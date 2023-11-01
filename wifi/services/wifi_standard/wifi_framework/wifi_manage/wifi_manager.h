@@ -41,10 +41,6 @@
 #include "common_event_manager.h"
 #include "timer.h"
 #endif
-#ifndef OHOS_ARCH_LITE
-#include "wifi_controller_define.h"
-#include "wifi_controller_state_machine.h"
-#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -157,14 +153,9 @@ public:
      * @return IScanSerivceCallbacks - return mScanCallback
      */
     IScanSerivceCallbacks GetScanCallback(void);
-#ifdef OHOS_ARCH_LITE
+    
     ErrCode AutoStartStaService(AutoStartOrStopServiceReason reason, int instId = 0);
     ErrCode AutoStopStaService(AutoStartOrStopServiceReason reason, int instId = 0);
-#endif
-#ifndef OHOS_ARCH_LITE
-    ConcreteModeCallback GetConcreteCallback(void);
-    SoftApModeCallback GetSoftApCallback(void);
-#endif
     void StopUnloadStaSaTimer(void);
     void StartUnloadStaSaTimer(void);
     void StopUnloadScanSaTimer(void);
@@ -180,10 +171,8 @@ public:
      */
     IApServiceCallbacks GetApCallback(void);
 
-#ifdef OHOS_ARCH_LITE
     ErrCode AutoStartApService(AutoStartOrStopServiceReason reason);
     ErrCode AutoStopApService(AutoStartOrStopServiceReason reason);
-#endif
     void StopUnloadApSaTimer(void);
     void StartUnloadApSaTimer(void);
 #endif
@@ -230,33 +219,15 @@ public:
     bool GetLastStaStateByDatashare();
     void CheckAndStartStaByDataShare();
 #endif
-    void PushServiceCloseMsg(WifiCloseServiceCode code, int instId = 0);
     static void CheckAndStartScanService(int instId = 0);
-    void CheckAndStopScanService(int instId = 0);
-    void DealOpenScanOnlyRes(int instId = 0);
-    void DealCloseScanOnlyRes(int instId = 0);
-    void ForceStopWifi(int instId = 0);
-#ifndef OHOS_ARCH_LITE
-    ErrCode WifiToggled(int isOpen, int id);
-    ErrCode SoftapToggled(int isOpen, int id);
-    ErrCode ScanOnlyToggled(int isOpen);
-    ErrCode AirplaneToggled(int isOpen);
-    WifiControllerMachine *GetControllerMachine();
-    bool HasAnyApRuning();
-#endif
 
 private:
+    void PushServiceCloseMsg(WifiCloseServiceCode code, int instId = 0);
     void InitStaCallback(void);
     void InitScanCallback(void);
     void InitSubscribeListener();
 #ifdef FEATURE_AP_SUPPORT
     void InitApCallback(void);
-#ifndef OHOS_ARCH_LITE
-    void InitSoftapCallback(void);
-#endif
-#endif
-#ifndef OHOS_ARCH_LITE
-    void InitConcreteCallback(void);
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     void InitP2pCallback(void);
@@ -275,23 +246,20 @@ private:
     static void CloseP2pService(void);
     static void UnloadP2PSaTimerCallback();
 #endif
-#ifndef OHOS_ARCH_LITE
-    static void DealConcreateStop(int id);
-    static void DealConcreateStartFailure(int id);
-    static void DealSoftapStop(int id);
-    static void DealSoftapStartFailure(int id);
-#endif
     static void DealStaOpenRes(OperateResState state, int instId = 0);
     static void DealStaCloseRes(OperateResState state, int instId = 0);
     static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     static void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
     static void DealStreamChanged(StreamDirection direction, int instId = 0);
     static void DealRssiChanged(int rssi, int instId = 0);
+    static void CheckAndStopScanService(int instId = 0);
     static void DealScanOpenRes(int instId = 0);
     static void DealScanCloseRes(int instId = 0);
     static void DealScanFinished(int state, int instId = 0);
     static void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId = 0);
     static void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0);
+    static void DealOpenScanOnlyRes(OperateResState state, int instId = 0);
+    static void DealCloseScanOnlyRes(OperateResState state, int instId = 0);
     static void DealAirplaneExceptionWhenStaOpen(int instId = 0);
     static void DealAirplaneExceptionWhenStaClose(int instId = 0);
 #ifdef FEATURE_AP_SUPPORT
@@ -310,10 +278,9 @@ private:
     static void DealP2pActionResult(P2pActionCallback action, ErrCode code);
     static void DealConfigChanged(CfgType type, char* data, int dataLen);
 #endif
-#ifdef OHOS_ARCH_LITE
     static void AutoStartScanOnly(int instId = 0);
     static void AutoStopScanOnly(int instId = 0);
-#endif
+    static void ForceStopWifi(int instId = 0);
     static void AutoStartScanService(int instId = 0);
     static void AutoStartEnhanceService(void);
     static void CheckAndStartSta(AutoStartOrStopServiceReason reason);
@@ -329,11 +296,6 @@ private:
     std::mutex batteryEventMutex;
     std::condition_variable mCondition;
     std::deque<WifiCloseServiceMsg> mEventQue;
-#ifndef OHOS_ARCH_LITE
-    ConcreteModeCallback mConcreteModeCb;
-    SoftApModeCallback mSoftApModeCb;
-    WifiControllerMachine *pWifiControllerMachine;
-#endif
     StaServiceCallback mStaCallback;
     IScanSerivceCallbacks mScanCallback;
 #ifndef OHOS_ARCH_LITE

@@ -82,7 +82,23 @@ constexpr int MULTI_AP = 0;
 constexpr int BLOCK_LIST_CLEAR_TIMER = 20 * 1000;
 
 /* Wpa3 selfcure failreason num*/
-constexpr int WPA3_SELFCURE_FAILREASON_NUM = 2;
+constexpr int WLAN_STATUS_AUTH_TIMEOUT = 16;
+constexpr int MAC_AUTH_RSP2_TIMEOUT = 5201;
+constexpr int MAC_AUTH_RSP4_TIMEOUT = 5202;
+constexpr int MAC_ASSOC_RSP_TIMEOUT = 5203;
+
+enum Wpa3ConnectFailReason {
+    WPA3_AUTH_TIMEOUT,
+    WPA3_ASSOC_TIMEOUT,
+    WPA3_FAIL_REASON_MAX
+};
+
+const std::map<int, int> wpa3FailreasonMap {
+    {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
+};
 
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
@@ -863,7 +879,7 @@ private:
     ApRoamingState *pApRoamingState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
-    std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_SELFCURE_FAILREASON_NUM];
+    std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
     /**
      * @Description Replace empty dns
      */

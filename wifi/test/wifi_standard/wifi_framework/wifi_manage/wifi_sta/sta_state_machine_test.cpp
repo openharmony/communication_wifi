@@ -43,6 +43,7 @@ static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 constexpr int FAILEDNUM = 3;
+constexpr int TEST_FAIL_REASON = 16;
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -1657,6 +1658,72 @@ public:
         pStaStateMachine->linkedInfo.lastPacketDirection = 1;
         pStaStateMachine->DealSignalPacketChanged(0, 0);
     }
+
+    void Wpa3TransitionChangeIfNeedTest()
+    {
+        int networkId = 0;
+        pStaStateMachine->Wpa3TransitionChangeIfNeed(networkId);
+    }
+
+    void GetWpa3FailCountSuccessTest()
+    {
+        int failreason = 0;
+        std::string ssid = RANDOMMAC_SSID;
+        pStaStateMachine->GetWpa3FailCount(failreason, ssid);
+    }
+
+    void GetWpa3FailCountFailTest()
+    {
+        int failreason = -1;
+        std::string ssid = RANDOMMAC_SSID;
+        pStaStateMachine->GetWpa3FailCount(failreason, ssid);
+    }
+
+    void AddWpa3FailCountSuccessTest()
+    {
+        int failreason = 0;
+        std::string ssid = RANDOMMAC_SSID;
+        pStaStateMachine->AddWpa3FailCount(failreason, ssid);
+    }
+
+    void AddWpa3FailCountFailTest()
+    {
+        int failreason = -1;
+        std::string ssid = RANDOMMAC_SSID;
+        pStaStateMachine->AddWpa3FailCount(failreason, ssid);
+    }
+
+    void AddWpa3BlackMapTest()
+    {
+        std::string ssid = RANDOMMAC_SSID;
+        pStaStateMachine->AddWpa3BlackMap(ssid);
+    }
+
+    void IsInWpa3BlackMapTest()
+    {
+        std::string ssid = RANDOMMAC_SSID;
+        pStaStateMachine->IsInWpa3BlackMap(ssid);
+    }
+
+    void OnWifiWpa3SelfCureSuccessTest()
+    {
+        int failreason = TEST_FAIL_REASON;
+        int networkId = 0;
+        pStaStateMachine->OnWifiWpa3SelfCure(failreason, networkId);
+    }
+
+    void OnWifiWpa3SelfCureFailTest()
+    {
+        int failreason = 0;
+        int networkId = 0;
+        pStaStateMachine->OnWifiWpa3SelfCure(failreason, networkId);
+    }
+
+    void IsWpa3TransitionTest()
+    {
+        int networkId = 0;
+        pStaStateMachine->IsWpa3Transition(networkId);
+    }
 };
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
@@ -2572,6 +2639,56 @@ HWTEST_F(StaStateMachineTest, DealSignalPollResultTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealSignalPacketChangedTest, TestSize.Level1)
 {
     DealSignalPacketChangedTest();
+}
+
+HWTEST_F(StaStateMachineTest, Wpa3TransitionChangeIfNeedTest, TestSize.Level1)
+{
+    Wpa3TransitionChangeIfNeedTest();
+}
+
+HWTEST_F(StaStateMachineTest, GetWpa3FailCountSuccessTest, TestSize.Level1)
+{
+    GetWpa3FailCountSuccessTest();
+}
+
+HWTEST_F(StaStateMachineTest, GetWpa3FailCountFailTest, TestSize.Level1)
+{
+    GetWpa3FailCountFailTest();
+}
+
+HWTEST_F(StaStateMachineTest, AddWpa3FailCountSuccessTest, TestSize.Level1)
+{
+    AddWpa3FailCountSuccessTest();
+}
+
+HWTEST_F(StaStateMachineTest, AddWpa3FailCountFailTest, TestSize.Level1)
+{
+    AddWpa3FailCountFailTest();
+}
+
+HWTEST_F(StaStateMachineTest, AddWpa3BlackMapTest, TestSize.Level1)
+{
+    AddWpa3BlackMapTest();
+}
+
+HWTEST_F(StaStateMachineTest, IsInWpa3BlackMapTest, TestSize.Level1)
+{
+    IsInWpa3BlackMapTest();
+}
+
+HWTEST_F(StaStateMachineTest, OnWifiWpa3SelfCureSuccessTest, TestSize.Level1)
+{
+    OnWifiWpa3SelfCureSuccessTest();
+}
+
+HWTEST_F(StaStateMachineTest, OnWifiWpa3SelfCureFailTest, TestSize.Level1)
+{
+    OnWifiWpa3SelfCureFailTest();
+}
+
+HWTEST_F(StaStateMachineTest, IsWpa3TransitionTest, TestSize.Level1)
+{
+    IsWpa3TransitionTest();
 }
 } // namespace Wifi
 } // namespace OHOS

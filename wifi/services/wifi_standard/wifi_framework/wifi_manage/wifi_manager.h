@@ -226,6 +226,10 @@ public:
     void DealCloseAirplaneModeEvent();
     void DealLocationModeChangeEvent();
     bool GetLocationModeByDatashare();
+#ifndef OHOS_ARCH_LITE
+    bool GetLastStaStateByDatashare();
+    void CheckAndStartStaByDataShare();
+#endif
     void PushServiceCloseMsg(WifiCloseServiceCode code, int instId = 0);
     static void CheckAndStartScanService(int instId = 0);
     void CheckAndStopScanService(int instId = 0);
@@ -333,6 +337,7 @@ private:
     StaServiceCallback mStaCallback;
     IScanSerivceCallbacks mScanCallback;
 #ifndef OHOS_ARCH_LITE
+    std::mutex settingsMigrateMutex;
     static uint32_t unloadStaSaTimerId;
     static std::mutex unloadStaSaTimerMutex;
     static uint32_t unloadScanSaTimerId;
@@ -371,6 +376,9 @@ private:
     uint32_t batteryTimerId{0};
     void RegisterBatteryEvent();
     void UnRegisterBatteryEvent();
+    void RegisterSettingsMigrateEvent();
+    void UnRegisterSettingsMigrateEvent();
+    uint32_t migrateTimerId{0};
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

@@ -33,7 +33,7 @@ void WifiDeviceProvisionObserver::OnChange()
 #ifndef OHOS_ARCH_LITE
 void SettingsMigrateObserver::OnChange()
 {
-    WifiManager::GetInstance().CheckAndStartStaByDataShare();
+    WifiManager::GetInstance().CheckAndStartStaByDatashare();
 }
 #endif
 

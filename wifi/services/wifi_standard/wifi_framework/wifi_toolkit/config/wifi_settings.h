@@ -121,12 +121,7 @@ public:
      * @return int - 0 success
      */
     int SetWifiState(int state, int instId = 0);
-#ifndef OHOS_ARCH_LITE
-    void SetWifiToggledState(bool state);
-    bool GetWifiToggledState() const;
-    void SetWifiStopState(bool state);
-    bool GetWifiStopState() const;
-#endif
+
     /**
      * @Description Get the ScanAlways switch state
      *
@@ -1433,10 +1428,6 @@ private:
 private:
     int mWifiStaCapabilities;            /* Sta capability */
     std::atomic<int> mWifiState;         /* Sta service state */
-#ifndef OHOS_ARCH_LITE
-    bool mWifiToggled;
-    bool mWifiStoping;
-#endif
     std::atomic<bool> mScanAlwaysActive; /* if scan always */
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
@@ -1492,10 +1483,6 @@ private:
     std::mutex mInfoMutex;
     std::mutex mP2pMutex;
     std::mutex mWifiConfigMutex;
-#ifndef OHOS_ARCH_LITE
-    std::mutex mWifiToggledMutex;
-    std::mutex mWifiStopMutex;
-#endif
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
 

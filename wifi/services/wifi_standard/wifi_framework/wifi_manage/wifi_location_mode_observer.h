@@ -38,6 +38,17 @@ public:
     void OnChange() override;
 };
 
+#ifndef OHOS_ARCH_LITE
+class SettingsMigrateObserver : public AAFwk::DataAbilityObserverStub {
+public:
+    SettingsMigrateObserver() = default;
+
+    ~SettingsMigrateObserver() = default;
+
+    void OnChange() override;
+};
+#endif
+
 }
 }
 #endif

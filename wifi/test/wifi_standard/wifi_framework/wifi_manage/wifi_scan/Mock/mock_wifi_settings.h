@@ -52,6 +52,7 @@ public:
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
     virtual int ClearScanInfoList(int instId = 0) = 0;
     virtual void SetAppPackageName(const std::string &name) = 0;
+    virtual void GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -83,6 +84,7 @@ public:
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
     MOCK_METHOD1(ClearScanInfoList, int(int));
     MOCK_METHOD1(SetAppPackageName, void(const std::string &name));
+    MOCK_METHOD1(GetPackageFilterMap, int(std::map<std::string, std::vector<std::string>> &filterMap));
 };
 }  // namespace Wifi
 }  // namespace OHOS

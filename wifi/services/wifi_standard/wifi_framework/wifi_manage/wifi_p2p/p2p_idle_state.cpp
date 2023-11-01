@@ -23,6 +23,7 @@ DEFINE_WIFILOG_P2P_LABEL("P2pIdleState");
 
 namespace OHOS {
 namespace Wifi {
+int P2pIdleState::retryConnectCnt{0};
 P2pIdleState::P2pIdleState(
     P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr)
     : State("P2pIdleState"), p2pStateMachine(stateMachine), groupManager(groupMgr), deviceManager(deviceMgr)
@@ -32,6 +33,7 @@ void P2pIdleState::GoInState()
     Init();
     WIFI_LOGI("             GoInState");
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
+    p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE), P2P_REMOVE_DEVICE_TIMEOUT);
 }
 
 void P2pIdleState::GoOutState()
@@ -71,6 +73,10 @@ void P2pIdleState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT, &P2pIdleState::ProcessCmdHid2dConnect));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IFACE_CREATED, &P2pIdleState::ProcessP2pIfaceCreatedEvt));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE, &P2pIdleState::ProcessRemoveDevice));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT, &P2pIdleState::RetryConnect));
 }
 
 bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
@@ -90,9 +96,60 @@ bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
     return EXECUTED;
 }
 
+bool P2pIdleState::ProcessRemoveDevice(InternalMessage &msg) const
+{
+    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    LOGI("remove all device");
+    WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO);
+#endif
+    return EXECUTED;
+}
+
+bool P2pIdleState::RetryConnect(InternalMessage &msg) const
+{
+    WIFI_LOGI("recv CMD: %{public}d",  msg.GetMessageName());
+    P2pConfigErrCode ret = p2pStateMachine.IsConfigUnusable(p2pStateMachine.savedP2pConfig);
+    if (ret != P2pConfigErrCode::SUCCESS) {
+        WIFI_LOGW("Invalid device information.");
+        if (ret == P2pConfigErrCode::MAC_NOT_FOUND) {
+            if (retryConnectCnt == RETRY_MAX_NUM) {
+                retryConnectCnt = 0;
+                p2pStateMachine.BroadcastActionResult(
+                    P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_P2P_MAC_NOT_FOUND);
+                return EXECUTED;
+            }
+            p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT), RETRY_INTERVAL);
+            retryConnectCnt++;
+        }
+        return EXECUTED;
+    } else {
+        retryConnectCnt = 0;
+        if (WifiErrorNo::WIFI_IDL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
+            WIFI_LOGE("Attempt to connect but cannot stop find");
+            p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
+            return EXECUTED;
+        }
+
+        if (p2pStateMachine.ReawakenPersistentGroup(p2pStateMachine.savedP2pConfig)) {
+            p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupNegotiationState);
+        } else {
+            p2pStateMachine.SwitchState(&p2pStateMachine.p2pProvisionDiscoveryState);
+        }
+
+        deviceManager.UpdateDeviceStatus(
+            p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED);
+        p2pStateMachine.BroadcastP2pPeersChanged();
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_SUCCESS);
+    }
+    return EXECUTED;
+}
+
 bool P2pIdleState::ProcessCmdConnect(InternalMessage &msg) const
 {
     WifiP2pConfigInternal config;
+    retryConnectCnt = 0;
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT));
     if (!msg.GetMessageObj(config)) {
         WIFI_LOGW("p2p connect Parameter error.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_INVALID_PARAM);
@@ -106,7 +163,8 @@ bool P2pIdleState::ProcessCmdConnect(InternalMessage &msg) const
         if (ret == P2pConfigErrCode::MAC_EMPTY) {
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_INVALID_PARAM);
         } else if (ret == P2pConfigErrCode::MAC_NOT_FOUND) {
-            p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_P2P_MAC_NOT_FOUND);
+            retryConnectCnt = 1;
+            p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT), RETRY_INTERVAL);
         } else if (ret == P2pConfigErrCode::ERR_MAC_FORMAT) {
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_P2P_ERR_MAC_FORMAT);
         } else if (ret == P2pConfigErrCode::ERR_INTENT) {
@@ -117,6 +175,7 @@ bool P2pIdleState::ProcessCmdConnect(InternalMessage &msg) const
         }
         return EXECUTED;
     } else {
+        p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
         if (WifiErrorNo::WIFI_IDL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
             WIFI_LOGE("Attempt to connect but cannot stop find");
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
@@ -143,6 +202,7 @@ bool P2pIdleState::ProcessCmdHid2dConnect(InternalMessage &msg) const
     WIFI_LOGI("Idle state hid2d connect recv CMD: %{public}d", msg.GetMessageName());
 
     Hid2dConnectConfig config;
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
     if (!msg.GetMessageObj(config)) {
         WIFI_LOGE("Hid2d connect:Failed to obtain config info.");
         return EXECUTED;

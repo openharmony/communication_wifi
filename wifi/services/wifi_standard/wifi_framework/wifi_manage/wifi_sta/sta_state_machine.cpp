@@ -956,6 +956,7 @@ void StaStateMachine::Wpa3TransitionChangeIfNeed(int networkId)
                    && deviceConfig.keyMgmt.find("PSK") != std::string::npos
                    && !IsInWpa3BlackMap(deviceConfig.ssid)) {
         deviceConfig.keyMgmt = KEY_MGMT_SAE;
+        isNeedChange = true;
     }
     if (isNeedChange) {
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);

@@ -50,12 +50,6 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PORTAL_ENTITY "entity.system.browsable"
 #define PORTAL_CHECK_TIME (10 * 60)
 #define PORTAL_MILLSECOND  1000
-#define WLAN_STATUS_AUTH_TIMEOUT 16
-#define MAC_AUTH_RSP2_TIMEOUT 5201
-#define MAC_AUTH_RSP4_TIMEOUT 5202
-#define MAC_ASSOC_RSP_TIMEOUT 5203
-#define WPA3_AUTH_TIMEOUT 1
-#define WPA3_ASSOC_TIMEOUT 2
 #define WPA3_BLACKMAP_MAX_NUM 20
 #define WPA3_BLACKMAP_RSSI_THRESHOLD (-70)
 #define WPA3_CONNECT_FAIL_COUNT_THRESHOLD 2
@@ -948,6 +942,7 @@ void StaStateMachine::OnConnectFailed(int networkId)
 void StaStateMachine::Wpa3TransitionChangeIfNeed(int networkId)
 {
     WifiDeviceConfig deviceConfig;
+    bool isNeedChange = false;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
         LOGE("Wpa3TransitionChangeIfNeed get deviceConfig failed!");
         return;
@@ -955,14 +950,14 @@ void StaStateMachine::Wpa3TransitionChangeIfNeed(int networkId)
     if (IsWpa3Transition(networkId)
             && deviceConfig.keyMgmt.find("SAE") != std::string::npos
             && IsInWpa3BlackMap(deviceConfig.ssid)) {
-        deviceConfig.keyMgmt = "WPA-PSK";
-        WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
-        WifiSettings::GetInstance().SyncDeviceConfig();
-        SyncDeviceConfigToWpa();
+        deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
+        isNeedChange = true;
     } else if (IsWpa3Transition(networkId)
                    && deviceConfig.keyMgmt.find("PSK") != std::string::npos
                    && !IsInWpa3BlackMap(deviceConfig.ssid)) {
-        deviceConfig.keyMgmt = "SAE";
+        deviceConfig.keyMgmt = KEY_MGMT_SAE;
+    }
+    if (isNeedChange) {
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
         SyncDeviceConfigToWpa();
@@ -1355,13 +1350,7 @@ void StaStateMachine::DealWpsConnectTimeOutEvent(InternalMessage *msg)
     int failreason = msg->GetParam1();
     if (failreason > 0) {
         DisConnectProcess();
-        if (failreason == WLAN_STATUS_AUTH_TIMEOUT ||
-            failreason == MAC_AUTH_RSP2_TIMEOUT ||
-            failreason == MAC_AUTH_RSP4_TIMEOUT) {
-            OnWifiWpa3SelfCure(WPA3_AUTH_TIMEOUT, targetNetworkId);
-        } else if (failreason == MAC_ASSOC_RSP_TIMEOUT) {
-            OnWifiWpa3SelfCure(WPA3_ASSOC_TIMEOUT, targetNetworkId);
-        }
+        OnWifiWpa3SelfCure(failreason, targetNetworkId);
     }
     DealCancelWpsCmd(msg);
 
@@ -1535,30 +1524,30 @@ void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)
 
 int StaStateMachine::GetWpa3FailCount(int failreason, std::string ssid) const
 {
-    if (failreason <= 0) {
+    if (failreason < 0 || failreason >= WPA3_FAIL_REASON_MAX) {
         WIFI_LOGE("GetWpa3FailCount, Err failreason");
         return 0;
     }
-    auto iter = wpa3ConnectFailCountMapArray[failreason - 1].find(ssid);
-    if (iter == wpa3ConnectFailCountMapArray[failreason - 1].end()) {
+    auto iter = wpa3ConnectFailCountMapArray[failreason].find(ssid);
+    if (iter == wpa3ConnectFailCountMapArray[failreason].end()) {
         WIFI_LOGI("GetWpa3FailCount, no failreason count");
         return 0;
     }
-    WIFI_LOGI("GetWpa3FailCount ssid=%{public}s, failreason=%{public}d, count=%{public}d",
-        ssid.c_str(), failreason, iter->second);
+    WIFI_LOGI("GetWpa3FailCount, failreason=%{public}d, count=%{public}d",
+        failreason, iter->second);
     return iter->second;
 }
 
 void StaStateMachine::AddWpa3FailCount(int failreason, std::string ssid)
 {
-    if (failreason <= 0) {
+    if (failreason < 0 || failreason >= WPA3_FAIL_REASON_MAX) {
         WIFI_LOGE("AddWpa3FailCount, Err failreason");
         return;
     }
-    auto iter = wpa3ConnectFailCountMapArray[failreason - 1].find(ssid);
-    if (iter == wpa3ConnectFailCountMapArray[failreason - 1].end()) {
+    auto iter = wpa3ConnectFailCountMapArray[failreason].find(ssid);
+    if (iter == wpa3ConnectFailCountMapArray[failreason].end()) {
         WIFI_LOGI("AddWpa3FailCount, new failreason count");
-        wpa3ConnectFailCountMapArray[failreason - 1].insert(std::make_pair(ssid, 1));
+        wpa3ConnectFailCountMapArray[failreason].insert(std::make_pair(ssid, 1));
     } else {
         WIFI_LOGI("AddWpa3FailCount, existed failreason count");
         iter->second = iter->second + 1;
@@ -1575,10 +1564,10 @@ void StaStateMachine::AddWpa3BlackMap(std::string ssid)
                 oldestIter = iter;
             }
         }
-        WIFI_LOGI("AddWpa3BlackMap, map full, delete ssid=%{public}s", oldestIter->first.c_str());
+        WIFI_LOGI("AddWpa3BlackMap, map full, delete oldest");
         wpa3BlackMap.erase(oldestIter);
     }
-    WIFI_LOGI("AddWpa3BlackMap, ssid=%{public}s", ssid.c_str());
+    WIFI_LOGI("AddWpa3BlackMap success");
     wpa3BlackMap.insert(std::make_pair(ssid, time(0)));
 }
 
@@ -1586,7 +1575,7 @@ bool StaStateMachine::IsInWpa3BlackMap(std::string ssid) const
 {
     auto iter = wpa3BlackMap.find(ssid);
     if (iter != wpa3BlackMap.end()) {
-        WIFI_LOGI("IsInWpa3BlackMap, ssid=%{public}s", ssid.c_str());
+        WIFI_LOGI("check is InWpa3BlackMap");
         return true;
     }
     return false;
@@ -1595,7 +1584,15 @@ bool StaStateMachine::IsInWpa3BlackMap(std::string ssid) const
 void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
 {
     WifiDeviceConfig config;
+    int failCountReason = 0;
+
     WIFI_LOGI("OnWifiWpa3SelfCure Enter.");
+    auto iter = wpa3FailreasonMap.find(failreason);
+    if (iter == wpa3FailreasonMap.end()) {
+        WIFI_LOGE("OnWifiWpa3SelfCure, Invalid fail reason");
+        return;
+    }
+    failCountReason = iter->second;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == -1) {
         WIFI_LOGE("OnWifiWpa3SelfCure, get deviceconfig failed");
         return;
@@ -1612,16 +1609,14 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
         WIFI_LOGE("OnWifiWpa3SelfCure, has ever connected");
         return;
     }
-    if (failreason <= 0) {
-        WIFI_LOGE("OnWifiWpa3SelfCure, Invalid fail reason");
-        return;
-    }
-    AddWpa3FailCount(failreason, config.ssid);
-    if (GetWpa3FailCount(failreason, config.ssid) < WPA3_CONNECT_FAIL_COUNT_THRESHOLD) {
+    AddWpa3FailCount(failCountReason, config.ssid);
+    if (GetWpa3FailCount(failCountReason, config.ssid) < WPA3_CONNECT_FAIL_COUNT_THRESHOLD) {
         WIFI_LOGI("OnWifiWpa3SelfCure, fail count not enough.");
         return;
     }
     AddWpa3BlackMap(config.ssid);
+    StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+    SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
 }
 
 bool StaStateMachine::IsWpa3Transition(int networkId) const

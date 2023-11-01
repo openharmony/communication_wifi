@@ -217,7 +217,7 @@ public:
     bool GetLocationModeByDatashare();
 #ifndef OHOS_ARCH_LITE
     bool GetLastStaStateByDatashare();
-    void CheckAndStartStaByDataShare();
+    void CheckAndStartStaByDatashare();
 #endif
     static void CheckAndStartScanService(int instId = 0);
 

@@ -240,10 +240,10 @@ HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
     wifiManager.GetLastStaStateByDatashare();
 }
 
-HWTEST_F(WifiManagerTest, CheckAndStartStaByDataShareTest, TestSize.Level1)
+HWTEST_F(WifiManagerTest, CheckAndStartStaByDatashareTest, TestSize.Level1)
 {
-    WIFI_LOGE("CheckAndStartStaByDataShareTest enter!");
-    wifiManager.CheckAndStartStaByDataShare();
+    WIFI_LOGE("CheckAndStartStaByDatashareTest enter!");
+    wifiManager.CheckAndStartStaByDatashare();
 }
 
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)

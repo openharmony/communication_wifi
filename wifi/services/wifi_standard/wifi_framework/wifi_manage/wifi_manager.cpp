@@ -604,9 +604,9 @@ int WifiManager::Init()
     }
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && migrateTimerId == 0) {
         RegisteSettingsMigrateEvent();
-        TimeOutCallback timeoutCallback = std::bind(&WifiManager::CheckAndStartStaByDataShare, this);
+        TimeOutCallback timeoutCallback = std::bind(&WifiManager::CheckAndStartStaByDatashare, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, migrateTimerId, TIMEOUT_CHECK_LAST_STA_STATE_EVENT);
-        WIFI_LOGI("RegisterBCheckAndStartStaByDataShare register success! migrateTimerId:%{public}u", migrateTimerId);
+        WIFI_LOGI("CheckAndStartStaByDatashare register success! migrateTimerId:%{public}u", migrateTimerId);
     }
 #endif
     mInitStatus = INIT_OK;
@@ -2277,7 +2277,7 @@ void WifiManager::DealLocationModeChangeEvent()
     }
 }
 
-void WifiManager::CheckAndStartStaByDataShare()
+void WifiManager::CheckAndStartStaByDatashare()
 {
     if (WifiManager::GetInstance().GetLastStaStateByDatashare()) {
         WIFI_LOGI("Datashare key: wifi_on is true, start wifi!");

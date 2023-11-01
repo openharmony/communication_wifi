@@ -2357,12 +2357,14 @@ ErrCode ScanService::CloseWpa()
 ErrCode ScanService::OpenScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::OpenScanOnly.\n");
+    mScanSerivceCallbacks.OnOpenScanOnlyRes(OperateResState::OPEN_SCAN_ONLY_SUCCEED, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode ScanService::CloseScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::CloseScanOnly.\n");
+    mScanSerivceCallbacks.OnCloseScanOnlyRes(OperateResState::CLOSE_SCAN_ONLY_SUCCEED, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 

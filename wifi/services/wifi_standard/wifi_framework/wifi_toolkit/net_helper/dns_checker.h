@@ -28,10 +28,10 @@ public:
     ~DnsChecker();
     void Start(std::string priDns, std::string secondDns);
     void Stop();
-    bool DoDnsCheck(int timeoutMillis);
+    bool DoDnsCheck(std::string url, int timeoutMillis);
 private:
     void formatHostAdress(char* hostAddress, const char* host);
-    bool checkDnsValid(std::string dnsAddress, int timeoutMillis);
+    bool checkDnsValid(std::string host, std::string dnsAddress, int timeoutMillis);
     int recvDnsData(char* buff, int size, int timeout);
 private:
     int dnsSocket;

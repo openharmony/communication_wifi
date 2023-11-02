@@ -22,12 +22,19 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_scan_death_recipient.h"
 #include "wifi_common_def.h"
+#include "wifi_config_center.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 
 namespace OHOS {
 namespace Wifi {
 WifiScanStub::WifiScanStub() : mSingleCallback(false)
+{
+    InitHandleMap();
+}
+
+WifiScanStub::WifiScanStub(int instId) : mSingleCallback(false), m_instId(instId)
 {
     InitHandleMap();
 }
@@ -129,7 +136,9 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
     bool compatible = data.ReadBool();
     WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d",
         code, data.GetRawDataSize(), compatible);
+    WifiSettings::GetInstance().SetAppPackageName(GetBundleName());
     ErrCode ret = Scan(compatible);
+    WifiSettings::GetInstance().SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -158,7 +167,9 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
     }
     params.band = data.ReadInt32();
 
+    WifiSettings::GetInstance().SetAppPackageName(GetBundleName());
     ErrCode ret = AdvanceScan(params);
+    WifiSettings::GetInstance().SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -258,7 +269,8 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             }
             if (callback_ != nullptr) {
                 for (const auto &eventName : event) {
-                    ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid, eventName, tokenId);
+                    ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(remote, callback_, pid, eventName,
+                        tokenId, m_instId);
                 }
             }
         }

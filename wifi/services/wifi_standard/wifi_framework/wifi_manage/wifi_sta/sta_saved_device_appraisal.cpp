@@ -24,7 +24,7 @@ DEFINE_WIFILOG_LABEL("StaSavedDeviceAppraisal");
 #define MAX(A, B) (((A) >= (B)) ? (A) : (B))
 namespace OHOS {
 namespace Wifi {
-StaSavedDeviceAppraisal::StaSavedDeviceAppraisal(bool supportFmRoamingFlag)
+StaSavedDeviceAppraisal::StaSavedDeviceAppraisal(bool supportFmRoamingFlag, int instId)
     : signalScorePerLevel(WifiSettings::GetInstance().GetScoretacticsScoreSlope()),
       signalBaseScore(WifiSettings::GetInstance().GetScoretacticsInitScore()),
       sameBssidScore(WifiSettings::GetInstance().GetScoretacticsSameBssidScore()),
@@ -33,7 +33,8 @@ StaSavedDeviceAppraisal::StaSavedDeviceAppraisal(bool supportFmRoamingFlag)
       userSelectedDeviceScore(WifiSettings::GetInstance().GetScoretacticsLastSelectionScore()),
       safetyDeviceScore(WifiSettings::GetInstance().GetScoretacticsSecurityScore()),
       normalDeviceScore(WifiSettings::GetInstance().GetScoretacticsNormalScore()),
-      firmwareRoamFlag(supportFmRoamingFlag)
+      firmwareRoamFlag(supportFmRoamingFlag),
+      m_instId(instId)
 {}
 StaSavedDeviceAppraisal::~StaSavedDeviceAppraisal()
 {
@@ -70,6 +71,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
             highestScore = score;
             scanInfoElected.rssi = scanInfo.rssi;
             electedDevice = device;
+            electedDevice.bssid = scanInfo.bssid;
             sign = 1;
             WIFI_LOGD("set highestScore: %{public}d, ssid: %{public}s", highestScore, SsidAnonymize(device.ssid).c_str());
         } else {
@@ -107,7 +109,7 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
         WIFI_LOGI("Skip disabled Network %{public}s.", SsidAnonymize(device.ssid).c_str());
         return true;
     }
-    std::string bssid = WifiSettings::GetInstance().GetConnectTimeoutBssid();
+    std::string bssid = WifiSettings::GetInstance().GetConnectTimeoutBssid(m_instId);
     if (!bssid.empty() && bssid == device.bssid) {
         WIFI_LOGI("Skip the connect timeout Network %{public}s.", SsidAnonymize(device.ssid).c_str());
         return true;
@@ -139,9 +141,9 @@ void StaSavedDeviceAppraisal::AppraiseDeviceQuality(int &score, InterScanInfo &s
     }
 
     /* Bonus points for last user selection */
-    int userLastSelectedNetworkId = WifiSettings::GetInstance().GetUserLastSelectedNetworkId();
+    int userLastSelectedNetworkId = WifiSettings::GetInstance().GetUserLastSelectedNetworkId(m_instId);
     if (userLastSelectedNetworkId != INVALID_NETWORK_ID && userLastSelectedNetworkId == device.networkId) {
-        time_t userLastSelectedNetworkTimeVal = WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal();
+        time_t userLastSelectedNetworkTimeVal = WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal(m_instId);
         time_t now = time(0);
         time_t timeDifference = now - userLastSelectedNetworkTimeVal;
         /*

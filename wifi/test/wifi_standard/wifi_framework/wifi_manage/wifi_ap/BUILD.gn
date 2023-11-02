@@ -76,6 +76,7 @@ ohos_unittest("WifiApServiceTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
     "$WIFI_ROOT_DIR/utils/inc",
     "$DHCP_ROOT_DIR/services/mgr_service/include",
     "$DHCP_ROOT_DIR/interfaces/inner_api/include",
@@ -91,6 +92,7 @@ ohos_unittest("WifiApServiceTest") {
     "--coverage",
   ]
   deps = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -102,6 +104,11 @@ ohos_unittest("WifiApServiceTest") {
     "dhcp:dhcp_manager_service",
     "hilog:libhilog",
   ]
+
+  if (defined(global_parts_info.powermgr_battery_manager)) {
+    external_deps += [ "battery_manager:batterysrv_client" ]
+  }
+
   defines = [
     "AP_INTF=\"$wifi_feature_with_ap_intf\"",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",

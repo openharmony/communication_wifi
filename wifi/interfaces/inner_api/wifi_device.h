@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Wifi {
 class WifiDevice {
 public:
-    static std::shared_ptr<WifiDevice> GetInstance(int system_ability_id);
+    static std::shared_ptr<WifiDevice> GetInstance(int systemAbilityId, int instId = 0);
 
     virtual ~WifiDevice();
 
@@ -66,6 +66,22 @@ public:
      */
     virtual ErrCode PutWifiProtectRef(const std::string &protectName) = 0;
 
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Acquire the Wi-Fi protect mode.
+     *
+     * @param protectMode - WifiProtectMode object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiProtect(const WifiProtectMode &protectMode) = 0;
+
+    /**
+     * @Description Release the Wi-Fi protect mode.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode PutWifiProtect() = 0;
+#endif
     /**
      * @Description Remove the wifi candidate device config equals to input network id
      *
@@ -319,12 +335,35 @@ public:
     virtual ErrCode Get5GHzChannelList(std::vector<int> &result) = 0;
 
     /**
+     * @Description start portal certification
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartPortalCertification() = 0;
+
+    /**
      * @Description set low latency mode
      *
      * @param enabled - true: enable low latency, false: disable low latency
      * @return bool - operation result
      */
     virtual bool SetLowLatencyMode(bool enabled) = 0;
+
+    /**
+     * @Description set frozen app
+     *
+     * @param uid - uid of frozen app
+     * @param isFrozen - is app frozen
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetAppFrozen(int uid, bool isFrozen) = 0;
+
+    /**
+     * @Description reset all frozen app
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ResetAllFrozenApp() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

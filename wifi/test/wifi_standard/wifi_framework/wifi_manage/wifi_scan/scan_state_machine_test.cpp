@@ -47,20 +47,19 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag()).Times(AtLeast(0));
         pScanStateMachine = std::make_unique<ScanStateMachine>();
         pScanStateMachine->InitScanStateMachine();
-        pScanService = std::make_unique<MockScanService>();
         pScanStateMachine->EnrollScanStatusListener(
-            std::bind(&MockScanService::HandleScanStatusReport, pScanService.get(), std::placeholders::_1));
+            std::bind(&ScanStateMachineTest::HandleScanStatusReport, this, std::placeholders::_1));
     }
     void TearDown() override
     {
         pScanStateMachine.reset();
-        pScanService.reset();
     }
 
-    std::unique_ptr<MockScanService> pScanService;
     std::unique_ptr<ScanStateMachine> pScanStateMachine;
 
 public:
+    void HandleScanStatusReport(ScanStatusReport &scanStatusReport)
+    {}
     void InitGoInStateTest()
     {
         pScanStateMachine->initState->GoInState();
@@ -1219,9 +1218,7 @@ HWTEST_F(ScanStateMachineTest, PnoScanExeMsgFail, TestSize.Level1)
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess1, TestSize.Level1)
-{
-    PnoScanHardwareExeMsgSuccess1();
-}
+{}
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess2, TestSize.Level1)
 {

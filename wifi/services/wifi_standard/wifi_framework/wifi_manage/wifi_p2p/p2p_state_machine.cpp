@@ -31,7 +31,7 @@ DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 
 namespace OHOS {
 namespace Wifi {
-bool P2pStateMachine::m_isNeedDhcp = true;
+DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
 P2pStateMachine::P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &groupMgr,
     WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pServiceManager &setSvrMgr, AuthorizingNegotiationRequestState &authorizingNegotiationRequestState,
@@ -661,7 +661,9 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
         std::string deviceAddress;
         savedP2pConfig.SetDeviceAddress(deviceAddress);
         UpdateOwnDevice(P2pDeviceStatus::PDS_CONNECTED);
-        BroadcastP2pConnectionChanged();
+        if (GetIsNeedDhcp() != DHCPTYPE::DHCP_LEGACEGO) {
+            BroadcastP2pConnectionChanged();
+        }
     }
 
     if (connectedState == P2pConnectedState::P2P_DISCONNECTED) {
@@ -751,7 +753,7 @@ void P2pStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string& ifnam
 
 void P2pStateMachine::StartDhcpClient()
 {
-    if (!GetIsNeedDhcp()) {
+    if (GetIsNeedDhcp() == DHCPTYPE::NO_DHCP) {
         WIFI_LOGI("The service of this time does not need DHCP.");
         return;
     }
@@ -975,16 +977,16 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
     return;
 }
 
-bool P2pStateMachine::GetIsNeedDhcp() const
+DHCPTYPE P2pStateMachine::GetIsNeedDhcp() const
 {
     WIFI_LOGI("Get need dhcp flag %{public}d", (int)m_isNeedDhcp);
     return m_isNeedDhcp;
 }
 
-void P2pStateMachine::SetIsNeedDhcp(bool isNeedDhcp)
+void P2pStateMachine::SetIsNeedDhcp(DHCPTYPE dhcpType)
 {
-    WIFI_LOGI("Set need dhcp flag %{public}d", (int)isNeedDhcp);
-    m_isNeedDhcp = isNeedDhcp;
+    WIFI_LOGI("Set need dhcp flag %{public}d", dhcpType);
+    m_isNeedDhcp = dhcpType;
 }
 } // namespace Wifi
 } // namespace OHOS

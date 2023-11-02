@@ -218,6 +218,14 @@ private:
     void ProcessCmdDisconnectStation(InternalMessage &msg) const;
 
     /**
+     * @Description  Process the update wifi country code received by the
+                     state machine.
+     * @param msg - Message body sent by the state machine
+     * @return None
+     */
+    void ProcessCmdUpdateCountryCode(InternalMessage &msg) const;
+
+    /**
      * @Description update the power mode.
      * @return None
      */

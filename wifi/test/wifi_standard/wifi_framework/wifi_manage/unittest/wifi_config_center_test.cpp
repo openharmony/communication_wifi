@@ -630,14 +630,5 @@ HWTEST_F(WifiConfigCenterTest, AddDeviceConfig_SUCCESS, TestSize.Level1)
     EXPECT_EQ(config.bssid, getconfig.at(0).bssid);
     EXPECT_EQ(config.networkId, getconfig.at(0).networkId);
 }
-
-HWTEST_F(WifiConfigCenterTest, SetCountryCode_SUCCESS, TestSize.Level1)
-{
-    std::string setname, getname;
-    setname = "";
-    WifiConfigCenter::GetInstance().SetCountryCode(setname);
-    WifiConfigCenter::GetInstance().GetCountryCode(getname);
-    EXPECT_EQ(setname, getname);
-}
 }  // namespace Wifi
 }  // namespace OHOS

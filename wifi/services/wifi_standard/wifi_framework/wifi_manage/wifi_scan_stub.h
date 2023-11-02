@@ -28,6 +28,7 @@ public:
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     using HandleFuncMap = std::map<int, handleFunc>;
     WifiScanStub();
+    explicit WifiScanStub(int instId);
     virtual ~WifiScanStub() override;
 
     virtual int OnRemoteRequest(
@@ -51,6 +52,9 @@ private:
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     HandleFuncMap handleFuncMap;
     bool mSingleCallback;
+
+protected:
+    int m_instId{0};
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -38,7 +38,7 @@ const int RECEIVE_BUFFER_LEN = 64;
 const int MAX_COMMAND_ARG = 32;
 #ifdef OHOS_ARCH_LITE
 const std::string SYSTEM_COMMAND_NDC = "/system/bin/ndc";
-const std::string IFNAME = "wlan0";
+const std::string IFNAME = "wlan";
 const int IPV6_SUFFIX_LEN = 3;
 const int MAX_IFNAME_LEN = 13;
 #endif
@@ -302,7 +302,7 @@ bool IfConfig::CheckIfaceValid(const std::string& ifname)
  * @Description : Set the network card routing, DNS
  * @Return success:0 failed:-1
  */
-int IfConfig::SetIfDnsAndRoute(const DhcpResult &dhcpResult, int ipType)
+int IfConfig::SetIfDnsAndRoute(const DhcpResult &dhcpResult, int ipType, int instId)
 {
     LOGD("ipType=%d, ip=%s, gateway=%s, subnet=%s, strDns1=%s, strDns2=%s",
         dhcpResult.iptype,
@@ -311,8 +311,9 @@ int IfConfig::SetIfDnsAndRoute(const DhcpResult &dhcpResult, int ipType)
         dhcpResult.strRouter1.c_str(),
         dhcpResult.strDns1.c_str(),
         dhcpResult.strDns2.c_str());
-    SetNetDns(IFNAME, dhcpResult.strDns1, dhcpResult.strDns2);
-    AddIfRoute(IFNAME, dhcpResult.strYourCli, dhcpResult.strSubnet, dhcpResult.strRouter1, ipType);
+    SetNetDns(IFNAME + std::to_string(instId), dhcpResult.strDns1, dhcpResult.strDns2);
+    AddIfRoute(IFNAME + std::to_string(instId), dhcpResult.strYourCli, dhcpResult.strSubnet, dhcpResult.strRouter1,
+        ipType);
     LOGI("set dns and route finished!");
     return 0;
 }

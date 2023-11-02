@@ -17,7 +17,6 @@
 
 #include <string>
 #include <vector>
-#include "singleton.h"
 #include "i_wifi_device.h"
 #include "i_wifi_device_callback.h"
 #include "refbase.h"
@@ -28,10 +27,10 @@
 namespace OHOS {
 namespace Wifi {
 class WifiDeviceImpl : public WifiDevice {
-    DECLARE_DELAYED_SINGLETON(WifiDeviceImpl)
-
 public:
-    bool Init(int systemAbilityId);
+    WifiDeviceImpl();
+    virtual ~WifiDeviceImpl();
+    bool Init(int systemAbilityId, int instId);
 
     /**
      * @Description Turn on Wi-Fi
@@ -72,7 +71,22 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode PutWifiProtectRef(const std::string &protectName) override;
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Acquire the Wi-Fi protect mode.
+     *
+     * @param protectMode - WifiProtectMode object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetWifiProtect(const WifiProtectMode &protectMode) override;
 
+    /**
+     * @Description Release the Wi-Fi protect mode.
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode PutWifiProtect() override;
+#endif
     /**
      * @Description Remove the wifi candidate device config equals to input network id
      *
@@ -340,12 +354,35 @@ public:
     ErrCode Get5GHzChannelList(std::vector<int> &result) override;
 
     /**
+     * @Description start portal certification
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode StartPortalCertification() override;
+
+    /**
      * @Description set low latency mode
      *
      * @param enabled - true: enable low latency, false: disable low latency
      * @return bool - operation result
      */
     bool SetLowLatencyMode(bool enabled) override;
+
+    /**
+     * @Description set frozen app
+     *
+     * @param uid - uid of frozen app
+     * @param isFrozen - is app frozen
+     * @return ErrCode - operation result
+     */
+    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+
+    /**
+     * @Description reset all frozen app
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ResetAllFrozenApp() override;
 
     /**
      * @Description Check whether service is died.
@@ -357,6 +394,7 @@ public:
 private:
     bool GetWifiDeviceProxy();
     int systemAbilityId_;
+    int instId_;
     std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE
     IWifiDevice *client_;

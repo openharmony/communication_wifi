@@ -232,6 +232,49 @@ bool IsValid24GHz(int freq);
  * @param chanVector - Channel vector output
  */
 void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector);
+
+#ifndef OHOS_ARCH_LITE
+/**
+ * @Description Check whether the country code is valid.
+ *
+ * @param wifiCountryCode - country code to be determined
+ * @return true - valid
+ * @return false - invalid
+ */
+bool IsValidCountryCode(const std::string &wifiCountryCode);
+
+/**
+ * @Description Convert the country code from mnc to iso.
+ *
+ * @param wifiCountryCode - country code to be convert
+ * @return true - convert success
+ * @return false - convert fail
+ */
+bool ConvertMncToIso(int mnc, std::string &wifiCountryCode);
+#endif
+
+/**
+ * @Description Convert the letters to upper.
+ *
+ * @param str - input lowercase letters and output upper letters
+ */
+void StrToUpper(std::string &str);
+
+/**
+ * @Description Converting char to numbers
+ *
+ * @param c - char
+ * @return numbers
+ */
+int ConvertCharToInt(const char &c);
+
+/**
+ * @Description Converting string to numbers
+ *
+ * @param str - string
+ * @return numbers
+ */
+int ConvertStringToInt(const std::string str);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -1402,6 +1402,21 @@ NO_SANITIZE("cfi") napi_value Get5GHzChannelList(napi_env env, napi_callback_inf
     return arrayResult;
 }
 
+NO_SANITIZE("cfi") napi_value StartPortalCertification(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+
+    ErrCode ret = wifiDevicePtr->StartPortalCertification();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartPortalCertification fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value result;
+    napi_create_uint32(env, ret, &result);
+    return result;
+}
+
 NO_SANITIZE("cfi") napi_value SetScanOnlyAvailable(napi_env env, napi_callback_info info)
 {
     WIFI_LOGI("wifi napi In SetScanOnlyAvailable");
@@ -1441,6 +1456,38 @@ NO_SANITIZE("cfi") napi_value GetScanOnlyAvailable(napi_env env, napi_callback_i
     napi_value result;
     napi_get_boolean(env, bScanOnlyAvailableStatus, &result);
     return result;
+}
+
+NO_SANITIZE("cfi") napi_value GetWifiProtect(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    int protectMode = 0;
+    napi_get_value_int32(env, argv[0], &protectMode);
+    WIFI_NAPI_ASSERT(env, protectMode >= (int)WifiProtectMode::WIFI_PROTECT_FULL &&
+        protectMode <= (int)WifiProtectMode::WIFI_PROTECT_NO_HELD, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    ErrCode ret = wifiDevicePtr->GetWifiProtect(static_cast<WifiProtectMode>(protectMode));
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
+NO_SANITIZE("cfi") napi_value PutWifiProtect(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    ErrCode ret = wifiDevicePtr->PutWifiProtect();
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 }  // namespace Wifi

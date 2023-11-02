@@ -34,7 +34,7 @@ const TAG = "[Wifi]"
 struct WifiDeviceSetting {
   @StorageLink( 'w_ssid' ) w_ssid: string = "TP-LINK_6365"; //TP-LINK_6365
   @StorageLink( 'w_bssid' ) w_bssid: string = "6C:B1:58:75:63:65"; //6C:B1:58:75:63:65
-  @StorageLink( 'w_preSharedKey' ) w_preSharedKey: string = "kaihong123"; //kaihong123
+  @StorageLink( 'w_preSharedKey' ) w_preSharedKey: string = "12345678"; //kaihong123
   @StorageLink( 'w_isHiddenSsid' ) w_isHiddenSsid: boolean = false;
   @StorageLink( 'w_securityType' ) w_securityType: number = 3
   @StorageLink( 'w_creatorUid' ) w_creatorUid: number = 1;
@@ -131,7 +131,7 @@ struct WifiDeviceSetting {
 
             Row() {
               Text( "preSharedKey:" ).fontSize( "15vp" ).width( 110 );
-              TextInput( { text : this.w_preSharedKey , placeholder : "kaihong123" } ) //kaihong123
+              TextInput( { text : this.w_preSharedKey , placeholder : "12345678" } ) //kaihong123
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
                   this.w_preSharedKey = strInput;
@@ -402,7 +402,7 @@ struct WifiInterfaceTest {
   @StorageLink( 'pairedSsid' ) pairedSsid: string = "";
   @State w_ssid: string = "TP-LINK_6365"; //TP-LINK_6365
   @State w_bssid: string = "6C:B1:58:75:63:65"; //6C:B1:58:75:63:65
-  @State w_preSharedKey: string = "kaihong123"; //kaihong123
+  @State w_preSharedKey: string = "12345678"; //kaihong123
   @State w_isHiddenSsid: boolean = false;
   @State w_securityType: number = 3
   @State w_creatorUid: number = 1;

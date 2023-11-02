@@ -181,12 +181,7 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode CancelWps() = 0;
-    /**
-     * @Description  Set country code
-     *
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode SetCountryCode(const std::string &countryCode) = 0;
+
     /**
      * @Description  ConnectivityManager process scan results.
      *
@@ -210,6 +205,15 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode SetSuspendMode(bool mode) = 0;
+
+    /**
+     * @Description send power mode for wpa.
+     *
+     * @param mode: true for power, false for resume.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetPowerMode(bool mode) = 0;
+
     /**
      * @Description systemabilitychanged
      *
@@ -217,6 +221,19 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add) = 0;
+    /**
+     * @Description Processes interface service screen change request.
+     *
+     * @param screenState screen state[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnScreenStateChanged(int screenState) = 0;
+    /**
+     * @Description start portal certification.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartPortalCertification() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

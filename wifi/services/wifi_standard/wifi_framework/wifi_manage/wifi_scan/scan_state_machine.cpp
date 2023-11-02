@@ -25,7 +25,7 @@ namespace Wifi {
 DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
 std::shared_mutex ScanStateMachine::lock;
 
-ScanStateMachine::ScanStateMachine()
+ScanStateMachine::ScanStateMachine(int instId)
     : StateMachine("ScanStateMachine"),
       quitFlag(false),
       initState(nullptr),
@@ -44,7 +44,8 @@ ScanStateMachine::ScanStateMachine()
       pnoConfigStoredFlag(false),
       runningHwPnoFlag(false),
       remainWaitResultTimer(false),
-      runningSwPnoFlag(false)
+      runningSwPnoFlag(false),
+      m_instId(instId)
 {}
 
 ScanStateMachine::~ScanStateMachine()

@@ -95,6 +95,11 @@ static WpaSsidField g_wpaSsidFields[] = {
     {DEVICE_CONFIG_EAP_CLIENT_CERT, "client_cert", QUOTATION_MARKS_FLAG_YES},
     {DEVICE_CONFIG_EAP_PRIVATE_KEY, "private_key", QUOTATION_MARKS_FLAG_YES},
     {DEVICE_CONFIG_EAP_PHASE2METHOD, "phase2", QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_IEEE80211W, "ieee80211w", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_ALLOW_PROTOCOLS, "proto", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_GROUP_CIPHERS, "group", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_PAIRWISE_CIPHERS, "pairwise", QUOTATION_MARKS_FLAG_NO},
+    {DEVICE_CONFIG_SAE_PASSWD, "sae_password", QUOTATION_MARKS_FLAG_YES},
 };
 
 static int WpaCliCmdStatus(WifiWpaStaInterface *this, struct WpaHalCmdStatus *pcmd)
@@ -509,7 +514,7 @@ static int WpaCliCmdSetCountryCode(WifiWpaStaInterface *this, const char *countr
     }
     char buf[REPLY_BUF_SMALL_LENGTH] = {0};
     char cmd[CMD_BUFFER_SIZE] = {0};
-    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s SET country %s", this->ifname, countryCode) < 0) {
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s DRIVER COUNTRY %s", this->ifname, countryCode) < 0) {
         LOGE("snprintf err");
         return -1;
     }
@@ -1167,19 +1172,20 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         ++infoElemsSize;
     }
     GetChanWidthCenterFreq(pcmd, &iesNeedParse);
-    /* Do NOT report inforElement to up layer */
-    if (infoElemsTemp != NULL) {
-        for (int i = 0; i < infoElemsSize; i++) {
-            if (infoElemsTemp[i].content != NULL) {
-                free(infoElemsTemp[i].content);
-                infoElemsTemp[i].content = NULL;
+
+    // clear old infoElems first
+    if (pcmd->infoElems != NULL) {
+        for (int i = 0; i < pcmd->ieSize; i++) {
+            if (pcmd->infoElems[i].content != NULL) {
+                free(pcmd->infoElems[i].content);
+                pcmd->infoElems[i].content = NULL;
             }
         }
-        free(infoElemsTemp);
-        infoElemsTemp = NULL;
+        free(pcmd->infoElems);
+        pcmd->infoElems = NULL;
     }
     pcmd->infoElems = infoElemsTemp;
-    pcmd->ieSize = 0;
+    pcmd->ieSize = infoElemsSize;
     return;
 }
 #endif
@@ -1368,11 +1374,7 @@ static int WpaCliCmdWpaSetSuspendMode(WifiWpaStaInterface *this, bool mode)
         LOGE("WpaCliCmdWpaSetSuspendMode, snprintf_s err");
         return -1;
     }
-
-    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
-        LOGE("WpaCliCmdWpaSetSuspendMode, WpaCliCmd return failed!");
-    }
-    return WpaCliCmdWpaSetPowerMode(this, mode == false);
+    return WpaCliCmd(cmd, buf, sizeof(buf));
 }
 
 WifiWpaStaInterface *GetWifiStaInterface(int staNo)
@@ -1422,6 +1424,7 @@ WifiWpaStaInterface *GetWifiStaInterface(int staNo)
     p->wpaCliCmdScanInfo = WpaCliCmdScanInfo;
     p->wpaCliCmdGetSignalInfo = WpaCliCmdGetSignalInfo;
     p->wpaCliCmdWpaSetSuspendMode = WpaCliCmdWpaSetSuspendMode;
+    p->wpaCliCmdWpaSetPowerMode = WpaCliCmdWpaSetPowerMode;
     p->next = g_wpaStaInterface;
     g_wpaStaInterface = p;
 

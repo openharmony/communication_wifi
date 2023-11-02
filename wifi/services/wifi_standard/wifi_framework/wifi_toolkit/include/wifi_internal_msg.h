@@ -435,7 +435,15 @@ struct WifiStoreRandomMac {
 };
 
 struct WifiPortalConf {
-    std::string portalUri;
+    std::string portalHttpUrl;
+    std::string portalHttpsUrl;
+    std::string portalBakHttpUrl;
+    std::string portalBakHttpsUrl;
+};
+
+struct PackageFilterConf {
+    std::string filterName;
+    std::vector<std::string> packageList;
 };
 }  // namespace Wifi
 }  // namespace OHOS

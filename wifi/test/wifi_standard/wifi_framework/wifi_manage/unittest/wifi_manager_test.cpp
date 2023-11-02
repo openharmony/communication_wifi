@@ -284,6 +284,18 @@ HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
     wifiManager.UnRegisterLocationEvent();
 }
 
+HWTEST_F(WifiManagerTest, RegisterBatteryEventTest, TestSize.Level1)
+{
+    WIFI_LOGE("RegisterBatteryEventTest enter!");
+    wifiManager.RegisterBatteryEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterBatteryEventTest, TestSize.Level1)
+{
+    WIFI_LOGE("UnRegisterBatteryEventTest enter!");
+    wifiManager.UnRegisterBatteryEvent();
+}
+
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
 {
     WIFI_LOGE("ExitTest enter!");

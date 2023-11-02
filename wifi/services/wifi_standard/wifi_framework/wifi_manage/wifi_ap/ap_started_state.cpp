@@ -32,7 +32,13 @@
 #include "wifi_settings.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "wifi_country_code_manager.h"
+#ifndef OHOS_ARCH_LITE
+#include "battery_srv_client.h"
+#endif
+
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
+
 namespace OHOS {
 namespace Wifi {
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
@@ -122,6 +128,8 @@ void ApStartedState::Init()
         std::make_pair(ApStatemachineEvent::CMD_DISCONNECT_STATION, &ApStartedState::ProcessCmdDisconnectStation));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_SET_IDLE_TIMEOUT,
     (ProcessFun)&ApStartedState::ProcessCmdSetHotspotIdleTimeout));
+    mProcessFunMap.insert(
+        std::make_pair(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE, &ApStartedState::ProcessCmdUpdateCountryCode));
 }
 
 bool ApStartedState::ExecuteStateMsg(InternalMessage *msg)
@@ -185,17 +193,6 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 bool ApStartedState::SetConfig()
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    std::string countryCode;
-    if (WifiSettings::GetInstance().GetCountryCode(countryCode)) {
-        WIFI_LOGE("get countryCode failed.");
-        return false;
-    }
-    if (WifiApHalInterface::GetInstance().SetWifiCountryCode(countryCode, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("set countryCode:%{public}s failed.", countryCode.c_str());
-        return false;
-    }
-    WIFI_LOGI("HotspotConfig  CountryCode  = %{public}s.", countryCode.c_str());
-
     if (WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id)) {
         WIFI_LOGE("GetConfig failed!!!.");
         return false;
@@ -365,6 +362,20 @@ void ApStartedState::ProcessCmdDisconnectStation(InternalMessage &msg) const
     m_ApStateMachine.m_ApStationsManager.DisConnectStation(staInfo);
 }
 
+void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessage &msg) const
+{
+    std::string wifiCountryCode = msg.GetStringFromMessage();
+    if (wifiCountryCode.empty()) {
+        return;
+    }
+    WifiErrorNo ret = WifiApHalInterface::GetInstance().SetWifiCountryCode(wifiCountryCode, m_id);
+    if (ret == WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WIFI_LOGI("update wifi country code success, wifiCountryCode=%{public}s", wifiCountryCode.c_str());
+        return;
+    }
+    WIFI_LOGE("update wifi country code fail, wifiCountryCode=%{public}s, %{public}d", wifiCountryCode.c_str(), ret);
+}
+
 void ApStartedState::UpdatePowerMode() const
 {
     WIFI_LOGI("UpdatePowerMode.");
@@ -398,6 +409,14 @@ void ApStartedState::SetHotspotIdleTimer()
 {
     WIFI_LOGI("SetHotspotIdleTimer.");
     int mTimeoutDelay = WifiSettings::GetInstance().GetHotspotIdleTimeout();
+#ifndef OHOS_ARCH_LITE
+    auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
+    auto batteryPluggedType = batterySrvClient.GetPluggedType();
+    if (batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_USB) {
+        WIFI_LOGI("usb connect do not start timer");
+        return;
+    }
+#endif
     if (!mTimeoutDelay) {
         return;
     }

@@ -14,6 +14,14 @@
  */
 
 #include "wifi_protect.h"
+#ifndef OHOS_ARCH_LITE
+#include "app_mgr_client.h"
+#include "wifi_common_util.h"
+#include "wifi_log.h"
+
+#undef LOG_TAG
+#define LOG_TAG "OHWIFI_MANAGER_PROTECT"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -28,14 +36,14 @@ WifiProtect::WifiProtect(
 WifiProtect::WifiProtect(const std::string &name)
     : mName(name),
       mType(WifiProtectType::WIFI_PROTECT_COMMON),
-      mMode(WifiProtectMode::WIFI_PROTECT_FULL),
+      mMode(WifiProtectMode::WIFI_PROTECT_NO_HELD),
       mAcqTimestamp(0)
 {}
 
 WifiProtect::WifiProtect()
     : mName(""),
       mType(WifiProtectType::WIFI_PROTECT_COMMON),
-      mMode(WifiProtectMode::WIFI_PROTECT_FULL),
+      mMode(WifiProtectMode::WIFI_PROTECT_NO_HELD),
       mAcqTimestamp(0)
 {}
 
@@ -44,6 +52,7 @@ WifiProtect::~WifiProtect()
 
 void WifiProtect::SetProtectType(const WifiProtectType &protectType)
 {
+    std::unique_lock<std::mutex> lock(mMutex);
     mType = protectType;
 }
 
@@ -54,6 +63,7 @@ WifiProtectType WifiProtect::GetProtectType() const
 
 void WifiProtect::SetProtectMode(const WifiProtectMode &protectMode)
 {
+    std::unique_lock<std::mutex> lock(mMutex);
     mMode = protectMode;
 }
 
@@ -64,6 +74,7 @@ WifiProtectMode WifiProtect::GetProtectMode() const
 
 void WifiProtect::SetName(const std::string &name)
 {
+    std::unique_lock<std::mutex> lock(mMutex);
     mName = name;
 }
 
@@ -76,5 +87,17 @@ long WifiProtect::GetAcqTimestamp() const
 {
     return mAcqTimestamp;
 }
+#ifndef OHOS_ARCH_LITE
+ void WifiProtect::SetAppState(int state)
+ {
+    std::unique_lock<std::mutex> lock(mMutex);
+    mAppState = state;
+ }
+
+int WifiProtect::GetAppState() const
+{
+    return mAppState;
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

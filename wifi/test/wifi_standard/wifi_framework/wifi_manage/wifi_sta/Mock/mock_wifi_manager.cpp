@@ -35,12 +35,13 @@ StaServiceCallback WifiManager::GetStaCallback()
 void WifiManager::InitStaCallback(void)
 {
     using namespace std::placeholders;
-    mStaCallback.OnStaOpenRes = std::bind(&WifiManager::DealStaOpenRes, this, _1);
-    mStaCallback.OnStaCloseRes = std::bind(&WifiManager::DealStaCloseRes, this, _1);
-    mStaCallback.OnStaConnChanged = std::bind(&WifiManager::DealStaConnChanged, this, _1, _2);
-    mStaCallback.OnWpsChanged = std::bind(&WifiManager::DealWpsChanged, this, _1, _2);
-    mStaCallback.OnStaStreamChanged = std::bind(&WifiManager::DealStreamChanged, this, _1);
-    mStaCallback.OnStaRssiLevelChanged = std::bind(&WifiManager::DealRssiChanged, this, _1);
+    mStaCallback.callbackModuleName = "";
+    mStaCallback.OnStaOpenRes = std::bind(&WifiManager::DealStaOpenRes, this, _1, _2);
+    mStaCallback.OnStaCloseRes = std::bind(&WifiManager::DealStaCloseRes, this, _1, _2);
+    mStaCallback.OnStaConnChanged = std::bind(&WifiManager::DealStaConnChanged, this, _1, _2, _3);
+    mStaCallback.OnWpsChanged = std::bind(&WifiManager::DealWpsChanged, this, _1, _2, _3);
+    mStaCallback.OnStaStreamChanged = std::bind(&WifiManager::DealStreamChanged, this, _1, _2);
+    mStaCallback.OnStaRssiLevelChanged = std::bind(&WifiManager::DealRssiChanged, this, _1, _2);
     return;
 }
 }  // namespace Wifi

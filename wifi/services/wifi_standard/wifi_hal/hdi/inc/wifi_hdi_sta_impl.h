@@ -45,6 +45,20 @@ void HdiStaUnInit();
 WifiErrorNo HdiStartScan(const ScanSettings *settings);
 
 /**
+ * @Description start pno scan wifi info.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiStartPnoScan(const PnoScanSettings *settings);
+
+/**
+ * @Description stop pno scan wifi info.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiStopPnoScan(void);
+
+/**
  * @Description Get the scan infos from saved info.
  *
  * @param infos - saved infos
@@ -74,6 +88,13 @@ WifiErrorNo RegisterHdiStaCallbackEvent();
  * @return NONE
  */
 void UnRegisterHdiStaCallbackEvent();
+
+/**
+ * @Description release local resources is hdi remote died
+ *
+ * @return NONE
+ */
+void ReleaseLocalResources();
 
 #ifdef RANDOM_MAC_SUPPORT
 /**

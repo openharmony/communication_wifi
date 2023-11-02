@@ -65,7 +65,7 @@ struct WifiManagerBenchmarkTest {
   @StorageLink( "wifiManagerBenchmarkTestMessage" ) wifiManagerBenchmarkTestMessage: string = ""
   @State w_ssid1: string = "TP-LINK_6365";
   @State w_bssid1: string = "6C:B1:58:75:63:65";
-  @State w_preSharedKey1: string = "kaihong123";
+  @State w_preSharedKey1: string = "12345678";
   @State w_isHiddenSsid1: boolean = false;
   @State w_securityType1: number = 3
   @State w_creatorUid1: number = 1;

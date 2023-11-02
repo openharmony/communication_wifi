@@ -100,7 +100,7 @@ int WifiMaxThroughput(int wifiStandard, bool is11bMode,
 class ScanService {
     FRIEND_GTEST(ScanService);
 public:
-    ScanService();
+    explicit ScanService(int instId = 0);
     virtual ~ScanService();
     /**
      * @Description  Initializing the Scan Service.
@@ -317,6 +317,10 @@ private:
     /* Stores data that is scanned and controlled regardless of applications. */
     std::vector<SingleAppForbid> fullAppForbidList;
     std::map<int, time_t> customSceneTimeMap; /* Record the time when a scene is entered. */
+    std::vector<std::string> scan_thermal_trust_list;
+    std::vector<std::string> scan_frequency_trust_list;
+    std::vector<std::string> scan_screen_off_trust_list;
+    std::vector<std::string> scan_gps_block_list;
     int staSceneForbidCount;
     int customSceneForbidCount;
     mutable std::mutex scanConfigMapMutex;
@@ -335,6 +339,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     StandByListerner standByListerner;         /* standby Listerner*/
 #endif
+    int m_instId;
     /**
      * @Description Obtains the frequency of a specified band.
      *
@@ -839,6 +844,13 @@ private:
      */
     bool AllowExternCustomSceneCheck(const std::map<int, time_t>::const_iterator &customIter, int appId,
         ScanMode scanMode);
+    /* *
+     * @Description Is app in the package filter.
+     *
+     * @param packageFilter packageFilter[in]
+     * @return true: int the list, false: not in the list.
+     */
+    bool IsAppInPackageFilter(std::vector<std::string> &packageFilter);
 };
 }  // namespace Wifi
 }  // namespace OHOS

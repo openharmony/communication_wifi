@@ -45,17 +45,68 @@ constexpr const char *SETTINGS_DATASHARE_KEY_DEVICE_PROVISIONED = "device_provis
 
 class WifiDataShareHelperUtils : DelayedSingleton<WifiDataShareHelperUtils> {
 public:
+    /**
+     * @Description : WifiDataShareHelperUtils constructor
+     */
     WifiDataShareHelperUtils();
+
+    /**
+     * @Description : WifiDataShareHelperUtils destructor
+     */
     ~WifiDataShareHelperUtils() = default;
+
+    /**
+     * @Description : Query function
+     *
+     * @param uri - Querying the database path
+     * @param key - key
+     * @param value - value
+     * @return query error code
+     */
     ErrCode Query(Uri &uri, const std::string &key, std::string &value);
 
+    /**
+     * @Description : Insert function
+     *
+     * @param uri - Inserting the database path
+     * @param key - key
+     * @param value - value
+     * @return Insert error code
+     */
+    ErrCode Insert(Uri &uri, const std::string &key, const std::string &value);
+
+    /**
+     * @Description : Update function
+     *
+     * @param uri - Updateing the database path
+     * @param key - key
+     * @param value - value
+     * @return Update error code
+     */
+    ErrCode Update(Uri &uri, const std::string &key, const std::string &value);
+
+    /**
+     * @Description : Register observer function
+     *
+     * @param uri - Register observer the database path
+     * @param key - key
+     * @param value - value
+     * @return Register observer error code
+     */
     ErrCode RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
 
+    /**
+     * @Description : Unregister observer function
+     *
+     * @param uri - Register observer the database path
+     * @param key - key
+     * @param value - value
+     * @return Unregister observer error code
+     */
     ErrCode UnRegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper();
-private:
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_ = nullptr;
 };
 

@@ -52,7 +52,7 @@ public:
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
     virtual int ClearScanInfoList(int instId = 0) = 0;
     virtual void SetAppPackageName(const std::string &name) = 0;
-    virtual void GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
+    virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {

@@ -2098,15 +2098,13 @@ void StaStateMachine::HandlePortalNetworkPorcess()
 {
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("portal uri is %{public}s\n", mPortalUrl.c_str());
-    if (WifiSettings::GetInstance().GetDeviceProvisionState() == MODE_STATE_CLOSE) {
-        AAFwk::Want want;
-        want.SetAction(PORTAL_ACTION);
-        want.SetUri(mPortalUrl);
-        want.AddEntity(PORTAL_ENTITY);
-        OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-        if (err != ERR_OK) {
-            WIFI_LOGI("StartAbility is failed %{public}d", err);
-        }
+    AAFwk::Want want;
+    want.SetAction(PORTAL_ACTION);
+    want.SetUri(mPortalUrl);
+    want.AddEntity(PORTAL_ENTITY);
+    OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    if (err != ERR_OK) {
+        WIFI_LOGI("StartAbility is failed %{public}d", err);
     }
 #endif
 }

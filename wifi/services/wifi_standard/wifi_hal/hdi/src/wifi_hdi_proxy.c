@@ -18,6 +18,9 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "wifi_log.h"
+#include "servmgr_hdi.h"
+#include "hdf_remote_service.h"
+#include "osal_mem.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiProxy"
@@ -30,6 +33,7 @@ static pthread_mutex_t g_mutex;
 static unsigned int g_wlanRefCount = 0;
 static struct IWlanInterface *g_wlanObj = NULL;
 static struct HdfFeatureInfo* g_featureArray[MAX_FEATURE_NUMBER] = {NULL};
+static bool g_isRemoteDied = false;
 
 static WifiErrorNo ReleaseFeatureInner(const int32_t wlanType)
 {
@@ -128,6 +132,23 @@ static void ReleaseAllFeatures()
     }
 }
 
+static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
+{
+    LOGI("%{public}s enter", __func__);
+    if (recipient == NULL || service == NULL) {
+        LOGE("%{public}s input param is null", __func__);
+        return;
+    }
+    g_isRemoteDied = true;
+    CleanLocalResources();
+    HdfRemoteServiceRemoveDeathRecipient(service, recipient);
+    HdfRemoteServiceRecycle(service);
+    if (recipient != NULL) {
+        OsalMemFree(recipient);
+        recipient = NULL;
+    }
+}
+
 WifiErrorNo HdiStart()
 {
     LOGI("%{public}s start...", __func__);
@@ -152,9 +173,26 @@ WifiErrorNo HdiStart()
         pthread_mutex_unlock(&g_mutex);
         return WIFI_HAL_FAILED;
     }
+    g_isRemoteDied = false;
     ++g_wlanRefCount;
     pthread_mutex_unlock(&g_mutex);
     LOGI("%{public}s is started", __func__);
+
+    struct HDIServiceManager* serviceMgr = HDIServiceManagerGet();
+    if (serviceMgr == NULL) {
+        LOGE("%{public}s HDIServiceManagerGet failed", __func__);
+        return WIFI_HAL_FAILED;
+    }
+    struct HdfRemoteService* remote = serviceMgr->GetService(serviceMgr, HDI_SERVICE_NAME);
+    HDIServiceManagerRelease(serviceMgr);
+    if (remote == NULL) {
+        LOGE("%{public}s GetService failed", __func__);
+        return WIFI_HAL_FAILED;
+    }
+    LOGI("%{public}s Get HdfRemoteService success", __func__);
+    struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
+    recipient->OnRemoteDied = ProxyOnRemoteDied;
+    HdfRemoteServiceAddDeathRecipient(remote, recipient);
     return WIFI_HAL_SUCCESS;
 }
 
@@ -220,5 +258,20 @@ WifiErrorNo ReleaseHdiProxy(const int32_t wlanType)
     ret = ReleaseFeatureInner(wlanType);
     pthread_mutex_unlock(&g_mutex);
     return ret;
+}
+
+bool IsHdiRemoteDied()
+{
+    return g_isRemoteDied;
+}
+
+void CleanLocalResources()
+{
+    pthread_mutex_lock(&g_mutex);
+    ReleaseAllFeatures();
+    IWlanInterfaceReleaseInstance(HDI_SERVICE_NAME, g_wlanObj, false);
+    g_wlanObj = NULL;
+    g_wlanRefCount = 0;
+    pthread_mutex_unlock(&g_mutex);
 }
 #endif

@@ -151,6 +151,7 @@ typedef struct Hid2dConnectInfo {
     char bssid[WIFI_BSSID_LENGTH];
     char passphrase[WIFI_P2P_PASSWORD_SIZE];
     int frequency;
+    int isLegacyGo;
 } Hid2dConnectInfo;
 
 #ifdef __cplusplus

@@ -137,7 +137,7 @@ public:
      * @Description - Set is need dhcp.
      * @param  isNeedDhcp - true: need, false: not need
      */
-    void SetIsNeedDhcp(bool isNeedDhcp);
+    void SetIsNeedDhcp(DHCPTYPE dhcpType);
 
 private:
     /**
@@ -288,7 +288,7 @@ private:
      * @Description Get is need dhcp.
      *
      */
-    bool GetIsNeedDhcp() const;
+    DHCPTYPE GetIsNeedDhcp() const;
 
     /**
      * @Description Is interface reuse.
@@ -416,7 +416,7 @@ private:
     P2pIdleState &p2pIdleState;
     P2pInvitingState &p2pInvitingState;
     ProvisionDiscoveryState &p2pProvisionDiscoveryState;
-    static bool m_isNeedDhcp;
+    static DHCPTYPE m_isNeedDhcp;
     std::string p2pDevIface;
 };
 }  // namespace Wifi

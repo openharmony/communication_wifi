@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Wifi {
 static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
 {
+    item.instanceId = 0;
     item.networkId = 0;
     item.status = 0;
     item.bssid.clear();
@@ -127,7 +128,10 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     if (SetWifiDeviceConfigOutDated(item, key, value) == 0) {
         return 0;
     }
-    if (key == "networkId") {
+
+    if (key == "instanceId") {
+        item.instanceId = std::stoi(value);
+    } else if (key == "networkId") {
         item.networkId = std::stoi(value);
     } else if (key == "status") {
         item.status = std::stoi(value);
@@ -436,6 +440,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfig>" << std::endl;
+    ss << "    " <<"instanceId=" << item.instanceId << std::endl;
     ss << "    " <<"uid=" << item.uid << std::endl;
     ss << "    " <<"status=" << item.status << std::endl;
     ss << "    " <<"bssid=" << item.bssid << std::endl;
@@ -1318,7 +1323,18 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
 
 template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
 {
-    item.portalUri.clear();
+    item.portalHttpUrl.clear();
+    item.portalHttpsUrl.clear();
+    item.portalBakHttpUrl.clear();
+    item.portalBakHttpsUrl.clear();
+    return;
+}
+
+template <> 
+void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
+{
+    item.filterName.clear();
+    item.packageList.clear();
     return;
 }
 
@@ -1326,8 +1342,29 @@ template <>
 int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    if (key == "url") {
-        item.portalUri = value;
+    if (key == "http") {
+        item.portalHttpUrl = value;
+    } else if (key == "https") {
+        item.portalHttpsUrl = value;
+    } else if (key == "httpbak") {
+        item.portalBakHttpUrl = value;
+    } else if (key == "httpsbak") {
+        item.portalBakHttpsUrl = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+
+template <>
+int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "filterName") {
+        item.filterName = value;
+    } else if (key == "package") {
+        item.packageList.push_back(value);
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -1344,7 +1381,7 @@ template <> std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiPortalConf>" << std::endl;
-    ss << "    " <<"url=" << ValidateString(item.portalUri) << std::endl;
+    ss << "    " <<"http=" << ValidateString(item.portalHttpUrl) << std::endl;
     return ss.str();
 }
 }  // namespace Wifi

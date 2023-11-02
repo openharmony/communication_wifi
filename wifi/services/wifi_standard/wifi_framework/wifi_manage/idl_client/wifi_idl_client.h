@@ -1067,6 +1067,14 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
+
+    /**
+     * @Description Send power mode to wpa
+     *
+     * @param mode: true for power, false for resume
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqWpaSetPowerMode(bool mode) const;
 public:
     RpcClient *pRpcClient;
 
@@ -1077,6 +1085,8 @@ private:
         const std::string &msg, bool checkEmpty = true) const;
     int PushDeviceConfigInt(SetNetworkConfig *pConfig, DeviceConfigType type, int i) const;
     int PushDeviceConfigAuthAlgorithm(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const;
+    int PushDeviceConfigParseMask(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int mask,
+        const std::string parseStr[], int size) const;
     WifiErrorNo CheckValidDeviceConfig(const WifiIdlDeviceConfig &config) const;
     int PushP2pGroupConfigString(P2pGroupConfig *pConfig, P2pGroupConfigType type, const std::string &str) const;
     int PushP2pGroupConfigInt(P2pGroupConfig *pConfig, P2pGroupConfigType type, int i) const;

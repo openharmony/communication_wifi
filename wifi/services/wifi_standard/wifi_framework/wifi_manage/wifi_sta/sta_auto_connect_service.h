@@ -47,7 +47,7 @@ static const int MIN_ROAM_RSSI_DIFF = 6;
 class StaAutoConnectService {
     FRIEND_GTEST(StaAutoConnectService);
 public:
-    explicit StaAutoConnectService(StaStateMachine *staStateMachine);
+    StaAutoConnectService(StaStateMachine *staStateMachine, int instId = 0);
     virtual ~StaAutoConnectService();
     /**
      * @Description  Initialize StaAutoConnectService
@@ -96,6 +96,7 @@ private:
     int maxBlockedBssidNum;
     int selectDeviceLastTime;
     StaDeviceAppraisal *pAppraisals[MAX_APPRAISAL_NUM];
+    int m_instId;
     struct BlockedBssidInfo {
         int count; /* Number of times the BSSID is rejected. */
         bool blockedFlag;

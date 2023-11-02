@@ -19,6 +19,7 @@ namespace OHOS {
 namespace Wifi {
 /* SAID: 1120 */
 enum class  DevInterfaceCode {
+    WIFI_MGR_GET_DEVICE_SERVICE = 0,
     WIFI_SVR_CMD_ENABLE_WIFI = 0x1001,               /* open wifi */
     WIFI_SVR_CMD_DISABLE_WIFI = 0x1002,              /* close wifi */
     WIFI_SVR_CMD_ADD_DEVICE_CONFIG = 0x1006,         /* add a network config */
@@ -55,6 +56,9 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_5G_CHANNELLIST = 0x1030,        /* get 5g channellist */
     WIFI_SVR_CMD_GET_DISCONNECTED_REASON = 0x1031,   /* get disconnect reason */
     WIFI_SVR_CMD_GET_DHCP_IPV6INFO = 0x1032,         /* get dhcp IPV6 info */
+    WIFI_SVR_CMD_SET_FROZEN_APP = 0x1033,            /* set frozen app */
+    WIFI_SVR_CMD_RESET_ALL_FROZEN_APP = 0x1034,      /* reset all frozen app */
+    WIFI_SVR_CMD_START_PORTAL_CERTIF = 0x1035,       /* start portal certification */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
@@ -155,6 +159,7 @@ enum class  P2PInterfaceCode {
 
 /* SAID: 1124 */
 enum class  ScanInterfaceCode {
+    WIFI_MGR_GET_SCAN_SERVICE = 0,
     WIFI_SVR_CMD_FULL_SCAN = 0x1004,                 /* scan request */
     WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN = 0x1005,     /* scan with params request */
     WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE = 0x1015,     /* whether set scan always */

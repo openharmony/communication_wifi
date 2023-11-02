@@ -7,7 +7,7 @@
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
@@ -26,12 +26,11 @@
 #define LOG_TAG "WifiHalChbaInterface"
 
 const char *g_wpaSupplicantChba = "wpa_supplicant";
-const char *g_systemCmdWpaChbaStart = "wpa_supplicant -ichba0 -g/data/service/el1/public/wifi/sockets/wpa/chba0";
-static int g_hmlSupplicantConnectEvent = 0;
+const char *g_systemCmdWpaChbaStart = "wpa_supplicant -ichba0 -g/data/service/el1/public/wifi/sockets/wpa";
 
 static WifiErrorNo ChbaStartSupplicant(void)
 {
-    LOGD("Start hml supplicant");
+    LOGD("Start chba supplicant");
     if (CopyConfigFile("p2p_supplicant.conf") != 0) {
         return WIFI_HAL_FAILED;
     }
@@ -45,7 +44,7 @@ static WifiErrorNo ChbaStartSupplicant(void)
 
 static WifiErrorNo ChbaConnectSupplicant(void)
 {
-    LOGD("Ready to connect hml_wpa_supplicant.");
+    LOGD("Ready to connect chba_wpa_supplicant.");
     WifiWpaChbaInterface *pMainIfc = GetWifiWpaChbaInterface();
     if (pMainIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
@@ -55,10 +54,10 @@ static WifiErrorNo ChbaConnectSupplicant(void)
 
 static WifiErrorNo ChbaStopSupplicant(void)
 {
-    LOGD("stop hml supplicant");
+    LOGD("stop chba supplicant");
     ModuleManageRetCode ret = StopModule(g_wpaSupplicantChba, false);
     if (ret == MM_FAILED) {
-        LOGE("stop hml_wpa_supplicant failed!");
+        LOGE("stop chba_wpa_supplicant failed!");
         return WIFI_HAL_FAILED;
     }
     if (ret == MM_SUCCESS) {
@@ -69,29 +68,29 @@ static WifiErrorNo ChbaStopSupplicant(void)
 
 static WifiErrorNo ChbaDisconnectSupplicant(void)
 {
-    LOGD("Ready to disconnect hml_wpa_supplicant.");
+    LOGD("Ready to disconnect chba_wpa_supplicant.");
     WifiWpaChbaInterface *pMainIfc = GetWifiWpaChbaInterface();
     if (pMainIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
     }
-    LOGD("Disconnect hml_wpa_supplicant finish!");
+    LOGD("Disconnect chba_wpa_supplicant finish!");
     return WIFI_HAL_SUCCESS;
 }
 
 static WifiErrorNo StopChbaWpaAndWpaHal(void)
 {
     if (ChbaDisconnectSupplicant() != WIFI_HAL_SUCCESS) {
-        LOGE("hml_wpa_s hal already stop!");
+        LOGE("chba_wpa_s hal already stop!");
     }
     WifiWpaInterface *pWpaInterface = GetWifiWapGlobalInterface();
     if (pWpaInterface != NULL) {
         pWpaInterface->wpaCliRemoveIface(pWpaInterface, "chba0");
     }
     if (ChbaStopSupplicant() != WIFI_HAL_SUCCESS) {
-        LOGE("hml_wpa_supplicant stop failed!");
+        LOGE("chba_wpa_supplicant stop failed!");
         return WIFI_HAL_FAILED;
     }
-    LOGD("hml_wpa_supplicant stop success!");
+    LOGD("chba_wpa_supplicant stop success!");
     ReleaseWpaChbaInterface();
     return WIFI_HAL_SUCCESS;
 }
@@ -122,19 +121,22 @@ static WifiErrorNo AddChbaIface(void)
 WifiErrorNo ChbaStart(void)
 {
     if (ChbaStartSupplicant() != WIFI_HAL_SUCCESS) {
-        LOGE("hml_wpa_supplicant start failed!");
+        LOGE("chba_wpa_supplicant start failed!");
         return WIFI_HAL_OPEN_SUPPLICANT_FAILED;
     }
     if (AddChbaIface() != WIFI_HAL_SUCCESS || ChbaConnectSupplicant() != WIFI_HAL_SUCCESS) {
-        LOGE("Supplicant connect hml_wpa_supplicant failed!");
+        LOGE("Supplicant connect chba_wpa_supplicant failed!");
         StopChbaWpaAndWpaHal();
         return WIFI_HAL_CONN_SUPPLICANT_FAILED;
     }
-    g_hmlSupplicantConnectEvent = 1;
+    int startchba = 1;
     char eventStr[25];
-    sprintf(eventStr, "P2P-CONNECTED status =%d", g_hmlSupplicantConnectEvent);
+    if (sprintf_s(eventStr, sizeof(eventStr), "P2P-CONNECTED status =%d", startchba) < 0) {
+        LOGE("ChbaStop sprintf_s failed! ");
+        return WIFI_HAL_FAILED;
+    }
     HalCallbackNotify(eventStr);
-    LOGD("Supplicant connect hml_wpa_supplicant success!");
+    LOGD("Supplicant connect chba_wpa_supplicant success!");
     return WIFI_HAL_SUCCESS;
 }
 
@@ -144,9 +146,12 @@ WifiErrorNo ChbaStop(void)
     if (ret == WIFI_HAL_FAILED) {
         return WIFI_HAL_FAILED;
     }
-    g_hmlSupplicantConnectEvent = 0;
+    int stopchba = 0;
     char eventStr[25];
-    sprintf(eventStr, "P2P-CONNECTED status =%d", g_hmlSupplicantConnectEvent);
+    if (sprintf_s(eventStr, sizeof(eventStr), "P2P-CONNECTED status =%d", stopchba) < 0) {
+        LOGE("ChbaStop sprintf_s failed! ");
+        return WIFI_HAL_FAILED;
+    }
     HalCallbackNotify(eventStr);
     return WIFI_HAL_SUCCESS;
 }

@@ -1098,6 +1098,7 @@ WifiErrorNo Hid2dConnect(Hid2dConnectInfo *info)
     WriteStr(context, info->bssid);
     WriteStr(context, info->passphrase);
     WriteInt(context, info->frequency);
+    WriteInt(context, info->isLegacyGo);
     WriteEnd(context);
     if (RpcClientCall(client, "P2pHid2dConnect") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;

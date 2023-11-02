@@ -17,18 +17,20 @@
 #define OHOS_STASERVICE_CALLBACK_H
 
 #include <functional>
+#include <string>
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
 struct StaServiceCallback {
-    std::function<void(OperateResState)> OnStaOpenRes;
-    std::function<void(OperateResState)> OnStaCloseRes;
-    std::function<void(OperateResState, const WifiLinkedInfo &)> OnStaConnChanged;
-    std::function<void(WpsStartState, const int)> OnWpsChanged;
-    std::function<void(StreamDirection)> OnStaStreamChanged;
-    std::function<void(int)> OnStaRssiLevelChanged;
+    std::string callbackModuleName;
+    std::function<void(OperateResState, int)> OnStaOpenRes;
+    std::function<void(OperateResState, int)> OnStaCloseRes;
+    std::function<void(OperateResState, const WifiLinkedInfo &, int)> OnStaConnChanged;
+    std::function<void(WpsStartState, const int, int)> OnWpsChanged;
+    std::function<void(StreamDirection, int)> OnStaStreamChanged;
+    std::function<void(int, int)> OnStaRssiLevelChanged;
 };
 }  // namespace Wifi
 }  // namespace OHOS

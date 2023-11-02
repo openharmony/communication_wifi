@@ -39,6 +39,10 @@
     "pages/subManualApiTest/subWifiTest/wifiFound",
     "pages/subManualApiTest/subP2pTest/p2pFound",
     "pages/subAppTest/wifiScanTest",
-    "pages/subAppTest/p2pDiscoveryTest"
+    "pages/subAppTest/wifiCandidateTest",
+    "pages/subAppTest/p2pDiscoveryTest",
+    "pages/subStabilityTest/wifiSwitchStabilityTest",
+    "pages/subStabilityTest/wifiScanStabilityTest",
+    "pages/subStabilityTest/wifiConnectStabilityTest"
   ]
 }

@@ -113,5 +113,11 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqWpaSetSuspendMode(mode);
 }
+
+WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqWpaSetPowerMode(mode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

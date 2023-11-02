@@ -12,6 +12,7 @@
 # limitations under the License.
 
 ability_runtime_path = "//foundation/ability/ability_runtime"
+fuzz_test_output_path = "wifi/wifi/wifi_sta"
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
 DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"
@@ -20,6 +21,7 @@ declare_args() {
   wifi_feature_with_p2p = true
   wifi_feature_with_ap_intf = "wlan"
   wifi_feature_with_ap_num = 1
+  wifi_feature_with_sta_num = 1
   wifi_feature_with_auth_disable = false
   wifi_feature_with_dhcp_disable = false
   wifi_feature_with_encryption = false

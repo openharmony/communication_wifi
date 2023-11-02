@@ -24,8 +24,8 @@ class MockWifiStaService : public StaService {
 public:
     MockWifiStaService() {}
     virtual ~MockWifiStaService() {}
-    MOCK_METHOD1(InitStaService, ErrCode(const StaServiceCallback &callbacks));
-    MOCK_CONST_METHOD0(EnableWifi, ErrCode());
+    MOCK_METHOD1(InitStaService, ErrCode(const std::vector<StaServiceCallback> &callbacks));
+    MOCK_METHOD0(EnableWifi, ErrCode());
     MOCK_CONST_METHOD0(DisableWifi, ErrCode());
     MOCK_CONST_METHOD1(ConnectToDevice, ErrCode(const WifiDeviceConfig &config));
     MOCK_CONST_METHOD1(ConnectToNetwork, ErrCode(int networkId));
@@ -39,9 +39,8 @@ public:
     MOCK_CONST_METHOD1(DisableDeviceConfig, ErrCode(int networkId));
     MOCK_CONST_METHOD1(StartWps, ErrCode(const WpsConfig &config));
     MOCK_CONST_METHOD0(CancelWps, ErrCode());
-    MOCK_CONST_METHOD1(SetCountryCode, ErrCode(const std::string &countryCode));
     MOCK_METHOD1(AutoConnectService, ErrCode(const std::vector<InterScanInfo> &scanInfos));
-    MOCK_CONST_METHOD1(RegisterStaServiceCallback, void(const StaServiceCallback &callbacks));
+    MOCK_CONST_METHOD1(RegisterStaServiceCallback, void(const std::vector<StaServiceCallback> &callbacks));
     MOCK_CONST_METHOD2(ConnectToCandidateConfig, ErrCode(const int uid, const int networkId));
     MOCK_CONST_METHOD2(RemoveCandidateConfig, ErrCode(const int uid, const int networkId));
     MOCK_CONST_METHOD1(RemoveAllCandidateConfig, ErrCode(const int uid));

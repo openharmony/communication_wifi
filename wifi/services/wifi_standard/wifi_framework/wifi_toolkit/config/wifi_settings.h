@@ -55,6 +55,9 @@ const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/trust_list
 const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/moving_freeze_policy.conf";
 constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
 constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
+constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.xml";
+constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
+constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 
 namespace OHOS {
 namespace Wifi {
@@ -109,7 +112,7 @@ public:
      *
      * @return int - the wifi state, DISABLING/DISABLED/ENABLING/ENABLED/UNKNOWN
      */
-    int GetWifiState() const;
+    int GetWifiState(int instId = 0);
 
     /**
      * @Description Save STA service state
@@ -117,7 +120,7 @@ public:
      * @param state - the wifi state
      * @return int - 0 success
      */
-    int SetWifiState(int state);
+    int SetWifiState(int state, int instId = 0);
 
     /**
      * @Description Get the ScanAlways switch state
@@ -140,13 +143,13 @@ public:
      * @param results - vector scan results
      * @return int - 0 success
      */
-    int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
+    int SaveScanInfoList(const std::vector<WifiScanInfo> &results, int instId = 0);
     /**
      * @Description Clear scan results
      *
      * @return int - 0 success
      */
-    int ClearScanInfoList();
+    int ClearScanInfoList(int instId = 0);
     /**
      * @Description UpdateLinkedChannelWidth
      *
@@ -154,7 +157,7 @@ public:
      * @param channelWidth ap channelwidth
      * @return void
      */
-    void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth);
+    void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth, int instId = 0);
 
     /**
      * @Description Get scan results
@@ -162,7 +165,7 @@ public:
      * @param results - output vector of scan results
      * @return int - 0 success
      */
-    int GetScanInfoList(std::vector<WifiScanInfo> &results);
+    int GetScanInfoList(std::vector<WifiScanInfo> &results, int instId = 0);
 
     /**
      * @Description Get scan result by bssid
@@ -170,7 +173,7 @@ public:
      * @param results - output scan result
      * @return int - 0 success
      */
-    int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
+    int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo, int instId = 0);
     /**
      * @Description save the p2p connected info
      *
@@ -193,7 +196,7 @@ public:
      * @param info - output ScanControlInfo struct
      * @return int - 0 success
      */
-    int GetScanControlInfo(ScanControlInfo &info);
+    int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
 
     /**
      * @Description Save the scan control policy info
@@ -201,7 +204,15 @@ public:
      * @param info - input ScanControlInfo struct
      * @return int - 0 success
      */
-    int SetScanControlInfo(const ScanControlInfo &info);
+    int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
+
+    /**
+     * @Description Get the filter info
+     *
+     * @param filterMap - output package map
+     * @return int - 0 success
+     */
+    int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
 
     /**
      * @Description Add Device Configuration
@@ -401,7 +412,7 @@ public:
      * @param info - output IpInfo struct
      * @return int - 0 success
      */
-    int GetIpInfo(IpInfo &info);
+    int GetIpInfo(IpInfo &info, int instId = 0);
 
     /**
      * @Description Save dhcp info
@@ -409,7 +420,7 @@ public:
      * @param info - input IpInfo struct
      * @return int - 0 success
      */
-    int SaveIpInfo(const IpInfo &info);
+    int SaveIpInfo(const IpInfo &info, int instId = 0);
 
     /**
      * @Description Get the dhcp ipv6info
@@ -417,7 +428,7 @@ public:
      * @param info - output IpV6Info struct
      * @return int - 0 success
      */
-    int GetIpv6Info(IpV6Info &info);
+    int GetIpv6Info(IpV6Info &info, int instId = 0);
 
     /**
      * @Description Save dhcp inV6fo
@@ -425,7 +436,7 @@ public:
      * @param info - input IpV6Info struct
      * @return int - 0 success
      */
-    int SaveIpV6Info(const IpV6Info &info);
+    int SaveIpV6Info(const IpV6Info &info, int instId = 0);
 
     /**
      * @Description Get current link info
@@ -433,7 +444,7 @@ public:
      * @param info - output WifiLinkedInfo struct
      * @return int - 0 success
      */
-    int GetLinkedInfo(WifiLinkedInfo &info);
+    int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0);
 
     /**
      * @Description Save link info
@@ -441,7 +452,7 @@ public:
      * @param info - input WifiLinkedInfo struct
      * @return int - 0 success
      */
-    int SaveLinkedInfo(const WifiLinkedInfo &info);
+    int SaveLinkedInfo(const WifiLinkedInfo &info, int instId = 0);
 
     /**
      * @Description Save mac address
@@ -449,7 +460,7 @@ public:
      * @param macAddress - mac address info
      * @return int - 0 success
      */
-    int SetMacAddress(const std::string &macAddress);
+    int SetMacAddress(const std::string &macAddress, int instId = 0);
 
     /**
      * @Description Get the mac address
@@ -457,7 +468,7 @@ public:
      * @param macAddress - output mac address info
      * @return int - 0 success
      */
-    int GetMacAddress(std::string &macAddress);
+    int GetMacAddress(std::string &macAddress, int instId = 0);
 
     /**
      * @Description reload mac address
@@ -479,7 +490,7 @@ public:
      * @param portalUri - portal uri
      * @return int - 0 success
      */
-    void GetPortalUri(std::string &portalUri);
+    void GetPortalUri(WifiPortalConf &urlInfo);
     
     /**
      * @Description add random mac address
@@ -505,7 +516,8 @@ public:
      * @return int - 1 success
      */
     bool RemoveRandomMac(const std::string &bssid, const std::string &randomMac);
-    
+
+#ifndef OHOS_ARCH_LITE
     /**
      * @Description Save the country code
      *
@@ -513,14 +525,7 @@ public:
      * @return int - 0 success
      */
     int SetCountryCode(const std::string &countryCode);
-
-    /**
-     * @Description Get the country code
-     *
-     * @param countryCode - output country code
-     * @return int - 0 success
-     */
-    int GetCountryCode(std::string &countryCode);
+#endif
 
     /**
      * @Description Get current hotspot state
@@ -770,28 +775,28 @@ public:
      * @return true
      * @return false
      */
-    bool EnableNetwork(int networkId, bool disableOthers);
+    bool EnableNetwork(int networkId, bool disableOthers, int instId = 0);
 
     /**
      * @Description Set the User Last Selected Network Id
      *
      * @param networkId - network id
      */
-    void SetUserLastSelectedNetworkId(int networkId);
+    void SetUserLastSelectedNetworkId(int networkId, int instId = 0);
 
     /**
      * @Description Get the User Last Selected Network Id
      *
      * @return int - network id
      */
-    int GetUserLastSelectedNetworkId();
+    int GetUserLastSelectedNetworkId(int instId = 0);
 
     /**
      * @Description Get the User Last Selected Network time
      *
      * @return time_t - timestamp
      */
-    time_t GetUserLastSelectedNetworkTimeVal();
+    time_t GetUserLastSelectedNetworkTimeVal(int instId = 0);
 
     /**
      * @Description Synchronizing saved the WifiConfig into config file
@@ -1202,20 +1207,20 @@ public:
      *
      * @return bssid.
      */
-    std::string GetConnectTimeoutBssid();
+    std::string GetConnectTimeoutBssid(int instId = 0);
 
     /**
      * @Description set bssid of connection timeout for last time.
      *
      * @return int - result
      */
-    int SetConnectTimeoutBssid(std::string &bssid);
+    int SetConnectTimeoutBssid(std::string &bssid, int instId = 0);
 
     /**
      * @Description set default frequencies for specify country band.
      *
      */
-    void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies);
+    void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies, int instId = 0);
 
     /**
      * @Description set type of GO group
@@ -1271,7 +1276,7 @@ public:
      *
      * @param discReason - discReason
      */
-    void SaveDisconnectedReason(DisconnectedReason discReason);
+    void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0);
 
     /**
      * @Description Get the last disconnected reason
@@ -1279,7 +1284,7 @@ public:
      * @param discReason - discReason
      * @return int - 0 success
      */
-    int GetDisconnectedReason(DisconnectedReason &discReason) const;
+    int GetDisconnectedReason(DisconnectedReason &discReason, int instId = 0);
 
     /**
      * @Description Set the Scan Only Switch State
@@ -1346,7 +1351,7 @@ public:
      * @return bool - false fail to save the MAC address, true success to save the MAC address
      */
     bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
-        const std::string &randomAddr);
+        const std::string &randomAddr, int instId = 0);
     /**
      * @Description get random MAC address
      *
@@ -1361,7 +1366,7 @@ public:
      * @param type - MAC address type[in]
      * @param bssid - MAC address
      */
-    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
+    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid, int instId = 0);
     /**
      * @Description add a MAC address pair
      *
@@ -1370,7 +1375,8 @@ public:
      * @param randomMacAddr - random MAC address[out]
      * @return WifiMacAddrErrCode - 0 success
      */
-    WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr);
+    WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo,
+        std::string randomMacAddr, int instId = 0);
     /**
      * @Description remove a MAC address pair
      *
@@ -1378,7 +1384,7 @@ public:
      * @param macAddrInfo - MAC address info[in]
      * @return int - 0 success
      */
-    int RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
+    int RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, int instId = 0);
     /**
      * @Description query a MAC address pair
      *
@@ -1386,7 +1392,7 @@ public:
      * @param macAddrInfo - MAC address info[in]
      * @return std::string - an empty string indicates failure
      */
-    std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
+    std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, int instId = 0);
     /**
      * @Description print MAC address pair
      *
@@ -1399,7 +1405,7 @@ public:
      * @param type - MAC address type[in]
      * @return std::string - an empty string indicates failure  
      */
-    void ClearMacAddrPairs(WifiMacAddrInfoType type);
+    void ClearMacAddrPairs(WifiMacAddrInfoType type, int instId = 0);
 #endif
 private:
     WifiSettings();
@@ -1413,6 +1419,11 @@ private:
     void InitScanControlIntervalList();
     void InitScanControlInfo();
     void GetLinkedChannelWidth();
+#ifndef OHOS_ARCH_LITE
+    void MergeSoftapConfig();
+    void MergeWifiConfig();
+#endif
+    void InitPackageFilterConfig();
 
 private:
     int mWifiStaCapabilities;            /* Sta capability */
@@ -1428,7 +1439,7 @@ private:
     IpV6Info mWifiIpV6Info;
     WifiLinkedInfo mWifiLinkedInfo;
     std::string mMacAddress;
-    std::string mCountryCode;
+    std::string m_countryCode;
     WifiPortalConf mPortalUri;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map <int, HotspotConfig> mHotspotConfig;
@@ -1486,9 +1497,11 @@ private:
     MovingFreezePolicy mFPolicy;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
+    WifiConfigFileImpl<PackageFilterConf> mPackageFilterConfig;
     bool explicitGroup;
     std::atomic_bool mThreadStatusFlag_ { false };
     std::atomic_uint64_t mThreadStartTime { 0 };
+    std::map<std::string, std::vector<std::string>> mFilterMap;
 };
 }  // namespace Wifi
 }  // namespace OHOS

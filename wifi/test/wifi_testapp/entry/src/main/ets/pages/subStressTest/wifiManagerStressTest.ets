@@ -66,7 +66,7 @@ struct wifiManagerStressTest {
   @StorageLink( 'pairedMac' ) pairedMac: string = "";
   @State w_ssid1: string = "TP-LINK_6365";
   @State w_bssid1: string = "6C:B1:58:75:63:65";
-  @State w_preSharedKey1: string = "kaihong123";
+  @State w_preSharedKey1: string = "12345678";
   @State w_isHiddenSsid1: boolean = false;
   @State w_securityType1: number = 3
   @State w_creatorUid1: number = 1;
@@ -247,7 +247,7 @@ struct wifiManagerStressTest {
 struct WifiManagerDeviceSetting {
   private w_ssid1 = "TP-LINK_6365";
   private w_bssid1 = "6C:B1:58:75:63:65";
-  private w_preSharedKey1 = "kaihong123";
+  private w_preSharedKey1 = "12345678";
   private w_isHiddenSsid1 = "false";
   @State w_securityType1: number = 3
   @State w_creatorUid1: number = 1;
@@ -323,7 +323,7 @@ struct WifiManagerDeviceSetting {
 
             Row() {
               Text( "preSharedKey1:" ).fontSize( "15vp" ).width( 110 );
-              TextInput( { text : this.w_preSharedKey1 , placeholder : "kaihong123" } )
+              TextInput( { text : this.w_preSharedKey1 , placeholder : "12345678" } )
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
                   this.w_preSharedKey1 = strInput;

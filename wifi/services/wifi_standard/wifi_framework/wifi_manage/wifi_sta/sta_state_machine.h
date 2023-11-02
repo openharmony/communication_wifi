@@ -84,12 +84,12 @@ constexpr int BLOCK_LIST_CLEAR_TIMER = 20 * 1000;
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
-const std::string IF_NAME = "wlan0";
+const std::string IF_NAME = "wlan";
 
 class StaStateMachine : public StateMachine {
     FRIEND_GTEST(StaStateMachine);
 public:
-    StaStateMachine();
+    explicit StaStateMachine(int instId = 0);
     ~StaStateMachine();
     using staSmHandleFunc = void (StaStateMachine::*)(InternalMessage *msg);
     using StaSmHandleFuncMap = std::map<int, staSmHandleFunc>;
@@ -379,9 +379,9 @@ public:
     /**
      * @Description Register sta callback function
      *
-     * @param callbacks - Callback function pointer storage structure
+     * @param callback - Callback function pointer storage structure
      */
-    void RegisterStaServiceCallback(const StaServiceCallback &callbacks);
+    void RegisterStaServiceCallback(const StaServiceCallback &callback);
 
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
@@ -421,6 +421,14 @@ public:
      * @param msg - Message body received by the state machine[in]
      */
     void DealRenewalTimeout(InternalMessage *msg);
+
+    /**
+     * @Description  start browser to login portal
+     *
+     */
+    void HandlePortalNetworkPorcess();
+
+    int GetInstanceId();
 private:
     /**
      * @Description  Destruct state.
@@ -552,6 +560,7 @@ private:
      */
     void SetOperationalMode(int mode);
     void SetSuspendMode(bool enabled);
+    void SetPowerMode(bool mode);
     void SetPowerSave(bool enabled);
     /**
      * @Description  Configure static ipaddress.
@@ -559,7 +568,6 @@ private:
      * @param staticIpAddress- static ip address(in)
      */
     bool ConfigStaticIpAddress(StaticIpAddress &staticIpAddress);
-    int PortalHttpDetection();
     /**
      * @Description  the process of handling network check results.
      *
@@ -766,7 +774,7 @@ private:
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
-    StaServiceCallback staCallback;
+    std::map<std::string, StaServiceCallback> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
 #endif
@@ -784,6 +792,7 @@ private:
     int getIpFailNum;
     bool isRoam;
     int netNoWorkNum;
+    bool portalFlag;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     std::unique_ptr<IDhcpService> pDhcpService;
@@ -803,10 +812,18 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    std::string mPortalUrl;
+    int m_instId;
     /**
      * @Description Replace empty dns
      */
     void ReplaceEmptyDns(DhcpResult *result);
+    void InvokeOnStaOpenRes(OperateResState state);
+    void InvokeOnStaCloseRes(OperateResState state);
+    void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
+    void InvokeOnWpsChanged(WpsStartState state, const int code);
+    void InvokeOnStaStreamChanged(StreamDirection direction);
+    void InvokeOnStaRssiLevelChanged(int level);
 };
 }  // namespace Wifi
 }  // namespace OHOS

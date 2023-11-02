@@ -72,7 +72,7 @@ public:
         std::function<void(const StationInfo &, int)> OnStationEvent =
             [&](const StationInfo &sta, int id) { m_sta = sta; };
 
-        IApServiceCallbacks callbacks = {[&](ApState state, int id) { mBState = state; },
+        IApServiceCallbacks callbacks = {"", [&](ApState state, int id) { mBState = state; },
             OnStationEvent, OnStationEvent};
         return pApStateMachine->RegisterApServiceCallbacks(callbacks);
     }

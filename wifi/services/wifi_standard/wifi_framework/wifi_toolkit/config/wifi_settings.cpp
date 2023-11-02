@@ -24,6 +24,12 @@
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #endif
+#ifndef OHOS_ARCH_LITE
+#include "wifi_country_code_define.h"
+#include "network_parser.h"
+#include "softap_parser.h"
+#endif
+
 namespace OHOS {
 namespace Wifi {
 WifiSettings &WifiSettings::GetInstance()
@@ -45,6 +51,7 @@ WifiSettings::WifiSettings()
       mLastSelectedTimeVal(0),
       mScreenState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
+      mDeviceProvision(MODE_STATE_OPEN),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
@@ -128,6 +135,18 @@ void WifiSettings::InitP2pVendorConfig()
     return;
 }
 
+void WifiSettings::InitPackageFilterConfig()
+{
+    if (mPackageFilterConfig.LoadConfig() >= 0) {
+        std::vector<PackageFilterConf> tmp;
+        mPackageFilterConfig.GetValue(tmp);
+        for (int i = 0; i < tmp.size(); i++) {
+            mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
+        }
+    }
+    return;
+}
+
 int WifiSettings::ReloadPortalconf()
 {
     if (mSavedPortal.LoadConfig() >= 0) {
@@ -136,17 +155,21 @@ int WifiSettings::ReloadPortalconf()
         if (tmp.size() > 0) {
             mPortalUri = tmp[0];
         } else {
-            mPortalUri.portalUri = "test";
+            mPortalUri.portalHttpUrl = "test";
         }
     } else {
-        mPortalUri.portalUri = "test";
+        mPortalUri.portalHttpUrl = "test";
     }
     return 0;
 }
 
 int WifiSettings::Init()
 {
-    mCountryCode = "CN";
+#ifndef OHOS_ARCH_LITE
+    m_countryCode = DEFAULT_WIFI_COUNTRY_CODE;
+#else
+    m_countryCode = "CN";
+#endif
     InitSettingsNum();
 
     /* read ini config */
@@ -160,6 +183,10 @@ int WifiSettings::Init()
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
     mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
+#ifndef OHOS_ARCH_LITE
+    MergeWifiConfig();
+    MergeSoftapConfig();
+#endif
     InitWifiConfig();
     ReloadDeviceConfig();
     InitHotspotConfig();
@@ -170,12 +197,79 @@ int WifiSettings::Init()
     ReloadMovingFreezePolicy();
     ReloadStaRandomMac();
     ReloadPortalconf();
+    InitPackageFilterConfig();
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     SetUpHks();
 #endif
     IncreaseNumRebootsSinceLastUse();
     return 0;
 }
+
+#ifndef OHOS_ARCH_LITE
+void WifiSettings::MergeWifiConfig()
+{
+    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(DEVICE_CONFIG_FILE_PATH)
+        || std::filesystem::exists(WIFI_STA_RANDOM_MAC_FILE_PATH)) {
+        LOGI("file exists don't need to merge");
+        return;
+    }
+    if (!std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH)) {
+        LOGI("dual frame file do not exists, don't need to merge");
+        return;
+    }
+    std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
+    bool ret = xmlParser->LoadConfiguration(DUAL_WIFI_CONFIG_FILE_PATH);
+    if (!ret) {
+        LOGE("MergeWifiConfig load fail");
+        return;
+    }
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("MergeWifiConfig Parse fail");
+        return;
+    }
+    std::vector<WifiDeviceConfig> wifideviceConfig =  xmlParser->GetNetworks();
+    if (wifideviceConfig.size() == 0) {
+        LOGE("MergeWifiConfig wifideviceConfig empty");
+        return;
+    }
+    mSavedDeviceConfig.SetValue(wifideviceConfig);
+    mSavedDeviceConfig.SaveConfig();
+    std::vector<WifiStoreRandomMac> wifiStoreRandomMac = xmlParser->GetRandomMacmap();
+    mSavedWifiStoreRandomMac.SetValue(wifiStoreRandomMac);
+    mSavedWifiStoreRandomMac.SaveConfig();
+}
+
+void WifiSettings::MergeSoftapConfig()
+{
+    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(HOTSPOT_CONFIG_FILE_PATH)) {
+        LOGI("MergeSoftapConfig file exists don't need to merge");
+        return;
+    }
+    if (!std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
+        LOGI("MergeSoftapConfig dual frame file do not exists, don't need to merge");
+        return;
+    }
+    std::unique_ptr<SoftapXmlParser> xmlParser = std::make_unique<SoftapXmlParser>();
+    bool ret = xmlParser->LoadConfiguration(DUAL_SOFTAP_CONFIG_FILE_PATH);
+    if (!ret) {
+        LOGE("MergeSoftapConfig fail");
+        return;
+    }
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("MergeSoftapConfig Parse fail");
+        return;
+    }
+    std::vector<HotspotConfig> hotspotConfig =  xmlParser->GetSoftapConfigs();
+    if (hotspotConfig.size() == 0) {
+        LOGE("MergeSoftapConfig hotspotConfig empty");
+        return;
+    }
+    mSavedHotspotConfig.SetValue(hotspotConfig);
+    mSavedHotspotConfig.SaveConfig();
+}
+#endif
 
 int WifiSettings::GetWifiStaCapabilities() const
 {
@@ -188,12 +282,12 @@ int WifiSettings::SetWifiStaCapabilities(int capabilities)
     return 0;
 }
 
-int WifiSettings::GetWifiState() const
+int WifiSettings::GetWifiState(int instId)
 {
     return mWifiState.load();
 }
 
-int WifiSettings::SetWifiState(int state)
+int WifiSettings::SetWifiState(int state, int instId)
 {
     mWifiState = state;
     return 0;
@@ -213,14 +307,14 @@ int WifiSettings::SetScanAlwaysState(bool isActive)
     return 0;
 }
 
-int WifiSettings::SaveScanInfoList(const std::vector<WifiScanInfo> &results)
+int WifiSettings::SaveScanInfoList(const std::vector<WifiScanInfo> &results, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mWifiScanInfoList = results;
     return 0;
 }
 
-int WifiSettings::ClearScanInfoList()
+int WifiSettings::ClearScanInfoList(int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
@@ -230,7 +324,7 @@ int WifiSettings::ClearScanInfoList()
     return 0;
 }
 
-int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
+int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ) {
@@ -248,7 +342,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     return 0;
 }
 
-int WifiSettings::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
+int WifiSettings::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
@@ -262,10 +356,17 @@ int WifiSettings::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
     return 0;
 }
 
-int WifiSettings::GetScanControlInfo(ScanControlInfo &info)
+int WifiSettings::GetScanControlInfo(ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     info = mScanControlInfo;
+    return 0;
+}
+
+int WifiSettings::GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap)
+{
+    std::unique_lock<std::mutex> lock(mInfoMutex);
+    filterMap = mFilterMap;
     return 0;
 }
 
@@ -283,7 +384,7 @@ int WifiSettings::SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo)
     return 0;
 }
 
-int WifiSettings::SetScanControlInfo(const ScanControlInfo &info)
+int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mScanControlInfo = info;
@@ -672,35 +773,35 @@ int WifiSettings::AddWpsDeviceConfig(const WifiDeviceConfig &config)
     return 0;
 }
 
-int WifiSettings::GetIpInfo(IpInfo &info)
+int WifiSettings::GetIpInfo(IpInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     info = mWifiIpInfo;
     return 0;
 }
 
-int WifiSettings::SaveIpInfo(const IpInfo &info)
+int WifiSettings::SaveIpInfo(const IpInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mWifiIpInfo = info;
     return 0;
 }
 
-int WifiSettings::GetIpv6Info(IpV6Info &info)
+int WifiSettings::GetIpv6Info(IpV6Info &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     info = mWifiIpV6Info;
     return 0;
 }
 
-int WifiSettings::SaveIpV6Info(const IpV6Info &info)
+int WifiSettings::SaveIpV6Info(const IpV6Info &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mWifiIpV6Info = info;
     return 0;
 }
 
-int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info)
+int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     if (mWifiLinkedInfo.channelWidth == WifiChannelWidth::WIDTH_INVALID) {
@@ -710,7 +811,7 @@ int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info)
     return 0;
 }
 
-int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info)
+int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     WifiChannelWidth channelWidth = mWifiLinkedInfo.channelWidth;
@@ -723,14 +824,14 @@ int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info)
     return 0;
 }
 
-int WifiSettings::SetMacAddress(const std::string &macAddress)
+int WifiSettings::SetMacAddress(const std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     mMacAddress = macAddress;
     return 0;
 }
 
-int WifiSettings::GetMacAddress(std::string &macAddress)
+int WifiSettings::GetMacAddress(std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     macAddress = mMacAddress;
@@ -815,21 +916,18 @@ bool WifiSettings::RemoveRandomMac(const std::string &bssid, const std::string &
     return false;
 }
 
+#ifndef OHOS_ARCH_LITE
 int WifiSettings::SetCountryCode(const std::string &countryCode)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    std::string tmpCode = countryCode;
-    std::transform(countryCode.begin(), countryCode.end(), tmpCode.begin(), ::toupper);
-    mCountryCode = tmpCode;
+    if (strcasecmp(m_countryCode.c_str(), countryCode.c_str()) == 0) {
+        return 0;
+    }
+    m_countryCode = countryCode;
+    StrToUpper(m_countryCode);
     return 0;
 }
-
-int WifiSettings::GetCountryCode(std::string &countryCode)
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    countryCode = mCountryCode;
-    return 0;
-}
+#endif
 
 int WifiSettings::GetHotspotState(int id)
 {
@@ -1325,7 +1423,7 @@ void WifiSettings::GetLinkedChannelWidth()
     LOGD("WifiSettings GetLinkedChannelWidth failed.");
 }
 
-void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannelWidth channelWidth)
+void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannelWidth channelWidth, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     if (bssid == mWifiLinkedInfo.bssid) {
@@ -1333,7 +1431,7 @@ void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannel
     }
 }
 
-bool WifiSettings::EnableNetwork(int networkId, bool disableOthers)
+bool WifiSettings::EnableNetwork(int networkId, bool disableOthers, int instId)
 {
     if (disableOthers) {
         SetUserLastSelectedNetworkId(networkId);
@@ -1341,18 +1439,18 @@ bool WifiSettings::EnableNetwork(int networkId, bool disableOthers)
     return true;
 }
 
-void WifiSettings::SetUserLastSelectedNetworkId(int networkId)
+void WifiSettings::SetUserLastSelectedNetworkId(int networkId, int instId)
 {
     mLastSelectedNetworkId = networkId;
     mLastSelectedTimeVal = time(NULL);
 }
 
-int WifiSettings::GetUserLastSelectedNetworkId()
+int WifiSettings::GetUserLastSelectedNetworkId(int instId)
 {
     return mLastSelectedNetworkId;
 }
 
-time_t WifiSettings::GetUserLastSelectedNetworkTimeVal()
+time_t WifiSettings::GetUserLastSelectedNetworkTimeVal(int instId)
 {
     return mLastSelectedTimeVal;
 }
@@ -1744,7 +1842,7 @@ const MovingFreezePolicy WifiSettings::ReloadMovingFreezePolicy()
     return mMovingFreezePolicy.GetValue()[0];
 }
 
-std::string WifiSettings::GetConnectTimeoutBssid()
+std::string WifiSettings::GetConnectTimeoutBssid(int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     const int timeout = 30; // 30s
@@ -1754,7 +1852,7 @@ std::string WifiSettings::GetConnectTimeoutBssid()
     return mBssidToTimeoutTime.first;
 }
 
-int WifiSettings::SetConnectTimeoutBssid(std::string &bssid)
+int WifiSettings::SetConnectTimeoutBssid(std::string &bssid, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     time_t now = time(0);
@@ -1762,15 +1860,10 @@ int WifiSettings::SetConnectTimeoutBssid(std::string &bssid)
     return 0;
 }
 
-void WifiSettings::SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies)
+void WifiSettings::SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies, int instId)
 {
-    std::string countryCode;
-    if (GetCountryCode(countryCode)) {
-        return;
-    }
-
     for (auto& item : g_countryDefaultFreqs) {
-        if (item.countryCode == countryCode && item.band == band) {
+        if (item.band == band) {
             frequencies = item.freqs;
         }
     }
@@ -1815,12 +1908,12 @@ uint64_t WifiSettings::GetThreadStartTime(void) const
     return mThreadStartTime;
 }
 
-void WifiSettings::SaveDisconnectedReason(DisconnectedReason discReason)
+void WifiSettings::SaveDisconnectedReason(DisconnectedReason discReason, int instId)
 {
     mLastDiscReason = discReason;
 }
 
-int WifiSettings::GetDisconnectedReason(DisconnectedReason &discReason) const
+int WifiSettings::GetDisconnectedReason(DisconnectedReason &discReason, int instId)
 {
     discReason = mLastDiscReason;
     return 0;
@@ -1851,9 +1944,12 @@ int WifiSettings::GetStaApExclusionType()
     return mWifiConfig.staApExclusionType;
 }
 
-void WifiSettings::GetPortalUri(std::string &portalUri)
+void WifiSettings::GetPortalUri(WifiPortalConf &urlInfo)
 {
-    portalUri = mPortalUri.portalUri;
+    urlInfo.portalHttpUrl = mPortalUri.portalHttpUrl;
+    urlInfo.portalHttpsUrl = mPortalUri.portalHttpsUrl;
+    urlInfo.portalBakHttpUrl = mPortalUri.portalBakHttpUrl;
+    urlInfo.portalBakHttpsUrl = mPortalUri.portalBakHttpsUrl;
 }
 
 int WifiSettings::SetStaApExclusionType(int type)
@@ -1964,7 +2060,7 @@ void WifiSettings::GenerateRandomMacAddress(std::string peerBssid, std::string &
 }
 
 bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
-    const std::string &randomAddr)
+    const std::string &randomAddr, int instId)
 {
     if (realMacAddr.empty()) {
         LOGE("StoreWifiMacAddrPairInfo: address is empty");
@@ -2021,7 +2117,7 @@ std::string WifiSettings::GetRandomMacAddr(WifiMacAddrInfoType type, std::string
     }
     return "";
 }
-void WifiSettings::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid)
+void WifiSettings::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid, int instId)
 {
     LOGD("%{public}s: remove a mac address pair, type:%{public}d, bssid:%{private}s",
         __func__, type, bssid.c_str());
@@ -2036,7 +2132,7 @@ void WifiSettings::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string b
     WifiSettings::GetInstance().RemoveMacAddrPairs(type, randomMacAddrInfo);
 }
 WifiMacAddrErrCode WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
-    const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr)
+    const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr, int instId)
 {
     if ((type >= WifiMacAddrInfoType::INVALID_MACADDR_INFO) || macAddrInfo.bssid.empty()) {
         LOGE("%{public}s: invalid parameter, type:%{public}d, bssid:%{private}s",
@@ -2062,7 +2158,7 @@ WifiMacAddrErrCode WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
     return WIFI_MACADDR_INVALID_PARAM;
 }
 
-int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo)
+int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, int instId)
 {
     LOGD("remove a mac address pair, type:%{public}d, bssid:%{private}s, bssidType:%{public}d",
         type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -2090,7 +2186,7 @@ int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddr
     return 0;
 }
 
-std::string WifiSettings::GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo)
+std::string WifiSettings::GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, int instId)
 {
     LOGD("get a mac address pair, type:%{public}d, bssid:%{private}s, bssidType:%{public}d",
         type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -2138,7 +2234,7 @@ void WifiSettings::PrintMacAddrPairs(WifiMacAddrInfoType type)
     }
 }
 
-void WifiSettings::ClearMacAddrPairs(WifiMacAddrInfoType type)
+void WifiSettings::ClearMacAddrPairs(WifiMacAddrInfoType type, int instId)
 {
     LOGI("%{public}s type:%{public}d", __func__, type);
     std::unique_lock<std::mutex> lock(mMacAddrPairMutex);

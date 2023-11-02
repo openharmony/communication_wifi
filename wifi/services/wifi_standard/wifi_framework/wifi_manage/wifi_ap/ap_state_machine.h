@@ -16,6 +16,7 @@
 #define OHOS_AP_STATE_MACHINE_H
 
 #include "state_machine.h"
+#include <vector>
 #include "dhcpd_interface.h"
 #include "i_ap_service.h"
 #include "ap_root_state.h"
@@ -156,7 +157,7 @@ private:
 
 private:
     std::string m_iface;
-    IApServiceCallbacks m_Callbacks;
+    std::map<std::string, IApServiceCallbacks> m_callbacks;
     /* STA Manager */
     ApStationsManager &m_ApStationsManager;
     /* The reference of RootState */

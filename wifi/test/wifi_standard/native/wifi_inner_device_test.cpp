@@ -218,5 +218,23 @@ HWTEST_F(WifiInnerDeviceTest, GetSupportedFeaturesTest, TestSize.Level1)
     WIFI_LOGE("GetSupportedFeaturesTest result(0x%{public}x)", result);
     EXPECT_EQ(result, WIFI_OPT_PERMISSION_DENIED);
 }
+
+HWTEST_F(WifiInnerDeviceTest, SetAppFrozenTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetAppFrozenTest enter!");
+    EXPECT_TRUE(devicePtr != nullptr);
+    ErrCode result = devicePtr->SetAppFrozen(11, true);
+    WIFI_LOGE("SetAppFrozenTest result(0x%{public}x)", result);
+    EXPECT_GE(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiInnerDeviceTest, ResetAllFrozenAppTest, TestSize.Level1)
+{
+    WIFI_LOGE("ResetAllFrozenAppTest enter!");
+    EXPECT_TRUE(devicePtr != nullptr);
+    ErrCode result = devicePtr->ResetAllFrozenApp();
+    WIFI_LOGE("ResetAllFrozenAppTest result(0x%{public}x)", result);
+    EXPECT_GE(result, WIFI_OPT_SUCCESS);
+}
 } // namespace Wifi
 } // namespace OHOS

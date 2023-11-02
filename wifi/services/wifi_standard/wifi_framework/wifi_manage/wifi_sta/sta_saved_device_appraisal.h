@@ -25,7 +25,7 @@ namespace Wifi {
 class StaSavedDeviceAppraisal : public StaDeviceAppraisal {
     FRIEND_GTEST(StaSavedDeviceAppraisal);
 public:
-    explicit StaSavedDeviceAppraisal(bool supportFmRoamingFlag);
+    StaSavedDeviceAppraisal(bool supportFmRoamingFlag, int instId = 0);
     ~StaSavedDeviceAppraisal() override;
     /**
      * @Description  Evaluate the Saved device from the scanning result and
@@ -50,6 +50,7 @@ private:
     int safetyDeviceScore;
     int normalDeviceScore;
     bool firmwareRoamFlag;
+    int m_instId;
 
     /**
      * @Description  Scoring mechanism.

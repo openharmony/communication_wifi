@@ -27,7 +27,7 @@ namespace Wifi {
 class ScanInterface : public IScanService {
     FRIEND_GTEST(ScanInterface);
 public:
-    ScanInterface();
+    explicit ScanInterface(int instId = 0);
     ~ScanInterface();
 
     /**
@@ -171,6 +171,7 @@ private:
     ScanService *pScanService;
     IScanSerivceCallbacks mScanSerivceCallbacks;
     std::mutex mutex;
+    int m_instId;
 };
 }  // namespace Wifi
 }  // namespace OHOS

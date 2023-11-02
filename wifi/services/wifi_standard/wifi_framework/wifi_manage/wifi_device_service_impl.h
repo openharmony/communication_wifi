@@ -26,7 +26,6 @@
 #include "system_ability.h"
 #include "wifi_device_stub.h"
 #include "iremote_object.h"
-#include "wifi_p2p_service_impl.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "bundle_constants.h"
@@ -35,7 +34,9 @@
 
 namespace OHOS {
 namespace Wifi {
-#ifndef OHOS_ARCH_LITE
+#ifdef OHOS_ARCH_LITE
+enum ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
+#else
 class AppEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -50,34 +51,19 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 #endif
-#ifdef OHOS_ARCH_LITE
-enum ServiceRunningState {
-    STATE_NOT_START,
-    STATE_RUNNING
-};
 
 class WifiDeviceServiceImpl : public WifiDeviceStub {
-#else
-
-class WifiDeviceServiceImpl : public SystemAbility, public WifiDeviceStub {
-DECLARE_SYSTEM_ABILITY(WifiDeviceServiceImpl);
-#endif
 public:
     WifiDeviceServiceImpl();
-    virtual ~WifiDeviceServiceImpl();
-
 #ifdef OHOS_ARCH_LITE
     static std::shared_ptr<WifiDeviceServiceImpl> GetInstance();
-
     void OnStart();
     void OnStop();
 #else
-    static sptr<WifiDeviceServiceImpl> GetInstance();
-
-    void OnStart() override;
-    void OnStop() override;
-    void StartWatchdog(void);
+    explicit WifiDeviceServiceImpl(int instId);
+    static void StartWatchdog(void);
 #endif
+    virtual ~WifiDeviceServiceImpl();
 
     ErrCode EnableWifi() override;
 
@@ -135,6 +121,10 @@ public:
 
     ErrCode GetCountryCode(std::string &countryCode) override;
 
+    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+
+    ErrCode ResetAllFrozenApp() override;
+
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
         const std::vector<std::string> &event) override;
@@ -160,9 +150,9 @@ public:
 
     ErrCode Get5GHzChannelList(std::vector<int> &result) override;
 
-#ifndef OHOS_ARCH_LITE
-    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
-#endif
+    static void SaBasicDump(std::string& result);
+    
+    ErrCode StartPortalCertification() override;
 
 private:
     bool Init();
@@ -172,9 +162,6 @@ private:
     bool CheckConfigEap(const WifiDeviceConfig &config);
     bool CheckConfigPwd(const WifiDeviceConfig &config);
     ErrCode CheckCallingUid(int &uid);
-    static void SaBasicDump(std::string& result);
-    static void SigHandler(int sig);
-    static bool IsProcessNeedToRestart();
     ErrCode CheckRemoveCandidateConfig(void);
 #ifndef OHOS_ARCH_LITE
     void RegisterAppRemoved();
@@ -193,9 +180,10 @@ private:
     static constexpr int WEP_KEY_LEN3 = 16;
 
 #ifdef OHOS_ARCH_LITE
+    static std::mutex g_instanceLock;
     static std::shared_ptr<WifiDeviceServiceImpl> g_instance;
+    ServiceRunningState mState;
 #else
-    static sptr<WifiDeviceServiceImpl> g_instance;
     std::shared_ptr<AppEventSubscriber> eventSubscriber_ = nullptr;
     std::shared_ptr<ThermalLevelSubscriber> thermalLevelSubscriber_ = nullptr;
     uint32_t appEventTimerId{0};
@@ -203,10 +191,6 @@ private:
     std::mutex appEventMutex;
     std::mutex thermalEventMutex;
 #endif
-    static std::mutex g_instanceLock;
-    static bool isServiceStart;
-    bool mPublishFlag;
-    ServiceRunningState mState;
 };
 }  // namespace Wifi
 }  // namespace OHOS

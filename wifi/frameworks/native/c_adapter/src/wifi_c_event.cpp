@@ -46,16 +46,45 @@ void WifiCDeviceEventCallback::OnWifiStateChanged(int state)
     WIFI_LOGI("sta received state changed event: %{public}d", state);
 }
 
+static OHOS::Wifi::ErrCode ConvertedLinkedInfo(const OHOS::Wifi::WifiLinkedInfo& linkedInfo, WifiLinkedInfo *dstInfo)
+{
+    if (dstInfo == nullptr) {
+        WIFI_LOGE("Error: the ptr is null!");
+        return OHOS::Wifi::WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (memcpy_s(dstInfo->ssid, WIFI_MAX_SSID_LEN, linkedInfo.ssid.c_str(), linkedInfo.ssid.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (OHOS::Wifi::MacStrToArray(linkedInfo.bssid, dstInfo->bssid) != EOK) {
+        WIFI_LOGE("linked info convert bssid error!");
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    dstInfo->rssi = linkedInfo.rssi;
+    dstInfo->band = linkedInfo.band;
+    dstInfo->frequency = linkedInfo.frequency;
+    dstInfo->connState = linkedInfo.connState == OHOS::Wifi::ConnState::CONNECTED ? WIFI_CONNECTED : WIFI_DISCONNECTED;
+    /* disconnectedReason not support */
+    dstInfo->ipAddress = linkedInfo.ipAddress;
+    dstInfo->wifiStandard = linkedInfo.wifiStandard;
+    dstInfo->maxSupportedRxLinkSpeed = linkedInfo.maxSupportedRxLinkSpeed;
+    dstInfo->maxSupportedTxLinkSpeed = linkedInfo.maxSupportedTxLinkSpeed;
+    dstInfo->rxLinkSpeed = linkedInfo.rxLinkSpeed;
+    dstInfo->txLinkSpeed = linkedInfo.txLinkSpeed;
+    return OHOS::Wifi::WIFI_OPT_SUCCESS;
+}
+
 NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnWifiConnectionChanged(int state,
     const OHOS::Wifi::WifiLinkedInfo &info)
 {
     WIFI_LOGI("sta received connection changed event: %{public}d", state);
     WifiLinkedInfo linkInfo;
-    WifiErrorCode ret = GetLinkedInfo(&linkInfo);
-    if (ret != WIFI_SUCCESS) {
-        WIFI_LOGE("Received event get linked info failed");
+    OHOS::Wifi::ErrCode retValue = ConvertedLinkedInfo(info, &linkInfo);
+    if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get linked info from cpp error!");
         return;
     }
+
     std::set<WifiEvent*> setCallbacks = GetEventCallBacks();
     for (auto& callback : setCallbacks) {
         if (callback && callback->OnWifiConnectionChanged) {
@@ -258,11 +287,22 @@ WifiErrorCode EventManager::RegisterP2PEvent(const std::vector<std::string> &eve
 NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
 {
     if (mSaStatusListener == nullptr) {
+        int32_t ret;
+        auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            WIFI_LOGI("samgrProxy is nullptr!");
+            return ERROR_WIFI_UNKNOWN;
+        }
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        if (mSaStatusListener == nullptr) {
+            WIFI_LOGI("mSaStatusListener is nullptr!");
+            return ERROR_WIFI_UNKNOWN;
+        }
+        ret = samgrProxy->SubscribeSystemAbility((int32_t)WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_SCAN_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        WIFI_LOGI("SubscribeSystemAbility return ret:%{public}d!", ret);
     }
 
     WifiErrorCode ret = WIFI_SUCCESS;
@@ -327,12 +367,23 @@ EventManager& EventManager::GetInstance()
 void EventManager::Init()
 {
     if (mSaStatusListener == nullptr) {
+        int32_t ret;
         WIFI_LOGI("EventManager Listener Init!");
+        auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            WIFI_LOGI("samgrProxy is nullptr!");
+            return;
+        }
         mSaStatusListener = new OHOS::Wifi::WifiAbilityStatusChange();
-        mSaStatusListener->Init(WIFI_DEVICE_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_SCAN_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_HOTSPOT_ABILITY_ID);
-        mSaStatusListener->Init(WIFI_P2P_ABILITY_ID);
+        if (mSaStatusListener == nullptr) {
+            WIFI_LOGI("mSaStatusListener is nullptr!");
+            return;
+        }
+        ret = samgrProxy->SubscribeSystemAbility((int32_t)WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_SCAN_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
+        samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        WIFI_LOGI("Init, SubscribeSystemAbility return ret:%{public}d!", ret);
     }
     return;
 }

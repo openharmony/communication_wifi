@@ -167,6 +167,7 @@ static int InitRpcFuncMapSta(void)
     ret += PushRpcFunc("GetNetworkList", RpcGetNetworkList);
     ret += PushRpcFunc("GetConnectSignalInfo", RpcGetConnectSignalInfo);
     ret += PushRpcFunc("SetSuspendMode", RpcSetSuspendMode);
+    ret += PushRpcFunc("SetPowerMode", RpcSetPowerMode);
     return ret;
 }
 
@@ -724,11 +725,12 @@ static void DealeventCommonCbk(int event, Context *context)
 {
     WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
     if (cbmsg != NULL) {
+        LOGD("callback msg is %{public}s", cbmsg->msg.commsg.event);
         WriteStr(context, cbmsg->msg.commsg.event);
     }
 }
 
-static void DealHmlCallback(int event, Context *context)
+static void DealChbaCallback(int event, Context *context)
 {
     switch (event) {
         case WIFI_HAL_COMMON_EVENT:
@@ -750,7 +752,7 @@ int OnCallbackTransact(const RpcServer *server, int event, Context *context)
     WriteInt(context, event);
     DealStaApCallback(event, context);
     DealP2pCallback(event, context);
-    DealHmlCallback(event, context);
+    DealChbaCallback(event, context);
     WriteEnd(context);
     return HAL_SUCCESS;
 }

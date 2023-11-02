@@ -927,7 +927,8 @@ int RpcP2pHid2dConnect(RpcServer *server, Context *context)
     if (ReadStr(context, info.ssid, sizeof(info.ssid)) != 0 ||
         ReadStr(context, info.bssid, sizeof(info.bssid)) != 0 ||
         ReadStr(context, info.passphrase, sizeof(info.passphrase)) != 0 ||
-        ReadInt(context, &info.frequency) < 0) {
+        ReadInt(context, &info.frequency) < 0 ||
+        ReadInt(context, &info.isLegacyGo) < 0) {
         return HAL_FAILURE;
     }
     WifiErrorNo err = P2pHid2dConnect(&info);

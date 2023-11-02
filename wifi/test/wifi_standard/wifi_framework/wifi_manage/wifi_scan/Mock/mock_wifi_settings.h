@@ -27,10 +27,10 @@ using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 class MockWifiSettings {
 public:
     virtual ~MockWifiSettings() = default;
-    virtual int SaveScanInfoList(const std::vector<WifiScanInfo> &results) = 0;
-    virtual int GetScanInfoList(std::vector<WifiScanInfo> &results) = 0;
-    virtual int GetScanControlInfo(ScanControlInfo &info) = 0;
-    virtual int SetScanControlInfo(const ScanControlInfo &info) = 0;
+    virtual int SaveScanInfoList(const std::vector<WifiScanInfo> &results, int instId = 0) = 0;
+    virtual int GetScanInfoList(std::vector<WifiScanInfo> &results, int instId = 0) = 0;
+    virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
+    virtual int SetScanControlInfo(const ScanControlInfo &info, int instId = 0) = 0;
     virtual void SetScreenState(const int &state) = 0;
     virtual int GetScreenState() const = 0;
     virtual ScanMode GetAppRunningState() const = 0;
@@ -50,17 +50,18 @@ public:
     virtual void SetAppRunningState(ScanMode appRunMode) = 0;
     virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
-    virtual int ClearScanInfoList() = 0;
+    virtual int ClearScanInfoList(int instId = 0) = 0;
+    virtual void SetAppPackageName(const std::string &name) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
 public:
     static WifiSettings &GetInstance(void);
 
-    MOCK_METHOD1(SaveScanInfoList, int(const std::vector<WifiScanInfo> &results));
-    MOCK_METHOD1(GetScanInfoList, int(std::vector<WifiScanInfo> &results));
-    MOCK_METHOD1(GetScanControlInfo, int(ScanControlInfo &info));
-    MOCK_METHOD1(SetScanControlInfo, int(const ScanControlInfo &info));
+    MOCK_METHOD2(SaveScanInfoList, int(const std::vector<WifiScanInfo> &results, int));
+    MOCK_METHOD2(GetScanInfoList, int(std::vector<WifiScanInfo> &results, int));
+    MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int));
+    MOCK_METHOD2(SetScanControlInfo, int(const ScanControlInfo &info, int));
     MOCK_METHOD1(SetScreenState, void(const int &state));
     MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_CONST_METHOD0(GetAppRunningState, ScanMode());
@@ -80,7 +81,8 @@ public:
     MOCK_METHOD1(SetAppRunningState, void(ScanMode appRunMode));
     MOCK_METHOD1(SetWhetherToAllowNetworkSwitchover, int(bool bSwitch));
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
-    MOCK_METHOD0(ClearScanInfoList, int());
+    MOCK_METHOD1(ClearScanInfoList, int(int));
+    MOCK_METHOD1(SetAppPackageName, void(const std::string &name));
 };
 }  // namespace Wifi
 }  // namespace OHOS

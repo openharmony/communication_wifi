@@ -83,6 +83,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
             .WillRepeatedly(Return(defaultValue));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetPackageFilterMap(_)).Times(AtLeast(1));
         EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
     }
 
@@ -105,6 +106,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
             .WillRepeatedly(Return(refVecTrustList));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetPackageFilterMap(_)).Times(AtLeast(1));
         EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
     }
 
@@ -811,6 +813,7 @@ public:
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetPackageFilterMap(_)).Times(AtLeast(1));
         pScanService->GetScanControlInfo();
     }
 
@@ -818,6 +821,7 @@ public:
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetPackageFilterMap(_)).Times(AtLeast(1));
         pScanService->GetScanControlInfo();
     }
     

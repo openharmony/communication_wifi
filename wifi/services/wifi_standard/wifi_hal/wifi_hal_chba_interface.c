@@ -7,7 +7,7 @@
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
@@ -26,7 +26,7 @@
 #define LOG_TAG "WifiHalChbaInterface"
 
 const char *g_wpaSupplicantChba = "wpa_supplicant";
-const char *g_systemCmdWpaChbaStart = "wpa_supplicant -ichba0 -g/data/service/el1/public/wifi/sockets/wpa";
+const char *g_systemCmdWpaChbaStart = "wpa_supplicant -ichba0 -g/data/service/el1/public/wifi/sockets/wpa/chba0";
 
 static WifiErrorNo ChbaStartSupplicant(void)
 {

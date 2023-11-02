@@ -23,6 +23,10 @@
 
 namespace OHOS {
 namespace Wifi {
+#define RETRY_TIMEOUT 10
+#define RETRY_MAX_NUM 9
+#define RETRY_INTERVAL 500
+#define P2P_REMOVE_DEVICE_TIMEOUT 300000
 class P2pStateMachine;
 class P2pIdleState : public State {
     FRIEND_GTEST(P2pIdleState);
@@ -169,12 +173,17 @@ private:
      */
     virtual bool ProcessP2pIfaceCreatedEvt(InternalMessage &msg) const;
 
+    virtual bool ProcessRemoveDevice(InternalMessage &msg) const;
+
+    virtual bool RetryConnect(InternalMessage &msg) const;
+
 private:
     using ProcessFun = bool (P2pIdleState::*)(InternalMessage &msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;
+    static int retryConnectCnt;
 };
 } // namespace Wifi
 } // namespace OHOS

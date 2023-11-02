@@ -114,6 +114,8 @@ bool P2pEnabledState::ProcessCmdDisable(InternalMessage &msg) const
 }
 bool P2pEnabledState::ProcessCmdStartListen(InternalMessage &msg) const
 {
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
+
     if (WifiP2PHalInterface::GetInstance().P2pFlush()) {
         WIFI_LOGW("Unexpected results in p2p flush.");
     }
@@ -156,6 +158,7 @@ bool P2pEnabledState::ProcessCmdStopListen(InternalMessage &msg) const
 }
 bool P2pEnabledState::ProcessCmdDiscPeer(InternalMessage &msg) const
 {
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
     WIFI_LOGI("P2P ProcessCmdDiscPeer recv CMD: %{public}d", msg.GetMessageName());
     p2pStateMachine.HandlerDiscoverPeers();
     return EXECUTED;
@@ -388,6 +391,7 @@ bool P2pEnabledState::ProcessCmdDiscServices(InternalMessage &msg) const
     request.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_ALL);
     request.SetTransactionId(p2pStateMachine.serviceManager.GetTransId());
 
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
     WifiErrorNo retCode =
         WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(device.GetDeviceAddress(), request.GetTlv(), reqId);
     if (WifiErrorNo::WIFI_IDL_OPT_OK != retCode) {

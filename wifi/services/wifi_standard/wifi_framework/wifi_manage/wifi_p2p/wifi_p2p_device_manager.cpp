@@ -54,11 +54,6 @@ bool WifiP2pDeviceManager::RemoveDevice(const std::string &deviceAddress)
     std::unique_lock<std::mutex> lock(deviceMutex);
     for (auto it = p2pDevices.begin(); it != p2pDevices.end(); it++) {
         if (it->GetDeviceAddress() == deviceAddress) {
-        #ifdef SUPPORT_RANDOM_MAC_ADDR
-            LOGD("%{public}s: remove a device, address: %{private}s", __func__, deviceAddress.c_str());
-            WifiSettings::GetInstance().RemoveMacAddrPairInfo(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO,
-                deviceAddress);
-        #endif
             p2pDevices.erase(it);
             LOGI("remove a device: address:%{private}s", deviceAddress.c_str());
             return true;

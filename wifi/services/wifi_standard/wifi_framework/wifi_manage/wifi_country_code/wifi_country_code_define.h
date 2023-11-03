@@ -44,10 +44,12 @@ struct MccEntry {
  * 2) The ISO 3166 country codes list, available here:
  *    http://www.iso.org/iso/en/prods-services/iso3166ma/02iso-3166-code-lists/index.html
  *
- * This table has not been verified.
- *
+ * very importent：The order of mnc must be from small to large！
  */
 const MccEntry MCC_TABLE[] = {
+    // Fake country code, which is the default value, Scan only 2.4G channels and passively receive 5G beacons
+    {0, "zz", 0},
+
     // Greece
     {202, "gr", 2},
 
@@ -763,10 +765,7 @@ const MccEntry MCC_TABLE[] = {
     {748, "uy", 2},
 
     // Falkland Islands Malvinas
-    {750, "fk", 2},
-
-    // Fake country code, which is the default value^M
-    {0, "zz", 0}
+    {750, "fk", 2}
 };
 }
 }

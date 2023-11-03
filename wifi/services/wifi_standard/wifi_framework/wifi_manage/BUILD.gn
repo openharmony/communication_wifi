@@ -568,23 +568,25 @@ if (defined(ohos_lite)) {
     subsystem_name = "communication"
   }
 
-  ohos_shared_library("wifi_p2p_ability") {
-    branch_protector_ret = "pac_ret"
+  if (wifi_feature_with_p2p) {
+    ohos_shared_library("wifi_p2p_ability") {
+      branch_protector_ret = "pac_ret"
 
-    sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
-      debug = false
+      sanitize = {
+        cfi = true
+        boundary_sanitize = true
+        cfi_cross_dso = true
+        debug = false
+      }
+      install_enable = true
+      deps = [
+        ":wifi_manager_service",
+        ":wifi_p2p_service_impl",
+      ]
+
+      shlib_type = "sa"
+      part_name = "wifi"
+      subsystem_name = "communication"
     }
-    install_enable = true
-    deps = [
-      ":wifi_manager_service",
-      ":wifi_p2p_service_impl",
-    ]
-
-    shlib_type = "sa"
-    part_name = "wifi"
-    subsystem_name = "communication"
   }
 }

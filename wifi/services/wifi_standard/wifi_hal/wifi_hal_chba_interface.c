@@ -25,8 +25,13 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHalChbaInterface"
 
-const char *g_wpaSupplicantChba = "wpa_supplicant";
-const char *g_systemCmdWpaChbaStart = "wpa_supplicant -ichba0 -g/data/service/el1/public/wifi/sockets/wpa/chba0";
+#ifdef WPA_CTRL_IFACE_UNIX
+#define CHBA_CMD "wpa_supplicant -c"CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf"\
+    " -g@abstract:"CONFIG_ROOR_DIR"/sockets/wpa/chba0"
+#else
+#define CHBA_CMD "wpa_supplicant -ichba0 -g"CONFIG_ROOR_DIR"/sockets/wpa"\
+    " -m"CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
+#endif // WPA_CTRL_IFACE_UNIX
 
 static WifiErrorNo ChbaStartSupplicant(void)
 {
@@ -34,7 +39,7 @@ static WifiErrorNo ChbaStartSupplicant(void)
     if (CopyConfigFile("p2p_supplicant.conf") != 0) {
         return WIFI_HAL_FAILED;
     }
-    ModuleManageRetCode ret = StartModule(g_wpaSupplicantChba, g_systemCmdWpaChbaStart);
+    ModuleManageRetCode ret = StartModule(WPA_SUPPLICANT_NAME, CHBA_CMD);
     if (ret == MM_SUCCESS) {
         return WIFI_HAL_SUCCESS;
     }
@@ -55,7 +60,7 @@ static WifiErrorNo ChbaConnectSupplicant(void)
 static WifiErrorNo ChbaStopSupplicant(void)
 {
     LOGD("stop chba supplicant");
-    ModuleManageRetCode ret = StopModule(g_wpaSupplicantChba, false);
+    ModuleManageRetCode ret = StopModule(WPA_SUPPLICANT_NAME, false);
     if (ret == MM_FAILED) {
         LOGE("stop chba_wpa_supplicant failed!");
         return WIFI_HAL_FAILED;

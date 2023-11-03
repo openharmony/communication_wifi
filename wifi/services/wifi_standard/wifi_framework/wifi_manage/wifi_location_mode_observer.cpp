@@ -30,5 +30,12 @@ void WifiDeviceProvisionObserver::OnChange()
     WifiManager::GetInstance().GetDeviceProvisionByDatashare();
 }
 
+#ifndef OHOS_ARCH_LITE
+void SettingsMigrateObserver::OnChange()
+{
+    WifiManager::GetInstance().CheckAndStartStaByDatashare();
+}
+#endif
+
 }
 }

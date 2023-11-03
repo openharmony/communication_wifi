@@ -234,6 +234,18 @@ HWTEST_F(WifiManagerTest, GetLocationModeByDatashareTest, TestSize.Level1)
     WIFI_LOGE("GetLocationModeByDatashareTest result(%{public}d)", result);
 }
 
+HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetLastStaStateByDatashareTest enter!");
+    wifiManager.GetLastStaStateByDatashare();
+}
+
+HWTEST_F(WifiManagerTest, CheckAndStartStaByDatashareTest, TestSize.Level1)
+{
+    WIFI_LOGE("CheckAndStartStaByDatashareTest enter!");
+    wifiManager.CheckAndStartStaByDatashare();
+}
+
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)
 {
     WIFI_LOGE("CheckAndStartScanService_001 enter!");
@@ -258,6 +270,18 @@ HWTEST_F(WifiManagerTest, UnRegisterScreenEventTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterScreenEventTest enter!");
     wifiManager.UnRegisterScreenEvent();
+}
+
+HWTEST_F(WifiManagerTest, RegisterSettingsMigrateEventTest, TestSize.Level1)
+{
+    WIFI_LOGE("RegisterSettingsMigrateEventTest enter!");
+    wifiManager.RegisterSettingsMigrateEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterSettingsMigrateEventTest, TestSize.Level1)
+{
+    WIFI_LOGE("UnRegisterSettingsMigrateEventTest enter!");
+    wifiManager.UnRegisterSettingsMigrateEvent();
 }
 
 HWTEST_F(WifiManagerTest, RegisterAirplaneModeEventTest, TestSize.Level1)

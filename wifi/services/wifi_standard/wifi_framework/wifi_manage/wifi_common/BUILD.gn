@@ -25,8 +25,10 @@ ohos_shared_library("wifi_common_service") {
   }
   install_enable = true
   include_dirs = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client/idl_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
@@ -40,7 +42,7 @@ ohos_shared_library("wifi_common_service") {
 
   sources = [ "wifi_chip_capability.cpp" ]
 
-  deps = [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/idl_client:wifi_idl_client" ]
+  deps = [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native" ]
 
   external_deps = [
     "c_utils:utils",

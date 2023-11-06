@@ -1961,14 +1961,14 @@ public:
         EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "1234") == false);
     }
 
-    void IsAppInPackageFilterTest()
+    void IsAppInFilterListTest()
     {
         std::vector<std::string> packageFilter;
         packageFilter.push_back("com.test.test");
         EXPECT_CALL(WifiSettings::GetInstance(), SetAppPackageName("com.test.test"));
-        EXPECT_TRUE(pScanService->IsAppInPackageFilter(packageFilter) == true);
+        EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == true);
         EXPECT_CALL(WifiSettings::GetInstance(), SetAppPackageName("com.test.test1"));
-        EXPECT_TRUE(pScanService->IsAppInPackageFilter(packageFilter) == false);
+        EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == false);
     }
 
     void StartWpaSuccessTest()
@@ -2021,6 +2021,14 @@ public:
         EXPECT_TRUE(pScanService->AllowScanByMovingFreeze() == true);
         pScanService->isAbsFreezeScaned = true;
         EXPECT_TRUE(pScanService->AllowScanByMovingFreeze() == false);
+    }
+
+    void AllowScanByHid2dStateTest()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D));
+        EXPECT_TRUE(pScanService->AllowScanByHid2dState() == true);
+        EXPECT_CALL(WifiSettings::GetInstance(), SetP2pBusinessType(P2pBusinessType::P2P_TYPE_CLASSIC));
+        EXPECT_TRUE(pScanService->AllowScanByHid2dState() == true);
     }
 
     void AllowExternCustomSceneCheckTest1()
@@ -3017,6 +3025,11 @@ HWTEST_F(ScanServiceTest, AllowScanByIntervalFixedSuccess3, TestSize.Level1)
     AllowScanByIntervalFixedSuccess3();
 }
 
+HWTEST_F(ScanServiceTest, AllowScanByHid2dStateTest, TestSize.Level1)
+{
+    AllowScanByHid2dStateTest();
+}
+
 HWTEST_F(ScanServiceTest, AllowScanByIntervalFixedFail1, TestSize.Level1)
 {
     AllowScanByIntervalFixedFail1();
@@ -3107,14 +3120,14 @@ HWTEST_F(ScanServiceTest, IsPackageInTrustListTest, TestSize.Level1)
     IsPackageInTrustListTest();
 }
 /**
- * @tc.name: IsAppInPackageFilterTest
- * @tc.desc: IsAppInPackageFilter()
+ * @tc.name: IsAppInFilterListTest
+ * @tc.desc: IsAppInFilterList()
  * @tc.type: FUNC
  * @tc.require: issue
 */
-HWTEST_F(ScanServiceTest, IsAppInPackageFilterTest, TestSize.Level1)
+HWTEST_F(ScanServiceTest, IsAppInFilterListTest, TestSize.Level1)
 {
-    IsAppInPackageFilterTest();
+    IsAppInFilterListTest();
 }
 /**
  * @tc.name: AllowScanByMovingFreeze_001

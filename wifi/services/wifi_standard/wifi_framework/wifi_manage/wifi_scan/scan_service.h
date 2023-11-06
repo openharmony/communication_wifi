@@ -321,6 +321,7 @@ private:
     std::vector<std::string> scan_frequency_trust_list;
     std::vector<std::string> scan_screen_off_trust_list;
     std::vector<std::string> scan_gps_block_list;
+    std::vector<std::string> scan_hid2d_list;
     int staSceneForbidCount;
     int customSceneForbidCount;
     mutable std::mutex scanConfigMapMutex;
@@ -816,6 +817,12 @@ private:
      * @return true: allow, false: not allowed.
      */
     bool AllowScanByMovingFreeze();
+    /**
+     * @Description Determines whether scanning is allowed in hid2d state.
+     *
+     * @return true: allow, false: not allowed.
+     */
+    bool AllowScanByHid2dState();
 
     /**
      * @Description Is the app in the trustlist?
@@ -845,12 +852,12 @@ private:
     bool AllowExternCustomSceneCheck(const std::map<int, time_t>::const_iterator &customIter, int appId,
         ScanMode scanMode);
     /* *
-     * @Description Is app in the package filter.
+     * @Description Is app in the filter list.
      *
      * @param packageFilter packageFilter[in]
      * @return true: int the list, false: not in the list.
      */
-    bool IsAppInPackageFilter(std::vector<std::string> &packageFilter);
+    bool IsAppInFilterList(const std::vector<std::string> &packageFilter) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -207,7 +207,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
         }
     }
 
-    WifiConfigCenter::GetInstance().GetScanInfoList(result, m_instId);
+    WifiConfigCenter::GetInstance().GetScanInfoList(result);
     if (!compatible) {
     #ifdef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
@@ -218,7 +218,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
                 macAddrInfo.bssidType = iter->bssidType;
                 std::string randomMacAddr =
                     WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
-                        macAddrInfo, m_instId);
+                        macAddrInfo);
                 WIFI_LOGD("ssid:%{private}s, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
                     iter->ssid.c_str(), macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
                 if (!randomMacAddr.empty() &&
@@ -248,7 +248,7 @@ ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
         WIFI_LOGE("SetScanOnlyAvailable:VerifySetWifiConfigPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    WifiSettings::GetInstance().SetScanOnlySwitchState(bScanOnlyAvailable);
+    WifiSettings::GetInstance().SetScanOnlySwitchState(bScanOnlyAvailable, m_instId);
     if (bScanOnlyAvailable) {
         OpenScanOnlyAvailable();
     } else {
@@ -273,14 +273,14 @@ ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    bScanOnlyAvailable = WifiSettings::GetInstance().GetScanOnlySwitchState();
+    bScanOnlyAvailable = WifiSettings::GetInstance().GetScanOnlySwitchState(m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiScanServiceImpl::OpenScanOnlyAvailable()
 {
     WIFI_LOGI("WifiScanServiceImpl OpenScanOnlyAvailable");
-    if (!WifiSettings::GetInstance().CheckScanOnlyAvailable() ||
+    if (!WifiSettings::GetInstance().CheckScanOnlyAvailable(m_instId) ||
         !WifiManager::GetInstance().GetLocationModeByDatashare()) {
         return WIFI_OPT_FAILED;
     }

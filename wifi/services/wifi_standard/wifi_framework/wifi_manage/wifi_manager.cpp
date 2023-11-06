@@ -139,7 +139,7 @@ ErrCode WifiManager::AutoStartStaService(AutoStartOrStopServiceReason reason, in
 
     StopUnloadStaSaTimer();
     if (reason == AutoStartOrStopServiceReason::STA_AP_EXCLUSION) {
-        if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
+        if (WifiConfigCenter::GetInstance().GetOperatorWifiType(instId) ==
             static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
             WIFI_LOGI("AutoStartStaService, user opened wifi in airplane mode!");
             return WIFI_OPT_SUCCESS;
@@ -150,7 +150,7 @@ ErrCode WifiManager::AutoStartStaService(AutoStartOrStopServiceReason reason, in
             operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
             WIFI_LOGI("AutoStartStaService, current airplane mode is opened, user open wifi!");
         }
-        WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType);
+        WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType, instId);
     }
 #ifdef  FEATURE_P2P_SUPPORT
     errCode = AutoStartP2pService(reason);
@@ -201,11 +201,11 @@ ErrCode WifiManager::AutoStopStaService(AutoStartOrStopServiceReason reason, int
         return ret;
     }
 
-    WifiConfigCenter::GetInstance().SetStaLastRunState(false);
+    WifiConfigCenter::GetInstance().SetStaLastRunState(false, instId);
     if (reason == AutoStartOrStopServiceReason::AIRPLANE_MODE) {
         WIFI_LOGI("DealOpenAirplaneModeEvent, auto stop wifi success!");
         WifiConfigCenter::GetInstance().SetOperatorWifiType(
-            static_cast<int>(OperatorWifiType::CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED));
+            static_cast<int>(OperatorWifiType::CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED), instId);
     } else if (reason == AutoStartOrStopServiceReason::STA_AP_EXCLUSION) {
         WifiConfigCenter::GetInstance().SetStaApExclusionType(
             static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI));
@@ -215,7 +215,7 @@ ErrCode WifiManager::AutoStopStaService(AutoStartOrStopServiceReason reason, int
 
 void WifiManager::AutoStartScanOnly(int instId)
 {
-    if (!WifiSettings::GetInstance().CheckScanOnlyAvailable() ||
+    if (!WifiSettings::GetInstance().CheckScanOnlyAvailable(instId) ||
         !WifiManager::GetInstance().GetLocationModeByDatashare()) {
         WIFI_LOGI("No need to StartScanOnly, return");
         return;
@@ -772,7 +772,7 @@ void WifiManager::CloseStaService(int instId)
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_CLOSE) {
-        if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
+        if (WifiConfigCenter::GetInstance().GetOperatorWifiType(instId) ==
             static_cast<int>(OperatorWifiType::CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED)) {
             DealAirplaneExceptionWhenStaClose();
             return;
@@ -1013,14 +1013,14 @@ void WifiManager::DealStaOpenRes(OperateResState state, int instId)
     WIFI_LOGI("DealStaOpenRes:wifi open successfully!");
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(true);
-        if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
+        if (WifiConfigCenter::GetInstance().GetOperatorWifiType(instId) ==
             static_cast<int>(OperatorWifiType::OPEN_WIFI_DUE_TO_AIRPLANEMODE_CLOSED)) {
             DealAirplaneExceptionWhenStaOpen(instId);
             return;
         }
     }
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
-    WifiConfigCenter::GetInstance().SetStaLastRunState(true);
+    WifiConfigCenter::GetInstance().SetStaLastRunState(true, instId);
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
@@ -1035,8 +1035,7 @@ void WifiManager::DealStaOpenRes(OperateResState state, int instId)
 #endif
     AutoStartEnhanceService();
     CheckAndStartScanService(instId);
-
-    if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
+    if (WifiSettings::GetInstance().CheckScanOnlyAvailable(instId) &&
         WifiManager::GetInstance().GetLocationModeByDatashare()) {
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, instId);
     }
@@ -1500,7 +1499,7 @@ void WifiManager::DealCloseScanOnlyRes(OperateResState state, int instId)
 void WifiManager::DealAirplaneExceptionWhenStaOpen(int instId)
 {
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
-    WifiConfigCenter::GetInstance().SetStaLastRunState(true);
+    WifiConfigCenter::GetInstance().SetStaLastRunState(true, instId);
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
@@ -1519,7 +1518,7 @@ void WifiManager::DealAirplaneExceptionWhenStaOpen(int instId)
 #endif
         AutoStartEnhanceService();
         CheckAndStartScanService(instId);
-        if (WifiSettings::GetInstance().CheckScanOnlyAvailable() &&
+        if (WifiSettings::GetInstance().CheckScanOnlyAvailable(instId) &&
             WifiManager::GetInstance().GetLocationModeByDatashare()) {
             WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, instId);
         }
@@ -1550,7 +1549,7 @@ void WifiManager::DealAirplaneExceptionWhenStaClose(int instId)
         return;
     }
     WifiConfigCenter::GetInstance().SetOperatorWifiType(
-        static_cast<int>(OperatorWifiType::OPEN_WIFI_DUE_TO_AIRPLANEMODE_CLOSED));
+        static_cast<int>(OperatorWifiType::OPEN_WIFI_DUE_TO_AIRPLANEMODE_CLOSED), instId);
     return;
 }
 
@@ -1945,13 +1944,13 @@ void WifiManager::DealOpenAirplaneModeEvent()
 #ifdef FEATURE_AP_SUPPORT
     AutoStopApService(AutoStartOrStopServiceReason::AIRPLANE_MODE);
 #endif
-    if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
-        static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
-            WIFI_LOGI("DealOpenAirplaneModeEvent, user opened sta in airplane mode, ignore openairplanemode event!");
-            return;
-    }
 
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        if (WifiConfigCenter::GetInstance().GetOperatorWifiType(i) ==
+            static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
+                WIFI_LOGI("DealOpenAirplaneModeEvent, user opened sta in airplane mode, ignore openairplanemode event!");
+                continue;
+        }
         AutoStopStaService(AutoStartOrStopServiceReason::AIRPLANE_MODE, i);
     }
 }
@@ -1959,10 +1958,10 @@ void WifiManager::DealOpenAirplaneModeEvent()
 void WifiManager::DealCloseAirplaneModeEvent()
 {
     WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_CLOSE);
-    if (WifiConfigCenter::GetInstance().GetOperatorWifiType() ==
-        static_cast<int>(OperatorWifiType::CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED) &&
-        !WifiConfigCenter::GetInstance().GetStaLastRunState()) {
-            for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        if (WifiConfigCenter::GetInstance().GetOperatorWifiType(i) ==
+            static_cast<int>(OperatorWifiType::CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED) &&
+            !WifiConfigCenter::GetInstance().GetStaLastRunState(i)) {
                 ErrCode ret = AutoStartStaService(AutoStartOrStopServiceReason::AIRPLANE_MODE, i);
                 if (ret != WIFI_OPT_SUCCESS && ret != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
                     WIFI_LOGE("DealCloseAirplaneModeEvent, AutoStartStaService failed!");
@@ -1970,9 +1969,9 @@ void WifiManager::DealCloseAirplaneModeEvent()
                 }
                 WIFI_LOGI("DealCloseAirplaneModeEvent, auto start wifi success!");
                 WifiConfigCenter::GetInstance().SetOperatorWifiType(
-                    static_cast<int>(OperatorWifiType::OPEN_WIFI_DUE_TO_AIRPLANEMODE_CLOSED));
-            }
-            return;
+                    static_cast<int>(OperatorWifiType::OPEN_WIFI_DUE_TO_AIRPLANEMODE_CLOSED), i);
+                continue;
+        }
     }
 
     if (!WifiConfigCenter::GetInstance().GetStaLastRunState()) {

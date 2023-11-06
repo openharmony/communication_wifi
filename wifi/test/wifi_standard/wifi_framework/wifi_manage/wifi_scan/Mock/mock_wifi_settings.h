@@ -27,8 +27,8 @@ using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 class MockWifiSettings {
 public:
     virtual ~MockWifiSettings() = default;
-    virtual int SaveScanInfoList(const std::vector<WifiScanInfo> &results, int instId = 0) = 0;
-    virtual int GetScanInfoList(std::vector<WifiScanInfo> &results, int instId = 0) = 0;
+    virtual int SaveScanInfoList(const std::vector<WifiScanInfo> &results) = 0;
+    virtual int GetScanInfoList(std::vector<WifiScanInfo> &results) = 0;
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
     virtual int SetScanControlInfo(const ScanControlInfo &info, int instId = 0) = 0;
     virtual void SetScreenState(const int &state) = 0;
@@ -38,19 +38,19 @@ public:
     virtual int GetFreezeModeState() const = 0;
     virtual int GetNoChargerPlugModeState() const = 0;
     virtual void SetSupportHwPnoFlag(bool supportHwPnoFlag) = 0;
-    virtual bool GetSupportHwPnoFlag() = 0;
-    virtual int GetMinRssi2Dot4Ghz() = 0;
-    virtual int GetMinRssi5Ghz() = 0;
-    virtual bool GetWhetherToAllowNetworkSwitchover() = 0;
+    virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
+    virtual int GetMinRssi2Dot4Ghz(int instId = 0) = 0;
+    virtual int GetMinRssi5Ghz(int instId = 0) = 0;
+    virtual bool GetWhetherToAllowNetworkSwitchover(int instId = 0) = 0;
     virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results) = 0;
     virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
     virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
     virtual int GetThermalLevel() const = 0;
     virtual void SetThermalLevel(const int &level) = 0;
     virtual void SetAppRunningState(ScanMode appRunMode) = 0;
-    virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch) = 0;
+    virtual int SetWhetherToAllowNetworkSwitchover(bool bSwitch, int instId = 0) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
-    virtual int ClearScanInfoList(int instId = 0) = 0;
+    virtual int ClearScanInfoList() = 0;
     virtual void SetAppPackageName(const std::string &name) = 0;
     virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
 };
@@ -59,8 +59,8 @@ class WifiSettings : public MockWifiSettings {
 public:
     static WifiSettings &GetInstance(void);
 
-    MOCK_METHOD2(SaveScanInfoList, int(const std::vector<WifiScanInfo> &results, int));
-    MOCK_METHOD2(GetScanInfoList, int(std::vector<WifiScanInfo> &results, int));
+    MOCK_METHOD1(SaveScanInfoList, int(const std::vector<WifiScanInfo> &results));
+    MOCK_METHOD1(GetScanInfoList, int(std::vector<WifiScanInfo> &results));
     MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int));
     MOCK_METHOD2(SetScanControlInfo, int(const ScanControlInfo &info, int));
     MOCK_METHOD1(SetScreenState, void(const int &state));
@@ -70,19 +70,19 @@ public:
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_CONST_METHOD0(GetNoChargerPlugModeState, int());
     MOCK_METHOD1(SetSupportHwPnoFlag, void(bool supportHwPnoFlag));
-    MOCK_METHOD0(GetSupportHwPnoFlag, bool());
-    MOCK_METHOD0(GetMinRssi2Dot4Ghz, int());
-    MOCK_METHOD0(GetMinRssi5Ghz, int());
-    MOCK_METHOD0(GetWhetherToAllowNetworkSwitchover, bool());
+    MOCK_METHOD1(GetSupportHwPnoFlag, bool(int));
+    MOCK_METHOD1(GetMinRssi2Dot4Ghz, int(int));
+    MOCK_METHOD1(GetMinRssi5Ghz, int(int));
+    MOCK_METHOD1(GetWhetherToAllowNetworkSwitchover, bool(int));
     MOCK_METHOD1(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
     MOCK_CONST_METHOD0(GetThermalLevel, int());
     MOCK_METHOD1(SetThermalLevel, void(const int &level));
     MOCK_METHOD1(SetAppRunningState, void(ScanMode appRunMode));
-    MOCK_METHOD1(SetWhetherToAllowNetworkSwitchover, int(bool bSwitch));
+    MOCK_METHOD2(SetWhetherToAllowNetworkSwitchover, int(bool bSwitch, int));
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
-    MOCK_METHOD1(ClearScanInfoList, int(int));
+    MOCK_METHOD0(ClearScanInfoList, int());
     MOCK_METHOD1(SetAppPackageName, void(const std::string &name));
     MOCK_METHOD1(GetPackageFilterMap, int(std::map<std::string, std::vector<std::string>> &filterMap));
 };

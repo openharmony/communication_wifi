@@ -40,15 +40,11 @@ WifiSettings &WifiSettings::GetInstance()
 
 WifiSettings::WifiSettings()
     : mWifiStaCapabilities(0),
-      mWifiState(0),
-      mScanAlwaysActive(false),
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
       mP2pConnectState(0),
       mApMaxConnNum(0),
       mMaxNumConfigs(0),
-      mLastSelectedNetworkId(-1),
-      mLastSelectedTimeVal(0),
       mScreenState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
       mDeviceProvision(MODE_STATE_OPEN),
@@ -57,11 +53,22 @@ WifiSettings::WifiSettings()
       mFreezeModeState(MODE_STATE_CLOSE),
       mNoChargerPlugModeState(MODE_STATE_CLOSE),
       mHotspotIdleTimeout(HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS),
-      mLastDiscReason(DisconnectedReason::DISC_REASON_DEFAULT),
       explicitGroup(false)
 {
+    mWifiState[0] = static_cast<int>(WifiState::DISABLED);
+    IpInfo ipInfo;
+    mWifiIpInfo[0] = ipInfo;
+    IpV6Info ipv6Info;
+    mWifiIpV6Info[0] = ipv6Info;
+    WifiLinkedInfo wifiLinkedInfo;
+    mWifiLinkedInfo[0] = wifiLinkedInfo;
+    mMacAddress[0] = "";
     mHotspotState[0] = static_cast<int>(ApState::AP_STATE_CLOSED);
+    mLastSelectedNetworkId[0] = -1;
+    mLastSelectedTimeVal[0] = 0;
     powerModel[0] = PowerModel::GENERAL;
+    mBssidToTimeoutTime[0] = std::make_pair("", 0);
+    mLastDiscReason[0] = DisconnectedReason::DISC_REASON_DEFAULT;
     mThermalLevel = static_cast<int>(ThermalLevel::NORMAL);
     mValidChannels.clear();
 }
@@ -77,6 +84,12 @@ WifiSettings::~WifiSettings()
     SyncWifiConfig();
 }
 
+void WifiSettings::InitDefaultWifiConfig()
+{
+    WifiConfig wifiConfig;
+    mWifiConfig[0] = wifiConfig;
+}
+
 void WifiSettings::InitWifiConfig()
 {
     if (mSavedWifiConfig.LoadConfig() < 0) {
@@ -85,8 +98,11 @@ void WifiSettings::InitWifiConfig()
     std::vector<WifiConfig> tmp;
     mSavedWifiConfig.GetValue(tmp);
     if (tmp.size() > 0) {
-        mWifiConfig = tmp[0];
-        mScanAlwaysActive = mWifiConfig.scanAlwaysSwitch;
+        for (size_t i = 0; i < tmp.size(); ++i) {
+            mWifiConfig[i] = tmp[i];
+        }
+    } else {
+        InitDefaultWifiConfig();
     }
     return;
 }
@@ -284,38 +300,66 @@ int WifiSettings::SetWifiStaCapabilities(int capabilities)
 
 int WifiSettings::GetWifiState(int instId)
 {
-    return mWifiState.load();
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiState.find(instId);
+    if (iter != mWifiState.end()) {
+        return iter->second.load();
+    }
+    mWifiState[instId] = static_cast<int>(WifiState::DISABLED);
+    return mWifiState[instId].load();
 }
 
 int WifiSettings::SetWifiState(int state, int instId)
 {
-    mWifiState = state;
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiState[instId] = state;
     return 0;
 }
 
-bool WifiSettings::GetScanAlwaysState() const
+bool WifiSettings::HasWifiActive()
 {
-    return mScanAlwaysActive.load();
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    for (auto &item : mWifiState) {
+        int state = item.second.load();
+        if (state == static_cast<int>(WifiState::ENABLING) || state == static_cast<int>(WifiState::ENABLED)) {
+            LOGD("HasWifiActive: one wifi is active! instId:%{public}d", item.first);
+            return true;
+        }
+    }
+    LOGD("HasWifiActive: No wifi is active!");
+    return false;
 }
 
-int WifiSettings::SetScanAlwaysState(bool isActive)
+bool WifiSettings::GetScanAlwaysState(int instId)
 {
-    mScanAlwaysActive = isActive;
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scanAlwaysSwitch = isActive;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scanAlwaysSwitch;
+    }
+    return mWifiConfig[0].scanAlwaysSwitch;
+}
+
+int WifiSettings::SetScanAlwaysState(bool isActive, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig[instId].scanAlwaysSwitch = isActive;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::SaveScanInfoList(const std::vector<WifiScanInfo> &results, int instId)
+int WifiSettings::SaveScanInfoList(const std::vector<WifiScanInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mWifiScanInfoList = results;
     return 0;
 }
 
-int WifiSettings::ClearScanInfoList(int instId)
+int WifiSettings::ClearScanInfoList()
 {
+    if (HasWifiActive()) {
+        return 0;
+    }
     std::unique_lock<std::mutex> lock(mInfoMutex);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO);
@@ -324,7 +368,7 @@ int WifiSettings::ClearScanInfoList(int instId)
     return 0;
 }
 
-int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results, int instId)
+int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ) {
@@ -342,7 +386,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results, int instId
     return 0;
 }
 
-int WifiSettings::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo, int instId)
+int WifiSettings::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
@@ -359,7 +403,10 @@ int WifiSettings::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo, int
 int WifiSettings::GetScanControlInfo(ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    info = mScanControlInfo;
+    auto iter = mScanControlInfo.find(instId);
+    if (iter != mScanControlInfo.end()) {
+        info = iter->second;
+    }
     return 0;
 }
 
@@ -387,7 +434,7 @@ int WifiSettings::SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo)
 int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    mScanControlInfo = info;
+    mScanControlInfo[instId] = info;
     return 0;
 }
 
@@ -776,49 +823,61 @@ int WifiSettings::AddWpsDeviceConfig(const WifiDeviceConfig &config)
 int WifiSettings::GetIpInfo(IpInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    info = mWifiIpInfo;
+    auto iter = mWifiIpInfo.find(instId);
+    if (iter != mWifiIpInfo.end()) {
+        info = iter->second;
+    }
     return 0;
 }
 
 int WifiSettings::SaveIpInfo(const IpInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    mWifiIpInfo = info;
+    mWifiIpInfo[instId] = info;
     return 0;
 }
 
 int WifiSettings::GetIpv6Info(IpV6Info &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    info = mWifiIpV6Info;
+    auto iter = mWifiIpV6Info.find(instId);
+    if (iter != mWifiIpV6Info.end()) {
+        info = iter->second;
+    }
     return 0;
 }
 
 int WifiSettings::SaveIpV6Info(const IpV6Info &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    mWifiIpV6Info = info;
+    mWifiIpV6Info[instId] = info;
     return 0;
 }
 
 int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    if (mWifiLinkedInfo.channelWidth == WifiChannelWidth::WIDTH_INVALID) {
-        GetLinkedChannelWidth();
+    auto iter = mWifiLinkedInfo.find(instId);
+    if (iter != mWifiLinkedInfo.end()) {
+        if (iter->second.channelWidth == WifiChannelWidth::WIDTH_INVALID) {
+            GetLinkedChannelWidth(instId);
+        }
+        info = iter->second;
     }
-    info = mWifiLinkedInfo;
     return 0;
 }
 
 int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    WifiChannelWidth channelWidth = mWifiLinkedInfo.channelWidth;
-    std::string bssid = mWifiLinkedInfo.bssid;
-    mWifiLinkedInfo = info;
-    if (bssid == info.bssid) {
-        mWifiLinkedInfo.channelWidth = channelWidth;
+    auto iter = mWifiLinkedInfo.find(instId);
+    if (iter != mWifiLinkedInfo.end()) {
+        WifiChannelWidth channelWidth = iter->second.channelWidth;
+        std::string bssid = iter->second.bssid;
+        iter->second = info;
+        if (bssid == info.bssid) {
+            iter->second.channelWidth = channelWidth;
+        }
     }
     
     return 0;
@@ -827,14 +886,17 @@ int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
 int WifiSettings::SetMacAddress(const std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    mMacAddress = macAddress;
+    mMacAddress[instId] = macAddress;
     return 0;
 }
 
 int WifiSettings::GetMacAddress(std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    macAddress = mMacAddress;
+    auto iter = mMacAddress.find(instId);
+    if (iter != mMacAddress.end()) {
+        macAddress = iter->second;
+    }
     return 0;
 }
 
@@ -1211,48 +1273,51 @@ int WifiSettings::GetP2pConnectedState()
     return mP2pConnectState.load();
 }
 
-int WifiSettings::GetSignalLevel(const int &rssi, const int &band)
+int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     int level = 0;
-    do {
-        if (band == static_cast<int>(BandType::BAND_2GHZ)) {
-            if (rssi < mWifiConfig.firstRssiLevel2G) {
-                break;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        do {
+            if (band == static_cast<int>(BandType::BAND_2GHZ)) {
+                if (rssi < iter->second.firstRssiLevel2G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.secondRssiLevel2G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.thirdRssiLevel2G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.fourthRssiLevel2G) {
+                    break;
+                }
+                ++level;
             }
-            ++level;
-            if (rssi < mWifiConfig.secondRssiLevel2G) {
-                break;
+            if (band == static_cast<int>(BandType::BAND_5GHZ)) {
+                if (rssi < iter->second.firstRssiLevel5G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.secondRssiLevel5G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.thirdRssiLevel5G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.fourthRssiLevel5G) {
+                    break;
+                }
+                ++level;
             }
-            ++level;
-            if (rssi < mWifiConfig.thirdRssiLevel2G) {
-                break;
-            }
-            ++level;
-            if (rssi < mWifiConfig.fourthRssiLevel2G) {
-                break;
-            }
-            ++level;
-        }
-        if (band == static_cast<int>(BandType::BAND_5GHZ)) {
-            if (rssi < mWifiConfig.firstRssiLevel5G) {
-                break;
-            }
-            ++level;
-            if (rssi < mWifiConfig.secondRssiLevel5G) {
-                break;
-            }
-            ++level;
-            if (rssi < mWifiConfig.thirdRssiLevel5G) {
-                break;
-            }
-            ++level;
-            if (rssi < mWifiConfig.fourthRssiLevel5G) {
-                break;
-            }
-            ++level;
-        }
-    } while (0);
+        } while (0);
+    }
     return level;
 }
 
@@ -1298,39 +1363,39 @@ void WifiSettings::InitScanControlForbidList(void)
     ScanForbidMode forbidMode;
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     forbidMode.scanScene = SCAN_SCENE_SCANNING;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
 
     /* Disable external scanning when the screen is shut down. */
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
 
     /* Disable all scans in connection */
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     forbidMode.scanScene = SCAN_SCENE_CONNECTING;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
     forbidMode.scanMode = ScanMode::PNO_SCAN;
     forbidMode.scanScene = SCAN_SCENE_CONNECTING;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
     forbidMode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
     forbidMode.scanScene = SCAN_SCENE_CONNECTING;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
 
     /* Deep sleep disables all scans. */
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     forbidMode.scanScene = SCAN_SCENE_DEEP_SLEEP;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
     forbidMode.scanMode = ScanMode::PNO_SCAN;
     forbidMode.scanScene = SCAN_SCENE_DEEP_SLEEP;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
     forbidMode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
     forbidMode.scanScene = SCAN_SCENE_DEEP_SLEEP;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
 
     /* PNO scanning disabled */
     forbidMode.scanMode = ScanMode::PNO_SCAN;
     forbidMode.scanScene = SCAN_SCENE_CONNECTED;
-    mScanControlInfo.scanForbidList.push_back(forbidMode);
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
     return;
 }
 
@@ -1344,7 +1409,7 @@ void WifiSettings::InitScanControlIntervalList(void)
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_FIXED;
     scanIntervalMode.interval = FOREGROUND_SCAN_CONTROL_INTERVAL;
     scanIntervalMode.count = FOREGROUND_SCAN_CONTROL_TIMES;
-    mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+    mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
 
     /* Backend apps: once every 30 minutes */
     scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_ORIGIN;
@@ -1353,7 +1418,7 @@ void WifiSettings::InitScanControlIntervalList(void)
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_FIXED;
     scanIntervalMode.interval = BACKGROUND_SCAN_CONTROL_INTERVAL;
     scanIntervalMode.count = BACKGROUND_SCAN_CONTROL_TIMES;
-    mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+    mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
 
     /* no charger plug */
     /* All app: If the scanning interval is less than 5s for five  */
@@ -1367,7 +1432,7 @@ void WifiSettings::InitScanControlIntervalList(void)
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_CONTINUE;
     scanIntervalMode.interval = frequencyContinueInterval;
     scanIntervalMode.count = frequencyContinueCount;
-    mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+    mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
 
     /* no charger plug */
     /* Single app: If all scanning interval in 10 times is less than */
@@ -1381,7 +1446,7 @@ void WifiSettings::InitScanControlIntervalList(void)
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_BLOCKLIST;
     scanIntervalMode.interval = frequencyBlocklistInterval;
     scanIntervalMode.count = frequencyBlocklistCount;
-    mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+    mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
 
     /* PNO scanning every 20 seconds */
     scanIntervalMode.scanScene = SCAN_SCENE_ALL;
@@ -1390,7 +1455,7 @@ void WifiSettings::InitScanControlIntervalList(void)
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_FIXED;
     scanIntervalMode.interval = PNO_SCAN_CONTROL_INTERVAL;
     scanIntervalMode.count = PNO_SCAN_CONTROL_TIMES;
-    mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+    mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
 
     /*
      * The system scans for 20 seconds, multiplies 2 each time,
@@ -1402,7 +1467,7 @@ void WifiSettings::InitScanControlIntervalList(void)
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_EXP;
     scanIntervalMode.interval = SYSTEM_TIMER_SCAN_CONTROL_INTERVAL;
     scanIntervalMode.count = SYSTEM_TIMER_SCAN_CONTROL_TIMES;
-    mScanControlInfo.scanIntervalList.push_back(scanIntervalMode);
+    mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
     return;
 }
 
@@ -1412,11 +1477,11 @@ void WifiSettings::InitScanControlInfo()
     InitScanControlIntervalList();
 }
 
-void WifiSettings::GetLinkedChannelWidth()
+void WifiSettings::GetLinkedChannelWidth(int instId)
 {
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
-        if (iter->bssid == mWifiLinkedInfo.bssid) {
-            mWifiLinkedInfo.channelWidth = iter->channelWidth;
+        if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
+            mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
             return;
         }
     }
@@ -1426,95 +1491,131 @@ void WifiSettings::GetLinkedChannelWidth()
 void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannelWidth channelWidth, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
-    if (bssid == mWifiLinkedInfo.bssid) {
-        mWifiLinkedInfo.channelWidth = channelWidth;
+    auto iter = mWifiLinkedInfo.find(instId);
+    if (iter != mWifiLinkedInfo.end()) {
+        if (bssid == iter->second.bssid) {
+            iter->second.channelWidth = channelWidth;
+        }
     }
 }
 
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers, int instId)
 {
     if (disableOthers) {
-        SetUserLastSelectedNetworkId(networkId);
+        SetUserLastSelectedNetworkId(networkId, instId);
     }
     return true;
 }
 
 void WifiSettings::SetUserLastSelectedNetworkId(int networkId, int instId)
 {
-    mLastSelectedNetworkId = networkId;
-    mLastSelectedTimeVal = time(NULL);
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mLastSelectedNetworkId[instId] = networkId;
+    mLastSelectedTimeVal[instId] = time(NULL);
 }
 
 int WifiSettings::GetUserLastSelectedNetworkId(int instId)
 {
-    return mLastSelectedNetworkId;
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mLastSelectedNetworkId.find(instId);
+    if (iter != mLastSelectedNetworkId.end()) {
+        return iter->second;
+    }
+    return -1;
 }
 
 time_t WifiSettings::GetUserLastSelectedNetworkTimeVal(int instId)
 {
-    return mLastSelectedTimeVal;
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mLastSelectedTimeVal.find(instId);
+    if (iter != mLastSelectedTimeVal.end()) {
+        return iter->second;
+    }
+    return 0;
 }
 
 int WifiSettings::SyncWifiConfig()
 {
     std::vector<WifiConfig> tmp;
-    tmp.push_back(mWifiConfig);
+    for (auto &item : mWifiConfig) {
+        tmp.push_back(item.second);
+    }
     mSavedWifiConfig.SetValue(tmp);
     return mSavedWifiConfig.SaveConfig();
 }
 
-int WifiSettings::GetOperatorWifiType()
+int WifiSettings::GetOperatorWifiType(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.staAirplaneMode;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.staAirplaneMode;
+    }
+    return mWifiConfig[0].staAirplaneMode;
 }
 
-int WifiSettings::SetOperatorWifiType(int type)
+int WifiSettings::SetOperatorWifiType(int type, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.staAirplaneMode = type;
+    mWifiConfig[instId].staAirplaneMode = type;
     SyncWifiConfig();
     return 0;
 }
 
-bool WifiSettings::GetCanOpenStaWhenAirplaneMode()
+bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.canOpenStaWhenAirplane;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.canOpenStaWhenAirplane;
+    }
+    return mWifiConfig[0].canOpenStaWhenAirplane;
 }
 
-bool WifiSettings::GetStaLastRunState()
+bool WifiSettings::GetStaLastRunState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.staLastState;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.staLastState;
+    }
+    return mWifiConfig[0].staLastState;
 }
 
-int WifiSettings::SetStaLastRunState(bool bRun)
+int WifiSettings::SetStaLastRunState(bool bRun, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.staLastState = bRun;
+    mWifiConfig[instId].staLastState = bRun;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetDhcpIpType()
+int WifiSettings::GetDhcpIpType(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.dhcpIpType;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.dhcpIpType;
+    }
+    return mWifiConfig[0].dhcpIpType;
 }
 
-int WifiSettings::SetDhcpIpType(int dhcpIpType)
+int WifiSettings::SetDhcpIpType(int dhcpIpType, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.dhcpIpType = dhcpIpType;
+    mWifiConfig[instId].dhcpIpType = dhcpIpType;
     SyncWifiConfig();
     return 0;
 }
 
-std::string WifiSettings::GetDefaultWifiInterface()
+std::string WifiSettings::GetDefaultWifiInterface(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.defaultWifiInterface;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.defaultWifiInterface;
+    }
+    return mWifiConfig[0].defaultWifiInterface;
 }
 
 void WifiSettings::SetScreenState(const int &state)
@@ -1591,208 +1692,273 @@ int WifiSettings::GetNoChargerPlugModeState() const
     return mNoChargerPlugModeState;
 }
 
-int WifiSettings::SetWhetherToAllowNetworkSwitchover(bool bSwitch)
+int WifiSettings::SetWhetherToAllowNetworkSwitchover(bool bSwitch, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.whetherToAllowNetworkSwitchover = bSwitch;
+    mWifiConfig[instId].whetherToAllowNetworkSwitchover = bSwitch;
     SyncWifiConfig();
     return 0;
 }
 
-bool WifiSettings::GetWhetherToAllowNetworkSwitchover()
+bool WifiSettings::GetWhetherToAllowNetworkSwitchover(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.whetherToAllowNetworkSwitchover;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.whetherToAllowNetworkSwitchover;
+    }
+    return mWifiConfig[0].whetherToAllowNetworkSwitchover;
 }
 
-int WifiSettings::SetScoretacticsScoreSlope(const int &score)
+int WifiSettings::SetScoretacticsScoreSlope(const int &score, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scoretacticsScoreSlope = score;
+    mWifiConfig[instId].scoretacticsScoreSlope = score;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetScoretacticsScoreSlope()
+int WifiSettings::GetScoretacticsScoreSlope(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scoretacticsScoreSlope;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scoretacticsScoreSlope;
+    }
+    return mWifiConfig[0].scoretacticsScoreSlope;
 }
 
-int WifiSettings::SetScoretacticsInitScore(const int &score)
+int WifiSettings::SetScoretacticsInitScore(const int &score, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scoretacticsInitScore = score;
+    mWifiConfig[instId].scoretacticsInitScore = score;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetScoretacticsInitScore()
+int WifiSettings::GetScoretacticsInitScore(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scoretacticsInitScore;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scoretacticsInitScore;
+    }
+    return mWifiConfig[0].scoretacticsInitScore;
 }
 
-int WifiSettings::SetScoretacticsSameBssidScore(const int &score)
+int WifiSettings::SetScoretacticsSameBssidScore(const int &score, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scoretacticsSameBssidScore = score;
+    mWifiConfig[instId].scoretacticsSameBssidScore = score;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetScoretacticsSameBssidScore()
+int WifiSettings::GetScoretacticsSameBssidScore(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scoretacticsSameBssidScore;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scoretacticsSameBssidScore;
+    }
+    return mWifiConfig[0].scoretacticsSameBssidScore;
 }
 
-int WifiSettings::SetScoretacticsSameNetworkScore(const int &score)
+int WifiSettings::SetScoretacticsSameNetworkScore(const int &score, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scoretacticsSameNetworkScore = score;
+    mWifiConfig[instId].scoretacticsSameNetworkScore = score;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetScoretacticsSameNetworkScore()
+int WifiSettings::GetScoretacticsSameNetworkScore(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scoretacticsSameNetworkScore;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scoretacticsSameNetworkScore;
+    }
+    return mWifiConfig[0].scoretacticsSameNetworkScore;
 }
 
-int WifiSettings::SetScoretacticsFrequency5GHzScore(const int &score)
+int WifiSettings::SetScoretacticsFrequency5GHzScore(const int &score, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scoretacticsFrequency5GHzScore = score;
+    mWifiConfig[instId].scoretacticsFrequency5GHzScore = score;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetScoretacticsFrequency5GHzScore()
+int WifiSettings::GetScoretacticsFrequency5GHzScore(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scoretacticsFrequency5GHzScore;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scoretacticsFrequency5GHzScore;
+    }
+    return mWifiConfig[0].scoretacticsFrequency5GHzScore;
 }
 
-int WifiSettings::SetScoretacticsLastSelectionScore(const int &score)
+int WifiSettings::SetScoretacticsLastSelectionScore(const int &score, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scoretacticsLastSelectionScore = score;
+    mWifiConfig[instId].scoretacticsLastSelectionScore = score;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetScoretacticsLastSelectionScore()
+int WifiSettings::GetScoretacticsLastSelectionScore(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scoretacticsLastSelectionScore;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scoretacticsLastSelectionScore;
+    }
+    return mWifiConfig[0].scoretacticsLastSelectionScore;
 }
 
-int WifiSettings::SetScoretacticsSecurityScore(const int &score)
+int WifiSettings::SetScoretacticsSecurityScore(const int &score, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scoretacticsSecurityScore = score;
+    mWifiConfig[instId].scoretacticsSecurityScore = score;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetScoretacticsSecurityScore()
+int WifiSettings::GetScoretacticsSecurityScore(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scoretacticsSecurityScore;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scoretacticsSecurityScore;
+    }
+    return mWifiConfig[0].scoretacticsSecurityScore;
 }
 
-int WifiSettings::SetScoretacticsNormalScore(const int &score)
+int WifiSettings::SetScoretacticsNormalScore(const int &score, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scoretacticsNormalScore = score;
+    mWifiConfig[instId].scoretacticsNormalScore = score;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetScoretacticsNormalScore()
+int WifiSettings::GetScoretacticsNormalScore(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scoretacticsNormalScore;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scoretacticsNormalScore;
+    }
+    return mWifiConfig[0].scoretacticsNormalScore;
 }
 
-int WifiSettings::SetSavedDeviceAppraisalPriority(const int &priority)
+int WifiSettings::SetSavedDeviceAppraisalPriority(const int &priority, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.savedDeviceAppraisalPriority = priority;
+    mWifiConfig[0].savedDeviceAppraisalPriority = priority;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetSavedDeviceAppraisalPriority()
+int WifiSettings::GetSavedDeviceAppraisalPriority(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.savedDeviceAppraisalPriority;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.savedDeviceAppraisalPriority;
+    }
+    return mWifiConfig[0].savedDeviceAppraisalPriority;
 }
 
 bool WifiSettings::IsModulePreLoad(const std::string &name)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     if (name == WIFI_SERVICE_STA) {
-        return mWifiConfig.preLoadSta;
+        return mWifiConfig[0].preLoadSta;
     } else if (name == WIFI_SERVICE_SCAN) {
-        return mWifiConfig.preLoadScan;
+        return mWifiConfig[0].preLoadScan;
     } else if (name == WIFI_SERVICE_AP) {
-        return mWifiConfig.preLoadAp;
+        return mWifiConfig[0].preLoadAp;
     } else if (name == WIFI_SERVICE_P2P) {
-        return mWifiConfig.preLoadP2p;
+        return mWifiConfig[0].preLoadP2p;
     } else if (name == WIFI_SERVICE_AWARE) {
-        return mWifiConfig.preLoadAware;
+        return mWifiConfig[0].preLoadAware;
     } else if (name == WIFI_SERVICE_ENHANCE) {
-        return mWifiConfig.preLoadEnhance;
+        return mWifiConfig[0].preLoadEnhance;
     } else {
         return false;
     }
 }
 
-bool WifiSettings::GetSupportHwPnoFlag()
+bool WifiSettings::GetSupportHwPnoFlag(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.supportHwPnoFlag;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.supportHwPnoFlag;
+    }
+    return mWifiConfig[0].supportHwPnoFlag;
 }
 
-int WifiSettings::GetMinRssi2Dot4Ghz()
+int WifiSettings::GetMinRssi2Dot4Ghz(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.minRssi2Dot4Ghz;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.minRssi2Dot4Ghz;
+    }
+    return mWifiConfig[0].minRssi2Dot4Ghz;
 }
 
-int WifiSettings::GetMinRssi5Ghz()
+int WifiSettings::GetMinRssi5Ghz(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.minRssi5Ghz;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.minRssi5Ghz;
+    }
+    return mWifiConfig[0].minRssi5Ghz;
 }
 
-std::string WifiSettings::GetStrDnsBak()
+std::string WifiSettings::GetStrDnsBak(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.strDnsBak;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.strDnsBak;
+    }
+    return mWifiConfig[0].strDnsBak;
 }
 
-bool WifiSettings::IsLoadStabak()
+bool WifiSettings::IsLoadStabak(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.isLoadStabak;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.isLoadStabak;
+    }
+    return mWifiConfig[0].isLoadStabak;
 }
 
-int WifiSettings::SetRealMacAddress(const std::string &macAddress)
+int WifiSettings::SetRealMacAddress(const std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.realMacAddress = macAddress;
+    mWifiConfig[instId].realMacAddress = macAddress;
     SyncWifiConfig();
     return 0;
 }
 
-int WifiSettings::GetRealMacAddress(std::string &macAddress)
+int WifiSettings::GetRealMacAddress(std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    macAddress = mWifiConfig.realMacAddress;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        macAddress = iter->second.realMacAddress;
+        return 0;
+    }
+    macAddress = mWifiConfig[0].realMacAddress;
     return 0;
 }
 
@@ -1845,18 +2011,22 @@ const MovingFreezePolicy WifiSettings::ReloadMovingFreezePolicy()
 std::string WifiSettings::GetConnectTimeoutBssid(int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    const int timeout = 30; // 30s
-    if (mBssidToTimeoutTime.second - static_cast<int>(time(0)) > timeout) {
-        return "";
+    auto iter = mBssidToTimeoutTime.find(instId);
+    if (iter != mBssidToTimeoutTime.end()) {
+        const int timeout = 30; // 30s
+        if (iter->second.second - static_cast<int>(time(0)) > timeout) {
+            return "";
+        }
+        return iter->second.first;
     }
-    return mBssidToTimeoutTime.first;
+    return "";
 }
 
 int WifiSettings::SetConnectTimeoutBssid(std::string &bssid, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     time_t now = time(0);
-    mBssidToTimeoutTime = std::make_pair(bssid, static_cast<int>(now));
+    mBssidToTimeoutTime[instId] = std::make_pair(bssid, static_cast<int>(now));
     return 0;
 }
 
@@ -1910,38 +2080,51 @@ uint64_t WifiSettings::GetThreadStartTime(void) const
 
 void WifiSettings::SaveDisconnectedReason(DisconnectedReason discReason, int instId)
 {
-    mLastDiscReason = discReason;
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mLastDiscReason[instId] = discReason;
 }
 
 int WifiSettings::GetDisconnectedReason(DisconnectedReason &discReason, int instId)
 {
-    discReason = mLastDiscReason;
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mLastDiscReason.find(instId);
+    if (iter != mLastDiscReason.end()) {
+        discReason = iter->second;
+    }
     return 0;
 }
 
-void WifiSettings::SetScanOnlySwitchState(const int &state)
+void WifiSettings::SetScanOnlySwitchState(const int &state, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.scanOnlySwitch = state;
+    mWifiConfig[instId].scanOnlySwitch = state;
     SyncWifiConfig();
 }
 
-int WifiSettings::GetScanOnlySwitchState()
+int WifiSettings::GetScanOnlySwitchState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scanOnlySwitch;
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scanOnlySwitch;
+    }
+    return mWifiConfig[0].scanOnlySwitch;
 }
 
-bool WifiSettings::CheckScanOnlyAvailable()
+bool WifiSettings::CheckScanOnlyAvailable(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.scanOnlySwitch && (MODE_STATE_CLOSE == mAirplaneModeState);
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.scanOnlySwitch && (MODE_STATE_CLOSE == mAirplaneModeState);
+    }
+    return mWifiConfig[0].scanOnlySwitch && (MODE_STATE_CLOSE == mAirplaneModeState);
 }
 
 int WifiSettings::GetStaApExclusionType()
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    return mWifiConfig.staApExclusionType;
+    return mWifiConfig[0].staApExclusionType;
 }
 
 void WifiSettings::GetPortalUri(WifiPortalConf &urlInfo)
@@ -1955,7 +2138,7 @@ void WifiSettings::GetPortalUri(WifiPortalConf &urlInfo)
 int WifiSettings::SetStaApExclusionType(int type)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig.staApExclusionType = type;
+    mWifiConfig[0].staApExclusionType = type;
     SyncWifiConfig();
     return 0;
 }
@@ -2060,7 +2243,7 @@ void WifiSettings::GenerateRandomMacAddress(std::string peerBssid, std::string &
 }
 
 bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
-    const std::string &randomAddr, int instId)
+    const std::string &randomAddr)
 {
     if (realMacAddr.empty()) {
         LOGE("StoreWifiMacAddrPairInfo: address is empty");
@@ -2117,7 +2300,7 @@ std::string WifiSettings::GetRandomMacAddr(WifiMacAddrInfoType type, std::string
     }
     return "";
 }
-void WifiSettings::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid, int instId)
+void WifiSettings::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid)
 {
     LOGD("%{public}s: remove a mac address pair, type:%{public}d, bssid:%{private}s",
         __func__, type, bssid.c_str());
@@ -2132,7 +2315,7 @@ void WifiSettings::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string b
     WifiSettings::GetInstance().RemoveMacAddrPairs(type, randomMacAddrInfo);
 }
 WifiMacAddrErrCode WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
-    const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr, int instId)
+    const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr)
 {
     if ((type >= WifiMacAddrInfoType::INVALID_MACADDR_INFO) || macAddrInfo.bssid.empty()) {
         LOGE("%{public}s: invalid parameter, type:%{public}d, bssid:%{private}s",
@@ -2158,7 +2341,7 @@ WifiMacAddrErrCode WifiSettings::AddMacAddrPairs(WifiMacAddrInfoType type,
     return WIFI_MACADDR_INVALID_PARAM;
 }
 
-int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, int instId)
+int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo)
 {
     LOGD("remove a mac address pair, type:%{public}d, bssid:%{private}s, bssidType:%{public}d",
         type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -2186,7 +2369,7 @@ int WifiSettings::RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddr
     return 0;
 }
 
-std::string WifiSettings::GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, int instId)
+std::string WifiSettings::GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo)
 {
     LOGD("get a mac address pair, type:%{public}d, bssid:%{private}s, bssidType:%{public}d",
         type, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -2234,7 +2417,7 @@ void WifiSettings::PrintMacAddrPairs(WifiMacAddrInfoType type)
     }
 }
 
-void WifiSettings::ClearMacAddrPairs(WifiMacAddrInfoType type, int instId)
+void WifiSettings::ClearMacAddrPairs(WifiMacAddrInfoType type)
 {
     LOGI("%{public}s type:%{public}d", __func__, type);
     std::unique_lock<std::mutex> lock(mMacAddrPairMutex);

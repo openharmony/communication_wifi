@@ -68,7 +68,7 @@ ScanService::~ScanService()
         delete pScanStateMachine;
         pScanStateMachine = nullptr;
     }
-    WifiSettings::GetInstance().ClearScanInfoList(m_instId);
+    WifiSettings::GetInstance().ClearScanInfoList();
 }
 
 bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks)
@@ -675,7 +675,7 @@ bool ScanService::StoreFullScanInfo(
     }
 
     std::vector<WifiScanInfo> results;
-    int ret = WifiSettings::GetInstance().GetScanInfoList(results, m_instId);
+    int ret = WifiSettings::GetInstance().GetScanInfoList(results);
     if (ret != 0) {
         WIFI_LOGW("GetScanInfoList return error. \n");
     }
@@ -694,7 +694,7 @@ bool ScanService::StoreFullScanInfo(
         if (!find) {
         #ifdef SUPPORT_RANDOM_MAC_ADDR
             WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
-                storedIter->bssid, "", m_instId);
+                storedIter->bssid, "");
         #endif
         }
         results.push_back(*storedIter);
@@ -702,7 +702,7 @@ bool ScanService::StoreFullScanInfo(
     }
 
     WIFI_LOGI("Save %{public}d scan results.", (int)(results.size()));
-    if (WifiSettings::GetInstance().SaveScanInfoList(results, m_instId) != 0) {
+    if (WifiSettings::GetInstance().SaveScanInfoList(results) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
         return false;
     }
@@ -800,8 +800,8 @@ bool ScanService::BeginPnoScan()
         pnoScanConfig.scanInterval = pnoScanIntervalMode.scanIntervalMode.interval;
     }
 
-    pnoScanConfig.minRssi2Dot4Ghz = WifiSettings::GetInstance().GetMinRssi2Dot4Ghz();
-    pnoScanConfig.minRssi5Ghz = WifiSettings::GetInstance().GetMinRssi5Ghz();
+    pnoScanConfig.minRssi2Dot4Ghz = WifiSettings::GetInstance().GetMinRssi2Dot4Ghz(m_instId);
+    pnoScanConfig.minRssi5Ghz = WifiSettings::GetInstance().GetMinRssi5Ghz(m_instId);
 
     InterScanConfig interConfig;
     interConfig.fullScanFlag = true;
@@ -1231,7 +1231,7 @@ ErrCode ScanService::AllowSystemTimerScan()
     }
 
     /* The network is connected and cannot be automatically switched. */
-    autoNetworkSelection = WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover();
+    autoNetworkSelection = WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover(m_instId);
     if ((staStatus == static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) && (!autoNetworkSelection)) {
         WIFI_LOGW("system timer scan not allowed for CONNECT_AP_CONNECTED");
         return WIFI_OPT_FAILED;

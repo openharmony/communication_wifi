@@ -535,9 +535,9 @@ void StaStateMachine::StartWifiProcess()
         if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_IDL_OPT_OK) {
             WifiSettings::GetInstance().SetMacAddress(mac, m_instId);
             std::string realMacAddress;
-            WifiSettings::GetInstance().GetRealMacAddress(realMacAddress);
+            WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
             if (realMacAddress.empty()) {
-                WifiSettings::GetInstance().SetRealMacAddress(mac);
+                WifiSettings::GetInstance().SetRealMacAddress(mac, m_instId);
             }
         } else {
             WIFI_LOGI("GetStaDeviceMacAddress failed!");
@@ -841,7 +841,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         } else {
             linkedInfo.rssi = setRssi(signalInfo.signal);
         }
-        int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
+        int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
         LOGI("DealSignalPollResult, networkId:%{public}d, ssid:%{public}s, rssi:%{public}d, band:%{public}d, "
             "connState:%{public}d, detailedState:%{public}d.",
             linkedInfo.networkId, SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.rssi, linkedInfo.band,
@@ -882,7 +882,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     }
     linkedInfo.snr = signalInfo.snr;
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
-        WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo, m_instId);
+        WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
     LOGI("DealSignalPollResult GetWifiStandard:%{public}d, bssid:%{public}s rxmax:%{public}d txmax:%{public}d.",
          linkedInfo.wifiStandard, MacAnonymize(linkedInfo.bssid).c_str(), linkedInfo.maxSupportedRxLinkSpeed,
@@ -1673,11 +1673,11 @@ bool StaStateMachine::SetRandomMac(int networkId)
     std::string lastMac;
     std::string currentMac;
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
-        WifiSettings::GetInstance().GetRealMacAddress(currentMac);
+        WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
         WifiStoreRandomMac randomMacInfo;
         std::vector<WifiScanInfo> scanInfoList;
-        WifiSettings::GetInstance().GetScanInfoList(scanInfoList, m_instId);
+        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
         for (auto scanInfo : scanInfoList) {
             if ((deviceConfig.ssid == scanInfo.ssid) &&
                 (ComparedKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
@@ -2108,7 +2108,8 @@ void StaStateMachine::GetIpState::GoInState()
             IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), dhcpInfo);
         LOGD("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
             pStaStateMachine->isRoam, dhcpInfo.clientRunStatus);
-        pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
+        pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType(
+            pStaStateMachine->GetInstanceId()));
         if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
             dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(
                     IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), false);
@@ -2459,7 +2460,7 @@ void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
     std::string macAddr;
     std::string realMacAddr;
     WifiSettings::GetInstance().GetMacAddress(macAddr, m_instId);
-    WifiSettings::GetInstance().GetRealMacAddress(realMacAddr);
+    WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
     linkedInfo.networkId = lastNetworkId;
     linkedInfo.bssid = bssid;
     linkedInfo.ssid = deviceConfig.ssid;

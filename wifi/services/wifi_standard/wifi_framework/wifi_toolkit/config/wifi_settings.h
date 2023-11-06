@@ -123,11 +123,18 @@ public:
     int SetWifiState(int state, int instId = 0);
 
     /**
+     * @Description Has STA service running
+     *
+     * @return bool - true
+     */
+    bool HasWifiActive();
+
+    /**
      * @Description Get the ScanAlways switch state
      *
      * @return true - ScanAlways on, false - ScanAlways off
      */
-    bool GetScanAlwaysState() const;
+    bool GetScanAlwaysState(int instId = 0);
 
     /**
      * @Description Set the ScanAlways switch state
@@ -135,7 +142,7 @@ public:
      * @param isActive - ScanAlways on/off
      * @return int - 0 success
      */
-    int SetScanAlwaysState(bool isActive);
+    int SetScanAlwaysState(bool isActive, int instId = 0);
 
     /**
      * @Description Save scan results
@@ -143,13 +150,13 @@ public:
      * @param results - vector scan results
      * @return int - 0 success
      */
-    int SaveScanInfoList(const std::vector<WifiScanInfo> &results, int instId = 0);
+    int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
     /**
      * @Description Clear scan results
      *
      * @return int - 0 success
      */
-    int ClearScanInfoList(int instId = 0);
+    int ClearScanInfoList();
     /**
      * @Description UpdateLinkedChannelWidth
      *
@@ -165,7 +172,7 @@ public:
      * @param results - output vector of scan results
      * @return int - 0 success
      */
-    int GetScanInfoList(std::vector<WifiScanInfo> &results, int instId = 0);
+    int GetScanInfoList(std::vector<WifiScanInfo> &results);
 
     /**
      * @Description Get scan result by bssid
@@ -173,7 +180,7 @@ public:
      * @param results - output scan result
      * @return int - 0 success
      */
-    int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo, int instId = 0);
+    int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
     /**
      * @Description save the p2p connected info
      *
@@ -758,7 +765,7 @@ public:
      * @param band - band info
      * @return int - level
      */
-    int GetSignalLevel(const int &rssi, const int &band);
+    int GetSignalLevel(const int &rssi, const int &band, int instId = 0);
 
     /**
      * @Description Get the Ap Max Conn Num
@@ -810,7 +817,7 @@ public:
      *
      * @return type - enum OperatorWifiType
      */
-    int GetOperatorWifiType();
+    int GetOperatorWifiType(int instId = 0);
 
     /**
      * @Description Set operator wifi state
@@ -818,7 +825,7 @@ public:
      * @param type - enum OperatorWifiType
      * @return int - 0 success
      */
-    int SetOperatorWifiType(int type);
+    int SetOperatorWifiType(int type, int instId = 0);
 
     /**
      * @Description Get the config whether can open sta when airplane mode opened
@@ -826,7 +833,7 @@ public:
      * @return true - can open
      * @return false - can't open
      */
-    bool GetCanOpenStaWhenAirplaneMode();
+    bool GetCanOpenStaWhenAirplaneMode(int instId = 0);
 
     /**
      * @Description Get the STA service last running state
@@ -834,7 +841,7 @@ public:
      * @return true - running
      * @return false - not running
      */
-    bool GetStaLastRunState();
+    bool GetStaLastRunState(int instId = 0);
 
     /**
      * @Description Set the STA service running state
@@ -842,14 +849,14 @@ public:
      * @param bRun - running or not
      * @return int - 0 success
      */
-    int SetStaLastRunState(bool bRun);
+    int SetStaLastRunState(bool bRun, int instId = 0);
 
     /**
      * @Description Get the Dhcp Ip Type
      *
      * @return int - dhcp ip type, ipv4/ipv6/double
      */
-    int GetDhcpIpType();
+    int GetDhcpIpType(int instId = 0);
 
     /**
      * @Description Set the Dhcp Ip Type
@@ -857,14 +864,14 @@ public:
      * @param dhcpIpType - ipv4/ipv6/double
      * @return int - 0 success
      */
-    int SetDhcpIpType(int dhcpIpType);
+    int SetDhcpIpType(int dhcpIpType, int instId = 0);
 
     /**
      * @Description Get the Default Wifi Interface
      *
      * @return std::string - interface name
      */
-    std::string GetDefaultWifiInterface();
+    std::string GetDefaultWifiInterface(int instId = 0);
 
     /**
      * @Description Set the Screen State
@@ -970,7 +977,7 @@ public:
      * @param bSwitch - enable/disable
      * @return int - 0 success
      */
-    int SetWhetherToAllowNetworkSwitchover(bool bSwitch);
+    int SetWhetherToAllowNetworkSwitchover(bool bSwitch, int instId = 0);
 
     /**
      * @Description Check whether enable network switchover
@@ -978,7 +985,7 @@ public:
      * @return true - enable
      * @return false - disable
      */
-    bool GetWhetherToAllowNetworkSwitchover();
+    bool GetWhetherToAllowNetworkSwitchover(int instId = 0);
 
     /**
      * @Description Set the policy score slope
@@ -986,14 +993,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetScoretacticsScoreSlope(const int &score);
+    int SetScoretacticsScoreSlope(const int &score, int instId = 0);
 
     /**
      * @Description Get the policy score slope
      *
      * @return int - score
      */
-    int GetScoretacticsScoreSlope();
+    int GetScoretacticsScoreSlope(int instId = 0);
 
     /**
      * @Description Initial score of the set strategy
@@ -1001,14 +1008,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetScoretacticsInitScore(const int &score);
+    int SetScoretacticsInitScore(const int &score, int instId = 0);
 
     /**
      * @Description Obtain the initial score of the tactic
      *
      * @return int - score
      */
-    int GetScoretacticsInitScore();
+    int GetScoretacticsInitScore(int instId = 0);
 
     /**
      * @Description Set the scoring policy to the same BSSID score
@@ -1016,14 +1023,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetScoretacticsSameBssidScore(const int &score);
+    int SetScoretacticsSameBssidScore(const int &score, int instId = 0);
 
     /**
      * @Description Get the scoring policy to the same BSSID score
      *
      * @return int - score
      */
-    int GetScoretacticsSameBssidScore();
+    int GetScoretacticsSameBssidScore(int instId = 0);
 
     /**
      * @Description Set the score policy for the same network
@@ -1031,14 +1038,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetScoretacticsSameNetworkScore(const int &score);
+    int SetScoretacticsSameNetworkScore(const int &score, int instId = 0);
 
     /**
      * @Description Get the score policy for the same network
      *
      * @return int - score
      */
-    int GetScoretacticsSameNetworkScore();
+    int GetScoretacticsSameNetworkScore(int instId = 0);
 
     /**
      * @Description Set the 5 GHz score of the policy frequency
@@ -1046,14 +1053,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetScoretacticsFrequency5GHzScore(const int &score);
+    int SetScoretacticsFrequency5GHzScore(const int &score, int instId = 0);
 
     /**
      * @Description Get the 5 GHz score of the policy frequency
      *
      * @return int - score
      */
-    int GetScoretacticsFrequency5GHzScore();
+    int GetScoretacticsFrequency5GHzScore(int instId = 0);
 
     /**
      * @Description Set the score policy. last select score
@@ -1061,14 +1068,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetScoretacticsLastSelectionScore(const int &score);
+    int SetScoretacticsLastSelectionScore(const int &score, int instId = 0);
 
     /**
      * @Description Get the score policy, last select score
      *
      * @return int - score
      */
-    int GetScoretacticsLastSelectionScore();
+    int GetScoretacticsLastSelectionScore(int instId = 0);
 
     /**
      * @Description Setting the Score Policy Security Score
@@ -1076,14 +1083,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetScoretacticsSecurityScore(const int &score);
+    int SetScoretacticsSecurityScore(const int &score, int instId = 0);
 
     /**
      * @Description Get the Score Policy Security Score
      *
      * @return int - priority
      */
-    int GetScoretacticsSecurityScore();
+    int GetScoretacticsSecurityScore(int instId = 0);
 
     /**
      * @Description Setting the Score Policy Candidate Score
@@ -1091,14 +1098,14 @@ public:
      * @param score - score
      * @return int - 0 success
      */
-    int SetScoretacticsNormalScore(const int &score);
+    int SetScoretacticsNormalScore(const int &score, int instId = 0);
 
     /**
      * @Description Get the Score Policy Candidate Score
      *
      * @return int - score
      */
-    int GetScoretacticsNormalScore();
+    int GetScoretacticsNormalScore(int instId = 0);
 
     /**
      * @Description Set the saved device appraisal priority
@@ -1106,14 +1113,14 @@ public:
      * @param priority - priority
      * @return int - 0 success
      */
-    int SetSavedDeviceAppraisalPriority(const int &priority);
+    int SetSavedDeviceAppraisalPriority(const int &priority, int instId = 0);
 
     /**
      * @Description Get the saved device appraisal priority
      *
      * @return int - priority
      */
-    int GetSavedDeviceAppraisalPriority();
+    int GetSavedDeviceAppraisalPriority(int instId = 0);
 
     /**
      * @Description Judge the Module need preloaded or not
@@ -1137,32 +1144,32 @@ public:
      * @return true - support HwPno scan
      * @return false - not support HwPno scan
      */
-    bool GetSupportHwPnoFlag();
+    bool GetSupportHwPnoFlag(int instId = 0);
     /**
      * @Description Get the Min 2.4G strength object
      *
      * @return int Min 2.4G strength
      */
-    int GetMinRssi2Dot4Ghz();
+    int GetMinRssi2Dot4Ghz(int instId = 0);
     /**
      * @Description Get the Min 5G strength object
      *
      * @return int Min 5G strength
      */
-    int GetMinRssi5Ghz();
+    int GetMinRssi5Ghz(int instId = 0);
 
     /**
      * @Description Get the Alternate dns.
      *
      * @return string - dns
      */
-    std::string GetStrDnsBak();
+    std::string GetStrDnsBak(int instId = 0);
     /**
      * @Description Obtaining Whether to Load the Configuration of the Standby STA.
      *
      * @return bool - Indicates whether to load the configuration of the standby STA.
      */
-    bool IsLoadStabak();
+    bool IsLoadStabak(int instId = 0);
 
     /**
      * @Description Set the real mac address
@@ -1170,7 +1177,7 @@ public:
      * @param macAddress - the real mac address
      * @return int - 0 success
      */
-    int SetRealMacAddress(const std::string &macAddress);
+    int SetRealMacAddress(const std::string &macAddress, int instId = 0);
 
     /**
      * @Description Get the real mac address
@@ -1178,7 +1185,7 @@ public:
      * @param macAddress - the real mac address
      * @return int - 0 success
      */
-    int GetRealMacAddress(std::string &macAddress);
+    int GetRealMacAddress(std::string &macAddress, int instId = 0);
 
     /**
      * @Description set the device name
@@ -1291,20 +1298,20 @@ public:
      *
      * @param state - 1 on; 2 off
      */
-    void SetScanOnlySwitchState(const int &state);
+    void SetScanOnlySwitchState(const int &state, int instId = 0);
 
     /**
      * @Description Get the Scan Only Switch State
      *
      * @return int - 1 on; 2 off
      */
-    int GetScanOnlySwitchState();
+    int GetScanOnlySwitchState(int instId = 0);
     /**
      * @Description Get the Scan Only Whether Available
      *
      * @return int - 1 on; 2 off
      */
-    bool CheckScanOnlyAvailable();
+    bool CheckScanOnlyAvailable(int instId = 0);
 
     /**
      * @Description Get sta ap exclusion type
@@ -1351,7 +1358,7 @@ public:
      * @return bool - false fail to save the MAC address, true success to save the MAC address
      */
     bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
-        const std::string &randomAddr, int instId = 0);
+        const std::string &randomAddr);
     /**
      * @Description get random MAC address
      *
@@ -1366,7 +1373,7 @@ public:
      * @param type - MAC address type[in]
      * @param bssid - MAC address
      */
-    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid, int instId = 0);
+    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
     /**
      * @Description add a MAC address pair
      *
@@ -1376,7 +1383,7 @@ public:
      * @return WifiMacAddrErrCode - 0 success
      */
     WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo,
-        std::string randomMacAddr, int instId = 0);
+        std::string randomMacAddr);
     /**
      * @Description remove a MAC address pair
      *
@@ -1384,7 +1391,7 @@ public:
      * @param macAddrInfo - MAC address info[in]
      * @return int - 0 success
      */
-    int RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, int instId = 0);
+    int RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
     /**
      * @Description query a MAC address pair
      *
@@ -1392,7 +1399,7 @@ public:
      * @param macAddrInfo - MAC address info[in]
      * @return std::string - an empty string indicates failure
      */
-    std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo, int instId = 0);
+    std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
     /**
      * @Description print MAC address pair
      *
@@ -1405,10 +1412,11 @@ public:
      * @param type - MAC address type[in]
      * @return std::string - an empty string indicates failure  
      */
-    void ClearMacAddrPairs(WifiMacAddrInfoType type, int instId = 0);
+    void ClearMacAddrPairs(WifiMacAddrInfoType type);
 #endif
 private:
     WifiSettings();
+    void InitDefaultWifiConfig();
     void InitWifiConfig();
     void InitDefaultHotspotConfig();
     void InitHotspotConfig();
@@ -1418,7 +1426,7 @@ private:
     void InitScanControlForbidList();
     void InitScanControlIntervalList();
     void InitScanControlInfo();
-    void GetLinkedChannelWidth();
+    void GetLinkedChannelWidth(int instId = 0);
 #ifndef OHOS_ARCH_LITE
     void MergeSoftapConfig();
     void MergeWifiConfig();
@@ -1427,18 +1435,17 @@ private:
 
 private:
     int mWifiStaCapabilities;            /* Sta capability */
-    std::atomic<int> mWifiState;         /* Sta service state */
-    std::atomic<bool> mScanAlwaysActive; /* if scan always */
+    std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
-    ScanControlInfo mScanControlInfo;
+    std::map <int, ScanControlInfo> mScanControlInfo;
     WifiP2pLinkedInfo mWifiP2pInfo;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
-    IpInfo mWifiIpInfo;
-    IpV6Info mWifiIpV6Info;
-    WifiLinkedInfo mWifiLinkedInfo;
-    std::string mMacAddress;
+    std::map <int, IpInfo> mWifiIpInfo;
+    std::map <int, IpV6Info> mWifiIpV6Info;
+    std::map <int, WifiLinkedInfo> mWifiLinkedInfo;
+    std::map <int, std::string> mMacAddress;
     std::string m_countryCode;
     WifiPortalConf mPortalUri;
     std::map <int, std::atomic<int>> mHotspotState;
@@ -1452,8 +1459,8 @@ private:
     std::atomic<int> mP2pConnectState;
     int mApMaxConnNum;           /* ap support max sta numbers */
     int mMaxNumConfigs;          /* max saved configs numbers */
-    int mLastSelectedNetworkId;  /* last selected networkid */
-    time_t mLastSelectedTimeVal; /* last selected time */
+    std::map <int, int> mLastSelectedNetworkId;  /* last selected networkid */
+    std::map <int, time_t> mLastSelectedTimeVal; /* last selected time */
     int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
     std::atomic<int> mAirplaneModeState;      /* 1 on 2 off */
@@ -1463,11 +1470,11 @@ private:
     std::string mAppPackageName;
     int mFreezeModeState;        /* 1 on 2 off */
     int mNoChargerPlugModeState;  /* 1 on 2 off */
-    WifiConfig mWifiConfig;
-    std::pair<std::string, int> mBssidToTimeoutTime;
+    std::map <int, WifiConfig> mWifiConfig;
+    std::map <int, std::pair<std::string, int>> mBssidToTimeoutTime;
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
-    DisconnectedReason mLastDiscReason;
+    std::map <int, DisconnectedReason> mLastDiscReason;
 
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;

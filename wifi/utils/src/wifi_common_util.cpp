@@ -253,7 +253,12 @@ std::string GetBundleName()
     auto ret = bundleInstance->GetBundleInfoForSelf(0, bundleInfo);
     if (ret != OHOS::ERR_OK) {
         WIFI_LOGE("GetBundleInfoForSelf failed! ret[%{public}d]", ret);
-        return "";
+        std::string bundleName;
+        int uid = IPCSkeleton::GetCallingUid();
+        if (bundleInstance->GetNameForUid(uid, bundleName) != OHOS::ERR_OK) {
+            WIFI_LOGE("Get bundle name failed!");
+        }
+        return bundleName;
     }
 
     WIFI_LOGI("Get bundle name uid[%{public}d]: %{public}s", bundleInfo.uid, bundleInfo.name.c_str());

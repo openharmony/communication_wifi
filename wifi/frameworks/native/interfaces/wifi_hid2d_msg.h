@@ -75,6 +75,12 @@ enum class CfgType {
     GET_SELF_CONFIG = 1,
 };
 
+enum P2pBusinessType {
+    INVALID = -1,
+    P2P_TYPE_CLASSIC = 0,
+    P2P_TYPE_HID2D = 1,
+};
+
 class Hid2dConnectConfig {
 public:
     Hid2dConnectConfig() : m_ssid(""), m_bssid(""), m_preSharedKey(""),

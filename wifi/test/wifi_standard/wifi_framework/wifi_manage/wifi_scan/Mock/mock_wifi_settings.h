@@ -53,6 +53,7 @@ public:
     virtual int ClearScanInfoList() = 0;
     virtual void SetAppPackageName(const std::string &name) = 0;
     virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
+    virtual int SetP2pBusinessType(const P2pBusinessType &type) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -85,6 +86,7 @@ public:
     MOCK_METHOD0(ClearScanInfoList, int());
     MOCK_METHOD1(SetAppPackageName, void(const std::string &name));
     MOCK_METHOD1(GetPackageFilterMap, int(std::map<std::string, std::vector<std::string>> &filterMap));
+    MOCK_METHOD1(SetP2pBusinessType, int(const P2pBusinessType &type));
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1086,6 +1086,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
+    WifiSettings::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     return pService->Hid2dCreateGroup(frequency, type);
 }
 
@@ -1114,6 +1115,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
+    WifiSettings::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     return pService->Hid2dConnect(config);
 }
 
@@ -1249,6 +1251,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
+    WifiSettings::GetInstance().SetHid2dUpperScene(scene);
     return pService->Hid2dSetUpperScene(ifName, scene);
 }
 

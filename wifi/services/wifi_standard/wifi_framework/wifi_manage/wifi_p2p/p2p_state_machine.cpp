@@ -303,6 +303,7 @@ void P2pStateMachine::DealGroupCreationFailed()
     WifiP2pLinkedInfo info;
     info.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
     WifiSettings::GetInstance().SaveP2pInfo(info);
+    WifiSettings::GetInstance().ClearLocalHid2dInfo();
     groupManager.SaveP2pInfo(info);
     BroadcastP2pConnectionChanged();
 
@@ -670,6 +671,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
         UpdateOwnDevice(P2pDeviceStatus::PDS_AVAILABLE);
         ClearWifiP2pInfo();
         BroadcastP2pConnectionChanged();
+        WifiSettings::GetInstance().ClearLocalHid2dInfo();
         deviceManager.UpdateAllDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
     }
     return;

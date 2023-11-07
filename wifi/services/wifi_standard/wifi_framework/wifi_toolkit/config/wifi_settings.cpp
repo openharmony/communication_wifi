@@ -199,6 +199,7 @@ int WifiSettings::Init()
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
     mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
+    mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -214,6 +215,7 @@ int WifiSettings::Init()
     ReloadStaRandomMac();
     ReloadPortalconf();
     InitPackageFilterConfig();
+    ClearLocalHid2dInfo();
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     SetUpHks();
 #endif
@@ -1271,6 +1273,44 @@ int WifiSettings::SetP2pConnectedState(int state)
 int WifiSettings::GetP2pConnectedState()
 {
     return mP2pConnectState.load();
+}
+
+int WifiSettings::SetHid2dUpperScene(const Hid2dUpperScene &scene)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    mUpperScene = scene;
+    return 0;
+}
+
+int WifiSettings::GetHid2dUpperScene(Hid2dUpperScene &scene)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    scene = mUpperScene;
+    return 0;
+}
+
+int WifiSettings::SetP2pBusinessType(const P2pBusinessType &type)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    mP2pBusinessType = type;
+    return 0;
+}
+
+int WifiSettings::GetP2pBusinessType(P2pBusinessType &type)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    type = mP2pBusinessType;
+    return 0;
+}
+
+void WifiSettings::ClearLocalHid2dInfo()
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    mUpperScene.mac = "";
+    mUpperScene.scene = 0;
+    mUpperScene.fps = 0;
+    mUpperScene.bw = 0;
+    mP2pBusinessType = P2pBusinessType::INVALID;
 }
 
 int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)

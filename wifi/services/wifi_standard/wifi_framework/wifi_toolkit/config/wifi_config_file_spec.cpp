@@ -1330,7 +1330,7 @@ template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
     return;
 }
 
-template <> 
+template <>
 void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
 {
     item.filterName.clear();

@@ -759,6 +759,43 @@ public:
     int GetP2pConnectedState();
 
     /**
+     * @Description Set the hid2d upper scene
+     *
+     * @param state - the hid2d upper scene
+     * @return int - 0 success
+     */
+    int SetHid2dUpperScene(const Hid2dUpperScene &scene);
+
+    /**
+     * @Description Get the hid2d upper scene
+     *
+     * @param state - the hid2d upper scene
+     * @return int - 0 success
+     */
+    int GetHid2dUpperScene(Hid2dUpperScene &scene);
+
+    /**
+     * @Description Set p2p type
+     *
+     * @param type - the p2p type
+     * @return int - 0 success
+     */
+    int SetP2pBusinessType(const P2pBusinessType &type);
+
+    /**
+     * @Description Get p2p type
+     *
+     * @param state - p2p type
+     * @return int - 0 success
+     */
+    int GetP2pBusinessType(P2pBusinessType &type);
+
+    /**
+     * @Description Clear the hid2d info
+     */
+    void ClearLocalHid2dInfo();
+
+    /**
      * @Description Get signal level about given rssi and band
      *
      * @param rssi - rssi info
@@ -1475,6 +1512,8 @@ private:
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
     std::map <int, DisconnectedReason> mLastDiscReason;
+    Hid2dUpperScene mUpperScene;
+    P2pBusinessType mP2pBusinessType;
 
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;

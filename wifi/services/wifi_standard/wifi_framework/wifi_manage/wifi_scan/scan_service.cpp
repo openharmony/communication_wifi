@@ -1176,6 +1176,7 @@ void ScanService::GetScanControlInfo()
     scan_frequency_trust_list = filterMap["scan_frequency_filter"];
     scan_screen_off_trust_list = filterMap["scan_screen_off_filter"];
     scan_gps_block_list = filterMap["scan_gps_filter"];
+    scan_hid2d_list = filterMap["scan_hid2d_filter"];
     return;
 }
 
@@ -1193,6 +1194,10 @@ ErrCode ScanService::AllowExternScan()
 
     if (!AllowExternScanByForbid(staScene, scanMode)) {
         WIFI_LOGW("extern scan not allow by forbid mode");
+        return WIFI_OPT_FAILED;
+    }
+    if (!AllowScanByHid2dState()) {
+        WIFI_LOGW("extern scan not allow by hid2d state");
         return WIFI_OPT_FAILED;
     }
     int appId = 0;
@@ -1244,6 +1249,11 @@ ErrCode ScanService::AllowSystemTimerScan()
         return WIFI_OPT_FAILED;
     }
 
+    if (!AllowScanByHid2dState()) {
+        WIFI_LOGW("system timer scan not allow by hid2d state");
+        return WIFI_OPT_FAILED;
+    }
+
     if (!AllowScanDuringStaScene(staScene, ScanMode::SYSTEM_TIMER_SCAN)) {
         WIFI_LOGW("system timer scan not allowed, staScene: %{public}d", staScene);
         return WIFI_OPT_FAILED;
@@ -1290,6 +1300,10 @@ ErrCode ScanService::AllowPnoScan()
         return WIFI_OPT_FAILED;
     }
 
+    if (!AllowScanByHid2dState()) {
+        WIFI_LOGW("pnoScan scan not allow by hid2d state");
+        return WIFI_OPT_FAILED;
+    }
     int staScene = GetStaScene();
     if (staScene == SCAN_SCENE_MAX) {
         WIFI_LOGE("NOT allow PNO scan for staScene: %{public}d", staScene);
@@ -1481,8 +1495,8 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
 bool ScanService::AllowExternScanByThermal()
 {
     WIFI_LOGI("Enter ScanService::AllowExternScanByThermal.\n");
-    if (IsAppInPackageFilter(scan_thermal_trust_list)) {
-        WIFI_LOGI("no need to control this scan");
+    if (IsAppInFilterList(scan_thermal_trust_list)) {
+        WIFI_LOGI("ScanService::AllowExternScanByThermal, no need to control this scan");
         return true;
     }
     auto level = WifiSettings::GetInstance().GetThermalLevel();
@@ -1510,9 +1524,6 @@ bool ScanService::AllowExternScanByForbid(int staScene, ScanMode scanMode)
 
     int state = WifiSettings::GetInstance().GetScreenState();
     if (state == MODE_STATE_CLOSE) {
-        if (IsAppInPackageFilter(scan_screen_off_trust_list)) {
-            return true;
-        }
         if (!AllowScanDuringScreenOff(scanMode)) {
             return false;
         }
@@ -1540,9 +1551,6 @@ bool ScanService::AllowExternScanByInterval(int appId, int staScene, ScanMode sc
 {
     WIFI_LOGI("Enter ScanService::AllowExternScanByInterval.\n");
 
-    if (IsAppInPackageFilter(scan_frequency_trust_list)) {
-        return true;
-    }
     if (!AllowExternScanByIntervalMode(appId, staScene, scanMode)) {
         return false;
     }
@@ -1844,6 +1852,9 @@ bool ScanService::AllowScanDuringScreenOff(ScanMode scanMode) const
 {
     WIFI_LOGI("Enter ScanService::AllowScanDuringScreenOff.\n");
 
+    if (IsAppInFilterList(scan_screen_off_trust_list)) {
+        return true;
+    }
     bool isTrustListMode = IsScanTrustMode();
     bool isInList = IsInScanTrust(SCAN_SCENE_SCREEN_OFF);
     if (isTrustListMode && isInList) {
@@ -2085,7 +2096,9 @@ bool ScanService::ExternScanByInterval(int appId, SingleAppForbid &singleAppForb
 bool ScanService::AllowSingleAppScanByInterval(int appId, ScanIntervalMode scanIntervalMode)
 {
     WIFI_LOGI("Enter ScanService::AllowSingleAppScanByInterval.\n");
-
+    if (IsAppInFilterList(scan_frequency_trust_list)) {
+        return true;
+    }
     bool appIdExisted = false;
     for (auto forbidListIter = appForbidList.begin(); forbidListIter != appForbidList.end(); ++forbidListIter) {
         if (forbidListIter->appID == appId &&
@@ -2311,6 +2324,32 @@ bool ScanService::AllowScanByMovingFreeze()
     return true;
 }
 
+bool ScanService::AllowScanByHid2dState()
+{
+    LOGD("Enter ScanService::AllowScanByHid2dState.\n");
+    Hid2dUpperScene scene;
+    P2pBusinessType type;
+    WifiP2pLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetHid2dUpperScene(scene);
+    WifiSettings::GetInstance().GetP2pBusinessType(type);
+    WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
+
+    if (IsAppInFilterList(scan_hid2d_list)) {
+        WIFI_LOGI("ScanService::AllowScanByHid2dState, no need to control this scan");
+        return true;
+    }
+    if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {
+        return true;
+    }
+    // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
+    // scene & 0x07 > 0 means one of them takes effect.
+    if (((scene.scene & 0x07) > 0) && type == P2pBusinessType::P2P_TYPE_HID2D) {
+        WIFI_LOGW("Scan is not allowed in hid2d business.");
+        return false;
+    }
+    return true;
+}
+
 bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId,
     const std::string &appPackageName) const
 {
@@ -2388,7 +2427,7 @@ ErrCode ScanService::OnSystemAbilityChanged(int systemAbilityId, bool add)
     return WIFI_OPT_SUCCESS;
 }
 
-bool ScanService::IsAppInPackageFilter(std::vector<std::string> &packageFilter) 
+bool ScanService::IsAppInFilterList(const std::vector<std::string> &packageFilter) const
 {
     std::string packageName = WifiSettings::GetInstance().GetAppPackageName();
     if (std::find(packageFilter.begin(), packageFilter.end(), packageName) != packageFilter.end()) {

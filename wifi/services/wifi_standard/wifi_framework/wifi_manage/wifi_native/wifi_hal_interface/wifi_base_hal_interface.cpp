@@ -24,6 +24,9 @@ namespace Wifi {
 WifiBaseHalInterface::WifiBaseHalInterface()
 {
     mIdlClient = nullptr;
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    mHdiWpaClient = nullptr;
+#endif
 }
 
 WifiBaseHalInterface::~WifiBaseHalInterface()
@@ -32,6 +35,12 @@ WifiBaseHalInterface::~WifiBaseHalInterface()
         delete mIdlClient;
         mIdlClient = nullptr;
     }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    if (mHdiWpaClient != nullptr) {
+        delete mHdiWpaClient;
+        mHdiWpaClient = nullptr;
+    }
+#endif
 }
 
 bool WifiBaseHalInterface::InitIdlClient(void)
@@ -57,6 +66,20 @@ void WifiBaseHalInterface::ExitAllIdlClient(void)
         mIdlClient->ExitAllClient();
     }
     return;
+}
+
+bool WifiBaseHalInterface::InitHdiWpaClient(void)
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    if (mHdiWpaClient == nullptr) {
+        mHdiWpaClient = new (std::nothrow) mHdiWpaClient;
+    }
+    if (mHdiWpaClient == nullptr) {
+        LOGE("Failed to create hdi wpa client");
+        return false;
+    }
+#endif
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

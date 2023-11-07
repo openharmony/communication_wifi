@@ -76,7 +76,7 @@ idl_client_sources = [
   "client/idl_client/idl_interface/i_wifi_sta_iface.c",
   "client/idl_client/idl_interface/i_wifi_supplicant_iface.c",
   "client/idl_client/wifi_idl_client.cpp",
-  "common/wifi_idl_inner_interface.cpp",
+  "client/idl_client/wifi_idl_inner_interface.cpp",
   "wifi_hal_interface/wifi_ap_hal_interface.cpp",
   "wifi_hal_interface/wifi_base_hal_interface.cpp",
   "wifi_hal_interface/wifi_chip_hal_interface.cpp",
@@ -148,7 +148,10 @@ if (defined(ohos_lite)) {
     install_enable = true
     sources = idl_client_sources
 
-    defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+    defines = [
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+      "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    ]
 
     configs = [ ":wifi_fw_common_header" ]
 
@@ -162,6 +165,12 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "hilog:libhilog",
     ]
+
+    if (wifi_feature_with_hdi_wpa_supported) {
+      defines += [ "HDI_WPA_INTERFACE_SUPPORT" ]
+      external_deps += [ "drivers_interface_wpa:libwpa_proxy_1.0" ]
+    }
+
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",

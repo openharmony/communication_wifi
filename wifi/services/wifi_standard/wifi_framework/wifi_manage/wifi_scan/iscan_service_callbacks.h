@@ -27,8 +27,6 @@ struct IScanSerivceCallbacks {
     std::function<void(int, int)> OnScanFinishEvent;
     std::function<void(std::vector<InterScanInfo> &, int)> OnScanInfoEvent;
     std::function<void(std::vector<InterScanInfo> &, int)> OnStoreScanInfoEvent;
-    std::function<void(OperateResState, int)> OnOpenScanOnlyRes;
-    std::function<void(OperateResState, int)> OnCloseScanOnlyRes;
 };
 }  // namespace Wifi
 }  // namespace OHOS

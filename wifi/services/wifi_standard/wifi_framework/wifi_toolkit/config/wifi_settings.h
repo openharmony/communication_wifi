@@ -122,6 +122,13 @@ public:
      */
     int SetWifiState(int state, int instId = 0);
 
+#ifndef OHOS_ARCH_LITE
+    void SetWifiToggledState(bool state);
+    bool GetWifiToggledState() const;
+    void SetWifiStopState(bool state);
+    bool GetWifiStopState() const;
+#endif
+
     /**
      * @Description Has STA service running
      *
@@ -1473,6 +1480,10 @@ private:
 private:
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
+#ifndef OHOS_ARCH_LITE
+    bool mWifiToggled;
+    bool mWifiStoping;
+#endif
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
@@ -1529,6 +1540,10 @@ private:
     std::mutex mInfoMutex;
     std::mutex mP2pMutex;
     std::mutex mWifiConfigMutex;
+#ifndef OHOS_ARCH_LITE
+    std::mutex mWifiToggledMutex;
+    std::mutex mWifiStopMutex;
+#endif
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
 

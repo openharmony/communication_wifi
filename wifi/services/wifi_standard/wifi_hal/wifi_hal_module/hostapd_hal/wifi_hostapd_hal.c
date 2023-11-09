@@ -666,7 +666,7 @@ static int SetApMaxConnHw(int maxConn, int channel)
         LOGI("SetSoftapHw - Ok");
         usleep(AP_SET_CFG_DELAY);
     }
-    return ret;
+    return 0;
 }
 #endif
 

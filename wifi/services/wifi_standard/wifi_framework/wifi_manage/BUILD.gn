@@ -416,8 +416,13 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_factory.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_mobile.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy_no_mobile.cpp",
+      "concrete_clientmode_manager.cpp",
+      "concrete_manager_state_machine.cpp",
+      "softap_manager.cpp",
+      "softap_manager_state_machine.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
+      "wifi_controller_state_machine.cpp",
       "wifi_dumper.cpp",
       "wifi_internal_event_dispatcher.cpp",
       "wifi_location_mode_observer.cpp",
@@ -437,6 +442,8 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
+
+    deps += [ "$WIFI_ROOT_DIR/base:wifi_base" ]
 
     configs = [ ":wifi_manager_service_header" ]
 

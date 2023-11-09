@@ -40,6 +40,10 @@ WifiSettings &WifiSettings::GetInstance()
 
 WifiSettings::WifiSettings()
     : mWifiStaCapabilities(0),
+#ifndef OHOS_ARCH_LITE
+      mWifiToggled(false),
+      mWifiStoping(false),
+#endif
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
       mP2pConnectState(0),
@@ -369,6 +373,30 @@ int WifiSettings::ClearScanInfoList()
     mWifiScanInfoList.clear();
     return 0;
 }
+
+#ifndef OHOS_ARCH_LITE
+void WifiSettings::SetWifiToggledState(bool state)
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    mWifiToggled = state;
+}
+
+bool WifiSettings::GetWifiToggledState() const
+{
+    return mWifiToggled;
+}
+
+void WifiSettings::SetWifiStopState(bool state)
+{
+    std::unique_lock<std::mutex> lock(mWifiStopMutex);
+    mWifiStoping = state;
+}
+
+bool WifiSettings::GetWifiStopState() const
+{
+    return mWifiStoping;
+}
+#endif
 
 int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {

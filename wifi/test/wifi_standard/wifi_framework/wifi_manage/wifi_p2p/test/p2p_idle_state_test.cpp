@@ -201,7 +201,6 @@ HWTEST_F(P2pIdleStateTest, ProcessCmdConnect5, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), IsConfigUnusable(_))
         .WillOnce(Return(P2pConfigErrCode::MAC_NOT_FOUND));
-    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
     EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
 }
 

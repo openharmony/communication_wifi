@@ -231,6 +231,42 @@ ErrCode WifiDeviceProxy::PutWifiProtectRef(const std::string &protectName)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::IsHeldWifiProtectRef(
+    const std::string &protectName, bool &isHoldProtect)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteCString(protectName.c_str());
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT), error);
+        return ErrCode(error);
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    isHoldProtect = reply.ReadBool();
+    WIFI_LOGD("%{public}s result %{public}d", __func__, isHoldProtect);
+    return WIFI_OPT_SUCCESS;
+}
+
 void WifiDeviceProxy::WriteIpAddress(MessageParcel &data, const WifiIpAddress &address)
 {
     data.WriteInt32(address.family);

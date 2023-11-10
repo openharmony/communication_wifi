@@ -68,6 +68,14 @@ public:
     virtual ErrCode GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName) = 0;
 
     /**
+     * @Description Query application whether or not acquired the Wi-Fi protect.
+     *
+     * @param protectName - the protect name
+     * @param isHoldProtect - out Whether or not acquired the Wi-Fi protect
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsHeldWifiProtectRef(const std::string &protectName, bool &isHoldProtect) = 0;
+    /**
      * @Description Release the Wi-Fi protect mode.
      *
      * @param protectName - the protect name

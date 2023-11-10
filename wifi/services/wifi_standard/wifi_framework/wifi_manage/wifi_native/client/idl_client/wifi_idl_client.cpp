@@ -1761,7 +1761,8 @@ WifiErrorNo WifiIdlClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &config) 
         return WIFI_IDL_OPT_FAILED;
     }
     info.frequency = config.GetFrequency();
-    if (config.GetDhcpMode() == DhcpMode::CONNECT_AP_DHCP) {
+    if (config.GetDhcpMode() == DhcpMode::CONNECT_AP_DHCP ||
+        config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
         info.isLegacyGo = 1;
     } else {
         info.isLegacyGo = 0;

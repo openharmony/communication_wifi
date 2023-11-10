@@ -52,7 +52,7 @@ public:
     virtual void SetUp()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetHid2dUpperScene(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetP2pBusinssType(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetP2pBusinessType(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         pScanService = std::make_unique<ScanService>();

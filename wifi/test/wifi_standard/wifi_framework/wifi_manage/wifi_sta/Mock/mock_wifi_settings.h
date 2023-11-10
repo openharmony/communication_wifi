@@ -144,7 +144,6 @@ public:
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
     MOCK_METHOD1(GetPortaUri, void(WifiPortalConf &urlInfo));
-
 };
 }  // namespace OHOS
 }  // namespace Wifi

@@ -29,9 +29,15 @@ WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
     if (initFlag == 0) {
         std::unique_lock<std::mutex> lock(initMutex);
         if (initFlag == 0) {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+            if (inst.InitHdiWpaClient()) {
+                initFlag = 1;
+            }
+#else
             if (inst.InitIdlClient()) {
                 initFlag = 1;
             }
+#endif
         }
     }
     return inst;
@@ -87,14 +93,24 @@ WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
 
 WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable) const
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqSetPowerSave(enable);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqSetPowerSave(enable);
+#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::WpaSetCountryCode(const std::string &countryCode) const
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqWpaSetCountryCode(countryCode);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqWpaSetCountryCode(countryCode);
+#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::WpaGetCountryCode(std::string &countryCode) const
@@ -110,8 +126,13 @@ const SupplicantEventCallback &WifiSupplicantHalInterface::GetCallbackInst(void)
 
 WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqWpaSetSuspendMode(mode);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqWpaSetSuspendMode(mode);
+#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const

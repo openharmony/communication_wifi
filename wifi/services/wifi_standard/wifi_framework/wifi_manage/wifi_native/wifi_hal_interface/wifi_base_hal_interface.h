@@ -17,6 +17,9 @@
 #define OHOS_WIFI_BASE_HAL_INTERFACE_H
 
 #include "wifi_idl_client.h"
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+#include "wifi_hdi_wpa_client.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -44,8 +47,17 @@ public:
      */
     void ExitAllIdlClient(void);
 
+    /**
+     * @Description Init HdiWpaClinet.
+     *
+     */
+    bool InitHdiWpaClient(void);
+
 public:
     WifiIdlClient *mIdlClient;
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    WifiHdiWpaClient *mHdiWpaClient;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

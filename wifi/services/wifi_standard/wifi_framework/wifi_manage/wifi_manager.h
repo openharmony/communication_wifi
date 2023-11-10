@@ -233,6 +233,7 @@ public:
     void DealCloseScanOnlyRes(int instId = 0);
     void ForceStopWifi(int instId = 0);
 #ifndef OHOS_ARCH_LITE
+    bool IsMdmForbidden(void);
     bool GetLastStaStateByDatashare();
     void CheckAndStartStaByDatashare();
     ErrCode WifiToggled(int isOpen, int id);
@@ -376,7 +377,11 @@ private:
     void UnRegisterBatteryEvent();
     void RegisterSettingsMigrateEvent();
     void UnRegisterSettingsMigrateEvent();
+    void GetMdmProp();
+    void RegisterMdmPropListener();
+    static void MdmPropChangeEvt(const char *key, const char *value, void *context);
     uint32_t migrateTimerId{0};
+    static bool mIsMdmForbidden;
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

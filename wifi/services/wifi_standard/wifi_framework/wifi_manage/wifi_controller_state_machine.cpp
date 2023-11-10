@@ -323,6 +323,9 @@ void WifiControllerMachine::MakeSoftapManager(SoftApManager::Role role, int id)
 bool WifiControllerMachine::ShouldEnableWifi()
 {
     WIFI_LOGE("Enter ShouldEnableWifi");
+    if (WifiManager::GetInstance().IsMdmForbidden()) {
+        return false;
+    }
     if (WifiSettings::GetInstance().GetWifiToggledState() || IsScanOnlyEnable()) {
         return true;
     }

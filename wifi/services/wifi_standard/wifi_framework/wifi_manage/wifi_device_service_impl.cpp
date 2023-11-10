@@ -298,12 +298,33 @@ ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectTyp
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::IsHeldWifiProtectRef(
+    const std::string &protectName, bool &isHoldProtect)
+{
+#ifdef OHOS_ARCH_LITE
+    /* refer to WifiProtectManager::GetInstance().IsHeldWifiProtect, DO NOT support now! */
+    return WIFI_OPT_SUCCESS;
+#else
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    isHoldProtect = WifiProtectManager::GetInstance().IsHeldWifiProtect(protectName);
+    WIFI_LOGD("App %{public}s hold protect is %{public}d", protectName.c_str(), isHoldProtect);
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
 ErrCode WifiDeviceServiceImpl::GetWifiProtectRef(const WifiProtectMode &protectMode, const std::string &protectName)
 {
 #ifdef OHOS_ARCH_LITE
     /* refer to WifiProtectManager::GetInstance().GetWifiProtect, DO NOT support now! */
     return WIFI_OPT_SUCCESS;
 #else
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!WifiProtectManager::GetInstance().GetWifiProtect(protectMode, protectName)) {
         WIFI_LOGE("App %{public}s set protect mode %{public}d failed.",
             protectName.c_str(), static_cast<int>(protectMode));
@@ -319,6 +340,10 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
     /* refer to WifiProtectManager::GetInstance().PutWifiProtect, DO NOT support now! */
     return WIFI_OPT_SUCCESS;
 #else
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!WifiProtectManager::GetInstance().PutWifiProtect(protectName)) {
         WIFI_LOGE("App %{public}s remove protect mode failed.", protectName.c_str());
         return WIFI_OPT_FAILED;

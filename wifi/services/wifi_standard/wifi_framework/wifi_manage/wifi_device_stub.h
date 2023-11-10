@@ -44,6 +44,7 @@ private:
     void OnInitWifiProtect(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnPutWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnIsHeldWifiProtectRef(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnAddDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnUpdateDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnRemoveDevice(uint32_t code, MessageParcel &data, MessageParcel &reply);

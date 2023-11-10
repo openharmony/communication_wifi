@@ -21,11 +21,10 @@
 #include "system_ability_definition.h"
 #include "connection_observer_client.h"
 #include "app_mgr_client.h"
-#include "app_mgr_interface.h"
 #include "app_process_data.h"
 #include "iservice_registry.h"
 #include "app_mgr_constants.h"
-#include "wifi_common_util.h"
+#include "define.h"
 #endif
 
 #undef LOG_TAG
@@ -101,6 +100,23 @@ bool WifiProtectManager::IsValidProtectMode(const WifiProtectMode &protectMode)
     return true;
 }
 
+bool WifiProtectManager::IsHeldWifiProtect(const std::string &protectName)
+{
+    LOGD("%{public}s enter, para bundlename: %{public}s",
+        __func__, protectName.c_str());
+    std::unique_lock<std::mutex> lock(mMutex);
+    std::vector<std::shared_ptr<WifiProtect>>::iterator itor = mWifiProtects.begin();
+    while (itor != mWifiProtects.end()) {
+        if ((*itor)->GetName() == protectName) {
+            LOGI("%{public}s app bundlename: %{public}s has held wifi protect",
+                __func__, protectName.c_str());
+            return true;
+        }
+        itor++;
+    }
+    return false;
+}
+
 WifiProtectMode WifiProtectManager::GetNearlyProtectMode()
 {
 #ifndef OHOS_ARCH_LITE
@@ -130,6 +146,9 @@ WifiProtectMode WifiProtectManager::GetNearlyProtectMode()
         return WifiProtectMode::WIFI_PROTECT_FULL_LOW_LATENCY;
     }
 #ifndef OHOS_ARCH_LITE
+    /* If screen is on and has app in foreground and app set wifi protect to low-lantency mode,
+     then set wifi to low-latency
+    */
     if (mScreenOn && (foregroudCount > 0) &&
         (mFullLowLatencyProtectsAcquired > mFullLowLatencyProtectsReleased)) {
         return WifiProtectMode::WIFI_PROTECT_FULL_LOW_LATENCY;
@@ -149,7 +168,7 @@ bool WifiProtectManager::InitWifiProtect(
     const WifiProtectType &protectType,
     const std::string &protectName)
 {
-    WifiProtect* pProtect = new WifiProtect(protectType,
+    std::shared_ptr<WifiProtect> pProtect = std::make_shared<WifiProtect>(protectType,
         WifiProtectMode::WIFI_PROTECT_FULL, protectName);
     mWifiProtects.push_back(pProtect);
     return true;
@@ -171,7 +190,7 @@ bool WifiProtectManager::GetWifiProtect(
 #endif
     bool isAlreadyExist = false;
     std::unique_lock<std::mutex> lock(mMutex);
-    std::vector<WifiProtect *>::iterator itor = mWifiProtects.begin();
+    std::vector<std::shared_ptr<WifiProtect>>::iterator itor = mWifiProtects.begin();
     while (itor != mWifiProtects.end()) {
         if ((*itor)->GetName() == name) {
             isAlreadyExist = true;
@@ -251,8 +270,8 @@ bool WifiProtectManager::AddProtect(
     const WifiProtectMode &protectMode,
     const std::string &name)
 {
-    WifiProtect *pProtect = new WifiProtect(name);
-    if (pProtect == nullptr) {
+    std::shared_ptr<WifiProtect> pProtect = std::make_shared<WifiProtect>(name);
+    if (!pProtect) {
         LOGE("Wifi protect pointer is null.");
         return false;
     }
@@ -289,9 +308,10 @@ bool WifiProtectManager::PutWifiProtect(const std::string &name)
         return false;
     }
     std::unique_lock<std::mutex> lock(mMutex);
-    WifiProtect *pWifiProtect = RemoveProtect(name);
-    if (pWifiProtect == nullptr) {
-        /* attempting to release a protect that does not exist. */
+    std::shared_ptr<WifiProtect> pWifiProtect = RemoveProtect(name);
+    if (!pWifiProtect) {
+        LOGE("attempting to release a protect that does not exist, protect name: %{public}s.",
+            name.c_str());
         return false;
     }
     switch (pWifiProtect->GetProtectMode()) {
@@ -307,15 +327,13 @@ bool WifiProtectManager::PutWifiProtect(const std::string &name)
 
     /* Recalculate the operating mode */
     bool ret = ChangeWifiPowerMode();
-    delete pWifiProtect;
-    pWifiProtect = nullptr;
     return ret;
 }
 
-WifiProtect *WifiProtectManager::RemoveProtect(const std::string &name)
+std::shared_ptr<WifiProtect> WifiProtectManager::RemoveProtect(const std::string &name)
 {
-    WifiProtect *pProtect = nullptr;
-    std::vector<WifiProtect *>::iterator itor = mWifiProtects.begin();
+    std::shared_ptr<WifiProtect> pProtect = nullptr;
+    std::vector<std::shared_ptr<WifiProtect>>::iterator itor = mWifiProtects.begin();
     while (itor != mWifiProtects.end()) {
         if ((*itor)->GetName() == name) {
             pProtect = *itor;
@@ -427,7 +445,7 @@ bool WifiProtectManager::IsForegroundApplication(const std::string &BundleName)
 int WifiProtectManager::GetFgLowlatyProtectCount()
 {
     int count = 0;
-    std::vector<WifiProtect *>::iterator iter = mWifiProtects.begin();
+    std::vector<std::shared_ptr<WifiProtect>>::iterator iter = mWifiProtects.begin();
     while (iter != mWifiProtects.end()) {
         if (static_cast<AppExecFwk::ApplicationState>((*iter)->GetAppState()) ==
             AppExecFwk::ApplicationState::APP_STATE_FOREGROUND &&
@@ -470,9 +488,15 @@ void WifiProtectManager::OnAppDied(const std::string bundlename)
         __func__, bundlename.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
     bool needUpdate = false;
-    std::vector<WifiProtect *>::iterator iter = mWifiProtects.begin();
+    std::vector<std::shared_ptr<WifiProtect>>::iterator iter = mWifiProtects.begin();
     while (iter != mWifiProtects.end()) {
         if ((*iter)->GetName() == bundlename) {
+            WifiProtectMode mode = (*iter)->GetProtectMode();
+            if (mode == WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF) {
+                ++mFullHighPerfProtectsReleased;
+            } else if (mode == WifiProtectMode::WIFI_PROTECT_FULL_LOW_LATENCY) {
+                ++mFullLowLatencyProtectsReleased;
+            }
             mWifiProtects.erase(iter);
             needUpdate = true;
             LOGI("%{public}s, remove app bundlename %{public}s.",
@@ -490,7 +514,7 @@ void WifiProtectManager::OnAppForegroudChanged(const std::string &bundleName, in
 {
     std::unique_lock<std::mutex> lock(mMutex);
     bool needUpdate = false;
-    std::vector<WifiProtect *>::iterator iter = mWifiProtects.begin();
+    std::vector<std::shared_ptr<WifiProtect>>::iterator iter = mWifiProtects.begin();
     while (iter != mWifiProtects.end()) {
         if ((*iter)->GetName() == bundleName) {
             (*iter)->SetAppState(state);

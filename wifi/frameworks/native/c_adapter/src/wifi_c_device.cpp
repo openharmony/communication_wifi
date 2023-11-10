@@ -539,4 +539,10 @@ NO_SANITIZE("cfi") WifiErrorCode PutWifiProtect()
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->PutWifiProtect());
 }
+
+NO_SANITIZE("cfi") WifiErrorCode IsHeldWifiProtect(bool &isHeld)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiDevicePtr->IsHeldWifiProtect(isHeld));
+}
 #endif

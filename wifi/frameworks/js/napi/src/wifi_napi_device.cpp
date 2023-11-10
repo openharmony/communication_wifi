@@ -1489,6 +1489,5 @@ NO_SANITIZE("cfi") napi_value PutWifiProtect(napi_env env, napi_callback_info in
     ErrCode ret = wifiDevicePtr->PutWifiProtect();
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

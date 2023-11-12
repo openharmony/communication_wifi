@@ -149,14 +149,14 @@ WifiErrorNo WifiIdlClient::GetSupportFrequencies(int band, std::vector<int> &fre
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo WifiIdlClient::SetConnectMacAddr(const std::string &mac)
+WifiErrorNo WifiIdlClient::SetConnectMacAddr(const std::string &mac, const int portType)
 {
     CHECK_CLIENT_NOT_NULL;
     if (CheckMacIsValid(mac) != 0) {
         return WIFI_IDL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return SetAssocMacAddr((unsigned char *)mac.c_str(), len);
+    return SetAssocMacAddr((unsigned char *)mac.c_str(), len, portType);
 }
 
 WifiErrorNo WifiIdlClient::SetScanMacAddress(const std::string &mac)

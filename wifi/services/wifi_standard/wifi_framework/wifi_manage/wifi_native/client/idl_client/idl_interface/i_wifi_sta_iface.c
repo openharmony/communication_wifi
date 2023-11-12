@@ -128,7 +128,7 @@ WifiErrorNo GetFrequencies(int32_t band, int *frequencies, int32_t *size)
     return result;
 }
 
-WifiErrorNo SetAssocMacAddr(unsigned char *mac, int lenMac)
+WifiErrorNo SetAssocMacAddr(unsigned char *mac, int lenMac, const int portType)
 {
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -137,6 +137,7 @@ WifiErrorNo SetAssocMacAddr(unsigned char *mac, int lenMac)
     WriteFunc(context, "SetAssocMacAddr");
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
+    WriteInt(context, portType);
     WriteEnd(context);
     if (RpcClientCall(client, "SetAssocMacAddr") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;

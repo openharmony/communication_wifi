@@ -241,6 +241,15 @@ typedef enum HalWpsMethod {
     HAL_WPS_METHOD_INVALID
 } HalWpsMethod;
 
+typedef enum HalPortType {
+    HAL_PORT_TYPE_STATION    = 0,
+    HAL_PORT_TYPE_AP         = 1,
+    HAL_PORT_TYPE_P2P_CLIENT = 2,
+    HAL_PORT_TYPE_P2P_GO     = 3,
+    HAL_PORT_TYPE_P2P_DEVICE = 4,
+    HAL_PORT_TYPE_BUTT            // invalid type
+}HalPortType;
+
 #ifdef __cplusplus
 }
 #endif

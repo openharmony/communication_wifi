@@ -80,10 +80,10 @@ HWTEST_F(WifiIdlClientTest, GetSupportFrequenciesTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, SetConnectMacAddrTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
-    WifiErrorNo err = mClient.SetConnectMacAddr(mac);
+    WifiErrorNo err = mClient.SetConnectMacAddr(mac, 0);
     EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
-    err = mClient.SetConnectMacAddr(mac);
+    err = mClient.SetConnectMacAddr(mac, 0);
     EXPECT_GE(err, WIFI_IDL_OPT_OK);
 }
 

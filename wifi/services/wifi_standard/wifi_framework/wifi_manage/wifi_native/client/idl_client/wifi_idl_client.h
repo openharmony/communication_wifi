@@ -135,10 +135,11 @@ public:
     /**
      * @Description Sets the MAC address of the Wi-Fi connection.
      *
-     * @param mac
+     * @param mac  -- MAC address
+     * @param portType -- port type
      * @return WifiErrorNo
      */
-    WifiErrorNo SetConnectMacAddr(const std::string &mac);
+    WifiErrorNo SetConnectMacAddr(const std::string &mac, const int portType);
 
     /**
      * @Description Sets the MAC address for Wi-Fi scanning.

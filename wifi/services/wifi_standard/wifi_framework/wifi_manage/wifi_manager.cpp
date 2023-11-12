@@ -33,6 +33,7 @@
 #include "wifi_location_mode_observer.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_protect_manager.h"
+#include "parameter.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
@@ -47,6 +48,13 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiManager");
 int WifiManager::mCloseApIndex = 0;
 #ifndef OHOS_ARCH_LITE
+bool WifiManager::mIsMdmForbidden = false;
+const uint32_t PROP_LEN = 26;
+const uint32_t PROP_TRUE_LEN = 4;
+const uint32_t PROP_FALSE_LEN = 5;
+const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
+const std::string PROP_TRUE = "true";
+const std::string PROP_FALSE = "false";
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
 const uint32_t TIMEOUT_AIRPLANE_MODE_EVENT = 3000;
 const uint32_t TIMEOUT_LOCATION_EVENT = 3000;
@@ -665,6 +673,8 @@ int WifiManager::Init()
     InitStaCallback();
     InitScanCallback();
 #ifndef OHOS_ARCH_LITE
+    GetMdmProp();
+    RegisterMdmPropListener();
     InitConcreteCallback();
 #endif
 #ifdef FEATURE_AP_SUPPORT
@@ -716,6 +726,49 @@ void WifiManager::InitSubscribeListener()
     SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
 #endif
 }
+
+#ifndef OHOS_ARCH_LITE
+void WifiManager::GetMdmProp()
+{
+    char preValue[PROP_FALSE_LEN + 1] = {0};
+
+    int errorCode = GetParameter(MDM_WIFI_PROP.c_str(), 0, preValue, PROP_FALSE_LEN + 1);
+    if (errorCode > 0) {
+        if (strncmp(preValue, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0) {
+            mIsMdmForbidden = true;
+        }
+    }
+}
+
+void WifiManager::RegisterMdmPropListener()
+{
+    int ret = WatchParameter(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
+    if (ret != 0) {
+        WIFI_LOGI("RegisterMdmPropListener failed");
+    }
+}
+
+void WifiManager::MdmPropChangeEvt(const char *key, const char *value, void *context)
+{
+    if (strncmp(key, MDM_WIFI_PROP.c_str(), PROP_LEN) != 0) {
+        WIFI_LOGI("not mdm prop change");
+        return;
+    }
+    WIFI_LOGI("mdm prop change");
+    if (strncmp(value, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0) {
+        mIsMdmForbidden = true;
+        return;
+    }
+    if (strncmp(value, PROP_FALSE.c_str(), PROP_FALSE_LEN) == 0) {
+        mIsMdmForbidden = false;
+    }
+}
+
+bool WifiManager::IsMdmForbidden()
+{
+    return mIsMdmForbidden;
+}
+#endif
 
 void WifiManager::Exit()
 {

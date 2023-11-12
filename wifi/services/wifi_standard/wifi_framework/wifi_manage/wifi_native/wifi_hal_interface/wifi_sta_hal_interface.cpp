@@ -15,6 +15,7 @@
 #include "wifi_sta_hal_interface.h"
 #include <mutex>
 #include "wifi_log.h"
+#include "wifi_idl_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiStaHalInterface"
@@ -149,7 +150,7 @@ WifiErrorNo WifiStaHalInterface::SetConnectMacAddr(const std::string &mac)
     return mHdiWpaClient->SetConnectMacAddr(mac);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->SetConnectMacAddr(mac);
+    return mIdlClient->SetConnectMacAddr(mac, WIFI_HAL_PORT_TYPE_STATION);
 #endif
 }
 

@@ -522,13 +522,13 @@ WifiErrorNo GetFrequencies(int32_t band, int *frequencies, int32_t *size)
     return WIFI_HAL_NOT_SUPPORT;
 }
 
-WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
+WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType)
 {
     if (mac == NULL) {
         LOGE("SetAssocMacAddr() mac is NULL");
         return WIFI_HAL_FAILED;
     }
-    LOGD("SetAssocMacAddr() mac length %{public}d", lenMac);
+    LOGD("SetAssocMacAddr() lenMac:%{public}d, portType:%{public}d", lenMac, portType);
     return WIFI_HAL_NOT_SUPPORT;
 }
 

@@ -110,7 +110,12 @@ const char* HdiSSid2Txt(const uint8_t *ssid, size_t ssidLen);
 
 char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     const uint8_t *ie, size_t ieLen);
-
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+uint8_t FillIfrName(char *ifrName, int ifrNameLen, int portType);
+int32_t GetFeatureType(int portType);
+void UpDownLink(int flag, int type);
+int32_t SetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType);
+#endif
 #ifdef __cplusplus
 }
 #endif

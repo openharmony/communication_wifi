@@ -149,7 +149,7 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
         pthread_join(tid, NULL);
         exit(0);
     } else {
-        LOGE("Create wpa process id is [%{public}d]", pid);
+        LOGE("Create wpa process id is [%{public}d], cmd:%{private}s", pid, startCmd);
         *pProcessId = pid;
     }
     return HAL_SUCCESS;

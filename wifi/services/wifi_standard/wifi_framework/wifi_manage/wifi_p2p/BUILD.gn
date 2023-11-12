@@ -115,6 +115,10 @@ ohos_shared_library("wifi_p2p_service") {
     defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   }
 
+  if (wifi_feature_with_local_random_mac) {
+    defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
+  }
+
   external_deps = [
     "c_utils:utils",
     "dhcp:dhcp_manager_service",

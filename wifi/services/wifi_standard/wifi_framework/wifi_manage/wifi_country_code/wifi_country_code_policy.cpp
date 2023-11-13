@@ -403,7 +403,7 @@ void WifiCountryCodePolicy::WifiScanEventListener::OnReceiveEvent(
         action.c_str(), eventData.GetCode());
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED &&
         static_cast<int>(ScanHandleNotify::SCAN_OK) == eventData.GetCode() &&
-        m_WifiCountryCodePolicyPtr != nullptr) {
+        m_wifiCountryCodePolicyPtr != nullptr) {
         m_wifiCountryCodePolicyPtr->HandleScanResultAction();
         WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();
     }

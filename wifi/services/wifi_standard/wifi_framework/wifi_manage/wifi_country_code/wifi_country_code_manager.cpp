@@ -23,7 +23,6 @@
 #include "parameter.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_common_event_helper.h"
-#include "wifi_country_code_policy_factory.h"
 #include "wifi_datashare_utils.h"
 #include "wifi_errcode.h"
 #include "wifi_global_func.h"
@@ -35,10 +34,6 @@ DEFINE_WIFILOG_LABEL("WifiCountryCodeManager");
 
 namespace OHOS {
 namespace Wifi {
-constexpr const char* WIFI_COUNTRY_CODE_CONFIG = "const.wifi.country_code_no_mcc";
-constexpr const char* WIFI_COUNTRY_CODE_CONFIG_DEFAULT = "0";
-constexpr int32_t SYSTEM_PARAMETER_ERROR_CODE = 0;
-constexpr int32_t WIFI_COUNTRY_CODE_SIZE = 16;
 const std::string CLASS_NAME = "WifiCountryCodeManager";
 
 WifiCountryCodeManager::~WifiCountryCodeManager()
@@ -56,17 +51,7 @@ WifiCountryCodeManager &WifiCountryCodeManager::GetInstance()
 ErrCode WifiCountryCodeManager::Init()
 {
     WIFI_LOGI("init");
-    char preValue[WIFI_COUNTRY_CODE_SIZE] = {0};
-    int errorCode = GetParameter(WIFI_COUNTRY_CODE_CONFIG,
-        WIFI_COUNTRY_CODE_CONFIG_DEFAULT, preValue, WIFI_COUNTRY_CODE_SIZE);
-    int policyConf = 0;
-    if (errorCode > SYSTEM_PARAMETER_ERROR_CODE) {
-        policyConf = ConvertStringToInt(preValue);
-    }
-    WIFI_LOGI("get wifi country code policy config is %{public}d", policyConf);
-
-    std::unique_ptr<WifiCountryCodePolicyFactory> policyFactory = std::make_unique<WifiCountryCodePolicyFactory>();
-    m_wifiCountryCodePolicy = policyFactory->CreatePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf));
+    m_wifiCountryCodePolicy = std::make_shared<WifiCountryCodePolicy>();
 
     m_staCallback.callbackModuleName = CLASS_NAME;
     m_staCallback.OnStaOpenRes = DealStaOpenRes;

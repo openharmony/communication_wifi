@@ -75,7 +75,7 @@ private:
          * @Description WifiScanEventListener constructor
          */
         WifiScanEventListener(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
-            WifiCountryCodePolicy *WifiCountryCodePolicy);
+            WifiCountryCodePolicy *wifiCountryCodePolicy);
 
         /**
          * @Description WifiScanEventListener destructor
@@ -89,7 +89,7 @@ private:
          */
         void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
     private:
-        WifiCountryCodePolicy *m_WifiCountryCodePolicy;
+        WifiCountryCodePolicy *m_wifiCountryCodePolicyPtr;
     };
 
     void CreatePolicy();
@@ -115,7 +115,7 @@ private:
     std::vector<std::vector<std::string>> m_allBssidVector;
     std::map<std::string, std::string> m_bssidAndCountryCodeMap;
     std::string m_wifiCountryCodeFromScanResults;
-    std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> m_wifiCountryCodePolicy;
+    std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> m_wifiCountryCodePolicyConf;
     std::list<std::function<ErrCode(std::string&)>> m_policyList;
 };
 }

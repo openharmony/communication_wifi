@@ -55,11 +55,11 @@ void WifiCountryCodePolicy::GetWifiCountryCodePolicy()
     int policyConf = 0;
     if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
         WIFI_LOGI("get wifi country code policy config fail, use policyConf=0");
-        m_wifiCountryCodePolicy = std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf);
+        m_wifiCountryCodePolicyConf = std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf);
         return;
     }
     policyConf = ConvertStringToInt(preValue);
-    m_wifiCountryCodePolicy = std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf);
+    m_wifiCountryCodePolicyConf = std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf);
     WIFI_LOGI("get wifi country code policy config is %{public}d", policyConf);
 }
 
@@ -69,7 +69,7 @@ void WifiCountryCodePolicy::CreatePolicy()
     GetWifiCountryCodePolicy();
     m_policyList.emplace_back(
         std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByFactory, this, std::placeholders::_1));
-    if (m_wifiCountryCodePolicy[FEATURE_MCC]) {
+    if (m_wifiCountryCodePolicyConf[FEATURE_MCC]) {
         OHOS::EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED);
         OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -80,11 +80,11 @@ void WifiCountryCodePolicy::CreatePolicy()
         m_policyList.emplace_back(
             std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByMcc, this, std::placeholders::_1));
     }
-    if (m_wifiCountryCodePolicy[FEATURE_RCV_AP_CONNECTED]) {
+    if (m_wifiCountryCodePolicyConf[FEATURE_RCV_AP_CONNECTED]) {
         m_policyList.emplace_back(
             std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByAP, this, std::placeholders::_1));
     }
-    if (m_wifiCountryCodePolicy[FEATURE_RCV_SCAN_RESLUT]) {
+    if (m_wifiCountryCodePolicyConf[FEATURE_RCV_SCAN_RESLUT]) {
         OHOS::EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED);
         OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -95,11 +95,11 @@ void WifiCountryCodePolicy::CreatePolicy()
         m_policyList.emplace_back(
             std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByScanResult, this, std::placeholders::_1));
     }
-    if (m_wifiCountryCodePolicy[FEATURE_USE_REGION]) {
+    if (m_wifiCountryCodePolicyConf[FEATURE_USE_REGION]) {
         m_policyList.emplace_back(
             std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByRegion, this, std::placeholders::_1));
     }
-    if (m_wifiCountryCodePolicy[FEATURE_USE_ZZ]) {
+    if (m_wifiCountryCodePolicyConf[FEATURE_USE_ZZ]) {
         m_policyList.emplace_back(
             std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByDefaultZZ, this, std::placeholders::_1));
     }
@@ -213,10 +213,10 @@ ErrCode WifiCountryCodePolicy::StatisticCountryCodeFromScanResult(std::string &w
     }
     m_allBssidVector.push_back(bssidVector);
     if (m_allBssidVector.size() > MAX_SCAN_SAVED_SIZE) {
-        for (const std::string &bssid : m_allBssidVector[0]) {
-            if (!IsContainBssid(m_allBssidVector[1], bssid) &&
-                !IsContainBssid(m_allBssidVector[2], bssid) &&
-                !IsContainBssid(m_allBssidVector[3], bssid)) {
+        for (const std::string &bssid : m_allBssidVector[BSSID_VECTOR_INDEX_ZERO]) {
+            if (!IsContainBssid(m_allBssidVector[BSSID_VECTOR_INDEX_ONE], bssid) &&
+                !IsContainBssid(m_allBssidVector[BSSID_VECTOR_INDEX_TWO], bssid) &&
+                !IsContainBssid(m_allBssidVector[BSSID_VECTOR_INDEX_THREE], bssid)) {
                 m_bssidAndCountryCodeMap.erase(bssid);  // remove the ap that have not been scanned recently
             }
         }
@@ -391,9 +391,8 @@ void WifiCountryCodePolicy::TelephoneNetworkSearchStateChangeListener::OnReceive
 }
 
 WifiCountryCodePolicy::WifiScanEventListener::WifiScanEventListener(
-    const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
-    WifiCountryCodePolicy *WifiCountryCodePolicy)
-    : CommonEventSubscriber(subscriberInfo), m_WifiCountryCodePolicy(WifiCountryCodePolicy)
+    const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo, WifiCountryCodePolicy *wifiCountryCodePolicy)
+    : CommonEventSubscriber(subscriberInfo), m_wifiCountryCodePolicyPtr(wifiCountryCodePolicy)
 {}
 
 void WifiCountryCodePolicy::WifiScanEventListener::OnReceiveEvent(
@@ -403,8 +402,9 @@ void WifiCountryCodePolicy::WifiScanEventListener::OnReceiveEvent(
     WIFI_LOGI("receive wifi scan finish common event, action = %{public}s, status = %{public}d",
         action.c_str(), eventData.GetCode());
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED &&
-        static_cast<int>(ScanHandleNotify::SCAN_OK) == eventData.GetCode()) {
-        m_WifiCountryCodePolicy->HandleScanResultAction();
+        static_cast<int>(ScanHandleNotify::SCAN_OK) == eventData.GetCode() &&
+        m_WifiCountryCodePolicyPtr != nullptr) {
+        m_wifiCountryCodePolicyPtr->HandleScanResultAction();
         WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();
     }
 }

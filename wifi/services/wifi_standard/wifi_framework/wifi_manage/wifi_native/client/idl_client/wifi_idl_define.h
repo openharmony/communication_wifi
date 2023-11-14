@@ -66,6 +66,15 @@ typedef enum WifiIdlEvent {
     WIFI_IDL_CBK_CMD_P2P_IFACE_CREATED_EVENT,           /* P2P interface created event */
 } WifiIdlEvent;
 
+typedef enum WifiHalPortType {
+    WIFI_HAL_PORT_TYPE_STATION    = 0,
+    WIFI_HAL_PORT_TYPE_AP         = 1,
+    WIFI_HAL_PORT_TYPE_P2P_CLIENT = 2,
+    WIFI_HAL_PORT_TYPE_P2P_GO     = 3,
+    WIFI_HAL_PORT_TYPE_P2P_DEVICE = 4,
+    WIFI_HAL_PORT_TYPE_BUTT            // invalid type
+}WifiHalPortType;
+
 #define WIFI_IDL_FALSE 0
 #define WIFI_IDL_TRUE 1
 #define SINGLE_SCAN_FAILED 1  /* Scan failure notification */

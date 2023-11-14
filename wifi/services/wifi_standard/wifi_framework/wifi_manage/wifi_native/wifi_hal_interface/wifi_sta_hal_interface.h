@@ -22,7 +22,6 @@
 #include "wifi_event_callback.h"
 #include "wifi_idl_struct.h"
 #include "wifi_scan_param.h"
-#include "wifi_idl_define.h"
 
 namespace OHOS {
 namespace Wifi {

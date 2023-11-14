@@ -148,6 +148,13 @@ public:
      */
     WifiErrorNo SetPowerModel(const int& model, int id = 0) const;
 
+    /**
+     * @Description Set the MAC address of the ap.
+     *
+     * @param mac
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetConnectMacAddr(const std::string &mac);
 private:
     std::map<int, IWifiApMonitorEventCallback> mApCallback;
 };

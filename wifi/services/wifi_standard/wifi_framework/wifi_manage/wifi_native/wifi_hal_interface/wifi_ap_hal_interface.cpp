@@ -16,6 +16,7 @@
 #include <mutex>
 #include "wifi_log.h"
 #include "wifi_error_no.h"
+#include "wifi_idl_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiApHalInterface"
@@ -128,6 +129,12 @@ WifiErrorNo WifiApHalInterface::SetPowerModel(const int& model, int id) const
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqSetPowerModel(model, id);
+}
+
+WifiErrorNo WifiApHalInterface::SetConnectMacAddr(const std::string &mac)
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->SetConnectMacAddr(mac, WIFI_HAL_PORT_TYPE_AP);
 }
 }  // namespace Wifi
 }  // namespace OHOS

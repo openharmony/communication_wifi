@@ -52,7 +52,6 @@ public:
     virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
     virtual int ClearScanInfoList() = 0;
     virtual void SetAppPackageName(const std::string &name) = 0;
-    virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
     virtual int SetP2pBusinessType(const P2pBusinessType &type) = 0;
     virtual int GetHid2dUpperScene(Hid2dUpperScene &scene) = 0;
     virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
@@ -88,7 +87,6 @@ public:
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
     MOCK_METHOD0(ClearScanInfoList, int());
     MOCK_METHOD1(SetAppPackageName, void(const std::string &name));
-    MOCK_METHOD1(GetPackageFilterMap, int(std::map<std::string, std::vector<std::string>> &filterMap));
     MOCK_METHOD1(SetP2pBusinessType, int(const P2pBusinessType &type));
     MOCK_METHOD1(GetHid2dUpperScene, int(Hid2dUpperScene &scene));
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));

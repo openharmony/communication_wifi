@@ -74,9 +74,10 @@ WifiErrorNo GetFrequencies(int32_t band, int *frequencies, int32_t *size);
  *
  * @param mac - Mac address.
  * @param lenMac - Mac string length.
+ * @param portType - Port Type
  * @return WifiErrorNo
  */
-WifiErrorNo SetAssocMacAddr(unsigned char *mac, int lenMac);
+WifiErrorNo SetAssocMacAddr(unsigned char *mac, int lenMac, const int portType);
 
 /**
  * @Description Sets the MAC address for Wi-Fi scanning.

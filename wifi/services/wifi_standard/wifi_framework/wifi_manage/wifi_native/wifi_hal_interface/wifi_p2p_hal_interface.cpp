@@ -332,5 +332,11 @@ WifiErrorNo WifiP2PHalInterface::Hid2dConnect(const Hid2dConnectConfig &config) 
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqP2pHid2dConnect(config);
 }
+
+WifiErrorNo WifiP2PHalInterface::SetConnectMacAddr(const std::string &mac, const int portType)
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->SetConnectMacAddr(mac, portType);
+}
 }  // namespace Wifi
 }  // namespace OHOS

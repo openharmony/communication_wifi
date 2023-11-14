@@ -12,6 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+
 #include "wifi_settings.h"
 #include <algorithm>
 #include <chrono>
@@ -2219,6 +2225,62 @@ void WifiSettings::SetDeviceProvisionState(const int &state)
 int WifiSettings::GetDeviceProvisionState() const
 {
     return mDeviceProvision;
+}
+
+long int WifiSettings::GetRandom()
+{
+    long random = 0;
+    do {
+        int fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
+        ssize_t length = 0;
+        if (fd >= 0) {
+            length = read(fd, &random, sizeof(random));
+            close(fd);
+        }
+    } while (0);
+    return (random >= 0 ? random : -random);
+}
+
+void WifiSettings::GenerateRandomMacAddress(std::string &randomMacAddr)
+{
+    constexpr unsigned long long high1stByteMask = 0xFF00000000000000;
+    constexpr unsigned long long high2rdByteMask = 0x00FF000000000000;
+    constexpr unsigned long long high3thByteMask = 0x0000FF0000000000;
+    constexpr unsigned long long high4thByteMask = 0x000000FF00000000;
+    constexpr unsigned long long high5thByteMask = 0x00000000FF000000;
+    constexpr unsigned long long high6thByteMask = 0x0000000000FF0000;
+    unsigned long long macAddressValidLongMask = (1ULL << 48) - 1;
+    unsigned long long macAddressSaiAssignedMask = 1ULL << 43;
+    unsigned long long macAddressEliAssignedMask = 1ULL << 42;
+    unsigned long long macAddressLocallyAssignedMask = 1ULL << 41;
+    unsigned long long macAddressMulticastMask = 1ULL << 40;
+    constexpr int maxMacSize = 18;
+    char strMac[maxMacSize] = { 0 };
+    int ret = 0;
+
+    unsigned long long random = GetRandom();
+    if (random == 0) {
+        LOGE("%{public}s: random is invalid!", __func__);
+        return;
+    }
+    LOGD("%{public}s: random is 0x%{public}llx==%{public}lld", __func__, random, random);
+    random &= macAddressValidLongMask;
+    random &= ~macAddressSaiAssignedMask;
+    random &= ~macAddressEliAssignedMask;
+    random |= macAddressLocallyAssignedMask;
+    random &= ~macAddressMulticastMask;
+
+    LOGD("mac:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx",
+        (random & high1stByteMask) >> 56, (random & high2rdByteMask) >> 48, (random & high3thByteMask) >> 40,
+        (random & high4thByteMask) >> 32, (random & high5thByteMask) >> 24, (random & high6thByteMask) >> 16);
+    ret = sprintf_s(strMac, maxMacSize, "%02llx:%02llx:%02llx:%02llx:%02llx:%02llx",
+        (random & high1stByteMask) >> 56, (random & high2rdByteMask) >> 48, (random & high3thByteMask) >> 40,
+        (random & high4thByteMask) >> 32, (random & high5thByteMask) >> 24, (random & high6thByteMask) >> 16);
+    if (ret < 0) {
+        LOGW("%{public}s: failed to sprintf_s", __func__);
+    }
+    randomMacAddr = strMac;
+    LOGD("%{public}s: randomMacAddr: %{private}s", __func__, randomMacAddr.c_str());
 }
 
 #ifdef SUPPORT_RANDOM_MAC_ADDR

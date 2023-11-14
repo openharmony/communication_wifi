@@ -63,7 +63,7 @@ static struct HdfFeatureInfo* GetFeatureInner(const int32_t wlanType)
 {
     struct HdfFeatureInfo *feature = NULL;
     if (g_wlanObj == NULL) {
-        LOGE("%{public}s g_wlanObj is null!", __func__);
+        LOGE("%{public}s: g_wlanObj is null, wlanType:%{public}d", __func__, wlanType);
         return NULL;
     }
     for (int i = 0; i != MAX_FEATURE_NUMBER; ++i) {
@@ -71,7 +71,7 @@ static struct HdfFeatureInfo* GetFeatureInner(const int32_t wlanType)
             continue;
         }
         if (g_featureArray[i]->type == wlanType) {
-            LOGI("%{public}s get an exist feature.", __func__);
+            LOGI("%{public}s: get an exist feature, wlanType:%{public}d", __func__, wlanType);
             feature = g_featureArray[i];
             return feature;
         }
@@ -80,16 +80,16 @@ static struct HdfFeatureInfo* GetFeatureInner(const int32_t wlanType)
     /* allocate 1 struct */
     feature = (struct HdfFeatureInfo *)calloc(1, sizeof(struct HdfFeatureInfo));
     if (feature == NULL) {
-        LOGE("%{public}s calloc failed!", __func__);
+        LOGE("%{public}s: failed to alloc memory", __func__);
         return NULL;
     }
-    LOGI("Create feature type: %{public}d", wlanType);
+    LOGI("%{public}s: Create feature type: %{public}d", __func__, wlanType);
     int32_t ret = g_wlanObj->CreateFeature(g_wlanObj, wlanType, feature);
     if (ret != HDF_SUCCESS) {
         LOGE("CreateFeature %{public}d failed: %{public}d", wlanType, ret);
         goto FAILURE;
     }
-    LOGI("Create feature end, ifname: %{public}s", feature->ifName);
+    LOGI("%{public}s: success to create feature, ifname:%{public}s", __func__, feature->ifName);
     bool isAdd = false;
     for (int i = 0; i != MAX_FEATURE_NUMBER; ++i) {
         if (g_featureArray[i] == NULL) {
@@ -99,7 +99,7 @@ static struct HdfFeatureInfo* GetFeatureInner(const int32_t wlanType)
         }
     }
     if (!isAdd) {
-        LOGE("%{public}s g_featureArray is full!", __func__);
+        LOGE("%{public}s: g_featureArray is full!", __func__);
         goto FAILURE;
     }
     return feature;

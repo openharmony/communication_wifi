@@ -137,8 +137,8 @@ if (defined(ohos_lite)) {
       external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
     }
 
-    if (wifi_feature_is_random_mac_supported) {
-      defines += [ "RANDOM_MAC_SUPPORT" ]
+    if (wifi_feature_with_local_random_mac) {
+      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
     }
 
     if ("${CONFIG_CTRL_IFACE}" == "unix") {
@@ -191,8 +191,8 @@ if (defined(ohos_lite)) {
       "AP_NUM=$wifi_feature_with_ap_num",
     ]
 
-    if (wifi_feature_is_random_mac_supported) {
-      defines += [ "RANDOM_MAC_SUPPORT" ]
+    if (wifi_feature_with_local_random_mac) {
+      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
     }
 
     if ("${CONFIG_CTRL_IFACE}" == "unix") {

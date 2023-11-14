@@ -1384,7 +1384,18 @@ public:
      * @return int - 1 open; 2 close
      */
     int GetDeviceProvisionState() const;
-
+    /**
+     * @Description Generate random number
+     *
+     * @return long int
+     */
+    long int GetRandom();
+    /**
+     * @Description generate a MAC address
+     *
+     * @param randomMacAddr - random MAC address[out]
+     */
+    void GenerateRandomMacAddress(std::string &randomMacAddr);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address

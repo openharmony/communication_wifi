@@ -14,13 +14,8 @@
  */
 
 #ifdef HDI_INTERFACE_SUPPORT
-#include <unistd.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
 #include <pthread.h>
 #include "securec.h"
-#include "v1_1/iwlan_callback.h"
 #include "wifi_hdi_sta_impl.h"
 #include "wifi_hdi_proxy.h"
 #include "wifi_log.h"
@@ -29,6 +24,7 @@
 #include "wifi_hdi_util.h"
 #include "wifi_supplicant_hal.h"
 #include "wifi_common_def.h"
+#include "wifi_hdi_common.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiStaImpl"
@@ -405,82 +401,6 @@ void UnRegisterHdiStaCallbackEvent()
     pthread_mutex_unlock(&g_hdiCallbackMutex);
 }
 
-#ifdef RANDOM_MAC_SUPPORT
-static const uint32_t MAC_ADDR_INDEX_0 = 0;
-static const uint32_t MAC_ADDR_INDEX_1 = 1;
-static const uint32_t MAC_ADDR_INDEX_2 = 2;
-static const uint32_t MAC_ADDR_INDEX_3 = 3;
-static const uint32_t MAC_ADDR_INDEX_4 = 4;
-static const uint32_t MAC_ADDR_INDEX_5 = 5;
-static const uint32_t MAC_ADDR_INDEX_SIZE = 6;
-
-void UpDownLink(int flag)
-{
-    struct ifreq ifr;
-    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK ||
-        strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), "wlan0") != EOK) {
-        LOGE("ccntoInit the ifreq struct failed!");
-        return;
-    }
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
-        LOGE("ccntoget mac addr socket error");
-        return;
-    }
-    if (ioctl(fd, SIOCGIFFLAGS, &ifr) != 0) {
-        LOGE("ioctl failed, error:%{public}d.", errno);
-        close(fd);
-        return;
-    }
-    if (flag == 1) {
-        ifr.ifr_flags |= IFF_UP;
-    } else {
-        ifr.ifr_flags &= ~IFF_UP;
-    }
-
-    if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
-        LOGE("ccntoget mac addr ioctl SIOCGIFHWADDR error");
-        close(fd);
-        return;
-    }
-
-    close(fd);
-}
-
-WifiErrorNo SetAssocMacAddr(const unsigned char *mac, int lenMac)
-{
-    if (mac == NULL) {
-        LOGE("SetAssocMacAddr is NULL");
-        return WIFI_HAL_FAILED;
-    }
-    LOGI("SetAssocMacAddr enter.");
-    CHECK_STA_HDI_PROXY_AND_RETURN(IsHdiRemoteDied());
-    if (strlen((const char *)mac) != WIFI_MAC_LENGTH || lenMac != WIFI_MAC_LENGTH) {
-        LOGE("Mac size not correct! mac len %{public}zu, request lenMac %{public}d", strlen((const char *)mac), lenMac);
-        return WIFI_HAL_FAILED;
-    }
-
-    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
-    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
-
-    unsigned char mac_bin[MAC_ADDR_INDEX_SIZE];
-    int32_t ret = sscanf_s((char *)mac, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
-           &mac_bin[MAC_ADDR_INDEX_0], &mac_bin[MAC_ADDR_INDEX_1], &mac_bin[MAC_ADDR_INDEX_2],
-           &mac_bin[MAC_ADDR_INDEX_3], &mac_bin[MAC_ADDR_INDEX_4], &mac_bin[MAC_ADDR_INDEX_5]);
-    if (ret <= EOK) {
-        LOGE("SetAssocMacAddr parse mac failed: %{public}d", ret);
-        return WIFI_HAL_FAILED;
-    }
-    
-    UpDownLink(0);
-    ret = proxy.wlanObj->SetMacAddress(proxy.wlanObj, proxy.feature, mac_bin, MAC_ADDR_INDEX_SIZE);
-    if (ret != HDF_SUCCESS) {
-        LOGE("SetAssocMacAddr failed: %{public}d", ret);
-    }
-    UpDownLink(1);
-    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
-}
-
 void ReleaseLocalResources()
 {
     LOGI("ReleaseLocalResources enter.");
@@ -491,6 +411,5 @@ void ReleaseLocalResources()
         g_hdiWanCallbackObj = NULL;
     }
 }
-#endif
 
 #endif

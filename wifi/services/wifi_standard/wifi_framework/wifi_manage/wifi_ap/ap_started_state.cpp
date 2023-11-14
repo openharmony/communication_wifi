@@ -209,6 +209,18 @@ bool ApStartedState::StartAp() const
         WIFI_LOGE("startAp is failed!");
         return false;
     }
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    std::string macAddress;
+    WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+    if (MacAddress::IsValidMac(macAddress.c_str())) {
+        if (WifiApHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
+            LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
+            return false;
+        }
+    } else {
+        LOGE("%{public}s: macAddress is invalid", __func__);
+    }
+#endif
     return true;
 }
 

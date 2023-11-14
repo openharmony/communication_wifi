@@ -530,6 +530,18 @@ void StaStateMachine::StartWifiProcess()
         /* callback the InterfaceService that wifi is enabled successfully. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), m_instId);
         InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+        std::string macAddress;
+        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+        if (MacAddress::IsValidMac(macAddress.c_str())) {
+            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
+                LOGE("%{public}s: failed to set sta MAC address:%{private}s", __func__, macAddress.c_str());
+            }
+            WifiSettings::GetInstance().SetMacAddress(macAddress, m_instId);
+        } else {
+            LOGE("%{public}s: macAddress is invalid", __func__);
+        }
+#else
         /* Sets the MAC address of WifiSettings. */
         std::string mac;
         if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_IDL_OPT_OK) {
@@ -542,6 +554,7 @@ void StaStateMachine::StartWifiProcess()
         } else {
             WIFI_LOGI("GetStaDeviceMacAddress failed!");
         }
+#endif
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
         WifiNetAgent::GetInstance().OnStaMachineWifiStart();
@@ -1665,10 +1678,11 @@ bool StaStateMachine::ComparedKeymgmt(const std::string scanInfoKeymgmt, const s
 
 bool StaStateMachine::SetRandomMac(int networkId)
 {
-    LOGD("enter SetRandomMac.\n");
+    LOGD("enter SetRandomMac.");
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
-        LOGE("SetRandomMac : GetDeviceConfig failed!\n");
+        LOGE("SetRandomMac : GetDeviceConfig failed!");
         return false;
     }
     std::string lastMac;
@@ -1690,15 +1704,24 @@ bool StaStateMachine::SetRandomMac(int networkId)
             }
         }
         if (randomMacInfo.ssid.empty()) {
-            LOGE("scanInfo has no target wifi!\n");
+            LOGE("scanInfo has no target wifi!");
             return false;
         }
 
         WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
         if (randomMacInfo.randomMac.empty()) {
             /* Sets the MAC address of WifiSettings. */
-            MacAddressGenerate(randomMacInfo);
+            std::string macAddress;
+            WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+            randomMacInfo.randomMac = macAddress;
+            LOGD("%{public}s: generate a random mac, randomMac:%{private}s, ssid:%{private}s, peerbssid:%{private}s",
+                __func__, randomMacInfo.randomMac.c_str(), randomMacInfo.ssid.c_str(),
+                randomMacInfo.peerBssid.c_str());
             WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        } else {
+            LOGD("%{public}s: randomMac:%{private}s, ssid:%{private}s, peerbssid:%{private}s",
+                __func__, randomMacInfo.randomMac.c_str(), randomMacInfo.ssid.c_str(),
+                randomMacInfo.peerBssid.c_str());
         }
         currentMac = randomMacInfo.randomMac;
     }
@@ -1708,11 +1731,11 @@ bool StaStateMachine::SetRandomMac(int networkId)
         return false;
     }
 
+    LOGD("%{public}s, currentMac:%{private}s, lastMac:%{private}s", __func__, currentMac.c_str(), lastMac.c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
-        LOGD("Check MacAddress successfully.\n");
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {
-                LOGE("set Mac [%{public}s] failed.\n", MacAnonymize(currentMac).c_str());
+                LOGE("set Mac [%{public}s] failed.", MacAnonymize(currentMac).c_str());
                 return false;
             }
         }
@@ -1721,9 +1744,10 @@ bool StaStateMachine::SetRandomMac(int networkId)
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
     } else {
-        LOGE("Check MacAddress error.\n");
+        LOGE("Check MacAddress error.");
         return false;
     }
+#endif
     return true;
 }
 
@@ -1932,6 +1956,16 @@ void StaStateMachine::DisConnectProcess()
             NetSupplierInfo->isAvailable_ = false;
             WIFI_LOGI("Disconnect process update netsupplierinfo");
             WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
+        }
+#endif
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+        std::string macAddress;
+        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+        if (MacAddress::IsValidMac(macAddress.c_str())) {
+            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
+                LOGE("%{public}s: failed to set sta MAC address:%{private}s", __func__, macAddress.c_str());
+            }
+            WifiSettings::GetInstance().SetMacAddress(macAddress, m_instId);
         }
 #endif
         WIFI_LOGI("Disconnect update wifi status");

@@ -17,6 +17,8 @@
 #include "wifi_p2p_hal_interface.h"
 #include "p2p_state_machine.h"
 #include "wifi_logger.h"
+#include "wifi_idl_define.h"
+
 DEFINE_WIFILOG_P2P_LABEL("P2pDisabledState");
 
 namespace OHOS {

@@ -361,10 +361,12 @@ private:
     void RegisterScreenEvent();
     void UnRegisterScreenEvent();
     std::shared_ptr<ScreenEventSubscriber> screenEventSubscriber_ = nullptr;
+    bool isScreenEventSubscribered = false;
     uint32_t screenTimerId{0};
     void RegisterAirplaneModeEvent();
     void UnRegisterAirplaneModeEvent();
     std::shared_ptr<AirplaneModeEventSubscriber> airplaneModeEventSubscriber_ = nullptr;
+    bool isAirplaneModeEventSubscribered = false;
     uint32_t airplaneModeTimerId{0};
     void RegisterLocationEvent();
     void UnRegisterLocationEvent();

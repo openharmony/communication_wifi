@@ -64,6 +64,7 @@ const uint32_t TIMEOUT_BATTERY_EVENT = 3000;
 using TimeOutCallback = std::function<void()>;
 
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
+static bool islocationModeObservered = false;
 static sptr<WifiDeviceProvisionObserver> deviceProvisionObserver_ = nullptr;
 static sptr<SettingsMigrateObserver> settingsMigrateObserver_ = nullptr;
 #endif
@@ -642,17 +643,17 @@ int WifiManager::Init()
     
 #ifndef OHOS_ARCH_LITE
     RegisterDeviceProvisionEvent();
-    if (screenEventSubscriber_ == nullptr && screenTimerId == 0) {
+    if (!isScreenEventSubscribered && screenTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterScreenEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, screenTimerId, TIMEOUT_SCREEN_EVENT, false);
         WIFI_LOGI("RegisterScreenEvent success! screenTimerId:%{public}u", screenTimerId);
     }
-    if (airplaneModeEventSubscriber_ == nullptr && airplaneModeTimerId == 0) {
+    if (!isAirplaneModeEventSubscribered && airplaneModeTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterAirplaneModeEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, airplaneModeTimerId, TIMEOUT_AIRPLANE_MODE_EVENT, false);
         WIFI_LOGI("RegisterAirplaneModeEvent success! airplaneModeTimerId:%{public}u", airplaneModeTimerId);
     }
-    if (locationModeObserver_ == nullptr && locationTimerId == 0) {
+    if (!islocationModeObservered && locationTimerId == 0) {
         TimeOutCallback timeoutCallback = std::bind(&WifiManager::RegisterLocationEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, locationTimerId, TIMEOUT_LOCATION_EVENT, false);
         WIFI_LOGI("RegisterLocationEvent success! locationTimerId:%{public}u", locationTimerId);
@@ -782,15 +783,15 @@ void WifiManager::Exit()
         mCloseServiceThread.join();
     }
 #ifndef OHOS_ARCH_LITE
-    if (screenEventSubscriber_ != nullptr) {
+    if (isScreenEventSubscribered) {
         UnRegisterScreenEvent();
     }
 
-    if (airplaneModeEventSubscriber_ != nullptr) {
+    if (isAirplaneModeEventSubscribered) {
         UnRegisterAirplaneModeEvent();
     }
 
-    if (locationModeObserver_ != nullptr) {
+    if (islocationModeObservered) {
         UnRegisterLocationEvent();
     }
     if (deviceProvisionObserver_ != nullptr) {
@@ -1976,7 +1977,7 @@ void WifiManager::RegisterCfgMonitorCallback(WifiCfgMonitorEventCallback callbac
 void WifiManager::RegisterScreenEvent()
 {
     std::unique_lock<std::mutex> lock(screenEventMutex);
-    if (screenEventSubscriber_) {
+    if (isScreenEventSubscribered) {
         return;
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -1988,6 +1989,7 @@ void WifiManager::RegisterScreenEvent()
         WIFI_LOGE("ScreenEvent SubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("ScreenEvent SubscribeCommonEvent() OK");
+        isScreenEventSubscribered = true;
         WifiTimer::GetInstance()->UnRegister(screenTimerId);
     }
 }
@@ -1995,13 +1997,14 @@ void WifiManager::RegisterScreenEvent()
 void WifiManager::UnRegisterScreenEvent()
 {
     std::unique_lock<std::mutex> lock(screenEventMutex);
-    if (!screenEventSubscriber_) {
+    if (!isScreenEventSubscribered) {
         return;
     }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(screenEventSubscriber_)) {
         WIFI_LOGE("ScreenEvent UnSubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("ScreenEvent UnSubscribeCommonEvent() OK");
+        isScreenEventSubscribered = false;
     }
 }
 
@@ -2070,7 +2073,7 @@ ScreenEventSubscriber::~ScreenEventSubscriber()
 void WifiManager::RegisterAirplaneModeEvent()
 {
     std::unique_lock<std::mutex> lock(airplaneModeEventMutex);
-    if (airplaneModeEventSubscriber_) {
+    if (isAirplaneModeEventSubscribered) {
         return;
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -2082,6 +2085,7 @@ void WifiManager::RegisterAirplaneModeEvent()
         WIFI_LOGE("AirplaneModeEvent SubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("AirplaneModeEvent SubscribeCommonEvent() OK");
+        isAirplaneModeEventSubscribered = true;
         WifiTimer::GetInstance()->UnRegister(airplaneModeTimerId);
     }
 }
@@ -2089,13 +2093,14 @@ void WifiManager::RegisterAirplaneModeEvent()
 void WifiManager::UnRegisterAirplaneModeEvent()
 {
     std::unique_lock<std::mutex> lock(airplaneModeEventMutex);
-    if (!airplaneModeEventSubscriber_) {
+    if (!isAirplaneModeEventSubscribered) {
         return;
     }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(airplaneModeEventSubscriber_)) {
         WIFI_LOGE("AirplaneModeEvent UnSubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("AirplaneModeEvent UnSubscribeCommonEvent() OK");
+        isAirplaneModeEventSubscribered = false;
     }
 }
 
@@ -2337,7 +2342,7 @@ void WifiManager::UnRegisterSettingsMigrateEvent()
 void WifiManager::RegisterLocationEvent()
 {
     std::unique_lock<std::mutex> lock(locationEventMutex);
-    if (locationModeObserver_) {
+    if (islocationModeObservered) {
         return;
     }
 
@@ -2349,13 +2354,14 @@ void WifiManager::RegisterLocationEvent()
     locationModeObserver_ = sptr<WifiLocationModeObserver>(new (std::nothrow)WifiLocationModeObserver());
     Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
     datashareHelper->RegisterObserver(uri, locationModeObserver_);
+    islocationModeObservered = true;
 }
 
 void WifiManager::UnRegisterLocationEvent()
 {
     std::unique_lock<std::mutex> lock(locationEventMutex);
-    if (locationModeObserver_ == nullptr) {
-        WIFI_LOGE("UnRegisterLocationEvent locationModeObserver_ is nullptr");
+    if (!islocationModeObservered) {
+        WIFI_LOGE("UnRegisterLocationEvent islocationModeObservered is false");
         return;
     }
 
@@ -2366,6 +2372,7 @@ void WifiManager::UnRegisterLocationEvent()
     }
     Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
     datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
+    islocationModeObservered = false;
 }
 
 void WifiManager::RegisterBatteryEvent()

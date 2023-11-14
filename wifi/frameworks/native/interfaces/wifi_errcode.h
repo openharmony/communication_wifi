@@ -42,7 +42,6 @@ enum ErrCode {
     WIFI_OPT_P2P_ERR_SIZE_NW_NAME,
     WIFI_OPT_MOVING_FREEZE_CTRL,      /* moving freeze scanning control */
     WIFI_OPT_NON_SYSTEMAPP,           /* not system app denied */
-    WIFI_OPT_ENTERPRISE_DENIED = 203, /* mdm forbidden */
 };
 }  // namespace Wifi
 }  // namespace OHOS

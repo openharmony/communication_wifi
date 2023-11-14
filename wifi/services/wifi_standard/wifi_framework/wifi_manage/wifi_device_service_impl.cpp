@@ -1274,12 +1274,7 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
         WIFI_LOGE("EnableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-#ifndef OHOS_ARCH_LITE
-    if (WifiManager::GetInstance().IsMdmForbidden()) {
-        WIFI_LOGE("EnableWifi: Mdm forbidden PERMISSION_DENIED!");
-        return WIFI_OPT_ENTERPRISE_DENIED;
-    }
-#endif
+
     /**
      * when airplane mode opened, if the config "can_open_sta_when_airplanemode"
      * opened, then can open sta; other, return forbid.

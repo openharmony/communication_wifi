@@ -466,7 +466,6 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "huks:libhukssdk",
       "i18n:intl_util",
-      "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",

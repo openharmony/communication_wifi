@@ -1964,9 +1964,9 @@ public:
     {
         std::vector<std::string> packageFilter;
         packageFilter.push_back("com.test.test");
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName(_)).WillRepeatedly(Return("com.test.test"));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test"));
         EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == true);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName(_)).WillRepeatedly(Return("com.test.test1"));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test1"));
         EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == false);
     }
 

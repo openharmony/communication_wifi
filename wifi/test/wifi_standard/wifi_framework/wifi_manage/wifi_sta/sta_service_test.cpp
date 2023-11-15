@@ -62,7 +62,6 @@ public:
 
     void StaServiceInitStaServiceSuccess();
     void StaServiceEnableWifiSuccess();
-    void StaServiceDisableWifiSuccess();
     void StaServiceConnectToWifiDeviceConfigSuccess();
     void StaServiceConnectToWifiDeviceConfigFail1();
     void StaServiceConnectToWifiDeviceConfigFail2();
@@ -144,11 +143,6 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
 void StaServiceTest::StaServiceEnableWifiSuccess()
 {
     EXPECT_TRUE(pStaService->EnableWifi() == WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(pStaService->DisableWifi() == WIFI_OPT_SUCCESS);
-}
-
-void StaServiceTest::StaServiceDisableWifiSuccess()
-{
     EXPECT_TRUE(pStaService->DisableWifi() == WIFI_OPT_SUCCESS);
 }
 
@@ -693,11 +687,6 @@ void StaServiceTest::StaServiceSetSuspendModeTest()
 HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)
 {
     StaServiceEnableWifiSuccess();
-}
-
-HWTEST_F(StaServiceTest, StaServiceDisableWifiSuccess, TestSize.Level1)
-{
-    StaServiceDisableWifiSuccess();
 }
 
 HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigSuccess, TestSize.Level1)

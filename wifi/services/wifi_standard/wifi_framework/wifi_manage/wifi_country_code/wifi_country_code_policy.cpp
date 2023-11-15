@@ -292,13 +292,14 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByAP(std::string &wifiCountryCo
         return WIFI_OPT_FAILED;
     }
     for (auto &info : scanResults) {
-        if (strcasecmp(info.bssid.c_str(), result.bssid.c_str()) == 0) {
-            ParseCountryCodeElement(info.infoElems, wifiCountryCode);
-            break;
+        if (strcasecmp(info.bssid.c_str(), result.bssid.c_str()) == 0 &&
+            ParseCountryCodeElement(info.infoElems, wifiCountryCode) == WIFI_OPT_SUCCESS) {
+            WIFI_LOGI("get wifi country code by ap success, code=%{public}s", wifiCountryCode.c_str());
+            return WIFI_OPT_SUCCESS;
         }
     }
-    WIFI_LOGI("get wifi country code by ap success, code=%{public}s", wifiCountryCode.c_str());
-    return WIFI_OPT_SUCCESS;
+    WIFI_LOGI("get wifi country code by ap fail, the country code of the AP is incorrect or empty");
+    return WIFI_OPT_FAILED;
 }
 
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByScanResult(std::string &wifiCountryCode)

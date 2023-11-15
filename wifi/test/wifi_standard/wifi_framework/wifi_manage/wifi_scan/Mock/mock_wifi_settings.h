@@ -56,6 +56,7 @@ public:
     virtual int GetHid2dUpperScene(Hid2dUpperScene &scene) = 0;
     virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
     virtual int GetP2pInfo(WifiP2pLinkedInfo &LinkedInfo) = 0;
+    virtual int GetDhcpIpType(int instId = 0) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -91,6 +92,7 @@ public:
     MOCK_METHOD1(GetHid2dUpperScene, int(Hid2dUpperScene &scene));
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
     MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &LinkedInfo));
+    MOCK_METHOD1(GetDhcpIpType, int(int));
 };
 }  // namespace Wifi
 }  // namespace OHOS

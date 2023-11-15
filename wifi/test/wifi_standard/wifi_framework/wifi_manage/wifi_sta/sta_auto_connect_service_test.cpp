@@ -53,7 +53,6 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetPortaUri(_)).Times(testing::AtLeast(0));
         pStaStateMachine = new (std::nothrow) MockStaStateMachine();
         pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine);
         pMockDeviceAppraisal = new (std::nothrow) MockDeviceAppraisal();

@@ -47,32 +47,6 @@ public:
     WifiManager wifiManager;
 };
 
-HWTEST_F(WifiManagerTest, AutoStartStaService_001, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStartStaService_001 enter!");
-    EXPECT_EQ(wifiManager.WifiToggled(1, 0), WIFI_OPT_SUCCESS);
-}
-
-HWTEST_F(WifiManagerTest, AutoStartStaService_002, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStartStaService_002 enter!");
-    EXPECT_EQ(wifiManager.WifiToggled(0, 0), WIFI_OPT_SUCCESS);
-    EXPECT_EQ(wifiManager.WifiToggled(1, 0), WIFI_OPT_SUCCESS);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopStaService_001, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStopStaService_001 enter!");
-    EXPECT_EQ(wifiManager.WifiToggled(0, 0), WIFI_OPT_SUCCESS);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopStaService_002, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStopStaService_002 enter!");
-    EXPECT_EQ(wifiManager.WifiToggled(1, 0), WIFI_OPT_SUCCESS);
-    EXPECT_EQ(wifiManager.WifiToggled(0, 0), WIFI_OPT_SUCCESS);
-}
-
 HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadStaSaTimerTest enter!");

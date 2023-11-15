@@ -124,6 +124,7 @@ public:
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         ScanStatusReport scanStatusReport;
         scanStatusReport.status = SCAN_STARTED_STATUS;
         pScanService->HandleScanStatusReport(scanStatusReport);

@@ -50,7 +50,6 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetPortaUri(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine.reset(new StaStateMachine());
         pStaStateMachine->InitStaStateMachine();

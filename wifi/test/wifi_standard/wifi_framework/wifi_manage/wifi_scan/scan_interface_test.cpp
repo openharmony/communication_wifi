@@ -101,6 +101,16 @@ HWTEST_F(ScanInterfaceTest, OnScreenStateChangedFail, TestSize.Level1)
     EXPECT_EQ(WIFI_OPT_INVALID_PARAM, pScanInterface->OnScreenStateChanged(screenState));
 }
 
+HWTEST_F(ScanInterfaceTest, OnStandbyStateChangedSuccess, TestSize.Level1)
+{
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnStandbyStateChanged(false));
+}
+
+HWTEST_F(ScanInterfaceTest, OnStandbyStateChangedFail, TestSize.Level1)
+{
+    EXPECT_EQ(WIFI_OPT_INVALID_PARAM, pScanInterface->OnStandbyStateChanged(true));
+}
+
 HWTEST_F(ScanInterfaceTest, OnClientModeStatusChangedSuccess, TestSize.Level1)
 {
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnClientModeStatusChanged(0));

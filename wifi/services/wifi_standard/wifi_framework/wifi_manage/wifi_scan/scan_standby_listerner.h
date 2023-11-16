@@ -80,6 +80,7 @@ public:
 private:
     static bool allowScan;
     std::shared_ptr<StandBySubscriber> standBySubscriber_ = nullptr;
+    bool isStandBySubscribered = false;
     std::mutex standByEventMutex;
 };
 }  // namespace Wifi

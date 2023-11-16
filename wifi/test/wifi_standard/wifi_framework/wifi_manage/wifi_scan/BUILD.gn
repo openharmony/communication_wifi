@@ -95,7 +95,10 @@ ohos_unittest("wifi_scan_unittest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+  defines = [
+    "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+  ]
   external_deps = [
     "ability_base:want",
     "c_utils:utils",

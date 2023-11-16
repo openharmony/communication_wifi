@@ -24,7 +24,6 @@
 #include "common_event_support.h"
 #include "common_event_subscriber.h"
 #include "i_wifi_country_code_change_listener.h"
-#include "i_wifi_country_code_policy.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service_callbacks.h"
 #endif
@@ -32,6 +31,7 @@
 #include "sta_service_callback.h"
 #endif
 #include "wifi_country_code_define.h"
+#include "wifi_country_code_policy.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -123,7 +123,7 @@ private:
 #endif
     std::map<std::string, std::shared_ptr<IWifiCountryCodeChangeListener>> m_codeChangeListeners;
     std::string m_wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
-    std::shared_ptr<IWifiCountryCodePolicy> m_wifiCountryCodePolicy;
+    std::shared_ptr<WifiCountryCodePolicy> m_wifiCountryCodePolicy;
     std::mutex m_countryCodeMutex;
 
     WifiCountryCodeManager() = default;

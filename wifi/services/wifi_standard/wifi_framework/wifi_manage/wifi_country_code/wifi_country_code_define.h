@@ -20,12 +20,41 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr int WIFI_COUNTRY_CODE_POLICE_DEF_LEN = 4;
+constexpr int WIFI_COUNTRY_CODE_POLICE_DEF_LEN = 5;
 const std::string SETTINGS_DATASHARE_KEY_WIFI_COUNTRY_CODE = "wifi_country_code";
 const std::string SETTINGS_DATASHARE_URI_WIFI_COUNTRY_CODE =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=wifi_country_code";
 constexpr const char* DEFAULT_WIFI_COUNTRY_CODE_ZZ = "ZZ";  // for tablets only, priority greater than HK
 constexpr const char* DEFAULT_WIFI_COUNTRY_CODE = "HK";
+constexpr const char* DEFAULT_RO_RUN_MODE = "normal";
+constexpr const char* FACTORY_RO_RUN_MODE = "factory";
+constexpr const char* FACTORY_WIFI_COUNTRY_CODE = "const.wifi_country_code.factory";
+constexpr const char* WIFI_COUNTRY_CODE_RUN_MODE = "const.wifi_country_code.runmode";
+constexpr const char* WIFI_COUNTRY_CODE_CONFIG = "const.wifi_country_code.conf";
+constexpr const char* WIFI_COUNTRY_CODE_CONFIG_DEFAULT = "0";
+constexpr const char* DEFAULT_REGION_PARAM = "const.global.region";
+constexpr const char* DEFAULT_REGION = "CN";
+constexpr int WIFI_COUNTRY_CODE_SIZE = 16;
+constexpr int FACTORY_WIFI_COUNTRY_CODE_SIZE = 16;
+constexpr int WIFI_COUNTRY_CODE_RUN_MODE_SIZE = 16;
+constexpr int SYSTEM_PARAMETER_ERROR_CODE = 0;
+constexpr int PLMN_LEN = 3;
+constexpr int PLMN_SUBSTR_LEFT = 0;
+constexpr int PLMN_SUBSTR_RIGHT = 3;
+constexpr int SLOT_ID = 0;
+constexpr int MAX_SCAN_SAVED_SIZE = 3;
+constexpr int COUNTRY_CODE_LENGTH = 2;
+constexpr unsigned int COUNTRY_CODE_EID = 7;
+constexpr int DEFAULT_REGION_SIZE = 16;
+constexpr int BSSID_VECTOR_INDEX_ZERO = 0;
+constexpr int BSSID_VECTOR_INDEX_ONE = 1;
+constexpr int BSSID_VECTOR_INDEX_TWO = 2;
+constexpr int BSSID_VECTOR_INDEX_THREE = 3;
+constexpr int FEATURE_MCC = 0;
+constexpr int FEATURE_RCV_AP_CONNECTED = 1;
+constexpr int FEATURE_RCV_SCAN_RESLUT = 2;
+constexpr int FEATURE_USE_REGION = 3;
+constexpr int FEATURE_USE_ZZ = 4;
 
 struct MccEntry {
     int mnc;

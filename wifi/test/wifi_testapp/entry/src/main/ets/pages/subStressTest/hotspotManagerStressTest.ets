@@ -20,13 +20,13 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { StressContentTable } from '../../Component/stressContentTable';
 import router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import LogUtil from '../../Utils/LogUtil';
-import { initHotspotManagerStressData } from '../../MainAbility/model/stressTestDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import LogUtil from '../../utils/LogUtil';
+import { initHotspotManagerStressData } from '../../entryability/model/stressTestDataModels'
+import { TestData } from '../../entryability/model/testData'
 import { FilterTableManager } from '../../Component/filterTableManager';
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../Utils/Util'
+import { resolveIP } from '../../utils/Util'
 import socket from '@ohos.net.socket';
 
 import http from '@ohos.net.http'
@@ -64,14 +64,14 @@ struct hotspotManagerStressTest {
   @State showListItem: boolean = false;
   private testItem: TestData = router.getParams().testId;
   @State message: string = "";
-  @StorageLink( 'stressNumber' ) stressNumber: number = 0 ;
-  @StorageLink( 'stressTime' ) stressTime: number = 0;
+  @StorageLink( 'stressNumber' ) stressNumber: Number = 0 ;
+  @StorageLink( 'stressTime' ) stressTime: Number = 0;
   @State h_ssid1: string = "testApp1";
-  @State h_securityType1: number = 3;
-  @State h_band1: number = 2;
+  @State h_securityType1: Number = 3;
+  @State h_band1: Number = 2;
   @State h_preSharedKey1: string = "12345678";
-  @State h_maxConn1: number = 3 ;
-  @State h_channel1: number = 36 ;
+  @State h_maxConn1: Number = 3 ;
+  @State h_channel1: Number = 36 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "h_ssid1" , this.h_ssid1 )
@@ -404,8 +404,8 @@ struct socketTest {
 
 @Component
 struct upDownLoad {
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []

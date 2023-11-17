@@ -11,6 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-const.wifi.country_code_no_mcc=0
-const.wifi.ro.runmode=normal
-const.factory.wifi_country_code=HK
+const.wifi_country_code.conf=1
+const.wifi_country_code.runmode=normal
+const.wifi_country_code.factory=HK

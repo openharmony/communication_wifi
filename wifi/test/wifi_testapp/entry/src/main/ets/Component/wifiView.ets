@@ -16,14 +16,14 @@
 // @ts-nocheck
 
 const TAG = "[wifiView]"
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 /**
  * WifiView Component of wifi test
  */
 
 @Component
 export struct WifiView {
-  @State wifi: any = null
+  private wifi: any = null
   private securityString: Resource = $r( 'app.string.encryption' )
   @State isLock: boolean = true
 

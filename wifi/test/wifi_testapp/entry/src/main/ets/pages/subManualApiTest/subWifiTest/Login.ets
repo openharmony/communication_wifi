@@ -15,7 +15,7 @@
 
 import wifi from '@ohos.wifi';
 import router from '@ohos.router';
-import { resolveIP } from '../../../Utils/Util'
+import { resolveIP } from '../../../utils/Util'
 import socket from '@ohos.net.socket';
 
 

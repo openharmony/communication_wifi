@@ -15,14 +15,14 @@
 
 // @ts-nocheck
 
-import ConfigData from '../../Utils/ConfigData';
+import ConfigData from '../../utils/ConfigData';
 import router from '@system.router';
-import { TestData } from '../../MainAbility/model/testData'
+import { TestData } from '../../entryability/model/testData'
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { P2pAutoTestCase , initP2pAutoData } from '../../MainAbility/model/autoTestDataModels'
+import { P2pAutoTestCase , initP2pAutoData } from '../../entryability/model/autoTestDataModels'
 import { AutoContentTable } from '../../Component/autoContentTable'
-import * as p2pInterface from '../../MainAbility/model/p2pInterface'
+import * as p2pInterface from '../../entryability/model/p2pInterface'
 import prompt from '@system.prompt';
 import emitter from '@ohos.events.emitter'
 
@@ -37,14 +37,14 @@ struct P2pAutoTest {
   //  @State textMessage: string = 'null';
   //  @State testState: boolean = false;
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "p2pAutoTestMessage" ) p2pAutoTestMessage: string = ""
   @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2 ;
+  @State netId: Number = - 2 ;
   @State passphrase: string = "12345678" ;
   @State groupName: string = "testGroup"
-  @State goBand: number = 0 ;
+  @State goBand: Number = 0 ;
   @State deviceName: string = "MyTestDevice"
 
   aboutToAppear() {

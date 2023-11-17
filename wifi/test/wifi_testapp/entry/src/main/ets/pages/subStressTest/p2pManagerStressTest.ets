@@ -20,12 +20,12 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { StressContentTable } from '../../Component/stressContentTable';
 import router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import LogUtil from '../../Utils/LogUtil';
-import { initP2pManagerStressData } from '../../MainAbility/model/stressTestDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import LogUtil from '../../utils/LogUtil';
+import { initP2pManagerStressData } from '../../entryability/model/stressTestDataModels'
+import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../Utils/Util'
+import { resolveIP } from '../../utils/Util'
 import socket from '@ohos.net.socket';
 
 import http from '@ohos.net.http'
@@ -64,15 +64,15 @@ struct P2pManagerStressTest {
   private testItem: TestData = router.getParams().testId;
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: Number = - 1;
   @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
-  @State netIdManager: number = - 2 ;
+  @State netIdManager: Number = - 2 ;
   @State passphraseManager: string = "12345678" ;
   @State groupNameManager: string = "testGroup"
-  @State goBandManager: number = 0 ;
+  @State goBandManager: Number = 0 ;
   @State devNameManager: string = "MyTestDevice"
-  @StorageLink( 'stressNumber' ) stressNumber: number = 0 ;
-  @StorageLink( 'stressTime' ) stressTime: number = 0;
+  @StorageLink( 'stressNumber' ) stressNumber: Number = 0 ;
+  @StorageLink( 'stressTime' ) stressTime: Number = 0;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
@@ -223,10 +223,10 @@ struct P2pManagerStressTest {
 @Component
 struct p2pManagerSetting {
   @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
-  @State netIdManager: number = - 2 ;
+  @State netIdManager: Number = - 2 ;
   @State passphraseManager: string = "12345678" ;
   @State groupNameManager: string = "testGroup"
-  @State goBandManager: number = 0 ;
+  @State goBandManager: Number = 0 ;
   @State devNameManager: string = "MyTestDevice"
 
   aboutToAppear() {
@@ -540,8 +540,8 @@ struct socketTest {
 
 @Component
 struct upDownLoad {
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []

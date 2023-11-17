@@ -40,6 +40,7 @@
 #ifndef OHOS_ARCH_LITE
 #include "common_event_manager.h"
 #include "timer.h"
+#include "wifi_power_state_listener.h"
 #endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_controller_define.h"
@@ -326,6 +327,7 @@ private:
     std::mutex airplaneModeEventMutex;
     std::mutex locationEventMutex;
     std::mutex batteryEventMutex;
+    std::mutex powerStateEventMutex;
     std::condition_variable mCondition;
     std::deque<WifiCloseServiceMsg> mEventQue;
 #ifndef OHOS_ARCH_LITE
@@ -384,6 +386,10 @@ private:
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);
     uint32_t migrateTimerId{0};
     static bool mIsMdmForbidden;
+    void RegisterPowerStateListener();
+    void UnRegisterPowerStateListener();
+    sptr<WifiPowerStateListener> powerStateListener_ = nullptr;
+    bool isPowerStateListenerSubscribered = false;
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

@@ -20,9 +20,9 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import { initWifiApiData } from '../../MainAbility/model/testDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import { initWifiApiData } from '../../entryability/model/testDataModels'
+import { TestData } from '../../entryability/model/testData'
 
 const TAG = "[Wifi]"
 
@@ -36,19 +36,19 @@ struct WifiDeviceSetting {
   @StorageLink( 'w_bssid' ) w_bssid: string = "6C:B1:58:75:63:65"; //6C:B1:58:75:63:65
   @StorageLink( 'w_preSharedKey' ) w_preSharedKey: string = "12345678"; //kaihong123
   @StorageLink( 'w_isHiddenSsid' ) w_isHiddenSsid: boolean = false;
-  @StorageLink( 'w_securityType' ) w_securityType: number = 3
-  @StorageLink( 'w_creatorUid' ) w_creatorUid: number = 1;
-  @StorageLink( 'w_disableReason' ) w_disableReason: number = 0;
-  @StorageLink( 'w_netId' ) w_netId: number = 100 ;
-  @StorageLink( 'w_randomMacType' ) w_randomMacType: number = 0 ;
+  @StorageLink( 'w_securityType' ) w_securityType: Number = 3
+  @StorageLink( 'w_creatorUid' ) w_creatorUid: Number = 1;
+  @StorageLink( 'w_disableReason' ) w_disableReason: Number = 0;
+  @StorageLink( 'w_netId' ) w_netId: Number = 100 ;
+  @StorageLink( 'w_randomMacType' ) w_randomMacType: Number = 0 ;
   @StorageLink( 'w_randomMacAddr' ) w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @StorageLink( 'w_ipType' ) w_ipType: number = 1 ;
-  @StorageLink( 'w_staticIp_ipAddress' ) w_staticIp_ipAddress: number = 3232235880 ;
-  @StorageLink( 'w_staticIp_gateway' ) w_staticIp_gateway: number = 3232235777 ;
-  @StorageLink( 'w_staticIp_dnsServers' ) w_staticIp_dnsServers: number = 3716386629 ;
+  @StorageLink( 'w_ipType' ) w_ipType: Number = 1 ;
+  @StorageLink( 'w_staticIp_ipAddress' ) w_staticIp_ipAddress: Number = 3232235880 ;
+  @StorageLink( 'w_staticIp_gateway' ) w_staticIp_gateway: Number = 3232235777 ;
+  @StorageLink( 'w_staticIp_dnsServers' ) w_staticIp_dnsServers: Number = 3716386629 ;
   @StorageLink( 'w_staticIp_domains' ) w_staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
-  @StorageLink( 'w_networkId' ) w_networkId: number = 0 ; // id,netId,networkId是一个值嘛？
-  @StorageLink( 'w_featureId' ) w_featureId: number = 1 ;
+  @StorageLink( 'w_networkId' ) w_networkId: Number = 0 ; // id,netId,networkId是一个值嘛？
+  @StorageLink( 'w_featureId' ) w_featureId: Number = 1 ;
 
   aboutToAppear() {
 //    AppStorage.SetOrCreate( 'w_ssid' , this.w_ssid );
@@ -181,7 +181,7 @@ struct WifiDeviceSetting {
                   .selectedOptionFont( { size : 17 } )
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
-                  .onSelect( ( index: number ) => {
+                  .onSelect( ( index: Number ) => {
                     console.log( TAG , "Select:" + index )
                     this.w_securityType = index;
                     AppStorage.SetOrCreate( 'w_securityType' , this.w_securityType );
@@ -398,25 +398,25 @@ struct WifiInterfaceTest {
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: Number = - 1;
   @StorageLink( 'pairedSsid' ) pairedSsid: string = "";
   @State w_ssid: string = "TP-LINK_6365"; //TP-LINK_6365
   @State w_bssid: string = "6C:B1:58:75:63:65"; //6C:B1:58:75:63:65
   @State w_preSharedKey: string = "12345678"; //kaihong123
   @State w_isHiddenSsid: boolean = false;
-  @State w_securityType: number = 3
-  @State w_creatorUid: number = 1;
-  @State w_disableReason: number = 0;
-  @State w_netId: number = 100 ;
-  @State w_randomMacType: number = 0 ;
+  @State w_securityType: Number = 3
+  @State w_creatorUid: Number = 1;
+  @State w_disableReason: Number = 0;
+  @State w_netId: Number = 100 ;
+  @State w_randomMacType: Number = 0 ;
   @State w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType: number = 1 ;
-  @State w_staticIp_ipAddress: number = 3232235880 ;
-  @State w_staticIp_gateway: number = 3232235777 ;
-  @State w_staticIp_dnsServers: number = 3716386629 ;
+  @State w_ipType: Number = 1 ;
+  @State w_staticIp_ipAddress: Number = 3232235880 ;
+  @State w_staticIp_gateway: Number = 3232235777 ;
+  @State w_staticIp_dnsServers: Number = 3716386629 ;
   @State w_staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkId: number = 0 ; // id,netId,networkId是一个值嘛？
-  @State w_featureId: number = 1 ;
+  @State w_networkId: Number = 0 ; // id,netId,networkId是一个值嘛？
+  @State w_featureId: Number = 1 ;
   @StorageLink( 'linkedInfoMessage' ) linkedInfoMessage: string = '';
   @StorageLink( 'ipInfoMessage' ) ipInfoMessage: string = '';
   @StorageLink( 'getDeviceConfigsMessage' ) getDeviceConfigsMessage: string = '';
@@ -473,7 +473,7 @@ struct WifiInterfaceTest {
             .padding( { top : 5 , left : 5 } )
           Image( $r( 'app.media.Switch' ) )
             .height( 50 )
-            .padding( { top : 5 , bottom : 5 , left : 5 } )
+            .padding( { top : 5 , bottom : 5 , left : 10 } )
             .width( ConfigData.WH_15_100 )
             .onClick( () => {
               this.showList = !this.showList;
@@ -490,22 +490,22 @@ struct WifiInterfaceTest {
             Column() {
               Text( "WLAN连接信息:" + this.linkedInfoMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "IP信息:" + this.ipInfoMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "获取网络配置:" + this.getDeviceConfigsMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "扫描结果:" + this.getScanInfoMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
             }

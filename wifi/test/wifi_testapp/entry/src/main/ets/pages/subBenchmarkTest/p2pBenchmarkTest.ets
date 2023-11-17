@@ -19,13 +19,13 @@ import prompt from '@ohos.prompt';
 import router from '@system.router'
 import { PageTitle } from '../../Component/pageTitle'
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { TestData } from '../../MainAbility/model/testData'
-import { initP2pBenchmarkData } from '../../MainAbility/model/benchmarkTestDataModels'
-import * as P2pInterface from '../../MainAbility/model/p2pInterface'
-import { P2pBenchmarkTestCase } from '../../MainAbility/model/benchmarkTestDataModels'
-import ConfigData from "../../Utils/ConfigData"
+import { TestData } from '../../entryability/model/testData'
+import { initP2pBenchmarkData } from '../../entryability/model/benchmarkTestDataModels'
+import * as P2pInterface from '../../entryability/model/p2pInterface'
+import { P2pBenchmarkTestCase } from '../../entryability/model/benchmarkTestDataModels'
+import ConfigData from "../../utils/ConfigData"
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../Utils/Util'
+import { resolveIP } from '../../utils/Util'
 import socket from '@ohos.net.socket';
 
 import http from '@ohos.net.http'
@@ -59,7 +59,7 @@ struct P2PBenchmarkTest {
   @State showList: boolean = false;
   @State message: string = 'P2PBenchmarkTest';
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @StorageLink( "p2pBenchmarkTestMessage" ) p2pBenchmarkTestMessage: string = ""
   //  @State login_feng: boolean = false
   //  @State login_wen: boolean = false
@@ -72,17 +72,17 @@ struct P2PBenchmarkTest {
   //  @State warnText: string = ''
   //  @State roomNumber: string = ''
   //  @State receiveMsg: string = '待接收数据'
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []
-  @StorageLink( 'p2pBenchmarkTime' ) p2pBenchmarkTime: number = 0;
+  @StorageLink( 'p2pBenchmarkTime' ) p2pBenchmarkTime: Number = 0;
   @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2 ;
+  @State netId: Number = - 2 ;
   @State passphrase: string = "12345678" ;
   @State groupName: string = "testGroup"
-  @State goBand: number = 0 ;
+  @State goBand: Number = 0 ;
   @State deviceName: string = "MyTestDevice"
 
   aboutToAppear() {
@@ -345,8 +345,8 @@ struct socketTest {
 
 @Component
 struct upDownLoad {
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []

@@ -15,9 +15,9 @@
 
 // @ts-nocheck
 
-import { TestData } from '../MainAbility/model/testData'
+import { TestData } from '../entryability/model/testData'
 import router from '@system.router'
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 /**
  * Test-GridItem page of wifi test
  */

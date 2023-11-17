@@ -19,14 +19,14 @@ import prompt from '@system.prompt';
 import router from '@system.router';
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { TestData } from '../../MainAbility/model/testData'
+import { TestData } from '../../entryability/model/testData'
 import { ScenarioContentTable } from '../../Component/scenarioContentTable'
 import {
   HotspotCreateScenarioTestCase ,
   initHotspotCreateScenarioData
-} from '../../MainAbility/model/scenarioTestDataModels'
-import * as HotspotInterface from '../../MainAbility/model/hotspotInterface'
-import ConfigData from '../../Utils/ConfigData';
+} from '../../entryability/model/scenarioTestDataModels'
+import * as HotspotInterface from '../../entryability/model/hotspotInterface'
+import ConfigData from '../../utils/ConfigData';
 /**
  * hotspot Create Scenario Test Page Of WiFi test
  */
@@ -36,14 +36,14 @@ import ConfigData from '../../Utils/ConfigData';
 struct hotspotCreateScenarioTest {
   @State message: string = 'hotspotCreateScenarioTest';
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @StorageLink( "hotspotCreateScenarioMessage" ) hotspotCreateScenarioMessage: string = ""
   @State h_ssid: string = "testApp1";
-  @State h_securityType: number = 3;
-  @State h_band: number = 2;
+  @State h_securityType: Number = 3;
+  @State h_band: Number = 2;
   @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: number = 3 ;
-  @State h_channel: number = 36 ;
+  @State h_maxConn: Number = 3 ;
+  @State h_channel: Number = 36 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "h_ssid" , this.h_ssid )

@@ -24,11 +24,11 @@ const TAG = "[basicDataSource]"
 class BasicDataSource implements IDataSource {
   private listeners: DataChangeListener[] = []
 
-  public totalCount(): number {
+  public totalCount(): Number {
     return 0
   }
 
-  public getData( index: number ): any {
+  public getData( index: Number ): any {
     return undefined
   }
 
@@ -57,25 +57,25 @@ class BasicDataSource implements IDataSource {
     } )
   }
 
-  notifyDataAdd( index: number ): void {
+  notifyDataAdd( index: Number ): void {
     this.listeners.forEach( listener => {
       listener.onDataAdd( index )
     } )
   }
 
-  notifyDataChange( index: number ): void {
+  notifyDataChange( index: Number ): void {
     this.listeners.forEach( listener => {
       listener.onDataChange( index )
     } )
   }
 
-  notifyDataDelete( index: number ): void {
+  notifyDataDelete( index: Number ): void {
     this.listeners.forEach( listener => {
       listener.onDataDelete( index )
     } )
   }
 
-  notifyDataMove( from: number , to: number ): void {
+  notifyDataMove( from: Number , to: Number ): void {
     this.listeners.forEach( listener => {
       listener.onDataMove( from , to )
     } )
@@ -90,15 +90,15 @@ export default class WifiDataSource extends BasicDataSource {
     this.dataArray = data
   }
 
-  public totalCount(): number {
+  public totalCount(): Number {
     return this.dataArray.length
   }
 
-  public getData( index: number ): any {
+  public getData( index: Number ): any {
     return this.dataArray[index]
   }
 
-  public addData( index: number , data: wifi.WifiScanInfo ): void {
+  public addData( index: Number , data: wifi.WifiScanInfo ): void {
     this.dataArray.splice( index , 0 , data )
     this.notifyDataAdd( index )
   }

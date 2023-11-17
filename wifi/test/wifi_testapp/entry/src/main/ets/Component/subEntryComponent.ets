@@ -15,7 +15,7 @@
 
 // @ts-nocheck
 
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 
 const TAG = "[subEntryComponent]"
 /**

@@ -452,12 +452,6 @@ ErrCode WifiP2pServiceImpl::RemoveGroup()
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
-    WifiP2pGroupInfo config;
-    ErrCode ret = pService->GetCurrentGroup(config);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("RemoveGroup:GetCurrentGroup failed!");
-        return WIFI_OPT_FAILED;
-    }
     return pService->RemoveGroup();
 }
 

@@ -15,15 +15,15 @@
 
 // @ts-nocheck
 
-import ConfigData from '../../Utils/ConfigData';
+import ConfigData from '../../utils/ConfigData';
 import prompt from '@system.prompt';
 import router from '@system.router';
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { TestData } from '../../MainAbility/model/testData'
+import { TestData } from '../../entryability/model/testData'
 import { ScenarioContentTable } from '../../Component/scenarioContentTable'
-import { P2pConnectScenarioTestCase , initP2pConnectScenarioData } from '../../MainAbility/model/scenarioTestDataModels'
-import * as P2pInterface from '../../MainAbility/model/p2pInterface'
+import { P2pConnectScenarioTestCase , initP2pConnectScenarioData } from '../../entryability/model/scenarioTestDataModels'
+import * as P2pInterface from '../../entryability/model/p2pInterface'
 
 /**
  * Classic p2p Connect Scenario Test Page Of WiFi test
@@ -34,13 +34,13 @@ import * as P2pInterface from '../../MainAbility/model/p2pInterface'
 struct p2pConnectScenarioTest {
   @State message: string = 'p2pConnectScenarioTest';
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @StorageLink( "p2pConnectScenarioMessage" ) p2pConnectScenarioMessage: string = ""
   @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2 ;
+  @State netId: Number = - 2 ;
   @State passphrase: string = "12345678" ;
   @State groupName: string = "testGroup"
-  @State goBand: number = 0 ;
+  @State goBand: Number = 0 ;
   @State deviceName: string = "MyTestDevice"
 
   aboutToAppear() {

@@ -19,14 +19,14 @@ import prompt from '@ohos.prompt';
 import router from '@system.router'
 import { PageTitle } from '../../Component/pageTitle'
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { TestData } from '../../MainAbility/model/testData'
-import { initWifiManagerBenchmarkData } from '../../MainAbility/model/scenarioTestDataModels'
-import * as WifiManagerInterface from '../../MainAbility/model/wifiManagerInterface'
-import { WifiManagerBenchmarkTestCase } from '../../MainAbility/model/benchmarkTestDataModels'
-import ConfigData from "../../Utils/ConfigData"
+import { TestData } from '../../entryability/model/testData'
+import { initWifiManagerBenchmarkData } from '../../entryability/model/scenarioTestDataModels'
+import * as WifiManagerInterface from '../../entryability/model/wifiManagerInterface'
+import { WifiManagerBenchmarkTestCase } from '../../entryability/model/benchmarkTestDataModels'
+import ConfigData from "../../utils/ConfigData"
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import { resolveIP } from '../../Utils/Util'
+import { resolveIP } from '../../utils/Util'
 import socket from '@ohos.net.socket';
 import http from '@ohos.net.http'
 import request from '@ohos.request'
@@ -61,25 +61,25 @@ struct WifiManagerBenchmarkTest {
   @State showList: boolean = false;
   @State message: string = 'WifiManagerBenchmarkTest';
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @StorageLink( "wifiManagerBenchmarkTestMessage" ) wifiManagerBenchmarkTestMessage: string = ""
   @State w_ssid1: string = "TP-LINK_6365";
   @State w_bssid1: string = "6C:B1:58:75:63:65";
   @State w_preSharedKey1: string = "12345678";
   @State w_isHiddenSsid1: boolean = false;
-  @State w_securityType1: number = 3
-  @State w_creatorUid1: number = 1;
-  @State w_disableReason1: number = 0;
-  @State w_netId1: number = 0 ;
-  @State w_randomMacType1: number = 0 ;
+  @State w_securityType1: Number = 3
+  @State w_creatorUid1: Number = 1;
+  @State w_disableReason1: Number = 0;
+  @State w_netId1: Number = 0 ;
+  @State w_randomMacType1: Number = 0 ;
   @State w_randomMacAddr1: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType1: number = 1 ;
-  @State w_staticIp_ipAddress1: number = 3232235880 ;
-  @State w_staticIp_gateway1: number = 3232235777 ;
-  @State w_staticIp_dnsServers1: number = 3716386629 ;
+  @State w_ipType1: Number = 1 ;
+  @State w_staticIp_ipAddress1: Number = 3232235880 ;
+  @State w_staticIp_gateway1: Number = 3232235777 ;
+  @State w_staticIp_dnsServers1: Number = 3716386629 ;
   @State w_staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkIdM: number = 0 ;
-  @State w_featureIdM: number = 1 ;
+  @State w_networkIdM: Number = 0 ;
+  @State w_featureIdM: Number = 1 ;
   //  @State login_feng: boolean = false
   //  @State login_wen: boolean = false
   //  @State user: string = ''
@@ -91,12 +91,12 @@ struct WifiManagerBenchmarkTest {
   //  @State warnText: string = ''
   //  @State roomNumber: string = ''
   //  @State receiveMsg: string = '待接收数据'
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []
-  @StorageLink( 'wifiManagerBenchmarkTime' ) wifiManagerBenchmarkTime: number = 0;
+  @StorageLink( 'wifiManagerBenchmarkTime' ) wifiManagerBenchmarkTime: Number = 0;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( 'w_ssid1' , this.w_ssid1 );
@@ -388,8 +388,8 @@ struct socketTest {
 
 @Component
 struct upDownLoad {
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []

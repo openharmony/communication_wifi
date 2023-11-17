@@ -644,6 +644,14 @@ bool ScanService::StoreFullScanInfo(
     WIFI_LOGI("Receive %{public}d scan results.\n", (int)(scanInfoList.size()));
     if (scanInfoList.size() == 0) {
         /* Don't overwrite ScanInfoList */
+        std::vector<WifiScanInfo> results;
+        int ret = WifiSettings::GetInstance().GetScanInfoList(results);
+        if (ret != 0) {
+            WIFI_LOGW("GetScanInfoList return error. \n");
+        }
+        for (auto iter = results.begin(); iter != results.end(); ++iter) {
+            iter->disappearCount++;
+        }
         return true;
     }
 

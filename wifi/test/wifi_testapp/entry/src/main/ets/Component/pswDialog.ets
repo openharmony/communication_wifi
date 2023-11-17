@@ -16,14 +16,14 @@
 // @ts-nocheck
 
 import wifi from '@ohos.wifi'
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 /**
  * PswDialog page of WiFi test
  */
 
 @CustomDialog
 export struct PswDialog {
-  @State scanInfo: any = null
+  private scanInfo: any = null
   private psw: string = ''
   private controller: CustomDialogController
   private action: ( scanInfo , psw ) => void

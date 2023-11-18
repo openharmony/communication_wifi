@@ -30,7 +30,7 @@
 #include "wifi_hostapd_hal.h"
 #include "wifi_log.h"
 #include "wifi_hal_module_manage.h"
-
+#include "dhcp_start_sa_api.h"
 #undef LOG_TAG
 #define LOG_TAG "WifiHalService"
 
@@ -112,6 +112,8 @@ static void SignalExit(int sig)
 int main(void)
 {
     LOGI("Wifi hal service starting...");
+    StartDhcpClientSa();
+    StartDhcpServerSa();
     char rpcSockPath[] = CONFIG_ROOR_DIR"/unix_sock.sock";
     if (access(rpcSockPath, 0) == 0) {
         unlink(rpcSockPath);

@@ -116,7 +116,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         }
 
         /* GC start DHCP Client. */
-        p2pStateMachine.StartDhcpClient();
+        p2pStateMachine.StartDhcpClientInterface();
 
         const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
         WifiP2pDevice device = deviceManager.GetDevices(owner.GetDeviceAddress());

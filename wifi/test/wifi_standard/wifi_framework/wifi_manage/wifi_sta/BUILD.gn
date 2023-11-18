@@ -122,7 +122,7 @@ ohos_unittest("wifi_sta_unittest") {
     "ability_runtime:ability_manager",
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
-    "dhcp:dhcp_manager_service",
+    "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",

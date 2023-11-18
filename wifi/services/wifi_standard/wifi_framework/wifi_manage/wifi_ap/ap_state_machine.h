@@ -34,47 +34,6 @@ class ApStateMachine : public StateMachine {
     friend class ApStartedState;
     FRIEND_GTEST(ApStateMachine);
 
-    class DhcpNotify : public IDhcpResultNotify {
-    public:
-        /**
-         * @Description : Construct a new dhcp result notify object
-         *
-         */
-        explicit DhcpNotify(ApStateMachine &apStateMachine);
-
-        /**
-         * @Description : Destroy the dhcp result notify object
-         *
-         */
-        ~DhcpNotify() override;
-
-        /**
-         * @Description - Asynchronous get dhcp result of specified interface success notify
-         *
-         * @param status - int
-         * @param ifname - interface name,eg:wlan0
-         * @param result - dhcp result
-         */
-        void OnSuccess(int status, const std::string &ifname, DhcpResult &result) override;
-
-        /**
-         * @Description - Asynchronous get dhcp result of specified interface failed notify
-         *
-         * @param status - int
-         * @param ifname - interface name,eg:wlan0
-         * @param reason - failed reason
-         */
-        void OnFailed(int status, const std::string &ifname, const std::string &reason) override;
-
-        /**
-        * @Description - Get the abnormal exit notify of dhcp server process
-        *
-        * @param ifname - interface name,eg:wlan0
-        */
-        void OnSerExitNotify(const std::string& ifname) override;
-    private:
-        ApStateMachine &m_apStateMachine;
-    };
 public:
     /**
      * @Description  construction method.
@@ -169,7 +128,6 @@ private:
     ApMonitor &m_ApMonitor;
 
     DhcpdInterface m_DhcpdInterface;
-    std::unique_ptr<DhcpNotify> pDhcpNotify;
     int m_id;
 }; /* ApStateMachine */
 }  // namespace Wifi

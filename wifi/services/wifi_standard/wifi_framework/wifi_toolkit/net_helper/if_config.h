@@ -19,7 +19,7 @@
 #include "wifi_log.h"
 
 #ifdef OHOS_ARCH_LITE
-#include "dhcp_define.h"
+#include "dhcp_c_api.h"
 #endif
 
 namespace OHOS {
@@ -57,7 +57,7 @@ public:
      * @param ipType - ip type[in]
      * @return int
      */
-    int SetIfDnsAndRoute(const DhcpResult &dhcpInfo, int ipType, int instId = 0);
+    int SetIfDnsAndRoute(const DhcpResult *dhcpInfo, int ipType, int instId = 0);
 
     void SetNetDns(const std::string &ifName, const std::string &dns1, const std::string &dns2);
 

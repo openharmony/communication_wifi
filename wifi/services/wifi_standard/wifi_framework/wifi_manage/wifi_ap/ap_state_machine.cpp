@@ -42,36 +42,8 @@ ApStateMachine::~ApStateMachine()
 {
 #ifndef WIFI_DHCP_DISABLED
     StopDhcpServer();
-    if (pDhcpNotify.get() != nullptr) {
-        pDhcpNotify.reset(nullptr);
-    }
     StopHandlerThread();
 #endif
-}
-
-ApStateMachine::DhcpNotify::DhcpNotify(ApStateMachine &apStateMachine) : m_apStateMachine(apStateMachine)
-{}
-
-ApStateMachine::DhcpNotify::~DhcpNotify()
-{}
-
-void ApStateMachine::DhcpNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
-{
-    WIFI_LOGI(
-        "Dhcp notify Success. status:%d, ifname:%s, result:%s.", status, ifname.c_str(), result.strYourCli.c_str());
-}
-
-void ApStateMachine::DhcpNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)
-{
-    WIFI_LOGW("Dhcp notify Failed. status:%d, ifname:%s, reason:%s.", status, ifname.c_str(), reason.c_str());
-}
-
-void ApStateMachine::DhcpNotify::OnSerExitNotify(const std::string &ifname)
-{
-    WIFI_LOGD("Dhcp exit notify.ifname:%s.", ifname.c_str());
-    if (ifname == IN_INTERFACE) {
-        m_apStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_FAIL));
-    }
 }
 
 void ApStateMachine::Init()
@@ -141,13 +113,11 @@ bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t
 #ifndef WIFI_DHCP_DISABLED
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-    if (!m_DhcpdInterface.StartDhcpServer(IN_INTERFACE, ipv4, ipv6, ipAddress, true, leaseTime)) {
+    if (!m_DhcpdInterface.StartDhcpServerFromInterface(IN_INTERFACE, ipv4, ipv6, ipAddress, true, leaseTime)) {
         WIFI_LOGE("start dhcpd fail.");
         return false;
     }
-    if (!m_DhcpdInterface.SetDhcpEventFunc(IN_INTERFACE, pDhcpNotify.get())) {
-        WIFI_LOGW("Set dhcp notify failed.");
-    }
+
     WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
 #else

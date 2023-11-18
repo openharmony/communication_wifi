@@ -174,7 +174,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
             p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
         }
     } else {
-        p2pStateMachine.StartDhcpClient();
+        p2pStateMachine.StartDhcpClientInterface();
     }
     SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
@@ -212,11 +212,7 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
             WIFI_LOGW("failed to stop Dhcp server.");
         }
     } else {
-        if (p2pStateMachine.pDhcpService != nullptr) {
-            p2pStateMachine.pDhcpService->StopDhcpClient(groupManager.GetCurrentGroup().GetInterface(), false);
-        } else {
-            WIFI_LOGE("pDhcpService is nullptr, cannot stop dhcp client.");
-        }
+        StopDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
     }
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
@@ -247,11 +243,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
     WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
     auto dhcpFunc = [=]() {
         if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
-            if (p2pStateMachine.pDhcpService != nullptr) {
-                p2pStateMachine.pDhcpService->StopDhcpClient(groupManager.GetCurrentGroup().GetInterface(), false);
-            } else {
-                WIFI_LOGE("pDhcpService is nullptr, cannot stop dhcp client.");
-            }
+            StopDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
         } else {
             if (!p2pStateMachine.StopDhcpServer()) {
                 WIFI_LOGW("failed to stop Dhcp server.");

@@ -16,7 +16,6 @@
 #define OHOS_MOCK_IF_CONFIG_H
 
 #include <gmock/gmock.h>
-#include "dhcp_define.h"
 
 namespace OHOS {
 namespace Wifi {

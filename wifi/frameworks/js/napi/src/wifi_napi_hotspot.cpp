@@ -267,7 +267,15 @@ NO_SANITIZE("cfi") napi_value GetStations(napi_env env, napi_callback_info info)
     return arrayResult;
 }
 
-NO_SANITIZE("cfi") napi_value AddBlockList(napi_env env, napi_callback_info info)
+static void JsObjToStationInfo(const napi_env& env, const napi_value& object, StationInfo& stationInfo)
+{
+    JsObjectToString(env, object, "name", WIFI_SSID_MAX_LEN + 1, stationInfo.deviceName);
+    JsObjectToString(env, object, "macAddress", WIFI_BSSID_LENGTH, stationInfo.bssid);
+    JsObjectToString(env, object, "ipAddress", WIFI_IP_MAX_LEN + 1, stationInfo.ipAddr);
+    JsObjectToInt(env, object, "macAddressType", stationInfo.bssidType);
+}
+
+NO_SANITIZE("cfi") napi_value AddHotspotBlockedList(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -277,14 +285,11 @@ NO_SANITIZE("cfi") napi_value AddBlockList(napi_env env, napi_callback_info info
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_string, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_AP_CORE);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_AP_CORE);
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
 
     StationInfo stationInfo;
-    char bssid[WIFI_BSSID_LENGTH] = {0};
-    size_t len = 0;
-    napi_get_value_string_utf8(env, argv[0], bssid, sizeof(bssid), &len);
-    stationInfo.bssid = bssid;
+    JsObjToStationInfo(env, argv[0], stationInfo);
     ErrCode ret = wifiHotspotPtr->AddBlockList(stationInfo);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Add block list fail: %{public}d", ret);
@@ -292,7 +297,7 @@ NO_SANITIZE("cfi") napi_value AddBlockList(napi_env env, napi_callback_info info
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
-NO_SANITIZE("cfi") napi_value DelBlockList(napi_env env, napi_callback_info info)
+NO_SANITIZE("cfi") napi_value DelHotspotBlockedList(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
     size_t argc = 1;
@@ -301,19 +306,36 @@ NO_SANITIZE("cfi") napi_value DelBlockList(napi_env env, napi_callback_info info
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_string, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_AP_CORE);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_AP_CORE);
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
 
     StationInfo stationInfo;
-    char bssid[WIFI_BSSID_LENGTH] = {0};
-    size_t len = 0;
-    napi_get_value_string_utf8(env, argv[0], bssid, sizeof(bssid), &len);
-    stationInfo.bssid = bssid;
+    JsObjToStationInfo(env, argv[0], stationInfo);
     ErrCode ret = wifiHotspotPtr->DelBlockList(stationInfo);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Del block list fail: %{public}d", ret);
     }
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
+}
+
+NO_SANITIZE("cfi") napi_value GetHotspotBlockedList(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+    std::vector<StationInfo> vecStationInfo;
+    ErrCode ret = wifiHotspotPtr->GetBlockLists(vecStationInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get block list error: %{public}d", ret);
+    }
+    WIFI_LOGI("Get block list size: %{public}zu", vecStationInfo.size());
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
+
+    napi_value arrayResult;
+    napi_create_array_with_length(env, vecStationInfo.size(), &arrayResult);
+    for (size_t i = 0; i != vecStationInfo.size(); ++i) {
+        StationInfoToJsArray(env, vecStationInfo, i, arrayResult);
+    }
+    return arrayResult;
 }
 }  // namespace Wifi
 }  // namespace OHOS

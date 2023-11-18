@@ -477,13 +477,16 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s"
         " device name [%{private}s]", m_id, __func__, info.deviceName.c_str());
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("AddBlockList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("AddBlockList:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AddBlockList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
-    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("AddBlockList:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AddBlockList:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (CheckMacIsValid(info.bssid)) {
@@ -510,13 +513,17 @@ ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s device name [%{private}s]",
         m_id, __func__, info.deviceName.c_str());
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DelBlockList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("DelBlockList:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DelBlockList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DelBlockList:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DelBlockList:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -581,6 +588,15 @@ ErrCode WifiHotspotServiceImpl::GetValidChannels(BandType band, std::vector<int3
 ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetBlockLists:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetBlockLists:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

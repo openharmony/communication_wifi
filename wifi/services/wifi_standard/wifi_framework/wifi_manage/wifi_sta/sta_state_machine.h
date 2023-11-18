@@ -26,9 +26,8 @@
 #include "wifi_msg.h"
 #include "state_machine.h"
 #include "sta_network_check.h"
-#include "i_dhcp_result_notify.h"
 #include "sta_service_callback.h"
-#include "i_dhcp_service.h"
+#include "dhcp_c_api.h"
 #include "sta_define.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_net_agent.h"
@@ -305,19 +304,19 @@ public:
         StaStateMachine *pStaStateMachine;
     };
 
-    class DhcpResultNotify : public IDhcpResultNotify {
+    class DhcpResultNotify {
     public:
         /**
          * @Description : Construct a new dhcp result notify object
          *
          */
-        explicit DhcpResultNotify(StaStateMachine *staStateMachine);
+        explicit DhcpResultNotify();
 
         /**
          * @Description : Destroy the dhcp result notify object
          *
          */
-        ~DhcpResultNotify() override;
+        ~DhcpResultNotify();
 
         /**
          * @Description : Get dhcp result of specified interface success notify asynchronously
@@ -326,7 +325,7 @@ public:
          * @param ifname - interface name,eg:wlan0
          * @param result - dhcp result
          */
-        void OnSuccess(int status, const std::string &ifname, DhcpResult &result) override;
+        static void OnSuccess(int status, const char *ifname, DhcpResult *result);
 
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
@@ -335,26 +334,23 @@ public:
          * @param ifname - interface name,eg:wlan0
          * @param reason - failed reason
          */
-        void OnFailed(int status, const std::string &ifname, const std::string &reason) override;
-
-        /**
-        * @Description : Get the abnormal exit notify of dhcp server process.
-        *
-        * @param ifname - interface name,eg:wlan0
-        */
-        void OnSerExitNotify(const std::string& ifname) override;
-
-        void TryToCloseDhcpClient(int iptype);
-
-        void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult &result);
-
-        void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult &result);
-
+        static void OnFailed(int status, const char *ifname, const char *reason);
+        static void SetStaStateMachine(StaStateMachine *staStateMachine);
+        static void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        static void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        static void TryToCloseDhcpClient(int iptype);
     private:
-        StaStateMachine *pStaStateMachine;
+        static StaStateMachine *pStaStateMachine;
     };
 
 public:
+    /**
+     * @Description  Register dhcp client CallBack
+     *
+     * @Return:  DHCP_OPT_SUCCESS - success  DHCP_OPT_FAILED - failed
+     */
+    int RegisterCallBack();
+
     /**
      * @Description  Initialize StaStateMachine
      *
@@ -861,8 +857,8 @@ private:
     bool portalFlag;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
-    std::unique_ptr<IDhcpService> pDhcpService;
     DhcpResultNotify *pDhcpResultNotify;
+    ClientCallBack clientCallBack;
     StaNetworkCheck *pNetcheck;
 
     RootState *pRootState;

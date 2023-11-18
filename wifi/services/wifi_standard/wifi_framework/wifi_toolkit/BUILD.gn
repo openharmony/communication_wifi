@@ -64,12 +64,10 @@ if (defined(ohos_lite)) {
     include_dirs += [
       "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$DHCP_ROOT_DIR/interfaces/inner_api/include",
+      "$DHCP_ROOT_DIR/interfaces/kits/c",
     ]
 
-    deps = [
-      "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    ]
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
 
     defines = [
       "OHOS_ARCH_LITE",
@@ -132,7 +130,7 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
-      "dhcp:dhcp_manager_service",
+      "dhcp:dhcp_sdk",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "huks:libhukssdk",

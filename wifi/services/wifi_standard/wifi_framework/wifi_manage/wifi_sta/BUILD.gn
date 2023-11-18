@@ -71,10 +71,10 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
+      "$DHCP_ROOT_DIR/interfaces/kits/c",
     ]
 
     deps = [
-      "$DHCP_ROOT_DIR/services/mgr_service:dhcp_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_service_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
@@ -152,7 +152,7 @@ if (defined(ohos_lite)) {
       "ability_base:want",
       "ability_runtime:ability_manager",
       "c_utils:utils",
-      "dhcp:dhcp_manager_service",
+      "dhcp:dhcp_sdk",
       "hilog:libhilog",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",

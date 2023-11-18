@@ -307,7 +307,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
     p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     if (!p2pStateMachine.groupManager.GetCurrentGroup().IsGroupOwner()) {
-        p2pStateMachine.StartDhcpClient();
+        p2pStateMachine.StartDhcpClientInterface();
 
         const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
         WifiP2pDevice device = deviceManager.GetDevices(owner.GetDeviceAddress());

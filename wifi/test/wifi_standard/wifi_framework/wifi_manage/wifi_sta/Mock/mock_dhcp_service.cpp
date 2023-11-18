@@ -19,122 +19,82 @@ DEFINE_WIFILOG_DHCP_LABEL("DhcpService");
 
 namespace OHOS {
 namespace Wifi {
-int DhcpService::StartDhcpClient(const std::string &ifname, bool bIpv6)
+
+int DhcpService::RegisterDhcpClientCallBack(const char *ifname, const ClientCallBack *event)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, isIpv6:%{public}d", __FUNCTION__, ifname.c_str(),
+    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
+    return 0;
+}
+
+int DhcpService::StartDhcpClient(const char *ifname, bool bIpv6)
+{
+    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, isIpv6:%{public}d", __FUNCTION__, ifname,
         bIpv6);
     return 0;
 }
 
-int DhcpService::StopDhcpClient(const std::string &ifname, bool bIpv6)
+int DhcpService::StopDhcpClient(const char *ifname, bool bIpv6)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, isIpv6:%{public}d", __FUNCTION__, ifname.c_str(),
+    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, isIpv6:%{public}d", __FUNCTION__, ifname,
         bIpv6);
     return 0;
 }
 
-int DhcpService::GetDhcpResult(const std::string &ifname, IDhcpResultNotify *pResultNotify, int timeouts)
+int DhcpService::RenewDhcpClient(const char *ifname)
 {
-    pResultNotify = nullptr;
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, timeouts:%{public}d", __FUNCTION__, ifname.c_str(),
-        timeouts);
+    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
     return 0;
 }
 
-int DhcpService::RemoveDhcpResult(IDhcpResultNotify *pResultNotify)
+int DhcpService::RegisterDhcpServerCallBack(const char *ifname, const ServerCallBack *event)
 {
-    pResultNotify = nullptr;
+    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
     return 0;
 }
 
-int DhcpService::GetDhcpInfo(const std::string &ifname, DhcpServiceInfo &dhcp)
+int DhcpService::StartDhcpServer(const char *ifname)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, dhcp.clientRunStatus:%{public}d", __FUNCTION__,
-        ifname.c_str(), dhcp.clientRunStatus);
+    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
     return 0;
 }
 
-int DhcpService::RenewDhcpClient(const std::string &ifname)
+int DhcpService::StopDhcpServer(const char *ifname)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname.c_str());
+    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
     return 0;
 }
 
-int DhcpService::ReleaseDhcpClient(const std::string &ifname)
+int DhcpService::PutDhcpRange(const char *tagName, const DhcpRange *range)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname.c_str());
+    WIFI_LOGD("Enter DhcpService::[%{public}s]", __FUNCTION__);
     return 0;
 }
 
-int DhcpService::StartDhcpServer(const std::string &ifname)
+int DhcpService::RemoveDhcpRange(const char *tagName, const DhcpRange *range)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname.c_str());
+    WIFI_LOGD("Enter DhcpService::[%{public}s]", __FUNCTION__);
     return 0;
 }
 
-int DhcpService::StopDhcpServer(const std::string &ifname)
+int DhcpService::RemoveAllDhcpRange(const char *tagName)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname.c_str());
+    WIFI_LOGD("Enter DhcpService::[%{public}s].tagName:%{public}s", __FUNCTION__, tagName);
     return 0;
 }
 
-int DhcpService::GetServerStatus(void)
+int DhcpService::SetDhcpRange(const char *ifname, const DhcpRange *range)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].", __FUNCTION__);
+    WIFI_LOGD("Enter DhcpService::[%{public}s]", __FUNCTION__);
     return 0;
 }
 
-int DhcpService::PutDhcpRange(const std::string &tagName, const DhcpRange &range)
+int DhcpService::GetDhcpClientInfos(const char *ifname, int staNumber, DhcpStationInfo *staInfo, int *staSize)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].tagName:%{public}s, range.iptype:%{public}d", __FUNCTION__,
-        tagName.c_str(), range.iptype);
+    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
     return 0;
 }
 
-int DhcpService::RemoveDhcpRange(const std::string &tagName, const DhcpRange &range)
-{
-    WIFI_LOGD("Enter DhcpService::[%{public}s].tagName:%{public}s, range.iptype:%{public}d", __FUNCTION__,
-        tagName.c_str(), range.iptype);
-    return 0;
-}
-
-int DhcpService::RemoveAllDhcpRange(const std::string &tagName)
-{
-    WIFI_LOGD("Enter DhcpService::[%{public}s].tagName:%{public}s", __FUNCTION__, tagName.c_str());
-    return 0;
-}
-
-int DhcpService::SetDhcpRange(const std::string &ifname, const DhcpRange &range)
-{
-    WIFI_LOGD("Enter DhcpService::[%{public}s].tagName:%{public}s, range.iptype:%{public}d", __FUNCTION__,
-        ifname.c_str(), range.iptype);
-    return 0;
-}
-
-int DhcpService::SetDhcpRange(const std::string &ifname, const std::string &tagName)
-{
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, tagName:%{public}s", __FUNCTION__, ifname.c_str(),
-        tagName.c_str());
-    return 0;
-}
-
-int DhcpService::GetLeases(const std::string&, std::vector<std::string>& leases)
-{
-    WIFI_LOGD("Enter DhcpService::[%{public}s].", __FUNCTION__);
-    if (leases.size() == 0) {
-        return -1;
-    }
-    return 0;
-}
-
-int DhcpService::GetDhcpSerProExit(const std::string &ifname, IDhcpResultNotify *pResultNotify)
-{
-    pResultNotify = nullptr;
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname.c_str());
-    return 0;
-}
-
-int DhcpService::UpdateDefaultConfigFile(const std::string leaseTime)
+int DhcpService::UpdateLeasesTime(const char *leaseTime)
 {
     WIFI_LOGD("Enter DhcpService::[%{public}s].", __FUNCTION__);
     return 0;

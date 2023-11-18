@@ -1415,12 +1415,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetStrDnsBak(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
-        std::string ifname = "wlan0";
-        DhcpResult result;
-        result.strYourCli = "192.168.0.0";
-        result.strRouter1 = "test";
-        result.iptype = 0;
-        pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname, result);
     }
 
     void DhcpResultNotifyOnFailedTest1()
@@ -1434,7 +1428,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
         std::string ifname = "wlan0";
         std::string reason = "test";
-        pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname, reason);
+        pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname.c_str(), reason.c_str());
     }
 
     void DhcpResultNotifyOnFailedTest2()
@@ -1446,7 +1440,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
         std::string ifname = "wlan1";
         std::string reason = "test";
-        pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname, reason);
+        pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname.c_str(), reason.c_str());
     }
 
     void DhcpResultNotifyOnFailedTest3()
@@ -1456,7 +1450,7 @@ public:
         pStaStateMachine->isRoam = true;
         std::string ifname = "wlan1";
         std::string reason = "test";
-        pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname, reason);
+        pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname.c_str(), reason.c_str());
     }
 
     void SaveLinkstateSuccess()

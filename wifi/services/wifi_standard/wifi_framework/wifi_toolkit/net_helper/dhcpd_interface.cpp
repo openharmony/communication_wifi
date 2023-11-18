@@ -16,11 +16,10 @@
 #include "dhcpd_interface.h"
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include "dhcp_define.h"
-#include "dhcp_service_api.h"
 #include "network_interface.h"
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
+#include "securec.h"
 
 DEFINE_WIFILOG_DHCP_LABEL("WifiDhcpdInterface");
 
@@ -29,11 +28,9 @@ namespace Wifi {
 const int EU_I64_ADDR_LEN = 64;
 const int GENE_V6_ADDR_LEN = 64; /* Generally, the prefix length cannot exceed 64 characters. */
 const int IP_V6_ADDR_LEN = 128;
-const int MAC_ADDR_MAX_LEN = 17;
-const int DHCP_LEASE_FORMAT_SIZE = 5;
-const int DHCP_LEASE_MAC_ADDR_POS = 0;
-const int DHCP_LEASE_IP_ADDR_POS = 1;
-const int DHCP_LEASE_HOSTNAME_POS = 2;
+const std::string IP_V4_MASK("255.255.255.0");
+const std::string IP_V4_DEFAULT("192.168.62.2");
+static bool g_startDhcpServerFlag = false;
 
 DhcpdInterface::DhcpdInterface()
     : mBindIpv4(Ipv4Address::INVALID_INET_ADDRESS), mBindIpv6(Ipv6Address::INVALID_INET6_ADDRESS)
@@ -41,34 +38,22 @@ DhcpdInterface::DhcpdInterface()
 
 DhcpdInterface::~DhcpdInterface()
 {
-    if (mDhcpService != nullptr) {
-        mDhcpService.reset(nullptr);
-    }
+    g_startDhcpServerFlag = false;
 }
 
-bool DhcpdInterface::SetDhcpEventFunc(const std::string &ifaceName, IDhcpResultNotify* pResultNotify)
+bool DhcpdInterface::RegisterDhcpCallBack(const std::string &ifaceName, ServerCallBack &event)
 {
-    if (pResultNotify == nullptr) {
-        WIFI_LOGE("pResultNotify == nullptr, don't register dhcp exit notify event!");
+    if (RegisterDhcpServerCallBack(ifaceName.c_str(), &event) != 0) {
+        WIFI_LOGE("Register dhcp server callBack failed!");
         return false;
     }
-    if (ifaceName.empty() || mDhcpService == nullptr) {
-        WIFI_LOGE("SetDhcpEventFunc parameter error!");
-        return false;
-    }
-    return (mDhcpService->GetDhcpSerProExit(ifaceName, pResultNotify) == DHCP_OPT_SUCCESS);
+    return true;
 }
 
-bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
+bool DhcpdInterface::StartDhcpServerFromInterface(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
     const std::string &ipAddress, bool isIpV4, const int32_t &leaseTime)
 {
-    if (mDhcpService == nullptr) {
-        mDhcpService = DhcpServiceApi::GetInstance();
-        if (mDhcpService == nullptr) {
-            return false;
-        }
-    }
-
+    g_startDhcpServerFlag = true;
     std::vector<Ipv4Address> vecIpv4Addr;
     std::vector<Ipv6Address> vecIpv6Addr;
     if (!NetworkInterface::FetchIpAddress(std::string(""), vecIpv4Addr, vecIpv6Addr)) {
@@ -95,7 +80,7 @@ bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &
         WIFI_LOGE("UpdateDefaultConfigFile failed!");
         return false;
     }
-    if (mDhcpService->StartDhcpServer(ifaceName) != 0) {
+    if (StartDhcpServer(ifaceName.c_str()) != 0) {
         WIFI_LOGE("Start dhcp server failed!");
         return false;
     }
@@ -105,114 +90,48 @@ bool DhcpdInterface::StartDhcpServer(const std::string &ifaceName, Ipv4Address &
 
 bool DhcpdInterface::SetDhcpIpRange(const std::string &ifaceName)
 {
-    if (mDhcpService == nullptr) {
-        WIFI_LOGE("SetDhcpIpRange mDhcpService is nullptr!");
-        return false;
-    }
     if (!mBindIpv4.IsValid()) { /* currently, we just support ipv4 */
         WIFI_LOGE("current interface does not bind ipv4!");
         return false;
     }
     std::string ipAddr = mBindIpv4.GetAddressWithString();
-    std::string::size_type pos = ipAddr.rfind(".");
-    if (pos == std::string::npos) {
-        WIFI_LOGE("invalid ip address[%{private}s]!", ipAddr.c_str());
-        return false;
-    }
-    std::string ipHead = ipAddr.substr(0, pos);
-    DhcpRange range;
-    range.iptype = IP_V4;
-    range.strStartip = ipHead + ".3";
-    range.strEndip = ipHead + ".254";
-    range.strSubnet = "255.255.255.0";
-    std::string tagName = ifaceName;
-    transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
-    if (tagName.find("p2p") != std::string::npos) {
-        range.strTagName = "p2p";
-        if (mDhcpService->PutDhcpRange(range.strTagName, range) != 0) {
-            WIFI_LOGE("Put dhcp range failed! TagName[%{public}s].", range.strTagName.c_str());
-            return false;
-        }
-        if (mDhcpService->SetDhcpRange(ifaceName, range.strTagName) != 0) {
-            WIFI_LOGE("Set dhcp range failed! TagName[%{public}s].", range.strTagName.c_str());
-            return false;
-        }
-    } else {
-        range.strTagName = ifaceName;
-        if (mDhcpService->SetDhcpRange(ifaceName, range) != 0) {
-            WIFI_LOGE("Set dhcp range failed! TagName[%{public}s].", range.strTagName.c_str());
-            return false;
-        }
-    }
-    WIFI_LOGD("Set dhcp range : ifaceName[%{public}s] TagName[%{public}s] start ip[%s] end ip[%s]",
-        ifaceName.c_str(),
-        range.strTagName.c_str(),
-        range.strStartip.c_str(),
-        range.strEndip.c_str());
+    CallAdapterSetRange(ipAddr, ifaceName);
     return true;
 }
 
 bool DhcpdInterface::UpdateDefaultConfigFile(const int32_t &leaseTime)
 {
-    if (mDhcpService == nullptr) {
-        WIFI_LOGE("UpdateDefaultConfigFile mDhcpService is nullptr!");
-        return false;
-    }
-    int result = mDhcpService->UpdateDefaultConfigFile(std::to_string(leaseTime));
+    std::string time = std::to_string(leaseTime);
+    int result = UpdateLeasesTime(time.c_str());
     WIFI_LOGI("UpdateDefaultConfigFile leaseTime:%{public}d result:%{public}d", leaseTime, result);
     return (result == 0) ? true : false;
 }
 
 bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::map<std::string, StationInfo> &result)
 {
-    if (mDhcpService == nullptr) {
-        return false;
-    }
-    std::vector<std::string> leaseInfo;
-    if (mDhcpService->GetLeases(ifaceName, leaseInfo) != 0) {
-        WIFI_LOGE("Get dhcp lease info failed!");
-        return false;
-    }
-    /* currently, our dhcp server's lease message type is :
-     * expire_time mac_address ip_address hostname client_identifier_info
-     * and when dhcpv6 type, output a line begin with "duid", skip it.
-     */
-    for (auto str : leaseInfo) {
-        std::vector<std::string> tmp;
-        SplitString(str, " ", tmp);
-        if (tmp.empty()) {
-            continue;
-        }
-        if (tmp[0] == "duid") {
-            break;
-        }
-        if (tmp.size() < DHCP_LEASE_FORMAT_SIZE) {
-            continue;
-        }
-        /* mac: [00-][00:00:00:00:00:00] */
-        std::string mac = tmp[DHCP_LEASE_MAC_ADDR_POS];
-        if (mac.length() < MAC_ADDR_MAX_LEN) {
-            continue;
-        }
-        if (mac.length() > MAC_ADDR_MAX_LEN) {
-            mac = mac.substr(mac.length() - MAC_ADDR_MAX_LEN);
-        }
+    DhcpStationInfo *staInfos = NULL;
+    int staNumber = 10;
+    int staSize = 0;
+    staInfos = (struct DhcpStationInfo*)malloc(sizeof(DhcpStationInfo) * staNumber);
+    GetConnectedStaInfo(ifaceName, staNumber, staInfos, &staSize);
+    for (int i = 0; i < staSize; i++) {
         StationInfo info;
-        info.deviceName = tmp[DHCP_LEASE_HOSTNAME_POS];
-        info.bssid = mac;
+        info.deviceName = staInfos[i].deviceName;
+        info.bssid = staInfos[i].macAddr;
         info.bssidType = REAL_DEVICE_ADDRESS;
-        info.ipAddr = tmp[DHCP_LEASE_IP_ADDR_POS];
+        info.ipAddr = staInfos[i].ipAddr;
         result.insert(std::make_pair(info.bssid, info));
     }
+    free(staInfos);
     return true;
 }
 
 bool DhcpdInterface::StopDhcpServer(const std::string &ifaceName)
 {
-    if (ifaceName.empty() || mDhcpService == nullptr) {
+    if (ifaceName.empty() || g_startDhcpServerFlag == false) {
         return false;
     }
-
+    g_startDhcpServerFlag = false;
     std::string rangeName;
     std::string tagName = ifaceName;
     transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
@@ -222,11 +141,11 @@ bool DhcpdInterface::StopDhcpServer(const std::string &ifaceName)
         rangeName = ifaceName;
     }
 
-    if (mDhcpService->RemoveAllDhcpRange(rangeName) != 0) {
+    if (RemoveAllDhcpRange(rangeName.c_str()) != 0) {
         WIFI_LOGW("failed to remove [%{public}s] dhcp range.", rangeName.c_str());
     }
 
-    if (mDhcpService->StopDhcpServer(ifaceName) != 0) {
+    if (StopDhcpServer(ifaceName.c_str()) != 0) {
         WIFI_LOGE("Dhcp server stop failed or already stopped!");
         return false;
     }
@@ -234,9 +153,6 @@ bool DhcpdInterface::StopDhcpServer(const std::string &ifaceName)
         WIFI_LOGW("Clear interface binding ip address failed!");
     }
 
-    if (mDhcpService != nullptr) {
-        mDhcpService.reset(nullptr);
-    }
     return true;
 }
 
@@ -306,7 +222,7 @@ Ipv4Address DhcpdInterface::AssignIpAddrV4(const std::vector<Ipv4Address> &vecIp
         return Ipv4Address::INVALID_INET_ADDRESS;
     }
     struct in_addr initAddr = {INADDR_ANY};
-    std::string destIpAddress = ipAddress.empty() ? IP_V4_DEFAULT: ipAddress;
+    std::string destIpAddress = ipAddress.empty() ? IP_V4_DEFAULT : ipAddress;
     if (inet_aton(destIpAddress.c_str(), &initAddr) == 0) {
         WIFI_LOGE("convert default ipaddress failed![%s].", destIpAddress.c_str());
         return Ipv4Address::INVALID_INET_ADDRESS;
@@ -367,6 +283,58 @@ Ipv6Address DhcpdInterface::AssignIpAddrV6(const std::vector<Ipv6Address> &vecIp
     }
     WIFI_LOGE("Fatal error,can not generate valid ULA addr!");
     return Ipv6Address::INVALID_INET6_ADDRESS;
+}
+
+bool DhcpdInterface::CallAdapterSetRange(std::string &ipAddr, const std::string &ifaceName)
+{
+    std::string::size_type pos = ipAddr.rfind(".");
+    if (pos == std::string::npos) {
+        return false;
+    }
+    std::string ipHead = ipAddr.substr(0, pos);
+    std::string subnet = "255.255.255.0";
+    std::string p2p = "p2p";
+
+    DhcpRange range;
+    if (strcpy_s(range.strStartip, INET_ADDRSTRLEN, (ipHead + ".3").c_str()) != EOK
+        || strcpy_s(range.strEndip, INET_ADDRSTRLEN, (ipHead + ".254").c_str()) != EOK
+        || strcpy_s(range.strSubnet, INET_ADDRSTRLEN, subnet.c_str()) != EOK) {
+        return false;
+    }
+    range.iptype = 0;
+    std::string tagName = ifaceName;
+    transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
+    if (tagName.find("p2p") != std::string::npos) {
+        if (strcpy_s(range.strTagName, DHCP_MAX_FILE_BYTES, "p2p") != EOK) {
+            return false;
+        }
+        if (PutDhcpRange(range.strTagName, &range) != 0) {
+            return false;
+        }
+        if (SetDhcpName(ifaceName.c_str(), range.strTagName) != 0) {
+            return false;
+        }
+    } else {
+        if (strcpy_s(range.strTagName, INET_ADDRSTRLEN, ifaceName.c_str()) != EOK) {
+            return false;
+        }
+        if (SetDhcpRange(ifaceName.c_str(), &range) != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DhcpdInterface::GetConnectedStaInfo(const std::string &ifaceName, int staNumber, DhcpStationInfo *staInfos,
+    int *staSize)
+{
+    if (GetDhcpClientInfos(ifaceName.c_str(), staNumber, staInfos, staSize) != 0) {
+        return false;
+    }
+    if (staInfos == NULL) {
+        return false;
+    }
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

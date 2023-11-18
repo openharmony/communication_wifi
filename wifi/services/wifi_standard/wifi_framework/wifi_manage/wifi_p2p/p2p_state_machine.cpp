@@ -73,18 +73,11 @@ P2pStateMachine::~P2pStateMachine()
 {
     StopHandlerThread();
     groupManager.StashGroups();
-    if (pDhcpService.get() != nullptr) {
-        pDhcpService->StopDhcpClient(groupManager.GetCurrentGroup().GetInterface(), false);
-        pDhcpService->RemoveDhcpResult(pDhcpResultNotify.get());
-    } else {
-        WIFI_LOGE("pDhcpService is nullptr, cannot stop dhcp client.");
-    }
+    StopDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
     StopDhcpServer();
-    if (pDhcpService.get() != nullptr) {
-        pDhcpService.reset(nullptr);
-    }
-    if (pDhcpResultNotify.get() != nullptr) {
-        pDhcpResultNotify.reset(nullptr);
+    if (pDhcpResultNotify != nullptr) {
+        delete pDhcpResultNotify;
+        pDhcpResultNotify = nullptr;
     }
     AbstractUI::GetInstance().UnInit();
 }
@@ -122,16 +115,10 @@ void P2pStateMachine::Initialize()
 
     SetFirstState(&p2pDisabledState);
     StartStateMachine();
-
-    pDhcpService = DhcpServiceApi::GetInstance();
-    if (pDhcpService.get() == nullptr) {
-        WIFI_LOGW("pDhcpService Initialize failed.");
-    }
-    pDhcpResultNotify.reset(new (std::nothrow) DhcpResultNotify(this, groupManager));
-    if (pDhcpResultNotify.get() == nullptr) {
+    pDhcpResultNotify = new (std::nothrow)DhcpResultNotify();
+    if (pDhcpResultNotify == nullptr) {
         WIFI_LOGW("pDhcpResultNotify Initialize failed.");
     }
-
     return;
 }
 
@@ -688,16 +675,14 @@ bool P2pStateMachine::StartDhcpServer()
 {
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-    if (!m_DhcpdInterface.StartDhcpServer(groupManager.GetCurrentGroup().GetInterface(), ipv4, ipv6)) {
+    if (!m_DhcpdInterface.StartDhcpServerFromInterface(groupManager.GetCurrentGroup().GetInterface(), ipv4, ipv6)) {
         return false;
     }
     SetWifiP2pInfoWhenGroupFormed(ipv4.GetAddressWithString());
     WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
     currGroup.SetGoIpAddress(ipv4.GetAddressWithString());
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
-    if (!m_DhcpdInterface.SetDhcpEventFunc(groupManager.GetCurrentGroup().GetInterface(), pDhcpResultNotify.get())) {
-        WIFI_LOGE("Set dhcp notify failed.");
-    }
+
     WIFI_LOGI("Start add route");
     WifiNetAgent::GetInstance().AddRoute(groupManager.GetCurrentGroup().GetInterface(),
         ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
@@ -710,69 +695,78 @@ bool P2pStateMachine::StopDhcpServer()
     return m_DhcpdInterface.StopDhcpServer(groupManager.GetCurrentGroup().GetInterface());
 }
 
-P2pStateMachine::DhcpResultNotify::DhcpResultNotify(
-    P2pStateMachine *p2pStateMachine, WifiP2pGroupManager &groupMgr)
-    : pP2pStateMachine(p2pStateMachine), groupManager(groupMgr)
+P2pStateMachine* P2pStateMachine::DhcpResultNotify::pP2pStateMachine = nullptr;
+WifiP2pGroupManager* P2pStateMachine::DhcpResultNotify::groupManager = nullptr;
+P2pStateMachine::DhcpResultNotify::DhcpResultNotify()
 {}
 
 P2pStateMachine::DhcpResultNotify::~DhcpResultNotify()
 {}
 
-void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
+void P2pStateMachine::DhcpResultNotify::SetP2pStateMachine(P2pStateMachine *p2pStateMachine,
+    WifiP2pGroupManager *pGroupManager)
 {
-    WIFI_LOGI("Enter P2P DhcpResultNotify::OnSuccess, status: %{public}d, ifname: %{public}s", status, ifname.c_str());
+    pP2pStateMachine = p2pStateMachine;
+    groupManager = pGroupManager;
+}
+
+void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname, DhcpResult *result)
+{
+    if (ifname == nullptr || result == nullptr) {
+        WIFI_LOGE("P2P DhcpResultNotify OnSuccess, ifname or result is nullptr, status: %{public}d, ifname: %{public}s",
+            status, ifname);
+        return;
+    }
+    WIFI_LOGI("Enter P2P DhcpResultNotify::OnSuccess, status: %{public}d, ifname: %{public}s", status, ifname);
     WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
-    WIFI_LOGI("Set GO IP: %{private}s", result.strServer.c_str());
-    p2pInfo.SetIsGroupOwnerAddress(result.strServer);
-    WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
-    currGroup.SetGoIpAddress(result.strServer);
-    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
+    WIFI_LOGI("Set GO IP: %{private}s", result->strOptServerId);
+    p2pInfo.SetIsGroupOwnerAddress(result->strOptServerId);
+    WifiP2pGroupInfo currGroup = groupManager->GetCurrentGroup();
+    currGroup.SetGoIpAddress(result->strOptServerId);
+    groupManager->SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
     WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
-    groupManager.SaveP2pInfo(p2pInfo);
+    groupManager->SaveP2pInfo(p2pInfo);
     pP2pStateMachine->BroadcastP2pConnectionChanged();
     WIFI_LOGI("Start add route on dhcp success");
-    WifiNetAgent::GetInstance().AddRoute(ifname, result.strYourCli, IpTools::GetMaskLength(result.strSubnet));
+    WifiNetAgent::GetInstance().AddRoute(ifname, result->strOptClientId, IpTools::GetMaskLength(result->strOptSubnet));
     WIFI_LOGI("DhcpResultNotify::OnSuccess end");
 }
 
-void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)
+void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname, const char *reason)
 {
     WIFI_LOGI("Enter DhcpResultNotify::OnFailed, status: %{public}d, reason: %{public}s. RemoveGroup: %{private}s",
         status,
-        reason.c_str(),
-        ifname.c_str());
-    if (pP2pStateMachine->p2pDevIface == ifname) {
+        reason,
+        ifname);
+    std::string ifaceifname = ifname;
+    if (pP2pStateMachine->p2pDevIface == ifaceifname) {
         pP2pStateMachine->p2pDevIface = "";
     }
-    WifiP2PHalInterface::GetInstance().GroupRemove(ifname);
+    WifiP2PHalInterface::GetInstance().GroupRemove(ifaceifname);
 }
 
-void P2pStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string& ifname)
-{
-    WIFI_LOGI("Dhcp exit notify.ifname:%{public}s!", ifname.c_str());
-}
-
-void P2pStateMachine::StartDhcpClient()
+void P2pStateMachine::StartDhcpClientInterface()
 {
     if (GetIsNeedDhcp() == DHCPTYPE::NO_DHCP) {
         WIFI_LOGI("The service of this time does not need DHCP.");
         return;
     }
 
-    if (pDhcpService.get() == nullptr) {
-        WIFI_LOGE("pDhcpService is nullptr, cannot start dhcp client.");
+    clientCallBack.OnIpSuccessChanged = DhcpResultNotify::OnSuccess;
+    clientCallBack.OnIpFailChanged = DhcpResultNotify::OnFailed;
+    pDhcpResultNotify->SetP2pStateMachine(this, &groupManager);
+    int result = RegisterDhcpClientCallBack(groupManager.GetCurrentGroup().GetInterface().c_str(), &clientCallBack);
+    if (result != 0) {
+        WIFI_LOGE("RegisterDhcpClientCallBack failed!");
         return;
     }
-    pDhcpService.get()->StartDhcpClient(groupManager.GetCurrentGroup().GetInterface(), false);
-    if (pDhcpService != nullptr && pDhcpResultNotify != nullptr) {
-        const int getResultTimeOut = 30;
-        pDhcpService->GetDhcpResult(
-            groupManager.GetCurrentGroup().GetInterface(), pDhcpResultNotify.get(), getResultTimeOut);
-    } else {
-        WIFI_LOGE("pDhcpService or pDhcpResultNotify is nullptr, cannot get dhcp result.");
+    result = StartDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
+    if (result != 0) {
+        WIFI_LOGE("StartDhcpClient failed!");
+        return;
     }
-    WIFI_LOGI("Start Dhcp Client");
+    WIFI_LOGI("StartDhcpClient ok");
 }
 
 void P2pStateMachine::HandleP2pServiceResp(const WifiP2pServiceResponse &resp, const WifiP2pDevice &dev) const

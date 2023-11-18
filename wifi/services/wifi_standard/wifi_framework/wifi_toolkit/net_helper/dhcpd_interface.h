@@ -24,7 +24,7 @@
 #include "ipv6_address.h"
 #include "mac_address.h"
 #include "wifi_ap_msg.h"
-#include "i_dhcp_service.h"
+#include "dhcp_c_api.h"
 
 #define IP_V4 0
 #define IP_V6 1
@@ -47,6 +47,8 @@ public:
      */
     ~DhcpdInterface();
 
+    bool RegisterDhcpCallBack(const std::string &ifaceName, ServerCallBack &event);
+
     /**
      * @Description Start the DHCP server and pass the IP address.
      * @param ifaceName - Network Interface
@@ -56,7 +58,7 @@ public:
      * @param isIpV4 - Is an ipv4 network
      * @return true: success   false: fail
      */
-    bool StartDhcpServer(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
+    bool StartDhcpServerFromInterface(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
         const std::string &ipAddress = "", bool isIpV4 = true, const int32_t &leaseTime = DHCP_LEASE_TIME);
 
     /**
@@ -76,16 +78,6 @@ public:
      */
     bool GetConnectedStationInfo(const std::string &ifaceName, std::map<std::string, StationInfo> &result);
 
-    /**
-     * @Description Obtain the abnormal exit status to dhcp manager.
-     *
-     * @param ifaceName - Port to listen.
-     * @param pResultNotify - Callback API.
-     * @return true - success
-     * @return false - fail
-     */
-    bool SetDhcpEventFunc(const std::string &ifaceName, IDhcpResultNotify *pResultNotify);
-
 private:
     bool SetDhcpIpRange(const std::string &ifaceName);
     bool CompareSubNet(
@@ -97,9 +89,9 @@ private:
         const std::vector<Ipv6Address> &vecIpv6Addr, const std::string &ipAddress, bool isIpV4);
     bool ApplyIpAddress(const std::string &ifaceName, const Ipv4Address &ipv4, const Ipv6Address &ipv6);
     bool UpdateDefaultConfigFile(const int32_t &leaseTime);
-
+    bool CallAdapterSetRange(std::string &ipAddr, const std::string &ifaceName);
+    bool GetConnectedStaInfo(const std::string &ifaceName, int staNumber, DhcpStationInfo *staInfos, int *staSize);
 private:
-    std::unique_ptr<IDhcpService> mDhcpService;
     Ipv4Address mBindIpv4;
     Ipv6Address mBindIpv6;
 };

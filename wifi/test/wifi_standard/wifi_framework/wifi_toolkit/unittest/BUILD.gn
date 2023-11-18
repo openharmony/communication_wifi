@@ -98,7 +98,7 @@ ohos_unittest("toolkit_unittest") {
   ]
   external_deps = [
     "c_utils:utils",
-    "dhcp:dhcp_manager_service",
+    "dhcp:dhcp_sdk",
     "hilog:libhilog",
   ]
   if (wifi_feature_with_encryption) {

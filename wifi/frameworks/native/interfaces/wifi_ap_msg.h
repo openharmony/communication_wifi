@@ -27,6 +27,8 @@ namespace Wifi {
 #define WIFI_BSSID_LENGTH 18
 #define DHCP_LEASE_TIME_MIN 60
 #define DHCP_LEASE_TIME 21600
+#define WIFI_SSID_MAX_LEN 32
+#define WIFI_IP_MAX_LEN 15
 enum class ApState {
     AP_STATE_NONE = 0,
     AP_STATE_IDLE,

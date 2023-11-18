@@ -28,8 +28,9 @@ napi_value SetHotspotIdleTimeout(napi_env env, napi_callback_info info);
 napi_value SetHotspotConfig(napi_env env, napi_callback_info info);
 napi_value GetHotspotConfig(napi_env env, napi_callback_info info);
 napi_value GetStations(napi_env env, napi_callback_info info);
-napi_value AddBlockList(napi_env env, napi_callback_info info);
-napi_value DelBlockList(napi_env env, napi_callback_info info);
+napi_value AddHotspotBlockedList(napi_env env, napi_callback_info info);
+napi_value DelHotspotBlockedList(napi_env env, napi_callback_info info);
+napi_value GetHotspotBlockedList(napi_env env, napi_callback_info info);
 }  // namespace Wifi
 }  // namespace OHOS
 

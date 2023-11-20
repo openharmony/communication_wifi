@@ -214,6 +214,24 @@ int GetCallingTokenId();
 bool IsForegroundApp(const int uid);
 
 /**
+ * @Description by Process uid ,the app is a wifi broker process
+ *
+ * @param uid - Input uid
+ * @param pid - Input pid
+ * @return string - Returns processname
+ */
+std::string GetRunningProcessNameByPid(const int uid, const int pid);
+
+/**
+ * @Description set Process pid and processname
+ *
+ * @param pid - Input pid
+ * @param processName - Input processName
+ * @return void
+ */
+void SetWifiBrokerProcess(int pid, std::string processName);
+
+/**
  * @Description Time consuming statistics
  *
  */

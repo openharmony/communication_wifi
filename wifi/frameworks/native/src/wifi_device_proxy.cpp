@@ -323,6 +323,9 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteInt32(config.wifiProxyconfig.manualProxyConfig.serverPort);
     data.WriteString(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList);
     data.WriteInt32((int)config.wifiPrivacySetting);
+    data.WriteString(config.callProcessName);
+    data.WriteString(config.ancoCallProcessName);
+    data.WriteInt32(config.uid);
 }
 
 ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)
@@ -584,7 +587,8 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = reply.ReadString();
         config.wifiPrivacySetting = WifiPrivacyConfig(reply.ReadInt32());
         config.uid = reply.ReadInt32();
-
+        config.callProcessName = reply.ReadString();
+        config.ancoCallProcessName = reply.ReadString();
         result.emplace_back(config);
     }
 }
@@ -1024,6 +1028,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     } else {
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
+    info.isAncoConnected = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)

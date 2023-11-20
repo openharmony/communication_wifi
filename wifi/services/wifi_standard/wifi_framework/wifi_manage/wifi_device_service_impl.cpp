@@ -44,6 +44,11 @@
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
 namespace Wifi {
+
+constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
+constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
+constexpr int WIFI_BROKER_NETWORK_ID = -2;
+
 #ifdef OHOS_ARCH_LITE
 std::mutex WifiDeviceServiceImpl::g_instanceLock;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance = nullptr;
@@ -431,6 +436,22 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
     return true;
 }
 
+#ifndef OHOS_ARCH_LITE
+bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &config)
+{
+    WIFI_LOGD("InitWifiBrokerProcessInfo,networkId=%{public}d, ProcessName=[%{public}s],"
+        "ancoCallProcessName =[%{public}s],bssid = [%{public}s],ssid=[%{public}s]",
+        config.networkId, config.callProcessName.c_str(), config.ancoCallProcessName.c_str(),
+        config.bssid.c_str(), config.ssid.c_str());
+    if (config.networkId == WIFI_BROKER_NETWORK_ID && config.ancoCallProcessName == BROKER_PROCESS_PROTECT_FLAG &&
+        config.bssid.empty() && config.ssid.empty() && config.callProcessName == ANCO_SERVICE_BROKER) {
+        SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);
+        return true;
+    }
+    return false;
+}
+#endif
+
 ErrCode WifiDeviceServiceImpl::CheckCallingUid(int &uid)
 {
 #ifndef OHOS_ARCH_LITE
@@ -441,6 +462,21 @@ ErrCode WifiDeviceServiceImpl::CheckCallingUid(int &uid)
     return WIFI_OPT_SUCCESS;
 #else
     return WIFI_OPT_NOT_SUPPORTED;
+#endif
+}
+
+bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
+{
+#ifndef OHOS_ARCH_LITE
+   int pid = GetCallingPid();
+   const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(uid, pid);
+    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+        return false;
+    }
+    return true;
+#else
+    return false;
 #endif
 }
 
@@ -459,6 +495,19 @@ ErrCode WifiDeviceServiceImpl::CheckRemoveCandidateConfig(void)
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiDeviceServiceImpl::SetWifiConnectedMode(void)
+{
+#ifndef OHOS_ARCH_LITE
+    if (IsWifiBrokerProcess(GetCallingUid())) {
+        WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
+        WIFI_LOGD("WifiDeviceServiceImpl %{public}s, anco, %{public}d", __func__, m_instId);
+    } else {
+        WifiConfigCenter::GetInstance().SetWifiConnectedMode(false, m_instId);
+        WIFI_LOGD("WifiDeviceServiceImpl %{public}s, not anco, %{public}d", __func__, m_instId);
+    }
+#endif
+    return;
+}
 ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)
 {
     ErrCode ret = CheckRemoveCandidateConfig();
@@ -468,8 +517,10 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
     /* check the caller's uid */
     int uid = 0;
     if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("CheckCallingUid failed!");
-        return WIFI_OPT_INVALID_PARAM;
+        if (!IsWifiBrokerProcess(uid)) {
+            WIFI_LOGE("CheckCallingUid IsWifiBrokerProcess failed!");
+            return WIFI_OPT_INVALID_PARAM;
+        }
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
@@ -507,8 +558,10 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
     }
     int uid = 0;
     if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("CheckCallingUid failed!");
-        return WIFI_OPT_INVALID_PARAM;
+        if (!IsWifiBrokerProcess(uid)) {
+            WIFI_LOGE("IsWifiBrokerProcess failed!");
+            return WIFI_OPT_INVALID_PARAM;
+        }
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
@@ -539,7 +592,11 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
             return WIFI_OPT_PERMISSION_DENIED;
         }
     }
-
+#ifndef OHOS_ARCH_LITE
+    if (InitWifiBrokerProcessInfo(config)) {
+        return WIFI_OPT_SUCCESS;
+    }
+#endif
     if (!CheckConfigPwd(config)) {
         WIFI_LOGE("CheckConfigPwd failed!");
         return WIFI_OPT_INVALID_PARAM;
@@ -585,8 +642,10 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     if (isCandidate) {
         int uid = 0;
         if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("CheckCallingUid failed!");
-            return WIFI_OPT_INVALID_PARAM;
+            if (!IsWifiBrokerProcess(uid)) {
+                WIFI_LOGE("CheckCallingUid IsWifiBrokerProcess failed!");
+                return WIFI_OPT_INVALID_PARAM;
+            }
         }
         return pService->AddCandidateConfig(uid, updateConfig, result);
     }
@@ -722,8 +781,10 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
     if (isCandidate) {
         int uid = 0;
         if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("CheckCallingUid failed!");
-            return WIFI_OPT_INVALID_PARAM;
+            if (!IsWifiBrokerProcess(uid)) {
+                WIFI_LOGE("IsWifiBrokerProcess failed!");
+                return WIFI_OPT_INVALID_PARAM;
+            }
         }
         WifiConfigCenter::GetInstance().GetCandidateConfigs(uid, result);
     } else {
@@ -822,12 +883,14 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
         WIFI_LOGE("ConnectToNetwork: pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
+    SetWifiConnectedMode();
     if (isCandidate) {
         int uid = 0;
         if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("ConnectToNetwork CheckCallingUid failed!");
-            return WIFI_OPT_INVALID_PARAM;
+            if (!IsWifiBrokerProcess(uid)) {
+                WIFI_LOGE("ConnectToNetwork IsWifiBrokerProcess failed!");
+                return WIFI_OPT_INVALID_PARAM;
+            }
         }
         WifiSettings::GetInstance().SetDeviceState(networkId, static_cast<int>(WifiDeviceConfigStatus::ENABLED), false);
         WifiLinkedInfo linkedInfo;
@@ -908,6 +971,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         WIFI_LOGE("ConnectToNetwork: pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
+    SetWifiConnectedMode();
     return pService->ConnectToDevice(updateConfig);
 }
 
@@ -949,6 +1013,7 @@ ErrCode WifiDeviceServiceImpl::ReConnect()
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
+    SetWifiConnectedMode();
     return pService->ReConnect();
 }
 
@@ -1089,6 +1154,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
      wifiStandard=%{public}d RxMaxSpeed=%{public}d TxmaxSpeed=%{public}d rxSpeed=%{public}d txSpeed=%{public}d",
               info.connState, info.supplicantState, info.detailedState, info.wifiStandard,
               info.maxSupportedRxLinkSpeed, info.maxSupportedTxLinkSpeed, info.rxLinkSpeed, info.txLinkSpeed);
+    info.isAncoConnected = WifiConfigCenter::GetInstance().GetWifiConnectedMode(m_instId);
     return WIFI_OPT_SUCCESS;
 }
 

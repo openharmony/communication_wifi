@@ -499,8 +499,7 @@ void WifiDeviceServiceImpl::SetWifiConnectedMode(void)
 {
     
 #ifndef OHOS_ARCH_LITE
-    int pid =  GetCallingPid();
-   if (IsWifiBrokerProcess(GetCallingUid(), pid)) {
+   if (IsWifiBrokerProcess(GetCallingUid())) {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
         WIFI_LOGD("WifiDeviceServiceImpl %{public}s, anco, %{public}d", __func__, m_instId);
     } else {

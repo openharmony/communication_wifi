@@ -422,7 +422,7 @@ public:
     void SetWifiStateWhenAirplaneMode(bool bState);
 
     /**
-     * @Description when last Connected mode,anco in or not 
+     * @Description when last Connected mode,anco in or not
      *
      * @return true - when in anco Connected
      * @return false - when in not anco Connected
@@ -430,9 +430,9 @@ public:
     bool GetWifiConnectedMode(int instId = 0);
 
     /**
-     * @Description set sta last Connected mode,anco in or not 
+     * @Description set sta last Connected mode,anco in or not
      *
-     * @param set sta last Connected mode,anco in or not 
+     * @param set sta last Connected mode,anco in or not
      */
     void SetWifiConnectedMode(bool isContainerConnected, int instId = 0);
 

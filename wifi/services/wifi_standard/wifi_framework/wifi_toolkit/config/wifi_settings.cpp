@@ -591,7 +591,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
 }
 
 int WifiSettings::GetDeviceConfig(const std::string &ancoCallProcessName, const std::string &ssid,
-            const std::string &keymgmt, WifiDeviceConfig &config)
+        const std::string &keymgmt, WifiDeviceConfig &config)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");

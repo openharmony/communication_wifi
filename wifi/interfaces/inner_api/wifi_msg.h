@@ -187,6 +187,7 @@ struct WifiLinkedInfo {
     int lastRxPackets;
     int lastTxPackets;
     int retryedConnCount;
+    bool isAncoConnected;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -213,6 +214,7 @@ struct WifiLinkedInfo {
         lastRxPackets = 0;
         lastTxPackets = 0;
         retryedConnCount = 0;
+        isAncoConnected = false;
     }
 };
 
@@ -479,7 +481,8 @@ struct WifiDeviceConfig {
     WifiEapConfig wifiEapConfig;
     WifiProxyConfig wifiProxyconfig;
     WifiPrivacyConfig wifiPrivacySetting;
-
+    std::string callProcessName;
+    std::string ancoCallProcessName;
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -502,6 +505,8 @@ struct WifiDeviceConfig {
         numRebootsSinceLastUse = 0;
         numAssociation = 0;
         connFailedCount = 0;
+        callProcessName = "";
+        ancoCallProcessName = "";
     }
 };
 

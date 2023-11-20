@@ -36,6 +36,7 @@ WifiConfigCenter::WifiConfigCenter()
     mStaScanOnlyMidState.emplace(0, WifiOprMidState::CLOSED);
     mWifiCloseTime.emplace(0, std::chrono::steady_clock::now());
     mWifiOpenedWhenAirplane = false;
+    mIsAncoConnected.emplace(0, false);
 }
 
 WifiConfigCenter::~WifiConfigCenter()
@@ -367,6 +368,18 @@ bool WifiConfigCenter::GetStaLastRunState(int instId)
 int WifiConfigCenter::SetStaLastRunState(bool bRun, int instId)
 {
     return WifiSettings::GetInstance().SetStaLastRunState(bRun, instId);
+}
+
+bool WifiConfigCenter::GetWifiConnectedMode(int instId)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    return mIsAncoConnected[instId].load();
+}
+
+void WifiConfigCenter::SetWifiConnectedMode(bool isAncoConnected, int instId)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mIsAncoConnected[instId] = isAncoConnected;
 }
 
 void WifiConfigCenter::SetScreenState(const int &state)

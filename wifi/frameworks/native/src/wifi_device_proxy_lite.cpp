@@ -174,6 +174,7 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
     } else {
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
+    (void)ReadBool(reply, &info.isAncoConnected);
 }
 
 static void ReadDhcpInfo(IpcIo *reply, IpInfo &info)
@@ -557,6 +558,9 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &r
     (void)WriteInt32(&req, config.wifiProxyconfig.manualProxyConfig.serverPort);
     (void)WriteString(&req, config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
     (void)WriteInt32(&req, (int)config.wifiPrivacySetting);
+    (void)WriteString(&req, config.callProcessName.c_str());
+    (void)WriteString(&req, config.ancoCallProcessName.c_str());
+    (void)WriteInt32(&req, (int)config.uid);
 }
 
 ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)

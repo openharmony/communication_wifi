@@ -497,16 +497,15 @@ ErrCode WifiDeviceServiceImpl::CheckRemoveCandidateConfig(void)
 
 void WifiDeviceServiceImpl::SetWifiConnectedMode(void)
 {
-    
 #ifndef OHOS_ARCH_LITE
-   if (IsWifiBrokerProcess(GetCallingUid())) {
+    if (IsWifiBrokerProcess(GetCallingUid())) {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
         WIFI_LOGD("WifiDeviceServiceImpl %{public}s, anco, %{public}d", __func__, m_instId);
     } else {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(false, m_instId);
         WIFI_LOGD("WifiDeviceServiceImpl %{public}s, not anco, %{public}d", __func__, m_instId);
     }
-#endif 
+#endif
     return;
 }
 ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)

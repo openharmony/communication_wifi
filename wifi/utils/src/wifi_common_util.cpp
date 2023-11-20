@@ -299,7 +299,6 @@ bool IsForegroundApp(const int uid)
 {
     using namespace OHOS::AppExecFwk;
     using namespace OHOS::AppExecFwk::Constants;
-    constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
     int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
 
     auto appMgrClient = std::make_unique<AppMgrClient>();

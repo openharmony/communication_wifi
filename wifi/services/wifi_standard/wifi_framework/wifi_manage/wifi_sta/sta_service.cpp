@@ -26,11 +26,16 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_cert_utils.h"
 #include "wifi_common_util.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
 namespace OHOS {
 namespace Wifi {
+
+const std::string CLASS_NAME = "sta_service";
+constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
+
 StaService::StaService(int instId)
     : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
 {}
@@ -239,11 +244,9 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     std::string userSelectbssid = config.bssid;
     int status = config.status;
     WifiDeviceConfig tempDeviceConfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, tempDeviceConfig) == 0) {
+    if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
         status = tempDeviceConfig.status;
-        LOGI("The same network name already exists in settings! netWorkId:%{public}d, ssid:%{public}s.",
-            netWorkId, SsidAnonymize(config.ssid).c_str());
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
         pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
@@ -455,6 +458,15 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
 {
     WIFI_LOGI("Enter AutoConnectService.\n");
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+        WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
+        WIFI_LOGD("StaService %{public}s, anco, %{public}d", __func__, m_instId);
+    } else {
+        WifiConfigCenter::GetInstance().SetWifiConnectedMode(false, m_instId);
+        WIFI_LOGD("StaService %{public}s,not anco, %{public}d", __func__, m_instId);
+    }
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
     return WIFI_OPT_SUCCESS;
 }
@@ -509,6 +521,23 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
     cbMsg.id = m_instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 #endif
+}
+
+int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const
+{
+    if (WifiSettings::GetInstance().GetDeviceConfig(config.ancoCallProcessName, config.ssid, config.keyMgmt,
+        outConfig) ==0 && (!config.ancoCallProcessName.empty())) {
+        LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
+            "ancoCallProcessName:%{public}s",outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
+        outConfig.ancoCallProcessName.c_str());
+    } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
+        outConfig) ==0 && config.callProcessName.empty()) {
+        LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s",
+            outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str());
+    } else {
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)

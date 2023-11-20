@@ -245,7 +245,7 @@ public:
     virtual ErrCode StartPortalCertification();
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
-
+    int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
 private:
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {

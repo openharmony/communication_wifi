@@ -590,6 +590,28 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     return -1;
 }
 
+int WifiSettings::GetDeviceConfig(const std::string &ancoCallProcessName, const std::string &ssid,
+            const std::string &keymgmt, WifiDeviceConfig &config)
+{
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGD("Reload wifi config");
+        ReloadDeviceConfig();
+    }
+    if (ancoCallProcessName.empty()) {
+        LOGD("anco do not deal with");
+        return -1;
+    }
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt) &&
+            iter->second.ancoCallProcessName == ancoCallProcessName) {
+            config = iter->second;
+            return 0;
+        }
+    }
+    return -1;
+}
+
 int WifiSettings::GetHiddenDeviceConfig(std::vector<WifiDeviceConfig> &results)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {

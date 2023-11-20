@@ -163,8 +163,11 @@ private:
     bool IsScanServiceRunning();
     bool CheckConfigEap(const WifiDeviceConfig &config);
     bool CheckConfigPwd(const WifiDeviceConfig &config);
+    bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
     ErrCode CheckCallingUid(int &uid);
+    bool IsWifiBrokerProcess(int uid, int pid);
     ErrCode CheckRemoveCandidateConfig(void);
+    void SetWifiConnectedMode(void);
 #ifndef OHOS_ARCH_LITE
     void RegisterAppRemoved();
     void UnRegisterAppRemoved();

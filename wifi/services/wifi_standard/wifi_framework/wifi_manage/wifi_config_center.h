@@ -422,6 +422,21 @@ public:
     void SetWifiStateWhenAirplaneMode(bool bState);
 
     /**
+     * @Description when last Connected mode,anco in or not 
+     *
+     * @return true - when in anco Connected
+     * @return false - when in not anco Connected
+     */
+    bool GetWifiConnectedMode(int instId = 0);
+
+    /**
+     * @Description set sta last Connected mode,anco in or not 
+     *
+     * @param set sta last Connected mode,anco in or not 
+     */
+    void SetWifiConnectedMode(bool isContainerConnected, int instId = 0);
+
+    /**
      * @Description Get the STA service last running state
      *
      * @return true - sta is running
@@ -612,6 +627,7 @@ private:
     /* Time interval for disabling and re-enabling the STA */
     std::map<int, std::chrono::steady_clock::time_point> mWifiCloseTime;
     std::atomic<bool> mWifiOpenedWhenAirplane;
+    std::map<int, std::atomic<bool>> mIsAncoConnected;
 };
 } // namespace Wifi
 } // namespace OHOS

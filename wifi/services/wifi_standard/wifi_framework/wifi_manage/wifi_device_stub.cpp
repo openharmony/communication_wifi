@@ -358,6 +358,9 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.wifiProxyconfig.manualProxyConfig.serverPort = data.ReadInt32();
     config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = data.ReadString();
     config.wifiPrivacySetting = WifiPrivacyConfig(data.ReadInt32());
+    config.callProcessName = data.ReadString();
+    config.ancoCallProcessName = data.ReadString();
+    config.uid = data.ReadInt32();
     return;
 }
 
@@ -420,6 +423,8 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteString(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList);
     reply.WriteInt32((int)config.wifiPrivacySetting);
     reply.WriteInt32(config.uid);
+    reply.WriteString(config.callProcessName);
+    reply.WriteString(config.ancoCallProcessName);
     return;
 }
 
@@ -657,6 +662,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32((int)wifiInfo.maxSupportedRxLinkSpeed);
         reply.WriteInt32((int)wifiInfo.maxSupportedTxLinkSpeed);
         reply.WriteInt32((int)wifiInfo.channelWidth);
+        reply.WriteBool(wifiInfo.isAncoConnected);
     }
 
     return;

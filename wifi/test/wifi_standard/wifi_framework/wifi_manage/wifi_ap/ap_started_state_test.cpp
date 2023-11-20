@@ -502,5 +502,16 @@ HWTEST_F(ApStartedState_test, EnableInterfaceNat_001, TestSize.Level1)
     EXPECT_CALL(MockNetworkInterface::GetInstance(), IsValidInterfaceName(_)).WillRepeatedly(Return(false));
     EXPECT_TRUE(pApStartedState->EnableInterfaceNat());
 }
+
+HWTEST_F(ApStartedState_test, ProcessCmdUpdateCountryCodeTest, TestSize.Level1)
+{
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, 0))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    std::string countryCode = "CN";
+    msg->ClearMessageBody();
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE));
+    msg->AddStringMessageBody(countryCode);
+    pApStartedState->ProcessCmdUpdateCountryCode(*msg);
+}
 } // namespace Wifi
 } // namespace OHOS

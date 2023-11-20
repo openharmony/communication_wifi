@@ -182,5 +182,49 @@ HWTEST_F(WifiGlobalFuncTest, Vec2StreamTest, TestSize.Level1)
     expect = "head|FF 00 |tail";
     EXPECT_TRUE(result == expect);
 }
+
+HWTEST_F(WifiGlobalFuncTest, IsValidCountryCodeSuccessTest, TestSize.Level1)
+{
+    EXPECT_TRUE(IsValidCountryCode("CN"));
+}
+
+HWTEST_F(WifiGlobalFuncTest, IsValidCountryCodeFailTest, TestSize.Level1)
+{
+    EXPECT_FALSE(IsValidCountryCode("XX"));
+}
+
+HWTEST_F(WifiGlobalFuncTest, ConvertMncToIsoSuccessTest, TestSize.Level1)
+{
+    int mnc = 460;
+    string code;
+    EXPECT_TRUE(ConvertMncToIso(mnc, code));
+}
+
+HWTEST_F(WifiGlobalFuncTest, ConvertMncToIsoFailTest, TestSize.Level1)
+{
+    int mnc = 1000;
+    string code;
+    EXPECT_FALSE(ConvertMncToIso(mnc, code));
+}
+
+HWTEST_F(WifiGlobalFuncTest, ConvertStrToUpperTest, TestSize.Level1)
+{
+    string code = "cn";
+    StrToUpper(code);
+}
+
+HWTEST_F(WifiGlobalFuncTest, ConvertConvertCharToIntTest, TestSize.Level1)
+{
+    char c = '2';
+    int i = ConvertCharToInt(c);
+    EXPECT_TRUE(i == 2);
+}
+
+HWTEST_F(WifiGlobalFuncTest, ConvertStringToIntTest, TestSize.Level1)
+{
+    string str = "2000";
+    int i = ConvertStringToInt(str);
+    EXPECT_TRUE(i == 2000);
+}
 }  // namespace Wifi
 }  // namespace OHOS

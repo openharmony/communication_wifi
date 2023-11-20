@@ -236,7 +236,7 @@ ErrCode WifiCountryCodePolicy::FindLargestCountCountryCode(std::string &wifiCoun
         const std::pair<std::string, int> &b) {
         return a.second > b.second;
     });
-    if (sortCode.size() < 0) {
+    if (sortCode.size() <= 0) {
         return WIFI_OPT_FAILED;
     }
     if (sortCode.size() == 1) {

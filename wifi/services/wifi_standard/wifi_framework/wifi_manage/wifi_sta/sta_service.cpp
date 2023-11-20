@@ -33,7 +33,6 @@ DEFINE_WIFILOG_LABEL("StaService");
 namespace OHOS {
 namespace Wifi {
 
-const std::string CLASS_NAME = "sta_service";
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 
 StaService::StaService(int instId)
@@ -526,12 +525,12 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const
 {
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ancoCallProcessName, config.ssid, config.keyMgmt,
-        outConfig) ==0 && (!config.ancoCallProcessName.empty())) {
+        outConfig) == 0 && (!config.ancoCallProcessName.empty())) {
         LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
-            "ancoCallProcessName:%{public}s",outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
+            "ancoCallProcessName:%{public}s.", outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
         outConfig.ancoCallProcessName.c_str());
     } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
-        outConfig) ==0 && config.callProcessName.empty()) {
+        outConfig) == 0 && config.callProcessName.empty()) {
         LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s",
             outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str());
     } else {

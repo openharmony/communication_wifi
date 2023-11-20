@@ -287,6 +287,19 @@ public:
      * @return int - 0 success; -1 not find the device config
      */
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config);
+
+    /**
+     * @Description Get the specify wifi device config which ssid is equal to input ssid and keymgmt is equal to input
+     * keymgmt
+     *@param networkId - network id
+     * @param ssid - ssid string
+     * @param keymgmt - keymgmt string
+     * @param config - output WifiDeviceConfig struct
+     * @return int - 0 success; -1 not find the device config
+     */
+    int GetDeviceConfig(const std::string &ancoCallProcessName, const std::string &ssid,
+            const std::string &keymgmt, WifiDeviceConfig &config);
+
     /**
      * @Description Get the wifi device configs which hiddenSSID is true
      *

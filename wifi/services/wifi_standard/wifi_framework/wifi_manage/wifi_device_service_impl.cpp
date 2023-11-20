@@ -443,7 +443,7 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
         config.networkId, config.callProcessName.c_str(), config.ancoCallProcessName.c_str(),
         config.bssid.c_str(), config.ssid.c_str());
     if (config.networkId == WIFI_BROKER_NETWORK_ID && config.ancoCallProcessName == BROKER_PROCESS_PROTECT_FLAG &&
-        config.bssid.empty() && config.ssid.empty() && config.callProcessName == ANCO_SERVICE_BROKER ) {
+        config.bssid.empty() && config.ssid.empty() && config.callProcessName == ANCO_SERVICE_BROKER) {
         SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);
         return true;
     }
@@ -774,7 +774,7 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
         if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
             if (!IsWifiBrokerProcess(uid, GetCallingPid())) {
                 WIFI_LOGE("IsWifiBrokerProcess failed!");
-                return WIFI_OPT_INVALID_PARAM;  
+                return WIFI_OPT_INVALID_PARAM;
             }
         }
         WifiConfigCenter::GetInstance().GetCandidateConfigs(uid, result);

@@ -528,7 +528,7 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
         outConfig) == 0 && (!config.ancoCallProcessName.empty())) {
         LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
             "ancoCallProcessName:%{public}s.", outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
-        outConfig.ancoCallProcessName.c_str());
+            outConfig.ancoCallProcessName.c_str());
     } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
         outConfig) == 0 && config.callProcessName.empty()) {
         LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s",

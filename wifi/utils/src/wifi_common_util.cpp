@@ -46,6 +46,7 @@ constexpr int MIN_5G_CHANNEL = 36;
 constexpr int MAX_5G_CHANNEL = 165;
 constexpr int FREQ_CHANNEL_1 = 2412;
 constexpr int FREQ_CHANNEL_36 = 5180;
+constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 static std::pair<std::string, int> g_brokerProcessInfo;
 
 static std::string DataAnonymize(const std::string str, const char delim,
@@ -325,9 +326,8 @@ std::string GetRunningProcessNameByPid(const int uid, const int pid)
 {
     using namespace OHOS::AppExecFwk;
     using namespace OHOS::AppExecFwk::Constants;
-    constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+   
     int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
-
     auto appMgrClient = std::make_unique<AppMgrClient>();
     appMgrClient->ConnectAppMgrService();
     AppMgrResultCode ret;

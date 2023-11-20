@@ -467,7 +467,6 @@ ErrCode WifiDeviceServiceImpl::CheckCallingUid(int &uid)
 
 bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
 {
-   
 #ifndef OHOS_ARCH_LITE
    int pid = GetCallingPid();
    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;

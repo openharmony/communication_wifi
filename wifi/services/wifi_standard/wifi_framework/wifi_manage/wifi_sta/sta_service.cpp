@@ -457,6 +457,7 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
 {
     WIFI_LOGI("Enter AutoConnectService.\n");
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+#ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
     std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
@@ -466,6 +467,7 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(false, m_instId);
         WIFI_LOGD("StaService %{public}s,not anco, %{public}d", __func__, m_instId);
     }
+#endif
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
     return WIFI_OPT_SUCCESS;
 }

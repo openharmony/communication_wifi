@@ -163,9 +163,8 @@ private:
     bool IsScanServiceRunning();
     bool CheckConfigEap(const WifiDeviceConfig &config);
     bool CheckConfigPwd(const WifiDeviceConfig &config);
-    bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
     ErrCode CheckCallingUid(int &uid);
-    bool IsWifiBrokerProcess(int uid, int pid);
+    bool IsWifiBrokerProcess(int uid);
     ErrCode CheckRemoveCandidateConfig(void);
     void SetWifiConnectedMode(void);
 #ifndef OHOS_ARCH_LITE
@@ -173,6 +172,7 @@ private:
     void UnRegisterAppRemoved();
     void RegisterThermalLevel();
     void UnRegisterThermalLevel();
+    bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
 #endif
 
 private:

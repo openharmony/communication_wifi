@@ -436,6 +436,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
     return true;
 }
 
+#ifndef OHOS_ARCH_LITE
 bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &config)
 {
     WIFI_LOGD("InitWifiBrokerProcessInfo,networkId=%{public}d, ProcessName=[%{public}s],"
@@ -449,6 +450,7 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
     }
     return false;
 }
+#endif
 
 ErrCode WifiDeviceServiceImpl::CheckCallingUid(int &uid)
 {
@@ -463,14 +465,20 @@ ErrCode WifiDeviceServiceImpl::CheckCallingUid(int &uid)
 #endif
 }
 
-bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid, int pid)
+bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
 {
-    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+   
+#ifndef OHOS_ARCH_LITE
+   int pid = GetCallingPid();
+   const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
     std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(uid, pid);
     if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
         return false;
     }
     return true;
+#else
+    return false;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::CheckRemoveCandidateConfig(void)
@@ -490,13 +498,17 @@ ErrCode WifiDeviceServiceImpl::CheckRemoveCandidateConfig(void)
 
 void WifiDeviceServiceImpl::SetWifiConnectedMode(void)
 {
-    if (IsWifiBrokerProcess(GetCallingUid(), GetCallingPid())) {
+    
+#ifndef OHOS_ARCH_LITE
+    int pid =  GetCallingPid();
+   if (IsWifiBrokerProcess(GetCallingUid(), pid)) {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
         WIFI_LOGD("WifiDeviceServiceImpl %{public}s, anco, %{public}d", __func__, m_instId);
     } else {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(false, m_instId);
         WIFI_LOGD("WifiDeviceServiceImpl %{public}s, not anco, %{public}d", __func__, m_instId);
     }
+#endif 
     return;
 }
 ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &config)
@@ -508,7 +520,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
     /* check the caller's uid */
     int uid = 0;
     if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-        if (!IsWifiBrokerProcess(uid, GetCallingPid())) {
+        if (!IsWifiBrokerProcess(uid)) {
             WIFI_LOGE("CheckCallingUid IsWifiBrokerProcess failed!");
             return WIFI_OPT_INVALID_PARAM;
         }
@@ -549,7 +561,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
     }
     int uid = 0;
     if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-        if (!IsWifiBrokerProcess(uid, GetCallingPid())) {
+        if (!IsWifiBrokerProcess(uid)) {
             WIFI_LOGE("IsWifiBrokerProcess failed!");
             return WIFI_OPT_INVALID_PARAM;
         }
@@ -583,11 +595,11 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
             return WIFI_OPT_PERMISSION_DENIED;
         }
     }
-
+#ifndef OHOS_ARCH_LITE
     if (InitWifiBrokerProcessInfo(config)) {
         return WIFI_OPT_SUCCESS;
     }
-
+#endif
     if (!CheckConfigPwd(config)) {
         WIFI_LOGE("CheckConfigPwd failed!");
         return WIFI_OPT_INVALID_PARAM;
@@ -633,7 +645,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     if (isCandidate) {
         int uid = 0;
         if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-            if (!IsWifiBrokerProcess(uid, GetCallingPid())) {
+            if (!IsWifiBrokerProcess(uid)) {
                 WIFI_LOGE("CheckCallingUid IsWifiBrokerProcess failed!");
                 return WIFI_OPT_INVALID_PARAM;
             }
@@ -772,7 +784,7 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
     if (isCandidate) {
         int uid = 0;
         if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-            if (!IsWifiBrokerProcess(uid, GetCallingPid())) {
+            if (!IsWifiBrokerProcess(uid)) {
                 WIFI_LOGE("IsWifiBrokerProcess failed!");
                 return WIFI_OPT_INVALID_PARAM;
             }
@@ -878,7 +890,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
     if (isCandidate) {
         int uid = 0;
         if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-            if (!IsWifiBrokerProcess(uid, GetCallingPid())) {
+            if (!IsWifiBrokerProcess(uid)) {
                 WIFI_LOGE("ConnectToNetwork IsWifiBrokerProcess failed!");
                 return WIFI_OPT_INVALID_PARAM;
             }

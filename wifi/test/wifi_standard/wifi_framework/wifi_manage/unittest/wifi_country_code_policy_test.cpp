@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023. All rights reserved.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,6 @@
 #include "wifi_scan_msg.h"
 #include "wifi_settings.h"
  
-// using namespace OHOS;
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;
@@ -38,7 +37,7 @@ using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
 DEFINE_WIFILOG_LABEL("WifiCountryCodePolicyTest");
- 
+
 namespace OHOS {
 namespace Wifi {
 class WifiCountryCodePolicyTest : public testing::Test {

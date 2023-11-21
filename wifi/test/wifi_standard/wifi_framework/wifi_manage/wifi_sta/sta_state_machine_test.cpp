@@ -1756,7 +1756,7 @@ public:
     void InvokeOnStaConnChanged(const OperateResState &state, WifiLinkedInfo &info)
     {
         pStaStateMachine->GetLinkedInfo(info);
-        if(info.connState == ConnState::CONNECTED) {
+        if (info.connState == ConnState::CONNECTED) {
             pStaStateMachine->InvokeOnStaConnChanged(state, info);
         }
     }

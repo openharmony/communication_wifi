@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023. All rights reserved.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,8 +28,7 @@
 #include "sta_service_callback.h"
 #include "wifi_settings.h"
 #include "wifi_config_center.h"
- 
-// using namespace OHOS;
+
 using ::testing::_;
 using ::testing::DoAll;
 using ::testing::Eq;
@@ -38,9 +37,9 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
- 
+
 DEFINE_WIFILOG_LABEL("WifiCountryCodeManagerTest");
- 
+
 namespace OHOS {
 namespace Wifi {
 class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
@@ -57,13 +56,12 @@ public:
         return m_listenerModuleName;
     }
 };
- 
-class MockStateMachine : public StateMachine
-{
+
+class MockStateMachine : public StateMachine {
 public:
-    MockStateMachine(const std::string &name) : StateMachine(name) {};
+    explicit MockStateMachine(const std::string &name) : StateMachine(name) {};
     ~MockStateMachine() {};
-    MOCK_METHOD2(StartTimer, void(int, long));
+    MOCK_METHOD2(StartTimer, void(int, int64_t));
     MOCK_METHOD1(StopTimer, void(int));
     MOCK_METHOD1(SendMessage, void(int));
     MOCK_METHOD2(SendMessage, void(int, int));
@@ -72,9 +70,7 @@ public:
     MOCK_METHOD2(SendMessage, void(int, const std::any&));
     MOCK_METHOD4(SendMessage, void(int, int, int, const std::any&));
 };
- 
-MockStateMachine *m_mockStateMachine;
- 
+
 class WifiCountryCodeManagerTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -90,27 +86,29 @@ public:
             m_mockStateMachine = nullptr;
         }
     }
+
+    MockStateMachine *m_mockStateMachine;
 };
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, InitTest, TestSize.Level1)
 {
     WIFI_LOGI("InitTest enter");
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WifiCountryCodeManager::GetInstance().Init());
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, SetWifiCountryCodeFromExternalSuccessTest, TestSize.Level1)
 {
     WIFI_LOGI("SetWifiCountryCodeFromExternalSuccessTest enter");
     std::string code = "CN";
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal(code));
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, UpdateWifiCountryCodeTest, TestSize.Level1)
 {
     WIFI_LOGI("UpdateWifiCountryCodeTest enter");
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode());
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, NotifyWifiCountryCodeChangeListenersTest, TestSize.Level1)
 {
     WIFI_LOGI("NotifyWifiCountryCodeChangeListenersTest enter");
@@ -119,7 +117,7 @@ HWTEST_F(WifiCountryCodeManagerTest, NotifyWifiCountryCodeChangeListenersTest, T
     std::string code = "CN";
     WifiCountryCodeManager::GetInstance().NotifyWifiCountryCodeChangeListeners(code);
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, RegisterWifiCountryCodeChangeListenerTest, TestSize.Level1)
 {
     WIFI_LOGI("RegisterWifiCountryCodeChangeListenerTest enter");
@@ -127,7 +125,7 @@ HWTEST_F(WifiCountryCodeManagerTest, RegisterWifiCountryCodeChangeListenerTest, 
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS,
         WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_apObserver));
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, UnregisterWifiCountryCodeChangeListenerSuccessTest, TestSize.Level1)
 {
     WIFI_LOGI("UnregisterWifiCountryCodeChangeListenerSuccessTest enter");
@@ -137,7 +135,7 @@ HWTEST_F(WifiCountryCodeManagerTest, UnregisterWifiCountryCodeChangeListenerSucc
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS,
         WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_apObserver));
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, UnregisterWifiCountryCodeChangeListenerFailTest, TestSize.Level1)
 {
     WIFI_LOGI("UnregisterWifiCountryCodeChangeListenerFailTest enter");
@@ -148,7 +146,7 @@ HWTEST_F(WifiCountryCodeManagerTest, UnregisterWifiCountryCodeChangeListenerFail
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED,
         WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_apObserver1));
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaOpenResTest enter");
@@ -167,7 +165,7 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED, 0);
     sleep(2);
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, DealStaCloseResTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaCloseResTest enter");
@@ -183,7 +181,7 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaCloseResTest, TestSize.Level1)
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, 0);
     sleep(2);
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, DealStaConnChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaConnChangedTest enter");
@@ -200,7 +198,7 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaConnChangedTest, TestSize.Level1)
     cbk.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
     sleep(2);
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, DealApStateChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealApStateChangedTest enter");
@@ -215,7 +213,7 @@ HWTEST_F(WifiCountryCodeManagerTest, DealApStateChangedTest, TestSize.Level1)
     cbk.OnApStateChangedEvent(ApState::AP_STATE_NONE, 0);
     sleep(2);
 }
- 
+
 HWTEST_F(WifiCountryCodeManagerTest, UpdateWifiCountryCodeCacheSuccessTest, TestSize.Level1)
 {
     WIFI_LOGI("UpdateWifiCountryCodeCacheSuccessTest enter");

@@ -36,8 +36,6 @@ public:
         const int SLEEP_TIEM = 20;
         pMockPendant = new MockPendant();
 
-        pMockPendant->GetMockApStateMachine().InitialStateMachine();
-
         pApIdleState = new ApIdleState(pMockPendant->GetMockApStateMachine());
 
         msg = new InternalMessage();

@@ -42,12 +42,9 @@ public:
         pMockApStartedState = &(pMockPendant->GetMockApStartedState());
         pMockApMonitor = &(pMockPendant->GetMockApMonitor());
 
-        pMockPendant->GetMockApStateMachine().InitialStateMachine();
-
         pApStateMachine = new ApStateMachine(*pMockApStationsManager, *pMockApRootState, *pMockApIdleState,
             *pMockApStartedState, *pMockApMonitor);
 
-        pApStateMachine->InitialStateMachine();
         RegisterApServiceCallbacks();
         EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
             .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));

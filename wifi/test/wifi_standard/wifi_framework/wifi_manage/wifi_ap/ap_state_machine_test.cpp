@@ -35,6 +35,7 @@ public:
     virtual void SetUp()
     {
         const int SLEEP_TIME = 20;
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThreadStatusFlag(_)).Times(AtLeast(0));
         pMockPendant = new MockPendant();
         pMockApStationsManager = &(pMockPendant->GetMockApStationsManager());
         pMockApRootState = &(pMockPendant->GetMockApRootState());

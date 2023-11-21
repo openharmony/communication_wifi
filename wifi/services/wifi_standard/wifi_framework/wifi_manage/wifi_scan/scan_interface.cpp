@@ -112,6 +112,18 @@ ErrCode ScanInterface::OnScreenStateChanged(int screenState)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanInterface::OnStandbyStateChanged(bool sleeping)
+{
+    WIFI_LOGI("Enter ScanInterface::OnStandbyStateChanged, sleeping=%{public}d.", sleeping);
+    if (sleeping) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    pScanService->SystemScanProcess(true);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
 {
     WIFI_LOGI("Enter ScanInterface::OnClientModeStatusChanged, staStatus=%{public}d.", staStatus);

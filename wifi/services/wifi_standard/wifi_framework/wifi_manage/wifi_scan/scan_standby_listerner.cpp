@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 #ifndef OHOS_ARCH_LITE
+#include "define.h"
 #include "wifi_logger.h"
 #include "scan_standby_listerner.h"
+#include "wifi_service_manager.h"
+#include "wifi_settings.h"
 
 #define WIFI_STANDBY_NAP "napped"
 #define WIFI_STANDBY_SLEEPING "sleeping"
@@ -56,6 +59,25 @@ void StandByListerner::OnStandbyStateChanged(bool napped, bool sleeping)
 {
     WIFI_LOGI("OnStandbyStateChanged napped:%{public}d, sleeping:%{public}d", napped, sleeping);
     allowScan = !sleeping;
+    if (sleeping) {
+        return;
+    }
+
+    int state = WifiSettings::GetInstance().GetScreenState();
+    WIFI_LOGI("Screen state(1:OPEN, 2:CLOSE): %{public}d.", state);
+    if (state != MODE_STATE_OPEN) {
+        return;
+    }
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
+        if (pScanService == nullptr) {
+            WIFI_LOGE("scan service is NOT start!");
+            return;
+        }
+        if (pScanService->OnStandbyStateChanged(sleeping) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("OnStandbyStateChanged failed");
+        }
+    }
 }
 
 StandBySubscriber::StandBySubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
@@ -73,8 +95,8 @@ StandBySubscriber::~StandBySubscriber()
 void StandByListerner::RegisterStandByEvent()
 {
     std::unique_lock<std::mutex> lock(standByEventMutex);
-    if (standBySubscriber_) {
-        WIFI_LOGI("standBySubscriber_ already exist!");
+    if (isStandBySubscribered) {
+        WIFI_LOGI("isStandBySubscribered is true!");
         return;
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -85,6 +107,7 @@ void StandByListerner::RegisterStandByEvent()
         WIFI_LOGE("StandByEvent SubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("StandByEvent SubscribeCommonEvent() OK");
+        isStandBySubscribered = true;
     }
 }
 
@@ -92,14 +115,15 @@ void StandByListerner::UnRegisterStandByEvent()
 {
     WIFI_LOGI("UnRegisterStandByEvent enter");
     std::unique_lock<std::mutex> lock(standByEventMutex);
-    if (!standBySubscriber_) {
-        WIFI_LOGI("standBySubscriber_ already nonexistent!");
+    if (!isStandBySubscribered) {
+        WIFI_LOGI("isStandBySubscribered is false!");
         return;
     }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(standBySubscriber_)) {
         WIFI_LOGE("StandByEvent UnSubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("StandByEvent UnSubscribeCommonEvent() OK");
+        isStandBySubscribered = false;
     }
 }
 

@@ -66,6 +66,13 @@ public:
      */
     virtual ErrCode OnScreenStateChanged(int screenState) = 0;
     /**
+     * @Description Processes interface service standby state change request.
+     *
+     * @param sleeping is sleeping[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnStandbyStateChanged(bool sleeping) = 0;
+    /**
      * @Description Processes interface service sta status change request.
      *
      * @param staStatus sta status[in]

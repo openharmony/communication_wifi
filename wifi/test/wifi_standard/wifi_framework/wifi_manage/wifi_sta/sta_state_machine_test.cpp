@@ -26,7 +26,7 @@
 #include "mock_wifi_supplicant_hal_interface.h"
 #include "sta_define.h"
 #include "sta_state_machine.h"
-#include "wifi_internal.h"
+#include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 
 using ::testing::_;

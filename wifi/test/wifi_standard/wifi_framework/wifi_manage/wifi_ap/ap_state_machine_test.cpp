@@ -24,6 +24,7 @@
 #include "operator_overload.h"
 
 using ::testing::_;
+using ::testing::AtLeast;
 using ::testing::Eq;
 using ::testing::Return;
 namespace OHOS {
@@ -35,6 +36,7 @@ public:
     virtual void SetUp()
     {
         const int SLEEP_TIME = 20;
+        EXPECT_CALL(WifiSettings::GetInstance(), SetThreadStatusFlag(_)).Times(AtLeast(0));
         pMockPendant = new MockPendant();
         pMockApStationsManager = &(pMockPendant->GetMockApStationsManager());
         pMockApRootState = &(pMockPendant->GetMockApRootState());
@@ -42,12 +44,9 @@ public:
         pMockApStartedState = &(pMockPendant->GetMockApStartedState());
         pMockApMonitor = &(pMockPendant->GetMockApMonitor());
 
-        pMockPendant->GetMockApStateMachine().InitialStateMachine();
-
         pApStateMachine = new ApStateMachine(*pMockApStationsManager, *pMockApRootState, *pMockApIdleState,
             *pMockApStartedState, *pMockApMonitor);
 
-        pApStateMachine->InitialStateMachine();
         RegisterApServiceCallbacks();
         EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
             .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));

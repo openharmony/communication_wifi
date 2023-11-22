@@ -29,13 +29,14 @@ public:
         ApStartedState &apStartedState, ApMonitor &apMonitor)
         : ApStateMachine(apStationsManager, apRootState, apIdleState, apStartedState, apMonitor)
     {}
-    MOCK_METHOD1(OnApStateChange, void(ApState));
-    MOCK_METHOD1(BroadCastStationJoin, void(const StationInfo &staInfo));
-    MOCK_METHOD1(BroadCastStationLeave, void(const StationInfo &staInfo));
-    MOCK_METHOD1(RegisterApServiceCallbacks, ErrCode(const IApServiceCallbacks &callbacks));
-    MOCK_METHOD0(StartDhcpServer, bool());
-    MOCK_METHOD0(StopDhcpServer, bool());
-    MOCK_METHOD1(GetConnectedStationInfo, bool(std::map<std::string, StationInfo> &result));
+    void SwitchState(State *targetState);
+    void CreateMessage();
+    void SendMessage(int what);
+    void SendMessage(int what, int arg1);
+    void SendMessage(int what, int arg1, int arg2);
+    void SendMessage(InternalMessage *msg);
+    void StartTimer(int timerName, int64_t interval);
+    void StopTimer(int timerName);
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -58,6 +58,7 @@ public:
     virtual int SyncHotspotConfig() = 0;
     virtual int SetPowerModel(const PowerModel& model, int id = 0) = 0;
     virtual int GetPowerModel(PowerModel& model, int id = 0) = 0;
+    virtual void SetThreadStatusFlag(bool state) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -88,6 +89,7 @@ public:
     MOCK_METHOD0(SyncHotspotConfig, int());
     MOCK_METHOD2(SetPowerModel, int(const PowerModel& model, int id));
     MOCK_METHOD2(GetPowerModel, int(PowerModel& model, int id));
+    MOCK_METHOD1(SetThreadStatusFlag, void(bool state));
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

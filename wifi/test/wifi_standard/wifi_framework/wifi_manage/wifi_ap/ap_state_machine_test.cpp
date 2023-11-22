@@ -24,6 +24,7 @@
 #include "operator_overload.h"
 
 using ::testing::_;
+using ::testing::AtLeast;
 using ::testing::Eq;
 using ::testing::Return;
 namespace OHOS {

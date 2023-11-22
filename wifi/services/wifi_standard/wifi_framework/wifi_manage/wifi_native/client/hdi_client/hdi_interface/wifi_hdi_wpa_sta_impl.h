@@ -18,75 +18,57 @@
 #define OHOS_WIFI_HDI_WPA_STA_IMPL_H
 
 #include "wifi_hdi_wpa_proxy.h"
-#include "wifi_hdi_wpa_callback.h"
+#include "i_wifi_struct.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-WifiErrorNo Start();
+WifiErrorNo HdiStart();
 
-WifiErrorNo Stop();
+WifiErrorNo HdiStop();
 
-WifiErrorNo Connect(int networkId);
+WifiErrorNo HdiConnect(int networkId);
 
-WifiErrorNo Reconnect();
+WifiErrorNo HdiReconnect();
 
-WifiErrorNo Reassociate();
+WifiErrorNo HdiDisconnect();
 
-WifiErrorNo Disconnect();
+WifiErrorNo HdiGetDeviceMacAddress(char *macAddr, int macAddrLen);
 
-WifiErrorNo GetCapabilities(int *capabilities);
+WifiErrorNo HdiScan();
 
-WifiErrorNo GetDeviceMacAddress(char *macAddr, int macAddrLen);
+ScanInfo *HdiGetScanInfos(int *size);
 
-WifiErrorNo GetFrequencies(int band, int *values, int *size);
+WifiErrorNo HdiRemoveNetwork(int networkId);
 
-WifiErrorNo SetAssocMacAddr(char *mac, int len);
+WifiErrorNo HdiAddNetwork(int *networkId);
 
-WifiErrorNo Scan(WifiScanParam *scanParam);
+WifiErrorNo HdiEnableNetwork(int networkId);
 
-WifiErrorNo GetScanInfos(InterScanInfo *scanInfos, int *size);
+WifiErrorNo HdiDisableNetwork(int networkId);
 
-WifiErrorNo StartPnoScan(WifiPnoScanParam *scanParam);
+WifiErrorNo HdiSetNetwork(int networkId, SetNetworkConfig *confs, int size);
 
-WifiErrorNo StopPnoScan();
+WifiErrorNo HdiSaveConfig();
 
-WifiErrorNo RemoveNetwork(int networkId);
+WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback);
 
-WifiErrorNo AddNetwork(int *networkId);
+WifiErrorNo HdiStartWpsPbcMode(WifiWpsParam *config);
 
-WifiErrorNo EnableNetwork(int networkId);
+WifiErrorNo HdiStartWpsPinMode(WifiWpsParam *config, int *pinCode);
 
-WifiErrorNo DisableNetwork(int networkId);
+WifiErrorNo HdiStopWps();
 
-WifiErrorNo SetNetwork(int networkId, const char *name, const char *value);
+WifiErrorNo HdiWpaAutoConnect(int enable);
 
-WifiErrorNo SaveConfig();
+WifiErrorNo HdiWpaBlocklistClear();
 
-WifiErrorNo RegisterHdiWpaStaEventCallback(IWifiHdiWpaCallback *callback);
+WifiErrorNo HdiSetPowerSave(int enable);
 
-WifiErrorNo StartWpsPbcMode(WifiIdlWpsConfig *config);
+WifiErrorNo HdiWpaSetCountryCode(const char *countryCode);
 
-WifiErrorNo StartWpsPinMode(WifiIdlWpsConfig *config, int *pinCode);
-
-WifiErrorNo StopWps();
-
-WifiErrorNo GetRoamingCapabilities(WifiIdlRoamCapability *capability);
-
-WifiErrorNo SetRoamConfig(WifiIdlRoamConfig *config);
-
-WifiErrorNo GetConnectSignalInfo(const char *endBssid, WifiWpaSignalInfo *info);
-
-WifiErrorNo WpaAutoConnect(int enable);
-
-WifiErrorNo WpaBlocklistClear();
-
-WifiErrorNo SetPowerSave(int enable);
-
-WifiErrorNo WpaSetCountryCode(const char *countryCode);
-
-WifiErrorNo WpaSetSuspendMode(int mode);
+WifiErrorNo HdiWpaSetSuspendMode(int mode);
 
 #ifdef __cplusplus
 }

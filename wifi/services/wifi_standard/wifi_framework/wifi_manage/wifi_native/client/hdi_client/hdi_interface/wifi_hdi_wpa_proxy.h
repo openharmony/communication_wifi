@@ -17,18 +17,18 @@
 #ifndef OHOS_WIFI_HDI_WPA_PROXY_H
 #define OHOS_WIFI_HDI_WPA_PROXY_H
 
+#include <pthread.h>
 #include "v1_0/iwpa_interface.h"
 #include "v1_0/iwpa_callback.h"
-#include "wifi_hal_base_feature.h"
+#include "v1_0/wpa_types.h"
 #include "wifi_error_no.h"
 #include "wifi_log.h"
 #include "securec.h"
+#include "wifi_common_def.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define MAX_IFACENAME_LEN 17
 
 #ifndef CHECK_HDI_WPA_INTERFACE
 #define CHECK_HDI_WPA_INTERFACE(wpaObj) \
@@ -77,11 +77,39 @@ WifiErrorNo HdiWpaStart();
 WifiErrorNo HdiWpaStop();
 
 /**
+ * @Description Add interface.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName);
+
+/**
+ * @Description Remove interface.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiRemoveWpaIface(const char *ifName);
+
+/**
  * @Description Create the WiFi object.
  *
  * @return WifiErrorNo - operation result
  */
-struct IWpaInterface* GetWlanInterface();
+struct IWpaInterface* GetWpaInterface();
+
+/**
+ * @Description Excute shell cmd.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo ExcuteCmd(const char *szCmd);
+
+/**
+ * @Description copy wpa_supplicant config file.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo CopyConfigFile(const char* configName);
 
 #ifdef __cplusplus
 }

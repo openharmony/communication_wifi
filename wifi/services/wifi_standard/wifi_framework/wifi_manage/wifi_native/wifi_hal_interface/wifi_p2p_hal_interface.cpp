@@ -30,9 +30,11 @@ WifiP2PHalInterface &WifiP2PHalInterface::GetInstance(void)
     if (initFlag == 0) {
         std::unique_lock<std::mutex> lock(initMutex);
         if (initFlag == 0) {
+#ifndef HDI_WPA_INTERFACE_SUPPORT
             if (inst.InitIdlClient()) {
                 initFlag = 1;
             }
+#endif
         }
     }
     return inst;

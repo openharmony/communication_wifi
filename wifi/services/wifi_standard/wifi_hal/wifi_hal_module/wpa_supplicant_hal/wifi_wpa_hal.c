@@ -907,7 +907,6 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
     WpaIfaceInfo *info = p->ifaces;
     while (info != NULL) {
         if (strcmp(info->name, argv->name) == 0) {
-            info->num += 1;
             return 0;
         }
         info = info->next;
@@ -928,7 +927,6 @@ static int WpaCliAddIface(WifiWpaInterface *p, const AddInterfaceArgv *argv, boo
         return -1;
     }
     LOGI("Add interface finish, cmd: %{public}s, buf: %{public}s", cmd, buf);
-    info->num += 1;
     info->next = p->ifaces;
     p->ifaces = info;
     return 0;
@@ -944,20 +942,18 @@ static int WpaCliRemoveIface(WifiWpaInterface *p, const char *name)
     WpaIfaceInfo *info = p->ifaces;
     while (info != NULL) {
         if (strcmp(info->name, name) == 0) {
-            info->num -= 1;
             break;
         }
         prev = info;
         info = info->next;
     }
-    if (info == NULL || info->num > 0) {
+    if (info == NULL) {
         return 0;
     }
     char cmd[WPA_CMD_BUF_LEN] = {0};
     char buf[WPA_CMD_REPLY_BUF_SMALL_LEN] = {0};
     if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "INTERFACE_REMOVE %s", name) < 0 ||
         WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
-        info->num += 1;
         return -1;
     }
     if (prev == NULL) {

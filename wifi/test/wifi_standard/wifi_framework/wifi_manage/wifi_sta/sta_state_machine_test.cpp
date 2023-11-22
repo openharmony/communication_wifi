@@ -2741,18 +2741,18 @@ HWTEST_F(StaStateMachineTest, IsWpa3TransitionTest, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaOpenResTest, TestSize.Level1)
 {
-    InvokeOnStaOpenRes(OperateResState::START_PBC_SUCCEED);
+    InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaCloseResTest, TestSize.Level1)
 {
-    InvokeOnStaCloseRes(OperateResState::START_PBC_SUCCEED);
+    InvokeOnStaCloseRes(OperateResState::OPEN_WIFI_SUCCEED);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaConnChangedTest, TestSize.Level1)
 {
     WifiLinkedInfo linkedInfo;
-    InvokeOnStaConnChanged(OperateResState::START_PBC_SUCCEED, linkedInfo);
+    InvokeOnStaConnChanged(OperateResState::OPEN_WIFI_SUCCEED, linkedInfo);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnWpsChangedTest, TestSize.Level1)

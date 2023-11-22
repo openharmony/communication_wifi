@@ -47,6 +47,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_location_mode_observer.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_net_agent.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_power_state_listener.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_protect.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_protect_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_service_manager.cpp",
@@ -60,6 +61,7 @@ ohos_unittest("manager_unittest") {
     "wifi_dumper_test.cpp",
     "wifi_internal_event_dispatcher_test.cpp",
     "wifi_manager_test.cpp",
+    "wifi_power_state_listener_test.cpp",
     "wifi_service_manager_test.cpp",
     "wifi_settings_test.cpp",
   ]
@@ -91,6 +93,8 @@ ohos_unittest("manager_unittest") {
     "//base/notification/common_event_service/cesfwk/kits/native/include",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
     "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "//base/powermgr/power_manager/interfaces/inner_api/native/include",
+    "//base/powermgr/power_manager/services/zidl/include",
     "$WIFI_ROOT_DIR/utils/inc",
     "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
     "//foundation/systemabilitymgr/samgr/utils/native/include",
@@ -139,6 +143,7 @@ ohos_unittest("manager_unittest") {
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
+    "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

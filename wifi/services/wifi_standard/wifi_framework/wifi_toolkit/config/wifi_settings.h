@@ -959,6 +959,20 @@ public:
     int GetAirplaneModeState() const;
 
     /**
+     * @Description Set the Power Sleep State
+     *
+     * @param state - 1 open; 2 close
+     */
+    void SetPowerSleepState(const int &state);
+
+    /**
+     * @Description Get the Power Sleep State
+     *
+     * @return int - 1 open; 2 close
+     */
+    int GetPowerSleepState() const;
+
+    /**
      * @Description Set the App Running State
      *
      * @param appRunMode - app run mode
@@ -1536,6 +1550,7 @@ private:
     int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
     std::atomic<int> mAirplaneModeState;      /* 1 on 2 off */
+    std::atomic<int> mPowerSleepState;        /* 1 on 2 off */
     int mDeviceProvision;      /* 1 on 2 off */
     ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
     int mPowerSavingModeState;   /* 1 on 2 off */

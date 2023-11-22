@@ -269,6 +269,18 @@ HWTEST_F(WifiManagerTest, UnRegisterBatteryEventTest, TestSize.Level1)
     wifiManager.UnRegisterBatteryEvent();
 }
 
+HWTEST_F(WifiManagerTest, RegisterPowerStateListenerTest, TestSize.Level1)
+{
+    WIFI_LOGE("RegisterPowerStateListenerTest enter!");
+    wifiManager.RegisterPowerStateListener();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterPowerStateListenerTest, TestSize.Level1)
+{
+    WIFI_LOGE("UnRegisterPowerStateListenerTest enter!");
+    wifiManager.UnRegisterPowerStateListener();
+}
+
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
 {
     WIFI_LOGE("ExitTest enter!");

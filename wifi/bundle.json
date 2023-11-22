@@ -101,7 +101,8 @@
                 "netstack",
                 "safwk",
                 "samgr",
-                "wpa_supplicant"
+                "wpa_supplicant",
+                "power_manager"
             ],
             "third_party": [
                 "bounds_checking_function",

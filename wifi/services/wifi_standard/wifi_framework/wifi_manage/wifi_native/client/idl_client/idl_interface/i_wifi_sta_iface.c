@@ -521,9 +521,9 @@ ScanInfo* GetScanInfos(int *size)
             if (scanInfos != NULL) {
                 for (int i = 0; i < *size; ++i) {
                     ReadStr(context, scanInfos[i].bssid, WIFI_BSSID_LENGTH);
-                    ReadInt(context, &scanInfos[i].frequency);
-                    ReadInt(context, &scanInfos[i].signalLevel);
-                    ReadStr(context, scanInfos[i].capability, WIFI_SCAN_INFO_CAPABILITIES_LENGTH);
+                    ReadInt(context, &scanInfos[i].freq);
+                    ReadInt(context, &scanInfos[i].siglv);
+                    ReadStr(context, scanInfos[i].flags, WIFI_SCAN_INFO_CAPABILITY_LENGTH);
                     ReadStr(context, scanInfos[i].ssid, WIFI_SSID_LENGTH);
                     ReadInt64(context, &scanInfos[i].timestamp);
                     ReadInt(context, &scanInfos[i].channelWidth);

@@ -83,6 +83,7 @@
                 "data_share",
                 "dhcp",
                 "drivers_interface_wlan",
+                "drivers_interface_wpa",
                 "efficiency_manager",
                 "eventhandler",
                 "hdf_core",

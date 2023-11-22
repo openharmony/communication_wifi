@@ -72,7 +72,7 @@ bool WifiBaseHalInterface::InitHdiWpaClient(void)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     if (mHdiWpaClient == nullptr) {
-        mHdiWpaClient = new (std::nothrow) mHdiWpaClient;
+        mHdiWpaClient = new (std::nothrow) WifiHdiWpaClient;
     }
     if (mHdiWpaClient == nullptr) {
         LOGE("Failed to create hdi wpa client");

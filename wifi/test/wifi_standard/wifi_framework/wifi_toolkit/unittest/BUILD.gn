@@ -94,6 +94,7 @@ ohos_unittest("toolkit_unittest") {
   defines = [
     "private = public",
     "protected = public",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
   ]
   external_deps = [
     "c_utils:utils",

@@ -89,7 +89,7 @@ public:
     MOCK_METHOD0(SyncHotspotConfig, int());
     MOCK_METHOD2(SetPowerModel, int(const PowerModel& model, int id));
     MOCK_METHOD2(GetPowerModel, int(PowerModel& model, int id));
-    MOCK_METHOD2(SetThreadStatusFlag, void(bool state));
+    MOCK_METHOD1(SetThreadStatusFlag, void(bool state));
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

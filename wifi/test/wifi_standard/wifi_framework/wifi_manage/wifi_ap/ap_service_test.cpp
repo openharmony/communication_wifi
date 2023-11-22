@@ -50,7 +50,6 @@ public:
     {
         const int SLEEP_TIME = 20;
         pMockPendant = new MockPendant();
-        pMockPendant->GetMockApStateMachine().InitialStateMachine();
         pApService = new ApService(pMockPendant->GetMockApStateMachine());
         int testMaxConn = 10;
         int channel = 6;

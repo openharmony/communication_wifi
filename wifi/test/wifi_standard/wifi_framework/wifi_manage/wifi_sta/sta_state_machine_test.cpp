@@ -1744,7 +1744,7 @@ public:
 
     void InvokeOnStaOpenRes(const OperateResState &state)
     {
-        EXPECT_CALL(WfifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(AtLeast(0));
         pStaStateMachine->InvokeOnStaOpenRes(state);
     }
 
@@ -2741,18 +2741,18 @@ HWTEST_F(StaStateMachineTest, IsWpa3TransitionTest, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaOpenResTest, TestSize.Level1)
 {
-    InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCEED);
+    InvokeOnStaOpenRes(OperateResState::START_PBC_SUCCEED);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaCloseResTest, TestSize.Level1)
 {
-    InvokeOnStaCloseRes(OperateResState::OPEN_WIFI_SUCEED);
+    InvokeOnStaCloseRes(OperateResState::START_PBC_SUCCEED);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaConnChangedTest, TestSize.Level1)
 {
     WifiLinkedInfo linkedInfo;
-    InvokeOnStaConnChanged(OperateResState::OPEN_WIFI_SUCEED, linkedInfo);
+    InvokeOnStaConnChanged(OperateResState::START_PBC_SUCCEED, linkedInfo);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnWpsChangedTest, TestSize.Level1)

@@ -39,7 +39,6 @@ const std::u16string FORMMGR_INTERFACE_TOKEN_EX = u"ohos.wifi.IWifiDeviceMgr";
 sptr<WifiDeviceMgrStub> pWifiDeviceMgrStub = WifiDeviceMgrServiceImpl::GetInstance();
 sptr<WifiDeviceStub> pWifiDeviceStub = new (std::nothrow) WifiDeviceServiceImpl(instId);
 
-
 bool DoSomethingInterestingWithMyAPIEx(const uint8_t* data, size_t size)
 {
     uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_MGR_GET_DEVICE_SERVICE);

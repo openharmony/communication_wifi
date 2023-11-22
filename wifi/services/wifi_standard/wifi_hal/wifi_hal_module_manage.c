@@ -35,6 +35,7 @@ static ModuleInfo *g_halModuleList = NULL;
 
 #define MAX_WPA_MAIN_ARGC_NUM 20
 #define MAX_WPA_MAIN_ARGV_LEN 128
+#define REFERENCE_CNT_MAX 3
 
 struct StWpaMainParam {
     int argc;
@@ -256,6 +257,9 @@ ModuleManageRetCode StartModule(const char *moduleName, const char *startCmd)
     ModuleInfo *p = FindModule(moduleName);
     if (p != NULL) {
         p->referenceCount += 1;
+        if (p->referenceCount > REFERENCE_CNT_MAX) {
+            p->referenceCount = 1;
+        }
         LOGD("module %{public}s has been started, current reference is %{public}d", moduleName, p->referenceCount);
         return MM_SUCCESS;
     }
@@ -293,6 +297,8 @@ ModuleManageRetCode StopModule(const char *moduleName, bool isHostapd)
     if (p->referenceCount > 0) {
         LOGD("module %{public}s reference left %{public}d, return ok", moduleName, p->referenceCount);
         return MM_REDUCE_REFERENCE;
+    } else if (p->referenceCount < 0) {
+        p->referenceCount = 1;
     }
     int ret = StopModuleInternal(p->szModuleName, p->processId, isHostapd);
     if (ret != 0) { /* stop module failed! */

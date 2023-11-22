@@ -34,6 +34,7 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_protect_manager.h"
 #include "parameter.h"
+#include "suspend/sleep_priority.h"
 #endif
 #include "wifi_sta_hal_interface.h"
 #include "wifi_service_manager.h"
@@ -669,6 +670,10 @@ int WifiManager::Init()
         WifiTimer::GetInstance()->Register(timeoutCallback, migrateTimerId, TIMEOUT_CHECK_LAST_STA_STATE_EVENT);
         WIFI_LOGI("CheckAndStartStaByDatashare register success! migrateTimerId:%{public}u", migrateTimerId);
     }
+
+    if (!isPowerStateListenerSubscribered) {
+        RegisterPowerStateListener();
+    }
 #endif
     mInitStatus = INIT_OK;
     InitStaCallback();
@@ -725,6 +730,7 @@ void WifiManager::InitSubscribeListener()
 #ifndef OHOS_ARCH_LITE
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
     SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
+    SubscribeSystemAbility(POWER_MANAGER_SERVICE_ID);
 #endif
 }
 
@@ -799,6 +805,9 @@ void WifiManager::Exit()
     }
     if (batterySubscriber_ != nullptr) {
         UnRegisterBatteryEvent();
+    }
+    if (isPowerStateListenerSubscribered) {
+        UnRegisterPowerStateListener();
     }
 #endif
     return;
@@ -917,6 +926,11 @@ void WifiManager::CloseStaService(int instId)
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close sta SA!");
+        return;
+    }
+    if (WifiConfigCenter::GetInstance().GetPowerSleepState() == MODE_STATE_OPEN) {
+        WIFI_LOGI("PowerSleep not close sta SA!");
+        WifiManager::GetInstance().StopUnloadStaSaTimer();
         return;
     }
 #ifdef OHOS_ARCH_LITE
@@ -1399,6 +1413,18 @@ void WifiManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
                     pService->OnSystemAbilityChanged(systemAbilityId, add);
                 }
             }
+            break;
+        }
+        case POWER_MANAGER_SERVICE_ID: {
+            if (add) {
+                RegisterPowerStateListener();
+            } else {
+                UnRegisterPowerStateListener();
+            }
+
+            WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
+                systemAbilityId, add);
+
             break;
         }
         default:
@@ -2012,6 +2038,11 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
 {
     std::string action = data.GetWant().GetAction();
     WIFI_LOGI("ScreenEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+
+    int screenState = WifiSettings::GetInstance().GetScreenState();
+    int screenStateNew = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON)
+        ? MODE_STATE_OPEN : MODE_STATE_CLOSE;
+    WifiSettings::GetInstance().SetScreenState(screenStateNew);
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
         if (pService == nullptr) {
@@ -2019,7 +2050,6 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
             return;
         }
 
-        int screenState = WifiSettings::GetInstance().GetScreenState();
         IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
         if (pScanService == nullptr) {
             WIFI_LOGE("scan service is NOT start!");
@@ -2031,7 +2061,6 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
     #endif
         if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
             screenState == MODE_STATE_OPEN) {
-            WifiSettings::GetInstance().SetScreenState(MODE_STATE_CLOSE);
             if (pScanService->OnScreenStateChanged(MODE_STATE_CLOSE) != WIFI_OPT_SUCCESS) {
                 WIFI_LOGE("OnScreenStateChanged failed");
             }
@@ -2045,7 +2074,6 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
 
         if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
             screenState == MODE_STATE_CLOSE) {
-            WifiSettings::GetInstance().SetScreenState(MODE_STATE_OPEN);
             if (pScanService->OnScreenStateChanged(MODE_STATE_OPEN) != WIFI_OPT_SUCCESS) {
                 WIFI_LOGE("OnScreenStateChanged failed");
             }
@@ -2510,6 +2538,52 @@ void WifiManager::CheckAndStartStaByDatashare()
     std::unique_lock<std::mutex> lock(settingsMigrateMutex);
     WifiTimer::GetInstance()->UnRegister(migrateTimerId);
     migrateTimerId = 0;
+}
+
+void WifiManager::RegisterPowerStateListener()
+{
+    WIFI_LOGI("Enter WifiManager::RegisterPowerStateListener");
+    std::unique_lock<std::mutex> lock(powerStateEventMutex);
+
+    if (isPowerStateListenerSubscribered) {
+        WIFI_LOGI("WifiManager::RegisterPowerStateListener, powerStateListener_ already exist!");
+        return;
+    }
+
+    auto& powerManagerClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
+    powerStateListener_ = new (std::nothrow) WifiPowerStateListener();
+    if (!powerStateListener_) {
+        WIFI_LOGE("WifiManager::RegisterPowerStateListener, create power state listener failed");
+        return;
+    }
+
+    bool ret = powerManagerClient.RegisterSyncSleepCallback(powerStateListener_, SleepPriority::HIGH);
+    if (!ret) {
+        WIFI_LOGE("WifiManager::RegisterPowerStateListener, register power state callback failed");
+    } else {
+        WIFI_LOGI("WifiManager::RegisterPowerStateListener OK!");
+        isPowerStateListenerSubscribered = true;
+    }
+}
+
+void WifiManager::UnRegisterPowerStateListener()
+{
+    WIFI_LOGI("Enter WifiManager::UnRegisterPowerStateListener");
+    std::unique_lock<std::mutex> lock(powerStateEventMutex);
+
+    if (!isPowerStateListenerSubscribered) {
+        WIFI_LOGE("WifiManager::UnRegisterPowerStateListener, powerStateListener_ is nullptr");
+        return;
+    }
+
+    auto& powerManagerClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
+    bool ret = powerManagerClient.UnRegisterSyncSleepCallback(powerStateListener_);
+    if (!ret) {
+        WIFI_LOGE("WifiManager::UnRegisterPowerStateListener, unregister power state callback failed");
+    } else {
+        isPowerStateListenerSubscribered = false;
+        WIFI_LOGI("WifiManager::UnRegisterPowerStateListener OK!");
+    }
 }
 
 WifiTimer *WifiTimer::GetInstance()

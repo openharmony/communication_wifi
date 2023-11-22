@@ -57,6 +57,7 @@ WifiSettings::WifiSettings()
       mMaxNumConfigs(0),
       mScreenState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
+      mPowerSleepState(MODE_STATE_CLOSE),
       mDeviceProvision(MODE_STATE_OPEN),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
@@ -1732,6 +1733,16 @@ void WifiSettings::SetAirplaneModeState(const int &state)
 int WifiSettings::GetAirplaneModeState() const
 {
     return mAirplaneModeState.load();
+}
+
+void WifiSettings::SetPowerSleepState(const int &state)
+{
+    mPowerSleepState = state;
+}
+
+int WifiSettings::GetPowerSleepState() const
+{
+    return mPowerSleepState.load();
 }
 
 void WifiSettings::SetAppRunningState(ScanMode appRunMode)

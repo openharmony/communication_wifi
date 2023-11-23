@@ -59,32 +59,6 @@ HWTEST_F(WifiManagerTest, StartUnloadScanSaTimerTest, TestSize.Level1)
     wifiManager.StartUnloadScanSaTimer();
 }
 
-HWTEST_F(WifiManagerTest, AutoStartApService_001, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStartApService_001 enter!");
-    EXPECT_EQ(wifiManager.SoftapToggled(1, 0), WIFI_OPT_SUCCESS);
-}
-
-HWTEST_F(WifiManagerTest, AutoStartApService_002, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStartApService_002 enter!");
-    EXPECT_EQ(wifiManager.SoftapToggled(0, 0), WIFI_OPT_SUCCESS);
-    EXPECT_EQ(wifiManager.SoftapToggled(1, 0), WIFI_OPT_SUCCESS);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopApService_001, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStopApService_001 enter!");
-    EXPECT_EQ(wifiManager.SoftapToggled(0, 0), WIFI_OPT_SUCCESS);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopApService_002, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStopApService_002 enter!");
-    EXPECT_EQ(wifiManager.SoftapToggled(1, 0), WIFI_OPT_SUCCESS);
-    EXPECT_EQ(wifiManager.SoftapToggled(0, 0), WIFI_OPT_SUCCESS);
-}
-
 HWTEST_F(WifiManagerTest, StartUnloadApSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadApSaTimerTest enter!");

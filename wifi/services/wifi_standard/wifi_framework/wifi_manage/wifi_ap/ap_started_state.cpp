@@ -33,7 +33,7 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
-#ifndef OHOS_ARCH_LITE
+#ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
 #endif
 
@@ -421,7 +421,7 @@ void ApStartedState::SetHotspotIdleTimer()
 {
     WIFI_LOGI("SetHotspotIdleTimer.");
     int mTimeoutDelay = WifiSettings::GetInstance().GetHotspotIdleTimeout();
-#ifndef OHOS_ARCH_LITE
+#ifdef HAS_BATTERY_MANAGER_PART
     auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
     auto batteryPluggedType = batterySrvClient.GetPluggedType();
     if (batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_USB) {

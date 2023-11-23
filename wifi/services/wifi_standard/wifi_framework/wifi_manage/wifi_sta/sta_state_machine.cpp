@@ -2762,6 +2762,13 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
 
 void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)
 {
+    // for dhcp: 4-DHCP_OPT_RENEW_FAILED  5-DHCP_OPT_RENEW_TIMEOUT
+    if ((status == DHCP_RENEW_FAILED) || (status == DHCP_RENEW_TIMEOUT)) {
+        LOGI("DhcpResultNotify::OnFailed, ifname[%{public}s], status[%{public}d], reason[%{public}s]", ifname.c_str(),
+            status, reason.c_str());
+        pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+        return;
+    }
     LOGI("Enter DhcpResultNotify::OnFailed. ifname=[%s] status=[%d], reason = [%s], detailedState = [%d]\n",
         ifname.c_str(), status, reason.c_str(), static_cast<int>(pStaStateMachine->linkedInfo.detailedState));
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));

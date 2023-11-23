@@ -53,7 +53,6 @@ HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
     wifiManager.StartUnloadStaSaTimer();
 }
 
-
 HWTEST_F(WifiManagerTest, StartUnloadScanSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadScanSaTimerTest enter!");

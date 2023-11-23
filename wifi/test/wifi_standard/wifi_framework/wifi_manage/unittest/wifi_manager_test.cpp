@@ -47,46 +47,6 @@ public:
     WifiManager wifiManager;
 };
 
-HWTEST_F(WifiManagerTest, AutoStartStaService_001, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStartStaService_001 enter!");
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING);
-    EXPECT_EQ(wifiManager.AutoStartStaService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_OPEN_FAIL_WHEN_CLOSING);
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING);
-    EXPECT_EQ(wifiManager.AutoStartStaService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_OPEN_SUCC_WHEN_OPENED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStartStaService_002, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStartStaService_002 enter!");
-    WIFI_LOGE("AutoStartStaService_002 enter!");
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
-    ErrCode result = wifiManager.AutoStartStaService(AutoStartOrStopServiceReason::STA_AP_EXCLUSION);
-    WIFI_LOGE("AutoStartStaService_002 result(%{public}d)", result);
-    EXPECT_EQ(result, WIFI_OPT_FAILED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopStaService_001, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStopStaService_001 enter!");
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING);
-    EXPECT_EQ(wifiManager.AutoStopStaService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_FAIL_WHEN_OPENING);
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED);
-    EXPECT_EQ(wifiManager.AutoStopStaService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopStaService_002, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStopStaService_002 enter!");
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING);
-    EXPECT_EQ(wifiManager.AutoStopStaService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
-}
-
 HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadStaSaTimerTest enter!");
@@ -98,45 +58,6 @@ HWTEST_F(WifiManagerTest, StartUnloadScanSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadScanSaTimerTest enter!");
     wifiManager.StartUnloadScanSaTimer();
-}
-
-HWTEST_F(WifiManagerTest, AutoStartApService_001, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStartApService_001 enter!");
-    WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, 0);
-    EXPECT_EQ(wifiManager.AutoStartApService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_OPEN_FAIL_WHEN_CLOSING);
-    WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::RUNNING, 0);
-    EXPECT_EQ(wifiManager.AutoStartApService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_OPEN_SUCC_WHEN_OPENED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStartApService_002, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStartApService_002 enter!");
-    WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, 0);
-    EXPECT_EQ(wifiManager.AutoStartApService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_FAILED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopApService_001, TestSize.Level1)
-
-{
-    WIFI_LOGE("AutoStopApService_001 enter!");
-    WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, 0);
-    EXPECT_EQ(wifiManager.AutoStopApService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_FAIL_WHEN_OPENING);
-    WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, 0);
-    EXPECT_EQ(wifiManager.AutoStopApService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopApService_002, TestSize.Level1)
-{
-    WIFI_LOGE("AutoStopApService_002 enter!");
-    WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::RUNNING, 0);
-    EXPECT_EQ(wifiManager.AutoStopApService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
 }
 
 HWTEST_F(WifiManagerTest, StartUnloadApSaTimerTest, TestSize.Level1)

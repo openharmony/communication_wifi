@@ -22,7 +22,7 @@ namespace Wifi {
 class WifiHalChbaInterfaceTest : public testing::Test {
 public:
     static void SetUpTestCase();
-    static void TearDownTestCase();
+    static void TearDownTestCase()
     {}
     virtual void SetUp()
     {}

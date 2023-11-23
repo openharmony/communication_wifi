@@ -84,7 +84,8 @@ ohos_shared_library("wifi_ap_service") {
     "hilog:libhilog",
   ]
 
-  if (defined(global_parts_info.powermgr_battery_manager)) {
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.powermgr_battery_manager)) {
     external_deps += [ "battery_manager:batterysrv_client" ]
     cflags_cc += [ "-DHAS_BATTERY_MANAGER_PART" ]
   }

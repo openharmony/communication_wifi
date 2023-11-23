@@ -14,7 +14,7 @@
  */
 
 #include "wifi_hal_chba_interface_test.h"
-#include "server.h"
+#include "securec.h"
 #include "wifi_log.h"
 #include "wifi_hal_chba_interface.h"
 #include "mock_wpa_ctrl.h"

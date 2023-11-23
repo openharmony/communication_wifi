@@ -777,9 +777,9 @@ private:
     /**
      * @Description : is wpa3 transition mode.
      *
-     * @param networkId - networkId
+     * @param ssid - ssid
      */
-    bool IsWpa3Transition(int networkId) const;
+    bool IsWpa3Transition(std::string ssid) const;
 
     /**
      * @Description : get wpa3 failreason connect fail count
@@ -818,13 +818,6 @@ private:
      * @param networkId - networkId
      */
     void OnWifiWpa3SelfCure(int failreason, int networkId);
-
-    /**
-     * @Description : wpa3 transition change keymgmt
-     *
-     * @param networkId - networkId
-     */
-    void Wpa3TransitionChangeIfNeed(int networkId);
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Subscribe system ability changed.

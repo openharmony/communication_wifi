@@ -453,15 +453,23 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
         idlConfig.authAlgorithms = 0x02;
     }
 
+    if (IsWpa3Transition(config.ssid)) {
+        if (IsInWpa3BlackMap(config.ssid)) {
+            idlConfig.keyMgmt = KEY_MGMT_WPA_PSK;
+        } else {
+            idlConfig.keyMgmt = KEY_MGMT_SAE;
+        }
+        idlConfig.isRequirePmf = false;
+    }
+
     if (config.keyMgmt.find("SAE") != std::string::npos) {
+        idlConfig.isRequirePmf = true;
+    }
+
+    if (idlConfig.keyMgmt.find("SAE") != std::string::npos) {
         idlConfig.allowedProtocols = 0x02; // RSN
         idlConfig.allowedPairwiseCiphers = 0x2c; // CCMP|GCMP|GCMP-256
         idlConfig.allowedGroupCiphers = 0x2c; // CCMP|GCMP|GCMP-256
-        if (IsWpa3Transition(idlConfig.networkId)) {
-            idlConfig.isRequirePmf = false;
-        } else {
-            idlConfig.isRequirePmf = true;
-        }
     }
 
     for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
@@ -960,32 +968,6 @@ void StaStateMachine::OnConnectFailed(int networkId)
     WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
 }
 
-void StaStateMachine::Wpa3TransitionChangeIfNeed(int networkId)
-{
-    WifiDeviceConfig deviceConfig;
-    bool isNeedChange = false;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
-        LOGE("Wpa3TransitionChangeIfNeed get deviceConfig failed!");
-        return;
-    }
-    if (IsWpa3Transition(networkId)
-            && deviceConfig.keyMgmt.find("SAE") != std::string::npos
-            && IsInWpa3BlackMap(deviceConfig.ssid)) {
-        deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
-        isNeedChange = true;
-    } else if (IsWpa3Transition(networkId)
-                   && deviceConfig.keyMgmt.find("PSK") != std::string::npos
-                   && !IsInWpa3BlackMap(deviceConfig.ssid)) {
-        deviceConfig.keyMgmt = KEY_MGMT_SAE;
-        isNeedChange = true;
-    }
-    if (isNeedChange) {
-        WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
-        WifiSettings::GetInstance().SyncDeviceConfig();
-        SyncDeviceConfigToWpa();
-    }
-}
-
 void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
 {
     LOGD("enter DealConnectToUserSelectedNetwork.\n");
@@ -1000,7 +982,6 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
         linkedInfo.retryedConnCount = 0;
     }
     WriteWifiConnectionInfoHiSysEvent(networkId);
-    Wpa3TransitionChangeIfNeed(networkId);
     if (networkId == linkedInfo.networkId) {
         if (linkedInfo.connState == ConnState::CONNECTED) {
             InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
@@ -1495,6 +1476,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
         LOGE("EnableNetwork() failed!");
         return WIFI_OPT_FAILED;
     }
+    SyncDeviceConfigToWpa();
 
     if (WifiStaHalInterface::GetInstance().Connect(targetNetworkId) != WIFI_IDL_OPT_OK) {
         LOGE("Connect failed!");
@@ -1619,7 +1601,7 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
         WIFI_LOGE("OnWifiWpa3SelfCure, get deviceconfig failed");
         return;
     }
-    if (config.keyMgmt.find("SAE") == std::string::npos || !IsWpa3Transition(networkId)) {
+    if (!IsWpa3Transition(config.ssid)) {
         WIFI_LOGE("OnWifiWpa3SelfCure, is not wpa3 transition");
         return;
     }
@@ -1641,17 +1623,12 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
     SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
 }
 
-bool StaStateMachine::IsWpa3Transition(int networkId) const
+bool StaStateMachine::IsWpa3Transition(std::string ssid) const
 {
-    WifiDeviceConfig deviceConfig;
     std::vector<WifiScanInfo> scanInfoList;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
-        LOGE("IsWpa3Transition, GetDeviceConfig failed!");
-        return false;
-    }
     WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
     for (auto scanInfo : scanInfoList) {
-        if ((deviceConfig.ssid == scanInfo.ssid) &&
+        if ((ssid == scanInfo.ssid) &&
             (scanInfo.capabilities.find("PSK+SAE") != std::string::npos)) {
             LOGI("IsWpa3Transition, check is transition");
             return true;

@@ -1672,12 +1672,6 @@ public:
         pStaStateMachine->DealSignalPacketChanged(0, 0);
     }
 
-    void Wpa3TransitionChangeIfNeedTest()
-    {
-        int networkId = 0;
-        pStaStateMachine->Wpa3TransitionChangeIfNeed(networkId);
-    }
-
     void GetWpa3FailCountSuccessTest()
     {
         int failreason = 0;
@@ -1734,8 +1728,7 @@ public:
 
     void IsWpa3TransitionTest()
     {
-        int networkId = 0;
-        pStaStateMachine->IsWpa3Transition(networkId);
+        pStaStateMachine->IsWpa3Transition(RANDOMMAC_SSID);
     }
 };
 
@@ -2648,11 +2641,6 @@ HWTEST_F(StaStateMachineTest, DealSignalPollResultTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealSignalPacketChangedTest, TestSize.Level1)
 {
     DealSignalPacketChangedTest();
-}
-
-HWTEST_F(StaStateMachineTest, Wpa3TransitionChangeIfNeedTest, TestSize.Level1)
-{
-    Wpa3TransitionChangeIfNeedTest();
 }
 
 HWTEST_F(StaStateMachineTest, GetWpa3FailCountSuccessTest, TestSize.Level1)

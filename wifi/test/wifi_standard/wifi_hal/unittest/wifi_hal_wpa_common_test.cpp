@@ -28,12 +28,10 @@ namespace OHOS {
 namespace Wifi {
 void WifiHalWpaCommonTest::SetUpTestCase()
 {
-
 }
 
 void WifiHalWpaCommonTest::TearDownTestCase()
 {
-
 }
 
 HWTEST_F(WifiHalWpaCommonTest, SendComCmdTest, TestSize.Level1)

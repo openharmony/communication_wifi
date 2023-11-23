@@ -83,6 +83,7 @@ ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport)
             isReport = true;
             return ConnState::CONNECTED;
         case OperateResState::CONNECT_NETWORK_ENABLED:
+        case OperateResState::CONNECT_CHECK_PORTAL:
             isReport = false;
             return ConnState::UNKNOWN;
         case OperateResState::CONNECT_NETWORK_DISABLED:

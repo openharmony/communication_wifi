@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include "server.h"
+#include "wifi_hal_wpa_common_test.h"
+#include "securec.h"
 #include "wifi_log.h"
 #include "wifi_common_hal.h"
 #include "mock_wpa_ctrl.h"

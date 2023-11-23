@@ -32,12 +32,12 @@
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
-constexpr size_t MAP_DEVICE_NUMS = 50;
+constexpr size_t MAP_DEVICE_NUMS = 100;
+constexpr int INS_ID = 0;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiDeviceService";
 const std::u16string FORMMGR_INTERFACE_TOKEN_EX = u"ohos.wifi.IWifiDeviceMgr";
 sptr<WifiDeviceMgrStub> pWifiDeviceMgrStub = WifiDeviceMgrServiceImpl::GetInstance();
-std::map<int, sptr<IRemoteObject>> &deviceServiceMgr = WifiDeviceMgrServiceImpl::GetInstance()->GetDeviceServiceMgr();
-sptr<WifiDeviceStub> pWifiDeviceStub = iface_cast<WifiDeviceServiceImpl>(deviceServiceMgr[0]);
+sptr<WifiDeviceStub> pWifiDeviceStub = new (std::nothrow) WifiDeviceServiceImpl(INS_ID);
 
 bool DoSomethingInterestingWithMyAPIEx(const uint8_t* data, size_t size)
 {

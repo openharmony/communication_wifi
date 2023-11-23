@@ -31,7 +31,6 @@ public:
     {}
     virtual void TearDown()
     {}
-
 };
 }  // namespace Wifi
 }  // namespace OHOS

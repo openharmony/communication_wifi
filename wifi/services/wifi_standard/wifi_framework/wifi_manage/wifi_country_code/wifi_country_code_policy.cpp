@@ -15,7 +15,9 @@
 
 #include "wifi_country_code_policy.h"
 #include <memory>
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
 #include "core_service_client.h"
+#endif
 #include "datashare_helper.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
@@ -236,7 +238,7 @@ ErrCode WifiCountryCodePolicy::FindLargestCountCountryCode(std::string &wifiCoun
         const std::pair<std::string, int> &b) {
         return a.second > b.second;
     });
-    if (sortCode.size() < 0) {
+    if (sortCode.size() <= 0) {
         return WIFI_OPT_FAILED;
     }
     if (sortCode.size() == 1) {

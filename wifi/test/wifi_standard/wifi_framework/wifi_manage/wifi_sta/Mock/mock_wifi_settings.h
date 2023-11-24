@@ -80,8 +80,6 @@ public:
     virtual int GetRealMacAddress(std::string &macAddress, int instId = 0) = 0;
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
-    virtual void GetPortaUri(WifiPortalConf &urlInfo) = 0;
-    virtual int GetP2pInfo(WifiP2pLinkedInfo &LinkedInfo) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -144,8 +142,6 @@ public:
     MOCK_METHOD2(GetRealMacAddress, int(std::string &macAddress, int));
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
-    MOCK_METHOD1(GetPortaUri, void(WifiPortalConf &urlInfo));
-    MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &LinkedInfo));
 };
 }  // namespace OHOS
 }  // namespace Wifi

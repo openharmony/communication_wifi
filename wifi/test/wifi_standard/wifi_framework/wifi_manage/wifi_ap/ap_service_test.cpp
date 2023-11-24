@@ -20,6 +20,7 @@
 #include "operator_overload.h"
 #include "mock_wifi_ap_hal_interface.h"
 #include "i_ap_service_callbacks.h"
+#include "wifi_logger.h"
 
 using namespace OHOS;
 using ::testing::_;
@@ -30,6 +31,8 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+
+DEFINE_WIFILOG_LABEL("ApServiceTest");
 
 namespace OHOS {
 namespace Wifi {
@@ -286,6 +289,14 @@ HWTEST_F(ApService_test, SetPowerModelFailed, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_CALL(WifiSettings::GetInstance(), SetPowerModel(_, _)).WillRepeatedly(Return(ErrCode::WIFI_OPT_SUCCESS));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->SetPowerModel(model));
+}
+
+HWTEST_F(ApService_test, OnWifiCountryCodeChangedSuccess, TestSize.Level1)
+{
+    WIFI_LOGI("OnWifiCountryCodeChangedSuccess enter");
+    std::string countryCode = "CN";
+    pApService->EnableHotspot();
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->m_apObserver->OnWifiCountryCodeChanged(countryCode));
 }
 } // namespace Wifi
 } // namespace OHOS

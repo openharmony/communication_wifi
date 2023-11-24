@@ -28,6 +28,7 @@ ohos_unittest("toolkit_unittest") {
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_file_spec.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_settings.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/log_helper.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/arp_checker.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/base_address.cpp",
@@ -41,8 +42,11 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/mac_address.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/network_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/raw_socket.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/network_parser.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/softap_parser.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_encryption_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/xml_parser.cpp",
     "arp_checker_test.cpp",
     "base_address_test.cpp",
     "dhcpd_interface_test.cpp",
@@ -52,12 +56,16 @@ ohos_unittest("toolkit_unittest") {
     "ipv6_address_test.cpp",
     "mac_address_test.cpp",
     "network_interface_test.cpp",
+    "network_parser_test.cpp",
     "raw_socket_test.cpp",
+    "softap_parser_test.cpp",
     "wifi_config_file_test.cpp",
     "wifi_encryption_util_test.cpp",
     "wifi_global_func_test.cpp",
     "wifi_ip_tools_test.cpp",
     "wifi_log_helper_test.cpp",
+    "wifi_settings_test.cpp",
+    "xml_parser_test.cpp",
   ]
 
   include_dirs = [
@@ -81,10 +89,12 @@ ohos_unittest("toolkit_unittest") {
   deps = [
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
+    "//third_party/libxml2:xml2",
   ]
   defines = [
     "private = public",
     "protected = public",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
   ]
   external_deps = [
     "c_utils:utils",

@@ -26,6 +26,8 @@
 #include "mock_wifi_supplicant_hal_interface.h"
 #include "sta_define.h"
 #include "sta_state_machine.h"
+#include "wifi_internal_msg.h"
+#include "wifi_msg.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -96,7 +98,9 @@ public:
     void RootStateExeMsgSuccess()
     {
         InternalMessage msg;
-        EXPECT_FALSE(pStaStateMachine->pRootState->ExecuteStateMsg(&msg));
+        msg.SetMessageName(WIFI_SVR_CMD_UPDATE_COUNTRY_CODE);
+        msg.AddStringMessageBody("CN");
+        EXPECT_TRUE(pStaStateMachine->pRootState->ExecuteStateMsg(&msg));
     }
 
     void RootStateExeMsgFail()
@@ -1730,6 +1734,41 @@ public:
     {
         pStaStateMachine->IsWpa3Transition(RANDOMMAC_SSID);
     }
+
+    void InvokeOnStaOpenRes(const OperateResState &state)
+    {
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(AtLeast(0));
+        pStaStateMachine->InvokeOnStaOpenRes(state);
+    }
+
+    void InvokeOnStaCloseRes(const OperateResState &state)
+    {
+        pStaStateMachine->InvokeOnStaCloseRes(state);
+    }
+
+    void InvokeOnStaConnChanged(const OperateResState &state, WifiLinkedInfo &info)
+    {
+        pStaStateMachine->GetLinkedInfo(info);
+        if (info.connState == ConnState::CONNECTED) {
+            pStaStateMachine->InvokeOnStaConnChanged(state, info);
+        }
+    }
+
+    void InvokeOnWpsChanged(const WpsStartState &state, const int code)
+    {
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
+        pStaStateMachine->InvokeOnWpsChanged(state, 0);
+    }
+
+    void InvokeOnStaStreamChanged(const StreamDirection &direction)
+    {
+        pStaStateMachine->InvokeOnStaStreamChanged(direction);
+    }
+
+    void InvokeOnStaRssiLevelChanged(int level)
+    {
+        pStaStateMachine->InvokeOnStaRssiLevelChanged(level);
+    }
 };
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
@@ -2686,6 +2725,38 @@ HWTEST_F(StaStateMachineTest, OnWifiWpa3SelfCureFailTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, IsWpa3TransitionTest, TestSize.Level1)
 {
     IsWpa3TransitionTest();
+}
+
+HWTEST_F(StaStateMachineTest, InvokeOnStaOpenResTest, TestSize.Level1)
+{
+    InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
+}
+
+HWTEST_F(StaStateMachineTest, InvokeOnStaCloseResTest, TestSize.Level1)
+{
+    InvokeOnStaCloseRes(OperateResState::OPEN_WIFI_SUCCEED);
+}
+
+HWTEST_F(StaStateMachineTest, InvokeOnStaConnChangedTest, TestSize.Level1)
+{
+    WifiLinkedInfo linkedInfo;
+    InvokeOnStaConnChanged(OperateResState::OPEN_WIFI_SUCCEED, linkedInfo);
+}
+
+HWTEST_F(StaStateMachineTest, InvokeOnWpsChangedTest, TestSize.Level1)
+{
+    InvokeOnWpsChanged(WpsStartState::START_PBC_SUCCEED, 0);
+}
+
+HWTEST_F(StaStateMachineTest, InvokeOnStaStreamChangedTest, TestSize.Level1)
+{
+    InvokeOnStaStreamChanged(StreamDirection::STREAM_DIRECTION_UP);
+}
+
+HWTEST_F(StaStateMachineTest, InvokeOnStaRssiLevelChangedTest, TestSize.Level1)
+{
+    int rssi = -61;
+    InvokeOnStaRssiLevelChanged(rssi);
 }
 } // namespace Wifi
 } // namespace OHOS

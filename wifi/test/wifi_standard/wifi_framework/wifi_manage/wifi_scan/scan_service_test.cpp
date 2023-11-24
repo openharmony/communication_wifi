@@ -795,7 +795,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), WillOnce()).WillOnce(Return(""));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillOnce(Return(""));
         pScanService->RestartPnoScanTimeOut();
     }
 

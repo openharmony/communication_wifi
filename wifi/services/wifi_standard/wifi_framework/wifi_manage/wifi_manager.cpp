@@ -33,6 +33,7 @@
 #include "wifi_location_mode_observer.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_protect_manager.h"
+#include "wifi_power_state_listener.h"
 #include "parameter.h"
 #include "suspend/sleep_priority.h"
 #endif
@@ -43,6 +44,7 @@
 #include "wifi_config_center.h"
 #include "wifi_common_def.h"
 #include "wifi_hisysevent.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -68,6 +70,7 @@ static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
 static bool islocationModeObservered = false;
 static sptr<WifiDeviceProvisionObserver> deviceProvisionObserver_ = nullptr;
 static sptr<SettingsMigrateObserver> settingsMigrateObserver_ = nullptr;
+static sptr<WifiPowerStateListener> powerStateListener_ = nullptr;
 #endif
 
 WifiManager &WifiManager::GetInstance()
@@ -1080,6 +1083,48 @@ void WifiManager::CloseP2pService(void)
 }
 #endif
 
+#ifdef FEATURE_HPF_SUPPORT
+void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
+{
+    WIFI_LOGD("%{public}s enter screenState: %{public}d, instId: %{public}d", __FUNCTION__, screenState, instId);
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGW("%{public}s pEnhanceService is nullptr", __FUNCTION__);
+        return;
+    }
+    // fill mac address arr
+    unsigned char macAddr[WIFI_MAC_LEN] = {0};
+    std::string macStr;
+    WifiSettings::GetInstance().GetRealMacAddress(macStr, instId);
+    WIFI_LOGD("%{public}s convert mac from str to arr success, macStr: %{public}s",
+        __FUNCTION__, OHOS::Wifi::MacAnonymize(macStr).c_str());
+    if (OHOS::Wifi::MacStrToArray(macStr, macAddr) != EOK) {
+        WIFI_LOGW("%{public}s get mac addr fail, set default mac addr", __FUNCTION__);
+        if (memset_s(macAddr, WIFI_MAC_LEN, 0x00, WIFI_MAC_LEN) != EOK) {
+            WIFI_LOGE("%{public}s set default mac addr fail", __FUNCTION__);
+        }
+    }
+    // get number ip and net mask
+    IpInfo ipInfo;
+    WifiSettings::GetInstance().GetIpInfo(ipInfo, instId);
+    if (ipInfo.ipAddress == 0 || ipInfo.netmask == 0) {
+        WIFI_LOGW("%{public}s cannot get device ip address", __FUNCTION__);
+    }
+    std::string ipAddrStr = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
+    std::string ipMaskStr = IpTools::ConvertIpv4Mask(ipInfo.netmask);
+    int netMaskLen = IpTools::GetMaskLength(ipMaskStr);
+    WIFI_LOGD("%{public}s get ip info ipaddrStr: %{public}s, ipMaskStr: %{public}s, netMaskLen: %{public}d",
+        __FUNCTION__,
+        OHOS::Wifi::MacAnonymize(ipAddrStr).c_str(), OHOS::Wifi::MacAnonymize(ipMaskStr).c_str(), netMaskLen);
+    if (pEnhanceService->InstallFilterProgram(
+        ipInfo.ipAddress, netMaskLen, macAddr, WIFI_MAC_LEN, screenState) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("%{public}s InstallFilterProgram fail", __FUNCTION__);
+        return;
+    }
+    WIFI_LOGE("%{public}s InstallFilterProgram success", __FUNCTION__);
+}
+#endif
+
 void WifiManager::DealCloseServiceMsg(WifiManager &manager)
 {
     const int waitDealTime = 10 * 1000; /* 10 ms */
@@ -1303,6 +1348,12 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
 #ifdef FEATURE_P2P_SUPPORT
     if (cfgMonitorCallback.onStaConnectionChange != nullptr) {
         cfgMonitorCallback.onStaConnectionChange(static_cast<int>(state));
+    }
+#endif
+#ifdef FEATURE_HPF_SUPPORT
+    if (state == OperateResState::CONNECT_AP_CONNECTED) {
+        int screenState = WifiSettings::GetInstance().GetScreenState();
+        WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
     }
 #endif
 #ifndef OHOS_ARCH_LITE

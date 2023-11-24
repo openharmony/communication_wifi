@@ -27,6 +27,7 @@
 #include "wifi_cert_utils.h"
 #include "wifi_common_util.h"
 #include "wifi_config_center.h"
+#include "wifi_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -588,6 +589,9 @@ void StaService::HandleScreenStatusChanged(int screenState)
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
+#endif
+#ifdef FEATURE_HPF_SUPPORT
+    WifiManager::GetInstance().InstallPacketFilterProgram(screenState, m_instId);
 #endif
     return;
 }

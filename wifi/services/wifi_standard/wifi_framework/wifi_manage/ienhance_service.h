@@ -46,6 +46,19 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetEnhanceParam(int64_t availableTime) = 0;
+
+    /**
+     * @Description Install Paket Filter Program
+     *
+     * @param ipAddr - ip address
+     * @param netMaskLen - net mask length
+     * @param macAddr - mac address
+     * @param macLen - mac address length
+     * @param screenState - screen state
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode InstallFilterProgram(
+        unsigned int ipAddr, int netMaskLen, const unsigned char *macAddr, int macLen, int screenState) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -44,6 +44,7 @@ namespace Wifi {
 static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
+constexpr int FAILEDNUM = 3;
 constexpr int TEST_FAIL_REASON = 16;
 
 class StaStateMachineTest : public testing::Test {
@@ -52,7 +53,6 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine.reset(new StaStateMachine());
         pStaStateMachine->InitStaStateMachine();
         pStaStateMachine->InitWifiLinkedInfo();
@@ -1533,7 +1533,7 @@ public:
 
     void OnNetManagerRestartFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(_)).WillRepeatedly(Return(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(_)).WillRepeatedly(Return(FAILEDNUM));
         pStaStateMachine->OnNetManagerRestart();
     }
 
@@ -1773,6 +1773,7 @@ public:
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
 {
+    DealConnectTimeOutCmd();
 }
 
 HWTEST_F(StaStateMachineTest, RootStateGoInStateSuccess, TestSize.Level1)
@@ -1987,10 +1988,12 @@ HWTEST_F(StaStateMachineTest, InitStaSMHandleMapSuccess, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkSuccess, TestSize.Level1)
 {
+    DealConnectToUserSelectedNetworkSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFail, TestSize.Level1)
 {
+    DealConnectToUserSelectedNetworkFail();
 }
 /**
  * @tc.name: DealConnectToUserSelectedNetworkFai2
@@ -2000,6 +2003,7 @@ HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFail, TestSize.Lev
 */
 HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFai2, TestSize.Level1)
 {
+    DealConnectToUserSelectedNetworkFai2();
 }
 /**
  * @tc.name: DealConnectToUserSelectedNetworkFail1
@@ -2009,10 +2013,12 @@ HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFai2, TestSize.Lev
 */
 HWTEST_F(StaStateMachineTest, DealConnectToUserSelectedNetworkFail1, TestSize.Level1)
 {
+    DealConnectToUserSelectedNetworkFail1();
 }
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmdSuccess, TestSize.Level1)
 {
+    DealConnectTimeOutCmdSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmdFail, TestSize.Level1)
@@ -2032,6 +2038,7 @@ HWTEST_F(StaStateMachineTest, DealDisconnectEventSuccess2, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, DealWpaWrongPskEventFail1, TestSize.Level1)
 {
+    DealWpaWrongPskEventFail1();
 }
 /**
  * @tc.name: DealWpaWrongPskEventFail2
@@ -2508,7 +2515,6 @@ HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess3, TestSize.Level1)
 {
     ConnectToNetworkProcessSuccess3();
 }
-
 HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessFail, TestSize.Level1)
 {
     ConnectToNetworkProcessFail();
@@ -2631,10 +2637,12 @@ HWTEST_F(StaStateMachineTest, DealReConnectCmdSuccess, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, DealConnectionEventFail, TestSize.Level1)
 {
+    DealConnectionEventFail();
 }
 
 HWTEST_F(StaStateMachineTest, DealConnectionEventSuccess, TestSize.Level1)
 {
+    DealConnectionEventSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, OnConnectFailedTest, TestSize.Level1)

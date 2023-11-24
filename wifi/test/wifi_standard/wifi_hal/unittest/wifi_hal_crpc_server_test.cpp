@@ -27,6 +27,9 @@
 #include "mock_wpa_ctrl.h"
 #include "wifi_hal_common_func.h"
 
+#undef LOG_TAG
+#define LOG_TAG "WifiHalCRpcServerTest"
+
 using namespace testing::ext;
 
 namespace OHOS {
@@ -1461,6 +1464,35 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetSuspendModeTest, TestSize.Level1)
     mContext->nPos = strlen("N\tRpcSetSuspendMode\t");
     mContext->nSize = strlen(buff1);
     EXPECT_TRUE(RpcSetSuspendMode(mServer, mContext) == 0);
+}
+
+HWTEST_F(WifiHalCRpcServerTest, RpcGetCommonCmdTest, TestSize.Level1)
+{
+    LOGE("enter RpcGetCommonCmdTest");
+    EXPECT_TRUE(RpcGetCommonCmd(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcGetCommonCmd(mServer, nullptr) < 0);
+
+    char buff[] = "N\tRpcGetCommonCmd\tchba0";
+    mContext->oneProcess = buff;
+    mContext->nPos = strlen("N\tRpcGetCommonCmd\t");
+    mContext->nSize = strlen(buff);
+    EXPECT_TRUE(RpcGetCommonCmd(mServer, mContext) == -1);
+}
+
+HWTEST_F(WifiHalCRpcServerTest, RpcChbaStartTest, TestSize.Level1)
+{
+    LOGE("enter RpcChbaStartTest");
+    EXPECT_TRUE(RpcChbaStart(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcChbaStart(mServer, nullptr) < 0);
+    EXPECT_TRUE(RpcChbaStart(mServer, mContext) == 0);
+}
+
+HWTEST_F(WifiHalCRpcServerTest, RpcChbaStopTest, TestSize.Level1)
+{
+    LOGE("enter RpcChbaStopTest");
+    EXPECT_TRUE(RpcChbaStop(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcChbaStop(mServer, nullptr) < 0);
+    EXPECT_TRUE(RpcChbaStop(mServer, mContext) == 0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

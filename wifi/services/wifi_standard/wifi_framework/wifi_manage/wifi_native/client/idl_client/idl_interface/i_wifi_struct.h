@@ -24,7 +24,7 @@ extern "C" {
 #define WIFI_BSSID_LENGTH 18
 #define WIFI_REASON_LENGTH 32
 #define WIFI_NETWORK_FLAGS_LENGTH 64
-#define WIFI_SCAN_INFO_CAPABILITIES_LENGTH 256
+#define WIFI_SCAN_INFO_CAPABILITY_LENGTH 256
 #define WIFI_NETWORK_CONFIG_NAME_LENGTH 64
 #define WIFI_NETWORK_CONFIG_VALUE_LENGTH 256
 #define WIFI_MAC_ADDR_LENGTH 17
@@ -94,18 +94,17 @@ typedef struct ScanInfoElem {
 typedef struct ScanInfo {
     char ssid[WIFI_SSID_LENGTH];
     char bssid[WIFI_BSSID_LENGTH];
-    int frequency;
+    int freq;
     int channelWidth;
     int centerFrequency0;
     int centerFrequency1;
     ScanInfoElem* infoElems;
     int ieSize;
     int64_t features;
-    int signalLevel;
-    char capability[WIFI_SCAN_INFO_CAPABILITIES_LENGTH];
+    int siglv;
+    char flags[WIFI_SCAN_INFO_CAPABILITY_LENGTH];
     int64_t timestamp;
-    int associated;
-    int antValue;
+    int ant;
     int isVhtInfoExist;
     int isHtInfoExist;
     int isHeInfoExist;
@@ -161,6 +160,12 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_END_POS, /* Number of network configuration parameters, which is used as the last parameter. */
 } DeviceConfigType;
 
+typedef struct WpaSsidField {
+    DeviceConfigType field;
+    char fieldName[WIFI_NETWORK_CONFIG_NAME_LENGTH];
+    int flag; /* 0 need add "" 1 no need */
+} WpaSsidField;
+
 typedef struct SetNetworkConfig {
     DeviceConfigType cfgParam;                       /* param */
     char cfgValue[WIFI_NETWORK_CONFIG_VALUE_LENGTH]; /* param value */
@@ -215,6 +220,15 @@ typedef struct CStationInfo {
     int type;
     char mac[WIFI_MAC_ADDR_LENGTH + 1];
 } CStationInfo;
+
+struct NeedParseIe {
+    ScanInfoElem* ieExtern;
+    ScanInfoElem* ieVhtOper;
+    ScanInfoElem* ieHtOper;
+    ScanInfoElem* ieMaxRate;
+    ScanInfoElem* ieErp;
+    ScanInfoElem* ieExtMaxRate;
+};
 
 typedef struct IWifiApEventCallback {
     void (*onStaJoinOrLeave)(const CStationInfo *info, int id);

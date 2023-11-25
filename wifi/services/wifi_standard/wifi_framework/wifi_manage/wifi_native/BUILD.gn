@@ -35,6 +35,8 @@ config("wifi_fw_common_header") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
   ]
   if (defined(ohos_lite)) {
@@ -67,6 +69,10 @@ config("wifi_idl_cxx_config") {
 idl_client_sources = [
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_msg.cpp",
+  "client/hdi_client/hdi_interface/wifi_hdi_wpa_proxy.c",
+  "client/hdi_client/hdi_interface/wifi_hdi_wpa_sta_impl.c",
+  "client/hdi_client/wifi_hdi_wpa_callback.cpp",
+  "client/hdi_client/wifi_hdi_wpa_client.cpp",
   "client/idl_client/idl_interface/i_wifi.c",
   "client/idl_client/idl_interface/i_wifi_chip.c",
   "client/idl_client/idl_interface/i_wifi_hotspot_iface.c",
@@ -163,6 +169,9 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdi",
+      "hdf_core:libpub_utils",
       "hilog:libhilog",
     ]
 

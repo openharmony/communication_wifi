@@ -285,10 +285,10 @@ WifiErrorNo WifiIdlClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
         InterScanInfo tmp;
         tmp.ssid = results[i].ssid;
         tmp.bssid = results[i].bssid;
-        tmp.frequency = results[i].frequency;
-        tmp.rssi = results[i].signalLevel;
+        tmp.frequency = results[i].freq;
+        tmp.rssi = results[i].siglv;
         tmp.timestamp = results[i].timestamp;
-        tmp.capabilities = results[i].capability;
+        tmp.capabilities = results[i].flags;
         tmp.channelWidth = (WifiChannelWidth)results[i].channelWidth;
         tmp.centerFrequency0 = results[i].centerFrequency0;
         tmp.centerFrequency1 = results[i].centerFrequency1;

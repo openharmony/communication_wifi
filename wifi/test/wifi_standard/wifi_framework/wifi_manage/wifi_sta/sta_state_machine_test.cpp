@@ -25,6 +25,7 @@
 #include "mock_wifi_sta_hal_interface.h"
 #include "mock_wifi_supplicant_hal_interface.h"
 #include "sta_define.h"
+#include "define.h"
 #include "sta_state_machine.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
@@ -1769,6 +1770,16 @@ public:
     {
         pStaStateMachine->InvokeOnStaRssiLevelChanged(level);
     }
+
+    void DealScreenStateChangedEventTest()
+    {
+        InternalMessage msg;
+        pStaStateMachine->DealScreenStateChangedEvent(nullptr);
+        msg.SetParam1(static_cast<int>(MODE_STATE_OPEN));
+        pStaStateMachine->DealScreenStateChangedEvent(&msg);
+        msg.SetParam1(static_cast<int>(MODE_STATE_CLOSE));
+        pStaStateMachine->DealScreenStateChangedEvent(&msg);
+    }
 };
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
@@ -2757,6 +2768,17 @@ HWTEST_F(StaStateMachineTest, InvokeOnStaRssiLevelChangedTest, TestSize.Level1)
 {
     int rssi = -61;
     InvokeOnStaRssiLevelChanged(rssi);
+}
+
+/**
+ * @tc.name: DealScreenStateChangedEventTest
+ * @tc.desc: DealScreenStateChangedEvent()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest, TestSize.Level1)
+{
+    DealScreenStateChangedEventTest();
 }
 } // namespace Wifi
 } // namespace OHOS

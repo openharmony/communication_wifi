@@ -818,6 +818,14 @@ private:
      * @param networkId - networkId
      */
     void OnWifiWpa3SelfCure(int failreason, int networkId);
+	
+    /**
+     * @Description : Deal screen state change event.
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void DealScreenStateChangedEvent(InternalMessage *msg);
+	
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Subscribe system ability changed.
@@ -854,6 +862,7 @@ private:
     IsWpsConnected isWpsConnect;
     int getIpSucNum;
     int getIpFailNum;
+    bool enableSignalPoll;
     bool isRoam;
     int netNoWorkNum;
     bool portalFlag;

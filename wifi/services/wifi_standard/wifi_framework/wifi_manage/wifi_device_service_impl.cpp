@@ -1460,6 +1460,15 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
     result += "\n";
 }
 
+ErrCode WifiDeviceServiceImpl::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config)
+{
+   bool result = WifiConfigCenter::GetInstance().GetChangeDeviceConfig(value, config);
+   if (!result) {
+    return WIFI_OPT_FAILED；
+   }
+   return WIFI_OPT_SUCCESS;
+}
+
 bool WifiDeviceServiceImpl::IsRemoteDied(void)
 {
     return false;

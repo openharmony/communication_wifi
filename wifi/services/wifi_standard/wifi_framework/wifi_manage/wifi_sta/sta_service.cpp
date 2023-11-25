@@ -179,8 +179,17 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     }
 
     if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
+#ifndef OHOS_ARCH_LITE
+        const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+        std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+        if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+            LOGE("AddCandidateConfig unsupport open or wep key!");
+            return WIFI_OPT_NOT_SUPPORTED;
+        }
+#else
         LOGE("AddCandidateConfig unsupport open or wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
+#endif
     }
     WifiDeviceConfig tempDeviceConfig = config;
     tempDeviceConfig.uid = uid;
@@ -329,6 +338,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     WifiSettings::GetInstance().RemoveDevice(networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
+    WifiConfigCenter::GetInstance().SetChangeDeviceConfig(ConfigChange::CONFIG_REMOVE, config);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -351,6 +361,9 @@ ErrCode StaService::RemoveAllDevice() const
         return WIFI_OPT_FAILED;
     }
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
+    WifiDeviceConfig config;
+    config.networkId = INVALID_NETWORK_ID;
+    WifiConfigCenter::GetInstance().SetChangeDeviceConfig(ConfigChange::CONFIG_REMOVE, config);
     return WIFI_OPT_SUCCESS;
 }
 

@@ -375,6 +375,8 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode ResetAllFrozenApp() = 0;
+
+    virtual ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

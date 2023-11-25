@@ -526,5 +526,19 @@ int WifiConfigCenter::GetDeviceProvisionState() const
     return WifiSettings::GetInstance().GetDeviceProvisionState();
 }
 
+int WifiConfigCenter::SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mLastRemoveDeviceConfig = std::make_pair((int)value, config);
+    return WIFI_OPT_SUCCESS;
+}
+
+bool WifiConfigCenter::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    value = mLastRemoveDeviceConfig.first;
+    config = mLastRemoveDeviceConfig.second;
+    return true;
+}
 }  // namespace Wifi
 }  // namespace OHOS

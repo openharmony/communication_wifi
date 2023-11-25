@@ -1942,7 +1942,7 @@ void WifiManager::DealP2pDiscoveryChanged(bool bState)
     return;
 }
 
-void WifiManager::DealP2pGroupsChanged()
+void WifiManager::DealP2pGroupsChanged() __attribute__((no_sanitize("cfi")))
 {
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_PERSISTENT_GROUPS_CHANGE;

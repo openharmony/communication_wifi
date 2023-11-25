@@ -86,6 +86,8 @@ constexpr int WLAN_STATUS_AUTH_TIMEOUT = 16;
 constexpr int MAC_AUTH_RSP2_TIMEOUT = 5201;
 constexpr int MAC_AUTH_RSP4_TIMEOUT = 5202;
 constexpr int MAC_ASSOC_RSP_TIMEOUT = 5203;
+constexpr int DHCP_RENEW_FAILED = 4;
+constexpr int DHCP_RENEW_TIMEOUT = 5;
 
 enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,

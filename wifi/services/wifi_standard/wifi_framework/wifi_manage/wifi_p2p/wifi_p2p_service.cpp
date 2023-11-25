@@ -192,7 +192,7 @@ ErrCode WifiP2pService::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 
 ErrCode WifiP2pService::GetCurrentGroup(WifiP2pGroupInfo &group)
 {
-    WIFI_LOGI("GetCurrentGroup");
+    WIFI_LOGD("GetCurrentGroup");
     WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
     if (p2pInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {

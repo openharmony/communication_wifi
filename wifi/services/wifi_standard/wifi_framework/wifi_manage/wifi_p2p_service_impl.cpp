@@ -612,7 +612,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 
 ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
 {
-    WIFI_LOGI("GetCurrentGroup pid: %{public}d, uid: %{public}d", GetCallingPid(), GetCallingUid());
+    WIFI_LOGD("GetCurrentGroup pid: %{public}d, uid: %{public}d", GetCallingPid(), GetCallingUid());
 
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetCurrentGroup:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");

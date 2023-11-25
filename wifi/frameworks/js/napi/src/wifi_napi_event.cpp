@@ -81,11 +81,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         return;
     }
 
-    uint32_t refCount = INVALID_REF_COUNT;
-    napi_reference_ref(asyncEvent->env, asyncEvent->callbackRef, &refCount);
     work->data = asyncEvent;
-    WIFI_LOGD("event notify, env: %{private}p, callbackRef: %{private}p, refCount: %{public}d",
-        asyncEvent->env, asyncEvent->callbackRef, refCount);
     uv_queue_work(
         loop,
         work,
@@ -102,6 +98,9 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
                 WIFI_LOGE("scope is nullptr");
                 goto EXIT;
             }
+            napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
+            WIFI_LOGD("event notify, env: %{private}p, callbackRef: %{private}p, refCount: %{public}d",
+                asyncData->env, asyncData->callbackRef, refCount);
             napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
             if (handler == nullptr) {
                 WIFI_LOGE("handler is nullptr");

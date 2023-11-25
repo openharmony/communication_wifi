@@ -588,6 +588,8 @@ void StaService::HandleScreenStatusChanged(int screenState)
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
+    
+    pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
 #endif
     return;
 }

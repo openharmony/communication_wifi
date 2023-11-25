@@ -38,4 +38,5 @@ declare_args() {
   wifi_feature_sta_ap_exclusion = true
   wifi_feature_with_random_mac_addr = true
   wifi_feature_with_hdi_wpa_supported = false
+  wifi_feature_with_hpf_supported = true
 }

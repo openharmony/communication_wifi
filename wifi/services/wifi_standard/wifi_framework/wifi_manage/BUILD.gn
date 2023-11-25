@@ -523,6 +523,10 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
+    if (wifi_feature_with_hpf_supported) {
+      defines += [ "FEATURE_HPF_SUPPORT" ]
+    }
+
     part_name = "wifi"
     subsystem_name = "communication"
   }

@@ -1469,14 +1469,13 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
         LOGE("StartConnectToNetwork get GetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-    
+    SyncDeviceConfigToWpa();
     WifiStaHalInterface::GetInstance().SetBssid(networkId, deviceConfig.userSelectBssid.c_str());
 
     if (WifiStaHalInterface::GetInstance().EnableNetwork(targetNetworkId) != WIFI_IDL_OPT_OK) {
         LOGE("EnableNetwork() failed!");
         return WIFI_OPT_FAILED;
     }
-    SyncDeviceConfigToWpa();
 
     if (WifiStaHalInterface::GetInstance().Connect(targetNetworkId) != WIFI_IDL_OPT_OK) {
         LOGE("Connect failed!");

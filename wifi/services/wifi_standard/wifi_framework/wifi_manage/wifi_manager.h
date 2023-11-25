@@ -40,7 +40,6 @@
 #ifndef OHOS_ARCH_LITE
 #include "common_event_manager.h"
 #include "timer.h"
-#include "wifi_power_state_listener.h"
 #endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_controller_define.h"
@@ -201,6 +200,10 @@ public:
     ErrCode AutoStopP2pService(AutoStartOrStopServiceReason reason);
     void StopUnloadP2PSaTimer(void);
     void StartUnloadP2PSaTimer(void);
+#endif
+
+#ifdef FEATURE_HPF_SUPPORT
+    void InstallPacketFilterProgram(int screenState, int instId);
 #endif
 
     /**
@@ -388,7 +391,6 @@ private:
     static bool mIsMdmForbidden;
     void RegisterPowerStateListener();
     void UnRegisterPowerStateListener();
-    sptr<WifiPowerStateListener> powerStateListener_ = nullptr;
     bool isPowerStateListenerSubscribered = false;
 #endif
     InitStatus mInitStatus;

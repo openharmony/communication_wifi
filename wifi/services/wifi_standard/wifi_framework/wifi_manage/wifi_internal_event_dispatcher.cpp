@@ -653,7 +653,8 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
     }
 }
 
-void WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackMsg &msg)
+void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
+    const WifiEventCallbackMsg &msg) __attribute__((no_sanitize("cfi")))
 {
     std::unique_lock<std::mutex> lock(mStaCallbackMutex);
     auto iter = mStaCallbacks.find(msg.id);

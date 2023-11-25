@@ -27,6 +27,7 @@
 #include "wifi_idl_define.h"
 #include "wifi_global_func.h"
 #include "i_wifi_struct.h"
+#include "wifi_event_callback.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -303,6 +304,15 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
+
+private:
+    int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
+        const std::string &msg, bool checkEmpty = true) const;
+    int PushDeviceConfigInt(SetNetworkConfig *pConfig, DeviceConfigType type, int i) const;
+    int PushDeviceConfigAuthAlgorithm(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const;
+    int PushDeviceConfigParseMask(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int mask,
+        const std::string parseStr[], int size) const;
+    WifiErrorNo CheckValidDeviceConfig(const WifiIdlDeviceConfig &config) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -75,20 +75,30 @@ WifiErrorNo WifiSupplicantHalInterface::RequestToSupplicant(const std::string &r
 
 WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    mCallback = callback;
+    return WIFI_IDL_OPT_OK;
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo err = mIdlClient->ReqRegisterSupplicantEventCallback(callback);
     if (err == WIFI_IDL_OPT_OK) {
         mCallback = callback;
     }
     return err;
+#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    mCallback.onScanNotify = nullptr;
+    return WIFI_IDL_OPT_OK;
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo err = mIdlClient->ReqUnRegisterSupplicantEventCallback();
     mCallback.onScanNotify = nullptr;
     return err;
+#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable) const

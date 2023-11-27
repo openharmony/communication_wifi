@@ -449,12 +449,25 @@ ErrCode WifiManager::AutoStopApService(AutoStartOrStopServiceReason reason)
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiManager::WifiToggled(int isOpen, int id)
 {
+#ifdef FEATURE_STA_AP_EXCLUSION
+    if (isOpen) {
+        WIFI_LOGI("set softap toggled false");
+        WifiSettings::GetInstance().SetSoftapToggledState(false);
+    }
+#endif
     pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiManager::SoftapToggled(int isOpen, int id)
 {
+    if (isOpen) {
+        WIFI_LOGI("set softap toggled true");
+        WifiSettings::GetInstance().SetSoftapToggledState(true);
+    } else {
+        WIFI_LOGI("set softap toggled false");
+        WifiSettings::GetInstance().SetSoftapToggledState(false);
+    }
     pWifiControllerMachine->SendMessage(CMD_SOFTAP_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
 }

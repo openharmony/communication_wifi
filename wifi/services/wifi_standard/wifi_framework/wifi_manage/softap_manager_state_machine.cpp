@@ -197,8 +197,6 @@ void SoftapManagerMachine::StopSoftap()
 {
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(mid);
     if (apState == WifiOprMidState::CLOSING || apState == WifiOprMidState::OPENING) {
-        WifiConfigCenter::GetInstance().SetStaApExclusionType(
-            static_cast<int>(StaApExclusionType::USER_CLOSE_AP_IN_CLOSING_OR_OPENING));
         return;
     }
     ErrCode ret = AutoStopApService(mid);

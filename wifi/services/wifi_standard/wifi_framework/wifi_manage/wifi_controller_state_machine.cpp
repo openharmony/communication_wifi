@@ -215,7 +215,8 @@ bool WifiControllerMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
 
 void WifiControllerMachine::HandleAirplaneOpen()
 {
-    WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
+    WIFI_LOGI("airplane open set softap false");
+    WifiSettings::GetInstance().SetSoftapToggledState(false);
     StopAllConcreteManagers();
     StopAllSoftapManagers();
 }
@@ -320,6 +321,15 @@ void WifiControllerMachine::MakeSoftapManager(SoftApManager::Role role, int id)
     softapManagers.push_back(softapmode);
 }
 
+bool WifiControllerMachine::ShouldEnableSoftap()
+{
+    WIFI_LOGE("Enter ShouldEnableSoftap");
+    if (WifiSettings::GetInstance().GetSoftapToggledState()) {
+        return true;
+    }
+    return false;
+}
+
 bool WifiControllerMachine::ShouldEnableWifi()
 {
     WIFI_LOGE("Enter ShouldEnableWifi");
@@ -388,11 +398,6 @@ void WifiControllerMachine::StopSoftapManager(int id)
 
 void WifiControllerMachine::StopAllSoftapManagers()
 {
-    if (WifiConfigCenter::GetInstance().GetStaApExclusionType() ==
-        static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI)) {
-        WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
-    }
-
     if (!HasAnySoftApManager()) {
         return;
     }
@@ -504,14 +509,8 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
     int id = msg->GetParam2();
     WIFI_LOGE("handleSoftapToggleChangeInEnabledState");
     if (msg->GetParam1() == 1) {
-        if (WifiConfigCenter::GetInstance().GetStaApExclusionType() ==
-            static_cast<int>(StaApExclusionType::USER_CLOSE_AP_IN_CLOSING_OR_OPENING)) {
-            WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
-        }
 #ifdef FEATURE_STA_AP_EXCLUSION
         if (pWifiControllerMachine->HasAnyConcreteManager()) {
-            WifiConfigCenter::GetInstance().SetStaApExclusionType(
-                static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI));
             pWifiControllerMachine->StopAllConcreteManagers();
             pWifiControllerMachine->mApidStopWifi = id;
             return;
@@ -531,21 +530,11 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
         }
     }
 #endif
-    if (WifiConfigCenter::GetInstance().GetStaApExclusionType() ==
-        static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI)) {
-        WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
-    }
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(id);
     if (apState == WifiOprMidState::CLOSING || apState == WifiOprMidState::OPENING) {
-        WifiConfigCenter::GetInstance().SetStaApExclusionType(
-            static_cast<int>(StaApExclusionType::USER_CLOSE_AP_IN_CLOSING_OR_OPENING));
         return;
     }
     if (pWifiControllerMachine->SoftApIdExit(id)) {
-        if (WifiConfigCenter::GetInstance().GetStaApExclusionType() ==
-            static_cast<int>(StaApExclusionType::USER_CLOSE_AP_IN_CLOSING_OR_OPENING)) {
-            WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
-        }
         pWifiControllerMachine->StopSoftapManager(id);
         return;
     }
@@ -573,8 +562,7 @@ void WifiControllerMachine::HandleStaStart(int id)
 
 void WifiControllerMachine::EnableState::HandleApStart(int id)
 {
-    if (WifiConfigCenter::GetInstance().GetStaApExclusionType() ==
-        static_cast<int>(StaApExclusionType::USER_CLOSE_AP_IN_CLOSING_OR_OPENING)) {
+    if (!pWifiControllerMachine->ShouldEnableSoftap()) {
         pWifiControllerMachine->StopSoftapManager(id);
     }
 }
@@ -584,10 +572,8 @@ void WifiControllerMachine::HandleConcreteStop(int id)
     int airplanstate = WifiConfigCenter::GetInstance().GetAirplaneModeState();
     RmoveConcreteManager(id);
 #ifdef FEATURE_STA_AP_EXCLUSION
-    if (WifiConfigCenter::GetInstance().GetStaApExclusionType() ==
-            static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI) &&
-        airplanstate != MODE_STATE_OPEN) {
-        WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
+    if (ShouldEnableSoftap() && airplanstate != MODE_STATE_OPEN &&
+        !SoftApIdExit(mApidStopWifi)) {
         MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, mApidStopWifi);
         return;
     }
@@ -618,9 +604,9 @@ void WifiControllerMachine::HandleSoftapStop(int id)
     ConcreteManagerRole role;
 
     RmoveSoftapManager(id);
-    if (WifiConfigCenter::GetInstance().GetStaApExclusionType() ==
-        static_cast<int>(StaApExclusionType::USER_CLOSE_AP_IN_CLOSING_OR_OPENING)) {
-        WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
+    if (ShouldEnableSoftap() && !SoftApIdExit(0)) {
+        MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, 0);
+        return;
     }
     if (HasAnyManager()) {
         return;

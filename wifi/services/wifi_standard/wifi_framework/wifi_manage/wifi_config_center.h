@@ -630,6 +630,7 @@ public:
     int GetDeviceProvisionState() const;
 
     int SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config);
+    
     bool GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config);
 private:
     std::mutex mStaMutex;

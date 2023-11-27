@@ -536,7 +536,7 @@ int WifiConfigCenter::SetChangeDeviceConfig(ConfigChange value, const WifiDevice
 bool WifiConfigCenter::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
-    value = mLastRemoveDeviceConfig.first;
+    value = (ConfigChange)mLastRemoveDeviceConfig.first;
     config = mLastRemoveDeviceConfig.second;
     return true;
 }

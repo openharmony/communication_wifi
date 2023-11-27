@@ -182,7 +182,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
 #ifndef OHOS_ARCH_LITE
         const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
         std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
-        if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+        if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
             LOGE("AddCandidateConfig unsupport open or wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
         }

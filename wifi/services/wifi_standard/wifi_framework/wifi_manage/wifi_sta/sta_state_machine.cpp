@@ -2112,13 +2112,20 @@ void StaStateMachine::GetIpState::GoInState()
             pStaStateMachine->DisConnectProcess();
             LOGE("ConfigstaticIpAddress failed!\n");
         }
-    } else {
+        return;
+    }
+    do {
         int dhcpRet = 0;
         DhcpServiceInfo dhcpInfo;
         pStaStateMachine->pDhcpService->GetDhcpInfo(
             IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), dhcpInfo);
         LOGD("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
             pStaStateMachine->isRoam, dhcpInfo.clientRunStatus);
+        if (pStaStateMachine->pDhcpService->GetDhcpResult(IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()),
+                pStaStateMachine->pDhcpResultNotify, DHCP_TIME) != 0) {
+            WIFI_LOGE("GetDhcpResult Failed.");
+            break;
+        }
         pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType(
             pStaStateMachine->GetInstanceId()));
         if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
@@ -2128,21 +2135,19 @@ void StaStateMachine::GetIpState::GoInState()
             dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(
                     IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), true);
         }
-        if ((dhcpRet != 0) || (pStaStateMachine->pDhcpService->GetDhcpResult(
-            IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()),
-                pStaStateMachine->pDhcpResultNotify, DHCP_TIME) != 0)) {
-            LOGE(" Dhcp connection failed.\n");
-            pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
-            pStaStateMachine->InvokeOnStaConnChanged(
-                OperateResState::CONNECT_OBTAINING_IP_FAILED, pStaStateMachine->linkedInfo);
-            if (!pStaStateMachine->isRoam) {
-                pStaStateMachine->DisConnectProcess();
-            }
-        } else {
+        if (dhcpRet == 0) {
             LOGD("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
             pStaStateMachine->StartTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT),
                 STA_SIGNAL_START_GET_DHCP_IP_DELAY);
+            return;
         }
+    } while (0);
+    WIFI_LOGE(" Dhcp connection failed.\n");
+    pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
+        pStaStateMachine->linkedInfo);
+    if (!pStaStateMachine->isRoam) {
+        pStaStateMachine->DisConnectProcess();
     }
     return;
 }

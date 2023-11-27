@@ -1465,7 +1465,7 @@ ErrCode WifiDeviceServiceImpl::GetChangeDeviceConfig(ConfigChange& value, WifiDe
     bool result = WifiConfigCenter::GetInstance().GetChangeDeviceConfig(value, config);
     if (!result) {
         WIFI_LOGE("WifiDeviceServiceImpl::GetChangeDeviceConfig failed!");
-        return WIFI_OPT_FAILED；
+        return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }

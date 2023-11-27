@@ -1871,6 +1871,7 @@ void WifiManager::DealApGetStaJoin(const StationInfo &info, int id)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("ApStaJoined") + std::string("id = ") + std::to_string(id);
     WifiCommonEventHelper::PublishApStaJoinEvent(0, msg);
+    WifiManager::GetInstance().GetControllerMachine()->StopSoftapCloseTimer();
     return;
 }
 
@@ -1883,6 +1884,19 @@ void WifiManager::DealApGetStaLeave(const StationInfo &info, int id)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("ApStaLeaved") + std::string("id = ") + std::to_string(id);
     WifiCommonEventHelper::PublishApStaLeaveEvent(0, msg);
+    std::vector<StationInfo> result;
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(id);
+    if (pService == nullptr) {
+        WIFI_LOGE("Instance %{public}d get hotspot service is null!", id);
+        return;
+    }
+    ErrCode errCode = pService->GetStationList(result);
+    if (errCode != ErrCode::WIFI_OPT_SUCCESS) {
+        return;
+    }
+    if (result.empty()) {
+        WifiManager::GetInstance().GetControllerMachine()->StartSoftapCloseTimer();
+    }
     return;
 }
 #endif
@@ -2499,13 +2513,25 @@ void BatteryEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDat
 
         if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_CONNECTED) {
             WIFI_LOGE("usb connect do not stop hostapd!");
-            pService->SetHotspotIdleTimeout(0);
+            WifiManager::GetInstance().GetControllerMachine()->StopSoftapCloseTimer();
             return;
         }
 
         if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_DISCONNECTED) {
             WIFI_LOGE("usb disconnect stop hostapd!");
-            pService->SetHotspotIdleTimeout(HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS);
+            std::vector<StationInfo> result;
+            IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(0);
+            if (pService == nullptr) {
+                WIFI_LOGE("get hotspot service is null!");
+                return;
+            }
+            ErrCode errCode = pService->GetStationList(result);
+            if (errCode != ErrCode::WIFI_OPT_SUCCESS) {
+                return;
+            }
+            if (result.empty()) {
+                WifiManager::GetInstance().GetControllerMachine()->StartSoftapCloseTimer();
+            }
             return;
         }
     }

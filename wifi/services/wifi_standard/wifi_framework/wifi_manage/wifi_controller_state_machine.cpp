@@ -19,6 +19,10 @@
 #include "wifi_config_center.h"
 #include "wifi_settings.h"
 #include "wifi_msg.h"
+#include "wifi_system_timer.h"
+#ifdef HAS_BATTERY_MANAGER_PART
+#include "battery_srv_client.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -172,6 +176,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             break;
         case CMD_AP_STOPPED:
         case CMD_AP_START_FAILURE:
+            pWifiControllerMachine->StopSoftapCloseTimer();
             pWifiControllerMachine->HandleSoftapStop(msg->GetParam1());
             break;
         case CMD_AIRPLANE_TOGGLED:
@@ -576,7 +581,9 @@ void WifiControllerMachine::EnableState::HandleApStart(int id)
     if (WifiConfigCenter::GetInstance().GetStaApExclusionType() ==
         static_cast<int>(StaApExclusionType::USER_CLOSE_AP_IN_CLOSING_OR_OPENING)) {
         pWifiControllerMachine->StopSoftapManager(id);
+        return;
     }
+    pWifiControllerMachine->StartSoftapCloseTimer();
 }
 
 void WifiControllerMachine::HandleConcreteStop(int id)
@@ -637,6 +644,44 @@ void WifiControllerMachine::HandleSoftapStop(int id)
     } else {
         SwitchState(pDisableState);
     }
+}
+
+static void AlarmStopSoftap()
+{
+    WifiManager::GetInstance().SoftapToggled(0, 0);
+}
+
+void WifiControllerMachine::StartSoftapCloseTimer()
+{
+    WIFI_LOGI("enter softapCloseTimer");
+    int mTimeoutDelay = WifiSettings::GetInstance().GetHotspotIdleTimeout();
+    if (stopSoftapTimerId_ != 0) {
+        return;
+    }
+#ifdef HAS_BATTERY_MANAGER_PART
+    auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
+    auto batteryPluggedType = batterySrvClient.GetPluggedType();
+    if (batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_USB) {
+        WIFI_LOGI("usb connect do not start timer");
+        return;
+    }
+#endif
+    std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+    wifiSysTimer->SetCallbackInfo(AlarmStopSoftap);
+    stopSoftapTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+    MiscServices::TimeServiceClient::GetInstance()->StartTimer(stopSoftapTimerId_, currentTime + mTimeoutDelay);
+}
+
+void WifiControllerMachine::StopSoftapCloseTimer()
+{
+    WIFI_LOGI("enter StopSoftapCloseTimer");
+    if (stopSoftapTimerId_ == 0) {
+        return;
+    }
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(stopSoftapTimerId_);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(stopSoftapTimerId_);
+    stopSoftapTimerId_ = 0;
 }
 
 } // namespace Wifi

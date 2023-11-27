@@ -232,20 +232,6 @@ private:
     void UpdatePowerMode() const;
 
     /**
-     * @Description  Set a timer to turn off the hotspot.
-     * @param None
-     * @return None
-     */
-    void SetHotspotIdleTimer();
-
-    /**
-     * @Description  Cancel the timer to turn off the hotspot.
-     * @param None
-     * @return None
-     */
-    void CancelHotspotIdleTimer();
-
-    /**
      * @Description  Initialization.
      * @param None
      * @return None

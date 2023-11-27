@@ -81,6 +81,8 @@ public:
     void HandleStaStartFailure(int id);
     void HandleConcreteStop(int id);
     void HandleSoftapStop(int id);
+    void StartSoftapCloseTimer();
+    void StopSoftapCloseTimer();
 
 private:
     template <typename T>
@@ -131,6 +133,7 @@ private:
     SoftApModeCallback mSoftapCallback;
     mutable std::mutex concreteManagerMutex;
     mutable std::mutex softapManagerMutex;
+    uint64_t stopSoftapTimerId_ {0};
 };
 }  // namespace Wifi
 }  // namespace OHOS

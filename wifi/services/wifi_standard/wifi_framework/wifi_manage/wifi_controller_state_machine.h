@@ -111,6 +111,7 @@ private:
     void MakeConcreteManager(ConcreteManagerRole role, int id);
     void MakeSoftapManager(SoftApManager::Role role, int id);
     bool ShouldEnableWifi();
+    bool ShouldEnableSoftap();
     ConcreteManagerRole GetWifiRole();
     void StopAllConcreteManagers();
     void StopAllSoftapManagers();

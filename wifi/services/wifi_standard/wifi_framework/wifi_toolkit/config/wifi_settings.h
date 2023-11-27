@@ -125,6 +125,8 @@ public:
 #ifndef OHOS_ARCH_LITE
     void SetWifiToggledState(bool state);
     bool GetWifiToggledState() const;
+    void SetSoftapToggledState(bool state);
+    bool GetSoftapToggledState() const;
     void SetWifiStopState(bool state);
     bool GetWifiStopState() const;
 #endif
@@ -1521,6 +1523,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     bool mWifiToggled;
     bool mWifiStoping;
+    bool mSoftapToggled;
 #endif
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
@@ -1582,6 +1585,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     std::mutex mWifiToggledMutex;
     std::mutex mWifiStopMutex;
+    std::mutex mSoftapToggledMutex;
 #endif
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;

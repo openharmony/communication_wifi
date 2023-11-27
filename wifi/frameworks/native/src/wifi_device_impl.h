@@ -402,7 +402,13 @@ public:
      */
     bool IsRemoteDied(void);
 
+    /**
+     * @Description get last Change devicecConfig
+     *
+     * @return ErrCode - operation result
+     */
     ErrCode GetChangeDeviceConfig(ConfigChange &value, WifiDeviceConfig &config) override;
+
 private:
     bool GetWifiDeviceProxy();
     int systemAbilityId_;

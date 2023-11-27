@@ -1620,10 +1620,10 @@ ErrCode WifiDeviceProxy::GetChangeDeviceConfig(ConfigChange &value, WifiDeviceCo
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE), data,
-        reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE),
+        data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("StartPortalCertification(%{public}d) failed,error code is %{public}d",
+        WIFI_LOGE("GetChangeDeviceConfig (%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE), error);
         return WIFI_OPT_FAILED;
     }
@@ -1632,7 +1632,7 @@ ErrCode WifiDeviceProxy::GetChangeDeviceConfig(ConfigChange &value, WifiDeviceCo
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    value = reply.ReadInt32();
+    value = (ConfigChange)reply.ReadInt32();
     config.networkId = reply.ReadInt32();
     config.ssid = reply.ReadString();
     config.bssid = reply.ReadString();
@@ -1640,7 +1640,6 @@ ErrCode WifiDeviceProxy::GetChangeDeviceConfig(ConfigChange &value, WifiDeviceCo
     if (ret != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

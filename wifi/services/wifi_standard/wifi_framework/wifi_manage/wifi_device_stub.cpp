@@ -511,9 +511,9 @@ void WifiDeviceStub::OnGetChangeDeviceConfig(uint32_t code, MessageParcel &data,
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     Wifi::ConfigChange value;
     Wifi::WifiDeviceConfig config;
-    ErrCode ret = GetChangeDeviceConfigs(value, config);
+    ErrCode ret = GetChangeDeviceConfig(value, config);
     reply.WriteInt32(0);
-    reply.WriteInt32(value);
+    reply.WriteInt32((int)value);
     reply.WriteInt32(config.networkId);
     reply.WriteString(config.ssid);
     reply.WriteString(config.bssid);

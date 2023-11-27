@@ -49,6 +49,7 @@ WifiSettings::WifiSettings()
 #ifndef OHOS_ARCH_LITE
       mWifiToggled(false),
       mWifiStoping(false),
+      mSoftapToggled(false),
 #endif
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
@@ -391,6 +392,17 @@ void WifiSettings::SetWifiToggledState(bool state)
 bool WifiSettings::GetWifiToggledState() const
 {
     return mWifiToggled;
+}
+
+void WifiSettings::SetSoftapToggledState(bool state)
+{
+    std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
+    mSoftapToggled = state;
+}
+
+bool WifiSettings::GetSoftapToggledState() const
+{
+    return mSoftapToggled;
 }
 
 void WifiSettings::SetWifiStopState(bool state)

@@ -103,7 +103,8 @@
                 "safwk",
                 "samgr",
                 "wpa_supplicant",
-                "power_manager"
+                "power_manager",
+                "time_service"
             ],
             "third_party": [
                 "bounds_checking_function",

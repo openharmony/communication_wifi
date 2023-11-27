@@ -33,9 +33,6 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
-#ifdef HAS_BATTERY_MANAGER_PART
-#include "battery_srv_client.h"
-#endif
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
@@ -87,7 +84,6 @@ void ApStartedState::GoInState()
         return;
     }
     UpdatePowerMode();
-    SetHotspotIdleTimer();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
     ChipCapability::GetInstance().InitializeChipCapability();
 }
@@ -104,7 +100,6 @@ void ApStartedState::GoOutState()
     StopMonitor();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_IDLE);
     WifiSettings::GetInstance().ClearStationList();
-    CancelHotspotIdleTimer();
 }
 
 void ApStartedState::Init()
@@ -282,7 +277,6 @@ void ApStartedState::ProcessCmdStationJoin(InternalMessage &msg)
     } else {
         WIFI_LOGE("failed to get station info.");
     }
-    CancelHotspotIdleTimer();
 }
 
 void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg)
@@ -293,9 +287,6 @@ void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg)
         m_ApStateMachine.m_ApStationsManager.StationLeave(staInfo.bssid);
     } else {
         WIFI_LOGE("failed to get station info.");
-    }
-    if (m_ApStateMachine.m_ApStationsManager.GetAllConnectedStations().size() == 0) {
-        SetHotspotIdleTimer();
     }
 }
 
@@ -408,47 +399,6 @@ void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg)
         return;
     }
     WifiSettings::GetInstance().SetHotspotIdleTimeout(mTimeoutDelay);
-    if (!mTimeoutDelay) {
-        CancelHotspotIdleTimer();
-        return;
-    }
-    if (m_ApStateMachine.m_ApStationsManager.GetAllConnectedStations().size() == 0) {
-        SetHotspotIdleTimer();
-    }
-}
-
-void ApStartedState::SetHotspotIdleTimer()
-{
-    WIFI_LOGI("SetHotspotIdleTimer.");
-    int mTimeoutDelay = WifiSettings::GetInstance().GetHotspotIdleTimeout();
-#ifdef HAS_BATTERY_MANAGER_PART
-    auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
-    auto batteryPluggedType = batterySrvClient.GetPluggedType();
-    if (batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_USB) {
-        WIFI_LOGI("usb connect do not start timer");
-        return;
-    }
-#endif
-    if (!mTimeoutDelay) {
-        return;
-    }
-    if (idleTimerExist) {
-        CancelHotspotIdleTimer();
-    }
-    m_ApStateMachine.StartTimer(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT), mTimeoutDelay);
-    idleTimerExist = true;
-    WIFI_LOGI("SetHotspotIdleTimer success!");
-}
-
-void ApStartedState::CancelHotspotIdleTimer()
-{
-    WIFI_LOGI("CancelHotspotIdleTimer.");
-    if (!idleTimerExist) {
-        return;
-    }
-    m_ApStateMachine.StopTimer(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
-    idleTimerExist = false;
-    WIFI_LOGI("CancelHotspotIdleTimer success!");
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -481,6 +481,21 @@ public:
     int GetAirplaneModeState() const;
 
     /**
+     * @Description Set whether open wifi when airplane mode opened
+     *
+     * @param ifOpen - user want to open wifi
+     * @return int - 0 success
+     */
+    int SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId = 0);
+
+    /**
+     * @Description Get whether open wifi when airplane mode opened
+     *
+     * @return true - open; false - can't open
+     */
+    bool GetOpenWifiWhenAirplaneMode(int instId = 0);
+
+    /**
      * @Description Set current power sleep state
      *
      * @param state - 1 open; 2 close

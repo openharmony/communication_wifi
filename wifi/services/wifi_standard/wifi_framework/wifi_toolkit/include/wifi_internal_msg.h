@@ -317,6 +317,7 @@ struct WifiConfig {
     bool scanAlwaysSwitch; /* scan always switch */
     int staAirplaneMode; /* operator wifi type */
     bool canOpenStaWhenAirplane; /* if airplane is opened, whether can open sta */
+    bool openWifiWhenAirplane;
     /**
      * last sta service state, when service started, power
      * saving off, airplane mode off we use this saved state to
@@ -365,6 +366,7 @@ struct WifiConfig {
         scanAlwaysSwitch = false;
         staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
         canOpenStaWhenAirplane = true;
+        openWifiWhenAirplane = false;
         staLastState = false;
         savedDeviceAppraisalPriority = PRIORITY_1;
         scoretacticsScoreSlope = SCORE_SLOPE;

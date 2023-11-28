@@ -20,8 +20,6 @@
 #include "p2p_define.h"
 #include "p2p_monitor.h"
 #include "wifi_p2p_service_manager.h"
-#include "i_dhcp_result_notify.h"
-#include "dhcp_service_api.h"
 #include "dhcpd_interface.h"
 #include "authorizing_negotiation_request_state.h"
 #include "group_formed_state.h"
@@ -41,6 +39,7 @@
 #include "provision_discovery_state.h"
 #include "abstract_ui.h"
 #include "wifi_hid2d_service_utils.h"
+#include "dhcp_c_api.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -48,47 +47,16 @@ const int MIN_GROUP_NAME_LENGTH = 9;
 const int MAX_GROUP_NAME_LENGTH = 32;
 const int DISC_TIMEOUT_S = 120;
 class P2pStateMachine : public StateMachine {
-    class DhcpResultNotify : public IDhcpResultNotify {
+    class DhcpResultNotify {
     public:
-        /**
-         * @Description : Construct a new dhcp result notify object.
-         *
-         */
-        explicit DhcpResultNotify(P2pStateMachine *p2pStateMachine, WifiP2pGroupManager &groupMgr);
-
-        /**
-         * @Description : Destroy the dhcp result notify object.
-         *
-         */
-        ~DhcpResultNotify() override;
-
-        /**
-         * @Description - Asynchronous get dhcp result of specified interface success notify.
-         *
-         * @param status - int
-         * @param ifname - interface name,eg:wlan0
-         * @param result - dhcp result
-         */
-        void OnSuccess(int status, const std::string &ifname, DhcpResult &result) override;
-
-        /**
-         * @Description - Asynchronous get dhcp result of specified interface failed notify.
-         *
-         * @param status - int
-         * @param ifname - interface name,eg:wlan0
-         * @param reason - failed reason
-         */
-        void OnFailed(int status, const std::string &ifname, const std::string &reason) override;
-
-        /**
-        * @Description - Get the abnormal exit notify of dhcp server process
-        *
-        * @param ifname - interface name,eg:wlan0
-        */
-        void OnSerExitNotify(const std::string& ifname) override;
+        explicit DhcpResultNotify();
+        ~DhcpResultNotify();
+        static void OnSuccess(int status, const char *ifname, DhcpResult *result);
+        static void OnFailed(int status, const char *ifname, const char *reason);
+        static void SetP2pStateMachine(P2pStateMachine *p2pStateMachine, WifiP2pGroupManager *pGroupManager);
     private:
-        P2pStateMachine *pP2pStateMachine;
-        WifiP2pGroupManager &groupManager;
+       static P2pStateMachine *pP2pStateMachine;
+       static WifiP2pGroupManager *groupManager;
     };
 
     friend class AuthorizingNegotiationRequestState;
@@ -245,7 +213,7 @@ private:
      * @Description Start dhcp client.
      *
      */
-    virtual void StartDhcpClient();
+    virtual void StartDhcpClientInterface();
     /**
      * @Description Processing the p2p service response result.
      *
@@ -397,8 +365,8 @@ private:
     WifiP2pGroupManager &groupManager;   /* group manager */
     WifiP2pDeviceManager &deviceManager; /* device manager */
     WifiP2pServiceManager &serviceManager;   /* service manager */
-    std::unique_ptr<IDhcpService> pDhcpService;
-    std::unique_ptr<DhcpResultNotify> pDhcpResultNotify;
+    ClientCallBack clientCallBack;
+    DhcpResultNotify *pDhcpResultNotify;
     DhcpdInterface m_DhcpdInterface;
     AuthorizingNegotiationRequestState &p2pAuthorizingNegotiationRequestState;
     GroupFormedState &p2pGroupFormedState;

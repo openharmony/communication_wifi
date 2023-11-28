@@ -36,7 +36,6 @@
 #endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST
-#include "dhcp_service_api.h"
 #else
 #include "mock_dhcp_service.h"
 #endif
@@ -68,7 +67,6 @@ StaStateMachine::StaStateMachine(int instId)
       getIpFailNum(0),
       isRoam(false),
       netNoWorkNum(0),
-      pDhcpService(nullptr),
       pDhcpResultNotify(nullptr),
       pNetcheck(nullptr),
       pRootState(nullptr),
@@ -105,15 +103,11 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pGetIpState);
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
-    if (pDhcpService.get() != nullptr) {
-        if (currentTpType == IPTYPE_IPV4) {
-            pDhcpService->StopDhcpClient(IF_NAME + std::to_string(m_instId), false);
-        } else {
-            pDhcpService->StopDhcpClient(IF_NAME + std::to_string(m_instId), true);
-        }
-
-        pDhcpService->RemoveDhcpResult(pDhcpResultNotify);
-        pDhcpService.reset(nullptr);
+    std::string ifname = IF_NAME + std::to_string(m_instId);
+    if (currentTpType == IPTYPE_IPV4) {
+        StopDhcpClient(ifname.c_str(), false);
+    } else {
+        StopDhcpClient(ifname.c_str(), true);
     }
     ParsePointer(pDhcpResultNotify);
     ParsePointer(pNetcheck);
@@ -135,15 +129,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-#ifndef OHOS_WIFI_STA_TEST
-    pDhcpService = DhcpServiceApi::GetInstance();
-#else
-    pDhcpService = std::make_unique<DhcpService>();
-#endif
-    if (pDhcpService.get() == nullptr) {
-        WIFI_LOGE("pDhcpServer is null\n");
-        return WIFI_OPT_FAILED;
-    }
 
     pNetcheck = new (std::nothrow)
         StaNetworkCheck(std::bind(&StaStateMachine::HandleNetCheckResult, this,
@@ -191,7 +176,7 @@ ErrCode StaStateMachine::InitStaStates()
     tmpErrNumber += JudgmentEmpty(pLinkedState);
     pApRoamingState = new (std::nothrow)ApRoamingState(this);
     tmpErrNumber += JudgmentEmpty(pApRoamingState);
-    pDhcpResultNotify = new (std::nothrow)DhcpResultNotify(this);
+    pDhcpResultNotify = new (std::nothrow)DhcpResultNotify();
     tmpErrNumber += JudgmentEmpty(pDhcpResultNotify);
     if (tmpErrNumber != 0) {
         WIFI_LOGE("InitStaStates some one state is null\n");
@@ -689,11 +674,13 @@ void StaStateMachine::StopWifiProcess()
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), m_instId);
     InvokeOnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+    WIFI_LOGI("StopTimer CMD_START_RENEWAL_TIMEOUT StopWifiProcess");
     StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
+    std::string ifname = IF_NAME + std::to_string(m_instId);
     if (currentTpType == IPTYPE_IPV4) {
-        pDhcpService->StopDhcpClient(IF_NAME + std::to_string(m_instId), false);
+        StopDhcpClient(ifname.c_str(), false);
     } else {
-        pDhcpService->StopDhcpClient(IF_NAME + std::to_string(m_instId), true);
+        StopDhcpClient(ifname.c_str(), true);
     }
     isRoam = false;
     WifiSettings::GetInstance().SetMacAddress("", m_instId);
@@ -1097,12 +1084,14 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #endif
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     StopTimer(static_cast<int>(CMD_START_NETCHECK));
+    WIFI_LOGI("StopTimer CMD_START_RENEWAL_TIMEOUT DealDisconnectEvent");
     StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
     pNetcheck->StopNetCheckThread();
+    std::string ifname = IF_NAME + std::to_string(m_instId);
     if (currentTpType == IPTYPE_IPV4) {
-        pDhcpService->StopDhcpClient(IF_NAME + std::to_string(m_instId), false);
+        StopDhcpClient(ifname.c_str(), false);
     } else {
-        pDhcpService->StopDhcpClient(IF_NAME + std::to_string(m_instId), true);
+        StopDhcpClient(ifname.c_str(), true);
     }
     getIpSucNum = 0;
     getIpFailNum = 0;
@@ -2078,6 +2067,20 @@ void StaStateMachine::SyncAllDeviceConfigs()
     }
 }
 
+int StaStateMachine::RegisterCallBack()
+{
+    clientCallBack.OnIpSuccessChanged = DhcpResultNotify::OnSuccess;
+    clientCallBack.OnIpFailChanged = DhcpResultNotify::OnFailed;
+    pDhcpResultNotify->SetStaStateMachine(this);
+    std::string ifname = IF_NAME + std::to_string(m_instId);
+    DhcpErrorCode dhcpRet = RegisterDhcpClientCallBack(ifname.c_str(), &clientCallBack);
+    if (dhcpRet != DHCP_SUCCESS) {
+        WIFI_LOGE("RegisterDhcpClientCallBack failed. dhcpRet=%{public}d", dhcpRet);
+        return DHCP_FAILED;
+    }
+    LOGI("RegisterDhcpClientCallBack ok");
+    return DHCP_SUCCESS;
+}
 /* --------------------------- state machine GetIp State ------------------------------ */
 StaStateMachine::GetIpState::GetIpState(StaStateMachine *staStateMachine)
     : State("GetIpState"), pStaStateMachine(staStateMachine)
@@ -2115,34 +2118,29 @@ void StaStateMachine::GetIpState::GoInState()
         return;
     }
     do {
-        int dhcpRet = 0;
-        DhcpServiceInfo dhcpInfo;
-        pStaStateMachine->pDhcpService->GetDhcpInfo(
-            IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), dhcpInfo);
-        LOGD("GetIpState get dhcp result, isRoam=%{public}d, clientRunStatus=%{public}d.",
-            pStaStateMachine->isRoam, dhcpInfo.clientRunStatus);
-        if (pStaStateMachine->pDhcpService->GetDhcpResult(IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()),
-                pStaStateMachine->pDhcpResultNotify, DHCP_TIME) != 0) {
-            WIFI_LOGE("GetDhcpResult Failed.");
+        int result = pStaStateMachine->RegisterCallBack();
+        if (result != DHCP_SUCCESS) {
+            WIFI_LOGE("RegisterCallBack failed!");
             break;
         }
-        pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType(
-            pStaStateMachine->GetInstanceId()));
+        int dhcpRet;
+        std::string ifname = IF_NAME + std::to_string(pStaStateMachine->GetInstanceId());
+        pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
         if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
-            dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(
-                    IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), false);
+            dhcpRet = StartDhcpClient(ifname.c_str(), false);
         } else {
-            dhcpRet = pStaStateMachine->pDhcpService->StartDhcpClient(
-                    IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), true);
+            dhcpRet = StartDhcpClient(ifname.c_str(), true);
         }
+        LOGI("StartDhcpClient type:%{public}d dhcpRet:%{public}d isRoam:%{public}d", pStaStateMachine->currentTpType,
+            dhcpRet, pStaStateMachine->isRoam);
         if (dhcpRet == 0) {
-            LOGD("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
+            LOGI("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
             pStaStateMachine->StartTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT),
                 STA_SIGNAL_START_GET_DHCP_IP_DELAY);
             return;
         }
     } while (0);
-    WIFI_LOGE(" Dhcp connection failed.\n");
+    WIFI_LOGE("Dhcp connection failed, isRoam:%{public}d", pStaStateMachine->isRoam);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
         pStaStateMachine->linkedInfo);
@@ -2187,21 +2185,30 @@ void StaStateMachine::ReplaceEmptyDns(DhcpResult *result)
         WIFI_LOGE("Enter ReplaceEmptyDns::result is nullptr");
         return;
     }
-
-    if (result->strDns1.empty()) {
+    std::string strDns1 = result->strOptDns1;
+    std::string strDns2 = result->strOptDns2;
+    if (strDns1.empty()) {
         WIFI_LOGI("Enter ReplaceEmptyDns::dns1 is null");
-        if (result->strDns2 == FIRST_DNS) {
-            result->strDns1.assign(SECOND_DNS);
+        if (strDns2 == FIRST_DNS) {
+            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, SECOND_DNS) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s SECOND_DNS failed!");
+            }
         } else {
-            result->strDns1.assign(FIRST_DNS);
+            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, FIRST_DNS) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s FIRST_DNS failed!");
+            }
         }
     }
-    if (result->strDns2.empty()) {
+    if (strDns2.empty()) {
         WIFI_LOGI("Enter ReplaceEmptyDns::dns2 is null");
-        if (result->strDns1 == FIRST_DNS) {
-            result->strDns2.assign(SECOND_DNS);
+        if (strDns1 == FIRST_DNS) {
+            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, SECOND_DNS) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s SECOND_DNS failed!");
+            }
         } else {
-            result->strDns2.assign(FIRST_DNS);
+            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, FIRST_DNS) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s SECOND_DNS failed!");
+            }
         }
     }
 }
@@ -2210,45 +2217,101 @@ void StaStateMachine::ReplaceEmptyDns(DhcpResult *result)
 bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 {
     WIFI_LOGI("Enter StaStateMachine::SetDhcpResultFromStatic.");
+    std::string ifname = IF_NAME + std::to_string(m_instId);
     DhcpResult result;
     switch (currentTpType) {
         case IPTYPE_IPV4: {
             result.iptype = IPTYPE_IPV4;
-            result.strYourCli = staticIpAddress.ipAddress.address.GetIpv4Address();
-            result.strRouter1 = staticIpAddress.gateway.GetIpv4Address();
-            result.strSubnet = staticIpAddress.GetIpv4Mask();
-            result.strDns1 = staticIpAddress.dnsServer1.GetIpv4Address();
-            result.strDns2 = staticIpAddress.dnsServer2.GetIpv4Address();
+            if (strcpy_s(result.strOptClientId, INET_ADDRSTRLEN,
+                staticIpAddress.ipAddress.address.GetIpv4Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptClientId strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptRouter1, INET_ADDRSTRLEN,
+                staticIpAddress.gateway.GetIpv4Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptRouter1 strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptSubnet, INET_ADDRSTRLEN, staticIpAddress.GetIpv4Mask().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptSubnet strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptDns1, INET_ADDRSTRLEN,
+                staticIpAddress.dnsServer1.GetIpv4Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptDns1 strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptDns2, INET_ADDRSTRLEN,
+                staticIpAddress.dnsServer2.GetIpv4Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptDns2 strcpy_s failed!");
+            }
             ReplaceEmptyDns(&result);
-            pDhcpResultNotify->OnSuccess(1, IF_NAME + std::to_string(m_instId), result);
+            pDhcpResultNotify->OnSuccess(1, ifname.c_str(), &result);
             break;
         }
         case IPTYPE_IPV6: {
             result.iptype = IPTYPE_IPV6;
-            result.strYourCli = staticIpAddress.ipAddress.address.GetIpv6Address();
-            result.strRouter1 = staticIpAddress.gateway.GetIpv6Address();
-            result.strSubnet = staticIpAddress.GetIpv6Mask();
-            result.strDns1 = staticIpAddress.dnsServer1.GetIpv6Address();
-            result.strDns2 = staticIpAddress.dnsServer2.GetIpv6Address();
-            pDhcpResultNotify->OnSuccess(1, IF_NAME + std::to_string(m_instId), result);
+            if (strcpy_s(result.strOptClientId, INET_ADDRSTRLEN,
+                staticIpAddress.ipAddress.address.GetIpv6Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptClientId strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptRouter1, INET_ADDRSTRLEN,
+                staticIpAddress.gateway.GetIpv6Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptRouter1 strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptSubnet, INET_ADDRSTRLEN, staticIpAddress.GetIpv6Mask().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptSubnet strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptDns1, INET_ADDRSTRLEN,
+                staticIpAddress.dnsServer1.GetIpv6Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptDns1 strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptDns2, INET_ADDRSTRLEN,
+                staticIpAddress.dnsServer2.GetIpv6Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptDns2 strcpy_s failed!");
+            }
+            pDhcpResultNotify->OnSuccess(1, ifname.c_str(), &result);
             break;
         }
         case IPTYPE_MIX: {
             result.iptype = IPTYPE_IPV4;
-            result.strYourCli = staticIpAddress.ipAddress.address.GetIpv4Address();
-            result.strRouter1 = staticIpAddress.gateway.GetIpv4Address();
-            result.strSubnet = staticIpAddress.GetIpv4Mask();
-            result.strDns1 = staticIpAddress.dnsServer1.GetIpv4Address();
-            result.strDns2 = staticIpAddress.dnsServer2.GetIpv4Address();
-            pDhcpResultNotify->OnSuccess(1, IF_NAME + std::to_string(m_instId), result);
-
-            result.iptype = IPTYPE_IPV6;
-            result.strYourCli = staticIpAddress.ipAddress.address.GetIpv6Address();
-            result.strRouter1 = staticIpAddress.gateway.GetIpv6Address();
-            result.strSubnet = staticIpAddress.GetIpv6Mask();
-            result.strDns1 = staticIpAddress.dnsServer1.GetIpv6Address();
-            result.strDns2 = staticIpAddress.dnsServer2.GetIpv6Address();
-            pDhcpResultNotify->OnSuccess(1, IF_NAME + std::to_string(m_instId), result);
+            if (strcpy_s(result.strOptClientId, INET_ADDRSTRLEN,
+                staticIpAddress.ipAddress.address.GetIpv4Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptClientId strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptRouter1, INET_ADDRSTRLEN,
+                staticIpAddress.gateway.GetIpv4Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptRouter1 strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptSubnet, INET_ADDRSTRLEN,
+                staticIpAddress.GetIpv4Mask().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptSubnet strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptDns1, INET_ADDRSTRLEN,
+                staticIpAddress.dnsServer1.GetIpv4Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptDns1 strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptDns2, INET_ADDRSTRLEN,
+                staticIpAddress.dnsServer2.GetIpv4Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptDns2 strcpy_s failed!");
+            }
+            pDhcpResultNotify->OnSuccess(1, ifname.c_str(), &result);
+            if (strcpy_s(result.strOptClientId, INET_ADDRSTRLEN,
+                staticIpAddress.ipAddress.address.GetIpv6Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptClientId strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptRouter1, INET_ADDRSTRLEN,
+                staticIpAddress.gateway.GetIpv6Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptRouter1 strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptSubnet, INET_ADDRSTRLEN, staticIpAddress.GetIpv6Mask().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptSubnet strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptDns1, INET_ADDRSTRLEN,
+                staticIpAddress.dnsServer1.GetIpv6Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptDns1 strcpy_s failed!");
+            }
+            if (strcpy_s(result.strOptDns2, INET_ADDRSTRLEN,
+                staticIpAddress.dnsServer2.GetIpv6Address().c_str()) != EOK) {
+                WIFI_LOGE("ConfigStaticIpAddress strOptDns2 strcpy_s failed!");
+            }
+            pDhcpResultNotify->OnSuccess(1, ifname.c_str(), &result);
             break;
         }
 
@@ -2569,51 +2632,57 @@ void StaStateMachine::DealGetDhcpIpTimeout(InternalMessage *msg)
         LOGE("DealGetDhcpIpTimeout InternalMessage msg is null.");
         return;
     }
-    LOGI("DealGetDhcpIpTimeout StopTimer CMD_START_GET_DHCP_IP_TIMEOUT");
+    LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT DealGetDhcpIpTimeout");
     StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     DisConnectProcess();
 }
 
 /* ------------------ state machine dhcp callback function ----------------- */
-
-StaStateMachine::DhcpResultNotify::DhcpResultNotify(StaStateMachine *staStateMachine)
+StaStateMachine* StaStateMachine::DhcpResultNotify::pStaStateMachine = nullptr;
+StaStateMachine::DhcpResultNotify::DhcpResultNotify()
 {
-    pStaStateMachine = staStateMachine;
 }
 
 StaStateMachine::DhcpResultNotify::~DhcpResultNotify()
-{}
-
-void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string &ifname, DhcpResult &result)
 {
-    LOGD("Enter Sta DhcpResultNotify::OnSuccess. ifname=[%{public}s] status=[%{public}d]\n",
-        ifname.c_str(), status);
+}
 
+void StaStateMachine::DhcpResultNotify::SetStaStateMachine(StaStateMachine *staStateMachine)
+{
+    StaStateMachine::DhcpResultNotify::pStaStateMachine = staStateMachine;
+}
+
+void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname, DhcpResult *result)
+{
+    if (ifname == nullptr || result == nullptr) {
+        LOGE("StaStateMachine DhcpResultNotify OnSuccess ifname or result is nullptr.");
+        return;
+    }
+    LOGI("Enter Sta DhcpResultNotify OnSuccess. ifname=[%{public}s] status=[%{public}d]", ifname, status);
+    LOGI("iptype=%{public}d, isOptSuc=%{public}d, clientip =%{private}s, serverip=%{private}s, subnet=%{private}s",
+        result->iptype, result->isOptSuc, result->strOptClientId,  result->strOptServerId, result->strOptSubnet);
+    LOGI("gateway1=%{private}s, gateway2=%{private}s, strDns1=%{private}s, strDns2=%{private}s, strVendor=%{public}s, \
+        uOptLeasetime=%{public}d, uAddTime=%{public}d, uGetTime=%{public}d, currentTpType=%{public}d",
+        result->strOptRouter1, result->strOptRouter2, result->strOptDns1, result->strOptDns2, result->strOptVendor,
+        result->uOptLeasetime, result->uAddTime, result->uGetTime, pStaStateMachine->currentTpType);
+
+    LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT OnSuccess");
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     if ((pStaStateMachine->linkedInfo.connState != ConnState::CONNECTED) &&
         (pStaStateMachine->linkedInfo.detailedState != DetailedState::OBTAINING_IPADDR)) {
         WIFI_LOGI("not in connected or in obtain ip address, need stop dhcp client");
         if (pStaStateMachine->pDhcpResultNotify != nullptr) {
+            std::string name = IF_NAME + std::to_string(pStaStateMachine->GetInstanceId());
             if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
-                pStaStateMachine->pDhcpService->StopDhcpClient(
-                    IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), true);
+                StopDhcpClient(name.c_str(), true);
+                LOGI("StopDhcpClient ipv6");
             } else {
-                pStaStateMachine->pDhcpService->StopDhcpClient(
-                    IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), false);
+                StopDhcpClient(name.c_str(), false);
+                LOGI("StopDhcpClient ipv4");
             }
         }
         return;
     }
-    WIFI_LOGD("iptype=%{public}d, ip=%{public}s, gateway=%{public}s, \
-        subnet=%{public}s, serverAddress=%{public}s, leaseDuration=%{public}d.",
-        result.iptype,
-        IpAnonymize(result.strYourCli).c_str(),
-        IpAnonymize(result.strRouter1).c_str(),
-        IpAnonymize(result.strSubnet).c_str(),
-        IpAnonymize(result.strServer).c_str(),
-        result.uLeaseTime);
-    WIFI_LOGD("strDns1=%{public}s, strDns2=%{public}s", IpAnonymize(result.strDns1).c_str(),
-        IpAnonymize(result.strDns2).c_str());
 
     IpInfo ipInfo;
     WifiSettings::GetInstance().GetIpInfo(ipInfo, pStaStateMachine->GetInstanceId());
@@ -2621,7 +2690,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     WifiSettings::GetInstance().GetIpv6Info(ipv6Info, pStaStateMachine->GetInstanceId());
     TryToSaveIpV4Result(ipInfo, ipv6Info, result);
     TryToSaveIpV6Result(ipInfo, ipv6Info, result);
-    TryToCloseDhcpClient(result.iptype);
+    TryToCloseDhcpClient(result->iptype);
 
     WifiDeviceConfig config;
     AssignIpMethod assignMethod = AssignIpMethod::DHCP;
@@ -2629,15 +2698,15 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     if (ret == 0) {
         assignMethod = config.wifiIpConfig.assignMethod;
     }
-    LOGI("DhcpResultNotify OnSuccess, uLeaseTime=%{public}d %{public}d %{public}d", result.uLeaseTime, assignMethod,
+    LOGI("DhcpResultNotify OnSuccess, uLeaseTime=%{public}d %{public}d %{public}d", result->uOptLeasetime, assignMethod,
         pStaStateMachine->currentTpType);
-    if ((assignMethod == AssignIpMethod::DHCP) && (result.uLeaseTime > 0) &&
+    if ((assignMethod == AssignIpMethod::DHCP) && (result->uOptLeasetime > 0) &&
         (pStaStateMachine->currentTpType != IPTYPE_IPV6)) {
-        if (result.uLeaseTime < STA_RENEWAL_MIN_TIME) {
-            result.uLeaseTime = STA_RENEWAL_MIN_TIME;
+        if (result->uOptLeasetime < STA_RENEWAL_MIN_TIME) {
+            result->uOptLeasetime = STA_RENEWAL_MIN_TIME;
         }
-        int64_t interval = result.uLeaseTime / 2 * TIME_USEC_1000; // s->ms
-        LOGI("StartTimer CMD_START_RENEWAL_TIMEOUT interval=%{public}lld", interval);
+        int64_t interval = result->uOptLeasetime / 2 * TIME_USEC_1000; // s->ms
+        LOGI("StartTimer CMD_START_RENEWAL_TIMEOUT uOptLeasetime=%{public}d", result->uOptLeasetime);
         pStaStateMachine->StartTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT), interval);
     }
 
@@ -2647,29 +2716,35 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const std::string 
     return;
 }
 
-void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult &result)
+void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
 {
-    if (!((IpTools::ConvertIpv4Address(result.strYourCli) == ipInfo.ipAddress) &&
-        (IpTools::ConvertIpv4Address(result.strRouter1) == ipInfo.gateway))) {
-        if (result.iptype == 0) {
-            ipInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
-            ipInfo.gateway = IpTools::ConvertIpv4Address(result.strRouter1);
-            ipInfo.netmask = IpTools::ConvertIpv4Address(result.strSubnet);
-            ipInfo.primaryDns = IpTools::ConvertIpv4Address(result.strDns1);
-            ipInfo.secondDns = IpTools::ConvertIpv4Address(result.strDns2);
-            ipInfo.serverIp = IpTools::ConvertIpv4Address(result.strServer);
-            ipInfo.leaseDuration = result.uLeaseTime;
-            WifiSettings::GetInstance().SaveIpInfo(ipInfo, pStaStateMachine->GetInstanceId());
-            pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result.strYourCli);
-            pStaStateMachine->linkedInfo.isDataRestricted =
-                (result.strVendor.find("ANDROID_METERED") == std::string::npos) ? 0 : 1;
-            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
+    if (result == nullptr) {
+        LOGE("TryToSaveIpV4Result resultis nullptr.");
+        return;
+    }
+
+    if (!((IpTools::ConvertIpv4Address(result->strOptClientId) == ipInfo.ipAddress) &&
+        (IpTools::ConvertIpv4Address(result->strOptRouter1) == ipInfo.gateway))) {
+        if (result->iptype == 0) {  /* 0-ipv4,1-ipv6 */
+            ipInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
+            ipInfo.gateway = IpTools::ConvertIpv4Address(result->strOptRouter1);
+            ipInfo.netmask = IpTools::ConvertIpv4Address(result->strOptSubnet);
+            ipInfo.primaryDns = IpTools::ConvertIpv4Address(result->strOptDns1);
+            ipInfo.secondDns = IpTools::ConvertIpv4Address(result->strOptDns2);
+            ipInfo.serverIp = IpTools::ConvertIpv4Address(result->strOptServerId);
+            ipInfo.leaseDuration = result->uOptLeasetime;
+            WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+
+            pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
+            std::string strVendor = result->strOptVendor;
+            pStaStateMachine->linkedInfo.isDataRestricted = (strVendor.find("ANDROID_METERED") == std::string::npos) ? 0 : 1;
+            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
 #ifndef OHOS_ARCH_LITE
-            WIFI_LOGD("Update NetLink info, strYourCli=%{public}s, strSubnet=%{public}s, \
-                strRouter1=%{public}s, strDns1=%{public}s, strDns2=%{public}s",
-                IpAnonymize(result.strYourCli).c_str(), IpAnonymize(result.strSubnet).c_str(),
-                IpAnonymize(result.strRouter1).c_str(), IpAnonymize(result.strDns1).c_str(),
-                IpAnonymize(result.strDns2).c_str());
+            LOGI("TryToSaveIpV4Result Update NetLink info, strYourCli=%{private}s, strSubnet=%{private}s, \
+                strRouter1=%{private}s, strDns1=%{private}s, strDns2=%{private}s",
+                IpAnonymize(result->strOptClientId).c_str(), IpAnonymize(result->strOptSubnet).c_str(),
+                IpAnonymize(result->strOptRouter1).c_str(), IpAnonymize(result->strOptDns1).c_str(),
+                IpAnonymize(result->strOptDns2).c_str());
             WIFI_LOGI("On dhcp success update net linke info");
             WifiDeviceConfig config;
             WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
@@ -2678,24 +2753,28 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
 #endif
         }
 #ifdef OHOS_ARCH_LITE
-        IfConfig::GetInstance().SetIfDnsAndRoute(result, result.iptype, pStaStateMachine->GetInstanceId());
+        IfConfig::GetInstance().SetIfDnsAndRoute(result, result->iptype, pStaStateMachine->GetInstanceId());
 #endif
     }
 }
 
-void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult &result)
+void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
 {
-    if (result.iptype == 1 &&
-        (ipv6Info.globalIpV6Address != result.strYourCli || ipv6Info.gateway != result.strRouter1)) {
+    if (result == nullptr) {
+        LOGE("TryToSaveIpV6Result resultis nullptr.");
+        return;
+    }
+    if (result->iptype == 1 &&  /* 0-ipv4,1-ipv6 */
+        (ipv6Info.globalIpV6Address != result->strOptClientId || ipv6Info.gateway != result->strOptRouter1)) {
         ipv6Info.linkIpV6Address = "";
-        ipv6Info.globalIpV6Address = result.strYourCli;
+        ipv6Info.globalIpV6Address = result->strOptClientId;
         ipv6Info.randGlobalIpV6Address = "";
-        ipv6Info.gateway = result.strRouter1;
-        ipv6Info.netmask = result.strSubnet;
-        ipv6Info.primaryDns = result.strDns1;
-        ipv6Info.secondDns = result.strDns2;
+        ipv6Info.gateway = result->strOptRouter1;
+        ipv6Info.netmask = result->strOptSubnet;
+        ipv6Info.primaryDns = result->strOptRouter1;
+        ipv6Info.secondDns = result->strOptRouter2;
         WifiSettings::GetInstance().SaveIpV6Info(ipv6Info, pStaStateMachine->GetInstanceId());
-        WIFI_LOGI("V6Info::addr=%{private}s, gateway=%{private}s, mask=%{private}s, dns=%{private}s, dns2=%{private}s",
+        WIFI_LOGI("SaveIpV6 addr=%{private}s, gateway=%{private}s, mask=%{private}s, dns=%{private}s, dns2=%{private}s",
             ipv6Info.globalIpV6Address.c_str(), ipv6Info.gateway.c_str(), ipv6Info.netmask.c_str(),
             ipv6Info.primaryDns.c_str(), ipv6Info.secondDns.c_str());
 #ifndef OHOS_ARCH_LITE
@@ -2710,9 +2789,10 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
 void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
 {
     if (iptype == 1) {
+        LOGE("TryToCloseDhcpClient iptype ipv6 return");
         return;
     }
-    WIFI_LOGI("DhcpResultNotify::OnSuccess, getIpSucNum=%{public}d, isRoam=%{public}d",
+    WIFI_LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d, isRoam=%{public}d",
         pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
     pStaStateMachine->OnDhcpResultNotifyEvent(true);
     if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
@@ -2728,37 +2808,38 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
         pStaStateMachine->DealSetStaConnectFailedCount(0, true);
     }
     pStaStateMachine->getIpSucNum++;
+    LOGI("TryToCloseDhcpClient, stop dhcp client, getIpSucNum=%{public}d", pStaStateMachine->getIpSucNum);
 
-    WIFI_LOGI("DhcpResultNotify::OnSuccess, stop dhcp client");
-    if (pStaStateMachine->pDhcpService != nullptr) {
-        if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
-            pStaStateMachine->pDhcpService->StopDhcpClient(
-                    IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), true);
-        } else {
-            pStaStateMachine->pDhcpService->StopDhcpClient(
-                    IF_NAME + std::to_string(pStaStateMachine->GetInstanceId()), false);
-        }
+    std::string ifname = IF_NAME + std::to_string(pStaStateMachine->GetInstanceId());
+    if (pStaStateMachine->currentTpType == IPTYPE_IPV6) {
+        StopDhcpClient(ifname.c_str(), true);
+        WIFI_LOGE("TryToCloseDhcpClient StopDhcpClient ipv6");
+    } else {
+        StopDhcpClient(ifname.c_str(), false);
+        WIFI_LOGE("TryToCloseDhcpClient StopDhcpClient ipv4");
     }
 }
 
-void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &ifname, const std::string &reason)
+void StaStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname, const char *reason)
 {
     // for dhcp: 4-DHCP_OPT_RENEW_FAILED  5-DHCP_OPT_RENEW_TIMEOUT
     if ((status == DHCP_RENEW_FAILED) || (status == DHCP_RENEW_TIMEOUT)) {
-        LOGI("DhcpResultNotify::OnFailed, ifname[%{public}s], status[%{public}d], reason[%{public}s]", ifname.c_str(),
-            status, reason.c_str());
+        LOGI("DhcpResultNotify::OnFailed, ifname[%{public}s], status[%{public}d], reason[%{public}s]", ifname, status,
+            reason);
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
         return;
     }
-    LOGI("Enter DhcpResultNotify::OnFailed. ifname=[%s] status=[%d], reason = [%s], detailedState = [%d]\n",
-        ifname.c_str(), status, reason.c_str(), static_cast<int>(pStaStateMachine->linkedInfo.detailedState));
+    LOGI("Enter DhcpResultNotify::OnFailed. ifname=%{public}s, status=%{public}d, reason=%{public}s, state=%{public}d",
+        ifname, status, reason, static_cast<int>(pStaStateMachine->linkedInfo.detailedState));
+    
+    LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT OnFailed");
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||
         (pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTED)) {
         return;
     }
 
-    LOGI("currentTpType: %{public}d, getIpSucNum: %{public}d, getIpFailNum: %{public}d, isRoam: %{public}d",
+    LOGI("DhcpResultNotify OnFailed type: %{public}d, sucNum: %{public}d, failNum: %{public}d, isRoam: %{public}d",
         pStaStateMachine->currentTpType, pStaStateMachine->getIpSucNum,
         pStaStateMachine->getIpFailNum, pStaStateMachine->isRoam);
 
@@ -2774,10 +2855,6 @@ void StaStateMachine::DhcpResultNotify::OnFailed(int status, const std::string &
     pStaStateMachine->getIpFailNum++;
 }
 
-void StaStateMachine::DhcpResultNotify::OnSerExitNotify(const std::string &ifname)
-{
-    LOGI("Enter DhcpResultNotify::OnSerExitNotify. ifname = [%s]\n", ifname.c_str());
-}
 
 /* ------------------ state machine Comment function ----------------- */
 void StaStateMachine::SaveDiscReason(DisconnectedReason discReason)
@@ -2878,7 +2955,7 @@ void StaStateMachine::DealRenewalTimeout(InternalMessage *msg)
         LOGE("DealRenewalTimeout InternalMessage msg is null.");
         return;
     }
-    LOGI("DealRenewalTimeout StopTimer CMD_START_RENEWAL_TIMEOUT");
+    LOGI("StopTimer CMD_START_RENEWAL_TIMEOUT DealRenewalTimeout");
     StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
     StartDhcpRenewal(); // start renewal
 }
@@ -2893,13 +2970,9 @@ void StaStateMachine::StartDhcpRenewal()
         return;
     }
 
-    if (pDhcpService == nullptr) {
-        WIFI_LOGE("StartDhcpRenewal pDhcpService is null!");
-        return;
-    }
-
-    int dhcpRet = pDhcpService->RenewDhcpClient(IF_NAME + std::to_string(m_instId));
-    if ((dhcpRet != 0) || (pDhcpService->GetDhcpResult(IF_NAME + std::to_string(m_instId), pDhcpResultNotify, DHCP_TIME) != 0)) {
+    std::string ifname = IF_NAME + std::to_string(m_instId);
+    int dhcpRet = RenewDhcpClient(ifname.c_str());
+    if (dhcpRet != 0) {
         WIFI_LOGE("StartDhcpRenewal dhcp renew failed, dhcpRet:%{public}d", dhcpRet);
     } else {
         WIFI_LOGI("StartDhcpRenewal dhcp renew success.");

@@ -137,7 +137,6 @@ ohos_unittest("manager_unittest") {
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
-    "dhcp:dhcp_manager_service",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "huks:libhukssdk",

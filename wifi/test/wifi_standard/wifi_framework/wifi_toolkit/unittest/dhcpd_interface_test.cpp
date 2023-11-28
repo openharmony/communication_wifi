@@ -48,39 +48,27 @@ public:
         std::string ifaceName = "wlan0";
         Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
         Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-        pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, "", isIpV4);
+        pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
     }
 public:
     std::unique_ptr<DhcpdInterface> pDhcpdInterface;
 };
 
-class DhcpNotifyMock : public IDhcpResultNotify {
+
+class DhcpNotifyMock {
 public:
     explicit DhcpNotifyMock()
     {
         WIFI_LOGI("DhcpNotifyMock constructor...");
     }
-
-    ~DhcpNotifyMock() override
+    ~DhcpNotifyMock()
     {
         WIFI_LOGI("DhcpNotifyMock destructor...");
     }
-
-    void OnSuccess(int status, const std::string &ifname, DhcpResult &result) override
-    {
-        WIFI_LOGI("OnSuccess mock enter...");
-    }
-
-    void OnFailed(int status, const std::string &ifname, const std::string &reason) override
-    {
-        WIFI_LOGI("OnFailed mock enter...");
-    }
-
-    void OnSerExitNotify(const std::string& ifname) override
-    {
-        WIFI_LOGI("OnSerExitNotify mock enter...");
-    }
+    void OnSuccess(int status, const char *ifname, DhcpResult *result);
+    void OnFailed(int status, const char *ifname, const char *reason);
 };
+
 /**
  * @tc.name: StartDhcpServer_001
  * @tc.desc: StartDhcpServer
@@ -105,7 +93,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_002, TestSize.Level1)
     bool isIpV4 = false;
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, "", isIpV4);
+    pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
 }
 /**
  * @tc.name: StartDhcpServer_003
@@ -121,7 +109,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_003, TestSize.Level1)
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     std::string ipAddress = "10";
-    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
+    pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
 }
 /**
  * @tc.name: StartDhcpServer_004
@@ -137,7 +125,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_004, TestSize.Level1)
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     std::string ipAddress = "192.168.62.0";
-    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
+    pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
 }
 /**
  * @tc.name: StartDhcpServer_005
@@ -152,49 +140,9 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_005, TestSize.Level1)
     std::string ifaceName = "p2p";
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-    pDhcpdInterface->StartDhcpServer(ifaceName, ipv4, ipv6, "", isIpV4);
+    pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
 }
-/**
- * @tc.name: SetDhcpEventFunc_001
- * @tc.desc: SetDhcpEventFunc with  pResultNotify == nullptr
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(DhcpdInterfaceTest, SetDhcpEventFunc_001, TestSize.Level1)
-{
-    WIFI_LOGI("SetDhcpEventFunc_001 enter");
-    std::string ifaceName = "wlan0";
-    IDhcpResultNotify *pResultNotify = nullptr;
-    EXPECT_FALSE(pDhcpdInterface->SetDhcpEventFunc(ifaceName, pResultNotify));
-}
-/**
- * @tc.name: SetDhcpEventFunc_002
- * @tc.desc: SetDhcpEventFunc with ifaceName is null
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(DhcpdInterfaceTest, SetDhcpEventFunc_002, TestSize.Level1)
-{
-    WIFI_LOGI("SetDhcpEventFunc_002 enter");
-    std::string ifaceName = "";
-    std::unique_ptr<DhcpNotifyMock> pResultNotify =  std::make_unique<DhcpNotifyMock>();
-    EXPECT_FALSE(pDhcpdInterface->SetDhcpEventFunc(ifaceName, pResultNotify.get()));
-    pResultNotify.reset();
-}
-/**
- * @tc.name: SetDhcpEventFunc_003
- * @tc.desc: SetDhcpEventFunc with mDhcpService == nullptr
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(DhcpdInterfaceTest, SetDhcpEventFunc_003, TestSize.Level1)
-{
-    WIFI_LOGI("SetDhcpEventFunc_003 enter");
-    std::string ifaceName = "wlan0";
-    std::unique_ptr<DhcpNotifyMock> pResultNotify =  std::make_unique<DhcpNotifyMock>();
-    EXPECT_FALSE(pDhcpdInterface->SetDhcpEventFunc(ifaceName, pResultNotify.get()));
-    pResultNotify.reset();
-}
+
 /**
  * @tc.name: SetDhcpEventFunc_004
  * @tc.desc: SetDhcpEventFunc
@@ -207,9 +155,9 @@ HWTEST_F(DhcpdInterfaceTest, SetDhcpEventFunc_004, TestSize.Level1)
     std::string ifaceName = "wlan0";
     std::unique_ptr<DhcpNotifyMock> pResultNotify =  std::make_unique<DhcpNotifyMock>();
     StartDhcpServerTest();
-    pDhcpdInterface->SetDhcpEventFunc(ifaceName, pResultNotify.get());
     pResultNotify.reset();
 }
+
 /**
  * @tc.name: GetConnectedStationInfo_001
  * @tc.desc: GetConnectedStationInfo with mDhcpService == nullptr

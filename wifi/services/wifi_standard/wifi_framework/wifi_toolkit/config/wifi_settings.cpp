@@ -1389,24 +1389,6 @@ int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
     auto iter = mWifiConfig.find(instId);
     if (iter != mWifiConfig.end()) {
         do {
-            if (band == static_cast<int>(BandType::BAND_2GHZ)) {
-                if (rssi < iter->second.firstRssiLevel2G) {
-                    break;
-                }
-                ++level;
-                if (rssi < iter->second.secondRssiLevel2G) {
-                    break;
-                }
-                ++level;
-                if (rssi < iter->second.thirdRssiLevel2G) {
-                    break;
-                }
-                ++level;
-                if (rssi < iter->second.fourthRssiLevel2G) {
-                    break;
-                }
-                ++level;
-            }
             if (band == static_cast<int>(BandType::BAND_5GHZ)) {
                 if (rssi < iter->second.firstRssiLevel5G) {
                     break;
@@ -1421,6 +1403,23 @@ int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
                 }
                 ++level;
                 if (rssi < iter->second.fourthRssiLevel5G) {
+                    break;
+                }
+                ++level;
+            } else {
+                if (rssi < iter->second.firstRssiLevel2G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.secondRssiLevel2G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.thirdRssiLevel2G) {
+                    break;
+                }
+                ++level;
+                if (rssi < iter->second.fourthRssiLevel2G) {
                     break;
                 }
                 ++level;

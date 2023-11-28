@@ -302,18 +302,18 @@ bool IfConfig::CheckIfaceValid(const std::string& ifname)
  * @Description : Set the network card routing, DNS
  * @Return success:0 failed:-1
  */
-int IfConfig::SetIfDnsAndRoute(const DhcpResult &dhcpResult, int ipType, int instId)
+int IfConfig::SetIfDnsAndRoute(const DhcpResult *dhcpResult, int ipType, int instId)
 {
     LOGD("ipType=%d, ip=%s, gateway=%s, subnet=%s, strDns1=%s, strDns2=%s",
-        dhcpResult.iptype,
-        dhcpResult.strYourCli.c_str(),
-        dhcpResult.strSubnet.c_str(),
-        dhcpResult.strRouter1.c_str(),
-        dhcpResult.strDns1.c_str(),
-        dhcpResult.strDns2.c_str());
-    SetNetDns(IFNAME + std::to_string(instId), dhcpResult.strDns1, dhcpResult.strDns2);
-    AddIfRoute(IFNAME + std::to_string(instId), dhcpResult.strYourCli, dhcpResult.strSubnet, dhcpResult.strRouter1,
-        ipType);
+        dhcpResult->iptype,
+        dhcpResult->strOptClientId,
+        dhcpResult->strOptSubnet,
+        dhcpResult->strOptRouter1,
+        dhcpResult->strOptDns1,
+        dhcpResult->strOptDns2);
+    SetNetDns(IFNAME + std::to_string(instId), dhcpResult->strOptDns1, dhcpResult->strOptDns2);
+    AddIfRoute(IFNAME + std::to_string(instId), dhcpResult->strOptClientId, dhcpResult->strOptSubnet,
+        dhcpResult->strOptRouter1, ipType);
     LOGI("set dns and route finished!");
     return 0;
 }

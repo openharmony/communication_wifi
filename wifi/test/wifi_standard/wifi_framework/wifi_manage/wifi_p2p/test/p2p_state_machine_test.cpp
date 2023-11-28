@@ -350,11 +350,11 @@ public:
     }
     void WarpDhcpResultNotifyOnSuccess(int status, const std::string &ifname, DhcpResult &result)
     {
-        pP2pStateMachine->pDhcpResultNotify->OnSuccess(status, ifname, result);
+        pP2pStateMachine->pDhcpResultNotify->OnSuccess(status, ifname.c_str(), &result);
     }
     void WarpDhcpResultNotifyOnFailed(int status, const std::string &ifname, const std::string &reason)
     {
-        pP2pStateMachine->pDhcpResultNotify->OnFailed(status, ifname, reason);
+        pP2pStateMachine->pDhcpResultNotify->OnFailed(status, ifname.c_str(), reason.c_str());
     }
     int WarpGetAvailableFreqByBand(GroupOwnerBand band) const
     {

@@ -16,32 +16,30 @@
 #define OHOS_MOCK_DHCPSERVICE_H
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "i_dhcp_service.h"
+#include "dhcp_c_api.h"
 
 namespace OHOS {
 namespace Wifi {
-class DhcpService : public IDhcpService {
+class DhcpService {
 public:
     DhcpService() = default;
     ~DhcpService() = default;
-    int StartDhcpClient(const std::string& ifname, bool bIpv6);
-    int StopDhcpClient(const std::string& ifname, bool bIpv6);
-    int GetDhcpResult(const std::string& ifname, IDhcpResultNotify *pResultNotify, int timeouts);
-    int RemoveDhcpResult(IDhcpResultNotify *pResultNotify);
-    int GetDhcpInfo(const std::string& ifname, DhcpServiceInfo& dhcp);
-    int RenewDhcpClient(const std::string& ifname);
-    int ReleaseDhcpClient(const std::string& ifname);
-    int StartDhcpServer(const std::string& ifname);
-    int StopDhcpServer(const std::string& ifname);
-    int GetServerStatus(void);
-    int PutDhcpRange(const std::string& tagName, const DhcpRange& range);
-    int RemoveDhcpRange(const std::string& tagName, const DhcpRange& range);
-    int RemoveAllDhcpRange(const std::string& tagName);
-    int SetDhcpRange(const std::string& ifname, const DhcpRange& range);
-    int SetDhcpRange(const std::string& ifname, const std::string& tagName);
-    int GetLeases(const std::string& ifname, std::vector<std::string>& leases);
-    int GetDhcpSerProExit(const std::string& ifname, IDhcpResultNotify *pResultNotify);
-    int UpdateDefaultConfigFile(const std::string leaseTime);
+    
+    int RegisterDhcpClientCallBack(const char *ifname, const ClientCallBack *event);
+    int StartDhcpClient(const char *ifname, bool bIpv6);
+    int StopDhcpClient(const char *ifname, bool bIpv6);
+    int RenewDhcpClient(const char *ifname);
+
+    int RegisterDhcpServerCallBack(const char *ifname, const ServerCallBack *event);
+    int StartDhcpServer(const char *ifname);
+    int StopDhcpServer(const char *ifname);
+    int PutDhcpRange(const char *tagName, const DhcpRange *range);
+    int RemoveDhcpRange(const char *tagName, const DhcpRange *range);
+    int RemoveAllDhcpRange(const char *tagName);
+    int SetDhcpRange(const char *ifname, const DhcpRange *range);
+    int SetDhcpName(const char *ifname, const char *tagName);
+    int GetDhcpClientInfos(const char *ifname, int staNumber, DhcpStationInfo *staInfo, int *staSize);
+    int UpdateLeasesTime(const char *leaseTime);
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -81,7 +81,6 @@ ohos_unittest("WifiApServiceTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
     "$WIFI_ROOT_DIR/utils/inc",
-    "$DHCP_ROOT_DIR/services/mgr_service/include",
     "$DHCP_ROOT_DIR/interfaces/inner_api/include",
     "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
     "//third_party/googletest/googlemock/include",
@@ -104,7 +103,7 @@ ohos_unittest("WifiApServiceTest") {
   ]
   external_deps = [
     "c_utils:utils",
-    "dhcp:dhcp_manager_service",
+    "dhcp:dhcp_sdk",
     "hilog:libhilog",
   ]
 

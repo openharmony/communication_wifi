@@ -1689,7 +1689,7 @@ int WifiSettings::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
     return 0;
 }
 
-bool WifiSetting::GetOpenWifiWhenAirplaneMode(int instId)
+bool WifiSettings::GetOpenWifiWhenAirplaneMode(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);

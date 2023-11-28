@@ -118,6 +118,9 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessage *msg)
                     break;
                 }
                 pWifiControllerMachine->MakeConcreteManager(role, msg->GetParam2());
+                if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+                    WifiConfigCenter::GetInstance().SetOpenWifiWhenAirplaneMode(true);
+                }
                 pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
             }
             break;
@@ -222,7 +225,9 @@ void WifiControllerMachine::HandleAirplaneOpen()
 {
     WIFI_LOGI("airplane open set softap false");
     WifiSettings::GetInstance().SetSoftapToggledState(false);
-    StopAllConcreteManagers();
+    if (!WifiConfigCenter::GetInstance().GetOpenWifiWhenAirplaneMode()) {
+        StopAllConcreteManagers();
+    }
     StopAllSoftapManagers();
 }
 
@@ -479,6 +484,9 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
     ConcreteManagerRole presentRole;
     if (!(pWifiControllerMachine->ShouldEnableWifi())) {
         pWifiControllerMachine->StopAllConcreteManagers();
+        if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+            WifiConfigCenter::GetInstance().SetOpenWifiWhenAirplaneMode(false);
+        }
         return;
     }
     if (pWifiControllerMachine->ConcreteIdExit(msg->GetParam2())) {

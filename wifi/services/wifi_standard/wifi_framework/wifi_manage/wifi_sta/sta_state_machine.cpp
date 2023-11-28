@@ -844,6 +844,11 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         MacAnonymize(linkedInfo.bssid).c_str(), signalInfo.frequency, signalInfo.signal, signalInfo.noise,
         signalInfo.chload, signalInfo.snr, signalInfo.ulDelay, signalInfo.txrate, signalInfo.rxrate, signalInfo.txBytes,
         signalInfo.rxBytes, signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets);
+
+    if (signalInfo.frequency > 0) {
+        linkedInfo.frequency = signalInfo.frequency;
+    }
+    ConvertFreqToChannel();
     if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
         if (signalInfo.signal > 0) {
             linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
@@ -886,9 +891,6 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         InvokeOnStaStreamChanged(StreamDirection::STREAM_DIRECTION_DOWN);
     }
 
-    if (signalInfo.frequency > 0) {
-        linkedInfo.frequency = signalInfo.frequency;
-    }
     linkedInfo.snr = signalInfo.snr;
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
@@ -897,7 +899,6 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
          linkedInfo.wifiStandard, MacAnonymize(linkedInfo.bssid).c_str(), linkedInfo.maxSupportedRxLinkSpeed,
          linkedInfo.maxSupportedTxLinkSpeed);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    ConvertFreqToChannel();
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
     StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
 }

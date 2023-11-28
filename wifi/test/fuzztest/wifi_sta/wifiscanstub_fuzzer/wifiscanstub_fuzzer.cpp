@@ -33,11 +33,10 @@ namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
 constexpr size_t MAP_SCAN_NUMS = 31;
-constexpr int INS_ID = 0;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiScan";
 const std::u16string FORMMGR_INTERFACE_TOKEN_EX = u"ohos.wifi.IWifiScanMgr";
 sptr<WifiScanMgrStub> pWifiScanMgrStub = WifiScanMgrServiceImpl::GetInstance();
-sptr<WifiScanStub> pWifiScanStub = new (std::nothrow) WifiScanServiceImpl(INS_ID);
+std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanServiceImpl>();
 
 bool DoSomethingInterestingWithMyAPIEx(const uint8_t* data, size_t size)
 {

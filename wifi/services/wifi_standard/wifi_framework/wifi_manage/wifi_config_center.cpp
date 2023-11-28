@@ -24,7 +24,7 @@ namespace Wifi {
 WifiConfigCenter &WifiConfigCenter::GetInstance()
 {
     static WifiConfigCenter gWifiConfigCenter;
-    return gWifiConfigCenter;
+    return gWifiConfigCenter;;
 }
 
 WifiConfigCenter::WifiConfigCenter()

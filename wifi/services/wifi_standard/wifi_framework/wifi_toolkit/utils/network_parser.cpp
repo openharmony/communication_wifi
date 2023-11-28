@@ -424,7 +424,7 @@ void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
     WIFI_LOGI("ParseNetworkList size[%{public}lu]", (unsigned long) wifiConfigs.size());
 }
 
-void NetworkXmlParser::SetMacMap()
+void NetworkXmlParser::ParseMacMap()
 {
     WifiStoreRandomMac wifiStoreRandomMac{};
     for (auto wifiConfig : wifiConfigs) {
@@ -447,6 +447,7 @@ bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
         return false;
     }
     ParseNetworkList(node);
+    ParseMacMap();
     return true;
 }
 
@@ -466,7 +467,6 @@ std::vector<WifiDeviceConfig> NetworkXmlParser::GetNetworks()
 
 std::vector<WifiStoreRandomMac> NetworkXmlParser::GetRandomMacmap()
 {
-    SetMacMap();
     return wifiStoreRandomMacs;
 }
 }

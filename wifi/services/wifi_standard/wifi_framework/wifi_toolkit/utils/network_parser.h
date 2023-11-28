@@ -109,7 +109,7 @@ private:
     void GetKeyMgmt(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
     OHOS::Wifi::WifiPrivacyConfig GetRandMacSetting(xmlNodePtr node);
     bool HasWepKeys(WifiDeviceConfig wifiConfig);
-    void SetMacMap();
+    void ParseMacMap();
     void ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig);
     void ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig);
     bool IsWifiConfigValid(WifiDeviceConfig wifiConfig);

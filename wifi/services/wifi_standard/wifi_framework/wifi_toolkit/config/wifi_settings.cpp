@@ -1681,6 +1681,24 @@ bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
     return mWifiConfig[0].canOpenStaWhenAirplane;
 }
 
+int WifiSettings::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig[instId].openWifiWhenAirplane = ifOpen;
+    SyncWifiConfig();
+    return 0;
+}
+
+bool WifiSetting::GetOpenWifiWhenAirplaneMode(int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.openWifiWhenAirplane;
+    }
+    return mWifiConfig[0].openWifiWhenAirplane;
+}
+
 bool WifiSettings::GetStaLastRunState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);

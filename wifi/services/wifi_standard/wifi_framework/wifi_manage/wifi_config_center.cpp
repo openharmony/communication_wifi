@@ -350,6 +350,16 @@ bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode(int instId)
     return WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(instId);
 }
 
+int WifiConfigCenter::SetOpenWifiWhenAirPlaneMode(bool ifOpen, int instId)
+{
+    return WifiSettings::GetInstance().SetOpenWifiWhenAirPlaneMode(ifOpen, instId);
+}
+
+bool WifiConfigCenter::GetOpenWifiWhenAirPlaneMode(int instId)
+{
+    return WifiSettings::GetInstance().GetOpenWifiWhenAirPlaneMode(instId);
+}
+
 bool WifiConfigCenter::GetWifiStateWhenAirplaneMode()
 {
     return mWifiOpenedWhenAirplane.load();

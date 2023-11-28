@@ -486,14 +486,14 @@ public:
      * @param ifOpen - user want to open wifi
      * @return int - 0 success
      */
-    int SetOpenWifiWhenAirPlaneMode(bool ifOpen, int instId = 0);
+    int SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId = 0);
 
     /**
      * @Description Get whether open wifi when airplane mode opened
      *
      * @return true - open; false - can't open
      */
-    bool GetOpenWifiWhenAirPlaneMode(int instId = 0);
+    bool GetOpenWifiWhenAirplaneMode(int instId = 0);
 
     /**
      * @Description Set current power sleep state

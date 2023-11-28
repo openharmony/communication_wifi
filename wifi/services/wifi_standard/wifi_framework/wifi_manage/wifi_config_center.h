@@ -484,16 +484,16 @@ public:
      * @Description Set whether open wifi when airplane mode opened
      *
      * @param ifOpen - user want to open wifi
-     * @return int - 0 success 
+     * @return int - 0 success
      */
-    int WifiConfigCenter::SetOpenWifiWhenAirPlaneMode(bool ifOpen, int instId = 0);
+    int SetOpenWifiWhenAirPlaneMode(bool ifOpen, int instId = 0);
 
     /**
      * @Description Get whether open wifi when airplane mode opened
      *
      * @return true - open; false - can't open
      */
-    bool WifiConfigCenter::GetOpenWifiWhenAirPlaneMode(int instId = 0);
+    bool GetOpenWifiWhenAirPlaneMode(int instId = 0);
 
     /**
      * @Description Set current power sleep state

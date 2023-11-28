@@ -157,11 +157,11 @@ HWTEST_F(NetworkParserTest, ParseNetworkListTest, TestSize.Level1)
     m_networkXmlParser->ParseNetworkList(nullptr);
 }
 
-HWTEST_F(NetworkParserTest, SetMacMapTest, TestSize.Level1)
+HWTEST_F(NetworkParserTest, ParseMacMapTest, TestSize.Level1)
 {
-    WIFI_LOGI("SetMacMapTest enter");
+    WIFI_LOGI("ParseMacMapTest enter");
     std::map<std::string, std::string> mapTest;
-    m_networkXmlParser->SetMacMap();
+    m_networkXmlParser->ParseMacMap();
 }
 
 HWTEST_F(NetworkParserTest, ParseInternalTest, TestSize.Level1)

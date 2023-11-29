@@ -50,6 +50,7 @@ private:
     void OnRemoveDevice(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnRemoveAllDevice(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDeviceConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetChangeDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnectTo(uint32_t code, MessageParcel &data, MessageParcel &reply);

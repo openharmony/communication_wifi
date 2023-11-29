@@ -35,6 +35,7 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
+constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 
 StaService::StaService(int instId)
     : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
@@ -180,8 +181,17 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     }
 
     if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
+#ifndef OHOS_ARCH_LITE
+        const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+        std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+        if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+            LOGE("AddCandidateConfig unsupport open or wep key!");
+            return WIFI_OPT_NOT_SUPPORTED;
+        }
+#else
         LOGE("AddCandidateConfig unsupport open or wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
+#endif
     }
     WifiDeviceConfig tempDeviceConfig = config;
     tempDeviceConfig.uid = uid;
@@ -330,6 +340,16 @@ ErrCode StaService::RemoveDevice(int networkId) const
     WifiSettings::GetInstance().RemoveDevice(networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
+#ifndef OHOS_ARCH_LITE
+    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+        config.callProcessName = wifiBrokerFrameProcessName;
+    } else {
+        config.callProcessName = "";
+    }
+    WifiConfigCenter::GetInstance().SetChangeDeviceConfig(ConfigChange::CONFIG_REMOVE, config);
+#endif
     return WIFI_OPT_SUCCESS;
 }
 
@@ -352,6 +372,18 @@ ErrCode StaService::RemoveAllDevice() const
         return WIFI_OPT_FAILED;
     }
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
+#ifndef OHOS_ARCH_LITE
+    WifiDeviceConfig config;
+    config.networkId = REMOVE_ALL_DEVICECONFIG;
+    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+        config.callProcessName = wifiBrokerFrameProcessName;
+    } else {
+        config.callProcessName = "";
+    }
+    WifiConfigCenter::GetInstance().SetChangeDeviceConfig(ConfigChange::CONFIG_REMOVE, config);
+#endif
     return WIFI_OPT_SUCCESS;
 }
 

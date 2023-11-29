@@ -69,6 +69,7 @@ enum class  DevInterfaceCode {
     WIFI_CBK_CMD_STREAM_DIRECTION = 0x3003,     /* traffic up/down state event */
     WIFI_CBK_CMD_WPS_STATE_CHANGE = 0x3004,     /* wps state change event */
     WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE = 0x3005,    /* device config change event */
+    WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE = 0x3006,    /* device config change event */
 };
 
 /* SAID: 1121 */

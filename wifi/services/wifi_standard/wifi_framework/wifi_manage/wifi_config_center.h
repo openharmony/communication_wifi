@@ -644,6 +644,9 @@ public:
      */
     int GetDeviceProvisionState() const;
 
+    int SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config);
+    
+    bool GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config);
 private:
     std::mutex mStaMutex;
     std::mutex mScanMutex;
@@ -657,6 +660,7 @@ private:
     std::map<int, std::chrono::steady_clock::time_point> mWifiCloseTime;
     std::atomic<bool> mWifiOpenedWhenAirplane;
     std::map<int, std::atomic<bool>> mIsAncoConnected;
+    std::pair<int, WifiDeviceConfig> mLastRemoveDeviceConfig;
 };
 } // namespace Wifi
 } // namespace OHOS

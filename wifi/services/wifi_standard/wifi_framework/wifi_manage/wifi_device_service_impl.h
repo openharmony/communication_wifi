@@ -156,6 +156,7 @@ public:
     
     ErrCode StartPortalCertification() override;
 
+    ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

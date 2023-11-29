@@ -49,6 +49,9 @@ constexpr auto IP_DHCP = "DHCP";
 constexpr auto IP_STATIC = "STATIC";
 constexpr auto PROXY_STATIC = "STATIC";
 constexpr auto PROXY_PAC = "PAC";
+static const std::string DEFAULT_BSSID = "00:00:00:00:00:00";
+static const std::string MULTICAST_MAC = "01:00:00:00:00:00";
+static const std::string LOCALLY_ASSIGNED_MAC = "02:00:00:00:00:00";
 
 const std::unordered_map<std::string, WifiConfigType> g_wifiConfigMap = {
     {XML_TAG_SSID, WifiConfigType::SSID},
@@ -424,15 +427,17 @@ void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
     WIFI_LOGI("ParseNetworkList size[%{public}lu]", (unsigned long) wifiConfigs.size());
 }
 
-void NetworkXmlParser::ParseMacMap()
+void NetworkXmlParser::SetMacMap()
 {
     WifiStoreRandomMac wifiStoreRandomMac{};
     for (auto wifiConfig : wifiConfigs) {
-        wifiStoreRandomMac.ssid = wifiConfig.ssid;
-        wifiStoreRandomMac.keyMgmt = wifiConfig.keyMgmt;
-        wifiStoreRandomMac.peerBssid = wifiConfig.bssid;
-        wifiStoreRandomMac.randomMac = wifiConfig.macAddress;
-        wifiStoreRandomMacs.push_back(wifiStoreRandomMac);
+        if (IsRandomMacValid(wifiConfig)) {
+            wifiStoreRandomMac.ssid = wifiConfig.ssid;
+            wifiStoreRandomMac.keyMgmt = wifiConfig.keyMgmt;
+            wifiStoreRandomMac.peerBssid = wifiConfig.bssid.empty() ? DEFAULT_BSSID : wifiConfig.bssid;
+            wifiStoreRandomMac.randomMac = wifiConfig.macAddress;
+            wifiStoreRandomMacs.push_back(wifiStoreRandomMac);
+        }
     }
 }
 
@@ -447,7 +452,6 @@ bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
         return false;
     }
     ParseNetworkList(node);
-    ParseMacMap();
     return true;
 }
 
@@ -460,6 +464,15 @@ bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)
     return false;
 }
 
+bool NetworkXmlParser::IsRandomMacValid(WifiDeviceConfig wifiConfig)
+{
+    if (wifiConfig.macAddress.empty() || wifiConfig.macAddress == MULTICAST_MAC ||
+        wifiConfig.macAddress == LOCALLY_ASSIGNED_MAC) {
+        return false;
+    }
+    return true;
+}
+
 std::vector<WifiDeviceConfig> NetworkXmlParser::GetNetworks()
 {
     return wifiConfigs;
@@ -467,6 +480,7 @@ std::vector<WifiDeviceConfig> NetworkXmlParser::GetNetworks()
 
 std::vector<WifiStoreRandomMac> NetworkXmlParser::GetRandomMacmap()
 {
+    SetMacMap();
     return wifiStoreRandomMacs;
 }
 }

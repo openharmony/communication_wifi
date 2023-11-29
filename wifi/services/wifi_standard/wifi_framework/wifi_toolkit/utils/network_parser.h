@@ -113,6 +113,7 @@ private:
     void ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig);
     void ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig);
     bool IsWifiConfigValid(WifiDeviceConfig wifiConfig);
+    bool IsRandomMacValid(WifiDeviceConfig wifiConfig);
 };
 }
 }

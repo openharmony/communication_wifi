@@ -15,6 +15,7 @@
 
 #include "wifi_global_func_test.h"
 #include "wifi_global_func.h"
+#include "wifi_country_code_define.h"
 
 using namespace testing::ext;
 
@@ -29,6 +30,7 @@ constexpr int CHANNEL_2G_MIN = 1;
 constexpr int CHANNEL_5G = 34;
 constexpr int CHANNEL_2G = 14;
 constexpr uint32_t PLAIN_LENGTH = 10;
+const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
 
 HWTEST_F(WifiGlobalFuncTest, GetRandomStr, TestSize.Level1)
 {

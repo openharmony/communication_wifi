@@ -30,10 +30,10 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
-DEFINE_WIFILOG_LABEL("WifiSettingsTest");
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiSettingsTest");
 constexpr int NETWORK_ID = 15;
 constexpr int TYPE = 3;
 constexpr int SCORE = 0;
@@ -505,6 +505,18 @@ HWTEST_F(WifiSettingsTest, ClearMacAddrPairsTest, TestSize.Level1)
 {
     WIFI_LOGE("ClearMacAddrPairsTest enter!");
     WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO);
+}
+
+HWTEST_F(WifiSettingsTest, MergeWifiConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("MergeWifiConfigTest enter");
+    WifiSettings::GetInstance().MergeWifiConfig();
+}
+
+HWTEST_F(WifiSettingsTest, MergeSoftapConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("MergeSoftapConfigTest enter");
+    WifiSettings::GetInstance().MergeSoftapConfig();
 }
 }  // namespace Wifi
 }  // namespace OHOS

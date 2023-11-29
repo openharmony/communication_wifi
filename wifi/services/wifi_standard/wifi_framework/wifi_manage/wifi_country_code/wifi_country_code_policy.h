@@ -105,7 +105,7 @@ private:
     ErrCode GetWifiCountryCodeByAP(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByScanResult(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByDefaultZZ(std::string &wifiCountryCode);
-    ErrCode GetWifiCountryCodeByDb(std::string &wifiCountryCode);
+    ErrCode GetWifiCountryCodeByCache(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByDefaultRegion(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByDefault(std::string &wifiCountryCode);
     bool IsContainBssid(const std::vector<std::string> &bssidList, const std::string &bssid);

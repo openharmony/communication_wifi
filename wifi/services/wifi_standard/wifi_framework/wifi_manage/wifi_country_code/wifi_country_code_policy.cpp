@@ -18,11 +18,9 @@
 #ifdef TELEPHONE_CORE_SERVICE_ENABLE
 #include "core_service_client.h"
 #endif
-#include "datashare_helper.h"
-#include "datashare_predicates.h"
-#include "datashare_result_set.h"
+#ifdef I18N_INTL_UTIL_ENABLE
 #include "locale_config.h"
-#include "parameter.h"
+#endif
 #include "uri.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_datashare_utils.h"
@@ -30,10 +28,10 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 
-DEFINE_WIFILOG_LABEL("WifiCountryCodePolicy");
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiCountryCodePolicy");
+
 WifiCountryCodePolicy::WifiCountryCodePolicy()
 {
     CreatePolicy();
@@ -52,7 +50,7 @@ WifiCountryCodePolicy::~WifiCountryCodePolicy()
 void WifiCountryCodePolicy::GetWifiCountryCodePolicy()
 {
     char preValue[WIFI_COUNTRY_CODE_SIZE] = {0};
-    int errorCode = GetParameter(WIFI_COUNTRY_CODE_CONFIG,
+    int errorCode = GetParamValue(WIFI_COUNTRY_CODE_CONFIG,
         WIFI_COUNTRY_CODE_CONFIG_DEFAULT, preValue, WIFI_COUNTRY_CODE_SIZE);
     int policyConf = 0;
     if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
@@ -106,7 +104,7 @@ void WifiCountryCodePolicy::CreatePolicy()
             std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByDefaultZZ, this, std::placeholders::_1));
     }
     m_policyList.emplace_back(
-        std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByDb, this, std::placeholders::_1));
+        std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByCache, this, std::placeholders::_1));
     m_policyList.emplace_back(
         std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByDefaultRegion, this, std::placeholders::_1));
     m_policyList.emplace_back(
@@ -126,7 +124,7 @@ ErrCode WifiCountryCodePolicy::CalculateWifiCountryCode(std::string &wifiCountry
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByFactory(std::string &wifiCountryCode)
 {
     char roRunModeValue[WIFI_COUNTRY_CODE_RUN_MODE_SIZE] = {0};
-    int errorCode = GetParameter(WIFI_COUNTRY_CODE_RUN_MODE, DEFAULT_RO_RUN_MODE, roRunModeValue,
+    int errorCode = GetParamValue(WIFI_COUNTRY_CODE_RUN_MODE, DEFAULT_RO_RUN_MODE, roRunModeValue,
         WIFI_COUNTRY_CODE_RUN_MODE_SIZE);
     if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE || strcasecmp(FACTORY_RO_RUN_MODE, roRunModeValue) != 0) {
         WIFI_LOGI("wifi country code factory mode does not take effect or fail, ret=%{public}d, "
@@ -134,7 +132,7 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByFactory(std::string &wifiCoun
         return WIFI_OPT_FAILED;
     }
     char factoryWifiCountryCodeValue[FACTORY_WIFI_COUNTRY_CODE_SIZE] = {0};
-    errorCode = GetParameter(FACTORY_WIFI_COUNTRY_CODE, DEFAULT_WIFI_COUNTRY_CODE,
+    errorCode = GetParamValue(FACTORY_WIFI_COUNTRY_CODE, DEFAULT_WIFI_COUNTRY_CODE,
         factoryWifiCountryCodeValue, FACTORY_WIFI_COUNTRY_CODE_SIZE);
     if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
         WIFI_LOGI("get wifi country code by factory fail, errorCode=%{public}d", errorCode);
@@ -319,7 +317,10 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByScanResult(std::string &wifiC
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByRegion(std::string &wifiCountryCode)
 {
     // the user selects an area in settings
-    std::string tempWifiCountryCode = Global::I18n::LocaleConfig::GetSystemRegion();
+    std::string tempWifiCountryCode;
+#ifdef I18N_INTL_UTIL_ENABLE
+    tempWifiCountryCode = Global::I18n::LocaleConfig::GetSystemRegion();
+#endif
     if (tempWifiCountryCode.empty() || !IsValidCountryCode(tempWifiCountryCode)) {
         WIFI_LOGE("get wifi country code by region fail, code=%{public}s", tempWifiCountryCode.c_str());
         return WIFI_OPT_FAILED;
@@ -337,26 +338,28 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByDefaultZZ(std::string &wifiCo
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByDb(std::string &wifiCountryCode)
+ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByCache(std::string &wifiCountryCode)
 {
-    auto wifiDataShareHelperUtils = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    CHECK_NULL_AND_RETURN(wifiDataShareHelperUtils, WIFI_OPT_FAILED);
-    std::string wifiCountryCodeCache;
-    Uri uri(SETTINGS_DATASHARE_URI_WIFI_COUNTRY_CODE);
-    int ret = wifiDataShareHelperUtils->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_COUNTRY_CODE, wifiCountryCodeCache);
-    if (ret == WIFI_OPT_SUCCESS) {
-        WIFI_LOGI("get wifi country code by db success, code=%{public}s", wifiCountryCodeCache.c_str());
-        wifiCountryCode = wifiCountryCodeCache;
-        return WIFI_OPT_SUCCESS;
+    char tempWifiCountryCode[WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_SIZE] = {0};
+    int ret = GetParamValue(WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY, DEFAULT_WIFI_COUNTRY_CODE
+        tempWifiCountryCode, WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_SIZE);
+    if (ret <= SYSTEM_PARAMETER_ERROR_CODE) {
+        WIFI_LOGE("get wifi country code by cache fail, ret=%{public}d", ret);
+        return WIFI_OPT_FAILED;
     }
-    WIFI_LOGE("get wifi country code by db fail, ret=%{public}d", ret);
-    return WIFI_OPT_FAILED;
+    if (!IsValidCountryCode(tempWifiCountryCode)) {
+        WIFI_LOGE("get wifi country code by cache fail, code invalid, code=%{public}d", tempWifiCountryCode);
+        return WIFI_OPT_FAILED;
+    }
+    wifiCountryCode = tempWifiCountryCode;
+    WIFI_LOGI("get wifi country code by cache success, code=%{public}d", wifiCountryCode.c_str());
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByDefaultRegion(std::string &wifiCountryCode)
 {
     char defaultRegion[DEFAULT_REGION_SIZE] = {0};
-    int errorCode = GetParameter(DEFAULT_REGION,
+    int errorCode = GetParamValue(DEFAULT_REGION,
         DEFAULT_REGION, defaultRegion, DEFAULT_REGION_SIZE);
     if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
         WIFI_LOGI("get wifi country code by default region fail, errorCode=%{public}d", errorCode);

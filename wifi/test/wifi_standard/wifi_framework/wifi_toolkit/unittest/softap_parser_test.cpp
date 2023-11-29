@@ -36,11 +36,11 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
- 
-DEFINE_WIFILOG_LABEL("SoftapParserTest");
- 
+  
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("SoftapParserTest");
+
 class SoftapParserTest : public testing::Test {
 public:
     static void SetUpTestCase() {}

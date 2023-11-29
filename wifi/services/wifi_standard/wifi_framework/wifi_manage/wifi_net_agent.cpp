@@ -299,7 +299,9 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
     route->iface_ = netLinkInfo->ifaceName_;
     route->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
     route->destination_.address_ = "0.0.0.0";
+    route->destination_.family_ = NetManagerStandard::INetAddr::IPV4;
     route->gateway_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
+    route->gateway_.family_ = NetManagerStandard::INetAddr::IPV4;
     netLinkInfo->routeList_.push_back(*route);
     LOGD("SetNetLinkRouteInfo: gateway %{public}s, address %{public}s",
         wifiIpV6Info.gateway.c_str(), route->gateway_.address_.c_str());
@@ -307,9 +309,11 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
         ipv6route->iface_ = netLinkInfo->ifaceName_;
         ipv6route->destination_.type_ = NetManagerStandard::INetAddr::IPV6;
+        ipv6route->destination_.family_ = NetManagerStandard::INetAddr::IPV6;
         ipv6route->destination_.address_ = "::";
         ipv6route->destination_.prefixlen_ = 0;
         ipv6route->gateway_.address_ = wifiIpV6Info.gateway;
+        ipv6route->gateway_.family_ = NetManagerStandard::INetAddr::IPV6;
         netLinkInfo->routeList_.push_back(*ipv6route);
     }
 }

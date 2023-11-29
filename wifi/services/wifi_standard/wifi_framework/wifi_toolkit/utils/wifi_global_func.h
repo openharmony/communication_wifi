@@ -34,6 +34,7 @@ constexpr int MAX_PSK_LEN = 63;
 constexpr int HEX_TYPE_LEN = 3; /* 3 hex type: 0 a A */
 constexpr int MAX_AP_CONN = 32;
 constexpr int MAX_CONFIGS_NUM = 1000;
+typedef void (*ParameterChgPtr)(const char *key, const char *value, void *context);
 
 /**
  * @Description Get a random string
@@ -275,6 +276,47 @@ int ConvertCharToInt(const char &c);
  * @return numbers
  */
 int ConvertStringToInt(const std::string str);
+
+/**
+ * @Description Obtains a system parameter matching the specified key.
+ *
+ * @param key - Indicates the key for the system parameter to query.
+ * The value can contain lowercase letters, digits, underscores (_), and dots (.).
+ * Its length cannot exceed 32 bytes (including the end-of-text character in the string).
+ * @param def - Indicates the default value to return when no query result is found.
+ * This parameter is specified by the caller.
+ * @param value - Indicates the data buffer that stores the query result.
+ * This parameter is applied for and released by the caller and can be used as an output parameter.
+ * @param len - Indicates the length of the data in the buffer.
+ * @return Returns the number of bytes of the system parameter if the operation is successful;
+ * returns -9 if a parameter is incorrect; returns -1 in other scenarios.
+ */
+int GetParamValue(const char *key, const char *def, char *value, uint32_t len);
+
+/**
+ * @Description Sets or updates a system parameter.
+ *
+ * @param key Indicates the key for the parameter to set or update.
+ * The value can contain lowercase letters, digits, underscores (_), and dots (.).
+ * Its length cannot exceed 32 bytes (including the end-of-text character in the string).
+ * @param value Indicates the system parameter value.
+ * Its length cannot exceed 128 bytes (including the end-of-text character in the string).
+ * @return Returns 0 if the operation is successful;
+ * returns -9 if a parameter is incorrect; returns -1 in other scenarios.
+ */
+int SetParamValue(const char *key, const char *value);
+
+/**
+ * @Description Watch for system parameter values.
+ *
+ * @param keyPrefix - Indicates the key prefix for the parameter to be watched.
+ * If keyPrefix is not a full name, "A.B." for example, it means to watch for all parameter started with "A.B.".
+ * @param callback - Indicates value change callback.
+ * If callback is NULL, it means to cancel the watch.
+ * @param context - context.
+ * @return Returns 0 if the operation is successful;
+ */
+int WatchParamValue(const char *keyprefix, ParameterChgPtr callback, void *context);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

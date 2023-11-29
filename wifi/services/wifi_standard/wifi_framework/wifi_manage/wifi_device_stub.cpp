@@ -518,6 +518,7 @@ void WifiDeviceStub::OnGetChangeDeviceConfig(uint32_t code, MessageParcel &data,
     reply.WriteString(config.ssid);
     reply.WriteString(config.bssid);
     reply.WriteString(config.callProcessName);
+    reply.WriteString(config.ancoCallProcessName);
     reply.WriteInt32(ret);
     return;
 }

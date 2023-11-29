@@ -396,7 +396,7 @@ int setParamValue(const char *key, const char *value)
 int WatchParamValue(const char *keyprefix, ParameterChgPtr callback, void *context)
 {
 #ifdef INIT_LIB_ENABLE
-    return SetParameter(key, value);
+    return WatchParameter(keyprefix, callback, context);
 #else
     return EC_INVALID;
 #endif

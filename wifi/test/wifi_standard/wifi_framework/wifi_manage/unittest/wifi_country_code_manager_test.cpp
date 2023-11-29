@@ -38,10 +38,10 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
-DEFINE_WIFILOG_LABEL("WifiCountryCodeManagerTest");
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiCountryCodeManagerTest");
+
 class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
 public:
     WifiCountryCodeChangeObserver(const std::string &name, StateMachine &stateMachineObj)

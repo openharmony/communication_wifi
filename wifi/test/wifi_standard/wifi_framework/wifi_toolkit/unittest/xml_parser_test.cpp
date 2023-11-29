@@ -35,11 +35,11 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
- 
-DEFINE_WIFILOG_LABEL("XmlParserTest");
- 
+  
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("XmlParserTest");
+
 class MockXmlParser : public XmlParser {
 public:
     bool ParseInternal(xmlNodePtr node)

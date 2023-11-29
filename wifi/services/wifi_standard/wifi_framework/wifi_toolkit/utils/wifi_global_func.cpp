@@ -20,6 +20,9 @@
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_define.h"
 #endif
+#ifdef INIT_LIB_ENABLE
+#include "parameter.h"
+#endif
 #undef LOG_TAG
 #define LOG_TAG "WifiGlobalFunc"
 
@@ -35,6 +38,9 @@ constexpr int CHANNEL_14 = 14;
 constexpr int CENTER_FREP_DIFF = 5;
 constexpr int CHANNEL_2G_MIN = 1;
 constexpr int CHANNEL_5G_MIN = 34;
+#ifdef INIT_LIB_ENABLE
+constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
+#endif
 
 std::string GetRandomStr(int len)
 {
@@ -367,6 +373,33 @@ int ConvertStringToInt(const std::string str)
     ss << str;
     ss >> result;
     return result;
+}
+
+int GetParamValue(const char *key, const char *def, char *value, uint32_t len)
+{
+#ifdef INIT_LIB_ENABLE
+    return GetParameter(key, def, value, len);
+#else
+    return EC_INVALID;
+#endif
+}
+
+int setParamValue(const char *key, const char *value)
+{
+#ifdef INIT_LIB_ENABLE
+    return SetParameter(key, value);
+#else
+    return EC_INVALID;
+#endif
+}
+
+int WatchParamValue(const char *keyprefix, ParameterChgPtr callback, void *context)
+{
+#ifdef INIT_LIB_ENABLE
+    return SetParameter(key, value);
+#else
+    return EC_INVALID;
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

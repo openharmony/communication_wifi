@@ -21,9 +21,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int WIFI_COUNTRY_CODE_POLICE_DEF_LEN = 5;
-const std::string SETTINGS_DATASHARE_KEY_WIFI_COUNTRY_CODE = "wifi_country_code";
-const std::string SETTINGS_DATASHARE_URI_WIFI_COUNTRY_CODE =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=wifi_country_code";
+constexpr const char* WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY = "persist.wifi_country_code.dynamic_update";
 constexpr const char* DEFAULT_WIFI_COUNTRY_CODE_ZZ = "ZZ";  // for tablets only, priority greater than HK
 constexpr const char* DEFAULT_WIFI_COUNTRY_CODE = "HK";
 constexpr const char* DEFAULT_RO_RUN_MODE = "normal";
@@ -37,6 +35,7 @@ constexpr const char* DEFAULT_REGION = "CN";
 constexpr int WIFI_COUNTRY_CODE_SIZE = 16;
 constexpr int FACTORY_WIFI_COUNTRY_CODE_SIZE = 16;
 constexpr int WIFI_COUNTRY_CODE_RUN_MODE_SIZE = 16;
+constexpr int WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_SIZE = 16;
 constexpr int SYSTEM_PARAMETER_ERROR_CODE = 0;
 constexpr int PLMN_LEN = 3;
 constexpr int PLMN_SUBSTR_LEFT = 0;

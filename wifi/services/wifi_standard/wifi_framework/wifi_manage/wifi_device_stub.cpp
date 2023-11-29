@@ -70,6 +70,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnResetAllFrozenApp;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_PORTAL_CERTIF)] =
         &WifiDeviceStub::OnStartPortalCertification;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE)] =
+        &WifiDeviceStub::OnGetChangeDeviceConfig;
     return;
 }
 
@@ -501,6 +503,23 @@ void WifiDeviceStub::OnDisableDeviceConfig(uint32_t code, MessageParcel &data, M
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
+    return;
+}
+
+void WifiDeviceStub::OnGetChangeDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    Wifi::ConfigChange value;
+    Wifi::WifiDeviceConfig config;
+    ErrCode ret = GetChangeDeviceConfig(value, config);
+    reply.WriteInt32(0);
+    reply.WriteInt32((int)value);
+    reply.WriteInt32(config.networkId);
+    reply.WriteString(config.ssid);
+    reply.WriteString(config.bssid);
+    reply.WriteString(config.callProcessName);
+    reply.WriteString(config.ancoCallProcessName);
+    reply.WriteInt32(ret);
     return;
 }
 

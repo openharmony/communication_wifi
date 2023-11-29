@@ -448,5 +448,12 @@ bool WifiDeviceImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
+
+ErrCode WifiDeviceImpl::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetChangeDeviceConfig(value, config);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -228,5 +228,25 @@ HWTEST_F(WifiGlobalFuncTest, ConvertStringToIntTest, TestSize.Level1)
     int i = ConvertStringToInt(str);
     EXPECT_TRUE(i == 2000);
 }
+
+HWTEST_F(WifiGlobalFuncTest, GetParamValueTest, TestSize.Level1)
+{
+    char preValue[WIFI_COUNTRY_CODE_SIZE] = {0};
+    GetParamValue(WIFI_COUNTRY_CODE_CONFIG,
+        WIFI_COUNTRY_CODE_CONFIG_DEFAULT, preValue, WIFI_COUNTRY_CODE_SIZE);
+}
+
+HWTEST_F(WifiGlobalFuncTest, SetParamValueTest, TestSize.Level1)
+{
+    SetParamValue(WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY, "US");
+}
+
+void MdmPropChangeEvt(const char *key, const char *value, void *context)
+{}
+
+HWTEST_F(WifiGlobalFuncTest, WatchParamValueTest, TestSize.Level1)
+{
+    WatchParamValue(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -341,7 +341,7 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByDefaultZZ(std::string &wifiCo
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByCache(std::string &wifiCountryCode)
 {
     char tempWifiCountryCode[WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_SIZE] = {0};
-    int ret = GetParamValue(WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY, DEFAULT_WIFI_COUNTRY_CODE
+    int ret = GetParamValue(WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY, DEFAULT_WIFI_COUNTRY_CODE,
         tempWifiCountryCode, WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_SIZE);
     if (ret <= SYSTEM_PARAMETER_ERROR_CODE) {
         WIFI_LOGE("get wifi country code by cache fail, ret=%{public}d", ret);

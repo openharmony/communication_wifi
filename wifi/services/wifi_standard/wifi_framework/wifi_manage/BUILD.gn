@@ -488,13 +488,13 @@ if (defined(ohos_lite)) {
     ]
 
     if (defined(global_parts_info) &&
-      defined(global_parts_info.telephony_core_service)) {
+        defined(global_parts_info.telephony_core_service)) {
       external_deps += [ "core_service:tel_core_service_api" ]
       defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
     }
 
     if (defined(global_parts_info) &&
-      defined(global_parts_info.global_i18n)) {
+        defined(global_parts_info.global_i18n)) {
       external_deps += [ "i18n:intl_util" ]
       defines += [ "I18N_INTL_UTIL_ENABLE" ]
     }

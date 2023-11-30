@@ -384,7 +384,7 @@ int GetParamValue(const char *key, const char *def, char *value, uint32_t len)
 #endif
 }
 
-int setParamValue(const char *key, const char *value)
+int SetParamValue(const char *key, const char *value)
 {
 #ifdef INIT_LIB_ENABLE
     return SetParameter(key, value);

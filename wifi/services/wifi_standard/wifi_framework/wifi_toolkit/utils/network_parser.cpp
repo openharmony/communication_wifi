@@ -16,9 +16,9 @@
 #include "network_parser.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_LABEL("NetworkXmlParser");
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("NetworkXmlParser");
 constexpr auto XML_TAG_SECTION_HEADER_NETWORK_LIST = "NetworkList";
 constexpr auto XML_TAG_SECTION_HEADER_NETWORK = "Network";
 constexpr auto XML_TAG_SECTION_HEADER_WIFI_CONFIGURATION = "WifiConfiguration";
@@ -273,7 +273,7 @@ void NetworkXmlParser::GetKeyMgmt(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
     }
     if (keyMgmtInt & MGMT_SAE) {
         wifiConfig.keyMgmt = KEY_MGMT_SAE;
-    } else if (keyMgmtInt & MGMT_WPA_PSK || keyMgmtInt & MGMT_WPA2_PSK || keyMgmtInt & MGMT_FT_PSK) {
+    } else if ((keyMgmtInt & MGMT_WPA_PSK) || (keyMgmtInt & MGMT_WPA2_PSK) || (keyMgmtInt & MGMT_FT_PSK)) {
         wifiConfig.keyMgmt = KEY_MGMT_WPA_PSK;
     } else if (keyMgmtInt & MGMT_NONE) {
         if (HasWepKeys(wifiConfig)) {

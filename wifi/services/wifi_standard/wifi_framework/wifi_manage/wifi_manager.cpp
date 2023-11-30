@@ -34,7 +34,6 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_protect_manager.h"
 #include "wifi_power_state_listener.h"
-#include "parameter.h"
 #include "suspend/sleep_priority.h"
 #endif
 #include "wifi_sta_hal_interface.h"
@@ -755,7 +754,7 @@ void WifiManager::GetMdmProp()
 {
     char preValue[PROP_FALSE_LEN + 1] = {0};
 
-    int errorCode = GetParameter(MDM_WIFI_PROP.c_str(), 0, preValue, PROP_FALSE_LEN + 1);
+    int errorCode = GetParamValue(MDM_WIFI_PROP.c_str(), 0, preValue, PROP_FALSE_LEN + 1);
     if (errorCode > 0) {
         if (strncmp(preValue, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0) {
             mIsMdmForbidden = true;
@@ -765,7 +764,7 @@ void WifiManager::GetMdmProp()
 
 void WifiManager::RegisterMdmPropListener()
 {
-    int ret = WatchParameter(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
+    int ret = WatchParamValue(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
     if (ret != 0) {
         WIFI_LOGI("RegisterMdmPropListener failed");
     }

@@ -17,9 +17,10 @@
 #include "wifi_logger.h"
 #include <vector>
 
-DEFINE_WIFILOG_LABEL("XmlParser");
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("XmlParser");
+
 XmlParser::~XmlParser()
 {
     Destroy();

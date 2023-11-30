@@ -16,11 +16,7 @@
 #include "wifi_country_code_manager.h"
 #include <cstdint>
 #include <sstream>
-#include "datashare_helper.h"
-#include "datashare_predicates.h"
-#include "datashare_result_set.h"
 #include "i_ap_service.h"
-#include "parameter.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_datashare_utils.h"
@@ -30,10 +26,9 @@
 #include "wifi_msg.h"
 #include "wifi_settings.h"
 
-DEFINE_WIFILOG_LABEL("WifiCountryCodeManager");
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiCountryCodeManager");
 const std::string CLASS_NAME = "WifiCountryCodeManager";
 
 WifiCountryCodeManager::~WifiCountryCodeManager()
@@ -59,7 +54,6 @@ ErrCode WifiCountryCodeManager::Init()
     m_staCallback.OnStaConnChanged = DealStaConnChanged;
     m_apCallback.callbackModuleName = CLASS_NAME;
     m_apCallback.OnApStateChangedEvent = DealApStateChanged;
-    UpdateWifiCountryCode();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -96,7 +90,7 @@ ErrCode WifiCountryCodeManager::SetWifiCountryCodeFromExternal(const std::string
 ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externalCode)
 {
     std::string wifiCountryCode;
-    if (!externalCode.empty() && IsValidCountryCode(externalCode) == WIFI_OPT_SUCCESS) {
+    if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
         WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
         wifiCountryCode = externalCode;
         StrToUpper(wifiCountryCode);
@@ -196,23 +190,14 @@ void WifiCountryCodeManager::DealApStateChanged(ApState state, int id)
 
 ErrCode WifiCountryCodeManager::UpdateWifiCountryCodeCache(const std::string &wifiCountryCode)
 {
-    WIFI_LOGI("update wifi country code cache");
-    auto wifiDataShareHelperUtils = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (wifiDataShareHelperUtils == nullptr) {
-        WIFI_LOGE("database is null");
+    if (wifiCountryCode.empty() || !IsValidCountryCode(wifiCountryCode)) {
+        WIFI_LOGE("wifi country code is empty or invalid");
         return WIFI_OPT_FAILED;
     }
-    Uri uri(SETTINGS_DATASHARE_URI_WIFI_COUNTRY_CODE);
-    std::string tempWifiCountryCode;
-    ErrCode ret = wifiDataShareHelperUtils->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_COUNTRY_CODE, tempWifiCountryCode);
-    if (ret == WIFI_OPT_FAILED) {
-        WIFI_LOGI("database to insert wifi country code");
-        ret = wifiDataShareHelperUtils->Insert(uri, SETTINGS_DATASHARE_KEY_WIFI_COUNTRY_CODE, wifiCountryCode);
-    } else if (strcasecmp(tempWifiCountryCode.c_str(), wifiCountryCode.c_str()) != 0) {
-        ret = wifiDataShareHelperUtils->Update(uri, SETTINGS_DATASHARE_KEY_WIFI_COUNTRY_CODE, wifiCountryCode);
-    }
-    WIFI_LOGI("database to insert or update wifi country code, ret=%{public}d", ret);
-    return WIFI_OPT_SUCCESS;
+    int ret = SetParamValue(WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY, wifiCountryCode.c_str());
+    std::string retStr = ret == 0 ? "success" : "fail, ret=" + std::to_string(ret);
+    WIFI_LOGI("update wifi country code cache %{public}s", retStr.c_str());
+    return ret == 0 ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
 }
 }
 }

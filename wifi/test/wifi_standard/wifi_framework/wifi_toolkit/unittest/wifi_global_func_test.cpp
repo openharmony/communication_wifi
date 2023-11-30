@@ -15,6 +15,7 @@
 
 #include "wifi_global_func_test.h"
 #include "wifi_global_func.h"
+#include "wifi_country_code_define.h"
 
 using namespace testing::ext;
 
@@ -29,6 +30,7 @@ constexpr int CHANNEL_2G_MIN = 1;
 constexpr int CHANNEL_5G = 34;
 constexpr int CHANNEL_2G = 14;
 constexpr uint32_t PLAIN_LENGTH = 10;
+const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
 
 HWTEST_F(WifiGlobalFuncTest, GetRandomStr, TestSize.Level1)
 {
@@ -225,6 +227,26 @@ HWTEST_F(WifiGlobalFuncTest, ConvertStringToIntTest, TestSize.Level1)
     string str = "2000";
     int i = ConvertStringToInt(str);
     EXPECT_TRUE(i == 2000);
+}
+
+HWTEST_F(WifiGlobalFuncTest, GetParamValueTest, TestSize.Level1)
+{
+    char preValue[WIFI_COUNTRY_CODE_SIZE] = {0};
+    GetParamValue(WIFI_COUNTRY_CODE_CONFIG,
+        WIFI_COUNTRY_CODE_CONFIG_DEFAULT, preValue, WIFI_COUNTRY_CODE_SIZE);
+}
+
+HWTEST_F(WifiGlobalFuncTest, SetParamValueTest, TestSize.Level1)
+{
+    SetParamValue(WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY, "US");
+}
+
+void MdmPropChangeEvt(const char *key, const char *value, void *context)
+{}
+
+HWTEST_F(WifiGlobalFuncTest, WatchParamValueTest, TestSize.Level1)
+{
+    WatchParamValue(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
 }
 }  // namespace Wifi
 }  // namespace OHOS

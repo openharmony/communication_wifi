@@ -138,7 +138,7 @@ if (defined(ohos_lite)) {
 
     if (defined(global_parts_info) &&
       defined(global_parts_info.startup_init)) {
-      external_deps + [
+      external_deps += [
         "init:libbegetutil",
         "init:libbeget_proxy",
       ]

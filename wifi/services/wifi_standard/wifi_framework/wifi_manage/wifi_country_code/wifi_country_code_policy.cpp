@@ -348,11 +348,11 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByCache(std::string &wifiCountr
         return WIFI_OPT_FAILED;
     }
     if (!IsValidCountryCode(tempWifiCountryCode)) {
-        WIFI_LOGE("get wifi country code by cache fail, code invalid, code=%{public}d", tempWifiCountryCode);
+        WIFI_LOGE("get wifi country code by cache fail, code invalid, code=%{public}s", tempWifiCountryCode);
         return WIFI_OPT_FAILED;
     }
     wifiCountryCode = tempWifiCountryCode;
-    WIFI_LOGI("get wifi country code by cache success, code=%{public}d", wifiCountryCode.c_str());
+    WIFI_LOGI("get wifi country code by cache success, code=%{public}s", wifiCountryCode.c_str());
     return WIFI_OPT_SUCCESS;
 }
 

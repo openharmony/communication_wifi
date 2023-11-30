@@ -2617,15 +2617,15 @@ void WifiManager::DealLocationModeChangeEvent()
 
 void WifiManager::CheckAndStartStaByDatashare()
 {
-    constexpr int OPEN_WIFI_NOT_INT_AIRPLANEMODE = 1;
-    constexpr int OPEN_WIFI_INT_AIRPLANEMODE = 2;
+    constexpr int OPEN_WIFI_NOT_IN_AIRPLANEMODE = 1;
+    constexpr int OPEN_WIFI_IN_AIRPLANEMODE = 2;
     constexpr int CLOSE_WIFI_BY_OPEN_AIRPLANEMODE = 3;
 
     int lastStaState = WifiManager::GetInstance().GetLastStaStateByDatashare();
-    if (lastStaState == OPEN_WIFI_NOT_INT_AIRPLANEMODE) {
+    if (lastStaState == OPEN_WIFI_NOT_IN_AIRPLANEMODE) {
         WifiSettings::GetInstance().SetWifiToggledState(true);
         WifiManager::GetInstance().WifiToggled(1, 0);
-    } else if (lastStaState == OPEN_WIFI_INT_AIRPLANEMODE) {
+    } else if (lastStaState == OPEN_WIFI_IN_AIRPLANEMODE) {
         WifiConfigCenter::GetInstance().SetOpenWifiWhenAirplaneMode(true);
         WifiSettings::GetInstance().SetWifiToggledState(true);
         WifiManager::GetInstance().WifiToggled(1, 0);

@@ -451,7 +451,13 @@ ErrCode WifiP2pServiceImpl::RemoveGroup()
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-
+    WifiP2pGroupInfo config;
+    ErrCode ret = pService->GetCurrentGroup(config);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("RemoveGroup:GetCurrentGroup failed!");
+        pService->RemoveGroup();
+        return WIFI_OPT_FAILED;
+    }
     return pService->RemoveGroup();
 }
 

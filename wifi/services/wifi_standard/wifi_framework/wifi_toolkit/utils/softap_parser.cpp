@@ -17,9 +17,9 @@
 #include "wifi_logger.h"
 #include "wifi_global_func.h"
 
-DEFINE_WIFILOG_LABEL("SoftapParser");
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("SoftapParser");
 const int BAND_2GHZ = 1 << 0;
 const int SECURITY_TYPE_WPA2_PSK = 1;
 

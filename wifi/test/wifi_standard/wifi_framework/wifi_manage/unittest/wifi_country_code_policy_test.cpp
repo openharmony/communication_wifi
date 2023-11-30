@@ -36,10 +36,10 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
-DEFINE_WIFILOG_LABEL("WifiCountryCodePolicyTest");
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiCountryCodePolicyTest");
+
 class WifiCountryCodePolicyTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -178,11 +178,11 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDefaultZZTest, TestSize.
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByDefaultZZ(code));
 }
 
-HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDbTest, TestSize.Level1)
+HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByCacheTest, TestSize.Level1)
 {
-    WIFI_LOGI("GetWifiCountryCodeByDbTest enter");
+    WIFI_LOGI("GetWifiCountryCodeByCacheTest enter");
     std::string code;
-    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByDb(code));
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByCache(code));
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDefaultRegionTest, TestSize.Level1)

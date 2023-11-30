@@ -38,7 +38,7 @@ constexpr int CHANNEL_14 = 14;
 constexpr int CENTER_FREP_DIFF = 5;
 constexpr int CHANNEL_2G_MIN = 1;
 constexpr int CHANNEL_5G_MIN = 34;
-#ifdef INIT_LIB_ENABLE
+#ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
 

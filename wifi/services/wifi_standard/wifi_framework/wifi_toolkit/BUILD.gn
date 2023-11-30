@@ -142,7 +142,7 @@ if (defined(ohos_lite)) {
         "init:libbegetutil",
         "init:libbeget_proxy",
       ]
-      defines += ["INIT_LIB_ENABLE"]
+      defines += [ "INIT_LIB_ENABLE" ]
     }
 
     public_deps = []

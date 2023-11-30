@@ -99,7 +99,7 @@ private:
     void HandleScanResultAction();
     ErrCode StatisticCountryCodeFromScanResult(std::string &wifiCountryCode);
     ErrCode FindLargestCountCountryCode(std::string &wifiCountryCode);
-    ErrCode ParseCountryCodeElement(std::vector<WifiInfoElem> &infoElems, std::string &wifiCountryCode);
+    ErrCode ParseCountryCodeElement(const std::vector<WifiInfoElem> &infoElems, std::string &wifiCountryCode);
     ErrCode HandleWifiNetworkStateChangeAction(int connectionStatus);
     ErrCode GetWifiCountryCodeByRegion(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByAP(std::string &wifiCountryCode);

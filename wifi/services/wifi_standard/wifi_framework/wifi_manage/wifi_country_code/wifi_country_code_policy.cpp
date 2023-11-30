@@ -236,7 +236,7 @@ ErrCode WifiCountryCodePolicy::FindLargestCountCountryCode(std::string &wifiCoun
         const std::pair<std::string, int> &b) {
         return a.second > b.second;
     });
-    if (sortCode.size() <= 0) {
+    if (sortCode.size() == 0) {
         return WIFI_OPT_FAILED;
     }
     if (sortCode.size() == 1) {
@@ -257,7 +257,7 @@ ErrCode WifiCountryCodePolicy::FindLargestCountCountryCode(std::string &wifiCoun
 }
 
 ErrCode WifiCountryCodePolicy::ParseCountryCodeElement(
-    std::vector<WifiInfoElem> &infoElems, std::string &wifiCountryCode)
+    const std::vector<WifiInfoElem> &infoElems, std::string &wifiCountryCode)
 {
     if (infoElems.empty()) {
         return WIFI_OPT_FAILED;
@@ -359,7 +359,7 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByCache(std::string &wifiCountr
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByDefaultRegion(std::string &wifiCountryCode)
 {
     char defaultRegion[DEFAULT_REGION_SIZE] = {0};
-    int errorCode = GetParamValue(DEFAULT_REGION,
+    int errorCode = GetParamValue(DEFAULT_REGION_KEY,
         DEFAULT_REGION, defaultRegion, DEFAULT_REGION_SIZE);
     if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
         WIFI_LOGI("get wifi country code by default region fail, errorCode=%{public}d", errorCode);

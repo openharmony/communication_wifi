@@ -2390,12 +2390,12 @@ bool WifiManager::GetLocationModeByDatashare()
     return (locationMode.compare("1") == 0);
 }
 
-bool WifiManager::GetLastStaStateByDatashare()
+int WifiManager::GetLastStaStateByDatashare()
 {
     auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
     if (datashareHelper == nullptr) {
         WIFI_LOGE("GetLastStaStateByDatashare, datashareHelper is nullptr!");
-        return false;
+        return 0;
     }
 
     std::string lastStaState;
@@ -2403,11 +2403,12 @@ bool WifiManager::GetLastStaStateByDatashare()
     int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ON, lastStaState);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetLastStaStateByDatashare, Query lastStaState fail!");
-        return false;
+        return 0;
     }
 
     WIFI_LOGI("GetLastStaStateByDatashare, lastStaState:%{public}s", lastStaState.c_str());
-    return (lastStaState.compare("1") == 0);
+    int lastStaStateType = ConvertStringToInt(lastStaState);
+    return lastStaStateType;
 }
 
 void WifiManager::RegisterSettingsMigrateEvent()
@@ -2616,14 +2617,22 @@ void WifiManager::DealLocationModeChangeEvent()
 
 void WifiManager::CheckAndStartStaByDatashare()
 {
-    if (WifiManager::GetInstance().GetLastStaStateByDatashare()) {
-        WIFI_LOGI("Datashare key: wifi_on is true, start wifi!");
-#ifdef OHOS_ARCH_LITE
-        WifiManager::GetInstance().AutoStartStaService(AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP);
-#else
+    constexpr int OPEN_WIFI_NOT_INT_AIRPLANEMODE = 1;
+    constexpr int OPEN_WIFI_INT_AIRPLANEMODE = 2;
+    constexpr int CLOSE_WIFI_BY_OPEN_AIRPLANEMODE = 3;
+
+    int lastStaState = WifiManager::GetInstance().GetLastStaStateByDatashare();
+    if (lastStaState == OPEN_WIFI_NOT_INT_AIRPLANEMODE) {
+        WifiSettings::GetInstance().SetWifiToggledState(true);
         WifiManager::GetInstance().WifiToggled(1, 0);
-#endif
+    } else if (lastStaState == OPEN_WIFI_INT_AIRPLANEMODE) {
+        WifiConfigCenter::GetInstance().SetOpenWifiWhenAirplaneMode(true);
+        WifiSettings::GetInstance().SetWifiToggledState(true);
+        WifiManager::GetInstance().WifiToggled(1, 0);
+    } else if (lastStaState == CLOSE_WIFI_BY_OPEN_AIRPLANEMODE) {
+        WifiSettings::GetInstance().SetWifiToggledState(true);
     }
+
     UnRegisterSettingsMigrateEvent();
     std::unique_lock<std::mutex> lock(settingsMigrateMutex);
     WifiTimer::GetInstance()->UnRegister(migrateTimerId);

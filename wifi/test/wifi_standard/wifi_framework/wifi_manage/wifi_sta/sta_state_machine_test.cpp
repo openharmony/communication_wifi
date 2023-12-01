@@ -44,7 +44,6 @@ namespace Wifi {
 static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
-constexpr int FAILEDNUM = 3;
 constexpr int TEST_FAIL_REASON = 16;
 
 class StaStateMachineTest : public testing::Test {
@@ -53,6 +52,9 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetPortalUri(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SaveDisconnectedReason(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine.reset(new StaStateMachine());
         pStaStateMachine->InitStaStateMachine();
         pStaStateMachine->InitWifiLinkedInfo();
@@ -1527,7 +1529,7 @@ public:
 
     void OnNetManagerRestartFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(_)).WillRepeatedly(Return(FAILEDNUM));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(_)).WillRepeatedly(Return(1));
         pStaStateMachine->OnNetManagerRestart();
     }
 

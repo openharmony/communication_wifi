@@ -36,5 +36,13 @@ void MockStaNetworkCheck::ExitNetCheckThread()
 {
     WIFI_LOGD("Enter ExitNetCheckThread::[%{public}s].", __FUNCTION__);
 }
+void MockStaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLenNum)
+{
+    WIFI_LOGD("Enter SetHttpResultInfo::[%{public}s].", __FUNCTION__);
+}
+void MockStaNetworkCheck::RegistHttpCallBack(std::shared_ptr<NetStack::HttpClient::HttpClientTask> task)
+{
+    WIFI_LOGD("Enter RegistHttpCallBack::[%{public}s].", __FUNCTION__);
+}
 }  // namespace Wifi
 }  // namespace OHOS

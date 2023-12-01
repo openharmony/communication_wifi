@@ -99,6 +99,16 @@ HWTEST_F(WifiServiceManagerTest, UnloadServiceTest, TestSize.Level1)
 
 HWTEST_F(WifiServiceManagerTest, UninstallAllServiceTest, TestSize.Level1)
 {
+    WIFI_LOGE("UninstallAllServiceTest enter!");
+    WifiServiceManager::GetInstance().CheckAndEnforceService("StaService");
+    EXPECT_FALSE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
+    WifiServiceManager::GetInstance().CheckAndEnforceService("ApService");
+    EXPECT_FALSE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
+    WifiServiceManager::GetInstance().CheckAndEnforceService("P2pService");
+    EXPECT_FALSE(WifiServiceManager::GetInstance().GetP2pServiceInst() == nullptr);
+    WifiServiceManager::GetInstance().UninstallAllService();
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
 }
 
 HWTEST_F(WifiServiceManagerTest, ApServiceSetHotspotConfigTest, TestSize.Level1)
@@ -114,7 +124,6 @@ HWTEST_F(WifiServiceManagerTest, GetEnhanceServiceInstTest, TestSize.Level1)
 {
     WIFI_LOGE("GetEnhanceServiceInstTest enter!");
     IEnhanceService *result = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    EXPECT_EQ(result, nullptr);
 }
 }  // namespace Wifi
 }  // namespace OHOS

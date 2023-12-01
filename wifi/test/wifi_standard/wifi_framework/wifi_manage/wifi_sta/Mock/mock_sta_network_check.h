@@ -30,6 +30,8 @@ public:
     void SignalNetCheckThread() override;
     void StopNetCheckThread() override;
     void ExitNetCheckThread() override;
+    void RegistHttpCallBack(std::shared_ptr<NetStack::HttpClient::HttpClientTask> task);
+    void SetHttpResultInfo(std::string url, int codeNum, int codeLenNum);
 };
 }  // namespace OHOS
 }  // namespace OHOS

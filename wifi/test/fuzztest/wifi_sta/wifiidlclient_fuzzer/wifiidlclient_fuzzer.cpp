@@ -22,7 +22,6 @@
 #include "message_parcel.h"
 #include "securec.h"
 #include "define.h"
-#include "wifi_manager_service_ipc_interface_code.h"
 #include "i_wifi_supplicant_iface.h"
 #include "wifi_log.h"
 

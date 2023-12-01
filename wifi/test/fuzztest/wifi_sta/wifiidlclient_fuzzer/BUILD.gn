@@ -17,9 +17,10 @@ import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("WifiScanStubFuzzTest") {
+ohos_fuzztest("WifiIdlClientFuzzTest") {
   module_out_path = fuzz_test_output_path
-  fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifiidlclient_fuzzer"
+  fuzz_config_file =
+      "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifiidlclient_fuzzer"
 
   include_dirs = [
     "$WIFI_ROOT_DIR/interfaces/inner_api",

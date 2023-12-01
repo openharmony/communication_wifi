@@ -120,8 +120,7 @@ ErrCode ScanInterface::OnStandbyStateChanged(bool sleeping)
     }
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    pScanService->SystemScanProcess(true);
-    return WIFI_OPT_SUCCESS;
+    return pScanService->Scan(false);
 }
 
 ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)

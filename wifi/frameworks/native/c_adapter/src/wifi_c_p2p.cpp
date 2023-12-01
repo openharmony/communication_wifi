@@ -21,6 +21,7 @@
 #include "wifi_common_util.h"
 #include "../../src/wifi_sa_event.h"
 constexpr int INVALID_VALUE = -1;
+#define STR_END '\0'
 
 DEFINE_WIFILOG_LABEL("WifiCP2P");
 std::shared_ptr<OHOS::Wifi::WifiP2p> wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
@@ -223,10 +224,20 @@ static OHOS::Wifi::ErrCode ConvertGroupInfoCppToC(const OHOS::Wifi::WifiP2pGroup
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
     group->isP2pGroupOwner = cppGroup.IsGroupOwner();
-    if (memcpy_s(group->passphrase, PASSPHRASE_LENGTH,
-        cppGroup.GetPassphrase().c_str(), cppGroup.GetPassphrase().size() + 1) != EOK) {
-        WIFI_LOGE("memcpy_s passphrase failed!");
-        return OHOS::Wifi::WIFI_OPT_FAILED;
+    if (cppGroup.GetPassphrase().size() >= PASSPHRASE_LENGTH) {
+        WIFI_LOGE("passwork len is invaild");
+        if (memcpy_s(group->passphrase, PASSPHRASE_LENGTH,
+            cppGroup.GetPassphrase().c_str(), PASSPHRASE_LENGTH) != EOK) {
+            WIFI_LOGE("memcpy_s passphrase failed!");
+            return OHOS::Wifi::WIFI_OPT_FAILED;
+        }
+    } else {
+        if (memcpy_s(group->passphrase, PASSPHRASE_LENGTH,
+            cppGroup.GetPassphrase().c_str(), cppGroup.GetPassphrase().size()) != EOK) {
+            WIFI_LOGE("memcpy_s passphrase failed!");
+            return OHOS::Wifi::WIFI_OPT_FAILED;
+        }
+        group->passphrase[cppGroup.GetPassphrase().size()] = STR_END;
     }
     if (memcpy_s(group->interface, INTERFACE_LENGTH,
         cppGroup.GetInterface().c_str(), cppGroup.GetInterface().size() + 1) != EOK) {

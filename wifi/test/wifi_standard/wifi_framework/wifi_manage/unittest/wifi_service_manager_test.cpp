@@ -123,7 +123,7 @@ HWTEST_F(WifiServiceManagerTest, ApServiceSetHotspotConfigTest, TestSize.Level1)
 HWTEST_F(WifiServiceManagerTest, GetEnhanceServiceInstTest, TestSize.Level1)
 {
     WIFI_LOGE("GetEnhanceServiceInstTest enter!");
-    IEnhanceService *result = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    WifiServiceManager::GetInstance().GetEnhanceServiceInst();
 }
 }  // namespace Wifi
 }  // namespace OHOS

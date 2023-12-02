@@ -2631,7 +2631,7 @@ void WifiManager::CheckAndStartStaByDatashare()
 
 void WifiManager::RegisterPowerStateListener()
 {
-    WIFI_LOGI("Enter WifiManager::RegisterPowerStateListener");
+    WIFI_LOGD("Enter WifiManager::RegisterPowerStateListener");
     std::unique_lock<std::mutex> lock(powerStateEventMutex);
 
     if (isPowerStateListenerSubscribered) {
@@ -2657,7 +2657,7 @@ void WifiManager::RegisterPowerStateListener()
 
 void WifiManager::UnRegisterPowerStateListener()
 {
-    WIFI_LOGI("Enter WifiManager::UnRegisterPowerStateListener");
+    WIFI_LOGD("Enter WifiManager::UnRegisterPowerStateListener");
     std::unique_lock<std::mutex> lock(powerStateEventMutex);
 
     if (!isPowerStateListenerSubscribered) {

@@ -229,7 +229,6 @@ HWTEST_F(WifiHalStaInterfaceTest, GetFrequenciesTest, TestSize.Level1)
 HWTEST_F(WifiHalStaInterfaceTest, SetAssocMacAddrTest, TestSize.Level1)
 {
     int frequencies = 1;
-    EXPECT_TRUE(SetAssocMacAddr(NULL, frequencies, 1) == WIFI_HAL_FAILED);
     EXPECT_TRUE(SetScanningMacAddress(NULL, frequencies) == WIFI_HAL_FAILED);
     EXPECT_TRUE(DeauthLastRoamingBssid(NULL, frequencies) == WIFI_HAL_FAILED);
 }

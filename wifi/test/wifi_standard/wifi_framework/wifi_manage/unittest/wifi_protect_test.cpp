@@ -34,16 +34,6 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiProtectTest");
-constexpr int NETWORK_ID = 15;
-constexpr int TYPE = 3;
-constexpr int SCORE = 0;
-constexpr int STATE = 0;
-constexpr int UID = 0;
-constexpr int ZERO = 0;
-constexpr int WIFI_OPT_SUCCESS = 0;
-constexpr int WIFI_OPT_RETURN = -1;
-constexpr int MIN_RSSI_2DOT_4GHZ = -80;
-constexpr int MIN_RSSI_5GZ = -77;
 class WifiProtectTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -96,9 +86,9 @@ HWTEST_F(WifiProtectTest, GetNearlyProtectModeTest, TestSize.Level1)
     EXPECT_EQ(result, WifiProtectMode::WIFI_PROTECT_NO_HELD);
 }
 
-HWTEST_F(WifiProtectTest, GetNearlyProtectModeTest, TestSize.Level1)
+HWTEST_F(WifiProtectTest, ChangeToPerfModeTest, TestSize.Level1)
 {
-    WIFI_LOGI("GetNearlyProtectMode enter!");
+    WIFI_LOGI("ChangeToPerfModeTest enter!");
     bool result = WifiProtectManager::GetInstance().ChangeToPerfMode(true);
     EXPECT_TRUE(result);
 }
@@ -106,15 +96,14 @@ HWTEST_F(WifiProtectTest, GetNearlyProtectModeTest, TestSize.Level1)
 HWTEST_F(WifiProtectTest, ChangeWifiPowerModeTest, TestSize.Level1)
 {
     WIFI_LOGI("ChangeWifiPowerModeTest enter!");
-    result = WifiProtectManager::GetInstance().ChangeWifiPowerMode();
+    bool result = WifiProtectManager::GetInstance().ChangeWifiPowerMode();
     EXPECT_TRUE(result);
 }
 
 HWTEST_F(WifiProtectTest, HandleScreenStateChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("HandleScreenStateChanged enter!");
-    result = WifiProtectManager::GetInstance().HandleScreenStateChanged(true);
-    EXPECT_TRUE(result);
+    WifiProtectManager::GetInstance().HandleScreenStateChanged(true);
 }
 
 HWTEST_F(WifiProtectTest, AddProtectTest, TestSize.Level1)
@@ -167,8 +156,7 @@ HWTEST_F(WifiProtectTest, SetLowLatencyModeTest, TestSize.Level1)
 HWTEST_F(WifiProtectTest, RegisterAppStateObserverTest, TestSize.Level1)
 {
     WIFI_LOGI("RegisterAppStateObserverTest enter!");
-    bool result = WifiProtectManager::GetInstance().RegisterAppStateObserver();
-    EXPECT_TRUE(result);
+    WifiProtectManager::GetInstance().RegisterAppStateObserver();
 }
 
 HWTEST_F(WifiProtectTest, OnAppDiedTest, TestSize.Level1)

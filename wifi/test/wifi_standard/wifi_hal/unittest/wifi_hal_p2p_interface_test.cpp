@@ -302,5 +302,56 @@ HWTEST_F(WifiHalP2pInterfaceTest, P2pForceStopTest, TestSize.Level1)
 {
     EXPECT_TRUE(P2pForceStop() == WIFI_HAL_SUCCESS);
 }
+
+HWTEST_F(WifiHalP2pInterfaceTest, P2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1)
+{
+    char type[] = "P2pSetWpsDeviceType";
+    P2pSetWpsSecondaryDeviceType(NULL);
+    P2pSetWpsSecondaryDeviceType(type);
+}
+
+HWTEST_F(WifiHalP2pInterfaceTest, P2pGetPeerTest, TestSize.Level1)
+{
+    char type[] = "P2pGetPeer";
+    P2pDeviceInfo peerInfo;
+    EXPECT_TRUE(P2pGetPeer(NULL, NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pGetPeer(type, NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pGetPeer(type, &peerInfo) == WIFI_HAL_SUCCESS);
+}
+
+HWTEST_F(WifiHalP2pInterfaceTest, P2pGetFrequenciesTest, TestSize.Level1)
+{
+    char type[] = "P2pGetPeer";
+    int peerInfo = 1;
+    int frequencies = 0;
+    EXPECT_TRUE(P2pGetFrequencies(0, NULL, NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pGetFrequencies(0, &frequencies, NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pGetFrequencies(0, &frequencies, &peerInfo) == WIFI_HAL_NOT_SUPPORT);
+}
+
+HWTEST_F(WifiHalP2pInterfaceTest, P2pSetGroupConfigTest, TestSize.Level1)
+{
+    P2pGroupConfig pConfig;
+    int size = 1;
+    EXPECT_TRUE(P2pSetGroupConfig(0, NULL, NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pSetGroupConfig(0, &pConfig, 0) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pSetGroupConfig(1, &pConfig, size) == WIFI_HAL_SUCCESS);
+}
+
+HWTEST_F(WifiHalP2pInterfaceTest, P2pGetGroupConfigTest, TestSize.Level1)
+{
+    P2pGroupConfig pConfig;
+    int size = 1;
+    EXPECT_TRUE(P2pGetGroupConfig(0, NULL, NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pGetGroupConfig(0, &pConfig, 0) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pGetGroupConfig(1, &pConfig, size) == WIFI_HAL_SUCCESS);
+}
+
+HWTEST_F(WifiHalP2pInterfaceTest, P2pHid2dConnectTest, TestSize.Level1)
+{
+    Hid2dConnectInfo info;
+    EXPECT_TRUE(P2pHid2dConnect( NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(P2pHid2dConnect(&info) == WIFI_HAL_SUCCESS);
+}
 }  // namespace Wifi
 }  // namespace OHOS

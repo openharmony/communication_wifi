@@ -14,6 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include "arp_checker.h"
+#include "dns_checker.h"
 
 using namespace testing::ext;
 
@@ -32,15 +33,18 @@ public:
         std::string gatewayAddr = "192.168.3.1";
         std::string ipAddr = "10.3.1";
         pArpChecker = std::make_unique<ArpChecker>();
+        pDnsChecker = std::make_unique<DnsChecker>();
         pArpChecker->Start(ifname, hwAddr, ipAddr, gatewayAddr);
     }
     virtual void TearDown()
     {
         pArpChecker.reset();
+        pDnsChecker.reset();
     }
 
 public:
     std::unique_ptr<ArpChecker> pArpChecker;
+    std::unique_ptr<DnsChecker> pDnsChecker;
 };
 
 HWTEST_F(ArpCheckerTest, DoArp_FAIL, TestSize.Level1)
@@ -49,6 +53,43 @@ HWTEST_F(ArpCheckerTest, DoArp_FAIL, TestSize.Level1)
     std::string targetIp = "192.168.3.66";
     bool isFillSenderIp = false;
     EXPECT_TRUE(pArpChecker->DoArpCheck(timeoutMillis, isFillSenderIp) == false);
+}
+
+HWTEST_F(ArpCheckerTest, Start_FAIL, TestSize.Level1)
+{
+    std::string priDns = "192.168.3.66";
+    std::string secondDns = "socket";
+    pDnsChecker->Start(timeoutMillis, isFillSenderIp);
+}
+
+HWTEST_F(ArpCheckerTest, Stop_FAIL, TestSize.Level1)
+{
+    pDnsChecker->Stop(timeoutMillis, isFillSenderIp);
+}
+
+HWTEST_F(ArpCheckerTest, formatHostAdress_Test, TestSize.Level1)
+{
+    std::string hostAddress = "192.168.3.66";
+    std::string host = "socket";
+    pDnsChecker->formatHostAdress(hostAddress, host);
+}
+
+HWTEST_F(ArpCheckerTest, DoDnsCheck_Test, TestSize.Level1)
+{
+    std::string hostAddress = "192.168.3.66";
+    pDnsChecker->DoDnsCheck(hostAddress, 1);
+}
+
+HWTEST_F(ArpCheckerTest,recvDnsData_Test, TestSize.Level1)
+{
+    std::string hostAddress = "192.168.3.66";
+    pDnsChecker->recvDnsData(hostAddress, 1, 0);
+}
+
+HWTEST_F(ArpCheckerTest, checkDnsValid_Test, TestSize.Level1)
+{
+    std::string hostAddress = "192.168.3.66";
+    pDnsChecker->checkDnsValid(hostAddress, hwAddr, 0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

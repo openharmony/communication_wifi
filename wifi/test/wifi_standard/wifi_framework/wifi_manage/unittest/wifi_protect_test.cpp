@@ -45,7 +45,7 @@ public:
 HWTEST_F(WifiProtectTest, InitWifiProtectTest, TestSize.Level1)
 {
     WIFI_LOGI("ClearScanInfoListTest enter!");
-    bool result = WifiProtectManager::GetInstance().InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON,"wifi");
+    bool result = WifiProtectManager::GetInstance().InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "wifi");
     EXPECT_TRUE(result);
 }
 

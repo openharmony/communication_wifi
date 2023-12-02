@@ -50,8 +50,7 @@ constexpr auto IP_STATIC = "STATIC";
 constexpr auto PROXY_STATIC = "STATIC";
 constexpr auto PROXY_PAC = "PAC";
 static const std::string DEFAULT_BSSID = "00:00:00:00:00:00";
-static const std::string MULTICAST_MAC = "01:00:00:00:00:00";
-static const std::string LOCALLY_ASSIGNED_MAC = "02:00:00:00:00:00";
+static const std::string DEFAULT_MAC_ADDRESS = "02:00:00:00:00:00";
 
 const std::unordered_map<std::string, WifiConfigType> g_wifiConfigMap = {
     {XML_TAG_SSID, WifiConfigType::SSID},
@@ -467,8 +466,7 @@ bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)
 
 bool NetworkXmlParser::IsRandomMacValid(WifiDeviceConfig wifiConfig)
 {
-    if (wifiConfig.macAddress.empty() || wifiConfig.macAddress == MULTICAST_MAC ||
-        wifiConfig.macAddress == LOCALLY_ASSIGNED_MAC) {
+    if (wifiConfig.macAddress.empty() || wifiConfig.macAddress == DEFAULT_MAC_ADDRESS) {
         return false;
     }
     return true;

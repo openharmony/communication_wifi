@@ -65,6 +65,7 @@ StaStateMachine::StaStateMachine(int instId)
       isWpsConnect(IsWpsConnected::WPS_INVALID),
       getIpSucNum(0),
       getIpFailNum(0),
+      enableSignalPoll(true),
       isRoam(false),
       netNoWorkNum(0),
       pDhcpResultNotify(nullptr),
@@ -810,6 +811,7 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[CMD_START_NETCHECK] = &StaStateMachine::DealNetworkCheck;
     staSmHandleFuncMap[CMD_START_GET_DHCP_IP_TIMEOUT] = &StaStateMachine::DealGetDhcpIpTimeout;
     staSmHandleFuncMap[CMD_START_RENEWAL_TIMEOUT] = &StaStateMachine::DealRenewalTimeout;
+    staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = &StaStateMachine::DealScreenStateChangedEvent;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -900,7 +902,11 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
          linkedInfo.maxSupportedTxLinkSpeed);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
-    StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
+
+    if (enableSignalPoll) {
+        WIFI_LOGD("DealSignalPollResult, StartTimer for SIGNAL_POLL.\n");
+        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
+    }
 }
 
 void StaStateMachine::DealSignalPacketChanged(int txPackets, int rxPackets)
@@ -2636,6 +2642,28 @@ void StaStateMachine::DealGetDhcpIpTimeout(InternalMessage *msg)
     LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT DealGetDhcpIpTimeout");
     StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     DisConnectProcess();
+}
+
+void StaStateMachine::DealScreenStateChangedEvent(InternalMessage *msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");
+        return;
+    }
+
+    int screenState = msg->GetParam1();
+    WIFI_LOGI("DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
+    if (screenState == MODE_STATE_OPEN) {
+        enableSignalPoll = true;
+        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
+    }
+
+    if (screenState == MODE_STATE_CLOSE) {
+        enableSignalPoll = false;
+        StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+    }
+
+    return;
 }
 
 /* ------------------ state machine dhcp callback function ----------------- */

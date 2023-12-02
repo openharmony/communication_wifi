@@ -621,6 +621,8 @@ void StaService::HandleScreenStatusChanged(int screenState)
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
+    
+    pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
 #endif
 #ifdef FEATURE_HPF_SUPPORT
     WifiManager::GetInstance().InstallPacketFilterProgram(screenState, m_instId);

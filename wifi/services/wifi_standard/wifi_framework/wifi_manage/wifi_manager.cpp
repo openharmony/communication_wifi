@@ -944,7 +944,6 @@ void WifiManager::CloseStaService(int instId)
         return;
     }
     if (WifiConfigCenter::GetInstance().GetPowerSleepState() == MODE_STATE_OPEN) {
-        WIFI_LOGI("PowerSleep not close sta SA!");
         WifiManager::GetInstance().StopUnloadStaSaTimer();
         return;
     }

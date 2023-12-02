@@ -80,7 +80,7 @@ HWTEST_F(ArpCheckerTest, DoDnsCheck_Test, TestSize.Level1)
     pDnsChecker->DoDnsCheck(hostAddress, 1);
 }
 
-HWTEST_F(ArpCheckerTest,recvDnsData_Test, TestSize.Level1)
+HWTEST_F(ArpCheckerTest, recvDnsData_Test, TestSize.Level1)
 {
     std::string hostAddress = "192.168.3.66";
     pDnsChecker->recvDnsData(hostAddress, 1, 0);

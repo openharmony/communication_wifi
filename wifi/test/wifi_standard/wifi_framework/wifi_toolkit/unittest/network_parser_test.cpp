@@ -184,6 +184,14 @@ HWTEST_F(NetworkParserTest, IsWifiConfigValidFalseTest, TestSize.Level1)
     EXPECT_FALSE(m_networkXmlParser->IsWifiConfigValid(wifiConfig));
 }
 
+HWTEST_F(NetworkParserTest, IsRandomMacValidFalseTest, TestSize.Level1)
+{
+    WIFI_LOGI("IsRandomMacValidFalseTest enter");
+    WifiDeviceConfig wifiConfig;
+    wifiConfig.macAddress = "02:00:00:00:00:00";
+    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+}
+
 HWTEST_F(NetworkParserTest, GetNetworksTest, TestSize.Level1)
 {
     WIFI_LOGI("GetNetworksTest enter");

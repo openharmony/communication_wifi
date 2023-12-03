@@ -160,7 +160,7 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
 #ifndef OHOS_ARCH_LITE
 void WifiDeviceStub::RemoveDeviceCbDeathRecipient(void)
 {
-    WIFI_LOGI("enter RemoveDeathRecipient!");
+    WIFI_LOGI("enter RemoveDeviceCbDeathRecipient, remove all death recipient!");
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto iter = remoteDeathMap.begin(); iter != remoteDeathMap.end(); ++iter) {
         iter->first->RemoveDeathRecipient(iter->second);
@@ -170,8 +170,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(void)
 
 void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &remoteObject)
 {
-    WIFI_LOGI("RemoveDeathRecipient, remoteObject: %{public}p!", &remoteObject);
-    WIFI_LOGI("RemoveDeathRecipient, remoteObject.promote: %{public}p!", static_cast<void*>(remoteObject.promote()));
+    WIFI_LOGI("RemoveDeviceCbDeathRecipient, remoteObject.promote: %{public}p!", static_cast<void*>(remoteObject.promote()));
     std::lock_guard<std::mutex> lock(mutex_);
     RemoteDeathMap::iterator iter = remoteDeathMap.find(remoteObject.promote());
     if (iter == remoteDeathMap.end()) {
@@ -179,7 +178,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &rem
     } else {
         remoteObject->RemoveDeathRecipient(iter->second);
         remoteDeathMap.erase(iter);
-        WIFI_LOGI("remove death recipient success!");
+        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}d.", remoteDeathMap.size());
     }
 }
 
@@ -188,7 +187,6 @@ void WifiDeviceStub::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
     WIFI_LOGI("OnRemoteDied, Remote is died! remoteObject: %{public}p", &remoteObject);
     WifiInternalEventDispatcher::GetInstance().RemoveStaCallback(remoteObject.promote());
     RemoveDeviceCbDeathRecipient(remoteObject);
-    WIFI_LOGI("yxt OnRemoteDied, do NOT remove death!!");
 }
 #endif
 
@@ -755,7 +753,7 @@ void WifiDeviceStub::OnGetCountryCode(uint32_t code, MessageParcel &data, Messag
 
 void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();
@@ -790,17 +788,19 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
                 deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
 #endif
             }
-            remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
-            WIFI_LOGI("OnRegisterCallBack, add deathRecipient, remote: %{public}p",
-                static_cast<void*>(remote));
+            RemoteDeathMap::iterator iter = remoteDeathMap.find(remote);
+            if (iter == remoteDeathMap.end()) {
+                std::lock_guard<std::mutex> lock(mutex_);
+                remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
+                WIFI_LOGI("OnRegisterCallBack, AddDeathRecipient, remote: %{public}p, remoteDeathMap.size: %{public}d",
+                    static_cast<void*>(remote), remoteDeathMap.size());
+            }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGI("AddDeathRecipient!");
             }
-            if (callback_ != nullptr) {
-                for (const auto &eventName : event) {
-                    ret = WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid, eventName,
-                        tokenId, m_instId);
-                }
+            for (const auto &eventName : event) {
+                ret = WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid, eventName,
+                    tokenId, m_instId);
             }
         }
     } while (0);

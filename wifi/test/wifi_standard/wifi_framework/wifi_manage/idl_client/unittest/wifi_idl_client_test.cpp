@@ -1243,5 +1243,48 @@ HWTEST_F(WifiIdlClientTest, ReqP2pListNetworksTest, TestSize.Level1)
     std::map<int, WifiP2pGroupInfo> mapGroups;
     mClient.ReqP2pListNetworks(mapGroups);
 }
+
+HWTEST_F(WifiIdlClientTest, ReqWpaAutoConnectTest, TestSize.Level1)
+{
+    mClient.ReqWpaAutoConnect(0);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pStartTest, TestSize.Level1)
+{
+    mClient.ReqP2pStart();
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pSetDeviceNameTest, TestSize.Level1)
+{
+    std::string name = "10.26.120.74";
+    mClient.ReqP2pSetDeviceName(name);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pSetSsidPostfixNameTest, TestSize.Level1)
+{
+    std::string postfixName = "10.26.120.74";
+    mClient.ReqP2pSetSsidPostfixName(postfixName);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pSetWpsConfigMethodsTest, TestSize.Level1)
+{
+    std::string config = "10.26.120.74";
+    mClient.ReqP2pSetWpsConfigMethods(config);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pFlushTest, TestSize.Level1)
+{
+    mClient.ReqP2pFlush();
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pFlushServiceTest, TestSize.Level1)
+{
+    mClient.ReqP2pFlushService();
+}
+
+HWTEST_F(WifiIdlClientTest, ReqWpaSetPowerModeTest, TestSize.Level1)
+{
+    mClient.ReqWpaSetPowerMode(true);
+}
 }  // namespace Wifi
 }  // namespace OHOS

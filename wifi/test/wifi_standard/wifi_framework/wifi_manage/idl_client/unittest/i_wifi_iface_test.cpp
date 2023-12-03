@@ -166,5 +166,58 @@ HWTEST_F(IWifiIfaceTest, IsChipSupportIndoorChannelTest, TestSize.Level1)
     bool isSupport = false;
     IsChipSupportIndoorChannel(&isSupport);
 }
+
+HWTEST_F(IWifiIfaceTest, GetChipId, TestSize.Level1)
+{
+    int32_t id = 0;
+    GetChipId(&id);
+}
+
+HWTEST_F(IWifiIfaceTest, CreateIface, TestSize.Level1)
+{
+    int32_t id = 0;
+    IWifiIface iface;
+    CreateIface(id, &iface);
+}
+
+HWTEST_F(IWifiIfaceTest, GetIface, TestSize.Level1)
+{
+    char ifname[] = "wifitest";
+    IWifiIface iface;
+    GetIface(ifname, &iface);
+}
+
+HWTEST_F(IWifiIfaceTest, GetIfaceNames, TestSize.Level1)
+{
+    int32_t type = 0;
+    char ifname[] = "wifitest";
+    int32_t size = 1;
+    GetIfaceNames(type, ifname, size);
+}
+
+HWTEST_F(IWifiIfaceTest, RemoveIface, TestSize.Level1)
+{
+    char ifname[] = "wifitest";
+    RemoveIface(ifname);
+}
+
+HWTEST_F(IWifiIfaceTest, ConfigComboModes, TestSize.Level1)
+{
+    int32_t mode = 0;
+    ConfigComboModes(mode);
+}
+
+HWTEST_F(IWifiIfaceTest, GetComboModes, TestSize.Level1)
+{
+    int32_t id = 0;
+    GetComboModes(&id);
+}
+
+HWTEST_F(IWifiIfaceTest, RequestFirmwareDebugDump, TestSize.Level1)
+{
+    unsigned char ifname[] = "wifitest";
+    int32_t id = 0;
+    RequestFirmwareDebugDump(ifname, &id);
+}
 }  // namespace Wifi
 }  // namespace OHOS

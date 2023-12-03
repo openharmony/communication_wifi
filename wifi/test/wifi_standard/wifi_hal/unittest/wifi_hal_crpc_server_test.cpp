@@ -358,6 +358,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetTypeTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcRegisterEventCallbackTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcRegisterEventCallback(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcRegisterEventCallback(mServer, nullptr) < 0);
     char buff[] = "N\tRegisterEventCallback\tasdgfd\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tRegisterEventCallback\t");
@@ -378,6 +379,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcRegisterEventCallbackTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcUnRegisterEventCallbackTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcUnRegisterEventCallback(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcUnRegisterEventCallback(mServer, nullptr) < 0);
     char buff[] = "N\tUnRegisterEventCallback\tasdgfd\t";
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tUnRegisterEventCallback\t");
@@ -398,6 +400,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcUnRegisterEventCallbackTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, RpcNotifyClearTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcNotifyClear(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcNotifyClear(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcNotifyClear(mServer, mContext) == 0);
 }
 

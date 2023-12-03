@@ -166,17 +166,21 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(void)
         iter->first->RemoveDeathRecipient(iter->second);
         remoteDeathMap.erase(iter);
     }
+    deathRecipient_ = nullptr;
 }
 
 void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &remoteObject)
 {
-    WIFI_LOGI("RemoveDeviceCbDeathRecipient, remoteObject.promote: %{public}p!", static_cast<void*>(remoteObject.promote()));
+    WIFI_LOGI("RemoveDeviceCbDeathRecipient, remoteObject.promote: %{public}p!",
+        static_cast<void*>(remoteObject.promote()));
     std::lock_guard<std::mutex> lock(mutex_);
     RemoteDeathMap::iterator iter = remoteDeathMap.find(remoteObject.promote());
     if (iter == remoteDeathMap.end()) {
-        WIFI_LOGW("not find remoteObject to deal!");
+        WIFI_LOGI("not find remoteObject to deal!");
     } else {
-        remoteObject->RemoveDeathRecipient(iter->second);
+        WIFI_LOGI("RemoveDeviceCbDeathRecipient, deathRecipient_: %{public}p, iter->second: %{public}p",
+            static_cast<void*>(deathRecipient_), static_cast<void*>(iter->second));
+        remoteObject->RemoveDeathRecipient(deathRecipient_);
         remoteDeathMap.erase(iter);
         WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}d.", remoteDeathMap.size());
     }

@@ -188,7 +188,7 @@ void WifiDeviceStub::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
     WIFI_LOGI("OnRemoteDied, Remote is died! remoteObject: %{public}p", &remoteObject);
     WifiInternalEventDispatcher::GetInstance().RemoveStaCallback(remoteObject.promote());
     // RemoveDeviceCbDeathRecipient(remoteObject);
-    WIFI_LOGI("yxt OnRemoteDied, do NOT remove death!!", &remoteObject);
+    WIFI_LOGI("yxt OnRemoteDied, do NOT remove death!!");
 }
 #endif
 
@@ -789,7 +789,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
 #else
                 deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
                 remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
-                WIFI_LOGI("OnRegisterCallBack, add deathRecipient, : %{public}p", remote);
+                WIFI_LOGI("OnRegisterCallBack, add deathRecipient: %{public}p", remote);
 #endif
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {

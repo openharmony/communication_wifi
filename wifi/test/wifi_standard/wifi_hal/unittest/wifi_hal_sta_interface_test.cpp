@@ -210,5 +210,47 @@ HWTEST_F(WifiHalStaInterfaceTest, ForceStopTest, TestSize.Level1)
 {
     EXPECT_TRUE(ForceStop() == WIFI_HAL_SUCCESS);
 }
+
+HWTEST_F(WifiHalStaInterfaceTest, GetStaCapabilitiesTest, TestSize.Level1)
+{
+    unsigned char mac[] = "lenMac";
+    EXPECT_TRUE(GetStaCapabilities(NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(GetDeviceMacAddress(NULL, NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(GetDeviceMacAddress(mac, NULL) == WIFI_HAL_FAILED);
+}
+
+HWTEST_F(WifiHalStaInterfaceTest, GetFrequenciesTest, TestSize.Level1)
+{
+    int frequencies = 1;
+    EXPECT_TRUE(GetFrequencies(0, NULL, NULL) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(GetFrequencies(0, &frequencies, NULL) == WIFI_HAL_FAILED);
+}
+
+HWTEST_F(WifiHalStaInterfaceTest, SetAssocMacAddrTest, TestSize.Level1)
+{
+    int frequencies = 1;
+    EXPECT_TRUE(SetScanningMacAddress(NULL, frequencies) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(DeauthLastRoamingBssid(NULL, frequencies) == WIFI_HAL_FAILED);
+}
+
+HWTEST_F(WifiHalStaInterfaceTest, GetSupportFeatureTest, TestSize.Level1)
+{
+    long frequencies = 1;
+    EXPECT_TRUE(GetSupportFeature(NULL) == WIFI_HAL_FAILED);
+    EXPECT_GE(GetSupportFeature(&frequencies), WIFI_HAL_FAILED);
+}
+
+HWTEST_F(WifiHalStaInterfaceTest, RunCmdTest, TestSize.Level1)
+{
+    int32_t cmdid = 1;
+    char mac[] = "lenMac";
+    EXPECT_TRUE(RunCmd(NULL, cmdid, NULL, 1) == WIFI_HAL_FAILED);
+    EXPECT_TRUE(RunCmd(mac, cmdid, NULL, 1) == WIFI_HAL_FAILED);
+}
+
+HWTEST_F(WifiHalStaInterfaceTest, SetPowerModeTest, TestSize.Level1)
+{
+    EXPECT_TRUE(SetPowerMode(true) == WIFI_HAL_SUCCESS);
+}
 }  // namespace Wifi
 }  // namespace OHOS

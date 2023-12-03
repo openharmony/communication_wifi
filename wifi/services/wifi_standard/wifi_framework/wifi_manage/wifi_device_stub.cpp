@@ -186,7 +186,8 @@ void WifiDeviceStub::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
     WIFI_LOGI("OnRemoteDied, Remote is died! remoteObject: %{private}p", &remoteObject);
     WifiInternalEventDispatcher::GetInstance().RemoveStaCallback(remoteObject.promote());
-    RemoveDeviceCbDeathRecipient(remoteObject);
+    // RemoveDeviceCbDeathRecipient(remoteObject);
+    WIFI_LOGI("yxt OnRemoteDied, do NOT remove death!!", &remoteObject);
 }
 #endif
 

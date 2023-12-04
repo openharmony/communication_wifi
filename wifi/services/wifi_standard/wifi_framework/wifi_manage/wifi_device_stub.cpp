@@ -178,7 +178,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &rem
     if (iter == remoteDeathMap.end()) {
         WIFI_LOGI("not find remoteObject to deal!");
     } else {
-        WIFI_LOGI("RemoveDeviceCbDeathRecipient, deathRecipient_: %{public}p, iter->second: %{public}p",
+        WIFI_LOGD("RemoveDeviceCbDeathRecipient, deathRecipient_: %{public}p, iter->second: %{public}p",
             static_cast<void*>(deathRecipient_), static_cast<void*>(iter->second));
         remoteObject->RemoveDeathRecipient(deathRecipient_);
         remoteDeathMap.erase(iter);
@@ -757,7 +757,7 @@ void WifiDeviceStub::OnGetCountryCode(uint32_t code, MessageParcel &data, Messag
 
 void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
-    WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = WIFI_OPT_FAILED;
     do {
         sptr<IRemoteObject> remote = data.ReadRemoteObject();
@@ -780,7 +780,8 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
                 event.emplace_back(data.ReadString());
             }
         }
-        WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
+        WIFI_LOGI("%{public}s, get pid: %{public}d, tokenId: %{private}d, eventNum: %{public}d",
+            __func__, pid, tokenId, eventNum);
 
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);

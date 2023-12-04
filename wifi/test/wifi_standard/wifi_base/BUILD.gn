@@ -31,7 +31,6 @@ ohos_unittest("base_unittest") {
     "$WIFI_ROOT_DIR/base/cRPC/src/context.c",
     "$WIFI_ROOT_DIR/base//cRPC/src/evloop.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/hash_table.c",
-    "$WIFI_ROOT_DIR/base/cRPC/src/rpc.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/net.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/serial.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/server.c",

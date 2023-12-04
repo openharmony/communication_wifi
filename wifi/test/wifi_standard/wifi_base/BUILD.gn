@@ -26,8 +26,6 @@ config("module_private_config") {
 ohos_unittest("base_unittest") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/base/cRPC/src/client_updater.c",
-    "$WIFI_ROOT_DIR/base/cRPC/src/client.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/context.c",
     "$WIFI_ROOT_DIR/base//cRPC/src/evloop.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/hash_table.c",
@@ -43,7 +41,7 @@ ohos_unittest("base_unittest") {
   ]
 
   include_dirs = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
 

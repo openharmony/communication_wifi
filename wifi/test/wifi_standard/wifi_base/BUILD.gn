@@ -35,7 +35,6 @@ ohos_unittest("base_unittest") {
     "context_test.cpp",
     "hash_table_test.cpp",
     "net_test.cpp",
-    "rpc_test_main.cpp",
     "serial_test.cpp",
     "server_test.cpp",
   ]

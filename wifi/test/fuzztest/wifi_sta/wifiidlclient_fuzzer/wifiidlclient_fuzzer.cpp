@@ -40,7 +40,7 @@ void OnSupportedTest_IWifi(const uint8_t* data, size_t size)
 
 void OnSupportedTest_IWifiChip(const uint8_t* data, size_t size)
 {
-    bool isSupport;
+    bool isSupport = true;
     IsChipSupportDbdc(&isSupport);
     IsChipSupportCsa(&isSupport);
     IsChipSupportRadarDetect(&isSupport);
@@ -74,9 +74,9 @@ void OnSupportedTest_IWifiP2pIface(const uint8_t* data, size_t size)
     const char* chardata;
     P2pSetDeviceName(chardata);
     P2pSetSsidPostfixName(chardata);
-    P2pSetWpaDeviceType(chardata);
+    P2pSetWpsDeviceType(chardata);
     P2pSetWpsSecondaryDeviceType(chardata);
-    P2pSetWpaConfigMethods(chardata);
+    P2pSetWpsConfigMethods(chardata);
     P2pSetWfdDeviceConfig(chardata);
     P2pRemoveGroup(chardata);
     P2pCancelServiceDiscovery(chardata);

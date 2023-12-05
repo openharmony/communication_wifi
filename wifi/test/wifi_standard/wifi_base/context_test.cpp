@@ -93,7 +93,7 @@ static int ExpandReadCache(Context *context, int len)
             capacity += context->rCapacity;
             left += context->rCapacity;
         }
-        char *p = static_cast<char *>calloc(capacity, sizeof(char));
+        char *p = (char *)calloc(capacity, sizeof(char));
         if (p == nullptr) {
             return -1;
         }

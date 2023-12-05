@@ -93,7 +93,7 @@ static int ExpandReadCache(Context *context, int len)
             capacity += context->rCapacity;
             left += context->rCapacity;
         }
-        std::string *p = std::string(reinterpret_cast<char *>calloc(capacity, sizeof(char)));
+        char *p = (char *)calloc(capacity, sizeof(char));
         if (p == nullptr) {
             return -1;
         }
@@ -106,13 +106,11 @@ static int ExpandReadCache(Context *context, int len)
             free(p);
             return -1;
         }
-        std::string *pFree = std::string(context->szRead);
         context->szRead = p;
         if (context->rBegin > context->rEnd) {
             context->rEnd += context->rCapacity;
         }
         context->rCapacity = capacity;
-        free(pFree);
     }
     return 0;
 }

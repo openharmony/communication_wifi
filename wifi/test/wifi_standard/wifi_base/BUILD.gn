@@ -23,7 +23,7 @@ config("module_private_config") {
 ohos_unittest("base_unittest") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/base//cRPC/src/evloop.c",
+    "$WIFI_ROOT_DIR/base/cRPC/src/evloop.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/context.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/hash_table.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/net.c",
@@ -32,6 +32,7 @@ ohos_unittest("base_unittest") {
     "context_test.cpp",
     "hash_table_test.cpp",
     "net_test.cpp",
+    "rpc_test_main.cpp",
     "serial_test.cpp",
     "server_test.cpp",
   ]

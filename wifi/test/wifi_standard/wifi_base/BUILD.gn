@@ -17,9 +17,7 @@ module_output_path = "wifi/base_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_base",
-  ]
+  include_dirs = [ "$WIFI_ROOT_DIR/test/wifi_standard/wifi_base" ]
 }
 
 ohos_unittest("base_unittest") {
@@ -38,9 +36,7 @@ ohos_unittest("base_unittest") {
     "server_test.cpp",
   ]
 
-  include_dirs = [
-    "$WIFI_ROOT_DIR/base/cRPC/include",
-  ]
+  include_dirs = [ "$WIFI_ROOT_DIR/base/cRPC/include" ]
 
   ldflags = [
     "-fPIC",

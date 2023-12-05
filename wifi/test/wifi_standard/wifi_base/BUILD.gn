@@ -26,8 +26,8 @@ config("module_private_config") {
 ohos_unittest("base_unittest") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/base/cRPC/src/context.c",
     "$WIFI_ROOT_DIR/base//cRPC/src/evloop.c",
+    "$WIFI_ROOT_DIR/base/cRPC/src/context.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/hash_table.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/net.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/serial.c",

@@ -238,7 +238,7 @@ public:
     void ForceStopWifi(int instId = 0);
 #ifndef OHOS_ARCH_LITE
     bool IsMdmForbidden(void);
-    bool GetLastStaStateByDatashare();
+    int GetLastStaStateByDatashare();
     void CheckAndStartStaByDatashare();
     ErrCode WifiToggled(int isOpen, int id);
     ErrCode SoftapToggled(int isOpen, int id);

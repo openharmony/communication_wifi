@@ -60,7 +60,7 @@ std::string XmlParser::GetNameValue(xmlNodePtr node)
     if (node == nullptr || GetNodeValue(node).empty()) {
         return "";
     }
-    xmlChar *value = xmlGetProp(node,  BAD_CAST"name");
+    xmlChar *value = xmlGetProp(node, BAD_CAST"name");
     if (value != nullptr) {
         return std::string(reinterpret_cast<char *>(value));
     } else {
@@ -119,7 +119,7 @@ std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
     int num = std::stoi(std::string(reinterpret_cast<char *>(numChar)));
     xmlChar *value = xmlNodeGetContent(node);
     std::string valueStr = std::string(reinterpret_cast<char *>(value));
-    if (valueStr.length() != 2 * num) { // byte length check
+    if (valueStr.length() != 2 * static_cast<size_t>(num)) { // byte length check
         return byteArr;
     }
     for (size_t i = 0; i < valueStr.length(); i += 2) { // trans string to byte

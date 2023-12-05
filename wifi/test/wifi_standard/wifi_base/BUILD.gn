@@ -18,7 +18,6 @@ module_output_path = "wifi/base_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_base",
   ]
 }
@@ -41,7 +40,6 @@ ohos_unittest("base_unittest") {
 
   include_dirs = [
     "$WIFI_ROOT_DIR/base/cRPC/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
 
   ldflags = [

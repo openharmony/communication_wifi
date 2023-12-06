@@ -25,6 +25,7 @@
 #include "iservice_registry.h"
 #include "app_mgr_constants.h"
 #include "define.h"
+#include "wifi_rx_listen_arbitration.h"
 #endif
 
 #undef LOG_TAG
@@ -90,7 +91,7 @@ WifiProtectManager &WifiProtectManager::GetInstance()
 
 bool WifiProtectManager::IsValidProtectMode(const WifiProtectMode &protectMode)
 {
-    if (protectMode != WifiProtectMode::WIFI_PROTECT_FULL && 
+    if (protectMode != WifiProtectMode::WIFI_PROTECT_FULL &&
         protectMode != WifiProtectMode::WIFI_PROTECT_SCAN_ONLY &&
         protectMode != WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF &&
         protectMode != WifiProtectMode::WIFI_PROTECT_FULL_LOW_LATENCY) {
@@ -559,6 +560,9 @@ void AppStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppState
 
     WifiProtectManager::GetInstance().OnAppForegroudChanged(
         appStateData.bundleName, appStateData.state);
+    #ifdef FEATURE_RX_LISTEN_SUPPORT
+        RxListenArbitration::GetInstance().OnForegroundAppChanged(appStateData);
+    #endif
 }
 #endif
 }  // namespace Wifi

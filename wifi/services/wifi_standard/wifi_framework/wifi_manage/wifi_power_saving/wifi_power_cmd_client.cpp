@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "wifi_power_cmd_client.h"
+#include <linux/sockios.h>
 #include <net/if.h>
 #include <net/route.h>
 #include <netinet/in.h>
@@ -21,8 +22,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <cerrno>
+#include <unistd.h>
 #include "wifi_logger.h"
-
 
 namespace OHOS {
 namespace Wifi {
@@ -35,7 +36,6 @@ static const char RX_LISTEN_ON = 'Y';
 static const char RX_LISTEN_OFF = 'N';
 static const auto CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
 static const auto CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
-
 
 WifiPowerCmdClient &Wifi::WifiPowerCmdClient::GetInstance()
 {
@@ -52,12 +52,15 @@ int Wifi::WifiPowerCmdClient::SendCmdToDriver(const char *iface, int commandId, 
     }
     if (commandId == CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH) {
         ret = SetRxListen(paramBuf);
+    } else {
+         WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
     }
     return ret;
 }
 int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(char *cmdBuf, int cmdSize,
     const char *interfaceName) const
 {
+    int ret = -1;
     if (cmdBuf > MAX_PRIV_CMD_SIZE) {
         WIFI_LOGE("%{public}s cmdSize too large", __FUNCTION__);
         return ret;
@@ -67,9 +70,8 @@ int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(char *cmdBuf, i
         return ret;
     }
     struct ifreq ifr;
-    int ret = -1;
     WifiPrivCmd privCmd = { 0 };
-    unint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
     (void)memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr));
     if (memcpy_s(buf, MAX_PRIV_CMD_SIZE, cmdBuf, cmdSize) != EOK) {
         WIFI_LOGE("%{public}s memcpy_s privCmd buf error", __FUNCTION__);
@@ -94,7 +96,7 @@ int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(char *cmdBuf, i
         return ret;
     }
     (void)memset_s(cmdBuf, cmdSize, 0, cmdSize);
-    if (memcpy_s(cmdBuf, cmdSize, privCmd.buf, cmdSize - 1) != 0) {
+    if (memcpy_s(cmdBuf, cmdSize, privCmd.buf, cmdSize - 1) != EOK) {
         WIFI_LOGE("%{public}s memcpy_s cmd fail", __FUNCTION__);
     }
     close(sock);
@@ -123,7 +125,7 @@ int Wifi::WifiPowerCmdClient::SetRxListen(const char *paramBuf) const
         WIFI_LOGE("%{public}s invalid param", __FUNCTION__);
         return ret;
     }
-    ret = SendCommandToDriverByInterfaceName(cmdBuf, TINY_BUFF_SIZE, WiFI_IFNAME);
+    ret = SendCommandToDriverByInterfaceName(cmdBuf, TINY_BUFF_SIZE, WIFI_IFNAME);
     return ret;
 }
 } // namespace Wifi

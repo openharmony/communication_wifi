@@ -16,7 +16,7 @@
 #include "wifi_rx_listen_arbitration.h"
 #include "wifi_logger.h"
 #include "wifi_power_cmd_client.h"
-#include "app_parser.h"
+#include "wifi_app_parser.h"
 
 namespace OHOS {
 namespace Wifi {

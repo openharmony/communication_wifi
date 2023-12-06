@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppXmlParser");
 
-static constexpr auto WIFI_MONITOR_APP_FILE_PATH = CONFIG_ROOR_DIR "/wifi_monitor_apps.xml";
+static constexpr auto WIFI_MONITOR_APP_FILE_PATH = CONFIG_ROOR_DIR"/wifi_monitor_apps.xml";
 static constexpr auto XML_TAG_SECTION_HEADER_MONITOR_APP = "MonitorAPP";
 static constexpr auto XML_TAG_SECTION_HEADER_GAME_INFO = "GameInfo";
 static constexpr auto XML_TAG_SECTION_HEADER_APP_WHITE_LIST = "AppWhiteList";
@@ -115,7 +115,7 @@ void AppParser::InitAppParser()
     WIFI_LOGD("%{public}s, wifi monitor app xml passed successfully", __FUNCTION__);
 }
 
-bool AppParser::ParserInternal(xmlNodePtr node)
+bool AppParser::ParseInternal(xmlNodePtr node)
 {
     if (node == nullptr) {
         WIFI_LOGE("%{public}s node is null", __FUNCTION__);
@@ -130,7 +130,11 @@ void AppParser::ParserAppList(const xmlNodePtr &innode)
     if (xmlStrcmp(innode->name, BAD_CAST(XML_TAG_SECTION_HEADER_MONITOR_APP)) != 0) {
         WIFI_LOGE("innode name=%{public}s not equal MonitorAPP", innode->name);
     }
-    for (xmlNodePtr node = innnode->children; node != nullptr; node = node->next) {
+    m_gameAppVec.clear();
+    m_whiteAppVec.clear();
+    m_blackAppVec.clear();
+    m_chariotAppVec.clear();
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetAppTypeAsInt(node)) {
             case AppType::GAME_APP:
                 m_gameAppVec.push_back(ParseGameAppInfo(node));
@@ -143,7 +147,7 @@ void AppParser::ParserAppList(const xmlNodePtr &innode)
                 break;
             case AppType::CHARIOT_APP:
                 m_chariotAppVec.push_back(ParseChariotAppInfo(node));
-
+                break;
             default:
                 WIFI_LOGD("app type: %{public}s is not monitored", GetNodeValue(node).c_str());
                 break;
@@ -160,7 +164,7 @@ GameAppInfo AppParser::ParseGameAppInfo(const xmlNodePtr &innode)
         WIFI_LOGW("%{public}s game name is empty", __FUNCTION__);
     }
     gameAppInfo.gameName = gameName;
-    for (xmlNodePtr node = innnode->children; node != nullptr; node = node->next) {
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetGameAppInfoNameAsInt(node)) {
             case GameAppInfoType::GAME_ID:
                 gameAppInfo.mGameId = GetStringValue(node);
@@ -214,21 +218,21 @@ ChariotAppInfo AppParser::ParseChariotAppInfo(const xmlNodePtr &innode)
 
 GameAppInfoType AppParser::GetGameAppInfoNameAsInt(const xmlNodePtr &innode)
 {
-    std::string tagName = GetNodeValue(node);
+    std::string tagName = GetNodeValue(innode);
     if (gameInfoTypeMap.find(tagName) != gameInfoTypeMap.end()) {
         return gameInfoTypeMap.at(tagName);
     }
-    WIFI_LOGD("%{public} not find targName:%{public}s in gameInfoTypeMap", __FUNCTION__, tagName.c_str());
+    WIFI_LOGD("%{public}s not find targName:%{public}s in gameInfoTypeMap", __FUNCTION__, tagName.c_str());
     return GameAppInfoType::INVALID;
 }
 
 AppType AppParser::GetAppTypeAsInt(const xmlNodePtr &innode)
 {
-    std::string tagName = GetNodeValue(node);
+    std::string tagName = GetNodeValue(innode);
     if (appTypeMap.find(tagName) != appTypeMap.end()) {
         return appTypeMap.at(tagName);
     }
-    WIFI_LOGD("%{public} not find targName:%{public}s in appTypeMap", __FUNCTION__, tagName.c_str());
+    WIFI_LOGD("%{public}s not find targName:%{public}s in appTypeMap", __FUNCTION__, tagName.c_str());
     return AppType::OTHER_APP;
 }
 } // namespace Wifi

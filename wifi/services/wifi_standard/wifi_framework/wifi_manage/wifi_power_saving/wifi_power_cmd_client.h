@@ -16,18 +16,18 @@
 #ifndef OHOS_WIFI_POWER_CMD_CLIENT_H
 #define OHOS_WIFI_POWER_CMD_CLIENT_H
 
-#include <unistd.h>
+#include <stdint.h>
 
 namespace OHOS {
 namespace Wifi {
 
-const auto WiFI_IFNAME = "wlan0";
+const auto WIFI_IFNAME = "wlan0";
 const int CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH = 125;
 
 typedef struct {
-    unit8_t *buf;
-    unint32_t size;
-    unint32_t len;
+    uint8_t *buf;
+    uint32_t size;
+    uint32_t len;
 } WifiPrivCmd;
 
 class WifiPowerCmdClient {

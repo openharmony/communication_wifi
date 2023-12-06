@@ -70,7 +70,7 @@ public:
 
 private:
     void InitAppParser();
-    bool ParserInternal(xmlNodePtr node) override;
+    bool ParseInternal(xmlNodePtr node) override;
     void ParserAppList(const xmlNodePtr &innode);
     GameAppInfo ParseGameAppInfo(const xmlNodePtr &innode);
     WhiteListAppInfo ParseWhiteAppInfo(const xmlNodePtr &innode);
@@ -80,10 +80,10 @@ private:
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
 
 private:
-    std::vector<GameAppInfoL> m_gameAppVec {};
-    std::vector<WhiteListAppInfoL> m_whiteAppVec {};
-    std::vector<BlackListAppInfoL> m_blackAppVec {};
-    std::vector<ChariotAppInfoL> m_chariotAppVec {};
+    std::vector<GameAppInfo> m_gameAppVec {};
+    std::vector<WhiteListAppInfo> m_whiteAppVec {};
+    std::vector<BlackListAppInfo> m_blackAppVec {};
+    std::vector<ChariotAppInfo> m_chariotAppVec {};
 };
 } // namespace Wifi
 } // namespace OHOS

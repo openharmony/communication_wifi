@@ -38,6 +38,7 @@ local_base_sources = [
   "net_helper/mac_address.cpp",
   "net_helper/network_interface.cpp",
   "net_helper/raw_socket.cpp",
+  "net_helper/sta_network_check.cpp",
   "utils/wifi_common_event_helper.cpp",
   "utils/wifi_encryption_util.cpp",
   "utils/wifi_global_func.cpp",
@@ -49,6 +50,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
   "//commonlibrary/c_utils/base/include",
   "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
@@ -134,6 +136,7 @@ if (defined(ohos_lite)) {
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "huks:libhukssdk",
+      "netstack:http_client",
     ]
 
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {

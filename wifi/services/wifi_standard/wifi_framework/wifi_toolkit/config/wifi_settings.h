@@ -963,6 +963,70 @@ public:
     int GetScreenState() const;
 
     /**
+     * @Description Set the Idel State
+     *
+     * @param state - 1 on; 2 off
+     */
+    void SetPowerIdelState(const int &state);
+
+    /**
+     * @Description Get the Idel State
+     *
+     * @return int - 1 on; 2 off
+     */
+    int GetPowerIdelState() const;
+
+    /**
+     * @Description Set the Battery Charge State
+     *
+     * @param state - 1 on; 2 off
+     */
+    void SetBatteryChargeState(const int &state);
+
+    /**
+     * @Description Set the Gnss Fix State
+     *
+     * @param state - 1 on; 2 off
+     */
+    void SetGnssFixState(const int &state);
+
+    /**
+     * @Description Get the Gnss Fix State
+     *
+     * @return int - 1 on; 2 off
+     */
+    int GetGnssFixState() const;
+
+    /**
+     * @Description Set the abnormal apps
+     *
+     * @param abnormalAppList - abnormal app list
+     */
+    void SetAbnormalApps(const std::vector<std::string> &abnormalAppList);
+
+    /**
+     * @Description Get the abnormal apps
+     *
+     * @param abnormalAppList - abnormal app list
+     * @return int - 0 success
+     */
+    int GetAbnormalApps(std::vector<std::string> &abnormalAppList);
+
+    /**
+     * @Description Set the scan genie state
+     *
+     * @param state - 1 on; 2 off
+     */
+    void SetScanGenieState(const int &state);
+
+    /**
+     * @Description Get the scan genie state
+     *
+     * @return int - 1 on; 2 off
+     */
+    int GetScanGenieState() const;
+
+    /**
      * @Description Set the Airplane Mode State
      *
      * @param state - 1 open; 2 close
@@ -1568,6 +1632,10 @@ private:
     std::map <int, time_t> mLastSelectedTimeVal; /* last selected time */
     int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
+    int mIdelState;              /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
+    int mBatteryChargeState;     /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
+    int mGnssFixState;           /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
+    int mScanGenieState;         /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     std::atomic<int> mAirplaneModeState;      /* 1 on 2 off */
     std::atomic<int> mPowerSleepState;        /* 1 on 2 off */
     int mDeviceProvision;      /* 1 on 2 off */
@@ -1622,6 +1690,7 @@ private:
     std::atomic_bool mThreadStatusFlag_ { false };
     std::atomic_uint64_t mThreadStartTime { 0 };
     std::map<std::string, std::vector<std::string>> mFilterMap;
+    std::vector<std::string> mAbnormalAppList;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -381,6 +381,12 @@ public:
      */
     void OnNetworkDisconnectEvent(int reason);
     /**
+     * @Description  Assoc events
+     *
+     * @param reason - the state of wifi assoc
+     */
+    void OnNetworkAssocEvent(int assocState);
+    /**
      * @Description  Bssid change events
      *
      * @param reason: the reason of bssid changed(in)

@@ -31,6 +31,7 @@
 #include "wifi_scan_callback_proxy.h"
 #include "wifi_service_manager.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
@@ -137,6 +138,9 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
+#ifndef OHOS_ARCH_LITE
+    UpdateScanMode();
+#endif
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;
@@ -169,6 +173,9 @@ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
+#ifndef OHOS_ARCH_LITE
+    UpdateScanMode();
+#endif
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;
@@ -284,6 +291,21 @@ ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
 
     bScanOnlyAvailable = WifiSettings::GetInstance().GetScanOnlySwitchState(m_instId);
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiScanServiceImpl::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
+{
+    WIFI_LOGD("WifiScanServiceImpl::StartWifiPnoScan");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("StartWifiPnoScan:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_SCAN_NOT_OPENED;
+    }
+    return pService->StartWifiPnoScan(isStartAction, periodMs, suspendReason);
 }
 
 ErrCode WifiScanServiceImpl::OpenScanOnlyAvailable()
@@ -405,5 +427,23 @@ bool WifiScanServiceImpl::IsRemoteDied(void)
 {
     return false;
 }
+
+#ifndef OHOS_ARCH_LITE
+void WifiScanServiceImpl::UpdateScanMode()
+{
+    int uid = GetCallingUid();
+    int pid = GetCallingPid();
+    std::string processName = GetRunningProcessNameByPid(uid, pid);
+    if (!processName.empty()) {
+        if (IsForegroundApp(uid)) {
+            WifiSettings::GetInstance().SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
+        } else {
+            WifiSettings::GetInstance().SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
+        }
+    } else {
+        WifiSettings::GetInstance().SetAppRunningState(ScanMode::SYS_BACKGROUND_SCAN);
+    }
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

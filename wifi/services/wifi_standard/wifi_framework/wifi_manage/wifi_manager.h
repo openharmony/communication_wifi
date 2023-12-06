@@ -330,7 +330,9 @@ private:
     std::mutex airplaneModeEventMutex;
     std::mutex locationEventMutex;
     std::mutex batteryEventMutex;
+#ifdef HAS_POWERMGR_PART
     std::mutex powerStateEventMutex;
+#endif
     std::condition_variable mCondition;
     std::deque<WifiCloseServiceMsg> mEventQue;
 #ifndef OHOS_ARCH_LITE
@@ -392,6 +394,14 @@ private:
     void RegisterPowerStateListener();
     void UnRegisterPowerStateListener();
     bool isPowerStateListenerSubscribered = false;
+#ifdef HAS_POWERMGR_PART
+    void RegisterPowerStateCallBack();
+    void UnRegisterPowerStateCallBack();
+#endif
+#ifdef HAS_MOVEMENT_PART
+    void RegisterMovementCallBack();
+    void UnRegisterMovementCallBack();
+#endif
 #endif
     InitStatus mInitStatus;
     long mSupportedFeatures;

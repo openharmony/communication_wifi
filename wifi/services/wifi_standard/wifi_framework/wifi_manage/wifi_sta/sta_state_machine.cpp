@@ -52,6 +52,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define WPA3_BLACKMAP_MAX_NUM 20
 #define WPA3_BLACKMAP_RSSI_THRESHOLD (-70)
 #define WPA3_CONNECT_FAIL_COUNT_THRESHOLD 2
+#define WPA_CB_ASSOCIATING 3
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -1757,6 +1758,15 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 void StaStateMachine::OnNetworkDisconnectEvent(int reason)
 {
     WriteWifiAbnormalDisconnectHiSysEvent(reason);
+}
+
+void StaStateMachine::OnNetworkAssocEvent(int assocState)
+{
+    if (assocState == WPA_CB_ASSOCIATING) {
+        InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
+    } else {
+        InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED, linkedInfo);
+    }
 }
 
 void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)

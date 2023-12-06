@@ -60,7 +60,8 @@
             "wifi_feature_with_local_random_mac",
             "wifi_feature_sta_ap_exclusion",
             "wifi_feature_with_random_mac_addr",
-            "wifi_feature_with_hdi_wpa_supported"
+            "wifi_feature_with_hdi_wpa_supported",
+	    "wifi_feature_with_scan_control"
         ],
         "adapted_system_type": [
             "small",
@@ -93,6 +94,7 @@
                 "i18n",
                 "init",
                 "ipc",
+                "movement",
                 "napi",
                 "netmanager_base",
                 "netstack",

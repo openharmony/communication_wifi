@@ -31,10 +31,6 @@
 #include "arp_checker.h"
 #include "dns_checker.h"
 #include "wifi_internal_msg.h"
-#ifndef OHOS_ARCH_LITE
-#include "http_client_request.h"
-#include "http_client.h"
-#endif
 
 #define HTTP_DETECTION_TIMEOUT 10000
 #define HTTP_BACKUP_TIMEOUT 3000
@@ -87,8 +83,6 @@ private:
      *
      */
     int HttpPortalDetection(const std::string& url);
-
-    void RegistHttpCallBack(std::shared_ptr<NetStack::HttpClient::HttpClientTask> task);
 #endif
     /**
      * @Description : NetCheck thread function

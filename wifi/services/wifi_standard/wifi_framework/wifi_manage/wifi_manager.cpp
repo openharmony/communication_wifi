@@ -32,8 +32,13 @@
 #include "wifi_datashare_utils.h"
 #include "wifi_location_mode_observer.h"
 #include "wifi_country_code_manager.h"
+#ifdef HAS_MOVEMENT_PART
+#include "wifi_msdp_state_listener.h"
+#endif
 #include "wifi_protect_manager.h"
+#ifdef HAS_POWERMGR_PART
 #include "wifi_power_state_listener.h"
+#endif
 #include "suspend/sleep_priority.h"
 #endif
 #include "wifi_sta_hal_interface.h"
@@ -69,7 +74,13 @@ static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
 static bool islocationModeObservered = false;
 static sptr<WifiDeviceProvisionObserver> deviceProvisionObserver_ = nullptr;
 static sptr<SettingsMigrateObserver> settingsMigrateObserver_ = nullptr;
+#ifdef HAS_POWERMGR_PART
 static sptr<WifiPowerStateListener> powerStateListener_ = nullptr;
+static sptr<PowerStateCallback> powerStateCallback_ = nullptr;
+#endif
+#ifdef HAS_MOVEMENT_PART
+static sptr<DeviceMovementCallback> deviceMovementCallback_ = nullptr;
+#endif
 #endif
 
 WifiManager &WifiManager::GetInstance()
@@ -685,10 +696,11 @@ int WifiManager::Init()
         WifiTimer::GetInstance()->Register(timeoutCallback, migrateTimerId, TIMEOUT_CHECK_LAST_STA_STATE_EVENT);
         WIFI_LOGI("CheckAndStartStaByDatashare register success! migrateTimerId:%{public}u", migrateTimerId);
     }
-
+#ifdef HAS_POWERMGR_PART
     if (!isPowerStateListenerSubscribered) {
         RegisterPowerStateListener();
     }
+#endif
 #endif
     mInitStatus = INIT_OK;
     InitStaCallback();
@@ -745,7 +757,12 @@ void WifiManager::InitSubscribeListener()
 #ifndef OHOS_ARCH_LITE
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
     SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
+#ifdef HAS_POWERMGR_PART
     SubscribeSystemAbility(POWER_MANAGER_SERVICE_ID);
+#endif
+#ifdef HAS_MOVEMENT_PART
+    SubscribeSystemAbility(MSDP_MOVEMENT_SERVICE_ID);
+#endif
 #endif
 }
 
@@ -821,9 +838,11 @@ void WifiManager::Exit()
     if (batterySubscriber_ != nullptr) {
         UnRegisterBatteryEvent();
     }
+#ifdef HAS_POWERMGR_PART
     if (isPowerStateListenerSubscribered) {
         UnRegisterPowerStateListener();
     }
+#endif
 #endif
     return;
 }
@@ -1310,7 +1329,8 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
     if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||
         state == OperateResState::DISCONNECT_DISCONNECTING || state == OperateResState::DISCONNECT_DISCONNECTED ||
         state == OperateResState::CONNECT_OBTAINING_IP || state == OperateResState::CONNECT_ASSOCIATING ||
-        state == OperateResState::CONNECT_ASSOCIATED) {
+        state == OperateResState::CONNECT_ASSOCIATED || state == OperateResState::CONNECT_NETWORK_ENABLED ||
+        state == OperateResState::CONNECT_NETWORK_DISABLED) {
         if (WifiConfigCenter::GetInstance().GetScanMidState(instId) == WifiOprMidState::RUNNING) {
             IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
             if (pService != nullptr) {
@@ -1477,11 +1497,14 @@ void WifiManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
             }
             break;
         }
+#ifdef HAS_POWERMGR_PART
         case POWER_MANAGER_SERVICE_ID: {
             if (add) {
                 RegisterPowerStateListener();
+                RegisterPowerStateCallBack();
             } else {
                 UnRegisterPowerStateListener();
+                UnRegisterPowerStateCallBack();
             }
 
             WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
@@ -1489,6 +1512,17 @@ void WifiManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
 
             break;
         }
+#endif
+#ifdef HAS_MOVEMENT_PART
+        case MSDP_MOVEMENT_SERVICE_ID: {
+            if (add) {
+                RegisterMovementCallBack();
+            } else {
+                UnRegisterMovementCallBack();
+            }
+            break;
+        }
+#endif
         default:
             break;
     }
@@ -2516,6 +2550,11 @@ void BatteryEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDat
 {
     std::string action = data.GetWant().GetAction();
     WIFI_LOGI("BatteryEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_CONNECTED) {
+        WifiSettings::GetInstance().SetNoChargerPlugModeState(MODE_STATE_CLOSE);
+    } else if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_DISCONNECTED) {
+        WifiSettings::GetInstance().SetNoChargerPlugModeState(MODE_STATE_OPEN);
+    }
     for (int i = 0; i < AP_INSTANCE_MAX_NUM; ++i) {
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(i);
         if (pService == nullptr) {
@@ -2639,6 +2678,7 @@ void WifiManager::CheckAndStartStaByDatashare()
 
 void WifiManager::RegisterPowerStateListener()
 {
+#ifdef HAS_POWERMGR_PART
     WIFI_LOGD("Enter WifiManager::RegisterPowerStateListener");
     std::unique_lock<std::mutex> lock(powerStateEventMutex);
 
@@ -2661,10 +2701,12 @@ void WifiManager::RegisterPowerStateListener()
         WIFI_LOGI("WifiManager::RegisterPowerStateListener OK!");
         isPowerStateListenerSubscribered = true;
     }
+#endif
 }
 
 void WifiManager::UnRegisterPowerStateListener()
 {
+#ifdef HAS_POWERMGR_PART
     WIFI_LOGD("Enter WifiManager::UnRegisterPowerStateListener");
     std::unique_lock<std::mutex> lock(powerStateEventMutex);
 
@@ -2681,7 +2723,64 @@ void WifiManager::UnRegisterPowerStateListener()
         isPowerStateListenerSubscribered = false;
         WIFI_LOGI("WifiManager::UnRegisterPowerStateListener OK!");
     }
+#endif
 }
+
+#ifdef HAS_POWERMGR_PART
+void WifiManager::RegisterPowerStateCallBack()
+{
+    WIFI_LOGI("RegisterPowerStateCallBack");
+    if (powerStateCallback_ == nullptr) {
+        powerStateCallback_ = new (std::nothrow) PowerStateCallback();
+    }
+
+    bool result = PowerMgr::PowerMgrClient::GetInstance().RegisterPowerStateCallback(powerStateCallback_);
+    if (!result) {
+        WIFI_LOGE("register power state callback failed");
+    } else {
+        WIFI_LOGI("register power state callback success");
+    }
+}
+
+void WifiManager::UnRegisterPowerStateCallBack()
+{
+    WIFI_LOGI("UnRegisterPowerStateCallBack");
+    if (powerStateCallback_ == nullptr) {
+        return;
+    }
+
+    bool result = PowerMgr::PowerMgrClient::GetInstance().UnRegisterPowerStateCallback(powerStateCallback_);
+    if (!result) {
+        WIFI_LOGE("register power state callback failed");
+    } else {
+        WIFI_LOGI("register power state callback success");
+    }
+}
+#endif
+#ifdef HAS_MOVEMENT_PART
+void WifiManager::RegisterMovementCallBack()
+{
+    WIFI_LOGI("RegisterMovementCallBack");
+    if (!deviceMovementCallback_) {
+        deviceMovementCallback_ = sptr<DeviceMovementCallback>(new DeviceMovementCallback());
+    }
+    if (Msdp::MovementClient::GetInstance().SubscribeCallback(
+        Msdp::MovementDataUtils::MovementType::TYPE_STILL, deviceMovementCallback_) != ERR_OK) {
+        WIFI_LOGE("Register a device movement observer failed!");
+    }
+}
+
+void WifiManager::UnRegisterMovementCallBack()
+{
+    WIFI_LOGI("UnRegisterMovementCallBack");
+    if (!deviceMovementCallback_) {
+        return;
+    }
+    Msdp::MovementClient::GetInstance().UnSubscribeCallback(
+        Msdp::MovementDataUtils::MovementType::TYPE_STILL, deviceMovementCallback_);
+    deviceMovementCallback_ = nullptr;
+}
+#endif
 
 WifiTimer *WifiTimer::GetInstance()
 {

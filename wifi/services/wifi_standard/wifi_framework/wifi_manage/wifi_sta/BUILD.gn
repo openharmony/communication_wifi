@@ -28,7 +28,6 @@ local_base_sources = [
   "sta_auto_connect_service.cpp",
   "sta_interface.cpp",
   "sta_monitor.cpp",
-  "sta_network_check.cpp",
   "sta_saved_device_appraisal.cpp",
   "sta_service.cpp",
   "sta_state_machine.cpp",
@@ -156,7 +155,6 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
-      "netstack:http_client",
       "samgr:samgr_proxy",
     ]
 

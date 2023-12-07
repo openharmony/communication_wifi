@@ -98,6 +98,14 @@ ErrCode ScanInterface::DisableScan(bool disable)
     return pScanService->DisableScan(disable);
 }
 
+ErrCode ScanInterface::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
+{
+    WIFI_LOGI("Enter ScanInterface::StartWifiPnoScan");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    return pScanService->StartWifiPnoScan(isStartAction, periodMs, suspendReason);
+}
+
 ErrCode ScanInterface::OnScreenStateChanged(int screenState)
 {
     WIFI_LOGI("Enter ScanInterface::OnScreenStateChanged, screenState=%{public}d.", screenState);

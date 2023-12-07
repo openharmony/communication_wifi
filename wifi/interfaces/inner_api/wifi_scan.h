@@ -98,6 +98,16 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) = 0;
+
+    /**
+     * @Description Start pno scan
+     *
+     * @param isStartAction - true:start pno scan; false:stop pno scan
+     * @param periodMs - pno scan interval
+     * @param suspendReason - pno scan suspent reason
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

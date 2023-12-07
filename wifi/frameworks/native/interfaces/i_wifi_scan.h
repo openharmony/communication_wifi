@@ -95,6 +95,16 @@ public:
      */
     virtual ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) = 0;
 
+    /**
+     * @Description Start/Stop wifi pno scan.
+     *
+     * @param isStartAction - start or stop pno scan
+     * @param periodMs - pno scan interval
+     * @param suspendReason - pno scan suspend reason
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) = 0;
+
 #ifdef OHOS_ARCH_LITE
     virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
         const std::vector<std::string> &event) = 0;

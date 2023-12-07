@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Wifi {
-const std::string WIFI_IFNAME = "wlan0";
 const int CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH = 125;
 
 struct WifiPrivCmd {
@@ -37,7 +36,7 @@ public:
 
 private:
     int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm) const;
-    int SetRxListen(const std::string &param) const;
+    int SetRxListen(const std::string &ifName, const std::string &param) const;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -25,8 +25,8 @@ DEFINE_WIFILOG_LABEL("WifiRxListen");
 static const int SHIFT_BIT_UTIL = 1;
 static const int GAME_APP_SHIFT = 0;
 
-static const std::string ENABLE_RX_LISTEN = "Y";
-static const std::string DISABLE_RX_LISTEN = "N";
+static const auto ENABLE_RX_LISTEN = "Y";
+static const auto DISABLE_RX_LISTEN = "N";
 
 RxListenArbitration::RxListenArbitration()
 {
@@ -63,17 +63,20 @@ void RxListenArbitration::OnForegroundAppChanged(const AppExecFwk::AppStateData 
 
 void RxListenArbitration::CheckRxListenSwitch()
 {
+    std::string param;
+    std::string ifName = "wlan0";
     if ((m_arbitrationCond == 0) && !m_isRxListenOn) {
-        if (WifiPowerCmdClient::GetInstance().SendCmdToDriver(WIFI_IFNAME, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
-            ENABLE_RX_LISTEN) != 0) {
+        param = ENABLE_RX_LISTENER;
+        if (WifiPowerCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
+            param) != 0) {
             WIFI_LOGE("%{public}s enable rx_listen fail", __FUNCTION__);
             return;
         }
         m_isRxListenOn = true;
         WIFI_LOGD("%{public}s enable rx_listen successful", __FUNCTION__);
     } else if ((m_arbitrationCond != 0) && m_isRxListenOn) {
-        if (WifiPowerCmdClient::GetInstance().SendCmdToDriver(WIFI_IFNAME, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
-            DISABLE_RX_LISTEN) != 0) {
+        if (WifiPowerCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
+            param) != 0) {
             WIFI_LOGE("%{public}s disable rx_listen fail", __FUNCTION__);
             return;
         }

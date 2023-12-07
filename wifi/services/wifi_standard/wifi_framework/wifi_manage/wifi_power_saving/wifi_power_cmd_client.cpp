@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <cerrno>
 #include <unistd.h>
+#include "securec.h"
 #include "wifi_logger.h"
 
 namespace OHOS {
@@ -32,10 +33,10 @@ DEFINE_WIFILOG_LABEL("WifiPowerCmdClient");
 static const int MAX_PRIV_CMD_SIZE = 4096;
 static const int TINY_BUFF_SIZE = 64;
 
-static const std::string RX_LISTEN_ON = "Y";
-static const std::string RX_LISTEN_OFF = "N";
-static const std::string CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
-static const std::string CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
+static const auto RX_LISTEN_ON = "Y";
+static const auto RX_LISTEN_OFF = "N";
+static const auto CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
+static const auto CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
 
 WifiPowerCmdClient &Wifi::WifiPowerCmdClient::GetInstance()
 {
@@ -45,12 +46,12 @@ WifiPowerCmdClient &Wifi::WifiPowerCmdClient::GetInstance()
 int Wifi::WifiPowerCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const
 {
     int ret = -1;
-    if (ifName.empty() || param.empty() || param.size() > MAX_PRIV_CMD_SIZE) {
+    if (ifName.empty() || param.empty() || (param.size() + 1) > MAX_PRIV_CMD_SIZE) {
         WIFI_LOGE("%{public}s invalid input params", __FUNCTION__);
         return ret;
     }
     if (commandId == CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH) {
-        ret = SetRxListen(param);
+        ret = SetRxListen(ifName, param);
     } else {
         WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
     }
@@ -97,19 +98,21 @@ int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(const std::stri
     return ret;
 }
 
-int Wifi::WifiPowerCmdClient::SetRxListen(const std::string &param) const
+int Wifi::WifiPowerCmdClient::SetRxListen(const std::string &ifName, const std::string &param) const
 {
     WIFI_LOGD("%{public}s enter", __FUNCTION__);
     std::string cmdParam;
-    if (param == RX_LISTEN_ON) {
-        cmdParam = CMD_SET_RX_LISTEN_ON.c_str();
-    } else if (param == RX_LISTEN_OFF) {
-        cmdParam = CMD_SET_RX_LISTEN_OFF.c_str();
+    if (param.compare(RX_LISTEN_ON) == 0) {
+        cmdParam = CMD_SET_RX_LISTEN_ON;
+        WIFI_LOGD("%{public}s enable rx listen", __FUNCTION__);
+    } else if (param.compare(RX_LISTEN_OFF) == 0) {
+        cmdParam = CMD_SET_RX_LISTEN_OFF;
+        WIFI_LOGD("%{public}s disable rx listen", __FUNCTION__);
     } else {
         WIFI_LOGE("%{public}s invalid param", __FUNCTION__);
         return -1;
     }
-    return SendCommandToDriverByInterfaceName(WIFI_IFNAME, cmdParam);
+    return SendCommandToDriverByInterfaceName(ifName, cmdParam);
 }
 } // namespace Wifi
 } // namespace OHOS

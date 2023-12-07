@@ -20,8 +20,8 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
-  "wifi_power_cmd_client.cpp",
   "rx_listen/wifi_rx_listen_arbitration.cpp",
+  "wifi_power_cmd_client.cpp",
 ]
 
 local_base_include_dirs = [
@@ -45,14 +45,14 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/libxml2:xml2"
+      "//third_party/libxml2:xml2",
     ]
 
     external_deps = [
+      "ability_runtime:app_manager",
+      "c_utils:utils",
       "hilog:libhilog",
       "init:libbegetutil",
-      "c_utils:utils",
-      "ability_runtime:app_manager",
     ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
@@ -84,14 +84,14 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/libxml2:xml2"
+      "//third_party/libxml2:xml2",
     ]
 
     external_deps = [
+      "ability_runtime:app_manager",
+      "c_utils:utils",
       "hilog:libhilog",
       "init:libbegetutil",
-      "c_utils:utils",
-      "ability_runtime:app_manager",
     ]
 
     cflags_cc = [

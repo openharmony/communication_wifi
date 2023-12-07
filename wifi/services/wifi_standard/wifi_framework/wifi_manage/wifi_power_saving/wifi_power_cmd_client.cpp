@@ -79,7 +79,7 @@ int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(const std::stri
     privCmd.buf = buf;
     privCmd.size = sizeof(buf);
     privCmd.len = static_cast<int>(cmdParm.size());
-    ifr.ifr_data = reinterpret_cast<void *>(&privCmd);
+    ifr.ifr_data = reinterpret_cast<char *>(&privCmd);
     if (memcpy_s(ifr.ifr_name, IFNAMSIZ, ifName.c_str(), ifName.size() + 1) != EOK) {
         WIFI_LOGE("%{public}s memcpy_s ifr fail", __FUNCTION__);
         return ret;

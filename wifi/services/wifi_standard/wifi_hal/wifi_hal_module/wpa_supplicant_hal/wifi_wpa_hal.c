@@ -49,8 +49,12 @@
 #define P2P_SERVICE_DISC_REQ_FIVE 5
 #define WPA_CB_CONNECTED 1
 #define WPA_CB_DISCONNECTED 2
+#define WPA_CB_ASSOCIATING 3
+#define WPA_CB_ASSOCIATED 4
 #define WPS_EVENT_PBC_OVERLAP "WPS-OVERLAP-DETECTED PBC session overlap"
 #define WPA_EVENT_BSSID_CHANGED "WPA-EVENT-BSSID-CHANGED "
+#define WPA_EVENT_ASSOCIATING "Request association with "
+#define WPA_EVENT_ASSOCIATED "Associated with "
 #define REPLY_BUF_LENGTH 4096
 #define CONNECTION_FULL_STATUS 17
 #define CONNECTION_REJECT_STATUS 37
@@ -615,6 +619,20 @@ static void WpaCallBackFuncTwo(const char *p)
                 WifiHalCbNotifyConnectionReject(status);
             }
         }
+    } else if (strncmp(p, WPA_EVENT_ASSOCIATING, strlen(WPA_EVENT_ASSOCIATING)) == 0) {
+        char *pBssid = strstr(p, WPA_EVENT_ASSOCIATING);
+        if (pBssid == NULL) {
+            return;
+        }
+        pBssid += strlen(WPA_EVENT_ASSOCIATING);
+        WifiHalCbNotifyConnectChanged(WPA_CB_ASSOCIATING, -1, pBssid);
+    } else if (strncmp(p, WPA_EVENT_ASSOCIATED, strlen(WPA_EVENT_ASSOCIATED)) == 0) {
+        char *pBssid = strstr(p, WPA_EVENT_ASSOCIATED);
+        if (pBssid == NULL) {
+            return;
+        }
+        pBssid += strlen(WPA_EVENT_ASSOCIATED);
+        WifiHalCbNotifyConnectChanged(WPA_CB_ASSOCIATED, -1, pBssid);
     }
     return;
 }

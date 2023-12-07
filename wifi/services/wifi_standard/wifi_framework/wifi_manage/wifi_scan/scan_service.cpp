@@ -351,6 +351,29 @@ ErrCode ScanService::DisableScan(bool disable)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanService::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
+{
+    LOGI("Enter ScanService::StartWifiPnoScan isStart:%{public}d", isStartAction);
+    if (isStartAction) {
+        StopPnoScan();
+        pnoScanIntervalMode.scanIntervalMode.interval = periodMs / 1000;
+        BeginPnoScan();
+    } else {
+        StopPnoScan();
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+void ScanService::StopPnoScan()
+{
+    if (!isPnoScanBegined) {
+        return;
+    }
+    EndPnoScan();
+    pnoScanFailedNum = 0;
+    pScanStateMachine->StopTimer(static_cast<int>(RESTART_PNO_SCAN_TIMER));
+}
+
 bool ScanService::SingleScan(ScanConfig &scanConfig)
 {
     WIFI_LOGI("Enter ScanService::SingleScan.\n");
@@ -540,10 +563,6 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
 {
     WIFI_LOGI("Enter ScanService::HandleCommonScanFailed, requestIndexList size: %{public}d.",
         static_cast<int>(requestIndexList.size()));
-    if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
-        staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
-        return;
-    }
 
     std::unique_lock<std::mutex> lock(scanConfigMapMutex);
     for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
@@ -965,7 +984,13 @@ void ScanService::HandleStaStatusChanged(int status)
             SystemScanProcess(true);
             break;
         }
+#ifdef SUPPORT_SCAN_CONTROL
+        case static_cast<int>(OperateResState::CONNECT_AP_CONNECTED):
+        case static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED):
+        case static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED): {
+#else
         case static_cast<int>(OperateResState::CONNECT_AP_CONNECTED): {
+#endif
             SystemScanProcess(false);
             break;
         }
@@ -1188,6 +1213,85 @@ void ScanService::GetScanControlInfo()
     return;
 }
 
+#ifdef SUPPORT_SCAN_CONTROL
+ErrCode ScanService::AllowExternScan()
+{
+    WIFI_LOGI("Enter ScanService::AllowExternScan SUPPORT_SCAN_CONTROL.\n");
+    int staScene = GetStaScene();
+    ScanMode scanMode = WifiSettings::GetInstance().GetAppRunningState();
+    WIFI_LOGI("AllowExternScan, staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
+
+    if (!AllowExternScanByPowerIdelState()) {
+        WIFI_LOGW("extern scan not allow by power idel state");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (!AllowExternScanByThermal()) {
+        WIFI_LOGW("extern scan not allow by thermal level");
+        return WIFI_OPT_FAILED;
+    }
+
+    int state = WifiSettings::GetInstance().GetScreenState();
+    if (state == MODE_STATE_CLOSE) {
+        if (!AllowScanDuringScreenOff(ScanMode::ALL_EXTERN_SCAN)) {
+            WIFI_LOGW("extern scan not allow by screen state");
+            return WIFI_OPT_FAILED;
+        }
+    }
+
+    if (!AllowScanByHid2dState()) {
+        WIFI_LOGW("extern scan not allow by hid2d state");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (mEnhanceService != nullptr) {
+        if (!mEnhanceService->AllowScanBySchedStrategy()) {
+            WIFI_LOGW("extern scan not allow by sched strategy.");
+            return WIFI_OPT_FAILED;
+        }
+    }
+
+    if (IsExternScanning()) {
+        if (!AllowScanDuringScanning(ScanMode::ALL_EXTERN_SCAN)) {
+            WIFI_LOGW("extern scan not allow when scan is going");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    if (!AllowScanDuringStaScene(staScene, ScanMode::ALL_EXTERN_SCAN)) {
+        WIFI_LOGW("extern scan not allow by sta connection state");
+        return WIFI_OPT_FAILED;
+    }
+    
+    int appId = 0;
+    if (!AllowExternScanByInterval(appId, staScene, scanMode)) {
+        WIFI_LOGW("extern scan not allow by interval mode");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (!AllowExternScanByGnssFixState()) {
+        WIFI_LOGW("extern scan not allow by gnss fix state");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (!AllowScanByMovingFreeze()) {
+        WIFI_LOGW("extern scan not allow by moving freeze mode");
+        return WIFI_OPT_MOVING_FREEZE_CTRL;
+    }
+
+    if (!AllowExternScanByAbnormalApp()) {
+        WIFI_LOGW("extern scan not allow by abnormal app");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (!AllowScanByDisableScanCtrl()) {
+        WIFI_LOGW("extern scan not allow by disable scan control.");
+        return WIFI_OPT_FAILED;
+    }
+    
+    WIFI_LOGI("extern scan has allowed");
+    return WIFI_OPT_SUCCESS;
+}
+#else
 ErrCode ScanService::AllowExternScan()
 {
     WIFI_LOGI("Enter ScanService::AllowExternScan.\n");
@@ -1232,6 +1336,7 @@ ErrCode ScanService::AllowExternScan()
     WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }
+#endif
 
 ErrCode ScanService::AllowSystemTimerScan()
 {
@@ -1272,6 +1377,10 @@ ErrCode ScanService::AllowSystemTimerScan()
         return WIFI_OPT_FAILED;
     }
 
+#ifdef SUPPORT_SCAN_CONTROL
+    SystemScanByInterval(staScene, systemScanIntervalMode.scanIntervalMode.interval,
+        systemScanIntervalMode.scanIntervalMode.count);
+#else
     if (!AllowScanByMovingFreeze()) {
         return WIFI_OPT_MOVING_FREEZE_CTRL;
     }
@@ -1289,6 +1398,7 @@ ErrCode ScanService::AllowSystemTimerScan()
             }
         }
     }
+#endif
 
     if (!AllowScanByDisableScanCtrl()) {
         WIFI_LOGW("system timer scan not allow by disable scan control.");
@@ -1329,6 +1439,7 @@ ErrCode ScanService::AllowPnoScan()
         return WIFI_OPT_MOVING_FREEZE_CTRL;
     }
 
+#ifndef SUPPORT_SCAN_CONTROL
     {
         std::unique_lock<std::mutex> lock(scanControlInfoMutex);
         for (auto iter = scanControlInfo.scanIntervalList.begin(); iter != scanControlInfo.scanIntervalList.end();
@@ -1345,6 +1456,7 @@ ErrCode ScanService::AllowPnoScan()
             }
         }
     }
+#endif
 
     if (!AllowScanByDisableScanCtrl()) {
         WIFI_LOGW("pnoScan not allow by disable scan control.");
@@ -1516,6 +1628,41 @@ bool ScanService::AllowExternScanByThermal()
     return true;
 }
 
+bool ScanService::AllowExternScanByPowerIdelState()
+{
+    WIFI_LOGI("Enter ScanService::AllowExternScanByPowerIdelState.\n");
+    auto powerState = WifiSettings::GetInstance().GetPowerIdelState();
+    if (powerState == MODE_STATE_OPEN) {
+        return false;
+    }
+    return true;
+}
+
+bool ScanService::AllowExternScanByGnssFixState()
+{
+    WIFI_LOGI("Enter ScanService::AllowExternScanByLocationState.\n");
+    if (IsAppInFilterList(scan_gps_block_list)) {
+        auto state = WifiSettings::GetInstance().GetGnssFixState();
+        if (state == MODE_STATE_OPEN) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ScanService::AllowExternScanByAbnormalApp()
+{
+    WIFI_LOGI("Enter ScanService::AllowExternScanByAbnormalApp.\n");
+    std::vector<std::string> abnormalAppList;
+    WifiSettings::GetInstance().GetAbnormalApps(abnormalAppList);
+    std::string packageName = WifiSettings::GetInstance().GetAppPackageName();
+    if (std::find(abnormalAppList.begin(), abnormalAppList.end(), packageName) != abnormalAppList.end()) {
+        WIFI_LOGI("Current app is abnormal, not allow wifi scan.\n");
+        return false;
+    }
+    return true;
+}
+
 bool ScanService::AllowExternScanByForbid(int staScene, ScanMode scanMode)
 {
     WIFI_LOGI("Enter ScanService::AllowExternScanByForbid, staScene:%{public}d, scanMode:%{public}d.",
@@ -1559,6 +1706,18 @@ bool ScanService::AllowExternScanByInterval(int appId, int staScene, ScanMode sc
 {
     WIFI_LOGI("Enter ScanService::AllowExternScanByInterval.\n");
 
+#ifdef SUPPORT_SCAN_CONTROL
+    int noChargerPlugModeState = WifiSettings::GetInstance().GetNoChargerPlugModeState();
+    if (noChargerPlugModeState == MODE_STATE_OPEN) {
+        WIFI_LOGI("No charger plug mode state.");
+        if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_CUSTOM, scanMode)) {
+            return false;
+        }
+    }
+    if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_ORIGIN, scanMode)) {
+        return false;
+    }
+#else
     if (!AllowExternScanByIntervalMode(appId, staScene, scanMode)) {
         return false;
     }
@@ -1587,6 +1746,7 @@ bool ScanService::AllowExternScanByInterval(int appId, int staScene, ScanMode sc
     if (!AllowExternScanByCustomScene(appId, ScanMode::ALL_EXTERN_SCAN)) {
         return false;
     }
+#endif
     return true;
 }
 
@@ -1968,6 +2128,9 @@ bool ScanService::AllowExternScanByIntervalMode(int appId, int scanScene, ScanMo
 {
     WIFI_LOGI("Enter ScanService::AllowExternScanByIntervalMode.\n");
 
+    if (IsAppInFilterList(scan_frequency_trust_list)) {
+        return true;
+    }
     bool isTrustListMode = IsScanTrustMode();
     if (isTrustListMode && IsInScanTrust(scanScene)) {
         WIFI_LOGD("Trust list mode,sceneId(%{public}d) in the list, return true.", scanScene);
@@ -2058,6 +2221,21 @@ bool ScanService::PnoScanByInterval(int &fixedScanCount, time_t &fixedScanTime, 
     return true;
 }
 
+#ifdef SUPPORT_SCAN_CONTROL
+bool ScanService::SystemScanByInterval(int staScene, int &interval, int &count)
+{
+    WIFI_LOGI("Enter ScanService::SystemScanByInterval.\n");
+    int state = WifiSettings::GetInstance().GetScreenState();
+    if (state == MODE_STATE_OPEN) {
+        if (staScene == SCAN_SCENE_CONNECTED) {
+            SystemScanConnectedPolicy(interval);
+        } else if (staScene == SCAN_SCENE_DISCONNCTED) {
+            SystemScanDisconnectedPolicy(interval, count);
+        }
+    }
+    return true;
+}
+#else
 bool ScanService::SystemScanByInterval(int &expScanCount, int &interval, int &count)
 {
     WIFI_LOGI("Enter ScanService::SystemScanByInterval.\n");
@@ -2072,6 +2250,7 @@ bool ScanService::SystemScanByInterval(int &expScanCount, int &interval, int &co
     expScanCount++;
     return true;
 }
+#endif
 
 bool ScanService::ExternScanByInterval(int appId, SingleAppForbid &singleAppForbid)
 {
@@ -2104,9 +2283,6 @@ bool ScanService::ExternScanByInterval(int appId, SingleAppForbid &singleAppForb
 bool ScanService::AllowSingleAppScanByInterval(int appId, ScanIntervalMode scanIntervalMode)
 {
     WIFI_LOGI("Enter ScanService::AllowSingleAppScanByInterval.\n");
-    if (IsAppInFilterList(scan_frequency_trust_list)) {
-        return true;
-    }
     bool appIdExisted = false;
     for (auto forbidListIter = appForbidList.begin(); forbidListIter != appForbidList.end(); ++forbidListIter) {
         if (forbidListIter->appID == appId &&
@@ -2440,6 +2616,58 @@ bool ScanService::IsAppInFilterList(const std::vector<std::string> &packageFilte
         return true;
     }
     return false;
+}
+
+void ScanService::SystemScanConnectedPolicy(int &interval)
+{
+    WIFI_LOGI("Enter ScanService::SystemScanConnectedPolicy");
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if (linkedInfo.detailedState == DetailedState::WORKING) {
+        interval = SYSTEM_SCAN_INTERVAL_ONE_HOUR;
+    } else {
+        interval *= DOUBLE_SCAN_INTERVAL;
+        if (IsMovingFreezeState()) {
+            if (interval > SYSTEM_SCAN_INTERVAL_FIVE_MINUTE) {
+                interval = SYSTEM_SCAN_INTERVAL_FIVE_MINUTE;
+            }
+        } else {
+            if (interval > SYSTEM_SCAN_INTERVAL_160_SECOND) {
+                interval = SYSTEM_SCAN_INTERVAL_160_SECOND;
+            }
+        }
+    }
+}
+
+void ScanService::SystemScanDisconnectedPolicy(int &interval, int &count)
+{
+    WIFI_LOGI("Enter ScanService::SystemScanDisconnectedPolicy");
+    int scanGenieState = WifiSettings::GetInstance().GetScanGenieState();
+    if (scanGenieState == MODE_STATE_OPEN) {
+        if (count < SYSTEM_SCAN_COUNT_3_TIMES) {
+            interval = SYSTEM_SCAN_INTERVAL_10_SECOND;
+        } else if (count < SYSTEM_SCAN_COUNT_3_TIMES * DOUBLE_SCAN_INTERVAL) {
+            interval = SYSTEM_SCAN_INTERVAL_30_SECOND;
+        } else {
+            if (IsMovingFreezeState()) {
+                interval = SYSTEM_SCAN_INTERVAL_FIVE_MINUTE;
+            } else {
+                interval = SYSTEM_SCAN_INTERVAL_60_SECOND;
+            }
+        }
+        count++;
+    } else {
+        interval *= DOUBLE_SCAN_INTERVAL;
+        if (IsMovingFreezeState()) {
+            if (interval > SYSTEM_SCAN_INTERVAL_FIVE_MINUTE) {
+                interval = SYSTEM_SCAN_INTERVAL_FIVE_MINUTE;
+            }
+        } else {
+            if (interval > SYSTEM_SCAN_INTERVAL_160_SECOND) {
+                interval = SYSTEM_SCAN_INTERVAL_160_SECOND;
+            }
+        }
+    }
 }
 
 int CalculateBitPerTone(int snrDb)

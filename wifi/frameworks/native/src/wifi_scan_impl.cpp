@@ -199,5 +199,12 @@ ErrCode WifiScanImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->GetScanOnlyAvailable(bScanOnlyAvailable);
 }
+
+ErrCode WifiScanImpl::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiScanProxy());
+    return client_->StartWifiPnoScan(isStartAction, periodMs, suspendReason);
+}
 }  // namespace Wifi
 }  // namespace OHOS

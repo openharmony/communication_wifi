@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MonitorAPP>
+    <GameInfo gameName="com.tencent.tmgp.sgame">
+        <mGameId>2001</mGameId>
+        <mScenceId>200001</mScenceId>
+        <mGameKQI>1</mGameKQI>
+        <mGameRtt>200</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mGameSpecialInfoSources>1</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.tmgp.sgame">
+        <mGameId>2001</mGameId>
+        <mScenceId>200001</mScenceId>
+        <mGameKQI>1</mGameKQI>
+        <mGameRtt>200</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mHistoryQoeBadTH>0.2</mHistoryQoeBadTH>
+        <mGameSpecialInfoSources>1</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.netease.hyxd.huawei">
+        <mGameId>2002</mGameId>
+        <mScenceId>200001</mScenceId>
+        <mGameKQI>1</mGameKQI>
+        <mGameRtt>230</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mGameSpecialInfoSources>2</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.netease.hyxd.huawei">
+        <mGameId>2002</mGameId>
+        <mScenceId>200002</mScenceId>
+        <mGameKQI>1</mGameKQI>
+        <mGameRtt>230</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mGameSpecialInfoSources>2</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.tmgp.pubgmhd">
+        <mGameId>2003</mGameId>
+        <mScenceId>200001</mScenceId>
+        <mGameKQI>1</mGameKQI>
+        <mGameRtt>230</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mGameSpecialInfoSources>2</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.tmgp.pubgmhd">
+        <mGameId>2003</mGameId>
+        <mScenceId>200002</mScenceId>
+        <mGameKQI>1</mGameKQI>
+        <mGameRtt>230</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mGameSpecialInfoSources>2</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.tmgp.speedmobile">
+        <mGameId>2005</mGameId>
+        <mScenceId>200002</mScenceId>
+        <mGameKQI>0</mGameKQI>
+        <mGameRtt>200</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mGameSpecialInfoSources>2</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.tmgp.pubm">
+        <mGameId>2006</mGameId>
+        <mScenceId>200001</mScenceId>
+        <mGameKQI>0</mGameKQI>
+        <mGameRtt>250</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mGameSpecialInfoSources>2</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.tmgp.pubm">
+        <mGameId>2006</mGameId>
+        <mScenceId>200002</mScenceId>
+        <mGameKQI>0</mGameKQI>
+        <mGameRtt>250</mGameRtt>
+        <mGameAction>1</mGameAction>
+        <mGameSpecialInfoSources>2</mGameSpecialInfoSources>
+    </GameInfo>
+    <GameInfo gameName="com.netease.onmyoji">
+        <mGameId>3002</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.ea.android.chs.nbamobile">
+        <mGameId>3004</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.miHoYo.bh3">
+        <mGameId>3005</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.tmgp.cf">
+        <mGameId>3006</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.superevilmegacorp.game">
+        <mGameId>3007</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.netease.chiji">
+        <mGameId>3008</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.mobile.legends">
+        <mGameId>3009</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.pubg.krmobile">
+        <mGameId>3010</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.ig">
+        <mGameId>3011</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="air.tv.douyu.android">
+        <mGameId>3012</mGameId>
+        <mGameAction>0</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.duowan.kiwi">
+        <mGameId>3013</mGameId>
+        <mGameAction>0</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.epicgames.fortnite">
+        <mGameId>3014</mGameId>
+        <mGameAction>0</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.ngame.allstar.eu">
+        <mGameId>3015</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.tencent.wegame.mangod">
+        <mGameId>3016</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.netease.hyxd">
+        <mGameId>3017</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.ea.android.chs.nbamobile.yxhy">
+        <mGameId>3018</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.miHoYo.enterprise.NGHSoD">
+        <mGameId>3019</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.douyu.hd.air.douyutv">
+        <mGameId>3020</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <GameInfo gameName="com.garena.game.kgsam">
+        <mGameId>3021</mGameId>
+        <mGameAction>1</mGameAction>
+    </GameInfo>
+    <AppWhiteList packageName="com.ss.android.ugc.aweme"></AppWhiteList>
+    <AppWhiteList packageName="com.smile.gifmaker"></AppWhiteList>
+    <AppWhiteList packageName="com.youku.phone"></AppWhiteList>
+    <AppWhiteList packageName="com.ss.android.article.news"></AppWhiteList>
+    <AppWhiteList packageName="com.netease.cloudmusic"></AppWhiteList>
+    <AppWhiteList packageName="com.ximalaya.ting.android"></AppWhiteList>
+    <AppWhiteList packageName="com.immomo.momo"></AppWhiteList>
+    <AppWhiteList packageName="com.huawei.hwireader"></AppWhiteList>
+    <AppWhiteList packageName="com.huawei.hwireader"></AppWhiteList>
+    <AppBlackList packageName="com.tencent.mm"></AppBlackList>
+    <ChariotApp packageName="com.ixia.ixchariot"></ChariotApp>
+</MonitorAPP>

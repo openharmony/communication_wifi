@@ -49,6 +49,7 @@ public:
     ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible) override;
     ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override;
     ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
+    ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) override;
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
         const std::vector<std::string> &event) override;
@@ -64,6 +65,9 @@ private:
     bool IsScanServiceRunning();
     ErrCode OpenScanOnlyAvailable();
     ErrCode CloseScanOnlyAvailable();
+#ifndef OHOS_ARCH_LITE
+    void UpdateScanMode();
+#endif
 
 private:
 #ifdef OHOS_ARCH_LITE

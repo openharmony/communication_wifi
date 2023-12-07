@@ -105,6 +105,10 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
             pStaStateMachine->OnNetworkDisconnectEvent(networkId);
             break;
         }
+        case WPA_CB_ASSOCIATING:
+        case WPA_CB_ASSOCIATED: 
+            pStaStateMachine->OnNetworkAssocEvent(status);
+            break;
         default:
             break;
     }

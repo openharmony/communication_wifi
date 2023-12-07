@@ -46,6 +46,13 @@ const int CUSTOM_SCAN_SCENE = 2;
 const int SCREEN_SCAN_SCENE = 3;
 const int OTHER_SCAN_SCENE = 4;
 const int SYSTEM_SCAN_INIT_TIME = 20;
+const int SYSTEM_SCAN_INTERVAL_ONE_HOUR = 60 * 60;
+const int SYSTEM_SCAN_INTERVAL_FIVE_MINUTE = 5 * 60;
+const int SYSTEM_SCAN_INTERVAL_160_SECOND = 160;
+const int SYSTEM_SCAN_INTERVAL_10_SECOND = 10;
+const int SYSTEM_SCAN_INTERVAL_30_SECOND = 30;
+const int SYSTEM_SCAN_INTERVAL_60_SECOND = 60;
+const int SYSTEM_SCAN_COUNT_3_TIMES = 3;
 
 const int TONE_PER_SYM_11ABG = 48;
 const int TONE_PER_SYM_11N_20MHZ = 52;
@@ -142,6 +149,15 @@ public:
      */
     ErrCode DisableScan(bool disable);
     /**
+     * @Description Start/Stop pno scan
+     *
+     * @param isStartAction - true:start pno scan; false:stop pno scan
+     * @param periodMs - pno scan interval
+     * @param suspendReason - pno scan suspent reason
+     * @return WIFI_OPT_SUCCESS: success, WIFI_OPT_FAILED: failed
+     */
+    ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason);
+    /**
      * @Description Starting a Single Scan.
      *
      * @param scanConfig - Scanning parameters[in]
@@ -166,6 +182,10 @@ public:
      *
      */
     void EndPnoScan();
+    /**
+     * @Description Stop pno scan and clear local resource.
+     */
+    void StopPnoScan();
     /**
      * @Description The system scans and selects a scanning mode
      *              based on the current screen status and STA status.
@@ -574,6 +594,30 @@ private:
     bool AllowExternScanByThermal();
 
     /**
+     * @Description Determine whether scanning is allowed through power idel state.
+     *
+     * @return true - allow extern scan
+     * @return false - not allow extern scan
+     */
+    bool AllowExternScanByPowerIdelState();
+
+    /**
+     * @Description Determine whether navigation application's scanning is allowed through gnss state.
+     *
+     * @return true - allow extern scan
+     * @return false - not allow extern scan
+     */
+    bool AllowExternScanByGnssFixState();
+
+    /**
+     * @Description If app in the abnormal list, the scan of this app is not allowed.
+     *
+     * @return true - allow extern scan
+     * @return false - not allow extern scan
+     */
+    bool AllowExternScanByAbnormalApp();
+
+    /**
      * @Description Determine whether scanning is allowed and scan the control policy through forbidMap.
      *
      * @param staScene scan scene
@@ -712,6 +756,17 @@ private:
      * @return false  - failed
      */
     bool AllowExternScanByCustomScene(int appId, ScanMode scanMode);
+#ifdef SUPPORT_SCAN_CONTROL
+    /**
+     * @Description Determines whether to allow system scan based on scanInterval control mode.
+     *
+     * @param staScene - sta scene.[in]
+     * @param interval - system scan interval[in]
+     * @param count - Total number of times that the scanning interval is multiplied by 2[in]
+     * @return success: true, failed: false
+     */
+    bool SystemScanByInterval(int staScene, int &interval, int &count);
+#else
     /**
      * @Description Determines whether to allow system scan based on scanInterval control mode.
      *
@@ -721,6 +776,7 @@ private:
      * @return success: true, failed: false
      */
     bool SystemScanByInterval(int &expScanCount, int &interval, int &count);
+#endif
     /**
      * @Description Determines whether to allow pno scan based on scanInterval control mode.
      *
@@ -858,6 +914,19 @@ private:
      * @return true: int the list, false: not in the list.
      */
     bool IsAppInFilterList(const std::vector<std::string> &packageFilter) const;
+    /* *
+     * @Description adjust system scan interval when sta connected.
+     *
+     * @param interval scan interval[in]
+     */
+    void SystemScanConnectedPolicy(int &interval);
+    /* *
+     * @Description adjust system scan interval when sta disconnected.
+     *
+     * @param interval scan interval[in]
+     * @param count adjust count[in]
+     */
+    void SystemScanDisconnectedPolicy(int &interval, int &count);
 };
 }  // namespace Wifi
 }  // namespace OHOS

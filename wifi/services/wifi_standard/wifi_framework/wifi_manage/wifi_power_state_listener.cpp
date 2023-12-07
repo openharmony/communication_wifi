@@ -108,5 +108,14 @@ void WifiPowerStateListener::DealPowerExitSleepEvent()
 #endif
     return;
 }
+
+void PowerStateCallback::OnPowerStateChanged(PowerState state)
+{
+    if (static_cast<int>(state) == POWER_STATE_DOZ) {
+        WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
+    } else {
+        WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
+    }
+}
 } // namespace Wifi
 } // namespace OHOS

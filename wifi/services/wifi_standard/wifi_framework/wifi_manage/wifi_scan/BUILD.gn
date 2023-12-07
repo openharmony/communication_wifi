@@ -114,6 +114,9 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
+    if (wifi_feature_with_scan_control) {
+      defines += [ "SUPPORT_SCAN_CONTROL" ]
+    }
 
     external_deps = [
       "ability_base:want",

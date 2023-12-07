@@ -431,13 +431,20 @@ if (defined(ohos_lite)) {
       "wifi_manager.cpp",
       "wifi_net_agent.cpp",
       "wifi_net_conn_event_handler.cpp",
-      "wifi_power_state_listener.cpp",
       "wifi_protect.cpp",
       "wifi_protect_manager.cpp",
       "wifi_service_manager.cpp",
       "wifi_system_ability_listerner.cpp",
       "wifi_system_timer.cpp",
     ]
+    if (defined(global_parts_info) &&
+        defined(global_parts_info.msdp_movement)) {
+      sources += [ "wifi_msdp_state_listener.cpp" ]
+    }
+    if (defined(global_parts_info) &&
+        defined(global_parts_info.powermgr_power_manager)) {
+      sources += [ "wifi_power_state_listener.cpp" ]
+    }
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
@@ -472,7 +479,6 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_native_manager_if",
-      "power_manager:powermgr_client",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",
@@ -502,6 +508,18 @@ if (defined(ohos_lite)) {
         defined(global_parts_info.powermgr_battery_manager)) {
       external_deps += [ "battery_manager:batterysrv_client" ]
       defines += [ "HAS_BATTERY_MANAGER_PART" ]
+    }
+
+    if (defined(global_parts_info) &&
+        defined(global_parts_info.msdp_movement)) {
+      external_deps += [ "movement:movement_client" ]
+      defines += [ "HAS_MOVEMENT_PART" ]
+    }
+
+    if (defined(global_parts_info) &&
+        defined(global_parts_info.powermgr_power_manager)) {
+      external_deps += [ "power_manager:powermgr_client" ]
+      defines += [ "HAS_POWERMGR_PART" ]
     }
 
     if (wifi_feature_with_app_frozen) {

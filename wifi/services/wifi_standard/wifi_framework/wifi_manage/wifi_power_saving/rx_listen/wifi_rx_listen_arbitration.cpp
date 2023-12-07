@@ -66,7 +66,7 @@ void RxListenArbitration::CheckRxListenSwitch()
     std::string param;
     std::string ifName = "wlan0";
     if ((m_arbitrationCond == 0) && !m_isRxListenOn) {
-        param = ENABLE_RX_LISTENER;
+        param = ENABLE_RX_LISTEN;
         if (WifiPowerCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
             param) != 0) {
             WIFI_LOGE("%{public}s enable rx_listen fail", __FUNCTION__);
@@ -75,6 +75,7 @@ void RxListenArbitration::CheckRxListenSwitch()
         m_isRxListenOn = true;
         WIFI_LOGD("%{public}s enable rx_listen successful", __FUNCTION__);
     } else if ((m_arbitrationCond != 0) && m_isRxListenOn) {
+         param = DISABLE_RX_LISTEN;
         if (WifiPowerCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
             param) != 0) {
             WIFI_LOGE("%{public}s disable rx_listen fail", __FUNCTION__);

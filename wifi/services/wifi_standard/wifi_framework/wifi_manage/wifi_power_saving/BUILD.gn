@@ -39,10 +39,6 @@ if (defined(ohos_lite)) {
   shared_library("wifi_power_saving_service") {
     sources = local_base_sources
     include_dirs = local_base_include_dirs
-    include_dirs += [
-      "//foundation/ability/ability_base/interfaces/kits/native/configuration/include",
-      "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-    ]
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
@@ -82,10 +78,6 @@ if (defined(ohos_lite)) {
     install_enable = true
     sources = local_base_sources
     include_dirs = local_base_include_dirs
-    include_dirs += [
-      "//foundation/ability/ability_base/interfaces/kits/native/configuration/include",
-      "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-    ]
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",

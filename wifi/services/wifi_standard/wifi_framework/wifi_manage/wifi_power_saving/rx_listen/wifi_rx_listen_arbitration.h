@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
+#ifndef OHOS_WIFI_POWER_RX_LISTEN_H
+#define OHOS_WIFI_POWER_RX_LISTEN_H
+
 #include <string>
 #include "app_mgr_interface.h"
 #include "app_mgr_constants.h"
-
-#ifndef OHOS_WIFI_POWER_RX_LISTEN_H
-#define OHOS_WIFI_POWER_RX_LISTEN_H
 
 namespace OHOS {
 namespace Wifi {

@@ -32,57 +32,56 @@ DEFINE_WIFILOG_LABEL("WifiPowerCmdClient");
 static const int MAX_PRIV_CMD_SIZE = 4096;
 static const int TINY_BUFF_SIZE = 64;
 
-static const char RX_LISTEN_ON = 'Y';
-static const char RX_LISTEN_OFF = 'N';
-static const auto CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
-static const auto CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
+static const std::string RX_LISTEN_ON = "Y";
+static const std::string RX_LISTEN_OFF = "N";
+static const std::string CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
+static const std::string CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
 
 WifiPowerCmdClient &Wifi::WifiPowerCmdClient::GetInstance()
 {
     static WifiPowerCmdClient instance;
     return instance;
 }
-int Wifi::WifiPowerCmdClient::SendCmdToDriver(const char *iface, int commandId, const char *paramBuf,
-    unsigned int paramSize) const
+int Wifi::WifiPowerCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const
 {
     int ret = -1;
-    if (iface == nullptr || paramBuf == nullptr) {
-        WIFI_LOGE("%{public}s invalid params", __FUNCTION__);
+    if (ifName.empty() || param.empty() || param.size() > MAX_PRIV_CMD_SIZE) {
+        WIFI_LOGE("%{public}s invalid input params", __FUNCTION__);
         return ret;
     }
     if (commandId == CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH) {
-        ret = SetRxListen(paramBuf);
+        ret = SetRxListen(param);
     } else {
-         WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
+        WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
     }
     return ret;
 }
-int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(char *cmdBuf, int cmdSize,
-    const char *interfaceName) const
+int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
+    const std::string &cmdParm) const
 {
     int ret = -1;
-    if (cmdBuf > MAX_PRIV_CMD_SIZE) {
-        WIFI_LOGE("%{public}s cmdSize too large", __FUNCTION__);
+    if (ifName.size() + 1 > IFNAMSIZ) {
+        WIFI_LOGE("%{public}s ifName size too large", __FUNCTION__);
         return ret;
     }
-    if (cmdBuf == nullptr) {
-        WIFI_LOGE("%{public}s cmdBuf is null", __FUNCTION__);
+    if (ifName.size() + 1 > MAX_PRIV_CMD_SIZE) {
+        WIFI_LOGE("%{public}s cmdParm size too large", __FUNCTION__);
         return ret;
     }
     struct ifreq ifr;
     WifiPrivCmd privCmd = { 0 };
     uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
     (void)memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr));
-    if (memcpy_s(buf, MAX_PRIV_CMD_SIZE, cmdBuf, cmdSize) != EOK) {
+    if (memcpy_s(buf, MAX_PRIV_CMD_SIZE, cmdParm.c_str(), cmdParm.size() + 1) != EOK) {
         WIFI_LOGE("%{public}s memcpy_s privCmd buf error", __FUNCTION__);
         return ret;
     }
     privCmd.buf = buf;
     privCmd.size = sizeof(buf);
-    privCmd.len = cmdSize;
-    ifr.ifr_data = reinterpret_cast<char *>(&privCmd);
-    if (strcpy_s(ifr.ifr_name, IFNAMSIZ, interfaceName) != EOK) {
-        WIFI_LOGE("%{public}s strcpy_s ifr fail", __FUNCTION__);
+    privCmd.len = static_cast<int>(cmdParm.size());
+    ifr.ifr_data = reinterpret_cast<void *>(&privCmd);
+    if (memcpy_s(ifr.ifr_name, IFNAMSIZ, ifName.c_str(), ifName.size() + 1) != EOK) {
+        WIFI_LOGE("%{public}s memcpy_s ifr fail", __FUNCTION__);
         return ret;
     }
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -93,40 +92,24 @@ int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(char *cmdBuf, i
     ret = ioctl(sock, SIOCDEVPRIVATE + 1, &ifr);
     if (ret < 0) {
         WIFI_LOGE("%{public}s ioctl failed, error is: %{public}d.", __FUNCTION__, errno);
-        return ret;
-    }
-    (void)memset_s(cmdBuf, cmdSize, 0, cmdSize);
-    if (memcpy_s(cmdBuf, cmdSize, privCmd.buf, cmdSize - 1) != EOK) {
-        WIFI_LOGE("%{public}s memcpy_s cmd fail", __FUNCTION__);
     }
     close(sock);
     return ret;
 }
 
-int Wifi::WifiPowerCmdClient::SetRxListen(const char *paramBuf) const
+int Wifi::WifiPowerCmdClient::SetRxListen(const std::string &param) const
 {
     WIFI_LOGD("%{public}s enter", __FUNCTION__);
-    int ret = -1;
-    size_t cmdLen;
-    char cmdBuf[TINY_BUFF_SIZE] = {0};
-    if (*paramBuf == RX_LISTEN_ON) {
-        cmdLen = strlen(CMD_SET_RX_LISTEN_ON);
-        if (memcpy_s(cmdBuf, TINY_BUFF_SIZE - 1, CMD_SET_RX_LISTEN_ON, cmdLen) != EOK) {
-            WIFI_LOGE("%{public}s memcpy_s cmdBuf fail", __FUNCTION__);
-            return ret;
-        }
-    } else if (*paramBuf == RX_LISTEN_OFF) {
-        cmdLen = strlen(CMD_SET_RX_LISTEN_OFF);
-        if (memcpy_s(cmdBuf, TINY_BUFF_SIZE - 1, CMD_SET_RX_LISTEN_OFF, cmdLen) != EOK) {
-            WIFI_LOGE("%{public}s memcpy_s cmdBuf fail", __FUNCTION__);
-            return ret;
-        }
+    std::string cmdParam;
+    if (param == RX_LISTEN_ON) {
+        cmdParam = CMD_SET_RX_LISTEN_ON.c_str();
+    } else if (param == RX_LISTEN_OFF) {
+        cmdParam = CMD_SET_RX_LISTEN_OFF.c_str();
     } else {
         WIFI_LOGE("%{public}s invalid param", __FUNCTION__);
-        return ret;
+        return -1;
     }
-    ret = SendCommandToDriverByInterfaceName(cmdBuf, TINY_BUFF_SIZE, WIFI_IFNAME);
-    return ret;
+    return SendCommandToDriverByInterfaceName(WIFI_IFNAME, cmdParam);
 }
 } // namespace Wifi
 } // namespace OHOS

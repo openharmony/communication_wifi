@@ -16,28 +16,28 @@
 #ifndef OHOS_WIFI_POWER_CMD_CLIENT_H
 #define OHOS_WIFI_POWER_CMD_CLIENT_H
 
-#include <stdint.h>
+#include <cstdint>
+#include <string>
 
 namespace OHOS {
 namespace Wifi {
-
-const auto WIFI_IFNAME = "wlan0";
+const std::string WIFI_IFNAME = "wlan0";
 const int CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH = 125;
 
-typedef struct {
+struct WifiPrivCmd {
     uint8_t *buf;
     uint32_t size;
     uint32_t len;
-} WifiPrivCmd;
+};
 
 class WifiPowerCmdClient {
 public:
     static WifiPowerCmdClient &GetInstance();
-    int SendCmdToDriver(const char *iface, int commandId, const char *paramBuf, unsigned int paramSize) const;
+    int SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const;
 
 private:
-    int SendCommandToDriverByInterfaceName(char *cmdBuf, int cmdSize, const char *interfaceName) const;
-    int SetRxListen(const char *paramBuf) const;
+    int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm) const;
+    int SetRxListen(const std::string &param) const;
 };
 } // namespace Wifi
 } // namespace OHOS

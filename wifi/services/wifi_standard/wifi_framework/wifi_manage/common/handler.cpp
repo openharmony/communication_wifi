@@ -71,7 +71,7 @@ void Handler::StopHandlerThread()
     return;
 }
 
-void *Handler::RunHandleThreadFunc(void *pInstance)
+void *Handler::RunHandleThreadFunc(void *pInstance) __attribute__((no_sanitize("cfi")))
 {
     if (pInstance == nullptr) {
         LOGE("pInstance is null.\n");

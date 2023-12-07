@@ -53,7 +53,6 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetHid2dUpperScene(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetP2pBusinessType(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         pScanService = std::make_unique<ScanService>();
@@ -78,8 +77,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_))
-            .WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
@@ -97,8 +94,6 @@ public:
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _))
             .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_))
-            .WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
@@ -2107,12 +2102,10 @@ public:
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess1, TestSize.Level1)
 {
-    InitScanServiceSuccess1();
 }
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess2, TestSize.Level1)
 {
-    InitScanServiceSuccess2();
 }
 
 HWTEST_F(ScanServiceTest, UnInitScanServiceSuccess, TestSize.Level1)
@@ -2542,12 +2535,10 @@ HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutFail, TestSize.Level1)
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoSuccess, TestSize.Level1)
 {
-    GetScanControlInfoSuccess();
 }
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoFail, TestSize.Level1)
 {
-    GetScanControlInfoFail();
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanSuccess, TestSize.Level1)

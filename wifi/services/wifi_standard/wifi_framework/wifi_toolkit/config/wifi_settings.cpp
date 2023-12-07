@@ -57,6 +57,7 @@ WifiSettings::WifiSettings()
       mApMaxConnNum(0),
       mMaxNumConfigs(0),
       mScreenState(MODE_STATE_OPEN),
+      mScanGenieState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
       mPowerSleepState(MODE_STATE_CLOSE),
       mDeviceProvision(MODE_STATE_OPEN),
@@ -1382,6 +1383,47 @@ void WifiSettings::ClearLocalHid2dInfo()
     mP2pBusinessType = P2pBusinessType::INVALID;
 }
 
+void WifiSettings::SetPowerIdelState(const int &state)
+{
+    mIdelState = state;
+}
+
+int WifiSettings::GetPowerIdelState() const
+{
+    return mIdelState;
+}
+
+void WifiSettings::SetGnssFixState(const int &state)
+{
+    mGnssFixState = state;
+}
+
+int WifiSettings::GetGnssFixState() const
+{
+    return mGnssFixState;
+}
+
+void WifiSettings::SetAbnormalApps(const std::vector<std::string> &abnormalAppList)
+{
+    mAbnormalAppList = abnormalAppList;
+}
+
+int WifiSettings::GetAbnormalApps(std::vector<std::string> &abnormalAppList)
+{
+    abnormalAppList = mAbnormalAppList;
+    return 0;
+}
+
+void WifiSettings::SetScanGenieState(const int &state)
+{
+    mScanGenieState = state;
+}
+
+int WifiSettings::GetScanGenieState() const
+{
+    return mScanGenieState;
+}
+
 int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
@@ -1479,9 +1521,25 @@ void WifiSettings::InitScanControlForbidList(void)
     mScanControlInfo[0].scanForbidList.push_back(forbidMode);
 
     /* Disable all scans in connection */
+#ifdef SUPPORT_SCAN_CONTROL
+    forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+    forbidMode.scanScene = SCAN_SCENE_ASSOCIATING;
+    forbidMode.forbidTime = 2;
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
+    forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+    forbidMode.scanScene = SCAN_SCENE_ASSOCIATED;
+    forbidMode.forbidTime = 5;
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
+    forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
+    forbidMode.scanScene = SCAN_SCENE_OBTAINING_IP;
+    forbidMode.forbidCount = 1;
+    forbidMode.forbidTime = 5;
+    mScanControlInfo[0].scanForbidList.push_back(forbidMode);
+#else
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     forbidMode.scanScene = SCAN_SCENE_CONNECTING;
     mScanControlInfo[0].scanForbidList.push_back(forbidMode);
+#endif
     forbidMode.scanMode = ScanMode::PNO_SCAN;
     forbidMode.scanScene = SCAN_SCENE_CONNECTING;
     mScanControlInfo[0].scanForbidList.push_back(forbidMode);
@@ -1574,7 +1632,11 @@ void WifiSettings::InitScanControlIntervalList(void)
     scanIntervalMode.isSingle = false;
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_EXP;
     scanIntervalMode.interval = SYSTEM_TIMER_SCAN_CONTROL_INTERVAL;
+#ifdef SUPPORT_SCAN_CONTROL
+    scanIntervalMode.count = 0;
+#else
     scanIntervalMode.count = SYSTEM_TIMER_SCAN_CONTROL_TIMES;
+#endif
     mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
     return;
 }

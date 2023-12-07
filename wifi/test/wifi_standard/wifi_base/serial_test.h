@@ -12,17 +12,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_WIFI_CRPC_SERIAL_TEST_H
+#define OHOS_WIFI_CRPC_SERIAL_TEST_H
 
-#include "wifi_scan_death_recipient.h"
-#include "wifi_logger.h"
-#include "wifi_internal_event_dispatcher.h"
-DEFINE_WIFILOG_SCAN_LABEL("WifiScanDeathRecipient");
+#include <gtest/gtest.h>
+#include "context.h"
+
 namespace OHOS {
 namespace Wifi {
-void WifiScanDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
-{
-    WIFI_LOGI("WifiScanDeathRecipient::OnRemoteDied! remoteObject: %{public}p", &remoteObject);
-    WifiInternalEventDispatcher::GetInstance().RemoveScanCallback(remoteObject.promote());
-}
+constexpr int BUFFER_1K = 1024;
+class SerialTest : public testing::Test {
+public:
+    static void SetUpTestCase()
+    {
+        ctx = CreateContext(BUFFER_1K);
+    }
+    static void TearDownTestCase()
+    {
+        if (ctx != nullptr) {
+            ReleaseContext(ctx);
+            ctx = nullptr;
+        }
+    }
+    virtual void SetUp()
+    {}
+    virtual void TearDown()
+    {}
+
+public:
+    static Context *ctx;
+    Context *test = NULL;
+};
 }  // namespace Wifi
 }  // namespace OHOS
+#endif

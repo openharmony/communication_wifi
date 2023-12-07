@@ -30,16 +30,6 @@ enum class AppType {
     OTHER_APP
 };
 
-enum class GameAppInfoType {
-    GAME_ID = 0,
-    SCENE_ID,
-    GAME_KQI,
-    GAME_RTT,
-    GAME_ACTION,
-    GAME_SPACIAL_INFO_SOURCES,
-    INVALID
-};
-
 struct CommonAppInfo {
     std::string packageName;
 };
@@ -50,12 +40,6 @@ struct ChariotAppInfo : CommonAppInfo {};
 
 struct GameAppInfo {
     std::string gameName;
-    std::string mGameId;
-    std::string mSceneId;
-    std::string mGameKQI;
-    std::string mGameRtt;
-    std::string mGameAction;
-    std::string mGameSpacialInfoSources;
 };
 
 class AppParser : public XmlParser {
@@ -76,7 +60,6 @@ private:
     WhiteListAppInfo ParseWhiteAppInfo(const xmlNodePtr &innode);
     BlackListAppInfo ParseBlackAppInfo(const xmlNodePtr &innode);
     ChariotAppInfo ParseChariotAppInfo(const xmlNodePtr &innode);
-    GameAppInfoType GetGameAppInfoNameAsInt(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
 
 private:

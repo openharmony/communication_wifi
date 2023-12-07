@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_HOTSPOT_CALLBACK_STUB_H
 #define OHOS_WIFI_HOTSPOT_CALLBACK_STUB_H
 
+#include <mutex>
 #include "iremote_stub.h"
 #include "i_wifi_hotspot_callback.h"
 
@@ -43,7 +44,7 @@ private:
 
 private:
     sptr<IWifiHotspotCallback> userCallback_;
-
+    std::mutex callBackEventMutex;
     bool mRemoteDied;
 };
 }  // namespace Wifi

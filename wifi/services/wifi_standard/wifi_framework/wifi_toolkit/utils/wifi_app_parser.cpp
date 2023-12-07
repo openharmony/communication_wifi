@@ -32,27 +32,12 @@ static constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
 
 static constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
 static constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
-static constexpr auto XML_TAG_GAME_ID = "mGameId";
-static constexpr auto XML_TAG_SCENE_ID = "mScenceId";
-static constexpr auto XML_TAG_GAME_KQI = "mGameKQI";
-static constexpr auto XML_TAG_GAME_RTT = "mGameRtt";
-static constexpr auto XML_TAG_GAME_ACTION = "mGameAction";
-static constexpr auto XML_TAG_GAME_SPECIAL_INFO_SOURCES = "mGameSpecialInfoSources";
 
 static const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_GAME_INFO, AppType::GAME_APP },
     { XML_TAG_SECTION_HEADER_APP_WHITE_LIST, AppType::WHITE_LIST_APP },
     { XML_TAG_SECTION_HEADER_APP_BLACK_LIST, AppType::BLACK_LIST_APP },
     { XML_TAG_SECTION_HEADER_CHARIOT_APP, AppType::CHARIOT_APP },
-};
-
-static const std::unordered_map<std::string, GameAppInfoType> gameInfoTypeMap = {
-    { XML_TAG_GAME_ID, GameAppInfoType::GAME_ID },
-    { XML_TAG_SCENE_ID, GameAppInfoType::SCENE_ID },
-    { XML_TAG_GAME_KQI, GameAppInfoType::GAME_KQI },
-    { XML_TAG_GAME_RTT, GameAppInfoType::GAME_RTT },
-    { XML_TAG_GAME_ACTION, GameAppInfoType::GAME_ACTION },
-    { XML_TAG_GAME_SPECIAL_INFO_SOURCES, GameAppInfoType::GAME_SPACIAL_INFO_SOURCES },
 };
 
 AppParser::AppParser()
@@ -160,35 +145,7 @@ GameAppInfo AppParser::ParseGameAppInfo(const xmlNodePtr &innode)
     GameAppInfo gameAppInfo;
     std::string gameName =
         std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME))));
-    if (gameName.empty()) {
-        WIFI_LOGW("%{public}s game name is empty", __FUNCTION__);
-    }
     gameAppInfo.gameName = gameName;
-    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
-        switch (GetGameAppInfoNameAsInt(node)) {
-            case GameAppInfoType::GAME_ID:
-                gameAppInfo.mGameId = GetStringValue(node);
-                break;
-            case GameAppInfoType::SCENE_ID:
-                gameAppInfo.mSceneId = GetStringValue(node);
-                break;
-            case GameAppInfoType::GAME_KQI:
-                gameAppInfo.mGameKQI = GetStringValue(node);
-                break;
-            case GameAppInfoType::GAME_RTT:
-                gameAppInfo.mGameRtt = GetStringValue(node);
-                break;
-            case GameAppInfoType::GAME_ACTION:
-                gameAppInfo.mGameAction = GetStringValue(node);
-                break;
-            case GameAppInfoType::GAME_SPACIAL_INFO_SOURCES:
-                gameAppInfo.mGameSpacialInfoSources = GetStringValue(node);
-                break;
-            default:
-                WIFI_LOGD("%{public}s invalid game app info: %{public}s", __FUNCTION__, GetStringValue(node).c_str());
-                break;
-        }
-    }
     return gameAppInfo;
 }
 
@@ -214,16 +171,6 @@ ChariotAppInfo AppParser::ParseChariotAppInfo(const xmlNodePtr &innode)
     appInfo.packageName =
         std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
     return appInfo;
-}
-
-GameAppInfoType AppParser::GetGameAppInfoNameAsInt(const xmlNodePtr &innode)
-{
-    std::string tagName = GetNodeValue(innode);
-    if (gameInfoTypeMap.find(tagName) != gameInfoTypeMap.end()) {
-        return gameInfoTypeMap.at(tagName);
-    }
-    WIFI_LOGD("%{public}s not find targName:%{public}s in gameInfoTypeMap", __FUNCTION__, tagName.c_str());
-    return GameAppInfoType::INVALID;
 }
 
 AppType AppParser::GetAppTypeAsInt(const xmlNodePtr &innode)

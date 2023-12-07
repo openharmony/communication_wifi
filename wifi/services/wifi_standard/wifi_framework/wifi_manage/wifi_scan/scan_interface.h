@@ -64,6 +64,15 @@ public:
      */
     ErrCode DisableScan(bool disable);
     /**
+     * @Description Start/Stop pno scan
+     *
+     * @param isStartAction - true:start pno scan; false:stop pno scan
+     * @param periodMs - pno scan interval
+     * @param suspendReason - pno scan suspent reason
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason);
+    /**
      * @Description Processes interface service screen change request.
      *
      * @param screenState screen state[in]

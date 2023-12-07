@@ -48,6 +48,7 @@ private:
     int OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnSetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnGetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int OnStartWifiPnoScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     HandleFuncMap handleFuncMap;

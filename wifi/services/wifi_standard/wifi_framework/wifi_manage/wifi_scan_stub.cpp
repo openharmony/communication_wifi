@@ -61,6 +61,8 @@ void WifiScanStub::InitHandleMap()
         &WifiScanStub::OnSetScanOnlyAvailable;
     handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY)] =
         &WifiScanStub::OnGetScanOnlyAvailable;
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN)] =
+        &WifiScanStub::OnStartWifiPnoScan;
 }
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -134,9 +136,10 @@ int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, Messa
 int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     bool compatible = data.ReadBool();
+    std::string name = data.ReadString();
     WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d",
         code, data.GetRawDataSize(), compatible);
-    WifiSettings::GetInstance().SetAppPackageName(GetBundleName());
+    WifiSettings::GetInstance().SetAppPackageName(name);
     ErrCode ret = Scan(compatible);
     WifiSettings::GetInstance().SetAppPackageName("");
     reply.WriteInt32(0);
@@ -166,8 +169,9 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
         params.freqs.push_back(tmp);
     }
     params.band = data.ReadInt32();
+    std::string name = data.ReadString();
 
-    WifiSettings::GetInstance().SetAppPackageName(GetBundleName());
+    WifiSettings::GetInstance().SetAppPackageName(name);
     ErrCode ret = AdvanceScan(params);
     WifiSettings::GetInstance().SetAppPackageName("");
     reply.WriteInt32(0);
@@ -328,6 +332,19 @@ int WifiScanStub::OnGetScanOnlyAvailable(
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteBool(state);
     }
+    return 0;
+}
+
+int WifiScanStub::OnStartWifiPnoScan(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGI("In WifiScanStub::OnStartWifiPnoScan");
+    bool isStart = data.ReadBool();
+    int periodMs = data.ReadInt32();
+    int suspendReason = data.ReadInt32();
+    ErrCode ret = StartWifiPnoScan(isStart, periodMs, suspendReason);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return 0;
 }
 }  // namespace Wifi

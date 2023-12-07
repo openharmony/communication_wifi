@@ -112,6 +112,16 @@ public:
      */
     ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
 
+    /**
+     * @Description Start pno scan
+     *
+     * @param isStartAction - true:start pno scan; false:stop pno scan
+     * @param periodMs - pno scan interval
+     * @param suspendReason - pno scan suspent reason
+     * @return ErrCode - operation result
+     */
+    ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) override;
+
 private:
     bool GetWifiScanProxy();
     int systemAbilityId_;

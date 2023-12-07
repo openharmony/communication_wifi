@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 group("etc") {
   deps = [ ":wifi_standard.cfg" ]
   deps += [ ":wifi_portal.conf" ]
+  deps += [ ":wifi_monitor_apps_xml" ]
 }
 
 ohos_prebuilt_etc("wifi_standard.cfg") {
@@ -28,6 +29,13 @@ ohos_prebuilt_etc("wifi_standard.cfg") {
 ohos_prebuilt_etc("wifi_portal.conf") {
   source = "wifi_portal.conf"
   relative_install_dir = "wifi"
+  part_name = "wifi"
+  subsystem_name = "communication"
+}
+
+ohos_prebuilt_etc("wifi_monitor_apps_xml") {
+  source = "//foundation/communication/wifi/wifi/resource/wifi_monitor_apps.xml"
+  module_install_dir = "/data/service/el1/public/wifi/"
   part_name = "wifi"
   subsystem_name = "communication"
 }

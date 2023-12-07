@@ -12,17 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_WIFI_CRPC_HASH_TABLE_TEST_H
+#define OHOS_WIFI_CRPC_HASH_TABLE_TEST_H
 
-#include "wifi_scan_death_recipient.h"
-#include "wifi_logger.h"
-#include "wifi_internal_event_dispatcher.h"
-DEFINE_WIFILOG_SCAN_LABEL("WifiScanDeathRecipient");
+#include <gtest/gtest.h>
+#include "hash_table.h"
+
 namespace OHOS {
 namespace Wifi {
-void WifiScanDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
-{
-    WIFI_LOGI("WifiScanDeathRecipient::OnRemoteDied! remoteObject: %{public}p", &remoteObject);
-    WifiInternalEventDispatcher::GetInstance().RemoveScanCallback(remoteObject.promote());
-}
+class HashTableTest : public testing::Test {
+public:
+    static void SetUpTestCase()
+    {}
+    static void TearDownTestCase()
+    {}
+    virtual void SetUp()
+    {
+        table = nullptr;
+    }
+    virtual void TearDown()
+    {
+        if (table != nullptr) {
+            DestroyHashTable(table);
+            table = nullptr;
+        }
+    }
+
+public:
+    HashTable *table;
+};
 }  // namespace Wifi
 }  // namespace OHOS
+#endif

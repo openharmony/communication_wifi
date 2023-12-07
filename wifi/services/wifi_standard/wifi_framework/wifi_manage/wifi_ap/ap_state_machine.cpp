@@ -20,6 +20,7 @@
 #include "ap_monitor.h"
 #include "wifi_settings.h"
 #include "wifi_logger.h"
+#include "wifi_net_agent.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStateMachine");
 
@@ -117,7 +118,7 @@ bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t
         WIFI_LOGE("start dhcpd fail.");
         return false;
     }
-
+    WifiNetAgent::GetInstance().AddRoute(IN_INTERFACE, ipAddress, ipv4.GetAddressPrefixLength());
     WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
 #else

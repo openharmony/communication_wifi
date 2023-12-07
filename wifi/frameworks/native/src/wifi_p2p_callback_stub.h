@@ -15,6 +15,7 @@
 #ifndef OHOS_WIFI_P2P_CALLBACK_STUB_H
 #define OHOS_WIFI_P2P_CALLBACK_STUB_H
 
+#include <mutex>
 #include <map>
 #include "iremote_stub.h"
 #include "i_wifi_p2p_callback.h"
@@ -121,6 +122,7 @@ private:
     HandleFuncMap handleFuncMap;
     sptr<IWifiP2pCallback> userCallback_;
     bool mRemoteDied;
+    std::mutex callBackEventMutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

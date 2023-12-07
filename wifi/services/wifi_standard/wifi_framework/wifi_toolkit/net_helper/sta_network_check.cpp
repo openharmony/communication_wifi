@@ -16,6 +16,10 @@
 #include "sta_network_check.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#ifndef OHOS_ARCH_LITE
+#include "http_client_request.h"
+#include "http_client.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("StaNetworkCheck");
 
@@ -137,13 +141,7 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url)
         WIFI_LOGE("http create task failed !");
         return -1;
     }
-    RegistHttpCallBack(task);
-    task->Start();
-    return 0;
-}
 
-void StaNetworkCheck::RegistHttpCallBack(std::shared_ptr<NetStack::HttpClient::HttpClientTask> task)
-{
     task->OnSuccess([task, this](const NetStack::HttpClient::HttpClientRequest &request,
         const NetStack::HttpClient::HttpClientResponse &response) {
         std::string url = request.GetURL();
@@ -180,6 +178,9 @@ void StaNetworkCheck::RegistHttpCallBack(std::shared_ptr<NetStack::HttpClient::H
         }
         WIFI_LOGE("HttpPortalDetection OnFailed, url:%{public}s, responseCode:%{public}d", url.c_str(), codeNum);
     });
+    
+    task->Start();
+    return 0;
 }
 #endif
 void StaNetworkCheck::RunNetCheckThreadFunc()

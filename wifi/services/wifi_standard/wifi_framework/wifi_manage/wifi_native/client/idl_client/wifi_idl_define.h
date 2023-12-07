@@ -82,6 +82,8 @@ typedef enum WifiHalPortType {
 #define PNO_SCAN_OVER_OK 3    /* PNO Scan success notification */
 #define WPA_CB_CONNECTED 1    /* The connection is successfully. */
 #define WPA_CB_DISCONNECTED 2 /* Disconnect */
+#define WPA_CB_ASSOCIATING 3
+#define WPA_CB_ASSOCIATED 4
 #define WIFI_IDL_COUNTRY_CODE_LENGTH 2
 #define WIFI_IDL_GET_MAX_SCAN_INFO 256 /* Maximum number of scan infos obtained at a time */
 #define WIFI_IDL_GET_MAX_NETWORK_LIST 128

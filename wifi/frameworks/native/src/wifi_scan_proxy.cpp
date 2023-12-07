@@ -145,6 +145,7 @@ ErrCode WifiScanProxy::Scan(bool compatible)
     }
     data.WriteInt32(0);
     data.WriteBool(compatible);
+    data.WriteString(GetBundleName());
     int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), data, reply,
         option);
     if (error != ERR_NONE) {
@@ -185,6 +186,7 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
         data.WriteInt32(params.freqs[i]);
     }
     data.WriteInt32(params.band);
+    data.WriteString(GetBundleName());
 
     int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN),
         data, reply, option);
@@ -473,6 +475,40 @@ ErrCode WifiScanProxy::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
         return ErrCode(ret);
     }
     bScanOnlyAvailable = reply.ReadBool();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiScanProxy::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteBool(isStartAction);
+    data.WriteInt32(periodMs);
+    data.WriteInt32(suspendReason);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

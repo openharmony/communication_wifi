@@ -30,7 +30,6 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiPowerCmdClient");
 
 static const int MAX_PRIV_CMD_SIZE = 4096;
-static const int TINY_BUFF_SIZE = 64;
 
 static const auto RX_LISTEN_ON = "Y";
 static const auto RX_LISTEN_OFF = "N";

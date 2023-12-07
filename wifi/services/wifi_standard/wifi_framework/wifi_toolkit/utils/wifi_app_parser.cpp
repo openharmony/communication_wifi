@@ -28,7 +28,7 @@ static constexpr auto XML_TAG_SECTION_HEADER_MONITOR_APP = "MonitorAPP";
 static constexpr auto XML_TAG_SECTION_HEADER_GAME_INFO = "GameInfo";
 static constexpr auto XML_TAG_SECTION_HEADER_APP_WHITE_LIST = "AppWhiteList";
 static constexpr auto XML_TAG_SECTION_HEADER_APP_BLACK_LIST = "AppBlackList";
-static constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APK = "ChariotApk";
+static constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
 
 static constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
 static constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
@@ -43,7 +43,7 @@ static const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_GAME_INFO, AppType::GAME_APP },
     { XML_TAG_SECTION_HEADER_APP_WHITE_LIST, AppType::WHITE_LIST_APP },
     { XML_TAG_SECTION_HEADER_APP_BLACK_LIST, AppType::BLACK_LIST_APP },
-    { XML_TAG_SECTION_HEADER_CHARIOT_APK, AppType::CHARIOT_APP },
+    { XML_TAG_SECTION_HEADER_CHARIOT_APP, AppType::CHARIOT_APP },
 };
 
 static const std::unordered_map<std::string, GameAppInfoType> gameInfoTypeMap = {

@@ -826,6 +826,11 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
             WIFI_LOGE("Get support frequencies failed, use default 5g frequency!");
             return DEFAULT_5G_FREQUENCY;
         }
+        constexpr int DEFAULT_2G_FREQUENCY = 2412;
+        if (band == GroupOwnerBand::GO_BAND_2GHZ) {
+            WIFI_LOGE("Get support frequencies failed, use default 2g frequency!");
+            return DEFAULT_2G_FREQUENCY;
+        }
         WIFI_LOGE("Cannot get support frequencies according to band, choose random frequency");
         return 0;
     }

@@ -18,7 +18,7 @@ group("etc") {
 }
 
 ohos_prebuilt_etc("wifi_monitor_apps_xml") {
-  source = "//foundation/communication/wifi/wifi/services/wifi_standard/etc/resource/wifi_monitor_apps.xml"
+  source = "wifi_monitor_apps.xml"
   module_install_dir = "/data/service/el1/public/wifi/"
   part_name = "wifi"
   subsystem_name = "communication"

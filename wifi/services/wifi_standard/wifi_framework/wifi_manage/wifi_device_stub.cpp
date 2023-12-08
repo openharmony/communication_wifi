@@ -72,6 +72,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnStartPortalCertification;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE)] =
         &WifiDeviceStub::OnGetChangeDeviceConfig;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET)] =
+        &WifiDeviceStub::OnFactoryReset;
     return;
 }
 
@@ -946,6 +948,16 @@ void WifiDeviceStub::OnResetAllFrozenApp(uint32_t code, MessageParcel& data, Mes
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = ResetAllFrozenApp();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<int> channelList;
+    ErrCode ret = FactoryReset();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

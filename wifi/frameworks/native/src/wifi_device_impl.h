@@ -409,6 +409,12 @@ public:
      */
     ErrCode GetChangeDeviceConfig(ConfigChange &value, WifiDeviceConfig &config) override;
 
+    /**
+     * @Description reset factiry
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode FactoryReset() override;
 private:
     bool GetWifiDeviceProxy();
     int systemAbilityId_;

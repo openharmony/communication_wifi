@@ -379,7 +379,12 @@ public:
     virtual ErrCode StartPortalCertification() = 0;
 
     virtual ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) = 0;
-    
+    /**
+     * @Description reset factory
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode FactoryReset() = 0;
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

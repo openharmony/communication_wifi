@@ -1449,6 +1449,22 @@ void WifiSettings::InitDefaultHotspotConfig()
     }
 }
 
+void WifiSettings::ClearHotspotConfig()
+{
+    mHotspotConfig.clear();
+    HotspotConfig config;
+    config.SetSecurityType(KeyMgmt::WPA2_PSK);
+    config.SetBand(BandType::BAND_2GHZ);
+    config.SetChannel(AP_CHANNEL_DEFAULT);
+    config.SetMaxConn(GetApMaxConnNum());
+    config.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
+    config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+    auto ret = mHotspotConfig.emplace(0, config);
+    if (!ret.second) {
+        mHotspotConfig[0] = config;
+    }
+}
+
 void WifiSettings::InitDefaultP2pVendorConfig()
 {
     mP2pVendorConfig.SetRandomMacSupport(false);

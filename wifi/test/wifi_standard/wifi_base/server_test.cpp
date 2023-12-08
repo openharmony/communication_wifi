@@ -35,9 +35,20 @@ public:
     static void TearDownTestCase()
     {}
     virtual void SetUp()
-    {}
+    {
+        char sockPath[] = "/temp/service/el1/public/wifi/unix_sock.sock";
+        pRpcClient = CreateRpcServer(sockPath);
+    }
     virtual void TearDown()
-    {}
+    {
+        if (pRpcServer != NULL)
+        {
+            ReleaseRpcServer(pRpcServer);
+            pRpcServer = NULL;
+        }
+    }
+public:
+    RpcServer *pRpcServer = NULL;
 };
 
 HWTEST_F(ServerTest, CreateEventLoopTest, TestSize.Level1)
@@ -189,6 +200,33 @@ HWTEST_F(ServerTest, UnRegisterCallbackTest, TestSize.Level1)
     EXPECT_TRUE(UnRegisterCallback(nullptr, MAX_SIZE, nullptr) == -1);
     EXPECT_TRUE(UnRegisterCallback(&server, MAX_SIZE, nullptr) == -1);
     EXPECT_TRUE(UnRegisterCallback(&server, MAX_SIZE, &context) == 0);
+}
+
+HWTEST_F(ServerTest, RunRpcLoopTest, TestSize.Level1)
+{
+    RunRpcLoop(NULL);
+    RunRpcLoop(pRpcServer);
+}
+
+HWTEST_F(ServerTest, ReleaseRpcServerTest, TestSize.Level1)
+{
+    ReleaseRpcServer(NULL);
+    ReleaseRpcServer(pRpcServer);
+}
+
+HWTEST_F(ServerTest, ReleaseRpcServerTest, TestSize.Level1)
+{
+    ReleaseRpcServer(NULL);
+    ReleaseRpcServer(pRpcServer);
+}
+
+HWTEST_F(ServerTest, EmitEventTest, TestSize.Level1)
+{
+    EmitEvent(NULL, 0);
+    pRpcServer->isHandlingMsg = true;
+    EmitEvent(pRpcServer, 1);
+    pRpcServer->isHandlingMsg = false;
+    EmitEvent(pRpcServer, 1);   
 }
 }  // namespace Wifi
 }  // namespace OHOS

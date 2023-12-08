@@ -200,5 +200,32 @@ HWTEST_F(ContextTest, ContextWriteNetTest, TestSize.Level1)
     ret = ContextWriteNet(ctx);
     EXPECT_TRUE(ret == size - 1);
 }
+
+HWTEST_F(ContextTest, ReadClientEndTest, TestSize.Level1)
+{
+    ReadClientEnd(NULL);
+    ReadClientEnd(pRpcClient);
+}
+
+HWTEST_F(ContextTest, LockRpcClientTest, TestSize.Level1)
+{
+    LockRpcClient(pRpcClient);
+    LockRpcClient(NULL);
+}
+
+HWTEST_F(ContextTest, UnlockRpcClientTest, TestSize.Level1)
+{
+    UnlockRpcClient(NULL);
+    UnlockRpcClient(pRpcClient);
+}
+
+HWTEST_F(ContextTest, RemoteCallTest, TestSize.Level1)
+{
+    RemoteCall(NULL);
+    pRpcClient->waitReply = CLIENT_STATE_EXIT;
+    RemoteCall(pRpcClient);
+    pRpcClient->waitReply = CLIENT_STATE_DEAL_REPLY;
+    RemoteCall(pRpcClient);
+}
 }  // namespace Wifi
 }  // namespace OHOS

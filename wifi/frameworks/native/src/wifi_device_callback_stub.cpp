@@ -156,7 +156,6 @@ int WifiDeviceCallBackStub::RemoteOnWifiStateChanged(uint32_t code, MessageParce
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int state = data.ReadInt32();
     OnWifiStateChanged(state);
-    reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
     return 0;
 }
 
@@ -201,7 +200,6 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, Message
         info.detailedState = DetailedState::INVALID;
     }
     OnWifiConnectionChanged(state, info);
-    reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
     return 0;
 }
 
@@ -210,7 +208,6 @@ int WifiDeviceCallBackStub::RemoteOnWifiRssiChanged(uint32_t code, MessageParcel
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int rssi = data.ReadInt32();
     OnWifiRssiChanged(rssi);
-    reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
     return 0;
 }
 
@@ -222,7 +219,6 @@ int WifiDeviceCallBackStub::RemoteOnWifiWpsStateChanged(uint32_t code, MessagePa
     readStr = data.ReadCString();
     std::string pinCode = (readStr != nullptr) ? readStr : "";
     OnWifiWpsStateChanged(state, pinCode);
-    reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
     return 0;
 }
 
@@ -231,7 +227,6 @@ int WifiDeviceCallBackStub::RemoteOnStreamChanged(uint32_t code, MessageParcel &
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int direction = data.ReadInt32();
     OnStreamChanged(direction);
-    reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
     return 0;
 }
 
@@ -240,7 +235,6 @@ int WifiDeviceCallBackStub::RemoteOnDeviceConfigChanged(uint32_t code, MessagePa
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int value = data.ReadInt32();
     OnDeviceConfigChanged(ConfigChange(value));
-    reply.WriteInt32(0); /* Reply 0 to indicate that no exception occurs. */
     return 0;
 }
 }  // namespace Wifi

@@ -19,15 +19,12 @@ if (defined(ohos_lite)) {
   import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 
-local_base_sources = [
-  "rx_listen/wifi_rx_listen_arbitration.cpp",
-  "wifi_power_cmd_client.cpp",
-]
+local_base_sources = [ "rx_listen/wifi_rx_listen_arbitration.cpp" ]
 
 local_base_include_dirs = [
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_power_saving",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_power_saving/rx_listen",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
@@ -41,6 +38,7 @@ if (defined(ohos_lite)) {
     include_dirs = local_base_include_dirs
 
     deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//third_party/libxml2:xml2",
@@ -80,6 +78,7 @@ if (defined(ohos_lite)) {
     include_dirs = local_base_include_dirs
 
     deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//third_party/libxml2:xml2",

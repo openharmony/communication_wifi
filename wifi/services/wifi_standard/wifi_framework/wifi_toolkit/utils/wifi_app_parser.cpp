@@ -23,18 +23,18 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppXmlParser");
 
-static constexpr auto WIFI_MONITOR_APP_FILE_PATH = CONFIG_ROOR_DIR"/wifi_monitor_apps.xml";
-static constexpr auto XML_TAG_SECTION_HEADER_MONITOR_APP = "MonitorAPP";
-static constexpr auto XML_TAG_SECTION_HEADER_GAME_INFO = "GameInfo";
-static constexpr auto XML_TAG_SECTION_HEADER_APP_WHITE_LIST = "AppWhiteList";
-static constexpr auto XML_TAG_SECTION_HEADER_APP_BLACK_LIST = "AppBlackList";
-static constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
+constexpr auto WIFI_MONITOR_APP_FILE_PATH = CONFIG_ROOR_DIR"/wifi_monitor_apps.xml";
+constexpr auto XML_TAG_SECTION_HEADER_MONITOR_APP = "MonitorAPP";
+constexpr auto XML_TAG_SECTION_HEADER_GAME_INFO = "GameInfo";
+constexpr auto XML_TAG_SECTION_HEADER_APP_WHITE_LIST = "AppWhiteList";
+constexpr auto XML_TAG_SECTION_HEADER_APP_BLACK_LIST = "AppBlackList";
+constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
 
-static constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
-static constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
+constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
+constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
 
-static const std::unordered_map<std::string, AppType> appTypeMap = {
-    { XML_TAG_SECTION_HEADER_GAME_INFO, AppType::GAME_APP },
+const std::unordered_map<std::string, AppType> appTypeMap = {
+    { XML_TAG_SECTION_HEADER_GAME_INFO, AppType::LOW_LATENCY_APP },
     { XML_TAG_SECTION_HEADER_APP_WHITE_LIST, AppType::WHITE_LIST_APP },
     { XML_TAG_SECTION_HEADER_APP_BLACK_LIST, AppType::BLACK_LIST_APP },
     { XML_TAG_SECTION_HEADER_CHARIOT_APP, AppType::CHARIOT_APP },
@@ -43,7 +43,11 @@ static const std::unordered_map<std::string, AppType> appTypeMap = {
 AppParser::AppParser()
 {
     WIFI_LOGI("%{public}s enter", __FUNCTION__);
-    InitAppParser();
+    if (InitAppParser(WIFI_MONITOR_APP_FILE_PATH)) {
+        WIFI_LOGD("%{public}s InitAppParser successful", __FUNCTION__);
+    } else {
+        WIFI_LOGE("%{public}s InitAppParser fail", __FUNCTION__);
+    };
 }
 
 AppParser::~AppParser()
@@ -57,10 +61,10 @@ AppParser &AppParser::GetInstance()
     return instance;
 }
 
-bool AppParser::IsGameApp(const std::string &bundleName) const
+bool AppParser::IsLowLatencyApp(const std::string &bundleName) const
 {
-    return std::any_of(m_gameAppVec.begin(), m_gameAppVec.end(),
-        [bundleName](const GameAppInfo &app) { return app.gameName == bundleName; });
+    return std::any_of(m_lowLatencyAppVec.begin(), m_lowLatencyAppVec.end(),
+        [bundleName](const LowLatencyAppInfo &app) { return app.packageName == bundleName; });
 }
 
 bool AppParser::IsWhiteListApp(const std::string &bundleName) const
@@ -81,23 +85,24 @@ bool AppParser::IsChariotApp(const std::string &bundleName) const
         [bundleName](const ChariotAppInfo &app) { return app.packageName == bundleName; });
 }
 
-void AppParser::InitAppParser()
+bool AppParser::InitAppParser(const char *appXmlFilePath)
 {
-    if (!std::filesystem::exists(WIFI_MONITOR_APP_FILE_PATH)) {
-        WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, WIFI_MONITOR_APP_FILE_PATH);
-        return;
+    if (!std::filesystem::exists(appXmlFilePath)) {
+        WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlFilePath);
+        return false;
     }
-    bool ret = LoadConfiguration(WIFI_MONITOR_APP_FILE_PATH);
+    bool ret = LoadConfiguration(appXmlFilePath);
     if (!ret) {
         WIFI_LOGE("%{public}s load failed", __FUNCTION__);
-        return;
+        return ret;
     }
     ret = Parse();
     if (!ret) {
         WIFI_LOGE("%{public}s parse failed", __FUNCTION__);
-        return;
+        return ret;
     }
-    WIFI_LOGD("%{public}s, wifi monitor app xml passed successfully", __FUNCTION__);
+    WIFI_LOGD("%{public}s, wifi monitor app xml parsed successfully", __FUNCTION__);
+    return ret;
 }
 
 bool AppParser::ParseInternal(xmlNodePtr node)
@@ -106,23 +111,23 @@ bool AppParser::ParseInternal(xmlNodePtr node)
         WIFI_LOGE("%{public}s node is null", __FUNCTION__);
         return false;
     }
-    ParserAppList(node);
-    return false;
+    ParseAppList(node);
+    return true;
 }
 
-void AppParser::ParserAppList(const xmlNodePtr &innode)
+void AppParser::ParseAppList(const xmlNodePtr &innode)
 {
     if (xmlStrcmp(innode->name, BAD_CAST(XML_TAG_SECTION_HEADER_MONITOR_APP)) != 0) {
         WIFI_LOGE("innode name=%{public}s not equal MonitorAPP", innode->name);
     }
-    m_gameAppVec.clear();
+    m_lowLatencyAppVec.clear();
     m_whiteAppVec.clear();
     m_blackAppVec.clear();
     m_chariotAppVec.clear();
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetAppTypeAsInt(node)) {
-            case AppType::GAME_APP:
-                m_gameAppVec.push_back(ParseGameAppInfo(node));
+            case AppType::LOW_LATENCY_APP:
+                m_lowLatencyAppVec.push_back(ParseLowLatencyAppInfo(node));
                 break;
             case AppType::WHITE_LIST_APP:
                 m_whiteAppVec.push_back(ParseWhiteAppInfo(node));
@@ -140,13 +145,13 @@ void AppParser::ParserAppList(const xmlNodePtr &innode)
     }
 }
 
-GameAppInfo AppParser::ParseGameAppInfo(const xmlNodePtr &innode)
+LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
 {
-    GameAppInfo gameAppInfo;
+    LowLatencyAppInfo appInfo;
     std::string gameName =
         std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME))));
-    gameAppInfo.gameName = gameName;
-    return gameAppInfo;
+    appInfo.packageName = gameName;
+    return appInfo;
 }
 
 WhiteListAppInfo AppParser::ParseWhiteAppInfo(const xmlNodePtr &innode)

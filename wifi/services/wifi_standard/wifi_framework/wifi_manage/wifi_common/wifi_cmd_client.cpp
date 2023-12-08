@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "wifi_power_cmd_client.h"
+#include "wifi_cmd_client.h"
 #include <linux/sockios.h>
 #include <net/if.h>
 #include <net/route.h>
@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("WifiPowerCmdClient");
+DEFINE_WIFILOG_LABEL("WifiCmdClient");
 
 static const int MAX_PRIV_CMD_SIZE = 4096;
 
@@ -36,12 +36,12 @@ static const auto RX_LISTEN_OFF = "N";
 static const auto CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
 static const auto CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
 
-WifiPowerCmdClient &Wifi::WifiPowerCmdClient::GetInstance()
+WifiCmdClient &WifiCmdClient::GetInstance()
 {
-    static WifiPowerCmdClient instance;
+    static WifiCmdClient instance;
     return instance;
 }
-int Wifi::WifiPowerCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const
+int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const
 {
     int ret = -1;
     if (ifName.empty() || param.empty() || (param.size() + 1) > MAX_PRIV_CMD_SIZE) {
@@ -55,7 +55,7 @@ int Wifi::WifiPowerCmdClient::SendCmdToDriver(const std::string &ifName, int com
     }
     return ret;
 }
-int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
+int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
     const std::string &cmdParm) const
 {
     int ret = -1;
@@ -96,7 +96,7 @@ int Wifi::WifiPowerCmdClient::SendCommandToDriverByInterfaceName(const std::stri
     return ret;
 }
 
-int Wifi::WifiPowerCmdClient::SetRxListen(const std::string &ifName, const std::string &param) const
+int WifiCmdClient::SetRxListen(const std::string &ifName, const std::string &param) const
 {
     WIFI_LOGD("%{public}s enter", __FUNCTION__);
     std::string cmdParam;

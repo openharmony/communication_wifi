@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Wifi {
 enum class AppType {
-    GAME_APP = 0,
+    LOW_LATENCY_APP = 0,
     WHITE_LIST_APP,
     BLACK_LIST_APP,
     CHARIOT_APP,
@@ -34,36 +34,33 @@ struct CommonAppInfo {
     std::string packageName;
 };
 
+struct LowLatencyAppInfo : CommonAppInfo {};
 struct WhiteListAppInfo : CommonAppInfo {};
 struct BlackListAppInfo : CommonAppInfo {};
 struct ChariotAppInfo : CommonAppInfo {};
-
-struct GameAppInfo {
-    std::string gameName;
-};
 
 class AppParser : public XmlParser {
 public:
     AppParser();
     ~AppParser() override;
     static AppParser &GetInstance();
-    bool IsGameApp(const std::string &bundleName) const;
+    bool IsLowLatencyApp(const std::string &bundleName) const;
     bool IsWhiteListApp(const std::string &bundleName) const;
     bool IsBlackListApp(const std::string &bundleName) const;
     bool IsChariotApp(const std::string &bundleName) const;
 
 private:
-    void InitAppParser();
+    bool InitAppParser(const char *appXmlFilePath);
     bool ParseInternal(xmlNodePtr node) override;
-    void ParserAppList(const xmlNodePtr &innode);
-    GameAppInfo ParseGameAppInfo(const xmlNodePtr &innode);
+    void ParseAppList(const xmlNodePtr &innode);
+    LowLatencyAppInfo ParseLowLatencyAppInfo(const xmlNodePtr &innode);
     WhiteListAppInfo ParseWhiteAppInfo(const xmlNodePtr &innode);
     BlackListAppInfo ParseBlackAppInfo(const xmlNodePtr &innode);
     ChariotAppInfo ParseChariotAppInfo(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
 
 private:
-    std::vector<GameAppInfo> m_gameAppVec {};
+    std::vector<LowLatencyAppInfo> m_lowLatencyAppVec {};
     std::vector<WhiteListAppInfo> m_whiteAppVec {};
     std::vector<BlackListAppInfo> m_blackAppVec {};
     std::vector<ChariotAppInfo> m_chariotAppVec {};

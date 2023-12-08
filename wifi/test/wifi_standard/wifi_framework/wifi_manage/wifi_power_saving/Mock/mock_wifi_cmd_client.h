@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,32 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_POWER_CMD_CLIENT_H
-#define OHOS_WIFI_POWER_CMD_CLIENT_H
+#ifndef OHOS_MOCK_WIFI_CMD_CLIENT_H
+#define OHOS_MOCK_WIFI_CMD_CLIENT_H
 
+#include <gmock/gmock.h>
 #include <cstdint>
 #include <string>
 
 namespace OHOS {
 namespace Wifi {
-const int CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH = 125;
-
-struct WifiPrivCmd {
-    uint8_t *buf;
-    uint32_t size;
-    uint32_t len;
+class MockWifiPowerCmdClient {
+public:
+    virtual ~MockWifiPowerCmdClient() = default;
+    virtual int SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const = 0;
 };
 
 class WifiPowerCmdClient {
 public:
-    static WifiPowerCmdClient &GetInstance();
-    int SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const;
-
-private:
-    int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm) const;
-    int SetRxListen(const std::string &ifName, const std::string &param) const;
+    static WifiPowerCmdClient &GetInstance(void);
+    MOCK_CONST_METHOD3(SendCmdToDriver, int(const std::string &ifName, int commandId, const std::string &param));
 };
 } // namespace Wifi
 } // namespace OHOS
-
-#endif /* OHOS_WIFI_POWER_CMD_CLIENT_H */
+#endif

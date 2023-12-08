@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "context.h"
+#include "client.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -27,7 +28,10 @@ public:
     static void TearDownTestCase()
     {}
     virtual void SetUp()
-    {}
+    {
+        char sockPath[] = "/temp/service/el1/public/wifi/unix_sock.sock";
+        pRpcClient = CreateRpcClient(sockPath);
+    }
     virtual void TearDown()
     {
         if (ctx != nullptr) {
@@ -39,6 +43,7 @@ public:
 public:
     Context *ctx;
     Context *test = NULL;
+    RpcClient *pRpcClient = NULL;
 };
 }  // namespace Wifi
 }  // namespace OHOS

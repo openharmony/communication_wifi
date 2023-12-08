@@ -107,7 +107,8 @@
                 "bounds_checking_function",
                 "wpa_supplicant",
                 "jsoncpp",
-                "libxml2"
+                "libxml2",
+                "curl"
             ]
         },
         "build": {

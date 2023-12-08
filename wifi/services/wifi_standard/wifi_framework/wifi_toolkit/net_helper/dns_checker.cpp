@@ -18,6 +18,7 @@
 #include <chrono>
 #include <poll.h>
 #include <net/if_arp.h>
+#include <net/if.h>
 #include <unistd.h>
 
 #include "securec.h"
@@ -77,6 +78,17 @@ void DnsChecker::Start(std::string priDns, std::string secondDns)
     if (dnsSocket < 0) {
         LOGE("DnsChecker:socket error : %{public}d", errno);
         dnsSocket = 0;
+        return;
+    }
+    struct ifreq ifaceReq;
+    if (strncpy_s(ifaceReq.ifr_name, sizeof(ifaceReq.ifr_name), "wlan0", strlen("wlan0")) != EOK) {
+        LOGE("DnsChecker copy ifaceReq failed.");
+        close(dnsSocket);
+        return;
+    }
+    if (setsockopt(dnsSocket, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifaceReq, sizeof(ifaceReq)) == -1) {
+        LOGE("DnsChecker start wlan0 SO_BINDTODEVICE error:%{public}d.", errno);
+        close(dnsSocket);
         return;
     }
     socketCreated = true;

@@ -112,7 +112,10 @@ if (defined(ohos_lite)) {
       "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include",
     ]
 
-    deps = [ "//third_party/libxml2:xml2" ]
+    deps = [
+      "//third_party/curl:curl",
+      "//third_party/libxml2:xml2",
+    ]
 
     defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",

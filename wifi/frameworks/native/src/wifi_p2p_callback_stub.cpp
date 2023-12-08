@@ -74,7 +74,6 @@ int WifiP2pCallbackStub::OnRemoteRequest(
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
-        reply.WriteInt32(0);
     } else {
         (this->*(iter->second))(code, data, reply);
     }
@@ -185,14 +184,12 @@ void WifiP2pCallbackStub::RemoteOnP2pStateChanged(uint32_t code, MessageParcel &
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int state = data.ReadInt32();
     OnP2pStateChanged(state);
-    reply.WriteInt32(0);
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pPersistentGroupsChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     OnP2pPersistentGroupsChanged();
-    reply.WriteInt32(0);
 }
 
 void WifiP2pCallbackStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &device)
@@ -220,7 +217,6 @@ void WifiP2pCallbackStub::RemoteOnP2pThisDeviceChanged(uint32_t code, MessagePar
     WifiP2pDevice config;
     ReadWifiP2pDeviceData(data, config);
     OnP2pThisDeviceChanged(config);
-    reply.WriteInt32(0);
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -231,7 +227,6 @@ void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &
     int size = data.ReadInt32();
     if (size > MAX_DEVICE_SIZE) {
         WIFI_LOGE("Peers change list size error: %{public}d", size);
-        reply.WriteInt32(0);
         return;
     }
     for (int i = 0; i < size; ++i) {
@@ -240,7 +235,6 @@ void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &
         device.emplace_back(config);
     }
     OnP2pPeersChanged(device);
-    reply.WriteInt32(0);
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -252,7 +246,6 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
     int size = data.ReadInt32();
     if (size > MAX_SIZE) {
         WIFI_LOGE("Service change size error: %{public}d", size);
-        reply.WriteInt32(0);
         return;
     }
     for (int i = 0; i < size; ++i) {
@@ -273,7 +266,6 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         srvInfo.emplace_back(info);
     }
     OnP2pServicesChanged(srvInfo);
-    reply.WriteInt32(0);
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pConnectionChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -286,7 +278,6 @@ void WifiP2pCallbackStub::RemoteOnP2pConnectionChanged(uint32_t code, MessagePar
     readStr = data.ReadCString();
     info.SetIsGroupOwnerAddress((readStr != nullptr) ? readStr : "");
     OnP2pConnectionChanged(info);
-    reply.WriteInt32(0);
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pDiscoveryChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -294,7 +285,6 @@ void WifiP2pCallbackStub::RemoteOnP2pDiscoveryChanged(uint32_t code, MessageParc
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool isChange = data.ReadBool();
     OnP2pDiscoveryChanged(isChange);
-    reply.WriteInt32(0);
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pActionResult(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -303,7 +293,6 @@ void WifiP2pCallbackStub::RemoteOnP2pActionResult(uint32_t code, MessageParcel &
     P2pActionCallback action = static_cast<P2pActionCallback>(data.ReadInt32());
     ErrCode errCode = static_cast<ErrCode>(data.ReadInt32());
     OnP2pActionResult(action, errCode);
-    reply.WriteInt32(0);
 }
 
 void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -314,31 +303,26 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
     int cfgLen = data.ReadInt32();
     if (cfgLen <= 0) {
         WIFI_LOGE("Config change size error: %{public}d", cfgLen);
-        reply.WriteInt32(static_cast<int>(WIFI_OPT_INVALID_PARAM));
         return;
     }
 
     const char *dataBuffer = (const char *)data.ReadBuffer(cfgLen);
     if (dataBuffer == nullptr) {
         WIFI_LOGE("read buffer error!");
-        reply.WriteInt32(static_cast<int>(WIFI_OPT_FAILED));
         return;
     }
 
     char* cfgData = new (std::nothrow) char[cfgLen];
     if (cfgData == nullptr) {
         WIFI_LOGE("new buffer error!");
-        reply.WriteInt32(static_cast<int>(WIFI_OPT_FAILED));
         return;
     }
     if (memcpy_s(cfgData, cfgLen, dataBuffer, cfgLen) != EOK) {
         WIFI_LOGE("memcpy_s failed!");
-        reply.WriteInt32(static_cast<int>(WIFI_OPT_FAILED));
         return;
     }
     OnConfigChanged(cfgType, cfgData, cfgLen);
     delete[] cfgData;
-    reply.WriteInt32(0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

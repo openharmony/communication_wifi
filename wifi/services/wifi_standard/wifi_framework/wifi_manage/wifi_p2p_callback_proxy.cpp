@@ -32,7 +32,7 @@ WifiP2pCallbackProxy::~WifiP2pCallbackProxy()
 void WifiP2pCallbackProxy::OnP2pStateChanged(int state)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pStateChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -48,17 +48,13 @@ void WifiP2pCallbackProxy::OnP2pStateChanged(int state)
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_STATE_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p state change failed!");
-    }
     return;
 }
 
 void WifiP2pCallbackProxy::OnP2pPersistentGroupsChanged(void)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pPersistentGroupsChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -72,10 +68,6 @@ void WifiP2pCallbackProxy::OnP2pPersistentGroupsChanged(void)
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE), error);
         return;
-    }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p persistent group change failed!");
     }
     return;
 }
@@ -100,7 +92,7 @@ void WifiP2pCallbackProxy::WriteWifiP2pDeviceData(MessageParcel &data, const Wif
 void WifiP2pCallbackProxy::OnP2pThisDeviceChanged(const WifiP2pDevice &device)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pThisDeviceChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -116,17 +108,13 @@ void WifiP2pCallbackProxy::OnP2pThisDeviceChanged(const WifiP2pDevice &device)
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_THIS_DEVICE_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p this device change failed!");
-    }
     return;
 }
 
 void WifiP2pCallbackProxy::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &devices)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pPeersChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -146,17 +134,13 @@ void WifiP2pCallbackProxy::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &d
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PEER_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p peers change failed!");
-    }
     return;
 }
 
 void WifiP2pCallbackProxy::OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo> &srvInfo)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pServicesChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -183,17 +167,13 @@ void WifiP2pCallbackProxy::OnP2pServicesChanged(const std::vector<WifiP2pService
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_SERVICE_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p service change failed!");
-    }
     return;
 }
 
 void WifiP2pCallbackProxy::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pConnectionChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -211,17 +191,13 @@ void WifiP2pCallbackProxy::OnP2pConnectionChanged(const WifiP2pLinkedInfo &info)
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CONNECT_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p connection change failed!");
-    }
     return;
 }
 
 void WifiP2pCallbackProxy::OnP2pDiscoveryChanged(bool isChange)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pDiscoveryChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -237,17 +213,13 @@ void WifiP2pCallbackProxy::OnP2pDiscoveryChanged(bool isChange)
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_DISCOVERY_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p discover change failed!");
-    }
     return;
 }
 
 void WifiP2pCallbackProxy::OnP2pActionResult(P2pActionCallback action, ErrCode code)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnP2pActionResult");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -264,17 +236,13 @@ void WifiP2pCallbackProxy::OnP2pActionResult(P2pActionCallback action, ErrCode c
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_ACTION_RESULT), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p action callback result failed!");
-    }
     return;
 }
 
 void WifiP2pCallbackProxy::OnConfigChanged(CfgType type, char* cfgData, int dataLen)
 {
     WIFI_LOGD("WifiP2pCallbackProxy::OnConfigChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -291,10 +259,6 @@ void WifiP2pCallbackProxy::OnConfigChanged(CfgType type, char* cfgData, int data
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CFG_CHANGE), error);
         return;
-    }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGI("notify wifi p2p action callback result failed!");
     }
     return;
 }

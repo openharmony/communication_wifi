@@ -87,6 +87,10 @@ bool AppParser::IsChariotApp(const std::string &bundleName) const
 
 bool AppParser::InitAppParser(const char *appXmlFilePath)
 {
+    if (appXmlFilePath == nullptr) {
+        WIFI_LOGE("%{public}s appXmlFilePath is null", __FUNCTION__);
+        return false;
+    }
     if (!std::filesystem::exists(appXmlFilePath)) {
         WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlFilePath);
         return false;

@@ -23,6 +23,7 @@ config("module_private_config") {
 ohos_unittest("wifi_power_saving_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_common/Mock/mock_wifi_cmd_client.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_power_saving/rx_listen/wifi_rx_listen_arbitration.cpp",
     "global_test.cpp",
     "rx_listen/wifi_rx_listen_arbitration_test.cpp",
@@ -31,6 +32,7 @@ ohos_unittest("wifi_power_saving_unittest") {
   include_dirs = [
     "./",
     "./Mock",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_common/Mock",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_power_saving/rx_listen",
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",

@@ -15,7 +15,7 @@
 
 #include "wifi_rx_listen_arbitration.h"
 #include "wifi_logger.h"
-#include "wifi_power_cmd_client.h"
+#include "wifi_cmd_client.h"
 #include "wifi_app_parser.h"
 
 namespace OHOS {
@@ -67,7 +67,7 @@ void RxListenArbitration::CheckRxListenSwitch()
     std::string ifName = "wlan0";
     if ((m_arbitrationCond == 0) && !m_isRxListenOn) {
         param = ENABLE_RX_LISTEN;
-        if (WifiPowerCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
+        if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
             param) != 0) {
             WIFI_LOGE("%{public}s enable rx_listen fail", __FUNCTION__);
             return;
@@ -76,7 +76,7 @@ void RxListenArbitration::CheckRxListenSwitch()
         WIFI_LOGD("%{public}s enable rx_listen successful", __FUNCTION__);
     } else if ((m_arbitrationCond != 0) && m_isRxListenOn) {
         param = DISABLE_RX_LISTEN;
-        if (WifiPowerCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
+        if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,
             param) != 0) {
             WIFI_LOGE("%{public}s disable rx_listen fail", __FUNCTION__);
             return;

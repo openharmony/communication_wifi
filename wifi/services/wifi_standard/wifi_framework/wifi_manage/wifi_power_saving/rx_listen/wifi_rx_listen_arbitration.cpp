@@ -48,7 +48,7 @@ void RxListenArbitration::OnForegroundAppChanged(const AppExecFwk::AppStateData 
 {
     if (appStateData.state == static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND) &&
         appStateData.isFocused) {
-        WIFI_LOGD("%{public}s enter rx_listen arbitration, appName: %{public}s", __FUNCTION__,
+        WIFI_LOGD("%{public}s enter rx_listen arbitration, app name: %{public}s", __FUNCTION__,
             appStateData.bundleName.c_str());
         if (AppParser::GetInstance().IsLowLatencyApp(appStateData.bundleName)) {
             // game scene: set m_arbitrationCond to zero to enable rx_listen

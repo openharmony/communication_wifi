@@ -61,8 +61,6 @@
             "wifi_feature_sta_ap_exclusion",
             "wifi_feature_with_random_mac_addr",
             "wifi_feature_with_hdi_wpa_supported",
-            "wifi_feature_with_hpf_supported",
-            "wifi_feature_with_rx_listen_supported",
 	    "wifi_feature_with_scan_control"
         ],
         "adapted_system_type": [

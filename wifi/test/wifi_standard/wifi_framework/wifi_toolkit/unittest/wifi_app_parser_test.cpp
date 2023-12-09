@@ -46,16 +46,16 @@ private:
     {
         root_node = xmlNewNode(NULL, BAD_CAST("MonitorAPP"));
 
-        xmlNodePtr gameAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("GameInfo"));
+        xmlNodePtr gameAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("GameInfo"), NULL);
         xmlNewProp(gameAppNode, BAD_CAST("gameName"), BAD_CAST "gameApp");
 
-        xmlNodePtr whileListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("AppWhiteList"));
+        xmlNodePtr whileListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("AppWhiteList"), NULL);
         xmlNewProp(whileListAppNode, BAD_CAST("packageName"), BAD_CAST "whiteListApp");
 
-        xmlNodePtr blackListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("AppBlackList"));
+        xmlNodePtr blackListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("AppBlackList"), NULL);
         xmlNewProp(blackListAppNode, BAD_CAST("packageName"), BAD_CAST "blackListApp");
 
-        xmlNodePtr chariotAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("ChariotApp"));
+        xmlNodePtr chariotAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("ChariotApp"), NULL);
         xmlNewProp(chariotAppNode, BAD_CAST("packageName"), BAD_CAST "chariotApp");
     }
 

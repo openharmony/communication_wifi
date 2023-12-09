@@ -206,6 +206,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.chload = 0;
     linkedInfo.snr = 0;
     linkedInfo.isDataRestricted = 0;
+    linkedInfo.platformType = "";
     linkedInfo.portalUrl = "";
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
     linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
@@ -234,6 +235,7 @@ void StaStateMachine::InitLastWifiLinkedInfo()
     lastLinkedInfo.chload = 0;
     lastLinkedInfo.snr = 0;
     linkedInfo.isDataRestricted = 0;
+    linkedInfo.platformType = "";
     linkedInfo.portalUrl = "";
     lastLinkedInfo.lastPacketDirection = 0;
     lastLinkedInfo.lastRxPackets = 0;
@@ -2594,6 +2596,7 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
             linkedInfo.chload = lastLinkedInfo.chload;
             linkedInfo.snr = lastLinkedInfo.snr;
             linkedInfo.isDataRestricted = lastLinkedInfo.isDataRestricted;
+            linkedInfo.platformType = lastLinkedInfo.platformType;
             linkedInfo.portalUrl = lastLinkedInfo.portalUrl;
             linkedInfo.detailedState = lastLinkedInfo.detailedState;
         } else if (networkId != INVALID_NETWORK_ID) {
@@ -2775,8 +2778,15 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
             WifiSettings::GetInstance().SaveIpInfo(ipInfo);
 
             pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
+            /* If not phone hotspot, set .isDataResticted = 0. */
             std::string strVendor = result->strOptVendor;
-            pStaStateMachine->linkedInfo.isDataRestricted = (strVendor.find("ANDROID_METERED") == std::string::npos) ? 0 : 1;
+            pStaStateMachine->linkedInfo.isDataRestricted = 
+                (strVendor.find("ANDROID_METERED") == std::string::npos && 
+                strVendor.find("hostname") == std::string::npos && 
+                strVendor.find("OPEN_HARMONY") == std::string::npos) ? 0 : 1;
+            pStaStateMachine->linkedInfo.platformType = strVendor;
+            WIFI_LOGI("WifiLinkedInfo.isDataRestricted = %{public}d, WifiLinkedInfo.platformType = %{public}s",
+                pStaStateMachine->linkedInfo.isDataRestricted, pStaStateMachine->linkedInfo.platformType.c_str());
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo);
 #ifndef OHOS_ARCH_LITE
             LOGI("TryToSaveIpV4Result Update NetLink info, strYourCli=%{private}s, strSubnet=%{private}s, \

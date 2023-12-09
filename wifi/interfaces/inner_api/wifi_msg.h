@@ -176,6 +176,7 @@ struct WifiLinkedInfo {
     int chload;
     int snr;                         /* Signal-to-Noise Ratio */
     int isDataRestricted;
+    std::string platformType;
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */

@@ -47,16 +47,16 @@ private:
         root_node = xmlNewNode(NULL, BAD_CAST("MonitorAPP"));
 
         xmlNodePtr gameAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("GameInfo"));
-        xmlNewProp(gameAppNode, BAD_CAST("gameName"), BAD_CAST "com.huawei.gameApp");
+        xmlNewProp(gameAppNode, BAD_CAST("gameName"), BAD_CAST "gameApp");
 
         xmlNodePtr whileListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("AppWhiteList"));
-        xmlNewProp(whileListAppNode, BAD_CAST("packageName"), BAD_CAST "com.huawei.whiteListApp");
+        xmlNewProp(whileListAppNode, BAD_CAST("packageName"), BAD_CAST "whiteListApp");
 
         xmlNodePtr blackListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("AppBlackList"));
-        xmlNewProp(blackListAppNode, BAD_CAST("packageName"), BAD_CAST "com.huawei.blackListApp");
+        xmlNewProp(blackListAppNode, BAD_CAST("packageName"), BAD_CAST "blackListApp");
 
         xmlNodePtr chariotAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("ChariotApp"));
-        xmlNewProp(chariotAppNode, BAD_CAST("packageName"), BAD_CAST "com.huawei.chariotApp");
+        xmlNewProp(chariotAppNode, BAD_CAST("packageName"), BAD_CAST "chariotApp");
     }
 
 private:
@@ -106,56 +106,56 @@ HWTEST_F(AppParserTest, ParseAppList_Success, TestSize.Level1)
 HWTEST_F(AppParserTest, IsLowLatencyApp_True, TestSize.Level1)
 {
     WIFI_LOGI("IsLowLatencyApp_True enter");
-    std::string appName = "com.huawei.gameApp";
+    std::string appName = "gameApp";
     EXPECT_TRUE(m_appXmlParser->IsLowLatencyApp(appName));
 }
 
 HWTEST_F(AppParserTest, IsLowLatencyApp_False, TestSize.Level1)
 {
     WIFI_LOGI("IsLowLatencyApp_False enter");
-    std::string appName = "com.huawei.other";
+    std::string appName = "other";
     EXPECT_FALSE(m_appXmlParser->IsLowLatencyApp(appName));
 }
 
 HWTEST_F(AppParserTest, IsWhiteListApp_True, TestSize.Level1)
 {
     WIFI_LOGI("IsWhiteListApp_True enter");
-    std::string appName = "com.huawei.whiteListApp";
+    std::string appName = "whiteListApp";
     EXPECT_TRUE(m_appXmlParser->IsWhiteListApp(appName));
 }
 
 HWTEST_F(AppParserTest, IsWhiteListApp_False, TestSize.Level1)
 {
     WIFI_LOGI("IsWhiteListApp_False enter");
-    std::string appName = "com.huawei.other";
+    std::string appName = "other";
     EXPECT_FALSE(m_appXmlParser->IsWhiteListApp(appName));
 }
 
 HWTEST_F(AppParserTest, IsBlackListApp_True, TestSize.Level1)
 {
     WIFI_LOGI("IsBlackListApp_True enter");
-    std::string appName = "com.huawei.blackListApp";
+    std::string appName = "blackListApp";
     EXPECT_TRUE(m_appXmlParser->IsBlackListApp(appName));
 }
 
 HWTEST_F(AppParserTest, IsBlackListApp_False, TestSize.Level1)
 {
     WIFI_LOGI("IsBlackListApp_False enter");
-    std::string appName = "com.huawei.other";
+    std::string appName = "other";
     EXPECT_FALSE(m_appXmlParser->IsBlackListApp(appName));
 }
 
 HWTEST_F(AppParserTest, IsChariotApp_True, TestSize.Level1)
 {
     WIFI_LOGI("IsChariotApp_True enter");
-    std::string appName = "com.huawei.chariotApp";
+    std::string appName = "chariotApp";
     EXPECT_TRUE(m_appXmlParser->IsChariotApp(appName));
 }
 
 HWTEST_F(AppParserTest, IsChariotApp_False, TestSize.Level1)
 {
     WIFI_LOGI("IsChariotApp_False enter");
-    std::string appName = "com.huawei.other";
+    std::string appName = "other";
     EXPECT_FALSE(m_appXmlParser->IsChariotApp(appName));
 }
 } // namespace Wifi

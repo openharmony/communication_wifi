@@ -57,8 +57,8 @@ HWTEST_F(RxListenArbitrationTest, OnForegroundAppChanged_DisableRxListen, TestSi
     appState.bundleName = "com.huawei.gameApp";
     appState.state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
     appState.isFocused = true;
-    pRxListenArbitration.m_arbitrationCond = 0x00;
-    pRxListenArbitration.m_isRxListenOn = true;
+    pRxListenArbitration->m_arbitrationCond = 0x00;
+    pRxListenArbitration->m_isRxListenOn = true;
     EXPECT_CALL(WifiPowerCmdClient::GetInstance(), SendCmdToDriver(_, _, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(AppParser::GetInstance(), GetInstance(appState.bundleName)).WillOnce(Return(true));
     pRxListenArbitration->OnForegroundAppChanged(appState);
@@ -72,8 +72,8 @@ HWTEST_F(RxListenArbitrationTest, OnForegroundAppChanged_EnableRxListen, TestSiz
     appState.bundleName = "com.huawei.otherApp";
     appState.state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
     appState.isFocused = true;
-    pRxListenArbitration.m_arbitrationCond = 0x01;
-    pRxListenArbitration.m_isRxListenOn = false;
+    pRxListenArbitration->m_arbitrationCond = 0x01;
+    pRxListenArbitration->m_isRxListenOn = false;
     EXPECT_CALL(WifiPowerCmdClient::GetInstance(), SendCmdToDriver(_, _, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(AppParser::GetInstance(), GetInstance(appState.bundleName)).WillOnce(Return(false));
     pRxListenArbitration->OnForegroundAppChanged(appState);

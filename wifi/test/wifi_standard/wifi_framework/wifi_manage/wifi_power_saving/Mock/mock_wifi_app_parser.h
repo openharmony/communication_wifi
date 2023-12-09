@@ -16,6 +16,7 @@
 #define OHOS_MOCK_WIFI_APP_PARSER_H
 
 #include <gmock/gmock.h>
+#include <string>
 
 namespace OHOS {
 namespace Wifi {
@@ -25,11 +26,11 @@ public:
     virtual int IsLowLatencyApp() const = 0;
 };
 
-class AppParser() : public MockAppParser {
+class AppParser : public MockAppParser {
     public:
     static WifiSettings &GetInstance(void);
-    MOCK_CONST_METHOD1(IsLowLatencyApp, bool(const std::string &bundleName))
-}
+    MOCK_CONST_METHOD1(IsLowLatencyApp, bool(const std::string &bundleName));
+};
 } // namespace Wifi
 } // namespace OHOS
 

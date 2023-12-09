@@ -14,12 +14,15 @@
  */
 
 #include "wifi_app_parser.h"
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <memory>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include "wifi_logger.h"
 
+using ::testing::Eq;
+using ::testing::TypedEq;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
@@ -28,33 +31,32 @@ DEFINE_WIFILOG_LABEL("WifiAppParserTest");
 
 class AppParserTest : public testing::Test {
 public:
-    static void SetUpTestCase() {
-        m_appXmlParser->ParseAppList(root_node);
-    }
+    static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
         m_appXmlParser = std::make_unique<AppParser>();
         InitAppParserTest();
+        m_appXmlParser->ParseAppList(root_node);
     }
     virtual void TearDown() {}
 
 private:
     void InitAppParserTest()
     {
-        root_node = xmlNewNode(NULL, BAD_CAST(XML_TAG_SECTION_HEADER_MONITOR_APP));
+        root_node = xmlNewNode(NULL, BAD_CAST("MonitorAPP"));
 
-        gameAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST(XML_TAG_SECTION_HEADER_GAME_INFO));
-        xmlNewProp(gameAppNode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME), BAD_CAST "com.huawei.gameApp");
+        xmlNodePtr gameAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("GameInfo"));
+        xmlNewProp(gameAppNode, BAD_CAST("gameName"), BAD_CAST "com.huawei.gameApp");
 
-        whileListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST(XML_TAG_SECTION_HEADER_APP_WHITE_LIST));
-        xmlNewProp(whileListAppNode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME), BAD_CAST "com.huawei.whiteListApp");
+        xmlNodePtr whileListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("AppWhiteList"));
+        xmlNewProp(whileListAppNode, BAD_CAST("packageName"), BAD_CAST "com.huawei.whiteListApp");
 
-        blackListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST(XML_TAG_SECTION_HEADER_APP_BLACK_LIST));
-        xmlNewProp(blackListAppNode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME), BAD_CAST "com.huawei.blackListApp");
+        xmlNodePtr blackListAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("AppBlackList"));
+        xmlNewProp(blackListAppNode, BAD_CAST("packageName"), BAD_CAST "com.huawei.blackListApp");
 
-        chariotAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST(XML_TAG_SECTION_HEADER_CHARIOT_APP));
-        xmlNewProp(chariotAppNode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME), BAD_CAST "com.huawei.chariotApp");
+        xmlNodePtr chariotAppNode = xmlNewTextChild(root_node, NULL, BAD_CAST("ChariotApp"));
+        xmlNewProp(chariotAppNode, BAD_CAST("packageName"), BAD_CAST "com.huawei.chariotApp");
     }
 
 private:
@@ -65,7 +67,7 @@ private:
 HWTEST_F(AppParserTest, InitAppParser, TestSize.Level1)
 {
     WIFI_LOGI("InitAppParser enter");
-    EXPECT_FALSE(m_appXmlParser->InitAppParser(nullptr));
+    EXPECT_FALSE(m_appXmlParser->InitAppParser("nothing.xml"));
 }
 
 HWTEST_F(AppParserTest, ParseInternal_Fail, TestSize.Level1)

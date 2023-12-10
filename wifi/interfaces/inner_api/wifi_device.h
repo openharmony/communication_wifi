@@ -192,6 +192,14 @@ public:
     virtual ErrCode IsWifiActive(bool &bActive) = 0;
 
     /**
+     * @Description Check whether Wi-Fi is metered hotspot.
+     *
+     * @param bMeteredHotspot - isMeteredHotspot / notMeteredHotspot
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsMeteredHotspot(bool &bMeteredHotspot) = 0;
+
+    /**
      * @Description Get the Wi-Fi State.
      *
      * @param state - return current wifi state

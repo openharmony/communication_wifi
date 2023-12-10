@@ -57,7 +57,7 @@ void ApStateMachine::Init()
     StatePlus(&m_ApIdleState, &m_ApRootState);
     StatePlus(&m_ApStartedState, &m_ApRootState);
     SetFirstState(&m_ApIdleState);
-    m_iface = std::string(AP_INTF) + std::to_string(m_id);
+    m_iface = WifiSettings::GetInstance().GetApIfaceName();
     StartStateMachine();
 }
 
@@ -114,11 +114,12 @@ bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t
 #ifndef WIFI_DHCP_DISABLED
     Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-    if (!m_DhcpdInterface.StartDhcpServerFromInterface(IN_INTERFACE, ipv4, ipv6, ipAddress, true, leaseTime)) {
+    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    if (!m_DhcpdInterface.StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, true, leaseTime)) {
         WIFI_LOGE("start dhcpd fail.");
         return false;
     }
-    WifiNetAgent::GetInstance().AddRoute(IN_INTERFACE, ipAddress, ipv4.GetAddressPrefixLength());
+    WifiNetAgent::GetInstance().AddRoute(ifaceName, ipAddress, ipv4.GetAddressPrefixLength());
     WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
 #else
@@ -130,7 +131,8 @@ bool ApStateMachine::StopDhcpServer()
 {
 #ifndef WIFI_DHCP_DISABLED
     WIFI_LOGI("Enter:StopDhcpServer");
-    if (!m_DhcpdInterface.StopDhcpServer(IN_INTERFACE)) {
+    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    if (!m_DhcpdInterface.StopDhcpServer(ifaceName)) {
         WIFI_LOGE("Close dhcpd fail.");
         return false;
     }
@@ -143,7 +145,8 @@ bool ApStateMachine::StopDhcpServer()
 bool ApStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo> &result)
 {
 #ifndef WIFI_DHCP_DISABLED
-    return m_DhcpdInterface.GetConnectedStationInfo(IN_INTERFACE, result);
+    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    return m_DhcpdInterface.GetConnectedStationInfo(ifaceName, result);
 #else
     return true;
 #endif

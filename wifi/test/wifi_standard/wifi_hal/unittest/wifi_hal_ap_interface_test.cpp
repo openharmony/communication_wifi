@@ -24,6 +24,8 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+const std::string IFACENAME = "wlan0";
+
 void WifiHalApInterfaceTest::SetUpTestCase()
 {
     MockInitApSupportedCmd();
@@ -118,8 +120,11 @@ HWTEST_F(WifiHalApInterfaceTest, StopSoftApTest, TestSize.Level1)
 
 HWTEST_F(WifiHalApInterfaceTest, StartSoftApTest, TestSize.Level1)
 {
-    EXPECT_TRUE(StartSoftAp(-1) == WIFI_HAL_HOSTAPD_NOT_INIT);
-    EXPECT_TRUE(StartSoftAp(0) == WIFI_HAL_SUCCESS);
+    char ifName[IFACENAME.size() + 1];
+    IFACENAME.copy(ifName, IFACENAME.size() + 1);
+    ifName[IFACENAME.size()] = '\0';
+    EXPECT_TRUE(StartSoftAp(-1, ifName) == WIFI_HAL_HOSTAPD_NOT_INIT);
+    EXPECT_TRUE(StartSoftAp(0, ifName) == WIFI_HAL_SUCCESS);
 }
 
 HWTEST_F(WifiHalApInterfaceTest, StartHostapdHalTest, TestSize.Level1)

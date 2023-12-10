@@ -387,6 +387,7 @@ private:
     void RegisterSettingsMigrateEvent();
     void UnRegisterSettingsMigrateEvent();
     void GetMdmProp();
+    void GetChipProp();
     void RegisterMdmPropListener();
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);
     uint32_t migrateTimerId{0};

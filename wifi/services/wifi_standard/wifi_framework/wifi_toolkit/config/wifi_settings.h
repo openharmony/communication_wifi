@@ -129,6 +129,10 @@ public:
     bool GetSoftapToggledState() const;
     void SetWifiStopState(bool state);
     bool GetWifiStopState() const;
+    void SetCoexSupport(bool isSupport);
+    bool GetCoexSupport() const;
+    void SetApIfaceName(const std::string &ifaceName);
+    std::string GetApIfaceName() const;
 #endif
 
     /**
@@ -1604,6 +1608,8 @@ private:
     bool mWifiToggled;
     bool mWifiStoping;
     bool mSoftapToggled;
+    bool mIsSupportCoex;
+    std::string mApIfaceName;
 #endif
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;

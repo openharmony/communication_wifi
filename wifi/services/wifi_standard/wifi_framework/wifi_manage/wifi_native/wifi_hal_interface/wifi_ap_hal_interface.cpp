@@ -42,10 +42,10 @@ WifiApHalInterface &WifiApHalInterface::GetInstance(void)
     return inst;
 }
 
-WifiErrorNo WifiApHalInterface::StartAp(int id)
+WifiErrorNo WifiApHalInterface::StartAp(int id, std::string ifaceName)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->StartAp(id);
+    return mIdlClient->StartAp(id, ifaceName);
 }
 
 WifiErrorNo WifiApHalInterface::StopAp(int id)

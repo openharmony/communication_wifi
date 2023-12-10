@@ -45,7 +45,7 @@ IWifiApEventCallback *GetWifiApEventCallback(int id);
  * @return WifiErrorNo
  * @param id - ap id
  */
-WifiErrorNo StartSoftAp(int id);
+WifiErrorNo StartSoftAp(int id, char *ifaceName);
 
 /**
  * @Description Close Ap.

@@ -86,7 +86,7 @@ void ApMonitor::StartMonitor()
     };
     WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 
-    std::string iface = std::string(AP_INTF) + std::to_string(m_id);
+    std::string iface = WifiSettings::GetInstance().GetApIfaceName();
     m_selectIfacName = iface;
     m_setMonitorIface.insert(iface);
 }

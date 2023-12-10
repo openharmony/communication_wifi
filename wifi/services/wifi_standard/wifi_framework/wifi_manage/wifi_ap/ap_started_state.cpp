@@ -199,7 +199,8 @@ bool ApStartedState::SetConfig()
 bool ApStartedState::StartAp() const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    WifiErrorNo retCode = WifiApHalInterface::GetInstance().StartAp(m_id);
+    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    WifiErrorNo retCode = WifiApHalInterface::GetInstance().StartAp(m_id, ifaceName);
     if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("startAp is failed!");
         return false;
@@ -244,7 +245,8 @@ void ApStartedState::StopMonitor() const
 bool ApStartedState::EnableInterfaceNat() const
 {
 #ifdef SUPPORT_NAT
-    if (!mApNatManager.EnableInterfaceNat(true, IN_INTERFACE, OUT_INTERFACE)) {
+    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    if (!mApNatManager.EnableInterfaceNat(true, ifaceName, ifaceName)) {
         WIFI_LOGE("set nat failed.");
         return false;
     }
@@ -255,7 +257,8 @@ bool ApStartedState::EnableInterfaceNat() const
 bool ApStartedState::DisableInterfaceNat() const
 {
 #ifdef SUPPORT_NAT
-    if (!mApNatManager.EnableInterfaceNat(false, IN_INTERFACE, OUT_INTERFACE)) {
+    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    if (!mApNatManager.EnableInterfaceNat(false, ifaceName, ifaceName)) {
         WIFI_LOGE("remove NAT config failed.");
     }
 #endif

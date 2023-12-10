@@ -40,6 +40,10 @@
 #define CONFIG_DENY_MAC_FILE_NAME "deny_mac.conf"
 #define SLEEP_TIME_100_MS (100 * 1000)
 #define CONFIG_PATH_DIR CONFIG_ROOR_DIR"/wpa_supplicant"
+#define CTRL_LEN 128
+#define IFACENAME_LEN 6
+#define CFGNAME_LEN 30
+
 #if (AP_NUM > 1)
 #define WIFI_5G_CFG "hostapd_0.conf"
 #define WIFI_2G_CFG "hostapd_1.conf"
@@ -53,22 +57,67 @@ WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
     {AP_2G_MAIN_INSTANCE, NULL, WIFI_2G_CFG, HOSTAPD_2G_CFG, HOSTAPD_2G_UDPPORT},
 };
 #else
+#define AP_IFNAME "wlan0"
+#define AP_IFNAME_COEX "wlan1"
 #define WIFI_DEFAULT_CFG "hostapd.conf"
-#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
-#define HOSTAPD_DEFAULT_UDPPORT "127.0.0.1:9877"
+#define WIFI_COEX_CFG "hostapd_coex.conf"
 #define HOSTAPD_CTRL_INTERFACE CONFIG_ROOR_DIR"/sockets/wpa/wlan0"
+#define HOSTAPD_CTRL_INTERFACE_COEX CONFIG_ROOR_DIR"/sockets/wpa/wlan1"
+#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
+#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_COEX_CFG
+#define HOSTAPD_DEFAULT_UDPPORT "127.0.0.1:9877"
 #define AP_SET_CFG_DELAY 500000
 #define SOFTAP_MAX_BUFFER_SIZE 4096
 #define IFNAMSIZ 16
 
 // from OSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
-#define AP_IFNAME "wlan0"
 
 WifiHostapdHalDeviceInfo g_hostapdHalDevInfo[] = {
     {AP_2G_MAIN_INSTANCE, NULL, WIFI_DEFAULT_CFG, HOSTAPD_DEFAULT_CFG, HOSTAPD_DEFAULT_UDPPORT}
 };
+char g_ctrlInterfacel[CTRL_LEN] = {0};
+char g_hostapdCfg[CTRL_LEN] = {0};
+char g_apIfaceName[IFACENAME_LEN] = {0};
+char g_apCfgName[CFGNAME_LEN] = {0};
 #endif
 #define HOSTAPD_CFG_VALUE_ON 1
+
+void InitCfg(char *ifaceName)
+{
+    if (strncmp(ifaceName, AP_IFNAME_COEX, IFACENAME_LEN - 1) == 0) {
+        if (memcpy_s(g_apCfgName, CFGNAME_LEN, WIFI_COEX_CFG, sizeof(WIFI_COEX_CFG)) != EOK) {
+            LOGE("memcpy cfg fail");
+        }
+        if (memcpy_s(g_apIfaceName, IFACENAME_LEN, AP_IFNAME_COEX, sizeof(AP_IFNAME_COEX)) != EOK) {
+            LOGE("memcpy ap name fail");
+        }
+        if (memcpy_s(g_hostapdCfg, CTRL_LEN, HOSTAPD_DEFAULT_CFG_COEX,
+            sizeof(HOSTAPD_DEFAULT_CFG_COEX)) != EOK) {
+            LOGE("memcpy hostapd fail");
+        }
+        if (memcpy_s(g_ctrlInterfacel, CTRL_LEN, HOSTAPD_CTRL_INTERFACE_COEX,
+            sizeof(HOSTAPD_CTRL_INTERFACE_COEX)) != EOK) {
+            LOGE("memcpy ctrl fail");
+        }
+    } else {
+        if (memcpy_s(g_apCfgName, CFGNAME_LEN, WIFI_DEFAULT_CFG, sizeof(WIFI_DEFAULT_CFG)) != EOK) {
+            LOGE("memcpy cfg fail");
+        }
+        if (memcpy_s(g_apIfaceName, IFACENAME_LEN, AP_IFNAME, sizeof(AP_IFNAME)) != EOK) {
+            LOGE("memcpy ap name fail");
+        }
+        if (memcpy_s(g_hostapdCfg, CTRL_LEN, HOSTAPD_DEFAULT_CFG,
+            sizeof(HOSTAPD_DEFAULT_CFG)) != EOK) {
+            LOGE("memcpy hostapd fail");
+        }
+        if (memcpy_s(g_ctrlInterfacel, CTRL_LEN, HOSTAPD_CTRL_INTERFACE,
+            sizeof(HOSTAPD_CTRL_INTERFACE)) != EOK) {
+            LOGE("memcpy ctrl fail");
+        }
+    }
+    g_hostapdHalDevInfo[0].cfgName = g_apCfgName;
+    g_hostapdHalDevInfo[0].config = g_hostapdCfg;
+}
 
 WifiHostapdHalDeviceInfo *GetWifiCfg(int *len)
 {
@@ -232,7 +281,7 @@ void GetDestPort(char *destPort, size_t len, int id)
 
 void GetCtrlInterface(char *ctrl_path, size_t len, int id)
 {
-    if (strcpy_s(ctrl_path, len, HOSTAPD_CTRL_INTERFACE) != EOK) {
+    if (strcpy_s(ctrl_path, len, g_ctrlInterfacel) != EOK) {
         LOGW("failed to copy the ctrl_path");
     }
 }
@@ -560,7 +609,7 @@ static int SetCommandHwHisi(const char *iface, const char *fName, unsigned int b
         return -1;
     }
 
-    ret = strncpy_s(wrq.ifr_name, sizeof(wrq.ifr_name), iface, strlen(iface));
+    ret = strncpy_s(wrq.ifr_name, sizeof(wrq.ifr_name), g_apIfaceName, strlen(g_apIfaceName));
     if (ret != EOK) {
         LOGE("%{public}s strncpy_s wrq fail", __func__);
         return -1;
@@ -583,7 +632,7 @@ static int SetCommandHwHisi(const char *iface, const char *fName, unsigned int b
         return ret;
     }
     struct iw_priv_args *privPtr = (struct iw_priv_args *)wrq.u.data.pointer;
-    ret = strncpy_s(wrq.ifr_name, sizeof(wrq.ifr_name), iface, strlen(iface));
+    ret = strncpy_s(wrq.ifr_name, sizeof(wrq.ifr_name), g_apIfaceName, strlen(g_apIfaceName));
     if (ret != EOK) {
         LOGE("%{public}s strncpy_s wrq fail", __func__);
         close(sock);

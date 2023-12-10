@@ -23,6 +23,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr int LENTH = 5;
 constexpr int LENMAC = 17;
+const std::string IFACENAME = "wlan0";
 
 class IWifiIfaceTest : public testing::Test {
 public:
@@ -56,7 +57,10 @@ HWTEST_F(IWifiIfaceTest, GetTypeTest, TestSize.Level1)
 HWTEST_F(IWifiIfaceTest, StartSoftApTest, TestSize.Level1)
 {
     int id = 0;
-    StartSoftAp(id);
+    char ifName[IFACENAME.size() + 1];
+    IFACENAME.copy(ifName, IFACENAME.size() + 1);
+    ifName[IFACENAME.size()] = '\0';
+    StartSoftAp(id, ifName);
 }
 
 HWTEST_F(IWifiIfaceTest, StopSoftApTest, TestSize.Level1)

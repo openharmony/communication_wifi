@@ -47,7 +47,7 @@ IWifiApEventCallback *GetWifiApEventCallback(int id)
     return &g_wifiApEventCallback[id];
 }
 
-WifiErrorNo StartSoftAp(int id)
+WifiErrorNo StartSoftAp(int id, char *ifaceName)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);
@@ -55,6 +55,7 @@ WifiErrorNo StartSoftAp(int id)
     WriteBegin(context, 0);
     WriteFunc(context, "StartSoftAp");
     WriteInt(context, id);
+    WriteStr(context, ifaceName);
     WriteEnd(context);
 
     if (RpcClientCall(client, "StartSoftAp") != WIFI_IDL_OPT_OK) {

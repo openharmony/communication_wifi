@@ -33,7 +33,7 @@ extern "C" {
  * @param id - ap id
  * @return WifiErrorNo
  */
-WifiErrorNo StartSoftAp(int id);
+WifiErrorNo StartSoftAp(int id, char *ifaceName);
 
 /**
  * @Description Start Hostapd.
@@ -163,6 +163,8 @@ WifiErrorNo WEAK_FUNC WifiSetPowerModel(const int mode, int id);
  * @return WifiErrorNo
  */
 WifiErrorNo WEAK_FUNC WifiGetPowerModel(int* mode, int id);
+
+void InitCfg(char *ifaceName);
 #ifdef __cplusplus
 }
 #endif

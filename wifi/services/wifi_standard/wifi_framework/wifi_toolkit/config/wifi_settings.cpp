@@ -38,6 +38,8 @@
 
 namespace OHOS {
 namespace Wifi {
+const std::string DEFAULT_IFACENAME = "wlan0";
+
 WifiSettings &WifiSettings::GetInstance()
 {
     static WifiSettings gWifiSettings;
@@ -50,6 +52,8 @@ WifiSettings::WifiSettings()
       mWifiToggled(false),
       mWifiStoping(false),
       mSoftapToggled(false),
+      mIsSupportCoex(false),
+      mApIfaceName(DEFAULT_IFACENAME),
 #endif
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
@@ -415,6 +419,26 @@ void WifiSettings::SetWifiStopState(bool state)
 bool WifiSettings::GetWifiStopState() const
 {
     return mWifiStoping;
+}
+
+void WifiSettings::SetCoexSupport(bool isSupport)
+{
+    mIsSupportCoex = isSupport;
+}
+
+bool WifiSettings::GetCoexSupport() const
+{
+    return mIsSupportCoex;
+}
+
+void WifiSettings::SetApIfaceName(const std::string &ifaceName)
+{
+    mApIfaceName = ifaceName;
+}
+
+std::string WifiSettings::GetApIfaceName() const
+{
+    return mApIfaceName;
 }
 #endif
 

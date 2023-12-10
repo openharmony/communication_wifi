@@ -976,8 +976,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "linkSpeed", linkedInfo.linkSpeed, result);
     SetValueInt32(env, "frequency", linkedInfo.frequency, result);
     SetValueBool(env, "isHidden", linkedInfo.ifHiddenSSID, result);
-    /* isRestricted not support now, set as default value */
-    SetValueBool(env, "isRestricted", false, result);
+    SetValueBool(env, "isRestricted", linkedInfo.isDataRestricted, result);
     SetValueInt32(env, "chload", linkedInfo.chload, result);
     SetValueInt32(env, "snr", linkedInfo.snr, result);
     SetValueUtf8String(env, "macAddress", linkedInfo.macAddress.c_str(), result);
@@ -1039,6 +1038,20 @@ NO_SANITIZE("cfi") napi_value GetDisconnectedReason(napi_env env, napi_callback_
     napi_value value;
     napi_create_int32(env, static_cast<int>(reason), &value);
     return value;
+}
+
+NO_SANITIZE("cfi") napi_value IsMeteredHotspot(napi_env env, napi_callback_info info)
+{
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    bool isMeteredHotspot = false;
+    ErrCode ret = wifiDevicePtr->IsMeteredHotspot(isMeteredHotspot);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get isMeteredHotspot value fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value result;
+    napi_get_boolean(env, isMeteredHotspot, &result);
+    return result;
 }
 
 NO_SANITIZE("cfi") napi_value RemoveDevice(napi_env env, napi_callback_info info)

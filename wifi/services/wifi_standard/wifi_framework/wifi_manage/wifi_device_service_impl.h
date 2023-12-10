@@ -111,6 +111,8 @@ public:
 
     ErrCode GetWifiState(int &state) override;
 
+    ErrCode IsMeteredHotspot(bool &bMeteredHotspot) override;
+
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;

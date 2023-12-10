@@ -1069,6 +1069,39 @@ ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::IsMeteredHotspot(bool &bMeteredHotspot)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), data, reply,
+        option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    bMeteredHotspot = reply.ReadBool();
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
 {
     if (mRemoteDied) {

@@ -58,6 +58,17 @@ NO_SANITIZE("cfi") int IsWifiActive()
     return (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) && isActive;
 }
 
+NO_SANITIZE("cfi") int IsMeteredHotspot()
+{
+    if (wifiDevicePtr == nullptr) {
+        return false;
+    }
+
+    bool isMeteredHotspot = false;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->IsMeteredHotspot(isMeteredHotspot);
+    return (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) && isMeteredHotspot;
+}
+
 NO_SANITIZE("cfi") WifiErrorCode Scan()
 {
     CHECK_PTR_RETURN(wifiScanPtr, ERROR_WIFI_NOT_AVAILABLE);

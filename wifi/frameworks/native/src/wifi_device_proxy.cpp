@@ -1082,8 +1082,8 @@ ErrCode WifiDeviceProxy::IsMeteredHotspot(bool &bMeteredHotspot)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), data, reply,
-        option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT),
+        data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), error);

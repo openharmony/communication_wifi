@@ -36,10 +36,10 @@
 #define WIFI_MULTI_CMD_MAX_LEN 1024
 #define IFCAE_NAME_LEN 256
 
-WifiErrorNo StartSoftAp(int id)
+WifiErrorNo StartSoftAp(int id, char *ifaceName)
 {
-    LOGI("Ready to start hostapd: %{public}d!", id);
-    char ifaceName[IFCAE_NAME_LEN] = {0};
+    LOGI("Ready to start hostapd: %{public}d, %{public}s", id, ifaceName);
+    InitCfg(ifaceName);
     if (StartHostapd() != WIFI_HAL_SUCCESS) {
         LOGE("hostapd start failed!");
         return WIFI_HAL_OPEN_HOSTAPD_FAILED;
@@ -53,13 +53,8 @@ WifiErrorNo StartSoftAp(int id)
         LOGE("hostapdHalDevice is NULL!");
         return WIFI_HAL_HOSTAPD_NOT_INIT;
     }
-    int ret = sprintf_s(ifaceName, IFCAE_NAME_LEN, AP_INTF"%d", id);
-    if (ret == -1) {
-        LOGE("StartSoftAp failed! ret=%{public}d", ret);
-        return WIFI_HAL_FAILED;
-    }
     if (GetIfaceState(ifaceName) == 0 || id > 0) {
-        ret = hostapdHalDevice->enableAp(id);
+        int ret = hostapdHalDevice->enableAp(id);
         if (ret != 0) {
             LOGE("enableAp failed! ret=%{public}d", ret);
             return WIFI_HAL_FAILED;

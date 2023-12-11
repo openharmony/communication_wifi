@@ -62,6 +62,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT = 0x1036,      /* is held the Wi-Fi protect. */
     WIFI_SVR_CMD_IS_SET_FACTORY_RESET = 0x1037,      /* factory reset */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
+    WIFI_SVR_CMD_IS_METERED_HOTSPOT = 0x1037,       /* whether current link is metered hotspot */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

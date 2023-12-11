@@ -1242,6 +1242,9 @@ void WifiManager::DealStaOpenRes(OperateResState state, int instId)
     }
     if ((state == OperateResState::OPEN_WIFI_FAILED) || (state == OperateResState::OPEN_WIFI_DISABLED)) {
         WIFI_LOGE("DealStaOpenRes:wifi open failed!");
+        WifiOprMidState apstate = WifiConfigCenter::GetInstance().GetApMidState(instId);
+        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED), "TIME_OUT",
+            static_cast<int>(apstate));
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
         DealStaCloseRes(state, instId);
         return;
@@ -1302,6 +1305,9 @@ void WifiManager::DealStaCloseRes(OperateResState state, int instId)
     }
     if (state == OperateResState::CLOSE_WIFI_FAILED) {
         WIFI_LOGI("DealStaCloseRes: broadcast wifi close failed event!");
+        WifiOprMidState apstate = WifiConfigCenter::GetInstance().GetApMidState(instId);
+        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
+            static_cast<int>(apstate));
         WifiManager::GetInstance().ForceStopWifi(instId);
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);

@@ -32,7 +32,36 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
 ]
 
-if (!defined(ohos_lite)) {
+if (defined(ohos_lite)) {
+  shared_library("wifi_power_saving_service") {
+    sources = local_base_sources
+    include_dirs = local_base_include_dirs
+
+    deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
+      "//third_party/libxml2:xml2",
+    ]
+
+    external_deps = [
+      "c_utils:utils",
+      "hilog:libhilog",
+      "init:libbegetutil",
+    ]
+
+    configs -= [ "//build/lite/config:language_cpp" ]
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+
+    defines = [ "OHOS_ARCH_LITE" ]
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+  }
+} else {
   ohos_shared_library("wifi_power_saving_service") {
     branch_protector_ret = "pac_ret"
 
@@ -45,10 +74,6 @@ if (!defined(ohos_lite)) {
     install_enable = true
     sources = local_base_sources
     include_dirs = local_base_include_dirs
-
-    include_dirs += [
-      "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
-    ]
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",

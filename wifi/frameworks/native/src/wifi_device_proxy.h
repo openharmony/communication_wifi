@@ -384,6 +384,12 @@ public:
     ErrCode StartPortalCertification() override;
 
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
+    /**
+     * @Description reset factory
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode FactoryReset() override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

@@ -377,6 +377,13 @@ public:
     virtual ErrCode ResetAllFrozenApp() = 0;
 
     virtual ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description reset factory
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode FactoryReset() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

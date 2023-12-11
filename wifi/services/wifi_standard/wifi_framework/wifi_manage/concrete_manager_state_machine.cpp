@@ -413,7 +413,11 @@ bool ConcreteMangerMachine::HandleCommonMessage(InternalMessage *msg)
 bool ConcreteMangerMachine::CheckCanOptSta()
 {
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
+    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::OPENING) {
+        return false;
+    }
+    if (p2pState == WifiOprMidState::CLOSING || p2pState == WifiOprMidState::OPENING) {
         return false;
     }
     return true;

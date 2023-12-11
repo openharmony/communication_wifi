@@ -235,6 +235,14 @@ public:
     ErrCode IsWifiActive(bool &bActive) override;
 
     /**
+     * @Description Check whether Wi-Fi is metered hotspot
+     *
+     * @param bMeteredHotspot - isMeteredHotspot / notMeteredHotspot
+     * @return ErrCode - operation result
+     */
+    ErrCode IsMeteredHotspot(bool &bMeteredHotspot) override;
+
+    /**
      * @Description Get the Wifi State
      *
      * @param state - return current wifi state

@@ -38,6 +38,10 @@ public:
             ReleaseContext(ctx);
             ctx = nullptr;
         }
+        if (pRpcClient != nullptr) {
+            ReleaseRpcClient(pRpcClient);
+            pRpcClient = nullptr;
+        }
     }
 
 public:

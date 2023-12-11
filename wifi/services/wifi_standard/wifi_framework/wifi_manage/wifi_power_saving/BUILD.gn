@@ -25,7 +25,9 @@ ohos_shared_library("wifi_power_saving_service") {
   }
 
   install_enable = true
+
   sources = [ "rx_listen/wifi_rx_listen_arbitration.cpp" ]
+
   include_dirs = [
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",

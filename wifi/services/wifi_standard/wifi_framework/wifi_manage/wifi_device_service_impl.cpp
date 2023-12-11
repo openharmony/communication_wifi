@@ -1548,6 +1548,53 @@ ErrCode WifiDeviceServiceImpl::StartPortalCertification()
     return pService->StartPortalCertification();
 }
 
+ErrCode WifiDeviceServiceImpl::FactoryReset()
+{
+    WIFI_LOGI("Enter FactoryReset.");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("FactoryReset: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:FactoryReset() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:FactoryReset() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    WIFI_LOGE("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot!");
+#ifndef OHOS_ARCH_LITE
+    ErrCode errCode;
+    if (IsStaServiceRunning()) {
+        WIFI_LOGI("WifiDeviceServiceImpl FactoryReset IsStaServiceRunning, m_instId:%{public}d", m_instId);
+        if (m_instId == 0) {
+            WifiSettings::GetInstance().SetWifiToggledState(false);
+        }
+        errCode = WifiManager::GetInstance().WifiToggled(0, m_instId);
+        WIFI_LOGI("WifiDeviceServiceImpl FactoryReset WifiToggled, errCode:%{public}d", errCode);
+    }
+    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);
+    if (curState == WifiOprMidState::RUNNING) {
+        errCode = WifiManager::GetInstance().SoftapToggled(0, m_instId);
+        WIFI_LOGI("WifiDeviceServiceImpl FactoryReset SoftapToggled, errCode:%{public}d", errCode);
+    }
+#endif
+    // wifi device
+    WifiSettings::GetInstance().ClearDeviceConfig();
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    /* p2p */
+    WifiSettings::GetInstance().RemoveWifiP2pGroupInfo();
+    WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();
+    /* Hotspot */
+    WifiSettings::GetInstance().ClearHotspotConfig();
+    WifiSettings::GetInstance().SyncHotspotConfig();
+    return WIFI_OPT_SUCCESS;
+}
+
 #ifndef OHOS_ARCH_LITE
 void WifiDeviceServiceImpl::StartWatchdog(void)
 {

@@ -26,6 +26,7 @@
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
 constexpr int RANDOM_STR_LEN = 6;
+constexpr int RANDOM_PASSWD_LEN = 8;
 constexpr int MSEC = 1000;
 constexpr int FOREGROUND_SCAN_CONTROL_TIMES = 4;
 constexpr int FOREGROUND_SCAN_CONTROL_INTERVAL = 2 * 60;
@@ -1509,6 +1510,12 @@ public:
      * @param randomMacAddr - random MAC address[out]
      */
     void GenerateRandomMacAddress(std::string &randomMacAddr);
+    /**
+     * @Description Clear Hotspot config
+     *
+     * @return void
+     */
+    void ClearHotspotConfig();
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address

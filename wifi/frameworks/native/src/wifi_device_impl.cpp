@@ -455,5 +455,12 @@ ErrCode WifiDeviceImpl::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceCon
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetChangeDeviceConfig(value, config);
 }
+
+ErrCode WifiDeviceImpl::FactoryReset()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->FactoryReset();
+}
 }  // namespace Wifi
 }  // namespace OHOS

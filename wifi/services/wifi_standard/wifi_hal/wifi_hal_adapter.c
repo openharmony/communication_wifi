@@ -156,6 +156,19 @@ int ExcuteCmd(const char *szCmd)
     return HAL_FAILURE;
 }
 
+int FileIsExisted(const char* file)
+{
+    if (file == NULL) {
+        LOGE("%{pubic}s: invalid parameter", __func__);
+        return HAL_FAILURE;
+    }
+    if (access(file, F_OK) != -1) {
+        LOGE("%{pubic}s: file isn't existed", __func__);
+        return HAL_FAILURE;
+    }
+    return HAL_SUCCESS;
+}
+
 int CopyConfigFile(const char* configName)
 {
     char buf[BUFF_SIZE] = {0};
@@ -168,6 +181,10 @@ int CopyConfigFile(const char* configName)
         if (strcat_s(path[i], sizeof(path[i]), configName) != EOK) {
             LOGE("strcat_s failed.");
             return HAL_FAILURE;
+        }
+        if ((strcmp(path[i], P2P_CONFIG_FILE) == 0) && FileIsExisted(path[i])) {
+            LOGW("%{public}s: path[%{public}d]: %{public}s is existed", __func__, i, path[i]);
+            break;
         }
         if (access(path[i], F_OK) != -1) {
             char cmd[BUFF_SIZE] = {0};

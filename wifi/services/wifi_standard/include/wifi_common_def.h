@@ -22,8 +22,10 @@ extern "C" {
 
 #ifdef OHOS_EUPDATER
 #define CONFIG_ROOR_DIR "/tmp/service/el1/public/wifi"
+#define P2P_CONFIG_FILE "/tmp/service/el1/public/wifi/p2p_supplicant.conf"
 #else
 #define CONFIG_ROOR_DIR "/data/service/el1/public/wifi"
+#define P2P_CONFIG_FILE "/data/service/el1/public/wifi/p2p_supplicant.conf"
 #endif // OHOS_EUPDATER
 
 #define WIFI_MANAGGER_PID_NAME "wifi_mgr_pid"

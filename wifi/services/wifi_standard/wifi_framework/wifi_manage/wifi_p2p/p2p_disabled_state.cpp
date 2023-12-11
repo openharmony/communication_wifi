@@ -79,7 +79,11 @@ void P2pDisabledState::SetVendorFeatures() const
     if (ret < 0) {
         WIFI_LOGW("Failed to obtain P2pVendorConfig information.");
     }
-
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    p2pVendorCfg.SetRandomMacSupport(true);
+    WifiSettings::GetInstance().SetP2pVendorConfig(p2pVendorCfg);
+    WifiSettings::GetInstance().SyncP2pVendorConfig();
+#endif
     WIFI_LOGI("P2pVendorConfig random mac is %{public}s", p2pVendorCfg.GetRandomMacSupport() ? "true" : "false");
     WifiP2PHalInterface::GetInstance().SetRandomMacAddr(p2pVendorCfg.GetRandomMacSupport());
 }

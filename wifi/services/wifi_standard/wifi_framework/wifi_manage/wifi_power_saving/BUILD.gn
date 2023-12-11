@@ -44,11 +44,6 @@ if (defined(ohos_lite)) {
       "//third_party/libxml2:xml2",
     ]
 
-    external_deps = [
-      "ability_runtime:app_manager",
-      "hilog:libhilog",
-    ]
-
     configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
       "-std=c++17",

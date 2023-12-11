@@ -19,85 +19,49 @@ if (defined(ohos_lite)) {
   import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 
-local_base_sources = [ "rx_listen/wifi_rx_listen_arbitration.cpp" ]
+ohos_shared_library("wifi_power_saving_service") {
+  branch_protector_ret = "pac_ret"
 
-local_base_include_dirs = [
-  "$WIFI_ROOT_DIR/interfaces/inner_api",
-  "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_power_saving/rx_listen",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+  sanitize = {
+    cfi = true
+    boundary_sanitize = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  install_enable = true
+  sources = [ "rx_listen/wifi_rx_listen_arbitration.cpp" ]
+  include_dirs = [
+    "$WIFI_ROOT_DIR/interfaces/inner_api",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_power_saving/rx_listen",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
 ]
+  deps = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
+    "//third_party/libxml2:xml2",
+  ]
 
-if (defined(ohos_lite)) {
-  shared_library("wifi_power_saving_service") {
-    sources = local_base_sources
-    include_dirs = local_base_include_dirs
+  external_deps = [
+    "ability_runtime:app_manager",
+    "hilog:libhilog",
+  ]
 
-    deps = [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-      "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/libxml2:xml2",
-    ]
+  cflags_cc = [
+    "-std=c++17",
+    "-fno-rtti",
+  ]
 
-    external_deps = [
-      "c_utils:utils",
-      "hilog:libhilog",
-      "init:libbegetutil",
-    ]
+  ldflags = [
+    "-fPIC",
+    "-Wl,-E",
+  ]
 
-    configs -= [ "//build/lite/config:language_cpp" ]
-    cflags_cc = [
-      "-std=c++17",
-      "-fno-rtti",
-    ]
-
-    defines = [ "OHOS_ARCH_LITE" ]
-    ldflags = [
-      "-fPIC",
-      "-Wl,-E",
-    ]
-  }
-} else {
-  ohos_shared_library("wifi_power_saving_service") {
-    branch_protector_ret = "pac_ret"
-
-    sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
-      debug = false
-    }
-    install_enable = true
-    sources = local_base_sources
-    include_dirs = local_base_include_dirs
-
-    deps = [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-      "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/libxml2:xml2",
-    ]
-
-    external_deps = [
-      "ability_runtime:app_manager",
-      "hilog:libhilog",
-    ]
-
-    cflags_cc = [
-      "-std=c++17",
-      "-fno-rtti",
-    ]
-
-    ldflags = [
-      "-fPIC",
-      "-Wl,-E",
-    ]
-
-    part_name = "wifi"
-    subsystem_name = "communication"
-  }
+  part_name = "wifi"
+  subsystem_name = "communication"
 }

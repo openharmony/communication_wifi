@@ -11,13 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-  import("//foundation/communication/wifi/wifi/wifi_lite.gni")
-} else {
-  import("//build/ohos.gni")
-  import("//foundation/communication/wifi/wifi/wifi.gni")
-}
+import("//build/ohos.gni")
+import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ohos_shared_library("wifi_power_saving_service") {
   branch_protector_ret = "pac_ret"

@@ -28,6 +28,7 @@ ohos_shared_library("wifi_power_saving_service") {
     cfi_cross_dso = true
     debug = false
   }
+
   install_enable = true
   sources = [ "rx_listen/wifi_rx_listen_arbitration.cpp" ]
   include_dirs = [
@@ -39,7 +40,8 @@ ohos_shared_library("wifi_power_saving_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-]
+  ]
+
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",

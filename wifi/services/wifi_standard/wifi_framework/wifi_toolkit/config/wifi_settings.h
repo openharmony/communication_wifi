@@ -791,7 +791,7 @@ public:
      * @param state - the hid2d upper scene
      * @return int - 0 success
      */
-    int SetHid2dUpperScene(const Hid2dUpperScene &scene);
+    int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene);
 
     /**
      * @Description Get the hid2d upper scene
@@ -799,7 +799,7 @@ public:
      * @param state - the hid2d upper scene
      * @return int - 0 success
      */
-    int GetHid2dUpperScene(Hid2dUpperScene &scene);
+    int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene);
 
     /**
      * @Description Set p2p type
@@ -1662,6 +1662,7 @@ private:
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
     std::map <int, DisconnectedReason> mLastDiscReason;
+    std::string mUpperIfName;
     Hid2dUpperScene mUpperScene;
     P2pBusinessType mP2pBusinessType;
 

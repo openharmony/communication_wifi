@@ -67,6 +67,12 @@ void WriteWifiOperateStateHiSysEvent(int operateType, int operateState);
 void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode);
 
 void WriteWifiConnectionInfoHiSysEvent(int networkId);
+
+void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReason, int apState);
+
+void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason);
+
+void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

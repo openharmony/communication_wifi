@@ -20,6 +20,8 @@
 namespace OHOS {
 namespace Wifi {
 
+#define SFOT_AP_TIME_OUT 10000
+
 #define CMD_WIFI_TOGGLED 0x1
 #define CMD_SOFTAP_TOGGLED 0x2
 #define CMD_SCAN_ALWAYS_MODE_CHANGED 0x3
@@ -29,6 +31,9 @@ namespace Wifi {
 #define CMD_AP_START_FAILURE 0x7
 #define CMD_AP_START 0x8
 #define CMD_AIRPLANE_TOGGLED 0x9
+
+#define CMD_AP_START_TIME 0x10
+#define CMD_AP_STOP_TIME 0x11
 
 #define CONCRETE_CMD_START 0x101
 #define CONCRETE_CMD_SWITCH_TO_CONNECT_MODE 0x102
@@ -58,6 +63,11 @@ enum class ConcreteManagerRole {
     ROLE_CLIENT_SCAN_ONLY = 0,
     ROLE_CLIENT_STA,
     ROLE_CLIENT_MIX,
+};
+
+enum class SoftApperateType {
+    OPEN_SOFT_AP_FAILED = 0,
+    CLOSE_SOFT_AP_FAILED = 1,
 };
 
 }  // namespace Wifi

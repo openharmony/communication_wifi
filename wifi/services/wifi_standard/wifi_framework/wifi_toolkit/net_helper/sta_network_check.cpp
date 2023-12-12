@@ -16,6 +16,7 @@
 #include "sta_network_check.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#include "wifi_hisysevent.h"
 #ifndef OHOS_ARCH_LITE
 #include "http_client_request.h"
 #include "http_client.h"
@@ -236,9 +237,14 @@ void StaNetworkCheck::RunNetCheckThreadFunc()
             netStateHandler(StaNetState::NETWORK_STATE_NOINTERNET, "");
             if (!arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true)) {
                 LOGI("RunNetCheckThreadFunc arp check failed.");
+                WriteWifiAccessIntFailedHiSysEvent(ARP_OPT, StaArpState::ARP_STATE_UNREACHABLE);
                 arpStateHandler(StaArpState::ARP_STATE_UNREACHABLE);
             }
             isStopNetCheck = true;
+            httpDetectCnt++;
+            if (httpDetectCnt == HTTP_OPT) {
+                WriteWifiAccessIntFailedHiSysEvent(HTTP_OPT, NETWORK_STATE_NOINTERNET);
+            }
         }
 
         std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
@@ -285,6 +291,7 @@ void StaNetworkCheck::SignalNetCheckThread()
         WIFI_LOGI("detection is now running!\n");
         return;
     }
+    httpDetectCnt = 0;
     // get mac address
     std::string macAddress;
     WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);

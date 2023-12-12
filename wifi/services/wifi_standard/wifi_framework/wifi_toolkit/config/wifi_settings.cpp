@@ -1369,17 +1369,20 @@ int WifiSettings::GetP2pConnectedState()
     return mP2pConnectState.load();
 }
 
-int WifiSettings::SetHid2dUpperScene(const Hid2dUpperScene &scene)
+int WifiSettings::SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene)
 {
+    LOGD("SetHid2dUpperScene ifName: %{public}s", ifName.c_str());
     std::unique_lock<std::mutex> lock(mP2pMutex);
+    mUpperIfName = ifName;
     mUpperScene = scene;
     return 0;
 }
 
-int WifiSettings::GetHid2dUpperScene(Hid2dUpperScene &scene)
+int WifiSettings::GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene)
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
     scene = mUpperScene;
+    ifName = mUpperIfName;
     return 0;
 }
 
@@ -1400,10 +1403,14 @@ int WifiSettings::GetP2pBusinessType(P2pBusinessType &type)
 void WifiSettings::ClearLocalHid2dInfo()
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
-    mUpperScene.mac = "";
-    mUpperScene.scene = 0;
-    mUpperScene.fps = 0;
-    mUpperScene.bw = 0;
+    if (strstr(mUpperIfName.c_str(), "chba") == NULL) {
+        mUpperScene.mac = "";
+        mUpperScene.scene = 0;
+        mUpperScene.fps = 0;
+        mUpperScene.bw = 0;
+        mUpperIfName = "";
+    }
+
     mP2pBusinessType = P2pBusinessType::INVALID;
 }
 

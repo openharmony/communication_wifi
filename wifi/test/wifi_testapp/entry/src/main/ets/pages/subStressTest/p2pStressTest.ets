@@ -20,11 +20,11 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { StressContentTable } from '../../Component/stressContentTable';
 import router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import { initP2pStressData } from '../../MainAbility/model/stressTestDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import { initP2pStressData } from '../../entryability/model/stressTestDataModels'
+import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../Utils/Util'
+import { resolveIP } from '../../utils/Util'
 import socket from '@ohos.net.socket';
 import http from '@ohos.net.http'
 import request from '@ohos.request'
@@ -61,15 +61,15 @@ struct P2pStressTest {
   private testItem: TestData = router.getParams().testId;
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: Number = - 1;
   @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2 ;
+  @State netId: Number = - 2 ;
   @State passphrase: string = "12345678" ;
   @State groupName: string = "testGroup"
-  @State goBand: number = 0 ;
+  @State goBand: Number = 0 ;
   @State deviceName: string = "MyTestDevice"
-  @StorageLink( 'stressNumber' ) stressNumber: number = 0 ;
-  @StorageLink( 'stressTime' ) stressTime: number = 0;
+  @StorageLink( 'stressNumber' ) stressNumber: Number = 0 ;
+  @StorageLink( 'stressTime' ) stressTime: Number = 0;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "deviceAddress" , this.deviceAddress )
@@ -221,10 +221,10 @@ struct P2pStressTest {
 @Component
 struct p2pSetting {
   @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2 ;
+  @State netId: Number = - 2 ;
   @State passphrase: string = "12345678" ;
   @State groupName: string = "testGroup"
-  @State goBand: number = 0 ;
+  @State goBand: Number = 0 ;
   @State deviceName: string = "MyTestDevice"
 
   aboutToAppear() {
@@ -539,8 +539,8 @@ struct socketTest {
 
 @Component
 struct upDownLoad {
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []

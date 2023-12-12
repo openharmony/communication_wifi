@@ -19,9 +19,9 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import { initWifiManagerApiData } from '../../MainAbility/model/testDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import { initWifiManagerApiData } from '../../entryability/model/testDataModels'
+import { TestData } from '../../entryability/model/testData'
 
 const TAG = '[WifiManager]'
 
@@ -31,8 +31,8 @@ const TAG = '[WifiManager]'
 
 @Component
 struct WifiManagerDeviceSetting {
-  @StorageLink( 'w_networkIdM' ) w_networkIdM: number = 0; // id,netId,networkId是一个值嘛？
-  @StorageLink( 'w_featureIdM' ) w_featureIdM: number = 1;
+  @StorageLink( 'w_networkIdM' ) w_networkIdM: Number = 0; // id,netId,networkId是一个值嘛？
+  @StorageLink( 'w_featureIdM' ) w_featureIdM: Number = 1;
   @StorageLink( 'wifiDeviceConfigManager' ) wifiDeviceConfigManager: Object = {
     ssid : String = "TP-LINK_6365" ,
     bssid : String = "6C:B1:58:75:63:65" ,
@@ -151,7 +151,7 @@ struct WifiManagerDeviceSetting {
                   .selectedOptionFont( { size : 17 } )
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
-                  .onSelect( ( index: number ) => {
+                  .onSelect( ( index: Number ) => {
                     console.log( TAG , "Select:" + index )
                     this.wifiDeviceConfigManager.securityType = index;
                   } )
@@ -361,10 +361,10 @@ struct WifiManagerInterfaceTest {
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: Number = - 1;
   @StorageLink( 'pairedSsidM' ) pairedSsidM: string = "";
-  @StorageLink( 'w_networkIdM' ) w_networkIdM: number = 0;
-  @StorageLink( 'w_featureIdM' ) w_featureIdM: number = 1;
+  @StorageLink( 'w_networkIdM' ) w_networkIdM: Number = 0;
+  @StorageLink( 'w_featureIdM' ) w_featureIdM: Number = 1;
   @StorageLink( 'ipInfoManagerMessage' ) ipInfoManagerMessage: string = '';
   @StorageLink( 'linkedInfoManagerMessage' ) linkedInfoManagerMessage: string = '';
   @StorageLink( 'getDeviceConfigsManagerMessage' ) getDeviceConfigsManagerMessage: string = '';
@@ -441,22 +441,22 @@ struct WifiManagerInterfaceTest {
             Column() {
               Text( "WLAN连接信息:" + this.linkedInfoManagerMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "IP信息:" + this.ipInfoManagerMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "获取网络配置:" + this.getDeviceConfigsManagerMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "扫描结果:" + this.getScanInfoManagerMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
             }

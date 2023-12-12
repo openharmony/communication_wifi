@@ -14,8 +14,8 @@
  */
 
 // @ts-nocheck
-import ConfigData from '../Utils/ConfigData';
-import { TestData } from '../MainAbility/model/testData'
+import ConfigData from '../utils/ConfigData';
+import { TestData } from '../entryability/model/testData'
 
 /**
  * Test-ListItem component of wifi test

@@ -15,8 +15,8 @@
  */
 
 // @ts-nocheck
-import ConfigData from '../Utils/ConfigData';
-import { TestData , TestApi } from '../MainAbility/model/testData'
+import ConfigData from '../utils/ConfigData';
+import { TestData , TestApi } from '../entryability/model/testData'
 import prompt from '@system.prompt';
 
 const TAG = "[stressContentTable]"
@@ -32,12 +32,12 @@ export struct GetProfileConnSateDialog {
     { value : 'HANDS_FREE_AUDIO_GATEWAY' },
     { value : 'HID_HOST' }
   ]
-  @State currentClick: number = 1;
+  @State currentClick: Number = 1;
   @Link textValue: string
   @Link inputValue: string
   @Link apiItem: TestApi
-  @Link currentIndex: number
-  @Link changeIndex: number
+  @Link currentIndex: Number
+  @Link changeIndex: Number
   controller: CustomDialogController
   cancel: () => void
   confirm: ( string ) => void
@@ -55,7 +55,7 @@ export struct GetProfileConnSateDialog {
         .optionFont( { size : 17 } )
         .height( 80 )
         .width( ConfigData.WH_90_100 )
-        .onSelect( ( index: number ) => {
+        .onSelect( ( index: Number ) => {
           console.log( "Select:" + index )
           this.currentClick = index
         } )
@@ -103,13 +103,13 @@ export struct SetScanModeDialog {
     { value : 'CONNECTABLE_GENERAL_DISCOVERABLE' },
     { value : 'CONNECTABLE_LIMITED_DISCOVERABLE' }
   ]
-  @State currentClick: number = 4;
+  @State currentClick: Number = 4;
   @Link textValue: string
   @Link inputValue: string
   @Link apiItem: TestApi
-  @Link currentIndex: number
-  @Link changeIndex: number
-  @State duration: number = 0
+  @Link currentIndex: Number
+  @Link changeIndex: Number
+  @State duration: Number = 0
   controller: CustomDialogController
   cancel: () => void
   confirm: ( string ) => void
@@ -127,7 +127,7 @@ export struct SetScanModeDialog {
         .optionFont( { size : 12 } )
         .height( 60 )
         .width( ConfigData.WH_90_100 )
-        .onSelect( ( index: number ) => {
+        .onSelect( ( index: Number ) => {
           console.log( TAG , "Select:" + index )
           this.currentClick = index
         } )
@@ -184,8 +184,8 @@ export struct InputDialog {
   @Link textValue: string
   @Link inputValue: string
   @Link apiItem: TestApi
-  @Link currentIndex: number
-  @Link changeIndex: number
+  @Link currentIndex: Number
+  @Link changeIndex: Number
   controller: CustomDialogController
   cancel: () => void
   confirm: ( string ) => void
@@ -239,9 +239,9 @@ export struct StressContentTable {
   private testItem: TestData
   @State currentApiItem: TestApi = {}
   @State apiItems: TestApi[] = [];
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @State localName: string = 'DaYuBlue1'
-  @State currentIndex: number = 1
+  @State currentIndex: Number = 1
   @StorageLink( 'pairedMac' ) pairedMac: string = "";
   getProfileConnSateDialog: CustomDialogController = new CustomDialogController({
     builder : GetProfileConnSateDialog( {
@@ -294,7 +294,7 @@ export struct StressContentTable {
     console.log( 'input text:' , text )
   }
 
-  @Builder IngredientItem( apiItem: TestApi , index: number ) {
+  @Builder IngredientItem( apiItem: TestApi , index: Number ) {
     Stack() {
       Flex() {
         Flex( { alignItems : ItemAlign.Center } ) {
@@ -367,7 +367,7 @@ export struct StressContentTable {
     } )
   }
 
-  getCurrentState( index: number ) {
+  getCurrentState( index: Number ) {
     return this.apiItems[ index ].result
   }
 
@@ -379,7 +379,7 @@ export struct StressContentTable {
           justifyContent : FlexAlign.SpaceBetween ,
           alignItems : ItemAlign.Start
         } ) {
-          ForEach( this.apiItems , ( item: TestApi , index: number ) => {
+          ForEach( this.apiItems , ( item: TestApi , index: Number ) => {
             this.IngredientItem( item , index )
           } )
         }

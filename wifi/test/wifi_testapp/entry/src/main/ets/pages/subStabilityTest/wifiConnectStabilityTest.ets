@@ -20,8 +20,8 @@ import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
 import ConfigData from '../../Utils/ConfigData';
-import { initWifiApiData } from '../../MainAbility/model/testDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import { initWifiApiData } from '../../entryability/model/testDataModels'
+import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
@@ -47,7 +47,6 @@ struct WiFiConnectStabilityTest {
   @State connectFailNumber: Number = 0 // 打开WiFi的失败次数
   @State disconnectSuccessNumber: Number = 0 // 关闭WiFi的成功次数
   @State disconnectFailNumber: Number = 0 // 关闭WiFi的失败次数
-
   @State message: string = "测试结果"
   @State testNumbers: Number = 30 //测试次数
   @State successTimes: Number = 0
@@ -215,7 +214,7 @@ struct WiFiConnectStabilityTest {
                       console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接开始时间: " + self.connect_StartTime + "ms" )
                       self.connectionMessageLog += "第" + ( self.connectNumber + 1 ) + "次WIFI连接结果：" + funcMessage + "\n"
                       console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接结果：" + funcMessage )
-                      await sleep( 10 )
+                      await sleep( 15 )
                       self.connectionMessage = AppStorage.Get( "connectionMessage" )
                       // prompt.showToast( { message : funcMessage } )
                       if ( self.connectionMessage == "connected" ) {
@@ -233,7 +232,7 @@ struct WiFiConnectStabilityTest {
                         self.connectionMessageLog += "第" + self.disconnectNumber + "次WIFI断连结果：" + funcMessage + "\n"
                         console.log( TAG , "第" + self.disconnectNumber + "次WIFI断连结果：" + funcMessage )
                         console.log( TAG , "disconnectNumber: " + self.disconnectNumber )
-                        await sleep( 10 )
+                        await sleep( 15 )
                         // prompt.showToast( { message : funcMessage } )
                         self.connectionMessage = AppStorage.Get( "connectionMessage" )
                         if ( self.connectionMessage == "disconnected" ) {
@@ -243,12 +242,16 @@ struct WiFiConnectStabilityTest {
                           self.disconnectSuccessNumber = self.disconnectSuccessNumber + 1
                           self.connectionMessageLog += "断连成功的次数：" + self.disconnectSuccessNumber + "\n"
                           console.log( TAG , "断连成功的次数：" + self.disconnectSuccessNumber )
-                          await sleep( 7 )
+                          await sleep( 15 )
                         } else {
                           self.disconnectFailNumber = self.disconnectFailNumber + 1
+                          console.log( TAG , "断连失败的次数：" + self.disconnectFailNumber )
+                          console.log( TAG , "第" + self.disconnectNumber + "次WIFI断连失败" )
                         }
                       } else if ( self.connectionMessage == "disconnected" ) {
                         self.connectFailNumber = self.connectFailNumber + 1
+                        console.log( TAG , "连接失败的次数：" + self.connectFailNumber )
+                        console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接失败" )
                         break;
                       } else {
                         console.log( "第" + ( self.connectNumber + 1 ) + "次连接后状态不清楚" );
@@ -261,6 +264,8 @@ struct WiFiConnectStabilityTest {
                 forLoop()
 
               } )
+
+            Blank().width( "10%" )
 
             Button( "关闭连接测试" )
               .operateButtonStyle( $r( 'app.color.main_blue' ) )
@@ -317,14 +322,17 @@ struct WiFiConnectStabilityTest {
       console.log( TAG , " on.wifiConnectionChange callback end--------" )
       return this.connectionMessage
     } )
-    return this.connectionMessage
+  }
+
+  aboutToDisappear() {
+    wifiManager.off( "wifiConnectionChange" )
   }
 }
 
 @Component
 struct setWifiDevice {
-  @StorageLink( 'w_networkIdM' ) w_networkIdM: number = 0; // id,netId,networkId是一个值嘛？
-  @StorageLink( 'w_featureIdM' ) w_featureIdM: number = 1;
+  @StorageLink( 'w_networkIdM' ) w_networkIdM: Number = 0; // id,netId,networkId是一个值嘛？
+  @StorageLink( 'w_featureIdM' ) w_featureIdM: Number = 1;
   @StorageLink( 'wifiConfig' ) wifiConfig: Object = {
     ssid : String = "TP-LINK_6365" ,
     bssid : String = "6C:B1:58:75:63:65" ,
@@ -443,7 +451,7 @@ struct setWifiDevice {
                   .selectedOptionFont( { size : 17 } )
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
-                  .onSelect( ( index: number ) => {
+                  .onSelect( ( index: Number ) => {
                     console.log( TAG , "Select:" + index )
                     this.wifiConfig.securityType = index;
                   } )
@@ -548,7 +556,7 @@ struct setWifiDevice {
 
             Row() {
               Text( "ipTypeM:" ).fontSize( 15 ).width( 60 );
-              TextInput( { text : this.wifiConfig.IpType , placeholder : "1" } ) //DHCP
+              TextInput( { text : this.wifiConfig.IpType , placeholder : "1" } )//DHCP
                 .fontSize( "15vp" )
                 .onChange( ( strInput ) => {
                   //判断合法性
@@ -649,7 +657,8 @@ struct setWifiDevice {
 /**
  * Custom button style.
  */
-@Extend( Button ) function operateButtonStyle( color: Resource ) {
+@Extend( Button )
+function operateButtonStyle( color: Resource ) {
   .width( $r( 'app.float.button_width' ) )
   .height( $r( 'app.float.button_height' ) )
   .fontSize( $r( 'app.float.font_16' ) )

@@ -17,7 +17,7 @@
 
 import prompt from '@ohos.prompt'
 import { PswDialog } from '../Component/pswDialog'
-import { WifiModel } from '../MainAbility/model/wifiModel'
+import { WifiModel } from '../entryability/model/wifiModel'
 import { WifiView } from '../Component/wifiView'
 import wifi from '@ohos.wifi'
 
@@ -32,8 +32,8 @@ let self = null
 export struct AvailableWifi {
   private wifiModel: WifiModel = new WifiModel()
   @Prop wifiList:Array<wifi.WifiScanInfo>
-  @Prop linkedInfo: any
-  @State selectIndex: number = -1
+  private linkedInfo: any
+  @State selectIndex: Number = -1
   private pswDialogController: CustomDialogController = new CustomDialogController({
     builder: PswDialog({ scanInfo: this.wifiList[this.selectIndex], action: this.onAccept }),
     autoCancel: true

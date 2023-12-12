@@ -15,9 +15,9 @@
 
 // @ts-nocheck
 
-import { TestData , TestApi } from '../MainAbility/model/testData'
-import { initHotspotApIData } from '../MainAbility/model/testDataModels'
-import ConfigData from '../Utils/ConfigData';
+import { TestData , TestApi } from '../entryability/model/testData'
+import { initHotspotApIData } from '../entryability/model/testDataModels'
+import ConfigData from '../utils/ConfigData';
 
 const TAG = "[filterTable]"
 /**
@@ -28,18 +28,18 @@ const TAG = "[filterTable]"
 export struct FilterTable {
   private testItem: TestData
   @State apiItems: TestApi[] = initHotspotApIData()
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   // input ble scan parameters:
   /*ScanFilter*/
   @State cbxBleScanFilter: boolean = false;
   @State h_ssid: string = "testApp1";
-  @State h_securityType: number = 3;
-  @State h_band: number = 2;
+  @State h_securityType: Number = 3;
+  @State h_band: Number = 2;
   @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: number = 3;
-  @State h_channel: number = 36;
+  @State h_maxConn: Number = 3;
+  @State h_channel: Number = 36;
 
-  getCurrentState( index: number ) {
+  getCurrentState( index: Number ) {
     return this.apiItems[ index ].result
   }
 
@@ -68,6 +68,7 @@ export struct FilterTable {
                 .width( ConfigData.WH_80_100 )
                 .borderRadius( 1 )
             }
+            .backgroundColor( $r( "app.color.moon" ) )
             .padding( 5 )
             .justifyContent( FlexAlign.Start )
             .alignItems( VerticalAlign.Center )
@@ -86,6 +87,7 @@ export struct FilterTable {
             .padding( 5 )
             .justifyContent( FlexAlign.Start )
             .alignItems( VerticalAlign.Center )
+            .backgroundColor( $r( "app.color.spring" ) )
 
             Row() {
               Text( "maxConn" ).fontSize( 17 ).width( 80 )
@@ -101,7 +103,7 @@ export struct FilterTable {
                   .selectedOptionFont( { size : 17 } )
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
-                  .onSelect( ( index: number ) => {
+                  .onSelect( ( index: Number ) => {
                     console.log( TAG , "Select:" + index )
                     AppStorage.SetOrCreate( 'h_maxConn' , index );
                   } )
@@ -111,6 +113,7 @@ export struct FilterTable {
             .padding( 5 )
             .justifyContent( FlexAlign.Start )
             .alignItems( VerticalAlign.Center )
+            .backgroundColor( $r( "app.color.spring" ) )
 
             Row() {
               Text( "band" ).fontSize( 17 ).width( 60 );
@@ -126,6 +129,7 @@ export struct FilterTable {
             .padding( 5 )
             .justifyContent( FlexAlign.Start )
             .alignItems( VerticalAlign.Center )
+            .backgroundColor( $r( "app.color.spring" ) )
 
 
             Row() {
@@ -141,6 +145,7 @@ export struct FilterTable {
             .padding( 5 )
             .justifyContent( FlexAlign.Start )
             .alignItems( VerticalAlign.Center )
+            .backgroundColor( $r( "app.color.spring" ) )
 
             Row() {
               Text( "channel" ).fontSize( 17 ).width( 120 )
@@ -155,6 +160,7 @@ export struct FilterTable {
             .padding( 5 )
             .justifyContent( FlexAlign.Start )
             .alignItems( VerticalAlign.Center )
+            .backgroundColor( $r( "app.color.spring" ) )
           }
           .height( 300 )
           .width( ConfigData.WH_100_100 )
@@ -164,7 +170,7 @@ export struct FilterTable {
         .borderWidth( 1 )
       }
       .height( ConfigData.WH_100_100 )
-      .backgroundColor( $r( "app.color.white" ) )
+      .backgroundColor( $r( "app.color.lead" ) )
     }
     .scrollBarWidth( 20 )
     .padding( { bottom : 10 } )

@@ -20,8 +20,8 @@ import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
 import ConfigData from '../../Utils/ConfigData';
-import { initWifiApiData } from '../../MainAbility/model/testDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import { initWifiApiData } from '../../entryability/model/testDataModels'
+import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
@@ -47,7 +47,6 @@ struct WiFiSwitchStabilityTest {
   @State openFailNumber: Number = 0 // 打开WiFi的失败次数
   @State closeSuccessNumber: Number = 0 // 关闭WiFi的成功次数
   @State closeFailNumber: Number = 0 // 关闭WiFi的失败次数
-
   @State message: string = "测试结果:"
   @State testNumbers: Number = 30 //测试次数
   @State successTimes: Number = 0
@@ -181,7 +180,7 @@ struct WiFiSwitchStabilityTest {
                     console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能开始时间: " + self.open_StartTime + "ms" )
                     self.stateMessageLog += "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能结果：" + funcMessage + "\n"
                     console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能结果：" + funcMessage )
-                    await sleep( 10 )
+                    await sleep( 15 )
                     self.stateMessage = AppStorage.Get( "stateMessage" )
                     // prompt.showToast( { message : funcMessage } )
                     if ( self.stateMessage == "active" ) {
@@ -199,7 +198,7 @@ struct WiFiSwitchStabilityTest {
                       self.stateMessageLog += "第" + self.closeWifiNumber + "次WIFI去使能结果：" + funcMessage + "\n"
                       console.log( TAG , "第" + self.closeWifiNumber + "次WIFI去使能结果：" + funcMessage )
                       console.log( TAG , "closeWifiNumber: " + self.closeWifiNumber )
-                      await sleep( 10 )
+                      await sleep( 15 )
                       // prompt.showToast( { message : funcMessage } )
                       self.stateMessage = AppStorage.Get( "stateMessage" )
                       if ( self.stateMessage == "inactive" ) {
@@ -212,9 +211,13 @@ struct WiFiSwitchStabilityTest {
                         await sleep( 7 )
                       } else {
                         self.closeFailNumber = self.closeFailNumber + 1
+                        console.log( TAG , "去使能失败的次数：" + self.closeFailNumber )
+                        console.log( TAG , "第" + self.closeWifiNumber + "次WIFI去使能失败" )
                       }
                     } else if ( self.stateMessage == "inactive" ) {
                       self.openFailNumber = self.openFailNumber + 1
+                      console.log( TAG , "使能失败的次数：" + self.openFailNumber )
+                      console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能失败" )
                       break;
                     } else {
                       console.log( "第" + ( self.openWifiNumber + 1 ) + "次开wifi后状态不清楚" );
@@ -227,6 +230,8 @@ struct WiFiSwitchStabilityTest {
               forLoop()
 
             } )
+
+          Blank().width( "10%" )
 
           Button( "关闭WiFi测试" )
             .operateButtonStyle( $r( 'app.color.main_blue' ) )
@@ -282,14 +287,18 @@ struct WiFiSwitchStabilityTest {
       console.log( TAG , " on.wifiStateChange callback end--------" )
       return this.stateMessage
     } )
-    return this.stateMessage
+  }
+
+  aboutToDisappear() {
+    wifiManager.off( "wifiStateChange" )
   }
 }
 
 /**
  * Custom button style.
  */
-@Extend( Button ) function operateButtonStyle( color: Resource ) {
+@Extend( Button )
+function operateButtonStyle( color: Resource ) {
   .width( $r( 'app.float.button_width' ) )
   .height( $r( 'app.float.button_height' ) )
   .fontSize( $r( 'app.float.font_16' ) )

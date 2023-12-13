@@ -20,6 +20,7 @@
 #include "wifi_hdi_sta_impl.h"
 #include "wifi_hdi_ap_impl.h"
 #include "wifi_hdi_callback.h"
+#include "wifi_hdi_proxy.h"
 #include "wifi_log.h"
 #include "securec.h"
 
@@ -228,6 +229,16 @@ WifiErrorNo WifiHdiClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
 }
 
 /* ************************ softAp Interface ************************** */
+WifiErrorNo WifiHdiClient::StartAp(int id)
+{
+    return StartHdiWifi();
+}
+
+WifiErrorNo WifiHdiClient::StopAp(int id)
+{
+    return HdiStop();
+}
+
 WifiErrorNo WifiHdiClient::GetFrequenciesByBand(int32_t band, std::vector<int> &frequencies, int id)
 {
     int values[WIFI_IDL_GET_MAX_BANDS] = {0};
@@ -255,7 +266,7 @@ WifiErrorNo WifiHdiClient::ReqGetPowerModel(int& model, int id)
 WifiErrorNo WifiHdiClient::SetWifiCountryCode(const std::string &code, int id)
 {
     if (code.length() != HDI_COUNTRY_CODE_LENGTH) {
-        LOGE("%{public}s: invalid code:%{public}lu", __func__, code.length());
+        LOGE("%{public}s: invalid code", __func__);
         return WIFI_IDL_OPT_INVALID_PARAM;
     }
     return HdiWifiSetCountryCode(code.c_str(), id);

@@ -51,34 +51,38 @@ WifiStaHalInterface &WifiStaHalInterface::GetInstance(void)
 
 WifiErrorNo WifiStaHalInterface::StartWifi(void)
 {
+    WifiErrorNo ret = WIFI_IDL_OPT_OK;
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
-    return mHdiWpaClient->StartWifi();
+    ret = mHdiWpaClient->StartWifi();
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    WifiErrorNo ret = mIdlClient->StartWifi();
+    ret = mIdlClient->StartWifi();
+#endif
+
 #ifdef HDI_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
     ret = mHdiClient->StartWifi();
 #endif
     return ret;
-#endif
 }
 
 WifiErrorNo WifiStaHalInterface::StopWifi(void)
 {
+    WifiErrorNo ret = WIFI_IDL_OPT_OK;
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
-    return mHdiWpaClient->StopWifi();
+    ret = mHdiWpaClient->StopWifi();
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    WifiErrorNo ret = mIdlClient->StopWifi();
+    ret = mIdlClient->StopWifi();
+#endif
+
 #ifdef HDI_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
     ret = mHdiClient->StopWifi();
 #endif
     return ret;
-#endif
 }
 
 WifiErrorNo WifiStaHalInterface::Connect(int networkId)

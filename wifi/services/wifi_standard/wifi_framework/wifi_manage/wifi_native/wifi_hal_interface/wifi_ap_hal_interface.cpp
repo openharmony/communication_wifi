@@ -50,13 +50,23 @@ WifiApHalInterface &WifiApHalInterface::GetInstance(void)
 WifiErrorNo WifiApHalInterface::StartAp(int id, std::string ifaceName)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->StartAp(id, ifaceName);
+    WifiErrorNo ret = mIdlClient->StartAp(id, ifaceName);
+#ifdef HDI_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
+    ret = mHdiClient->StartAp(id);
+#endif
+    return ret;
 }
 
 WifiErrorNo WifiApHalInterface::StopAp(int id)
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->StopAp(id);
+    WifiErrorNo ret = mIdlClient->StopAp(id);
+#ifdef HDI_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
+    ret = mHdiClient->StopAp(id);
+#endif
+    return ret;
 }
 
 WifiErrorNo WifiApHalInterface::SetSoftApConfig(const HotspotConfig &config, int id)

@@ -30,36 +30,48 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiCommon"
 
-#ifndef CHECK_WIFI_HDI_WIFI_PROXY_AND_RETURN
-#define CHECK_WIFI_HDI_WIFI_PROXY_AND_RETURN(portType, isRemoteDied) \
-if (isRemoteDied) { \
-    LOGD("portType:%{public}d[0:sta, 1:ap, 4:p2p device], isRemoteDied:%{public}d", \
-        (portType), (isRemoteDied)); \
-    if ((portType) == HDI_PORT_TYPE_STATION) { \
-        HdiReleaseLocalResources(); \
-        if (StartHdiWifi() != WIFI_IDL_OPT_OK) { \
-            LOGE("[STA] Start hdi failed!"); \
-            return WIFI_IDL_OPT_FAILED; \
-        } \
-        struct IWlanCallback cEventCallback; \
-        if (memset_s(&cEventCallback, sizeof(cEventCallback), 0, sizeof(cEventCallback)) != EOK) { \
-            LOGE("%{public}s: failed to memset", __func__); \
-            return WIFI_IDL_OPT_FAILED; \
-        } \
-        cEventCallback.ScanResults = HdiWifiScanResultsCallback; \
-        if (HdiRegisterEventCallback(&cEventCallback) != WIFI_IDL_OPT_OK) { \
-            LOGE("[STA] RegisterHdiStaCallbackEvent failed!"); \
-            return WIFI_IDL_OPT_FAILED; \
-        } \
-    } else { \
-        if (StartHdiWifi() != WIFI_IDL_OPT_OK) { \
-            LOGE("failed to start %{public}d", (portType)); \
-            return WIFI_IDL_OPT_FAILED; \
-        } \
-    } \
+void HdiDeathCallbackCheck(HdiPortType portType, bool isRemoteDied)
+{
+    if (isRemoteDied) {
+        switch (portType) {
+            case HDI_PORT_TYPE_STATION:
+                HdiReleaseLocalResources();
+                if (HdiStop() != WIFI_IDL_OPT_OK) {
+                    LOGE("failed to stop sta hdi");
+                    return;
+                }
+                if (StartHdiWifi() != WIFI_IDL_OPT_OK) {
+                    LOGE("[STA] Start hdi failed!");
+                    return;
+                }
+                struct IWlanCallback cEventCallback;
+                if (memset_s(&cEventCallback, sizeof(cEventCallback), 0, sizeof(cEventCallback)) != EOK) {
+                    LOGE("%{public}s: failed to memset", __func__);
+                    return;
+                }
+                cEventCallback.ScanResults = HdiWifiScanResultsCallback;
+                if (HdiRegisterEventCallback(&cEventCallback) != WIFI_IDL_OPT_OK) {
+                    LOGE("[STA] RegisterHdiStaCallbackEvent failed!");
+                    return;
+                }
+                break;
+            case HDI_PORT_TYPE_AP:
+            case HDI_PORT_TYPE_P2P_DEVICE:
+                if (HdiStop() != WIFI_IDL_OPT_OK) {
+                    LOGE("failed to stop ap hdi");
+                    return;
+                }
+                if (StartHdiWifi() != WIFI_IDL_OPT_OK) {
+                    LOGE("failed to start %{public}d", portType);
+                    return;
+                }
+                break;
+            default:
+                LOGE("invalid portType:%{public}d", portType);
+                break;
+        }
+    }
 }
-#endif
-
 
 static int hex2num(char c)
 {
@@ -721,7 +733,6 @@ int CheckMacIsValid(const char *macStr)
     }
     return 0;
 }
-
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
 static const uint32_t MAC_ADDR_INDEX_0 = 0;
 static const uint32_t MAC_ADDR_INDEX_1 = 1;
@@ -829,7 +840,7 @@ WifiErrorNo HdiSetAssocMacAddr(const unsigned char *mac, int lenMac, const int p
     }
     LOGD("%{public}s: begin to set random mac address, type:%{public}d, mac:%{private}s",
         __func__, portType, mac);
-    CHECK_WIFI_HDI_WIFI_PROXY_AND_RETURN(portType, IsHdiRemoteDied());
+    HdiDeathCallbackCheck(portType, IsHdiRemoteDied());
     if (strlen((const char *)mac) != HDI_MAC_LENGTH || lenMac != HDI_MAC_LENGTH) {
         LOGE("%{public}s: Mac size not correct! real len:%{public}zu, lenMac:%{public}d",
             __func__, strlen((const char *)mac), lenMac);

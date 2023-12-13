@@ -36,6 +36,10 @@
 #define CHECK_STA_HDI_WIFI_PROXY_AND_RETURN(isRemoteDied) \
 if (isRemoteDied) { \
     HdiReleaseLocalResources(); \
+    if (HdiStop() != WIFI_IDL_OPT_OK) { \
+        LOGE("failed to stop sta hdi"); \
+        return WIFI_IDL_OPT_FAILED; \
+    } \
     if (StartHdiWifi() != WIFI_IDL_OPT_OK) { \
         LOGE("[STA] Start hdi failed!"); \
         return WIFI_IDL_OPT_FAILED; \
@@ -372,7 +376,7 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
 
 void HdiUnRegisterStaCallbackEvent()
 {
-    HdiClearScanResults();
+    ClearScanResults();
     pthread_mutex_lock(&g_hdiWifiCallbackMutex);
     if (g_hdiWifiCallbackObj != NULL) {
         WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);

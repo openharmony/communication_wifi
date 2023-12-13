@@ -16,7 +16,6 @@
 #include "wifi_hal_crpc_ap.h"
 #include <securec.h>
 #include "serial.h"
-#include "wifi_hdi_ap_impl.h"
 #include "wifi_hal_ap_interface.h"
 #include "wifi_hal_define.h"
 

@@ -105,6 +105,20 @@ public:
 
     /* ************************ softAp Interface ************************** */
     /**
+     * @Description Start Ap.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo StartAp(int id = 0);
+
+    /**
+     * @Description Close Ap.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo StopAp(int id = 0);
+
+    /**
      * @Description Obtains the hotspot frequency supported by a specified frequency band.
      *
      * @param band

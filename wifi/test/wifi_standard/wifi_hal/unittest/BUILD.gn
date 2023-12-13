@@ -116,7 +116,7 @@ ohos_unittest("wifi_hal_unittest") {
 
   defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]
 
-  if (wifi_feature_is_hdi_supported) {
+  if (wifi_feature_with_wifi_hdi) {
     defines += [ "HDI_INTERFACE_SUPPORT" ]
     external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
   }

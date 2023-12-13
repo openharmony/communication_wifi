@@ -300,7 +300,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnApStaJoinOrLeaveTest, TestSize.Level1)
     OnApStaJoinOrLeave(info, id);
     CStationInfo infomation;
     infomation.type = 1;
-    if (memcpy_s(infomation.mac, WIFI_MAC_ADDR_LENGTH, "00:00:AA:BB:CC:DD", WIFI_MAC_ADDR_LENGTH - 1) != EOK) {
+    if (memcpy_s(infomation.mac, WIFI_MAX_MAC_ADDR_LENGTH, "00:00:AA:BB:CC:DD", WIFI_MAX_MAC_ADDR_LENGTH - 1) != EOK) {
         return;
     }
     IWifiApMonitorEventCallback callback;
@@ -787,7 +787,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pServDiscReqTest, TestSize.Level1)
     OnP2pServDiscReq(info);
     P2pServDiscReqInfo infomation;
     infomation.tlvsLength = LENTH;
-    if (memcpy_s(infomation.tlvs, WIFI_MAC_ADDR_LENGTH, "AABBCCDDEEFFGGHH", LENTH) != EOK) {
+    if (memcpy_s(infomation.tlvs, WIFI_MAX_MAC_ADDR_LENGTH, "AABBCCDDEEFFGGHH", LENTH) != EOK) {
         return;
     }
     P2pHalCallback callback;

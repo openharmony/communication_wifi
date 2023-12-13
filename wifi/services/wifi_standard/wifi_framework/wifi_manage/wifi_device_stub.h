@@ -61,6 +61,7 @@ private:
     void OnStartWps(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnCancelWps(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsWifiActive(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnIsMeteredHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -80,6 +81,7 @@ private:
     void OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnResetAllFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply);
+    void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);

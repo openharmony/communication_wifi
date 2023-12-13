@@ -229,6 +229,14 @@ public:
     virtual ErrCode IsWifiActive(bool &bActive) = 0;
 
     /**
+     * @Description Check whether Wi-Fi is metered hotspot
+     *
+     * @param bMeteredHotspot - isMeteredHotspot / notMeteredHotspot
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsMeteredHotspot(bool &bMeteredHotspot) = 0;
+
+    /**
      * @Description Get the Wifi State
      *
      * @param state - return current wifi state
@@ -379,7 +387,12 @@ public:
     virtual ErrCode StartPortalCertification() = 0;
 
     virtual ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) = 0;
-    
+    /**
+     * @Description reset factory
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode FactoryReset() = 0;
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

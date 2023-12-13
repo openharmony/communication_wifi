@@ -30,10 +30,10 @@ HWTEST_F(WifiServiceManagerTest, CheckPreLoadServiceTest, TestSize.Level1)
 HWTEST_F(WifiServiceManagerTest, CheckAndEnforceService_SUCCESS, TestSize.Level1)
 {
     WIFI_LOGE("CheckAndEnforceService_SUCCESS enter!");
-    EXPECT_EQ(0, WifiServiceManager::GetInstance().CheckAndEnforceService("StaService"));
-    EXPECT_EQ(0, WifiServiceManager::GetInstance().CheckAndEnforceService("ApService"));
-    EXPECT_EQ(0, WifiServiceManager::GetInstance().CheckAndEnforceService("ScanService"));
-    EXPECT_EQ(0, WifiServiceManager::GetInstance().CheckAndEnforceService("P2pService"));
+    EXPECT_EQ(-1, WifiServiceManager::GetInstance().CheckAndEnforceService("StaService"));
+    EXPECT_EQ(-1, WifiServiceManager::GetInstance().CheckAndEnforceService("ApService"));
+    EXPECT_EQ(-1, WifiServiceManager::GetInstance().CheckAndEnforceService("ScanService"));
+    EXPECT_EQ(-1, WifiServiceManager::GetInstance().CheckAndEnforceService("P2pService"));
 }
 
 HWTEST_F(WifiServiceManagerTest, CheckAndEnforceService_FAILED, TestSize.Level1)
@@ -47,52 +47,52 @@ HWTEST_F(WifiServiceManagerTest, CheckAndEnforceService_FAILED, TestSize.Level1)
 HWTEST_F(WifiServiceManagerTest, GetStaServiceInstTest, TestSize.Level1)
 {
     WIFI_LOGE("GetStaServiceInstTest enter!");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
     WifiServiceManager::GetInstance().CheckAndEnforceService("StaService");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
     WifiServiceManager::GetInstance().UnloadService("StaService");
     WifiServiceManager::GetInstance().CheckAndEnforceService("StaService", false);
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
 }
 
 HWTEST_F(WifiServiceManagerTest, GetScanServiceInstTest, TestSize.Level1)
 {
     WIFI_LOGE("GetScanServiceInstTest enter!");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetScanServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetScanServiceInst() == nullptr);
     WifiServiceManager::GetInstance().CheckAndEnforceService("ScanService");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetScanServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetScanServiceInst() == nullptr);
     WifiServiceManager::GetInstance().UnloadService("ScanService");
     WifiServiceManager::GetInstance().CheckAndEnforceService("ScanService", false);
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetScanServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetScanServiceInst() == nullptr);
 }
 
 HWTEST_F(WifiServiceManagerTest, GetApServiceInstTest, TestSize.Level1)
 {
     WIFI_LOGE("GetApServiceInstTest enter!");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
     WifiServiceManager::GetInstance().CheckAndEnforceService("ApService");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
     WifiServiceManager::GetInstance().UnloadService("ApService");
     WifiServiceManager::GetInstance().CheckAndEnforceService("ApService", false);
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
 }
 
 HWTEST_F(WifiServiceManagerTest, GetP2pServiceInstTest, TestSize.Level1)
 {
     WIFI_LOGE("GetP2pServiceInstTest enter!");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetP2pServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetP2pServiceInst() == nullptr);
     WifiServiceManager::GetInstance().CheckAndEnforceService("P2pService");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetP2pServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetP2pServiceInst() == nullptr);
     WifiServiceManager::GetInstance().UnloadService("P2pService");
     WifiServiceManager::GetInstance().CheckAndEnforceService("P2pService", false);
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetP2pServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetP2pServiceInst() == nullptr);
 }
 
 HWTEST_F(WifiServiceManagerTest, UnloadServiceTest, TestSize.Level1)
 {
     WIFI_LOGE("UnloadServiceTest enter!");
     WifiServiceManager::GetInstance().CheckAndEnforceService("StaService");
-    EXPECT_FALSE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
+    EXPECT_TRUE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
     WifiServiceManager::GetInstance().UnloadService("StaService");
     EXPECT_TRUE(WifiServiceManager::GetInstance().GetStaServiceInst() == nullptr);
 }

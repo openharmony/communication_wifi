@@ -15,9 +15,9 @@
 
 // @ts-nocheck
 
-import { TestData } from '../MainAbility/model/testData'
+import { TestData } from '../entryability/model/testData'
 import { TestListItem } from './testListItems';
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 /**
  * Test-List component page of wifi test
  */
@@ -37,7 +37,7 @@ export struct TestList {
           }
         } , item => item.id.toString() )
       }
-      .height( ConfigData.WH_93_100 )
+      .height( ConfigData.WH_100_100 )
       .backgroundColor( $r( "app.color.lead" ) )
     }
   }

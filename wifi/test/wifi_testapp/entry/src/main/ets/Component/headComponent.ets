@@ -15,7 +15,7 @@
 
 // @ts-nocheck
 
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 import Router from '@system.router';
 
 const TAG = "[headComponent]"

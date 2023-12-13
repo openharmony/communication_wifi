@@ -70,7 +70,6 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStateChanged(uint32_t code, MessageP
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int state = data.ReadInt32();
     OnHotspotStateChanged(state);
-    reply.WriteInt32(0);
     return 0;
 }
 
@@ -87,7 +86,6 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStaJoin(uint32_t code, MessageParcel
     readStr = data.ReadCString();
     info.ipAddr = (readStr != nullptr) ? readStr : "";
     OnHotspotStaJoin(info);
-    reply.WriteInt32(0);
     return 0;
 }
 
@@ -104,7 +102,6 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStaLeave(uint32_t code, MessageParce
     readStr = data.ReadCString();
     info.ipAddr = (readStr != nullptr) ? readStr : "";
     OnHotspotStaLeave(info);
-    reply.WriteInt32(0);
     return 0;
 }
 

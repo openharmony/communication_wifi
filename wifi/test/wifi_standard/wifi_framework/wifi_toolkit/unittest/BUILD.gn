@@ -44,6 +44,7 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/sta_network_check.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/network_parser.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/softap_parser.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_app_parser.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_encryption_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/xml_parser.cpp",
@@ -61,6 +62,7 @@ ohos_unittest("toolkit_unittest") {
     "raw_socket_test.cpp",
     "softap_parser_test.cpp",
     "sta_network_check_test.cpp",
+    "wifi_app_parser_test.cpp",
     "wifi_config_file_test.cpp",
     "wifi_encryption_util_test.cpp",
     "wifi_global_func_test.cpp",
@@ -81,6 +83,7 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
+    "$WIFI_ROOT_DIR/utils/inc",
   ]
 
   ldflags = [
@@ -90,6 +93,7 @@ ohos_unittest("toolkit_unittest") {
 
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/libxml2:xml2",

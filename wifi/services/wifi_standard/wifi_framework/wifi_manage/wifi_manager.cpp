@@ -59,7 +59,12 @@ bool WifiManager::mIsMdmForbidden = false;
 const uint32_t PROP_LEN = 26;
 const uint32_t PROP_TRUE_LEN = 4;
 const uint32_t PROP_FALSE_LEN = 5;
+const uint32_t PROP_SUBCHIPTYPE_LEN = 10;
+const std::string SUBCHIP_WIFI_PROP = "ohos.boot.odm.conn.schiptype";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
+const std::string SUPPORT_COEXCHIP = "bisheng";
+const std::string COEX_IFACENAME = "wlan1";
+const int SUPPORT_COEXCHIP_LEN = 7;
 const std::string PROP_TRUE = "true";
 const std::string PROP_FALSE = "false";
 const uint32_t TIMEOUT_SCREEN_EVENT = 3000;
@@ -459,12 +464,10 @@ ErrCode WifiManager::AutoStopApService(AutoStartOrStopServiceReason reason)
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiManager::WifiToggled(int isOpen, int id)
 {
-#ifdef FEATURE_STA_AP_EXCLUSION
-    if (isOpen) {
+    if (!WifiSettings::GetInstance().GetCoexSupport() && isOpen) {
         WIFI_LOGI("set softap toggled false");
         WifiSettings::GetInstance().SetSoftapToggledState(false);
     }
-#endif
     pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
 }
@@ -500,12 +503,10 @@ ErrCode WifiManager::ScanOnlyToggled(int isOpen)
         WIFI_LOGE("Airplane mode do not start scanonly.");
         return WIFI_OPT_FAILED;
     }
-#ifdef FEATURE_STA_AP_EXCLUSION
-    if (WifiManager::GetInstance().HasAnyApRuning()) {
+    if (!WifiSettings::GetInstance().GetCoexSupport() && WifiManager::GetInstance().HasAnyApRuning()) {
         WIFI_LOGE("Softap mode do not start scanonly.");
         return WIFI_OPT_FAILED;
     }
-#endif
     pWifiControllerMachine->SendMessage(CMD_SCAN_ALWAYS_MODE_CHANGED, isOpen, 0);
     return WIFI_OPT_SUCCESS;
 }
@@ -707,6 +708,7 @@ int WifiManager::Init()
     InitScanCallback();
 #ifndef OHOS_ARCH_LITE
     GetMdmProp();
+    GetChipProp();
     RegisterMdmPropListener();
     InitConcreteCallback();
 #endif
@@ -775,6 +777,18 @@ void WifiManager::GetMdmProp()
     if (errorCode > 0) {
         if (strncmp(preValue, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0) {
             mIsMdmForbidden = true;
+        }
+    }
+}
+
+void WifiManager::GetChipProp()
+{
+    char preValue[PROP_SUBCHIPTYPE_LEN] = {0};
+    int errorCode = GetParamValue(SUBCHIP_WIFI_PROP.c_str(), 0, preValue, PROP_SUBCHIPTYPE_LEN);
+    if (errorCode > 0) {
+        if (strncmp(preValue, SUPPORT_COEXCHIP.c_str(), SUPPORT_COEXCHIP_LEN) == 0) {
+            WifiSettings::GetInstance().SetApIfaceName(COEX_IFACENAME);
+            WifiSettings::GetInstance().SetCoexSupport(true);
         }
     }
 }
@@ -1228,6 +1242,9 @@ void WifiManager::DealStaOpenRes(OperateResState state, int instId)
     }
     if ((state == OperateResState::OPEN_WIFI_FAILED) || (state == OperateResState::OPEN_WIFI_DISABLED)) {
         WIFI_LOGE("DealStaOpenRes:wifi open failed!");
+        WifiOprMidState apstate = WifiConfigCenter::GetInstance().GetApMidState(instId);
+        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED), "TIME_OUT",
+            static_cast<int>(apstate));
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
         DealStaCloseRes(state, instId);
         return;
@@ -1288,6 +1305,9 @@ void WifiManager::DealStaCloseRes(OperateResState state, int instId)
     }
     if (state == OperateResState::CLOSE_WIFI_FAILED) {
         WIFI_LOGI("DealStaCloseRes: broadcast wifi close failed event!");
+        WifiOprMidState apstate = WifiConfigCenter::GetInstance().GetApMidState(instId);
+        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
+            static_cast<int>(apstate));
         WifiManager::GetInstance().ForceStopWifi(instId);
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);

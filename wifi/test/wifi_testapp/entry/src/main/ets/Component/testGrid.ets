@@ -15,7 +15,7 @@
 
 // @ts-nocheck
 
-import { TestData } from '../MainAbility/model/testData'
+import { TestData } from '../entryability/model/testData'
 import { TestGridItem } from './testGridItem'
 /**
  * TestGrid component page of wifi test
@@ -25,7 +25,7 @@ import { TestGridItem } from './testGridItem'
 export struct TestGrid {
   private testItems: TestData[]
   private gridRowTemplate: string = ''
-  private heightValue: number
+  private heightValue: Number
 
   aboutToAppear() {
     var rows = Math.round( this.testItems.length / 2 );

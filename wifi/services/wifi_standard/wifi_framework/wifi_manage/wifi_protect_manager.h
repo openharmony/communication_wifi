@@ -25,6 +25,7 @@
 #include "event_handler.h"
 #include "event_runner.h"
 #include "app_mgr_interface.h"
+#include "wifi_event_handler.h"
 #endif
 
 namespace OHOS {
@@ -149,8 +150,7 @@ private:
     bool mForceLowLatencyMode {false};
     std::mutex mMutex;
 #ifndef OHOS_ARCH_LITE
-    std::shared_ptr<AppExecFwk::EventRunner> mAppChangeEventRunner {nullptr};
-    std::shared_ptr<AppExecFwk::EventHandler> mAppChangeEventHandler {nullptr};
+    std::unique_ptr<WifiEventHandler> appChangeEventHandler = nullptr;
     sptr<AppStateObserver> mAppStateObserver {nullptr};
     sptr<AppExecFwk::IAppMgr> mAppObject {nullptr};
 #endif

@@ -15,15 +15,15 @@
 
 // @ts-nocheck
 
-import ConfigData from '../../Utils/ConfigData';
+import ConfigData from '../../utils/ConfigData';
 import router from '@system.router';
-import { TestData } from '../../MainAbility/model/testData'
+import { TestData } from '../../entryability/model/testData'
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { WifiAutoTestCase , initWifiAutoData } from '../../MainAbility/model/autoTestDataModels'
+import { WifiAutoTestCase , initWifiAutoData } from '../../entryability/model/autoTestDataModels'
 import { AutoContentTable } from '../../Component/autoContentTable'
 
-import * as wifiInterface from '../../MainAbility/model/wifiInterface'
+import * as wifiInterface from '../../entryability/model/wifiInterface'
 import prompt from '@system.prompt';
 import emitter from '@ohos.events.emitter'
 
@@ -38,26 +38,26 @@ struct WifiAutoTest {
   //  @State textMessage: string = 'null';
   //  @State testState: boolean = false;
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "wifiAutoTestMessage" ) wifiAutoTestMessage: string = ""
   @State w_ssid: string = "TP-LINK_6365";
   @State w_bssid: string = "6C:B1:58:75:63:65";
   @State w_preSharedKey: string = "12345678";
   @State w_isHiddenSsid: boolean = false;
-  @State w_securityType: number = 3
-  @State w_creatorUid: number = 1;
-  @State w_disableReason: number = 0;
-  @State w_netId: number = 100 ;
-  @State w_randomMacType: number = 0 ;
+  @State w_securityType: Number = 3
+  @State w_creatorUid: Number = 1;
+  @State w_disableReason: Number = 0;
+  @State w_netId: Number = 100 ;
+  @State w_randomMacType: Number = 0 ;
   @State w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType: number = 1 ;
-  @State w_staticIp_ipAddress: number = 3232235880 ;
-  @State w_staticIp_gateway: number = 3232235777 ;
-  @State w_staticIp_dnsServers: number = 3716386629 ;
+  @State w_ipType: Number = 1 ;
+  @State w_staticIp_ipAddress: Number = 3232235880 ;
+  @State w_staticIp_gateway: Number = 3232235777 ;
+  @State w_staticIp_dnsServers: Number = 3716386629 ;
   @State w_staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkId: number = 0 ; // id,netId,networkId是一个值嘛？
-  @State w_featureId: number = 1 ;
+  @State w_networkId: Number = 0 ; // id,netId,networkId是一个值嘛？
+  @State w_featureId: Number = 1 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( 'w_ssid' , this.w_ssid );

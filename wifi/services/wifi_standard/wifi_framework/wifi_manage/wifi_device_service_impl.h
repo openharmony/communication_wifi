@@ -111,6 +111,8 @@ public:
 
     ErrCode GetWifiState(int &state) override;
 
+    ErrCode IsMeteredHotspot(bool &bMeteredHotspot) override;
+
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
@@ -157,6 +159,8 @@ public:
     ErrCode StartPortalCertification() override;
 
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
+
+    ErrCode FactoryReset() override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

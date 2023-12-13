@@ -60,6 +60,8 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_RESET_ALL_FROZEN_APP = 0x1034,      /* reset all frozen app */
     WIFI_SVR_CMD_START_PORTAL_CERTIF = 0x1035,       /* start portal certification */
     WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT = 0x1036,      /* is held the Wi-Fi protect. */
+    WIFI_SVR_CMD_IS_SET_FACTORY_RESET = 0x1037,      /* factory reset */
+    WIFI_SVR_CMD_IS_METERED_HOTSPOT = 0x1038,       /* whether current link is metered hotspot */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */

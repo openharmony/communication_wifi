@@ -38,6 +38,8 @@
 
 namespace OHOS {
 namespace Wifi {
+const std::string DEFAULT_IFACENAME = "wlan0";
+
 WifiSettings &WifiSettings::GetInstance()
 {
     static WifiSettings gWifiSettings;
@@ -50,6 +52,8 @@ WifiSettings::WifiSettings()
       mWifiToggled(false),
       mWifiStoping(false),
       mSoftapToggled(false),
+      mIsSupportCoex(false),
+      mApIfaceName(DEFAULT_IFACENAME),
 #endif
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
@@ -415,6 +419,26 @@ void WifiSettings::SetWifiStopState(bool state)
 bool WifiSettings::GetWifiStopState() const
 {
     return mWifiStoping;
+}
+
+void WifiSettings::SetCoexSupport(bool isSupport)
+{
+    mIsSupportCoex = isSupport;
+}
+
+bool WifiSettings::GetCoexSupport() const
+{
+    return mIsSupportCoex;
+}
+
+void WifiSettings::SetApIfaceName(const std::string &ifaceName)
+{
+    mApIfaceName = ifaceName;
+}
+
+std::string WifiSettings::GetApIfaceName() const
+{
+    return mApIfaceName;
 }
 #endif
 
@@ -1345,17 +1369,20 @@ int WifiSettings::GetP2pConnectedState()
     return mP2pConnectState.load();
 }
 
-int WifiSettings::SetHid2dUpperScene(const Hid2dUpperScene &scene)
+int WifiSettings::SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene)
 {
+    LOGD("SetHid2dUpperScene ifName: %{public}s", ifName.c_str());
     std::unique_lock<std::mutex> lock(mP2pMutex);
+    mUpperIfName = ifName;
     mUpperScene = scene;
     return 0;
 }
 
-int WifiSettings::GetHid2dUpperScene(Hid2dUpperScene &scene)
+int WifiSettings::GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene)
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
     scene = mUpperScene;
+    ifName = mUpperIfName;
     return 0;
 }
 
@@ -1376,10 +1403,14 @@ int WifiSettings::GetP2pBusinessType(P2pBusinessType &type)
 void WifiSettings::ClearLocalHid2dInfo()
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
-    mUpperScene.mac = "";
-    mUpperScene.scene = 0;
-    mUpperScene.fps = 0;
-    mUpperScene.bw = 0;
+    if (strstr(mUpperIfName.c_str(), "chba") == NULL) {
+        mUpperScene.mac = "";
+        mUpperScene.scene = 0;
+        mUpperScene.fps = 0;
+        mUpperScene.bw = 0;
+        mUpperIfName = "";
+    }
+
     mP2pBusinessType = P2pBusinessType::INVALID;
 }
 
@@ -1488,6 +1519,22 @@ void WifiSettings::InitDefaultHotspotConfig()
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {
         mHotspotConfig[0] = cfg;
+    }
+}
+
+void WifiSettings::ClearHotspotConfig()
+{
+    mHotspotConfig.clear();
+    HotspotConfig config;
+    config.SetSecurityType(KeyMgmt::WPA2_PSK);
+    config.SetBand(BandType::BAND_2GHZ);
+    config.SetChannel(AP_CHANNEL_DEFAULT);
+    config.SetMaxConn(GetApMaxConnNum());
+    config.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
+    config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+    auto ret = mHotspotConfig.emplace(0, config);
+    if (!ret.second) {
+        mHotspotConfig[0] = config;
     }
 }
 

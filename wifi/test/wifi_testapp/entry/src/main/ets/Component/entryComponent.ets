@@ -16,7 +16,7 @@
 // @ts-nocheck
 
 import ComponentConfig from './componentconfig';
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 /**
  * entry contentTable Component Page Of Wifi test
  */

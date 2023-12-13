@@ -20,6 +20,7 @@
 #include "wifi_settings.h"
 #include "wifi_msg.h"
 #include "wifi_system_timer.h"
+#include "wifi_hisysevent.h"
 #ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
 #endif
@@ -106,6 +107,7 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessage *msg)
             if (msg->GetParam1()) {
                 int id = msg->GetParam2();
                 pWifiControllerMachine->MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, id);
+                pWifiControllerMachine->StartTimer(CMD_AP_START_TIME, SFOT_AP_TIME_OUT);
                 pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
             }
             break;
@@ -175,10 +177,12 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             pWifiControllerMachine->HandleConcreteStop(msg->GetParam1());
             break;
         case CMD_AP_START:
+            pWifiControllerMachine->StopTimer(CMD_AP_START_TIME);
             HandleApStart(msg->GetParam1());
             break;
         case CMD_AP_STOPPED:
         case CMD_AP_START_FAILURE:
+            pWifiControllerMachine->StopTimer(CMD_AP_STOP_TIME);
             pWifiControllerMachine->StopSoftapCloseTimer();
             pWifiControllerMachine->HandleSoftapStop(msg->GetParam1());
             break;
@@ -188,6 +192,12 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             } else {
                 pWifiControllerMachine->HandleAirplaneClose();
             }
+            break;
+        case CMD_AP_START_TIME:
+            WriteSoftApOpenAndCloseFailedEvent(static_cast<int>(SoftApperateType::OPEN_SOFT_AP_FAILED), "TIME_OUT");
+            break;
+        case CMD_AP_STOP_TIME:
+            WriteSoftApOpenAndCloseFailedEvent(static_cast<int>(SoftApperateType::CLOSE_SOFT_AP_FAILED), "TIME_OUT");
             break;
         default:
             break;
@@ -236,12 +246,10 @@ void WifiControllerMachine::HandleAirplaneClose()
     if (!ShouldEnableWifi() || WifiSettings::GetInstance().GetWifiStopState()) {
         return;
     }
-#ifdef FEATURE_STA_AP_EXCLUSION
-    if (HasAnySoftApManager()) {
+    if (!WifiSettings::GetInstance().GetCoexSupport() && HasAnySoftApManager()) {
         WIFI_LOGE("HandleAirplaneClose, has softap in runing return.");
         return;
     }
-#endif
     ConcreteManagerRole role = GetWifiRole();
     if (role == ConcreteManagerRole::ROLE_UNKNOW) {
         WIFI_LOGE("Get unknow wifi role in HandleAirplaneClose.");
@@ -502,12 +510,11 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
         return;
     }
     WifiSettings::GetInstance().SetWifiStopState(false);
-#ifdef FEATURE_STA_AP_EXCLUSION
-    if (pWifiControllerMachine->HasAnySoftApManager()) {
+    if (!WifiSettings::GetInstance().GetCoexSupport() &&
+        pWifiControllerMachine->HasAnySoftApManager()) {
         pWifiControllerMachine->StopAllSoftapManagers();
         return;
     }
-#endif
     presentRole = pWifiControllerMachine->GetWifiRole();
     if (presentRole == ConcreteManagerRole::ROLE_UNKNOW) {
         WIFI_LOGE("Get unknow wifi role  in EnableState.");
@@ -522,33 +529,32 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
     int id = msg->GetParam2();
     WIFI_LOGE("handleSoftapToggleChangeInEnabledState");
     if (msg->GetParam1() == 1) {
-#ifdef FEATURE_STA_AP_EXCLUSION
-        if (pWifiControllerMachine->HasAnyConcreteManager()) {
+        if (!WifiSettings::GetInstance().GetCoexSupport() &&
+            pWifiControllerMachine->HasAnyConcreteManager()) {
             pWifiControllerMachine->StopAllConcreteManagers();
             pWifiControllerMachine->mApidStopWifi = id;
             return;
         }
-#endif
         if (!pWifiControllerMachine->SoftApIdExit(id)) {
             pWifiControllerMachine->MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, id);
             return;
         }
     }
-#ifdef FEATURE_STA_AP_EXCLUSION
-    if (pWifiControllerMachine->ShouldEnableWifi() && !WifiSettings::GetInstance().GetWifiStopState() &&
+    if (!WifiSettings::GetInstance().GetCoexSupport() &&
+        pWifiControllerMachine->ShouldEnableWifi() && !WifiSettings::GetInstance().GetWifiStopState() &&
         pWifiControllerMachine->HasAnyConcreteManager()) {
         ConcreteManagerRole role = pWifiControllerMachine->GetWifiRole();
         if (role != ConcreteManagerRole::ROLE_UNKNOW) {
             pWifiControllerMachine->SwitchRole(role);
         }
     }
-#endif
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(id);
     if (apState == WifiOprMidState::CLOSING || apState == WifiOprMidState::OPENING) {
         return;
     }
     if (pWifiControllerMachine->SoftApIdExit(id)) {
         pWifiControllerMachine->StopSoftapManager(id);
+        pWifiControllerMachine->StartTimer(CMD_AP_STOP_TIME, SFOT_AP_TIME_OUT);
         return;
     }
 }
@@ -586,28 +592,28 @@ void WifiControllerMachine::HandleConcreteStop(int id)
 {
     int airplanstate = WifiConfigCenter::GetInstance().GetAirplaneModeState();
     RmoveConcreteManager(id);
-#ifdef FEATURE_STA_AP_EXCLUSION
-    if (ShouldEnableSoftap() && airplanstate != MODE_STATE_OPEN &&
-        !SoftApIdExit(mApidStopWifi)) {
-        MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, mApidStopWifi);
-        return;
-    }
-    if (airplanstate != MODE_STATE_OPEN && !WifiManager::GetInstance().HasAnyApRuning()) {
-        if (ShouldEnableWifi()) {
-            ConcreteManagerRole presentRole = GetWifiRole();
-            MakeConcreteManager(presentRole, 0);
+    if (!WifiSettings::GetInstance().GetCoexSupport()) {
+        if (ShouldEnableSoftap() && airplanstate != MODE_STATE_OPEN &&
+            !SoftApIdExit(mApidStopWifi)) {
+            MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, mApidStopWifi);
             return;
         }
-    }
-#else
-    if (airplanstate != MODE_STATE_OPEN) {
-        if (ShouldEnableWifi()) {
-            ConcreteManagerRole presentRole = GetWifiRole();
-            MakeConcreteManager(presentRole, 0);
-            return;
+        if (airplanstate != MODE_STATE_OPEN && !WifiManager::GetInstance().HasAnyApRuning()) {
+            if (ShouldEnableWifi()) {
+                ConcreteManagerRole presentRole = GetWifiRole();
+                MakeConcreteManager(presentRole, 0);
+                return;
+            }
+        }
+    } else {
+        if (airplanstate != MODE_STATE_OPEN) {
+            if (ShouldEnableWifi()) {
+                ConcreteManagerRole presentRole = GetWifiRole();
+                MakeConcreteManager(presentRole, 0);
+                return;
+            }
         }
     }
-#endif
     if (!(HasAnyManager())) {
         SwitchState(pDisableState);
     }

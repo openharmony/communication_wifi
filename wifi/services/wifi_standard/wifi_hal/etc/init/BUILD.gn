@@ -25,6 +25,7 @@ group("etc") {
   if (!defined(ohos_lite)) {
     deps += [
       ":hostapd.conf",
+      ":hostapd_coex.conf",
       ":p2p_supplicant.conf",
       ":wifi_hal_service.cfg",
     ]
@@ -76,6 +77,18 @@ if (defined(ohos_lite)) {
       source = "unix_socket/p2p_supplicant.conf"
     } else {
       source = "udp_socket/p2p_supplicant.conf"
+    }
+    relative_install_dir = "wifi"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_prebuilt_etc("hostapd_coex.conf") {
+    source = "hostapd_coex.conf"
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "default_conf/unix_socket/hostapd_coex.conf"
+    } else {
+      source = "default_conf/udp_socket/hostapd_coex.conf"
     }
     relative_install_dir = "wifi"
     part_name = "wifi"

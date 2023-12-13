@@ -61,6 +61,7 @@
             "wifi_feature_sta_ap_exclusion",
             "wifi_feature_with_random_mac_addr",
             "wifi_feature_with_hdi_wpa_supported",
+            "wifi_feature_with_rx_listen_supported",
 	    "wifi_feature_with_scan_control"
         ],
         "adapted_system_type": [
@@ -153,7 +154,8 @@
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_hal/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/native:unittest",
-                "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_base:unittest"
+                "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_base:unittest",
+                "//foundation/communication/wifi/wifi/test/wifi_utils/unittest:unittest"
             ]
         },
         "hisysevent_config": [

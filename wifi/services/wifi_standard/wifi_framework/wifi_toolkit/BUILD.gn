@@ -57,6 +57,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
+  "$WIFI_ROOT_DIR/utils/inc",
 ]
 
 if (defined(ohos_lite)) {
@@ -101,6 +102,7 @@ if (defined(ohos_lite)) {
     sources += [
       "utils/network_parser.cpp",
       "utils/softap_parser.cpp",
+      "utils/wifi_app_parser.cpp",
       "utils/wifi_cert_utils.cpp",
       "utils/xml_parser.cpp",
     ]
@@ -110,10 +112,12 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
       "//base/security/certificate_manager/frameworks/cert_manager_standard/main/common/include",
       "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include",
+      "$WIFI_ROOT_DIR/utils/inc",
     ]
 
     deps = [
       "//third_party/curl:curl",
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//third_party/libxml2:xml2",
     ]
 

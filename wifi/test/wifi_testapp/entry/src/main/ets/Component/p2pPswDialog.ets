@@ -16,7 +16,7 @@
 // @ts-nocheck
 
 import wifi from '@ohos.wifi'
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 /**
  * PswDialog page of WiFi test
  */

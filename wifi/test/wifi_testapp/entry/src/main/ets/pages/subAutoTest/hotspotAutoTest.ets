@@ -15,14 +15,14 @@
 
 // @ts-nocheck
 
-import ConfigData from '../../Utils/ConfigData';
+import ConfigData from '../../utils/ConfigData';
 import router from '@system.router';
-import { TestData } from '../../MainAbility/model/testData'
+import { TestData } from '../../entryability/model/testData'
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { HotspotAutoTestCase , initHotspotAutoData } from '../../MainAbility/model/autoTestDataModels'
+import { HotspotAutoTestCase , initHotspotAutoData } from '../../entryability/model/autoTestDataModels'
 import { AutoContentTable } from '../../Component/autoContentTable'
-import * as hotspotInterface from '../../MainAbility/model/hotspotInterface'
+import * as hotspotInterface from '../../entryability/model/hotspotInterface'
 import prompt from '@system.prompt';
 import emitter from '@ohos.events.emitter'
 
@@ -36,15 +36,15 @@ struct HotspotAutoTest {
   //  @State textMessage: string = 'null';
   //  @State testState: boolean = false;
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "hotspotAutoTestMessage" ) hotspotAutoTestMessage: string = ""
   @State h_ssid: string = "testApp1";
-  @State h_securityType: number = 3;
-  @State h_band: number = 2;
+  @State h_securityType: Number = 3;
+  @State h_band: Number = 2;
   @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: number = 3 ;
-  @State h_channel: number = 36 ;
+  @State h_maxConn: Number = 3 ;
+  @State h_channel: Number = 36 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "h_ssid" , this.h_ssid )

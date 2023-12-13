@@ -28,7 +28,7 @@ WifiHotspotCallbackProxy::WifiHotspotCallbackProxy(const sptr<IRemoteObject> &im
 void WifiHotspotCallbackProxy::OnHotspotStateChanged(int state)
 {
     WIFI_LOGD("WifiHotspotCallbackProxy::OnHotspotStateChanged state %{public}d", state);
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -44,18 +44,13 @@ void WifiHotspotCallbackProxy::OnHotspotStateChanged(int state)
             static_cast<int32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi hotspot state change failed!");
-    }
-
     return;
 }
 
 void WifiHotspotCallbackProxy::OnHotspotStaJoin(const StationInfo &info)
 {
     WIFI_LOGD("WifiHotspotCallbackProxy::OnHotspotStaJoin");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -74,17 +69,13 @@ void WifiHotspotCallbackProxy::OnHotspotStaJoin(const StationInfo &info)
             static_cast<int32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_JOIN), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi hotspot join failed!");
-    }
     return;
 }
 
 void WifiHotspotCallbackProxy::OnHotspotStaLeave(const StationInfo &info)
 {
     WIFI_LOGD("WifiHotspotCallbackProxy::OnHotspotStaLeave");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -102,10 +93,6 @@ void WifiHotspotCallbackProxy::OnHotspotStaLeave(const StationInfo &info)
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE), error);
         return;
-    }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi hotspot leave failed!");
     }
     return;
 }

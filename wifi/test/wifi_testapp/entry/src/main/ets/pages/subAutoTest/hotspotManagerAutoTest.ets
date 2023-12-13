@@ -15,14 +15,14 @@
 
 // @ts-nocheck
 
-import ConfigData from '../../Utils/ConfigData';
+import ConfigData from '../../utils/ConfigData';
 import router from '@system.router';
-import { TestData } from '../../MainAbility/model/testData'
+import { TestData } from '../../entryability/model/testData'
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { HotspotManagerAutoTestCase , initHotspotManagerAutoData } from '../../MainAbility/model/autoTestDataModels'
+import { HotspotManagerAutoTestCase , initHotspotManagerAutoData } from '../../entryability/model/autoTestDataModels'
 import { AutoContentTable } from '../../Component/autoContentTable'
-import * as hotspotManagerInterface from '../../MainAbility/model/hotspotManagerInterface'
+import * as hotspotManagerInterface from '../../entryability/model/hotspotManagerInterface'
 import prompt from '@system.prompt';
 import emitter from '@ohos.events.emitter'
 
@@ -36,15 +36,15 @@ struct HotspotManagerAutoTest {
   //  @State textMessage: string = 'null';
   //  @State testState: boolean = false;
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   //  @State autoTextMessage: string ="None";
   @StorageLink( "hotspotManagerAutoTestMessage" ) hotspotManagerAutoTestMessage: string = ""
   @State h_ssid1: string = "testApp1";
-  @State h_securityType1: number = 3;
-  @State h_band1: number = 2;
+  @State h_securityType1: Number = 3;
+  @State h_band1: Number = 2;
   @State h_preSharedKey1: string = "12345678";
-  @State h_maxConn1: number = 3 ;
-  @State h_channel1: number = 36 ;
+  @State h_maxConn1: Number = 3 ;
+  @State h_channel1: Number = 36 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "h_ssid1" , this.h_ssid1 )

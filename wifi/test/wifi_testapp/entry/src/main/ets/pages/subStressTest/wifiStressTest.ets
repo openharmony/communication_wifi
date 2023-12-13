@@ -20,12 +20,12 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { StressContentTable } from '../../Component/stressContentTable';
 import router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import LogUtil from '../../Utils/LogUtil';
-import { initWifiStressData } from '../../MainAbility/model/stressTestDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import LogUtil from '../../utils/LogUtil';
+import { initWifiStressData } from '../../entryability/model/stressTestDataModels'
+import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../Utils/Util'
+import { resolveIP } from '../../utils/Util'
 import socket from '@ohos.net.socket';
 import http from '@ohos.net.http'
 import request from '@ohos.request'
@@ -61,27 +61,27 @@ struct WifiStressTest {
   private testItem: TestData = router.getParams().testId;
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: Number = - 1;
   @StorageLink( 'pairedMac' ) pairedMac: string = "";
   @State w_ssid: string = "TP-LINK_6365";
   @State w_bssid: string = "6C:B1:58:75:63:65";
   @State w_preSharedKey: string = "12345678";
   @State w_isHiddenSsid: boolean = false;
-  @State w_securityType: number = 3
-  @State w_creatorUid: number = 1;
-  @State w_disableReason: number = 0;
-  @State w_netId: number = 100 ;
-  @State w_randomMacType: number = 0 ;
+  @State w_securityType: Number = 3
+  @State w_creatorUid: Number = 1;
+  @State w_disableReason: Number = 0;
+  @State w_netId: Number = 100 ;
+  @State w_randomMacType: Number = 0 ;
   @State w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType: number = 1 ;
-  @State w_staticIp_ipAddress: number = 3232235880 ;
-  @State w_staticIp_gateway: number = 3232235777 ;
-  @State w_staticIp_dnsServers: number = 3716386629 ;
+  @State w_ipType: Number = 1 ;
+  @State w_staticIp_ipAddress: Number = 3232235880 ;
+  @State w_staticIp_gateway: Number = 3232235777 ;
+  @State w_staticIp_dnsServers: Number = 3716386629 ;
   @State w_staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkId: number = 0 ; // id,netId,networkId是一个值嘛？
-  @State w_featureId: number = 1 ;
-  @StorageLink( 'stressNumber' ) stressNumber: number = 0 ;
-  @StorageLink( 'stressTime' ) stressTime: number = 0;
+  @State w_networkId: Number = 0 ; // id,netId,networkId是一个值嘛？
+  @State w_featureId: Number = 1 ;
+  @StorageLink( 'stressNumber' ) stressNumber: Number = 0 ;
+  @StorageLink( 'stressTime' ) stressTime: Number = 0;
   //  @StorageLink('getDeviceConfigsMessage') getDeviceConfigsMessage: string = '';
   //  @StorageLink('getScanInfoMessage') getScanInfoMessage: string = '';
 
@@ -249,19 +249,19 @@ struct WifiDeviceSetting {
   @State w_bssid: string = "6C:B1:58:75:63:65"; //6C:B1:58:75:63:65
   @State w_preSharedKey: string = "12345678"; //kaihong123
   @State w_isHiddenSsid: boolean = false;
-  @State w_securityType: number = 3
-  @State w_creatorUid: number = 1;
-  @State w_disableReason: number = 0;
-  @State w_netId: number = 100 ;
-  @State w_randomMacType: number = 0 ;
+  @State w_securityType: Number = 3
+  @State w_creatorUid: Number = 1;
+  @State w_disableReason: Number = 0;
+  @State w_netId: Number = 100 ;
+  @State w_randomMacType: Number = 0 ;
   @State w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType: number = 1 ;
-  @State w_staticIp_ipAddress: number = 3232235880 ;
-  @State w_staticIp_gateway: number = 3232235777 ;
-  @State w_staticIp_dnsServers: number = 3716386629 ;
+  @State w_ipType: Number = 1 ;
+  @State w_staticIp_ipAddress: Number = 3232235880 ;
+  @State w_staticIp_gateway: Number = 3232235777 ;
+  @State w_staticIp_dnsServers: Number = 3716386629 ;
   @State w_staticIp_domains: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkId: number = 0 ; // id,netId,networkId是一个值嘛？
-  @State w_featureId: number = 1 ;
+  @State w_networkId: Number = 0 ; // id,netId,networkId是一个值嘛？
+  @State w_featureId: Number = 1 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( 'w_ssid' , this.w_ssid );
@@ -372,7 +372,7 @@ struct WifiDeviceSetting {
                   .selectedOptionFont( { size : 17 } )
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
-                  .onSelect( ( index: number ) => {
+                  .onSelect( ( index: Number ) => {
                     console.log( "Select:" + index )
                     this.w_securityType = index;
                     AppStorage.SetOrCreate( 'w_securityType' , this.w_securityType );
@@ -761,8 +761,8 @@ struct socketTest {
 
 @Component
 struct upDownLoad {
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []

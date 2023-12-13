@@ -43,6 +43,8 @@
     "pages/subAppTest/p2pDiscoveryTest",
     "pages/subStabilityTest/wifiSwitchStabilityTest",
     "pages/subStabilityTest/wifiScanStabilityTest",
-    "pages/subStabilityTest/wifiConnectStabilityTest"
+    "pages/subStabilityTest/wifiConnectStabilityTest",
+    "pages/subStabilityTest/hotspotStabilityTest",
+    "pages/subStabilityTest/webLatencyTest"
   ]
 }

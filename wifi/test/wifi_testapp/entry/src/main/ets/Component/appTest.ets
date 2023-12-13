@@ -15,7 +15,7 @@
 
 // @ts-nocheck
 
-import { TestData } from '../MainAbility/model/testData'
+import { TestData } from '../entryability/model/testData'
 import { TestList } from './testList';
 
 /**

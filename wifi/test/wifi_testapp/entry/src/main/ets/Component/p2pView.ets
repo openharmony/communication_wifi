@@ -16,8 +16,8 @@
 // @ts-nocheck
 
 const TAG = "[P2pView]"
-import ConfigData from '../Utils/ConfigData';
-import { testOnP2pConnectionChange , testGetCurrentGroupCallback } from '../MainAbility/model/p2pInterface'
+import ConfigData from '../utils/ConfigData';
+import { testOnP2pConnectionChange , testGetCurrentGroupCallback } from '../entryability/model/p2pInterface'
 /**
  * P2pView Component of p2p test
  */
@@ -26,7 +26,7 @@ import { testOnP2pConnectionChange , testGetCurrentGroupCallback } from '../Main
 export struct P2pView {
   private p2p: any = null
   private securityString: Resource = $r( 'app.string.useful' )
-  private p2pConnectState: number = 0
+  private p2pConnectState: Number = 0
   private p2pLinkedDeviceName: string = ""
   @State isLock: boolean = true
 

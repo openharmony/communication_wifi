@@ -25,6 +25,7 @@
 #include "iservice_registry.h"
 #include "app_mgr_constants.h"
 #include "define.h"
+#include "wifi_rx_listen_arbitration.h"
 #endif
 
 #undef LOG_TAG
@@ -47,16 +48,11 @@ WifiProtectManager::WifiProtectManager()
     mFullLowLatencyProtectsReleased = 0;
     mWifiProtects.clear();
 #ifndef OHOS_ARCH_LITE
-    mAppChangeEventRunner = AppExecFwk::EventRunner::Create(WIFI_APP_CHANGE_MGR_WORK_THREAD);
-    if (!mAppChangeEventRunner) {
-        LOGE("Create event runner failed.");
-        return;
-    }
-    mAppChangeEventHandler = std::make_shared<AppExecFwk::EventHandler>(mAppChangeEventRunner);
-    if (mAppChangeEventHandler) {
+    appChangeEventHandler = std::make_unique<WifiEventHandler>(WIFI_APP_CHANGE_MGR_WORK_THREAD);
+    if (appChangeEventHandler) {
         std::function<void()> RegisterAppStateObserverFunc =
                             std::bind(&WifiProtectManager::RegisterAppStateObserver, this);
-        mAppChangeEventHandler->PostSyncTask(RegisterAppStateObserverFunc);
+        appChangeEventHandler->PostSyncTask(RegisterAppStateObserverFunc);
     } else {
         LOGE("Create event handler failed.");
     }
@@ -67,13 +63,8 @@ WifiProtectManager::WifiProtectManager()
 WifiProtectManager::~WifiProtectManager()
 {
 #ifndef OHOS_ARCH_LITE
-    if (mAppChangeEventRunner) {
-        mAppChangeEventRunner->Stop();
-        mAppChangeEventRunner.reset();
-    }
-
-    if (mAppChangeEventHandler) {
-        mAppChangeEventHandler.reset();
+    if (appChangeEventHandler) {
+        appChangeEventHandler.reset();
     }
 
     if (mAppStateObserver) {
@@ -90,7 +81,7 @@ WifiProtectManager &WifiProtectManager::GetInstance()
 
 bool WifiProtectManager::IsValidProtectMode(const WifiProtectMode &protectMode)
 {
-    if (protectMode != WifiProtectMode::WIFI_PROTECT_FULL && 
+    if (protectMode != WifiProtectMode::WIFI_PROTECT_FULL &&
         protectMode != WifiProtectMode::WIFI_PROTECT_SCAN_ONLY &&
         protectMode != WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF &&
         protectMode != WifiProtectMode::WIFI_PROTECT_FULL_LOW_LATENCY) {
@@ -559,6 +550,9 @@ void AppStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppState
 
     WifiProtectManager::GetInstance().OnAppForegroudChanged(
         appStateData.bundleName, appStateData.state);
+    #ifdef FEATURE_RX_LISTEN_SUPPORT
+        RxListenArbitration::GetInstance().OnForegroundAppChanged(appStateData);
+    #endif
 }
 #endif
 }  // namespace Wifi

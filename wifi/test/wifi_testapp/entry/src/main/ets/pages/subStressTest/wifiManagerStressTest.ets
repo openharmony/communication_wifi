@@ -20,12 +20,12 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { StressContentTable } from '../../Component/stressContentTable';
 import router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import LogUtil from '../../Utils/LogUtil';
-import { initWifiManagerStressData } from '../../MainAbility/model/stressTestDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import LogUtil from '../../utils/LogUtil';
+import { initWifiManagerStressData } from '../../entryability/model/stressTestDataModels'
+import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../Utils/Util'
+import { resolveIP } from '../../utils/Util'
 import socket from '@ohos.net.socket';
 import http from '@ohos.net.http'
 import request from '@ohos.request'
@@ -62,27 +62,27 @@ struct wifiManagerStressTest {
   private testItem: TestData = router.getParams().testId;
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: Number = - 1;
   @StorageLink( 'pairedMac' ) pairedMac: string = "";
   @State w_ssid1: string = "TP-LINK_6365";
   @State w_bssid1: string = "6C:B1:58:75:63:65";
   @State w_preSharedKey1: string = "12345678";
   @State w_isHiddenSsid1: boolean = false;
-  @State w_securityType1: number = 3
-  @State w_creatorUid1: number = 1;
-  @State w_disableReason1: number = 0;
-  @State w_netId1: number = 0 ;
-  @State w_randomMacType1: number = 0 ;
+  @State w_securityType1: Number = 3
+  @State w_creatorUid1: Number = 1;
+  @State w_disableReason1: Number = 0;
+  @State w_netId1: Number = 0 ;
+  @State w_randomMacType1: Number = 0 ;
   @State w_randomMacAddr1: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType1: number = 1 ;
-  @State w_staticIp_ipAddress1: number = 3232235880 ;
-  @State w_staticIp_gateway1: number = 3232235777 ;
-  @State w_staticIp_dnsServers1: number = 3716386629 ;
+  @State w_ipType1: Number = 1 ;
+  @State w_staticIp_ipAddress1: Number = 3232235880 ;
+  @State w_staticIp_gateway1: Number = 3232235777 ;
+  @State w_staticIp_dnsServers1: Number = 3716386629 ;
   @State w_staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkIdM: number = 0 ;
-  @State w_featureIdM: number = 1 ;
-  @StorageLink( 'stressNumber' ) stressNumber: number = 0 ;
-  @StorageLink( 'stressTime' ) stressTime: number = 0;
+  @State w_networkIdM: Number = 0 ;
+  @State w_featureIdM: Number = 1 ;
+  @StorageLink( 'stressNumber' ) stressNumber: Number = 0 ;
+  @StorageLink( 'stressTime' ) stressTime: Number = 0;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( 'w_ssid1' , this.w_ssid1 );
@@ -249,19 +249,19 @@ struct WifiManagerDeviceSetting {
   private w_bssid1 = "6C:B1:58:75:63:65";
   private w_preSharedKey1 = "12345678";
   private w_isHiddenSsid1 = "false";
-  @State w_securityType1: number = 3
-  @State w_creatorUid1: number = 1;
-  @State w_disableReason1: number = 0;
-  @State w_netId1: number = 0 ;
-  @State w_randomMacType1: number = 0 ;
+  @State w_securityType1: Number = 3
+  @State w_creatorUid1: Number = 1;
+  @State w_disableReason1: Number = 0;
+  @State w_netId1: Number = 0 ;
+  @State w_randomMacType1: Number = 0 ;
   @State w_randomMacAddr1: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType1: number = 1 ;
-  @State w_staticIp_ipAddress1: number = 3232235880 ;
-  @State w_staticIp_gateway1: number = 3232235777 ;
-  @State w_staticIp_dnsServers1: number = 3716386629 ;
+  @State w_ipType1: Number = 1 ;
+  @State w_staticIp_ipAddress1: Number = 3232235880 ;
+  @State w_staticIp_gateway1: Number = 3232235777 ;
+  @State w_staticIp_dnsServers1: Number = 3716386629 ;
   @State w_staticIp_domains1: Array<string> = [ "0", "1", "2" ] ;
-  @State w_networkIdM: number = 0 ;
-  @State w_featureIdM: number = 1 ;
+  @State w_networkIdM: Number = 0 ;
+  @State w_featureIdM: Number = 1 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( 'w_ssid1' , this.w_ssid1 );
@@ -372,7 +372,7 @@ struct WifiManagerDeviceSetting {
                   .selectedOptionFont( { size : 17 } )
                   .optionFont( { size : 15 } )
                   .width( ConfigData.WH_80_100 )
-                  .onSelect( ( index: number ) => {
+                  .onSelect( ( index: Number ) => {
                     console.log( "Select:" + index )
                     this.w_securityType1 = index;
                     AppStorage.SetOrCreate( 'w_securityType1' , index );
@@ -761,8 +761,8 @@ struct socketTest {
 
 @Component
 struct upDownLoad {
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []

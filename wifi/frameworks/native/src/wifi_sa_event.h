@@ -15,6 +15,7 @@
 
 #ifndef OHOS_WIFI_SA_EVENT_H
 #define OHOS_WIFI_SA_EVENT_H
+#include <mutex>
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
 #include "../../interfaces/kits/c/wifi_event.h"
@@ -28,6 +29,7 @@
 #include "i_wifi_p2p_callback.h"
 #include "../../interfaces/kits/c/wifi_p2p.h"
 #include "../../interfaces/kits/c/wifi_hid2d.h"
+#include "wifi_event_handler.h"
 
 class WifiCDeviceEventCallback : public OHOS::Wifi::IWifiDeviceCallBack {
 public:
@@ -134,6 +136,9 @@ public:
     WifiCfgChangCallback cfgChangeCallback;
 
 private:
+    std::mutex p2pCallbackMutex;
+
+private:
     WifiP2pLinkedInfo ConvertP2pLinkedInfo(const OHOS::Wifi::WifiP2pLinkedInfo& linkedInfo);
 };
 
@@ -151,9 +156,9 @@ public:
 
 class EventManager {
 public:
-    EventManager() {}
+    EventManager();
 
-    virtual ~EventManager() {}
+    ~EventManager();
 
     bool AddEventCallback(WifiEvent *cb);
 
@@ -169,7 +174,7 @@ public:
 
     void SetIsEventRegistrated(bool isEventRegistered);
 
-    std::set<WifiEvent*> GetEventCallBacks();
+    std::set<WifiEvent*>& GetEventCallBacks();
 
     void Init();
 
@@ -181,7 +186,14 @@ public:
 
     OHOS::sptr<WifiP2pCEventCallback> GetP2PCallbackPtr();
 
+    std::unique_ptr<OHOS::Wifi::WifiEventHandler>& GetWifiCEventHandler();
+    
+    std::unique_ptr<OHOS::Wifi::WifiEventHandler>& GetWifiP2pCEventHandler();
+
     static EventManager& GetInstance();
+
+public:
+    static std::mutex callbackMutex;
 
 private:
     static std::set<WifiEvent*> m_setEventCallback;
@@ -189,5 +201,7 @@ private:
     std::set<std::string> p2pRegisteredCallbackEvent;
     OHOS::sptr<WifiP2pCEventCallback> sptrP2PCallback = nullptr;
     OHOS::sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
+    std::unique_ptr<OHOS::Wifi::WifiEventHandler> wifiCEventHandler = nullptr;
+    std::unique_ptr<OHOS::Wifi::WifiEventHandler> wifiP2pCEventHandler = nullptr;
 };
 #endif

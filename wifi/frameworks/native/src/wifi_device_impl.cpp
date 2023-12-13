@@ -326,6 +326,13 @@ ErrCode WifiDeviceImpl::GetDisconnectedReason(DisconnectedReason &reason)
     return client_->GetDisconnectedReason(reason);
 }
 
+ErrCode WifiDeviceImpl::IsMeteredHotspot(bool &bMeteredHotspot)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->IsMeteredHotspot(bMeteredHotspot);
+}
+
 ErrCode WifiDeviceImpl::GetIpInfo(IpInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -454,6 +461,13 @@ ErrCode WifiDeviceImpl::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceCon
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetChangeDeviceConfig(value, config);
+}
+
+ErrCode WifiDeviceImpl::FactoryReset()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->FactoryReset();
 }
 }  // namespace Wifi
 }  // namespace OHOS

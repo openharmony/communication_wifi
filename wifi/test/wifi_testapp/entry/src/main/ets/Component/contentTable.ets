@@ -16,9 +16,9 @@
 
 // @ts-nocheck
 
-import { TestData , TestApi } from '../MainAbility/model/testData'
+import { TestData , TestApi } from '../entryability/model/testData'
 import prompt from '@system.prompt';
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 
 const TAG = "[contentTable]"
 /**
@@ -33,12 +33,12 @@ export struct GetProfileConnSateDialog {
     { value : 'HANDS_FREE_AUDIO_GATEWAY' },
     { value : 'HID_HOST' }
   ]
-  @State currentClick: number = 1;
+  @State currentClick: Number = 1;
   @Link textValue: string
   @Link inputValue: string
   @Link apiItem: TestApi
-  @Link currentIndex: number
-  @Link changeIndex: number
+  @Link currentIndex: Number
+  @Link changeIndex: Number
   controller: CustomDialogController
   cancel: () => void
   confirm: ( string ) => void
@@ -56,7 +56,7 @@ export struct GetProfileConnSateDialog {
         .optionFont( { size : 17 } )
         .height( 80 )
         .width( ConfigData.WH_90_100 )
-        .onSelect( ( index: number ) => {
+        .onSelect( ( index: Number ) => {
           console.log( "Select:" + index )
           this.currentClick = index
         } )
@@ -104,13 +104,13 @@ export struct SetScanModeDialog {
     { value : 'CONNECTABLE_GENERAL_DISCOVERABLE' },
     { value : 'CONNECTABLE_LIMITED_DISCOVERABLE' }
   ]
-  @State currentClick: number = 4;
+  @State currentClick: Number = 4;
   @Link textValue: string
   @Link inputValue: string
   @Link apiItem: TestApi
-  @Link currentIndex: number
-  @Link changeIndex: number
-  @State duration: number = 0
+  @Link currentIndex: Number
+  @Link changeIndex: Number
+  @State duration: Number = 0
   controller: CustomDialogController
   cancel: () => void
   confirm: ( string ) => void
@@ -128,7 +128,7 @@ export struct SetScanModeDialog {
         .optionFont( { size : 12 } )
         .height( 60 )
         .width( ConfigData.WH_90_100 )
-        .onSelect( ( index: number ) => {
+        .onSelect( ( index: Number ) => {
           console.log( TAG , "Select:" + index )
           this.currentClick = index
         } )
@@ -185,8 +185,8 @@ export struct InputDialog {
   @Link textValue: string
   @Link inputValue: string
   @Link apiItem: TestApi
-  @Link currentIndex: number
-  @Link changeIndex: number
+  @Link currentIndex: Number
+  @Link changeIndex: Number
   controller: CustomDialogController
   cancel: () => void
   confirm: ( string ) => void
@@ -240,9 +240,9 @@ export struct ContentTable {
   private testItem: TestData
   @State currentApiItem: TestApi = {}
   @State apiItems: TestApi[] = [];
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @State localName: string = 'MyTestDevice'
-  @State currentIndex: number = 1
+  @State currentIndex: Number = 1
   @StorageLink( 'pairedMac' ) pairedMac: string = "";
   getProfileConnSateDialog: CustomDialogController = new CustomDialogController({
     builder : GetProfileConnSateDialog( {
@@ -295,15 +295,16 @@ export struct ContentTable {
     console.log( TAG , 'input text:' , text )
   }
 
-  @Builder IngredientItem( apiItem: TestApi , index: number ) {
+  @Builder IngredientItem( apiItem: TestApi , index: Number ) {
     Stack() {
       Flex() {
         Flex( { alignItems : ItemAlign.Center } ) {
           Image( $r( 'app.media.WLAN' ) )
             .objectFit( ImageFit.Contain )
             .autoResize( false )
-            .height( 30 )
-            .width( 30 )
+            .height( 50 )
+            .width( 40 )
+            .padding( { top : "15vp" } )
         }
         .layoutWeight( 1 )
         .padding( { left : 10 } )
@@ -313,12 +314,12 @@ export struct ContentTable {
             .fontSize( 17.4 )
             .fontWeight( FontWeight.Bold )
             .layoutWeight( 1 )
-            .padding( { left : 10 , top : 15 } )
+            .padding( { left : "10vp" , top : "10vp" } )
           Text( apiItem.method )
             .fontSize( 17.4 )
             .fontWeight( FontWeight.Bold )
             .layoutWeight( 1 )
-            .padding( { left : 10 , top : 5 } )
+            .padding( { left : "10vp" , top : "5vp" } )
         }
         .layoutWeight( 6 )
         .width( ConfigData.WH_80_100 )
@@ -327,6 +328,7 @@ export struct ContentTable {
           Text( this.changeIndex >= 0 ? this.getCurrentState( index ) : apiItem.result )
             .fontSize( 17.4 )
             .flexGrow( 1 )
+            .padding( { top : "15vp" } )
         }
         .layoutWeight( 3 )
         .padding( { left : 25 } )
@@ -406,7 +408,7 @@ export struct ContentTable {
     } )
   }
 
-  getCurrentState( index: number ) {
+  getCurrentState( index: Number ) {
     return this.apiItems[ index ].result
   }
 
@@ -418,7 +420,7 @@ export struct ContentTable {
           justifyContent : FlexAlign.SpaceBetween ,
           alignItems : ItemAlign.Start
         } ) {
-          ForEach( this.apiItems , ( item: TestApi , index: number ) => {
+          ForEach( this.apiItems , ( item: TestApi , index: Number ) => {
             this.IngredientItem( item , index )
           } )
         }

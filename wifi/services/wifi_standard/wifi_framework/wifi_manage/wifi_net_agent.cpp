@@ -42,22 +42,12 @@ WifiNetAgent &WifiNetAgent::GetInstance()
 
 WifiNetAgent::WifiNetAgent()
 {
-    netConnEventRunner_ = AppExecFwk::EventRunner::Create(WIFI_NET_CONN_MGR_WORK_THREAD);
-    if (netConnEventRunner_) {
-        netConnEventHandler_ = std::make_shared<WifiNetConnEventHandler>(netConnEventRunner_);
-    } else {
-        WIFI_LOGE("Create event runner failed.");
-    }
+    netAgentEventHandler = std::make_unique<WifiEventHandler>(WIFI_NET_CONN_MGR_WORK_THREAD);
 }
 WifiNetAgent::~WifiNetAgent()
 {
-    if (netConnEventRunner_) {
-        netConnEventRunner_->Stop();
-        netConnEventRunner_.reset();
-    }
-
-    if (netConnEventHandler_) {
-        netConnEventHandler_.reset();
+    if (netAgentEventHandler) {
+        netAgentEventHandler.reset();
     }
 }
 
@@ -162,8 +152,8 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
 void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
     WifiProxyConfig &wifiProxyConfig, int instId)
 {
-    if (netConnEventHandler_) {
-        netConnEventHandler_->PostSyncTask(
+    if (netAgentEventHandler) {
+        netAgentEventHandler->PostSyncTask(
             [this, &wifiIpInfo, &wifiIpV6Info, &wifiProxyConfig, &instId]() {
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
@@ -172,8 +162,8 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &w
 
 void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
 {
-    if (netConnEventHandler_) {
-        netConnEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
+    if (netAgentEventHandler) {
+        netAgentEventHandler->PostSyncTask([this, netInfo = netSupplierInfo]() {
            this->UpdateNetSupplierInfo(netInfo);
         });
     }
@@ -181,8 +171,8 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 
 void WifiNetAgent::OnStaMachineWifiStart()
 {
-    if (netConnEventHandler_) {
-        netConnEventHandler_->PostSyncTask([this]() {
+    if (netAgentEventHandler) {
+        netAgentEventHandler->PostSyncTask([this]() {
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
         });
@@ -192,8 +182,8 @@ void WifiNetAgent::OnStaMachineWifiStart()
 void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
     int instId)
 {
-    if (netConnEventHandler_) {
-        netConnEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+    if (netAgentEventHandler) {
+        netAgentEventHandler->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
             WifiLinkedInfo linkedInfo;

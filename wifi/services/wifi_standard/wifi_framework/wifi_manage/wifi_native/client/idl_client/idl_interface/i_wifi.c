@@ -391,7 +391,7 @@ static void IdlCbP2pDeviceFoundEventDeal(Context *context)
 
 static void IdlCbP2pDeviceLostEventDeal(Context *context)
 {
-    char address[WIFI_MAC_ADDR_LENGTH + 1] = {0};
+    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     if (ReadStr(context, address, sizeof(address)) != 0) {
         return;
     }
@@ -404,7 +404,7 @@ static void IdlCbP2pDeviceLostEventDeal(Context *context)
 
 static void IdlCbP2pGoNegotiationRequestEvent(Context *context)
 {
-    char address[WIFI_MAC_ADDR_LENGTH + 1] = {0};
+    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     int passId = 0;
     if (ReadInt(context, &passId) < 0 || ReadStr(context, address, sizeof(address)) != 0) {
         return;
@@ -461,7 +461,7 @@ static void IdlCbP2pInvitationReceivedEvent(Context *context)
 static void IdlCbP2pInvitationResultEvent(Context *context)
 {
     int status = 0;
-    char address[WIFI_MAC_ADDR_LENGTH + 1] = {0};
+    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     if (ReadInt(context, &status) < 0 || ReadStr(context, address, sizeof(address)) != 0) {
         return;
     }
@@ -530,7 +530,7 @@ static void IdlCbP2pGroupRemovedEvent(Context *context)
 
 static void IdlCbP2pProvDiscEvent(Context *context, int event)
 {
-    char address[WIFI_MAC_ADDR_LENGTH + 1] = {0};
+    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     if (ReadStr(context, address, sizeof(address)) != 0) {
         return;
     }
@@ -552,7 +552,7 @@ static void IdlCbP2pProvDiscEvent(Context *context, int event)
 
 static void IdlCbP2pProDiscShowPinEvent(Context *context)
 {
-    char address[WIFI_MAC_ADDR_LENGTH + 1] = {0};
+    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     char pin[WIFI_PIN_CODE_LENGTH + 1] = {0};
     if (ReadStr(context, address, sizeof(address)) != 0 || ReadStr(context, pin, sizeof(pin)) != 0) {
         return;
@@ -613,7 +613,7 @@ static int NumStrToNumArry(unsigned char *src, int *size)
 static void IdlCbP2pServDiscRespEvent(Context *context)
 {
     int updataIndicator = 0;
-    char address[WIFI_MAC_ADDR_LENGTH + 1] = {0};
+    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     int tlvsLength = 0;
     if (ReadInt(context, &updataIndicator) < 0 || ReadStr(context, address, sizeof(address)) != 0 ||
         ReadInt(context, &tlvsLength) < 0) {
@@ -657,7 +657,7 @@ static void IdlCbP2pProvServDiscFailureEvent()
 
 static void IdlCbP2pApStaConnectEvent(Context *context, int event)
 {
-    char address[WIFI_MAC_ADDR_LENGTH + 1] = {0};
+    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     if (ReadStr(context, address, sizeof(address)) != 0) {
         return;
     }

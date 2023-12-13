@@ -27,7 +27,7 @@ extern "C" {
 #define WIFI_SCAN_INFO_CAPABILITY_LENGTH 256
 #define WIFI_NETWORK_CONFIG_NAME_LENGTH 64
 #define WIFI_NETWORK_CONFIG_VALUE_LENGTH 256
-#define WIFI_MAC_ADDR_LENGTH 17
+#define WIFI_MAX_MAC_ADDR_LENGTH 17
 #define WIFI_AP_PASSWORD_LENGTH 64
 #define WIFI_INTERFACE_NAME_SIZE 32
 #define WIFI_PIN_CODE_LENGTH 8
@@ -41,7 +41,7 @@ typedef struct TagIWifiIface {
     int index;
     int type;
     char name[WIFI_INTERFACE_NAME_SIZE];
-    char macAddr[WIFI_MAC_ADDR_LENGTH + 1];
+    char macAddr[WIFI_MAX_MAC_ADDR_LENGTH + 1];
 } IWifiIface;
 
 /* IWifiClientIface */
@@ -218,7 +218,7 @@ typedef struct HostapdConfig {
 
 typedef struct CStationInfo {
     int type;
-    char mac[WIFI_MAC_ADDR_LENGTH + 1];
+    char mac[WIFI_MAX_MAC_ADDR_LENGTH + 1];
 } CStationInfo;
 
 struct NeedParseIe {
@@ -249,8 +249,8 @@ typedef enum IfaceType { TYPE_STA, TYPE_AP, TYPE_P2P, TYPE_NAN } IfaceType;
 #define WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH 256
 
 typedef struct P2pDeviceInfo {
-    char srcAddress[WIFI_MAC_ADDR_LENGTH + 1];
-    char p2pDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
+    char srcAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1];
+    char p2pDeviceAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1];
     char primaryDeviceType[WIFI_P2P_DEVICE_TYPE_LENGTH];
     char deviceName[WIFI_P2P_DEVICE_NAME_LENGTH];
     int configMethods;
@@ -269,16 +269,16 @@ typedef struct P2pGroupInfo {
     char ssid[WIFI_SSID_LENGTH];
     char psk[WIFI_P2P_TMP_MSG_LENGTH_128];
     char passphrase[WIFI_P2P_TMP_MSG_LENGTH_128];
-    char goDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
+    char goDeviceAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1];
 } P2pGroupInfo;
 
 typedef struct P2pInvitationInfo {
     int type; /* 0:Received, 1:Accepted */
     int persistentNetworkId;
     int operatingFrequency;
-    char srcAddress[WIFI_MAC_ADDR_LENGTH + 1];
-    char goDeviceAddress[WIFI_MAC_ADDR_LENGTH + 1];
-    char bssid[WIFI_MAC_ADDR_LENGTH + 1];
+    char srcAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1];
+    char goDeviceAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1];
+    char bssid[WIFI_MAX_MAC_ADDR_LENGTH + 1];
 } P2pInvitationInfo;
 
 typedef struct P2pServDiscReqInfo {
@@ -286,7 +286,7 @@ typedef struct P2pServDiscReqInfo {
     int dialogToken;
     int updateIndic;
     int tlvsLength;
-    char mac[WIFI_MAC_ADDR_LENGTH + 1];
+    char mac[WIFI_MAX_MAC_ADDR_LENGTH + 1];
     unsigned char *tlvs;
 } P2pServDiscReqInfo;
 
@@ -301,7 +301,7 @@ typedef struct P2pServiceInfo {
 typedef struct P2pNetworkInfo {
     int id;
     char ssid[WIFI_SSID_LENGTH];
-    char bssid[WIFI_MAC_ADDR_LENGTH + 1];
+    char bssid[WIFI_MAX_MAC_ADDR_LENGTH + 1];
     char flags[WIFI_P2P_TMP_MSG_LENGTH_64];
 } P2pNetworkInfo;
 
@@ -315,7 +315,7 @@ typedef struct P2pConnectInfo {
     int mode; /* [join|auth] */
     int goIntent; /* [go_intent=<0..15>] */
     int provdisc; /* [provdisc] */
-    char peerDevAddr[WIFI_MAC_ADDR_LENGTH + 1];
+    char peerDevAddr[WIFI_MAX_MAC_ADDR_LENGTH + 1];
     char pin[WIFI_PIN_CODE_LENGTH + 1]; /* <pbc|pin|PIN#|p2ps> */
 } P2pConnectInfo;
 
@@ -340,7 +340,7 @@ typedef struct P2pGroupConfig {
 
 typedef struct Hid2dConnectInfo {
     char ssid[WIFI_SSID_LENGTH];
-    char bssid[WIFI_MAC_ADDR_LENGTH + 1];
+    char bssid[WIFI_MAX_MAC_ADDR_LENGTH + 1];
     char passphrase[WIFI_P2P_TMP_MSG_LENGTH_128];
     int frequency;
     int isLegacyGo;

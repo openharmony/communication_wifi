@@ -232,8 +232,7 @@ ErrCode SoftapManagerMachine::AutoStartApService(int id)
             WIFI_LOGE("Instance get hotspot service is null!");
             break;
         }
-        IApServiceCallbacks cb = WifiManager::GetInstance().GetApCallback();
-        errCode = pService->RegisterApServiceCallbacks(cb);
+        errCode = pService->RegisterApServiceCallbacks(WifiManager::GetInstance().GetWifiHotspotManager()->GetApCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Register ap service callback failed!");
             break;
@@ -255,7 +254,7 @@ ErrCode SoftapManagerMachine::AutoStartApService(int id)
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, mid);
         return errCode;
     }
-    WifiManager::GetInstance().StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
     return WIFI_OPT_SUCCESS;
 }
 

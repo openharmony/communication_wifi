@@ -258,17 +258,9 @@ ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
     WifiSettings::GetInstance().SetScanOnlySwitchState(bScanOnlyAvailable, m_instId);
     ErrCode errCode = WIFI_OPT_SUCCESS;
     if (bScanOnlyAvailable) {
-#ifdef OHOS_ARCH_LITE
-        OpenScanOnlyAvailable();
-#else
-        errCode = WifiManager::GetInstance().ScanOnlyToggled(1);
-#endif
+        errCode = WifiManager::GetInstance().GetWifiTogglerManager()->ScanOnlyToggled(1);
     } else {
-#ifdef OHOS_ARCH_LITE
-        CloseScanOnlyAvailable();
-#else
-        errCode = WifiManager::GetInstance().ScanOnlyToggled(0);
-#endif
+        errCode = WifiManager::GetInstance().GetWifiTogglerManager()->ScanOnlyToggled(0);
     }
     return errCode;
 }
@@ -306,73 +298,6 @@ ErrCode WifiScanServiceImpl::StartWifiPnoScan(bool isStartAction, int periodMs, 
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
     return pService->StartWifiPnoScan(isStartAction, periodMs, suspendReason);
-}
-
-ErrCode WifiScanServiceImpl::OpenScanOnlyAvailable()
-{
-    WIFI_LOGI("WifiScanServiceImpl OpenScanOnlyAvailable");
-    if (!WifiSettings::GetInstance().CheckScanOnlyAvailable(m_instId) ||
-        !WifiManager::GetInstance().GetLocationModeByDatashare()) {
-        return WIFI_OPT_FAILED;
-    }
-   
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId);
-    WIFI_LOGI("current wifi scan only state is %{public}d", static_cast<int>(curState));
-    if (curState != WifiOprMidState::CLOSED) {
-        if (curState == WifiOprMidState::CLOSING) { /* when current wifi is closing, return */
-            return WIFI_OPT_FAILED;
-        } else {
-            return WIFI_OPT_SUCCESS;
-        }
-    }
-
-    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState(m_instId)) {
-        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, m_instId);
-        return WIFI_OPT_SUCCESS;
-    }
-    
-    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, m_instId);
-    WifiManager::GetInstance().CheckAndStartScanService(m_instId);
-    int res = WifiStaHalInterface::GetInstance().StartWifi();
-    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
-        WIFI_LOGE("Start Wpa failed");
-        return WIFI_OPT_FAILED;
-    }
-    WifiManager::GetInstance().DealOpenScanOnlyRes(m_instId);
-    WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, m_instId);
-
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode WifiScanServiceImpl::CloseScanOnlyAvailable()
-{
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId);
-    WIFI_LOGI("current wifi scan only state is %{public}d", static_cast<int>(curState));
-    if (curState != WifiOprMidState::RUNNING) {
-        if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
-            return WIFI_OPT_FAILED;
-        } else {
-            return WIFI_OPT_SUCCESS;
-        }
-    }
-    
-    if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState(m_instId)) {
-        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, m_instId);
-        return WIFI_OPT_SUCCESS;
-    }
-
-    if (!WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSING, m_instId)) {
-        WIFI_LOGI("set wifi scan only mid state opening failed!");
-        return WIFI_OPT_FAILED;
-    }
-    
-    int res = WifiStaHalInterface::GetInstance().StopWifi();
-    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
-        WIFI_LOGE("Stop Wpa failed");
-        return WIFI_OPT_FAILED;
-    }
-    WifiManager::GetInstance().DealCloseScanOnlyRes(m_instId);
-    return WIFI_OPT_SUCCESS;
 }
 
 #ifdef OHOS_ARCH_LITE

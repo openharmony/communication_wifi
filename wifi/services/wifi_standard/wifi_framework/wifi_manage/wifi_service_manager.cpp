@@ -122,7 +122,7 @@ int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
         IStaService *service = mStaServiceHandle.create(0);
         mStaServiceHandle.pService[0] = service;
     }
-    WifiManager::GetInstance().StopUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
     return 0;
 }
 
@@ -151,7 +151,7 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
         IScanService *service = mScanServiceHandle.create(0);
         mScanServiceHandle.pService[0] = service;
     }
-    WifiManager::GetInstance().StopUnloadScanSaTimer();
+    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
     return 0;
 }
 
@@ -184,7 +184,7 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
             mApServiceHandle.pService[0] = service;
         }
     }
-    WifiManager::GetInstance().StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
     return 0;
 }
 #endif
@@ -214,7 +214,7 @@ int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
     if (bCreate) {
         mP2pServiceHandle.pService = mP2pServiceHandle.create();
     }
-    WifiManager::GetInstance().StopUnloadP2PSaTimer();
+    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
     return 0;
 }
 #endif

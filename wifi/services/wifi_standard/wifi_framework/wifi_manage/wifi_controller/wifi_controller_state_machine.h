@@ -23,7 +23,9 @@
 #include "wifi_logger.h"
 #include "wifi_errcode.h"
 #include "concrete_clientmode_manager.h"
+#ifdef FEATURE_AP_SUPPORT
 #include "softap_manager.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -55,7 +57,9 @@ public:
     private:
         void HandleApStart(int id);
         void HandleWifiToggleChangeInEnabledState(InternalMessage *msg);
+#ifdef FEATURE_AP_SUPPORT
         void HandleSoftapToggleChangeInEnabledState(InternalMessage *msg);
+#endif
         WifiControllerMachine *pWifiControllerMachine;
     };
 
@@ -75,14 +79,16 @@ public:
     ErrCode InitWifiControllerMachine();
 
     void RmoveConcreteManager(int id);
-    void RmoveSoftapManager(int id);
     void HandleStaClose(int id);
     void HandleStaStart(int id);
     void HandleStaStartFailure(int id);
     void HandleConcreteStop(int id);
+#ifdef FEATURE_AP_SUPPORT
+    void RmoveSoftapManager(int id);
     void HandleSoftapStop(int id);
     void StartSoftapCloseTimer();
     void StopSoftapCloseTimer();
+#endif
 
 private:
     template <typename T>
@@ -106,18 +112,20 @@ private:
     void BuildStateTree();
     ErrCode InitWifiStates();
     bool HasAnyConcreteManager();
-    bool HasAnySoftApManager();
     bool HasAnyManager();
-    bool SoftApIdExit(int id);
     bool ConcreteIdExit(int id);
     void MakeConcreteManager(ConcreteManagerRole role, int id);
+#ifdef FEATURE_AP_SUPPORT
+    bool HasAnySoftApManager();
+    bool SoftApIdExit(int id);
     void MakeSoftapManager(SoftApManager::Role role, int id);
-    bool ShouldEnableWifi();
     bool ShouldEnableSoftap();
-    ConcreteManagerRole GetWifiRole();
-    void StopAllConcreteManagers();
     void StopAllSoftapManagers();
     void StopSoftapManager(int id);
+#endif
+    bool ShouldEnableWifi();
+    ConcreteManagerRole GetWifiRole();
+    void StopAllConcreteManagers();
     void SwitchRole(ConcreteManagerRole role);
     void HandleAirplaneOpen();
     void HandleAirplaneClose();
@@ -129,12 +137,12 @@ private:
     DisableState *pDisableState;
     DefaultState *pDefaultState;
     std::vector<ConcreteClientModeManager *> concreteManagers;
-    std::vector<SoftApManager *> softapManagers;
-    ConcreteModeCallback mConcreteCallback;
-    SoftApModeCallback mSoftapCallback;
     mutable std::mutex concreteManagerMutex;
+#ifdef FEATURE_AP_SUPPORT
+    std::vector<SoftApManager *> softapManagers;
     mutable std::mutex softapManagerMutex;
     uint64_t stopSoftapTimerId_ {0};
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

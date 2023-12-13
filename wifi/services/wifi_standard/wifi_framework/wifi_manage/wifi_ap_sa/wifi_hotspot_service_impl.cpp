@@ -333,7 +333,7 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiManager::GetInstance().GetAirplaneModeByDatashare();
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("current airplane mode and can not use ap, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
@@ -352,74 +352,8 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
-#ifdef OHOS_ARCH_LITE
-    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
-    if (staState != WifiOprMidState::CLOSED) {
-#ifdef FEATURE_STA_AP_EXCLUSION
-        errCode = WifiManager::GetInstance().AutoStopStaService(AutoStartOrStopServiceReason::STA_AP_EXCLUSION);
-        if (errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
-            return errCode;
-        }
-#else
-        WIFI_LOGI("current wifi state is %{public}d, please close sta first!",
-            static_cast<int>(curState));
-        return WIFI_OPT_NOT_SUPPORTED;
-#endif
-    }
 
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_id);
-    if (curState != WifiOprMidState::CLOSED) {
-        WIFI_LOGI("current ap is %{public}d, state is %{public}d", m_id, static_cast<int>(curState));
-        if (curState == WifiOprMidState::CLOSING) { /* when ap is closing, return */
-            return WIFI_OPT_OPEN_FAIL_WHEN_CLOSING;
-        } else {
-            return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
-        }
-    }
-    if (!WifiConfigCenter::GetInstance().SetApMidState(curState, WifiOprMidState::OPENING, m_id)) {
-        WIFI_LOGI("current ap is %{public}d, set ap mid state opening failed!"
-            "may be other activity has been operated", m_id);
-        return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
-    }
-    errCode = WIFI_OPT_FAILED;
-    do {
-        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_AP) < 0) {
-            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_AP);
-            break;
-        }
-        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
-        if (pService == nullptr) {
-            WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-            break;
-        }
-        errCode = pService->RegisterApServiceCallbacks(WifiManager::GetInstance().GetApCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register ap service callback failed!");
-            break;
-        }
-        errCode = pService->RegisterApServiceCallbacks(WifiCountryCodeManager::GetInstance().GetApCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("WifiCountryCodeManager Register ap service callback failed! ret=%{public}d!",
-                static_cast<int>(errCode));
-            break;
-        }
-        errCode = pService->EnableHotspot();
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("service enable ap failed, ret %{public}d!", static_cast<int>(errCode));
-            break;
-        }
-    } while (false);
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, m_id);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, m_id);
-    } else {
-        WifiManager::GetInstance().StopUnloadApSaTimer();
-        WifiConfigCenter::GetInstance().SetStaApExclusionType(static_cast<int>(StaApExclusionType::INITIAL_TYPE));
-    }
-#else
-    errCode = WifiManager::GetInstance().SoftapToggled(1, m_id);
-#endif
-    return errCode;
+    return  WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
 }
 
 ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
@@ -433,44 +367,8 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-#ifdef OHOS_ARCH_LITE
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_id);
-    if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGI("current ap state is %{public}d", static_cast<int>(curState));
-        if (curState == WifiOprMidState::OPENING) { /* when ap is opening, return */
-            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
-        } else {
-            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-        }
-    }
-    if (!WifiConfigCenter::GetInstance().SetApMidState(curState, WifiOprMidState::CLOSING, m_id)) {
-        WIFI_LOGI("set ap mid state closing failed! may be other activity has been operated");
-        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-    }
-    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
-    if (pService == nullptr) {
-        WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, m_id);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, m_id);
-        return WIFI_OPT_SUCCESS;
-    }
-    ErrCode ret = pService->DisableHotspot();
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_id);
-        return ret;
-    }
-#ifdef FEATURE_STA_AP_EXCLUSION
-    if (WifiConfigCenter::GetInstance().GetStaApExclusionType()
-        == static_cast<int>(StaApExclusionType::USER_OPEN_AP_AUTO_STOP_WIFI)) {
-        WifiConfigCenter::GetInstance().SetStaApExclusionType(
-            static_cast<int>(StaApExclusionType::USER_CLOSE_AP_AUTO_START_WIFI));
-    }
-#endif
-    return WIFI_OPT_SUCCESS;
-#else
-    ErrCode errCode = WifiManager::GetInstance().SoftapToggled(0, m_id);
-    return errCode;
-#endif
+
+    return WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_id);
 }
 
 ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)

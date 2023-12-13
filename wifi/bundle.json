@@ -153,7 +153,8 @@
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_hal/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/native:unittest",
-                "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_base:unittest"
+                "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_base:unittest",
+                "//foundation/communication/wifi/wifi/test/wifi_utils/unittest:unittest"
             ]
         },
         "hisysevent_config": [

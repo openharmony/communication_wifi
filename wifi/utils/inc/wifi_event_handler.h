@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef WIFI_NET_CONN_EVENT_HANDLER_H
-#define WIFI_NET_CONN_EVENT_HANDLER_H
+#ifndef WIFI_EVENT_HANDLER_H
+#define WIFI_EVENT_HANDLER_H
 
+#include <string>
 #include <memory>
 
 #include "event_handler.h"
@@ -23,14 +24,22 @@
 
 namespace OHOS {
 namespace Wifi {
-class WifiNetConnEventHandler final : public AppExecFwk::EventHandler {
+class WifiEventHandler {
 public:
-    explicit WifiNetConnEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
-    ~WifiNetConnEventHandler() override = default;
-    bool PostAsyncTask(const Callback &callback, int64_t delayTime);
+    using Callback = AppExecFwk::EventHandler::Callback;
+    using Priority = AppExecFwk::EventHandler::Priority;
+
+    explicit WifiEventHandler(const std::string &threadName);
+    ~WifiEventHandler();
+    bool PostSyncTask(const Callback &callback);
+    bool PostAsyncTask(const Callback &callback, int64_t delayTime = 0);
     bool PostAsyncTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
     void RemoveAsyncTask(const std::string &name);
+
+private:
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS
-#endif // WIFI_NET_CONN_EVENT_HANDLER_H
+#endif

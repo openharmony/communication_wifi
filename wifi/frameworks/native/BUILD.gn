@@ -118,7 +118,6 @@ if (defined(ohos_lite)) {
       "src/wifi_device_impl.cpp",
       "src/wifi_device_mgr_proxy.cpp",
       "src/wifi_device_proxy.cpp",
-      "src/wifi_sa_event.cpp",
     ]
 
     configs = [
@@ -230,6 +229,7 @@ if (defined(ohos_lite)) {
       "src/wifi_p2p.cpp",
       "src/wifi_p2p_callback_stub.cpp",
       "src/wifi_p2p_msg.cpp",
+      "src/wifi_sa_event.cpp",
       "src/wifi_scan.cpp",
       "src/wifi_scan_callback_stub.cpp",
     ]

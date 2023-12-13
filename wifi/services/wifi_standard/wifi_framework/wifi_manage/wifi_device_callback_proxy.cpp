@@ -29,7 +29,7 @@ WifiDeviceCallBackProxy::WifiDeviceCallBackProxy(const sptr<IRemoteObject> &impl
 void WifiDeviceCallBackProxy::OnWifiStateChanged(int state)
 {
     WIFI_LOGD("WifiDeviceCallBackProxy::OnWifiStateChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -45,18 +45,13 @@ void WifiDeviceCallBackProxy::OnWifiStateChanged(int state)
             static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_STATE_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi state change failed!");
-    }
-
     return;
 }
 
 void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
 {
     WIFI_LOGD("WifiDeviceCallBackProxy::OnWifiConnectionChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -91,17 +86,13 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
             static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi connection change failed!");
-    }
     return;
 }
 
 void WifiDeviceCallBackProxy::OnWifiRssiChanged(int rssi)
 {
     WIFI_LOGD("WifiDeviceCallBackProxy::OnWifiRssiChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -117,17 +108,13 @@ void WifiDeviceCallBackProxy::OnWifiRssiChanged(int rssi)
             static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_RSSI_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi rssi change failed!");
-    }
     return;
 }
 
 void WifiDeviceCallBackProxy::OnWifiWpsStateChanged(int state, const std::string &pinCode)
 {
     WIFI_LOGD("WifiDeviceCallBackProxy::OnWifiWpsStateChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -144,17 +131,13 @@ void WifiDeviceCallBackProxy::OnWifiWpsStateChanged(int state, const std::string
             static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_WPS_STATE_CHANGE), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wps pinmode started failed!");
-    }
     return;
 }
 
 void WifiDeviceCallBackProxy::OnStreamChanged(int direction)
 {
     WIFI_LOGD("WifiDeviceCallBackProxy::OnStreamChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -170,17 +153,13 @@ void WifiDeviceCallBackProxy::OnStreamChanged(int direction)
             static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_STREAM_DIRECTION), error);
         return;
     }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi stream direction failed!");
-    }
     return;
 }
 
 void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange value)
 {
     WIFI_LOGD("WifiDeviceCallBackProxy::OnDeviceConfigChanged");
-    MessageOption option;
+    MessageOption option = {MessageOption::TF_ASYNC};
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -195,10 +174,6 @@ void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange value)
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE), error);
         return;
-    }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi device config changed failed!");
     }
     return;
 }

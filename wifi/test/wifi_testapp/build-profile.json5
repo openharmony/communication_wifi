@@ -14,26 +14,33 @@
  */
 {
   "app": {
-    "signingConfigs": [
-      {
-        "name": "default",
-        "material": {
-          "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.cer",
-          "storePassword": "0000001BA241473C90A825CB41480027D18FA6CF3640ABD0F2220314E6F250D4FB17ED05A0C0B39781957C",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B31D2FEB1E86B08E01A2D1E525B62283A49A604A4549114E2C35BF9EC1BDD4785E78E659E077314",
-          "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_kaihong.sample.wifitest.p12"
-        }
-      }
-    ],
-    "compileSdkVersion": 9,
-    "compatibleSdkVersion": 9,
+    //    "signingConfigs": [
+    //
+    //    ],
+    //    "compileSdkVersion": 10,
+    //    "compatibleSdkVersion": 10,
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
+        "compileSdkVersion": 10,
+        "compatibleSdkVersion": 9,
+        "targetSdkVersion": 10,
+        "runtimeOS": "OpenHarmony"
+      }
+    ],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "material": {
+          "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifitest_kaihong.sample.wifitest.cer",
+          "storePassword": "0000001AA825068A821704832948DE46705A5A5998C549D28D49C970D32BDB909913CBE63E1FB860C8AD",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A93B49F7C266CDA20213B713DD79D5645AD93794E13E5689CF620245D56A7419611D9FF56881E",
+          "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifitest_kaihong.sample.wifitest.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifitest_kaihong.sample.wifitest.p12"
+        }
       }
     ]
   },

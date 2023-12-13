@@ -58,6 +58,24 @@ WIFI_ABDISCONNECT:
   PUBLIC_ESS_COUNT: {type: INT32, desc: public ess count}
   SUB_ERROR_CODE: {type: STRING, desc: sub error code}
 
+WIFI_OPEN_AND_CLOSE_FAILED:
+  __BASE: {type: FAULT, level: MINOR, desc: Wifi open and close failed event}
+  OPEN_FAIL: {type: STRING, desc: open wifi fail}
+  CLOSE_FAIL: {type: STRING, desc: close wifi fail}
+  FAIL_REASON: {type: STRING, desc: fail reason}
+  IS_AP_OPEN: {type: INT32, desc: is ap open}
+
+SOFTAP_OPEN_AND_CLOSE_FAILED:
+  __BASE: {type: FAULT, level: MINOR, desc: soft ap open and close failed event}
+  OPEN_FAIL: {type: STRING, desc: open soft ap fail}
+  CLOSE_FAIL: {type: STRING, desc: close soft ap fail}
+  FAIL_REASON: {type: STRING, desc: fail reason}
+
+WIFI_ACCESS_INTERNET_FAILED:
+  __BASE: {type: FAULT, level: MINOR, desc: Wifi access internet failed event}
+  ARP_FAIL_CNT: {type: STRING, desc: arp fail cnt}
+  NET_STATE: {type: STRING, desc: http network fail}
+
 WIFI_CHR_EVENT:
   __BASE: {type: STATISTIC, level: MINOR, desc: Wifi chr event}
   EVENT_NAME: {type: STRING, desc: event name}

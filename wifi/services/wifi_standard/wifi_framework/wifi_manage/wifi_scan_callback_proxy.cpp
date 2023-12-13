@@ -34,7 +34,7 @@ void WifiScanCallbackProxy::OnWifiScanStateChanged(int state)
     WIFI_LOGD("OnWifiScanStateChanged, state:%{public}d", state);
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option = {MessageOption::TF_ASYNC};
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return;
@@ -58,10 +58,6 @@ void WifiScanCallbackProxy::OnWifiScanStateChanged(int state)
             WIFI_LOGE("OnWifiScanStateChanged,connect done failed, error: %{public}d!", error);
             break;
         }
-    }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        WIFI_LOGE("notify wifi scan state failed!");
     }
     return;
 }

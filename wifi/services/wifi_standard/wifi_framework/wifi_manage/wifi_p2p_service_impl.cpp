@@ -1251,7 +1251,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    WifiSettings::GetInstance().SetHid2dUpperScene(scene);
+    WifiSettings::GetInstance().SetHid2dUpperScene(ifName, scene);
     return pService->Hid2dSetUpperScene(ifName, scene);
 }
 

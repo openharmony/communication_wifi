@@ -19,13 +19,13 @@ import prompt from '@ohos.prompt';
 import router from '@system.router'
 import { PageTitle } from '../../Component/pageTitle'
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { TestData } from '../../MainAbility/model/testData'
-import { initHotspotBenchmarkData } from '../../MainAbility/model/benchmarkTestDataModels'
-import * as HotspotInterface from '../../MainAbility/model/hotspotInterface'
-import { HotspotBenchmarkTestCase } from '../../MainAbility/model/benchmarkTestDataModels'
-import ConfigData from "../../Utils/ConfigData"
+import { TestData } from '../../entryability/model/testData'
+import { initHotspotBenchmarkData } from '../../entryability/model/benchmarkTestDataModels'
+import * as HotspotInterface from '../../entryability/model/hotspotInterface'
+import { HotspotBenchmarkTestCase } from '../../entryability/model/benchmarkTestDataModels'
+import ConfigData from "../../utils/ConfigData"
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../Utils/Util'
+import { resolveIP } from '../../utils/Util'
 import socket from '@ohos.net.socket';
 
 import http from '@ohos.net.http'
@@ -59,7 +59,7 @@ struct HotspotBenchmarkTest {
   @State showList: boolean = false;
   @State message: string = 'hotspotBenchmarkTest';
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @StorageLink( "hotspotBenchmarkTestMessage" ) hotspotBenchmarkTestMessage: string = ""
   //  @State login_feng: boolean = false
   //  @State login_wen: boolean = false
@@ -72,18 +72,18 @@ struct HotspotBenchmarkTest {
   //  @State warnText: string = ''
   //  @State roomNumber: string = ''
   //  @State receiveMsg: string = '待接收数据'
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []
-  @StorageLink( 'hotspotBenchmarkTime' ) hotspotBenchmarkTime: number = 0;
+  @StorageLink( 'hotspotBenchmarkTime' ) hotspotBenchmarkTime: Number = 0;
   @State h_ssid: string = "testApp1";
-  @State h_securityType: number = 3;
-  @State h_band: number = 2;
+  @State h_securityType: Number = 3;
+  @State h_band: Number = 2;
   @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: number = 3 ;
-  @State h_channel: number = 36 ;
+  @State h_maxConn: Number = 3 ;
+  @State h_channel: Number = 36 ;
 
   aboutToAppear() {
     AppStorage.SetOrCreate( "h_ssid" , this.h_ssid )
@@ -362,8 +362,8 @@ struct socketTest {
 
 @Component
 struct upDownLoad {
-  @State receivedSize: number = 0
-  @State totalSize: number = 0
+  @State receivedSize: Number = 0
+  @State totalSize: Number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []

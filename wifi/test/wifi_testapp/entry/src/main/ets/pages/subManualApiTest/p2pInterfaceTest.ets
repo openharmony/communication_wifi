@@ -19,10 +19,10 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import LogUtil from '../../Utils/LogUtil';
-import { initP2pApiData } from '../../MainAbility/model/testDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import LogUtil from '../../utils/LogUtil';
+import { initP2pApiData } from '../../entryability/model/testDataModels'
+import { TestData } from '../../entryability/model/testData'
 
 /**
  * p2p Test Page Of Wifi test
@@ -31,10 +31,10 @@ import { TestData } from '../../MainAbility/model/testData'
 @Component
 struct p2pSetting {
   @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2 ;
-  @State passphrase: string = "12345678" ;
+  @State netId: Number = - 2;
+  @State passphrase: string = "12345678";
   @State groupName: string = "testGroup"
-  @State goBand: number = 0 ;
+  @State goBand: Number = 0;
   @State deviceName: string = "MyTestDevice"
 
   aboutToAppear() {
@@ -176,16 +176,17 @@ struct P2pInterfaceTest {
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: Number = - 1;
   @State pairPinCode: string = '';
   @State isStateChangeClick: boolean = false;
   @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2 ;
-  @State passphrase: string = "12345678" ;
+  @State netId: Number = - 2;
+  @State passphrase: string = "12345678";
   @State groupName: string = "testGroup"
-  @State goBand: number = 0 ;
+  @State goBand: Number = 0;
   @State deviceName: string = "MyTestDevice"
   @State connectedIp: sting = "192.168.1.107"
+  @StorageLink( 'p2pDeviceName' ) p2pDeviceName: String = "";
   @StorageLink( 'p2pStateMessage' ) p2pStateMessage: string = "";
   @StorageLink( 'p2pDeviceMessage' ) p2pDeviceMessage: string = "";
   @StorageLink( 'p2pLinkStateMessage' ) p2pLinkStateMessage: string = "";
@@ -219,19 +220,19 @@ struct P2pInterfaceTest {
 
       Column() {
         Row() {
-          Text( "目标设备IP：" )
+          Text( "本设备名称：" )
             .fontSize( "20vp" )
             .height( 40 )
             .padding( { top : 5 } )
             .width( ConfigData.WH_28_100 )
             .align( Alignment.Start )
 
-          TextInput( { text : this.connectedIp , placeholder : "192.168.1.107" } )
+          TextInput( { text : this.p2pDeviceName , placeholder : "请在右侧输入p2p的配置" } )
             .height( 40 )
             .borderStyle( BorderStyle.Dashed )
             .backgroundColor( $r( "app.color.white" ) )
             .onChange( ( str ) => {
-              this.deviceId = str;
+              this.p2pDeviceName = str;
             } )
             .width( ConfigData.WH_45_100 )
             .padding( { top : 5 , left : 5 } )
@@ -254,42 +255,42 @@ struct P2pInterfaceTest {
             Column() {
               Text( "开关结果:" + this.p2pStateMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "本机信息:" + this.p2pDeviceMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "发现信息:" + this.p2pDiscoveryMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "连接状态:" + this.p2pLinkStateMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "连接信息:" + this.p2pLinkMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "对端设备:" + this.p2pPeerDeviceMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "对端设备[]:" + this.p2pPeerDeviceMessages )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "组信息:" + this.p2pGroupMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
             }

@@ -20,6 +20,8 @@
 #include "wifi_hal_ap_interface.h"
 #include "wifi_hal_define.h"
 
+#define IFACENAME_LEN 6
+
 int RpcStartSoftAp(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
@@ -29,8 +31,9 @@ int RpcStartSoftAp(RpcServer *server, Context *context)
     if (ReadInt(context, &id) < 0 || id < 0) {
         return HAL_FAILURE;
     }
-
-    WifiErrorNo err = StartSoftAp(id);
+    char ifaceName[IFACENAME_LEN];
+    ReadStr(context, ifaceName, sizeof(ifaceName));
+    WifiErrorNo err = StartSoftAp(id, ifaceName);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);

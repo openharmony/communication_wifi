@@ -15,8 +15,8 @@
 
 // @ts-nocheck
 
-import { Category , TestData } from '../MainAbility/model/testData'
-import { initTestData } from '../MainAbility/model/testDataModels'
+import { Category , TestData } from '../entryability/model/testData'
+import { initTestData } from '../entryability/model/testDataModels'
 import { MainPageTitle } from '../Component/mainPageTitle';
 import { ManualApiTest } from '../Component/manualApiTestComponent';
 import { ManualSceneTest } from '../Component/manualSceneTest';
@@ -25,7 +25,7 @@ import { AppTest } from '../Component/appTest';
 import { StabilityTest } from "../Component/stabilityTest"
 import { BenchmarkTest } from '../Component/benchmarkTest';
 import { StressTest } from "../Component/stressTest"
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 
 const TAG = '[homePage]'
 
@@ -42,11 +42,15 @@ struct TestCategory {
       Tabs() {
         TabContent() {
           AppTest( { testItems : this.testItems.filter( item => ( item.category === Category.App ) ) } )
-        }.tabBar( $r( "app.string.App" ) ).margin( { top : $r( "app.float.distance_20" ) } )
+        }.tabBar( $r( "app.string.App" ) ).margin( { top : $r( "app.float.distance_5" ) } )
 
         TabContent() {
           ManualApiTest( { testItems : this.testItems.filter( item => ( item.category === Category.API ) ) } )
-        }.tabBar( $r( "app.string.api" ) ).margin( { top : $r( "app.float.distance_20" ) } )
+        }.tabBar( $r( "app.string.api" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+
+        TabContent() {
+          StabilityTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stability ) ) } )
+        }.tabBar( $r( "app.string.stability" ) ).margin( { top : $r( "app.float.distance_5" ) } )
 
         TabContent() {
           AutoTest( { testItems : this.testItems.filter( item => ( item.category === Category.AutoTest ) ) } )
@@ -55,10 +59,6 @@ struct TestCategory {
         TabContent() {
           ManualSceneTest( { testItems : this.testItems.filter( item => ( item.category === Category.Scenario ) ) } )
         }.tabBar( $r( "app.string.scenario" ) ).margin( { top : $r( "app.float.distance_5" ) } )
-
-        TabContent() {
-          StabilityTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stability ) ) } )
-        }.tabBar( $r( "app.string.stability" ) ).margin( { top : $r( "app.float.distance_5" ) } )
 
         TabContent() {
           BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.BenchMark ) ) } )

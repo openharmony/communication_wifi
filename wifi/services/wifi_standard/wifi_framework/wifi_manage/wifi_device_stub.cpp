@@ -72,6 +72,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnStartPortalCertification;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE)] =
         &WifiDeviceStub::OnGetChangeDeviceConfig;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET)] =
+        &WifiDeviceStub::OnFactoryReset;
     return;
 }
 
@@ -112,6 +114,8 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnIsWifiActive;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_STATE)] =
         &WifiDeviceStub::OnGetWifiState;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT)] =
+        &WifiDeviceStub::OnIsMeteredHotspot;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO)] =
         &WifiDeviceStub::OnGetLinkedInfo;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO)] = &WifiDeviceStub::OnGetIpInfo;
@@ -652,6 +656,19 @@ void WifiDeviceStub::OnGetWifiState(uint32_t code, MessageParcel &data, MessageP
     return;
 }
 
+void WifiDeviceStub::OnIsMeteredHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool bMeteredHotspot = false;
+    ErrCode ret = IsMeteredHotspot(bMeteredHotspot);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(bMeteredHotspot);
+    }
+    return;
+}
+
 void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -956,6 +973,16 @@ void WifiDeviceStub::OnResetAllFrozenApp(uint32_t code, MessageParcel& data, Mes
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = ResetAllFrozenApp();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<int> channelList;
+    ErrCode ret = FactoryReset();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

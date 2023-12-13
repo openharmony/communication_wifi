@@ -791,10 +791,13 @@ WifiErrorNo WifiIdlClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
     return err;
 }
 
-WifiErrorNo WifiIdlClient::StartAp(int id)
+WifiErrorNo WifiIdlClient::StartAp(int id, std::string ifaceName)
 {
     CHECK_CLIENT_NOT_NULL;
-    return StartSoftAp(id);
+    char ifName[ifaceName.size() + 1];
+    ifaceName.copy(ifName, ifaceName.size() + 1);
+    ifName[ifaceName.size()] = '\0';
+    return StartSoftAp(id, ifName);
 }
 
 WifiErrorNo WifiIdlClient::StopAp(int id)

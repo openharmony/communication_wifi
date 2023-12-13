@@ -29,7 +29,7 @@ const PERMISSION_NAME: string = 'ohos.permission.LOCATION'
 @Component
 struct WifiFound {
   private testItem: string = "Wlan扫描"
-  @State linkedInfo: any = {
+  private linkedInfo: any = {
     ssid : "" ,
     bssid : "" ,
     networkId : 0 ,

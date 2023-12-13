@@ -14,8 +14,8 @@
  */
 
 // @ts-nocheck
-import ConfigData from '../Utils/ConfigData';
-import { TestScenario } from '../MainAbility/model/testData'
+import ConfigData from '../utils/ConfigData';
+import { TestScenario } from '../entryability/model/testData'
 import prompt from '@system.prompt';
 
 const TAG = "[scenarioContentTable]"
@@ -27,10 +27,10 @@ const TAG = "[scenarioContentTable]"
 export struct ScenarioContentTable {
   @State scenarioItems: TestScenario[] = [];
   private scenarioItemsX: TestScenario[]
-  @Prop changeIndex: number;
+  @Prop changeIndex: Number;
   @State localName: string = 'DaYuBlue'
 
-  @Builder IngredientItem( scenarioItem: TestScenario , index: number ) {
+  @Builder IngredientItem( scenarioItem: TestScenario , index: Number ) {
     Stack() {
       Flex() {
         Flex( { direction : FlexDirection.Column , alignItems : ItemAlign.Start } ) {
@@ -72,7 +72,7 @@ export struct ScenarioContentTable {
     .backgroundColor( $r( "app.color.white" ) )
   }
 
-  getCurrentState( index: number ) {
+  getCurrentState( index: Number ) {
     if ( index <= this.changeIndex ) {
       this.scenarioItemsX[ index ].result = 'pass';
     } else {
@@ -95,7 +95,7 @@ export struct ScenarioContentTable {
           justifyContent : FlexAlign.SpaceBetween ,
           alignItems : ItemAlign.Start
         } ) {
-          ForEach( this.scenarioItems , ( item: TestScenario , index: number ) => {
+          ForEach( this.scenarioItems , ( item: TestScenario , index: Number ) => {
             this.IngredientItem( item , index )
           } )
         }

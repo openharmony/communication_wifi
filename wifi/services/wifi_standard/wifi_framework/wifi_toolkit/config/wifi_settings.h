@@ -26,6 +26,7 @@
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
 constexpr int RANDOM_STR_LEN = 6;
+constexpr int RANDOM_PASSWD_LEN = 8;
 constexpr int MSEC = 1000;
 constexpr int FOREGROUND_SCAN_CONTROL_TIMES = 4;
 constexpr int FOREGROUND_SCAN_CONTROL_INTERVAL = 2 * 60;
@@ -129,6 +130,10 @@ public:
     bool GetSoftapToggledState() const;
     void SetWifiStopState(bool state);
     bool GetWifiStopState() const;
+    void SetCoexSupport(bool isSupport);
+    bool GetCoexSupport() const;
+    void SetApIfaceName(const std::string &ifaceName);
+    std::string GetApIfaceName() const;
 #endif
 
     /**
@@ -786,7 +791,7 @@ public:
      * @param state - the hid2d upper scene
      * @return int - 0 success
      */
-    int SetHid2dUpperScene(const Hid2dUpperScene &scene);
+    int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene);
 
     /**
      * @Description Get the hid2d upper scene
@@ -794,7 +799,7 @@ public:
      * @param state - the hid2d upper scene
      * @return int - 0 success
      */
-    int GetHid2dUpperScene(Hid2dUpperScene &scene);
+    int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene);
 
     /**
      * @Description Set p2p type
@@ -1505,6 +1510,12 @@ public:
      * @param randomMacAddr - random MAC address[out]
      */
     void GenerateRandomMacAddress(std::string &randomMacAddr);
+    /**
+     * @Description Clear Hotspot config
+     *
+     * @return void
+     */
+    void ClearHotspotConfig();
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address
@@ -1604,6 +1615,8 @@ private:
     bool mWifiToggled;
     bool mWifiStoping;
     bool mSoftapToggled;
+    bool mIsSupportCoex;
+    std::string mApIfaceName;
 #endif
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
@@ -1649,6 +1662,7 @@ private:
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
     std::map <int, DisconnectedReason> mLastDiscReason;
+    std::string mUpperIfName;
     Hid2dUpperScene mUpperScene;
     P2pBusinessType mP2pBusinessType;
 

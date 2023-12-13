@@ -63,8 +63,6 @@ public:
 private:
     bool Init();
     bool IsScanServiceRunning();
-    ErrCode OpenScanOnlyAvailable();
-    ErrCode CloseScanOnlyAvailable();
 #ifndef OHOS_ARCH_LITE
     void UpdateScanMode();
 #endif

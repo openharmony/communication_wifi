@@ -34,6 +34,10 @@
 
 #define HTTP_DETECTION_TIMEOUT 10000
 #define HTTP_BACKUP_TIMEOUT 3000
+
+#define ARP_OPT 0
+#define HTTP_OPT 1
+
 namespace OHOS {
 namespace Wifi {
 class StaNetworkCheck {
@@ -115,6 +119,7 @@ private:
     StaNetState bakNetState;
     StaNetState mainNetState;
     int m_instId;
+    int httpDetectCnt;
 };
 }  // namespace Wifi
 }  // namespace OHOS

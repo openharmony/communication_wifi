@@ -16,6 +16,11 @@
 #define OHOS_WIFI_HAL_ADAPTER_TEST_H
 
 #include <gtest/gtest.h>
+#include "wifi_hal_adapter.h"
+#include "wifi_hal_vendor_interface.h"
+#include "securec.h"
+#include "wifi_common_def.h"
+#include "wifi_log.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -30,6 +35,13 @@ public:
     virtual void TearDown()
     {}
 };
+HWTEST_F(WifiHalCRpcServerTest, ReleaseWifiHalVendorInterfaceTest, TestSize.Level1)
+{
+    ReleaseWifiHalVendorInterface();
+    WifiHalVendorInterface *g_wifiHalVendorInterface = GetWifiHalVendorInterface();
+    ReleaseWifiHalVendorInterface();
+    EXPECT_TRUE(g_wifiHalVendorInterface != NULL);
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

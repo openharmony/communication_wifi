@@ -22,6 +22,8 @@
 #include "wifi_common_def.h"
 #include "wifi_log.h"
 
+using namespace testing::ext;
+
 namespace OHOS {
 namespace Wifi {
 class WifiHalAdapterTest : public testing::Test {

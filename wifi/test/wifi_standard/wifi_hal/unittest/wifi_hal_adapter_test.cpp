@@ -35,7 +35,7 @@ public:
     virtual void TearDown()
     {}
 };
-HWTEST_F(WifiHalCRpcServerTest, ReleaseWifiHalVendorInterfaceTest, TestSize.Level1)
+HWTEST_F(WifiHalAdapterTest, ReleaseWifiHalVendorInterfaceTest, TestSize.Level1)
 {
     ReleaseWifiHalVendorInterface();
     WifiHalVendorInterface *g_wifiHalVendorInterface = GetWifiHalVendorInterface();

@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 #include "wifi_auth_center.h"
-#include "wifi_net_agent.h"
 
 namespace OHOS {
 namespace Wifi {

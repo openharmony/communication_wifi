@@ -440,7 +440,7 @@ HWTEST_F(WifiHalWpaStaTest, GetStaInterfaceNoTest, TestSize.Level1)
 
 HWTEST_F(WifiHalWpaStaTest, DelScanInfoLineTest, TestSize.Level1)
 {
-    char ifname[] = "\t\0\SIGNwpa_state=SCANNING\\1024AL_POLL";
+    char ifname[] = "\t15IGNwpa_state=SCANNING\\1024AL_POLL";
     ScanInfo *pcmd = nullptr;
     DelScanInfoLine(pcmd, ifname, 1);
     DelScanInfoLine(pcmd, ifname, 0);

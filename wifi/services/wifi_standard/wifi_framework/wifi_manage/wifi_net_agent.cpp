@@ -188,8 +188,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
             this->RegisterNetSupplierCallback();
             WifiLinkedInfo linkedInfo;
             WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-            if ((linkedInfo.detailedState == DetailedState::NOTWORKING)
-                && (linkedInfo.connState == ConnState::CONNECTED)) {
+            if (linkedInfo.connState == ConnState::CONNECTED) {
 #ifndef OHOS_ARCH_LITE
                 if (supplierInfo != nullptr) {
                     TimeStats timeStats("Call UpdateNetSupplierInfo");

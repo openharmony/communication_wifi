@@ -1153,6 +1153,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
         InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
+        InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
     } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT) {
         DisableNetwork(targetNetworkId);
         SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_FULL);

@@ -25,8 +25,6 @@ DEFINE_WIFILOG_LABEL("WifiCEventStubTest");
 
 namespace OHOS {
 namespace Wifi {
-OHOS::sptr<WifiCDeviceEventCallback> wifiCDeviceCallback =
-    OHOS::sptr<WifiCDeviceEventCallback>(new (std::nothrow) WifiCDeviceEventCallback());
 class WifiEventTest : public testing::Test {
 public:
     static void SetUpTestCase() {};
@@ -101,11 +99,6 @@ HWTEST_F(WifiEventTest, RegisterWifiEventErrorTest, TestSize.Level1)
 HWTEST_F(WifiEventTest, UnRegisterWifiEventTest, TestSize.Level1)
 {
     UnRegisterWifiEventTest();
-}
-
-HWTEST_F(WifiEventTest, RegisterWifiEventSuccessTest, TestSize.Level1)
-{
-    RegisterWifiEventSuccessTest();
 }
 
 HWTEST_F(WifiEventTest, RegisterWifiEventSuccessTest, TestSize.Level1)

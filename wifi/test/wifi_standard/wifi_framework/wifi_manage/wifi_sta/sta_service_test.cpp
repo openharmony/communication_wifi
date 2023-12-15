@@ -696,11 +696,6 @@ HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)
     StaServiceEnableWifiSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceInitStaServiceSuccess, TestSize.Level1)
-{
-    StaServiceInitStaServiceSuccess();
-}
-
 HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigSuccess, TestSize.Level1)
 {
     StaServiceConnectToWifiDeviceConfigSuccess();

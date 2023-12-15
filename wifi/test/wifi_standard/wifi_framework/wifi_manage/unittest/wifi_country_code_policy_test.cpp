@@ -149,7 +149,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPTest, TestSize.Level1)
     WifiLinkedInfo info;
     WifiSettings::GetInstance().GetLinkedInfo(info);
     std::string code;
-    ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code);
+    m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code);
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultTest, TestSize.Level1)
@@ -157,7 +157,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultTest, TestSize
     WIFI_LOGI("GetWifiCountryCodeByScanResultTest enter");
     int state = WifiSettings::GetInstance().GetWifiState(0);
     std::string code;
-    ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code);
+    m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code);
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByRegionTest, TestSize.Level1)

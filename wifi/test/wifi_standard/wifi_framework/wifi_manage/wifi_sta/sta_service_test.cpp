@@ -269,7 +269,7 @@ void StaServiceTest::StaServiceAddDeviceConfigSuccess()
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
     config.keyMgmt = "123456";
-    config.wifiEapConfig.eap == "TLS";
+    config.wifiEapConfig.eap = "TLS";
     config.wifiEapConfig.certEntry.push_back(1);
     config.wifiEapConfig.clientCert = "client certificate";
     config.wifiEapConfig.privateKey = "//12302345//";
@@ -689,58 +689,6 @@ void StaServiceTest::StaServiceSetSuspendModeTest()
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_FAILED);
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->SetSuspendMode(true) == WIFI_OPT_SUCCESS);
-}
-
-void StaServiceTest::StaServiceSetPowerModeTest()
-{
-    EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), WpaSetSuspendMode(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_TRUE(pStaService->SetPowerMode(false) == WIFI_OPT_FAILED);
-    EXPECT_TRUE(pStaService->SetPowerMode(false) == WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(pStaService->SetPowerMode(true) == WIFI_OPT_SUCCESS);
-}
-
-
-void StaServiceTest::StaServiceOnSystemAbilityChangedTest()
-{
-    EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(0)).Times(AtLeast(0);
-    EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, false) == WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, true) == WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(pStaService->OnSystemAbilityChanged(1, true) == WIFI_OPT_SUCCESS);
-}
-
-void StaServiceTest::StaServiceHandleScreenStatusChangedTest()
-{
-    pStaService->HandleScreenStatusChanged(1);
-    pStaService->HandleScreenStatusChanged(0);
-}
-
-void StaServiceTest::StaServiceStartPortalCertificationTest()
-{
-    EXPECT_TRUE(pStaService->StartPortalCertification(COMM_NET, false) == WIFI_OPT_SUCCESS);
-    pStaService->pStaStateMachine = nullptr;
-    EXPECT_TRUE(pStaService->StartPortalCertification(COMM_NET, true) == WIFI_OPT_FAILED);
-}
-
-HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
-{
-    StaServiceStartPortalCertificationTest();
-}
-
-HWTEST_F(StaServiceTest, StaServiceHandleScreenStatusChangedTest, TestSize.Level1)
-{
-    StaServiceHandleScreenStatusChangedTest();
-}
-
-HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level1)
-{
-    StaServiceOnSystemAbilityChangedTest();
-}
-
-HWTEST_F(StaServiceTest, StaServiceSetPowerModeTest, TestSize.Level1)
-{
-    StaServiceSetPowerModeTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)

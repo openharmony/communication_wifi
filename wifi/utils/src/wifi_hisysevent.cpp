@@ -116,5 +116,13 @@ void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ACCESS_INTERNET_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
+void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["IS_START"] = isStartScan;
+    root["SUSPEND_REASON"] = suspendReason;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PNO_SCAN_INFO", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

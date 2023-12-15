@@ -158,6 +158,14 @@ HWTEST_F(ScanInterfaceTest, ScanWithParamTest, TestSize.Level1)
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams));
 }
 
+HWTEST_F(ScanInterfaceTest, StartWifiPnoScanTest, TestSize.Level1)
+{
+    int isStartAction = 1;
+    int periodMs = 60 * 1000;
+    int suspendReason = 0;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->StartWifiPnoScan(isStartAction, periodMs, suspendReason));
+}
+
 HWTEST_F(ScanInterfaceTest, DisableScanTest, TestSize.Level1)
 {
     bool disable = false;

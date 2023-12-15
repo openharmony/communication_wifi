@@ -395,10 +395,6 @@ private:
     void RegisterPowerStateListener();
     void UnRegisterPowerStateListener();
     bool isPowerStateListenerSubscribered = false;
-#ifdef HAS_POWERMGR_PART
-    void RegisterPowerStateCallBack();
-    void UnRegisterPowerStateCallBack();
-#endif
 #ifdef HAS_MOVEMENT_PART
     void RegisterMovementCallBack();
     void UnRegisterMovementCallBack();

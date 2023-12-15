@@ -35,10 +35,14 @@ constexpr int BACKGROUND_SCAN_CONTROL_INTERVAL = 30 * 60;
 constexpr int PNO_SCAN_CONTROL_TIMES = 1;
 constexpr int PNO_SCAN_CONTROL_INTERVAL = 20;
 constexpr int SYSTEM_TIMER_SCAN_CONTROL_TIMES = 4;
-constexpr int SYSTEM_TIMER_SCAN_CONTROL_INTERVAL = 20;
+constexpr int SYSTEM_TIMER_SCAN_CONTROL_INTERVAL = 10;
 constexpr int MODE_ADD = 0;
 constexpr int MODE_DEL = 1;
 constexpr int MODE_UPDATE = 2;
+constexpr int ASSOCIATING_SCAN_CONTROL_INTERVAL = 2;
+constexpr int ASSOCIATED_SCAN_CONTROL_INTERVAL = 5;
+constexpr int OBTAINING_IP_SCAN_CONTROL_INTERVAL = 5;
+constexpr int OBTAINING_IP_SCAN_CONTROL_TIMES = 1;
 /* Obtain the scanning result that is valid within 180s. */
 constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
 /* Hotspot idle status auto close timeout 10min. */

@@ -81,7 +81,6 @@ static sptr<WifiDeviceProvisionObserver> deviceProvisionObserver_ = nullptr;
 static sptr<SettingsMigrateObserver> settingsMigrateObserver_ = nullptr;
 #ifdef HAS_POWERMGR_PART
 static sptr<WifiPowerStateListener> powerStateListener_ = nullptr;
-static sptr<PowerStateCallback> powerStateCallback_ = nullptr;
 #endif
 #ifdef HAS_MOVEMENT_PART
 static sptr<DeviceMovementCallback> deviceMovementCallback_ = nullptr;
@@ -1521,10 +1520,8 @@ void WifiManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
         case POWER_MANAGER_SERVICE_ID: {
             if (add) {
                 RegisterPowerStateListener();
-                RegisterPowerStateCallBack();
             } else {
                 UnRegisterPowerStateListener();
-                UnRegisterPowerStateCallBack();
             }
 
             WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
@@ -2746,37 +2743,6 @@ void WifiManager::UnRegisterPowerStateListener()
 #endif
 }
 
-#ifdef HAS_POWERMGR_PART
-void WifiManager::RegisterPowerStateCallBack()
-{
-    WIFI_LOGI("RegisterPowerStateCallBack");
-    if (powerStateCallback_ == nullptr) {
-        powerStateCallback_ = new (std::nothrow) PowerStateCallback();
-    }
-
-    bool result = PowerMgr::PowerMgrClient::GetInstance().RegisterPowerStateCallback(powerStateCallback_);
-    if (!result) {
-        WIFI_LOGE("register power state callback failed");
-    } else {
-        WIFI_LOGI("register power state callback success");
-    }
-}
-
-void WifiManager::UnRegisterPowerStateCallBack()
-{
-    WIFI_LOGI("UnRegisterPowerStateCallBack");
-    if (powerStateCallback_ == nullptr) {
-        return;
-    }
-
-    bool result = PowerMgr::PowerMgrClient::GetInstance().UnRegisterPowerStateCallback(powerStateCallback_);
-    if (!result) {
-        WIFI_LOGE("register power state callback failed");
-    } else {
-        WIFI_LOGI("register power state callback success");
-    }
-}
-#endif
 #ifdef HAS_MOVEMENT_PART
 void WifiManager::RegisterMovementCallBack()
 {

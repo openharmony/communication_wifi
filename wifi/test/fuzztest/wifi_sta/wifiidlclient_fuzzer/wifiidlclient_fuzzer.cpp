@@ -164,6 +164,7 @@ void OnIWifiSupplicantIfaceTest(const uint8_t* data, size_t size)
 void OnIWifiHotSpotIfaceTest(const uint8_t* data, size_t size)
 {
     int id = 0;
+    char ifaceName[] = "p2p0";
     StartSoftAp(id);
     StopSoftAp(id);
 

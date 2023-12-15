@@ -112,7 +112,6 @@ void OnIWifiP2pIfaceTest(const uint8_t* data, size_t size)
     P2pSetListenChannel(data1, data2);
     P2pAddGroup(datas, data1, data2);
 
-
     P2pReinvoke(datas, chardata);
 }
 

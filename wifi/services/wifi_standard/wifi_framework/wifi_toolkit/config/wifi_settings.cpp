@@ -1571,16 +1571,16 @@ void WifiSettings::InitScanControlForbidList(void)
 #ifdef SUPPORT_SCAN_CONTROL
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     forbidMode.scanScene = SCAN_SCENE_ASSOCIATING;
-    forbidMode.forbidTime = 2;
+    forbidMode.forbidTime = ASSOCIATING_SCAN_CONTROL_INTERVAL;
     mScanControlInfo[0].scanForbidList.push_back(forbidMode);
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     forbidMode.scanScene = SCAN_SCENE_ASSOCIATED;
-    forbidMode.forbidTime = 5;
+    forbidMode.forbidTime = ASSOCIATED_SCAN_CONTROL_INTERVAL;
     mScanControlInfo[0].scanForbidList.push_back(forbidMode);
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     forbidMode.scanScene = SCAN_SCENE_OBTAINING_IP;
-    forbidMode.forbidCount = 1;
-    forbidMode.forbidTime = 5;
+    forbidMode.forbidCount = OBTAINING_IP_SCAN_CONTROL_TIMES;
+    forbidMode.forbidTime = OBTAINING_IP_SCAN_CONTROL_INTERVAL;
     mScanControlInfo[0].scanForbidList.push_back(forbidMode);
 #else
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;

@@ -17,6 +17,7 @@
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "define.h"
+#include "wifi_service_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -31,6 +32,16 @@ void DeviceMovementCallback::OnMovementChanged(const Msdp::MovementDataUtils::Mo
             WifiSettings::GetInstance().SetFreezeModeState(MODE_STATE_OPEN);
         } else {
             WifiSettings::GetInstance().SetFreezeModeState(MODE_STATE_CLOSE);
+        }
+    }
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
+        if (pScanService == nullptr) {
+            WIFI_LOGE("scan service is NOT start!");
+            return;
+        }
+        if (pScanService->OnMovingFreezeStateChange() != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("OnMovingFreezeStateChange failed");
         }
     }
 }

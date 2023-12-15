@@ -1904,6 +1904,11 @@ public:
         pScanService->HandleMovingFreezeChanged();
     }
 
+    void HandleNetworkQualityChangedTest()
+    {
+        pScanService->HandleNetworkQualityChanged(19);
+    }
+
     void WifiMaxThroughputTest()
     {
         int channelUtilization = 10;
@@ -3069,6 +3074,11 @@ HWTEST_F(ScanServiceTest, PnoScanFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleMovingFreezeChangedTest, TestSize.Level1)
 {
     HandleMovingFreezeChangedTest();
+}
+
+HWTEST_F(ScanServiceTest, HandleNetworkQualityChangedTest, TestSize.Level1)
+{
+    HandleNetworkQualityChangedTest();
 }
 /**
  * @tc.name: WifiMaxThroughputTest

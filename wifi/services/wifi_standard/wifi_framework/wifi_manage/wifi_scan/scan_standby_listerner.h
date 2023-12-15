@@ -35,6 +35,7 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &event) override;
 private:
     std::function<void(bool, bool)> onStandbyChangedEvent;
+    bool lastSleepState = false;
 };
 
 class StandByListerner {

@@ -73,6 +73,8 @@ void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReas
 void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason);
 
 void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt);
+
+void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

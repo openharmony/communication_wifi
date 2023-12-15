@@ -136,8 +136,13 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
     WIFI_LOGI("Enter ScanInterface::OnClientModeStatusChanged, staStatus=%{public}d.", staStatus);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    pScanService->HandleStaStatusChanged(staStatus);
-    pScanService->SetStaCurrentTime();
+    if (staStatus == static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED)
+        || staStatus == static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED)) {
+        pScanService->HandleNetworkQualityChanged(staStatus);
+    } else {
+        pScanService->HandleStaStatusChanged(staStatus);
+        pScanService->SetStaCurrentTime();
+    }
     return WIFI_OPT_SUCCESS;
 }
 

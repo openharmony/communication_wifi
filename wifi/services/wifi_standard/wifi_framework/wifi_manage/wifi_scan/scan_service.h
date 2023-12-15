@@ -217,6 +217,12 @@ public:
      */
     virtual void HandleStaStatusChanged(int status);
     /**
+     * @Description Network quality change processing
+     *
+     * @param state - Network quality[in]
+     */
+    virtual void HandleNetworkQualityChanged(int status);
+    /**
      * @Description movingfreeze status change processing
      *
      */

@@ -73,8 +73,18 @@ SOFTAP_OPEN_AND_CLOSE_FAILED:
 
 WIFI_ACCESS_INTERNET_FAILED:
   __BASE: {type: FAULT, level: MINOR, desc: Wifi access internet failed event}
-  ARP_FAIL_CNT: {type: STRING, desc: arp fail cnt}
-  NET_STATE: {type: STRING, desc: http network fail}
+  ARP_FAIL_CNT: {type: INT32, desc: arp fail cnt}
+  NET_STATE: {type: INT32, desc: http network fail}
+
+BROWSER_FAILED_FOR_PROTAL:
+  __BASE: {type: FAULT, level: MINOR, desc: browser failed for portal}
+  RESP_CODE: {type: INT32, desc: resp code}
+  SERVER: {type: STRING, desc: server}
+
+WIFI_CONNECT_FAILED_EVENT:
+  __BASE: {type: FAULT, level: MINOR, desc: wifi connect failed event}
+  ASSOC_FAIL_CNT: {type: INT32, desc: assoc fail cnt}
+  DHCP_FAIL_CNT: {type: INT32, desc: dhcp fail cnt}
 
 WIFI_CHR_EVENT:
   __BASE: {type: STATISTIC, level: MINOR, desc: Wifi chr event}
@@ -91,6 +101,7 @@ WIFI_KPI:
   DISCONNECT_CNT: {type: INT32, desc: Wifi disconnect count}
   OPEN_COUNT: {type: INT32, desc: Wifi open count}
   OPEN_SUCCESS_COUNT: {type: INT32, desc: Wifi open success count}
+  PNO_SCAN_COUNT: {type: INT32, desc: pno scan count}
   
 WIFI_KPI_SSID:
   __BASE: {type: STATISTIC, level: MINOR, desc: Wifi KPI SSID}

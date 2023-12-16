@@ -149,6 +149,8 @@ enum class WifiOperateState {
     STA_DHCP,
     STA_DHCP_SUCCESS,
     STA_DISCONNECT,
+    STA_DHCP_FAIL,
+    STA_CLOSING,
 };
 
 enum class DisconnectDetailReason {

@@ -124,5 +124,22 @@ void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason)
     root["SUSPEND_REASON"] = suspendReason;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PNO_SCAN_INFO", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &Server)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["RESP_CODE"] = respCode;
+    root["SERVER"] = Server;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BROWSER_FAILED_FOR_PROTAL", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiConnectFailedEventHiSysEvent(int operateType)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OPERATE_TYPE"] = operateType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONNECT_FAILED_EVENT", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

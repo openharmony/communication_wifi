@@ -25,7 +25,7 @@
 #include "wifi_settings.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_country_code_manager.h"
-
+#include "wifi_common_util.h"
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("ConcreteMangerMachine");

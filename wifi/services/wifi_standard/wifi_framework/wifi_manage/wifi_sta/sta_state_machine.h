@@ -450,8 +450,8 @@ public:
      *
      */
     void HandlePortalNetworkPorcess();
-
     int GetInstanceId();
+
 private:
     /**
      * @Description  Destruct state.
@@ -597,6 +597,10 @@ private:
      * @param netState - the state of connecting network(in)
      */
     void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
+
+    void NetDetectionProcess(StaNetState netState, const std::string portalUrl);
+
+    void NetStateObserverCallback(SystemNetWorkState netState);
     /**
      * @Description  the process of handling arp check results.
      *
@@ -889,10 +893,12 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-    std::string mPortalUrl;
+    int m_lastNoWorkTime;
+    SystemNetWorkState m_netState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
+    std::string mPortalUrl;
     /**
      * @Description Replace empty dns
      */

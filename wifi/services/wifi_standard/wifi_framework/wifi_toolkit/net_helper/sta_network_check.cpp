@@ -18,12 +18,14 @@
 #include "wifi_settings.h"
 #include "wifi_hisysevent.h"
 #ifndef OHOS_ARCH_LITE
+#include <curl/curl.h>
+#include <curl/easy.h>
 #include "http_client_request.h"
 #include "http_client.h"
 #endif
 
 DEFINE_WIFILOG_LABEL("StaNetworkCheck");
-
+const static std::string IFNAME = "wlan";
 namespace OHOS {
 namespace Wifi {
 constexpr int NET_ERR_OK = 200;
@@ -179,7 +181,12 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url)
         }
         WIFI_LOGE("HttpPortalDetection OnFailed, url:%{public}s, responseCode:%{public}d", url.c_str(), codeNum);
     });
-    
+    CURLcode errCode = CURLE_OK;
+    errCode = curl_easy_setopt(task->GetCurlHandle(), CURLOPT_INTERFACE, (IFNAME + std::to_string(m_instId)).c_str());
+    if (errCode != CURLE_OK) {
+        WIFI_LOGE("CURLOPT_INTERFACE failed errCode:%{public}d", errCode);
+        return -1;
+    }
     task->Start();
     return 0;
 }

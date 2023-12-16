@@ -117,6 +117,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/utils:wifi_utils",
+      "//third_party/curl:curl",
       "//third_party/libxml2:xml2",
     ]
 

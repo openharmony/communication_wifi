@@ -100,22 +100,6 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
-class WifiTimer {
-public:
-    using TimerCallback = std::function<void()>;
-    static constexpr uint32_t DEFAULT_TIMEROUT = 10000;
-    static WifiTimer *GetInstance(void);
-
-    WifiTimer();
-    ~WifiTimer();
-
-    ErrCode Register(
-        const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT, bool once = true);
-    void UnRegister(uint32_t timerId);
-
-private:
-    std::unique_ptr<Utils::Timer> timer_{nullptr};
-};
 #endif
 
 class WifiManager : WifiSystemAbilityListener {

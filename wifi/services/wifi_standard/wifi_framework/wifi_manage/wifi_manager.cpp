@@ -2768,56 +2768,6 @@ void WifiManager::UnRegisterMovementCallBack()
 }
 #endif
 
-WifiTimer *WifiTimer::GetInstance()
-{
-    static WifiTimer instance;
-    return &instance;
-}
-
-WifiTimer::WifiTimer() : timer_(std::make_unique<Utils::Timer>("WifiManagerTimer"))
-{
-    timer_->Setup();
-}
-
-WifiTimer::~WifiTimer()
-{
-    if (timer_) {
-        timer_->Shutdown(true);
-    }
-}
-
-ErrCode WifiTimer::Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval, bool once)
-{
-    if (timer_ == nullptr) {
-        WIFI_LOGE("timer_ is nullptr");
-        return WIFI_OPT_FAILED;
-    }
-
-    uint32_t ret = timer_->Register(callback, interval, once);
-    if (ret == Utils::TIMER_ERR_DEAL_FAILED) {
-        WIFI_LOGE("Register timer failed");
-        return WIFI_OPT_FAILED;
-    }
-
-    outTimerId = ret;
-    return WIFI_OPT_SUCCESS;
-}
-
-void WifiTimer::UnRegister(uint32_t timerId)
-{
-    if (timerId == 0) {
-        WIFI_LOGE("timerId is 0, no register timer");
-        return;
-    }
-
-    if (timer_ == nullptr) {
-        WIFI_LOGE("timer_ is nullptr");
-        return;
-    }
-
-    timer_->Unregister(timerId);
-    return;
-}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

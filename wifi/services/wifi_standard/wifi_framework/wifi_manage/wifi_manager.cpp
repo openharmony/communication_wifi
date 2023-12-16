@@ -1300,6 +1300,7 @@ void WifiManager::DealStaCloseRes(OperateResState state, int instId)
     if (state == OperateResState::CLOSE_WIFI_CLOSING) {
         cbMsg.msgData = static_cast<int>(WifiState::DISABLING);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_CLOSING));
         return;
     }
     if (state == OperateResState::CLOSE_WIFI_FAILED) {
@@ -1373,10 +1374,12 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
         case OperateResState::CONNECT_ASSOCIATING:
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
                 static_cast<int>(WifiOperateState::STA_ASSOCIATING));
+            WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_ASSOCIATING));
             break;
         case OperateResState::CONNECT_ASSOCIATED:
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
                 static_cast<int>(WifiOperateState::STA_ASSOCIATED));
+            WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_ASSOCIATED));
             break;
         case OperateResState::CONNECT_CONNECTION_FULL:
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
@@ -1385,6 +1388,10 @@ void WifiManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo
         case OperateResState::CONNECT_OBTAINING_IP:
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_DHCP),
                 static_cast<int>(WifiOperateState::STA_DHCP));
+            break;
+        case OperateResState::DISCONNECT_DISCONNECTING:
+        case OperateResState::CONNECT_CONNECTING_TIMEOUT:
+            WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DISCONNECT));
             break;
         default:
             break;

@@ -37,10 +37,10 @@ static bool g_isRemoteDied = false;
 
 static WifiErrorNo ReleaseFeatureInner(const int32_t wlanType)
 {
-    WifiErrorNo ret = WIFI_HAL_SUCCESS;
+    WifiErrorNo ret = WIFI_IDL_OPT_OK;
     if (g_wlanObj == NULL) {
         LOGE("%{public}s g_wlanObj is null", __func__);
-        return WIFI_HAL_FAILED;
+        return WIFI_IDL_OPT_FAILED;
     }
     for (int i = 0; i != MAX_FEATURE_NUMBER; ++i) {
         if (g_featureArray[i] == NULL || g_featureArray[i]->type != wlanType) {
@@ -116,7 +116,7 @@ static void ReleaseAllFeatures()
     if (g_wlanObj == NULL) {
         return;
     }
-    WifiErrorNo ret = WIFI_HAL_SUCCESS;
+    WifiErrorNo ret = WIFI_IDL_OPT_OK;
     for (int i = 0; i != MAX_FEATURE_NUMBER; ++i) {
         if (g_featureArray[i] == NULL) {
             continue;
@@ -149,81 +149,83 @@ static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRem
     }
 }
 
-WifiErrorNo HdiStart()
+WifiErrorNo StartHdiWifi()
 {
-    LOGI("%{public}s start...", __func__);
+    LOGI("%{public}s: begin to start hdi service", __func__);
     pthread_mutex_lock(&g_mutex);
     if (g_wlanRefCount != 0) {
         ++g_wlanRefCount;
         pthread_mutex_unlock(&g_mutex);
-        LOGI("%{public}s wlan ref count: %d", __func__, g_wlanRefCount);
-        return WIFI_HAL_SUCCESS;
+        LOGI("%{public}s: wlan ref count:%{public}d", __func__, g_wlanRefCount);
+        return WIFI_IDL_OPT_OK;
     }
     g_wlanObj = IWlanInterfaceGetInstance(HDI_SERVICE_NAME, false);
     if (g_wlanObj == NULL) {
         pthread_mutex_unlock(&g_mutex);
-        LOGE("%{public}s WlanInterfaceGetInstance failed", __func__);
-        return WIFI_HAL_FAILED;
+        LOGE("%{public}s: failed to get instance", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    } else {
+        LOGI("%{public}s: success to create the hdi WlanInterface, wlanObj:%{public}p", __func__, g_wlanObj);
     }
     int32_t ret = g_wlanObj->Start(g_wlanObj);
     if (ret != HDF_SUCCESS) {
-        LOGE("%{public}s Start failed: %{public}d", __func__, ret);
+        LOGE("%{public}s: failed to start wlan, ret:%{public}d", __func__, ret);
         IWlanInterfaceReleaseInstance(HDI_SERVICE_NAME, g_wlanObj, false);
         g_wlanObj = NULL;
         pthread_mutex_unlock(&g_mutex);
-        return WIFI_HAL_FAILED;
+        return WIFI_IDL_OPT_FAILED;
     }
     g_isRemoteDied = false;
     ++g_wlanRefCount;
     pthread_mutex_unlock(&g_mutex);
-    LOGI("%{public}s is started", __func__);
+    LOGI("%{public}s: success to starte wlan", __func__);
 
     struct HDIServiceManager* serviceMgr = HDIServiceManagerGet();
     if (serviceMgr == NULL) {
-        LOGE("%{public}s HDIServiceManagerGet failed", __func__);
-        return WIFI_HAL_FAILED;
+        LOGE("%{public}s: failed to get HDIServiceManager", __func__);
+        return WIFI_IDL_OPT_FAILED;
     }
     struct HdfRemoteService* remote = serviceMgr->GetService(serviceMgr, HDI_SERVICE_NAME);
     HDIServiceManagerRelease(serviceMgr);
     if (remote == NULL) {
-        LOGE("%{public}s GetService failed", __func__);
-        return WIFI_HAL_FAILED;
+        LOGE("%{public}s: failed to get HdfRemoteService", __func__);
+        return WIFI_IDL_OPT_FAILED;
     }
-    LOGI("%{public}s Get HdfRemoteService success", __func__);
+    LOGI("%{public}s: success to get HdfRemoteService", __func__);
     struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
     recipient->OnRemoteDied = ProxyOnRemoteDied;
     HdfRemoteServiceAddDeathRecipient(remote, recipient);
-    return WIFI_HAL_SUCCESS;
+    return WIFI_IDL_OPT_OK;
 }
 
 WifiErrorNo HdiStop()
 {
-    LOGI("%{public}s stop...", __func__);
+    LOGI("%{public}s: begin to stop hdi service", __func__);
     pthread_mutex_lock(&g_mutex);
     if (g_wlanObj == NULL || g_wlanRefCount == 0) {
         pthread_mutex_unlock(&g_mutex);
-        LOGE("%{public}s g_wlanObj is NULL or ref count is 0", __func__);
-        return WIFI_HAL_FAILED;
+        LOGE("%{public}s: invalid parameter", __func__);
+        return WIFI_IDL_OPT_FAILED;
     }
 
     const unsigned int ONE_REF_COUNT = 1;
     if (g_wlanRefCount > ONE_REF_COUNT) {
         --g_wlanRefCount;
         pthread_mutex_unlock(&g_mutex);
-        LOGI("%{public}s wlan ref count: %d", __func__, g_wlanRefCount);
-        return WIFI_HAL_SUCCESS;
+        LOGI("%{public}s: invalid wlanRefCount:%{public}d", __func__, g_wlanRefCount);
+        return WIFI_IDL_OPT_OK;
     }
     ReleaseAllFeatures();
     int32_t ret = g_wlanObj->Stop(g_wlanObj);
     if (ret != HDF_SUCCESS) {
-        LOGE("%{public}s Stop failed: %{public}d", __func__, ret);
+        LOGE("%{public}s: failed to stop, ret:%{public}d", __func__, ret);
     }
     IWlanInterfaceReleaseInstance(HDI_SERVICE_NAME, g_wlanObj, false);
     --g_wlanRefCount;
     g_wlanObj = NULL;
     pthread_mutex_unlock(&g_mutex);
-    LOGI("%{public}s is stopped", __func__);
-    return (ret == HDF_SUCCESS) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+    LOGI("%{public}s: success to release instance", __func__);
+    return (ret == HDF_SUCCESS) ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 struct IWlanInterface* GetWlanInterface()
@@ -253,7 +255,7 @@ WifiHdiProxy GetHdiProxy(const int32_t wlanType)
 
 WifiErrorNo ReleaseHdiProxy(const int32_t wlanType)
 {
-    WifiErrorNo ret = WIFI_HAL_FAILED;
+    WifiErrorNo ret = WIFI_IDL_OPT_FAILED;
     pthread_mutex_lock(&g_mutex);
     ret = ReleaseFeatureInner(wlanType);
     pthread_mutex_unlock(&g_mutex);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_AP_IMPL_H
-#define OHOS_HDI_AP_IMPL_H
-
-#include "wifi_hal_define.h"
+#ifdef HDI_INTERFACE_SUPPORT
+#ifndef OHOS_WIFI_HDI_CALLBACK_H
+#define OHOS_WIFI_HDI_CALLBACK_H
+#include "wifi_hdi_struct.h"
+#include "wifi_hdi_define.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-WifiErrorNo GetValidFrequenciesForBand(int32_t band, int *frequencies, int32_t *size, int id);
-WifiErrorNo WifiSetPowerModel(const int mode, int id);
-WifiErrorNo WifiGetPowerModel(int* mode, int id);
-WifiErrorNo HdiSetCountryCode(const char* code, int id);
+void OnEventScanNotify(int status);
+
 #ifdef __cplusplus
 }
+#endif
 #endif
 #endif

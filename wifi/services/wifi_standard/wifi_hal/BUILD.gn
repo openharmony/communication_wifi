@@ -22,12 +22,6 @@ if (defined(ohos_lite)) {
 
 local_base_sources = [
   "common/wifi_hal_common_func.c",
-  "hdi/src/wifi_hdi_ap_impl.c",
-  "hdi/src/wifi_hdi_common.c",
-  "hdi/src/wifi_hdi_p2p_impl.c",
-  "hdi/src/wifi_hdi_proxy.c",
-  "hdi/src/wifi_hdi_sta_impl.c",
-  "hdi/src/wifi_hdi_util.c",
   "main.c",
   "wifi_hal_adapter.c",
   "wifi_hal_ap_interface.c",
@@ -65,7 +59,6 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
 ]
 
@@ -137,11 +130,6 @@ if (defined(ohos_lite)) {
       "AP_INTF=\"$wifi_feature_with_ap_intf\"",
       "AP_NUM=$wifi_feature_with_ap_num",
     ]
-
-    if (wifi_feature_is_hdi_supported) {
-      defines += [ "HDI_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
-    }
 
     if (wifi_feature_with_local_random_mac) {
       defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]

@@ -259,6 +259,16 @@ extern "C" {
 #define HDI_MOVE_SIXTEEN 16
 #define HDI_MOVE_TF 24
 
+#define HDI_BSSID_LENGTH 18
+#define HDI_SSID_LENGTH 132
+#define HDI_SCAN_INFO_CAPABILITY_LENGTH 256
+#define HDI_GET_MAX_SCAN_INFO 256 /* Maximum number of scan infos obtained at a time */
+#define HDI_COUNTRY_CODE_LENGTH 2
+#define HDI_MAC_LENGTH 17
+
+#define HDI_STA_CB_SCAN_FAILED 1
+#define HDI_STA_CB_SCAN_OVER_OK 2
+
 typedef long os_time_t;
 
 enum HDIVendorElementId {
@@ -270,6 +280,14 @@ enum HDIVendorElementId {
     HDI_VENDOR_ELEM_BSS_COLOR_CHANGE = 5,
 };
 
+typedef enum HdiPortType {
+    HDI_PORT_TYPE_STATION    = 0,
+    HDI_PORT_TYPE_AP         = 1,
+    HDI_PORT_TYPE_P2P_CLIENT = 2,
+    HDI_PORT_TYPE_P2P_GO     = 3,
+    HDI_PORT_TYPE_P2P_DEVICE = 4,
+    HDI_PORT_TYPE_BUTT            // invalid type
+} HdiPortType;
 #ifdef __cplusplus
 }
 #endif

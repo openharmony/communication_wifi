@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 #ifdef HDI_INTERFACE_SUPPORT
-#ifndef OHOS_HDI_STRUCT_H
-#define OHOS_HDI_STRUCT_H
+#ifndef OHOS_WIFI_HDI_STRUCT_H
+#define OHOS_WIFI_HDI_STRUCT_H
 
-
+#include <stdint.h>
 #include "wifi_hdi_define.h"
+#include "i_wifi_struct.h"
+#include "wifi_error_no.h"
 
 #ifdef __cplusplus
 extern "C" {

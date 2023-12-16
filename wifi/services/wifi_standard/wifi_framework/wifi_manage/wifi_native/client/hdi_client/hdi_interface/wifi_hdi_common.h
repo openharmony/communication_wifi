@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 #ifdef HDI_INTERFACE_SUPPORT
-#ifndef OHOS_HDI_COMMON_H
-#define OHOS_HDI_COMMON_H
+#ifndef OHOS_WIFI_HDI_COMMON_H
+#define OHOS_WIFI_HDI_COMMON_H
 
 #include "wifi_hdi_define.h"
 #include "wifi_hdi_struct.h"
@@ -27,6 +27,7 @@ extern "C" {
 #define HDI_BIT(x) (1U << (x))
 #endif
 
+#define MAC_STRING_SIZE 17
 #define HDI_CHECK_ELEMENT(e, input, len)    \
     for ((e) = (const struct HdiElem *) (input);    \
         (const uint8_t *) (input) + (len) - (const uint8_t *)(e) >=    \
@@ -110,11 +111,14 @@ const char* HdiSSid2Txt(const uint8_t *ssid, size_t ssidLen);
 
 char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     const uint8_t *ie, size_t ieLen);
+int8_t IsValidHexCharAndConvert(char c);
+int CheckMacIsValid(const char *macStr);
+
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
 uint8_t FillIfrName(char *ifrName, int ifrNameLen, int portType);
 int32_t GetFeatureType(int portType);
 void UpDownLink(int flag, int type);
-int32_t SetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType);
+WifiErrorNo HdiSetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType);
 #endif
 #ifdef __cplusplus
 }

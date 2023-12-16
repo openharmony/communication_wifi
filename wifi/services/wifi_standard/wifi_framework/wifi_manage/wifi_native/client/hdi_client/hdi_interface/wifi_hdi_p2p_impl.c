@@ -13,26 +13,10 @@
  * limitations under the License.
  */
 #ifdef HDI_INTERFACE_SUPPORT
-#ifndef OHOS_HDI_UTIL_H
-#define OHOS_HDI_UTIL_H
+#include "wifi_hdi_p2p_impl.h"
 
-#include "wifi_hdi_define.h"
-#include "wifi_hdi_struct.h"
-#include "wifi_hdi_common.h"
-#include "v1_1/wlan_types.h"
+#undef LOG_TAG
+#define LOG_TAG "WifiHdiP2pImpl"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems,
-    int show);
-
-int GetScanResultText(const struct HdfWifiScanResultExt *scanResults,
-    struct HdiElems *elems, char* buff, int buffLen);
-
-#ifdef __cplusplus
-}
-#endif
-#endif
 #endif

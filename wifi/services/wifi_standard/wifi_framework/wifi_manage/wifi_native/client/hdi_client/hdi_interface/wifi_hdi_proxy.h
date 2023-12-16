@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef HDI_INTERFACE_SUPPORT
+#ifndef OHOS_WIFI_HDI_PROXY_H
+#define OHOS_WIFI_HDI_PROXY_H
 
-#ifndef OHOS_HDI_PROXY_H
-#define OHOS_HDI_PROXY_H
-
-#include "wifi_hal_define.h"
+#include "wifi_hdi_define.h"
+#include "wifi_error_no.h"
 #include "v1_1/iwlan_interface.h"
 #include "wifi_hal_base_feature.h"
 
@@ -42,7 +43,7 @@ if (proxy.wlanObj == NULL || proxy.feature == NULL) { \
  *
  * @return WifiErrorNo - operation result
  */
-WifiErrorNo HdiStart();
+WifiErrorNo StartHdiWifi();
 
 /**
  * @Description Stop the created channel.
@@ -89,5 +90,6 @@ bool IsHdiRemoteDied();
 void CleanLocalResources();
 #ifdef __cplusplus
 }
+#endif
 #endif
 #endif

@@ -27,36 +27,51 @@
 #include "wifi_hdi_proxy.h"
 #include "wifi_hdi_sta_impl.h"
 
-extern void ReleaseLocalResources();
-extern WifiErrorNo RegisterHdiStaCallbackEvent();
-
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiCommon"
 
-#ifndef CHECK_WIFI_HDI_PROXY_AND_RETURN
-#define CHECK_WIFI_HDI_PROXY_AND_RETURN(portType, isRemoteDied) \
-if (isRemoteDied) { \
-    LOGD("portType:%{public}d[0:sta, 1:ap, 4:p2p device], isRemoteDied:%{public}d", \
-        (portType), (isRemoteDied)); \
-    if ((portType) == HAL_PORT_TYPE_STATION) { \
-        ReleaseLocalResources(); \
-        if (HdiStart() != WIFI_HAL_SUCCESS) { \
-            LOGE("[STA] Start hdi failed!"); \
-            return WIFI_HAL_FAILED; \
-        } \
-        if (RegisterHdiStaCallbackEvent() != WIFI_HAL_SUCCESS) { \
-            LOGE("[STA] RegisterHdiStaCallbackEvent failed!"); \
-            return WIFI_HAL_FAILED; \
-        } \
-    } else { \
-        if (HdiStart() != WIFI_HAL_SUCCESS) { \
-            LOGE("failed to start %{public}d", (portType)); \
-            return WIFI_HAL_FAILED; \
-        } \
-    } \
+void HdiDeathCallbackCheck(HdiPortType portType, bool isRemoteDied)
+{
+    if (isRemoteDied) {
+        switch (portType) {
+            case HDI_PORT_TYPE_STATION:
+                HdiReleaseLocalResources();
+                if (HdiStop() != WIFI_IDL_OPT_OK) {
+                    LOGE("failed to stop sta hdi");
+                    return;
+                }
+                if (StartHdiWifi() != WIFI_IDL_OPT_OK) {
+                    LOGE("[STA] Start hdi failed!");
+                    return;
+                }
+                struct IWlanCallback cEventCallback;
+                if (memset_s(&cEventCallback, sizeof(cEventCallback), 0, sizeof(cEventCallback)) != EOK) {
+                    LOGE("%{public}s: failed to memset", __func__);
+                    return;
+                }
+                cEventCallback.ScanResults = HdiWifiScanResultsCallback;
+                if (HdiRegisterEventCallback(&cEventCallback) != WIFI_IDL_OPT_OK) {
+                    LOGE("[STA] RegisterHdiStaCallbackEvent failed!");
+                    return;
+                }
+                break;
+            case HDI_PORT_TYPE_AP:
+            case HDI_PORT_TYPE_P2P_DEVICE:
+                if (HdiStop() != WIFI_IDL_OPT_OK) {
+                    LOGE("failed to stop ap hdi");
+                    return;
+                }
+                if (StartHdiWifi() != WIFI_IDL_OPT_OK) {
+                    LOGE("failed to start %{public}d", portType);
+                    return;
+                }
+                break;
+            default:
+                LOGE("invalid portType:%{public}d", portType);
+                break;
+        }
+    }
 }
-#endif
-
 
 static int hex2num(char c)
 {
@@ -682,6 +697,42 @@ const char* HdiSSid2Txt(const uint8_t *ssid, size_t ssidLen)
     HdiBufEncode(ssid_txt, sizeof(ssid_txt), ssid, ssidLen);
     return ssid_txt;
 }
+
+int8_t IsValidHexCharAndConvert(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (c >= 'a' && c <= 'f') {
+        return c - 'a' + ('9' - '0' + 1);
+    }
+    if (c >= 'A' && c <= 'F') {
+        return c - 'A' + ('9' - '0' + 1);
+    }
+    return -1;
+}
+
+int CheckMacIsValid(const char *macStr)
+{
+    if (macStr == NULL || strlen(macStr) != MAC_STRING_SIZE) {
+        return -1;
+    }
+    for (int i = 0, j = 0; i < MAC_STRING_SIZE; ++i) {
+        if (j == 0 || j == 1) {
+            int v = IsValidHexCharAndConvert(macStr[i]);
+            if (v < 0) {
+                return -1;
+            }
+            ++j;
+        } else {
+            if (macStr[i] != ':') {
+                return -1;
+            }
+            j = 0;
+        }
+    }
+    return 0;
+}
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
 static const uint32_t MAC_ADDR_INDEX_0 = 0;
 static const uint32_t MAC_ADDR_INDEX_1 = 1;
@@ -695,45 +746,45 @@ uint8_t FillIfrName(char *ifrName, int ifrNameLen, int portType)
 {
     if (ifrName == NULL) {
         LOGE("%{public}s: ifrName is null", __func__);
-        return WIFI_HAL_INVALID_PARAM;
+        return WIFI_IDL_OPT_INVALID_PARAM;
     }
     if (ifrNameLen > IFNAMSIZ) {
         LOGE("%{public}s: invalid length:%{public}d", __func__, ifrNameLen);
-        return WIFI_HAL_INVALID_PARAM;
+        return WIFI_IDL_OPT_INVALID_PARAM;
     }
     switch (portType) {
-        case HAL_PORT_TYPE_STATION:
-        case HAL_PORT_TYPE_AP:
+        case HDI_PORT_TYPE_STATION:
+        case HDI_PORT_TYPE_AP:
             if (strcpy_s(ifrName, ifrNameLen, "wlan0") != EOK) {
                 LOGE("%{public}s: failed to copy the wlan0", __func__);
-                return WIFI_HAL_FAILED;
+                return WIFI_IDL_OPT_FAILED;
             }
             break;
-        case HAL_PORT_TYPE_P2P_DEVICE:
+        case HDI_PORT_TYPE_P2P_DEVICE:
             if (strcpy_s(ifrName, ifrNameLen, "p2p0") != EOK) {
                 LOGE("%{public}s: failed to copy the p2p0", __func__);
-                return WIFI_HAL_FAILED;
+                return WIFI_IDL_OPT_FAILED;
             }
             break;
         default:
             LOGE("%{public}s: invalid type:%{public}d", __func__, portType);
-            return WIFI_HAL_INVALID_PARAM;
+            return WIFI_IDL_OPT_INVALID_PARAM;
     }
-    return WIFI_HAL_SUCCESS;
+    return WIFI_IDL_OPT_OK;
 }
 
 int32_t GetFeatureType(int portType)
 {
     switch (portType) {
-        case HAL_PORT_TYPE_STATION:
+        case HDI_PORT_TYPE_STATION:
             return PROTOCOL_80211_IFTYPE_STATION;
-        case HAL_PORT_TYPE_AP:
+        case HDI_PORT_TYPE_AP:
             return PROTOCOL_80211_IFTYPE_AP;
-        case HAL_PORT_TYPE_P2P_CLIENT:
+        case HDI_PORT_TYPE_P2P_CLIENT:
             return PROTOCOL_80211_IFTYPE_P2P_CLIENT;
-        case HAL_PORT_TYPE_P2P_GO:
+        case HDI_PORT_TYPE_P2P_GO:
             return PROTOCOL_80211_IFTYPE_P2P_GO;
-        case HAL_PORT_TYPE_P2P_DEVICE:
+        case HDI_PORT_TYPE_P2P_DEVICE:
             return PROTOCOL_80211_IFTYPE_P2P_DEVICE;
         default:
             return PROTOCOL_80211_IFTYPE_UNSPECIFIED;
@@ -748,7 +799,7 @@ void UpDownLink(int flag, int type)
         LOGE("%{public}s: failed to init", __func__);
         return;
     }
-    if (FillIfrName(ifr.ifr_name, sizeof(ifr.ifr_name), type) != WIFI_HAL_SUCCESS) {
+    if (FillIfrName(ifr.ifr_name, sizeof(ifr.ifr_name), type) != WIFI_IDL_OPT_OK) {
         LOGE("%{public}s: failed to fill the ifr_name", __func__);
         return;
     }
@@ -781,23 +832,23 @@ void UpDownLink(int flag, int type)
     close(fd);
 }
 
-int32_t SetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType)
+WifiErrorNo HdiSetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType)
 {
     if (mac == NULL) {
-        LOGE("SetAssocMacAddr is NULL");
-        return WIFI_HAL_FAILED;
+        LOGE("HdiSetAssocMacAddr is NULL");
+        return WIFI_IDL_OPT_FAILED;
     }
     LOGD("%{public}s: begin to set random mac address, type:%{public}d, mac:%{private}s",
         __func__, portType, mac);
-    CHECK_WIFI_HDI_PROXY_AND_RETURN(portType, IsHdiRemoteDied());
-    if (strlen((const char *)mac) != WIFI_MAC_LENGTH || lenMac != WIFI_MAC_LENGTH) {
+    HdiDeathCallbackCheck(portType, IsHdiRemoteDied());
+    if (strlen((const char *)mac) != HDI_MAC_LENGTH || lenMac != HDI_MAC_LENGTH) {
         LOGE("%{public}s: Mac size not correct! real len:%{public}zu, lenMac:%{public}d",
             __func__, strlen((const char *)mac), lenMac);
-        return WIFI_HAL_FAILED;
+        return WIFI_IDL_OPT_FAILED;
     }
     int32_t featureType = GetFeatureType(portType);
     WifiHdiProxy proxy = GetHdiProxy(featureType);
-    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_HAL_FAILED);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
 
     unsigned char mac_bin[MAC_ADDR_INDEX_SIZE];
     int32_t ret = sscanf_s((char *)mac, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
@@ -805,7 +856,7 @@ int32_t SetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType
            &mac_bin[MAC_ADDR_INDEX_3], &mac_bin[MAC_ADDR_INDEX_4], &mac_bin[MAC_ADDR_INDEX_5]);
     if (ret <= EOK) {
         LOGE("%{public}s: failed to parse mac, ret:%{public}d", __func__, ret);
-        return WIFI_HAL_FAILED;
+        return WIFI_IDL_OPT_FAILED;
     }
 
     UpDownLink(0, portType);
@@ -816,7 +867,7 @@ int32_t SetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType
     }
     UpDownLink(1, portType);
     LOGI("%{public}s: result is %{public}d", __func__, ret);
-    return (ret == 0) ? WIFI_HAL_SUCCESS : WIFI_HAL_FAILED;
+    return (ret == 0) ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 #endif
 

@@ -100,7 +100,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
                 goto EXIT;
             }
             res = napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
-            WIFI_LOGI("event notify, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
+            WIFI_LOGI("uv_queue_work, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
                 res, asyncData->callbackRef, refCount);
             res = napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
             if (res != napi_ok || handler == nullptr) {
@@ -117,10 +117,8 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         EXIT:
             napi_close_handle_scope(asyncData->env, scope);
             res = napi_reference_unref(asyncData->env, asyncData->callbackRef, &refCount);
-            WIFI_LOGI("uv_queue_work unref, res: %{public}d, refCount: %{public}d",
-                res, refCount);
+            WIFI_LOGI("uv_queue_work unref, res: %{public}d, refCount: %{public}d", res, refCount);
             if (refCount == 0) {
-                // napi_delete_reference(asyncData->env, asyncData->callbackRef);
                 WIFI_LOGE("uv_queue_work unref, refCount is zero!");
             }
             delete asyncData;

@@ -75,7 +75,7 @@ struct HotspotStabilityTest {
             .fontSize( $r( 'app.float.font_16' ) )
             .fontColor( $r( 'app.color.title_black_color' ) )
             .onChange( ( value: string ) => {
-              this.testNumbers = Number( value );
+              this.testNumbers = parseInt( value );
             } )
         }
 
@@ -251,7 +251,7 @@ struct HotspotStabilityTest {
 
   onHotspotStateChange() {
     console.log( TAG , "on.hotspotStateChange start--------" )
-    wifiManager.on( "hotspotStateChange" , ( number ) => {
+    wifi.on( "hotspotStateChange" , ( number ) => {
       console.log( TAG , " on.hotspotStateChange --------" )
       let hotspotStateMessage = ""
       switch ( number ) {
@@ -288,6 +288,10 @@ struct HotspotStabilityTest {
       return this.hotspotMessage
     } )
     return this.hotspotMessage
+  }
+
+  aboutToDisappear() {
+    wifi.off( "hotspotStateChange" )
   }
 }
 

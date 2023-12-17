@@ -93,12 +93,13 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_handle_scope scope = nullptr;
             napi_value jsEvent = nullptr;
             uint32_t refCount = INVALID_REF_COUNT;
+            napi_status res;
             napi_open_handle_scope(asyncData->env, &scope);
             if (scope == nullptr) {
                 WIFI_LOGE("scope is nullptr");
                 goto EXIT;
             }
-            napi_status res = napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
+            res = napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
             WIFI_LOGI("event notify, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
                 res, asyncData->callbackRef, refCount);
             res = napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);

@@ -102,6 +102,10 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             res = napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
             WIFI_LOGI("uv_queue_work, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
                 res, asyncData->callbackRef, refCount);
+            if (res != napi_ok || refCount <= 1) {
+                WIFI_LOGE("uv_queue_work, do NOT call back, res: %{public}d!", res);
+                goto EXIT;
+            }
             res = napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
             if (res != napi_ok || handler == nullptr) {
                 WIFI_LOGE("handler is nullptr or res: %{public}d!", res);

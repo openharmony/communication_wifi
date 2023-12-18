@@ -33,6 +33,7 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
@@ -239,6 +240,7 @@ bool ApStartedState::StartAp() const
         LOGE("%{public}s: macAddress is invalid", __func__);
     }
 #endif
+    WriteWifiApStateHiSysEvent(1);
     return true;
 }
 
@@ -249,6 +251,7 @@ bool ApStartedState::StopAp() const
     if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
         return false;
     }
+    WriteWifiApStateHiSysEvent(0);
     return true;
 }
 

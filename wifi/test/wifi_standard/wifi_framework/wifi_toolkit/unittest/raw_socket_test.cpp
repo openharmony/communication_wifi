@@ -93,7 +93,7 @@ HWTEST_F(RawSocketTest, Send_Fail3, TestSize.Level1)
     EXPECT_TRUE(pRawSocket->Send(buff, count, destHwaddr) == -1);
 }
 
-HWTEST_F(RawSocketTest, Send_Fail3, TestSize.Level1)
+HWTEST_F(RawSocketTest, Send_Fail4, TestSize.Level1)
 {
     uint8_t *buff = &NUMBLE;
     int count = 10;

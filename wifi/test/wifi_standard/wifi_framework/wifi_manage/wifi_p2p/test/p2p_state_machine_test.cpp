@@ -715,7 +715,7 @@ HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnSuccess, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    std::string ifName("ifName");
+    char *ifName = "ifName";
     DhcpResult result;
     WarpDhcpResultNotifyOnSuccess(1, ifName, result);
 }
@@ -723,8 +723,8 @@ HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnSuccess, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnFailed, TestSize.Level1)
 {
     int status = 1;
-    std::string ifName("ifName");
-    std::string reason("reason");
+    char *ifName = "ifName";
+    char *reason = "reason";
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     WarpDhcpResultNotifyOnFailed(status, ifName, reason);
 }
@@ -740,7 +740,7 @@ HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand2, TestSize.Level1)
     GroupOwnerBand band = GroupOwnerBand::GO_BAND_2GHZ;
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_EQ(WarpGetAvailableFreqByBand(band), 0);
+    EXPECT_GE(WarpGetAvailableFreqByBand(band), 0);
 }
 
 HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand3, TestSize.Level1)

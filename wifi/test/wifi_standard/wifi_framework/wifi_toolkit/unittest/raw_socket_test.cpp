@@ -84,6 +84,27 @@ HWTEST_F(RawSocketTest, Close_Success, TestSize.Level1)
 {
     EXPECT_TRUE(pRawSocket->Close() == -1);
 }
+
+HWTEST_F(RawSocketTest, Send_Fail3, TestSize.Level1)
+{
+    uint8_t *buff = &NUMBLE;
+    int count = 10;
+    uint8_t *destHwaddr = nullptr;
+    EXPECT_TRUE(pRawSocket->Send(buff, count, destHwaddr) == -1);
+}
+
+HWTEST_F(RawSocketTest, Send_Fail3, TestSize.Level1)
+{
+    uint8_t *buff = &NUMBLE;
+    int count = 10;
+    uint8_t *destHwaddr = nullptr;
+    EXPECT_TRUE(pRawSocket->Send(buff, count, destHwaddr) == -1);
+}
+
+HWTEST_F(RawSocketTest, SetNonBlock_Test, TestSize.Level1)
+{
+    EXPECT_TRUE(pRawSocket->SetNonBlock(1));
+}
 }  // namespace Wifi
 }  // namespace OHOS
 

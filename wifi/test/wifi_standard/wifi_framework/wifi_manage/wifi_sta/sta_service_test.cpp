@@ -44,7 +44,6 @@ constexpr int FREQUENCY = 2437;
 constexpr int TIMESTAMP = -750366468;
 constexpr int UID = 5225;
 constexpr int TWO = 2;
-constexpr int COMM_NET = 1151;
 
 class StaServiceTest : public testing::Test {
 public:

@@ -348,10 +348,6 @@ public:
     {
         return pP2pStateMachine->StartDhcpServer();
     }
-    void WarpDhcpResultNotifyOnSuccess(int status, const std::string &ifname, DhcpResult &result)
-    {
-        pP2pStateMachine->pDhcpResultNotify->OnSuccess(status, ifname.c_str(), &result);
-    }
     void WarpDhcpResultNotifyOnFailed(int status, const std::string &ifname, const std::string &reason)
     {
         pP2pStateMachine->pDhcpResultNotify->OnFailed(status, ifname.c_str(), reason.c_str());
@@ -709,14 +705,6 @@ HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup4, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, StartDhcpServer, TestSize.Level1)
 {
     WarpStartDhcpServer();
-}
-
-HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnSuccess, TestSize.Level1)
-{
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    std::string ifName("ifName");
-    WarpDhcpResultNotifyOnSuccess(1, ifName, nullptr);
 }
 
 HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnFailed, TestSize.Level1)

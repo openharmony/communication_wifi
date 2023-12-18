@@ -268,6 +268,10 @@ void StaServiceTest::StaServiceAddDeviceConfigSuccess()
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
     config.keyMgmt = "123456";
+    config.wifiEapConfig.eap = "TLS";
+    config.wifiEapConfig.certEntry.push_back(1);
+    config.wifiEapConfig.clientCert = "client certificate";
+    config.wifiEapConfig.privateKey = "//12302345//";
 
     WifiLinkedInfo info;
     EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
@@ -401,6 +405,8 @@ void StaServiceTest::StaServiceRemoveDeviceConfigFail1()
 {
     int networkId = NETWORK_ID;
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), RemoveDevice(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
 }
@@ -656,7 +662,7 @@ void StaServiceTest::StaServiceRemoveAllDeviceTestFail1()
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
     .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
         .WillRepeatedly(Return(1));

@@ -254,5 +254,41 @@ HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
     WIFI_LOGE("ExitTest enter!");
     wifiManager.Exit();
 }
+
+HWTEST_F(WifiManagerTest, PushServiceCloseMsgTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
+}
+
+HWTEST_F(WifiManagerTest, GetDeviceProvisionByDatashareTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.GetDeviceProvisionByDatashare();
+}
+
+HWTEST_F(WifiManagerTest, CheckAndStopScanServiceTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.CheckAndStopScanService();
+}
+
+HWTEST_F(WifiManagerTest, ForceStopWifiTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.ForceStopWifi();
+}
+
+HWTEST_F(WifiManagerTest, AutoStartScanServiceTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.AutoStartScanService();
+}
+
+HWTEST_F(WifiManagerTest, AutoStartEnhanceServiceTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.AutoStartEnhanceService();
+}
 }  // namespace Wifi
 }  // namespace OHOS

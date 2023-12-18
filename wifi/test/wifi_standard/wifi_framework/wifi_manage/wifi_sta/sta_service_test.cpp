@@ -663,7 +663,7 @@ void StaServiceTest::StaServiceRemoveAllDeviceTestFail1()
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
     .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_OPT_FAILED));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
         .WillRepeatedly(Return(1));

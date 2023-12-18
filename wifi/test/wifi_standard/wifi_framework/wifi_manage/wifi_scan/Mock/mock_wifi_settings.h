@@ -85,7 +85,7 @@ public:
     MOCK_METHOD0(ClearScanInfoList, int());
     MOCK_METHOD1(SetAppPackageName, void(const std::string &name));
     MOCK_METHOD1(SetP2pBusinessType, int(const P2pBusinessType &type));
-    MOCK_METHOD1(GetHid2dUpperScene, int(std::string& ifName, Hid2dUpperScene &scene));
+    MOCK_METHOD2(GetHid2dUpperScene, int(std::string& ifName, Hid2dUpperScene &scene));
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
 };
 }  // namespace Wifi

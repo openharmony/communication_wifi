@@ -715,16 +715,15 @@ HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnSuccess, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    char *ifName = "ifName";
-    DhcpResult result;
-    WarpDhcpResultNotifyOnSuccess(1, ifName, result);
+    std::string ifName("ifName");
+    WarpDhcpResultNotifyOnSuccess(1, ifName, nullptr);
 }
 
 HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnFailed, TestSize.Level1)
 {
     int status = 1;
-    char *ifName = "ifName";
-    char *reason = "reason";
+    std::string ifName("ifName");
+    std::string reason("reason");
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     WarpDhcpResultNotifyOnFailed(status, ifName, reason);
 }

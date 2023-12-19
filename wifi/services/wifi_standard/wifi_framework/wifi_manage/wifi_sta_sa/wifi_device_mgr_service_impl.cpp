@@ -63,9 +63,9 @@ void WifiDeviceMgrServiceImpl::OnStart()
     }
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start sta service!");
-    WifiManager::GetInstance().GetAirplaneModeByDatashare();
-    WifiManager::GetInstance().GetDeviceProvisionByDatashare();
-    WifiManager::GetInstance().StartUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetDeviceProvisionByDatashare();
+    WifiManager::GetInstance().GetWifiStaManager()->StartUnloadStaSaTimer();
     WifiDeviceServiceImpl::StartWatchdog();
 }
 

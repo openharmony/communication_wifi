@@ -27,7 +27,7 @@ namespace Wifi {
 class WifiSystemAbilityListener {
 public:
     WifiSystemAbilityListener();
-    ~WifiSystemAbilityListener();
+    virtual ~WifiSystemAbilityListener();
     void SubscribeSystemAbility(int systemAbilityId);
     void UnSubscribeSystemAbility(int systemAbilityId);
     virtual void OnSystemAbilityChanged(int systemAbilityId, bool add) = 0;

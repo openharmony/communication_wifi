@@ -96,33 +96,12 @@ WifiDeviceServiceImpl::WifiDeviceServiceImpl()
 WifiDeviceServiceImpl::WifiDeviceServiceImpl(int instId) : WifiDeviceStub(instId)
 {
     WIFI_LOGI("enter WifiDeviceServiceImpl");
-    using TimeOutCallback = std::function<void()>;
-    const uint32_t TIMEOUT_APP_EVENT = 3000;
-    const uint32_t TIMEOUT_THERMAL_EVENT = 3000;
-    if (eventSubscriber_ == nullptr && appEventTimerId == 0) {
-        TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterAppRemoved, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, appEventTimerId, TIMEOUT_APP_EVENT, false);
-    }
-
-    if (thermalLevelSubscriber_ == nullptr && thermalTimerId == 0) {
-        TimeOutCallback timeoutCallback = std::bind(&WifiDeviceServiceImpl::RegisterThermalLevel, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, thermalTimerId, TIMEOUT_THERMAL_EVENT, false);
-    }
 }
 #endif
 
 WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 {
     WIFI_LOGI("enter ~WifiDeviceServiceImpl");
-#ifndef OHOS_ARCH_LITE
-    if (eventSubscriber_ != nullptr) {
-        UnRegisterAppRemoved();
-    }
-
-    if (thermalLevelSubscriber_ != nullptr) {
-        UnRegisterThermalLevel();
-    }
-#endif
 }
 
 ErrCode WifiDeviceServiceImpl::EnableWifi()
@@ -131,95 +110,12 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
-#ifdef OHOS_ARCH_LITE
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
-    if (curState != WifiOprMidState::CLOSED) {
-        WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
-        if (curState == WifiOprMidState::CLOSING) { /* when current wifi is closing, return */
-            return WIFI_OPT_OPEN_FAIL_WHEN_CLOSING;
-        } else {
-            return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
-        }
-    }
 
-#ifdef FEATURE_AP_SUPPORT
-    WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
-    if (apState != WifiOprMidState::CLOSED) {
-#ifdef FEATURE_STA_AP_EXCLUSION
-        errCode = WifiManager::GetInstance().AutoStopApService(AutoStartOrStopServiceReason::STA_AP_EXCLUSION);
-        if (errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
-            return errCode;
-        }
-#else
-        WIFI_LOGW("current ap state is %{public}d, please close SoftAp first!",
-            static_cast<int>(curState));
-        return WIFI_OPT_NOT_SUPPORTED;
-#endif
-    }
-#endif
-
-    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::OPENING, m_instId)) {
-        WIFI_LOGI("set wifi mid state opening failed!");
-        return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
-    }
-
-    errCode = WIFI_OPT_FAILED;
-    do {
-        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
-            break;
-        }
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-        if (pService == nullptr) {
-            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
-            break;
-        }
-
-        errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register sta service callback failed!");
-            break;
-        }
-        errCode = pService->EnableWifi();
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("service enable sta failed, ret %{public}d!", static_cast<int>(errCode));
-            break;
-        }
-    } while (false);
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, m_instId);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, m_instId);
-        return errCode;
-    }
-#ifdef FEATURE_P2P_SUPPORT
-    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
-    if (p2pService != nullptr && p2pService->EnableP2p() != WIFI_OPT_SUCCESS) {
-        // only record to log
-        WIFI_LOGE("Enable P2p failed!");
-    }
-#endif
-
-    WifiSettings::GetInstance().SyncWifiConfig();
-    WifiManager::GetInstance().StopUnloadStaSaTimer();
-    if (WifiConfigCenter::GetInstance().GetOperatorWifiType(m_instId) ==
-        static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
-        WIFI_LOGI("EnableWifi, user opened wifi in airplane mode!");
-        return WIFI_OPT_SUCCESS;
-    }
-
-    int operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_NO_AIRPLANEMODE);
-    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-        operatorWifiType = static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE);
-        WIFI_LOGI("EnableWifi, current airplane mode is opened, user open wifi!");
-    }
-    WifiConfigCenter::GetInstance().SetOperatorWifiType(operatorWifiType, m_instId);
-    return WIFI_OPT_SUCCESS;
-#else
     if (m_instId == 0) {
         WifiSettings::GetInstance().SetWifiToggledState(true);
     }
-    errCode = WifiManager::GetInstance().WifiToggled(1, m_instId);
-    return errCode;
-#endif
+
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
@@ -237,64 +133,12 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WIFI_LOGE("DisableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-#ifdef OHOS_ARCH_LITE
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
-    if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGI("current wifi state is %{public}d", static_cast<int>(curState));
-        if (curState == WifiOprMidState::OPENING) { /* when current wifi is opening, return */
-            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
-        } else {
-            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-        }
-    }
 
-#ifdef FEATURE_P2P_SUPPORT
-    sptr<WifiP2pServiceImpl> p2pService = WifiP2pServiceImpl::GetInstance();
-    if (p2pService != nullptr) {
-        ErrCode errCode = p2pService->DisableP2p();
-        if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
-            WIFI_LOGE("Disable P2p failed!");
-            return WIFI_OPT_FAILED;
-        }
-    }
-#endif
-
-    if (!WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSING, m_instId)) {
-        WIFI_LOGI("set wifi mid state opening failed! may be other activity has been operated");
-        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-    }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if (pService == nullptr) {
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, m_instId);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, m_instId);
-        return WIFI_OPT_SUCCESS;
-    }
-    ErrCode ret = pService->DisableWifi();
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, m_instId);
-    } else {
-        WifiConfigCenter::GetInstance().SetStaLastRunState(false, m_instId);
-        WifiManager::GetInstance().GetAirplaneModeByDatashare();
-        if (WifiConfigCenter::GetInstance().GetOperatorWifiType(m_instId) ==
-            static_cast<int>(OperatorWifiType::USER_OPEN_WIFI_IN_AIRPLANEMODE)) {
-            if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-                WifiConfigCenter::GetInstance().SetOperatorWifiType(
-                    static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE), m_instId);
-                WIFI_LOGI("DisableWifi, current airplane mode is opened, user close wifi!");
-            }
-        } else {
-            WifiConfigCenter::GetInstance().SetOperatorWifiType(
-                static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_NO_AIRPLANEMODE), m_instId);
-        }
-    }
-    return ret;
-#else
     if (m_instId == 0) {
         WifiSettings::GetInstance().SetWifiToggledState(false);
     }
-    ErrCode errCode = WifiManager::GetInstance().WifiToggled(0, m_instId);
-    return errCode;
-#endif
+
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
@@ -1363,16 +1207,16 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 #ifndef OHOS_ARCH_LITE
-    if (WifiManager::GetInstance().IsMdmForbidden()) {
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
         WIFI_LOGE("EnableWifi: Mdm forbidden PERMISSION_DENIED!");
         return WIFI_OPT_ENTERPRISE_DENIED;
     }
-#endif
     /**
      * when airplane mode opened, if the config "can_open_sta_when_airplanemode"
      * opened, then can open sta; other, return forbid.
      */
-    WifiManager::GetInstance().GetAirplaneModeByDatashare();
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
+#endif
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
         !WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode(m_instId)) {
         WIFI_LOGI("current airplane mode and can not use sta, open failed!");
@@ -1589,22 +1433,17 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     }
 
     WIFI_LOGE("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot!");
-#ifndef OHOS_ARCH_LITE
-    ErrCode errCode;
     if (IsStaServiceRunning()) {
         WIFI_LOGI("WifiDeviceServiceImpl FactoryReset IsStaServiceRunning, m_instId:%{public}d", m_instId);
         if (m_instId == 0) {
             WifiSettings::GetInstance().SetWifiToggledState(false);
         }
-        errCode = WifiManager::GetInstance().WifiToggled(0, m_instId);
-        WIFI_LOGI("WifiDeviceServiceImpl FactoryReset WifiToggled, errCode:%{public}d", errCode);
+        WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     }
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);
     if (curState == WifiOprMidState::RUNNING) {
-        errCode = WifiManager::GetInstance().SoftapToggled(0, m_instId);
-        WIFI_LOGI("WifiDeviceServiceImpl FactoryReset SoftapToggled, errCode:%{public}d", errCode);
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_instId);
     }
-#endif
     // wifi device
     WifiSettings::GetInstance().ClearDeviceConfig();
     WifiSettings::GetInstance().SyncDeviceConfig();
@@ -1636,68 +1475,6 @@ void WifiDeviceServiceImpl::StartWatchdog(void)
         WATCHDOG_INTERVAL_MS, WATCHDOG_DELAY_MS);
 }
 
-void WifiDeviceServiceImpl::RegisterAppRemoved()
-{
-    std::unique_lock<std::mutex> lock(appEventMutex);
-    if (eventSubscriber_) {
-        return;
-    }
-    OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    eventSubscriber_ = std::make_shared<AppEventSubscriber>(subscriberInfo);
-    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(eventSubscriber_)) {
-        WIFI_LOGE("AppEvent SubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("AppEvent SubscribeCommonEvent() OK");
-        WifiTimer::GetInstance()->UnRegister(appEventTimerId);
-    }
-}
-
-void WifiDeviceServiceImpl::UnRegisterAppRemoved()
-{
-    std::unique_lock<std::mutex> lock(appEventMutex);
-    if (!eventSubscriber_) {
-        return;
-    }
-    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventSubscriber_)) {
-        WIFI_LOGE("AppEvent UnSubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("AppEvent UnSubscribeCommonEvent() OK");
-    }
-}
-
-void WifiDeviceServiceImpl::RegisterThermalLevel()
-{
-    std::unique_lock<std::mutex> lock(thermalEventMutex);
-    if (thermalLevelSubscriber_) {
-        return;
-    }
-    OHOS::EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    thermalLevelSubscriber_ = std::make_shared<ThermalLevelSubscriber>(subscriberInfo);
-    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(thermalLevelSubscriber_)) {
-        WIFI_LOGE("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() OK");
-        WifiTimer::GetInstance()->UnRegister(thermalTimerId);
-    }
-}
-
-void WifiDeviceServiceImpl::UnRegisterThermalLevel()
-{
-    std::unique_lock<std::mutex> lock(thermalEventMutex);
-    if (!thermalLevelSubscriber_) {
-        return;
-    }
-    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(thermalLevelSubscriber_)) {
-        WIFI_LOGE("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() failed");
-    } else {
-        WIFI_LOGI("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() OK");
-    }
-}
-
 ErrCode WifiDeviceServiceImpl::SetAppFrozen(int uid, bool isFrozen)
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
@@ -1716,73 +1493,6 @@ ErrCode WifiDeviceServiceImpl::ResetAllFrozenApp()
     }
     WifiInternalEventDispatcher::GetInstance().ResetAllFrozenApp();
     return WIFI_OPT_SUCCESS;
-}
-
-AppEventSubscriber::AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-    : CommonEventSubscriber(subscriberInfo)
-{
-    WIFI_LOGI("AppEventSubscriber enter");
-}
-
-AppEventSubscriber::~AppEventSubscriber()
-{
-    WIFI_LOGI("~AppEventSubscriber enter");
-}
-
-void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
-{
-    std::string action = data.GetWant().GetAction();
-    WIFI_LOGI("AppEventSubscriber::OnReceiveEvent : %{public}s.", action.c_str());
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
-        auto wantTemp = data.GetWant();
-        auto uid = wantTemp.GetIntParam(AppExecFwk::Constants::UID, -1);
-        if (uid == -1) {
-            WIFI_LOGE("%{public}s getPackage uid is illegal.", __func__);
-            return;
-        }
-        WIFI_LOGI("Package removed of uid %{public}d.", uid);
-        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
-            if (pService == nullptr) {
-                WIFI_LOGI("Sta service not opend!");
-                std::vector<WifiDeviceConfig> tempConfigs;
-                WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
-                for (const auto &config : tempConfigs) {
-                    if (WifiSettings::GetInstance().RemoveDevice(config.networkId) != WIFI_OPT_SUCCESS) {
-                        WIFI_LOGE("RemoveAllCandidateConfig-RemoveDevice() failed!");
-                    }
-                }
-                WifiSettings::GetInstance().SyncDeviceConfig();
-                return;
-            }
-            if (pService->RemoveAllCandidateConfig(uid) != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("RemoveAllCandidateConfig failed");
-            }
-        }
-    }
-}
-
-ThermalLevelSubscriber::ThermalLevelSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-    : CommonEventSubscriber(subscriberInfo) 
-{
-    WIFI_LOGI("ThermalLevelSubscriber enter");
-}
-
-ThermalLevelSubscriber::~ThermalLevelSubscriber()
-{
-    WIFI_LOGI("~ThermalLevelSubscriber enter");
-}
-
-void ThermalLevelSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
-{
-    std::string action = data.GetWant().GetAction();
-    WIFI_LOGI("ThermalLevelSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
-    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED) {
-        static const std::string THERMAL_EVENT_ID = "0";
-        int level = data.GetWant().GetIntParam(THERMAL_EVENT_ID, 0);
-        WifiSettings::GetInstance().SetThermalLevel(level);
-        WIFI_LOGI("ThermalLevelSubscriber SetThermalLevel: %{public}d.", level);
-    }
 }
 #endif
 }  // namespace Wifi

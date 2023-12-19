@@ -77,7 +77,7 @@ void WifiP2pServiceImpl::OnStart()
     WifiManager::GetInstance().AddSupportedFeatures(WifiFeatures::WIFI_FEATURE_P2P);
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (p2pState == WifiOprMidState::CLOSED) {
-        WifiManager::GetInstance().StartUnloadP2PSaTimer();
+        WifiManager::GetInstance().GetWifiP2pManager()->StartUnloadP2PSaTimer();
     }
 }
 
@@ -141,7 +141,7 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
         }
     }
     if (!WifiConfigCenter::GetInstance().SetP2pMidState(curState, WifiOprMidState::OPENING)) {
-        WIFI_LOGD("set p2p mid state opening failed! may be other activity has been operated");
+        WIFI_LOGD("set p2p mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
     }
     ErrCode ret = WIFI_OPT_FAILED;
@@ -155,7 +155,7 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_P2P);
             break;
         }
-        ret = pService->RegisterP2pServiceCallbacks(WifiManager::GetInstance().GetP2pCallback());
+        ret = pService->RegisterP2pServiceCallbacks(WifiManager::GetInstance().GetWifiP2pManager()->GetP2pCallback());
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Register p2p service callback failed!");
             break;
@@ -170,7 +170,7 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
     } else {
-        WifiManager::GetInstance().StopUnloadP2PSaTimer();
+        WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
     }
     return ret;
 }

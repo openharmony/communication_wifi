@@ -26,21 +26,32 @@ if (defined(ohos_lite)) {
 if (defined(ohos_lite)) {
   shared_library("wifi_service_base") {
     sources = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/handler.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/internal_message.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/message_queue.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/wifi_controller_state_machine.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_callback_proxy_lite.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_stub_lite.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_callback_proxy_lite.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_stub_lite.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_scan_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_toggler_manager.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
-      "wifi_device_callback_proxy_lite.cpp",
-      "wifi_device_service_impl.cpp",
-      "wifi_device_stub_lite.cpp",
       "wifi_dumper.cpp",
       "wifi_internal_event_dispatcher_lite.cpp",
       "wifi_manager.cpp",
       "wifi_protect.cpp",
       "wifi_protect_manager.cpp",
-      "wifi_scan_callback_proxy_lite.cpp",
-      "wifi_scan_service_impl.cpp",
-      "wifi_scan_stub_lite.cpp",
       "wifi_service_manager.cpp",
       "wifi_system_ability_listerner.cpp",
     ]
@@ -57,12 +68,16 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
       "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$WIFI_ROOT_DIR/utils/inc",
@@ -92,6 +107,7 @@ if (defined(ohos_lite)) {
       defines += [ "PERMISSION_ALWAYS_GRANT" ]
     }
 
+    configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",
@@ -100,9 +116,9 @@ if (defined(ohos_lite)) {
 
   executable("wifi_manager_service") {
     sources = [
-      "wifi_device_feature_lite.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_feature_lite.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_feature_lite.cpp",
       "wifi_sa_service_lite.c",
-      "wifi_scan_feature_lite.cpp",
       "wifi_service_main_lite.c",
     ]
 
@@ -123,7 +139,9 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa",
       "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$WIFI_ROOT_DIR/utils/inc",
@@ -166,16 +184,22 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_power_saving/rx_listen",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa",
       "$WIFI_ROOT_DIR/utils/inc",
       "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
       "//base/notification/common_event_service/interfaces/inner_api",
@@ -211,12 +235,12 @@ if (defined(ohos_lite)) {
 
     part_name = "wifi"
     sources = [
-      "wifi_scan_callback_proxy.cpp",
-      "wifi_scan_death_recipient.cpp",
-      "wifi_scan_mgr_service_impl.cpp",
-      "wifi_scan_mgr_stub.cpp",
-      "wifi_scan_service_impl.cpp",
-      "wifi_scan_stub.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_callback_proxy.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_death_recipient.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_mgr_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_mgr_stub.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_stub.cpp",
     ]
     configs = [
       ":wifi_manager_service_config",
@@ -251,12 +275,12 @@ if (defined(ohos_lite)) {
 
     part_name = "wifi"
     sources = [
-      "wifi_device_callback_proxy.cpp",
-      "wifi_device_death_recipient.cpp",
-      "wifi_device_mgr_service_impl.cpp",
-      "wifi_device_mgr_stub.cpp",
-      "wifi_device_service_impl.cpp",
-      "wifi_device_stub.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_callback_proxy.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_death_recipient.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_mgr_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_mgr_stub.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_stub.cpp",
     ]
     configs = [
       ":wifi_manager_service_config",
@@ -312,12 +336,12 @@ if (defined(ohos_lite)) {
 
     part_name = "wifi"
     sources = [
-      "wifi_hotspot_callback_proxy.cpp",
-      "wifi_hotspot_death_recipient.cpp",
-      "wifi_hotspot_mgr_service_impl.cpp",
-      "wifi_hotspot_mgr_stub.cpp",
-      "wifi_hotspot_service_impl.cpp",
-      "wifi_hotspot_stub.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_callback_proxy.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_death_recipient.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_mgr_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_mgr_stub.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_stub.cpp",
     ]
     configs = [
       ":wifi_manager_service_config",
@@ -364,10 +388,10 @@ if (defined(ohos_lite)) {
     sources = [
       "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
       "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
-      "wifi_p2p_callback_proxy.cpp",
-      "wifi_p2p_death_recipient.cpp",
-      "wifi_p2p_service_impl.cpp",
-      "wifi_p2p_stub.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa/wifi_p2p_callback_proxy.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa/wifi_p2p_death_recipient.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa/wifi_p2p_service_impl.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa/wifi_p2p_stub.cpp",
     ]
     configs = [
       ":wifi_manager_service_config",
@@ -417,15 +441,21 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_datashare_utils.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/softap_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/softap_manager_state_machine.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/wifi_controller_state_machine.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy.cpp",
-      "concrete_clientmode_manager.cpp",
-      "concrete_manager_state_machine.cpp",
-      "softap_manager.cpp",
-      "softap_manager_state_machine.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_event_subscriber_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_hotspot_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_p2p_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_scan_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_toggler_manager.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
-      "wifi_controller_state_machine.cpp",
       "wifi_dumper.cpp",
       "wifi_internal_event_dispatcher.cpp",
       "wifi_location_mode_observer.cpp",

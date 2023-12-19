@@ -141,5 +141,31 @@ void WriteWifiConnectFailedEventHiSysEvent(int operateType)
     root["OPERATE_TYPE"] = operateType;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONNECT_FAILED_EVENT", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteP2pKpiCountHiSysEvent(int eventType)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["EVENT_TYPE"] = eventType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_KPI", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["EVENT_TYPE"] = errCode;
+    root["FAIL_RES"] = failRes;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_CONNECT_FAIL", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["EVENT_TYPE"] = errCode;
+    root["FAIL_RES"] = failRes;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_AB_DISCONNECT", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -17,6 +17,8 @@
 #include "wifi_p2p_hal_interface.h"
 #include "p2p_state_machine.h"
 #include "wifi_logger.h"
+#include "p2p_define.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupNegotiationState");
 
@@ -153,6 +155,7 @@ bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessage &msg) const
 {
     int status = msg.GetParam1();
     WIFI_LOGE("Negotiation failure. Error code: %{public}d", status);
+    WriteP2pConnectFailedHiSysEvent(status, static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));

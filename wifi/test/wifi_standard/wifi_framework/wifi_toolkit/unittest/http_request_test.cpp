@@ -158,7 +158,6 @@ HWTEST_F(HttpRequestTest, HttpDataTransmit_001, TestSize.Level1)
 HWTEST_F(HttpRequestTest, GetIPFromUrl_001, TestSize.Level1)
 {
     WIFI_LOGI("GetIPFromUrl_001");
-    int iSockFd = 1;
     pHttpRequest->strHost = "Connection: Keep-Alive\r\n";
     pHttpRequest->GetIPFromUrl();
 }

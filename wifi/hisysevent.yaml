@@ -123,6 +123,28 @@ WIFI_KPI_SSID:
   DISCONNECT_COUNT: {type: INT32, desc: sum of disconnection}
   IP_DHCP_COUNT: {type: INT32, desc: sum of dhcp}
 
+P2P_CHR_EVENT:
+  __BASE: {type: STATISTIC, level: MINOR, desc: P2P chr event}
+  EVENT_NAME: {type: STRING, desc: event name}
+  EVENT_VALUE: {type: STRING, desc: event value}
+
+P2P_KPI:
+  __BASE: {type: STATISTIC, level: MINOR, desc: P2P KPI}
+  CONN_CNT: {type: INT32, desc: P2P connect count}
+  MAGICLINK_CONNECTED_COUNT: {type: INT32, desc: magiclink connect success count}
+  P2P_SUC_2G4_CNT: {type: INT32, desc: channl is on 2.4GHz channl after P2P connection}
+  P2P_SUC_5G_CNT: {type: INT32, desc: channl is on 5GHz channl after P2P connection}
+  
+P2P_CONNECT_FAIL:
+  __BASE: {type: FAULT, level: MINOR, desc: P2P conect fail}
+  ERR_CODE: {type: INT32, desc: fail error code}
+  SUB_ERR_CODE: {type: INT32, desc: fail reason}
+
+P2P_AB_DISCONNECT:
+  __BASE: {type: FAULT, level: MINOR, desc: P2P abnormal disconect}
+  ERR_CODE: {type: INT32, desc: fail error code}
+  SUB_ERR_CODE: {type: INT32, desc: fail reason}
+
 CHIP_CALIBRATION_FAIL:
   __BASE: {type: FAULT, level: MINOR, desc: calibration Fail Err event}
   ERROR_CODE: {type: INT32, desc: ERROR_CODE}

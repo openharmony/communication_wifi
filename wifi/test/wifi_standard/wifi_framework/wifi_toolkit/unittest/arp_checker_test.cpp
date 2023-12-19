@@ -95,8 +95,7 @@ HWTEST_F(ArpCheckerTest, checkDnsValid_Test, TestSize.Level1)
 
 HWTEST_F(ArpCheckerTest, recvDnsData01_Test, TestSize.Level1)
 {
-    std::string hostAddress = "192.168.3.66";
-    std::string secondDns = "socket";
+    char hostAddress[] = "192.168.3.66";
     pDnsChecker->dnsSocket = -1;
     pDnsChecker->recvDnsData(hostAddress, 1, 0);
 }
@@ -126,7 +125,6 @@ HWTEST_F(ArpCheckerTest, formatHostAdress_FAIL2, TestSize.Level1)
     pDnsChecker->socketCreated = true;
     pDnsChecker->formatHostAdress(hostAddress, nullptr);
     pDnsChecker->formatHostAdress(nullptr, host);
-}
 }
 }  // namespace Wifi
 }  // namespace OHOS

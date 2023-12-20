@@ -145,6 +145,30 @@ bool ApStartedState::ExecuteStateMsg(InternalMessage *msg)
     return EXECUTED;
 }
 
+bool ApStartedState::UpdatMacAddress(const std::string ssid, KeyMgmt securityType)
+{
+    HotspotConfig curApConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, m_id);
+
+    LOGD("%{public}s: [ssid:%{private}s, securityType:%{public}d] ==> [ssid:%{private}s, securityType:%{public}d]",
+        __func__, curApConfig.GetSsid().c_str(), curApConfig.GetSecurityType(),
+        ssid.c_str(), securityType);
+    if ((curApConfig.GetSsid() != ssid) ||
+        (curApConfig.GetSecurityType() != securityType)) {
+        std::string macAddress;
+        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+        if (MacAddress::IsValidMac(macAddress.c_str())) {
+            if (WifiApHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
+                LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
+                return false;
+            }
+        } else {
+            LOGW("%{public}s: macAddress is invalid", __func__);
+        }
+    }
+    return true;
+}
+
 bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
@@ -296,9 +320,14 @@ void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg)
 void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessage &msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    m_hotspotConfig.SetSsid(msg.GetStringFromMessage());
+    std::string ssid = msg.GetStringFromMessage();
+    KeyMgmt securityType = static_cast<KeyMgmt>(msg.GetIntFromMessage());
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    UpdatMacAddress(ssid, securityType);
+#endif
+    m_hotspotConfig.SetSsid(ssid);
     m_hotspotConfig.SetPreSharedKey(msg.GetStringFromMessage());
-    m_hotspotConfig.SetSecurityType(static_cast<KeyMgmt>(msg.GetIntFromMessage()));
+    m_hotspotConfig.SetSecurityType(securityType);
     m_hotspotConfig.SetBand(static_cast<BandType>(msg.GetIntFromMessage()));
     m_hotspotConfig.SetChannel(msg.GetIntFromMessage());
     m_hotspotConfig.SetMaxConn(msg.GetIntFromMessage());

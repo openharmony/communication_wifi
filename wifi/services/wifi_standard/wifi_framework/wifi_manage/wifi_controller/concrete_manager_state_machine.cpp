@@ -21,6 +21,7 @@
 #include "wifi_internal_msg.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_manager.h"
+#include "wifi_common_util.h"
 #endif
 
 namespace OHOS {

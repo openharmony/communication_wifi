@@ -461,6 +461,7 @@ if (defined(ohos_lite)) {
       "wifi_location_mode_observer.cpp",
       "wifi_manager.cpp",
       "wifi_net_agent.cpp",
+      "wifi_net_observer.cpp",
       "wifi_protect.cpp",
       "wifi_protect_manager.cpp",
       "wifi_service_manager.cpp",

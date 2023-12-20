@@ -44,6 +44,7 @@ constexpr int FREQUENCY = 2437;
 constexpr int TIMESTAMP = -750366468;
 constexpr int UID = 5225;
 constexpr int TWO = 2;
+constexpr int COMM_NET = 1151;
 
 class StaServiceTest : public testing::Test {
 public:
@@ -101,6 +102,9 @@ public:
     void StaServiceRemoveAllDeviceTestFail0();
     void StaServiceRemoveAllDeviceTestFail1();
     void StaServiceReConnectTestSucc();
+    void StaServiceSetPowerModeTest();
+    void StaServiceOnSystemAbilityChangedTest();
+    void StaServiceStartPortalCertificationTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -684,10 +688,48 @@ void StaServiceTest::StaServiceSetSuspendModeTest()
     EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), WpaSetSuspendMode(_))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_FAILED);
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->SetSuspendMode(true) == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceSetPowerModeTest()
+{
+    EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), WpaSetSuspendMode(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_TRUE(pStaService->SetPowerMode(false) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->SetPowerMode(true) == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceOnSystemAbilityChangedTest()
+{
+    EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(0)).Times(AtLeast(0);
+    EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, false) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, true) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->OnSystemAbilityChanged(1, true) == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceStartPortalCertificationTest()
+{
+    EXPECT_TRUE(pStaService->StartPortalCertification() == WIFI_OPT_SUCCESS);
+    pStaService->pStaStateMachine = nullptr;
+    EXPECT_TRUE(pStaService->StartPortalCertification() == WIFI_OPT_FAILED);
+}
+
+HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
+{
+    StaServiceStartPortalCertificationTest();
+}
+
+HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level1)
+{
+    StaServiceOnSystemAbilityChangedTest();
+}
+
+HWTEST_F(StaServiceTest, StaServiceSetPowerModeTest, TestSize.Level1)
+{
+    StaServiceSetPowerModeTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)

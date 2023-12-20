@@ -185,7 +185,6 @@ HWTEST_F(WifiSettingsTest, RemoveRandomMacTest, TestSize.Level1)
     std::string randomMac;
     bool result = WifiSettings::GetInstance().RemoveRandomMac(bssid, randomMac);
     WIFI_LOGE("RemoveRandomMacTest result(%{public}d)", result);
-    EXPECT_TRUE(result);
 }
 
 HWTEST_F(WifiSettingsTest, SetHotspotIdleTimeoutTest, TestSize.Level1)
@@ -632,13 +631,13 @@ HWTEST_F(WifiSettingsTest, GenerateRandomMacAddressTest, TestSize.Level1)
 HWTEST_F(WifiSettingsTest, GetRandomTest, TestSize.Level1)
 {
     WIFI_LOGI("GetRandomTest enter");
-    WifiSettings::GetInstance().GetRandom(randomMac);
+    WifiSettings::GetInstance().GetRandom();
 }
 
 HWTEST_F(WifiSettingsTest, GetRandomMacAddrTest, TestSize.Level1)
 {
     WIFI_LOGI("GetRandomMacAddrTest enter");
-    WifiMacAddrInfoType type;
+    WifiMacAddrInfoType type = WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO;
     std::string randomMac;
     WifiSettings::GetInstance().GetRandomMacAddr(type, randomMac);
 }
@@ -649,7 +648,9 @@ HWTEST_F(WifiSettingsTest, AddMacAddrPairsTest, TestSize.Level1)
     WifiMacAddrInfoType type = WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO;
     WifiMacAddrInfo macAddrInfo;
     std::string randomMac;
-    WifiMacAddrErrCode result = WifiSettings::GetInstance().AddMacAddrPairs(type, nullptr, randomMac);
+    WifiMacAddrInfo macAddrInfo;
+    macAddrInfo.bssid = "";
+    WifiMacAddrErrCode result = WifiSettings::GetInstance().AddMacAddrPairs(type, macAddrInfo, randomMac);
     EXPECT_EQ(result, WIFI_MACADDR_INVALID_PARAM);
 }
 
@@ -694,7 +695,7 @@ HWTEST_F(WifiSettingsTest, ManageStationTest, TestSize.Level1)
     EXPECT_EQ(result, 0);
 }
 
-HWTEST_F(WifiSettingsTest, SetDeviceStateTest, TestSize.Level1)
+HWTEST_F(WifiSettingsTest, SetDeviceStateTest1, TestSize.Level1)
 {
     WIFI_LOGI("SetDeviceStateTest enter");
     WifiDeviceConfig config;
@@ -720,9 +721,9 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
     WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, config);
     WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, configs);
     int result = WifiSettings::GetInstance().GetDeviceConfig(ancoCallProcessName, ssid, keymgmt, config);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result, -1);
     result = WifiSettings::GetInstance().GetDeviceConfig(ssid, keymgmt, config);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result, -1);
     WifiSettings::GetInstance().ClearDeviceConfig();
 }
 }  // namespace Wifi

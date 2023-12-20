@@ -62,6 +62,7 @@ namespace Wifi {
 #define WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT 0x3019
 #define WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT 0x301A
 #define WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT 0x301B
+#define WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT 0x301C
 
 #define WPA_BLOCK_LIST_CLEAR_EVENT 0x4001
 #define WIFI_SVR_CMD_UPDATE_COUNTRY_CODE 0x4002
@@ -100,6 +101,12 @@ typedef enum EnumStaDnsState {
     DNS_STATE_WORKING,
     DNS_STATE_UNREACHABLE,
 } StaDnsState;
+
+typedef enum EnumNetWorkState {
+    NETWORK_UNKNOWN,
+    NETWORK_CELL_WORKING,
+    NETWORK_CELL_NOWORK,
+}SystemNetWorkState;
 
 using NetStateHandler = std::function<void(StaNetState netState, std::string portalUrl)>;
 using ArpStateHandler = std::function<void(StaArpState arpState)>;

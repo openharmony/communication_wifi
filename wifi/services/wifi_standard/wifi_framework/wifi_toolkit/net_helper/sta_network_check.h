@@ -31,6 +31,9 @@
 #include "arp_checker.h"
 #include "dns_checker.h"
 #include "wifi_internal_msg.h"
+#ifndef OHOS_ARCH_LITE
+#include "wifi_event_handler.h"
+#endif
 
 #define HTTP_DETECTION_TIMEOUT 10000
 #define HTTP_BACKUP_TIMEOUT 3000
@@ -88,6 +91,10 @@ private:
      */
     int HttpPortalDetection(const std::string& url);
 #endif
+
+    void HttpProbeTimeout();
+
+    void StopHttpProbeTimer();
     /**
      * @Description : NetCheck thread function
      *
@@ -102,6 +109,8 @@ private:
     void SetHttpResultInfo(std::string url, int codeNum, int codeLenNum);
 
     void DnsDetection(std::string url);
+
+    void ArpDetection();
 private:
     std::mutex mMutex;
     std::condition_variable mCondition;
@@ -114,11 +123,14 @@ private:
     std::atomic<bool> bakDetectFinsh;
     ArpChecker arpChecker;
     DnsChecker dnsChecker;
-    std::chrono::steady_clock::time_point lastArpDnsCheckTime;
     WifiPortalConf mUrlInfo;
     StaNetState bakNetState;
     StaNetState mainNetState;
     int m_instId;
+    uint32_t m_timerId;
+#ifndef OHOS_ARCH_LITE
+    std::unique_ptr<WifiEventHandler> mDetectionEventHandler = nullptr;
+#endif
     int httpDetectCnt;
 };
 }  // namespace Wifi

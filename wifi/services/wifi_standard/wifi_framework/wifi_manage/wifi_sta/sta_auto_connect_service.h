@@ -27,6 +27,7 @@
 #include "sta_define.h"
 #include "sta_state_machine.h"
 #include "sta_saved_device_appraisal.h"
+#include "network_selection_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -89,14 +90,46 @@ public:
      */
     virtual bool RegisterDeviceAppraisal(StaDeviceAppraisal *appraisal, int priority);
 
+    /**
+     * @Description  disable auto join.
+     *
+     * @param conditionName autoJoinDisabled condition.
+     */
+    virtual void DisableAutoJoin(const std::string &conditionName);
+
+    /**
+     * @Description  enable auto join.
+     *
+     * @param conditionName autoJoinDisabled condition.
+     */
+    virtual void EnableAutoJoin(const std::string &conditionName);
+
+    /**
+     * @Description  register auto join condition.
+     *
+     * @param conditionName the name of condition.
+     * @param autoJoinCondition condition.
+     */
+    virtual void RegisterAutoJoinCondition(const std::string &conditionName,
+                                           const std::function<bool()> &autoJoinCondition);
+
+    /**
+     * @Description  deregister auto join condition.
+     *
+     * @param conditionName the name of condition.
+     */
+    virtual void DeregisterAutoJoinCondition(const std::string &conditionName);
 private:
     StaStateMachine *pStaStateMachine;
     StaDeviceAppraisal *pSavedDeviceAppraisal;
+    NetworkSelectionManager *pNetworkSelectionManager;
     bool firmwareRoamFlag;
     int maxBlockedBssidNum;
     int selectDeviceLastTime;
     StaDeviceAppraisal *pAppraisals[MAX_APPRAISAL_NUM];
     int m_instId;
+    std::map<std::string, std::function<bool()>> autoJoinConditionsMap{};
+    std::mutex autoJoinMutex;
     struct BlockedBssidInfo {
         int count; /* Number of times the BSSID is rejected. */
         bool blockedFlag;
@@ -175,6 +208,13 @@ private:
     /**
      * @Description  Whether the device needs to be switched.
      *
+     * @param info - Current Connected Device(in)
+     * @Return success : true  failed : false
+     */
+    bool AllowAutoSelectDevice(WifiLinkedInfo &info);
+    /**
+     * @Description  Whether the device needs to be switched.
+     *
      * @param scanInfos - WifiScanInfo list of all APs in the range(in)
      * @param info - Current Connected Device(in)
      * @Return success : true  failed : false
@@ -222,6 +262,12 @@ private:
      * @Return success : true  failed : false
      */
     bool Whether24GDevice(int frequency);
+    /**
+     * @Description Whether allow auto join.
+     *
+     * @return true if allow autoJoin.
+     */
+    bool IsAllowAutoJoin();
     /**
      * @Description  Whether the device is a 5G device.
      *

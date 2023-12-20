@@ -68,6 +68,10 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnSetFrozenApp;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RESET_ALL_FROZEN_APP)] =
         &WifiDeviceStub::OnResetAllFrozenApp;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_AUTO_JOIN)] =
+        &WifiDeviceStub::OnDisableAutoJoin;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_AUTO_JOIN)] =
+        &WifiDeviceStub::OnEnableAutoJoin;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_PORTAL_CERTIF)] =
         &WifiDeviceStub::OnStartPortalCertification;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE)] =
@@ -973,6 +977,24 @@ void WifiDeviceStub::OnResetAllFrozenApp(uint32_t code, MessageParcel& data, Mes
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = ResetAllFrozenApp();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnDisableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = DisableAutoJoin(data.ReadString());
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnEnableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = EnableAutoJoin(data.ReadString());
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

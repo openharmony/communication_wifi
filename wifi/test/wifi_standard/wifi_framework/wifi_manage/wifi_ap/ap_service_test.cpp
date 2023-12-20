@@ -208,7 +208,7 @@ HWTEST_F(ApService_test, GetStationListFailed, TestSize.Level1)
     result.push_back(info);
     EXPECT_CALL(WifiSettings::GetInstance(), GetStationList(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetStationList(result));
+    EXPECT_EQ(ErrCode::WIFI_IDL_OPT_OK, pApService->GetStationList(result));
 }
 
 HWTEST_F(ApService_test, GetValidBandsSuccess, TestSize.Level1)

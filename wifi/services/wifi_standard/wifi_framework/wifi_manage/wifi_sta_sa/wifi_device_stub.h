@@ -81,6 +81,8 @@ private:
     void OnGetDisconnectedReason(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnResetAllFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply);
+    void OnDisableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
+    void OnEnableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:

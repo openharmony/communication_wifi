@@ -478,6 +478,10 @@ struct WifiDeviceConfig {
     int numRebootsSinceLastUse;
     int numAssociation;
     int connFailedCount;
+    unsigned int networkStatusHistory;
+    bool isPortal;
+    time_t lastHasInternetTime;
+    bool noInternetAccess;
     /* save select mac address */
     std::string userSelectBssid;
     WifiIpConfig wifiIpConfig;
@@ -508,6 +512,10 @@ struct WifiDeviceConfig {
         numRebootsSinceLastUse = 0;
         numAssociation = 0;
         connFailedCount = 0;
+        networkStatusHistory = 0;
+        isPortal = false;
+        lastHasInternetTime = -1;
+        noInternetAccess = false;
         callProcessName = "";
         ancoCallProcessName = "";
     }

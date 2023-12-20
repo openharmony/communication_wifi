@@ -70,6 +70,7 @@ StaStateMachine::StaStateMachine(int instId)
       enableSignalPoll(true),
       isRoam(false),
       netNoWorkNum(0),
+      networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr),
       pNetcheck(nullptr),
       pRootState(nullptr),
@@ -984,6 +985,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
 
     int networkId = msg->GetParam1();
     int connTriggerMode = msg->GetParam2();
+    auto bssid = msg->GetStringFromMessage();
     if (connTriggerMode != NETWORK_SELECTED_BY_RETRY) {
         linkedInfo.retryedConnCount = 0;
     }
@@ -1004,10 +1006,11 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     /* Save connection information. */
     SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
+    networkStatusHistoryInserted = false;
     /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
 
-    if (StartConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+    if (StartConnectToNetwork(networkId, bssid) != WIFI_OPT_SUCCESS) {
         OnConnectFailed(networkId);
         return;
     }
@@ -1468,7 +1471,7 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
     SwitchState(pApRoamingState);
 }
 
-ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
+ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string & bssid)
 {
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId);
@@ -1479,7 +1482,11 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
         return WIFI_OPT_FAILED;
     }
     SyncDeviceConfigToWpa();
-    WifiStaHalInterface::GetInstance().SetBssid(networkId, deviceConfig.userSelectBssid.c_str());
+    if (bssid.empty()) {
+        WifiStaHalInterface::GetInstance().SetBssid(networkId, deviceConfig.userSelectBssid);
+    } else {
+        WifiStaHalInterface::GetInstance().SetBssid(networkId, bssid);
+    }
 
     if (WifiStaHalInterface::GetInstance().EnableNetwork(targetNetworkId) != WIFI_IDL_OPT_OK) {
         LOGE("EnableNetwork() failed!");
@@ -2398,6 +2405,7 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
             WIFI_LOGD("portal network normal working need redetect for expired!");
             StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
         }
+        InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET);
         netNoWorkNum = 0;
     } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
         WifiLinkedInfo linkedInfo;
@@ -2409,6 +2417,7 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
+        InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL);
         netNoWorkNum = 0;
     } else {
         WIFI_LOGI("HandleNetCheckResult network state is notworking.\n");
@@ -2418,6 +2427,7 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         delay = delay > PORTAL_CHECK_TIME ? PORTAL_CHECK_TIME : delay;
         netNoWorkNum++;
         StartTimer(static_cast<int>(CMD_START_NETCHECK), delay * PORTAL_MILLSECOND);
+        InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET);
     }
 }
 void StaStateMachine::NetDetectionProcess(StaNetState netState, const std::string portalUrl)
@@ -3071,6 +3081,41 @@ void StaStateMachine::StartDhcpRenewal()
     } else {
         WIFI_LOGI("StartDhcpRenewal dhcp renew success.");
     }
+}
+
+WifiDeviceConfig StaStateMachine::getCurrentWifiDeviceConfig()
+{
+    WifiDeviceConfig wifiDeviceConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wifiDeviceConfig);
+    return wifiDeviceConfig;
+}
+
+void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus)
+{
+    WifiDeviceConfig &&wifiDeviceConfig = getCurrentWifiDeviceConfig();
+    if (networkStatusHistoryInserted) {
+        NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
+        WIFI_LOGI("After updated, current network status history is %{public}s.",
+                  NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+    } else {
+        NetworkStatusHistoryManager::Insert(wifiDeviceConfig.networkStatusHistory, networkStatus);
+        networkStatusHistoryInserted = true;
+        WIFI_LOGI("After inserted, current network status history is %{public}s.",
+                  NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+    }
+    if (networkStatus == NetworkStatus::PORTAL) {
+        wifiDeviceConfig.isPortal = true;
+        wifiDeviceConfig.noInternetAccess = true;
+    }
+    if (networkStatus == NetworkStatus::HAS_INTERNET) {
+        wifiDeviceConfig.lastHasInternetTime = time(0);
+        wifiDeviceConfig.noInternetAccess = false;
+    }
+    if (networkStatus == NetworkStatus::NO_INTERNET) {
+        wifiDeviceConfig.noInternetAccess = true;
+    }
+    WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
+    WifiSettings::GetInstance().SyncDeviceConfig();
 }
 
 int StaStateMachine::GetInstanceId()

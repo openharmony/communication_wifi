@@ -1607,6 +1607,85 @@ ErrCode WifiDeviceProxy::ResetAllFrozenApp()
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::DisableAutoJoin(const std::string &conditionName)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteString(conditionName);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_AUTO_JOIN), data,
+                                      reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("DisableAutoJoin (%{public}d) failed,error code is %{public}d",
+                  static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_AUTO_JOIN), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::EnableAutoJoin(const std::string &conditionName)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteString(conditionName);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_AUTO_JOIN), data,
+                                      reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("EnableAutoJoin(%{public}d) failed,error code is %{public}d",
+                  static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_AUTO_JOIN), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::RegisterAutoJoinCondition(const std::string &conditionName,
+                                                   const std::function<bool()> &autoJoinCondition)
+{
+    return WIFI_OPT_FAILED;
+}
+
+ErrCode WifiDeviceProxy::DeregisterAutoJoinCondition(const std::string &conditionName)
+{
+    return WIFI_OPT_FAILED;
+}
+
+ErrCode WifiDeviceProxy::RegisterFilterBuilder(const FilterTag &filterTag,
+                                               const std::string &filterName,
+                                               const FilterBuilder &filterBuilder)
+{
+    return WIFI_OPT_FAILED;
+}
+
+ErrCode WifiDeviceProxy::DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName)
+{
+    return WIFI_OPT_FAILED;
+}
+
 ErrCode WifiDeviceProxy::StartPortalCertification()
 {
     if (mRemoteDied) {

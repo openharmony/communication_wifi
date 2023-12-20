@@ -25,6 +25,7 @@ namespace Wifi {
 StaAutoConnectService::StaAutoConnectService(StaStateMachine *staStateMachine, int instId)
     : pStaStateMachine(staStateMachine),
       pSavedDeviceAppraisal(nullptr),
+      pNetworkSelectionManager(nullptr),
       firmwareRoamFlag(true),
       maxBlockedBssidNum(BLOCKLIST_INVALID_SIZE),
       selectDeviceLastTime(0),
@@ -38,6 +39,10 @@ StaAutoConnectService::~StaAutoConnectService()
     if (pSavedDeviceAppraisal != nullptr) {
         delete pSavedDeviceAppraisal;
         pSavedDeviceAppraisal = nullptr;
+    }
+    if (pNetworkSelectionManager != nullptr) {
+        delete pNetworkSelectionManager;
+        pNetworkSelectionManager = nullptr;
     }
 }
 
@@ -55,7 +60,15 @@ ErrCode StaAutoConnectService::InitAutoConnectService()
         WIFI_LOGE("savedDeviceAppraisal is null\n");
         return WIFI_OPT_FAILED;
     }
-
+    pNetworkSelectionManager = new (std::nothrow) NetworkSelectionManager();
+    if (pNetworkSelectionManager == nullptr) {
+        WIFI_LOGE("pNetworkSelectionManager is null\n");
+        return WIFI_OPT_FAILED;
+    }
+    if (pNetworkSelectionManager->InitNetworkSelectionService() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("InitAutoConnectService failed.\n");
+        return WIFI_OPT_FAILED;
+    }
     int savedPriority = WifiSettings::GetInstance().GetSavedDeviceAppraisalPriority(m_instId);
     if (RegisterDeviceAppraisal(pSavedDeviceAppraisal, savedPriority)) {
         WIFI_LOGI("RegisterSavedDeviceAppraisal succeeded.\n");
@@ -83,14 +96,21 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     }
     std::vector<std::string> blockedBssids;
     GetBlockedBssids(blockedBssids);
-
-    WifiDeviceConfig electedDevice;
-    if (AutoSelectDevice(electedDevice, scanInfos, blockedBssids, info) == WIFI_OPT_SUCCESS) {
-        WIFI_LOGI("AutoSelectDevice succeed: "
-            "[networkId:%{public}d, ssid:%{public}s, bssid:%{public}s, psk len:%{public}d].",
-            electedDevice.networkId, SsidAnonymize(electedDevice.ssid).c_str(),
-            MacAnonymize(electedDevice.bssid).c_str(), (int)electedDevice.preSharedKey.length());
-        ConnectElectedDevice(electedDevice);
+    if (!AllowAutoSelectDevice(info) || !IsAllowAutoJoin()) {
+        return;
+    }
+    NetworkSelectionResult networkSelectionResult;
+    if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
+        int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
+        std::string &bssid = networkSelectionResult.interScanInfo.bssid;
+        std::string &ssid = networkSelectionResult.interScanInfo.ssid;
+        WIFI_LOGI("AutoSelectDevice networkId: %{public}d, ssid: %{public}s, bssid: %{public}s.", networkId,
+                  SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
+        auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+        message->SetParam1(networkId);
+        message->SetParam2(NETWORK_SELECTED_BY_AUTO);
+        message->AddStringMessageBody(bssid);
+        pStaStateMachine->SendMessage(message);
     } else {
         WIFI_LOGI("AutoSelectDevice return fail.");
         return;
@@ -421,6 +441,15 @@ bool StaAutoConnectService::RoamingEncryptionModeCheck(
     return false;
 }
 
+bool StaAutoConnectService::AllowAutoSelectDevice(OHOS::Wifi::WifiLinkedInfo &info)
+{
+    if (info.connState == DISCONNECTED || info.connState == UNKNOWN) {
+        return true;
+    }
+    WIFI_LOGI("Current linkInfo is not in DISCONNECTED state, skip network selection.\n");
+    return false;
+}
+
 bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
     WIFI_LOGI("Allow auto select device, connState=%{public}d, detailedState=%{public}d\n",
@@ -613,6 +642,47 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &av
         availableScanInfos.clear();
     }
     return;
+}
+
+void StaAutoConnectService::DisableAutoJoin(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(autoJoinMutex);
+    WIFI_LOGI("Auto Join is disabled by %{public}s.\n", conditionName.c_str());
+    autoJoinConditionsMap.insert_or_assign(conditionName, []() { return false; });
+}
+
+void StaAutoConnectService::EnableAutoJoin(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(autoJoinMutex);
+    WIFI_LOGI("Auto Join disabled by %{public}s is released.\n", conditionName.c_str());
+    autoJoinConditionsMap.erase(conditionName);
+}
+
+void StaAutoConnectService::RegisterAutoJoinCondition(const std::string &conditionName,
+                                                      const std::function<bool()> &autoJoinCondition)
+{
+    std::lock_guard<std::mutex> lock(autoJoinMutex);
+    WIFI_LOGI("Auto Join condition of %{public}s is registered.\n", conditionName.c_str());
+    autoJoinConditionsMap.insert_or_assign(conditionName, autoJoinCondition);
+}
+
+void StaAutoConnectService::DeregisterAutoJoinCondition(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(autoJoinMutex);
+    WIFI_LOGI("Auto Join condition of %{public}s is deregistered.\n", conditionName.c_str());
+    autoJoinConditionsMap.erase(conditionName);
+}
+
+bool StaAutoConnectService::IsAllowAutoJoin()
+{
+    std::lock_guard<std::mutex> lock(autoJoinMutex);
+    for (auto condition = autoJoinConditionsMap.rbegin(); condition != autoJoinConditionsMap.rend(); ++condition) {
+        if (!condition->second.operator()()) {
+            WIFI_LOGI("Auto Join is not allowed because of  %{public}s.\n", condition->first.c_str());
+            return false;
+        }
+    }
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

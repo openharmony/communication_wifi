@@ -29,6 +29,7 @@
 #include "sta_service_callback.h"
 #include "dhcp_c_api.h"
 #include "sta_define.h"
+#include "network_status_history_manager.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_net_agent.h"
 #endif
@@ -557,9 +558,10 @@ private:
      * @Description  Start to connect to network.
      *
      * @param networkId - the networkId of network which is going to be connected.(in)
+     * @param bssid - the bssid of network which is going to be connected.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode StartConnectToNetwork(int networkId);
+    ErrCode StartConnectToNetwork(int networkId, const std::string &bssid);
     /**
      * @Description  Disable network
      *
@@ -874,6 +876,7 @@ private:
     bool isRoam;
     int netNoWorkNum;
     bool portalFlag;
+    bool networkStatusHistoryInserted;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     DhcpResultNotify *pDhcpResultNotify;
@@ -908,6 +911,8 @@ private:
     void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);
     void InvokeOnStaRssiLevelChanged(int level);
+    WifiDeviceConfig getCurrentWifiDeviceConfig();
+    void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
 };
 }  // namespace Wifi
 }  // namespace OHOS

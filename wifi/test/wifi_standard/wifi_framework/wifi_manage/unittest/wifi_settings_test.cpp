@@ -538,7 +538,6 @@ HWTEST_F(WifiSettingsTest, GetMacAddrPairsTest, TestSize.Level1)
     WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::INVALID_MACADDR_INFO, macAddrInfo);
     WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
     WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, macAddrInfo);
-
 }
 
 HWTEST_F(WifiSettingsTest, PrintMacAddrPairsTest, TestSize.Level1)

@@ -647,7 +647,6 @@ HWTEST_F(WifiSettingsTest, AddMacAddrPairsTest, TestSize.Level1)
     WifiMacAddrInfoType type = WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO;
     WifiMacAddrInfo macAddrInfo;
     std::string randomMac;
-    WifiMacAddrInfo macAddrInfo;
     macAddrInfo.bssid = "";
     WifiMacAddrErrCode result = WifiSettings::GetInstance().AddMacAddrPairs(type, macAddrInfo, randomMac);
     EXPECT_EQ(result, WIFI_MACADDR_INVALID_PARAM);

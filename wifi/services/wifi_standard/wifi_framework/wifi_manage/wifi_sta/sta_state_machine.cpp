@@ -1499,6 +1499,8 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId)
 
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
+    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+        static_cast<int>(WifiOperateState::STA_CONNECTING));
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1765,6 +1767,8 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
     msg->SetParam1(networkId);
     msg->AddStringMessageBody(bssid);
     SendMessage(msg);
+    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+        static_cast<int>(WifiOperateState::STA_CONNECTED));
 }
 
 void StaStateMachine::OnNetworkDisconnectEvent(int reason)

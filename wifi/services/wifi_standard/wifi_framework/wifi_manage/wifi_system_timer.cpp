@@ -13,10 +13,15 @@
  * limitations under the License.
  */
 
+#ifndef OHOS_ARCH_LITE
 #include "wifi_system_timer.h"
+#include "wifi_logger.h"
+#include "common_timer_errors.h"
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiTimer");
+
 WifiSysTimer::WifiSysTimer()
 {}
 
@@ -67,5 +72,57 @@ void WifiSysTimer::SetWantAgent(std::shared_ptr<OHOS::AbilityRuntime::WantAgent:
 {
     this->wantAgent = wantAgent;
 }
+
+WifiTimer *WifiTimer::GetInstance()
+{
+    static WifiTimer instance;
+    return &instance;
 }
+
+WifiTimer::WifiTimer() : timer_(std::make_unique<Utils::Timer>("WifiManagerTimer"))
+{
+    timer_->Setup();
 }
+
+WifiTimer::~WifiTimer()
+{
+    if (timer_) {
+        timer_->Shutdown(true);
+    }
+}
+
+bool WifiTimer::Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval, bool once)
+{
+    if (timer_ == nullptr) {
+        WIFI_LOGE("timer_ is nullptr");
+        return false;
+    }
+
+    uint32_t ret = timer_->Register(callback, interval, once);
+    if (ret == Utils::TIMER_ERR_DEAL_FAILED) {
+        WIFI_LOGE("Register timer failed");
+        return false;
+    }
+
+    outTimerId = ret;
+    return true;
+}
+
+void WifiTimer::UnRegister(uint32_t timerId)
+{
+    if (timerId == 0) {
+        WIFI_LOGE("timerId is 0, no register timer");
+        return;
+    }
+
+    if (timer_ == nullptr) {
+        WIFI_LOGE("timer_ is nullptr");
+        return;
+    }
+
+    timer_->Unregister(timerId);
+    return;
+}
+} // namespace Wifi
+} // namespace OHOS
+#endif

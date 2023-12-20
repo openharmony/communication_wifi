@@ -137,10 +137,6 @@ private:
     void HandleStaStop();
     void HandleStaStart();
 
-    static void StartConcreteStopTimer(void);
-    static void StopConcreteTimer(void);
-    static void ConcreteStopTimerCallback();
-
     DefaultState *pDefaultState;
     IdleState *pIdleState;
     ConnectState *pConnectState;
@@ -149,8 +145,6 @@ private:
     static int mTargetRole;
     ConcreteModeCallback mcb;
     static int mid;
-    static uint32_t concreteStopTimerId;
-    static std::mutex concreteStopTimerMutex;
 };
 } // namespace Wifi
 } // namespace OHOS

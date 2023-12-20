@@ -97,9 +97,6 @@ private:
     ErrCode InitSoftapManagerStates();
     ErrCode AutoStartApService(int id);
     ErrCode AutoStopApService(int id);
-    static void DealApStateChanged(ApState bState, int id = 0);
-    static void DealApGetStaJoin(const StationInfo &info, int id = 0);
-    static void DealApGetStaLeave(const StationInfo &info, int id = 0);
     void StopSoftap();
     DefaultState *pDefaultState;
     IdleState *pIdleState;

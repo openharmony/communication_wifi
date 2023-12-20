@@ -26,30 +26,13 @@
 #include "system_ability.h"
 #include "wifi_device_stub.h"
 #include "iremote_object.h"
-#include "common_event_manager.h"
-#include "common_event_support.h"
 #include "bundle_constants.h"
-#include "timer.h"
 #endif
 
 namespace OHOS {
 namespace Wifi {
 #ifdef OHOS_ARCH_LITE
 enum ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
-#else
-class AppEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-    virtual ~AppEventSubscriber();
-    virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-};
-
-class ThermalLevelSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit ThermalLevelSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-    virtual ~ThermalLevelSubscriber();
-    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-};
 #endif
 
 class WifiDeviceServiceImpl : public WifiDeviceStub {
@@ -173,10 +156,6 @@ private:
     ErrCode CheckRemoveCandidateConfig(void);
     void SetWifiConnectedMode(void);
 #ifndef OHOS_ARCH_LITE
-    void RegisterAppRemoved();
-    void UnRegisterAppRemoved();
-    void RegisterThermalLevel();
-    void UnRegisterThermalLevel();
     bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
 #endif
 
@@ -193,13 +172,6 @@ private:
     static std::mutex g_instanceLock;
     static std::shared_ptr<WifiDeviceServiceImpl> g_instance;
     ServiceRunningState mState;
-#else
-    std::shared_ptr<AppEventSubscriber> eventSubscriber_ = nullptr;
-    std::shared_ptr<ThermalLevelSubscriber> thermalLevelSubscriber_ = nullptr;
-    uint32_t appEventTimerId{0};
-    uint32_t thermalTimerId{0};
-    std::mutex appEventMutex;
-    std::mutex thermalEventMutex;
 #endif
 };
 }  // namespace Wifi

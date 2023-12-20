@@ -52,6 +52,7 @@ ohos_unittest("wifi_hal_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_sta_interface.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_vendor_interface.c",
     "mock_wpa_ctrl.cpp",
+    "wifi_hal_adapter_test.cpp",
     "wifi_hal_ap_interface_test.cpp",
     "wifi_hal_base_interface_test.cpp",
     "wifi_hal_callback_test.cpp",

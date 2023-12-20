@@ -150,7 +150,7 @@ void P2pStateMachine::InitializeThisDevice()
     if (ret < 0) {
         WIFI_LOGW("Failed to obtain P2pVendorConfig information.");
     }
-
+    WIFI_LOGI("%{public}s: random mac is %{public}s", __func__, p2pVendorCfg.GetRandomMacSupport() ? "true" : "false");
     if (p2pVendorCfg.GetDeviceName().empty()) {
         deviceName = std::string("OHOS_") + GetRandomStr(randomLen);
         p2pVendorCfg.SetDeviceName(deviceName);

@@ -18,6 +18,8 @@
 #include "dhcpd_interface.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "p2p_define.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pMonitor");
 
@@ -395,6 +397,8 @@ void P2pMonitor::WpaEventGoNegFailure(int status) const
 void P2pMonitor::WpaEventInvitationReceived(const IdlP2pInvitationInfo &recvInfo) const
 {
     WIFI_LOGI("onInvitationReceived callback");
+    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::NEGO_FAILURE_ERROR),
+        static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     WifiP2pGroupInfo group;
     group.SetNetworkId(recvInfo.persistentNetworkId);
 
@@ -451,6 +455,8 @@ void P2pMonitor::WpaEventGroupFormationFailure(const std::string &failureReason)
 void P2pMonitor::WpaEventGroupStarted(const IdlP2pGroupInfo &groupInfo) const
 {
     WIFI_LOGD("onGroupStarted callback");
+    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::FORMATION_ERROR),
+        static_cast<int>(P2P_ERROR_RES::FORMATION_FAILURE));
     if (groupInfo.groupName.empty()) {
         WIFI_LOGE("Missing group interface name.");
         return;
@@ -479,6 +485,8 @@ void P2pMonitor::WpaEventGroupRemoved(const std::string &groupIfName, bool isGo)
 {
     WIFI_LOGD("onGroupRemoved callback, groupIfName:%{private}s, isGo:%{public}s", groupIfName.c_str(),
         (isGo) ? "true" : "false");
+    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::P2P_GROUP_REMOVE_ERROR),
+        static_cast<int>(P2P_ERROR_RES::P2P_GROUP_REMOVE_FAILURE));
     if (groupIfName.empty()) {
         WIFI_LOGE("ERROR! No group name!");
         return;
@@ -539,6 +547,8 @@ void P2pMonitor::WpaEventProvDiscShowPin(const std::string &p2pDeviceAddress, co
 void P2pMonitor::WpaEventProvDiscFailure(void) const
 {
     WIFI_LOGD("onProvisionDiscoveryFailure callback");
+    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::P2P_DISCOVER_FAILURE_ERROR),
+        static_cast<int>(P2P_ERROR_RES::P2P_DISCOVERY_FAILURE));
     Broadcast2SmProvDiscFailure(selectIfacName);
 }
 

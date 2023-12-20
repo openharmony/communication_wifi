@@ -85,7 +85,6 @@ StaStateMachine::StaStateMachine(int instId)
       pGetIpState(nullptr),
       pLinkedState(nullptr),
       pApRoamingState(nullptr),
-      m_lastNoWorkTime(0),
       m_netState(NETWORK_UNKNOWN),
       m_instId(instId)
 {
@@ -2364,6 +2363,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
         WIFI_LOGI("StartAbility is failed %{public}d", err);
+        WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
     }
 #endif
 }
@@ -2416,17 +2416,8 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         int delay = 1 << netNoWorkNum;
         delay = delay > PORTAL_CHECK_TIME ? PORTAL_CHECK_TIME : delay;
-        struct timespec curTime = {0, 0};
-        if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
-            WIFI_LOGI("clock_gettime failed.");
-            return;
-        }
-        if (curTime.tv_sec - m_lastNoWorkTime > delay) {
-            netNoWorkNum++;
-            StartTimer(static_cast<int>(CMD_START_NETCHECK), delay * PORTAL_MILLSECOND);
-            WIFI_LOGI("start timer delay %{public}d.\n", delay);
-        }
-        m_lastNoWorkTime = curTime.tv_sec;
+        netNoWorkNum++;
+        StartTimer(static_cast<int>(CMD_START_NETCHECK), delay * PORTAL_MILLSECOND);
     }
 }
 void StaStateMachine::NetDetectionProcess(StaNetState netState, const std::string portalUrl)
@@ -2761,6 +2752,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
 
     LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT OnSuccess");
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+    WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DHCP_SUCCESS));
     if ((pStaStateMachine->linkedInfo.connState != ConnState::CONNECTED) &&
         (pStaStateMachine->linkedInfo.detailedState != DetailedState::OBTAINING_IPADDR)) {
         WIFI_LOGI("not in connected or in obtain ip address, need stop dhcp client");
@@ -2932,7 +2924,7 @@ void StaStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname,
     }
     LOGI("Enter DhcpResultNotify::OnFailed. ifname=%{public}s, status=%{public}d, reason=%{public}s, state=%{public}d",
         ifname, status, reason, static_cast<int>(pStaStateMachine->linkedInfo.detailedState));
-    
+    WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DHCP_FAIL));
     LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT OnFailed");
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     if ((pStaStateMachine->linkedInfo.detailedState == DetailedState::DISCONNECTING) ||

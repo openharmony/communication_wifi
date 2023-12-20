@@ -893,7 +893,6 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-    int m_lastNoWorkTime;
     SystemNetWorkState m_netState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;

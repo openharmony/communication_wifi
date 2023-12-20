@@ -178,6 +178,28 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         return false;
     }
 
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    HotspotConfig curApConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, m_id);
+
+    LOGD("%{public}s: [ssid:%{private}s, securityType:%{public}d] ==> [ssid:%{private}s, securityType:%{public}d]",
+        __func__, curApConfig.GetSsid().c_str(), curApConfig.GetSecurityType(),
+        apConfig.GetSsid().c_str(), apConfig.GetSecurityType());
+    if ((curApConfig.GetSsid() != apConfig.GetSsid()) ||
+        (curApConfig.GetSecurityType() != apConfig.GetSecurityType())) {
+        std::string macAddress;
+        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+        if (MacAddress::IsValidMac(macAddress.c_str())) {
+            if (WifiApHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
+                LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
+                return false;
+            }
+        } else {
+            LOGW("%{public}s: macAddress is invalid", __func__);
+        }
+    }
+#endif
+
     WifiSettings::GetInstance().SetHotspotConfig(apConfig, m_id);
     WifiSettings::GetInstance().SyncHotspotConfig();
     m_ApConfigUse.LogConfig(apConfig);

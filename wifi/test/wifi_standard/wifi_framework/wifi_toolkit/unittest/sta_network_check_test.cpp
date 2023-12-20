@@ -92,5 +92,16 @@ HWTEST_F(StaNetworkCheckTest, HttpCheckResponseCode3, TestSize.Level1)
 {
     EXPECT_FALSE(HttpCheckResponseCode(mUrlInfo.portalHttpsUrl, 0));
 }
+
+HWTEST_F(StaNetworkCheckTest, SignalNetCheckThreadTest, TestSize.Level1)
+{
+    pStaNetworkCheck->SignalNetCheckThread();
+}
+
+HWTEST_F(StaNetworkCheckTest, ExitNetCheckThreadTest, TestSize.Level1)
+{
+    pStaNetworkCheck->isExited = false;
+    pStaNetworkCheck->ExitNetCheckThread();
+}
 } // Wifi
 } // OHOS

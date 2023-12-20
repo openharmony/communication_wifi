@@ -18,14 +18,12 @@
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"
-#include "wifi_chip_hal_interface.h"
-#include "wifi_internal_event_dispatcher.h"
 #include "wifi_internal_msg.h"
-#include "wifi_hisysevent.h"
-#include "wifi_settings.h"
-#include "wifi_common_event_helper.h"
+#ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_manager.h"
 #include "wifi_common_util.h"
+#endif
+
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("ConcreteMangerMachine");
@@ -103,7 +101,6 @@ void ConcreteMangerMachine::RegisterCallback(ConcreteModeCallback &callback)
 void ConcreteMangerMachine::SetTargetRole(ConcreteManagerRole role)
 {
     mTargetRole = static_cast<int>(role);
-    StopConcreteTimer();
 }
 
 ConcreteMangerMachine::DefaultState::DefaultState(ConcreteMangerMachine *concreteMangerMachine)
@@ -446,8 +443,7 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
-        StaServiceCallback mStaCallback = WifiManager::GetInstance().GetStaCallback();
-        errCode = pService->RegisterStaServiceCallback(mStaCallback);
+        errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Register sta service callback failed!");
             break;
@@ -471,9 +467,9 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
         return errCode;
     }
-    WifiManager::GetInstance().StopUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 #ifdef FEATURE_P2P_SUPPORT
-    errCode = WifiManager::GetInstance().AutoStartP2pService(AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP);
+    errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
     if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
         WIFI_LOGE("AutoStartStaService, AutoStartP2pService failed!");
     }
@@ -490,7 +486,7 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
     }
     ErrCode ret = WIFI_OPT_FAILED;
 #ifdef FEATURE_P2P_SUPPORT
-    ret = WifiManager::GetInstance().AutoStopP2pService(AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP);
+    ret = WifiManager::GetInstance().GetWifiP2pManager()->AutoStopP2pService();
     if (ret != WIFI_OPT_SUCCESS && ret != WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED) {
         WIFI_LOGE("AutoStopStaService,AutoStopP2pService failed!");
     }
@@ -537,7 +533,7 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
     }
 
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, instId);
-    WifiManager::GetInstance().CheckAndStartScanService(instId);
+    WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(instId);
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
     if (pService == nullptr) {
         WIFI_LOGE("[AutoStartScanOnly] scan service is null.");
@@ -545,7 +541,7 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
         return WIFI_OPT_FAILED;
     }
     ErrCode ret = pService->StartWpa();
-    if (ret != static_cast<int>(WIFI_IDL_OPT_OK)) {
+    if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
         WIFI_LOGE("Start Wpa failed.");
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
@@ -579,12 +575,12 @@ ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId)
         return WIFI_OPT_FAILED;
     }
     ErrCode ret = pService->CloseWpa();
-    if (ret != static_cast<int>(WIFI_IDL_OPT_OK)) {
+    if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
         WIFI_LOGE("Stop Wpa failed!");
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
     }
-    WifiManager::GetInstance().CheckAndStopScanService(instId);
+    WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(instId);
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
     return WIFI_OPT_SUCCESS;
 }
@@ -665,62 +661,32 @@ void ConcreteMangerMachine::HandleStaStart()
 void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessage *msg)
 {
     if (WifiSettings::GetInstance().GetWifiStopState()) {
-        WIFI_LOGE("wifi is stoping");
+        WIFI_LOGE("checkAndContinueToStopWifi: wifi is stoping");
         return;
     }
-    mTargetRole = static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW);
-    StartConcreteStopTimer();
-}
 
-uint32_t ConcreteMangerMachine::concreteStopTimerId{0};
-std::mutex ConcreteMangerMachine::concreteStopTimerMutex{};
-void ConcreteMangerMachine::ConcreteStopTimerCallback()
-{
-    if (mTargetRole != static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW)) {
-        StopConcreteTimer();
-        return;
-    }
-    StopConcreteTimer();
+    mTargetRole = static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW);
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
-    WIFI_LOGE("ConcreteStopTimerCallback, current sta state: %{public}d", staState);
+    WIFI_LOGI("checkAndContinueToStopWifi: current sta state: %{public}d", staState);
     if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::OPENING) {
         return;
     }
-    WIFI_LOGE("Set WifiStopState is true.");
+
     WifiSettings::GetInstance().SetWifiStopState(true);
+    WIFI_LOGI("Set WifiStopState is true.");
     if (staState == WifiOprMidState::RUNNING) {
         ErrCode ret = AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("stop sta failed in timer ret = %{public}d", ret);
             WifiSettings::GetInstance().SetWifiStopState(false);
-            WifiControllerMachine *ins = WifiManager::GetInstance().GetControllerMachine();
+            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
             ins->HandleStaClose(mid);
         }
     } else {
-        WifiControllerMachine *ins = WifiManager::GetInstance().GetControllerMachine();
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
         ins->HandleStaClose(mid);
     }
 }
 
-void ConcreteMangerMachine::StopConcreteTimer(void)
-{
-    WIFI_LOGE("StopConcreteTimer! concreteStopTimerId:%{public}u", concreteStopTimerId);
-    std::unique_lock<std::mutex> lock(concreteStopTimerMutex);
-    WifiTimer::GetInstance()->UnRegister(concreteStopTimerId);
-    concreteStopTimerId = 0;
-    return;
-}
-
-void ConcreteMangerMachine::StartConcreteStopTimer(void)
-{
-    WIFI_LOGE("StartConcreteStopTimer! concreteStopTimerId:%{public}u", concreteStopTimerId);
-    std::unique_lock<std::mutex> lock(concreteStopTimerMutex);
-    if (concreteStopTimerId == 0) {
-        TimeOutCallback timeoutCallback = std::bind(ConcreteMangerMachine::ConcreteStopTimerCallback);
-        WifiTimer::GetInstance()->Register(timeoutCallback, concreteStopTimerId, STOP_WIFI_WAIT_TIME);
-        WIFI_LOGE("StartConcreteStopTimer success! concreteStopTimerId:%{public}u", concreteStopTimerId);
-    }
-    return;
-}
 } // namespace Wifi
 } // namespace OHOS

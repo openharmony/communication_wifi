@@ -161,6 +161,39 @@ enum class DHCPTYPE {
     DHCP_LEGACEGO,
 };
 
+enum class P2P_ERROR_RES {
+    NEGO_FAILURE = 0,           // p2p go negotiation failure
+    FORMATION_FAILURE,      // p2p group formation failure
+    PROV_SCAN_FAILURE,       // prov scan failur
+    P2P_GROUP_REMOVE_FAILURE,
+    P2P_DISCOVERY_FAILURE
+};
+
+enum class P2P_ERROR_CODE {
+    NEGO_FAILURE_ERROR = 1001,
+    PROV_SCAN_ERROR,
+    FORMATION_ERROR,
+    P2P_GROUP_REMOVE_ERROR,
+    P2P_DISCOVER_FAILURE_ERROR
+};
+
+enum class P2P_CHR_EVENT {
+    CONN_CNT = 0,
+    MAGICLINK_CNT,
+    P2P_SUC_2G4_CNT,
+    P2P_SUC_5G_CNT
+};
+
+enum class P2P_CONNECT_FAIL {
+    ERR_CODE = 0,
+    FAIL_REASON
+};
+
+enum class P2P_AB_DISCONNECT {
+    ERR_CODE = 0,
+    FAIL_REASON
+};
+
 using HandlerMethod = void(P2P_STATE_MACHINE_CMD, int, int, const std::any &);
 } // namespace Wifi
 } // namespace OHOS

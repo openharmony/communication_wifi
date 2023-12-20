@@ -96,7 +96,7 @@ struct WiFiConnectStabilityTest {
             .fontSize( $r( 'app.float.font_16' ) )
             .fontColor( $r( 'app.color.title_black_color' ) )
             .onChange( ( value: string ) => {
-              this.testNumbers = Number( value );
+              this.testNumbers = parseInt( value );
             } )
           Image( $r( 'app.media.Switch' ) )
             .height( 50 )
@@ -289,7 +289,7 @@ struct WiFiConnectStabilityTest {
 
   onConnectionState() {
     console.log( TAG , "on.wifiConnectionChange start--------" )
-    wifiManager.on( "wifiConnectionChange" , ( number ) => {
+    wifi.on( "wifiConnectionChange" , ( number ) => {
       console.log( TAG , " on.wifiConnectionChange --------" )
       let wifiConnectionMessage = ""
       switch ( number ) {
@@ -325,7 +325,7 @@ struct WiFiConnectStabilityTest {
   }
 
   aboutToDisappear() {
-    wifiManager.off( "wifiConnectionChange" )
+    wifi.off( "wifiConnectionChange" )
   }
 }
 

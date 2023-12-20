@@ -41,7 +41,10 @@ class WifiManagerTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {}
+    virtual void SetUp()
+    {
+        wifiManager.Init();
+    }
     virtual void TearDown() {}
 public:
     WifiManager wifiManager;
@@ -50,63 +53,57 @@ public:
 HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadStaSaTimerTest enter!");
-    wifiManager.StartUnloadStaSaTimer();
+    wifiManager.wifiStaManager->StartUnloadStaSaTimer();
 }
 
 HWTEST_F(WifiManagerTest, StartUnloadScanSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadScanSaTimerTest enter!");
-    wifiManager.StartUnloadScanSaTimer();
+    wifiManager.wifiScanManager->StartUnloadScanSaTimer();
 }
 
 HWTEST_F(WifiManagerTest, StartUnloadApSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadApSaTimerTest enter!");
-    wifiManager.StartUnloadApSaTimer();
+    wifiManager.wifiHotspotManager->StartUnloadApSaTimer();
 }
 
 HWTEST_F(WifiManagerTest, AutoStartP2pService_001, TestSize.Level1)
 {
     WIFI_LOGE("AutoStartP2pService_001 enter!");
     WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSING);
-    EXPECT_EQ(wifiManager.AutoStartP2pService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_OPEN_FAIL_WHEN_CLOSING);
+    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_OPEN_FAIL_WHEN_CLOSING);
     WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::RUNNING);
-    EXPECT_EQ(wifiManager.AutoStartP2pService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_OPEN_SUCC_WHEN_OPENED);
+    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_OPEN_SUCC_WHEN_OPENED);
 }
 
 HWTEST_F(WifiManagerTest, AutoStartP2pService_002, TestSize.Level1)
 {
     WIFI_LOGE("AutoStartP2pService_002 enter!");
     WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
-    EXPECT_EQ(wifiManager.AutoStartP2pService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_FAILED);
+    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiManagerTest, AutoStopP2pService_001, TestSize.Level1)
 {
     WIFI_LOGE("AutoStopP2pService_001 enter!");
     WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING);
-    EXPECT_EQ(wifiManager.AutoStopP2pService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_FAIL_WHEN_OPENING);
+    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_FAIL_WHEN_OPENING);
     WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
-    EXPECT_EQ(wifiManager.AutoStopP2pService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
+    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
 }
 
 HWTEST_F(WifiManagerTest, AutoStopP2pService_002, TestSize.Level1)
 {
     WIFI_LOGE("AutoStopP2pService_002 enter!");
     WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::RUNNING);
-    EXPECT_EQ(wifiManager.AutoStopP2pService(
-        AutoStartOrStopServiceReason::AUTO_START_UPON_STARTUP), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
+    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
 }
 
 HWTEST_F(WifiManagerTest, StartUnloadP2PSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGE("StartUnloadP2PSaTimerTest enter!");
-    wifiManager.StartUnloadP2PSaTimer();
+    wifiManager.wifiP2pManager->StartUnloadP2PSaTimer();
 }
 
 HWTEST_F(WifiManagerTest, GetSupportedFeaturesTest, TestSize.Level1)
@@ -121,138 +118,142 @@ HWTEST_F(WifiManagerTest, GetSupportedFeaturesTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, GetAirplaneModeByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGE("DealOpenAirplGetAirplaneModeByDatashareTestaneModeEventTest enter!");
-    wifiManager.GetAirplaneModeByDatashare();
-}
-
-HWTEST_F(WifiManagerTest, DealOpenAirplaneModeEventTest, TestSize.Level1)
-{
-    WIFI_LOGE("DealOpenAirplaneModeEventTest enter!");
-    wifiManager.DealOpenAirplaneModeEvent();
-}
-
-HWTEST_F(WifiManagerTest, DealCloseAirplaneModeEvent_001, TestSize.Level1)
-{
-    WIFI_LOGE("DealCloseAirplaneModeEvent_001 enter!");
-    WifiConfigCenter::GetInstance().SetOperatorWifiType(
-        static_cast<int>(OperatorWifiType::USER_CLOSE_WIFI_IN_AIRPLANEMODE));
-    WifiConfigCenter::GetInstance().SetStaLastRunState(false);
-    wifiManager.unloadP2PSaTimerId = 0;
-    WifiSettings::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), 0);
-    wifiManager.DealCloseAirplaneModeEvent();
-}
-
-HWTEST_F(WifiManagerTest, DealCloseAirplaneModeEvent_002, TestSize.Level1)
-{
-    WIFI_LOGE("DealCloseAirplaneModeEvent_002 enter!");
-    WifiConfigCenter::GetInstance().SetOperatorWifiType(
-        static_cast<int>(OperatorWifiType::CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED));
-    WifiConfigCenter::GetInstance().SetStaLastRunState(false);
-    wifiManager.DealCloseAirplaneModeEvent();
+    wifiManager.wifiEventSubscriberManager->GetAirplaneModeByDatashare();
 }
 
 HWTEST_F(WifiManagerTest, GetLocationModeByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGE("GetLocationModeByDatashareTest enter!");
-    bool result = wifiManager.GetLocationModeByDatashare();
+    bool result = wifiManager.wifiEventSubscriberManager->GetLocationModeByDatashare();
     WIFI_LOGE("GetLocationModeByDatashareTest result(%{public}d)", result);
 }
 
 HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGE("GetLastStaStateByDatashareTest enter!");
-    wifiManager.GetLastStaStateByDatashare();
+    wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare();
 }
 
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)
 {
     WIFI_LOGE("CheckAndStartScanService_001 enter!");
     WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::RUNNING);
-    wifiManager.CheckAndStartScanService();
+    wifiManager.wifiScanManager->CheckAndStartScanService();
 }
 
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_002, TestSize.Level1)
 {
     WIFI_LOGE("CheckAndStartScanService_002 enter!");
     WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::CLOSED);
-    wifiManager.CheckAndStartScanService();
+    wifiManager.wifiScanManager->CheckAndStartScanService();
 }
 
 HWTEST_F(WifiManagerTest, RegisterScreenEventTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterScreenEventTest enter!");
-    wifiManager.RegisterScreenEvent();
+    wifiManager.wifiEventSubscriberManager->RegisterScreenEvent();
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterScreenEventTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterScreenEventTest enter!");
-    wifiManager.UnRegisterScreenEvent();
+    wifiManager.wifiEventSubscriberManager->UnRegisterScreenEvent();
 }
 
 HWTEST_F(WifiManagerTest, RegisterSettingsMigrateEventTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterSettingsMigrateEventTest enter!");
-    wifiManager.RegisterSettingsMigrateEvent();
+    wifiManager.wifiEventSubscriberManager->RegisterSettingsMigrateEvent();
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterSettingsMigrateEventTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterSettingsMigrateEventTest enter!");
-    wifiManager.UnRegisterSettingsMigrateEvent();
+    wifiManager.wifiEventSubscriberManager->UnRegisterSettingsMigrateEvent();
 }
 
 HWTEST_F(WifiManagerTest, RegisterAirplaneModeEventTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterAirplaneModeEventTest enter!");
-    wifiManager.RegisterAirplaneModeEvent();
+    wifiManager.wifiEventSubscriberManager->RegisterAirplaneModeEvent();
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterAirplaneModeEventTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterAirplaneModeEventTest enter!");
-    wifiManager.UnRegisterAirplaneModeEvent();
+    wifiManager.wifiEventSubscriberManager->UnRegisterAirplaneModeEvent();
 }
 
 HWTEST_F(WifiManagerTest, RegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterLocationEventTest enter!");
-    wifiManager.RegisterLocationEvent();
+    wifiManager.wifiEventSubscriberManager->RegisterLocationEvent();
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterLocationEventTest enter!");
-    wifiManager.UnRegisterLocationEvent();
+    wifiManager.wifiEventSubscriberManager->UnRegisterLocationEvent();
 }
 
 HWTEST_F(WifiManagerTest, RegisterBatteryEventTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterBatteryEventTest enter!");
-    wifiManager.RegisterBatteryEvent();
+    wifiManager.wifiEventSubscriberManager->RegisterBatteryEvent();
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterBatteryEventTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterBatteryEventTest enter!");
-    wifiManager.UnRegisterBatteryEvent();
+    wifiManager.wifiEventSubscriberManager->UnRegisterBatteryEvent();
 }
 
 HWTEST_F(WifiManagerTest, RegisterPowerStateListenerTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterPowerStateListenerTest enter!");
-    wifiManager.RegisterPowerStateListener();
+    wifiManager.wifiEventSubscriberManager->RegisterPowerStateListener();
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterPowerStateListenerTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterPowerStateListenerTest enter!");
-    wifiManager.UnRegisterPowerStateListener();
+    wifiManager.wifiEventSubscriberManager->UnRegisterPowerStateListener();
 }
 
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
 {
     WIFI_LOGE("ExitTest enter!");
     wifiManager.Exit();
+}
+
+HWTEST_F(WifiManagerTest, PushServiceCloseMsgTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
+}
+
+HWTEST_F(WifiManagerTest, GetDeviceProvisionByDatashareTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.wifiEventSubscriberManager->GetDeviceProvisionByDatashare();
+}
+
+HWTEST_F(WifiManagerTest, CheckAndStopScanServiceTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.wifiScanManager->CheckAndStopScanService();
+}
+
+HWTEST_F(WifiManagerTest, ForceStopWifiTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.wifiStaManager->ForceStopWifi();
+}
+
+HWTEST_F(WifiManagerTest, AutoStartEnhanceServiceTest, TestSize.Level1)
+{
+    WIFI_LOGE("ExitTest enter!");
+    wifiManager.AutoStartEnhanceService();
 }
 }  // namespace Wifi
 }  // namespace OHOS

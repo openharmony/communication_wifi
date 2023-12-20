@@ -51,7 +51,7 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetHid2dUpperScene(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetHid2dUpperScene(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetP2pBusinessType(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));

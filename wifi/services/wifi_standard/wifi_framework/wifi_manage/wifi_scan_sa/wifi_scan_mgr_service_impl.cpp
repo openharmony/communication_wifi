@@ -74,7 +74,7 @@ void WifiScanMgrServiceImpl::OnStart()
     }
 
     if (isStartUnloadScanSaTimer) {
-        WifiManager::GetInstance().StartUnloadScanSaTimer();
+        WifiManager::GetInstance().GetWifiScanManager()->StartUnloadScanSaTimer();
     }
     return;
 }

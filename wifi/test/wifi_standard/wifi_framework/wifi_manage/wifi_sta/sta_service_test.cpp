@@ -704,7 +704,7 @@ void StaServiceTest::StaServiceSetPowerModeTest()
 
 void StaServiceTest::StaServiceOnSystemAbilityChangedTest()
 {
-    EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(0)).Times(AtLeast(0);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(0)).Times(AtLeast(0));
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, false) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, true) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(1, true) == WIFI_OPT_SUCCESS);

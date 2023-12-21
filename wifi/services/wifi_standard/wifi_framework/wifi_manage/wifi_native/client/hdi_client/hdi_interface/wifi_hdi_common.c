@@ -238,6 +238,9 @@ static int HdiRsnKeyMgmtToAuthMgmt(const uint8_t *s)
     if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_UNSPEC) {
         return HDI_KEY_MGMT;
     }
+    if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_SAE) {
+        return HDI_KEY_MGMT_SAE;
+    }
     if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_PSK_OVER) {
         return HDI_KEY_MGMT_PSK;
     }

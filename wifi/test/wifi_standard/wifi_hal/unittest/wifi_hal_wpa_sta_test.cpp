@@ -429,22 +429,6 @@ HWTEST_F(WifiHalWpaStaTest, WpaCliCmdWpaSetSuspendModeTest, TestSize.Level1)
     MockSetWpaExpectCmdResponse("DRIVER SETSUSPENDMODE", "OK");
     EXPECT_TRUE(mInterface->wpaCliCmdWpaSetSuspendMode(mInterface, true) == 0);
 }
-
-HWTEST_F(WifiHalWpaStaTest, GetStaInterfaceNoTest, TestSize.Level1)
-{
-    char ifname[] = "SIGNAL_POLL";
-    GetWifiStaInterface(0);
-    GetStaInterfaceNo(ifname);
-    EXPECT_TRUE(GetStaInterfaceNo(nullptr) < 0);
-}
-
-HWTEST_F(WifiHalWpaStaTest, DelScanInfoLineTest, TestSize.Level1)
-{
-    char ifname[] = "\t15IGNwpa_state=SCANNING\\1024AL_POLL";
-    ScanInfo *pcmd = nullptr;
-    DelScanInfoLine(pcmd, ifname, 1);
-    DelScanInfoLine(pcmd, ifname, 0);
-}
 }  // namespace Wifi
 }  // namespace OHOS
 

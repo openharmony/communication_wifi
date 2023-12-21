@@ -28,6 +28,7 @@ public:
     virtual WifiErrorNo StartSupplicant(void) = 0;
     virtual WifiErrorNo WpaSetCountryCode(const std::string &countryCode) const = 0;
     virtual WifiErrorNo WpaSetSuspendMode(bool mode) const = 0;
+    virtual WifiErrorNo WpaSetPowerMode(bool mode) const = 0;
 };
 
 class WifiSupplicantHalInterface : public MockWifiSupplicantHalInterface {
@@ -38,6 +39,7 @@ public:
     MOCK_METHOD0(StartSupplicant, WifiErrorNo());
     MOCK_CONST_METHOD1(WpaSetCountryCode, WifiErrorNo(const std::string &countryCode));
     MOCK_CONST_METHOD1(WpaSetSuspendMode, WifiErrorNo(bool mode));
+    MOCK_CONST_METHOD1(WpaSetPowerMode, WifiErrorNo(bool mode));
 };
 }  // namespace OHOS
 }  // namespace OHOS

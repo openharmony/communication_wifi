@@ -417,7 +417,7 @@ EventManager& EventManager::GetInstance()
     return g_eventManger;
 }
 
-void EventManager::Init()
+NO_SANITIZE("cfi") void EventManager::Init()
 {
     if (mSaStatusListener == nullptr) {
         int32_t ret;

@@ -71,12 +71,9 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//third_party/bounds_checking_function/include",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9/src",
-      "$DHCP_ROOT_DIR/interfaces/kits/c",
     ]
 
     deps = [
-      "$DHCP_ROOT_DIR/services/dhcp_client:dhcp_client",
-      "$DHCP_ROOT_DIR/services/dhcp_server:dhcp_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
@@ -113,7 +110,6 @@ if (defined(ohos_lite)) {
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
       "//third_party/bounds_checking_function/include/",
       "//drivers/peripheral/wlan/interfaces/include/",
-      "$DHCP_ROOT_DIR/interfaces/kits/c",
     ]
 
     deps = [
@@ -124,8 +120,6 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
-      "dhcp:dhcp_client",
-      "dhcp:dhcp_server",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
@@ -186,8 +180,6 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
-      "dhcp:dhcp_client",
-      "dhcp:dhcp_server",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",

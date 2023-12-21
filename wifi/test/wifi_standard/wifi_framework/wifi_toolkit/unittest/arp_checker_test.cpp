@@ -114,7 +114,7 @@ HWTEST_F(ArpCheckerTest, checkDnsValid_FAIL2, TestSize.Level1)
     std::string hostAddress = "192.168.3.66";
     std::string secondDns = "socket";
     pDnsChecker->socketCreated = true;
-    pDnsChecker->checkDnsValid(hostAddress, nullptr, 0);
+    pDnsChecker->checkDnsValid(hostAddress, "", 0);
     pDnsChecker->checkDnsValid(hostAddress, secondDns, 0);
 }
 

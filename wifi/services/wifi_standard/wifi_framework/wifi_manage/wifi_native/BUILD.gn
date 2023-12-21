@@ -186,6 +186,10 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
     ]
 
+    if (wifi_feature_with_local_random_mac) {
+      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
+    }
+
     if (wifi_feature_with_hdi_wpa_supported) {
       defines += [ "HDI_WPA_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wpa:libwpa_proxy_1.0" ]

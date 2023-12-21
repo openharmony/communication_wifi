@@ -238,6 +238,14 @@ private:
      */
     void Init();
 
+    /**
+     * @Description update MAC address.
+     * @param ssid - Network name
+     * @param securityType - Security type
+     * @return true: Set successfully    false: Set failed
+     */
+    bool UpdatMacAddress(const std::string ssid, KeyMgmt securityType);
+
 private:
     HotspotConfig m_hotspotConfig; /*
                                     * Store the configuration when set to

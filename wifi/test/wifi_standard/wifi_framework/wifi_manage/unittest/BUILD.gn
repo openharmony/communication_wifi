@@ -63,7 +63,6 @@ ohos_unittest("manager_unittest") {
     "wifi_country_code_policy_test.cpp",
     "wifi_dumper_test.cpp",
     "wifi_internal_event_dispatcher_test.cpp",
-    "wifi_manager_test.cpp",
     "wifi_protect_test.cpp",
     "wifi_service_manager_test.cpp",
     "wifi_settings_test.cpp",

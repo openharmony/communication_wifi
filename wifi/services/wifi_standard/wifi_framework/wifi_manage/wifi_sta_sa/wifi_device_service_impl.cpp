@@ -1494,6 +1494,94 @@ ErrCode WifiDeviceServiceImpl::ResetAllFrozenApp()
     WifiInternalEventDispatcher::GetInstance().ResetAllFrozenApp();
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiDeviceServiceImpl::DisableAutoJoin(const std::string &conditionName)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("DisableAutoJoin:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->DisableAutoJoin(conditionName);
+}
+
+ErrCode WifiDeviceServiceImpl::EnableAutoJoin(const std::string &conditionName)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableAutoJoin:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->EnableAutoJoin(conditionName);
+}
+
+ErrCode WifiDeviceServiceImpl::RegisterAutoJoinCondition(const std::string &conditionName,
+                                                         const std::function<bool()> &autoJoinCondition)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("RegisterAutoJoinCondition:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->RegisterAutoJoinCondition(conditionName, autoJoinCondition);
+}
+
+ErrCode WifiDeviceServiceImpl::DeregisterAutoJoinCondition(const std::string &conditionName)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("DeregisterAutoJoinCondition:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->DeregisterAutoJoinCondition(conditionName);
+}
+
+ErrCode WifiDeviceServiceImpl::RegisterFilterBuilder(const FilterTag &filterTag,
+                                                     const std::string &builderName,
+                                                     const FilterBuilder &filterBuilder)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("RegisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->RegisterFilterBuilder(filterTag, builderName, filterBuilder);
+}
+
+ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTag,
+                                                       const std::string &builderName)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("DeregisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->DeregisterFilterBuilder(filterTag, builderName);
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

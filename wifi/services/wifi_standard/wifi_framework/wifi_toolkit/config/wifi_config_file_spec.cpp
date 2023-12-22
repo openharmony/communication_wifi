@@ -44,6 +44,10 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.lastConnectTime = -1;
     item.numRebootsSinceLastUse = 0;
     item.numAssociation = 0;
+    item.networkStatusHistory = 0;
+    item.isPortal = false;
+    item.lastHasInternetTime = -1;
+    item.noInternetAccess = false;
     return;
 }
 
@@ -123,6 +127,26 @@ static int SetWifiDeviceConfigOutDated(WifiDeviceConfig &item, const std::string
     return 0;
 }
 
+static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string &key, const std::string &value)
+{
+    if (key == "numRebootsSinceLastUse") {
+        item.numRebootsSinceLastUse = std::stoi(value);
+    } else if (key == "numAssociation") {
+        item.numAssociation = std::stoi(value);
+    } else if (key == "networkStatusHistory") {
+        item.networkStatusHistory = std::stoi(value);
+    } else if (key == "isPortal") {
+        item.isPortal = std::stoi(value);
+    } else if (key == "lastHasInternetTime") {
+        item.lastHasInternetTime = std::stol(value);
+    } else if (key == "noInternetAccess") {
+        item.noInternetAccess = std::stoi(value);
+    } else {
+        return -1;
+    }
+    return 0;
+}
+
 static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     if (SetWifiDeviceConfigOutDated(item, key, value) == 0) {
@@ -166,12 +190,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.uid = std::stoi(value);
     } else if (key == "lastConnectTime") {
         item.lastConnectTime = std::stol(value);
-    } else if (key == "numRebootsSinceLastUse") {
-        item.numRebootsSinceLastUse = std::stoi(value);
-    } else if (key == "numAssociation") {
-        item.numAssociation = std::stoi(value);
     } else {
-        return -1;
+        return SetWifiDeviceConfigExternal(item, key, value);
     }
     return 0;
 }
@@ -455,6 +475,10 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"lastConnectTime=" << item.lastConnectTime << std::endl;
     ss << "    " <<"numRebootsSinceLastUse=" << item.numRebootsSinceLastUse << std::endl;
     ss << "    " <<"numAssociation=" << item.numAssociation << std::endl;
+    ss << "    " <<"networkStatusHistory=" << item.networkStatusHistory << std::endl;
+    ss << "    " <<"isPortal=" << item.isPortal << std::endl;
+    ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
+    ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else
@@ -1388,5 +1412,30 @@ template <> std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item)
     ss << "    " <<"http=" << ValidateString(item.portalHttpUrl) << std::endl;
     return ss.str();
 }
+
+int SetNetworkStatusHistory(WifiDeviceConfig &item, const std::string &value)
+{
+    item.networkStatusHistory = std::stoi(value);
+    return 0;
+}
+
+int SetIsPortal(WifiDeviceConfig &item, const std::string &value)
+{
+    item.isPortal = std::stoi(value);
+    return 0;
+}
+
+int SetLastHasInternetTime(WifiDeviceConfig &item, const std::string &value)
+{
+    item.lastHasInternetTime = std::stol(value);
+    return 0;
+}
+
+int SetNoInternetAccess(WifiDeviceConfig &item, const std::string &value)
+{
+    item.noInternetAccess = std::stoi(value);
+    return 0;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

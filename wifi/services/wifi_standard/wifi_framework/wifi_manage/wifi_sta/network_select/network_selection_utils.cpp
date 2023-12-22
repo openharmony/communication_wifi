@@ -19,8 +19,6 @@
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
 
-
-
 namespace OHOS {
 namespace Wifi {
 

@@ -30,7 +30,7 @@ struct NetworkSelectionResult {
 
 class NetworkSelectionManager {
 public:
-    ErrCode InitNetworkSelectionService();
+    NetworkSelectionManager();
     /**
      * the function to select network.
      *

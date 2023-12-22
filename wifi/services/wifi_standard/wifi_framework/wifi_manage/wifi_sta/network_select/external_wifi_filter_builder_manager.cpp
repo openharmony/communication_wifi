@@ -17,8 +17,6 @@
 #include "external_wifi_filter_builder_manager.h"
 #include "wifi_logger.h"
 
-
-
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiFilterBuilderManager")

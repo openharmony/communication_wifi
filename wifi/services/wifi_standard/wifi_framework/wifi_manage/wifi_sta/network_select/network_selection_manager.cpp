@@ -23,10 +23,9 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("networkSelectionManager")
 
-ErrCode NetworkSelectionManager::InitNetworkSelectionService()
+NetworkSelectionManager::NetworkSelectionManager()
 {
     pNetworkSelectorFactory = std::make_unique<NetworkSelectorFactory>();
-    return WIFI_OPT_SUCCESS;
 }
 
 bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelectionResult,

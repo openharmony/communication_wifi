@@ -31,6 +31,7 @@
 #include "sta_define.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_net_agent.h"
+#include "wifi_net_observer.h"
 #endif
 
 namespace OHOS {
@@ -857,6 +858,7 @@ private:
     std::map<std::string, StaServiceCallback> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
+    std::shared_ptr<NetStateObserver> m_NetWorkState;
 #endif
 
     int lastNetworkId;

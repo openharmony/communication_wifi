@@ -115,9 +115,6 @@ StaStateMachine::~StaStateMachine()
     }
     ParsePointer(pDhcpResultNotify);
     ParsePointer(pNetcheck);
-#ifndef OHOS_ARCH_LITE
-    NetStateObserver::GetInstance().StopNetStateObserver();
-#endif
 }
 
 /* ---------------------------Initialization functions------------------------------ */
@@ -136,10 +133,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-#ifndef OHOS_ARCH_LITE
-    NetStateObserver::GetInstance().SetNetStateCallback(
-        std::bind(&StaStateMachine::NetStateObserverCallback, this, std::placeholders::_1));
-#endif
     pNetcheck = new (std::nothrow)
         StaNetworkCheck(std::bind(&StaStateMachine::NetDetectionProcess, this,
             std::placeholders::_1, std::placeholders::_2),
@@ -152,7 +145,9 @@ ErrCode StaStateMachine::InitStaStateMachine()
     pNetcheck->InitNetCheckThread();
 #ifndef OHOS_ARCH_LITE
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
-    NetStateObserver::GetInstance().StartNetStateObserver();
+    m_NetWorkState = std::make_shared<NetStateObserver>();
+    m_NetWorkState->SetNetStateCallback(
+        std::bind(&StaStateMachine::NetStateObserverCallback, this, std::placeholders::_1));
 #endif
     return WIFI_OPT_SUCCESS;
 }
@@ -564,6 +559,7 @@ void StaStateMachine::StartWifiProcess()
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
         WifiNetAgent::GetInstance().OnStaMachineWifiStart();
+        m_NetWorkState->StartNetStateObserver();
 #endif
         /* Initialize Connection Information. */
         InitWifiLinkedInfo();
@@ -682,6 +678,7 @@ void StaStateMachine::StopWifiProcess()
     WIFI_LOGI("Enter StaStateMachine::StopWifiProcess.\n");
 #ifndef OHOS_ARCH_LITE
     WifiNetAgent::GetInstance().UnregisterNetSupplier();
+    m_NetWorkState->StopNetStateObserver();
 #endif
     WIFI_LOGI("Stop wifi is in process...\n");
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), m_instId);
@@ -3001,7 +2998,7 @@ void StaStateMachine::OnNetManagerRestart(void)
     if (state != static_cast<int>(WifiState::ENABLED)) {
         return;
     }
-    NetStateObserver::GetInstance().StartNetStateObserver();
+    m_NetWorkState->StartNetStateObserver();
     WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo, m_instId);
 }
 

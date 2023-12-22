@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include<sys/stat.h>
+#include<fcntl.h>
 #include "wifi_hdi_wpa_proxy.h"
 #include "servmgr_hdi.h"
 #include "devmgr_hdi.h"
@@ -28,6 +30,10 @@
 #define LOG_TAG "WifiHdiWpaProxy"
 #define PATH_NUM 2
 #define BUFF_SIZE 256
+
+#define MAX_READ_FILE_SIZE 1024
+#define MAX_READ_BLOCK_SIZE 1024
+#define FILE_OPEN_PRIV 0666
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -183,26 +189,53 @@ struct IWpaInterface* GetWpaInterface()
     return wpaObj;
 }
 
-WifiErrorNo ExcuteCmd(const char *szCmd)
+WifiErrorNo CopyUserFile(const char *srcFilePath,const char* destFilePath)
 {
-    LOGI("Execute cmd: %{private}s", szCmd);
-    int ret = system(szCmd);
-    if (ret == -1) {
-        LOGE("Execute system cmd %{private}s failed!", szCmd);
+    LOGI("Execute CopyUserFile enter");
+    if (srcFilePath == NULL || destFilePath == NULL) {
+        LOGE("CopyUserFile() srcFilePath or destFilePath is nullptr!");
         return WIFI_IDL_OPT_FAILED;
     }
-    if (WIFEXITED(ret) && (WEXITSTATUS(ret) == 0)) {
-        return WIFI_IDL_OPT_OK;
+    int srcFd = -1;
+    int destFd = -1;
+    do {
+
+        if ((srcFd = open(srcFilePath, O_RDONLY))< 0)  {
+            LOGE("CopyUserFile() failed, open srcFilePath:%{public}s error!", srcFilePath);
+            break;
+        }
+        if ((destFd = open(destFilePath, O_RDWR | O_CREAT | O_TRUNC , FILE_OPEN_PRIV))< 0)  {
+            LOGE("CopyUserFile() failed, open destFilePath:%{public}s error!", destFilePath);
+            break;
+        }
+        size_t bytes;
+        lseek(srcFd, 0, SEEK_SET);
+        char buf[MAX_READ_FILE_SIZE] = {0};
+        for(int i = 0; i < MAX_READ_BLOCK_SIZE; i++) {
+            memset(buf, 0, MAX_READ_FILE_SIZE);
+            if((bytes = read(srcFd, buf, MAX_READ_FILE_SIZE-1)) < 0) {
+                LOGE("CopyUserFile() failed, read srcFilePath:%{public}s error!", srcFilePath);
+                break;
+            }
+            write(destFd, buf, bytes);
+        }
+    }while (0);
+    
+    if(srdFd>=0) {
+        close(srcFd);
     }
-    LOGE("Execute system cmd %{private}s failed: %{private}d", szCmd, WEXITSTATUS(ret));
-    return WIFI_IDL_OPT_FAILED;
+    
+    if(destFd>=0) {
+        close(destFd);
+    }
+    LOGI("CopyUserFile() copy file succeed");
+    return WIFI_IDL_OPT_OK;
 }
 
 WifiErrorNo CopyConfigFile(const char* configName)
 {
-    char buf[BUFF_SIZE] = {0};
-    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "%s/wpa_supplicant/%s", CONFIG_ROOR_DIR, configName) < 0) {
-        LOGE("snprintf_s dest dir failed.");
+    if(configName == NULL || strlen(configName) == 0) {
+        LOGE("Copy config file failed:is null");
         return WIFI_IDL_OPT_FAILED;
     }
     char path[PATH_NUM][BUFF_SIZE] = {"/system/etc/wifi/", "/vendor/etc/wifi/"};
@@ -212,13 +245,13 @@ WifiErrorNo CopyConfigFile(const char* configName)
             return WIFI_IDL_OPT_FAILED;
         }
         if (access(path[i], F_OK) != -1) {
-            char cmd[BUFF_SIZE] = {0};
-            if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
-                "cp %s %s/wpa_supplicant/", path[i], CONFIG_ROOR_DIR) < 0) {
-                LOGE("snprintf_s cp cmd failed.");
+            char destFilePath[BUFF_SIZE] = {0};
+            if (snprintf_s(destFilePath, sizeof(destFilePath), sizeof(destFilePath) - 1,
+                "%s/wpa_supplicant/%s", CONFIG_ROOR_DIR, configName) < 0) {
+                LOGE("snprintf_s destFilePath failed.");
                 return WIFI_IDL_OPT_FAILED;
             }
-            return ExcuteCmd(cmd);
+            return CopyUserFile(path[i], destFilePath);
         }
     }
     LOGE("Copy config file failed: %{public}s", configName);

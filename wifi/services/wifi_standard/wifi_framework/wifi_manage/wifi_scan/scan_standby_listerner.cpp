@@ -96,7 +96,7 @@ void StandByListerner::RegisterStandByEvent()
 {
     std::unique_lock<std::mutex> lock(standByEventMutex);
     if (isStandBySubscribered) {
-        WIFI_LOGI("isStandBySubscribered is true!");
+        WIFI_LOGI("isStandBySubscribered is true");
         return;
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -116,7 +116,7 @@ void StandByListerner::UnRegisterStandByEvent()
     WIFI_LOGI("UnRegisterStandByEvent enter");
     std::unique_lock<std::mutex> lock(standByEventMutex);
     if (!isStandBySubscribered) {
-        WIFI_LOGI("isStandBySubscribered is false!");
+        WIFI_LOGI("isStandBySubscribered is false");
         return;
     }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(standBySubscriber_)) {
@@ -136,7 +136,15 @@ void StandBySubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &ev
         action.c_str(), napped, sleeping);
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED &&
         onStandbyChangedEvent != NULL) {
-        onStandbyChangedEvent(napped, sleeping);
+        if (lastSleepState != sleeping) {
+            onStandbyChangedEvent(napped, sleeping);
+            lastSleepState = sleeping;
+        }
+    }
+    if (napped || sleeping) {
+        WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
+    } else {
+        WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
     }
 }
 

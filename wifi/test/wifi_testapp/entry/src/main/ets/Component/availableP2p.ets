@@ -17,7 +17,7 @@
 
 import prompt from '@ohos.prompt'
 import { P2pPswDialog } from '../Component/p2pPswDialog'
-import { P2pModel } from '../MainAbility/model/p2pModel'
+import { P2pModel } from '../entryability/model/p2pModel'
 import { P2pView } from '../Component/p2pView'
 import wifi from '@ohos.wifi'
 
@@ -32,8 +32,8 @@ let self = null
 export struct AvailableP2p {
   private p2pModel: P2pModel = new P2pModel()
   @Prop p2pList: Array<any>
-  @Prop p2pLinkedInfo: any
-  private selectIndex: number = - 1
+  private p2pLinkedInfo: any
+  private selectIndex: Number = - 1
   private p2pPswDialogController: CustomDialogController = new CustomDialogController({
     builder : P2pPswDialog( { p2pScanInfo : this.p2pList[ this.selectIndex ] , action : this.onAccept } ) ,
     autoCancel : true

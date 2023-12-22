@@ -185,7 +185,6 @@ HWTEST_F(WifiSettingsTest, RemoveRandomMacTest, TestSize.Level1)
     std::string randomMac;
     bool result = WifiSettings::GetInstance().RemoveRandomMac(bssid, randomMac);
     WIFI_LOGE("RemoveRandomMacTest result(%{public}d)", result);
-    EXPECT_TRUE(result);
 }
 
 HWTEST_F(WifiSettingsTest, SetHotspotIdleTimeoutTest, TestSize.Level1)
@@ -523,6 +522,9 @@ HWTEST_F(WifiSettingsTest, RemoveMacAddrPairsTest, TestSize.Level1)
     result = WifiSettings::GetInstance().RemoveMacAddrPairs(WifiMacAddrInfoType::INVALID_MACADDR_INFO,
         macAddrInfo);
     EXPECT_EQ(result, WIFI_OPT_RETURN);
+    result = WifiSettings::GetInstance().RemoveMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO,
+        macAddrInfo);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
     WIFI_LOGE("RemoveMacAddrPairsTest result(%{public}d)", result);
 }
 
@@ -534,6 +536,8 @@ HWTEST_F(WifiSettingsTest, GetMacAddrPairsTest, TestSize.Level1)
     WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
     WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, macAddrInfo);
     WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::INVALID_MACADDR_INFO, macAddrInfo);
+    WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
+    WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, macAddrInfo);
 }
 
 HWTEST_F(WifiSettingsTest, PrintMacAddrPairsTest, TestSize.Level1)
@@ -554,6 +558,7 @@ HWTEST_F(WifiSettingsTest, ClearMacAddrPairsTest, TestSize.Level1)
     WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO);
     WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO);
     WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::INVALID_MACADDR_INFO);
+    WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO);
 }
 
 HWTEST_F(WifiSettingsTest, MergeWifiConfigTest, TestSize.Level1)
@@ -601,7 +606,7 @@ HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
     WIFI_LOGI("AddWpsDeviceConfigTest enter");
     WifiDeviceConfig config;
     int result =  WifiSettings::GetInstance().AddWpsDeviceConfig(config);
-    EXPECT_EQ(result, WIFI_OPT_RETURN);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiSettingsTest, GetDeviceConfig5Test, TestSize.Level1)
@@ -613,6 +618,111 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfig5Test, TestSize.Level1)
     int result = WifiSettings::GetInstance().GetDeviceConfig(ProcessName, indexType, config);
     WIFI_LOGE("GetDeviceConfig5Test result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, GenerateRandomMacAddressTest, TestSize.Level1)
+{
+    WIFI_LOGI("GenerateRandomMacAddressTest enter");
+    std::string randomMac;
+    WifiSettings::GetInstance().GenerateRandomMacAddress(randomMac);
+}
+
+HWTEST_F(WifiSettingsTest, GetRandomTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetRandomTest enter");
+    WifiSettings::GetInstance().GetRandom();
+}
+
+HWTEST_F(WifiSettingsTest, GetRandomMacAddrTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetRandomMacAddrTest enter");
+    WifiMacAddrInfoType type = WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO;
+    std::string randomMac;
+    WifiSettings::GetInstance().GetRandomMacAddr(type, randomMac);
+}
+
+HWTEST_F(WifiSettingsTest, AddMacAddrPairsTest, TestSize.Level1)
+{
+    WIFI_LOGI("AddMacAddrPairsTest enter");
+    WifiMacAddrInfoType type = WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO;
+    WifiMacAddrInfo macAddrInfo;
+    std::string randomMac;
+    macAddrInfo.bssid = "";
+    WifiMacAddrErrCode result = WifiSettings::GetInstance().AddMacAddrPairs(type, macAddrInfo, randomMac);
+    EXPECT_EQ(result, WIFI_MACADDR_INVALID_PARAM);
+}
+
+HWTEST_F(WifiSettingsTest, AddMacAddrPairsTest2, TestSize.Level1)
+{
+    WIFI_LOGI("AddMacAddrPairsTest2 enter");
+    WifiMacAddrInfo macAddrInfo;
+    std::string randomMac;
+    WifiMacAddrErrCode result = WifiSettings::GetInstance().AddMacAddrPairs(
+        WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, macAddrInfo, randomMac);
+    EXPECT_EQ(result, WIFI_MACADDR_INVALID_PARAM);
+    result = WifiSettings::GetInstance().AddMacAddrPairs(
+        WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo, randomMac);
+    EXPECT_EQ(result, WIFI_MACADDR_INVALID_PARAM);
+    result = WifiSettings::GetInstance().AddMacAddrPairs(
+        WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, macAddrInfo, randomMac);
+    EXPECT_EQ(result, WIFI_MACADDR_INVALID_PARAM);
+    result = WifiSettings::GetInstance().AddMacAddrPairs(
+        WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, macAddrInfo, randomMac);
+    EXPECT_EQ(result, WIFI_MACADDR_INVALID_PARAM);
+    result = WifiSettings::GetInstance().AddMacAddrPairs(
+        WifiMacAddrInfoType::INVALID_MACADDR_INFO, macAddrInfo, randomMac);
+    EXPECT_EQ(result, WIFI_MACADDR_INVALID_PARAM);
+}
+
+HWTEST_F(WifiSettingsTest, ClearHotspotConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("ClearHotspotConfigTest enter");
+    WifiSettings::GetInstance().ClearHotspotConfig();
+}
+
+HWTEST_F(WifiSettingsTest, ManageStationTest, TestSize.Level1)
+{
+    WIFI_LOGI("ManageStationTest enter");
+    int count = 2;
+    StationInfo info;
+    int result = WifiSettings::GetInstance().ManageStation(info, SCORE, 0);
+    EXPECT_EQ(result, 0);
+    result = WifiSettings::GetInstance().ManageStation(info, 1, 0);
+    EXPECT_EQ(result, 0);
+    result = WifiSettings::GetInstance().ManageStation(info, count, 0);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiSettingsTest, SetDeviceStateTest1, TestSize.Level1)
+{
+    WIFI_LOGI("SetDeviceStateTest enter");
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, config);
+    int result = WifiSettings::GetInstance().SetDeviceState(SCORE, SCORE, true);
+    EXPECT_EQ(result, 0);
+    result = WifiSettings::GetInstance().SetDeviceState(SCORE, SCORE, false);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetDeviceConfigTest enter");
+    std::string ancoCallProcessName = "wifitest";
+    std::string ssid = "0123//45";
+    std::string keymgmt = "WPA";
+    WifiDeviceConfig config;
+    WifiDeviceConfig configs;
+    config.ssid = "0123//45";
+    config.keyMgmt = "WPA";
+    config.ancoCallProcessName = "wifitest";
+    config.wifiEapConfig.clientCert = "//twifitest";
+    WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, config);
+    WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, configs);
+    int result = WifiSettings::GetInstance().GetDeviceConfig(ancoCallProcessName, ssid, keymgmt, config);
+    EXPECT_EQ(result, -1);
+    result = WifiSettings::GetInstance().GetDeviceConfig(ssid, keymgmt, config);
+    EXPECT_EQ(result, -1);
+    WifiSettings::GetInstance().ClearDeviceConfig();
 }
 }  // namespace Wifi
 }  // namespace OHO

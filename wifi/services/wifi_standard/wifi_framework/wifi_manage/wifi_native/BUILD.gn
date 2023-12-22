@@ -48,6 +48,8 @@ config("wifi_fw_common_header") {
     include_dirs += [
       "//commonlibrary/c_utils/base/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "//drivers/peripheral/wlan/interfaces/include/",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
     ]
   }
 }
@@ -69,8 +71,16 @@ config("wifi_idl_cxx_config") {
 idl_client_sources = [
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_msg.cpp",
+  "client/hdi_client/hdi_interface/wifi_hdi_ap_impl.c",
+  "client/hdi_client/hdi_interface/wifi_hdi_common.c",
+  "client/hdi_client/hdi_interface/wifi_hdi_p2p_impl.c",
+  "client/hdi_client/hdi_interface/wifi_hdi_proxy.c",
+  "client/hdi_client/hdi_interface/wifi_hdi_sta_impl.c",
+  "client/hdi_client/hdi_interface/wifi_hdi_util.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_proxy.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_sta_impl.c",
+  "client/hdi_client/wifi_hdi_callback.cpp",
+  "client/hdi_client/wifi_hdi_client.cpp",
   "client/hdi_client/wifi_hdi_wpa_callback.cpp",
   "client/hdi_client/wifi_hdi_wpa_client.cpp",
   "client/idl_client/idl_interface/i_wifi.c",
@@ -133,6 +143,12 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_utils") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     part_name = "wifi"
     sources = []
 
@@ -165,6 +181,7 @@ if (defined(ohos_lite)) {
       ":wifi_utils",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
     ]
 
     external_deps = [
@@ -175,9 +192,18 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
     ]
 
+    if (wifi_feature_with_local_random_mac) {
+      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
+    }
+
     if (wifi_feature_with_hdi_wpa_supported) {
       defines += [ "HDI_WPA_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wpa:libwpa_proxy_1.0" ]
+    }
+
+    if (wifi_feature_with_wifi_hdi) {
+      defines += [ "HDI_INTERFACE_SUPPORT" ]
+      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
     }
 
     cflags_cc = [

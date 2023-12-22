@@ -52,7 +52,7 @@
             "wifi_feature_with_auth_disable",
             "wifi_feature_with_dhcp_disable",
             "wifi_feature_with_encryption",
-            "wifi_feature_is_hdi_supported",
+            "wifi_feature_with_wifi_hdi",
             "wifi_feature_with_ap_extension",
             "wifi_feature_with_app_frozen",
             "wifi_feature_non_seperate_p2p",
@@ -108,7 +108,8 @@
                 "bounds_checking_function",
                 "wpa_supplicant",
                 "jsoncpp",
-                "libxml2"
+                "libxml2",
+                "curl"
             ]
         },
         "build": {
@@ -153,7 +154,8 @@
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_hal/unittest:unittest",
                 "//foundation/communication/wifi/wifi/test/wifi_standard/native:unittest",
-                "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_base:unittest"
+                "//foundation/communication/wifi/wifi/test/wifi_standard/wifi_base:unittest",
+                "//foundation/communication/wifi/wifi/test/wifi_utils/unittest:unittest"
             ]
         },
         "hisysevent_config": [

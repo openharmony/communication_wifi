@@ -22,18 +22,18 @@ namespace Wifi {
 
 void WifiLocationModeObserver::OnChange()
 {
-    WifiManager::GetInstance().DealLocationModeChangeEvent();
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->DealLocationModeChangeEvent();
 }
 
 void WifiDeviceProvisionObserver::OnChange()
 {
-    WifiManager::GetInstance().GetDeviceProvisionByDatashare();
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetDeviceProvisionByDatashare();
 }
 
 #ifndef OHOS_ARCH_LITE
 void SettingsMigrateObserver::OnChange()
 {
-    WifiManager::GetInstance().CheckAndStartStaByDatashare();
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->CheckAndStartStaByDatashare();
 }
 #endif
 

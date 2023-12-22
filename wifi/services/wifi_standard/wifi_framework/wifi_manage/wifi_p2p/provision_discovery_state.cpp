@@ -17,6 +17,7 @@
 #include "wifi_p2p_temp_disc_event.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_logger.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("ProvisionDiscoveryState");
 
@@ -89,7 +90,8 @@ bool ProvisionDiscoveryState::ProcessCmdStartListen(InternalMessage &msg) const
 bool ProvisionDiscoveryState::ProcessProvDiscPbcRspEvt(InternalMessage &msg) const
 {
     WifiP2pTempDiscEvent provDisc;
-
+    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::PROV_SCAN_ERROR),
+        static_cast<int>(P2P_ERROR_RES::PROV_SCAN_FAILURE));
     if (!msg.GetMessageObj(provDisc)) {
         WIFI_LOGD("Invalid argument provDisc");
         return EXECUTED;

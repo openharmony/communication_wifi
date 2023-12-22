@@ -319,6 +319,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getIpv6Info", GetIpv6Info),
         DECLARE_NAPI_FUNCTION("getLinkedInfo", GetLinkedInfo),
         DECLARE_NAPI_FUNCTION("getDisconnectedReason", GetDisconnectedReason),
+        DECLARE_NAPI_FUNCTION("isMeteredHotspot", IsMeteredHotspot),
         DECLARE_NAPI_FUNCTION("removeDevice", RemoveDevice),
         DECLARE_NAPI_FUNCTION("removeDeviceConfig", RemoveDevice),
         DECLARE_NAPI_FUNCTION("removeAllNetwork", RemoveAllNetwork),
@@ -374,6 +375,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("startPortalCertification", StartPortalCertification),
         DECLARE_NAPI_FUNCTION("getWifiProtect", GetWifiProtect),
         DECLARE_NAPI_FUNCTION("putWifiProtect", PutWifiProtect),
+        DECLARE_NAPI_FUNCTION("factoryReset", FactoryReset),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

@@ -67,6 +67,24 @@ void WriteWifiOperateStateHiSysEvent(int operateType, int operateState);
 void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode);
 
 void WriteWifiConnectionInfoHiSysEvent(int networkId);
+
+void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReason, int apState);
+
+void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason);
+
+void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt);
+
+void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason);
+
+void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &Server);
+
+void WriteWifiConnectFailedEventHiSysEvent(int operateType);
+
+void WriteP2pKpiCountHiSysEvent(int eventType);
+
+void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes);
+
+void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

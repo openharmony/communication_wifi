@@ -15,8 +15,8 @@
 
 // @ts-nocheck
 
-import { TestData , TestAuto } from '../MainAbility/model/testData'
-import ConfigData from '../Utils/ConfigData';
+import { TestData , TestAuto } from '../entryability/model/testData'
+import ConfigData from '../utils/ConfigData';
 
 const TAG = "[autoContentTable]"
 /**
@@ -30,9 +30,9 @@ export struct AutoContentTable {
   @State currentAutoItem: TestAuto = {}
   @State autoItems: TestAuto[] = [];
   @State localName: string = 'DaYuBlue'
-  @Prop changeIndex: number;
+  @Prop changeIndex: Number;
 
-  @Builder IngredientItem( autoItem: TestAuto , index: number ) {
+  @Builder IngredientItem( autoItem: TestAuto , index: Number ) {
     Stack() {
       Flex() {
         Flex( { alignItems : ItemAlign.Center } ) {
@@ -77,7 +77,7 @@ export struct AutoContentTable {
     .backgroundColor( $r( "app.color.white" ) )
   }
 
-  getCurrentState( index: number ) {
+  getCurrentState( index: Number ) {
     if ( index <= this.changeIndex ) {
       this.autoItemsX[ index ].result = 'pass';
     } else {
@@ -100,7 +100,7 @@ export struct AutoContentTable {
           justifyContent : FlexAlign.SpaceBetween ,
           alignItems : ItemAlign.Start
         } ) {
-          ForEach( this.autoItems , ( item: TestAuto , index: number ) => {
+          ForEach( this.autoItems , ( item: TestAuto , index: Number ) => {
             this.IngredientItem( item , index )
           } )
         }

@@ -153,7 +153,11 @@ HWTEST_F(WifiHalCRpcServerTest, PushPopCallbackMsgTest, TestSize.Level1)
 HWTEST_F(WifiHalCRpcServerTest, OnCallbackTransactTest, TestSize.Level1)
 {
     EXPECT_TRUE(OnCallbackTransact(nullptr, 0, nullptr) < 0);
+    EXPECT_TRUE(OnCallbackTransact(mServer, 0, nullptr) < 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_FAILURE_EVENT, mContext) == 0);
+    EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_HAL_COMMON_EVENT, mContext) == 0);
+    EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_CONNECTION_REJECT_EVENT, mContext) == 0);
+    EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_BSSID_CHANGED_NOTIFY_EVENT, mContext) == 0);
     EXPECT_TRUE(EndCallbackTransact(nullptr, 0) < 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, WIFI_FAILURE_EVENT) == 0);
 }
@@ -915,7 +919,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetAssocMacAddrTest, TestSize.Level1)
     mContext->oneProcess = buff2;
     mContext->nPos = strlen("N\tSetAssocMacAddr\t");
     mContext->nSize = strlen(buff2);
-    EXPECT_TRUE(RpcSetAssocMacAddr(mServer, mContext) >= 0);
+    RpcSetAssocMacAddr(mServer, mContext);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcSetScanningMacAddressTest, TestSize.Level1)

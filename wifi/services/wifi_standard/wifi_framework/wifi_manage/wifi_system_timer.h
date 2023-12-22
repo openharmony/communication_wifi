@@ -16,6 +16,7 @@
 #ifndef WIFI_SYSTEM_TIMER_H
 #define WIFI_SYSTEM_TIMER_H
 
+#ifndef OHOS_ARCH_LITE
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -23,6 +24,7 @@
 #include <vector>
 #include "time_service_client.h"
 #include "itimer_info.h"
+#include "timer.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -40,6 +42,24 @@ public:
 private:
     std::function<void()> callBack_ = nullptr;
 };
-}
-}
+
+class WifiTimer {
+public:
+    using TimerCallback = std::function<void()>;
+    static constexpr uint32_t DEFAULT_TIMEROUT = 10000;
+    static WifiTimer *GetInstance(void);
+
+    WifiTimer();
+    ~WifiTimer();
+
+    bool Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT,
+        bool once = true);
+    void UnRegister(uint32_t timerId);
+
+private:
+    std::unique_ptr<Utils::Timer> timer_{nullptr};
+};
+} // namespace Wifi
+} // namespace OHOS
 #endif
+#endif // WIFI_SYSTEM_TIMER_H

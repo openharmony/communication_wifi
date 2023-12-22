@@ -15,13 +15,13 @@
 
 // @ts-nocheck
 
-import { TestData } from '../MainAbility/model/testData'
+import { TestData } from '../entryability/model/testData'
 import Router from '@system.router';
 import screenshot from '@ohos.screenshot'
 import image from '@ohos.multimedia.image'
-import MediaUtils from '../MainAbility/model/MediaUtils'
+import MediaUtils from '../entryability/model/MediaUtils'
 
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 
 const TAG = "[titleBar]"
 const PAGE_URI_ABOUT_MODE = 'pages/subManualApiTest/subWifiTest/about'
@@ -34,14 +34,14 @@ const PAGE_URI_ABOUT_MODE = 'pages/subManualApiTest/subWifiTest/about'
 export struct TitleBar {
   private testItem: TestData = null
   private detail: string
-  @State colOpacity: number = 1
-  @State count: number = 0
-  @State myborderWidth: number = 0
-  @State myborderRadius: number = 0
-  @State offsetX: number = 0
-  @State offsetY: number = 0
-  @State myscale: number = 1
-  @State angle: number = 0
+  @State colOpacity: Number = 1
+  @State count: Number = 0
+  @State myborderWidth: Number = 0
+  @State myborderRadius: Number = 0
+  @State offsetX: Number = 0
+  @State offsetY: Number = 0
+  @State myscale: Number = 1
+  @State angle: Number = 0
   getScreen = ( isFullScreen: boolean ) => {
     let screenshotOptions: screenshot.ScreenshotOptions = {
       screenRect : { left : 0 , top : 0 , width : 400 , height : 400 } ,

@@ -113,12 +113,17 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_device_proxy_impl") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_device_impl.cpp",
       "src/wifi_device_mgr_proxy.cpp",
       "src/wifi_device_proxy.cpp",
-      "src/wifi_sa_event.cpp",
     ]
 
     configs = [
@@ -137,6 +142,12 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_hotspot_proxy_impl") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_hotspot_impl.cpp",
@@ -160,6 +171,12 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_scan_proxy_impl") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_scan_impl.cpp",
@@ -183,6 +200,12 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_p2p_proxy_impl") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_p2p_impl.cpp",
@@ -210,7 +233,6 @@ if (defined(ohos_lite)) {
       boundary_sanitize = true
       cfi_cross_dso = true
       debug = false
-      blocklist = "../wifi_frameworks_sdk_block.txt"
     }
     install_enable = true
     sources = [
@@ -230,6 +252,7 @@ if (defined(ohos_lite)) {
       "src/wifi_p2p.cpp",
       "src/wifi_p2p_callback_stub.cpp",
       "src/wifi_p2p_msg.cpp",
+      "src/wifi_sa_event.cpp",
       "src/wifi_scan.cpp",
       "src/wifi_scan_callback_stub.cpp",
     ]

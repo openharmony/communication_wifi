@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppXmlParser");
 
-constexpr auto WIFI_MONITOR_APP_FILE_PATH = CONFIG_ROOR_DIR"/wifi_monitor_apps.xml";
+constexpr auto WIFI_MONITOR_APP_FILE_PATH = "/system/etc/wifi/wifi_monitor_apps.xml";
 constexpr auto XML_TAG_SECTION_HEADER_MONITOR_APP = "MonitorAPP";
 constexpr auto XML_TAG_SECTION_HEADER_GAME_INFO = "GameInfo";
 constexpr auto XML_TAG_SECTION_HEADER_APP_WHITE_LIST = "AppWhiteList";

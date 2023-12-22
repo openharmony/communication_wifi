@@ -26,8 +26,9 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_cert_utils.h"
 #include "wifi_common_util.h"
+#include "network_selection_manager.h"
 #include "wifi_config_center.h"
-#include "wifi_manager.h"
+#include "external_wifi_filter_builder_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -624,11 +625,52 @@ void StaService::HandleScreenStatusChanged(int screenState)
     
     pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
 #endif
-#ifdef FEATURE_HPF_SUPPORT
-    WifiManager::GetInstance().InstallPacketFilterProgram(screenState, m_instId);
-#endif
     return;
 }
+
+ErrCode StaService::DisableAutoJoin(const std::string &conditionName)
+{
+    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+    pStaAutoConnectService->DisableAutoJoin(conditionName);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::EnableAutoJoin(const std::string &conditionName)
+{
+    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+    pStaAutoConnectService->EnableAutoJoin(conditionName);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::RegisterAutoJoinCondition(const std::string &conditionName,
+                                              const std::function<bool()> &autoJoinCondition)
+{
+    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+    pStaAutoConnectService->RegisterAutoJoinCondition(conditionName, autoJoinCondition);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::DeregisterAutoJoinCondition(const std::string &conditionName)
+{
+    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+    pStaAutoConnectService->DeregisterAutoJoinCondition(conditionName);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::RegisterFilterBuilder(const OHOS::Wifi::FilterTag &filterTag,
+                                          const std::string &filterName,
+                                          const OHOS::Wifi::FilterBuilder &filterBuilder)
+{
+    ExternalWifiFilterBuildManager::GetInstance().RegisterFilterBuilder(filterTag, filterName, filterBuilder);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::DeregisterFilterBuilder(const OHOS::Wifi::FilterTag &filterTag, const std::string &filterName)
+{
+    ExternalWifiFilterBuildManager::GetInstance().DeregisterFilterBuilder(filterTag, filterName);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::StartPortalCertification()
 {
     if (pStaStateMachine == nullptr) {

@@ -340,6 +340,55 @@ ErrCode StaInterface::OnScreenStateChanged(int screenState)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::DisableAutoJoin(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->DisableAutoJoin(conditionName);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::EnableAutoJoin(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->EnableAutoJoin(conditionName);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::RegisterAutoJoinCondition(const std::string &conditionName,
+                                                const std::function<bool()> &autoJoinCondition)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->RegisterAutoJoinCondition(conditionName, autoJoinCondition);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::DeregisterAutoJoinCondition(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->DeregisterAutoJoinCondition(conditionName);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::RegisterFilterBuilder(const FilterTag &filterTag,
+                                            const std::string &filterName,
+                                            const FilterBuilder &filterBuilder)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->RegisterFilterBuilder(filterTag, filterName, filterBuilder);
+}
+
+ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->DeregisterFilterBuilder(filterTag, filterName);
+}
+
 ErrCode StaInterface::StartPortalCertification()
 {
     WIFI_LOGI("Enter StaInterface::StartPortalCertification");

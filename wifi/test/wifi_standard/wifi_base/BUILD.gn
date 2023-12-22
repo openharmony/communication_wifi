@@ -37,6 +37,11 @@ ohos_unittest("base_unittest") {
     "server_test.cpp",
   ]
 
+  defines = [
+    "private = public",
+    "protected = public",
+  ]
+
   include_dirs = [ "$WIFI_ROOT_DIR/base/cRPC/include" ]
 
   ldflags = [

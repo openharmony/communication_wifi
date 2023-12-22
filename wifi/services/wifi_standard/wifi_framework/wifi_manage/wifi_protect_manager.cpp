@@ -48,16 +48,11 @@ WifiProtectManager::WifiProtectManager()
     mFullLowLatencyProtectsReleased = 0;
     mWifiProtects.clear();
 #ifndef OHOS_ARCH_LITE
-    mAppChangeEventRunner = AppExecFwk::EventRunner::Create(WIFI_APP_CHANGE_MGR_WORK_THREAD);
-    if (!mAppChangeEventRunner) {
-        LOGE("Create event runner failed.");
-        return;
-    }
-    mAppChangeEventHandler = std::make_shared<AppExecFwk::EventHandler>(mAppChangeEventRunner);
-    if (mAppChangeEventHandler) {
+    appChangeEventHandler = std::make_unique<WifiEventHandler>(WIFI_APP_CHANGE_MGR_WORK_THREAD);
+    if (appChangeEventHandler) {
         std::function<void()> RegisterAppStateObserverFunc =
                             std::bind(&WifiProtectManager::RegisterAppStateObserver, this);
-        mAppChangeEventHandler->PostSyncTask(RegisterAppStateObserverFunc);
+        appChangeEventHandler->PostSyncTask(RegisterAppStateObserverFunc);
     } else {
         LOGE("Create event handler failed.");
     }
@@ -68,13 +63,8 @@ WifiProtectManager::WifiProtectManager()
 WifiProtectManager::~WifiProtectManager()
 {
 #ifndef OHOS_ARCH_LITE
-    if (mAppChangeEventRunner) {
-        mAppChangeEventRunner->Stop();
-        mAppChangeEventRunner.reset();
-    }
-
-    if (mAppChangeEventHandler) {
-        mAppChangeEventHandler.reset();
+    if (appChangeEventHandler) {
+        appChangeEventHandler.reset();
     }
 
     if (mAppStateObserver) {

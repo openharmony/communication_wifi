@@ -18,20 +18,22 @@
 import wifi from '@ohos.wifi'
 import { TitleBar } from '../../Component/titleBar'
 import router from '@system.router';
-import { TestData } from '../../MainAbility/model/testData'
-import { WifiModel } from '../../MainAbility/model/wifiModel'
-import ConfigData from '../../Utils/ConfigData';
+import { TestData } from '../../entryability/model/testData'
+import { WifiModel } from '../../entryability/model/wifiModel'
+import ConfigData from '../../utils/ConfigData';
 import wifiManager from '@ohos.wifiManager'
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { PageTitle } from '../../Component/pageTitle';
 
-import TargetInformation from '../../MainAbility/candidateWifiModel/view/TargetInformation';
-import TargetList from '../../MainAbility/candidateWifiModel/view/TargetList';
-import { CommonConstants } from '../../MainAbility/candidateWifiModel/common/constant/CommonConstant';
-import DataModel from '../../MainAbility/candidateWifiModel/viewmodel/DataModel';
-import AddTargetDialog from '../../MainAbility/candidateWifiModel/view/AddTargetDialog';
-import { saveTask } from '../../MainAbility/candidateWifiModel/viewmodel/MainPageModel';
-import getCurrentTime from '../../MainAbility/candidateWifiModel/common/utils/DateUtil';
+import TargetInformation from '../../entryability/candidateWifiModel/view/TargetInformation';
+import TargetList from '../../entryability/candidateWifiModel/view/TargetList';
+import { CommonConstants } from '../../entryability/candidateWifiModel/common/constant/CommonConstant';
+import DataModel from '../../entryability/candidateWifiModel/viewmodel/DataModel';
+import AddTargetDialog from '../../entryability/candidateWifiModel/view/AddTargetDialog';
+import { saveTask } from '../../entryability/candidateWifiModel/viewmodel/MainPageModel';
+import getCurrentTime from '../../entryability/candidateWifiModel/common/utils/DateUtil';
+import TargetListItem from '../../entryability/candidateWifiModel/view/TargetListItem';
+import TargetInformation from '../../entryability/candidateWifiModel/view/TargetInformation';
 
 const TAG = '[wifiCandidate]'
 
@@ -44,8 +46,8 @@ struct WifiCandidate {
   @State targetData: Array<TaskItemBean> = DataModel.getData();
   private wifiModel: WifiModel = new WifiModel()
   private testItem: TestData = router.getParams().testId;
-  @State totalTasksNumber: number = 0;
-  @State completedTasksNumber: number = 0;
+  @State totalTasksNumber: Number = 0;
+  @State completedTasksNumber: Number = 0;
   @State latestUpdateDate: string = CommonConstants.DEFAULT_PROGRESS_VALUE;
   @Provide @Watch('onProgressChanged') overAllProgressChanged: boolean = false;
   dialogController: CustomDialogController = new CustomDialogController({

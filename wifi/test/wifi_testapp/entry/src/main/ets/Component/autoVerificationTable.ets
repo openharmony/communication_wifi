@@ -15,9 +15,9 @@
 
 // @ts-nocheck
 
-import { TestData , TestApi } from '../MainAbility/model/testData'
+import { TestData , TestApi } from '../entryability/model/testData'
 import prompt from '@system.prompt';
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 /**
  * AutoVerificationTable of wifi test
  */
@@ -27,12 +27,12 @@ export struct AutoVerificationTable {
   private testItem: TestData
   @State currentApiItem: TestApi = {}
   @State apiItems: TestApi[] = [];
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @State localName: string = 'DaYuBlue'
-  @State currentIndex: number = 1
+  @State currentIndex: Number = 1
   @StorageLink( 'pairedMac' ) pairedMac: string = "";
 
-  @Builder IngredientItem( apiItem: TestApi , index: number ) {
+  @Builder IngredientItem( apiItem: TestApi , index: Number ) {
     Stack() {
       Flex() {
         Flex( { alignItems : ItemAlign.Center } ) {
@@ -86,7 +86,7 @@ export struct AutoVerificationTable {
     } )
   }
 
-  getCurrentState( index: number ) {
+  getCurrentState( index: Number ) {
     return this.apiItems[index].result
   }
 
@@ -98,7 +98,7 @@ export struct AutoVerificationTable {
           justifyContent : FlexAlign.SpaceBetween ,
           alignItems : ItemAlign.Start
         } ) {
-          ForEach( this.apiItems , ( item: TestApi , index: number ) => {
+          ForEach( this.apiItems , ( item: TestApi , index: Number ) => {
             this.IngredientItem( item , index )
           } )
         }

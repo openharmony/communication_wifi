@@ -22,12 +22,6 @@ if (defined(ohos_lite)) {
 
 local_base_sources = [
   "common/wifi_hal_common_func.c",
-  "hdi/src/wifi_hdi_ap_impl.c",
-  "hdi/src/wifi_hdi_common.c",
-  "hdi/src/wifi_hdi_p2p_impl.c",
-  "hdi/src/wifi_hdi_proxy.c",
-  "hdi/src/wifi_hdi_sta_impl.c",
-  "hdi/src/wifi_hdi_util.c",
   "main.c",
   "wifi_hal_adapter.c",
   "wifi_hal_ap_interface.c",
@@ -65,7 +59,6 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/hdi/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
 ]
 
@@ -78,12 +71,9 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//third_party/bounds_checking_function/include",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9/src",
-      "$DHCP_ROOT_DIR/interfaces/kits/c",
     ]
 
     deps = [
-      "$DHCP_ROOT_DIR/services/dhcp_client:dhcp_client",
-      "$DHCP_ROOT_DIR/services/dhcp_server:dhcp_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
@@ -104,6 +94,12 @@ if (defined(ohos_lite)) {
   ohos_executable("wifi_hal_service") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     install_enable = true
     sources = local_base_sources
 
@@ -114,7 +110,6 @@ if (defined(ohos_lite)) {
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
       "//third_party/bounds_checking_function/include/",
       "//drivers/peripheral/wlan/interfaces/include/",
-      "$DHCP_ROOT_DIR/interfaces/kits/c",
     ]
 
     deps = [
@@ -125,8 +120,6 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
-      "dhcp:dhcp_client",
-      "dhcp:dhcp_server",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
@@ -137,11 +130,6 @@ if (defined(ohos_lite)) {
       "AP_INTF=\"$wifi_feature_with_ap_intf\"",
       "AP_NUM=$wifi_feature_with_ap_num",
     ]
-
-    if (wifi_feature_is_hdi_supported) {
-      defines += [ "HDI_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.1" ]
-    }
 
     if (wifi_feature_with_local_random_mac) {
       defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
@@ -165,6 +153,12 @@ if (defined(ohos_lite)) {
   ohos_executable("wifi_hal_service_updater") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     install_enable = true
     sources = local_base_sources
 
@@ -186,8 +180,6 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
-      "dhcp:dhcp_client",
-      "dhcp:dhcp_server",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",

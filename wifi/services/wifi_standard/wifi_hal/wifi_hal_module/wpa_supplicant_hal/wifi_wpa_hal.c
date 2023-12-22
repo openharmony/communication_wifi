@@ -56,6 +56,7 @@
 #define WPA_EVENT_ASSOCIATING "Request association with "
 #define WPA_EVENT_ASSOCIATED "Associated with "
 #define REPLY_BUF_LENGTH 4096
+#define CONNECTION_PWD_WRONG_STATUS 1
 #define CONNECTION_FULL_STATUS 17
 #define CONNECTION_REJECT_STATUS 37
 #define WLAN_STATUS_AUTH_TIMEOUT 16
@@ -609,7 +610,9 @@ static void WpaCallBackFuncTwo(const char *p)
         if (connectionStatus != NULL) {
             connectionStatus += strlen("status_code=");
             int status = atoi(connectionStatus);
-            if (status == CONNECTION_FULL_STATUS) {
+            if (status == CONNECTION_PWD_WRONG_STATUS) {
+                WifiHalCbNotifyWrongKey(1);
+            } else if (status == CONNECTION_FULL_STATUS) {
                 WifiHalCbNotifyConnectionFull(status);
             } else if (status == CONNECTION_REJECT_STATUS
                        || status == WLAN_STATUS_AUTH_TIMEOUT
@@ -858,7 +861,7 @@ static void *WpaReceiveCallback(void *arg)
         if (strncmp(iface, staIface, strlen(staIface)) == 0) {
             WpaCallBackFunc(p);
         }
-        if (strncmp(iface, chbaIface, strlen(chbaIface)) == 0 && (strstr(p, "chba0") != NULL)) {
+        if (strncmp(iface, chbaIface, strlen(chbaIface)) == 0) {
             HalCallbackNotify(p);
         }
     }

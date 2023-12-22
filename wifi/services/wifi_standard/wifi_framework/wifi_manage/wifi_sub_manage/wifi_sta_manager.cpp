@@ -170,8 +170,10 @@ void WifiStaManager::DealStaOpenRes(OperateResState state, int instId)
     ins->HandleStaStart(instId);
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
-        static_cast<int>(WifiOperateState::STA_OPENED));
+    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
+            static_cast<int>(WifiOperateState::STA_OPENED));
+    }
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId)) {
         WIFI_LOGI("DealStaOpenRes: wifi scan only state notify scan result!");
         IScanSerivceCallbacks &scanCallback = WifiManager::GetInstance().GetWifiScanManager()->GetScanCallback();

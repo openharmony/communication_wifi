@@ -22,6 +22,10 @@
 #include <vector>
 #include "securec.h"
 #include "define.h"
+#ifndef OHOS_ARCH_LITE
+#include "timer.h"
+#endif
+#include "wifi_errcode.h"
 
 #ifndef WIFI_MAC_LEN
 #define WIFI_MAC_LEN 6
@@ -244,6 +248,23 @@ public:
 private:
     std::string m_desc;
     std::chrono::steady_clock::time_point m_startTime;
+};
+
+class WifiTimer {
+public:
+    using TimerCallback = std::function<void()>;
+    static constexpr uint32_t DEFAULT_TIMEROUT = 10000;
+    static WifiTimer *GetInstance(void);
+
+    WifiTimer();
+    ~WifiTimer();
+
+    ErrCode Register(
+        const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT, bool once = true);
+    void UnRegister(uint32_t timerId);
+
+private:
+    std::unique_ptr<Utils::Timer> timer_{nullptr};
 };
 #endif
 

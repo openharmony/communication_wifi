@@ -26,6 +26,7 @@
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
 constexpr int RANDOM_STR_LEN = 6;
+constexpr int RANDOM_PASSWD_LEN = 8;
 constexpr int MSEC = 1000;
 constexpr int FOREGROUND_SCAN_CONTROL_TIMES = 4;
 constexpr int FOREGROUND_SCAN_CONTROL_INTERVAL = 2 * 60;
@@ -34,10 +35,14 @@ constexpr int BACKGROUND_SCAN_CONTROL_INTERVAL = 30 * 60;
 constexpr int PNO_SCAN_CONTROL_TIMES = 1;
 constexpr int PNO_SCAN_CONTROL_INTERVAL = 20;
 constexpr int SYSTEM_TIMER_SCAN_CONTROL_TIMES = 4;
-constexpr int SYSTEM_TIMER_SCAN_CONTROL_INTERVAL = 20;
+constexpr int SYSTEM_TIMER_SCAN_CONTROL_INTERVAL = 10;
 constexpr int MODE_ADD = 0;
 constexpr int MODE_DEL = 1;
 constexpr int MODE_UPDATE = 2;
+constexpr int ASSOCIATING_SCAN_CONTROL_INTERVAL = 2;
+constexpr int ASSOCIATED_SCAN_CONTROL_INTERVAL = 5;
+constexpr int OBTAINING_IP_SCAN_CONTROL_INTERVAL = 5;
+constexpr int OBTAINING_IP_SCAN_CONTROL_TIMES = 1;
 /* Obtain the scanning result that is valid within 180s. */
 constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
 /* Hotspot idle status auto close timeout 10min. */
@@ -122,7 +127,6 @@ public:
      */
     int SetWifiState(int state, int instId = 0);
 
-#ifndef OHOS_ARCH_LITE
     void SetWifiToggledState(bool state);
     bool GetWifiToggledState() const;
     void SetSoftapToggledState(bool state);
@@ -133,7 +137,6 @@ public:
     bool GetCoexSupport() const;
     void SetApIfaceName(const std::string &ifaceName);
     std::string GetApIfaceName() const;
-#endif
 
     /**
      * @Description Has STA service running
@@ -790,7 +793,7 @@ public:
      * @param state - the hid2d upper scene
      * @return int - 0 success
      */
-    int SetHid2dUpperScene(const Hid2dUpperScene &scene);
+    int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene);
 
     /**
      * @Description Get the hid2d upper scene
@@ -798,7 +801,7 @@ public:
      * @param state - the hid2d upper scene
      * @return int - 0 success
      */
-    int GetHid2dUpperScene(Hid2dUpperScene &scene);
+    int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene);
 
     /**
      * @Description Set p2p type
@@ -1509,6 +1512,12 @@ public:
      * @param randomMacAddr - random MAC address[out]
      */
     void GenerateRandomMacAddress(std::string &randomMacAddr);
+    /**
+     * @Description Clear Hotspot config
+     *
+     * @return void
+     */
+    void ClearHotspotConfig();
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address
@@ -1604,13 +1613,11 @@ private:
 private:
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
-#ifndef OHOS_ARCH_LITE
     bool mWifiToggled;
     bool mWifiStoping;
     bool mSoftapToggled;
     bool mIsSupportCoex;
     std::string mApIfaceName;
-#endif
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
@@ -1655,6 +1662,7 @@ private:
     std::map<int, PowerModel> powerModel;
     int mHotspotIdleTimeout;
     std::map <int, DisconnectedReason> mLastDiscReason;
+    std::string mUpperIfName;
     Hid2dUpperScene mUpperScene;
     P2pBusinessType mP2pBusinessType;
 
@@ -1672,11 +1680,9 @@ private:
     std::mutex mInfoMutex;
     std::mutex mP2pMutex;
     std::mutex mWifiConfigMutex;
-#ifndef OHOS_ARCH_LITE
     std::mutex mWifiToggledMutex;
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;
-#endif
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
 

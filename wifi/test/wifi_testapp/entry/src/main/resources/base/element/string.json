@@ -1733,7 +1733,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "目标管理"
+      "value": "wifi专项测试"
     },
     {
       "name": "title",
@@ -1814,6 +1814,10 @@
     {
       "name": "input_candidate_wifi_securityType",
       "value": "选择securityType"
+    },
+    {
+      "name": "Input_url",
+      "value": "输入网址..."
     }
   ]
 }

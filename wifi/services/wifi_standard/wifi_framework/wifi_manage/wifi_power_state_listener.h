@@ -23,7 +23,6 @@
 namespace OHOS {
 namespace Wifi {
 using namespace OHOS::PowerMgr;
-const int POWER_STATE_DOZ = 4;
 class WifiPowerStateListener : public SyncSleepCallbackStub {
 public:
     WifiPowerStateListener();
@@ -35,12 +34,6 @@ private:
     void DealPowerEnterSleepEvent();
     void DealPowerExitSleepEvent();
     std::map <int, bool> bWifiStateBeforeSleep;
-};
-
-class PowerStateCallback : public PowerStateCallbackStub {
-public:
-    PowerStateCallback() = default;
-    void OnPowerStateChanged(PowerState state) override;
 };
 
 } // namespace Wifi

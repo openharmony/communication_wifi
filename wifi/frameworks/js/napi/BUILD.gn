@@ -22,7 +22,6 @@ ohos_shared_library("wifi") {
     boundary_sanitize = true
     cfi_cross_dso = true
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
@@ -82,7 +81,6 @@ ohos_shared_library("wifiext") {
     boundary_sanitize = true
     cfi_cross_dso = true
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
@@ -136,7 +134,6 @@ ohos_shared_library("wifi_native_js") {
     boundary_sanitize = true
     cfi_cross_dso = true
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
@@ -196,7 +193,6 @@ ohos_shared_library("wifimanager") {
     boundary_sanitize = true
     cfi_cross_dso = true
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
@@ -253,7 +249,6 @@ ohos_shared_library("wifimanagerext") {
     boundary_sanitize = true
     cfi_cross_dso = true
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [

@@ -19,7 +19,7 @@ import featureAbility from '@ohos.ability.featureAbility'
 import wifi from '@ohos.wifi'
 import { AvailableP2p } from '../../../Component/availableP2p'
 import { P2pTitleBar } from '../../../Component/p2pTitleBar'
-import { P2pModel } from '../../../MainAbility/model/p2pModel'
+import { P2pModel } from '../../../entryability/model/p2pModel'
 
 const TAG = '[p2pFound]'
 const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
@@ -31,7 +31,7 @@ const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
 struct P2pFound {
   private p2pModel: P2pModel = new P2pModel()
   private testItem: string = "p2p扫描"
-  @State p2pLinkedInfo: any = {
+  private p2pLinkedInfo: any = {
     deviceName : "" ,
     deviceAddress : "" ,
     groupOwnerAddr: "" ,

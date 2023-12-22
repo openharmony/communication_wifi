@@ -15,9 +15,9 @@
 
 // @ts-nocheck
 
-import { WifiModel } from '../../../MainAbility/model/wifiModel'
+import { WifiModel } from '../../../entryability/model/wifiModel'
 import { InfoView } from '../../../Component/infoView'
-import ConfigData from '../../../Utils/ConfigData';
+import ConfigData from '../../../utils/ConfigData';
 import Router from '@system.router';
 /**
  * about Test Page Of Wifi test

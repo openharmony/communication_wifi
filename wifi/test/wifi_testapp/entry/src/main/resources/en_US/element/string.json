@@ -1,0 +1,1825 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "wifiTest"
+    },
+    {
+      "name": "entry_desc",
+      "value": "description"
+    },
+    {
+      "name": "MainAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "form_FormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "form_FormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "MainAbility2_desc",
+      "value": "description"
+    },
+    {
+      "name": "btn_fullscreen",
+      "value": "全屏截屏"
+    },
+    {
+      "name": "btn_fixedsize",
+      "value": "部分截屏"
+    },
+    {
+      "name": "MainAbility2_label",
+      "value": "label"
+    },
+    {
+      "name": "MainAbility3_desc",
+      "value": "description"
+    },
+    {
+      "name": "MainAbility3_label",
+      "value": "label"
+    },
+    {
+      "name": "PageAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "PageAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "DataAbility_desc",
+      "value": "hap sample empty provider"
+    },
+    {
+      "name": "MainAbility_label",
+      "value": "wifi专项测试"
+    },
+    {
+      "name": "api",
+      "value": "接口测试"
+    },
+    {
+      "name": "scenario",
+      "value": "场景测试"
+    },
+    {
+      "name": "stability",
+      "value": "稳定性测试"
+    },
+    {
+      "name": "autotest",
+      "value": "自动测试"
+    },
+    {
+      "name": "profile",
+      "value": "Profile测试"
+    },
+    {
+      "name": "testcase",
+      "value": "接口"
+    },
+    {
+      "name": "result",
+      "value": "结果"
+    },
+    {
+      "name": "benchmark",
+      "value": "性能测试"
+    },
+    {
+      "name": "stress",
+      "value": "压力测试"
+    },
+    {
+      "name": "App",
+      "value": "应用测试"
+    },
+    {
+      "name": "test_title",
+      "value": "WIFI测试"
+    },
+    {
+      "name": "api_test_title",
+      "value": "手动API测试"
+    },
+    {
+      "name": "manual_test_title",
+      "value": "手动场景化测试"
+    },
+    {
+      "name": "auto_test_title",
+      "value": "自动化测试"
+    },
+    {
+      "name": "conf_title",
+      "value": "配置信息"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "confirm",
+      "value": "确认"
+    },
+    {
+      "name": "version",
+      "value": "1.1.1"
+    },
+    {
+      "name": "more",
+      "value": "more"
+    },
+    {
+      "name": "put_away",
+      "value": "put away"
+    },
+    {
+      "name": "cancelPairing",
+      "value": "取消配对"
+    },
+    {
+      "name": "scanning",
+      "value": "正在搜索…"
+    },
+    {
+      "name": "entry_wifi_MainAbility",
+      "value": "wifi扫描结果"
+    },
+    {
+      "name": "entry_p2p_MainAbility",
+      "value": "p2p扫描结果"
+    },
+    {
+      "name": "description_mainability",
+      "value": "eTSWLAN Ability"
+    },
+    {
+      "name": "sure",
+      "value": "确定"
+    },
+    {
+      "name": "router_uri",
+      "value": "跳转"
+    },
+    {
+      "name": "wlan",
+      "value": "WLAN"
+    },
+    {
+      "name": "available_wlan",
+      "value": "Available WLAN"
+    },
+    {
+      "name": "connected",
+      "value": "Connected"
+    },
+    {
+      "name": "create_room",
+      "value": "create room"
+    },
+    {
+      "name": "send_message",
+      "value": "发送"
+    },
+    {
+      "name": "about",
+      "value": "关于"
+    },
+    {
+      "name": "ip_address",
+      "value": "IP地址:"
+    },
+    {
+      "name": "gate_way",
+      "value": "网关:"
+    },
+    {
+      "name": "net_mask",
+      "value": "掩码:"
+    },
+    {
+      "name": "primary_dns",
+      "value": "主DNS服务器:"
+    },
+    {
+      "name": "second_dns",
+      "value": "备DNS服务器:"
+    },
+    {
+      "name": "server_ip",
+      "value": "DHCP服务端ip:"
+    },
+    {
+      "name": "lease_duration",
+      "value": "IP地址租用时长:"
+    },
+    {
+      "name": "country_code",
+      "value": "国家码:"
+    },
+    {
+      "name": "infrastructure_feature",
+      "value": "基础结构模式特性:"
+    },
+    {
+      "name": "ghz_feature",
+      "value": "5 GHz 宽带特性:"
+    },
+    {
+      "name": "gas_anqp_feature",
+      "value": "GAS/ANQP特性:"
+    },
+    {
+      "name": "wifi_direct",
+      "value": "WiFi-Direct特性:"
+    },
+    {
+      "name": "soft_ap",
+      "value": "Soft AP特性:"
+    },
+    {
+      "name": "wifi_aware",
+      "value": "WiFi Aware组网特性:"
+    },
+    {
+      "name": "encryption",
+      "value": "加密"
+    },
+    {
+      "name": "useful",
+      "value": "可用"
+    },
+    {
+      "name": "p2pConnected",
+      "value": "已连接"
+    },
+    {
+      "name": "open",
+      "value": "开放"
+    },
+    {
+      "name": "wifi_enable",
+      "value": "wifi已经使能"
+    },
+    {
+      "name": "testEnableWifi_Start",
+      "value": "testEnableWifi Start----------"
+    },
+    {
+      "name": "testEnableWifi_End",
+      "value": "testEnableWifi End----------"
+    },
+    {
+      "name": "enableWifi_result",
+      "value": "使能结果: "
+    },
+    {
+      "name": "wifi_disEnable",
+      "value": "WIFI还未使能"
+    },
+    {
+      "name": "testDisableWifi_Start",
+      "value": "testDisableWifi Start----------"
+    },
+    {
+      "name": "testDisableWifi_End",
+      "value": "testDisableWifi End----------"
+    },
+    {
+      "name": "disableWifi_result",
+      "value": "去使能结果: "
+    },
+    {
+      "name": "wifi_enable_result",
+      "value": "Wifi使能执行结果："
+    },
+    {
+      "name": "wifi_disEnable_result",
+      "value": "Wifi去使能执行结果："
+    },
+    {
+      "name": "wifi_enable_confirm",
+      "value": "Wifi已打开或打开失败,请确认"
+    },
+    {
+      "name": "wifi_disEnable_confirm",
+      "value": "Wifi已关闭或关闭失败,请确认"
+    },
+    {
+      "name": "wifi_IsActive",
+      "value": "wifi使能结果为："
+    },
+    {
+      "name": "testIsWifiActive_Start",
+      "value": "testIsWifiActive Start----------"
+    },
+    {
+      "name": "testIsWifiActive_End",
+      "value": "testDisableWifi End----------"
+    },
+    {
+      "name": "testEnableWifi",
+      "value": "enableWifi test"
+    },
+    {
+      "name": "testDisableWifi",
+      "value": "disableWifi test"
+    },
+    {
+      "name": "testIsWifiActive",
+      "value": "isWifiActive test"
+    },
+    {
+      "name": "testScan",
+      "value": "scan test"
+    },
+    {
+      "name": "testScan_Start",
+      "value": "testScan Start----------"
+    },
+    {
+      "name": "testScan_End",
+      "value": "testScan End----------"
+    },
+    {
+      "name": "scan",
+      "value": "scan: "
+    },
+    {
+      "name": "testForcibleScan_Start",
+      "value": "testForcibleScan Start----------"
+    },
+    {
+      "name": "testForcibleScan_End",
+      "value": "testForcibleScan End----------"
+    },
+    {
+      "name": "testGetScanInfosPromise",
+      "value": "getScanInfosPromise test"
+    },
+    {
+      "name": "testGetScanInfosPromise_Start",
+      "value": "testGetScanInfosPromise Start----------"
+    },
+    {
+      "name": "testGetScanInfosPromise_End",
+      "value": "testGetScanInfosPromise End----------"
+    },
+    {
+      "name": "testGetScanInfosPromise_successful",
+      "value": "getScanInfos promise successful"
+    },
+    {
+      "name": "getScanInfosPromise",
+      "value": "WifiScanInfo: "
+    },
+    {
+      "name": "testGetScanInfosCallback",
+      "value": "getScanInfosCallback test"
+    },
+    {
+      "name": "testGetScanInfosCallback_Start",
+      "value": "testGetScanInfosCallback Start----------"
+    },
+    {
+      "name": "testGetScanInfosCallback_End",
+      "value": "testGetScanInfosCallback End----------"
+    },
+    {
+      "name": "testGetScanInfosCallback_successful",
+      "value": "getScanInfos callback successful"
+    },
+    {
+      "name": "getScanInfosCallback",
+      "value": "WifiScanInfo: "
+    },
+    {
+      "name": "testAddDeviceConfigPromise",
+      "value": "addDeviceConfigPromise test"
+    },
+    {
+      "name": "testAddDeviceConfigPromise_Start",
+      "value": "testAddDeviceConfigPromise Start----------"
+    },
+    {
+      "name": "testAddDeviceConfigPromise_End",
+      "value": "testAddDeviceConfigPromise End----------"
+    },
+    {
+      "name": "testAddDeviceConfigPromise_successful",
+      "value": "addDeviceConfig promise successful"
+    },
+    {
+      "name": "addDeviceConfigPromise",
+      "value": "addDeviceConfig: "
+    },
+    {
+      "name": "testAddDeviceConfigCallback",
+      "value": "addDeviceConfigCallback test"
+    },
+    {
+      "name": "testAddDeviceConfigCallback_Start",
+      "value": "testAddDeviceConfigCallback Start----------"
+    },
+    {
+      "name": "testAddDeviceConfigCallback_End",
+      "value": "testAddDeviceConfigCallback End----------"
+    },
+    {
+      "name": "testAddDeviceConfigCallback_successful",
+      "value": "addDeviceConfig Callback successful"
+    },
+    {
+      "name": "addDeviceConfigCallback",
+      "value": "addDeviceConfig: "
+    },
+    {
+      "name": "testAddUntrustedConfigPromise",
+      "value": "addUntrustedConfigPromise test"
+    },
+    {
+      "name": "testAddUntrustedConfigPromise_Start",
+      "value": "testAddUntrustedConfigPromise Start----------"
+    },
+    {
+      "name": "testAddUntrustedConfigPromise_End",
+      "value": "testAddUntrustedConfigPromise End----------"
+    },
+    {
+      "name": "testAddUntrustedConfigPromise_successful",
+      "value": "addUntrustedConfig promise successful"
+    },
+    {
+      "name": "addUntrustedConfigPromise",
+      "value": "addUntrustedConfig: "
+    },
+    {
+      "name": "testAddUntrustedConfigCallback",
+      "value": "addUntrustedConfigCallback test"
+    },
+    {
+      "name": "testAddUntrustedConfigCallback_Start",
+      "value": "testAddUntrustedConfigCallback Start----------"
+    },
+    {
+      "name": "testAddUntrustedConfigCallback_End",
+      "value": "testAddUntrustedConfigCallback End----------"
+    },
+    {
+      "name": "testAddUntrustedConfigCallback_successful",
+      "value": "addUntrustedConfig Callback successful"
+    },
+    {
+      "name": "addUntrustedConfigCallback",
+      "value": "addUntrustedConfig: "
+    },
+    {
+      "name": "testRemoveUntrustedConfigPromise",
+      "value": "removeUntrustedConfigPromise test"
+    },
+    {
+      "name": "testRemoveUntrustedConfigPromise_Start",
+      "value": "testRemoveUntrustedConfigPromise Start----------"
+    },
+    {
+      "name": "testRemoveUntrustedConfigPromise_End",
+      "value": "testRemoveUntrustedConfigPromise End----------"
+    },
+    {
+      "name": "testRemoveUntrustedConfigPromise_successful",
+      "value": "removeUntrustedConfig promise successful"
+    },
+    {
+      "name": "removeUntrustedConfigPromise",
+      "value": "removeUntrustedConfig: "
+    },
+    {
+      "name": "testRemoveUntrustedConfigCallback",
+      "value": "removeUntrustedConfigCallback test"
+    },
+    {
+      "name": "testRemoveUntrustedConfigCallback_Start",
+      "value": "testRemoveUntrustedConfigCallback Start----------"
+    },
+    {
+      "name": "testRemoveUntrustedConfigCallback_End",
+      "value": "testRemoveUntrustedConfigCallback End----------"
+    },
+    {
+      "name": "testRemoveUntrustedConfigCallback_successful",
+      "value": "removeUntrustedConfig Callback successful"
+    },
+    {
+      "name": "removeUntrustedConfigCallback",
+      "value": "removeUntrustedConfig: "
+    },
+    {
+      "name": "testConnectToNetwork",
+      "value": "connectToNetwork test"
+    },
+    {
+      "name": "testConnectToNetwork_Start",
+      "value": "testConnectToNetwork Start----------"
+    },
+    {
+      "name": "testConnectToNetwork_End",
+      "value": "testConnectToNetwork End----------"
+    },
+    {
+      "name": "connectToNetwork",
+      "value": "ConnectToNetwork: "
+    },
+    {
+      "name": "testConnectToDevice",
+      "value": "connectToDevice test"
+    },
+    {
+      "name": "testConnectToDevice_Start",
+      "value": "testConnectToDevice Start----------"
+    },
+    {
+      "name": "testConnectToDevice_End",
+      "value": "testConnectToDevice End----------"
+    },
+    {
+      "name": "connectToDevice",
+      "value": "ConnectToDevice: "
+    },
+    {
+      "name": "testDisconnect",
+      "value": "disconnect test"
+    },
+    {
+      "name": "testDisconnect_Start",
+      "value": "testDisconnect Start----------"
+    },
+    {
+      "name": "choice_download_file",
+      "value": "请选择需要下载的文件"
+    },
+    {
+      "name": "upload_page",
+      "value": "上传"
+    },
+    {
+      "name": "click_download",
+      "value": "点击下载"
+    },
+    {
+      "name": "download_progress",
+      "value": "下载进度："
+    },
+    {
+      "name": "testDisconnect_End",
+      "value": "testDisconnect End----------"
+    },
+    {
+      "name": "disconnect",
+      "value": "disconnect: "
+    },
+    {
+      "name": "testGetSignalLevel",
+      "value": "getSignalLevel test"
+    },
+    {
+      "name": "testGetSignalLevel_Start",
+      "value": "testGetSignalLevel Start----------"
+    },
+    {
+      "name": "testGetSignalLevel_End",
+      "value": "testGetSignalLevel End----------"
+    },
+    {
+      "name": "getSignalLevel",
+      "value": "getSignalLevel is: "
+    },
+    {
+      "name": "testGetLinkedInfoPromise",
+      "value": "getLinkedInfoPromise test"
+    },
+    {
+      "name": "testGetLinkedInfoPromise_Start",
+      "value": "testGetLinkedInfoPromise Start----------"
+    },
+    {
+      "name": "testGetLinkedInfoPromise_End",
+      "value": "testGetLinkedInfoPromise End----------"
+    },
+    {
+      "name": "testGetLinkedInfoPromise_successful",
+      "value": "getLinkedInfoPromise test successful"
+    },
+    {
+      "name": "getLinkedInfoPromise",
+      "value": "get wifi linked info: "
+    },
+    {
+      "name": "testGetLinkedInfoCallback",
+      "value": "getLinkedInfoCallback test"
+    },
+    {
+      "name": "testGetLinkedInfoCallback_Start",
+      "value": "testGetLinkedInfoCallback Start----------"
+    },
+    {
+      "name": "testGetLinkedInfoCallback_End",
+      "value": "testGetLinkedInfoCallback End----------"
+    },
+    {
+      "name": "testGetLinkedInfoCallback_successful",
+      "value": "getLinkedInfoCallback test successful"
+    },
+    {
+      "name": "getLinkedInfoCallback",
+      "value": "get wifi linked info: "
+    },
+    {
+      "name": "testIsConnected",
+      "value": "isConnected test"
+    },
+    {
+      "name": "testIsConnected_Start",
+      "value": "testIsConnected Start----------"
+    },
+    {
+      "name": "testIsConnected_End",
+      "value": "testIsConnected End----------"
+    },
+    {
+      "name": "isConnected",
+      "value": "isConnected: "
+    },
+    {
+      "name": "testGetSupportedFeatures",
+      "value": "getSupportedFeatures test"
+    },
+    {
+      "name": "testGetSupportedFeatures_Start",
+      "value": "testGetSupportedFeatures Start----------"
+    },
+    {
+      "name": "testGetSupportedFeatures_End",
+      "value": "testGetSupportedFeatures End----------"
+    },
+    {
+      "name": "getSupportedFeatures",
+      "value": "GetSupportedFeatures: "
+    },
+    {
+      "name": "testIsFeatureSupported",
+      "value": "isFeatureSupported test"
+    },
+    {
+      "name": "testIsFeatureSupported_Start",
+      "value": "testIsFeatureSupported Start----------"
+    },
+    {
+      "name": "testIsFeatureSupported_End",
+      "value": "testIsFeatureSupported End----------"
+    },
+    {
+      "name": "isFeatureSupported",
+      "value": "isFeatureSupported: "
+    },
+    {
+      "name": "testGetDeviceMacAddress",
+      "value": "getDeviceMacAddress test"
+    },
+    {
+      "name": "testGetDeviceMacAddress_Start",
+      "value": "testGetDeviceMacAddress Start----------"
+    },
+    {
+      "name": "testGetDeviceMacAddress_End",
+      "value": "testGetDeviceMacAddress End----------"
+    },
+    {
+      "name": "getDeviceMacAddress",
+      "value": "macAddress: "
+    },
+    {
+      "name": "testGetIpInfo",
+      "value": "getIpInfo test"
+    },
+    {
+      "name": "testGetIpInfo_Start",
+      "value": "testGetIpInfo Start----------"
+    },
+    {
+      "name": "testGetIpInfo_End",
+      "value": "testGetIpInfo End----------"
+    },
+    {
+      "name": "getIpInfo",
+      "value": "IpInfo: "
+    },
+    {
+      "name": "testGetCountryCode",
+      "value": "getCountryCode test"
+    },
+    {
+      "name": "testGetCountryCode_Start",
+      "value": "testGetCountryCode Start----------"
+    },
+    {
+      "name": "testGetCountryCode_End",
+      "value": "testGetCountryCode End----------"
+    },
+    {
+      "name": "getCountryCode",
+      "value": "CountryCode is: "
+    },
+    {
+      "name": "testReassociate",
+      "value": "reAssociate test"
+    },
+    {
+      "name": "testReassociate_Start",
+      "value": "testReassociate Start----------"
+    },
+    {
+      "name": "testReassociate_End",
+      "value": "testReassociate End----------"
+    },
+    {
+      "name": "reassociate",
+      "value": "reassociate is: "
+    },
+    {
+      "name": "testReConnect",
+      "value": "reConnect test"
+    },
+    {
+      "name": "testReConnect_Start",
+      "value": "testReConnect Start----------"
+    },
+    {
+      "name": "testReConnect_End",
+      "value": "testReConnect End----------"
+    },
+    {
+      "name": "reconnect",
+      "value": "reConnect is: "
+    },
+    {
+      "name": "testGetDeviceConfigs",
+      "value": "getDeviceConfigs test"
+    },
+    {
+      "name": "testGetDeviceConfigs_Start",
+      "value": "testGetDeviceConfigs Start----------"
+    },
+    {
+      "name": "testGetDeviceConfigs_End",
+      "value": "testGetDeviceConfigs End----------"
+    },
+    {
+      "name": "getDeviceConfigs",
+      "value": "DeviceConfigs is: "
+    },
+    {
+      "name": "testUpdateNetwork",
+      "value": "updateNetwork test"
+    },
+    {
+      "name": "testUpdateNetwork_Start",
+      "value": "testUpdateNetwork Start----------"
+    },
+    {
+      "name": "testUpdateNetwork_End",
+      "value": "testUpdateNetwork End----------"
+    },
+    {
+      "name": "updateNetwork",
+      "value": "updateNetwork: "
+    },
+    {
+      "name": "testDisableNetwork",
+      "value": "disableNetWork test"
+    },
+    {
+      "name": "testDisableNetwork_Start",
+      "value": "testDisableNetwork Start----------"
+    },
+    {
+      "name": "testDisableNetwork_End",
+      "value": "testDisableNetwork End----------"
+    },
+    {
+      "name": "disableNetwork",
+      "value": "disableNetwork: "
+    },
+    {
+      "name": "testRemoveAllNetwork",
+      "value": "removeAllNetwork test"
+    },
+    {
+      "name": "testRemoveAllNetwork_Start",
+      "value": "testRemoveAllNetwork Start----------"
+    },
+    {
+      "name": "testRemoveAllNetwork_End",
+      "value": "testRemoveAllNetwork End----------"
+    },
+    {
+      "name": "removeAllNetwork",
+      "value": "removeAllNetwork: "
+    },
+    {
+      "name": "testRemoveDevice",
+      "value": "removeDevice test"
+    },
+    {
+      "name": "testRemoveDevice_Start",
+      "value": "testRemoveDevice Start----------"
+    },
+    {
+      "name": "testRemoveDevice_End",
+      "value": "testRemoveDevice End----------"
+    },
+    {
+      "name": "removeDevice",
+      "value": "removeDevice: "
+    },
+    {
+      "name": "testOnWifiStateChange",
+      "value": "onWifiStateChange test"
+    },
+    {
+      "name": "testOnWifiStateChange_Start",
+      "value": "testOnWifiStateChange Start----------"
+    },
+    {
+      "name": "testOnWifiStateChange_End",
+      "value": "testOnWifiStateChange End----------"
+    },
+    {
+      "name": "offWifiStateChange",
+      "value": "on.WifiStateChange监听已关闭"
+    },
+    {
+      "name": "offWifiStateChangeTest",
+      "value": "关闭注册WLAN状态改变事件"
+    },
+    {
+      "name": "onWifiStateChange",
+      "value": "on.WifiStateChange监听已打开"
+    },
+    {
+      "name": "onWifiStateChangeTest",
+      "value": "打开注册WLAN状态变化"
+    },
+    {
+      "name": "wifiStateChange",
+      "value": "wifi状态: "
+    },
+    {
+      "name": "testOnWifiConnectionChange",
+      "value": "onWifiConnectionChange test"
+    },
+    {
+      "name": "testOnWifiConnectionChange_Start",
+      "value": "testOnWifiConnectionChange Start----------"
+    },
+    {
+      "name": "testOnWifiConnectionChange_End",
+      "value": "testOnWifiConnectionChange End----------"
+    },
+    {
+      "name": "offWifiConnectionChange",
+      "value": "on.wifiConnectionChange监听已关闭"
+    },
+    {
+      "name": "offWifiConnectionChangeTest",
+      "value": "关闭WLAN连接状态改变事件"
+    },
+    {
+      "name": "onWifiConnectionChange",
+      "value": "on.wifiConnectionChange监听已打开"
+    },
+    {
+      "name": "onWifiConnectionChangeTest",
+      "value": "打开注册WLAN连接状态变化"
+    },
+    {
+      "name": "wifiConnectionChange",
+      "value": "连接状态: "
+    },
+    {
+      "name": "testOnWifiScanStateChange",
+      "value": "onWifiScanStateChange test"
+    },
+    {
+      "name": "testOnWifiScanStateChange_Start",
+      "value": "testOnWifiConnectionChange Start----------"
+    },
+    {
+      "name": "testOnWifiScanStateChange_End",
+      "value": "testOnWifiConnectionChange End----------"
+    },
+    {
+      "name": "offWifiScanStateChange",
+      "value": "on.wifiScanStateChange监听已关闭"
+    },
+    {
+      "name": "offWifiScanStateChangeTest",
+      "value": "关闭扫描状态改变事件"
+    },
+    {
+      "name": "onWifiScanStateChange",
+      "value": "on.wifiScanStateChange监听已打开"
+    },
+    {
+      "name": "onWifiScanStateChangeTest",
+      "value": "打开注册扫描状态变化"
+    },
+    {
+      "name": "wifiScanStateChange",
+      "value": "scan状态: "
+    },
+    {
+      "name": "testOnWifiRssiChange",
+      "value": "onWifiRssiChange test"
+    },
+    {
+      "name": "testOnWifiRssiChange_Start",
+      "value": "testOnWifiRssiChange Start----------"
+    },
+    {
+      "name": "testOnWifiRssiChange_End",
+      "value": "testOnWifiRssiChange End----------"
+    },
+    {
+      "name": "offWifiRssiChange",
+      "value": "on.wifiRssiChange监听已关闭"
+    },
+    {
+      "name": "offWifiRssiChangeTest",
+      "value": "关闭RSSI状态变化事件"
+    },
+    {
+      "name": "onWifiRssiChange",
+      "value": "on.wifiRssiChange监听已打开"
+    },
+    {
+      "name": "onWifiRssiChangeTest",
+      "value": "打开注册RSSI状态变化"
+    },
+    {
+      "name": "wifiRssiChange",
+      "value": "rssi: "
+    },
+    {
+      "name": "testOnStreamChange",
+      "value": "onStreamChange test"
+    },
+    {
+      "name": "testOnStreamChange_Start",
+      "value": "testOnStreamChange Start----------"
+    },
+    {
+      "name": "testOnStreamChange_End",
+      "value": "testOnStreamChange End----------"
+    },
+    {
+      "name": "offStreamChange",
+      "value": "on.streamChange监听已关闭"
+    },
+    {
+      "name": "offStreamChangeTest",
+      "value": "关闭注册流改变事件"
+    },
+    {
+      "name": "onStreamChange",
+      "value": "on.streamChange监听已打开"
+    },
+    {
+      "name": "onStreamChangeTest",
+      "value": "打开注册流变化"
+    },
+    {
+      "name": "streamChange",
+      "value": "stream状态: "
+    },
+    {
+      "name": "testEnableHotspot",
+      "value": "enableHotspot test"
+    },
+    {
+      "name": "testEnableHotspot_Start",
+      "value": "testEnableHotspot start--------------"
+    },
+    {
+      "name": "testEnableHotspot_End",
+      "value": "testEnableHotspot End--------------"
+    },
+    {
+      "name": "hotspot_enable",
+      "value": "热点已经使能"
+    },
+    {
+      "name": "hotspot_disEnable",
+      "value": "热点还未使能"
+    },
+    {
+      "name": "hotspot_enable_result",
+      "value": "热点使能执行结果："
+    },
+    {
+      "name": "hotspot_disEnable_result",
+      "value": "热点去使能执行结果："
+    },
+    {
+      "name": "hotspot_enable_confirm",
+      "value": "热点已打开或打开失败,请确认"
+    },
+    {
+      "name": "hotspot_disEnable_confirm",
+      "value": "热点已关闭或关闭失败,请确认"
+    },
+    {
+      "name": "hotspot_IsActive",
+      "value": "热点使能结果为："
+    },
+    {
+      "name": "testDisableHotspot",
+      "value": "disableHotspot test"
+    },
+    {
+      "name": "testDisableHotspot_Start",
+      "value": "testDisableHotspot start--------------"
+    },
+    {
+      "name": "testDisableHotspot_End",
+      "value": "testDisableHotspot End--------------"
+    },
+    {
+      "name": "testIsHotspotActive",
+      "value": "isHotspotActive test"
+    },
+    {
+      "name": "testIsHostActive_Start",
+      "value": "testIsHostActive start--------------"
+    },
+    {
+      "name": "testIsHostActive_End",
+      "value": "testIsHostActive End--------------"
+    },
+    {
+      "name": "testIsHotspotDualBandSupported",
+      "value": "isHotspotDualBandSupported test"
+    },
+    {
+      "name": "testIsHotspotDualBandSupported_Start",
+      "value": "testIsHotspotDualBandSupported start--------------"
+    },
+    {
+      "name": "testIsHotspotDualBandSupported_End",
+      "value": "testIsHotspotDualBandSupported End--------------"
+    },
+    {
+      "name": "isHotspotDualBandSupported",
+      "value": "热点支持双频结果："
+    },
+    {
+      "name": "testSetHotspotConfig",
+      "value": "SetHotspotConfig test"
+    },
+    {
+      "name": "testSetHotspotConfig_Start",
+      "value": "testSetHotspotConfig start--------------"
+    },
+    {
+      "name": "testSetHotspotConfig_End",
+      "value": "testSetHotspotConfig End--------------"
+    },
+    {
+      "name": "setHotspotConfig",
+      "value": "SetHotspotConfig: "
+    },
+    {
+      "name": "testGetHotspotConfig",
+      "value": "getHotspotConfig test"
+    },
+    {
+      "name": "testGetHotspotConfig_Start",
+      "value": "testGetHotspotConfig start--------------"
+    },
+    {
+      "name": "testGetHotspotConfig_End",
+      "value": "testGetHotspotConfig End--------------"
+    },
+    {
+      "name": "getHotspotConfig",
+      "value": "HotspotConfig: "
+    },
+    {
+      "name": "testGetStations",
+      "value": "GetStations test"
+    },
+    {
+      "name": "testGetStations_Start",
+      "value": "testGetStations start--------------"
+    },
+    {
+      "name": "testGetStations_End",
+      "value": "testGetStations End--------------"
+    },
+    {
+      "name": "getStations",
+      "value": "GetStations: "
+    },
+    {
+      "name": "testOnHotspotStateChange",
+      "value": "onHotspotStateChange test"
+    },
+    {
+      "name": "testOnHotspotStateChange_Start",
+      "value": "testOnHotspotStateChange start--------------"
+    },
+    {
+      "name": "testOnHotspotStateChange_End",
+      "value": "testOnHotspotStateChange End--------------"
+    },
+    {
+      "name": "offHotspotStateChange",
+      "value": "on.hotspotStateChange监听已关闭"
+    },
+    {
+      "name": "offHotspotStateChangeTest",
+      "value": "关闭注册热点状态改变事件"
+    },
+    {
+      "name": "onHotspotStateChange",
+      "value": "on.hotspotStateChange监听已打开"
+    },
+    {
+      "name": "onHotspotStateChangeTest",
+      "value": "打开注册热点状态变化"
+    },
+    {
+      "name": "hotspotStateChange",
+      "value": "状态为: "
+    },
+    {
+      "name": "testOnHotspotStaJoin",
+      "value": "onHotspotStaJoin test"
+    },
+    {
+      "name": "testOnHotspotStaJoin_Start",
+      "value": "testOnHotspotStaJoin start--------------"
+    },
+    {
+      "name": "testOnHotspotStaJoin_End",
+      "value": "testOnHotspotStaJoin End--------------"
+    },
+    {
+      "name": "offHotspotStaJoin",
+      "value": "on.hotspotStaJoin监听已关闭"
+    },
+    {
+      "name": "offHotspotStaJoinTest",
+      "value": "关闭注册Wi-Fi 热点 sta加入变化事件"
+    },
+    {
+      "name": "onHotspotStaJoin",
+      "value": "on.hotspotStateChange监听已打开"
+    },
+    {
+      "name": "onHotspotStaJoinTest",
+      "value": "打开注册Wi-Fi 热点 sta加入变化"
+    },
+    {
+      "name": "hotspotStaJoin",
+      "value": "状态为: "
+    },
+    {
+      "name": "testOnHotspotStaLeave",
+      "value": "onHotspotStaLeave test"
+    },
+    {
+      "name": "testOnHotspotStaLeave_Start",
+      "value": "testOnHotspotStaLeave start--------------"
+    },
+    {
+      "name": "testOnHotspotStaLeave_End",
+      "value": "testOnHotspotStaLeave End--------------"
+    },
+    {
+      "name": "offHotspotStaLeave",
+      "value": "on.hotspotStaLeave监听已关闭"
+    },
+    {
+      "name": "offHotspotStaLeaveTest",
+      "value": "关闭注册Wi-Fi 热点 sta离开变化事件"
+    },
+    {
+      "name": "onHotspotStaLeave",
+      "value": "on.hotspotStateChange监听已打开"
+    },
+    {
+      "name": "onHotspotStaLeaveTest",
+      "value": "打开注册Wi-Fi 热点 sta离开变化"
+    },
+    {
+      "name": "hotspotStaLeave",
+      "value": "状态为: "
+    },
+    {
+      "name": "testGetP2pLinkedInfoPromise",
+      "value": "getP2pLinkedInfoPromise test"
+    },
+    {
+      "name": "testGetP2pLinkedInfoPromise_Start",
+      "value": "testGetP2pLinkedInfoPromise Start----------"
+    },
+    {
+      "name": "testGetP2pLinkedInfoPromise_End",
+      "value": "testGetP2pLinkedInfoPromise End----------"
+    },
+    {
+      "name": "getP2pLinkedInfoPromise_successful",
+      "value": "getP2pLinkedInfoPromise successful"
+    },
+    {
+      "name": "getP2pLinkedInfoPromise",
+      "value": "getP2pLinkedInfoPromise: "
+    },
+    {
+      "name": "testGetP2pLinkedInfoCallback",
+      "value": "getP2pLinkedInfoCallback test"
+    },
+    {
+      "name": "testGetP2pLinkedInfoCallback_Start",
+      "value": "testGetP2pLinkedInfoCallback Start----------"
+    },
+    {
+      "name": "testGetP2pLinkedInfoCallback_End",
+      "value": "testGetP2pLinkedInfoCallback End----------"
+    },
+    {
+      "name": "getP2pLinkedInfoCallback_error",
+      "value": "getP2pLinkedInfoCallback error"
+    },
+    {
+      "name": "getP2pLinkedInfoCallback_successful",
+      "value": "getP2pLinkedInfoCallback successful "
+    },
+    {
+      "name": "getP2pLinkedInfoCallback",
+      "value": "getP2pLinkedInfoCallback: "
+    },
+    {
+      "name": "testGetCurrentGroupPromise",
+      "value": "getCurrentGroupPromise test"
+    },
+    {
+      "name": "testGetCurrentGroupPromise_Start",
+      "value": "testGetCurrentGroupPromise Start----------"
+    },
+    {
+      "name": "testGetCurrentGroupPromise_End",
+      "value": "testGetCurrentGroupPromise End----------"
+    },
+    {
+      "name": "testGetCurrentGroupPromise_successful",
+      "value": "getCurrentGroupPromise successful"
+    },
+    {
+      "name": "getCurrentGroupPromise",
+      "value": "getCurrentGroupPromise: "
+    },
+    {
+      "name": "testGetCurrentGroupCallback",
+      "value": "getCurrentGroupCallback test"
+    },
+    {
+      "name": "testGetCurrentGroupCallback_Start",
+      "value": "testGetCurrentGroupCallback Start----------"
+    },
+    {
+      "name": "testGetCurrentGroupCallback_End",
+      "value": "testGetCurrentGroupCallback End----------"
+    },
+    {
+      "name": "testCurrentGroupCallback_error",
+      "value": "testCurrentGroupCallback error"
+    },
+    {
+      "name": "getCurrentGroupCallback_successful",
+      "value": "getCurrentGroupCallback successful"
+    },
+    {
+      "name": "getCurrentGroupCallback",
+      "value": "getCurrentGroupCallback: "
+    },
+    {
+      "name": "testGetP2pPeerDevicesPromise",
+      "value": "getP2pPeerDevicesPromise test: "
+    },
+    {
+      "name": "testGetP2pPeerDevicesPromise_Start",
+      "value": "testGetP2pPeerDevicesPromise Start----------"
+    },
+    {
+      "name": "testGetP2pPeerDevicesPromise_End",
+      "value": "testGetP2pPeerDevicesPromise End----------"
+    },
+    {
+      "name": "getP2pPeerDevicesPromise_successful",
+      "value": "getP2pPeerDevicesPromise successful"
+    },
+    {
+      "name": "getP2pPeerDevicesPromise",
+      "value": "getP2pPeerDevicesPromise: "
+    },
+    {
+      "name": "testGetP2pPeerDevicesCallback",
+      "value": "getP2pPeerDevicesCallback test: "
+    },
+    {
+      "name": "testGetP2pPeerDevicesCallback_Start",
+      "value": "testGetP2pPeerDevicesCallback Start----------"
+    },
+    {
+      "name": "testGetP2pPeerDevicesCallback_End",
+      "value": "testGetP2pPeerDevicesCallback End----------"
+    },
+    {
+      "name": "getP2pPeerDevicesCallback_error",
+      "value": "getP2pPeerDevicesCallback error"
+    },
+    {
+      "name": "getP2pPeerDevicesCallback_successful",
+      "value": "getP2pPeerDevicesCallback successful"
+    },
+    {
+      "name": "getP2pPeerDevicesCallback",
+      "value": "getP2pPeerDevicesCallback: "
+    },
+    {
+      "name": "testCreateGroup",
+      "value": "createGroup test"
+    },
+    {
+      "name": "testCreateGroup_Start",
+      "value": "testCreateGroup Start----------"
+    },
+    {
+      "name": "testCreateGroup_End",
+      "value": "testCreateGroup End----------"
+    },
+    {
+      "name": "createGroup",
+      "value": "createGroup: "
+    },
+    {
+      "name": "testRemoveGroup",
+      "value": "removeGroup test"
+    },
+    {
+      "name": "testRemoveGroup_Start",
+      "value": "testRemoveGroup Start----------"
+    },
+    {
+      "name": "testRemoveGroup_End",
+      "value": "testRemoveGroup End----------"
+    },
+    {
+      "name": "removeGroup",
+      "value": "removeGroup: "
+    },
+    {
+      "name": "testP2pConnect",
+      "value": "P2pConnect test"
+    },
+    {
+      "name": "testP2pConnect_Start",
+      "value": "testP2pConnect Start----------"
+    },
+    {
+      "name": "testP2pConnect_End",
+      "value": "testP2pConnect End----------"
+    },
+    {
+      "name": "p2pConnect",
+      "value": "p2pConnect: "
+    },
+    {
+      "name": "testP2pCancelConnect",
+      "value": "p2pCancelConnect test"
+    },
+    {
+      "name": "testP2pCancelConnect_Start",
+      "value": "testP2pCancelConnect Start----------"
+    },
+    {
+      "name": "testP2pCancelConnect_End",
+      "value": "testP2pCancelConnect End----------"
+    },
+    {
+      "name": "p2pCancelConnect",
+      "value": "p2pCancelConnect: "
+    },
+    {
+      "name": "testStartDiscoverDevices",
+      "value": "startDiscoverDevices test"
+    },
+    {
+      "name": "testStartDiscoverDevices_Start",
+      "value": "testStartDiscoverDevices Start----------"
+    },
+    {
+      "name": "testStartDiscoverDevices_End",
+      "value": "testStartDiscoverDevices End----------"
+    },
+    {
+      "name": "startDiscoverDevices",
+      "value": "startDiscoverDevices: "
+    },
+    {
+      "name": "testStopDiscoverDevices",
+      "value": "stopDiscoverDevices test"
+    },
+    {
+      "name": "testStopDiscoverDevices_Start",
+      "value": "testStopDiscoverDevices Start----------"
+    },
+    {
+      "name": "testStopDiscoverDevices_End",
+      "value": "testStopDiscoverDevices End----------"
+    },
+    {
+      "name": "stopDiscoverDevices",
+      "value": "stopDiscoverDevices: "
+    },
+    {
+      "name": "testDeletePersistentGroup",
+      "value": "deletePersistentGroup test"
+    },
+    {
+      "name": "testDeletePersistentGroup_Start",
+      "value": "testDeletePersistentGroup Start----------"
+    },
+    {
+      "name": "testDeletePersistentGroup_End",
+      "value": "testDeletePersistentGroup End----------"
+    },
+    {
+      "name": "deletePersistentGroup",
+      "value": "deletePersistentGroup: "
+    },
+    {
+      "name": "testSetDeviceName",
+      "value": "setDeviceName test"
+    },
+    {
+      "name": "testSetDeviceName_Start",
+      "value": "testSetDeviceName Start----------"
+    },
+    {
+      "name": "testSetDeviceName_End",
+      "value": "testSetDeviceName End----------"
+    },
+    {
+      "name": "setDeviceName",
+      "value": "setDeviceName: "
+    },
+    {
+      "name": "testOnP2pStateChange",
+      "value": "OnP2pStateChange test"
+    },
+    {
+      "name": "testOnP2pStateChange_test",
+      "value": "testOnP2pStateChange test"
+    },
+    {
+      "name": "testOnP2pStateChange_Start",
+      "value": "testOnP2pStateChange Start----------"
+    },
+    {
+      "name": "testOnP2pStateChange_End",
+      "value": "testOnP2pStateChange End----------"
+    },
+    {
+      "name": "offP2pStateChange",
+      "value": "on.p2pStateChange监听已关闭"
+    },
+    {
+      "name": "offP2pStateChangeTest",
+      "value": "关闭注册P2P开关状态改变事件"
+    },
+    {
+      "name": "onP2pStateChange",
+      "value": "on.p2pStateChange监听已打开"
+    },
+    {
+      "name": "onP2pStateChangeTest",
+      "value": "打开注册P2P开关状态变化"
+    },
+    {
+      "name": "p2pStateChange",
+      "value": "状态为: "
+    },
+    {
+      "name": "testOnP2pConnectionChange",
+      "value": "OnP2pConnectionChange test"
+    },
+    {
+      "name": "testOnP2pConnectionChange_test",
+      "value": "testOnP2pConnectionChange test"
+    },
+    {
+      "name": "testOnP2pConnectionChange_Start",
+      "value": "testOnP2pConnectionChange Start----------"
+    },
+    {
+      "name": "testOnP2pConnectionChange_End",
+      "value": "testOnP2pConnectionChange End----------"
+    },
+    {
+      "name": "offP2pConnectionChange",
+      "value": "on.P2pConnectionChange监听已关闭"
+    },
+    {
+      "name": "offP2pConnectionChangeTest",
+      "value": "关闭P2P连接状态改变事件"
+    },
+    {
+      "name": "onP2pConnectionChange",
+      "value": "on.p2pConnectionChange监听已打开"
+    },
+    {
+      "name": "onP2pConnectionChangeTest",
+      "value": "打开注册p2p连接状态变化"
+    },
+    {
+      "name": "P2pConnectionChange",
+      "value": "状态为: "
+    },
+    {
+      "name": "testOnP2pDeviceChange",
+      "value": "OnP2pDeviceChange test"
+    },
+    {
+      "name": "testOnP2pDeviceChange_Start",
+      "value": "testOnP2pDeviceChange Start----------"
+    },
+    {
+      "name": "testOnP2pDeviceChange_End",
+      "value": "testOnP2pDeviceChange End----------"
+    },
+    {
+      "name": "testOnP2pDeviceChange_test",
+      "value": "testOnP2pDeviceChange test"
+    },
+    {
+      "name": "offP2pDeviceChange",
+      "value": "on.P2pDeviceChange监听已关闭"
+    },
+    {
+      "name": "offP2pDeviceChangeTest",
+      "value": "关闭P2P设备状态改变事件"
+    },
+    {
+      "name": "onP2pDeviceChange",
+      "value": "on.p2pConnectionChange监听已打开"
+    },
+    {
+      "name": "onP2pDeviceChangeTest",
+      "value": "打开注册p2p设备连接状态变化"
+    },
+    {
+      "name": "P2pDeviceChange",
+      "value": "状态为: "
+    },
+    {
+      "name": "testOnP2pPeerDeviceChange",
+      "value": "OnP2pPeerDeviceChange test"
+    },
+    {
+      "name": "testOnP2pPeerDeviceChange_Start",
+      "value": "testOnP2pPeerDeviceChange Start----------"
+    },
+    {
+      "name": "testOnP2pPeerDeviceChange_End",
+      "value": "testOnP2pPeerDeviceChange End----------"
+    },
+    {
+      "name": "testOnP2pPeerDeviceChange_test",
+      "value": "testOnP2pPeerDeviceChange test"
+    },
+    {
+      "name": "offP2pPeerDeviceChange",
+      "value": "on.p2pPeerDeviceChange监听已关闭"
+    },
+    {
+      "name": "offP2pPeerDeviceChangeTest",
+      "value": "关闭P2P对端设备状态改变事件"
+    },
+    {
+      "name": "onP2pPeerDeviceChange",
+      "value": "on.p2pPeerDeviceChange监听已打开"
+    },
+    {
+      "name": "onP2pPeerDeviceChangeTest",
+      "value": "打开P2P对端设备状态变化"
+    },
+    {
+      "name": "P2pPeerDeviceChange",
+      "value": "状态为: "
+    },
+    {
+      "name": "testOnP2pPersistentGroupChange",
+      "value": "OnP2pPersistentGroupChange test"
+    },
+    {
+      "name": "testOnP2pPersistentGroupChange_Start",
+      "value": "testOnP2pPersistentGroupChange Start----------"
+    },
+    {
+      "name": "testOnP2pPersistentGroupChange_End",
+      "value": "testOnP2pPersistentGroupChange End----------"
+    },
+    {
+      "name": "testOnP2pPersistentGroupChange_test",
+      "value": "testOnP2pPersistentGroupChange test"
+    },
+    {
+      "name": "offP2pPersistentGroupChange",
+      "value": "on.p2pPersistentGroupChange监听已关闭"
+    },
+    {
+      "name": "offP2pPersistentGroupChangeTest",
+      "value": "关闭P2P设备状态改变事件"
+    },
+    {
+      "name": "onP2pPersistentGroupChange",
+      "value": "on.p2pPersistentGroupChange监听已打开"
+    },
+    {
+      "name": "onP2pPersistentGroupChangeTest",
+      "value": "打开P2P永久组状态变化"
+    },
+    {
+      "name": "p2pPersistentGroupChange",
+      "value": "状态为: "
+    },
+    {
+      "name": "testOnP2pDiscoveryChange",
+      "value": "OnP2pDiscoveryChange test"
+    },
+    {
+      "name": "testOnP2pDiscoveryChange_Start",
+      "value": "testOnP2pDiscoveryChange Start----------"
+    },
+    {
+      "name": "testOnP2pDiscoveryChange_End",
+      "value": "testOnP2pDiscoveryChange End----------"
+    },
+    {
+      "name": "testOnP2pDiscoveryChange_test",
+      "value": "testOnP2pDiscoveryChange test"
+    },
+    {
+      "name": "offP2pDiscoveryChange",
+      "value": "on.P2pDiscoveryChange监听已关闭"
+    },
+    {
+      "name": "offP2pDiscoveryChangeTest",
+      "value": "关闭发现设备状态改变事件"
+    },
+    {
+      "name": "onP2pDiscoveryChange",
+      "value": "on.p2pDiscoveryChange监听已打开"
+    },
+    {
+      "name": "onP2pDiscoveryChangeTest",
+      "value": "打开发现设备状态变化"
+    },
+    {
+      "name": "p2pDiscoveryChange",
+      "value": "状态为: "
+    },
+    {
+      "name": "wlanIsConnected",
+      "value": "已连接"
+    },
+    {
+      "name": "wlan_available",
+      "value": "可用WLAN"
+    },
+    {
+      "name": "p2p_available",
+      "value": "对等设备"
+    },
+    {
+      "name": "candidateWifiGroup",
+      "value": "可选的候选网络"
+    },
+    {
+      "name": "candidateWifi",
+      "value": "candidateWifi"
+    },
+
+    {
+      "name": "title",
+      "value": "工作目标"
+    },
+    {
+      "name": "add_task",
+      "value": "添加候选wifi"
+    },
+    {
+      "name": "target_name",
+      "value": "目标"
+    },
+    {
+      "name": "target_info",
+      "value": "点击按钮添加候选网络"
+    },
+    {
+      "name": "overall_progress",
+      "value": "整体进度"
+    },
+    {
+      "name": "add_task_dialog",
+      "value": "添加候选WiFi"
+    },
+    {
+      "name": "latest_updateTime",
+      "value": "更新时间: "
+    },
+    {
+      "name": "sub_goals",
+      "value": "候选WiFi列表"
+    },
+    {
+      "name": "cancel_button",
+      "value": "取消"
+    },
+    {
+      "name": "confirm_button",
+      "value": "确定"
+    },
+    {
+      "name": "delete_button",
+      "value": "删除"
+    },
+    {
+      "name": "edit_button",
+      "value": "编辑"
+    },
+    {
+      "name": "select_all_button",
+      "value": "全选"
+    },
+    {
+      "name": "cannot_input_empty",
+      "value": "WiFi名称不能为空！"
+    },
+    {
+      "name": "input_candidate_wifi",
+      "value": "输入候选WiFi的配置"
+    },
+    {
+      "name": "input_candidate_wifi_ssid",
+      "value": "输入候选WiFi的SSID"
+    },
+    {
+      "name": "input_candidate_wifi_bssid",
+      "value": "输入候选WiFi的bssid(MAC) (可不填)"
+    },
+    {
+      "name": "input_candidate_wifi_preSharedKey",
+      "value": "输入候选WiFi密码"
+    },
+    {
+      "name": "input_candidate_wifi_isHiddenSsid",
+      "value": "输入1或0 (可不填;1:ture,0:false)"
+    },
+    {
+      "name": "input_candidate_wifi_securityType",
+      "value": "选择securityType"
+    },
+    {
+      "name": "Input_url",
+      "value": "InputUrl"
+    }
+  ]
+}

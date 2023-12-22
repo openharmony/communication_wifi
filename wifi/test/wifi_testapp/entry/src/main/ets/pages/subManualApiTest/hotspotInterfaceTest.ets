@@ -19,9 +19,9 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
-import ConfigData from '../../Utils/ConfigData';
-import { initHotspotApIData } from '../../MainAbility/model/testDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import { initHotspotApIData } from '../../entryability/model/testDataModels'
+import { TestData } from '../../entryability/model/testData'
 import { FilterTable } from '../../Component/filterTable';
 
 /**
@@ -35,11 +35,11 @@ struct hotspotInterfaceTest {
   private testItem: TestData = Router.getParams().testId;
   @State message: string = "";
   @State h_ssid: string = "testApp1";
-  @State h_securityType: number = 3;
-  @State h_band: number = 2;
+  @State h_securityType: Number = 3;
+  @State h_band: Number = 2;
   @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: number = 3 ;
-  @State h_channel: number = 36 ;
+  @State h_maxConn: Number = 3 ;
+  @State h_channel: Number = 36 ;
   @StorageLink( 'hotspotSsid' ) hotspotSsid: string = "";
   @StorageLink( 'hotspotStateMessage' ) hotspotStateMessage: string = "";
   @StorageLink( 'getStationsMessage' ) getStationsMessage: string = "";
@@ -68,23 +68,24 @@ struct hotspotInterfaceTest {
       }
 
       Stack().height( "0.5vp" ).backgroundColor( "#000000" );
+
       Column() {
         Row() {
           Text( "本设备热点名:" )
             .fontSize( "17vp" )
             .height( 60 )
             .width( ConfigData.WH_30_100 )
+            .padding( { left : 10 } )
           TextInput( { text : this.hotspotSsid , placeholder : "在右侧输入热点的配置" } )
             .fontSize( "17vp" )
+            .backgroundColor( $r( "app.color.white" ) )
             .onChange( ( strInput ) => {
               this.hotspotSsid = strInput;
-              AppStorage.SetOrCreate( "hotspotSsid" , strInput )
             } )
             .width( ConfigData.WH_50_100 )
           Image( $r( 'app.media.Switch' ) )
-            .height( 40 )
-            .width( 40 )
-            .padding( { top : 10 , bottom : 10 , left : 2 } )
+            .height( 50 )
+            .padding( { top : 5 , bottom : 5 , left : 10 } )
             .width( ConfigData.WH_15_100 )
             .onClick( () => {
               this.showList = !this.showList;
@@ -92,7 +93,6 @@ struct hotspotInterfaceTest {
         }
         .margin( { top : "10vp" , left : "20vp" , right : "20vp" } )
         .alignItems( VerticalAlign.Center )
-        .backgroundColor( $r( "app.color.white" ) )
         .width( ConfigData.WH_100_100 )
         .height( 60 )
       }
@@ -109,27 +109,27 @@ struct hotspotInterfaceTest {
               //                .width(ConfigData.WH_100_100)
               Text( "热点状态:" + this.hotspotStateMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "热点配置:" + this.getHotspotConfigMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "连接设备:" + this.getStationsMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "加入状态:" + this.hotspotStaJoinMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
               Text( "离开状态:" + this.hotspotStaLeaveMessage )
                 .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
+                .margin( { top : "5vp" , left : "10vp" } )
                 .textAlign( TextAlign.Start )
                 .width( ConfigData.WH_90_100 )
             }

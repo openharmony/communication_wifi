@@ -19,10 +19,6 @@
 #include "wifi_hal_adapter.h"
 #include "wifi_hal_module_manage.h"
 #include "wifi_hal_common_func.h"
-#ifdef HDI_INTERFACE_SUPPORT
-#include "wifi_hdi_proxy.h"
-#include "wifi_hdi_ap_impl.h"
-#endif
 #include "wifi_log.h"
 #include "wifi_wpa_hal.h"
 #include "wifi_hostapd_hal.h"
@@ -60,12 +56,6 @@ WifiErrorNo StartSoftAp(int id, char *ifaceName)
             return WIFI_HAL_FAILED;
         }
     }
-#ifdef HDI_INTERFACE_SUPPORT
-    if (HdiStart() != WIFI_HAL_SUCCESS) {
-        LOGE("[Ap] Start hdi failed!");
-        return WIFI_HAL_FAILED;
-    }
-#endif
     LOGI("AP start successfully, id:%{public}d!", id);
     return WIFI_HAL_SUCCESS;
 }
@@ -121,12 +111,6 @@ WifiErrorNo StartHostapdHal(int id)
 
 WifiErrorNo StopSoftAp(int id)
 {
-#ifdef HDI_INTERFACE_SUPPORT
-    if (HdiStop() != WIFI_HAL_SUCCESS) {
-        LOGE("[Ap] Stop hdi failed!");
-        return WIFI_HAL_FAILED;
-    }
-#endif
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice != NULL) {
         int ret = hostapdHalDevice->disableAp(id);
@@ -190,13 +174,6 @@ WifiErrorNo SetCountryCode(const char *code, int id)
         return WIFI_HAL_INVALID_PARAM;
     }
     LOGD("SetCountryCode() code: %{public}s", code);
-#ifdef HDI_INTERFACE_SUPPORT
-    WifiErrorNo ret = HdiSetCountryCode(code, id);
-    if (ret != WIFI_HAL_SUCCESS) {
-        LOGE("[Ap] HdiSetCountryCode failed!");
-        return WIFI_HAL_FAILED;
-    }
-#else
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         return WIFI_HAL_HOSTAPD_NOT_INIT;
@@ -205,7 +182,6 @@ WifiErrorNo SetCountryCode(const char *code, int id)
         LOGE("SetCountryCode failed!");
         return WIFI_HAL_FAILED;
     }
-#endif
     return WIFI_HAL_SUCCESS;
 }
 

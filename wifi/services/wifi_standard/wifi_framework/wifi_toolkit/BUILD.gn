@@ -57,6 +57,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
+  "$WIFI_ROOT_DIR/utils/inc",
 ]
 
 if (defined(ohos_lite)) {
@@ -111,9 +112,14 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
       "//base/security/certificate_manager/frameworks/cert_manager_standard/main/common/include",
       "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include",
+      "$WIFI_ROOT_DIR/utils/inc",
     ]
 
-    deps = [ "//third_party/libxml2:xml2" ]
+    deps = [
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
+      "//third_party/curl:curl",
+      "//third_party/libxml2:xml2",
+    ]
 
     defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",

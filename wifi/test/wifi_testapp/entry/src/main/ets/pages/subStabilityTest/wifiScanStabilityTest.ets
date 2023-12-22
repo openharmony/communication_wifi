@@ -20,8 +20,8 @@ import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
 import ConfigData from '../../Utils/ConfigData';
-import { initWifiApiData } from '../../MainAbility/model/testDataModels'
-import { TestData } from '../../MainAbility/model/testData'
+import { initWifiApiData } from '../../entryability/model/testDataModels'
+import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
@@ -76,7 +76,7 @@ struct WiFiScanStabilityTest {
             .fontSize( $r( 'app.float.font_16' ) )
             .fontColor( $r( 'app.color.title_black_color' ) )
             .onChange( ( value: string ) => {
-              this.testNumbers = Number( value );
+              this.testNumbers = parseInt( value );
             } )
         }
 
@@ -204,9 +204,13 @@ struct WiFiScanStabilityTest {
                         await sleep( 7 )
                       } else {
                         self.closeScanFailNumber = self.closeScanFailNumber + 1
+                        console.log( TAG , "去使能失败的次数：" + self.closeScanFailNumber )
+                        console.log( TAG , "第" + self.closeScanNumber + "次去使能失败" )
                       }
                     } else if ( self.scanStateMessage == "scan fail" ) {
                       self.openScanFailNumber = self.openScanFailNumber + 1
+                      console.log( TAG , "扫描失败的次数：" + self.openScanFailNumber )
+                      console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描失败" )
                       break;
                     } else {
                       console.log( "第" + ( self.openScanNumber + 1 ) + "次扫描后状态不清楚" );
@@ -219,6 +223,8 @@ struct WiFiScanStabilityTest {
               forLoop()
 
             } )
+
+          Blank().width( "10%" )
 
           Button( "关闭扫描测试" )
             .operateButtonStyle( $r( 'app.color.main_blue' ) )
@@ -238,7 +244,7 @@ struct WiFiScanStabilityTest {
 
   onWifiScanState() {
     console.log( TAG , "on.wifiScanStateChange start--------" )
-    wifiManager.on( "wifiScanStateChange" , ( number ) => {
+    wifi.on( "wifiScanStateChange" , ( number ) => {
       console.log( TAG , " on.wifiScanStateChange success--------" )
       let wifiScanStateMessage = ""
       switch ( number ) {
@@ -269,14 +275,18 @@ struct WiFiScanStabilityTest {
       console.log( TAG , " on.wifiStateChange callback end--------" )
       return this.scanStateMessage
     } )
-    return this.scanStateMessage
+  }
+
+  aboutToDisappear() {
+    wifi.off( "wifiScanStateChange" )
   }
 }
 
 /**
  * Custom button style.
  */
-@Extend( Button ) function operateButtonStyle( color: Resource ) {
+@Extend( Button )
+function operateButtonStyle( color: Resource ) {
   .width( $r( 'app.float.button_width' ) )
   .height( $r( 'app.float.button_height' ) )
   .fontSize( $r( 'app.float.font_16' ) )

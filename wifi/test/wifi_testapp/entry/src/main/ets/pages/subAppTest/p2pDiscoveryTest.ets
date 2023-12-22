@@ -18,12 +18,12 @@
 import featureAbility from '@ohos.ability.featureAbility'
 import wifi from '@ohos.wifi'
 import { AvailableP2p } from '../../Component/availableP2p'
-import { TestData } from '../../MainAbility/model/testData'
+import { TestData } from '../../entryability/model/testData'
 import router from '@system.router';
 import { P2pTitleBar } from '../../Component/p2pTitleBar'
 import { PageTitle } from '../../Component/pageTitle'
 import { TestImageDisplay } from '../../Component/testImageDisplay'
-import { P2pModel } from '../../MainAbility/model/p2pModel'
+import { P2pModel } from '../../entryability/model/p2pModel'
 
 const TAG = '[p2pScan]'
 const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
@@ -36,7 +36,7 @@ struct P2pFound {
   private p2pModel: P2pModel = new P2pModel()
   private testItem: TestData = router.getParams().testId;
   // private testItem: string = "p2p扫描"
-  @State p2pLinkedInfo: any = {
+  private p2pLinkedInfo: any = {
     deviceName : "" ,
     deviceAddress : "" ,
     groupOwnerAddr : "" ,

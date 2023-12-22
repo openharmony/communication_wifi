@@ -35,7 +35,6 @@ WifiPowerStateListener::WifiPowerStateListener()
 void WifiPowerStateListener::OnSyncSleep(bool onForceSleep)
 {
     WIFI_LOGI("Enter WifiPowerStateListener::OnSyncSleep");
-
     if (!onForceSleep) {
         WIFI_LOGI("WifiPowerStateListener::OnSyncSleep not force sleep");
         return;
@@ -47,7 +46,6 @@ void WifiPowerStateListener::OnSyncSleep(bool onForceSleep)
 void WifiPowerStateListener::OnSyncWakeup(bool onForceSleep)
 {
     WIFI_LOGI("Enter WifiPowerStateListener::OnSyncWakeup");
-
     if (!onForceSleep) {
         WIFI_LOGI("WifiPowerStateListener::OnSyncWakeup not force sleep");
         return;
@@ -59,13 +57,11 @@ void WifiPowerStateListener::OnSyncWakeup(bool onForceSleep)
 void WifiPowerStateListener::DealPowerEnterSleepEvent()
 {
     WIFI_LOGI("DealPowerEnterSleepEvent Enter!");
-
     WifiConfigCenter::GetInstance().SetPowerSleepState(MODE_STATE_OPEN);
 
-#ifndef OHOS_ARCH_LITE
 #ifdef FEATURE_AP_SUPPORT
     for (int idx = 0; idx < AP_INSTANCE_MAX_NUM; idx++) {
-        WifiManager::GetInstance().SoftapToggled(0, idx);
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, idx);
     }
 #endif
 
@@ -74,29 +70,25 @@ void WifiPowerStateListener::DealPowerEnterSleepEvent()
         if (staState == WifiOprMidState::RUNNING) {
             bWifiStateBeforeSleep[idx] = true;
             WifiSettings::GetInstance().SetWifiToggledState(false);
-            WifiManager::GetInstance().WifiToggled(0, idx);
+            WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, idx);
 
             /* For the forced sleep mode, the final status does not need to be stored. */
             WifiConfigCenter::GetInstance().SetStaLastRunState(true, idx);
         }
     }
-#endif
-
     return;
 }
 
 void WifiPowerStateListener::DealPowerExitSleepEvent()
 {
     WIFI_LOGI("DealPowerExitSleepEvent Enter!");
-
     WifiConfigCenter::GetInstance().SetPowerSleepState(MODE_STATE_CLOSE);
 
-#ifndef OHOS_ARCH_LITE
     /* Re-opening is required only if it was previously turned on and then turned off when entering enforce sleep. */
     for (int idx = 0; idx < STA_INSTANCE_MAX_NUM; idx++) {
         if (bWifiStateBeforeSleep[idx]) {
             WifiSettings::GetInstance().SetWifiToggledState(true);
-            ErrCode ret = WifiManager::GetInstance().WifiToggled(1, idx);
+            ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, idx);
             if (ret != WIFI_OPT_SUCCESS) {
                 WIFI_LOGE("DealPowerExitSleepEvent, AutoStartStaService failed, err_code = %{public}d!", ret);
             } else {
@@ -105,17 +97,7 @@ void WifiPowerStateListener::DealPowerExitSleepEvent()
             bWifiStateBeforeSleep[idx] = false;
         }
     }
-#endif
     return;
-}
-
-void PowerStateCallback::OnPowerStateChanged(PowerState state)
-{
-    if (static_cast<int>(state) == POWER_STATE_DOZ) {
-        WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
-    } else {
-        WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
-    }
 }
 } // namespace Wifi
 } // namespace OHOS

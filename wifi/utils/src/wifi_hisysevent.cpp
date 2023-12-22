@@ -89,5 +89,86 @@ void WriteWifiConnectionInfoHiSysEvent(int networkId)
     root["NETWORK_ID"] = networkId;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONNECTION_INFO", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReason, int apState)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OPERATE_TYPE"] = operateType;
+    root["FAIL_REASON"] = failReason;
+    root["AP_STATE"] = apState;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_OPEN_AND_CLOSE_FAILED", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason)
+{
+    WIFI_LOGE("WriteSoftApOpenAndCloseFailedEvent operateType=%{public}d", operateType);
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OPERATE_TYPE"] = operateType;
+    root["FAIL_REASON"] = failReason;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_OPEN_AND_CLOSE_FAILED", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OPERATE_TYPE"] = operateRes;
+    root["FAIL_CNT"] = failCnt;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ACCESS_INTERNET_FAILED", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["IS_START"] = isStartScan;
+    root["SUSPEND_REASON"] = suspendReason;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PNO_SCAN_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &Server)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["RESP_CODE"] = respCode;
+    root["SERVER"] = Server;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BROWSER_FAILED_FOR_PROTAL", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiConnectFailedEventHiSysEvent(int operateType)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OPERATE_TYPE"] = operateType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONNECT_FAILED_EVENT", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteP2pKpiCountHiSysEvent(int eventType)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["EVENT_TYPE"] = eventType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_KPI", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["EVENT_TYPE"] = errCode;
+    root["FAIL_RES"] = failRes;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_CONNECT_FAIL", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["EVENT_TYPE"] = errCode;
+    root["FAIL_RES"] = failRes;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_AB_DISCONNECT", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

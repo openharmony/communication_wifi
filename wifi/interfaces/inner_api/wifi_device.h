@@ -18,6 +18,7 @@
 #include "i_wifi_device_callback.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
+#include "network_selection_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -190,6 +191,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode IsWifiActive(bool &bActive) = 0;
+
+    /**
+     * @Description Check whether Wi-Fi is metered hotspot.
+     *
+     * @param bMeteredHotspot - isMeteredHotspot / notMeteredHotspot
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsMeteredHotspot(bool &bMeteredHotspot) = 0;
 
     /**
      * @Description Get the Wi-Fi State.
@@ -376,7 +385,68 @@ public:
      */
     virtual ErrCode ResetAllFrozenApp() = 0;
 
+    /**
+      * @Description  disable auto join.
+      *
+      * @param conditionName autoJoinDisabled condition.
+      * @return WifiErrorNo
+      */
+    virtual ErrCode DisableAutoJoin(const std::string &conditionName) = 0;
+
+    /**
+     * @Description  enable auto join.
+     *
+     * @param conditionName autoJoinDisabled condition.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode EnableAutoJoin(const std::string &conditionName) = 0;
+
+    /**
+     * @Description  register auto join condition.
+     *
+     * @param conditionName the name of condition.
+     * @param autoJoinCondition condition.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode RegisterAutoJoinCondition(const std::string &conditionName,
+                                              const std::function<bool()> &autoJoinCondition) = 0;
+
+    /**
+     * @Description  deregister auto join condition.
+     *
+     * @param conditionName the name of condition.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode DeregisterAutoJoinCondition(const std::string &conditionName) = 0;
+
+    /**
+     * @Description  register external filter builder.
+     *
+     * @param filterTag filterTag which define where the filter should be inserted.
+     * @param filterName the name of the filter to build.
+     * @param filterBuilder filter builder.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode RegisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName,
+                               const FilterBuilder &filterBuilder) = 0;
+
+    /**
+     * @Description  deregister external filter builder.
+     *
+     * @param filterTag filterTag which define where the filter should be inserted.
+     * @param filterName the name of the filter to build.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) = 0;
+
     virtual ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description reset factory
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode FactoryReset() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -508,11 +508,6 @@ int WifiIdlClient::PushDeviceConfigParseMask(
 
 WifiErrorNo WifiIdlClient::CheckValidDeviceConfig(const WifiIdlDeviceConfig &config) const
 {
-    if (config.psk.length() > 0) {
-        if (config.psk.length() < WIFI_IDL_PSK_MIN_LENGTH || config.psk.length() > WIFI_IDL_PSK_MAX_LENGTH) {
-            return WIFI_IDL_OPT_FAILED;
-        }
-    }
     if (config.authAlgorithms >= AUTH_ALGORITHM_MAX) { /* max is 0111 */
         return WIFI_IDL_OPT_FAILED;
     }
@@ -533,7 +528,9 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
     }
     int num = 0;
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SSID, config.ssid);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PSK, config.psk);
+    if (config.keyMgmt.find(KEY_MGMT_WPA_PSK) != std::string::npos) {
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PSK, config.psk);
+    }
     if (config.keyMgmt.find(KEY_MGMT_SAE) != std::string::npos) {
         num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SAE_PASSWD, config.psk);
     }

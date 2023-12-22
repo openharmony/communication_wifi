@@ -18,7 +18,7 @@
 import  wifi from '@ohos.wifi'
 import { AvailableWifi } from '../../Component/availableWifi'
 import { TitleBar } from '../../Component/titleBar'
-import { WifiModel } from '../../MainAbility/model/wifiModel'
+import { WifiModel } from '../../entryability/model/wifiModel'
 
 const TAG = '[wifiScan]'
 
@@ -30,7 +30,7 @@ const TAG = '[wifiScan]'
 struct WifiScan {
   private wifiModel: WifiModel = new WifiModel()
   private testItem: string = "Wlan扫描"
-  @State linkedInfo: any = {
+  private linkedInfo: any = {
     ssid : "" ,
     bssid : "" ,
     networkId : 0 ,

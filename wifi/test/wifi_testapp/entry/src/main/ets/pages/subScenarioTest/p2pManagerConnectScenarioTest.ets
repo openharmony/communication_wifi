@@ -19,14 +19,14 @@ import prompt from '@system.prompt';
 import router from '@system.router';
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { TestData } from '../../MainAbility/model/testData'
+import { TestData } from '../../entryability/model/testData'
 import { ScenarioContentTable } from '../../Component/scenarioContentTable'
 import {
   P2pManagerConnectScenarioTestCase ,
   initP2pManagerConnectScenarioData
-} from '../../MainAbility/model/scenarioTestDataModels'
-import * as P2pManagerInterface from '../../MainAbility/model/p2pManagerInterface'
-import ConfigData from '../../Utils/ConfigData';
+} from '../../entryability/model/scenarioTestDataModels'
+import * as P2pManagerInterface from '../../entryability/model/p2pManagerInterface'
+import ConfigData from '../../utils/ConfigData';
 
 /**
  * p2pManager Connect Scenario Test Page Of WiFi test
@@ -36,13 +36,13 @@ import ConfigData from '../../Utils/ConfigData';
 struct p2pManagerConnectScenarioTest {
   @State message: string = 'p2pManagerConnectScenarioTest';
   private testItem: TestData = router.getParams().testId;
-  @State changeIndex: number = - 1
+  @State changeIndex: Number = - 1
   @StorageLink( "p2pManagerConnectScenarioMessage" ) p2pManagerConnectScenarioMessage: string = ""
   @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
-  @State netIdManager: number = - 2 ;
+  @State netIdManager: Number = - 2 ;
   @State passphraseManager: string = "12345678" ;
   @State groupNameManager: string = "testGroup"
-  @State goBandManager: number = 0 ;
+  @State goBandManager: Number = 0 ;
   @State devNameManager: string = "MyTestDevice"
 
   aboutToAppear() {

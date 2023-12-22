@@ -169,7 +169,7 @@ HWTEST_F(DhcpdInterfaceTest, GetConnectedStationInfo_001, TestSize.Level1)
     WIFI_LOGI("GetConnectedStationInfo_001 enter");
     std::string ifaceName = "wlan0";
     std::map<std::string, StationInfo> result;
-    EXPECT_FALSE(pDhcpdInterface->GetConnectedStationInfo(ifaceName, result));
+    EXPECT_TRUE(pDhcpdInterface->GetConnectedStationInfo(ifaceName, result));
 }
 /**
  * @tc.name: GetConnectedStationInfo_002
@@ -183,7 +183,7 @@ HWTEST_F(DhcpdInterfaceTest, GetConnectedStationInfo_002, TestSize.Level1)
     std::string ifaceName;
     std::map<std::string, StationInfo> result;
     StartDhcpServerTest();
-    EXPECT_FALSE(pDhcpdInterface->GetConnectedStationInfo(ifaceName, result));
+    EXPECT_TRUE(pDhcpdInterface->GetConnectedStationInfo(ifaceName, result));
 }
 /**
  * @tc.name: GetConnectedStationInfo_003
@@ -197,7 +197,7 @@ HWTEST_F(DhcpdInterfaceTest, GetConnectedStationInfo_003, TestSize.Level1)
     std::string ifaceName = "wlan0";
     std::map<std::string, StationInfo> result;
     StartDhcpServerTest();
-    EXPECT_FALSE(pDhcpdInterface->GetConnectedStationInfo(ifaceName, result));
+    EXPECT_TRUE(pDhcpdInterface->GetConnectedStationInfo(ifaceName, result));
 }
 /**
  * @tc.name: StopDhcpServer_001

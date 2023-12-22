@@ -29,8 +29,10 @@
 #include "sta_service_callback.h"
 #include "dhcp_c_api.h"
 #include "sta_define.h"
+#include "network_status_history_manager.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_net_agent.h"
+#include "wifi_net_observer.h"
 #endif
 
 namespace OHOS {
@@ -450,8 +452,8 @@ public:
      *
      */
     void HandlePortalNetworkPorcess();
-
     int GetInstanceId();
+
 private:
     /**
      * @Description  Destruct state.
@@ -557,9 +559,10 @@ private:
      * @Description  Start to connect to network.
      *
      * @param networkId - the networkId of network which is going to be connected.(in)
+     * @param bssid - the bssid of network which is going to be connected.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode StartConnectToNetwork(int networkId);
+    ErrCode StartConnectToNetwork(int networkId, const std::string &bssid);
     /**
      * @Description  Disable network
      *
@@ -597,6 +600,10 @@ private:
      * @param netState - the state of connecting network(in)
      */
     void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
+
+    void NetDetectionProcess(StaNetState netState, const std::string portalUrl);
+
+    void NetStateObserverCallback(SystemNetWorkState netState);
     /**
      * @Description  the process of handling arp check results.
      *
@@ -853,6 +860,7 @@ private:
     std::map<std::string, StaServiceCallback> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
+    std::shared_ptr<NetStateObserver> m_NetWorkState;
 #endif
 
     int lastNetworkId;
@@ -870,6 +878,7 @@ private:
     bool isRoam;
     int netNoWorkNum;
     bool portalFlag;
+    bool networkStatusHistoryInserted;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
     DhcpResultNotify *pDhcpResultNotify;
@@ -889,10 +898,11 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-    std::string mPortalUrl;
+    SystemNetWorkState m_netState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
+    std::string mPortalUrl;
     /**
      * @Description Replace empty dns
      */
@@ -903,6 +913,8 @@ private:
     void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);
     void InvokeOnStaRssiLevelChanged(int level);
+    WifiDeviceConfig getCurrentWifiDeviceConfig();
+    void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
 };
 }  // namespace Wifi
 }  // namespace OHOS

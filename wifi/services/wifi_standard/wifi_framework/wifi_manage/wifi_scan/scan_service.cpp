@@ -22,6 +22,7 @@
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
@@ -360,6 +361,7 @@ ErrCode ScanService::StartWifiPnoScan(bool isStartAction, int periodMs, int susp
         BeginPnoScan();
     } else {
         StopPnoScan();
+        WriteWifiPnoScanHiSysEvent(MODE_STATE_CLOSE, suspendReason);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -821,7 +823,7 @@ bool ScanService::BeginPnoScan()
         return false;
     }
 
-    pnoScanConfig.scanInterval = MIN_SYSTEM_SCAN_INTERVAL;
+    pnoScanConfig.scanInterval = DEFAULT_PNO_SCAN_INTERVAL;
     /* Querying a Scan Policy */
     if (pnoScanIntervalMode.scanIntervalMode.interval > 0) {
         pnoScanConfig.scanInterval = pnoScanIntervalMode.scanIntervalMode.interval;
@@ -842,6 +844,7 @@ bool ScanService::BeginPnoScan()
         return false;
     }
     isPnoScanBegined = true;
+    WriteWifiPnoScanHiSysEvent(MODE_STATE_OPEN, 0);
 
     return true;
 }
@@ -1003,6 +1006,21 @@ void ScanService::HandleStaStatusChanged(int status)
     return;
 }
 
+void ScanService::HandleNetworkQualityChanged(int status)
+{
+    WIFI_LOGI("Enter ScanService::HandleNetworkQualityChanged, change to status: %{public}d.", status);
+    switch (status) {
+        case static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED): {
+            SystemScanProcess(true);
+            break;
+        }
+        case static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED): {
+            SystemScanProcess(false);
+            break;
+        }
+    }
+}
+
 void ScanService::HandleMovingFreezeChanged()
 {
     LOGI("Enter ScanService::HandleMovingFreezeChanged.");
@@ -1022,6 +1040,7 @@ void ScanService::HandleMovingFreezeChanged()
         WIFI_LOGW("set movingFreeze scanned false.");
         SetMovingFreezeScaned(false);
     }
+    SystemScanProcess(false);
 }
 
 void ScanService::HandleCustomStatusChanged(int customScene, int customSceneStatus)
@@ -1262,7 +1281,7 @@ ErrCode ScanService::AllowExternScan()
         return WIFI_OPT_FAILED;
     }
     
-    int appId = 0;
+    int appId = GetCallingUid();
     if (!AllowExternScanByInterval(appId, staScene, scanMode)) {
         WIFI_LOGW("extern scan not allow by interval mode");
         return WIFI_OPT_FAILED;
@@ -2482,7 +2501,7 @@ bool ScanService::AllowScanByDisableScanCtrl()
 
 bool ScanService::AllowScanByMovingFreeze()
 {
-    LOGD("Enter ScanService::AllowScanByMovingFreeze.\n");
+    LOGI("Enter ScanService::AllowScanByMovingFreeze.\n");
 
     /* moving freeze trust mode. */
     bool isTrustListMode = IsScanTrustMode();
@@ -2511,10 +2530,11 @@ bool ScanService::AllowScanByMovingFreeze()
 bool ScanService::AllowScanByHid2dState()
 {
     LOGD("Enter ScanService::AllowScanByHid2dState.\n");
+    std::string ifName;
     Hid2dUpperScene scene;
     P2pBusinessType type;
     WifiP2pLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetHid2dUpperScene(scene);
+    WifiSettings::GetInstance().GetHid2dUpperScene(ifName, scene);
     WifiSettings::GetInstance().GetP2pBusinessType(type);
     WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
 
@@ -2522,14 +2542,25 @@ bool ScanService::AllowScanByHid2dState()
         WIFI_LOGI("ScanService::AllowScanByHid2dState, no need to control this scan");
         return true;
     }
-    if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {
+    if (strstr(ifName.c_str(), "chba")) {
+        if ((scene.scene & 0x07) > 0) {
+            WIFI_LOGW("Scan is not allowed in hml.");
+            return false;
+        } else {
+            WIFI_LOGW("allow scan, and clear ifname.");
+            WifiSettings::GetInstance().SetHid2dUpperScene("", scene);
+        }
         return true;
-    }
-    // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
-    // scene & 0x07 > 0 means one of them takes effect.
-    if (((scene.scene & 0x07) > 0) && type == P2pBusinessType::P2P_TYPE_HID2D) {
-        WIFI_LOGW("Scan is not allowed in hid2d business.");
-        return false;
+    } else {
+        if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {
+            return true;
+        }
+        // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
+        // scene & 0x07 > 0 means one of them takes effect.
+        if (((scene.scene & 0x07) > 0) && type == P2pBusinessType::P2P_TYPE_HID2D) {
+            WIFI_LOGW("Scan is not allowed in hid2d business.");
+            return false;
+        }
     }
     return true;
 }

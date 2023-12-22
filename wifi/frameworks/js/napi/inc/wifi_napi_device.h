@@ -49,6 +49,7 @@ napi_value GetIpInfo(napi_env env, napi_callback_info info);
 napi_value GetIpv6Info(napi_env env, napi_callback_info info);
 napi_value GetLinkedInfo(napi_env env, napi_callback_info info);
 napi_value GetDisconnectedReason(napi_env env, napi_callback_info info);
+napi_value IsMeteredHotspot(napi_env env, napi_callback_info info);
 napi_value RemoveDevice(napi_env env, napi_callback_info info);
 napi_value RemoveAllNetwork(napi_env env, napi_callback_info info);
 napi_value DisableNetwork(napi_env env, napi_callback_info info);
@@ -65,6 +66,7 @@ napi_value GetScanOnlyAvailable(napi_env env, napi_callback_info info);
 napi_value StartPortalCertification(napi_env env, napi_callback_info info);
 napi_value GetWifiProtect(napi_env env, napi_callback_info info);
 napi_value PutWifiProtect(napi_env env, napi_callback_info info);
+napi_value FactoryReset(napi_env env, napi_callback_info info);
 
 class ScanInfoAsyncContext : public AsyncContext {
 public:

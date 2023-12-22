@@ -19,10 +19,10 @@
 #include "wifi_logger.h"
 #include "network_selection_utils.h"
 
-DEFINE_WIFILOG_LABEL("networkSelectionManager")
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("networkSelectionManager")
+
 ErrCode NetworkSelectionManager::InitNetworkSelectionService()
 {
     pNetworkSelectorFactory = std::make_unique<NetworkSelectorFactory>();

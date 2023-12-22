@@ -3,13 +3,12 @@
 //
 
 #include "network_selection.h"
-#include "network_selection_utils.h"
 #include "wifi_logger.h"
-
-DEFINE_WIFILOG_LABEL("NetworkSelection")
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("NetworkSelection")
+
 bool IWifiFilter::DoFilter(NetworkCandidate &networkCandidate)
 {
     bool filterResult = Filter(networkCandidate);

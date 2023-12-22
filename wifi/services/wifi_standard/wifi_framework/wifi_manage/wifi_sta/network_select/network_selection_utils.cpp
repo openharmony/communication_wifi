@@ -19,10 +19,12 @@
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_LABEL("NetworkSelectionUtils")
+
 
 namespace OHOS {
 namespace Wifi {
+
+DEFINE_WIFILOG_LABEL("NetworkSelectionUtils")
 
 constexpr int RECHECK_DELAYED_SECONDS = 1 * 60 * 60;
 constexpr int MAX_RETRY_COUNT = 3;

@@ -28,7 +28,8 @@ ErrCode NetworkSelectorFactory::InitNetworkSelectorFactory()
     return WIFI_OPT_SUCCESS;
 }
 
-std::optional<std::unique_ptr<INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(NetworkSelectType networkSelectType)
+std::optional<std::unique_ptr<INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(
+    NetworkSelectType networkSelectType)
 {
     auto iter = handleFuncMap.find(static_cast<uint32_t>(networkSelectType));
     if (iter != handleFuncMap.end()) {

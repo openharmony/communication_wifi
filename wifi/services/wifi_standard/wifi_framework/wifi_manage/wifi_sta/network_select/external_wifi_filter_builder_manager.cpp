@@ -17,10 +17,12 @@
 #include "external_wifi_filter_builder_manager.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_LABEL("WifiFilterBuilderManager")
+
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiFilterBuilderManager")
+
 ExternalWifiFilterBuildManager &ExternalWifiFilterBuildManager::GetInstance()
 {
     static ExternalWifiFilterBuildManager gNetworkSelectorFilterBuilderManager;

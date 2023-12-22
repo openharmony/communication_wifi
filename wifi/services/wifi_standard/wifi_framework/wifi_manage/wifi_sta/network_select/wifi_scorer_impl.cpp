@@ -19,10 +19,10 @@
 #include "network_status_history_manager.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_LABEL("WifiScorerImpl")
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiScorerImpl")
+
 constexpr int SUFFICIENT_RSSI_5G = -70;
 constexpr int SUFFICIENT_RSSI_2G = -73;
 constexpr int RSSI_SCORE_OFFSET = 85;

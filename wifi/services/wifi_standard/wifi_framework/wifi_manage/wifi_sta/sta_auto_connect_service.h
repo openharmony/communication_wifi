@@ -122,7 +122,7 @@ public:
 private:
     StaStateMachine *pStaStateMachine;
     StaDeviceAppraisal *pSavedDeviceAppraisal;
-    NetworkSelectionManager *pNetworkSelectionManager;
+    std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = nullptr;
     bool firmwareRoamFlag;
     int maxBlockedBssidNum;
     int selectDeviceLastTime;

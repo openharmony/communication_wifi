@@ -14,13 +14,14 @@
  */
 
 #include <sstream>
-#include "network_selector_comparator.h"
+#include "wifi_comparator_impl.h"
 #include "network_selection_utils.h"
 #include "wifi_logger.h"
 
+DEFINE_WIFILOG_LABEL("WifiComparatorImpl")
+
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("NETWORK_SELECTOR_COMPARATOR")
 WifiScorerComparator::WifiScorerComparator(const std::string &comparatorName)
     : comparatorName(comparatorName) {}
 

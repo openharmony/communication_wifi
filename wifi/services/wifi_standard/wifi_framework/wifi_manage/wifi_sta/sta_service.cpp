@@ -28,7 +28,7 @@
 #include "wifi_common_util.h"
 #include "network_selection_manager.h"
 #include "wifi_config_center.h"
-#include "network_filter_builder_manager.h"
+#include "external_wifi_filter_builder_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 

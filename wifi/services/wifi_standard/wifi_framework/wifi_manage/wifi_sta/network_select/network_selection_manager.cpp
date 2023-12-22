@@ -19,30 +19,13 @@
 #include "wifi_logger.h"
 #include "network_selection_utils.h"
 
+DEFINE_WIFILOG_LABEL("networkSelectionManager")
+
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("NETWORK_SELECTION_MANAGER")
-NetworkSelectionManager::NetworkSelectionManager() : pNetworkSelectorFactory(nullptr) {}
-
-NetworkSelectionManager::~NetworkSelectionManager()
-{
-    if (pNetworkSelectorFactory != nullptr) {
-        delete pNetworkSelectorFactory;
-        pNetworkSelectorFactory = nullptr;
-    }
-}
-
 ErrCode NetworkSelectionManager::InitNetworkSelectionService()
 {
-    pNetworkSelectorFactory = new (std::nothrow) NetworkSelectorFactory();
-    if (pNetworkSelectorFactory == nullptr) {
-        WIFI_LOGE("pNetworkSelectorFactory is null\n");
-        return WIFI_OPT_FAILED;
-    }
-    if (pNetworkSelectorFactory->InitNetworkSelectorFactory() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("InitAutoConnectService failed.\n");
-        return WIFI_OPT_FAILED;
-    }
+    pNetworkSelectorFactory = std::make_unique<NetworkSelectorFactory>();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -62,11 +45,11 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     /* Get the device config for each scanInfo, then create networkCandidate and put it into networkCandidates */
     GetAllDeviceConfigs(networkCandidates, scanInfos);
 
-    /* Traverse networkCandidates and reserve qualified netwrorkCandidate */
-    TryNominator(networkCandidates, networkSelector);
-    std::vector<NetworkCandidate *> bestNetworkCandidates;
+    /* Traverse networkCandidates and reserve qualified networkCandidate */
+    TryNominate(networkCandidates, networkSelector);
 
     /* Get best networkCandidate from the reserved networkCandidates */
+    std::vector<NetworkCandidate *> bestNetworkCandidates;
     networkSelector->GetBestCandidates(bestNetworkCandidates);
     if (bestNetworkCandidates.empty()) {
         return false;
@@ -92,12 +75,11 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkCandidate> 
     }
 }
 
-void NetworkSelectionManager::TryNominator(std::vector<NetworkCandidate> &networkCandidates,
-                                           const std::unique_ptr<INetworkSelector> &networkSelector)
+void NetworkSelectionManager::TryNominate(std::vector<NetworkCandidate> &networkCandidates,
+                                          const std::unique_ptr<INetworkSelector> &networkSelector)
 {
     std::for_each(networkCandidates.begin(), networkCandidates.end(), [&networkSelector](auto &networkCandidate) {
         networkSelector->TryNominate(networkCandidate);
-
         /* log the nominate result for current networkCandidate */
         LogNominateResult(networkCandidate);
     });

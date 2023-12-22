@@ -17,8 +17,8 @@
 #ifndef OHOS_WIFI_NETWORK_SELECTION_MANAGER_H
 #define OHOS_WIFI_NETWORK_SELECTION_MANAGER_H
 
+#include "network_selection.h"
 #include "network_selection_msg.h"
-#include "network_selector.h"
 #include "network_selector_factory.h"
 
 namespace OHOS {
@@ -30,8 +30,6 @@ struct NetworkSelectionResult {
 
 class NetworkSelectionManager {
 public:
-    NetworkSelectionManager();
-    ~NetworkSelectionManager();
     ErrCode InitNetworkSelectionService();
     /**
      * the function to select network.
@@ -45,7 +43,7 @@ public:
                        NetworkSelectType type,
                        const std::vector<InterScanInfo> &scanInfos);
 private:
-    NetworkSelectorFactory *pNetworkSelectorFactory;
+    std::unique_ptr<NetworkSelectorFactory> pNetworkSelectorFactory = nullptr;
 
     /**
      * get the saved deviceConfig associated with scanInfo
@@ -62,8 +60,8 @@ private:
      * @param networkCandidates candidate networks
      * @param networkSelector networkSelector
      */
-    static void TryNominator(std::vector<NetworkCandidate> &networkCandidates,
-                             const std::unique_ptr<INetworkSelector> &networkSelector);
+    static void TryNominate(std::vector<NetworkCandidate> &networkCandidates,
+                            const std::unique_ptr<INetworkSelector> &networkSelector);
 
     /**
      * the function to log the networkSelection nominate result.

@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("NETWORK_SELECTOR_FACTORY")
+DEFINE_WIFILOG_LABEL("NetworkSelectorFactory")
 
 ErrCode NetworkSelectorFactory::InitNetworkSelectorFactory()
 {

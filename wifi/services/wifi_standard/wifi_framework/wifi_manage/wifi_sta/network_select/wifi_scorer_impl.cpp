@@ -14,9 +14,12 @@
  */
 
 #include <iostream>
-#include "network_selector_scorer.h"
+#include "wifi_scorer_impl.h"
 #include "wifi_settings.h"
 #include "network_status_history_manager.h"
+#include "wifi_logger.h"
+
+DEFINE_WIFILOG_LABEL("WifiScorerImpl")
 
 namespace OHOS {
 namespace Wifi {
@@ -40,35 +43,6 @@ constexpr int SIGNAL_LEVEL_FOUR = 4;
 constexpr int MIN_RSSI = -128;
 constexpr int INTERNET_ACCESS_AWARD = 2;
 constexpr int EMPTY_NETWORK_STATUS_HISTORY_AWARD = 1;
-
-SimpleWifiScorer::SimpleWifiScorer(const std::string &scorerName) : IWifiScorer(), m_scoreName(scorerName) {}
-
-void SimpleWifiScorer::DoScore(NetworkCandidate &networkCandidate, ScoreResult &scoreResult)
-{
-    scoreResult.scorerName = m_scoreName;
-    scoreResult.score = Score(networkCandidate);
-}
-
-CompositeWifiScorer::CompositeWifiScorer(const std::string &scorerName) : IWifiScorer(), m_scoreName(scorerName) {}
-
-void CompositeWifiScorer::AddScorer(const std::shared_ptr<IWifiScorer> &scorer)
-{
-    scorers.emplace_back(scorer);
-}
-
-void CompositeWifiScorer::DoScore(NetworkCandidate &networkCandidate,
-                                  ScoreResult &scoreResult)
-{
-    scoreResult.scorerName = m_scoreName;
-    for (auto &score : scorers) {
-        if (score) {
-            ScoreResult subScoreResult;
-            score->DoScore(networkCandidate, subScoreResult);
-            scoreResult.scoreDetails.emplace_back(subScoreResult);
-            scoreResult.score += subScoreResult.score;
-        }
-    }
-}
 
 RssiScorer::RssiScorer() : SimpleWifiScorer("rssiScorer") {}
 
@@ -127,7 +101,12 @@ bool ThroughputScorer::IsRecentUserSelected(NetworkCandidate &networkCandidate) 
     if (userLastSelectedNetworkId != INVALID_NETWORK_ID
         && userLastSelectedNetworkId == networkCandidate.wifiDeviceConfig.networkId) {
         time_t userLastSelectedNetworkTimeVal = WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal();
-        return (time(nullptr) - userLastSelectedNetworkTimeVal) < MAX_RECENT_SELECTION_SECONDS;
+        auto now = time(nullptr);
+        if (now < 0) {
+            WIFI_LOGW("time return invalid!\n.");
+            return false;
+        }
+        return (now - userLastSelectedNetworkTimeVal) < MAX_RECENT_SELECTION_SECONDS;
     }
     return false;
 }

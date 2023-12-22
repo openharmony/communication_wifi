@@ -18,7 +18,7 @@
 
 #include <memory>
 #include <optional>
-#include "network_selector.h"
+#include "network_selector_impl.h"
 #include "wifi_errcode.h"
 
 namespace OHOS {

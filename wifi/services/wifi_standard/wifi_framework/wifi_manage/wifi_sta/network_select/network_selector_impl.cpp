@@ -19,9 +19,6 @@
 #include "wifi_scorer_impl.h"
 #include "network_selection_utils.h"
 #include "external_wifi_filter_builder_manager.h"
-#include "wifi_logger.h"
-
-DEFINE_WIFILOG_LABEL("NetworkSelectorImpl")
 
 using namespace std;
 
@@ -71,7 +68,8 @@ SavedNetworkSelector::SavedNetworkSelector() : CompositeNetworkSelector("savedNe
     andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsEphemeralNetwork,
                                                                 "notEphemeral",
                                                                 true));
-    andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsNetworkEnabled, "enableNetwork"));
+    andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsNetworkEnabled,
+                                                                "enableNetwork"));
     andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsMatchUserSelected,
                                                                 "matchUserSelected"));
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG, *andFilter);
@@ -143,7 +141,8 @@ HasInternetNetworkSelector::HasInternetNetworkSelector() : SimpleNetworkSelector
     auto filters = make_shared<AndWifiFilter>();
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::HAS_INTERNET_NETWORK_SELECTOR_FILTER_TAG,
                                                               *filters);
-    filters->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsHasInternetNetwork, "hasInternet"));
+    filters->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsHasInternetNetwork,
+                                                              "hasInternet"));
     SetWifiFilter(filters);
     auto networkScoreComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     networkScoreComparator->AddScorer(make_shared<NetworkStatusHistoryScorer>());
@@ -180,7 +179,9 @@ bool RecoveryNetworkSelector::Filter(NetworkCandidate &networkCandidate)
 
 PortalNetworkSelector::PortalNetworkSelector() : SimpleNetworkSelector("portalNetworkSelector"), OrWifiFilter()
 {
-    SetWifiFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsPoorPortalNetwork, "notPoorPortal", true));
+    SetWifiFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsPoorPortalNetwork,
+                                                         "notPoorPortal",
+                                                         true));
     auto networkScorerComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     networkScorerComparator->AddScorer(make_shared<LastHaveInternetTimeScorer>());
     networkScorerComparator->AddScorer(make_shared<SavedNetworkScorer>("portalNetworkScorer"));

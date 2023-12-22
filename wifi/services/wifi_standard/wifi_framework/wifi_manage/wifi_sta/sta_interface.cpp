@@ -16,7 +16,6 @@
 #include "sta_interface.h"
 #include "sta_service.h"
 #include "wifi_logger.h"
-#include "network_filter_builder_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaInterface");
 

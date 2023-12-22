@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_NETWORK_SELECTOR_SCORER_H_
-#define OHOS_WIFI_NETWORK_SELECTOR_SCORER_H_
+#ifndef OHOS_WIFI_WIFI_SCORER_IMPL_H_
+#define OHOS_WIFI_WIFI_SCORER_IMPL_H_
 
 #include <memory>
 #include <string>

@@ -18,10 +18,10 @@
 #include "network_selection_utils.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_LABEL("WifiComparatorImpl")
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("WifiComparatorImpl")
+
 WifiScorerComparator::WifiScorerComparator(const std::string &comparatorName)
     : comparatorName(comparatorName) {}
 

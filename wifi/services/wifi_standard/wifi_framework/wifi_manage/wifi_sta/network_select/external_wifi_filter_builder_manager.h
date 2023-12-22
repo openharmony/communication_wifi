@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_NETWORK_FILTER_BUILDER_MANAGER_H_
-#define OHOS_WIFI_NETWORK_FILTER_BUILDER_MANAGER_H_
+#ifndef OHOS_WIFI_EXTERNAL_NETWORK_FILTER_BUILDER_MANAGER_H_
+#define OHOS_WIFI_EXTERNAL_NETWORK_FILTER_BUILDER_MANAGER_H_
 
 #include <mutex>
 #include "network_selection.h"

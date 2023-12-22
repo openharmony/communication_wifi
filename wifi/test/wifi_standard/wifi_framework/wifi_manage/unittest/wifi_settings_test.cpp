@@ -183,8 +183,9 @@ HWTEST_F(WifiSettingsTest, RemoveRandomMacTest, TestSize.Level1)
     WIFI_LOGE("RemoveRandomMacTest enter!");
     std::string bssid;
     std::string randomMac;
-    WifiSettings::GetInstance().RemoveRandomMac(bssid, randomMac);
+    bool result = WifiSettings::GetInstance().RemoveRandomMac(bssid, randomMac);
     WIFI_LOGE("RemoveRandomMacTest result(%{public}d)", result);
+    EXPECT_TRUE(result);
 }
 
 HWTEST_F(WifiSettingsTest, SetHotspotIdleTimeoutTest, TestSize.Level1)

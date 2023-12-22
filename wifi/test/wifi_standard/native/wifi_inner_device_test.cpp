@@ -63,7 +63,7 @@ HWTEST_F(WifiInnerDeviceTest, GetWifiProtectRefTest, TestSize.Level1)
     EXPECT_TRUE(devicePtr != nullptr);
     ErrCode result = devicePtr->GetWifiProtectRef(WifiProtectMode::WIFI_PROTECT_FULL, PROTECTNAME);
     WIFI_LOGE("GetWifiProtectRefTest result(0x%{public}x)", result);
-    EXPECT_GE(result, WIFI_OPT_SUCCESS);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiInnerDeviceTest, PutWifiProtectRefTest, TestSize.Level1)
@@ -72,7 +72,7 @@ HWTEST_F(WifiInnerDeviceTest, PutWifiProtectRefTest, TestSize.Level1)
     EXPECT_TRUE(devicePtr != nullptr);
     ErrCode result = devicePtr->PutWifiProtectRef(PROTECTNAME);
     WIFI_LOGE("PutWifiProtectRefTest result(0x%{public}x)", result);
-    EXPECT_GE(result, WIFI_OPT_SUCCESS);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiInnerDeviceTest, RemoveCandidateConfigTest, TestSize.Level1)

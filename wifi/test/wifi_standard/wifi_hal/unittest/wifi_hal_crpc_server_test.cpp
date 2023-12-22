@@ -915,7 +915,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcSetAssocMacAddrTest, TestSize.Level1)
     mContext->oneProcess = buff2;
     mContext->nPos = strlen("N\tSetAssocMacAddr\t");
     mContext->nSize = strlen(buff2);
-    RpcSetAssocMacAddr(mServer, mContext);
+    EXPECT_TRUE(RpcSetAssocMacAddr(mServer, mContext) >= 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcSetScanningMacAddressTest, TestSize.Level1)

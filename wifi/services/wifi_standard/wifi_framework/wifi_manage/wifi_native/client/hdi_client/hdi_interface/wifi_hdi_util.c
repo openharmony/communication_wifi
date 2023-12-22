@@ -40,9 +40,6 @@
 #define REPLY_BUF_SMALL_LENGTH 64
 #define CMD_FREQ_MAX_LEN 8
 
-const int QUOTATION_MARKS_FLAG_YES = 0;
-const int QUOTATION_MARKS_FLAG_NO = 1;
-
 const unsigned int HT_OPER_EID = 61;
 const unsigned int VHT_OPER_EID = 192;
 const unsigned int EXT_EXIST_EID = 255;

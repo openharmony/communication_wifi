@@ -25,7 +25,6 @@ namespace Wifi {
 StaAutoConnectService::StaAutoConnectService(StaStateMachine *staStateMachine, int instId)
     : pStaStateMachine(staStateMachine),
       pSavedDeviceAppraisal(nullptr),
-      pNetworkSelectionManager(nullptr),
       firmwareRoamFlag(true),
       maxBlockedBssidNum(BLOCKLIST_INVALID_SIZE),
       selectDeviceLastTime(0),
@@ -39,10 +38,6 @@ StaAutoConnectService::~StaAutoConnectService()
     if (pSavedDeviceAppraisal != nullptr) {
         delete pSavedDeviceAppraisal;
         pSavedDeviceAppraisal = nullptr;
-    }
-    if (pNetworkSelectionManager != nullptr) {
-        delete pNetworkSelectionManager;
-        pNetworkSelectionManager = nullptr;
     }
 }
 
@@ -60,15 +55,7 @@ ErrCode StaAutoConnectService::InitAutoConnectService()
         WIFI_LOGE("savedDeviceAppraisal is null\n");
         return WIFI_OPT_FAILED;
     }
-    pNetworkSelectionManager = new (std::nothrow) NetworkSelectionManager();
-    if (pNetworkSelectionManager == nullptr) {
-        WIFI_LOGE("pNetworkSelectionManager is null\n");
-        return WIFI_OPT_FAILED;
-    }
-    if (pNetworkSelectionManager->InitNetworkSelectionService() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("InitAutoConnectService failed.\n");
-        return WIFI_OPT_FAILED;
-    }
+    pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
     int savedPriority = WifiSettings::GetInstance().GetSavedDeviceAppraisalPriority(m_instId);
     if (RegisterDeviceAppraisal(pSavedDeviceAppraisal, savedPriority)) {
         WIFI_LOGI("RegisterSavedDeviceAppraisal succeeded.\n");

@@ -17,6 +17,9 @@
 #include "network_status_history_manager.h"
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
+#include "wifi_logger.h"
+
+DEFINE_WIFILOG_LABEL("NetworkSelectionUtils")
 
 namespace OHOS {
 namespace Wifi {
@@ -130,7 +133,12 @@ bool NetworkSelectionUtils::IsPoorPortalNetwork(NetworkCandidate &networkCandida
         return true;
     }
     auto lastHasInternetTime = networkCandidate.wifiDeviceConfig.lastHasInternetTime;
-    return (time(nullptr) - lastHasInternetTime) > POOR_PORTAL_RECHECK_DELAYED_SECONDS;
+    auto now = time(nullptr);
+    if (now < 0) {
+        WIFI_LOGW("time return invalid!\n.");
+        return true;
+    }
+    return (now - lastHasInternetTime) > POOR_PORTAL_RECHECK_DELAYED_SECONDS;
 }
 
 bool NetworkSelectionUtils::IsMatchUserSelected(NetworkCandidate &networkCandidate)

@@ -40,7 +40,7 @@ NetworkStatus NetworkStatusHistoryManager::GetLastNetworkStatus(const uint32_t &
     return static_cast<NetworkStatus>(networkHistory & NETWORK_STATUS_MASK);
 }
 
-void NetworkStatusHistoryManager::CountNetworkStatus(const uint32_t &networkStatusHistory, int counts[4])
+void NetworkStatusHistoryManager::CountNetworkStatus(const uint32_t &networkStatusHistory, int counts[NETWORK_STATUS_NUM])
 {
     auto history = networkStatusHistory;
     while (history) {
@@ -64,7 +64,8 @@ bool NetworkStatusHistoryManager::IsInternetAccessByHistory(const uint32_t &netw
         return true;
     }
     if (checkedNum == THRESHOLD_CHECKED_NUM) {
-        return GetLastNetworkStatus(networkStatusHistory >> ITEM_BIT_NUM) == NetworkStatus::HAS_INTERNET;
+        return GetLastNetworkStatus(networkStatusHistory >> SECOND_FROM_LAST *  ITEM_BIT_NUM) ==
+        NetworkStatus::HAS_INTERNET;
     }
     return counts[static_cast<int>(NetworkStatus::HAS_INTERNET)] >= checkedNum * RECOVERY_PERCENTAGE;
 }

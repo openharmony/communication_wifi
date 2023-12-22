@@ -17,7 +17,7 @@
 #define OHOS_WIFI_NETWORK_FILTER_BUILDER_MANAGER_H_
 
 #include <mutex>
-#include "network_selector_filter.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {

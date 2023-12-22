@@ -14,13 +14,13 @@
  */
 
 #include <memory>
-#include "network_filter_builder_manager.h"
+#include "external_wifi_filter_builder_manager.h"
 #include "wifi_logger.h"
+
+DEFINE_WIFILOG_LABEL("WifiFilterBuilderManager")
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("WIFI_FILTER_BUILD_MANAGER")
-
 ExternalWifiFilterBuildManager &ExternalWifiFilterBuildManager::GetInstance()
 {
     static ExternalWifiFilterBuildManager gNetworkSelectorFilterBuilderManager;
@@ -61,7 +61,7 @@ void ExternalWifiFilterBuildManager::BuildFilter(const FilterTag &filterTag, Com
              * if the build function return true,
              * transfer the filterFunc to compositeFilter and put it into the compositeFilter
              */
-            compositeFilter.AddFilter(std::make_shared<WifiFunctionFilter>(
+            compositeFilter.AddFilter(std::make_shared<WifiFunctionFilterAdapter>(
                 filterFunc, filterBuilderPair.first.second));
         }
     }

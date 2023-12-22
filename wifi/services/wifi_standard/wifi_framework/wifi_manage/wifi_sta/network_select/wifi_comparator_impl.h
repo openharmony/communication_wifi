@@ -18,24 +18,10 @@
 
 #include <memory>
 #include <functional>
-#include "network_selector_scorer.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {
-
-class IWifiComparator {
-public:
-    virtual ~IWifiComparator() = default;
-
-    /**
-     * GetBestCandidates
-     *
-     * @param candidates the candidate network before compare.
-     * @param selectedCandidates the best candidate network after compare.
-     */
-    virtual void GetBestCandidates(const std::vector<NetworkCandidate *> &candidates,
-                                   std::vector<NetworkCandidate *> &selectedCandidates) = 0;
-};
 
 class WifiScorerComparator : public IWifiComparator {
 public:

@@ -14,85 +14,19 @@
  */
 
 #include <sstream>
-#include "network_selector.h"
+#include "network_selector_impl.h"
+#include "wifi_comparator_impl.h"
+#include "wifi_scorer_impl.h"
 #include "network_selection_utils.h"
-#include "network_filter_builder_manager.h"
+#include "external_wifi_filter_builder_manager.h"
 #include "wifi_logger.h"
+
+DEFINE_WIFILOG_LABEL("NetworkSelectorImpl")
 
 using namespace std;
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("NETWORK_SELECTOR")
-
-NetworkSelector::NetworkSelector(const string &networkSelectorName):m_networkSelectorName(networkSelectorName) {}
-
-void NetworkSelector::SetWifiComparator(const shared_ptr<IWifiComparator> &networkSelectorComparator)
-{
-    comparator = networkSelectorComparator;
-}
-
-void NetworkSelector::SetWifiFilter(const shared_ptr<IWifiFilter> &networkSelectorFilter)
-{
-    filter = networkSelectorFilter;
-}
-
-bool NetworkSelector::TryNominate(NetworkCandidate &networkCandidate)
-{
-    bool ret = false;
-    if (DoFilter(networkCandidate)) {
-        ret = Nominate(networkCandidate);
-        AfterNominate(networkCandidate, ret);
-    }
-    return ret;
-}
-
-bool NetworkSelector::DoFilter(NetworkCandidate &networkCandidate)
-{
-    return !filter || filter->DoFilter(networkCandidate);
-}
-
-void NetworkSelector::AfterNominate(NetworkCandidate &networkCandidate, bool nominateResult)
-{
-    if (nominateResult) {
-        networkCandidate.nominateMsg.emplace_back(m_networkSelectorName);
-    }
-}
-
-void NetworkSelector::GetBestCandidatesByComparator(vector<NetworkCandidate *> &selectedNetworkCandidates)
-{
-    if (comparator) {
-        comparator->GetBestCandidates(networkCandidates, selectedNetworkCandidates);
-    } else {
-        WIFI_LOGI("comparator in %{public}s is null, select all networkCandidates as result",
-                  m_networkSelectorName.c_str());
-        selectedNetworkCandidates.insert(selectedNetworkCandidates.end(),
-                                         networkCandidates.begin(),
-                                         networkCandidates.end());
-    }
-}
-
-void SimpleNetworkSelector::GetBestCandidates(vector<NetworkCandidate *> &selectedNetworkCandidates)
-{
-    GetBestCandidatesByComparator(selectedNetworkCandidates);
-}
-
-SimpleNetworkSelector::SimpleNetworkSelector(const string &networkSelectorName)
-    : NetworkSelector(networkSelectorName) {}
-
-CompositeNetworkSelector::CompositeNetworkSelector(const string &networkSelectorName) : NetworkSelector(
-    networkSelectorName) {}
-
-void CompositeNetworkSelector::AddSubNetworkSelector(const shared_ptr<INetworkSelector> &subNetworkSelector)
-{
-    subNetworkSelectors.emplace_back(subNetworkSelector);
-}
-
-void CompositeNetworkSelector::GetBestCandidates(vector<NetworkCandidate *> &selectedNetworkCandidates)
-{
-    GetCandidatesFromSubNetworkSelector();
-    GetBestCandidatesByComparator(selectedNetworkCandidates);
-}
 
 void AutoConnectNetworkSelector::GetCandidatesFromSubNetworkSelector()
 {
@@ -101,37 +35,16 @@ void AutoConnectNetworkSelector::GetCandidatesFromSubNetworkSelector()
     }
 }
 
-string CompositeNetworkSelector::GetNetworkSelectorMsg()
-{
-    stringstream networkSelectorMsg;
-    networkSelectorMsg << R"({ "name": ")" << m_networkSelectorName << "\" ";
-    if (filter) {
-        networkSelectorMsg << R"(,"filter": ")" << filter->GetFilterMsg() << "\"";
-    }
-    if (!subNetworkSelectors.empty()) {
-        networkSelectorMsg << R"(,"subNetworkSelectors": [)";
-        for (auto i = 0; i < subNetworkSelectors.size(); i++) {
-            networkSelectorMsg << subNetworkSelectors.at(i)->GetNetworkSelectorMsg();
-            if (i < subNetworkSelectors.size() - 1) {
-                networkSelectorMsg << ",";
-            }
-        }
-        networkSelectorMsg << "]";
-    }
-    networkSelectorMsg << "}";
-    return networkSelectorMsg.str();
-}
-
 AutoConnectNetworkSelector::AutoConnectNetworkSelector() : CompositeNetworkSelector(
     "autoConnectedNetworkSelectorManager")
 {
     auto filters = make_shared<AndWifiFilter>();
-    filters->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsHiddenNetwork,
-                                                       "notHiddenNetwork",
-                                                       true));
-    filters->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsSignalTooWeak,
-                                                       "notSignalTooWeak",
-                                                       true));
+    filters->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsHiddenNetwork,
+                                                              "notHiddenNetwork",
+                                                              true));
+    filters->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsSignalTooWeak,
+                                                              "notSignalTooWeak",
+                                                              true));
     SetWifiFilter(filters);
     auto savedNetworkSelector = make_shared<SavedNetworkSelector>();
     AddSubNetworkSelector(savedNetworkSelector);
@@ -151,16 +64,16 @@ bool AutoConnectNetworkSelector::Nominate(NetworkCandidate &networkCandidate)
 SavedNetworkSelector::SavedNetworkSelector() : CompositeNetworkSelector("savedNetworkSelector")
 {
     auto andFilter = make_shared<AndWifiFilter>();
-    andFilter->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsSavedNetwork, "savedNetwork"));
-    andFilter->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsPassPointNetwork,
-                                                         "notPassPoint",
-                                                         true));
-    andFilter->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsEphemeralNetwork,
-                                                         "notEphemeral",
-                                                         true));
-    andFilter->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsNetworkEnabled, "enableNetwork"));
-    andFilter->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsMatchUserSelected,
-                                                         "matchUserSelected"));
+    andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsSavedNetwork, "savedNetwork"));
+    andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsPassPointNetwork,
+                                                                "notPassPoint",
+                                                                true));
+    andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsEphemeralNetwork,
+                                                                "notEphemeral",
+                                                                true));
+    andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsNetworkEnabled, "enableNetwork"));
+    andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsMatchUserSelected,
+                                                                "matchUserSelected"));
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG, *andFilter);
     auto blackListNetworkSelector = make_shared<BlackListNetworkSelector>();
     auto hasInternetNetworkSelector = make_shared<HasInternetNetworkSelector>();
@@ -174,6 +87,12 @@ SavedNetworkSelector::SavedNetworkSelector() : CompositeNetworkSelector("savedNe
     andFilter->AddFilter(portalNetworkSelector);
     andFilter->AddFilter(noInternetNetworkSelector);
     SetWifiFilter(andFilter);
+    /*
+     * current networkSelector only obtains one non-empty network selection result of subNetworkSelector, which is
+     * depends on the sequence of the subNetworkSelectors, When the network selection result of one of the
+     * subNetworkSelectors is not empty, the network selection result of other subNetworkSelectors inserted later will
+     * be abandoned.
+     */
     AddSubNetworkSelector(hasInternetNetworkSelector);
     AddSubNetworkSelector(recoveryNetworkSelector);
     AddSubNetworkSelector(portalNetworkSelector);
@@ -197,27 +116,10 @@ void SavedNetworkSelector::GetCandidatesFromSubNetworkSelector()
     }
 }
 
-bool SimpleNetworkSelector::Nominate(NetworkCandidate &networkCandidate)
-{
-    networkCandidates.emplace_back(&networkCandidate);
-    return true;
-}
-
-string SimpleNetworkSelector::GetNetworkSelectorMsg()
-{
-    stringstream networkSelectorMsg;
-    networkSelectorMsg << R"({ "name": ")" << m_networkSelectorName << "\" ";
-    if (filter) {
-        networkSelectorMsg << R"(,"filter": ")" << filter->GetFilterMsg() << "\"";
-    }
-    networkSelectorMsg << "}";
-    return networkSelectorMsg.str();
-}
-
 BlackListNetworkSelector::BlackListNetworkSelector() : SimpleNetworkSelector("blackListNetworkSelector"),
                                                        SimpleWifiFilter("blackListNetworkSelector")
 {
-    SetWifiFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsBlackListNetwork, "inBlackList"));
+    SetWifiFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsBlackListNetwork, "inBlackList"));
 }
 
 bool BlackListNetworkSelector::Nominate(NetworkCandidate &networkCandidate)
@@ -241,7 +143,7 @@ HasInternetNetworkSelector::HasInternetNetworkSelector() : SimpleNetworkSelector
     auto filters = make_shared<AndWifiFilter>();
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::HAS_INTERNET_NETWORK_SELECTOR_FILTER_TAG,
                                                               *filters);
-    filters->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsHasInternetNetwork, "hasInternet"));
+    filters->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsHasInternetNetwork, "hasInternet"));
     SetWifiFilter(filters);
     auto networkScoreComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     networkScoreComparator->AddScorer(make_shared<NetworkStatusHistoryScorer>());
@@ -262,7 +164,7 @@ RecoveryNetworkSelector::RecoveryNetworkSelector() : SimpleNetworkSelector("reco
     auto filters = make_shared<AndWifiFilter>();
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::RECOVERY_NETWORK_SELECTOR_FILTER_TAG,
                                                               *filters);
-    filters->AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsRecoveryNetwork, "recovery"));
+    filters->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsRecoveryNetwork, "recovery"));
     SetWifiFilter(filters);
     auto networkScorerComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     networkScorerComparator->AddScorer(make_shared<SavedNetworkScorer>("recoveryNetworkScorer"));
@@ -278,7 +180,7 @@ bool RecoveryNetworkSelector::Filter(NetworkCandidate &networkCandidate)
 
 PortalNetworkSelector::PortalNetworkSelector() : SimpleNetworkSelector("portalNetworkSelector"), OrWifiFilter()
 {
-    SetWifiFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsPoorPortalNetwork, "notPoorPortal", true));
+    SetWifiFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsPoorPortalNetwork, "notPoorPortal", true));
     auto networkScorerComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     networkScorerComparator->AddScorer(make_shared<LastHaveInternetTimeScorer>());
     networkScorerComparator->AddScorer(make_shared<SavedNetworkScorer>("portalNetworkScorer"));
@@ -288,8 +190,8 @@ PortalNetworkSelector::PortalNetworkSelector() : SimpleNetworkSelector("portalNe
 
 void PortalNetworkSelector::InitFilter()
 {
-    AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsPortalNetwork, "portal"));
-    AddFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::MayBePortalNetwork, "maybePortal"));
+    AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsPortalNetwork, "portal"));
+    AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::MayBePortalNetwork, "maybePortal"));
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::PORTAL_NETWORK_SELECTOR_FILTER_TAG, *this);
 }
 
@@ -297,6 +199,7 @@ bool PortalNetworkSelector::Filter(NetworkCandidate &networkCandidate)
 {
     if (OrWifiFilter::Filter(networkCandidate)) {
         TryNominate(networkCandidate);
+        networkCandidate.filteredMsg.emplace_back(m_networkSelectorName);
         return false;
     }
     if (networkCandidates.empty()) {
@@ -335,7 +238,7 @@ string PortalNetworkSelector::GetFilterMsg()
 NoInternetNetworkSelector::NoInternetNetworkSelector() : SimpleNetworkSelector("noInternetNetworkSelector"),
                                                          SimpleWifiFilter("noInternetNetworkSelector")
 {
-    SetWifiFilter(make_shared<WifiFunctionFilter>(NetworkSelectionUtils::IsNoInternetNetwork, "noInternet"));
+    SetWifiFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsNoInternetNetwork, "noInternet"));
     auto networkScorerComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     networkScorerComparator->AddScorer(make_shared<SavedNetworkScorer>("noInternetNetworkScorer"));
     networkScorerComparator->AddScorer(make_shared<RssiScorer>());

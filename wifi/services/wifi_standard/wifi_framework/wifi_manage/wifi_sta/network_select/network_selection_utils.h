@@ -16,8 +16,7 @@
 #ifndef OHOS_WIFI_NETWORK_SELECTION_UTILS_H_
 #define OHOS_WIFI_NETWORK_SELECTION_UTILS_H_
 
-#include "network_selection_msg.h"
-#include "network_selector_scorer.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {

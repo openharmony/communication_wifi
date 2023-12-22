@@ -21,45 +21,10 @@
 #include <vector>
 #include <iomanip>
 #include <sstream>
-#include "network_selection_msg.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {
-
-struct ScoreResult {
-    double score;
-    std::string scorerName;
-    std::vector<ScoreResult> scoreDetails;
-    ScoreResult()
-    {
-        score = 0;
-    }
-};
-
-class IWifiScorer {
-public:
-    virtual ~IWifiScorer() = default;
-    virtual void DoScore(NetworkCandidate &networkCandidate, ScoreResult &scoreResult) = 0;
-};
-
-class SimpleWifiScorer : public IWifiScorer {
-public:
-    explicit SimpleWifiScorer(const std::string &scorerName);
-    void DoScore(NetworkCandidate &networkCandidate, ScoreResult &scoreResult) final;
-protected:
-    virtual double Score(NetworkCandidate &networkCandidate) = 0;
-    std::string m_scoreName;
-};
-
-class CompositeWifiScorer : public IWifiScorer {
-public:
-    explicit CompositeWifiScorer(const std::string &scorerName);
-    void DoScore(NetworkCandidate &networkCandidate, ScoreResult &scoreResult) final;
-    void AddScorer(const std::shared_ptr<IWifiScorer> &scorer);
-protected:
-    std::vector<std::shared_ptr<IWifiScorer>> scorers;
-    std::string m_scoreName;
-};
 
 class RssiScorer : public SimpleWifiScorer {
 public:

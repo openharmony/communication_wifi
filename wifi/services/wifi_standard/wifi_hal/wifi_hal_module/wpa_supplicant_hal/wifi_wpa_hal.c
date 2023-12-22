@@ -861,7 +861,7 @@ static void *WpaReceiveCallback(void *arg)
         if (strncmp(iface, staIface, strlen(staIface)) == 0) {
             WpaCallBackFunc(p);
         }
-        if (strncmp(iface, chbaIface, strlen(chbaIface)) == 0 && (strstr(p, "chba0") != NULL)) {
+        if (strncmp(iface, chbaIface, strlen(chbaIface)) == 0) {
             HalCallbackNotify(p);
         }
     }

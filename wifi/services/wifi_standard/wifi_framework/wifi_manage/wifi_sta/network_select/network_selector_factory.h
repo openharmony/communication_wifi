@@ -26,7 +26,7 @@ namespace Wifi {
 enum class NetworkSelectType { AUTO_CONNECT };
 class NetworkSelectorFactory {
 public:
-    ErrCode InitNetworkSelectorFactory();
+    NetworkSelectorFactory();
     using HandleFunc = std::unique_ptr<INetworkSelector> (NetworkSelectorFactory::*)();
     using HandleFuncMap = std::map<int, HandleFunc>;
 

@@ -90,7 +90,7 @@ void WifiScorerComparator::GetBestCandidates(const std::vector<NetworkCandidate 
 void WifiScorerComparator::LogSelectedCandidates(std::vector<NetworkCandidate *> &selectedCandidates,
                                                  std::vector<ScoreResult> &scoreResults)
 {
-    WIFI_LOGD("%{public}s get best candidates %{public}s which get scores %{public}s",
+    WIFI_LOGI("%{public}s get best candidates %{public}s which get scores %{public}s",
               comparatorName.c_str(),
               getAllNetworkCandidateMsg(selectedCandidates).c_str(),
               getAllScoreMsg(scoreResults).c_str());

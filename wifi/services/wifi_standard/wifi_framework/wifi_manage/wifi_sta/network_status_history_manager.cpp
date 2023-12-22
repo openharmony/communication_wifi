@@ -40,7 +40,8 @@ NetworkStatus NetworkStatusHistoryManager::GetLastNetworkStatus(const uint32_t &
     return static_cast<NetworkStatus>(networkHistory & NETWORK_STATUS_MASK);
 }
 
-void NetworkStatusHistoryManager::CountNetworkStatus(const uint32_t &networkStatusHistory, int counts[NETWORK_STATUS_NUM])
+void NetworkStatusHistoryManager::CountNetworkStatus(const uint32_t &networkStatusHistory,
+                                                     int counts[NETWORK_STATUS_NUM])
 {
     auto history = networkStatusHistory;
     while (history) {

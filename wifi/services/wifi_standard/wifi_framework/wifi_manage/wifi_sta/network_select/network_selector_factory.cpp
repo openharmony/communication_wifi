@@ -21,11 +21,10 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("NetworkSelectorFactory")
 
-ErrCode NetworkSelectorFactory::InitNetworkSelectorFactory()
+NetworkSelectorFactory::NetworkSelectorFactory()
 {
     handleFuncMap[static_cast<uint32_t>(NetworkSelectType::AUTO_CONNECT)] =
         &NetworkSelectorFactory::CreateAutoConnectNetworkSelector;
-    return WIFI_OPT_SUCCESS;
 }
 
 std::optional<std::unique_ptr<INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(

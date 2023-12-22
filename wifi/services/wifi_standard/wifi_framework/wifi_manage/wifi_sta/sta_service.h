@@ -20,6 +20,7 @@
 #include "sta_auto_connect_service.h"
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
+#include "network_selection_msg.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
 #endif
@@ -237,6 +238,59 @@ public:
      *
      */
     virtual void HandleScreenStatusChanged(int screenState);
+
+    /**
+     * @Description  disable auto join.
+     *
+     * @param conditionName autoJoinDisabled condition.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode DisableAutoJoin(const std::string &conditionName);
+
+    /**
+     * @Description  enable auto join.
+     *
+     * @param conditionName autoJoinDisabled condition.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode EnableAutoJoin(const std::string &conditionName);
+
+    /**
+     * @Description  register auto join condition.
+     *
+     * @param conditionName the name of condition.
+     * @param autoJoinCondition condition.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode RegisterAutoJoinCondition(const std::string &conditionName,
+                                              const std::function<bool()> &autoJoinCondition);
+    /**
+     * @Description  deregister auto join condition.
+     *
+     * @param conditionName the name of condition.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode DeregisterAutoJoinCondition(const std::string &conditionName);
+
+    /**
+     * @Description  register external filter builder.
+     *
+     * @param filterTag filterTag which define where the filter should be inserted.
+     * @param filterName the name of the filter to build.
+     * @param filterBuilder filter builder.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode RegisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName,
+                                          const FilterBuilder &filterBuilder);
+    /**
+     * @Description  deregister external filter builder.
+     *
+     * @param filterTag filterTag which define where the filter should be inserted.
+     * @param filterName the name of the filter to build.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName);
+
     /**
      * @Description start portal certification.
      *

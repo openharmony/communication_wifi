@@ -451,6 +451,51 @@ ErrCode WifiDeviceImpl::ResetAllFrozenApp()
     return client_->ResetAllFrozenApp();
 }
 
+ErrCode WifiDeviceImpl::DisableAutoJoin(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->DisableAutoJoin(conditionName);
+}
+
+ErrCode WifiDeviceImpl::EnableAutoJoin(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->EnableAutoJoin(conditionName);
+}
+
+ErrCode WifiDeviceImpl::RegisterAutoJoinCondition(const std::string &conditionName,
+                                                  const std::function<bool()> &autoJoinCondition)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->RegisterAutoJoinCondition(conditionName, autoJoinCondition);
+}
+
+ErrCode WifiDeviceImpl::DeregisterAutoJoinCondition(const std::string &conditionName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->DeregisterAutoJoinCondition(conditionName);
+}
+
+ErrCode WifiDeviceImpl::RegisterFilterBuilder(const FilterTag &filterTag,
+                                              const std::string &filterName,
+                                              const FilterBuilder &filterBuilder)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->RegisterFilterBuilder(filterTag, filterName, filterBuilder);
+}
+
+ErrCode WifiDeviceImpl::DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->DeregisterFilterBuilder(filterTag, filterName);
+}
+
 bool WifiDeviceImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();

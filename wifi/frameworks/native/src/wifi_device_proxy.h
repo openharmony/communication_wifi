@@ -391,6 +391,60 @@ public:
      */
     ErrCode StartPortalCertification() override;
 
+    /**
+     * @Description  disable auto join.
+     *
+     * @param conditionName autoJoinDisabled condition.
+     * @return WifiErrorNo
+     */
+    ErrCode DisableAutoJoin(const std::string &conditionName) override;
+
+    /**
+     * @Description  enable auto join.
+     *
+     * @param conditionName autoJoinDisabled condition.
+     * @return WifiErrorNo
+     */
+    ErrCode EnableAutoJoin(const std::string &conditionName) override;
+
+    /**
+     * @Description  register auto join condition.
+     *
+     * @param conditionName the name of condition.
+     * @param autoJoinCondition condition.
+     * @return WifiErrorNo
+     */
+    ErrCode RegisterAutoJoinCondition(const std::string &conditionName,
+                                      const std::function<bool()> &autoJoinCondition) override;
+
+    /**
+     * @Description  deregister auto join condition.
+     *
+     * @param conditionName the name of condition.
+     * @return WifiErrorNo
+     */
+    ErrCode DeregisterAutoJoinCondition(const std::string &conditionName) override;
+
+    /**
+     * @Description  register external filter builder.
+     *
+     * @param filterTag filterTag which define where the filter should be inserted.
+     * @param filterName the name of the filter to build.
+     * @param filterBuilder filter builder.
+     * @return WifiErrorNo
+     */
+    ErrCode RegisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName,
+                                  const FilterBuilder &filterBuilder) override;
+
+    /**
+     * @Description  deregister external filter builder.
+     *
+     * @param filterTag filterTag which define where the filter should be inserted.
+     * @param filterName the name of the filter to build.
+     * @return WifiErrorNo
+     */
+    ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) override;
+
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
     /**
      * @Description reset factory

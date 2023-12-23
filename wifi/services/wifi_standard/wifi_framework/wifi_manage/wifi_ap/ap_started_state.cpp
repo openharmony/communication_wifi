@@ -33,6 +33,7 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
@@ -332,6 +333,7 @@ void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
+    WriteSoftApAbDisconnectHiSysEvent(AP_ERR_CODE);
     if (msg.GetMessageObj(staInfo)) {
         m_ApStateMachine.m_ApStationsManager.StationLeave(staInfo.bssid);
     } else {

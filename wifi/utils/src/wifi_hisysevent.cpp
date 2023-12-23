@@ -17,7 +17,6 @@
 #include "hisysevent.h"
 #include "wifi_logger.h"
 #include "json/json.h"
-#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -40,14 +39,12 @@ void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operT
 
 void WriteWifiConnectionHiSysEvent(const WifiConnectionType& type, const std::string& pkgName)
 {
-    WriteEvent("WIFI_CONNECTION", "TYPE", static_cast<int>(type), "PACKAGE_NAME", pkgName,
-        "ISANCO", "false", "UID", GetCallingUid());
+    WriteEvent("WIFI_CONNECTION", "TYPE", static_cast<int>(type), "PACKAGE_NAME", pkgName);
 }
 
 void WriteWifiScanHiSysEvent(const int result, const std::string& pkgName)
 {
-    WriteEvent("WIFI_SCAN", "EXECUTE_RESULT", result, "PACKAGE_NAME", pkgName,
-        "ISANCO", "false", "UID", GetCallingUid());
+    WriteEvent("WIFI_SCAN", "EXECUTE_RESULT", result, "PACKAGE_NAME", pkgName);
 }
 
 void WriteWifiEventReceivedHiSysEvent(const std::string& eventType, int value)

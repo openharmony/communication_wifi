@@ -16,6 +16,9 @@
 #include <vector>
 #include "iremote_stub.h"
 #include "wifi_datashare_utils.h"
+#ifdef HAS_ACCOUNT_PART
+#include "os_account_manager.h"
+#endif
 #include "wifi_log.h"
 #include "wifi_logger.h"
 
@@ -146,6 +149,22 @@ ErrCode WifiDataShareHelperUtils::UnRegisterObserver(const Uri &uri, const sptr<
 
     dataShareHelper_->UnregisterObserver(uri, observer);
     return WIFI_OPT_SUCCESS;
+}
+
+std::string WifiDataShareHelperUtils::GetLoactionDataShareUri()
+{
+    std::vector<int> accountIds;
+#ifdef HAS_ACCOUNT_PART
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(accountIds);
+#endif
+    std::string userId = "100";
+    if (!accountIds.empty()) {
+        userId = std::to_string(accountIds[0]);
+    }
+
+    std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
+        + userId + "?Proxy=true&key=location_enable";
+    return uri;
 }
 
 }   // namespace Wifi

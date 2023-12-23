@@ -184,6 +184,12 @@ ohos_unittest("manager_unittest") {
     defines += [ "HAS_BATTERY_MANAGER_PART" ]
   }
 
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.account_os_account)) {
+    external_deps += [ "os_account:os_account_innerkits" ]
+    defines += [ "HAS_ACCOUNT_PART" ]
+  }
+
   defines += [
     "FEATURE_AP_SUPPORT",
     "FEATURE_STA_SUPPORT",

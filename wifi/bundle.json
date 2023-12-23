@@ -99,6 +99,7 @@
                 "napi",
                 "netmanager_base",
                 "netstack",
+                "os_account",
                 "safwk",
                 "samgr",
                 "power_manager",

@@ -84,6 +84,8 @@ void WifiHotspotStub::InitHandleMap()
         &WifiHotspotStub::OnIsHotspotDualBandSupported;
     handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP)] =
         &WifiHotspotStub::OnSetApIdleTimeout;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_IFACE_NAME)] =
+        &WifiHotspotStub::OnGetApIfaceName;
     return;
 }
 
@@ -491,6 +493,20 @@ void WifiHotspotStub::OnSetApIdleTimeout(uint32_t code, MessageParcel &data,
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
+    return;
+}
+
+void WifiHotspotStub::OnGetApIfaceName(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{private}s code %{private}u, datasize %{private}zu", __func__, code, data.GetRawDataSize());
+    std::string ifaceName;
+    ErrCode ret = GetApIfaceName(ifaceName);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteString(ifaceName);
+    }
     return;
 }
 }  // namespace Wifi

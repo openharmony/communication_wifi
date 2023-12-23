@@ -838,5 +838,39 @@ bool WifiHotspotProxy::IsRemoteDied(void)
     }
     return mRemoteDied;
 }
+
+ErrCode WifiHotspotProxy::GetApIfaceName(std::string& ifaceName)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_IFACE_NAME), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_IFACE_NAME));
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    ifaceName = reply.ReadString();
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

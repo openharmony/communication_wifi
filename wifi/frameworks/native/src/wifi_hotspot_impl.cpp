@@ -245,5 +245,12 @@ bool WifiHotspotImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
+
+ErrCode WifiHotspotImpl::GetApIfaceName(std::string& ifaceName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    return client_->GetApIfaceName(ifaceName);
+}
 }  // namespace Wifi
 }  // namespace OHOS

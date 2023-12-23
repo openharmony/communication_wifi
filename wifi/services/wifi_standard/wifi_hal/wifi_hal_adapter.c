@@ -163,10 +163,10 @@ int FileIsExisted(const char* file)
         return HAL_FAILURE;
     }
     if (access(file, F_OK) != -1) {
-        LOGE("%{public}s: file isn't existed", __func__);
-        return HAL_FAILURE;
+        return HAL_SUCCESS;
     }
-    return HAL_SUCCESS;
+    LOGE("%{public}s: file isn't existed", __func__);
+    return HAL_FAILURE;
 }
 
 int CopyConfigFile(const char* configName)
@@ -190,7 +190,7 @@ int CopyConfigFile(const char* configName)
                 return HAL_FAILURE;
             }
             LOGD("%{public}s: destination is %{public}s", __func__, dstPath);
-            if ((strcmp(dstPath, P2P_WPA_CONFIG_FILE) == 0) && FileIsExisted(dstPath)) {
+            if ((strcmp(dstPath, P2P_WPA_CONFIG_FILE) == 0) && (FileIsExisted(dstPath) == HAL_SUCCESS)) {
                 LOGW("%{public}s: dstPath is existed", __func__);
                 memset_s(dstPath, sizeof(dstPath), 0x0, sizeof(dstPath));
                 continue;

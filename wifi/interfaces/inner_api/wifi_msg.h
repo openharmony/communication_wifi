@@ -545,9 +545,10 @@ enum class WpsStartState {
 };
 
 enum class StreamDirection {
-    STREAM_DIRECTION_UP = 0,
+    STREAM_DIRECTION_NONE = 0,
     STREAM_DIRECTION_DOWN = 1,
-    UNKNOWN,
+    STREAM_DIRECTION_UP = 2,
+    STREAM_DIRECTION_UPDOWN = 3,
 };
 
 /* WifiProtectType  */

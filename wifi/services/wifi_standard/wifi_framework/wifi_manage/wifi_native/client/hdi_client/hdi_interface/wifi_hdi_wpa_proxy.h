@@ -102,7 +102,7 @@ struct IWpaInterface* GetWpaInterface();
  *
  * @return WifiErrorNo - operation result
  */
-WifiErrorNo CopyUserFile(const char *srcFilePath,const char* destFilePath);
+WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath);
 
 /**
  * @Description copy wpa_supplicant config file.

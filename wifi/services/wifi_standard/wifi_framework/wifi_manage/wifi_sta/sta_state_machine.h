@@ -42,6 +42,8 @@ constexpr int STA_SCAN_ONLY_MODE = 2;
 constexpr int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
 constexpr int STA_DISABLED_MODE = 4;
 constexpr int STA_RENEWAL_MIN_TIME = 120;
+constexpr int STREAM_TXPACKET_THRESHOLD = 0;
+constexpr int STREAM_RXPACKET_THRESHOLD = 0;
 
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;

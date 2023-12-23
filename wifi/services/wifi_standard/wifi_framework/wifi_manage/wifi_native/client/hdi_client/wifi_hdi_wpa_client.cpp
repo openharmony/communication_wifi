@@ -28,7 +28,7 @@ constexpr int PMF_REQUIRED = 2;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(void)
 {
-    return HdiStaStart();
+    return HdiWpaStaStart();
 }
 
 WifiErrorNo WifiHdiWpaClient::StopWifi(void)
@@ -90,6 +90,7 @@ WifiErrorNo WifiHdiWpaClient::Scan(const WifiScanParam &scanParam)
 
 WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
+    LOGI("WifiHdiWpaClient::%{public}s enter", __func__);
     int size = WIFI_IDL_GET_MAX_SCAN_INFO;
     ScanInfo* results = HdiWpaStaGetScanInfos(&size);
     if (results == NULL) {
@@ -111,7 +112,8 @@ WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInf
         tmp.isHeInfoExist = results[i].isHeInfoExist;
         tmp.isErpExist = results[i].isErpExist;
         tmp.maxRates = results[i].maxRates > results[i].extMaxRates ? results[i].maxRates : results[i].extMaxRates;
-
+        LOGI("WifiHdiWpaClient::QueryScanInfos ssid = %{public}s, ssid = %{public}s", 
+            results[i].ssid, results[i].bssid);
         for (int j = 0; j < results[i].ieSize; ++j) {
             WifiInfoElem infoElemTmp;
             int infoElemSize = results[i].infoElems[j].size;
@@ -357,7 +359,7 @@ WifiErrorNo WifiHdiWpaClient::ReqSetPowerSave(bool enable)
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCode)
 {
-    return HdiWpaSetCountryCode(countryCode.c_str());
+    return HdiWpaStaSetCountryCode(countryCode.c_str());
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetSuspendMode(bool mode) const

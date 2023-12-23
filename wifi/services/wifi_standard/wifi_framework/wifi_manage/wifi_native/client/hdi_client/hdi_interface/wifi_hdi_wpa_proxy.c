@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include<sys/stat.h>
-#include<fcntl.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "wifi_hdi_wpa_proxy.h"
 #include "servmgr_hdi.h"
 #include "devmgr_hdi.h"
@@ -32,7 +32,7 @@
 #define BUFF_SIZE 256
 
 #define MAX_READ_FILE_SIZE 1024
-#define MAX_READ_BLOCK_SIZE 1024
+#define MAX_FILE_BLOCK_SIZE 1024
 #define FILE_OPEN_PRIV 0666
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
@@ -189,7 +189,7 @@ struct IWpaInterface* GetWpaInterface()
     return wpaObj;
 }
 
-WifiErrorNo CopyUserFile(const char *srcFilePath,const char* destFilePath)
+WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath)
 {
     LOGI("Execute CopyUserFile enter");
     if (srcFilePath == NULL || destFilePath == NULL) {
@@ -199,7 +199,6 @@ WifiErrorNo CopyUserFile(const char *srcFilePath,const char* destFilePath)
     int srcFd = -1;
     int destFd = -1;
     do {
-
         if ((srcFd = open(srcFilePath, O_RDONLY))< 0)  {
             LOGE("CopyUserFile() failed, open srcFilePath:%{public}s error!", srcFilePath);
             break;
@@ -208,10 +207,10 @@ WifiErrorNo CopyUserFile(const char *srcFilePath,const char* destFilePath)
             LOGE("CopyUserFile() failed, open destFilePath:%{public}s error!", destFilePath);
             break;
         }
-        size_t bytes;
+        ssize_t bytes;
         lseek(srcFd, 0, SEEK_SET);
         char buf[MAX_READ_FILE_SIZE] = {0};
-        for(int i = 0; i < MAX_READ_BLOCK_SIZE; i++) {
+        for(int i = 0; i < MAX_FILE_BLOCK_SIZE; i++) {
             memset(buf, 0, MAX_READ_FILE_SIZE);
             if((bytes = read(srcFd, buf, MAX_READ_FILE_SIZE-1)) < 0) {
                 LOGE("CopyUserFile() failed, read srcFilePath:%{public}s error!", srcFilePath);
@@ -219,16 +218,15 @@ WifiErrorNo CopyUserFile(const char *srcFilePath,const char* destFilePath)
             }
             write(destFd, buf, bytes);
         }
-    }while (0);
-    
-    if(srdFd>=0) {
+    } while (0);
+    if(srcFd>=0) {
         close(srcFd);
     }
     
     if(destFd>=0) {
         close(destFd);
     }
-    LOGI("CopyUserFile() copy file succeed");
+    LOGI("CopyUserFile() copy file succeed.");
     return WIFI_IDL_OPT_OK;
 }
 

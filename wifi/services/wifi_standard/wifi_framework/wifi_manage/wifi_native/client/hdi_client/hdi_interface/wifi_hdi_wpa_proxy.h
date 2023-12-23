@@ -98,11 +98,11 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName);
 struct IWpaInterface* GetWpaInterface();
 
 /**
- * @Description Excute copy file.
+ * @Description copy file.
  *
  * @return WifiErrorNo - operation result
  */
-CopyUserFile(const char *srcFilePath,const char* destFilePath);
+WifiErrorNo CopyUserFile(const char *srcFilePath,const char* destFilePath);
 
 /**
  * @Description copy wpa_supplicant config file.

@@ -39,6 +39,7 @@ static std::set<std::string> g_supportEventList = {
     EVENT_STA_RSSI_STATE_CHANGE,
     EVENT_STA_DEVICE_CONFIG_CHANGE,
     EVENT_STREAM_CHANGE,
+    EVENT_STREAM_CHANGE,
     EVENT_HOTSPOT_STATE_CHANGE,
     EVENT_HOTSPOT_STA_JOIN,
     EVENT_HOTSPOT_STA_LEAVE,
@@ -229,7 +230,7 @@ public:
     void OnWifiWpsStateChanged(int state, const std::string &pinCode) override {
     }
 
-    void OnStreamChanged(int direction) override 
+    void OnStreamChanged(int direction) override
     {
         WIFI_LOGI("sta received stream changed event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
             direction);

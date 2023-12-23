@@ -199,7 +199,7 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath)
     int srcFd = -1;
     int destFd = -1;
     do {
-        if ((srcFd = open(srcFilePath, O_RDONLY))< 0)  {
+        if ((srcFd = open(srcFilePath, O_RDONLY)) < 0)  {
             LOGE("CopyUserFile() failed, open srcFilePath:%{public}s error!", srcFilePath);
             break;
         }
@@ -210,7 +210,7 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath)
         ssize_t bytes;
         lseek(srcFd, 0, SEEK_SET);
         char buf[MAX_READ_FILE_SIZE] = {0};
-        for(int i = 0; i < MAX_FILE_BLOCK_SIZE; i++) {
+        for (int i = 0; i < MAX_FILE_BLOCK_SIZE; i++) {
             memset(buf, 0, MAX_READ_FILE_SIZE);
             if((bytes = read(srcFd, buf, MAX_READ_FILE_SIZE-1)) < 0) {
                 LOGE("CopyUserFile() failed, read srcFilePath:%{public}s error!", srcFilePath);

@@ -258,7 +258,7 @@ WifiErrorNo HdiWpaStaReconnect()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->Reconnect(wpaObj, "waln0");
+    int32_t result = wpaObj->Reconnect(wpaObj, "wlan0");
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaReconnect: Reconnect failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;

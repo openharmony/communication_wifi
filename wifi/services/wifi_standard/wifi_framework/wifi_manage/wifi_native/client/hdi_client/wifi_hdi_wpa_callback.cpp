@@ -17,7 +17,9 @@
 #include "wifi_hdi_wpa_callback.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
+#include "wifi_hdi_util.h"
 
+constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaCallback"
 
@@ -28,10 +30,14 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         LOGE("OnEventDisconnected: invalid parameter!");
         return 1;
     }
-
+    uint32_t bssidLen = disconectParam->bssidLen;
+    std::string strBssid = OHOS::Wifi::ConvertArrayToHex(disconectParam->bssidLen,
+        disconectParam->bssidLen);
+    char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+    ConvertMacToStr(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, (const char *)disconectParam->bssid);
+        cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, szBssid);
     }
     return 0;
 }
@@ -43,7 +49,11 @@ int32_t OnEventConnected(struct IWpaCallback *self,
         LOGE("OnEventConnected: invalid parameter!");
         return 1;
     }
-
+    uint32_t bssidLen = connectParam->bssidLen;
+    std::string strBssid = OHOS::Wifi::ConvertArrayToHex(connectParam->bssidLen,
+        connectParam->bssidLen);
+    char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+    ConvertMacToStr(connectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, (const char *)connectParam->bssid);

@@ -1246,4 +1246,21 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
     return fail;
 }
 
+int ConvertMacToStr(const unsigned char *mac, int macSize, char *macStr, int strLen)
+{
+    if (mac == NULL || macStr == NULL || macSize != MAC_UINT_SIZE || strLen <= MAC_STRING_SIZE) {
+        return -1;
+    }
+    const int posZero = 0;
+    const int posOne = 1;
+    const int posTwo = 2;
+    const int posThree = 3;
+    const int posFour = 4;
+    const int posFive = 5;
+    if (snprintf_s(macStr, strLen, strLen - 1, "%02x:%02x:%02x:%02x:%02x:%02x", mac[posZero], mac[posOne], mac[posTwo],
+        mac[posThree], mac[posFour], mac[posFive]) < 0) {
+        return -1;
+    }
+    return 0;
+}
 #endif

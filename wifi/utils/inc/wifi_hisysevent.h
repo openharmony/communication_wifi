@@ -18,6 +18,7 @@
 
 #include <string>
 
+#define AP_ERR_CODE 3
 namespace OHOS {
 namespace Wifi {
 enum class WifiOperType {
@@ -76,7 +77,7 @@ void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt);
 
 void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason);
 
-void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &Server);
+void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server);
 
 void WriteWifiConnectFailedEventHiSysEvent(int operateType);
 
@@ -85,6 +86,8 @@ void WriteP2pKpiCountHiSysEvent(int eventType);
 void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes);
 
 void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes);
+
+void WriteSoftApAbDisconnectHiSysEvent(int errorCode);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

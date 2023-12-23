@@ -112,7 +112,7 @@ WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInf
         tmp.isHeInfoExist = results[i].isHeInfoExist;
         tmp.isErpExist = results[i].isErpExist;
         tmp.maxRates = results[i].maxRates > results[i].extMaxRates ? results[i].maxRates : results[i].extMaxRates;
-        LOGI("WifiHdiWpaClient::QueryScanInfos ssid = %{public}s, ssid = %{public}s", 
+        LOGI("WifiHdiWpaClient::QueryScanInfos ssid = %{public}s, ssid = %{public}s",
             results[i].ssid, results[i].bssid);
         for (int j = 0; j < results[i].ieSize; ++j) {
             WifiInfoElem infoElemTmp;

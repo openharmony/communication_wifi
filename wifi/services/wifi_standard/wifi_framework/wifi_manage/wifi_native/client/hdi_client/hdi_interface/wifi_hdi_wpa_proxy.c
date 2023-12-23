@@ -203,7 +203,7 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath)
             LOGE("CopyUserFile() failed, open srcFilePath:%{public}s error!", srcFilePath);
             break;
         }
-        if ((destFd = open(destFilePath, O_RDWR | O_CREAT | O_TRUNC , FILE_OPEN_PRIV))< 0)  {
+        if ((destFd = open(destFilePath, O_RDWR | O_CREAT | O_TRUNC, FILE_OPEN_PRIV))< 0)  {
             LOGE("CopyUserFile() failed, open destFilePath:%{public}s error!", destFilePath);
             break;
         }
@@ -211,19 +211,21 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath)
         lseek(srcFd, 0, SEEK_SET);
         char buf[MAX_READ_FILE_SIZE] = {0};
         for (int i = 0; i < MAX_FILE_BLOCK_SIZE; i++) {
-            memset(buf, 0, MAX_READ_FILE_SIZE);
-            if((bytes = read(srcFd, buf, MAX_READ_FILE_SIZE-1)) < 0) {
+            if (memset(buf, MAX_READ_FILE_SIZE, 0, MAX_READ_FILE_SIZE)) {
+                return WIFI_IDL_OPT_FAILED;
+            }
+            if ((bytes = read(srcFd, buf, MAX_READ_FILE_SIZE-1)) < 0) {
                 LOGE("CopyUserFile() failed, read srcFilePath:%{public}s error!", srcFilePath);
                 break;
             }
             write(destFd, buf, bytes);
         }
     } while (0);
-    if(srcFd>=0) {
+    if (srcFd>=0) {
         close(srcFd);
     }
     
-    if(destFd>=0) {
+    if (destFd>=0) {
         close(destFd);
     }
     LOGI("CopyUserFile() copy file succeed.");
@@ -232,7 +234,7 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath)
 
 WifiErrorNo CopyConfigFile(const char* configName)
 {
-    if(configName == NULL || strlen(configName) == 0) {
+    if (configName == NULL || strlen(configName) == 0) {
         LOGE("Copy config file failed:is null");
         return WIFI_IDL_OPT_FAILED;
     }

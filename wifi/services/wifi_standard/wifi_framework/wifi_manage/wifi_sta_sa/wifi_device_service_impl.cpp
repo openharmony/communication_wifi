@@ -1008,10 +1008,12 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     }
 
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
-    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetLinkedInfo:VerifyGetWifiLocalMacPermission() PERMISSION_DENIED!");
-        /* Clear mac addr */
-        info.macAddress = "";
+    if (info.macType == static_cast<int>(WifiPrivacyConfig::DEVICEMAC)) {
+        if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetLinkedInfo:VerifyGetWifiLocalMacPermission() PERMISSION_DENIED!");
+            /* Clear mac addr */
+            info.macAddress = "";
+        }
     }
 
     WIFI_LOGD("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",

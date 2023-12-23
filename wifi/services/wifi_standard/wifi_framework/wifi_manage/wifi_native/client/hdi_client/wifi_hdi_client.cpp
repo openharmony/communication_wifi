@@ -32,12 +32,12 @@ namespace Wifi {
 /* ************************ Sta Interface ************************** */
 WifiErrorNo WifiHdiClient::StartWifi()
 {
-    return HdiWpaStaWifiStart();
+    return HdiWifiStart();
 }
 
 WifiErrorNo WifiHdiClient::StopWifi()
 {
-    return HdiWpaStaWifiStop();
+    return HdiWifiStop();
 }
 
 WifiErrorNo WifiHdiClient::Scan(const WifiScanParam &scanParam)

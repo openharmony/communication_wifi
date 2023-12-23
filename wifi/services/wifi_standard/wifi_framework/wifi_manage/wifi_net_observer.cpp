@@ -73,22 +73,13 @@ void NetStateObserver::StartNetStateObserver()
 void NetStateObserver::StopNetStateObserver()
 {
     WIFI_LOGI("StopNetObserver");
-    std::thread th = std::thread([this]() {
-        int32_t retryCount = 0;
-        int32_t ret = 0;
-        do {
-            ret = NetManagerStandard::NetConnClient::GetInstance().UnregisterNetConnCallback(this);
-            if (ret == 0) {
-                WIFI_LOGI("StopNetObserver unregister success");
-                return;
-            }
-            retryCount++;
-            WIFI_LOGE("StopNetObserver retry, ret = %{public}d", ret);
-            sleep(1);
-        } while (retryCount < RETRY_MAX_TIMES);
-        WIFI_LOGE("StopNetObserver failed");
-    });
-    th.detach();
+    int32_t ret = 0;
+    ret = NetManagerStandard::NetConnClient::GetInstance().UnregisterNetConnCallback(this);
+    if (ret == 0) {
+        WIFI_LOGI("StopNetObserver unregister success");
+        return;
+    }
+    WIFI_LOGE("StopNetObserver unregister failed!");
 }
 
 int32_t NetStateObserver::NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,

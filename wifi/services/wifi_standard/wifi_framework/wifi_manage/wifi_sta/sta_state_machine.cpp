@@ -895,12 +895,10 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     if (signalInfo.txrate > 0) {
         linkedInfo.txLinkSpeed = signalInfo.txrate;
         linkedInfo.linkSpeed = signalInfo.txrate;
-        InvokeOnStaStreamChanged(StreamDirection::STREAM_DIRECTION_UP);
     }
 
     if (signalInfo.rxrate > 0) {
         linkedInfo.rxLinkSpeed = signalInfo.rxrate;
-        InvokeOnStaStreamChanged(StreamDirection::STREAM_DIRECTION_DOWN);
     }
 
     linkedInfo.snr = signalInfo.snr;
@@ -921,17 +919,19 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
 
 void StaStateMachine::DealSignalPacketChanged(int txPackets, int rxPackets)
 {
+    WIFI_LOGI("DealSignalPacketChanged.\n");
     int send = txPackets - linkedInfo.lastTxPackets;
     int received = rxPackets - linkedInfo.lastRxPackets;
     int direction = 0;
-    if (send > 0) {
-        direction |= 1;
+    if (send > STREAM_TXPACKET_THRESHOLD) {
+        direction |= static_cast<int>(StreamDirection::STREAM_DIRECTION_UP);
     }
-    if (received > 0) {
-        direction |= 1 << 1;
+    if (received > STREAM_RXPACKET_THRESHOLD) {
+        direction |= static_cast<int>(StreamDirection::STREAM_DIRECTION_DOWN);
     }
     if (direction != linkedInfo.lastPacketDirection) {
         WriteWifiSignalHiSysEvent(direction, txPackets, rxPackets);
+        InvokeOnStaStreamChanged(static_cast<StreamDirection>(direction));
     }
     linkedInfo.lastPacketDirection = direction;
     linkedInfo.lastRxPackets = rxPackets;

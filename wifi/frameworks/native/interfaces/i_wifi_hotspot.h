@@ -201,6 +201,14 @@ public:
      */
     virtual bool IsRemoteDied(void) = 0;
 
+    /**
+     * @Description Get ap iface name
+     *
+     * @param ifaceName - the ifaceName to be set
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetApIfaceName(std::string& ifaceName) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiHotspotService");
 };

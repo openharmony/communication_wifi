@@ -22,6 +22,8 @@
 #include "ip_tools.h"
 #include "wifi_common_util.h"
 
+#define IFACENAME_MIN_LEN 6
+
 DEFINE_WIFILOG_LABEL("WifiCHotspot");
 
 std::shared_ptr<OHOS::Wifi::WifiHotspot> hotspotPtr = OHOS::Wifi::WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
@@ -204,4 +206,25 @@ WifiErrorCode DisassociateSta(unsigned char *mac, int macLen)
 WifiErrorCode AddTxPowerInfo(int power)
 {
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
+}
+
+WifiErrorCode GetApIfaceName(char *ifaceName, int nameLen)
+{
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(ifaceName, ERROR_WIFI_INVALID_ARGS);
+    if (nameLen < IFACENAME_MIN_LEN) {
+        return ERROR_WIFI_INVALID_ARGS;
+    }
+    std::string iface;
+    OHOS::Wifi::ErrCode ret = hotspotPtr->GetApIfaceName(iface);
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        if (iface.size() > nameLen) {
+            return ERROR_WIFI_INVALID_ARGS;
+        }
+        if (memcpy_s(ifaceName, nameLen, iface.c_str(), iface.size()) != EOK) {
+            WIFI_LOGE("memcpy iface name failed");
+            return ERROR_WIFI_UNKNOWN;
+        }
+    }
+    return GetCErrorCode(ret);
 }

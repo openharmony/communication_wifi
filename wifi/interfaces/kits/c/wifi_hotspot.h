@@ -144,6 +144,16 @@ WifiErrorCode DisassociateSta(unsigned char *mac, int macLen);
  */
 WifiErrorCode AddTxPowerInfo(int power);
 
+/**
+ * @brief Get ap iface name.
+ *
+ * @param iface name
+ * @param iface name array size.
+ * @return Returns {@link WIFI_SUCCESS} if Get ap iface name success; returns an error.
+ * code defined in {@link WifiErrorCode} otherwise.
+ * @since 7
+ */
+WifiErrorCode GetApIfaceName(char *ifaceName, int nameLen);
 #ifdef __cplusplus
 }
 #endif

@@ -28,22 +28,22 @@ constexpr int PMF_REQUIRED = 2;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(void)
 {
-    return HdiStart();
+    return HdiWpaStaStart();
 }
 
 WifiErrorNo WifiHdiWpaClient::StopWifi(void)
 {
-    return HdiStop();
+    return HdiWpaStaStop();
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqConnect(int networkId)
 {
-    return HdiConnect(networkId);
+    return HdiWpaStaConnect(networkId);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqReconnect(void)
 {
-    return HdiReconnect();
+    return HdiWpaStaReconnect();
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqReassociate(void)
@@ -53,7 +53,7 @@ WifiErrorNo WifiHdiWpaClient::ReqReassociate(void)
 
 WifiErrorNo WifiHdiWpaClient::ReqDisconnect(void)
 {
-    return HdiDisconnect();
+    return HdiWpaStaDisconnect();
 }
 
 WifiErrorNo WifiHdiWpaClient::GetStaCapabilities(unsigned int &capabilities)
@@ -66,7 +66,7 @@ WifiErrorNo WifiHdiWpaClient::GetStaDeviceMacAddress(std::string &mac)
 {
     char macAddr[WIFI_IDL_BSSID_LENGTH + 1] = {0};
     int macAddrLen = WIFI_IDL_BSSID_LENGTH;
-    WifiErrorNo err = HdiGetDeviceMacAddress(macAddr, macAddrLen);
+    WifiErrorNo err = HdiWpaStaGetDeviceMacAddress(macAddr, macAddrLen);
     if (err == WIFI_IDL_OPT_OK) {
         mac = std::string(macAddr);
     }
@@ -85,13 +85,14 @@ WifiErrorNo WifiHdiWpaClient::SetConnectMacAddr(const std::string &mac)
 
 WifiErrorNo WifiHdiWpaClient::Scan(const WifiScanParam &scanParam)
 {
-    return HdiScan();
+    return HdiWpaStaScan();
 }
 
 WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
+    LOGI("WifiHdiWpaClient::%{public}s enter", __func__);
     int size = WIFI_IDL_GET_MAX_SCAN_INFO;
-    ScanInfo* results = HdiGetScanInfos(&size);
+    ScanInfo* results = HdiWpaStaGetScanInfos(&size);
     if (results == NULL) {
         return size == 0 ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
     }
@@ -111,7 +112,8 @@ WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInf
         tmp.isHeInfoExist = results[i].isHeInfoExist;
         tmp.isErpExist = results[i].isErpExist;
         tmp.maxRates = results[i].maxRates > results[i].extMaxRates ? results[i].maxRates : results[i].extMaxRates;
-
+        LOGI("WifiHdiWpaClient::QueryScanInfos ssid = %{public}s, ssid = %{public}s",
+            results[i].ssid, results[i].bssid);
         for (int j = 0; j < results[i].ieSize; ++j) {
             WifiInfoElem infoElemTmp;
             int infoElemSize = results[i].infoElems[j].size;
@@ -150,27 +152,27 @@ WifiErrorNo WifiHdiWpaClient::RemoveDevice(int networkId)
         return WIFI_IDL_OPT_INVALID_PARAM;
     }
 
-    return HdiRemoveNetwork(networkId);
+    return HdiWpaStaRemoveNetwork(networkId);
 }
 
 WifiErrorNo WifiHdiWpaClient::ClearDeviceConfig(void) const
 {
-    return HdiRemoveNetwork(-1);
+    return HdiWpaStaRemoveNetwork(-1);
 }
 
 WifiErrorNo WifiHdiWpaClient::GetNextNetworkId(int &networkId)
 {
-    return HdiAddNetwork(&networkId);
+    return HdiWpaStaAddNetwork(&networkId);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqEnableNetwork(int networkId)
 {
-    return HdiEnableNetwork(networkId);
+    return HdiWpaStaEnableNetwork(networkId);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqDisableNetwork(int networkId)
 {
-    return HdiDisableNetwork(networkId);
+    return HdiWpaStaDisableNetwork(networkId);
 }
 
 WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDeviceConfig &config)
@@ -245,7 +247,7 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
     if (num == 0) {
         return WIFI_IDL_OPT_OK;
     }
-    return HdiSetNetwork(networkId, conf, num);
+    return HdiWpaStaSetNetwork(networkId, conf, num);
 }
 
 WifiErrorNo WifiHdiWpaClient::SetBssid(int networkId, const std::string &bssid)
@@ -257,12 +259,12 @@ WifiErrorNo WifiHdiWpaClient::SetBssid(int networkId, const std::string &bssid)
         return WIFI_IDL_OPT_OK;
     }
     
-    return HdiSetNetwork(networkId, &conf, num);
+    return HdiWpaStaSetNetwork(networkId, &conf, num);
 }
 
 WifiErrorNo WifiHdiWpaClient::SaveDeviceConfig(void)
 {
-    return HdiSaveConfig();
+    return HdiWpaStaSaveConfig();
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqRegisterStaEventCallback(const WifiEventCallback &callback)
@@ -298,7 +300,7 @@ WifiErrorNo WifiHdiWpaClient::ReqStartWpsPbcMode(const WifiIdlWpsConfig &config)
     if (strncpy_s(param.bssid, sizeof(param.bssid), config.bssid.c_str(), config.bssid.length()) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    return HdiStartWpsPbcMode(&param);
+    return HdiWpaStaStartWpsPbcMode(&param);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqStartWpsPinMode(const WifiIdlWpsConfig &config, int &pinCode)
@@ -317,12 +319,12 @@ WifiErrorNo WifiHdiWpaClient::ReqStartWpsPinMode(const WifiIdlWpsConfig &config,
             return WIFI_IDL_OPT_FAILED;
         }
     }
-    return HdiStartWpsPinMode(&param, &pinCode);
+    return HdiWpaStaStartWpsPinMode(&param, &pinCode);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqStopWps(void)
 {
-    return HdiStopWps();
+    return HdiStopWpsSta();
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqGetRoamingCapabilities(WifiIdlRoamCapability &capability)
@@ -342,27 +344,27 @@ WifiErrorNo WifiHdiWpaClient::ReqGetConnectSignalInfo(const std::string &endBssi
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaAutoConnect(int enable)
 {
-    return HdiWpaAutoConnect(enable);
+    return HdiWpaStaAutoConnect(enable);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaBlocklistClear(void)
 {
-    return HdiWpaBlocklistClear();
+    return HdiWpaStaBlocklistClear();
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqSetPowerSave(bool enable)
 {
-    return HdiSetPowerSave(enable);
+    return HdiWpaStaSetPowerSave(enable);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCode)
 {
-    return HdiWpaSetCountryCode(countryCode.c_str());
+    return HdiWpaStaSetCountryCode(countryCode.c_str());
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetSuspendMode(bool mode) const
 {
-    return HdiWpaSetSuspendMode(mode);
+    return HdiWpaStaSetSuspendMode(mode);
 }
 
 int WifiHdiWpaClient::PushDeviceConfigString(

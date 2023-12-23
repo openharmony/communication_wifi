@@ -24,51 +24,51 @@
 extern "C" {
 #endif
 
-WifiErrorNo HdiStart();
+WifiErrorNo HdiWpaStaStart();
 
-WifiErrorNo HdiStop();
+WifiErrorNo HdiWpaStaStop();
 
-WifiErrorNo HdiConnect(int networkId);
+WifiErrorNo HdiWpaStaConnect(int networkId);
 
-WifiErrorNo HdiReconnect();
+WifiErrorNo HdiWpaStaReconnect();
 
-WifiErrorNo HdiDisconnect();
+WifiErrorNo HdiWpaStaDisconnect();
 
-WifiErrorNo HdiGetDeviceMacAddress(char *macAddr, int macAddrLen);
+WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen);
 
-WifiErrorNo HdiScan();
+WifiErrorNo HdiWpaStaScan();
 
-ScanInfo *HdiGetScanInfos(int *size);
+ScanInfo *HdiWpaStaGetScanInfos(int *size);
 
-WifiErrorNo HdiRemoveNetwork(int networkId);
+WifiErrorNo HdiWpaStaRemoveNetwork(int networkId);
 
-WifiErrorNo HdiAddNetwork(int *networkId);
+WifiErrorNo HdiWpaStaAddNetwork(int *networkId);
 
-WifiErrorNo HdiEnableNetwork(int networkId);
+WifiErrorNo HdiWpaStaEnableNetwork(int networkId);
 
-WifiErrorNo HdiDisableNetwork(int networkId);
+WifiErrorNo HdiWpaStaDisableNetwork(int networkId);
 
-WifiErrorNo HdiSetNetwork(int networkId, SetNetworkConfig *confs, int size);
+WifiErrorNo HdiWpaStaSetNetwork(int networkId, SetNetworkConfig *confs, int size);
 
-WifiErrorNo HdiSaveConfig();
+WifiErrorNo HdiWpaStaSaveConfig();
 
 WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback);
 
-WifiErrorNo HdiStartWpsPbcMode(WifiWpsParam *config);
+WifiErrorNo HdiWpaStaStartWpsPbcMode(WifiWpsParam *config);
 
-WifiErrorNo HdiStartWpsPinMode(WifiWpsParam *config, int *pinCode);
+WifiErrorNo HdiWpaStaStartWpsPinMode(WifiWpsParam *config, int *pinCode);
 
-WifiErrorNo HdiStopWps();
+WifiErrorNo HdiStopWpsSta();
 
-WifiErrorNo HdiWpaAutoConnect(int enable);
+WifiErrorNo HdiWpaStaAutoConnect(int enable);
 
-WifiErrorNo HdiWpaBlocklistClear();
+WifiErrorNo HdiWpaStaBlocklistClear();
 
-WifiErrorNo HdiSetPowerSave(int enable);
+WifiErrorNo HdiWpaStaSetPowerSave(int enable);
 
-WifiErrorNo HdiWpaSetCountryCode(const char *countryCode);
+WifiErrorNo HdiWpaStaSetCountryCode(const char *countryCode);
 
-WifiErrorNo HdiWpaSetSuspendMode(int mode);
+WifiErrorNo HdiWpaStaSetSuspendMode(int mode);
 
 #ifdef __cplusplus
 }

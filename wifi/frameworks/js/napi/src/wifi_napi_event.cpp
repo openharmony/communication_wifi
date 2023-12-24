@@ -38,6 +38,8 @@ static std::set<std::string> g_supportEventList = {
     EVENT_STA_SCAN_STATE_CHANGE,
     EVENT_STA_RSSI_STATE_CHANGE,
     EVENT_STA_DEVICE_CONFIG_CHANGE,
+    EVENT_STREAM_CHANGE,
+    EVENT_STREAM_CHANGE,
     EVENT_HOTSPOT_STATE_CHANGE,
     EVENT_HOTSPOT_STA_JOIN,
     EVENT_HOTSPOT_STA_LEAVE,
@@ -55,6 +57,7 @@ std::map<std::string, std::int32_t> g_EventSysCapMap = {
     { EVENT_STA_SCAN_STATE_CHANGE, SYSCAP_WIFI_STA },
     { EVENT_STA_RSSI_STATE_CHANGE, SYSCAP_WIFI_STA },
     { EVENT_STA_DEVICE_CONFIG_CHANGE, SYSCAP_WIFI_STA },
+    { EVENT_STREAM_CHANGE, SYSCAP_WIFI_STA },
     { EVENT_HOTSPOT_STATE_CHANGE, SYSCAP_WIFI_AP_CORE },
     { EVENT_HOTSPOT_STA_JOIN, SYSCAP_WIFI_AP_CORE },
     { EVENT_HOTSPOT_STA_LEAVE, SYSCAP_WIFI_AP_CORE },
@@ -64,7 +67,6 @@ std::map<std::string, std::int32_t> g_EventSysCapMap = {
     { EVENT_P2P_PERSISTENT_GROUP_CHANGE, SYSCAP_WIFI_P2P },
     { EVENT_P2P_PEER_DEVICE_CHANGE, SYSCAP_WIFI_P2P },
     { EVENT_P2P_DISCOVERY_CHANGE, SYSCAP_WIFI_P2P },
-    { EVENT_STREAM_CHANGE, SYSCAP_WIFI_P2P },
 };
 
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
@@ -228,7 +230,15 @@ public:
     void OnWifiWpsStateChanged(int state, const std::string &pinCode) override {
     }
 
-    void OnStreamChanged(int direction) override {
+    void OnStreamChanged(int direction) override
+    {
+        WIFI_LOGI("sta received stream changed event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
+            direction);
+        if (m_streamDirectionConvertMap.find(direction) == m_streamDirectionConvertMap.end()) {
+            WIFI_LOGW("not find stream state.");
+            return;
+        }
+        CheckAndNotify(EVENT_STREAM_CHANGE, m_streamDirectionConvertMap[direction]);
     }
 
     void OnDeviceConfigChanged(ConfigChange value) override {
@@ -253,6 +263,13 @@ private:
         CONNECTED = 1,
     };
 
+    enum class JsLayerStreamDirection {
+        STREAM_DIRECTION_NONE = 0,
+        STREAM_DIRECTION_DOWN = 1,
+        STREAM_DIRECTION_UP = 2,
+        STREAM_DIRECTION_UPDOWN = 3
+    };
+
     std::map<int, int> m_wifiStateConvertMap = {
         { static_cast<int>(WifiState::DISABLING), static_cast<int>(JsLayerWifiState::DISABLING) },
         { static_cast<int>(WifiState::DISABLED), static_cast<int>(JsLayerWifiState::DISABLED) },
@@ -263,6 +280,17 @@ private:
     std::map<int, int> m_connectStateConvertMap = {
         { static_cast<int>(ConnState::CONNECTED), static_cast<int>(JsLayerConnectStatus::CONNECTED) },
         { static_cast<int>(ConnState::DISCONNECTED), static_cast<int>(JsLayerConnectStatus::DISCONNECTED) },
+    };
+
+    std::map<int, int> m_streamDirectionConvertMap = {
+        { static_cast<int>(StreamDirection::STREAM_DIRECTION_NONE),
+            static_cast<int>(JsLayerStreamDirection::STREAM_DIRECTION_NONE) },
+        { static_cast<int>(StreamDirection::STREAM_DIRECTION_DOWN),
+            static_cast<int>(JsLayerStreamDirection::STREAM_DIRECTION_DOWN) },
+        { static_cast<int>(StreamDirection::STREAM_DIRECTION_UP),
+            static_cast<int>(JsLayerStreamDirection::STREAM_DIRECTION_UP) },
+        { static_cast<int>(StreamDirection::STREAM_DIRECTION_UPDOWN),
+            static_cast<int>(JsLayerStreamDirection::STREAM_DIRECTION_UPDOWN) },
     };
 };
 

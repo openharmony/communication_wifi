@@ -202,7 +202,7 @@ static int StopModuleInternalSendTerminate(void)
         LOGE("Get wpa global interface failed!");
         return HAL_FAILURE;
     }
-    int ret = pWpaInterface->wpaCliTerminate(pWpaInterface);
+    int ret = pWpaInterface->wpaCliTerminate();
     return (ret == 0 ? HAL_SUCCESS : HAL_FAILURE);
 }
 

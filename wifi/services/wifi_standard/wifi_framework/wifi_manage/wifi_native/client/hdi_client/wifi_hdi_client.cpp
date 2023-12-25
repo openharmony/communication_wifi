@@ -279,7 +279,7 @@ WifiErrorNo WifiHdiClient::SetConnectMacAddr(const std::string &mac, const int p
     if (CheckMacIsValid((const char *)mac.c_str()) != 0) {
         return WIFI_IDL_OPT_INPUT_MAC_INVALID;
     }
-    HdiSetAssocMacAddr((unsigned char *)mac.c_str(), mac.length(), portType);
+    return HdiSetAssocMacAddr((unsigned char *)mac.c_str(), mac.length(), portType);
 #else
     return WIFI_IDL_OPT_OK;
 #endif

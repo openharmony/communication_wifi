@@ -146,7 +146,7 @@ ErrCode StaStateMachine::InitStaStateMachine()
     pNetcheck->InitNetCheckThread();
 #ifndef OHOS_ARCH_LITE
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
-    m_NetWorkState = std::make_shared<NetStateObserver>();
+    m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
     m_NetWorkState->SetNetStateCallback(
         std::bind(&StaStateMachine::NetStateObserverCallback, this, std::placeholders::_1));
 #endif

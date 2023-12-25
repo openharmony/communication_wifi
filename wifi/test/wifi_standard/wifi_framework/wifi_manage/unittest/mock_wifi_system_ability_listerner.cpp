@@ -19,10 +19,10 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiSystemAbilityListener");
 
 namespace OHOS {
 namespace Wifi {
-void WifiSystemAbilityListener::WifiSystemAbilityListener()
+WifiSystemAbilityListener::WifiSystemAbilityListener()
 {}
 
-void WifiSystemAbilityListener::~WifiSystemAbilityListener()
+WifiSystemAbilityListener::~WifiSystemAbilityListener()
 {}
 
 void WifiSystemAbilityListener::SubscribeSystemAbility(int systemAbilityId)

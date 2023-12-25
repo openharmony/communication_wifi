@@ -862,7 +862,7 @@ private:
     std::map<std::string, StaServiceCallback> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
-    std::shared_ptr<NetStateObserver> m_NetWorkState;
+    sptr<NetStateObserver> m_NetWorkState;
 #endif
 
     int lastNetworkId;

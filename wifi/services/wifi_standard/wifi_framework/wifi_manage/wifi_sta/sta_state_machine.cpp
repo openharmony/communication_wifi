@@ -2832,12 +2832,17 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
             WifiSettings::GetInstance().SaveIpInfo(ipInfo);
 
             pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
-            /* If not phone hotspot, set .isDataResticted = 0. */
+            /* If not phone hotspot, set .isDataRestricted = 0. */
             std::string strVendor = result->strOptVendor;
+            std::string ipAddress = result->strOptClientId;
             pStaStateMachine->linkedInfo.isDataRestricted = 
                 (strVendor.find("ANDROID_METERED") == std::string::npos && 
-                strVendor.find("hostname") == std::string::npos && 
                 strVendor.find("OPEN_HARMONY") == std::string::npos) ? 0 : 1;
+            if (!pStaStateMachine->linkedInfo.isDataRestricted) {
+                pStaStateMachine->linkedInfo.isDataRestricted =
+                    (strVendor.find("hostname:") != std::string::npos &&
+                    ipAddress.find("172.20.10.") != std::string::npos);
+            }
             pStaStateMachine->linkedInfo.platformType = strVendor;
             WIFI_LOGI("WifiLinkedInfo.isDataRestricted = %{public}d, WifiLinkedInfo.platformType = %{public}s",
                 pStaStateMachine->linkedInfo.isDataRestricted, pStaStateMachine->linkedInfo.platformType.c_str());

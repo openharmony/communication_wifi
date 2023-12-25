@@ -125,12 +125,12 @@ void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PNO_SCAN_INFO", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &Server)
+void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server)
 {
     Json::Value root;
     Json::FastWriter writer;
     root["RESP_CODE"] = respCode;
-    root["SERVER"] = Server;
+    root["SERVER"] = server;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BROWSER_FAILED_FOR_PROTAL", "EVENT_VALUE", writer.write(root));
 }
 
@@ -166,6 +166,14 @@ void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes)
     root["EVENT_TYPE"] = errCode;
     root["FAIL_RES"] = failRes;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_AB_DISCONNECT", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteSoftApAbDisconnectHiSysEvent(int errorCode)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ERROR_CODE"] = errorCode;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOTFAP_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi
 }  // namespace OHOS

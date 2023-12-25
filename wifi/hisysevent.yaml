@@ -86,6 +86,10 @@ WIFI_CONNECT_FAILED_EVENT:
   ASSOC_FAIL_CNT: {type: INT32, desc: assoc fail cnt}
   DHCP_FAIL_CNT: {type: INT32, desc: dhcp fail cnt}
 
+SOTFAP_ABNORMAL_DISCONNECT:
+  __BASE: {type: FAULT, level: MINOR, desc: soft abnormal disconnect event}
+  ERROR_CODE: {type: INT32, desc: error code}
+
 WIFI_CHR_EVENT:
   __BASE: {type: STATISTIC, level: MINOR, desc: Wifi chr event}
   EVENT_NAME: {type: STRING, desc: event name}

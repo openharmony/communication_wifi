@@ -119,7 +119,7 @@ WifiInternalEventDispatcher::WifiInternalEventDispatcher() : mRunFlag(true)
 WifiInternalEventDispatcher::~WifiInternalEventDispatcher()
 {}
 
-NO_SANITIZE("cfi") int WifiInternalEventDispatcher::Init()
+int WifiInternalEventDispatcher::Init()
 {
     /* first init system notify service client here ! */
 

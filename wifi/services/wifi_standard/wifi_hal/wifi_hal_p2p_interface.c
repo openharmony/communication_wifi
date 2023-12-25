@@ -47,6 +47,8 @@ const int P2P_CONNECT_DELAY_TIME = 100000;
 #endif // WPA_CTRL_IFACE_UNIX
 #endif // NON_SEPERATE_P2P
 
+#define P2P_RANDOM_MAC_FLAG "p2p_device_random_mac_addr=1\n"
+#define BUFF_SIZE 256
 static int g_p2pSupplicantConnectEvent = 0;
 
 static WifiErrorNo P2pStartSupplicant(void)
@@ -150,6 +152,36 @@ static WifiErrorNo AddP2pIface(void)
     return WIFI_HAL_SUCCESS;
 }
 
+static WifiErrorNo AddP2pRandomMacFlag()
+{
+    char str[BUFF_SIZE] = { 0 };
+    int indicate = 0;
+    FILE *fp = fopen(P2P_WPA_CONFIG_FILE, "a+");
+    if (fp == NULL) {
+        LOGE("%{public}s: failed to open the file", __func__);
+        return WIFI_HAL_FAILED;
+    }
+    while (fgets(str, BUFF_SIZE, fp)) {
+        if (strstr(str, P2P_RANDOM_MAC_FLAG) != NULL) {
+            indicate = 1;
+            break;
+        }
+        memset_s(str, sizeof(str), 0x0, sizeof(str));
+    }
+    if (indicate == 0) {
+        int ret = fputs(P2P_RANDOM_MAC_FLAG, fp);
+        if (ret < 0) {
+            LOGE("%{public}s: failed to update the file", __func__);
+            fclose(fp);
+            return WIFI_HAL_FAILED;
+        } else {
+            LOGD("%{public}s: success to update the file, ret:%{public}d", __func__, ret);
+        }
+    }
+    fclose(fp);
+    return WIFI_HAL_SUCCESS;
+}
+
 WifiErrorNo P2pStart(void)
 {
     LOGD("Ready to start P2p");
@@ -205,6 +237,9 @@ WifiErrorNo P2pSetRandomMac(int enable)
     if (ret != P2P_SUP_ERRCODE_SUCCESS) {
         LOGE("WpaP2pCliCmdSetRandomMac fail, ret = %{public}d", ret);
         return ConvertP2pErrCode(ret);
+    }
+    if (AddP2pRandomMacFlag() != WIFI_HAL_SUCCESS) {
+        LOGW("%{public}s: failed to write %{public}s", __func__, P2P_RANDOM_MAC_FLAG);
     }
     return WIFI_HAL_SUCCESS;
 }

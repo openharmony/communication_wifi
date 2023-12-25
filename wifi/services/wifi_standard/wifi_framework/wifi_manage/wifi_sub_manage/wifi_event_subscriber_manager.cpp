@@ -265,7 +265,7 @@ bool WifiEventSubscriberManager::GetLocationModeByDatashare()
     }
 
     std::string locationMode;
-    Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
+    Uri uri(datashareHelper->GetLoactionDataShareUri());
     int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_LOCATION_MODE, locationMode);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetLocationModeByDatashare, Query locationMode fail!");
@@ -430,7 +430,7 @@ void WifiEventSubscriberManager::RegisterLocationEvent()
         return;
     }
     locationModeObserver_ = sptr<WifiLocationModeObserver>(new (std::nothrow)WifiLocationModeObserver());
-    Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
+    Uri uri(datashareHelper->GetLoactionDataShareUri());
     datashareHelper->RegisterObserver(uri, locationModeObserver_);
     islocationModeObservered = true;
 }
@@ -448,7 +448,7 @@ void WifiEventSubscriberManager::UnRegisterLocationEvent()
         WIFI_LOGE("UnRegisterLocationEvent datashareHelper is nullptr");
         return;
     }
-    Uri uri(SETTINGS_DATASHARE_URI_LOCATION_MODE);
+    Uri uri(datashareHelper->GetLoactionDataShareUri());
     datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
     islocationModeObservered = false;
 }

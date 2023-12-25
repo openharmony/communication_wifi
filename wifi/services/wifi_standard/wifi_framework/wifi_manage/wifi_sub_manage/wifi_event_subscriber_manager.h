@@ -124,7 +124,6 @@ private:
     std::shared_ptr<AirplaneModeEventSubscriber> airplaneModeEventSubscriber_ = nullptr;
     uint32_t batteryTimerId{0};
     std::shared_ptr<BatteryEventSubscriber> batterySubscriber_ = nullptr;
-    bool isBatterySubscribered = false;
     uint32_t locationTimerId{0};
     uint32_t migrateTimerId{0};
     static bool mIsMdmForbidden;
@@ -132,10 +131,8 @@ private:
     bool islocationModeObservered = false;
     uint32_t appEventTimerId{0};
 	std::shared_ptr<AppEventSubscriber> eventSubscriber_ = nullptr;
-    bool isEventSubscribered = false;
     uint32_t thermalTimerId{0};
     std::shared_ptr<ThermalLevelSubscriber> thermalLevelSubscriber_ = nullptr;
-    bool isThermalLevelSubscribered = false;
 };
 
 }  // namespace Wifi

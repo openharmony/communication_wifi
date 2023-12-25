@@ -532,18 +532,6 @@ void StaStateMachine::StartWifiProcess()
         /* callback the InterfaceService that wifi is enabled successfully. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), m_instId);
         InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-        std::string macAddress;
-        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
-        if (MacAddress::IsValidMac(macAddress.c_str())) {
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
-                LOGE("%{public}s: failed to set sta MAC address:%{private}s", __func__, macAddress.c_str());
-            }
-            WifiSettings::GetInstance().SetMacAddress(macAddress, m_instId);
-        } else {
-            LOGE("%{public}s: macAddress is invalid", __func__);
-        }
-#else
         /* Sets the MAC address of WifiSettings. */
         std::string mac;
         if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_IDL_OPT_OK) {
@@ -555,6 +543,17 @@ void StaStateMachine::StartWifiProcess()
             }
         } else {
             WIFI_LOGI("GetStaDeviceMacAddress failed!");
+        }
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+        std::string macAddress;
+        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+        if (MacAddress::IsValidMac(macAddress.c_str())) {
+            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
+                LOGE("%{public}s: failed to set sta MAC address:%{private}s", __func__, macAddress.c_str());
+            }
+            WifiSettings::GetInstance().SetMacAddress(macAddress, m_instId);
+        } else {
+            LOGE("%{public}s: macAddress is invalid", __func__);
         }
 #endif
 #ifndef OHOS_ARCH_LITE

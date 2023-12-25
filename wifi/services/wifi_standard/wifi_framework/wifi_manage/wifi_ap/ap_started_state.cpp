@@ -264,6 +264,7 @@ bool ApStartedState::StartAp() const
         LOGE("%{public}s: macAddress is invalid", __func__);
     }
 #endif
+    WriteWifiApStateHiSysEvent(1);
     return true;
 }
 
@@ -274,6 +275,7 @@ bool ApStartedState::StopAp() const
     if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
         return false;
     }
+    WriteWifiApStateHiSysEvent(0);
     return true;
 }
 

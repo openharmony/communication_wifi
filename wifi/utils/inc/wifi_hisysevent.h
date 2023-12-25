@@ -53,6 +53,10 @@ const std::string HISYS_SERVICE_TYPE_P2P = "P2P";
 
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
+void WriteWifiApStateHiSysEvent(int32_t state);
+
+void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t state);
+
 void WriteWifiConnectionHiSysEvent(const WifiConnectionType& type, const std::string& pkgName);
 
 void WriteWifiScanHiSysEvent(const int result, const std::string& pkgName);

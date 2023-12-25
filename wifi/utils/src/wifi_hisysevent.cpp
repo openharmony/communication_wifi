@@ -32,9 +32,29 @@ static void WriteEvent(const std::string& eventType, Types... args)
     }
 }
 
+template<typename... Type>
+static void WriteEventBehavior(const std::string& eventType, Type... args)
+{
+    int ret = HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::COMMUNICATION, eventType,
+        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, args...);
+    if (ret != 0) {
+        WIFI_LOGE("Write event fail: %{public}s", eventType.c_str());
+    }
+}
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType)
 {
     WriteEvent("WIFI_STATE", "TYPE", serviceType, "OPER_TYPE", static_cast<int>(operType));
+}
+
+void WriteWifiApStateHiSysEvent(int32_t state)
+{
+    WriteEventBehavior("WIFI_AP_STATE", "STATE", state);
+}
+
+void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t state)
+{
+    WriteEventBehavior("WIFI_P2P_STATE", "INTERFACE", inter, "P2PTYPE", type, "STATE", state);
 }
 
 void WriteWifiConnectionHiSysEvent(const WifiConnectionType& type, const std::string& pkgName)

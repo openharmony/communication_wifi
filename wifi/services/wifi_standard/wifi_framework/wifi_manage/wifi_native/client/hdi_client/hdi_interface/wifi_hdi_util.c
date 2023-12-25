@@ -69,6 +69,9 @@ const unsigned int CHAN_WIDTH_80MHZ = 2;
 const unsigned int CHAN_WIDTH_160MHZ = 3;
 const unsigned int CHAN_WIDTH_80MHZ_MHZ = 4;
 
+#define MAC_UINT_SIZE 6
+#define MAC_STRING_SIZE 17
+
 #ifndef OHOS_ARCH_LITE
 static int ConvertChanToFreqMhz(int channel, int band)
 {

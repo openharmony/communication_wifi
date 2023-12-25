@@ -23,6 +23,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
@@ -2038,6 +2039,9 @@ bool ScanService::AllowScanDuringScanning(ScanMode scanMode) const
 bool ScanService::AllowScanDuringScreenOff(ScanMode scanMode) const
 {
     WIFI_LOGI("Enter ScanService::AllowScanDuringScreenOff.\n");
+    if (WifiAuthCenter::IsNativeProcess()) {
+        return true;
+    }
 
     if (IsAppInFilterList(scan_screen_off_trust_list)) {
         return true;

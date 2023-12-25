@@ -96,7 +96,7 @@ void StandByListerner::RegisterStandByEvent()
 {
     std::unique_lock<std::mutex> lock(standByEventMutex);
     if (isStandBySubscribered) {
-        WIFI_LOGI("isStandBySubscribered is true");
+        WIFI_LOGI("isStandBySubscribered is true!");
         return;
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -116,7 +116,7 @@ void StandByListerner::UnRegisterStandByEvent()
     WIFI_LOGI("UnRegisterStandByEvent enter");
     std::unique_lock<std::mutex> lock(standByEventMutex);
     if (!isStandBySubscribered) {
-        WIFI_LOGI("isStandBySubscribered is false");
+        WIFI_LOGI("isStandBySubscribered is false!");
         return;
     }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(standBySubscriber_)) {

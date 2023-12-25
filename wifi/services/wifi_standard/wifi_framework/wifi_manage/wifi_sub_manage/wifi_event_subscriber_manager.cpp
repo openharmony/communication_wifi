@@ -81,17 +81,17 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
         WifiTimer::GetInstance()->Register(timeoutCallback, locationTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterLocationEvent success! locationTimerId:%{public}u", locationTimerId);
     }
-    if (!isBatterySubscribered && batteryTimerId == 0) {
+    if (batterySubscriber_ == nullptr && batteryTimerId == 0) {
         WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::RegisterBatteryEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, batteryTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterBatteryEvent success! locationTimerId:%{public}u", batteryTimerId);
     }
-    if (!isEventSubscribered && appEventTimerId == 0) {
+    if (eventSubscriber_ == nullptr && appEventTimerId == 0) {
         WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::RegisterAppRemoved, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, appEventTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
     }
 
-    if (!isThermalLevelSubscribered && thermalTimerId == 0) {
+    if (thermalLevelSubscriber_ == nullptr && thermalTimerId == 0) {
         WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::RegisterThermalLevel, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, thermalTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
     }
@@ -127,13 +127,13 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     if (deviceProvisionObserver_) {
         UnRegisterDeviceProvisionEvent();
     }
-    if (isBatterySubscribered) {
+    if (batterySubscriber_) {
         UnRegisterBatteryEvent();
     }
-    if (isEventSubscribered) {
+    if (eventSubscriber_) {
         UnRegisterAppRemoved();
     }
-    if (isThermalLevelSubscribered) {
+    if (thermalLevelSubscriber_) {
         UnRegisterThermalLevel();
     }
 #ifdef HAS_POWERMGR_PART
@@ -490,7 +490,7 @@ void WifiEventSubscriberManager::UnRegisterDeviceProvisionEvent()
 void WifiEventSubscriberManager::RegisterBatteryEvent()
 {
     std::unique_lock<std::mutex> lock(batteryEventMutex);
-    if (isBatterySubscribered) {
+    if (batterySubscriber_) {
         return;
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -502,7 +502,6 @@ void WifiEventSubscriberManager::RegisterBatteryEvent()
         WIFI_LOGE("BatteryEvent SubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("BatteryEvent SubscribeCommonEvent() OK");
-        isBatterySubscribered = true;
         WifiTimer::GetInstance()->UnRegister(batteryTimerId);
     }
 }
@@ -510,13 +509,12 @@ void WifiEventSubscriberManager::RegisterBatteryEvent()
 void WifiEventSubscriberManager::UnRegisterBatteryEvent()
 {
     std::unique_lock<std::mutex> lock(batteryEventMutex);
-    if (!isBatterySubscribered) {
+    if (!batterySubscriber_) {
         return;
     }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(batterySubscriber_)) {
         WIFI_LOGE("BatteryEvent UnSubscribeCommonEvent() failed");
     } else {
-        isBatterySubscribered = false;
         WIFI_LOGI("BatteryEvent UnSubscribeCommonEvent() OK");
     }
 }
@@ -653,7 +651,7 @@ void WifiEventSubscriberManager::UnRegisterPowerStateListener()
 void WifiEventSubscriberManager::RegisterAppRemoved()
 {
     std::unique_lock<std::mutex> lock(appEventMutex);
-    if (isEventSubscribered) {
+    if (eventSubscriber_) {
         return;
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -664,7 +662,6 @@ void WifiEventSubscriberManager::RegisterAppRemoved()
         WIFI_LOGE("AppEvent SubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("AppEvent SubscribeCommonEvent() OK");
-        isEventSubscribered = true;
         WifiTimer::GetInstance()->UnRegister(appEventTimerId);
     }
 }
@@ -672,13 +669,12 @@ void WifiEventSubscriberManager::RegisterAppRemoved()
 void WifiEventSubscriberManager::UnRegisterAppRemoved()
 {
     std::unique_lock<std::mutex> lock(appEventMutex);
-    if (!isEventSubscribered) {
+    if (!eventSubscriber_) {
         return;
     }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventSubscriber_)) {
         WIFI_LOGE("AppEvent UnSubscribeCommonEvent() failed");
     } else {
-        isEventSubscribered = false;
         WIFI_LOGI("AppEvent UnSubscribeCommonEvent() OK");
     }
 }
@@ -686,7 +682,7 @@ void WifiEventSubscriberManager::UnRegisterAppRemoved()
 void WifiEventSubscriberManager::RegisterThermalLevel()
 {
     std::unique_lock<std::mutex> lock(thermalEventMutex);
-    if (isThermalLevelSubscribered) {
+    if (thermalLevelSubscriber_) {
         return;
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -697,7 +693,6 @@ void WifiEventSubscriberManager::RegisterThermalLevel()
         WIFI_LOGE("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("THERMAL_LEVEL_CHANGED SubscribeCommonEvent() OK");
-        isThermalLevelSubscribered = true;
         WifiTimer::GetInstance()->UnRegister(thermalTimerId);
     }
 }
@@ -705,13 +700,12 @@ void WifiEventSubscriberManager::RegisterThermalLevel()
 void WifiEventSubscriberManager::UnRegisterThermalLevel()
 {
     std::unique_lock<std::mutex> lock(thermalEventMutex);
-    if (!isThermalLevelSubscribered) {
+    if (!thermalLevelSubscriber_) {
         return;
     }
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(thermalLevelSubscriber_)) {
         WIFI_LOGE("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() failed");
     } else {
-        isThermalLevelSubscribered = false;
         WIFI_LOGI("THERMAL_LEVEL_CHANGED UnSubscribeCommonEvent() OK");
     }
 }

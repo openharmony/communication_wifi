@@ -64,11 +64,13 @@ public:
     napi_env env;
     napi_ref callbackRef;
     std::function<napi_value ()> packResult;
+    std::string eventType;
 
-    explicit AsyncEventData(napi_env e, napi_ref r, std::function<napi_value ()> p) {
+    explicit AsyncEventData(napi_env e, napi_ref r, std::function<napi_value ()> p, const std::string& type) {
         env = e;
         callbackRef = r;
         packResult = p;
+        eventType = type;
     }
 
     AsyncEventData() = delete;
@@ -100,7 +102,7 @@ public:
         }
         for (auto& each : it->second) {
             auto func = [this, env = each.m_regEnv, obj] () -> napi_value { return CreateResult(env, obj); };
-            AsyncEventData *asyncEvent = new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, func);
+            AsyncEventData *asyncEvent = new (std::nothrow)AsyncEventData(each.m_regEnv, each.m_regHanderRef, func, type);
             if (asyncEvent == nullptr) {
                 return;
             }

@@ -1249,9 +1249,9 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
     return fail;
 }
 
-int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *DestMacStr, int strLen)
+int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *destMacStr, int strLen)
 {
-    if (srcMac == NULL || DestMacStr == NULL || srcMacSize != MAC_UINT_SIZE || strLen <= MAC_STRING_SIZE) {
+    if (srcMac == NULL || destMacStr == NULL || srcMacSize != MAC_UINT_SIZE || strLen <= MAC_STRING_SIZE) {
         return -1;
     }
     const int srcMacPosZero = 0;
@@ -1260,7 +1260,7 @@ int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *Dest
     const int srcMacPosThree = 3;
     const int srcMacPosFour = 4;
     const int srcMacPosFive = 5;
-    if (snprintf_s(DestMacStr, strLen, strLen - 1, "%02x:%02x:%02x:%02x:%02x:%02x", srcMac[srcMacPosZero],
+    if (snprintf_s(destMacStr, strLen, strLen - 1, "%02x:%02x:%02x:%02x:%02x:%02x", srcMac[srcMacPosZero],
         srcMac[srcMacPosOne], srcMac[srcMacPosTwo], srcMac[srcMacPosThree], srcMac[srcMacPosFour],
         srcMac[srcMacPosFive]) < 0) {
         return -1;

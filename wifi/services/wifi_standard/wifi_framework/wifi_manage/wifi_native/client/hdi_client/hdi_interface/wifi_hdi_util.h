@@ -40,7 +40,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length);
  * @param strLen - mac string length, must be bigger than 17
  * @return int - return result. 0 is Failed ,1 is Success
  */
-int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *DestMacStr, int strLen);
+int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *destMacStr, int strLen);
 #ifdef __cplusplus
 }
 #endif

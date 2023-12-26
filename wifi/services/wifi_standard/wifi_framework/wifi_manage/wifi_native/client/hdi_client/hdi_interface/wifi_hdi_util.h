@@ -34,13 +34,13 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length);
 /**
  * @Description Convert [a,b,c,d,e,f] mac address to string type [xx:xx:xx:xx:xx:xx]
  *
- * @param mac - mac address
- * @param macSize - mac size, must be equal to 6
- * @param macStr - output mac string, type: [xx:xx:xx:xx:xx:xx]
- * @param strLen - mac string len, must bigger than 17
- * @return int - convert result. 0 - Failed 1 - Success
+ * @param srcMac - srcMac address
+ * @param srcMacSize - srcMacSize size, must be equal to 6, or error
+ * @param DesMacStr - output mac string, type: [xx:xx:xx:xx:xx:xx]
+ * @param strLen - mac string length, must be bigger than 17
+ * @return int - return result. 0 is Failed ,1 is Success
  */
-int ConvertMacToStr(const unsigned char *mac, int macSize, char *macStr, int strLen);
+int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *DestMacStr, int strLen);
 #ifdef __cplusplus
 }
 #endif

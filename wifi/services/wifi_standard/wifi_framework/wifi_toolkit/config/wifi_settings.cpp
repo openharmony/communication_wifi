@@ -812,12 +812,12 @@ int WifiSettings::GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups)
 
 int WifiSettings::RemoveWifiP2pSupplicantGroupInfo()
 {
-    if (!std::filesystem::exists(P2P_CONFIG_FILE)) {
-        LOGE("p2p_supplicant file do not exists!");
+    if (!std::filesystem::exists(P2P_SUPPLICANT_CONFIG_FILE)) {
+        LOGE("p2p_supplicant file do not exists!, file:%{public}s", P2P_SUPPLICANT_CONFIG_FILE);
         return -1;
     }
     std::error_code ec;
-    int retval = std::filesystem::remove(P2P_CONFIG_FILE, ec);
+    int retval = std::filesystem::remove(P2P_SUPPLICANT_CONFIG_FILE, ec);
     if (!ec) { // successful
         LOGI("p2p_supplicant file removed successful, retval:%{public}d value:%{public}d message:%{public}s",
             retval, ec.value(), ec.message().c_str());

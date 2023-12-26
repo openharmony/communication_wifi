@@ -32,9 +32,8 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         return 1;
     }
     uint32_t bssidLen = disconectParam->bssidLen;
-    std::string strBssid = OHOS::Wifi::ConvertArrayToHex(disconectParam->bssid, bssidLen);
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(strBssid.c_str(), strBssid.length(), szBssid, sizeof(szBssid));
+    ConvertMacToStr(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, szBssid);
@@ -52,9 +51,8 @@ int32_t OnEventConnected(struct IWpaCallback *self,
         return 1;
     }
     uint32_t bssidLen = connectParam->bssidLen;
-    std::string strBssid = OHOS::Wifi::ConvertArrayToHex(connectParam->bssid, bssidLen);
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(strBssid.c_str(), strBssid.length(), szBssid, sizeof(szBssid));
+    ConvertMacToStr(connectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, (const char *)connectParam->bssid);
@@ -72,9 +70,8 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
         return 1;
     }
     uint32_t bssidLen = bssidChangedParam->bssidLen;
-    std::string strBssid = OHOS::Wifi::ConvertArrayToHex(bssidChangedParam->bssid, bssidLen);
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(strBssid.c_str(), strBssid.length(), szBssid, sizeof(szBssid));
+    ConvertMacToStr(bssidChangedParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onBssidChanged) {
         cbk.onBssidChanged((const char *)bssidChangedParam->reason, szBssid);

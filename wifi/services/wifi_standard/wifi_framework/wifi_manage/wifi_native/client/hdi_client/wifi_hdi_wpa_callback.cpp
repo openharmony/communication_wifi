@@ -33,7 +33,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     }
     uint32_t bssidLen = disconectParam->bssidLen;
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    ConvertMacArr2String(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, szBssid);
@@ -52,7 +52,7 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     }
     uint32_t bssidLen = connectParam->bssidLen;
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(connectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    ConvertMacArr2String(connectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, szBssid);
@@ -71,7 +71,7 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
     }
     uint32_t bssidLen = bssidChangedParam->bssidLen;
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(bssidChangedParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    ConvertMacArr2String(bssidChangedParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onBssidChanged) {
         cbk.onBssidChanged((const char *)bssidChangedParam->reason, szBssid);

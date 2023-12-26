@@ -204,6 +204,14 @@ public:
      */
     bool IsRemoteDied(void) override;
 
+    /**
+     * @Description Get ap iface name
+     *
+     * @param ifaceName - the ifaceName to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode GetApIfaceName(std::string& ifaceName) override;
+
 private:
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

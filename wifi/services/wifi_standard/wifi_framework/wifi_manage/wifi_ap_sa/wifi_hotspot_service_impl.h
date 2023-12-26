@@ -258,6 +258,13 @@ public:
     ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgFromCenter,
         std::vector<BandType> &bandsFromCenter, ChannelsTable &channInfoFromCenter);
 
+    /**
+     * @Description Get ap iface name
+     *
+     * @param ifaceName - the ifaceName to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode GetApIfaceName(std::string& ifaceName) override;
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
     int CheckOperHotspotSwitchPermission(const ServiceType type);

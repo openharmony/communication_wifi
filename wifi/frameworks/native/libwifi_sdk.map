@@ -52,6 +52,7 @@
         GetLinkedInfo;
         GetDisconnectedReason;
         GetDeviceMacAddress;
+        GetApIfaceName;
         AdvanceScan;
         GetIpInfo;
         GetSignalLevel;

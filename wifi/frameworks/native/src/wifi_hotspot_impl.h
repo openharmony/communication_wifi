@@ -218,6 +218,14 @@ public:
      */
     bool IsRemoteDied(void);
 
+    /**
+     * @Description Get ap iface name
+     *
+     * @param ifaceName - the ifaceName to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode GetApIfaceName(std::string& ifaceName) override;
+
 private:
     bool GetWifiHotspotProxy();
     int systemAbilityId_;

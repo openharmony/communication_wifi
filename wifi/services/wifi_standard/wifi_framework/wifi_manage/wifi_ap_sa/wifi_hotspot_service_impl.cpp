@@ -828,5 +828,19 @@ ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, c
 
     return ErrCode::WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiHotspotServiceImpl::GetApIfaceName(std::string& ifaceName)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetBlockLists:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

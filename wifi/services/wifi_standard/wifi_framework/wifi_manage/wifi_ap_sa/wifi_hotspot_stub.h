@@ -60,6 +60,7 @@ private:
     void OnGetPowerModel(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnSetPowerModel(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnIsHotspotDualBandSupported(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnGetApIfaceName(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
 private:
     HandleFuncMap handleFuncMap;

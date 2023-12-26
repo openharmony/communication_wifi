@@ -200,6 +200,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetPowerModel(const PowerModel& model) = 0;
+
+    /**
+     * @Description Get ap iface name
+     *
+     * @param ifaceName - the ifaceName to be set
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetApIfaceName(std::string& ifaceName) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

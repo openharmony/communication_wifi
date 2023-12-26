@@ -30,6 +30,7 @@ WIFI_SCAN:
   __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wifi scan event}
   EXECUTE_RESULT: {type: INT32, desc: 0 is scan fail and 1 is scan success}
   PACKAGE_NAME: {type: STRING, desc: Package name}
+  FAIL_REASON: {type: STRING, desc: API called fail reason}
 
 # Wi-Fi event received
 WIFI_EVENT_RECEIVED:
@@ -81,7 +82,7 @@ BROWSER_FAILED_FOR_PROTAL:
   RESP_CODE: {type: INT32, desc: resp code}
   SERVER: {type: STRING, desc: server}
 
-WIFI_CONNECT_FAILED_EVENT:
+WIFI_CONNECT_FAILED:
   __BASE: {type: FAULT, level: MINOR, desc: wifi connect failed event}
   ASSOC_FAIL_CNT: {type: INT32, desc: assoc fail cnt}
   DHCP_FAIL_CNT: {type: INT32, desc: dhcp fail cnt}
@@ -106,7 +107,9 @@ WIFI_KPI:
   OPEN_COUNT: {type: INT32, desc: Wifi open count}
   OPEN_SUCCESS_COUNT: {type: INT32, desc: Wifi open success count}
   PNO_SCAN_COUNT: {type: INT32, desc: pno scan count}
-  
+  INT_ACCESS_FAIL_COUNT: {type: INT32, desc: Number of Internet Access Failures}
+  INT_ACCESS_DURATION: {type: INT32, desc: internet access duration}
+
 WIFI_KPI_SSID:
   __BASE: {type: STATISTIC, level: MINOR, desc: Wifi KPI SSID}
   ABNORMAL_DISCONNECT_COUNT: {type: INT32, desc: sum of abnormal disconnection}

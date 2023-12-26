@@ -67,8 +67,3 @@ ohos_unittest("crpc_unittest") {
   subsystem_name = "communication"
   testonly = true
 }
-
-group("unittest") {
-  testonly = true
-  deps = [ ":crpc_unittest" ]
-}

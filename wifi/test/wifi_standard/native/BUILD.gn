@@ -79,8 +79,3 @@ ohos_unittest("native_unittest") {
   part_name = "wifi"
   subsystem_name = "communication"
 }
-
-group("unittest") {
-  testonly = true
-  deps = [ ":native_unittest" ]
-}

@@ -30,6 +30,7 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_hisysevent.h"
 #include "wifi_config_center.h"
+#include "wifi_hisysevent.h"
 #ifndef OHOS_ARCH_LITE
 #include "ability_manager_client.h"
 #include "wifi_net_observer.h"
@@ -2393,12 +2394,14 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
     WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d.", netState);
     if (linkedInfo.connState != ConnState::CONNECTED) {
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
+        WriteIsInternetHiSysEvent(false);
         return;
     }
     mPortalUrl = portalUrl;
     if (netState == StaNetState::NETWORK_STATE_WORKING) {
         WIFI_LOGI("HandleNetCheckResult network state is working\n");
         /* Save connection information to WifiSettings. */
+        WriteIsInternetHiSysEvent(true);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         if (portalFlag == true) {
@@ -2421,6 +2424,7 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         netNoWorkNum = 0;
     } else {
         WIFI_LOGI("HandleNetCheckResult network state is notworking.\n");
+        WriteIsInternetHiSysEvent(false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         int delay = 1 << netNoWorkNum;

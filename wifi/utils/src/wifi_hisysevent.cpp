@@ -195,5 +195,14 @@ void WriteSoftApAbDisconnectHiSysEvent(int errorCode)
     root["ERROR_CODE"] = errorCode;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOTFAP_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteIsInternetHiSysEvent(bool isInternet)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["IS_INTERNET"] = isInternet;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_KPI_INTERNET", "EVENT_VALUE", writer.write(root));
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

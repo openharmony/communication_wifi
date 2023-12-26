@@ -1940,6 +1940,24 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
 
             break;
         }
+        case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {
+            ret = EXECUTED;
+            std::string reason = msg->GetStringFromMessage();
+            std::string bssid = msg->GetStringFromMessage();
+            WIFI_LOGI("ApLinkedState reveived bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
+                reason.c_str(), MacAnonymize(bssid).c_str());
+            if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
+                WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
+                return false;
+            }
+            /* BSSID change is not received during roaming, only set BSSID */
+            if (WifiStaHalInterface::GetInstance().SetBssid(pStaStateMachine->linkedInfo.networkId,
+                bssid) != WIFI_IDL_OPT_OK) {
+                WIFI_LOGE("SetBssid return fail.");
+                return false;
+            }
+            break;
+        }
         default:
             break;
     }

@@ -98,13 +98,12 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_status res;
             bool find = false;
             bool unrefRef = false;
-            auto it;
+            auto it = g_eventRegisterInfo.find(asyncData->eventType);
             napi_open_handle_scope(asyncData->env, &scope);
             if (scope == nullptr) {
                 WIFI_LOGE("scope is nullptr");
                 goto EXIT;
             }
-            it = g_eventRegisterInfo.find(asyncData->eventType);
             if (it == g_eventRegisterInfo.end()) {
                 WIFI_LOGW("event has been unregistered.");
                 goto EXIT;

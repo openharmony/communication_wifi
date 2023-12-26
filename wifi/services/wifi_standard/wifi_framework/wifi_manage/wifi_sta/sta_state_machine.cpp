@@ -2390,7 +2390,7 @@ void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState)
 
 void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::string portalUrl)
 {
-    WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d.", netState);
+    WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d screen:%{public}d.", netState, enableSignalPoll);
     if (linkedInfo.connState != ConnState::CONNECTED) {
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         return;
@@ -2721,11 +2721,13 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessage *msg)
     if (screenState == MODE_STATE_OPEN) {
         enableSignalPoll = true;
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
+        pNetcheck->NetWorkCheckSetScreenState(MODE_STATE_OPEN);
     }
 
     if (screenState == MODE_STATE_CLOSE) {
         enableSignalPoll = false;
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+        pNetcheck->NetWorkCheckSetScreenState(MODE_STATE_CLOSE);
     }
 
     return;

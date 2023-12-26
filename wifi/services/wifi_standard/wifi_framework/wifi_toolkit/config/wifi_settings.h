@@ -435,6 +435,13 @@ public:
     int RemoveWifiP2pGroupInfo();
 
     /**
+     * @Description Delete a WifiP2pSupplicantGroupInfo conf
+     *
+     * @return int
+     */
+    int RemoveWifiP2pSupplicantGroupInfo();
+
+    /**
      * @Description Get all saved wifi p2p groups config
      *
      * @param results - output wifi p2p groups config results
@@ -519,6 +526,13 @@ public:
      * @return int - 0 success
      */
     int ReloadPortalconf();
+
+    /**
+     * @Description clear random mac conf
+     *
+     * @return int - 0 success
+     */
+    void ClearRandomMacConfig();
 
     /**
      * @Description Get portal uri

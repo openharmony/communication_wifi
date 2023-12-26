@@ -92,6 +92,8 @@ void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes);
 void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes);
 
 void WriteSoftApAbDisconnectHiSysEvent(int errorCode);
+
+void WriteIsInternetHiSysEvent(bool isInternet);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

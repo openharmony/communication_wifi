@@ -1082,6 +1082,10 @@ void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanIn
             iter->securityType = WifiSecurity::SAE;
             continue;
         }
+        if (iter->capabilities.find("OWE-TRANS-OPEN") != std::string::npos) {
+            iter->securityType = WifiSecurity::OPEN;
+            continue;
+        }
         if (iter->capabilities.find("OWE") != std::string::npos) {
             iter->securityType = WifiSecurity::OWE;
             continue;

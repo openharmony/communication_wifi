@@ -1455,6 +1455,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     /* Hotspot */
     WifiSettings::GetInstance().ClearHotspotConfig();
     WifiSettings::GetInstance().SyncHotspotConfig();
+    //duliqun
     return WIFI_OPT_SUCCESS;
 }
 

@@ -22,6 +22,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalCallback"
+#define MAC_OFFSET 2
 
 static void EmitEventCallbackMsg(WifiHalEventCallbackMsg *pCbkMsg, WifiHalEvent event)
 {
@@ -202,10 +203,10 @@ void WifiHalCbStaJoin(const char *content, int id)
     char tmpBuf[WIFI_BSSID_LENGTH] = {0};
     if (strncmp("AP-STA-CONNECTED", content, strlen("AP-STA-CONNECTED")) == 0) {
         event = WIFI_STA_JOIN_EVENT;
-        StrSafeCopy(tmpBuf, sizeof(tmpBuf), content + strlen("AP-STA-CONNECTED") + 1);
+        StrSafeCopy(tmpBuf, sizeof(tmpBuf), content + strlen("AP-STA-CONNECTED") + MAC_OFFSET);
     } else if (strncmp("AP-STA-DISCONNECTED", content, strlen("AP-STA-DISCONNECTED")) == 0) {
         event = WIFI_STA_LEAVE_EVENT;
-        StrSafeCopy(tmpBuf, sizeof(tmpBuf), content + strlen("AP-STA-DISCONNECTED") + 1);
+        StrSafeCopy(tmpBuf, sizeof(tmpBuf), content + strlen("AP-STA-DISCONNECTED") + MAC_OFFSET);
     } else {
         return;
     }

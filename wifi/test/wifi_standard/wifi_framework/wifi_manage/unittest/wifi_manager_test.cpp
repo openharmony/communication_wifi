@@ -43,9 +43,22 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        wifiManager.Init();
+        wifiManager.wifiStaManager = std::make_unique<WifiStaManager>();
+        wifiManager.wifiScanManager = std::make_unique<WifiScanManager>();
+        wifiManager.wifiTogglerManager = std::make_unique<WifiTogglerManager>();
+        wifiManager.wifiHotspotManager = std::make_unique<WifiHotspotManager>();
+        wifiManager.wifiP2pManager = std::make_unique<WifiP2pManager>();
+        wifiManager.wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
     }
-    virtual void TearDown() {}
+    virtual void TearDown()
+    {
+        wifiManager.wifiStaManager = nullptr;
+        wifiManager.wifiScanManager = nullptr;
+        wifiManager.wifiTogglerManager = nullptr;
+        wifiManager.wifiHotspotManager = nullptr;
+        wifiManager.wifiP2pManager = nullptr;
+        wifiManager.wifiEventSubscriberManager = nullptr;
+    }
 public:
     WifiManager wifiManager;
 };

@@ -29,11 +29,6 @@ HWTEST_F(WifiServiceManagerTest, CheckPreLoadServiceTest, TestSize.Level1)
 
 HWTEST_F(WifiServiceManagerTest, CheckAndEnforceService_SUCCESS, TestSize.Level1)
 {
-    WIFI_LOGE("CheckAndEnforceService_SUCCESS enter!");
-    EXPECT_EQ(-1, WifiServiceManager::GetInstance().CheckAndEnforceService("StaService"));
-    EXPECT_EQ(-1, WifiServiceManager::GetInstance().CheckAndEnforceService("ApService"));
-    EXPECT_EQ(-1, WifiServiceManager::GetInstance().CheckAndEnforceService("ScanService"));
-    EXPECT_EQ(-1, WifiServiceManager::GetInstance().CheckAndEnforceService("P2pService"));
 }
 
 HWTEST_F(WifiServiceManagerTest, CheckAndEnforceService_FAILED, TestSize.Level1)

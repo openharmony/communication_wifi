@@ -810,6 +810,24 @@ int WifiSettings::GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups)
     return 0;
 }
 
+int WifiSettings::RemoveWifiP2pSupplicantGroupInfo()
+{
+    if (!std::filesystem::exists(P2P_CONFIG_FILE)) {
+        LOGE("p2p_supplicant file do not exists!");
+        return -1;
+    }
+    std::error_code ec;
+    int retval = std::filesystem::remove(P2P_CONFIG_FILE, ec);
+    if (!ec) { // successful
+        LOGI("p2p_supplicant file removed successful, retval:%{public}d value:%{public}d message:%{public}s",
+            retval, ec.value(), ec.message().c_str());
+        return 0;
+    } // unsuccessful
+    LOGE("p2p_supplicant file removed unsuccessful, value:%{public}d value:%{public}d message:%{public}s",
+        retval, ec.value(), ec.message().c_str());
+    return -1;
+}
+
 int WifiSettings::IncreaseNumRebootsSinceLastUse()
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
@@ -1001,6 +1019,15 @@ int WifiSettings::ReloadStaRandomMac()
     mWifiStoreRandomMac.clear();
     mSavedWifiStoreRandomMac.GetValue(mWifiStoreRandomMac);
     return 0;
+}
+
+void WifiSettings::ClearRandomMacConfig()
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiStoreRandomMac.clear();
+    mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
+    mSavedWifiStoreRandomMac.SaveConfig();
+    LOGI("Clear RandomMacConfig");
 }
 
 const static uint32_t COMPARE_MAC_OFFSET = 2;

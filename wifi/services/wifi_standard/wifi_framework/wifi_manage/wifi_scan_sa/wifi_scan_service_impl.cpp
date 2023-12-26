@@ -145,7 +145,15 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
-    ErrCode ret = pService->Scan(true);
+
+    bool externFlag = true;
+#ifndef OHOS_ARCH_LITE
+    if (WifiAuthCenter::IsNativeProcess()) {
+        externFlag = false;
+        WIFI_LOGI("Scan: native process start scan !");
+    }
+#endif
+    ErrCode ret = pService->Scan(externFlag);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed: %{public}d!", static_cast<int>(ret));
     }

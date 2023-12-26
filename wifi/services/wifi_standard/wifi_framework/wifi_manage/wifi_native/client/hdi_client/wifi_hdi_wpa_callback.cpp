@@ -32,13 +32,13 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         return 1;
     }
     uint32_t bssidLen = disconectParam->bssidLen;
-    char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    string  strBssid = "";
+    ConvertMacToStr(disconectParam->bssid, bssidLen, strBssid);
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, szBssid);
+        cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, strBssid.c_str());
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, strBssid.c_str());
     return 0;
 }
 
@@ -51,13 +51,13 @@ int32_t OnEventConnected(struct IWpaCallback *self,
         return 1;
     }
     uint32_t bssidLen = connectParam->bssidLen;
-    char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(connectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    string  strBssid = "";
+    ConvertMacToStr(connectParam->bssid, bssidLen, strBssid);
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, (const char *)connectParam->bssid);
+        cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, strBssid.c_str());
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, strBssid.c_str());
     return 0;
 }
 
@@ -70,13 +70,13 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
         return 1;
     }
     uint32_t bssidLen = bssidChangedParam->bssidLen;
-    char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacToStr(bssidChangedParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    string  strBssid = "";
+    ConvertMacToStr(bssidChangedParam->bssid, bssidLen, strBssid);
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onBssidChanged) {
-        cbk.onBssidChanged((const char *)bssidChangedParam->reason, szBssid);
+        cbk.onBssidChanged((const char *)bssidChangedParam->reason, strBssid.c_str());
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, strBssid.c_str());
     return 0;
 }
 

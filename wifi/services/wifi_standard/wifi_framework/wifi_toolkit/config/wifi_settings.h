@@ -1721,31 +1721,3 @@ private:
 }  // namespace Wifi
 }  // namespace OHOS
 #endif
-int WifiSettings::RemoveWifiP2pSupplicantGroupInfo() //duliqun
-{
-    //#define P2P_CONFIG_FILE "/data/service/el1/public/wifi/p2p_supplicant.conf"
-    if (!std::filesystem::exists(P2P_CONFIG_FILE)) {
-        LOGE("duliqun p2p_supplicant file do not exists!");
-        return -1;
-    }
-    std::error_code ec;
-    LOGI("duliqun P2P_CONFIG_FILE:%{public}s", P2P_CONFIG_FILE);
-    int retval = std::filesystem::remove(P2P_CONFIG_FILE, ec);
-    if (!ec) { // successful
-        LOGI("duliqun p2p_supplicant file removed successful, retval:%{public}d value:%{public}d message:%{public}s",
-            retval, ec.value(), ec.message().c_str());
-        return 0;
-    } // unsuccessful
-    LOGE("duliqun p2p_supplicant file removed unsuccessful, value:%{public}d value:%{public}d message:%{public}s",
-        retval, ec.value(), ec.message().c_str());
-    return -1;
-}
-
-void WifiSettings::ClearRandomMacConfig() //duliqun
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    mWifiStoreRandomMac.clear();
-    mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
-    mSavedWifiStoreRandomMac.SaveConfig();
-    LOGI("duliqun ClearRandomMacConfig");
-}

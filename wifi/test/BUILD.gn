@@ -1,0 +1,33 @@
+# Copyright (C) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+group("unittest") {
+  testonly = true
+  deps = []
+
+  deps += [
+    "wifi_standard/ipc_framework/cRPC/unittest:crpc_unittest",
+    "wifi_standard/native:native_unittest",
+    "wifi_standard/wifi_base:base_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:idl_client_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/unittest:manager_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_ap:WifiApServiceTest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_p2p/test:wifi_p2p_test",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_scan:wifi_scan_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_unittest",
+    "wifi_standard/wifi_framework/wifi_toolkit/unittest:toolkit_unittest",
+    "wifi_standard/wifi_hal/unittest:wifi_hal_unittest",
+    "wifi_utils/unittest:utils_unittest",
+  ]
+}

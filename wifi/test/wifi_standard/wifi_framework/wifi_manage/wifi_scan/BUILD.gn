@@ -108,8 +108,3 @@ ohos_unittest("wifi_scan_unittest") {
   part_name = "wifi"
   subsystem_name = "communication"
 }
-
-group("unittest") {
-  testonly = true
-  deps = [ ":wifi_scan_unittest" ]
-}

@@ -233,12 +233,6 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_scan_service_impl") {
     branch_protector_ret = "pac_ret"
 
-    sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
-      debug = false
-    }
     part_name = "wifi"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_callback_proxy.cpp",
@@ -279,12 +273,6 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_device_service_impl") {
     branch_protector_ret = "pac_ret"
 
-    sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
-      debug = false
-    }
     part_name = "wifi"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_callback_proxy.cpp",
@@ -346,12 +334,6 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_hotspot_service_impl") {
     branch_protector_ret = "pac_ret"
 
-    sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
-      debug = false
-    }
     part_name = "wifi"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_callback_proxy.cpp",
@@ -402,12 +384,6 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_p2p_service_impl") {
     branch_protector_ret = "pac_ret"
 
-    sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
-      debug = false
-    }
     part_name = "wifi"
     sources = [
       "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",

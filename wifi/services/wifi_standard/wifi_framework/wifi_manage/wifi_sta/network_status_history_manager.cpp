@@ -44,7 +44,7 @@ void NetworkStatusHistoryManager::CountNetworkStatus(const uint32_t &networkStat
                                                      int counts[NETWORK_STATUS_NUM])
 {
     auto history = networkStatusHistory;
-    while (history) {
+    while (history != 0) {
         NetworkStatus networkStatus = GetLastNetworkStatus(history);
         counts[static_cast<int>(networkStatus)]++;
         history = history >> ITEM_BIT_NUM;
@@ -124,7 +124,7 @@ std::string NetworkStatusHistoryManager::ToString(const uint32_t &networkStatusH
 {
     std::stringstream networkStatusString;
     auto history = networkStatusHistory;
-    while (history) {
+    while (history != 0) {
         NetworkStatus networkStatus = GetLastNetworkStatus(history);
         networkStatusString << static_cast<int>(networkStatus) << "/";
         history = history >> ITEM_BIT_NUM;

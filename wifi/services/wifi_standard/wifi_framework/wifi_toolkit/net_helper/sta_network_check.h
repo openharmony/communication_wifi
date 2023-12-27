@@ -43,6 +43,20 @@
 
 namespace OHOS {
 namespace Wifi {
+struct HttpResult {
+    std::string httpUrl;
+    int httpCodeNum;
+    int httpResultLen;
+    StaNetState netState;
+    bool hasResult;
+
+    void HttpClear() {
+        httpCodeNum = 0;
+        httpResultLen = 0;
+        netState = NETWORK_STATE_UNKNOWN;
+        hasResult = false;
+    }
+};
 class StaNetworkCheck {
     FRIEND_GTEST(StaNetworkCheck);
 public:
@@ -72,17 +86,17 @@ public:
      */
     virtual void ExitNetCheckThread();
 
+    virtual void NetWorkCheckSetScreenState(int state);
+
 private:
     std::thread *pDealNetCheckThread;
     NetStateHandler netStateHandler;
     ArpStateHandler arpStateHandler;
     DnsStateHandler dnsStateHandler;
-    std::string httpUrl;
-    std::string httpsUrl;
-    int httpCodeNum;
-    int httpsCodeNum;
-    int httpResultLen;
-    int httpsResultLen;
+    HttpResult mainHttpResult;
+    HttpResult mainHttpsResult;
+    HttpResult bakHttpResult;
+    HttpResult bakHttpsResult;
     std::atomic<StaNetState> lastNetState;
 #ifndef OHOS_ARCH_LITE
     /**
@@ -104,9 +118,11 @@ private:
      * @Description : check networktype by code function
      *
      */
-    void CheckResponseCode(std::string url, int codeNum, int codeLenNum);
+    StaNetState CheckResponseCode(std::string url, int codeNum, int codeLenNum);
 
-    void SetHttpResultInfo(std::string url, int codeNum, int codeLenNum);
+    void ClearHttpResultInfo();
+
+    void SetHttpResultInfo(std::string url, int codeNum, int codeLenNum, StaNetState netState);
 
     void DnsDetection(std::string url);
 
@@ -119,15 +135,12 @@ private:
     std::atomic<bool> isExitNetCheckThread;
     std::atomic<bool> isExited;
     std::atomic<int> detectResultNum;
-    std::atomic<bool> mainDetectFinsh;
-    std::atomic<bool> bakDetectFinsh;
     ArpChecker arpChecker;
     DnsChecker dnsChecker;
     WifiPortalConf mUrlInfo;
-    StaNetState bakNetState;
-    StaNetState mainNetState;
     int m_instId;
     uint32_t m_timerId;
+    uint32_t m_screenState;
 #ifndef OHOS_ARCH_LITE
     std::unique_ptr<WifiEventHandler> mDetectionEventHandler = nullptr;
 #endif

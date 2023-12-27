@@ -36,13 +36,8 @@ constexpr const char *SETTINGS_DATASHARE_URL_AIRPLANE_MODE =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 constexpr const char *SETTINGS_DATASHARE_KEY_AIRPLANE_MODE = "settings.telephony.airplanemode";
 constexpr const char *SETTINGS_DATASHARE_KEY_LOCATION_MODE = "location_switch_enable";
-constexpr const char *SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned";
-constexpr const char *SETTINGS_DATASHARE_KEY_DEVICE_PROVISIONED = "device_provisioned";
 
 #ifndef OHOS_ARCH_LITE
-constexpr const char *SETTINGS_DATASHARE_URI_SETTINGS_MIGRATE =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=settings_migrate_success";
 constexpr const char *SETTINGS_DATASHARE_URI_WIFI_ON =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=wifi_on";
 constexpr const char *SETTINGS_DATASHARE_KEY_WIFI_ON = "wifi_on";
@@ -54,7 +49,7 @@ public:
     /**
      * @Description : WifiDataShareHelperUtils constructor
      */
-    WifiDataShareHelperUtils();
+    WifiDataShareHelperUtils() = default;
 
     /**
      * @Description : WifiDataShareHelperUtils destructor
@@ -115,7 +110,7 @@ public:
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper();
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_ = nullptr;
+    std::shared_ptr<DataShare::DataShareHelper> m_registerHelper = nullptr;
 };
 
 class IWifiDataShareRemoteBroker : public IRemoteBroker {

@@ -34,11 +34,6 @@ constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 }
 
-WifiDataShareHelperUtils::WifiDataShareHelperUtils()
-{
-    dataShareHelper_ = WifiCreateDataShareHelper();
-}
-
 std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreateDataShareHelper()
 {
     auto remote = sptr<IWifiDataShareRemoteBroker>(new (std::nothrow) IRemoteStub<IWifiDataShareRemoteBroker>());
@@ -56,15 +51,13 @@ std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreate
 
 ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::string &value)
 {
-    if (dataShareHelper_ == nullptr) {
-        WIFI_LOGE("WifiDataShareHelper query error, dataShareHelper_ is nullptr");
-        return WIFI_OPT_FAILED;
-    }
+    std::shared_ptr<DataShare::DataShareHelper> queryHelper = WifiCreateDataShareHelper();
+    CHECK_NULL_AND_RETURN(queryHelper, WIFI_OPT_FAILED);
 
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> columns;
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
-    auto result = dataShareHelper_->Query(uri, predicates, columns);
+    auto result = queryHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         WIFI_LOGE("WifiDataShareHelper query error, result is null");
         return WIFI_OPT_FAILED;
@@ -80,74 +73,70 @@ ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::s
     result->GetColumnIndex(SETTINGS_DATA_COLUMN_VALUE, columnIndex);
     result->GetString(columnIndex, value);
     result->Close();
+    queryHelper->Release();
     WIFI_LOGI("WifiDataShareHelper query success,value[%{public}s]", value.c_str());
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDataShareHelperUtils::Insert(Uri &uri, const std::string &key, const std::string &value)
 {
-    CHECK_NULL_AND_RETURN(dataShareHelper_, WIFI_OPT_FAILED);
+    std::shared_ptr<DataShare::DataShareHelper> insertHelper = WifiCreateDataShareHelper();
+    CHECK_NULL_AND_RETURN(insertHelper, WIFI_OPT_FAILED);
+
     DataShare::DataShareValuesBucket valuesBucket;
     DataShare::DataShareValueObject keyObj(key);
     DataShare::DataShareValueObject valueObj(value);
     valuesBucket.Put(SETTINGS_DATA_COLUMN_KEYWORD, keyObj);
     valuesBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
-    int result = dataShareHelper_->Insert(uri, valuesBucket);
+    int result = insertHelper->Insert(uri, valuesBucket);
     if (result != DataShare::DATA_SHARE_NO_ERROR) {
         WIFI_LOGE("WifiDataShareHelper insert failed, resultCode=%{public}d", result);
         return WIFI_OPT_FAILED;
     }
-    dataShareHelper_->NotifyChange(uri);
+    insertHelper->NotifyChange(uri);
+    insertHelper->Release();
     WIFI_LOGE("DataShareHelper insert success");
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDataShareHelperUtils::Update(Uri &uri, const std::string &key, const std::string &value)
 {
-    CHECK_NULL_AND_RETURN(dataShareHelper_, WIFI_OPT_FAILED);
+    std::shared_ptr<DataShare::DataShareHelper> updateHelper = WifiCreateDataShareHelper();
+    CHECK_NULL_AND_RETURN(updateHelper, WIFI_OPT_FAILED);
+
     DataShare::DataShareValuesBucket valuesBucket;
     DataShare::DataShareValueObject valueObj(value);
     valuesBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
-    int result = dataShareHelper_->Update(uri, predicates, valuesBucket);
+    int result = updateHelper->Update(uri, predicates, valuesBucket);
     if (result != DataShare::DATA_SHARE_NO_ERROR) {
         WIFI_LOGE("WifiDataShareHelper update failed, resultCode=%{public}d", result);
         return WIFI_OPT_FAILED;
     }
-    dataShareHelper_->NotifyChange(uri);
+    updateHelper->NotifyChange(uri);
+    updateHelper->Release();
     WIFI_LOGE("DataShareHelper update success");
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDataShareHelperUtils::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer)
 {
-    if (dataShareHelper_ == nullptr) {
-        WIFI_LOGE("WifiDataShareHelper %{public}s error, dataShareHelper_ is nullptr", __func__);
-        return WIFI_OPT_FAILED;
+    if (m_registerHelper == nullptr) {
+        m_registerHelper = WifiCreateDataShareHelper();  // the listening callback handle is not released
     }
 
-    if (observer == nullptr) {
-        WIFI_LOGE("WifiDataShareHelper %{public}s error, observer is nullptr", __func__);
-        return WIFI_OPT_FAILED;
-    }
-    dataShareHelper_->RegisterObserver(uri, observer);
+    CHECK_NULL_AND_RETURN(m_registerHelper, WIFI_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(observer, WIFI_OPT_FAILED);
+    m_registerHelper->RegisterObserver(uri, observer);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDataShareHelperUtils::UnRegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer)
 {
-    if (dataShareHelper_ == nullptr) {
-        WIFI_LOGE("WifiDataShareHelper %{public}s error, dataShareHelper_ is nullptr", __func__);
-        return WIFI_OPT_FAILED;
-    }
-
-    if (observer == nullptr) {
-        WIFI_LOGE("WifiDataShareHelper %{public}s error, observer is nullptr", __func__);
-        return WIFI_OPT_FAILED;
-    }
-
-    dataShareHelper_->UnregisterObserver(uri, observer);
+    CHECK_NULL_AND_RETURN(m_registerHelper, WIFI_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(observer, WIFI_OPT_FAILED);
+    m_registerHelper->UnregisterObserver(uri, observer);
     return WIFI_OPT_SUCCESS;
 }
 

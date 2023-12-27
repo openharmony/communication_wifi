@@ -218,7 +218,9 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath)
                 LOGE("CopyUserFile() failed, read srcFilePath:%{public}s error!", srcFilePath);
                 break;
             }
-            write(destFd, buf, bytes);
+            if (write(destFd, buf, bytes) < 0) {
+                LOGE("CopyUserFile() failed, write destFilePath:%{public}s error!", destFilePath);
+            }
         }
     } while (0);
     if (srcFd>=0) {

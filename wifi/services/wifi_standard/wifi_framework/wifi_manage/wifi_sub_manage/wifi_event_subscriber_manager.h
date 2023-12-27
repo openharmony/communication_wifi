@@ -76,6 +76,15 @@ public:
 
 private:
     void InitSubscribeListener();
+    void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
+    void HandleCommonEventServiceChange(int systemAbilityId, bool add);
+#ifdef HAS_POWERMGR_PART
+    void HandlePowerManagerServiceChange(int systemAbilityId, bool add);
+#endif
+#ifdef HAS_MOVEMENT_PART
+    void HandleHasMovementPartChange(int systemAbilityId, bool add);
+#endif
+    void HandleDistributedKvDataServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void RegisterScreenEvent();
     void UnRegisterScreenEvent();

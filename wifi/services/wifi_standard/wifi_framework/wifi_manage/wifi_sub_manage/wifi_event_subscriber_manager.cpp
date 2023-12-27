@@ -136,70 +136,90 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
 #endif
 }
 
+void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbilityId, bool add)
+{
+    if (!add) {
+        return;
+    }
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+        if (pService != nullptr) {
+            pService->OnSystemAbilityChanged(systemAbilityId, add);
+        }
+    }
+}
+
+void WifiEventSubscriberManager::HandleCommonEventServiceChange(int systemAbilityId, bool add)
+{
+    if (add) {
+        RegisterScreenEvent();
+        RegisterAirplaneModeEvent();
+    } else {
+        UnRegisterScreenEvent();
+        UnRegisterAirplaneModeEvent();
+        UnRegisterLocationEvent();
+    }
+    WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!", systemAbilityId, add);
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
+        if (pService != nullptr) {
+            pService->OnSystemAbilityChanged(systemAbilityId, add);
+        }
+    }
+}
+
+#ifdef HAS_POWERMGR_PART
+void WifiEventSubscriberManager::HandlePowerManagerServiceChange(int systemAbilityId, bool add)
+{
+    if (add) {
+        RegisterPowerStateListener();
+    } else {
+        UnRegisterPowerStateListener();
+    }
+    WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!", systemAbilityId, add);
+}
+#endif
+
+#ifdef HAS_MOVEMENT_PART
+void WifiEventSubscriberManager::HandleHasMovementPartChange(int systemAbilityId, bool add)
+{
+    if (add) {
+        RegisterMovementCallBack();
+    } else {
+        UnRegisterMovementCallBack();
+    }
+}
+#endif
+
+void WifiEventSubscriberManager::HandleDistributedKvDataServiceChange(bool add)
+{
+    if (!add) {
+        return;
+    }
+    RegisterLocationEvent();
+}
+
 void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
 {
     switch (systemAbilityId) {
-        case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID: {
-            if (!add) {
-                break;
-            }
-            for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-                IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
-                if (pService != nullptr) {
-                    pService->OnSystemAbilityChanged(systemAbilityId, add);
-                }
-            }
+        case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
+            HandleCommNetConnManagerSysChange(systemAbilityId, add);
             break;
-        }
-        case COMMON_EVENT_SERVICE_ID: {
-            if (add) {
-                RegisterScreenEvent();
-                RegisterAirplaneModeEvent();
-            } else {
-                UnRegisterScreenEvent();
-                UnRegisterAirplaneModeEvent();
-                UnRegisterLocationEvent();
-            }
-
-            WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
-                systemAbilityId, add);
-            for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-                IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
-                if (pService != nullptr) {
-                    pService->OnSystemAbilityChanged(systemAbilityId, add);
-                }
-            }
+        case COMMON_EVENT_SERVICE_ID:
+            HandleCommonEventServiceChange(systemAbilityId, add);
             break;
-        }
 #ifdef HAS_POWERMGR_PART
-        case POWER_MANAGER_SERVICE_ID: {
-            if (add) {
-                RegisterPowerStateListener();
-            } else {
-                UnRegisterPowerStateListener();
-            }
-
-            WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
-                systemAbilityId, add);
-
+        case POWER_MANAGER_SERVICE_ID:
+            HandlePowerManagerServiceChange(systemAbilityId, add);
             break;
-        }
 #endif
 #ifdef HAS_MOVEMENT_PART
-        case MSDP_MOVEMENT_SERVICE_ID: {
-            if (add) {
-                RegisterMovementCallBack();
-            } else {
-                UnRegisterMovementCallBack();
-            }
+        case MSDP_MOVEMENT_SERVICE_ID:
+            HandleHasMovementPartChange(systemAbilityId, add);
             break;
-        }
 #endif
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
-            if (!add) {
-                break;
-            }
-            RegisterLocationEvent();
+            HandleDistributedKvDataServiceChange(add);
             break;
         default:
             break;

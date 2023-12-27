@@ -30,15 +30,12 @@ WifiStaHalInterface &WifiStaHalInterface::GetInstance(void)
     if (initFlag == 0) {
         std::unique_lock<std::mutex> lock(initMutex);
         if (initFlag == 0) {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
             if (inst.InitHdiWpaClient()) {
                 initFlag = 1;
             }
-#else
             if (inst.InitIdlClient()) {
                 initFlag = 1;
             }
-#endif
 #ifdef HDI_INTERFACE_SUPPORT
             if (inst.InitHdiClient()) {
                 initFlag = 1;

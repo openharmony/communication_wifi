@@ -2038,7 +2038,6 @@ bool ScanService::AllowScanDuringScanning(ScanMode scanMode) const
 bool ScanService::AllowScanDuringScreenOff(ScanMode scanMode) const
 {
     WIFI_LOGI("Enter ScanService::AllowScanDuringScreenOff.\n");
-
     if (IsAppInFilterList(scan_screen_off_trust_list)) {
         return true;
     }

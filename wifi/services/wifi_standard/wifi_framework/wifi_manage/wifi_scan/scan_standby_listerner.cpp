@@ -123,8 +123,8 @@ void StandByListerner::UnRegisterStandByEvent()
         WIFI_LOGE("StandByEvent UnSubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("StandByEvent UnSubscribeCommonEvent() OK");
-        isStandBySubscribered = false;
     }
+    isStandBySubscribered = false;
 }
 
 void StandBySubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &event)

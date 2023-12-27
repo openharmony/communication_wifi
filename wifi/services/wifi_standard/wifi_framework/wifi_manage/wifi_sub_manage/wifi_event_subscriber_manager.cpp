@@ -405,8 +405,8 @@ void WifiEventSubscriberManager::UnRegisterAirplaneModeEvent()
         WIFI_LOGE("AirplaneModeEvent UnSubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("AirplaneModeEvent UnSubscribeCommonEvent() OK");
-        isAirplaneModeEventSubscribered = false;
     }
+    isAirplaneModeEventSubscribered = false;
 }
 
 void WifiEventSubscriberManager::RegisterLocationEvent()
@@ -566,9 +566,9 @@ void WifiEventSubscriberManager::UnRegisterPowerStateListener()
     if (!ret) {
         WIFI_LOGE("UnRegisterPowerStateListener, unregister power state callback failed");
     } else {
-        isPowerStateListenerSubscribered = false;
         WIFI_LOGI("UnRegisterPowerStateListener OK!");
     }
+    isPowerStateListenerSubscribered = false;
 }
 #endif
 

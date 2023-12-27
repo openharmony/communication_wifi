@@ -1487,19 +1487,7 @@ public:
      * @return int - 0 success
      */
     int SetStaApExclusionType(int type);
-    /**
-     * @Description Set the Device Provision State
-     *
-     * @param state - 1 open; 2 close
-     */
-    void SetDeviceProvisionState(const int &state);
 
-    /**
-     * @Description Get the Device Provision State
-     *
-     * @return int - 1 open; 2 close
-     */
-    int GetDeviceProvisionState() const;
     /**
      * @Description Generate random number
      *
@@ -1651,7 +1639,6 @@ private:
     int mScanGenieState;         /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     std::atomic<int> mAirplaneModeState;      /* 1 on 2 off */
     std::atomic<int> mPowerSleepState;        /* 1 on 2 off */
-    int mDeviceProvision;      /* 1 on 2 off */
     ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
     int mPowerSavingModeState;   /* 1 on 2 off */
     std::string mAppPackageName;

@@ -173,18 +173,6 @@ HWTEST_F(WifiManagerTest, UnRegisterScreenEventTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->UnRegisterScreenEvent();
 }
 
-HWTEST_F(WifiManagerTest, RegisterSettingsMigrateEventTest, TestSize.Level1)
-{
-    WIFI_LOGE("RegisterSettingsMigrateEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterSettingsMigrateEvent();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterSettingsMigrateEventTest, TestSize.Level1)
-{
-    WIFI_LOGE("UnRegisterSettingsMigrateEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterSettingsMigrateEvent();
-}
-
 HWTEST_F(WifiManagerTest, RegisterAirplaneModeEventTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterAirplaneModeEventTest enter!");
@@ -243,12 +231,6 @@ HWTEST_F(WifiManagerTest, PushServiceCloseMsgTest, TestSize.Level1)
 {
     WIFI_LOGE("ExitTest enter!");
     wifiManager.PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
-}
-
-HWTEST_F(WifiManagerTest, GetDeviceProvisionByDatashareTest, TestSize.Level1)
-{
-    WIFI_LOGE("ExitTest enter!");
-    wifiManager.wifiEventSubscriberManager->GetDeviceProvisionByDatashare();
 }
 
 HWTEST_F(WifiManagerTest, CheckAndStopScanServiceTest, TestSize.Level1)

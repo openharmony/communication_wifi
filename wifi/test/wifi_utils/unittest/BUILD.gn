@@ -54,8 +54,3 @@ ohos_unittest("utils_unittest") {
   subsystem_name = "communication"
   testonly = true
 }
-
-group("unittest") {
-  testonly = true
-  deps = [ ":utils_unittest" ]
-}

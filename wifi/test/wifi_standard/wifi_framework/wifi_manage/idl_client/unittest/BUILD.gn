@@ -145,8 +145,3 @@ ohos_unittest("mock_wifi_hal_service") {
   subsystem_name = "communication"
   testonly = true
 }
-
-group("unittest") {
-  testonly = true
-  deps = [ ":idl_client_unittest" ]
-}

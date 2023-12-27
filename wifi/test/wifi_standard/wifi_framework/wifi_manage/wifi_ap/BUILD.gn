@@ -126,8 +126,3 @@ ohos_unittest("WifiApServiceTest") {
   part_name = "wifi"
   subsystem_name = "communication"
 }
-group("unittest") {
-  testonly = true
-  deps = []
-  deps += [ ":WifiApServiceTest" ]
-}

@@ -121,11 +121,6 @@ ohos_unittest("wifi_hal_unittest") {
   testonly = true
 }
 
-group("unittest") {
-  testonly = true
-  deps = [ ":wifi_hal_unittest" ]
-}
-
 ohos_shared_library("WifiHalVendorTest") {
   sources = [ "wifi_hal_vendor_interface_test.c" ]
   include_dirs = [

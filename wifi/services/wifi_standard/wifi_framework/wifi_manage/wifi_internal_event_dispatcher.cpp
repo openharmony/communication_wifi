@@ -403,6 +403,7 @@ int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject>
 
 int WifiInternalEventDispatcher::SetSingleHotspotCallback(const sptr<IWifiHotspotCallback> &callback, int id)
 {
+    std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
     mHotspotSingleCallback[id] = callback;
     return 0;
 }
@@ -432,6 +433,7 @@ bool WifiInternalEventDispatcher::HasHotspotRemote(const sptr<IRemoteObject> &re
 
 int WifiInternalEventDispatcher::SetSingleP2pCallback(const sptr<IWifiP2pCallback> &callback)
 {
+    std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
     mP2pSingleCallback = callback;
     return 0;
 }

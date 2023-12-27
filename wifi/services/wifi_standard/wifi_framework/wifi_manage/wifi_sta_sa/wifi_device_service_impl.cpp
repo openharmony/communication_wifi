@@ -1434,7 +1434,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WIFI_LOGE("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot!");
+    WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot!");
     if (IsStaServiceRunning()) {
         WIFI_LOGI("WifiDeviceServiceImpl FactoryReset IsStaServiceRunning, m_instId:%{public}d", m_instId);
         if (m_instId == 0) {
@@ -1443,6 +1443,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     }
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);
+    WIFI_LOGI("WifiDeviceServiceImpl curState:%{public}d", curState);
     if (curState == WifiOprMidState::RUNNING) {
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_instId);
     }
@@ -1452,9 +1453,12 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     /* p2p */
     WifiSettings::GetInstance().RemoveWifiP2pGroupInfo();
     WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();
+    WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();
     /* Hotspot */
     WifiSettings::GetInstance().ClearHotspotConfig();
     WifiSettings::GetInstance().SyncHotspotConfig();
+    WifiSettings::GetInstance().ClearRandomMacConfig();
+    WIFI_LOGI("WifiDeviceServiceImpl FactoryReset ok!");
     return WIFI_OPT_SUCCESS;
 }
 

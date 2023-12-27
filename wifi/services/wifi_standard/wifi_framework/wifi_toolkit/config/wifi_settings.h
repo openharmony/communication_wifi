@@ -63,6 +63,7 @@ constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
 constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.xml";
 constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
 constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
+constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
 
 namespace OHOS {
 namespace Wifi {
@@ -435,6 +436,13 @@ public:
     int RemoveWifiP2pGroupInfo();
 
     /**
+     * @Description Delete a WifiP2pSupplicantGroupInfo conf
+     *
+     * @return int
+     */
+    int RemoveWifiP2pSupplicantGroupInfo();
+
+    /**
      * @Description Get all saved wifi p2p groups config
      *
      * @param results - output wifi p2p groups config results
@@ -519,6 +527,13 @@ public:
      * @return int - 0 success
      */
     int ReloadPortalconf();
+
+    /**
+     * @Description clear random mac conf
+     *
+     * @return int - 0 success
+     */
+    void ClearRandomMacConfig();
 
     /**
      * @Description Get portal uri

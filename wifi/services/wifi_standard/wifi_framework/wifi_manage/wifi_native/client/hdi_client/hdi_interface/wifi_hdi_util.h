@@ -30,6 +30,17 @@ int GetScanResultText(const struct HdfWifiScanResultExt *scanResults,
     struct HdiElems *elems, char* buff, int buffLen);
 
 int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length);
+
+/**
+ * @Description Convert [a,b,c,d,e,f] mac address to string type [xx:xx:xx:xx:xx:xx]
+ *
+ * @param srcMac - srcMac address
+ * @param srcMacSize - srcMacSize size, must be equal to 6, or error
+ * @param DesMacStr - output mac string, type: [xx:xx:xx:xx:xx:xx]
+ * @param strLen - mac string length, must be bigger than 17
+ * @return int - return result. 0 is Failed ,1 is Success
+ */
+int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *destMacStr, int strLen);
 #ifdef __cplusplus
 }
 #endif

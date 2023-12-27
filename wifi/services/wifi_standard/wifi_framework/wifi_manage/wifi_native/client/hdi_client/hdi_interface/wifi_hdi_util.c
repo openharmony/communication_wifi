@@ -69,6 +69,9 @@ const unsigned int CHAN_WIDTH_80MHZ = 2;
 const unsigned int CHAN_WIDTH_160MHZ = 3;
 const unsigned int CHAN_WIDTH_80MHZ_MHZ = 4;
 
+#define MAC_UINT_SIZE 6
+#define MAC_STRING_SIZE 17
+
 #ifndef OHOS_ARCH_LITE
 static int ConvertChanToFreqMhz(int channel, int band)
 {
@@ -1246,4 +1249,22 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
     return fail;
 }
 
+int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *destMacStr, int strLen)
+{
+    if (srcMac == NULL || destMacStr == NULL || srcMacSize != MAC_UINT_SIZE || strLen <= MAC_STRING_SIZE) {
+        return -1;
+    }
+    const int srcMacPosZero = 0;
+    const int srcMacPosOne = 1;
+    const int srcMacPosTwo = 2;
+    const int srcMacPosThree = 3;
+    const int srcMacPosFour = 4;
+    const int srcMacPosFive = 5;
+    if (snprintf_s(destMacStr, strLen, strLen - 1, "%02x:%02x:%02x:%02x:%02x:%02x", srcMac[srcMacPosZero],
+        srcMac[srcMacPosOne], srcMac[srcMacPosTwo], srcMac[srcMacPosThree], srcMac[srcMacPosFour],
+        srcMac[srcMacPosFive]) < 0) {
+        return -1;
+    }
+    return 0;
+}
 #endif

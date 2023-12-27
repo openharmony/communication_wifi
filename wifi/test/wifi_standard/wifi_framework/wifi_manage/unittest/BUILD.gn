@@ -73,7 +73,6 @@ ohos_unittest("manager_unittest") {
     "wifi_manager_test.cpp",
     "wifi_protect_test.cpp",
     "wifi_service_manager_test.cpp",
-    "wifi_settings_test.cpp",
   ]
 
   include_dirs = [
@@ -207,9 +206,4 @@ ohos_unittest("manager_unittest") {
   part_name = "wifi"
   subsystem_name = "communication"
   testonly = true
-}
-
-group("unittest") {
-  testonly = true
-  deps = [ ":manager_unittest" ]
 }

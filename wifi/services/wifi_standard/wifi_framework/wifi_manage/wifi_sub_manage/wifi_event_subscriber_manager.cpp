@@ -297,7 +297,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 #ifdef HAS_MOVEMENT_PART
     SubscribeSystemAbility(MSDP_MOVEMENT_SERVICE_ID);
 #endif
-    SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // data management service done
+    SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
 }
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()

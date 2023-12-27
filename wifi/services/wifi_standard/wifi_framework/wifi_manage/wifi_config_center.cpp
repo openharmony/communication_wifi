@@ -526,16 +526,6 @@ int WifiConfigCenter::SetStaApExclusionType(int type)
     return WifiSettings::GetInstance().SetStaApExclusionType(type);
 }
 
-void WifiConfigCenter::SetDeviceProvisionState(const int &state)
-{
-    WifiSettings::GetInstance().SetDeviceProvisionState(state);
-}
-
-int WifiConfigCenter::GetDeviceProvisionState() const
-{
-    return WifiSettings::GetInstance().GetDeviceProvisionState();
-}
-
 int WifiConfigCenter::SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);

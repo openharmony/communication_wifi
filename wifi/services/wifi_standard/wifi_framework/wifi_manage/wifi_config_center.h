@@ -630,19 +630,6 @@ public:
      * @return int - 0 success
      */
     int SetStaApExclusionType(int type);
-    /**
-     * @Description Set current Device Provision state
-     *
-     * @param state - 1 open; 2 close
-     */
-    void SetDeviceProvisionState(const int &state);
-
-    /**
-     * @Description Get current Device Provision state
-     *
-     * @return int - 1 open; 2 close
-     */
-    int GetDeviceProvisionState() const;
 
     int SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config);
     

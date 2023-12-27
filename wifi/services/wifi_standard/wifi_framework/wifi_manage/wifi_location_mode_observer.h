@@ -28,27 +28,6 @@ public:
 
     void OnChange() override;
 };
-
-class WifiDeviceProvisionObserver : public AAFwk::DataAbilityObserverStub {
-public:
-    WifiDeviceProvisionObserver() = default;
-
-    ~WifiDeviceProvisionObserver() = default;
-
-    void OnChange() override;
-};
-
-#ifndef OHOS_ARCH_LITE
-class SettingsMigrateObserver : public AAFwk::DataAbilityObserverStub {
-public:
-    SettingsMigrateObserver() = default;
-
-    ~SettingsMigrateObserver() = default;
-
-    void OnChange() override;
-};
-#endif
-
 }
 }
 #endif

@@ -69,7 +69,6 @@ public:
 
     void OnSystemAbilityChanged(int systemAbilityId, bool add) override;
     void GetAirplaneModeByDatashare();
-    void GetDeviceProvisionByDatashare();
     bool GetLocationModeByDatashare();
     void DealLocationModeChangeEvent();
     void CheckAndStartStaByDatashare();
@@ -84,12 +83,8 @@ private:
     void UnRegisterAirplaneModeEvent();
     void RegisterLocationEvent();
     void UnRegisterLocationEvent();
-    void RegisterDeviceProvisionEvent();
-    void UnRegisterDeviceProvisionEvent();
     void RegisterBatteryEvent();
     void UnRegisterBatteryEvent();
-    void RegisterSettingsMigrateEvent();
-    void UnRegisterSettingsMigrateEvent();
     void GetMdmProp();
     void GetChipProp();
     void RegisterMdmPropListener();

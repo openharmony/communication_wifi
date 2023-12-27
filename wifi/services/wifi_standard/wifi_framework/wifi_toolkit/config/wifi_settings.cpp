@@ -62,7 +62,6 @@ WifiSettings::WifiSettings()
       mScanGenieState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
       mPowerSleepState(MODE_STATE_CLOSE),
-      mDeviceProvision(MODE_STATE_OPEN),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
@@ -2382,16 +2381,6 @@ int WifiSettings::SetStaApExclusionType(int type)
     mWifiConfig[0].staApExclusionType = type;
     SyncWifiConfig();
     return 0;
-}
-
-void WifiSettings::SetDeviceProvisionState(const int &state)
-{
-    mDeviceProvision = state;
-}
-
-int WifiSettings::GetDeviceProvisionState() const
-{
-    return mDeviceProvision;
 }
 
 long int WifiSettings::GetRandom()

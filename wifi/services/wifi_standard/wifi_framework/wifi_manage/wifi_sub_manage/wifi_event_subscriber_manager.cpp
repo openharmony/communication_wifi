@@ -53,8 +53,6 @@ const std::string COEX_IFACENAME = "wlan1";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
-static sptr<WifiDeviceProvisionObserver> deviceProvisionObserver_ = nullptr;
-static sptr<SettingsMigrateObserver> settingsMigrateObserver_ = nullptr;
 #ifdef HAS_POWERMGR_PART
 static sptr<WifiPowerStateListener> powerStateListener_ = nullptr;
 #endif
@@ -65,7 +63,6 @@ static sptr<DeviceMovementCallback> deviceMovementCallback_ = nullptr;
 WifiEventSubscriberManager::WifiEventSubscriberManager()
 {
     WIFI_LOGI("create WifiEventSubscriberManager");
-    RegisterDeviceProvisionEvent();
     if (!isScreenEventSubscribered && screenTimerId == 0) {
         WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::RegisterScreenEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, screenTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
@@ -96,7 +93,6 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
         WifiTimer::GetInstance()->Register(timeoutCallback, thermalTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
     }
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && migrateTimerId == 0) {
-        RegisterSettingsMigrateEvent();
         WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::CheckAndStartStaByDatashare, this);
         WifiTimer::GetInstance()->Register(timeoutCallback, migrateTimerId, TIMEOUT_CHECK_LAST_STA_STATE_EVENT);
         WIFI_LOGI("CheckAndStartStaByDatashare register success! migrateTimerId:%{public}u", migrateTimerId);
@@ -123,9 +119,6 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     }
     if (islocationModeObservered) {
         UnRegisterLocationEvent();
-    }
-    if (deviceProvisionObserver_) {
-        UnRegisterDeviceProvisionEvent();
     }
     if (batterySubscriber_) {
         UnRegisterBatteryEvent();
@@ -162,7 +155,6 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             if (add) {
                 RegisterScreenEvent();
                 RegisterAirplaneModeEvent();
-                RegisterLocationEvent();
             } else {
                 UnRegisterScreenEvent();
                 UnRegisterAirplaneModeEvent();
@@ -203,6 +195,12 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
         }
 #endif
+        case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
+            if (!add) {
+                break;
+            }
+            RegisterLocationEvent();
+            break;
         default:
             break;
     }
@@ -228,31 +226,6 @@ void WifiEventSubscriberManager::GetAirplaneModeByDatashare()
     if (airplaneMode.compare("1") == 0) {
         WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
     }
-    return;
-}
-
-void WifiEventSubscriberManager::GetDeviceProvisionByDatashare()
-{
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("GetDeviceProvisionByDatashare, datashareHelper is nullptr!");
-        return;
-    }
-
-    std::string provision;
-    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
-    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_DEVICE_PROVISIONED, provision);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("GetDeviceProvisionByDatashare, Query provision fail!");
-        return;
-    }
-
-    WIFI_LOGI("GetDeviceProvisionByDatashare, provision:%{public}s", provision.c_str());
-    if (provision.compare("1") == 0) {
-        WifiConfigCenter::GetInstance().SetDeviceProvisionState(MODE_STATE_CLOSE);
-        return;
-    }
-    WifiConfigCenter::GetInstance().SetDeviceProvisionState(MODE_STATE_OPEN);
     return;
 }
 
@@ -304,8 +277,6 @@ void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
     } else if (lastStaState == closeWifiByAirplanemodeOpen) {
         WifiSettings::GetInstance().SetWifiToggledState(true);
     }
-
-    UnRegisterSettingsMigrateEvent();
     std::unique_lock<std::mutex> lock(settingsMigrateMutex);
     WifiTimer::GetInstance()->UnRegister(migrateTimerId);
     migrateTimerId = 0;
@@ -326,6 +297,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 #ifdef HAS_MOVEMENT_PART
     SubscribeSystemAbility(MSDP_MOVEMENT_SERVICE_ID);
 #endif
+    SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // data management service done
 }
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()
@@ -433,6 +405,7 @@ void WifiEventSubscriberManager::RegisterLocationEvent()
     Uri uri(datashareHelper->GetLoactionDataShareUri());
     datashareHelper->RegisterObserver(uri, locationModeObserver_);
     islocationModeObservered = true;
+    WIFI_LOGI("registerLocationEvent success");
 }
 
 void WifiEventSubscriberManager::UnRegisterLocationEvent()
@@ -451,40 +424,6 @@ void WifiEventSubscriberManager::UnRegisterLocationEvent()
     Uri uri(datashareHelper->GetLoactionDataShareUri());
     datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
     islocationModeObservered = false;
-}
-
-void WifiEventSubscriberManager::RegisterDeviceProvisionEvent()
-{
-    if (deviceProvisionObserver_) {
-        return;
-    }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("RegisterDeviceProvisionEvent datashareHelper is nullptr");
-        return;
-    }
-    WIFI_LOGI("RegisterDeviceProvisionEvent");
-    deviceProvisionObserver_ = sptr<WifiDeviceProvisionObserver>(new (std::nothrow)WifiDeviceProvisionObserver());
-    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
-    datashareHelper->RegisterObserver(uri, deviceProvisionObserver_);
-}
-
-void WifiEventSubscriberManager::UnRegisterDeviceProvisionEvent()
-{
-    if (deviceProvisionObserver_ == nullptr) {
-        WIFI_LOGE("UnRegisterLocationEvent deviceProvisionObserver_ is nullptr");
-        return;
-    }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("UnRegisterLocationEvent datashareHelper is nullptr");
-        return;
-    }
-    WIFI_LOGI("UnRegisterDeviceProvisionEvent");
-    Uri uri(SETTINGS_DATASHARE_URI_DEVICE_PROVISIONED);
-    datashareHelper->UnRegisterObserver(uri, deviceProvisionObserver_);
 }
 
 void WifiEventSubscriberManager::RegisterBatteryEvent()
@@ -517,41 +456,6 @@ void WifiEventSubscriberManager::UnRegisterBatteryEvent()
     } else {
         WIFI_LOGI("BatteryEvent UnSubscribeCommonEvent() OK");
     }
-}
-
-void WifiEventSubscriberManager::RegisterSettingsMigrateEvent()
-{
-    std::unique_lock<std::mutex> lock(settingsMigrateMutex);
-    if (settingsMigrateObserver_) {
-        return;
-    }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("RegisterSettingsMigrateEvent datashareHelper is nullptr");
-        return;
-    }
-    settingsMigrateObserver_ = sptr<SettingsMigrateObserver>(new (std::nothrow)SettingsMigrateObserver());
-    Uri uri(SETTINGS_DATASHARE_URI_SETTINGS_MIGRATE);
-    datashareHelper->RegisterObserver(uri, settingsMigrateObserver_);
-}
-
-void WifiEventSubscriberManager::UnRegisterSettingsMigrateEvent()
-{
-    std::unique_lock<std::mutex> lock(settingsMigrateMutex);
-    if (settingsMigrateObserver_ == nullptr) {
-        WIFI_LOGE("UnRegisterSettingsMigrateEvent settingsMigrateObserver_ is nullptr");
-        return;
-    }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("UnRegisterSettingsMigrateEvent datashareHelper is nullptr");
-        return;
-    }
-    Uri uri(SETTINGS_DATASHARE_URI_SETTINGS_MIGRATE);
-    datashareHelper->UnRegisterObserver(uri, settingsMigrateObserver_);
-    settingsMigrateObserver_ = nullptr;
 }
 
 void WifiEventSubscriberManager::GetMdmProp()

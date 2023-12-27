@@ -24,18 +24,5 @@ void WifiLocationModeObserver::OnChange()
 {
     WifiManager::GetInstance().GetWifiEventSubscriberManager()->DealLocationModeChangeEvent();
 }
-
-void WifiDeviceProvisionObserver::OnChange()
-{
-    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetDeviceProvisionByDatashare();
-}
-
-#ifndef OHOS_ARCH_LITE
-void SettingsMigrateObserver::OnChange()
-{
-    WifiManager::GetInstance().GetWifiEventSubscriberManager()->CheckAndStartStaByDatashare();
-}
-#endif
-
 }
 }

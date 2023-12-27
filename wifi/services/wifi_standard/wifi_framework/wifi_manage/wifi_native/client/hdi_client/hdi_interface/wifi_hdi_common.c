@@ -265,6 +265,9 @@ static int HdiRsnKeyMgmtToAuthMgmt(const uint8_t *s)
     if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_OSEN) {
         return HDI_KEY_MGMT_OSEN;
     }
+    if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_OWE) {
+        return HDI_KEY_MGMT_OWE;
+    }
     return 0;
 }
 
@@ -603,6 +606,10 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
 
     if (data.keyMgmt & HDI_KEY_MGMT_OSEN) {
         HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sOSEN");
+    }
+
+    if (data.keyMgmt & HDI_KEY_MGMT_OWE) {
+        HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sOWE");
     }
 
     pos = HdiGetCipherTxt(pos, end, data.pairwiseCipher);

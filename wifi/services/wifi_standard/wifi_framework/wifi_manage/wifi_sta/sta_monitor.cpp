@@ -126,11 +126,6 @@ void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::st
 
     WifiLinkedInfo linkedInfo;
     pStaStateMachine->GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState != ConnState::CONNECTED) {
-        WIFI_LOGW("Sta ignored the event for NOT in connected status!, connState: %{public}d",
-            linkedInfo.connState);
-        return;
-    }
     if (linkedInfo.bssid == bssid) {
         WIFI_LOGW("Sta ignored the event for bssid is the same.");
         return;

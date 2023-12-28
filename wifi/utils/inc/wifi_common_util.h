@@ -182,13 +182,6 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
 std::string GetBundleName();
 
 /**
- * @Description Check whether the app is a system app
- *
- * @return bool - Returns true for yes, false for no.
- */
-bool IsSystemApp();
-
-/**
  * @Description get calling pid
  *
  * @return int - calling pid

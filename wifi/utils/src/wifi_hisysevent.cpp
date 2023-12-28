@@ -204,5 +204,13 @@ void WriteIsInternetHiSysEvent(bool isInternet)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_KPI_INTERNET", "EVENT_VALUE", writer.write(root));
 }
 
+void WriteSoftApConnectFailHiSysEvent(int errorCnt)
+{
+    WIFI_LOGE("WriteSoftApConnectFailHiSysEvent errorCnt=%{public}d", errorCnt);
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ERROR_CODE"] = errorCnt;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFT_AP_CONNECT_FAILD", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

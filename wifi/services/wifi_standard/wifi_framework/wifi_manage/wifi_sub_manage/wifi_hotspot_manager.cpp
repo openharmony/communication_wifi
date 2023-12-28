@@ -85,6 +85,8 @@ void WifiHotspotManager::CloseApService(int id)
     cbMsg.msgData = static_cast<int>(ApState::AP_STATE_CLOSED);
     cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    std::string msg = std::string("OnHotspotStateChanged") + std::string("id = ") + std::to_string(id);
+    WifiCommonEventHelper::PublishHotspotStateChangedEvent(static_cast<int>(ApState::AP_STATE_CLOSED), msg);
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close ap SA!");

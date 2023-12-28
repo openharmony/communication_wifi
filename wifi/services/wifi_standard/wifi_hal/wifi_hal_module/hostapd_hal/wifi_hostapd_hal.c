@@ -170,6 +170,8 @@ static void DelCallbackMessage(const char *msg, int id)
         if (strncmp(msg, WPA_EVENT_TERMINATING, strlen(WPA_EVENT_TERMINATING)) == 0) {
             g_hostapdHalDevInfo[id].hostapdHalDev->threadRunFlag = 0;
         }
+    } else if (strncmp(msg, AP_STA_POSSIBLE_PSK_MISMATCH, strlen(AP_STA_POSSIBLE_PSK_MISMATCH)) == 0) {
+        WifiHalCbApState(msg, id);
     }
 }
 

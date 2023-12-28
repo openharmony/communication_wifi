@@ -19,6 +19,7 @@
 #include <string>
 
 #define AP_ERR_CODE 3
+#define AP_STA_PSK_MISMATCH_CNT 1
 namespace OHOS {
 namespace Wifi {
 enum class WifiOperType {
@@ -94,6 +95,8 @@ void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes);
 void WriteSoftApAbDisconnectHiSysEvent(int errorCode);
 
 void WriteIsInternetHiSysEvent(bool isInternet);
+
+void WriteSoftApConnectFailHiSysEvent(int errorCnt);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

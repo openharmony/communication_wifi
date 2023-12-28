@@ -261,7 +261,8 @@ static int GetApCallbackEvents(int *events, int size)
         WIFI_IDL_CBK_CMD_STA_JOIN,
         WIFI_IDL_CBK_CMD_STA_LEAVE,
         WIFI_IDL_CBK_CMD_AP_ENABLE,
-        WIFI_IDL_CBK_CMD_AP_DISABLE
+        WIFI_IDL_CBK_CMD_AP_DISABLE,
+        WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT
     };
     int max = sizeof(apEvents) / sizeof(apEvents[0]);
     int num = 0;

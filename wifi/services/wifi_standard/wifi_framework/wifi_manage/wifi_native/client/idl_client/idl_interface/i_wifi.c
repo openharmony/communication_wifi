@@ -329,6 +329,7 @@ static int IdlDealStaApEvent(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_AP_ENABLE:
         case WIFI_IDL_CBK_CMD_AP_DISABLE:
+        case WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT:
             IdlCbkApStateChange(context, event);
             break;
         case WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM:

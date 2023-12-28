@@ -516,6 +516,7 @@ static void DealStaApCallback(int event, Context *context)
         case WIFI_STA_LEAVE_EVENT:
         case WIFI_AP_ENABLE_EVENT:
         case WIFI_AP_DISABLE_EVENT:
+        case AP_STA_PSK_MISMATH_EVENT:
             DealIfaceCbk(event, context);
             break;
         case WIFI_SCAN_INFO_NOTIFY_EVENT:

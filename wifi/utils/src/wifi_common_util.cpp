@@ -263,19 +263,6 @@ std::string GetBundleName()
     return bundleInfo.name;
 }
 
-bool IsSystemApp()
-{
-    sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
-    if (bundleInstance == nullptr) {
-        return false;
-    }
-
-    int uid = IPCSkeleton::GetCallingUid();
-    bool isSysApp = bundleInstance->CheckIsSystemAppByUid(uid);
-    WIFI_LOGI("Is system App uid[%{public}d]: %{public}d", uid, isSysApp);
-    return isSysApp;
-}
-
 int GetCallingPid()
 {
     return IPCSkeleton::GetCallingPid();

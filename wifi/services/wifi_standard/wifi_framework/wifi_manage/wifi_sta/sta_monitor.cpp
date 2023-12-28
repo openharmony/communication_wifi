@@ -54,7 +54,7 @@ ErrCode StaMonitor::InitStaMonitor()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaMonitor::UnInitStaMonitor() const
+NO_SANITIZE("cfi") ErrCode StaMonitor::UnInitStaMonitor() const
 {
     WIFI_LOGI("Enter StaMonitor::UnInitStaMonitor.\n");
     WifiEventCallback callBack;

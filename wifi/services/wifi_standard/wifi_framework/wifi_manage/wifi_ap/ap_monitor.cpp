@@ -25,6 +25,7 @@
 #include "wifi_logger.h"
 #include "dhcpd_interface.h"
 #include "wifi_common_util.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApMonitor");
 
@@ -72,6 +73,8 @@ void ApMonitor::OnHotspotStateEvent(int state) const
         SendMessage(m_selectIfacName, ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT, 0, 0, 0);
     } else if (state == WIFI_IDL_CBK_CMD_AP_ENABLE) {
         SendMessage(m_selectIfacName, ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT, 1, 0, 0);
+    } else if (state == WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT) {
+        WriteSoftApConnectFailHiSysEvent(AP_STA_PSK_MISMATCH_CNT);
     } else {
         WIFI_LOGE("Error: Incorrect status code [%{public}d].", state);
     }

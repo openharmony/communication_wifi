@@ -235,6 +235,8 @@ void WifiHalCbApState(const char *content, int id)
     } else if (strncmp(content, "AP-DISABLED", strlen("AP-DISABLED")) == 0 ||
                strncmp(content, "CTRL-EVENT-TERMINATING", strlen("CTRL-EVENT-TERMINATING")) == 0) {
         event = WIFI_AP_DISABLE_EVENT;
+    } else if (strncmp(content, "AP-STA-POSSIBLE-PSK-MISMATCH ", strlen("AP-STA-POSSIBLE-PSK-MISMATCH ")) == 0) {
+        event = AP_STA_PSK_MISMATH_EVENT;
     } else {
         return;
     }

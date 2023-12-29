@@ -43,6 +43,8 @@ public:
 
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
+        void HandleSwitchToConnectOrMixMode(InternalMessage *msg);
+        void HandleSwitchToScanOnlyMode(InternalMessage *msg);
         void HandleStartInIdleState(InternalMessage *msg);
     };
 

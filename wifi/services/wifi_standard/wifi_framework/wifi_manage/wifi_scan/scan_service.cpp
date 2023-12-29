@@ -1254,7 +1254,7 @@ ErrCode ScanService::AllowExternScan()
         LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
         return WIFI_OPT_SUCCESS;
     }
-#endif    
+#endif
     if (!AllowExternScanByThermal()) {
         WIFI_LOGW("extern scan not allow by thermal level");
         return WIFI_OPT_FAILED;
@@ -1334,7 +1334,7 @@ ErrCode ScanService::AllowExternScan()
         LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
         return WIFI_OPT_SUCCESS;
     }
-#endif   
+#endif
     if (!AllowExternScanByThermal()) {
         WIFI_LOGW("extern scan not allow by thermal level");
         return WIFI_OPT_FAILED;

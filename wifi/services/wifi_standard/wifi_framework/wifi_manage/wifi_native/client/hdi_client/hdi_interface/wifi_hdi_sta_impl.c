@@ -362,6 +362,7 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
             LOGE("%{public}s: failed to obtain the scanning result", __func__);
             continue;
         }
+        g_hdiWifiScanResults[g_hdiWifiScanResultsCount].timestamp = scanResult->tsf;
         LOGD("%{public}s: bssid:%{private}s, ssid:%{private}s",
             __func__,
             g_hdiWifiScanResults[g_hdiWifiScanResultsCount].bssid,

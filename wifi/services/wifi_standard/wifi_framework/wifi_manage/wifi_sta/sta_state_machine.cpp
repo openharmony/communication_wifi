@@ -55,6 +55,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define WPA3_BLACKMAP_RSSI_THRESHOLD (-70)
 #define WPA3_CONNECT_FAIL_COUNT_THRESHOLD 2
 #define WPA_CB_ASSOCIATING 3
+#define TRANSFORMATION_TO_MBPS 10
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -893,12 +894,12 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         linkedInfo.rssi = INVALID_RSSI_VALUE;
     }
     if (signalInfo.txrate > 0) {
-        linkedInfo.txLinkSpeed = signalInfo.txrate;
-        linkedInfo.linkSpeed = signalInfo.txrate;
+        linkedInfo.txLinkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
+        linkedInfo.linkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
     }
 
     if (signalInfo.rxrate > 0) {
-        linkedInfo.rxLinkSpeed = signalInfo.rxrate;
+        linkedInfo.rxLinkSpeed = signalInfo.rxrate / TRANSFORMATION_TO_MBPS;
     }
 
     linkedInfo.snr = signalInfo.snr;

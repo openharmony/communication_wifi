@@ -40,16 +40,19 @@ static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
 static unsigned int g_wpaRefCount = 0;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
+static unsigned int g_wpaStubProcessDeath = 29189;
 
 WifiErrorNo HdiWpaStart()
 {
     LOGI("HdiWpaStart start...");
     pthread_mutex_lock(&g_wpaObjMutex);
-    if (g_wpaRefCount != 0) {
+    if (g_wpaRefCount != 0 && g_wpaObj != NULL && g_devMgr != NULL) {
         ++g_wpaRefCount;
         pthread_mutex_unlock(&g_wpaObjMutex);
-        LOGI("%{public}s wpa ref count: %d", __func__, g_wpaRefCount);
+        LOGI("%{public}s wpa ref count: %{public}d", __func__, g_wpaRefCount);
         return WIFI_IDL_OPT_OK;
+    } else {
+        g_wpaRefCount = 0;
     }
 
     g_devMgr = HDIDeviceManagerGet();
@@ -143,6 +146,7 @@ WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName)
     int32_t ret = g_wpaObj->AddWpaIface(g_wpaObj, ifName, confName);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s AddWpaIface failed: %{public}d", __func__, ret);
+        HdiWpaResetGlobalObj(ret);
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_IDL_OPT_FAILED;
     }
@@ -171,6 +175,7 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
     int32_t ret = g_wpaObj->RemoveWpaIface(g_wpaObj, ifName);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s RemoveWpaIface failed: %{public}d", __func__, ret);
+        HdiWpaResetGlobalObj(ret);
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_IDL_OPT_FAILED;
     }
@@ -258,5 +263,16 @@ WifiErrorNo CopyConfigFile(const char* configName)
     }
     LOGE("Copy config file failed: %{public}s", configName);
     return WIFI_IDL_OPT_FAILED;
+}
+
+void HdiWpaResetGlobalObj(int errorCode)
+{   
+    if (g_wpaStubProcessDeath == errorCode) {
+        g_wpaRefCount = 0;
+        g_wpaObj = NULL;
+        g_devMgr = NULL;
+        LOGE("%{public}s reset wpa g_wpaObj", __func__);
+    }
+    HdiWpaStart();
 }
 #endif

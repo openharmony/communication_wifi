@@ -79,6 +79,7 @@ static WifiErrorNo RegisterEventCallback()
     if (result != HDF_SUCCESS) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterEventCallback: RegisterEventCallback failed result:%{public}d", result);
+         HdiWpaResetGlobalObj(result);
         return WIFI_IDL_OPT_FAILED;
     }
 

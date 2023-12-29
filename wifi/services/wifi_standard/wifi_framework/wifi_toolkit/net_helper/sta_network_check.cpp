@@ -142,6 +142,7 @@ void StaNetworkCheck::ArpDetection()
                     if (!arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true)) {
                         LOGI("RunNetCheckThreadFunc arp check failed.");
                         arpStateHandler(StaArpState::ARP_STATE_UNREACHABLE);
+                        WriteWifiAccessIntFailedHiSysEvent(ARP_OPT, StaArpState::ARP_STATE_UNREACHABLE);
                     }
                 });
         }
@@ -174,6 +175,7 @@ StaNetState StaNetworkCheck::CheckResponseCode(std::string url, int codeNum, int
         (lastNetState.load() != NETWORK_CHECK_PORTAL)) {
         WIFI_LOGE("http detect network not working!");
         lastNetState = NETWORK_STATE_NOINTERNET;
+        WriteWifiAccessIntFailedHiSysEvent(DETECT_NOT_NETWORK, NETWORK_STATE_NOINTERNET);
     } else {
         WIFI_LOGE("http detect unknow network!");
     }
@@ -320,10 +322,7 @@ void StaNetworkCheck::RunNetCheckThreadFunc()
             ArpDetection();
             StopHttpProbeTimer();
             isStopNetCheck = true;
-            httpDetectCnt++;
-            if (httpDetectCnt == HTTP_OPT) {
-                WriteWifiAccessIntFailedHiSysEvent(HTTP_OPT, NETWORK_STATE_NOINTERNET);
-            }
+            WriteWifiAccessIntFailedHiSysEvent(HTTP_OPT, NETWORK_STATE_NOINTERNET);
             continue;
         }
 
@@ -371,7 +370,6 @@ void StaNetworkCheck::SignalNetCheckThread()
         WIFI_LOGI("detection is now running or screen %{public}d!\n", m_screenState);
         return;
     }
-    httpDetectCnt = 0;
     // get mac address
     std::string macAddress;
     WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);

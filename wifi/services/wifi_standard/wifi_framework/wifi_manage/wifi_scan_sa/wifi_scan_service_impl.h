@@ -44,6 +44,7 @@ public:
 
     ErrCode SetScanControlInfo(const ScanControlInfo &info) override;
     ErrCode Scan(bool compatible) override;
+    ErrCode PermissionVerification();
     ErrCode AdvanceScan(const WifiScanParams &params) override;
     ErrCode IsWifiClosedScan(bool &bOpen) override;
     ErrCode GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible) override;

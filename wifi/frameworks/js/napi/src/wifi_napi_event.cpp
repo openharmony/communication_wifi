@@ -109,7 +109,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
                 goto EXIT;
             }
             for (auto& each : it->second) {
-                if (each.m_regEnv == asyncData->env && each.m_regHanderRef == asyncData->callbackRef ) {
+                if (each.m_regEnv == asyncData->env && each.m_regHanderRef == asyncData->callbackRef) {
                     find = true;
                     break;
                 }

@@ -91,8 +91,6 @@ public:
     napi_value CreateResult(const napi_env& env, const WifiP2pDevice& device);
     napi_value CreateResult(const napi_env& env, const std::vector<WifiP2pDevice>& devices);
     napi_value CreateResult(const napi_env& env, const WifiP2pLinkedInfo& info);
-    bool IsCallBackExist(const AsyncEventData *asyncData);
-    void HandleQueueWork(const AsyncEventData *asyncData);
     void EventNotify(AsyncEventData *asyncEvent);
 
     template<typename T>

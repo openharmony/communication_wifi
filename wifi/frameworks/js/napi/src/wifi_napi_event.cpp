@@ -70,7 +70,7 @@ std::map<std::string, std::int32_t> g_EventSysCapMap = {
 
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
-    WIFI_LOGI("Enter wifi event notify");
+    WIFI_LOGI("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
     uv_loop_s* loop = nullptr;
     napi_get_uv_event_loop(asyncEvent->env, &loop);
 

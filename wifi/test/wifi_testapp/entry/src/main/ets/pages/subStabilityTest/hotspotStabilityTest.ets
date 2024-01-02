@@ -154,6 +154,12 @@ struct HotspotStabilityTest {
               console.log( TAG , "start HotspotSwitch test-------------" )
               let self = this
               self.hotspotLoopState = true
+              self.openHotspotNumber = 0
+              self.closeHotspotNumber = 0
+              self.openSuccessNumber = 0
+              self.openFailNumber = 0
+              self.closeSuccessNumber = 0
+              self.closeFailNumber = 0
 
               async function forLoop() {
                 self.hotspotMessageLog = ""
@@ -225,6 +231,7 @@ struct HotspotStabilityTest {
                     }
                   }
                 }
+                console.log( TAG , "测试结束 -------------" )
               }
 
               forLoop()
@@ -241,6 +248,7 @@ struct HotspotStabilityTest {
               self.hotspotLoopState = false
               console.log( TAG , "准备测试停止 -------------" )
               self.hotspotMessageLog = ""
+              self.openHotspotNumber = 0
             } )
         }
 

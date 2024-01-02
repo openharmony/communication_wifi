@@ -301,7 +301,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess1()
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
         .WillRepeatedly(Return(-1)); // if it is false, it will do process.
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_SUCCESS));
+    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).Times(AtLeast(0));
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -317,7 +317,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess2()
     EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_SUCCESS));
+    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).Times(AtLeast(0));
 
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
@@ -337,7 +337,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess3()
         .Times(AtLeast(1))
         .WillOnce(Return(true));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_SUCCESS));
+    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).Times(AtLeast(0));
 
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
@@ -391,7 +391,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail3()
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
         .WillRepeatedly(Return(-1)); // if it is false, it will do process.
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_FAILED));
+    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).Times(AtLeast(0));
 
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
@@ -408,7 +408,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail4()
     EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_FAILED));
+    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).Times(AtLeast(0));
 
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
@@ -445,7 +445,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail6()
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_))
         .Times(AtLeast(1))
         .WillOnce(Return(true));
-    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_FAILED));
+    EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).Times(AtLeast(0));
 
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }

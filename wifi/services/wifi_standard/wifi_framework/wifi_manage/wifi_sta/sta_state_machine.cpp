@@ -1785,8 +1785,12 @@ void StaStateMachine::OnNetworkAssocEvent(int assocState)
 {
     if (assocState == WPA_CB_ASSOCIATING) {
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+            static_cast<int>(WifiOperateState::STA_ASSOCIATING));
     } else {
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED, linkedInfo);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+            static_cast<int>(WifiOperateState::STA_ASSOCIATED));
     }
 }
 

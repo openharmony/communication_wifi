@@ -188,6 +188,12 @@ struct WiFiConnectStabilityTest {
                 console.log( TAG , "start WiFiConnect test-------------" )
                 let self = this
                 self.connectionLoopState = true
+                self.connectNumber = 0
+                self.connectSuccessNumber = 0
+                self.connectFailNumber = 0
+                self.disconnectNumber = 0
+                self.disconnectSuccessNumber = 0
+                self.disconnectFailNumber = 0
 
                 async function forLoop() {
                   self.connectionMessageLog = ""
@@ -212,8 +218,8 @@ struct WiFiConnectStabilityTest {
                       self.connect_StartTime = new Date().getTime()
                       console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接-----" )
                       console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接开始时间: " + self.connect_StartTime + "ms" )
-                      self.connectionMessageLog += "第" + ( self.connectNumber + 1 ) + "次WIFI连接结果：" + funcMessage + "\n"
-                      console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接结果：" + funcMessage )
+                      self.connectionMessageLog += "第" + ( self.connectNumber + 1 ) + "次WIFI连接接口的调用结果：" + funcMessage + "\n"
+                      console.log( TAG , "第" + ( self.connectNumber + 1 ) + "次WIFI连接接口的调用结果：" + funcMessage )
                       await sleep( 15 )
                       self.connectionMessage = AppStorage.Get( "connectionMessage" )
                       // prompt.showToast( { message : funcMessage } )
@@ -229,8 +235,8 @@ struct WiFiConnectStabilityTest {
                         self.disconnect_StartTime = new Date().getTime()
                         console.log( TAG , "第" + self.disconnectNumber + "次WIFI断连-----" )
                         console.log( TAG , "第" + self.disconnectNumber + "次WIFI断连开始时间: " + self.disconnect_StartTime + "ms" )
-                        self.connectionMessageLog += "第" + self.disconnectNumber + "次WIFI断连结果：" + funcMessage + "\n"
-                        console.log( TAG , "第" + self.disconnectNumber + "次WIFI断连结果：" + funcMessage )
+                        self.connectionMessageLog += "第" + self.disconnectNumber + "次WIFI断连接口的调用结果：" + funcMessage + "\n"
+                        console.log( TAG , "第" + self.disconnectNumber + "次WIFI断连接口的调用结果：" + funcMessage )
                         console.log( TAG , "disconnectNumber: " + self.disconnectNumber )
                         await sleep( 15 )
                         // prompt.showToast( { message : funcMessage } )
@@ -259,6 +265,7 @@ struct WiFiConnectStabilityTest {
                       }
                     }
                   }
+                  console.log( TAG , "测试结束 -------------" )
                 }
 
                 forLoop()
@@ -275,7 +282,7 @@ struct WiFiConnectStabilityTest {
                 self.connectionLoopState = false
                 console.log( TAG , "准备测试停止 -------------" )
                 self.connectionMessageLog = ""
-
+                self.connectNumber = 0
               } )
 
           }
@@ -313,7 +320,7 @@ struct WiFiConnectStabilityTest {
         this.disconnect_EndTime = new Date().getTime()
         console.log( TAG , "WIFI断连结束时间: " + this.disconnect_EndTime + "ms" )
         let removeMessage = wifi.removeAllNetwork()
-        console.log( TAG , "移除网络配置的结果: " + removeMessage )
+        console.log( TAG , "移除网络配置接口的调用结果: " + removeMessage )
       }
       console.log( TAG , " on.wifiConnectionChange callback success --------" )
       prompt.showToast( { message : "wifi连接状态: " + wifiConnectionMessage } )
@@ -471,7 +478,7 @@ struct setWifiDevice {
                 .onChange( ( strInput ) => {
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    this.wifiConfig.creatorUid = Number( strInput );
+                    this.wifiConfig.creatorUid = parseInt( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -489,7 +496,7 @@ struct setWifiDevice {
                 .onChange( ( strInput ) => {
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    this.wifiConfig.disableReason = Number( strInput );
+                    this.wifiConfig.disableReason = parseInt( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -507,7 +514,7 @@ struct setWifiDevice {
                 .onChange( ( strInput ) => {
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    this.wifiConfig.netId = Number( strInput );
+                    this.wifiConfig.netId = parseInt( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -525,7 +532,7 @@ struct setWifiDevice {
                 .onChange( ( strInput ) => {
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    this.wifiConfig.randomMacType = Number( strInput );
+                    this.wifiConfig.randomMacType = parseInt( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -561,7 +568,7 @@ struct setWifiDevice {
                 .onChange( ( strInput ) => {
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    this.wifiConfig.IpType = Number( strInput );
+                    this.wifiConfig.IpType = parseInt( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -579,7 +586,7 @@ struct setWifiDevice {
                 .onChange( ( strInput ) => {
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    this.wifiConfig.staticIp.ipAddress = Number( strInput );
+                    this.wifiConfig.staticIp.ipAddress = parseInt( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -597,7 +604,7 @@ struct setWifiDevice {
                 .onChange( ( strInput ) => {
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    this.wifiConfig.staticIp.gateway = Number( strInput );
+                    this.wifiConfig.staticIp.gateway = parseInt( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )
@@ -615,7 +622,7 @@ struct setWifiDevice {
                 .onChange( ( strInput ) => {
                   //判断合法性
                   if ( strInput.length >= 1 ) {
-                    this.wifiConfig.staticIp.dnsServers = Number( strInput );
+                    this.wifiConfig.staticIp.dnsServers = parseInt( strInput );
                   }
                 } )
                 .width( ConfigData.WH_80_100 )

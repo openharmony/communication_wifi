@@ -25,16 +25,10 @@ import parameter from '@ohos.systemparameter';
 import { TabletTitle , BrowserTabs , WebTab } from '../../Component/webTitleBar';
 import { PhoneLayout } from '../../Component/phoneLayout';
 import { Browser , LoadingStatus } from '../../entryability/model/bowser';
-import Logger from '../../entryability/model/Logger';
 import ConfigData from '../../utils/ConfigData';
 import { ConfigData } from '../../utils/ConfigData';
 import fs from '@ohos.file.fs';
-import UIAbility from '@ohos.app.ability.UIAbility';
-import window from '@ohos.window';
 import http from '@ohos.net.http';
-import performanceMonitor from '@ohos.arkui.performanceMonitor';
-import App from '@system.app';
-
 const TAG = '[webLatencyTest]';
 
 /**
@@ -43,37 +37,50 @@ const TAG = '[webLatencyTest]';
 @Entry
 @Component
 struct webLatencyTest {
-  private testItem: TestData = Router.getParams().testId;
-  @State isPhone: boolean = true;
-  @State testNumbers: Number = 30 //测试次数
-  @State openWebNumber: Number = 0 // 打开Web的次数
-  @State closeWebNumber: Number = 0 // 关闭Web的次数
-  @State openSuccessNumbers: Number = 0;
-  @State openFailNumbers: Number = 0;
-  @State progressStatus: Number = 0;
-  @State browser: Browser = new Browser();
-  @StorageLink( "pageCostTime" ) pageCostTime: number = 0
-  @StorageLink( "pathDir" ) pathDir: string = ""
-  @State addr: string = "www.baidu.com"
-  @State filePath: string = ""
-  private isInit: Boolean = false;
-  @State pairedSsid: string = "";
-  @State wifiConnectionMessage: String = ""
-  @State webLoopState: Boolean = true
-  @State webMessage: String = ""
-  @State webMessageLog: String = ""
-  @State requestStartTime: Number = 0
-  @State requestEndTime: Number = 0
-  @State requestCostTime: Number = 0
-  @State file: fs.File = null
-  @State fileData: string = "";
+  private testItem : TestData = Router.getParams().testId;
+  @State isPhone : boolean = true;
+  @State testNumbers : Number = 3 //测试次数
+  @State openWebNumbers : Number = 0 // 打开Web的次数
+  @State closeWebNumbers : Number = 0 // 关闭Web的次数
+  @State openSuccessNumbers : Number = 0;
+  @State openFailNumbers : Number = 0;
+  @State progressStatus : Number = 0;
+  @State browser : Browser = new Browser();
+  @StorageLink( "pageCostTime" ) pageCostTime : number = 0
+  @StorageLink( "pathDir" ) pathDir : string = ""
+  @State addr : string = "www.baidu.com"
+  @State filePath : string = ""
+  private isInit : Boolean = false;
+  @State pairedSsid : string = "";
+  @State wifiConnectionMessage : String = ""
+  @State webLoopState : Boolean = true
+  @State webMessage : String = ""
+  @State webMessageLog : String = ""
+  @State requestStartTime : Number = 0
+  @State requestEndTime : Number = 0
+  @State requestCostTime : Number = 0
+  @State file : fs.File = null
+  @State fileData : string = "";
   listener = mediaquery.matchMediaSync( '(orientation:landscape)' );
+
+  async openLogFile() {
+    let time : number = new Date().getTime()
+    let currentTime : string = timestampToDate( time )
+    console.log( TAG , "当前时间: " + currentTime )
+    this.filePath = this.pathDir + ( "/" + currentTime + ".txt" );
+    console.log( TAG , "沙箱路径为: " + this.filePath )
+    this.file = fs.openSync( this.filePath , fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE );
+    AppStorage.setOrCreate( "fsFile" , this.file )
+    AppStorage.setOrCreate( "openWebNumbers" , this.openWebNumbers )
+    console.log( TAG , "数据文件的沙箱路径为: " + this.filePath )
+    console.log( TAG , "file fd: " + this.file.fd );
+  }
 
   aboutToAppear() {
     try {
       let deviceType = parameter.getSync( "const.build.characteristics" );
       console.log( TAG , "deviceType：" + deviceType )
-      if ( deviceType === 'default' ) {
+      if( deviceType === 'default' ) {
         this.isPhone = true;
       }
     } catch( e ) {
@@ -82,10 +89,10 @@ struct webLatencyTest {
     console.log( TAG , "aboutToAppear" )
     let wifiState = wifi.isConnected()
     console.log( TAG , "aboutToAppear,isConnected:" + wifiState )
-    if ( wifiState ) {
+    if( wifiState ) {
       this.wifiConnectionMessage = "connected";
       wifi.getLinkedInfo( ( err , data ) => {
-        if ( err ) {
+        if( err ) {
           console.log( TAG , "get linked info error" );
         }
         let linkedInfoMessage = JSON.stringify( data )
@@ -97,18 +104,16 @@ struct webLatencyTest {
       this.wifiConnectionMessage = "disconnected";
       prompt.showToast( { message : 'wifi还未连接，请先连接WiFi' } )
     }
-
-    this.filePath = this.pathDir + "/dataLog.txt";
+    this.filePath = this.pathDir + ( "/loadlog.txt" );
     console.log( TAG , "沙箱路径为: " + this.filePath )
     this.file = fs.openSync( this.filePath , fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE );
     AppStorage.setOrCreate( "fsFile" , this.file )
-    AppStorage.SetOrCreate( "openWebNumber" , this.openWebNumber )
+    AppStorage.setOrCreate( "openWebNumbers" , this.openWebNumbers )
     console.log( TAG , "数据文件的沙箱路径为: " + this.filePath )
     console.log( TAG , "file fd: " + this.file.fd );
   }
 
   aboutToDisappear() {
-    fs.closeSync( this.file );
   }
 
   build() {
@@ -143,7 +148,7 @@ struct webLatencyTest {
             .width( "70%" )
             .fontSize( $r( 'app.float.font_16' ) )
             .fontColor( $r( 'app.color.title_black_color' ) )
-            .onChange( ( value: string ) => {
+            .onChange( ( value : string ) => {
               this.testNumbers = parseInt( value );
             } )
         }
@@ -155,29 +160,39 @@ struct webLatencyTest {
             Button( "开始web测试" )
               .operateButtonStyle( $r( 'app.color.main_blue' ) )
               .align( Alignment.Center )
-              .onClick( async( event: ClickEvent ) => {
+              .onClick( async( event : ClickEvent ) => {
                 console.log( TAG , "start web test-------------" )
                 let self = this
                 self.webLoopState = true
+                self.openWebNumbers =0
+                self.openSuccessNumbers =0
+                self.openFailNumbers =0
+                await this.openLogFile()
 
                 async function forLoop() {
                   self.stateMessageLog = ""
                   let funcMessage = "" // 函数信息
-                  for ( self.openWebNumber ; self.openWebNumber < self.testNumbers ; self.openWebNumber ++ ) {
-                    if ( !self.webLoopState ) {
+                  for( self.openWebNumbers ; self.openWebNumbers < self.testNumbers ; self.openWebNumbers ++ ) {
+                    if( !self.webLoopState ) {
                       console.log( TAG , "web测试结束------------" )
+                      self.openWebNumbers =0
+                      AppStorage.SetOrCreate( "openWebNumbers" , self.openWebNumbers )
                       break;
                     } else {
                       console.log( TAG , "测试开始--------" )
                       console.log( TAG , "self.addr:" , self.addr )
-                      self.fileData = "第" + ( self.openWebNumber + 1 ) + "次网页测试开始! addr为: " + self.addr + "------------" + "\n"
+                      AppStorage.setOrCreate( "openWebNumbers" , self.openWebNumbers )
+                      let time1 : number = new Date().getTime()
+                      let currentTime1 : string = timestampToDateFormat( time1 )
+                      self.fileData = currentTime1 + " 第" + ( self.openWebNumbers + 1 ) + "次网页测试开始! addr为: " + self.addr + "------------" + "\n"
+
                       fs.writeSync( self.file.fd , self.fileData );
 
                       let httpRequest = http.createHttp();
                       self.requestStartTime = new Date().getTime()
                       console.time( "request" )
-                      httpRequest.request( "www.baidu.com" , ( err: Error , data: http.HttpResponse ) => {
-                        if ( !err ) {
+                      httpRequest.request( "www.baidu.com" , ( err : Error , data : http.HttpResponse ) => {
+                        if( !err ) {
                           console.log( TAG , 'Result:' + data.result );
                           console.log( TAG , 'code:' + data.responseCode );
                           console.log( TAG , 'header:' + JSON.stringify( data.header ) );
@@ -185,9 +200,10 @@ struct webLatencyTest {
                           console.timeEnd( "request" )
                           self.requestEndTime = new Date().getTime()
                           self.requestCostTime = self.requestEndTime - self.requestStartTime
-                          self.fileData = "第" + ( self.openWebNumber + 1 ) + "次http request的耗时： " + self.requestCostTime + "ms" + "\n"
+                          let time2 : number = new Date().getTime()
+                          let currentTime2 : string = timestampToDateFormat( time2 )
+                          self.fileData = currentTime2 + " 第" + ( self.openWebNumbers + 1 ) + "次http request的耗时： " + self.requestCostTime + "ms" + "\n"
                           fs.writeSync( self.file.fd , self.fileData );
-                          // console.info( TAG , "write data to file succeed and size is:" + writeLen );
                         } else {
                           console.log( TAG , 'error:' + JSON.stringify( err ) );
                         }
@@ -198,15 +214,20 @@ struct webLatencyTest {
                       self.browser.loadUrl( {
                         url : $rawfile( 'phone.html' )  // pad.html
                       } )
-                      console.log( TAG , "第" + ( self.openWebNumber + 1 ) + "次测试结束--------" )
-                      self.fileData = "第" + ( self.openWebNumber + 1 ) + "次网页测试结束! ------------" + "\n"
+                      console.log( TAG , "第" + ( self.openWebNumbers + 1 ) + "次测试结束--------" )
+                      let time3 : number = new Date().getTime()
+                      let currentTime3 : string = timestampToDateFormat( time3 )
+                      self.fileData = currentTime3 + " 第" + ( self.openWebNumbers + 1 ) + "次网页测试结束! ------------" + "\n"
                       fs.writeSync( self.file.fd , self.fileData );
-                      AppStorage.SetOrCreate( "openWebNumber" , self.openWebNumber )
+                      AppStorage.SetOrCreate( "openWebNumbers" , self.openWebNumbers )
                       await sleep( 5 )
                     }
 
                   }
+                  console.log( TAG , "测试结束 -------------" )
                   fs.closeSync( self.file );
+                  AppStorage.SetOrCreate( "openWebNumbers" , self.openWebNumbers )
+                  self.webMessageLog = ""
                 }
 
                 forLoop()
@@ -218,10 +239,12 @@ struct webLatencyTest {
             Button( "关闭Web测试" )
               .operateButtonStyle( $r( 'app.color.main_blue' ) )
               .align( Alignment.Center )
-              .onClick( async( event: ClickEvent ) => {
+              .onClick( async( event : ClickEvent ) => {
                 let self = this
                 self.webLoopState = false
                 console.log( TAG , "准备测试停止 -------------" )
+                self.openWebNumbers =0
+                AppStorage.SetOrCreate( "openWebNumbers" , self.openWebNumbers )
                 self.webMessageLog = ""
                 fs.closeSync( self.file );
               } )
@@ -276,37 +299,15 @@ struct webLatencyTest {
             .scrollBar( BarState.Auto )
           }
           .width( ConfigData.WH_100_100 )
-
-          Column() {
-            Text( "log显示：" )
-              .fontSize( "18vp" )
-              .width( ConfigData.WH_95_100 )
-              .align( Alignment.TopStart )
-              .padding( { top : "5vp" } )
-            List() {
-              ListItem() {
-                Text( "hilog" )
-                  .fontSize( "18vp" )
-                  .margin( { top : "5vp" , left : "20vp" , right : "5vp" } )
-                  .textAlign( TextAlign.Start )
-                  .width( ConfigData.WH_90_100 )
-              }
-            }
-            .width( ConfigData.WH_95_100 )
-            .height( ConfigData.WH_88_100 )
-            .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
-          }
-          .height( ConfigData.WH_50_100 )
-          .width( ConfigData.WH_100_100 )
         }
-        .height( ConfigData.WH_50_100 )
+        .height( ConfigData.WH_60_100 )
         .width( ConfigData.WH_100_100 )
       }
       .width( ConfigData.WH_100_100 )
-      .height( ConfigData.WH_65_100 )
+      .height( ConfigData.WH_60_100 )
 
       Column() {
-        if ( this.isPhone ) {
+        if( this.isPhone ) {
           Progress( { value : this.browser.progress , total : 100 } )
             .color( '#0000ff' )
             .visibility( this.browser.hideProgress ? Visibility.None : Visibility.Visible )
@@ -318,7 +319,7 @@ struct webLatencyTest {
         }
       }
       .width( ConfigData.WH_100_100 )
-      .height( ConfigData.WH_20_100 )
+      .height( ConfigData.WH_35_100 )
 
     }
     .width( ConfigData.WH_100_100 )
@@ -327,8 +328,8 @@ struct webLatencyTest {
   }
 
   orientationCallback( result ) {
-    if ( !this.isInit ) {
-      if ( result.matches ) {
+    if( !this.isInit ) {
+      if( result.matches ) {
         this.isPhone = false;
       } else {
         this.isPhone = true;
@@ -338,9 +339,9 @@ struct webLatencyTest {
     console.log( TAG , `orientationCallback end,isPhone=${ this.isPhone }` );
   }
 
-  onBackPress(): boolean {
+  onBackPress() : boolean {
     console.log( TAG , `enter onBackPress` );
-    if ( this.browser.webControllerArray[ this.browser.tabArrayIndex ].controller.accessBackward() ||
+    if( this.browser.webControllerArray[ this.browser.tabArrayIndex ].controller.accessBackward() ||
       this.browser.loadingStatus === LoadingStatus.LOADING ) {
       this.browser.webControllerArray[ this.browser.tabArrayIndex ].controller.backward();
       return true;
@@ -355,7 +356,7 @@ struct webLatencyTest {
 }
 
 @Extend( Button )
-function operateButtonStyle( color: Resource ) {
+function operateButtonStyle( color : Resource ) {
   .width( $r( 'app.float.button_width' ) )
   .height( $r( 'app.float.button_height' ) )
   .fontSize( $r( 'app.float.font_16' ) )
@@ -370,4 +371,38 @@ function sleep( time ) {
       resolve()
     } , time * 1000 )
   })
+}
+
+export function timestampToDate( timestamp : number ) : string {
+  const date = new Date(timestamp);
+  let year = date.getFullYear();
+  let month : string | number = date.getMonth() + 1;
+  month = month >= 10 ? month : ( '0' + month );
+  let day : string | number = date.getDate();
+  day = day >= 10 ? day : ( '0' + day );
+  let hours : string | number = date.getHours();
+  hours = hours >= 10 ? hours : ( '0' + hours );
+  let minutes : string | number = date.getMinutes();
+  minutes = minutes >= 10 ? minutes : ( '0' + minutes );
+  let seconds : string | number = date.getSeconds();
+  seconds = seconds >= 10 ? seconds : ( '0' + seconds );
+  return `${ year }${ month }${ day }_${ hours }${ minutes }${ seconds }`;
+}
+
+export function timestampToDateFormat( timestamp : number ) : string {
+  const date = new Date(timestamp);
+  let year = date.getFullYear();
+  let month : string | number = date.getMonth() + 1;
+  month = month >= 10 ? month : ( '0' + month );
+  let day : string | number = date.getDate();
+  day = day >= 10 ? day : ( '0' + day );
+  let hours : string | number = date.getHours();
+  hours = hours >= 10 ? hours : ( '0' + hours );
+  let minutes : string | number = date.getMinutes();
+  minutes = minutes >= 10 ? minutes : ( '0' + minutes );
+  let seconds : string | number = date.getSeconds();
+  seconds = seconds >= 10 ? seconds : ( '0' + seconds );
+  let milliSeconds : string | number = date.getMilliseconds();
+  milliSeconds = milliSeconds >= 10 ? ( milliSeconds >= 100 ? milliSeconds : ( '0' + milliSeconds ) ) : ( '00' + milliSeconds );
+  return `${ year }-${ month }-${ day }·${ hours }:${ minutes }:${ seconds }.${ milliSeconds }·`;
 }

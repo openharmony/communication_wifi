@@ -16,23 +16,23 @@ import { Browser , LoadingStatus , WebObject } from '../entryability/model/bowse
 import Logger from '../entryability/model/Logger'
 import fs from '@ohos.file.fs';
 
-const TAG: string = '[webTitleBar]'
-const BUTTON_WIDTH: number = 22
-const BUTTON_RADIUS: number = 4
-const DOWN_COLOR: string = '#e4e4e4'
-const UP_COLOR: string = '#00000000'
-const PAD_USER_AGENT: string = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTMl, like Gecko) Chrome/92.0.4515.105 Safari/537.36'
-const PHONE_USER_AGENT: string = 'Mozilla/5.0 (Linux; Android 9; VRD-AL10; HMSCore 6.3.0.331) AppleWebKit/537.36 (KHTMl, like Gecko) Chrome/92.0.4515.105 HuaweiBrowser/12.0.4.1 Mobile Safari/537.36'
+const TAG : string = '[webTitleBar]'
+const BUTTON_WIDTH : number = 22
+const BUTTON_RADIUS : number = 4
+const DOWN_COLOR : string = '#e4e4e4'
+const UP_COLOR : string = '#00000000'
+const PAD_USER_AGENT : string = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTMl, like Gecko) Chrome/92.0.4515.105 Safari/537.36'
+const PHONE_USER_AGENT : string = 'Mozilla/5.0 (Linux; Android 9; VRD-AL10; HMSCore 6.3.0.331) AppleWebKit/537.36 (KHTMl, like Gecko) Chrome/92.0.4515.105 HuaweiBrowser/12.0.4.1 Mobile Safari/537.36'
 
 @Component
 export struct TabletTitle {
-  @Link browser: Browser;
-  @State inputValue: string = ''
-  @State arrayIndex: Number = 0
-  @State addr: string = 'www.baidu.com'
-  private navigationButton: Array<{
-    imageSrc: Resource,
-    id: Number
+  @Link browser : Browser;
+  @State inputValue : string = ''
+  @State arrayIndex : Number = 0
+  @State addr : string = 'www.baidu.com'
+  private navigationButton : Array<{
+    imageSrc : Resource,
+    id : Number
   }> = [
     {
       imageSrc : $r( 'app.media.ic_public_back' ) ,
@@ -51,9 +51,9 @@ export struct TabletTitle {
       id : 4
     },
   ]
-  private actionButton: Array<{
-    imageSrc: Resource,
-    id: Number
+  private actionButton : Array<{
+    imageSrc : Resource,
+    id : Number
   }> = [
     {
       imageSrc : $r( 'app.media.submit' ) ,
@@ -78,17 +78,17 @@ export struct TabletTitle {
         .backgroundColor( this.arrayIndex === item.id ? DOWN_COLOR : UP_COLOR )
         .borderRadius( BUTTON_RADIUS )
         .flexShrink( 0 )
-        .onTouch( ( event: TouchEvent ) => {
-          if ( event.type === TouchType.Down ) {
+        .onTouch( ( event : TouchEvent ) => {
+          if( event.type === TouchType.Down ) {
             this.arrayIndex = item.id
           }
 
-          if ( event.type === TouchType.Up ) {
+          if( event.type === TouchType.Up ) {
             this.arrayIndex = 0
           }
         } )
-        .onClick( ( event: ClickEvent ) => {
-          switch ( item.id ) {
+        .onClick( ( event : ClickEvent ) => {
+          switch( item.id ) {
             case 1:
               this.browser.Back()
               break;
@@ -114,13 +114,13 @@ export struct TabletTitle {
         .id( 'inputUrl' )
         .width( '51%' )
         .layoutWeight( 1 )
-        .onChange( ( value: string ) => {
+        .onChange( ( value : string ) => {
           this.addr = value
           AppStorage.setOrCreate( "addr" , this.addr )
         } )
-        .onSubmit( ( enterKey: EnterKeyType ) => {
+        .onSubmit( ( enterKey : EnterKeyType ) => {
           console.log( TAG , `onSubmit` )
-          if ( this.addr.length !== 0 ) {
+          if( this.addr.length !== 0 ) {
             this.browser.webControllerArray[ this.browser.tabArrayIndex ].controller.loadUrl( {
               url : `https://${ this.addr }`
             } )
@@ -139,19 +139,19 @@ export struct TabletTitle {
         .backgroundColor( this.arrayIndex === item.id ? DOWN_COLOR : UP_COLOR )
         .borderRadius( BUTTON_RADIUS )
         .flexShrink( 0 )
-        .onTouch( ( event: TouchEvent ) => {
-          if ( event.type === TouchType.Down ) {
+        .onTouch( ( event : TouchEvent ) => {
+          if( event.type === TouchType.Down ) {
             this.arrayIndex = item.id
           }
-          if ( event.type === TouchType.Up ) {
+          if( event.type === TouchType.Up ) {
             this.arrayIndex = 0
           }
         } )
-        .onClick( ( event: ClickEvent ) => {
-          if ( item.id === 5 ) {
+        .onClick( ( event : ClickEvent ) => {
+          if( item.id === 5 ) {
             this.browser.loadUrl( this.addr )
             this.addr = ''
-          } else if ( item.id === 6 ) {
+          } else if( item.id === 6 ) {
             console.log( TAG , `add tab index = ` + this.arrayIndex )
             this.browser.addTab()
           }
@@ -165,8 +165,8 @@ export struct TabletTitle {
 
 @Component
 export struct BrowserTabs {
-  @Link browser: Browser;
-  @State tabButtonIndex: Number = - 1;
+  @Link browser : Browser;
+  @State tabButtonIndex : Number = - 1;
 
   build() {
     Flex( { direction : FlexDirection.Row , alignItems : ItemAlign.Start } ) {
@@ -185,15 +185,15 @@ export struct BrowserTabs {
           .width( 33 )
           .height( 33 )
           .borderRadius( 5 )
-          .onTouch( ( event: TouchEvent ) => {
-            if ( event.type === TouchType.Down ) {
+          .onTouch( ( event : TouchEvent ) => {
+            if( event.type === TouchType.Down ) {
               this.tabButtonIndex = item.key
-            } else if ( event.type == TouchType.Up ) {
+            } else if( event.type == TouchType.Up ) {
               this.tabButtonIndex = - 1
             }
           } )
-          .onClick( ( event: ClickEvent ) => {
-            if ( this.browser.webArray.length > 1 ) {
+          .onClick( ( event : ClickEvent ) => {
+            if( this.browser.webArray.length > 1 ) {
               this.browser.deleteTab( item.key )
             }
           } )
@@ -201,7 +201,7 @@ export struct BrowserTabs {
         .width( 180 )
         .height( '100%' )
         .backgroundColor( this.browser.tabArrayIndex == item.key ? '#ffffff' : '#ececec' )
-        .onClick( ( event: ClickEvent ) => {
+        .onClick( ( event : ClickEvent ) => {
           console.log( TAG , `key= ${ item.key }` )
           this.browser.setTabArrayIndex( item.key )
           this.browser.tabsController.changeIndex( item.key )
@@ -215,28 +215,28 @@ export struct BrowserTabs {
 
 @Component
 export struct WebTab {
-  @Link browser: Browser;
-  @Link isPhone: boolean;
-  @State progressStartTime: number = 0;
-  @State progressEndTime: number = 0;
-  @State progressCostTime: number = 0;
-  @State pageStartTime: number = 0;
-  @State pageEndTime: number = 0;
-  @State pageCostTime: number = 0;
-  @State Time: Number = 11
-  @State fileData: string = "";
-  @State onPageBeginNumber: number = 0
-  @State onPageEndNumber: number = 0
-  @State onProgressChangeNumber: number = 0
-  @StorageLink( "openWebNumber" ) openWebNumber: number = 0
-  @StorageLink( "fsFile" ) file: fs.File = null
-  isRegistered: boolean = false
+  @Link browser : Browser;
+  @Link isPhone : boolean;
+  @State progressStartTime : number = 0;
+  @State progressEndTime : number = 0;
+  @State progressCostTime : number = 0;
+  @State pageStartTime : number = 0;
+  @State pageEndTime : number = 0;
+  @State pageCostTime : number = 0;
+  @State Time : Number = 11
+  @State fileData : string = "";
+  @State onPageBeginNumber : number = 0
+  @State onPageEndNumber : number = 0
+  @State onProgressChangeNumber : number = 0
+  @StorageLink( "openWebNumbers" ) openWebNumbers : number = 0
+  @StorageLink( "fsFile" ) file : fs.File = null
+  isRegistered : boolean = false
   testObj = {
     test : ( addr ) => {
       console.log( TAG , `addr= ${ this.browser.tabArrayIndex }` )
       this.browser.webControllerArray[ this.browser.tabArrayIndex ].controller.loadUrl( { url : `https://${ addr }` } )
     } ,
-    searchWord : ( word: string ) => {
+    searchWord : ( word : string ) => {
       console.log( `search word= ${ word }` )
       let code = encodeURI( word )
       this.browser.webControllerArray[ this.browser.tabArrayIndex ].controller.loadUrl( {
@@ -263,8 +263,6 @@ export struct WebTab {
               this.pageStartTime = new Date().getTime()
               console.log( TAG , "onPageBegin,开始加载页面,开始时间：" + this.pageStartTime )
               this.browser.loadingStatus = LoadingStatus.LOADING
-              this.fileData = "第" + ( this.openWebNumber + 1 ) + "次onPageBegin,开始加载页面,开始时间：" + this.pageStartTime + "\n"
-              fs.writeSync( this.file.fd , this.fileData );
             } )
             .onPageEnd( ( event ) => {
               console.log( TAG , `onPageEnd= ${ JSON.stringify( event ) }` )
@@ -272,15 +270,12 @@ export struct WebTab {
               console.log( TAG , "onPageEnd,结束加载页面,开始时间：" + this.pageEndTime )
               this.pageCostTime = this.pageEndTime - this.pageStartTime
               console.log( TAG , "onPageEnd,加载页面耗时：" + this.pageCostTime )
-              this.fileData = "第" + ( this.openWebNumber + 1 ) + "次onPageEnd,结束加载页面,开始时间：" + this.pageEndTime + "\n"
-              this.fileData += "第" + ( this.openWebNumber + 1 ) + "次onPageEnd,加载页面耗时：" + this.pageCostTime + "ms" + "\n"
-              fs.writeSync( this.file.fd , this.fileData );
 
-              if ( item.key < this.browser.webControllerArray.length && this.browser.webControllerArray[ item.key ].controller ) {
+              if( item.key < this.browser.webControllerArray.length && this.browser.webControllerArray[ item.key ].controller ) {
                 this.browser.webControllerArray[ item.key ].controller.runJavaScript( { script : 'adapterDevice()' } )
                 this.browser.loadingStatus = LoadingStatus.END
                 this.registerFunc( this.browser.webControllerArray[ item.key ] )
-                if ( event.url.startsWith( 'http' ) ) {
+                if( event.url.startsWith( 'http' ) ) {
                   this.browser.inputValue = event.url
                 } else {
                   this.browser.inputValue = ''
@@ -288,24 +283,34 @@ export struct WebTab {
               }
             } )
             .onProgressChange( ( event ) => {
+              this.openWebNumbers = AppStorage.get( "openWebNumbers" )
               console.log( TAG , `onProgressChange` )
               this.browser.progress = event.newProgress
               console.log( TAG , `onProgressChange,progress:` + this.browser.progress )
-              if ( this.browser.progress === 10 ) {
+              if( this.browser.progress === 10 ) {
                 this.progressStartTime = new Date().getTime()
-                console.log( TAG , "onProgressChange,开始加载页面,开始时间：" + this.progressStartTime )
-                this.fileData = "第" + ( this.openWebNumber + 1 ) + "次onProgressChange,开始加载页面,开始时间：" + this.progressStartTime + "\n"
+                console.log( TAG , "onProgressChange,开始加载页面,开始时间：" + timestampToDate( this.progressStartTime ) )
+                let currentTime3 : string = timestampToDateFormat( this.progressStartTime )
+                this.fileData = currentTime3 + " 第" + ( this.openWebNumbers + 1 ) + "次onProgressChange,开始加载页面,时间：" + timestampToDate( this.progressStartTime ) + "\n"
+                this.fileData += currentTime3 + " onProgressChange: loading website: " + this.browser.progress + "%" + "\n"
                 fs.writeSync( this.file.fd , this.fileData );
-              } else if ( this.browser.progress === 100 ) {
+              } else if( this.browser.progress === 100 ) {
                 this.progressEndTime = new Date().getTime()
                 this.browser.hideProgress = true
-                console.log( TAG , "onProgressChange,结束加载页面,开始时间：" + this.progressEndTime )
                 this.progressCostTime = this.progressEndTime - this.progressStartTime
-                console.log( TAG , "onProgressChange,加载页面耗时：" + this.progressCostTime )
-                this.fileData = "第" + ( this.openWebNumber + 1 ) + "次onProgressChange,结束加载页面,开始时间：" + this.progressEndTime + "\n"
-                this.fileData += "第" + ( this.openWebNumber + 1 ) + "次onProgressChange,加载页面耗时：" + this.progressCostTime + "\n"
+                let currentTime4 : string = timestampToDateFormat( this.progressEndTime )
+                this.openWebNumbers = AppStorage.get( "openWebNumbers" )
+                this.fileData = currentTime4 + " onProgressChange: loading website: " + this.browser.progress + "%" + "\n"
+                this.fileData += currentTime4 + " 第" + ( this.openWebNumbers + 1 ) + "次onProgressChange,结束加载页面,时间：" + timestampToDate( this.progressEndTime ) + "\n"
+                this.fileData += currentTime4 + " 第" + ( this.openWebNumbers + 1 ) + "次onProgressChange,加载页面耗时：" + this.progressCostTime + "ms" + "\n"
                 fs.writeSync( this.file.fd , this.fileData );
+                console.log( TAG , "onProgressChange,结束加载页面,时间：" + this.progressEndTime )
+                console.log( TAG , "onProgressChange,加载页面耗时：" + this.progressCostTime )
               } else {
+                let time5 : number = new Date().getTime()
+                let currentTime5 : string = timestampToDateFormat( time5 )
+                this.fileData = currentTime5 + " onProgressChange: loading website: " + this.browser.progress + "%" + "\n"
+                fs.writeSync( this.file.fd , this.fileData );
                 this.browser.hideProgress = false
               }
             } )
@@ -316,8 +321,8 @@ export struct WebTab {
     .scrollable( false )
   }
 
-  registerFunc( webObject: WebObject ) {
-    if ( !webObject.isRegistered ) {
+  registerFunc( webObject : WebObject ) {
+    if( !webObject.isRegistered ) {
       console.log( TAG , `registerFunc` )
       webObject.controller.registerJavaScriptProxy( {
         object : this.testObj , name : 'etsObj' , methodList : [ 'test', 'searchWord' ]
@@ -326,4 +331,35 @@ export struct WebTab {
       webObject.controller.refresh()
     }
   }
+}
+
+export function timestampToDate( timestamp : number ) : string {
+  const date = new Date(timestamp);
+  let hours : string | number = date.getHours();
+  hours = hours >= 10 ? hours : ( '0' + hours );
+  let minutes : string | number = date.getMinutes();
+  minutes = minutes >= 10 ? minutes : ( '0' + minutes );
+  let seconds : string | number = date.getSeconds();
+  seconds = seconds >= 10 ? seconds : ( '0' + seconds );
+  let milliSeconds : string | number = date.getMilliseconds();
+  milliSeconds = milliSeconds >= 10 ? ( milliSeconds >= 100 ? milliSeconds : ( '0' + milliSeconds ) ) : ( '00' + milliSeconds );
+  return `${ hours }:${ minutes }:${ seconds }.${ milliSeconds }`;
+}
+
+export function timestampToDateFormat( timestamp : number ) : string {
+  const date = new Date(timestamp);
+  let year = date.getFullYear();
+  let month : string | number = date.getMonth() + 1;
+  month = month >= 10 ? month : ( '0' + month );
+  let day : string | number = date.getDate();
+  day = day >= 10 ? day : ( '0' + day );
+  let hours : string | number = date.getHours();
+  hours = hours >= 10 ? hours : ( '0' + hours );
+  let minutes : string | number = date.getMinutes();
+  minutes = minutes >= 10 ? minutes : ( '0' + minutes );
+  let seconds : string | number = date.getSeconds();
+  seconds = seconds >= 10 ? seconds : ( '0' + seconds );
+  let milliSeconds : string | number = date.getMilliseconds();
+  milliSeconds = milliSeconds >= 10 ? ( milliSeconds >= 100 ? milliSeconds : ( '0' + milliSeconds ) ) : ( '00' + milliSeconds );
+  return `${ year }-${ month }-${ day }·${ hours }:${ minutes }:${ seconds }.${ milliSeconds }·`;
 }

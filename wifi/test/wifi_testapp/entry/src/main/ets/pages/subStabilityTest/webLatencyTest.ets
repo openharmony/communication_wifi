@@ -29,6 +29,7 @@ import ConfigData from '../../utils/ConfigData';
 import { ConfigData } from '../../utils/ConfigData';
 import fs from '@ohos.file.fs';
 import http from '@ohos.net.http';
+
 const TAG = '[webLatencyTest]';
 
 /**
@@ -39,7 +40,7 @@ const TAG = '[webLatencyTest]';
 struct webLatencyTest {
   private testItem : TestData = Router.getParams().testId;
   @State isPhone : boolean = true;
-  @State testNumbers : Number = 3 //测试次数
+  @State testNumbers : Number = 30 //测试次数
   @State openWebNumbers : Number = 0 // 打开Web的次数
   @State closeWebNumbers : Number = 0 // 关闭Web的次数
   @State openSuccessNumbers : Number = 0;
@@ -164,9 +165,9 @@ struct webLatencyTest {
                 console.log( TAG , "start web test-------------" )
                 let self = this
                 self.webLoopState = true
-                self.openWebNumbers =0
-                self.openSuccessNumbers =0
-                self.openFailNumbers =0
+                self.openWebNumbers = 0
+                self.openSuccessNumbers = 0
+                self.openFailNumbers = 0
                 await this.openLogFile()
 
                 async function forLoop() {
@@ -175,7 +176,7 @@ struct webLatencyTest {
                   for( self.openWebNumbers ; self.openWebNumbers < self.testNumbers ; self.openWebNumbers ++ ) {
                     if( !self.webLoopState ) {
                       console.log( TAG , "web测试结束------------" )
-                      self.openWebNumbers =0
+                      self.openWebNumbers = 0
                       AppStorage.SetOrCreate( "openWebNumbers" , self.openWebNumbers )
                       break;
                     } else {
@@ -184,8 +185,9 @@ struct webLatencyTest {
                       AppStorage.setOrCreate( "openWebNumbers" , self.openWebNumbers )
                       let time1 : number = new Date().getTime()
                       let currentTime1 : string = timestampToDateFormat( time1 )
-                      self.fileData = currentTime1 + " 第" + ( self.openWebNumbers + 1 ) + "次网页测试开始! addr为: " + self.addr + "------------" + "\n"
-
+                      self.fileData = currentTime1 + " 第" + ( self.openWebNumbers + 1 ) + "次网页测试开始! Start loading website" + "\n"
+                      self.fileData += currentTime1 + " nextWebUrl: " + self.addr + "\n"
+                      self.fileData += currentTime1 + " loadUrl: " + self.addr + "\n"
                       fs.writeSync( self.file.fd , self.fileData );
 
                       let httpRequest = http.createHttp();
@@ -243,7 +245,7 @@ struct webLatencyTest {
                 let self = this
                 self.webLoopState = false
                 console.log( TAG , "准备测试停止 -------------" )
-                self.openWebNumbers =0
+                self.openWebNumbers = 0
                 AppStorage.SetOrCreate( "openWebNumbers" , self.openWebNumbers )
                 self.webMessageLog = ""
                 fs.closeSync( self.file );

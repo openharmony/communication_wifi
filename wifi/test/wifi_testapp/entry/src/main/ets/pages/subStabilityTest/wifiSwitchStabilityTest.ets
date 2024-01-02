@@ -183,8 +183,8 @@ struct WiFiSwitchStabilityTest {
                     self.open_StartTime = new Date().getTime()
                     console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能-----" )
                     console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能开始时间: " + self.open_StartTime + "ms" )
-                    self.stateMessageLog += "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能结果：" + funcMessage + "\n"
-                    console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能结果：" + funcMessage )
+                    self.stateMessageLog += "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能接口的调用结果：" + funcMessage + "\n"
+                    console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能接口的调用结果：" + funcMessage )
                     await sleep( 15 )
                     self.stateMessage = AppStorage.Get( "stateMessage" )
                     // prompt.showToast( { message : funcMessage } )
@@ -200,8 +200,8 @@ struct WiFiSwitchStabilityTest {
                       self.close_StartTime = new Date().getTime()
                       console.log( TAG , "第" + self.closeWifiNumber + "次WIFI去使能-----" )
                       console.log( TAG , "第" + self.closeWifiNumber + "次WIFI去使能开始时间: " + self.close_StartTime + "ms" )
-                      self.stateMessageLog += "第" + self.closeWifiNumber + "次WIFI去使能结果：" + funcMessage + "\n"
-                      console.log( TAG , "第" + self.closeWifiNumber + "次WIFI去使能结果：" + funcMessage )
+                      self.stateMessageLog += "第" + self.closeWifiNumber + "次WIFI去使能接口的调用结果：" + funcMessage + "\n"
+                      console.log( TAG , "第" + self.closeWifiNumber + "次WIFI去使能接口的调用结果：" + funcMessage )
                       console.log( TAG , "closeWifiNumber: " + self.closeWifiNumber )
                       await sleep( 15 )
                       // prompt.showToast( { message : funcMessage } )

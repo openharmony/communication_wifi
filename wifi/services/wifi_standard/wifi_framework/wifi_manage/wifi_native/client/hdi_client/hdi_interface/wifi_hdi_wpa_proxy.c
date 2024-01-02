@@ -266,7 +266,7 @@ WifiErrorNo CopyConfigFile(const char* configName)
 }
 
 void HdiWpaResetGlobalObj(int errorCode)
-{   
+{
     if (g_wpaStubProcessDeath == errorCode) {
         g_wpaRefCount = 0;
         g_wpaObj = NULL;

@@ -256,13 +256,9 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
                 static_cast<int>(WifiOperateState::STA_DISCONNECTED));
             break;
         case OperateResState::CONNECT_ASSOCIATING:
-            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
-                static_cast<int>(WifiOperateState::STA_ASSOCIATING));
             WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_ASSOCIATING));
             break;
         case OperateResState::CONNECT_ASSOCIATED:
-            WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
-                static_cast<int>(WifiOperateState::STA_ASSOCIATED));
             WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_ASSOCIATED));
             break;
         case OperateResState::CONNECT_CONNECTION_FULL:

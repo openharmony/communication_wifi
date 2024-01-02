@@ -17,10 +17,8 @@
 
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { ContentTable } from '../../Component/contentTable';
 import Router from '@system.router';
 import ConfigData from '../../Utils/ConfigData';
-import { initWifiApiData } from '../../entryability/model/testDataModels'
 import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
@@ -34,26 +32,26 @@ const TAG = '[WiFiSwitchStabilityTest]'
 @Entry
 @Component
 struct WiFiSwitchStabilityTest {
-  private testItem: TestData = Router.getParams().testId;
-  @State open_StartTime: Number = 0
-  @State open_EndTime: Number = 0
-  @State open_SpendTime: Number = 0
-  @State close_StartTime: Number = 0
-  @State close_EndTime: Number = 0
-  @State close_SpendTime: Number = 0
-  @State openWifiNumber: Number = 0 // 打开WiFi的次数
-  @State closeWifiNumber: Number = 0 // 关闭WiFi的次数
-  @State openSuccessNumber: Number = 0 // 打开WiFi的成功次数
-  @State openFailNumber: Number = 0 // 打开WiFi的失败次数
-  @State closeSuccessNumber: Number = 0 // 关闭WiFi的成功次数
-  @State closeFailNumber: Number = 0 // 关闭WiFi的失败次数
-  @State message: string = "测试结果:"
-  @State testNumbers: Number = 30 //测试次数
-  @State successTimes: Number = 0
-  @State failTimes: Number = 0
-  @State stateMessage: String = ""
-  @State stateMessageLog: String = ""
-  @State switchLoopState: Boolean = true
+  private testItem : TestData = Router.getParams().testId;
+  @State open_StartTime : Number = 0
+  @State open_EndTime : Number = 0
+  @State open_SpendTime : Number = 0
+  @State close_StartTime : Number = 0
+  @State close_EndTime : Number = 0
+  @State close_SpendTime : Number = 0
+  @State openWifiNumber : Number = 0 // 打开WiFi的次数
+  @State closeWifiNumber : Number = 0 // 关闭WiFi的次数
+  @State openSuccessNumber : Number = 0 // 打开WiFi的成功次数
+  @State openFailNumber : Number = 0 // 打开WiFi的失败次数
+  @State closeSuccessNumber : Number = 0 // 关闭WiFi的成功次数
+  @State closeFailNumber : Number = 0 // 关闭WiFi的失败次数
+  @State message : string = "测试结果:"
+  @State testNumbers : Number = 30 //测试次数
+  @State successTimes : Number = 0
+  @State failTimes : Number = 0
+  @State stateMessage : String = ""
+  @State stateMessageLog : String = ""
+  @State switchLoopState : Boolean = true
 
   build() {
     Column() {
@@ -74,7 +72,7 @@ struct WiFiSwitchStabilityTest {
             .width( "70%" )
             .fontSize( $r( 'app.float.font_16' ) )
             .fontColor( $r( 'app.color.title_black_color' ) )
-            .onChange( ( value: string ) => {
+            .onChange( ( value : string ) => {
               this.testNumbers = parseInt( value );
             } )
         }
@@ -150,22 +148,29 @@ struct WiFiSwitchStabilityTest {
           Button( "开始WiFi测试" )
             .operateButtonStyle( $r( 'app.color.main_blue' ) )
             .padding( { right : "10vp" } )
-            .onClick( async( event: ClickEvent ) => {
+            .onClick( async( event : ClickEvent ) => {
               console.log( TAG , "start WiFiSwitch test-------------" )
               let self = this
               self.switchLoopState = true
+              self.openWifiNumber = 0
+              self.closeWifiNumber = 0
+              self.openSuccessNumber = 0
+              self.openFailNumber = 0
+              self.closeSuccessNumber = 0
+              self.closeFailNumber = 0
 
               async function forLoop() {
                 self.stateMessageLog = ""
                 self.onWifiState() // 监听函数
                 let funcMessage = "" // 函数信息
-                for ( self.openWifiNumber ; self.openWifiNumber < self.testNumbers ; self.openWifiNumber ++ ) {
-                  if ( !self.switchLoopState ) {
+                for( self.openWifiNumber ; self.openWifiNumber < self.testNumbers ; self.openWifiNumber ++ ) {
+                  if( !self.switchLoopState ) {
+                    self.openWifiNumber = 0;
                     console.log( TAG , "测试结束------------" )
                     break;
                   } else {
                     let wifiState = wifiManager.isWifiActive()
-                    if ( wifiState ) {
+                    if( wifiState ) {
                       wifi.disableWifi()
                       console.log( TAG , "wifi当前已使能，已经去使能，正常开始测试------" )
                     } else {
@@ -183,7 +188,7 @@ struct WiFiSwitchStabilityTest {
                     await sleep( 15 )
                     self.stateMessage = AppStorage.Get( "stateMessage" )
                     // prompt.showToast( { message : funcMessage } )
-                    if ( self.stateMessage == "active" ) {
+                    if( self.stateMessage == "active" ) {
                       self.open_SpendTime = self.open_EndTime - self.open_StartTime
                       self.stateMessageLog += "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能耗时: " + self.open_SpendTime + "ms" + "\n"
                       console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能耗时: " + self.open_SpendTime + "ms" )
@@ -201,7 +206,7 @@ struct WiFiSwitchStabilityTest {
                       await sleep( 15 )
                       // prompt.showToast( { message : funcMessage } )
                       self.stateMessage = AppStorage.Get( "stateMessage" )
-                      if ( self.stateMessage == "inactive" ) {
+                      if( self.stateMessage == "inactive" ) {
                         self.close_SpendTime = self.close_EndTime - self.close_StartTime
                         self.stateMessageLog += "第" + self.closeWifiNumber + "次WIFI去使能耗时: " + self.close_SpendTime + "ms" + "\n"
                         console.log( TAG , "第" + self.closeWifiNumber + "次WIFI去使能耗时: " + self.close_SpendTime + "ms" )
@@ -214,7 +219,7 @@ struct WiFiSwitchStabilityTest {
                         console.log( TAG , "去使能失败的次数：" + self.closeFailNumber )
                         console.log( TAG , "第" + self.closeWifiNumber + "次WIFI去使能失败" )
                       }
-                    } else if ( self.stateMessage == "inactive" ) {
+                    } else if( self.stateMessage == "inactive" ) {
                       self.openFailNumber = self.openFailNumber + 1
                       console.log( TAG , "使能失败的次数：" + self.openFailNumber )
                       console.log( TAG , "第" + ( self.openWifiNumber + 1 ) + "次WIFI使能失败" )
@@ -225,6 +230,7 @@ struct WiFiSwitchStabilityTest {
                     }
                   }
                 }
+                console.log( TAG , "测试结束 -------------" )
               }
 
               forLoop()
@@ -236,11 +242,12 @@ struct WiFiSwitchStabilityTest {
           Button( "关闭WiFi测试" )
             .operateButtonStyle( $r( 'app.color.main_blue' ) )
             .padding( { right : "10vp" } )
-            .onClick( async( event: ClickEvent ) => {
+            .onClick( async( event : ClickEvent ) => {
               let self = this
               self.switchLoopState = false
               console.log( TAG , "准备测试停止 -------------" )
               self.stateMessageLog = ""
+              self.openWifiNumber = 0
             } )
         }
 
@@ -254,7 +261,7 @@ struct WiFiSwitchStabilityTest {
     wifi.on( "wifiStateChange" , ( number ) => {
       console.log( TAG , " on.wifiStateChange --------" )
       let wifiStateMessage = ""
-      switch ( number ) {
+      switch( number ) {
         case 0:
           wifiStateMessage = "inactive";
           break;
@@ -272,11 +279,11 @@ struct WiFiSwitchStabilityTest {
           break;
       }
       console.log( TAG , "WiFi开关状态为:" + wifiStateMessage )
-      if ( number == 1 ) {
+      if( number == 1 ) {
         // 打时间戳
         this.open_EndTime = new Date().getTime()
         console.log( TAG , "WIFI使能结束时间: " + this.open_EndTime + "ms" )
-      } else if ( number == 0 ) {
+      } else if( number == 0 ) {
         this.close_EndTime = new Date().getTime()
         console.log( TAG , "WIFI去使能结束时间: " + this.close_EndTime + "ms" )
       }
@@ -298,7 +305,7 @@ struct WiFiSwitchStabilityTest {
  * Custom button style.
  */
 @Extend( Button )
-function operateButtonStyle( color: Resource ) {
+function operateButtonStyle( color : Resource ) {
   .width( $r( 'app.float.button_width' ) )
   .height( $r( 'app.float.button_height' ) )
   .fontSize( $r( 'app.float.font_16' ) )

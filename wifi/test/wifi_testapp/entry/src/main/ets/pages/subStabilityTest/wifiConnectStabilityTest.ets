@@ -188,6 +188,12 @@ struct WiFiConnectStabilityTest {
                 console.log( TAG , "start WiFiConnect test-------------" )
                 let self = this
                 self.connectionLoopState = true
+                self.connectNumber = 0
+                self.connectSuccessNumber = 0
+                self.connectFailNumber = 0
+                self.disconnectNumber = 0
+                self.disconnectSuccessNumber = 0
+                self.disconnectFailNumber = 0
 
                 async function forLoop() {
                   self.connectionMessageLog = ""
@@ -259,6 +265,7 @@ struct WiFiConnectStabilityTest {
                       }
                     }
                   }
+                  console.log( TAG , "测试结束 -------------" )
                 }
 
                 forLoop()
@@ -275,7 +282,7 @@ struct WiFiConnectStabilityTest {
                 self.connectionLoopState = false
                 console.log( TAG , "准备测试停止 -------------" )
                 self.connectionMessageLog = ""
-
+                self.connectNumber = 0
               } )
 
           }

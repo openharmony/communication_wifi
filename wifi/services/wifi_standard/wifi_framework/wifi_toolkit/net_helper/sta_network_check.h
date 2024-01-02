@@ -40,6 +40,7 @@
 
 #define ARP_OPT 0
 #define HTTP_OPT 1
+#define DETECT_NOT_NETWORK 2
 
 namespace OHOS {
 namespace Wifi {
@@ -144,7 +145,6 @@ private:
 #ifndef OHOS_ARCH_LITE
     std::unique_ptr<WifiEventHandler> mDetectionEventHandler = nullptr;
 #endif
-    int httpDetectCnt;
 };
 }  // namespace Wifi
 }  // namespace OHOS

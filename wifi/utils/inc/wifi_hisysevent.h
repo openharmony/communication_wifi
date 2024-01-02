@@ -97,6 +97,8 @@ void WriteSoftApAbDisconnectHiSysEvent(int errorCode);
 void WriteIsInternetHiSysEvent(bool isInternet);
 
 void WriteSoftApConnectFailHiSysEvent(int errorCnt);
+
+void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

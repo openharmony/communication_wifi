@@ -32,6 +32,7 @@
 #include "wifi_service_manager.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
@@ -111,38 +112,59 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
     WIFI_LOGI("Scan, compatible:%{public}d", compatible);
     if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("Scan:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
-
         if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("Scan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+#ifndef OHOS_ARCH_LITE
+            WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+#endif
             return WIFI_OPT_PERMISSION_DENIED;
         }
         if (compatible) {
             if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
                 WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+#ifndef OHOS_ARCH_LITE
+                WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+#endif
                 return WIFI_OPT_PERMISSION_DENIED;
             }
         } else {
             if (!WifiAuthCenter::IsSystemAppByToken()) {
                 WIFI_LOGE("Scan:NOT System APP, PERMISSION_DENIED!");
+#ifndef OHOS_ARCH_LITE
+                WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+#endif
                 return WIFI_OPT_NON_SYSTEMAPP;
             }
-            
             if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
                 WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+#ifndef OHOS_ARCH_LITE
+                WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+#endif
                 return WIFI_OPT_PERMISSION_DENIED;
             }
         }
     }
-
+    
     if (!IsScanServiceRunning()) {
+#ifndef OHOS_ARCH_LITE
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+#endif
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
 #ifndef OHOS_ARCH_LITE
     UpdateScanMode();
 #endif
+    return PermissionVerification();
+}
+
+ErrCode WifiScanServiceImpl::PermissionVerification()
+{
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pService == nullptr) {
+#ifndef OHOS_ARCH_LITE
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+#endif
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
@@ -156,6 +178,9 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
     ErrCode ret = pService->Scan(externFlag);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed: %{public}d!", static_cast<int>(ret));
+#ifndef OHOS_ARCH_LITE
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+#endif
     }
     return ret;
 }

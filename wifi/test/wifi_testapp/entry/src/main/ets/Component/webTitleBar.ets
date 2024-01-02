@@ -301,6 +301,7 @@ export struct WebTab {
                 let currentTime4 : string = timestampToDateFormat( this.progressEndTime )
                 this.openWebNumbers = AppStorage.get( "openWebNumbers" )
                 this.fileData = currentTime4 + " onProgressChange: loading website: " + this.browser.progress + "%" + "\n"
+                this.fileData += currentTime4 + " onPageFinished loadUrl finish" + "\n"
                 this.fileData += currentTime4 + " 第" + ( this.openWebNumbers + 1 ) + "次onProgressChange,结束加载页面,时间：" + timestampToDate( this.progressEndTime ) + "\n"
                 this.fileData += currentTime4 + " 第" + ( this.openWebNumbers + 1 ) + "次onProgressChange,加载页面耗时：" + this.progressCostTime + "ms" + "\n"
                 fs.writeSync( this.file.fd , this.fileData );

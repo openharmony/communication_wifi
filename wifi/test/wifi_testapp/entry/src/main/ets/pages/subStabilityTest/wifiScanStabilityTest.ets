@@ -42,11 +42,8 @@ struct WiFiScanStabilityTest {
   @State stop_EndTime : Number = 0
   @State stop_SpendTime : Number = 0
   @State openScanNumber : Number = 0
-  @State closeScanNumber : Number = 0
   @State openScanSuccessNumber : Number = 0
   @State openScanFailNumber : Number = 0
-  @State closeScanSuccessNumber : Number = 0
-  @State closeScanFailNumber : Number = 0
   @State scanInfo : String = 0
   @State message : string = "测试结果"
   @State testNumbers : Number = 30 //测试次数
@@ -151,11 +148,8 @@ struct WiFiScanStabilityTest {
               let self = this
               self.scanLoopState = true
               self.openScanNumber = 0
-              self.closeScanNumber = 0
               self.openScanSuccessNumber = 0
               self.openScanFailNumber = 0
-              self.closeScanSuccessNumber = 0
-              self.closeScanFailNumber = 0
 
               async function forLoop() {
                 self.scanStateMessageLog = ""
@@ -182,11 +176,10 @@ struct WiFiScanStabilityTest {
                     self.scan_StartTime = new Date().getTime()
                     console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI使能-----" )
                     console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI使能开始时间: " + self.scan_StartTime + "ms" )
-                    self.scanStateMessageLog += "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描结果：" + funcMessage + "\n"
-                    console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描结果：" + funcMessage )
+                    self.scanStateMessageLog += "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描接口的调用结果：" + funcMessage + "\n"
+                    console.log( TAG , "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描接口的调用结果：" + funcMessage )
                     await sleep( 10 )
                     self.scanStateMessage = AppStorage.Get( "scanStateMessage" )
-                    // prompt.showToast( { message : funcMessage } )
                     if( self.scanStateMessage == "scan success" ) {
                       self.scan_SpendTime = self.scan_EndTime - self.scan_StartTime
                       self.scanStateMessageLog += "第" + ( self.openScanNumber + 1 ) + "次WIFI扫描耗时: " + self.scan_SpendTime + "ms" + "\n"
@@ -195,24 +188,8 @@ struct WiFiScanStabilityTest {
                       self.openScanSuccessNumber = self.openScanSuccessNumber + 1
                       self.scanStateMessageLog += "扫描成功的次数：" + self.openScanSuccessNumber + "\n"
                       console.log( TAG , "扫描成功的次数：" + self.openScanSuccessNumber )
-                      funcMessage = wifi.disableWifi()
-                      self.closeScanNumber = self.closeScanNumber + 1
-                      self.scanStateMessageLog += "第" + self.closeScanNumber + "次WIFI去使能结果：" + funcMessage + "\n"
-                      console.log( TAG , "第" + self.closeScanNumber + "次WIFI去使能结果：" + funcMessage )
-                      console.log( TAG , "closeScanNumber: " + self.closeScanNumber )
                       await sleep( 10 )
-                      // prompt.showToast( { message : funcMessage } )
                       self.scanStateMessage = AppStorage.Get( "scanStateMessage" )
-                      if( self.scanStateMessage == "scan fail" ) {
-                        self.closeScanSuccessNumber = self.closeScanSuccessNumber + 1
-                        self.scanStateMessageLog += "去使能成功的次数：" + self.closeScanSuccessNumber + "\n"
-                        console.log( TAG , "去使能成功的次数：" + self.closeScanSuccessNumber )
-                        await sleep( 7 )
-                      } else {
-                        self.closeScanFailNumber = self.closeScanFailNumber + 1
-                        console.log( TAG , "去使能失败的次数：" + self.closeScanFailNumber )
-                        console.log( TAG , "第" + self.closeScanNumber + "次去使能失败" )
-                      }
                     } else if( self.scanStateMessage == "scan fail" ) {
                       self.openScanFailNumber = self.openScanFailNumber + 1
                       console.log( TAG , "扫描失败的次数：" + self.openScanFailNumber )

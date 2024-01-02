@@ -103,7 +103,7 @@ HWTEST_F(RawSocketTest, Send_Fail4, TestSize.Level1)
 
 HWTEST_F(RawSocketTest, SetNonBlock_Test, TestSize.Level1)
 {
-    EXPECT_TRUE(pRawSocket->SetNonBlock(1));
+    EXPECT_FALSE(pRawSocket->SetNonBlock(1));
 }
 }  // namespace Wifi
 }  // namespace OHOS

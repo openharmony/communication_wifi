@@ -166,7 +166,7 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg)
             break;
         case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
             HandleSwitchToScanOnlyMode(msg);
-            break;       
+            break;
         default:
             break;
     }

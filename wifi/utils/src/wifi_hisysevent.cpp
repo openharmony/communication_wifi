@@ -212,5 +212,14 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt)
     root["ERROR_CODE"] = errorCnt;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFT_AP_CONNECT_FAILD", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["PACKAGE_NAME"] = pkgName;
+    root["FAIL_REASON"] = failReason;
+    WriteEvent("WIFI_SCAN", "EVENT_NAME", "WIFI_SCAN_API_FAIL", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

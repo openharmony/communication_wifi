@@ -52,7 +52,8 @@ ScanService::ScanService(int instId)
       isAbsFreezeScaned(false),
       scanResultBackup(-1),
       mEnhanceService(nullptr),
-      m_instId(instId)
+      m_instId(instId),
+      lastNetworkQuality(0)
 {}
 
 ScanService::~ScanService()
@@ -1009,6 +1010,9 @@ void ScanService::HandleStaStatusChanged(int status)
 void ScanService::HandleNetworkQualityChanged(int status)
 {
     WIFI_LOGI("Enter ScanService::HandleNetworkQualityChanged, change to status: %{public}d.", status);
+    if (lastNetworkQuality == status) {
+        return;
+    }
     switch (status) {
         case static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED): {
             SystemScanProcess(true);
@@ -1019,6 +1023,7 @@ void ScanService::HandleNetworkQualityChanged(int status)
             break;
         }
     }
+    lastNetworkQuality = status;
 }
 
 void ScanService::HandleMovingFreezeChanged()

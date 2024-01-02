@@ -218,7 +218,7 @@ WifiErrorCode GetApIfaceName(char *ifaceName, int nameLen)
     std::string iface;
     OHOS::Wifi::ErrCode ret = hotspotPtr->GetApIfaceName(iface);
     if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
-        if (iface.size() > nameLen) {
+        if (iface.size() > static_cast<unsigned long>(nameLen)) {
             return ERROR_WIFI_INVALID_ARGS;
         }
         if (memcpy_s(ifaceName, nameLen, iface.c_str(), iface.size()) != EOK) {

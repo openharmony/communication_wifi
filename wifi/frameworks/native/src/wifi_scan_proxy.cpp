@@ -82,14 +82,14 @@ void WifiScanProxy::RemoveDeathRecipient(void)
 ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
 {
     if (mRemoteDied) {
-        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to SetScanControlInfo, remote service is died!");
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("SetScanControlInfo Write interface token error!");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -120,27 +120,28 @@ ErrCode WifiScanProxy::SetScanControlInfo(const ScanControlInfo &info)
     }
     int exception = reply.ReadInt32();
     if (exception) {
+        WIFI_LOGE("SetScanControlInfo Reply exception failed!");
         return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetScanControlInfo Reply ReadInt32 failed, ret:%{public}d", ret);
         return ErrCode(ret);
     }
-
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiScanProxy::Scan(bool compatible)
 {
     if (mRemoteDied) {
-        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to Scan, remote service is died!");
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("Scan Write interface token error!");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -168,14 +169,14 @@ ErrCode WifiScanProxy::Scan(bool compatible)
 ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
 {
     if (mRemoteDied) {
-        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to AdvanceScan, remote service is died!");
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("AdvanceScan Write interface token error!");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -211,14 +212,14 @@ ErrCode WifiScanProxy::AdvanceScan(const WifiScanParams &params)
 ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
 {
     if (mRemoteDied) {
-        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to IsWifiClosedScan, remote service is died!");
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("IsWifiClosedScan Write interface token error!");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -231,10 +232,12 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     }
     int exception = reply.ReadInt32();
     if (exception) {
+        WIFI_LOGE("IsWifiClosedScan Reply exception failed!");
         return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("IsWifiClosedScan Reply ReadInt32 failed, ret:%{public}d", ret);
         return ErrCode(ret);
     }
     bOpen = reply.ReadBool();
@@ -244,14 +247,14 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
 ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
 {
     if (mRemoteDied) {
-        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGW("failed to GetScanInfoList, remote service is died!");
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("GetScanInfoList Write interface token error!");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -265,10 +268,12 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result, bool c
     }
     int exception = reply.ReadInt32();
     if (exception) {
+        WIFI_LOGE("GetScanInfoList Reply exception failed!");
         return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetScanInfoList Reply ReadInt32 failed, ret:%{public}d", ret);
         return ErrCode(ret);
     }
 
@@ -419,14 +424,14 @@ bool WifiScanProxy::IsRemoteDied(void)
 ErrCode WifiScanProxy::SetScanOnlyAvailable(bool bScanOnlyAvailable)
 {
     if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGE("failed to SetScanOnlyAvailable, remote service is died!");
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("SetScanOnlyAvailable Write interface token error!");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -449,13 +454,13 @@ ErrCode WifiScanProxy::SetScanOnlyAvailable(bool bScanOnlyAvailable)
 ErrCode WifiScanProxy::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
 {
     if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGE("failed to GetScanOnlyAvailable,remote service is died!");
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
     MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("GetScanOnlyAvailable Write interface token error!");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -468,10 +473,12 @@ ErrCode WifiScanProxy::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
     }
     int exception = reply.ReadInt32();
     if (exception) {
+        WIFI_LOGE("GetScanOnlyAvailable Reply exception failed!");
         return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
     if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetScanOnlyAvailable Reply ReadInt32 failed, ret:%{public}d", ret);
         return ErrCode(ret);
     }
     bScanOnlyAvailable = reply.ReadBool();
@@ -481,13 +488,13 @@ ErrCode WifiScanProxy::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
 ErrCode WifiScanProxy::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
 {
     if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        WIFI_LOGE("failed to StartWifiPnoScan, remote service is died!");
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
     MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("StartWifiPnoScan Write interface token error!");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -503,10 +510,12 @@ ErrCode WifiScanProxy::StartWifiPnoScan(bool isStartAction, int periodMs, int su
     }
     int exception = reply.ReadInt32();
     if (exception) {
+        WIFI_LOGE("StartWifiPnoScan Reply exception failed!");
         return WIFI_OPT_FAILED;
     }
     int ret = reply.ReadInt32();
     if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartWifiPnoScan Reply ReadInt32 failed, ret:%{public}d", ret);
         return ErrCode(ret);
     }
     return WIFI_OPT_SUCCESS;

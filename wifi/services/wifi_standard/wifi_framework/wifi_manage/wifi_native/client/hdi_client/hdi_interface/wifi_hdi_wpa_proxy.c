@@ -39,7 +39,7 @@
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
-static unsigned int g_wpaRefCount = 0;
+static unsigned int g_wpaRefCount = 0x0;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
 
@@ -70,7 +70,7 @@ WifiErrorNo RegistHdfDeathCallBack()
         LOGE("%{public}s: failed to get HDIServiceManager", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-    struct HdfRemoteService* remote = serviceMgr->GetService(serviceMgr, HDI_SERVICE_NAME);
+    struct HdfRemoteService* remote = serviceMgr->GetService(serviceMgr, HDI_WPA_SERVICE_NAME);
     HDIServiceManagerRelease(serviceMgr);
     if (remote == NULL) {
         LOGE("%{public}s: failed to get HdfRemoteService", __func__);
@@ -93,7 +93,7 @@ WifiErrorNo HdiWpaStart()
         LOGI("%{public}s wpa ref count: %{public}d", __func__, g_wpaRefCount);
         return WIFI_IDL_OPT_OK;
     } else {
-        g_wpaRefCount = 0;
+        g_wpaRefCount = 0x0;
     }
     g_devMgr = HDIDeviceManagerGet();
     if (g_devMgr == NULL) {
@@ -139,6 +139,7 @@ WifiErrorNo HdiWpaStop()
     LOGI("HdiWpaStop stop...");
     pthread_mutex_lock(&g_wpaObjMutex);
     if (g_wpaObj == NULL || g_wpaRefCount == 0) {
+        g_wpaRefCount = 0x0;
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or ref count is 0", __func__);
         return WIFI_IDL_OPT_FAILED;

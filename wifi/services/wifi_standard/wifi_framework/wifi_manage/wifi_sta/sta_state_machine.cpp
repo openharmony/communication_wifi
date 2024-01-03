@@ -57,7 +57,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define WPA_CB_ASSOCIATING 3
 #define TRANSFORMATION_TO_MBPS 10
 #define DEFAULT_NUM_ARP_PINGS 3
-#define MAX_ARP_CHECK_TIME 1000
+#define MAX_ARP_CHECK_TIME 300
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -2605,6 +2605,10 @@ bool StaStateMachine::CanArpReachable()
     WifiSettings::GetInstance().GetIpInfo(ipInfo, m_instId);
     std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
     std::string ifName = "wlan" + std::to_string(m_instId);
+    if (ipInfo.gateway == 0) {
+        WIFI_LOGI("gateway is empty");
+        return false;
+    }
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
     for (int i = 0; i < DEFAULT_NUM_ARP_PINGS; i++) {

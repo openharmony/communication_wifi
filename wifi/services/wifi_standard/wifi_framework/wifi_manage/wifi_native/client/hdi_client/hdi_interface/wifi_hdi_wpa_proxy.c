@@ -42,6 +42,22 @@ static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
 static unsigned int g_wpaStubProcessDeath = 29189;
 
+static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
+{
+    LOGI("%{public}s enter", __func__);
+    if (recipient == NULL || service == NULL) {
+        LOGE("%{public}s input param is null", __func__);
+        return;
+    }
+    HdiWpaResetGlobalObj();
+    HdfRemoteServiceRemoveDeathRecipient(service, recipient);
+    HdfRemoteServiceRecycle(service);
+    if (recipient != NULL) {
+        OsalMemFree(recipient);
+        recipient = NULL;
+    }
+}
+
 WifiErrorNo HdiWpaStart()
 {
     LOGI("HdiWpaStart start...");
@@ -54,21 +70,18 @@ WifiErrorNo HdiWpaStart()
     } else {
         g_wpaRefCount = 0;
     }
-
     g_devMgr = HDIDeviceManagerGet();
     if (g_devMgr == NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s HDIDeviceManagerGet failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-
     if (g_devMgr->LoadDevice(g_devMgr, HDI_WPA_SERVICE_NAME) != HDF_SUCCESS) {
         g_devMgr = NULL;
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s LoadDevice failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-
     g_wpaObj = IWpaInterfaceGetInstance(HDI_WPA_SERVICE_NAME, false);
     if (g_wpaObj == NULL) {
         g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
@@ -77,7 +90,6 @@ WifiErrorNo HdiWpaStart()
         LOGE("%{public}s WpaInterfaceGetInstance failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-
     int32_t ret = g_wpaObj->Start(g_wpaObj);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);
@@ -88,8 +100,10 @@ WifiErrorNo HdiWpaStart()
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_IDL_OPT_FAILED;
     }
-
     ++g_wpaRefCount;
+    struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
+    recipient->OnRemoteDied = ProxyOnRemoteDied;
+    HdfRemoteServiceAddDeathRecipient(remote, recipient);
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("HdiWpaStart is started");
     return WIFI_IDL_OPT_OK;
@@ -146,7 +160,6 @@ WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName)
     int32_t ret = g_wpaObj->AddWpaIface(g_wpaObj, ifName, confName);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s AddWpaIface failed: %{public}d", __func__, ret);
-        HdiWpaResetGlobalObj(ret);
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_IDL_OPT_FAILED;
     }
@@ -175,7 +188,6 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
     int32_t ret = g_wpaObj->RemoveWpaIface(g_wpaObj, ifName);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s RemoveWpaIface failed: %{public}d", __func__, ret);
-        HdiWpaResetGlobalObj(ret);
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_IDL_OPT_FAILED;
     }

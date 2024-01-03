@@ -30,12 +30,16 @@ WifiStaHalInterface &WifiStaHalInterface::GetInstance(void)
     if (initFlag == 0) {
         std::unique_lock<std::mutex> lock(initMutex);
         if (initFlag == 0) {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
             if (inst.InitHdiWpaClient()) {
                 initFlag = 1;
             }
+#else
             if (inst.InitIdlClient()) {
                 initFlag = 1;
             }
+#endif
+
 #ifdef HDI_INTERFACE_SUPPORT
             if (inst.InitHdiClient()) {
                 initFlag = 1;
@@ -61,8 +65,12 @@ WifiErrorNo WifiStaHalInterface::StartWifi(void)
     CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
     ret |= mHdiClient->StartWifi();
 #endif
-    return (WifiErrorNo)ret;
+    if (ret != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    } 
+    return WIFI_IDL_OPT_OK;
 }
+    
 
 WifiErrorNo WifiStaHalInterface::StopWifi(void)
 {
@@ -79,7 +87,10 @@ WifiErrorNo WifiStaHalInterface::StopWifi(void)
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     ret |= mIdlClient->StopWifi();
 #endif
-    return (WifiErrorNo)ret;
+    if (ret != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    } 
+    return WIFI_IDL_OPT_OK;
 }
 
 WifiErrorNo WifiStaHalInterface::Connect(int networkId)

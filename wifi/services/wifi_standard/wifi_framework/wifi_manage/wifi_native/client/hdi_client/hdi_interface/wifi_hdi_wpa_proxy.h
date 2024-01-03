@@ -111,6 +111,8 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath);
  */
 WifiErrorNo CopyConfigFile(const char* configName);
 
+void HdiWpaResetGlobalObj();
+
 #ifdef __cplusplus
 }
 #endif

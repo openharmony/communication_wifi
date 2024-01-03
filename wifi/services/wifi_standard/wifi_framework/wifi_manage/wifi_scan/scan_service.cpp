@@ -31,6 +31,9 @@ DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
+
 ScanService::ScanService(int instId)
     : pScanStateMachine(nullptr),
       pScanMonitor(nullptr),
@@ -1249,7 +1252,14 @@ ErrCode ScanService::AllowExternScan()
         WIFI_LOGW("extern scan not allow by power idel state");
         return WIFI_OPT_FAILED;
     }
-
+#ifndef OHOS_ARCH_LITE
+    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+        LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
+        return WIFI_OPT_SUCCESS;
+    }
+#endif
     if (!AllowExternScanByThermal()) {
         WIFI_LOGW("extern scan not allow by thermal level");
         return WIFI_OPT_FAILED;
@@ -1322,7 +1332,14 @@ ErrCode ScanService::AllowExternScan()
     int staScene = GetStaScene();
     ScanMode scanMode = WifiSettings::GetInstance().GetAppRunningState();
     WIFI_LOGI("AllowExternScan, staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
-
+#ifndef OHOS_ARCH_LITE
+    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+        LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
+        return WIFI_OPT_SUCCESS;
+    }
+#endif
     if (!AllowExternScanByThermal()) {
         WIFI_LOGW("extern scan not allow by thermal level");
         return WIFI_OPT_FAILED;

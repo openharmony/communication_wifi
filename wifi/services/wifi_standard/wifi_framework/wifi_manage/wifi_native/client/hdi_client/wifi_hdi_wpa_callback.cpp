@@ -93,6 +93,7 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
     if (cbk.onWpaStateChanged) {
         cbk.onWpaStateChanged(statechangedParam->status);
     }
+    LOGI("OnEventStateChanged:callback out status = %{public}d", statechangedParam->status);
     return 0;
 }
 

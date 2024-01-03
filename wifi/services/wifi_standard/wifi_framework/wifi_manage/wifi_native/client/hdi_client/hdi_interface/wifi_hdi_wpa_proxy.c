@@ -25,6 +25,8 @@
 #include "wifi_hdi_wpa_proxy.h"
 #include "servmgr_hdi.h"
 #include "devmgr_hdi.h"
+#include "hdf_remote_service.h"
+#include "osal_mem.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaProxy"
@@ -37,21 +39,62 @@
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
-static unsigned int g_wpaRefCount = 0;
+static unsigned int g_wpaRefCount = 0x0;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
+
+static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
+{
+    LOGI("%{public}s enter", __func__);
+    if (recipient == NULL || service == NULL) {
+        LOGE("%{public}s input param is null", __func__);
+        HdiWpaResetGlobalObj();
+        return;
+    }
+    HdfRemoteServiceRemoveDeathRecipient(service, recipient);
+    HdfRemoteServiceRecycle(service);
+    if (recipient == NULL) {
+        LOGE("%{public}s param recipient is null", __func__);
+        HdiWpaResetGlobalObj();
+        return;
+    }
+    OsalMemFree(recipient);
+    recipient = NULL;
+    HdiWpaResetGlobalObj();
+}
+
+WifiErrorNo RegistHdfDeathCallBack()
+{
+    struct HDIServiceManager* serviceMgr = HDIServiceManagerGet();
+    if (serviceMgr == NULL) {
+        LOGE("%{public}s: failed to get HDIServiceManager", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    struct HdfRemoteService* remote = serviceMgr->GetService(serviceMgr, HDI_WPA_SERVICE_NAME);
+    HDIServiceManagerRelease(serviceMgr);
+    if (remote == NULL) {
+        LOGE("%{public}s: failed to get HdfRemoteService", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    LOGI("%{public}s: success to get HdfRemoteService", __func__);
+    struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
+    recipient->OnRemoteDied = ProxyOnRemoteDied;
+    HdfRemoteServiceAddDeathRecipient(remote, recipient);
+    return WIFI_IDL_OPT_OK;
+}
 
 WifiErrorNo HdiWpaStart()
 {
     LOGI("HdiWpaStart start...");
     pthread_mutex_lock(&g_wpaObjMutex);
-    if (g_wpaRefCount != 0) {
+    if (g_wpaRefCount != 0 && g_wpaObj != NULL && g_devMgr != NULL) {
         ++g_wpaRefCount;
         pthread_mutex_unlock(&g_wpaObjMutex);
-        LOGI("%{public}s wpa ref count: %d", __func__, g_wpaRefCount);
+        LOGI("%{public}s wpa ref count: %{public}d", __func__, g_wpaRefCount);
         return WIFI_IDL_OPT_OK;
+    } else {
+        g_wpaRefCount = 0x0;
     }
-
     g_devMgr = HDIDeviceManagerGet();
     if (g_devMgr == NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
@@ -65,7 +108,6 @@ WifiErrorNo HdiWpaStart()
         LOGE("%{public}s LoadDevice failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-
     g_wpaObj = IWpaInterfaceGetInstance(HDI_WPA_SERVICE_NAME, false);
     if (g_wpaObj == NULL) {
         g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
@@ -85,8 +127,8 @@ WifiErrorNo HdiWpaStart()
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_IDL_OPT_FAILED;
     }
-
     ++g_wpaRefCount;
+    RegistHdfDeathCallBack();
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("HdiWpaStart is started");
     return WIFI_IDL_OPT_OK;
@@ -97,6 +139,7 @@ WifiErrorNo HdiWpaStop()
     LOGI("HdiWpaStop stop...");
     pthread_mutex_lock(&g_wpaObjMutex);
     if (g_wpaObj == NULL || g_wpaRefCount == 0) {
+        g_wpaRefCount = 0x0;
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or ref count is 0", __func__);
         return WIFI_IDL_OPT_FAILED;
@@ -258,5 +301,14 @@ WifiErrorNo CopyConfigFile(const char* configName)
     }
     LOGE("Copy config file failed: %{public}s", configName);
     return WIFI_IDL_OPT_FAILED;
+}
+
+void HdiWpaResetGlobalObj()
+{
+    g_wpaRefCount = 0;
+    g_wpaObj = NULL;
+    g_devMgr = NULL;
+    LOGE("%{public}s reset wpa g_wpaObj", __func__);
+    HdiWpaStart();
 }
 #endif

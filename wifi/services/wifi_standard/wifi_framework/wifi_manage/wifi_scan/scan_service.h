@@ -367,6 +367,7 @@ private:
     StandByListerner standByListerner;         /* standby Listerner*/
 #endif
     int m_instId;
+    int lastNetworkQuality;
     /**
      * @Description Obtains the frequency of a specified band.
      *

@@ -56,6 +56,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define WPA3_CONNECT_FAIL_COUNT_THRESHOLD 2
 #define WPA_CB_ASSOCIATING 3
 #define TRANSFORMATION_TO_MBPS 10
+#define DEFAULT_NUM_ARP_PINGS 3
+#define MAX_ARP_CHECK_TIME 300
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -2571,11 +2573,19 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
             /* Notify result to InterfaceService. */
             pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED,
                 pStaStateMachine->linkedInfo);
-            pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
-                pStaStateMachine->linkedInfo);
-
-            /* The current state of StaStateMachine transfers to GetIpState. */
-            pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+            if (!pStaStateMachine->CanArpReachable()) {
+                WIFI_LOGI("Arp is not reachable");
+                pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
+                    pStaStateMachine->linkedInfo);
+                /* The current state of StaStateMachine transfers to GetIpState. */
+                pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+            } else {
+                WIFI_LOGI("Arp is reachable");
+                pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+                pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED,
+                    pStaStateMachine->linkedInfo);
+                pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+            }
             break;
         }
         default:
@@ -2584,6 +2594,29 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
     }
 
     return ret;
+}
+
+bool StaStateMachine::CanArpReachable()
+{
+    ArpChecker arpChecker;
+    std::string macAddress;
+    WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);
+    IpInfo ipInfo;
+    WifiSettings::GetInstance().GetIpInfo(ipInfo, m_instId);
+    std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
+    std::string ifName = "wlan" + std::to_string(m_instId);
+    if (ipInfo.gateway == 0) {
+        WIFI_LOGI("gateway is empty");
+        return false;
+    }
+    std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
+    arpChecker.Start(ifName, macAddress, ipAddress, gateway);
+    for (int i = 0; i < DEFAULT_NUM_ARP_PINGS; i++) {
+        if (arpChecker.DoArpCheck(MAX_ARP_CHECK_TIME, true)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)

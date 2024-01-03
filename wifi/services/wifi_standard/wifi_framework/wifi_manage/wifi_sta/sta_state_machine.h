@@ -917,6 +917,7 @@ private:
     void InvokeOnStaRssiLevelChanged(int level);
     WifiDeviceConfig getCurrentWifiDeviceConfig();
     void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
+    bool CanArpReachable();
 };
 }  // namespace Wifi
 }  // namespace OHOS

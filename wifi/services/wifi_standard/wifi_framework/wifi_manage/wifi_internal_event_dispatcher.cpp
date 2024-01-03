@@ -210,6 +210,7 @@ int WifiInternalEventDispatcher::RemoveStaCallback(const sptr<IRemoteObject> &re
 int WifiInternalEventDispatcher::SetSingleStaCallback(const sptr<IWifiDeviceCallBack> &callback,
     const std::string &eventName, int instId)
 {
+    std::unique_lock<std::mutex> lock(mStaCallbackMutex);
     mStaSingleCallback[instId] = callback;
     return 0;
 }
@@ -314,6 +315,7 @@ int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &r
 int WifiInternalEventDispatcher::SetSingleScanCallback(const sptr<IWifiScanCallback> &callback,
     const std::string &eventName, int instId)
 {
+    std::unique_lock<std::mutex> lock(mScanCallbackMutex);
     mScanSingleCallback[instId] = callback;
     return 0;
 }

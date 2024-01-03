@@ -67,7 +67,7 @@ WifiErrorNo WifiStaHalInterface::StartWifi(void)
 #endif
     if (ret != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
-    } 
+    }
     return WIFI_IDL_OPT_OK;
 }
     
@@ -89,7 +89,7 @@ WifiErrorNo WifiStaHalInterface::StopWifi(void)
 #endif
     if (ret != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
-    } 
+    }
     return WIFI_IDL_OPT_OK;
 }
 

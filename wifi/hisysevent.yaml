@@ -77,7 +77,7 @@ WIFI_ACCESS_INTERNET_FAILED:
   ARP_FAIL_CNT: {type: INT32, desc: arp fail cnt}
   NET_STATE: {type: INT32, desc: http network fail}
 
-BROWSER_FAILED_FOR_PROTAL:
+BROWSER_FAILED_FOR_PORTAL:
   __BASE: {type: FAULT, level: MINOR, desc: browser failed for portal}
   RESP_CODE: {type: INT32, desc: resp code}
   SERVER: {type: STRING, desc: server}
@@ -87,11 +87,11 @@ WIFI_CONNECT_FAILED:
   ASSOC_FAIL_CNT: {type: INT32, desc: assoc fail cnt}
   DHCP_FAIL_CNT: {type: INT32, desc: dhcp fail cnt}
 
-SOTFAP_ABNORMAL_DISCONNECT:
+SOFTAP_ABNORMAL_DISCONNECT:
   __BASE: {type: FAULT, level: MINOR, desc: soft abnormal disconnect event}
   ERROR_CODE: {type: INT32, desc: error code}
 
-SOTF_AP_CONNECT_FAILD:
+SOFTAP_CONNECT_FAILED:
   __BASE: {type: FAULT, level: MINOR, desc: soft ap connect failed}
   ERROR_CODE: {type: INT32, desc: error code}
 
@@ -139,7 +139,7 @@ P2P_CHR_EVENT:
   EVENT_NAME: {type: STRING, desc: event name}
   EVENT_VALUE: {type: STRING, desc: event value}
 
-P2P_KPI:
+P2P_CONNECT_STATICS:
   __BASE: {type: STATISTIC, level: MINOR, desc: P2P KPI}
   CONN_CNT: {type: INT32, desc: P2P connect count}
   MAGICLINK_CONNECTED_COUNT: {type: INT32, desc: magiclink connect success count}
@@ -151,7 +151,7 @@ P2P_CONNECT_FAIL:
   ERR_CODE: {type: INT32, desc: fail error code}
   SUB_ERR_CODE: {type: INT32, desc: fail reason}
 
-P2P_AB_DISCONNECT:
+P2P_ABNORMAL_DISCONNECT:
   __BASE: {type: FAULT, level: MINOR, desc: P2P abnormal disconect}
   ERR_CODE: {type: INT32, desc: fail error code}
   SUB_ERR_CODE: {type: INT32, desc: fail reason}

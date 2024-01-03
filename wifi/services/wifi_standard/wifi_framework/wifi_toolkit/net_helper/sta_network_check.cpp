@@ -182,7 +182,7 @@ StaNetState StaNetworkCheck::CheckResponseCode(std::string url, int codeNum, int
     return lastNetState;
 }
 #ifndef OHOS_ARCH_LITE
-int StaNetworkCheck::HttpPortalDetection(const std::string &url)
+int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((no_sanitize("cfi")))
 {
     NetStack::HttpClient::HttpClientRequest httpReq;
     httpReq.SetURL(url);
@@ -252,7 +252,7 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url)
 }
 #endif
 
-void StaNetworkCheck::HttpProbeTimeout()
+void StaNetworkCheck::HttpProbeTimeout() __attribute__((no_sanitize("cfi")))
 {
     WIFI_LOGE("HttpProbeTimeout http bak detect start!");
 #ifndef OHOS_ARCH_LITE

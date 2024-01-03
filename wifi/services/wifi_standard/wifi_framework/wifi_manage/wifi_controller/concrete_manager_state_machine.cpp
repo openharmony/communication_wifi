@@ -160,10 +160,40 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg)
             pConcreteMangerMachine->mTargetRole = msg->GetParam1();
             HandleStartInIdleState(msg);
             break;
+        case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
+        case CONCRETE_CMD_SWITCH_TO_MIX_MODE:
+            HandleSwitchToConnectOrMixMode(msg);
+            break;
+        case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
+            HandleSwitchToScanOnlyMode(msg);
+            break;
         default:
             break;
     }
     return true;
+}
+
+void ConcreteMangerMachine::IdleState::HandleSwitchToConnectOrMixMode(InternalMessage *msg)
+{
+    if (!CheckCanOptSta()) {
+        return;
+    }
+    ErrCode ret = AutoStartStaService(mid);
+    if (ret != WIFI_OPT_SUCCESS) {
+        pConcreteMangerMachine->mcb.onStartFailure(mid);
+        return;
+    }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
+}
+
+void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessage *msg)
+{
+    ErrCode ret = AutoStartScanOnly(mid);
+    if (ret != WIFI_OPT_SUCCESS) {
+        pConcreteMangerMachine->mcb.onStartFailure(mid);
+        return;
+    }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
 void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *msg)

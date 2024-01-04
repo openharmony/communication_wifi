@@ -50,7 +50,7 @@ public:
      */
     void UpdateApChannelConfig(HotspotConfig &apConfig);
 private:
-    constexpr int DEFAULT_STA_INSTANCE_ID = 0;
+    static constexpr int DEFAULT_STA_INSTANCE_ID = 0;
 
     class SoftapChannelPolicyParser : public XmlParser {
     public:

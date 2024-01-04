@@ -26,6 +26,7 @@
 #include "i_wifi_sta_iface.h"
 #include "i_wifi_supplicant_iface.h"
 #include "i_wifi_p2p_iface.h"
+#include "wifi_common_def.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlClient"

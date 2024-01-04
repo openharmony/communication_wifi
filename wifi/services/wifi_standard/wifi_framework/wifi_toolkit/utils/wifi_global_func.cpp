@@ -14,8 +14,10 @@
  */
 #include "wifi_global_func.h"
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
+#include <random>
 #include "wifi_log.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_define.h"
@@ -37,7 +39,9 @@ constexpr int CHANNEL_14_FREP = 2484;
 constexpr int CHANNEL_14 = 14;
 constexpr int CENTER_FREP_DIFF = 5;
 constexpr int CHANNEL_2G_MIN = 1;
+constexpr int CHANNEL_2G_MAX = 14;  // 2484
 constexpr int CHANNEL_5G_MIN = 34;
+constexpr int CHANNEL_5G_MAX = 165;  // 5825
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
@@ -69,6 +73,14 @@ std::string GetRandomStr(int len)
     return res;
 }
 
+int GetRandomInt(int start, int end)
+{
+    if (end <= start) {
+       return start;
+    }
+    return (std::rand() % (end - start + 1)) + start;
+}
+
 bool IsAllowScanAnyTime(const ScanControlInfo &info)
 {
     for (auto forbidIter = info.scanForbidList.begin(); forbidIter != info.scanForbidList.end(); forbidIter++) {
@@ -77,6 +89,31 @@ bool IsAllowScanAnyTime(const ScanControlInfo &info)
         }
     }
     return true;
+}
+
+std::vector<int> SplitStringToIntVector(const std::string &str, const std::string &split)
+{
+    std::vector<int> res;
+    if (str.empty() || split.empty()) {
+        return res;
+    }
+    std::string::size_type begPos = 0;
+    std::string::size_type endPos = 0;
+    std::string tmpStr;
+    while ((endPos = str.find(split, begPos)) != std::string::npos) {
+        if (endPos > begPos) {
+            tmpStr = str.substr(begPos, endPos - begPos);
+            if (IsValidateNum(tmpStr)) {
+                res.push_back(ConvertStringToInt(tmpStr));
+            }
+        }
+        begPos = endPos + split.size();
+    }
+    tmpStr = str.substr(begPos);
+    if (!tmpStr.empty() && IsValidateNum(tmpStr)) {
+        res.push_back(ConvertStringToInt(tmpStr));
+    }
+    return res;
 }
 
 ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport)
@@ -205,6 +242,35 @@ std::string Vec2Stream(const std::string &prefix, const std::vector<char> &vecCh
     return ss.str();
 }
 
+bool IsValidateNum(const std::string &str)
+{
+    if (str.empty()) {
+        return false;
+    }
+    for (char i : str)
+    {
+        int tmp = (int)i;
+        if (tmp >= 48 && tmp <= 57) {  // the range of numbers in the ascll table
+            continue;
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+int TransformFrequencyIntoChannel(int freq)
+{
+    if (freq >= FREP_2G_MIN && freq <= FREP_2G_MAX) {
+        return (freq - FREP_2G_MIN) / CENTER_FREP_DIFF + CHANNEL_2G_MIN;
+    } else if (freq == CHANNEL_14_FREP) {
+        return CHANNEL_14;
+    } else if (freq >= FREP_5G_MIN && freq <= FREP_5G_MAX) {
+        return (freq - FREP_5G_MIN) / CENTER_FREP_DIFF + CHANNEL_5G_MIN;
+    }
+    return -1;
+}
+
 int HexStringToVec(const std::string &str, std::vector<char> &vec)
 {
     unsigned len = str.length();
@@ -301,6 +367,26 @@ void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vect
     }
 }
 
+BandType TransformFreqToBand(int freq)
+{
+    if (freq <= CHANNEL_14_FREP) {
+        return BandType::BAND_2GHZ;
+    } else if (freq <= FREP_5G_MAX) {
+        return BandType::BAND_5GHZ;
+    }
+    return BandType::BAND_NONE;  // not supported currently 6/60GHZ
+}
+
+BandType TransformChannelToBand(int channel)
+{
+    if (channel <= CHANNEL_2G_MAX) {
+        return BandType::BAND_2GHZ;
+    } else if (channel <= CHANNEL_5G_MAX) {
+        return BandType::BAND_5GHZ;
+    }
+    return BandType::BAND_NONE;  // not supported currently 6/60GHZ
+}
+
 bool IsValid24GHz(int freq)
 {
     return freq > 2400 && freq < 2500;
@@ -309,6 +395,16 @@ bool IsValid24GHz(int freq)
 bool IsValid5GHz(int freq)
 {
     return freq > 4900 && freq < 5900;
+}
+
+bool IsValid24GChannel(int channel)
+{
+    return channel >= 1 && channel <= 14;
+}
+
+bool IsValid5GChannel(int channel)
+{
+    return channel >= 34 && channel <= 165;
 }
 
 #ifndef OHOS_ARCH_LITE
@@ -400,6 +496,34 @@ int WatchParamValue(const char *keyprefix, ParameterChgPtr callback, void *conte
 #else
     return EC_INVALID;
 #endif
+}
+
+bool IsfreqDbac(int freqA, int freqB)
+{
+    if (freqA == freqB) {
+        return false;
+    }
+    if (IsValid5GHz(freqA) && IsValid5GHz(freqB)) {
+        return true;
+    }
+    if (IsValid24GHz(freqA) && IsValid24GHz(freqB)) {
+        return true;
+    }
+    return false;
+}
+
+bool IsChannelDbac(int channelA, int channelB)
+{
+    if (channelA == channelB) {
+        return false;
+    }
+    if (IsValid5GChannel(channelA) && IsValid5GChannel(channelB)) {
+        return true;
+    }
+    if (IsValid24GChannel(channelA) && IsValid24GChannel(channelB)) {
+        return true;
+    }
+    return false;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -12,243 +12,165 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "mock_wifi_settings.h"
-#include "mock_wifi_ap_hal_interface.h"
 #include "operator_overload.h"
 #include "ap_config_use.h"
+#include "mock_wifi_ap_hal_interface.h"
+#include "mock_wifi_country_code_manager.h"
+#include "mock_wifi_settings.h"
+#include "wifi_ap_msg.h"
+#include "wifi_logger.h"
+#include "wifi_global_func.h"
+#include "wifi_msg.h"
+#include "wifi_p2p_msg.h"
 
-using namespace OHOS;
 using ::testing::_;
+using ::testing::AtLeast;
 using ::testing::DoAll;
 using ::testing::Eq;
 using ::testing::Return;
+using ::testing::SetArgReferee;
 using ::testing::StrEq;
+using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-std::vector<int> allowed5GFreq, allowed2GFreq;
-std::vector<int> allowed5GChan, allowed2GChan;
-std::vector<int> allowedFreqCom;
-std::map<BandType, std::vector<int32_t>> ChanTbs;
+DEFINE_WIFILOG_LABEL("ApConfigUseTest");
 
 class ApConfigUse_Test : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp()
-    {
-        allowed5GFreq.clear();
-        allowed2GFreq.clear();
-        allowed2GChan.clear();
-        allowed5GChan.clear();
-        allowedFreqCom.clear();
-        ChanTbs.clear();
-        const int testFreq1 = 2412;
-        const int testFreq2 = 2417;
-        const int testFreq3 = 2472;
-        const int testFreq4 = 2484;
-        const int testFreq5 = 5170;
-        const int testFreq6 = 5745;
-        const int testFreq7 = 5825;
-
-        allowed2GFreq.push_back(testFreq1);
-        allowed2GFreq.push_back(testFreq2);
-        allowed2GFreq.push_back(testFreq3);
-        allowed2GFreq.push_back(testFreq4);
-        allowed5GFreq.push_back(testFreq5);
-        allowed5GFreq.push_back(testFreq6);
-        allowed5GFreq.push_back(testFreq7);
-
-        const int testChannel1 = 1;
-        const int testChannel2 = 2;
-        const int testChannel3 = 13;
-        const int testChannel4 = 14;
-
-        const int testChannel5 = 34;
-        const int testChannel6 = 149;
-        const int testChannel7 = 14;
-
-        allowed2GChan.push_back(testChannel1);
-        allowed2GChan.push_back(testChannel2);
-        allowed2GChan.push_back(testChannel3);
-        allowed2GChan.push_back(testChannel4);
-
-        allowed5GChan.push_back(testChannel5);
-        allowed5GChan.push_back(testChannel6);
-        allowed5GChan.push_back(testChannel7);
-
-        ChanTbs[BandType::BAND_2GHZ] = allowed2GChan;
-        ChanTbs[BandType::BAND_5GHZ] = allowed5GChan;
-
-        pApConfigUse = new ApConfigUse();
+    virtual void SetUp() {
+        m_apConfigUse = std::make_unique<ApConfigUse>();
     }
-    virtual void TearDown()
-    {
-        allowed5GFreq.clear();
-        allowed2GFreq.clear();
-        allowed2GChan.clear();
-        allowed5GChan.clear();
-        allowedFreqCom.clear();
-        ChanTbs.clear();
-        delete pApConfigUse;
-        pApConfigUse = nullptr;
-    }
+    virtual void TearDown() {}
 
-public:
-    ApConfigUse *pApConfigUse;
+    std::unique_ptr<ApConfigUse> m_apConfigUse;
 };
 
-/* TransformFrequencyIntoChannel */
-HWTEST_F(ApConfigUse_Test, TransformFrequencyIntoChannel, TestSize.Level1)
+HWTEST_F(ApConfigUse_Test, UpdateApChannelConfigTest, TestSize.Level1)
 {
-    const int testFreq1 = 2412;
-    const int testFreq2 = 2417;
-    const int testFreq13 = 2472;
-    const int testFreq14 = 2484;
+    WIFI_LOGI("UpdateApChannelConfigTest enter");
+    HotspotConfig apConfig;
+    apConfig.SetBand(BandType::BAND_2GHZ);
+    apConfig.SetChannel(1);
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, 0))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
 
-    const int testFreq01 = 2411;
-    const int testFreq02 = 2485;
-    const int testFreq03 = 2473;
-    const int testFreq04 = 5826;
-    const int testFreq05 = 5169;
+    WifiP2pLinkedInfo p2pLinkedInfo;
+    p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)));
 
-    const int testChannel34 = 5170;
-    const int testChannel149 = 5745;
-    const int testChannel165 = 5825;
-
-    /* 2.4G success */
-    EXPECT_EQ(1, pApConfigUse->TransformFrequencyIntoChannel(testFreq1));
-    EXPECT_EQ(2, pApConfigUse->TransformFrequencyIntoChannel(testFreq2));
-    EXPECT_EQ(13, pApConfigUse->TransformFrequencyIntoChannel(testFreq13));
-    EXPECT_EQ(14, pApConfigUse->TransformFrequencyIntoChannel(testFreq14));
-    /* 5G  success */
-    EXPECT_EQ(34, pApConfigUse->TransformFrequencyIntoChannel(testChannel34));
-    EXPECT_EQ(149, pApConfigUse->TransformFrequencyIntoChannel(testChannel149));
-    EXPECT_EQ(165, pApConfigUse->TransformFrequencyIntoChannel(testChannel165));
-    /* 2.4G  failed */
-    EXPECT_EQ(-1, pApConfigUse->TransformFrequencyIntoChannel(testFreq01));
-    EXPECT_EQ(-1, pApConfigUse->TransformFrequencyIntoChannel(testFreq02));
-    EXPECT_EQ(-1, pApConfigUse->TransformFrequencyIntoChannel(testFreq03));
-    /* 5G   failed */
-    EXPECT_EQ(-1, pApConfigUse->TransformFrequencyIntoChannel(testFreq04));
-    EXPECT_EQ(-1, pApConfigUse->TransformFrequencyIntoChannel(testFreq05));
+    m_apConfigUse->UpdateApChannelConfig(apConfig);
 }
-/* TransformFrequencyIntoChannel_overload */
-HWTEST_F(ApConfigUse_Test, TransformFrequencyIntoChannel_1, TestSize.Level1)
-{
-    const int testFreq1 = 2412;
-    const int testFreq2 = 2417;
-    const int testFreq3 = 2472;
-    const int testFreq4 = 2484;
-    const int testFreq5 = 5170;
-    const int testFreq6 = 5745;
-    const int testFreq7 = 5825;
-    const int testFreq = -1;
-    std::vector<int> FreqVector;
-    FreqVector.push_back(testFreq1);
-    FreqVector.push_back(testFreq2);
-    FreqVector.push_back(testFreq3);
-    FreqVector.push_back(testFreq4);
-    FreqVector.push_back(testFreq5);
-    FreqVector.push_back(testFreq6);
-    FreqVector.push_back(testFreq7);
-    FreqVector.push_back(testFreq);
-    std::vector<int> FreqVector1 = FreqVector;
 
-    int buf[] = {1, 2, 13, 14, 34, 149, 165};
-    std::vector<int> ChanVector;
-    pApConfigUse->TransformFrequencyIntoChannel(FreqVector, ChanVector);
-    for (unsigned long i = 0; i < (sizeof(buf) / 4); ++i) {
-        EXPECT_EQ(buf[i], ChanVector[i]);
+HWTEST_F(ApConfigUse_Test, JudgeConflictBandTest, TestSize.Level1)
+{
+    WIFI_LOGI("JudgeConflictBandTest enter");
+    HotspotConfig apConfig;
+    apConfig.SetBand(BandType::BAND_2GHZ);
+    apConfig.SetChannel(1);
+
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = ConnState::CONNECTED;
+    wifiLinkedInfo.band = 1;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, 0))
+        .WillOnce(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+    
+    WifiP2pLinkedInfo p2pLinkedInfo;
+    p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+        .WillOnce(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)));
+
+    WifiP2pGroupInfo wifiP2pGroupInfo;
+    wifiP2pGroupInfo.SetFrequency(5200);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCurrentP2pGroupInfo())
+        .WillOnce(DoAll(Return(wifiP2pGroupInfo)));
+
+    m_apConfigUse->JudgeConflictBand(apConfig);
+}
+
+HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetChannelFromDrvOrXmlByBandTest enter");
+    std::vector<int> freq2G = {2412, 2417, 2422};
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(1, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(freq2G), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+    std::vector<int> channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_2GHZ);
+    for(int c : channels) {
+        EXPECT_TRUE(IsValid24GChannel(c));
     }
-    EXPECT_EQ(FreqVector1, FreqVector);
-}
-/* SetConfig */
-HWTEST_F(ApConfigUse_Test, LogConfig_SUCCESS, TestSize.Level1)
-{
-    HotspotConfig apConfig;
-    apConfig.SetBand(BandType::BAND_2GHZ);
-    HotspotConfig apConfig1 = apConfig;
-    pApConfigUse->LogConfig(apConfig);
-    EXPECT_EQ(apConfig1, apConfig);
+
+    std::vector<int> freq5G = {5180, 5200, 5220};
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(2, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(freq5G), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+    channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_5GHZ);
+    for(int c : channels) {
+        EXPECT_TRUE(IsValid5GChannel(c));
+    }
 }
 
-/* IsValid24GHz */
-HWTEST_F(ApConfigUse_Test, IsValid24GHz, TestSize.Level1)
+HWTEST_F(ApConfigUse_Test, GetBestChannelFor2GTest, TestSize.Level1)
 {
-    EXPECT_FALSE(pApConfigUse->IsValid24GHz(2400));
-    EXPECT_FALSE(pApConfigUse->IsValid24GHz(2500));
-    EXPECT_TRUE(pApConfigUse->IsValid24GHz(2412));
-    EXPECT_TRUE(pApConfigUse->IsValid24GHz(2484));
-    EXPECT_FALSE(pApConfigUse->IsValid24GHz(2499));
-}
-/* IsValid5GHz */
-HWTEST_F(ApConfigUse_Test, IsValid5GHz, TestSize.Level1)
-{
-    EXPECT_FALSE(pApConfigUse->IsValid5GHz(4900));
-    EXPECT_FALSE(pApConfigUse->IsValid5GHz(5169));
-    EXPECT_TRUE(pApConfigUse->IsValid5GHz(5170));
-    EXPECT_TRUE(pApConfigUse->IsValid5GHz(5825));
-    EXPECT_FALSE(pApConfigUse->IsValid5GHz(5827));
+    WIFI_LOGI("GetBestChannelFor2GTest enter");
+    int channel = m_apConfigUse->GetBestChannelFor2G();
+    WIFI_LOGI("GetBestChannelFor2GTest channel=%{public}d", channel);
+    EXPECT_TRUE(IsValid24GChannel(channel));
 }
 
-/* CheckBandChannel */
-HWTEST_F(ApConfigUse_Test, CheckBandChannel_1, TestSize.Level1)
+HWTEST_F(ApConfigUse_Test, GetBestChannelFor5GTest, TestSize.Level1)
 {
-    HotspotConfig apConfig;
-    apConfig.SetBand(BandType::BAND_2GHZ);
-    apConfig.SetChannel(2);
-    HotspotConfig apConfig1 = apConfig;
-    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
-    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
-    ChannelsTable ChannelsTb = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
+    WIFI_LOGI("GetBestChannelFor5GTest enter");
+    std::vector<int> frequencies = {5180, 5200, 5220};
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(2, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(frequencies), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
 
-    pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
-    EXPECT_EQ(apConfig1, apConfig);
+    int channel = m_apConfigUse->GetBestChannelFor5G();
+    WIFI_LOGI("GetBestChannelFor5GTest channel=%{public}d", channel);
 }
-HWTEST_F(ApConfigUse_Test, CheckBandChannel_2, TestSize.Level1)
+
+HWTEST_F(ApConfigUse_Test, FilterIndoorChannelTest, TestSize.Level1)
 {
+    WIFI_LOGI("FilterIndoorChannelTest enter");
+    EXPECT_CALL(WifiCountryCodeManager::GetInstance(), GetWifiCountryCode(_))
+        .WillOnce(DoAll(SetArgReferee<0>("CA")));  // xml CA indoor channel：36,40,44,48
+    std::vector<int> channels = {36, 40, 44, 48, 52, 56};
+    m_apConfigUse->FilterIndoorChannel(channels);
+}
+
+HWTEST_F(ApConfigUse_Test, Filter165ChannelTest, TestSize.Level1)
+{
+    WIFI_LOGI("Filter165ChannelTest enter");
+    std::vector<int> channels = {36, 165};
+    m_apConfigUse->Filter165Channel(channels);
+
+    // 165 need to be filtered
+    EXPECT_TRUE(channels.size() == 1);
+    EXPECT_TRUE(channels[0] == 36);
+}
+
+HWTEST_F(ApConfigUse_Test, JudgeDbacWithP2pTest, TestSize.Level1)
+{
+    WIFI_LOGI("JudgeDbacWithP2pTest enter");
     HotspotConfig apConfig;
     apConfig.SetBand(BandType::BAND_2GHZ);
-    apConfig.SetChannel(9);
-    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
-    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
-    ChannelsTable ChannelsTb = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
-    pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
-    EXPECT_EQ(apConfig.GetChannel(), 1);
-    EXPECT_EQ(apConfig.GetBand(), BandType::BAND_2GHZ);
-}
-HWTEST_F(ApConfigUse_Test, CheckBandChannel_3, TestSize.Level1)
-{
-    HotspotConfig apConfig;
-    ChannelsTable ChannelsTb;
-    pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
-    EXPECT_EQ(apConfig.GetChannel(), 6);
-    EXPECT_EQ(apConfig.GetBand(), BandType::BAND_2GHZ);
-}
-HWTEST_F(ApConfigUse_Test, CheckBandChannel_4, TestSize.Level1)
-{
-    HotspotConfig apConfig;
-    apConfig.SetBand(BandType::BAND_5GHZ);
-    apConfig.SetChannel(133);
-    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
-    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
-    ChannelsTable ChannelsTb = {{ BandType::BAND_5GHZ, band_5G_channel }, { BandType::BAND_2GHZ, band_2G_channel }};
-    pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
-    EXPECT_EQ(apConfig.GetBand(), BandType::BAND_5GHZ);
-}
-HWTEST_F(ApConfigUse_Test, CheckBandChannel_5, TestSize.Level1)
-{
-    HotspotConfig apConfig;
-    apConfig.SetBand(BandType::BAND_ANY);
-    apConfig.SetChannel(133);
-    std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
-    std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
-    ChannelsTable ChannelsTb = {{ BandType::BAND_5GHZ, band_5G_channel }, { BandType::BAND_2GHZ, band_2G_channel }};
-    pApConfigUse->CheckBandChannel(apConfig, ChannelsTb);
+
+    WifiP2pLinkedInfo p2pLinkedInfo;
+    p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+        .WillOnce(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)));
+    WifiP2pGroupInfo wifiP2pGroupInfo;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCurrentP2pGroupInfo())
+        .WillOnce(DoAll(Return(wifiP2pGroupInfo)));
+
+    m_apConfigUse->JudgeDbacWithP2p(apConfig);
 }
 } // namespace Wifi
 } // namespace OHOS

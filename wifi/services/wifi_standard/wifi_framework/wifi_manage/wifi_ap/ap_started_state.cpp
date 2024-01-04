@@ -34,6 +34,7 @@
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_hisysevent.h"
+#include "wifi_global_func.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
@@ -172,32 +173,8 @@ bool ApStartedState::UpdatMacAddress(const std::string ssid, KeyMgmt securityTyp
 
 bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 {
-    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    std::vector<int> allowed5GFreq, allowed2GFreq;
-    std::vector<int> allowed5GChan, allowed2GChan;
-    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
-        WIFI_LOGW("failed to get 2.4G channel.");
-        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, allowed2GFreq);
-    }
-    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
-        WIFI_LOGW("failed to get 5G channel.");
-        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, allowed5GFreq);
-    }
-
-    m_ApConfigUse.TransformFrequencyIntoChannel(allowed5GFreq, allowed5GChan);
-    m_ApConfigUse.TransformFrequencyIntoChannel(allowed2GFreq, allowed2GChan);
-
-    ChannelsTable channelTbs;
-    channelTbs[BandType::BAND_2GHZ] = allowed2GChan;
-    channelTbs[BandType::BAND_5GHZ] = allowed5GChan;
-
-    if (WifiSettings::GetInstance().SetValidChannels(channelTbs)) {
-        WIFI_LOGE("failed to SetValidChannels.");
-        return false;
-    }
-
-    m_ApConfigUse.CheckBandChannel(apConfig, channelTbs);
-
+    WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
+    m_ApConfigUse.UpdateApChannelConfig(apConfig);
     if (WifiApHalInterface::GetInstance().SetSoftApConfig(apConfig, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("set hostapd config failed.");
         return false;
@@ -234,12 +211,11 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 
 bool ApStartedState::SetConfig()
 {
-    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+    WIFI_LOGI("set softap config, id=%{public}d", m_id);
     if (WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id)) {
-        WIFI_LOGE("GetConfig failed!!!.");
+        WIFI_LOGE("get config failed");
         return false;
     }
-
     return SetConfig(m_hotspotConfig);
 }
 

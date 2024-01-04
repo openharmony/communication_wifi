@@ -247,17 +247,13 @@ private:
     bool UpdatMacAddress(const std::string ssid, KeyMgmt securityType);
 
 private:
-    HotspotConfig m_hotspotConfig; /*
-                                    * Store the configuration when set to
-                                    * hostapd, hostapd will asynchronously
-                                    * notify the setting result
-                                    */
+    // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result
+    HotspotConfig m_hotspotConfig;
     WifiApNatManager mApNatManager;
     typedef void (ApStartedState::*ProcessFun)(InternalMessage &msg) const;
-    std::map<ApStatemachineEvent, ProcessFun> mProcessFunMap; /*
-                                                               * Message processing function map
-                                                               * of the state machine
-                                                               */
+
+    // Message processing function map of the state machine
+    std::map<ApStatemachineEvent, ProcessFun> mProcessFunMap;
     ApStateMachine &m_ApStateMachine;
     ApConfigUse &m_ApConfigUse;
     ApMonitor &m_ApMonitor;

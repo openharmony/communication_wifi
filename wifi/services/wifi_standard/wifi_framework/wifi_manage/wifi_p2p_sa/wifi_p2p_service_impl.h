@@ -21,7 +21,6 @@
 #include "system_ability.h"
 #include "wifi_p2p_stub.h"
 #include "iremote_object.h"
-#include "ip2p_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -66,7 +65,6 @@ public:
      */
     ErrCode StopDiscoverDevices(void) override;
 
-    ErrCode CheckP2pCanOpt(IP2pService *pService);
     /**
      * @Description Start the search for the Wi-Fi P2P service
      *

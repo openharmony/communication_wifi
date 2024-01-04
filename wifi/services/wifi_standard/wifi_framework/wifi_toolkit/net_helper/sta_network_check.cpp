@@ -32,15 +32,11 @@ namespace OHOS {
 namespace Wifi {
 using TimeOutCallback = std::function<void()>;
 constexpr int NET_ERR_OK = 200;
-constexpr int NET_ERR_CREATED = 201;
 constexpr int NET_ERR_NO_CONTENT = 204;
-constexpr int NET_ERR_BAD_REQUEST = 400;
 
 constexpr int NET_ERR_REDIRECT_CLASS_MAX = 399;
-constexpr int NET_ERR_REQUEST_ERROR_CLASS_MAX = 499;
 constexpr int MAX_ARP_DNS_CHECK_TIME = 1000;
 constexpr int MAX_RESULT_NUM = 2;
-constexpr int PORTAL_CONTENT_LENGTH_MIN = 4;
 constexpr int TIME_OUT_COUNT = 4000;
 const std::string CA_CERT_PATH = "/etc/ssl/certs/cacert.pem";
 
@@ -154,7 +150,7 @@ void StaNetworkCheck::NetWorkCheckSetScreenState(int state)
 {
     m_screenState = state;
 }
-StaNetState StaNetworkCheck::CheckResponseCode(std::string url, int codeNum, int contLenNum)
+StaNetState StaNetworkCheck::CheckResponseCode(std::string url, int codeNum)
 {
     lastNetState = NETWORK_STATE_UNKNOWN;
     bool isHttps = (url == mUrlInfo.portalHttpsUrl || url == mUrlInfo.portalBakHttpsUrl);
@@ -162,14 +158,9 @@ StaNetState StaNetworkCheck::CheckResponseCode(std::string url, int codeNum, int
         WIFI_LOGE("This network is normal!");
         lastNetState = NETWORK_STATE_WORKING;
     } else if (!isHttps && codeNum != NET_ERR_NO_CONTENT &&
-        (codeNum >= NET_ERR_CREATED && codeNum <= NET_ERR_REDIRECT_CLASS_MAX)) {
+        (codeNum >= NET_ERR_OK && codeNum <= NET_ERR_REDIRECT_CLASS_MAX)) {
         /* Callback result to InterfaceService. */
         WIFI_LOGI("This network is portal AP, need certification1!");
-        lastNetState = NETWORK_CHECK_PORTAL;
-    } else if (!isHttps &&
-        (codeNum == NET_ERR_OK || (codeNum >= NET_ERR_BAD_REQUEST && codeNum <= NET_ERR_REQUEST_ERROR_CLASS_MAX)) &&
-        contLenNum > PORTAL_CONTENT_LENGTH_MIN) {
-        WIFI_LOGI("This network is portal AP, need certification!");
         lastNetState = NETWORK_CHECK_PORTAL;
     } else if (isHttps && (lastNetState.load() != NETWORK_STATE_NOINTERNET) &&
         (lastNetState.load() != NETWORK_CHECK_PORTAL)) {
@@ -216,7 +207,7 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
             contLenNum = std::atoi(iter->second.c_str());
         }
         detectResultNum++;
-        StaNetState netState = CheckResponseCode(url, codeNum, contLenNum);
+        StaNetState netState = CheckResponseCode(url, codeNum);
         SetHttpResultInfo(url, codeNum, contLenNum, netState);
         if (detectResultNum >= MAX_RESULT_NUM) {
             WIFI_LOGI("http detect result collect ok!");
@@ -231,7 +222,7 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
         const NetStack::HttpClient::HttpClientResponse &response, const NetStack::HttpClient::HttpClientError &error) {
         std::string url = request.GetURL();
         int codeNum = response.GetResponseCode();
-        StaNetState netState = CheckResponseCode(url, codeNum, 0);
+        StaNetState netState = CheckResponseCode(url, codeNum);
         SetHttpResultInfo(url, codeNum, 0, netState);
         detectResultNum++;
         if (detectResultNum >= MAX_RESULT_NUM) {

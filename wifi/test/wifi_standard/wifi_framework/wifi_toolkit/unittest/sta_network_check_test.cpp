@@ -60,7 +60,7 @@ bool StaNetworkCheckTest::HttpDetectionSuccess()
 
 int StaNetworkCheckTest::HttpCheckResponseCode(std::string url, int codeNum)
 {
-    pStaNetworkCheck->CheckResponseCode(url, codeNum, mUrlInfo.portalHttpUrl.size());
+    pStaNetworkCheck->CheckResponseCode(url, codeNum);
     return 0;
 }
 

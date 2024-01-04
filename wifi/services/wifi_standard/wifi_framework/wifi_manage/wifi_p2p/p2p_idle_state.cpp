@@ -18,6 +18,7 @@
 #include "p2p_state_machine.h"
 #include "wifi_p2p_temp_disc_event.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pIdleState");
 

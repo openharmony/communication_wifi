@@ -26,7 +26,7 @@
 #define LOG_TAG "WifiHdiProxy"
 
 #define MAX_FEATURE_NUMBER 16
-
+#define MAX_OBJ_REFERENCE_COUNT 2
 const char *HDI_SERVICE_NAME = "wlan_interface_service"; // Move the define to HDF module
 
 static pthread_mutex_t g_mutex;
@@ -155,6 +155,9 @@ WifiErrorNo StartHdiWifi()
     pthread_mutex_lock(&g_mutex);
     if (g_wlanRefCount != 0) {
         ++g_wlanRefCount;
+        if (g_wlanRefCount > MAX_OBJ_REFERENCE_COUNT) {
+            g_wlanRefCount = MAX_OBJ_REFERENCE_COUNT;
+        }
         pthread_mutex_unlock(&g_mutex);
         LOGI("%{public}s: wlan ref count:%{public}d", __func__, g_wlanRefCount);
         return WIFI_IDL_OPT_OK;
@@ -221,7 +224,7 @@ WifiErrorNo HdiStop()
         LOGE("%{public}s: failed to stop, ret:%{public}d", __func__, ret);
     }
     IWlanInterfaceReleaseInstance(HDI_SERVICE_NAME, g_wlanObj, false);
-    --g_wlanRefCount;
+    g_wlanRefCount = 0;
     g_wlanObj = NULL;
     pthread_mutex_unlock(&g_mutex);
     LOGI("%{public}s: success to release instance", __func__);
@@ -275,5 +278,26 @@ void CleanLocalResources()
     g_wlanObj = NULL;
     g_wlanRefCount = 0;
     pthread_mutex_unlock(&g_mutex);
+}
+
+WifiErrorNo CheckHdiNormalStart(const int32_t wlanType)
+{
+    WifiErrorNo ret = WIFI_IDL_OPT_OK;
+    WifiHdiProxy proxy = GetHdiProxy(wlanType);
+    if (proxy.wlanObj == NULL || proxy.feature == NULL) {
+        LOGE("CheckHdiNormalStart: Hdi proxy is null, hdi abnormal start!");
+        ret = HdiStop();
+        if (ret != WIFI_IDL_OPT_OK) {
+            LOGE("CheckHdiNormalStart: HdiStop failed!");
+            retrun ret;
+        }
+        ret = StartHdiWifi();
+        if (ret != WIFI_IDL_OPT_OK) {
+            LOGE("CheckHdiNormalStart: StartHdiWifi failed!");
+            retrun ret;
+        }
+    }
+    LOGI("CheckHdiNormalStart: hdi normal start!");
+    return ret;
 }
 #endif

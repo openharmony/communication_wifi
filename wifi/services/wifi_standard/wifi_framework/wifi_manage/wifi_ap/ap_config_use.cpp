@@ -361,8 +361,8 @@ xmlNodePtr ApConfigUse::SoftapChannelPolicyParser::GotoCountryPolicy(xmlNodePtr 
     return nullptr;
 }
 
-ApConfigUse::SoftapChannelPolicyParser::SoftapChannelsPolicyType
-    ApConfigUse::SoftapChannelPolicyParser::GetPolicyItem(xmlNodePtr node)
+ApConfigUse::SoftapChannelPolicyParser::SoftapChannelsPolicyType ApConfigUse::
+    SoftapChannelPolicyParser::GetPolicyItem(xmlNodePtr node)
 {
     if (node == nullptr) {
         WIFI_LOGE("GetPolicyItem node is null");
@@ -435,7 +435,8 @@ BandType ApConfigUse::SoftapChannelPolicyParser::GetSupportChannelsItem(xmlNodeP
     return BandType::BAND_NONE;
 }
 
-std::vector<int> ApConfigUse::SoftapChannelPolicyParser::ParseSupportChannels(xmlNodePtr innode, const char* const &bandXml)
+std::vector<int> ApConfigUse::SoftapChannelPolicyParser::ParseSupportChannels(
+    xmlNodePtr innode, const char* const &bandXml)
 {
     if (innode == nullptr) {
         WIFI_LOGE("parse channels node is null");

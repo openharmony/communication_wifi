@@ -30,9 +30,10 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr int ASCALL_NUM_START_INDEX = 48;  // the range of numbers in the ascll table
+constexpr int ASCALL_NUM_END_INDEX = 57;
 constexpr int FREP_2G_MIN = 2412;
 constexpr int FREP_2G_MAX = 2472;
-
 constexpr int FREP_5G_MIN = 5170;
 constexpr int FREP_5G_MAX = 5825;
 constexpr int CHANNEL_14_FREP = 2484;
@@ -76,9 +77,12 @@ std::string GetRandomStr(int len)
 int GetRandomInt(int start, int end)
 {
     if (end <= start) {
-       return start;
+        return start;
     }
-    return (std::rand() % (end - start + 1)) + start;
+    std::random_device rd;
+    std::mt19937 e{rd()};
+    std::uniform_int_distribution<int> dist{start, end};
+    return dist(e);
 }
 
 bool IsAllowScanAnyTime(const ScanControlInfo &info)
@@ -247,10 +251,9 @@ bool IsValidateNum(const std::string &str)
     if (str.empty()) {
         return false;
     }
-    for (char i : str)
-    {
+    for (char i : str) {
         int tmp = (int)i;
-        if (tmp >= 48 && tmp <= 57) {  // the range of numbers in the ascll table
+        if (tmp >= ASCALL_NUM_START_INDEX && tmp <= ASCALL_NUM_END_INDEX) {
             continue;
         } else {
             return false;
@@ -399,12 +402,12 @@ bool IsValid5GHz(int freq)
 
 bool IsValid24GChannel(int channel)
 {
-    return channel >= 1 && channel <= 14;
+    return channel >= CHANNEL_2G_MIN && channel <= CHANNEL_2G_MAX;
 }
 
 bool IsValid5GChannel(int channel)
 {
-    return channel >= 34 && channel <= 165;
+    return channel >= CHANNEL_5G_MIN && channel <= CHANNEL_5G_MAX;
 }
 
 #ifndef OHOS_ARCH_LITE

@@ -104,6 +104,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
                 WIFI_LOGE("uv_queue_work, scope is nullptr");
                 goto EXIT;
             }
+            std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
             if (it == g_eventRegisterInfo.end()) {
                 WIFI_LOGW("uv_queue_work, event has been unregistered.");
                 goto EXIT;

@@ -227,25 +227,17 @@ ErrCode WifiP2pServiceImpl::DiscoverDevices(void)
     #endif
     }
 
-    IP2pService *pService = nullptr;
-    if (CheckP2pCanOpt(pService) != WIFI_OPT_SUCCESS) {
-        return WIFI_OPT_P2P_NOT_OPENED;
-    }
-    return pService->DiscoverDevices();
-}
-
-ErrCode WifiP2pServiceImpl::CheckP2pCanOpt(IP2pService *pService)
-{
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return WIFI_OPT_SUCCESS;
+    return pService->DiscoverDevices();
 }
 
 ErrCode WifiP2pServiceImpl::StopDiscoverDevices(void)
@@ -256,8 +248,14 @@ ErrCode WifiP2pServiceImpl::StopDiscoverDevices(void)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->StopDiscoverDevices();
@@ -271,8 +269,14 @@ ErrCode WifiP2pServiceImpl::DiscoverServices(void)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->DiscoverServices();
@@ -285,8 +289,14 @@ ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
         WIFI_LOGE("StopDiscoverServices:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->StopDiscoverServices();
@@ -300,8 +310,14 @@ ErrCode WifiP2pServiceImpl::RequestService(const WifiP2pDevice &device, const Wi
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->RequestService(device, request);
@@ -314,8 +330,14 @@ ErrCode WifiP2pServiceImpl::PutLocalP2pService(const WifiP2pServiceInfo &srvInfo
         WIFI_LOGE("PutLocalP2pService:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->PutLocalP2pService(srvInfo);
@@ -328,8 +350,14 @@ ErrCode WifiP2pServiceImpl::DeleteLocalP2pService(const WifiP2pServiceInfo &srvI
         WIFI_LOGE("DeleteLocalP2pService:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->DeleteLocalP2pService(srvInfo);
@@ -343,8 +371,14 @@ ErrCode WifiP2pServiceImpl::StartP2pListen(int period, int interval)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->StartP2pListen(period, interval);
@@ -358,8 +392,14 @@ ErrCode WifiP2pServiceImpl::StopP2pListen()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->StopP2pListen();
@@ -382,8 +422,14 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         return WIFI_OPT_INVALID_PARAM;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->CreateGroup(config);
@@ -397,8 +443,14 @@ ErrCode WifiP2pServiceImpl::RemoveGroup()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiP2pGroupInfo config;
@@ -428,8 +480,14 @@ ErrCode WifiP2pServiceImpl::DeleteGroup(const WifiP2pGroupInfo &group)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->DeleteGroup(group);
@@ -465,8 +523,9 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         WIFI_LOGE("P2pConnect:VerifyPassphrase failed!");
         return WIFI_OPT_INVALID_PARAM;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiP2pConfig updateConfig = config;
@@ -500,6 +559,12 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         WIFI_LOGW("invalid mac address");
     }
 #endif
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
     return pService->P2pConnect(updateConfig);
 }
@@ -512,8 +577,14 @@ ErrCode WifiP2pServiceImpl::P2pCancelConnect()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->P2pCancelConnect();
@@ -528,8 +599,14 @@ ErrCode WifiP2pServiceImpl::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -563,8 +640,14 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
     #endif
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     ErrCode errCode = pService->GetCurrentGroup(group);
@@ -624,8 +707,14 @@ ErrCode WifiP2pServiceImpl::GetP2pDiscoverStatus(int &status)
         WIFI_LOGE("GetP2pDiscoverStatus:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->GetP2pDiscoverStatus(status);
@@ -638,8 +727,14 @@ ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
         WIFI_LOGE("GetP2pConnectedStatus:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->GetP2pConnectedStatus(status);
@@ -663,8 +758,14 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
     #endif
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     ErrCode errCode = pService->QueryP2pDevices(devices);
@@ -704,8 +805,14 @@ ErrCode WifiP2pServiceImpl::QueryP2pLocalDevice(WifiP2pDevice &device)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -738,8 +845,14 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
         }
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     ErrCode errCode = pService->QueryP2pGroups(groups);
@@ -791,8 +904,14 @@ ErrCode WifiP2pServiceImpl::QueryP2pServices(std::vector<WifiP2pServiceInfo> &se
         WIFI_LOGE("QueryP2pServices:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->QueryP2pServices(services);
@@ -852,8 +971,13 @@ ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
         return WIFI_OPT_INVALID_PARAM;
     }
     WifiConfigCenter::GetInstance().SetP2pDeviceName(deviceName);
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_SUCCESS;
+    }
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->SetP2pDeviceName(deviceName);
@@ -866,8 +990,13 @@ ErrCode WifiP2pServiceImpl::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
         WIFI_LOGE("SetP2pWfdInfo:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->SetP2pWfdInfo(wfdInfo);
@@ -880,8 +1009,13 @@ ErrCode WifiP2pServiceImpl::Hid2dRequestGcIp(const std::string& gcMac, std::stri
         WIFI_LOGE("Hid2dRequestGcIp:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->Hid2dRequestGcIp(gcMac, ipAddr);
@@ -920,8 +1054,13 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
         WIFI_LOGE("Hid2dSharedlinkDecrease:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     if (pService->GetSharedLinkCount() > 0) {
@@ -942,8 +1081,14 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiSettings::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
@@ -965,8 +1110,14 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiSettings::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
@@ -1005,8 +1156,13 @@ ErrCode WifiP2pServiceImpl::Hid2dGetRecommendChannel(const RecommendChannelReque
         WIFI_LOGE("Hid2dGetRecommendChannel:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     int channel = pService->GetP2pRecommendChannel();
@@ -1055,8 +1211,14 @@ ErrCode WifiP2pServiceImpl::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
         WIFI_LOGE("Hid2dGetSelfWifiCfgInfo:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
@@ -1070,8 +1232,14 @@ ErrCode WifiP2pServiceImpl::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
         WIFI_LOGE("Hid2dSetPeerWifiCfgInfo:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
@@ -1084,8 +1252,14 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         WIFI_LOGE("Hid2dSetUpperScene:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiSettings::GetInstance().SetHid2dUpperScene(ifName, scene);
@@ -1095,8 +1269,14 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
 ErrCode WifiP2pServiceImpl::MonitorCfgChange(void)
 {
     WIFI_LOGI("MonitorCfgChange");
-    IP2pService *pService = nullptr;
-    if (!CheckP2pCanOpt(pService)) {
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not runing!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->MonitorCfgChange();

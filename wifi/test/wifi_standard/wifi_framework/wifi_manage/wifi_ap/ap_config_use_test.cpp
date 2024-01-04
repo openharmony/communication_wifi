@@ -44,7 +44,8 @@ class ApConfigUse_Test : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
         m_apConfigUse = std::make_unique<ApConfigUse>();
     }
     virtual void TearDown() {}
@@ -104,7 +105,7 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(1, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(freq2G), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
     std::vector<int> channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_2GHZ);
-    for(int c : channels) {
+    for (int c : channels) {
         EXPECT_TRUE(IsValid24GChannel(c));
     }
 
@@ -112,7 +113,7 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(2, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(freq5G), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
     channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_5GHZ);
-    for(int c : channels) {
+    for (int c : channels) {
         EXPECT_TRUE(IsValid5GChannel(c));
     }
 }

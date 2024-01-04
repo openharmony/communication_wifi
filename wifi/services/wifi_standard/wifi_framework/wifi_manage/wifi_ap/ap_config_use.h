@@ -50,7 +50,7 @@ public:
      */
     void UpdateApChannelConfig(HotspotConfig &apConfig);
 private:
-    const int DEFAULT_STA_INSTANCE_ID = 0;
+    constexpr int DEFAULT_STA_INSTANCE_ID = 0;
 
     class SoftapChannelPolicyParser : public XmlParser {
     public:
@@ -59,8 +59,8 @@ private:
             COUNTRY_CODE,
             INDOOR_CHANNELS
         };
-        const char* SOFTAP_CHANNELS_POLICY_FILE_PATH = "/system/etc/wifi/softap_channels_policy.xml";
-        const char* XML_TAG_SOFTAP_CHANNELS_POLICY = "SoftapChannelsPolicy";
+        static constexpr const char* SOFTAP_CHANNELS_POLICY_FILE_PATH = "/system/etc/wifi/softap_channels_policy.xml";
+        static constexpr const char* XML_TAG_SOFTAP_CHANNELS_POLICY = "SoftapChannelsPolicy";
         static constexpr const char* XML_TAG_CHANNELS_POLICY = "CountryPolicy";
         static constexpr const char* XML_TAG_POLICY_ITEM = "PolicyItem";
         static constexpr const char* XML_TAG_COUNTRY_CODE = "CountryCode";

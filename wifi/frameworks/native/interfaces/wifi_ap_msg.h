@@ -22,10 +22,10 @@
 
 namespace OHOS {
 namespace Wifi {
-#define AP_CHANNEL_INVALID -1
+#define AP_CHANNEL_INVALID (-1)
 #define AP_CHANNEL_DEFAULT 6
 #define AP_CHANNEL_5G_DEFAULT 149
-#define AP_CHANNEL_5G_NOT_RECOMMEND 165  // cannot group bandwidth of 40M or above
+#define AP_CHANNEL_5G_NOT_RECOMMEND (165)  // cannot group bandwidth of 40M or above
 #define WIFI_BSSID_LENGTH 18
 #define DHCP_LEASE_TIME_MIN 60
 #define DHCP_LEASE_TIME 21600

@@ -145,18 +145,19 @@ std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandT
     CHECK_NULL_AND_RETURN(m_softapChannelPolicyPtr, {});
     std::vector<int> preferredChannels = m_softapChannelPolicyPtr->GetPreferredChannels(bandType);
     if (!preferredChannels.empty()) {
-        WIFI_LOGI("get freqs from xml success, bandType=%{public}d, channel size=%{public}lu",
-            static_cast<int>(bandType), preferredChannels.size());
+        WIFI_LOGI("get freqs from xml success, bandType=%{public}d, channel size=%{public}d",
+            static_cast<int>(bandType), static_cast<int>(preferredChannels.size()));
         return preferredChannels;
     }
     std::vector<int> freqs;
     WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(bandType), freqs);
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGI("get freqs from drv fail, use default, bandType=%{public}d", static_cast<int>(bandType));
         WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(bandType, freqs);
+        WIFI_LOGI("get freqs from drv fail, use default, bandType=%{public}d, size=%{public}d",
+            static_cast<int>(bandType), static_cast<int>(freqs.size()));
     } else {
-        WIFI_LOGI("get freqs from drv success, bandType=%{public}d, size=%{public}lu",
-            static_cast<int>(bandType), freqs.size());
+        WIFI_LOGI("get freqs from drv success, bandType=%{public}d, size=%{public}d",
+            static_cast<int>(bandType), static_cast<int>(freqs.size()));
     }
     std::vector<int> channels;
     TransformFrequencyIntoChannel(freqs, channels);

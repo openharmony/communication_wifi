@@ -30,7 +30,8 @@ class WifiCountryCodeManager : public MockWifiCountryCodeManager {
 public:
     WifiCountryCodeManager() = default;
     ~WifiCountryCodeManager() = default;
-    static WifiCountryCodeManager &GetInstance() {
+    static WifiCountryCodeManager &GetInstance()
+    {
         static WifiCountryCodeManager g_wifiCountryCodeManager;
         return g_wifiCountryCodeManager;
     };

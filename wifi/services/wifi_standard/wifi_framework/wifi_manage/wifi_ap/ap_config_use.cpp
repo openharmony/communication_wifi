@@ -361,8 +361,8 @@ xmlNodePtr ApConfigUse::SoftapChannelPolicyParser::GotoCountryPolicy(xmlNodePtr 
     return nullptr;
 }
 
-ApConfigUse::SoftapChannelPolicyParser::SoftapChannelsPolicyType ApConfigUse::
-    SoftapChannelPolicyParser::GetPolicyItem(xmlNodePtr node)
+ApConfigUse::SoftapChannelPolicyParser::SoftapChannelsPolicyType ApConfigUse::SoftapChannelPolicyParser::GetPolicyItem(
+    xmlNodePtr node)
 {
     if (node == nullptr) {
         WIFI_LOGE("GetPolicyItem node is null");

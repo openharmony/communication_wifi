@@ -251,9 +251,8 @@ bool IsValidateNum(const std::string &str)
     if (str.empty()) {
         return false;
     }
-    for (char i : str) {
-        int tmp = (int)i;
-        if (tmp >= ASCALL_NUM_START_INDEX && tmp <= ASCALL_NUM_END_INDEX) {
+    for (char item : str) {
+        if (item >= ASCALL_NUM_START_INDEX && item <= ASCALL_NUM_END_INDEX) {
             continue;
         } else {
             return false;

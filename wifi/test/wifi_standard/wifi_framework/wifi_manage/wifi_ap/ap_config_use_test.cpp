@@ -72,32 +72,6 @@ HWTEST_F(ApConfigUse_Test, UpdateApChannelConfigTest, TestSize.Level1)
     m_apConfigUse->UpdateApChannelConfig(apConfig);
 }
 
-HWTEST_F(ApConfigUse_Test, JudgeConflictBandTest, TestSize.Level1)
-{
-    WIFI_LOGI("JudgeConflictBandTest enter");
-    HotspotConfig apConfig;
-    apConfig.SetBand(BandType::BAND_2GHZ);
-    apConfig.SetChannel(1);
-
-    WifiLinkedInfo wifiLinkedInfo;
-    wifiLinkedInfo.connState = ConnState::CONNECTED;
-    wifiLinkedInfo.band = 1;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, 0))
-        .WillOnce(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
-    
-    WifiP2pLinkedInfo p2pLinkedInfo;
-    p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
-        .WillOnce(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)));
-
-    WifiP2pGroupInfo wifiP2pGroupInfo;
-    wifiP2pGroupInfo.SetFrequency(5200);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCurrentP2pGroupInfo())
-        .WillOnce(DoAll(Return(wifiP2pGroupInfo)));
-
-    m_apConfigUse->JudgeConflictBand(apConfig);
-}
-
 HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
 {
     WIFI_LOGI("GetChannelFromDrvOrXmlByBandTest enter");

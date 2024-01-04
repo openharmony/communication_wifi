@@ -40,7 +40,6 @@ ApConfigUse::ApConfigUse(int id) : m_id(id)
 
 void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig)
 {
-    JudgeConflictBand(apConfig);
     int bestChannel = AP_CHANNEL_INVALID;
     switch (apConfig.GetBand()) {
         case BandType::BAND_2GHZ:
@@ -64,49 +63,6 @@ void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig)
     JudgeDbacWithP2p(apConfig);
     WIFI_LOGI("ap config: ssid=%{public}s, inst_id=%{public}d, band=%{public}d, channel=%{public}d",
         SsidAnonymize(apConfig.GetSsid()).c_str(), m_id, static_cast<int>(apConfig.GetBand()), apConfig.GetChannel());
-}
-
-void ApConfigUse::JudgeConflictBand(HotspotConfig &apConfig)
-{
-    BandType apBand = apConfig.GetBand();
-    BandType p2pBand = BandType::BAND_NONE;
-    BandType staBand = BandType::BAND_NONE;
-    WifiLinkedInfo wifiLinkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo, DEFAULT_STA_INSTANCE_ID);
-    if (wifiLinkedInfo.connState == ConnState::CONNECTED) {
-        switch (wifiLinkedInfo.band) {
-            case static_cast<int>(BandType::BAND_2GHZ):
-                staBand = BandType::BAND_2GHZ;
-                break;
-            case static_cast<int>(BandType::BAND_5GHZ):
-                staBand = BandType::BAND_5GHZ;
-                break;
-            default:
-                // BAND_6GHZ, BAND_60GHZ do nothing
-                break;
-        }
-    }
-    WifiP2pLinkedInfo p2pLinkedInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pLinkedInfo);
-    if (p2pLinkedInfo.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
-        WifiP2pGroupInfo group = WifiSettings::GetInstance().GetCurrentP2pGroupInfo();
-        p2pBand = TransformFreqToBand(group.GetFrequency());
-    }
-    if (p2pBand == BandType::BAND_NONE || staBand == BandType::BAND_NONE || p2pBand != staBand) {
-        WIFI_LOGI("no need judge conflict, p2pBandType=%{public}d, staBandType=%{public}d",
-            static_cast<int>(p2pBand), static_cast<int>(staBand));
-        return;
-    }
-
-    // handling scenes with the same band
-    if (apBand >= BandType::BAND_5GHZ && p2pBand == BandType::BAND_5GHZ) {
-        apBand = BandType::BAND_2GHZ;
-    } else if (apBand == BandType::BAND_2GHZ && p2pBand == BandType::BAND_2GHZ) {
-        apBand = BandType::BAND_5GHZ;
-    }
-    apConfig.SetBand(apBand);
-    WIFI_LOGI("judge conflict result, p2pBandType=%{public}d, staBandType=%{public}d, apBandType=%{public}d",
-        static_cast<int>(p2pBand), static_cast<int>(staBand), static_cast<int>(apBand));
 }
 
 int ApConfigUse::GetBestChannelFor2G()
@@ -145,18 +101,19 @@ std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandT
     CHECK_NULL_AND_RETURN(m_softapChannelPolicyPtr, {});
     std::vector<int> preferredChannels = m_softapChannelPolicyPtr->GetPreferredChannels(bandType);
     if (!preferredChannels.empty()) {
-        WIFI_LOGI("get freqs from xml success, bandType=%{public}d, channel size=%{public}lu",
-            static_cast<int>(bandType), preferredChannels.size());
+        WIFI_LOGI("get freqs from xml success, bandType=%{public}d, channel size=%{public}d",
+            static_cast<int>(bandType), static_cast<int>(preferredChannels.size()));
         return preferredChannels;
     }
     std::vector<int> freqs;
     WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(bandType), freqs);
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
-        WIFI_LOGI("get freqs from drv fail, use default, bandType=%{public}d", static_cast<int>(bandType));
         WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(bandType, freqs);
+        WIFI_LOGI("get freqs from drv fail, use default, bandType=%{public}d, size=%{public}d",
+            static_cast<int>(bandType), static_cast<int>(freqs.size()));
     } else {
-        WIFI_LOGI("get freqs from drv success, bandType=%{public}d, size=%{public}lu",
-            static_cast<int>(bandType), freqs.size());
+        WIFI_LOGI("get freqs from drv success, bandType=%{public}d, size=%{public}d",
+            static_cast<int>(bandType), static_cast<int>(freqs.size()));
     }
     std::vector<int> channels;
     TransformFrequencyIntoChannel(freqs, channels);
@@ -200,7 +157,7 @@ void ApConfigUse::Filter165Channel(std::vector<int> &channels)
     while (iter != channels.end()) {
         if (AP_CHANNEL_5G_NOT_RECOMMEND == *iter) {
             channels.erase(iter);
-            WIFI_LOGI("filter 165 channel");
+            WIFI_LOGI("filter not recommand channel=165");
             return;
         }
         iter++;

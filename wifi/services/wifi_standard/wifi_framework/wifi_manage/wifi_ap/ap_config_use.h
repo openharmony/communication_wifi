@@ -96,7 +96,6 @@ private:
     std::unique_ptr<SoftapChannelPolicyParser> m_softapChannelPolicyPtr;
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
 
-    void JudgeConflictBand(HotspotConfig &apConfig);
     int GetBestChannelFor2G();
     int GetBestChannelFor5G();
     std::vector<int> GetChannelFromDrvOrXmlByBand(const BandType &bandType);

@@ -18,6 +18,8 @@
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #endif
+#include "wifi_log.h"
+
 namespace OHOS {
 namespace Wifi {
 static void ClearWifiDeviceConfig(WifiDeviceConfig &item)

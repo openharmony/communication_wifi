@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2023-2023 Huawei Device Co., Ltd.
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<SoftapChannelsPolicy>
+    <!-- These resources are used to set indoor channels in different countries. -->
+    <CountryPolicy>
+        <PolicyItem>
+            <CountryCode>IN</CountryCode>
+            <IndoorChannels>36,40,44,48,52,56,60,64,100,104,108,112,116,120,124,128,132,136,140,144,149,153,157,161,165</IndoorChannels>
+        </PolicyItem>
+        <PolicyItem>
+            <CountryCode>NZ</CountryCode>
+            <IndoorChannels>36,40,44,48</IndoorChannels>
+        </PolicyItem>
+        <PolicyItem>
+            <CountryCode>QA</CountryCode>
+            <IndoorChannels>36,40,44,48,52,56,60,64,100,104,108,112,116,120,124,128,132,136,140,144,149,153,157,161,165</IndoorChannels>
+        </PolicyItem>
+        <PolicyItem>
+            <CountryCode>CA</CountryCode>
+            <IndoorChannels>36,40,44,48</IndoorChannels>
+        </PolicyItem>
+    </CountryPolicy>
+
+    <!-- List of allowed channels in 2/5/6/60GHz band for softap. If the device doesn't want to restrict
+        channels this should be empty. -->
+    <SoftapSupportChannels>
+        <Channel2gList>1,2,3,4,5,6,7,8,9,10,11</Channel2gList>
+        <Channel5gList></Channel5gList>
+        <Channel6gList></Channel6gList>
+        <Channel60gList></Channel60gList>
+    </SoftapSupportChannels>
+</SoftapChannelsPolicy>

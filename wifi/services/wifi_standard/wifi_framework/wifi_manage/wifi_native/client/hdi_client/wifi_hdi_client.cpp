@@ -231,7 +231,18 @@ WifiErrorNo WifiHdiClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
 /* ************************ softAp Interface ************************** */
 WifiErrorNo WifiHdiClient::StartAp(int id)
 {
-    return StartHdiWifi();
+    WifiErrorNo ret = WIFI_IDL_OPT_OK;
+    ret = StartHdiWifi();
+    if (ret != WIFI_IDL_OPT_OK) {
+        LOGE("%{public}s: failed to StartHdiWifi", __func__);
+        return ret;
+    }
+    ret = CheckHdiNormalStart(PROTOCOL_80211_IFTYPE_AP);
+    if (ret != WIFI_IDL_OPT_OK) {
+        LOGE("%{public}s: check hdi abnormal start, failed to start hdi wifi!", __func__);
+        return ret;
+    }
+    return ret;
 }
 
 WifiErrorNo WifiHdiClient::StopAp(int id)

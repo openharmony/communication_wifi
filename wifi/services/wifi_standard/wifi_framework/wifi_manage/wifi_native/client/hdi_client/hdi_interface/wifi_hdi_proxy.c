@@ -178,7 +178,7 @@ WifiErrorNo StartHdiWifi()
     g_isRemoteDied = false;
     ++g_wlanRefCount;
     pthread_mutex_unlock(&g_mutex);
-    LOGI("%{public}s: success to starte wlan", __func__);
+    LOGI("%{public}s: success to start wlan", __func__);
 
     struct HDIServiceManager* serviceMgr = HDIServiceManagerGet();
     if (serviceMgr == NULL) {

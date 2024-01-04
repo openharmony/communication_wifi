@@ -88,6 +88,14 @@ bool IsHdiRemoteDied();
  * @Description Clean local resources if remote died.
  */
 void CleanLocalResources();
+
+/**
+ * @Description check hdi normal start
+ *
+ * @param wlanType - wlan type
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo CheckHdiNormalStart(const int32_t wlanType);
 #ifdef __cplusplus
 }
 #endif

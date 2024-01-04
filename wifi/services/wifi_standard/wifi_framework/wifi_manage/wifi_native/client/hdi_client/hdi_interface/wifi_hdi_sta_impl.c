@@ -167,6 +167,10 @@ WifiErrorNo HdiWifiStart()
         LOGE("failed to start hdi wifi!");
         return WIFI_IDL_OPT_FAILED;
     }
+    if (CheckHdiNormalStart(PROTOCOL_80211_IFTYPE_STATION) != WIFI_IDL_OPT_OK) {
+        LOGE("check hdi abnormal start, failed to start hdi wifi!");
+        return WIFI_IDL_OPT_FAILED;
+    }
     struct IWlanCallback cEventCallback;
     if (memset_s(&cEventCallback, sizeof(cEventCallback), 0, sizeof(cEventCallback)) != EOK) {
         LOGE("%{public}s: failed to memset", __func__);

@@ -222,7 +222,7 @@ WifiErrorNo RequestToSupplicant(const unsigned char *buf, int32_t bufSize)
 
 WifiErrorNo StartScan(const ScanSettings *settings)
 {
-    LOGD("Ready to start scan with param.");
+    LOGI("Ready to start scan with param.");
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
     if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
@@ -236,13 +236,13 @@ WifiErrorNo StartScan(const ScanSettings *settings)
         LOGD("StartScan return scan busy");
         return WIFI_HAL_SCAN_BUSY;
     }
-    LOGD("StartScan successfully!");
+    LOGI("StartScan successfully!");
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo GetScanInfos(ScanInfo *results, int *size)
 {
-    LOGD("Ready to get scan result.");
+    LOGI("Ready to get scan result.");
     if (results == NULL || size == NULL || *size == 0) {
         return WIFI_HAL_SUCCESS;
     }
@@ -255,13 +255,13 @@ WifiErrorNo GetScanInfos(ScanInfo *results, int *size)
         LOGE("GetScanInfos failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
-    LOGD("Get scan result successfully!");
+    LOGI("Get scan result successfully!");
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 {
-    LOGD("GetNetworkList()");
+    LOGI("GetNetworkList()");
     if (infos == NULL || size == NULL || *size == 0) {
         return WIFI_HAL_FAILED;
     }
@@ -279,7 +279,7 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
 
 WifiErrorNo StartPnoScan(const PnoScanSettings *settings)
 {
-    LOGD("Ready to start pnoscan with param.");
+    LOGI("Ready to start pnoscan with param.");
     ScanSettings scanSettings;
     scanSettings.freqs = settings->freqs;
     scanSettings.freqSize = settings->freqSize;
@@ -301,13 +301,13 @@ WifiErrorNo StartPnoScan(const PnoScanSettings *settings)
         LOGE("StartPnoScan failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
-    LOGD("StartPnoScan successfully!");
+    LOGI("StartPnoScan successfully!");
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo StopPnoScan(void)
 {
-    LOGD("Ready to stop pnoscan.");
+    LOGI("Ready to stop pnoscan.");
     ScanSettings scanSettings;
     scanSettings.scanStyle = SCAN_TYPE_PNO;
     scanSettings.isStartPnoScan = 0;
@@ -320,7 +320,7 @@ WifiErrorNo StopPnoScan(void)
         LOGE("StopPnoScan failed! ret=%{public}d", ret);
         return WIFI_HAL_FAILED;
     }
-    LOGD("StopPnoScan successfully!");
+    LOGI("StopPnoScan successfully!");
     return WIFI_HAL_SUCCESS;
 }
 

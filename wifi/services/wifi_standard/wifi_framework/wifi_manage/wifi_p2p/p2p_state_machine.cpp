@@ -26,6 +26,7 @@
 #include "wifi_p2p_dns_sd_service_response.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_p2p_upnp_service_response.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 

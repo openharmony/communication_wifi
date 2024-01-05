@@ -71,7 +71,7 @@ ErrCode WifiControllerMachine::InitWifiStates()
 
     WIFI_LOGE("Enter InitWifiStates.\n");
     pDefaultState = new (std::nothrow) DefaultState(this);
-    tmpErrNumber += JudgmentEmpty(pDefaultState);
+    tmpErrNumber = JudgmentEmpty(pDefaultState);
     pEnableState = new (std::nothrow) EnableState(this);
     tmpErrNumber += JudgmentEmpty(pEnableState);
     pDisableState = new (std::nothrow) DisableState(this);

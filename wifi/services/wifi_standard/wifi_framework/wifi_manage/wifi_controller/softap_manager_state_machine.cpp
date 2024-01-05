@@ -73,7 +73,7 @@ ErrCode SoftapManagerMachine::InitSoftapManagerStates()
 
     WIFI_LOGE("Enter InitConcreteMangerStates\n");
     pDefaultState = new (std::nothrow) DefaultState(this);
-    tmpErrNumber += JudgmentEmpty(pDefaultState);
+    tmpErrNumber = JudgmentEmpty(pDefaultState);
     pIdleState = new (std::nothrow) IdleState(this);
     tmpErrNumber += JudgmentEmpty(pIdleState);
     pStartedState = new (std::nothrow) StartedState(this);

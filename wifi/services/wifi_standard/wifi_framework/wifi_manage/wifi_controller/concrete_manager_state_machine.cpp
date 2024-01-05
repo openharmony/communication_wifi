@@ -81,7 +81,7 @@ ErrCode ConcreteMangerMachine::InitConcreteMangerStates()
 
     WIFI_LOGE("Enter InitConcreteMangerStates.\n");
     pDefaultState = new (std::nothrow) DefaultState(this);
-    tmpErrNumber += JudgmentEmpty(pDefaultState);
+    tmpErrNumber = JudgmentEmpty(pDefaultState);
     pIdleState = new (std::nothrow) IdleState(this);
     tmpErrNumber += JudgmentEmpty(pIdleState);
     pConnectState = new (std::nothrow) ConnectState(this);

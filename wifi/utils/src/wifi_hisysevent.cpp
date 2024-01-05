@@ -151,7 +151,7 @@ void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server)
     Json::FastWriter writer;
     root["RESP_CODE"] = respCode;
     root["SERVER"] = server;
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BROWSER_FAILED_FOR_PROTAL", "EVENT_VALUE", writer.write(root));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BROWSER_FAILED_FOR_PORTAL", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteWifiConnectFailedEventHiSysEvent(int operateType)
@@ -167,7 +167,7 @@ void WriteP2pKpiCountHiSysEvent(int eventType)
     Json::Value root;
     Json::FastWriter writer;
     root["EVENT_TYPE"] = eventType;
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_KPI", "EVENT_VALUE", writer.write(root));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_CONNECT_STATICS", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes)
@@ -185,7 +185,7 @@ void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes)
     Json::FastWriter writer;
     root["EVENT_TYPE"] = errCode;
     root["FAIL_RES"] = failRes;
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_AB_DISCONNECT", "EVENT_VALUE", writer.write(root));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteSoftApAbDisconnectHiSysEvent(int errorCode)
@@ -193,7 +193,7 @@ void WriteSoftApAbDisconnectHiSysEvent(int errorCode)
     Json::Value root;
     Json::FastWriter writer;
     root["ERROR_CODE"] = errorCode;
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOTFAP_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteIsInternetHiSysEvent(bool isInternet)
@@ -210,7 +210,7 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt)
     Json::Value root;
     Json::FastWriter writer;
     root["ERROR_CODE"] = errorCnt;
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFT_AP_CONNECT_FAILD", "EVENT_VALUE", writer.write(root));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CONNECT_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason)

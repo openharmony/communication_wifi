@@ -71,11 +71,15 @@ ErrCode WifiControllerMachine::InitWifiStates()
 
     WIFI_LOGE("Enter InitWifiStates.\n");
     pDefaultState = new (std::nothrow) DefaultState(this);
-    tmpErrNumber = JudgmentEmpty(pDefaultState);
+    tmpErrNumber += JudgmentEmpty(pDefaultState);
     pEnableState = new (std::nothrow) EnableState(this);
-    tmpErrNumber = JudgmentEmpty(pEnableState);
+    tmpErrNumber += JudgmentEmpty(pEnableState);
     pDisableState = new (std::nothrow) DisableState(this);
-    tmpErrNumber = JudgmentEmpty(pDisableState);
+    tmpErrNumber += JudgmentEmpty(pDisableState);
+    if (tmpErrNumber != 0) {
+        WIFI_LOGE("InitWifiStates some one state is null\n");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 

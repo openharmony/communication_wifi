@@ -166,8 +166,8 @@ int WifiScanStub::OnScanByParams(uint32_t code, IpcIo *req, IpcIo *reply)
     size_t readLen;
     constexpr int MAX_FREQS_SIZE = 512;
     WifiScanParams params;
-    params.ssid = (char *)ReadString(req, &readLen);
-    params.bssid = (char *)ReadString(req, &readLen);
+    params.ssid = static_cast<char *>(ReadString(req, &readLen));
+    params.bssid = static_cast<char *>(ReadString(req, &readLen));
     int size = 0;
     (void)ReadInt32(req, &size);
     if (size > MAX_FREQS_SIZE) {

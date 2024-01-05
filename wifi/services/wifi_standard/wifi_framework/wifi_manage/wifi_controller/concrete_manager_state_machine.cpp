@@ -146,7 +146,7 @@ void ConcreteMangerMachine::IdleState::GoOutState()
     WIFI_LOGE("IdleState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __attribute__((no_sanitize("cfi")))
 {
     if (msg == nullptr) {
         return false;

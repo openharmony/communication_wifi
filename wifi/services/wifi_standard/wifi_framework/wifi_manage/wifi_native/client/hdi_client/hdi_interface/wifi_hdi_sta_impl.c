@@ -64,12 +64,32 @@ ScanInfo* g_hdiWifiScanResults = NULL;
 int g_hdiWifiScanResultsCount = 0;
 static pthread_mutex_t g_hdiWifiMutex = PTHREAD_MUTEX_INITIALIZER;
 
-static void ClearScanResults()
+static void ReleaseScanResultsInfoElems(ScanInfo* scanResult)
 {
-    LOGI("[DEBUG] enter into HdiClearScanResults");
+    if (scanResult == NULL) {
+        LOGE("%{public}s: scan results is null", __func__);
+        return;
+    }
+    if (scanResult->infoElems != NULL) {
+        for (int i = 0; (i < scanResult->ieSize) && (i < WIFI_IDL_GET_MAX_SCAN_INFO); i++) {
+            if (scanResult->infoElems[i].content != NULL) {
+                free(scanResult->infoElems[i].content);
+                scanResult->infoElems[i].content = NULL;
+            }
+        }
+        free(scanResult->infoElems);
+        scanResult->infoElems = NULL;
+    }
+}
+
+static void ReleaseScanResultsResource()
+{
     pthread_mutex_lock(&g_hdiWifiMutex);
     g_hdiWifiScanResultsCount = 0;
     if (g_hdiWifiScanResults != NULL) {
+        for (int i = 0; i < WIFI_IDL_GET_MAX_SCAN_INFO; i++) {
+            ReleaseScanResultsInfoElems(&g_hdiWifiScanResults[i]);
+        }
         free(g_hdiWifiScanResults);
         g_hdiWifiScanResults = NULL;
     }
@@ -79,19 +99,34 @@ static void ClearScanResults()
 
 static WifiErrorNo InitScanResults()
 {
-    LOGI("[DEBUG] enter into HdiInitScanResults");
+    LOGD("initialize scan results");
     pthread_mutex_lock(&g_hdiWifiMutex);
     g_hdiWifiScanResultsCount = 0;
+    if (g_hdiWifiScanResults != NULL) {
+        LOGW("g_hdiScanResults has been initialized");
+        for (int i = 0; i < WIFI_IDL_GET_MAX_SCAN_INFO; i++) {
+            ReleaseScanResultsInfoElems(&g_hdiWifiScanResults[i]);
+        }
+        if (memset_s(g_hdiWifiScanResults, WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo),
+            0, WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo)) != EOK) {
+            pthread_mutex_unlock(&g_hdiWifiMutex);
+            LOGE("failed to memset_s");
+            return WIFI_IDL_OPT_FAILED;
+        }
+        pthread_mutex_unlock(&g_hdiWifiMutex);
+        return WIFI_IDL_OPT_OK;
+    }
+
     g_hdiWifiScanResults = (struct ScanInfo*)malloc(WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo));
     if (g_hdiWifiScanResults == NULL) {
         pthread_mutex_unlock(&g_hdiWifiMutex);
-        LOGE("g_hdiScanResults malloc failed.");
+        LOGE("failed to alloc memory");
         return WIFI_IDL_OPT_FAILED;
     }
     if (memset_s(g_hdiWifiScanResults, WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo),
         0, WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo)) != EOK) {
         pthread_mutex_unlock(&g_hdiWifiMutex);
-        LOGE("g_hdiWifiScanResults memset_s failied.");
+        LOGE("failed to memset_s");
         return WIFI_IDL_OPT_FAILED;
     }
     pthread_mutex_unlock(&g_hdiWifiMutex);
@@ -100,14 +135,13 @@ static WifiErrorNo InitScanResults()
 
 static WifiErrorNo GetScanInfos(ScanInfo* infos, int *size)
 {
-    LOGI("[DEBUG] enter into GetScanInfos");
     if (infos == NULL || size == NULL || *size == 0) {
-        LOGE("invalid parameter");
+        LOGE("%{public}s: invalid parameter", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
 
     pthread_mutex_lock(&g_hdiWifiMutex);
-    LOGI("GetScanInfos enter, saved size:%{public}d.", g_hdiWifiScanResultsCount);
+    LOGI("%{public}s: saved size:%{public}d.", __func__, g_hdiWifiScanResultsCount);
     if (*size < g_hdiWifiScanResultsCount) {
         LOGE("input size invalid. %{public}d < %{public}d.", *size, g_hdiWifiScanResultsCount);
         pthread_mutex_unlock(&g_hdiWifiMutex);
@@ -116,12 +150,14 @@ static WifiErrorNo GetScanInfos(ScanInfo* infos, int *size)
 
     if (memcpy_s(infos, *size * sizeof(struct ScanInfo),
         g_hdiWifiScanResults, g_hdiWifiScanResultsCount * sizeof(struct ScanInfo)) != EOK) {
-        LOGE("GetScanInfos memcpy_s failied.");
+        LOGE("%{public}s: failed to memcpy_s", __func__);
         pthread_mutex_unlock(&g_hdiWifiMutex);
         return WIFI_IDL_OPT_FAILED;
     }
-
     *size = g_hdiWifiScanResultsCount;
+    for (int i = 0; i < WIFI_IDL_GET_MAX_SCAN_INFO; i++) {
+        ReleaseScanResultsInfoElems(&g_hdiWifiScanResults[i]);
+    }
     pthread_mutex_unlock(&g_hdiWifiMutex);
     return WIFI_IDL_OPT_OK;
 }
@@ -132,8 +168,6 @@ static WifiErrorNo GetSignalInfo(WpaSignalInfo *info)
         LOGE("HdiWifiGetSignalInfo info is null.");
         return -1;
     }
-
-    LOGI("[DEBUG] HdiWifiGetSignalInfo enter.");
     CHECK_STA_HDI_WIFI_PROXY_AND_RETURN(IsHdiRemoteDied());
     int32_t ret = 0;
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
@@ -323,19 +357,19 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
     g_hdiWifiScanResultsCount = 0;
     if (g_hdiWifiScanResults == NULL) {
         pthread_mutex_unlock(&g_hdiWifiMutex);
-        LOGE("%{public}s: param invalid. g_hdiWifiScanResults is null!", __func__);
+        LOGE("%{public}s: g_hdiWifiScanResults is null!", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
     if (scanResults == NULL || ifName == NULL) {
         pthread_mutex_unlock(&g_hdiWifiMutex);
-        LOGE("%{public}s:  param invalid. scanResults or ifName is null!", __func__);
+        LOGE("%{public}s: scanResults or ifName is null!", __func__);
         HdiNotifyScanResult(HDI_STA_CB_SCAN_FAILED);
         return WIFI_IDL_OPT_FAILED;
     }
     if (memset_s(g_hdiWifiScanResults, WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo),
         0, WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo)) != EOK) {
         pthread_mutex_unlock(&g_hdiWifiMutex);
-        LOGE("%{public}s: memset_s failed.", __func__);
+        LOGE("%{public}s: failed to memset_s", __func__);
         HdiNotifyScanResult(HDI_STA_CB_SCAN_FAILED);
         return WIFI_IDL_OPT_FAILED;
     }
@@ -381,7 +415,7 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
 
 void HdiUnRegisterStaCallbackEvent()
 {
-    ClearScanResults();
+    ReleaseScanResultsResource();
     pthread_mutex_lock(&g_hdiWifiCallbackMutex);
     if (g_hdiWifiCallbackObj != NULL) {
         WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
@@ -444,7 +478,6 @@ WifiErrorNo HdiRegisterStaCallbackEvent(struct IWlanCallback *callback)
 
 WifiErrorNo HdiRegisterEventCallback(struct IWlanCallback *callback)
 {
-    LOGI("[DEBUG] RegisterHdiWifiEventCallback enter");
     HdiRegisterStaCallbackEvent(callback);
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     if (proxy.wlanObj == NULL || proxy.feature == NULL) {
@@ -494,7 +527,7 @@ WifiErrorNo HdiWifiGetConnectSignalInfo(const char *endBssid, WpaSignalInfo *inf
 
 void HdiReleaseLocalResources()
 {
-    ClearScanResults();
+    ReleaseScanResultsResource();
     if (g_hdiWifiCallbackObj != NULL) {
         StubCollectorRemoveObject(IWLANCALLBACK_INTERFACE_DESC, g_hdiWifiCallbackObj);
         free(g_hdiWifiCallbackObj);

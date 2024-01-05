@@ -28,7 +28,7 @@ namespace Wifi {
 P2pMonitor::P2pMonitor() : selectIfacName(), setMonitorIface(), mapHandler()
 {}
 
-P2pMonitor::~P2pMonitor()
+P2pMonitor::~P2pMonitor() __attribute__((no_sanitize("cfi")))
 {
     P2pHalCallback callback;
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);

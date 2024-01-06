@@ -98,13 +98,13 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_status res;
             bool find = false;
             bool unrefRef = false;
+            std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
             auto it = g_eventRegisterInfo.find(asyncData->eventType);
             napi_open_handle_scope(asyncData->env, &scope);
             if (scope == nullptr) {
                 WIFI_LOGE("uv_queue_work, scope is nullptr");
                 goto EXIT;
             }
-            std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
             if (it == g_eventRegisterInfo.end()) {
                 WIFI_LOGW("uv_queue_work, event has been unregistered.");
                 goto EXIT;

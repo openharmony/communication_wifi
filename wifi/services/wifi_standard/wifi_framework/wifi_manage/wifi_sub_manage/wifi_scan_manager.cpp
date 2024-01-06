@@ -44,17 +44,21 @@ IScanSerivceCallbacks& WifiScanManager::GetScanCallback()
 }
 
 #ifndef OHOS_ARCH_LITE
-void WifiScanManager::UnloadScanSaTimerCallback()
+static void UnloadScanSaTimerCallback()
 {
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_SCAN_ABILITY_ID);
-    StopUnloadScanSaTimer();
+    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
 }
 
 void WifiScanManager::StopUnloadScanSaTimer(void)
 {
     WIFI_LOGI("StopUnloadScanSaTimer! unloadScanSaTimerId:%{public}u", unloadScanSaTimerId);
     std::unique_lock<std::mutex> lock(unloadScanSaTimerMutex);
-    WifiTimer::GetInstance()->UnRegister(unloadScanSaTimerId);
+    if (unloadScanSaTimerId == 0) {
+        return;
+    }
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(unloadScanSaTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(unloadScanSaTimerId);
     unloadScanSaTimerId = 0;
     return;
 }
@@ -64,8 +68,12 @@ void WifiScanManager::StartUnloadScanSaTimer(void)
     WIFI_LOGI("StartUnloadScanSaTimer! unloadScanSaTimerId:%{public}u", unloadScanSaTimerId);
     std::unique_lock<std::mutex> lock(unloadScanSaTimerMutex);
     if (unloadScanSaTimerId == 0) {
-        WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiScanManager::UnloadScanSaTimerCallback, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, unloadScanSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+        wifiSysTimer->SetCallbackInfo(UnloadScanSaTimerCallback);
+        unloadScanSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+        MiscServices::TimeServiceClient::GetInstance()->StartTimer(unloadScanSaTimerId,
+            currentTime + TIMEOUT_UNLOAD_WIFI_SA);
         WIFI_LOGI("StartUnloadScanSaTimer success! unloadScanSaTimerId:%{public}u", unloadScanSaTimerId);
     }
     return;

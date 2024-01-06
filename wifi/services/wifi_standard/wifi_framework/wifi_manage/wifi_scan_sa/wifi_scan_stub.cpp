@@ -317,7 +317,7 @@ int WifiScanStub::OnSetScanOnlyAvailable(
     bool enabled = data.ReadBool();
     WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable enabled is %{public}d", enabled);
     reply.WriteInt32(0);
-    reply.WriteBool(SetScanOnlyAvailable(enabled));
+    reply.WriteInt32(SetScanOnlyAvailable(enabled));
     return 0;
 }
 

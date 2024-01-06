@@ -811,6 +811,16 @@ void BatteryEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDat
             return;
         }
     }
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
+        if (pScanService == nullptr) {
+            WIFI_LOGE("scan service is NOT start!");
+            return;
+        }
+        if (pScanService->OnMovingFreezeStateChange() != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("OnMovingFreezeStateChange failed");
+        }
+    }
 }
 
 AppEventSubscriber::AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)

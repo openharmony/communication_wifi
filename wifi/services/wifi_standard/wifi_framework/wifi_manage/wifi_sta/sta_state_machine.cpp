@@ -902,6 +902,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     }
 
     linkedInfo.snr = signalInfo.snr;
+    linkedInfo.chload = signalInfo.chload;
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }

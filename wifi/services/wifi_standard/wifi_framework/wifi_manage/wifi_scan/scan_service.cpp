@@ -143,7 +143,8 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         }
     }
     pScanMonitor->SetScanStateMachine(pScanStateMachine);
-    pScanStateMachine->SendMessage(static_cast<int>(CMD_SCAN_PREPARE));
+    int delayMs = 100;
+    pScanStateMachine->MessageExecutedLater(static_cast<int>(CMD_SCAN_PREPARE), delayMs);
     GetScanControlInfo();
 
     return true;
@@ -1048,6 +1049,10 @@ void ScanService::HandleMovingFreezeChanged()
         WIFI_LOGW("set movingFreeze scanned false.");
         SetMovingFreezeScaned(false);
     }
+    if (movingFreezeBakup == movingFreeze) {
+        WIFI_LOGD("AbsFreezeState not change, no need to restart system timer scan.");
+        return;
+    }
     SystemScanProcess(false);
 }
 
@@ -1117,6 +1122,7 @@ void ScanService::StopSystemScan()
         WIFI_LOGE("pScanStateMachine is null.\n");
         return;
     }
+    lastSystemScanTime = 0;
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     EndPnoScan();
     pnoScanFailedNum = 0;

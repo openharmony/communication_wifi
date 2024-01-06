@@ -978,6 +978,30 @@ WifiErrorNo P2pGetPeer(const char *deviceAddress, P2pDeviceInfo *peerInfo)
     return result;
 }
 
+WifiErrorNo P2pGetChba0Freq(int *chba0Freq)
+{
+    RpcClient *client = GetP2pRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "P2pGetChba0Freq");
+    WriteStr(context, deviceAddress);
+    WriteEnd(context);
+    if (RpcClientCall(client, "P2pGetChba0Freq") != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    if (result != WIFI_IDL_OPT_OK) {
+        LOGE("P2pGetChba0Freq failed!");
+    } else {
+        ReadInt(context, chba0Freq);
+    }
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
 WifiErrorNo P2pGetFrequencies(int32_t band, int *frequencies, int32_t *size)
 {
     RpcClient *client = GetP2pRpcClient();

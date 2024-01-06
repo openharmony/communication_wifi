@@ -797,6 +797,22 @@ int RpcP2pGetPeer(RpcServer *server, Context *context)
     return HAL_SUCCESS;
 }
 
+int RpcP2pGetChba0Freq(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    int chba0Freq = 0;
+    WifiErrorNo err = P2pGetChba0Freq(&chba0Freq);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    if (err == WIFI_HAL_SUCCESS) {
+        WriteInt(context, chba0Freq);
+    }
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
 int RpcP2pGetFrequencies(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {

@@ -390,6 +390,15 @@ int RpcP2pSetServDiscExternal(RpcServer *server, Context *context);
 int RpcP2pGetPeer(RpcServer *server, Context *context);
 
 /**
+ * @Description Get chba0 frequency.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcP2pGetChba0Freq(RpcServer *server, Context *context)
+
+/**
  * @Description Obtains the frequencies supported by a specified frequency band.
  *
  * @param server - Pointer to the global structure of the communication server.

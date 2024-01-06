@@ -1132,6 +1132,44 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetPeer(
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
+static P2pSupplicantErrCode WpaP2pCliCmdP2pGetChba0Freq(WifiWpaP2pInterface *this, int *chba0Freq)
+{
+    if (this == NULL || networkId == NULL) {
+        return P2P_SUP_ERRCODE_INVALID;
+    }
+    char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
+    char cmd[P2P_CMD_BUF_LENGTH] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=IFNAME=chba0 STATUS") < 0) {
+        LOGE("snprintf error");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        LOGE("chba0 STATUS command failed!");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+    size_t bufLen = strlen(buf);
+    if (strncmp(cmd, "IFNAME=chba0 STATUS", strlen("IFNAME=chba0 STATUS")) != 0) {
+        LOGE("chba0 STATUS command failed!");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+    for (int i = 0; i < bufLen; i++) {
+        buf[i] = buf[i] == '\n' ? '*' : buf[i];
+    }
+    char *sep = "*";
+    char *retbuf = strtok(buf, sep);
+    retbuf = strtok(NULL, sep);
+    char *freq = strstr(retbuf, "freq=");
+    if (freq != NULL) {
+        freq += strlen("freq=");
+        *chba0Freq = atoi(freq);
+    } else {
+        LOGE("chba0Freq is null");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+    LOGD("WpaP2pCliCmdP2pGetChba0Freq: buf = %{public}s chba0Freq = %{public}d", buf, *chba0Freq);
+    return P2P_SUP_ERRCODE_SUCCESS;
+}
+
 static int CheckValidGroupConfigField(const P2pWpaGroupConfigArgv *argv)
 {
     int pos = -1;
@@ -1290,6 +1328,7 @@ static void InitGlobalWpaP2pFunc(void)
     g_wpaP2pInterface->wpaP2pCliCmdSetServDiscExternal = WpaP2pCliCmdSetServDiscExternal;
     g_wpaP2pInterface->wpaP2pCliCmdSetRandomMac = WpaP2pCliCmdSetRandomMac;
     g_wpaP2pInterface->wpaP2pCliCmdP2pGetPeer = WpaP2pCliCmdP2pGetPeer;
+    g_wpaP2pInterface->wpaP2pCliCmdP2pGetChba0Freq = WpaP2pCliCmdP2pGetChba0Freq;
     g_wpaP2pInterface->wpaP2pCliCmdSetGroupConfig = WpaP2pCliCmdSetGroupConfig;
     g_wpaP2pInterface->wpaP2pCliCmdGetGroupConfig = WpaP2pCliCmdGetGroupConfig;
     g_wpaP2pInterface->wpaP2pCliCmdAddNetwork = WpaP2pCliCmdAddNetwork;

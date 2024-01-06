@@ -44,17 +44,21 @@ IApServiceCallbacks& WifiHotspotManager::GetApCallback()
 }
 
 #ifndef OHOS_ARCH_LITE
-void WifiHotspotManager::UnloadHotspotSaTimerCallback()
+static void UnloadHotspotSaTimerCallback()
 {
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
-    StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
 }
 
 void WifiHotspotManager::StopUnloadApSaTimer(void)
 {
     WIFI_LOGI("StopUnloadApSaTimer! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
     std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
-    WifiTimer::GetInstance()->UnRegister(unloadHotspotSaTimerId);
+    if (unloadHotspotSaTimerId == 0) {
+        return;
+    }
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(unloadHotspotSaTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(unloadHotspotSaTimerId);
     unloadHotspotSaTimerId = 0;
     return;
 }
@@ -64,8 +68,12 @@ void WifiHotspotManager::StartUnloadApSaTimer(void)
     WIFI_LOGI("StartUnloadApSaTimer! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
     std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
     if (unloadHotspotSaTimerId == 0) {
-        WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiHotspotManager::UnloadHotspotSaTimerCallback, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, unloadHotspotSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+        wifiSysTimer->SetCallbackInfo(UnloadHotspotSaTimerCallback);
+        unloadHotspotSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+        MiscServices::TimeServiceClient::GetInstance()->StartTimer(unloadHotspotSaTimerId,
+            currentTime + TIMEOUT_UNLOAD_WIFI_SA);
         WIFI_LOGI("RegisterUnloadHotspotSaTimer success! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
     }
     return;

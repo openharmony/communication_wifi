@@ -1134,12 +1134,12 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetPeer(
 
 static P2pSupplicantErrCode WpaP2pCliCmdP2pGetChba0Freq(WifiWpaP2pInterface *this, int *chba0Freq)
 {
-    if (this == NULL || networkId == NULL) {
+    if (this == NULL || chba0Freq == NULL) {
         return P2P_SUP_ERRCODE_INVALID;
     }
     char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
     char cmd[P2P_CMD_BUF_LENGTH] = {0};
-    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=IFNAME=chba0 STATUS") < 0) {
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=chba0 STATUS") < 0) {
         LOGE("snprintf error");
         return P2P_SUP_ERRCODE_FAILED;
     }
@@ -1155,9 +1155,11 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetChba0Freq(WifiWpaP2pInterface *thi
     for (int i = 0; i < bufLen; i++) {
         buf[i] = buf[i] == '\n' ? '*' : buf[i];
     }
-    char *sep = "*";
-    char *retbuf = strtok(buf, sep);
-    retbuf = strtok(NULL, sep);
+    char *ptr = NULL;
+    char *retbuf = strtok_r(buf, "*", &ptr);
+    if (retbuf != NULL) {
+       retbuf = strtok_r(NULL, "*", &ptr);
+    }
     char *freq = strstr(retbuf, "freq=");
     if (freq != NULL) {
         freq += strlen("freq=");

@@ -396,7 +396,7 @@ int RpcP2pGetPeer(RpcServer *server, Context *context);
  * @param context - Pointer to the global communication context structure of the server.
  * @return int - 0 Success, -1 Failed.
  */
-int RpcP2pGetChba0Freq(RpcServer *server, Context *context)
+int RpcP2pGetChba0Freq(RpcServer *server, Context *context);
 
 /**
  * @Description Obtains the frequencies supported by a specified frequency band.

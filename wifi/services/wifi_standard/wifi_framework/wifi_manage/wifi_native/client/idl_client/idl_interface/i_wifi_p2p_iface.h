@@ -390,7 +390,7 @@ WifiErrorNo P2pGetPeer(const char *deviceAddress, P2pDeviceInfo *peerInfo);
  *
  * @return WifiErrorNo
  */
-WifiErrorNo P2pGetChba0Freq(int *chba0Freq)
+WifiErrorNo P2pGetChba0Freq(int *chba0Freq);
 
 /**
  * @Description Obtains the frequencies supported by a specified frequency band.

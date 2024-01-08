@@ -985,7 +985,6 @@ WifiErrorNo P2pGetChba0Freq(int *chba0Freq)
     Context *context = client->context;
     WriteBegin(context, 0);
     WriteFunc(context, "P2pGetChba0Freq");
-    WriteStr(context, deviceAddress);
     WriteEnd(context);
     if (RpcClientCall(client, "P2pGetChba0Freq") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;

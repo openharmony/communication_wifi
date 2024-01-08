@@ -980,8 +980,8 @@ WifiErrorNo P2pGetPeer(const char *bssid, P2pDeviceInfo *peerInfo)
 
 WifiErrorNo P2pGetChba0Freq(int *chba0Freq)
 {
-    if (networkId == NULL) {
-        LOGE("P2pGetChba0Freq() networkId is null");
+    if (chba0Freq == NULL) {
+        LOGE("P2pGetChba0Freq() chba0Freq is null");
         return WIFI_HAL_FAILED;
     }
     LOGD("P2pGetChba0Freq");

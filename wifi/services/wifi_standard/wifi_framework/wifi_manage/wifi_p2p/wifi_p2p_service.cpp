@@ -25,28 +25,6 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 
 namespace OHOS {
 namespace Wifi {
-#define FREQ_2G_MIN 2412
-#define FREQ_2G_MAX 2472
-#define FREQ_2G_BASE 2407
-#define FREQ_2G_CHANNEL_14 2484
-#define CHANNEL_14 14
-#define FREQ_5G_4000 4000
-#define FREQ_5G_4900 4900
-#define FREQ_5G_5000 5000
-#define FREQ_5G_1_MIN 5180
-#define FREQ_5G_1_MAX 5240
-#define FREQ_DFS_MIN 5260
-#define FREQ_DFS_MAX 5320
-#define FREQ_5G_2_MIN 5500
-#define FREQ_5G_2_MAX 5720
-#define FREQ_5G_3_MIN 5745
-#define FREQ_5G_3_MAX 5885
-#define FREQ_5G_5925 5925
-#define FREQ_5G_5935 5935
-#define FREQ_5G_4_MIN 5950
-#define FREQ_5G_4_MAX 7115
-#define FREQ_DIFF 5
-
 WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pGroupManager &setGroupMgr, WifiP2pServiceManager &setSvrMgr)
     : p2pStateMachine(p2pStateMachine),
@@ -359,29 +337,6 @@ int WifiP2pService::GetSharedLinkCount(void)
     return SharedLinkManager::GetSharedLinkCount();
 }
 
-int WifiP2pService::FreqToChannel(int freq)
-{
-    WIFI_LOGI("FreqToChannel");
-    int channel = 0;
-    if (freq >= FREQ_2G_MIN && freq <= FREQ_2G_MAX) {
-        channel = (freq - FREQ_2G_BASE) / FREQ_DIFF;
-    } else if (freq == FREQ_2G_CHANNEL_14) {
-        channel = CHANNEL_14;
-    } else if (freq >= FREQ_5G_4900 && freq < FREQ_5G_5000) {
-        channel = (freq - FREQ_5G_4000) / FREQ_DIFF;
-    } else if ((freq >= FREQ_5G_1_MIN && freq <= FREQ_5G_1_MAX) || (freq >= FREQ_DFS_MIN && freq <= FREQ_DFS_MAX) ||
-               (freq >= FREQ_5G_3_MIN && freq <= FREQ_5G_3_MAX) || (freq >= FREQ_5G_2_MIN && freq <= FREQ_5G_2_MAX)) {
-        channel = (freq - FREQ_5G_5000) / FREQ_DIFF;
-    } else if (freq > FREQ_5G_4_MIN && freq <= FREQ_5G_4_MAX) {
-        channel = (freq - FREQ_5G_4_MIN) / FREQ_DIFF;
-    } else if (freq == FREQ_5G_5935) {
-        channel = (freq - FREQ_5G_5925) / FREQ_DIFF;
-    } else {
-        WIFI_LOGE("frequency is invalid");
-    }
-    return channel;
-}
-
 int WifiP2pService::GetP2pRecommendChannel(void)
 {
     WIFI_LOGI("GetP2pRecommendChannel");
@@ -389,7 +344,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     WifiErrorNo ret = P2pGetChba0Freq(&frequency);
     if (ret == WIFI_IDL_OPT_OK && frequency != 0) {
         WIFI_LOGI("P2pGetChba0Freq success, frequency = %{public}d", frequency);
-        int channel = FreqToChannel(frequency);
+        int channel = FrequencyToChannel(frequency);
         WIFI_LOGI("Recommend hml channel: %{public}d", channel);
         return channel;
     }

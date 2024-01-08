@@ -35,6 +35,9 @@
 #include "network_parser.h"
 #include "softap_parser.h"
 #endif
+#ifdef INIT_LIB_ENABLE
+#include "parameter.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -1532,11 +1535,18 @@ int WifiSettings::GetApMaxConnNum()
 void WifiSettings::InitDefaultHotspotConfig()
 {
     HotspotConfig cfg;
+#ifdef INIT_LIB_ENABLE
+    std::string ssid = GetMarketName();
+#endif
     cfg.SetSecurityType(KeyMgmt::WPA2_PSK);
     cfg.SetBand(BandType::BAND_2GHZ);
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
+#ifdef INIT_LIB_ENABLE
+    cfg.SetSsid(ssid);
+#else
     cfg.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
+#endif
     cfg.SetPreSharedKey("12345678");
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {
@@ -1548,11 +1558,18 @@ void WifiSettings::ClearHotspotConfig()
 {
     mHotspotConfig.clear();
     HotspotConfig config;
+#ifdef INIT_LIB_ENABLE
+    std::string ssid = GetMarketName();
+#endif
     config.SetSecurityType(KeyMgmt::WPA2_PSK);
     config.SetBand(BandType::BAND_2GHZ);
     config.SetChannel(AP_CHANNEL_DEFAULT);
     config.SetMaxConn(GetApMaxConnNum());
+#ifdef INIT_LIB_ENABLE
+    config.SetSsid(ssid);
+#else
     config.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
+#endif
     config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, config);
     if (!ret.second) {

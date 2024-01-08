@@ -20,8 +20,6 @@
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
-#include "i_wifi_p2p_iface.h"
-#include "wifi_error_no.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 

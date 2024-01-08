@@ -273,13 +273,6 @@ public:
     virtual int GetSharedLinkCount(void) override;
 
     /**
-     * @Description transform frequency to channel.
-     *
-     * @return int - channel.
-     */
-    int FreqToChannel(int freq);
-
-    /**
      * @Description - Get P2P recommended channel.
      *
      * @return - int - Recommended channel

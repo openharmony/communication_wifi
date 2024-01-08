@@ -2134,7 +2134,6 @@ int StaStateMachine::RegisterCallBack()
 {
     clientCallBack.OnIpSuccessChanged = DhcpResultNotify::OnSuccess;
     clientCallBack.OnIpFailChanged = DhcpResultNotify::OnFailed;
-    pDhcpResultNotify->SetStaStateMachine(this);
     std::string ifname = IF_NAME + std::to_string(m_instId);
     DhcpErrorCode dhcpRet = RegisterDhcpClientCallBack(ifname.c_str(), &clientCallBack);
     if (dhcpRet != DHCP_SUCCESS) {
@@ -2170,6 +2169,7 @@ void StaStateMachine::GetIpState::GoInState()
         assignMethod = config.wifiIpConfig.assignMethod;
     }
 
+    pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(pStaStateMachine);
     if (assignMethod == AssignIpMethod::STATIC) {
         pStaStateMachine->currentTpType = config.wifiIpConfig.staticIpAddress.ipAddress.address.family;
         if (!pStaStateMachine->ConfigStaticIpAddress(config.wifiIpConfig.staticIpAddress)) {
@@ -2811,7 +2811,7 @@ void StaStateMachine::DhcpResultNotify::SetStaStateMachine(StaStateMachine *staS
 
 void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname, DhcpResult *result)
 {
-    if (ifname == nullptr || result == nullptr) {
+    if (ifname == nullptr || result == nullptr || pStaStateMachine == nullptr) {
         LOGE("StaStateMachine DhcpResultNotify OnSuccess ifname or result is nullptr.");
         return;
     }

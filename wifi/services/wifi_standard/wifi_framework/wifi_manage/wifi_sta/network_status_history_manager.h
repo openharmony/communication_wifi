@@ -51,7 +51,7 @@ public:
      * @param networkStatusHistory  historical network status records
      * @return whether to access the internet
      */
-    static bool IsInternetAccessByHistory(const uint32_t &networkStatusHistory);
+    static bool IsInternetAccessByHistory(uint32_t networkStatusHistory);
 
     /**
      * determine whether the access to internet recovery based on historical network records
@@ -59,7 +59,7 @@ public:
      * @param networkStatusHistory historical network status records
      * @return whether the access to internet recovery
      */
-    static bool IsAllowRecoveryByHistory(const uint32_t &networkStatusHistory);
+    static bool IsAllowRecoveryByHistory(uint32_t networkStatusHistory);
 
     /**
      * determine whether the network is portal based on historical network records
@@ -67,7 +67,7 @@ public:
      * @param networkStatusHistory
      * @return
      */
-    static bool IsPortalByHistory(const uint32_t &networkStatusHistory);
+    static bool IsPortalByHistory(uint32_t networkStatusHistory);
 
     /**
      * determine whether the network has internet ever on historical network records
@@ -75,7 +75,7 @@ public:
      * @param networkStatusHistory
      * @return
      */
-    static bool HasInternetEverByHistory(const uint32_t &networkStatusHistory);
+    static bool HasInternetEverByHistory(uint32_t networkStatusHistory);
 
     /**
      * determine whether the network has no networkStatus history on historical network records
@@ -83,7 +83,7 @@ public:
      * @param networkStatusHistory
      * @return
      */
-    static bool IsEmptyNetworkStatusHistory(const uint32_t &networkStatusHistory);
+    static bool IsEmptyNetworkStatusHistory(uint32_t networkStatusHistory);
 
     /**
      * to Display the networkStatus History;
@@ -91,7 +91,7 @@ public:
      * @param networkStatusHistory
      * @return
      */
-    static std::string ToString(const uint32_t &networkStatusHistory);
+    static std::string ToString(uint32_t networkStatusHistory);
 private:
 
     /**
@@ -100,7 +100,7 @@ private:
      * @param networkHistory historical network status records
      * @return the last network status
      */
-    static NetworkStatus GetLastNetworkStatus(const uint32_t &networkHistory);
+    static NetworkStatus GetLastNetworkStatus(uint32_t networkHistory);
 
     /* the num of enum class NetworkStatus values */
     constexpr static int NETWORK_STATUS_NUM = 4;
@@ -111,7 +111,7 @@ private:
      * @param networkStatusHistory historical network status records
      * @param counts 0: UNKNOWN,1:HAS_INTERNET,2:PORTAL,3:NO_INTERNET
      */
-    static void CountNetworkStatus(const uint32_t &networkStatusHistory, int counts[NETWORK_STATUS_NUM]);
+    static void CountNetworkStatus(uint32_t networkStatusHistory, int counts[NETWORK_STATUS_NUM]);
 
     /*!
      * the mask to get the network status from network status history.

@@ -1158,7 +1158,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetChba0Freq(WifiWpaP2pInterface *thi
     char *ptr = NULL;
     char *retbuf = strtok_r(buf, "*", &ptr);
     if (retbuf != NULL) {
-       retbuf = strtok_r(NULL, "*", &ptr);
+        retbuf = strtok_r(NULL, "*", &ptr);
     }
     char *freq = strstr(retbuf, "freq=");
     if (freq != NULL) {

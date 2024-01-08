@@ -361,7 +361,8 @@ int WifiP2pService::GetSharedLinkCount(void)
     return SharedLinkManager::GetSharedLinkCount();
 }
 
-int WifiP2pService::FreqToChannel(int freq) {
+int WifiP2pService::FreqToChannel(int freq)
+{
     WIFI_LOGI("FreqToChannel");
     int channel = 0;
     if (freq >= FREQ_2G_MIN && freq <= FREQ_2G_MAX) {
@@ -378,7 +379,7 @@ int WifiP2pService::FreqToChannel(int freq) {
     } else if (freq == FREQ_5G_5935) {
         channel = (freq - FREQ_5G_5925) / FREQ_DIFF;
     } else {
-        WIFI_LOGI("frequency is invalid");
+        WIFI_LOGE("frequency is invalid");
     }
     return channel;
 }
@@ -388,7 +389,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     WIFI_LOGI("GetP2pRecommendChannel");
     int frequency;
     WifiErrorNo ret = P2pGetChba0Freq(&frequency);
-    if(ret == WIFI_IDL_OPT_OK && frequency != 0) {
+    if (ret == WIFI_IDL_OPT_OK && frequency != 0) {
         WIFI_LOGI("P2pGetChba0Freq success, frequency = %{public}d", frequency);
         int channel = FreqToChannel(frequency);
         WIFI_LOGI("Recommend hml channel: %{public}d", channel);

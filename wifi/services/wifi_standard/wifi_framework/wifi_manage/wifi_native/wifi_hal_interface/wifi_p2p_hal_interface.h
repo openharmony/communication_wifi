@@ -392,7 +392,7 @@ public:
      * @param chba0Freq
      * @return WifiErrorNo
      */
-    WifiErrorNo WifiP2PHalInterface::GetChba0Freq(int &chba0Freq) const
+    WifiErrorNo GetChba0Freq(int &chba0Freq) const;
 
     /**
      * @Description Obtains the P2P frequency supported by a specified frequency band.

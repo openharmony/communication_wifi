@@ -978,6 +978,25 @@ WifiErrorNo P2pGetPeer(const char *bssid, P2pDeviceInfo *peerInfo)
     return WIFI_HAL_SUCCESS;
 }
 
+WifiErrorNo P2pGetChba0Freq(int *chba0Freq)
+{
+    if (chba0Freq == NULL) {
+        LOGE("P2pGetChba0Freq() chba0Freq is null");
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("P2pGetChba0Freq");
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    if (pMainIfc == NULL) {
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdP2pGetChba0Freq(pMainIfc, chba0Freq);
+    if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        LOGE("wpaP2pCliCmdP2pGetChba0Freq fail, ret = %{public}d", ret);
+        return ConvertP2pErrCode(ret);
+    }
+    return WIFI_HAL_SUCCESS;
+}
+
 WifiErrorNo P2pGetFrequencies(int band, int *frequencies, int *size)
 {
     if (frequencies == NULL || size == NULL) {

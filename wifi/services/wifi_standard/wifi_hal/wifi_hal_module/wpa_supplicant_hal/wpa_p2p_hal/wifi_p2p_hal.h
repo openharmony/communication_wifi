@@ -74,6 +74,7 @@ struct stWifiWpaP2pInterface {
     P2pSupplicantErrCode (*wpaP2pCliCmdSetRandomMac)(WifiWpaP2pInterface *p, int mode);
     P2pSupplicantErrCode (*wpaP2pCliCmdP2pGetPeer)(
         WifiWpaP2pInterface *p, const char *bssid, P2pDeviceInfo *peerInfo);
+    P2pSupplicantErrCode (*wpaP2pCliCmdP2pGetChba0Freq)(WifiWpaP2pInterface *p, int *chba0Freq);
     P2pSupplicantErrCode (*wpaP2pCliCmdSetGroupConfig)(WifiWpaP2pInterface *p, const P2pWpaGroupConfigArgv *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdGetGroupConfig)(WifiWpaP2pInterface *p, P2pWpaGroupConfigArgv *argv);
     P2pSupplicantErrCode (*wpaP2pCliCmdAddNetwork)(WifiWpaP2pInterface *p, int *networkId);

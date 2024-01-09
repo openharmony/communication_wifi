@@ -289,12 +289,12 @@ WifiErrorNo CheckHdiNormalStart(const int32_t wlanType)
         ret = HdiStop();
         if (ret != WIFI_IDL_OPT_OK) {
             LOGE("CheckHdiNormalStart: HdiStop failed!");
-            retrun ret;
+            return ret;
         }
         ret = StartHdiWifi();
         if (ret != WIFI_IDL_OPT_OK) {
             LOGE("CheckHdiNormalStart: StartHdiWifi failed!");
-            retrun ret;
+            return ret;
         }
     }
     LOGI("CheckHdiNormalStart: hdi normal start!");

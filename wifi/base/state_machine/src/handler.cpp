@@ -134,13 +134,14 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
     }
 
     /* Obtains the current time, accurate to milliseconds. */
-    struct timeval curTime = {0, 0};
-    if (gettimeofday(&curTime, nullptr) != 0) {
-        LOGE("gettimeofday failed.\n");
+    struct timespec curTime = {0, 0};
+    if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
+        LOGE("clock_gettime failed.");
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;
     }
-    int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * USEC_1000 + curTime.tv_usec / USEC_1000;
+    int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * USEC_1000 +
+        curTime.tv_nsec / (USEC_1000 * USEC_1000);
 
     MessageExecutedAtTime(msg, nowTime + delayTime);
     return;

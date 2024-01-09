@@ -37,6 +37,7 @@ SoftapManagerMachine::SoftapManagerMachine()
 SoftapManagerMachine::~SoftapManagerMachine()
 {
     WIFI_LOGE("SoftapManagerMachine::~SoftapManagerMachine");
+    StopHandleThread();
     ParsePointer(pDefaultState);
     ParsePointer(pIdleState);
     ParsePointer(pStartedState);

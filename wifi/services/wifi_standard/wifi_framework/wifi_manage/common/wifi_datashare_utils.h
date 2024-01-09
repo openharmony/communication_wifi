@@ -110,7 +110,7 @@ public:
     std::string GetLoactionDataShareUri();
 
 private:
-    std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(bool onlySettingsData);
+    std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(bool onlySettingsData = false);
     std::shared_ptr<DataShare::DataShareHelper> m_registerHelper = nullptr;
 };
 

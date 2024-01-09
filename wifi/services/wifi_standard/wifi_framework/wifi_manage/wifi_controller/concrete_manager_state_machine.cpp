@@ -39,7 +39,7 @@ ConcreteMangerMachine::ConcreteMangerMachine()
 ConcreteMangerMachine::~ConcreteMangerMachine()
 {
     WIFI_LOGE("ConcreteMangerMachine::~ConcreteMangerMachine");
-    StopHandleThread();
+    StopHandlerThread();
     ParsePointer(pDefaultState);
     ParsePointer(pIdleState);
     ParsePointer(pConnectState);

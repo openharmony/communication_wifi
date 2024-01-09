@@ -119,7 +119,7 @@ private:
      * @Description : check networktype by code function
      *
      */
-    StaNetState CheckResponseCode(std::string url, int codeNum, int codeLenNum);
+    StaNetState CheckResponseCode(std::string url, int codeNum);
 
     void ClearHttpResultInfo();
 

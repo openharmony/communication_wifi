@@ -387,6 +387,14 @@ public:
     WifiErrorNo GetP2pPeer(const std::string &deviceAddress, WifiP2pDevice &device) const;
 
     /**
+     * @Description get chba0 frequency.
+     *
+     * @param chba0Freq
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetChba0Freq(int &chba0Freq) const;
+
+    /**
      * @Description Obtains the P2P frequency supported by a specified frequency band.
      *
      * @param band - Frequency band.

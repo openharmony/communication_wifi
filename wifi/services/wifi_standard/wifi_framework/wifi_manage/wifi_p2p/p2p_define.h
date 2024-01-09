@@ -189,7 +189,7 @@ enum class P2P_CONNECT_FAIL {
     FAIL_REASON
 };
 
-enum class P2P_AB_DISCONNECT {
+enum class P2P_ABNORMAL_DISCONNECT {
     ERR_CODE = 0,
     FAIL_REASON
 };

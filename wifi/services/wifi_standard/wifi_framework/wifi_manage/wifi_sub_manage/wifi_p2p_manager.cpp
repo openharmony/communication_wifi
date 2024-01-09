@@ -130,17 +130,21 @@ ErrCode WifiP2pManager::AutoStopP2pService()
 }
 
 #ifndef OHOS_ARCH_LITE
-void WifiP2pManager::UnloadP2PSaTimerCallback()
+static void UnloadP2PSaTimerCallback()
 {
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_P2P_ABILITY_ID);
-    StopUnloadP2PSaTimer();
+    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
 }
 
 void WifiP2pManager::StopUnloadP2PSaTimer(void)
 {
     WIFI_LOGI("StopUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
     std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
-    WifiTimer::GetInstance()->UnRegister(unloadP2PSaTimerId);
+    if (unloadP2PSaTimerId == 0) {
+        return;
+    }
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(unloadP2PSaTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(unloadP2PSaTimerId);
     unloadP2PSaTimerId = 0;
     return;
 }
@@ -150,8 +154,12 @@ void WifiP2pManager::StartUnloadP2PSaTimer(void)
     WIFI_LOGI("StartUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
     std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
     if (unloadP2PSaTimerId == 0) {
-        WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiP2pManager::UnloadP2PSaTimerCallback, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, unloadP2PSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+        wifiSysTimer->SetCallbackInfo(UnloadP2PSaTimerCallback);
+        unloadP2PSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+        MiscServices::TimeServiceClient::GetInstance()->StartTimer(unloadP2PSaTimerId,
+            currentTime + TIMEOUT_UNLOAD_WIFI_SA);
         WIFI_LOGI("StartUnloadP2PSaTimer success! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
     }
     return;

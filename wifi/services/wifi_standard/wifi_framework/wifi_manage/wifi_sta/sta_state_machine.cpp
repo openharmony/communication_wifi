@@ -905,6 +905,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     }
 
     linkedInfo.snr = signalInfo.snr;
+    linkedInfo.chload = signalInfo.chload;
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
@@ -2825,6 +2826,8 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
     LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT OnSuccess");
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DHCP_SUCCESS));
+    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_DHCP),
+        static_cast<int>(WifiOperateState::STA_DHCP_SUCCESS));
     if ((pStaStateMachine->linkedInfo.connState != ConnState::CONNECTED) &&
         (pStaStateMachine->linkedInfo.detailedState != DetailedState::OBTAINING_IPADDR)) {
         WIFI_LOGI("not in connected or in obtain ip address, need stop dhcp client");

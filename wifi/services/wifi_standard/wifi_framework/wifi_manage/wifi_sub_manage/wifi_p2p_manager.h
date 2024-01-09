@@ -39,7 +39,6 @@ public:
 
 private:
     void InitP2pCallback(void);
-    void UnloadP2PSaTimerCallback();
     void DealP2pStateChanged(P2pState bState);
     void DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers);
     void DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &vServices);

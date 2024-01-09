@@ -386,6 +386,13 @@ WifiErrorNo P2pSetServDiscExternal(int mode);
 WifiErrorNo P2pGetPeer(const char *deviceAddress, P2pDeviceInfo *peerInfo);
 
 /**
+ * @Description get chba0 freq.
+ *
+ * @return WifiErrorNo
+ */
+WifiErrorNo P2pGetChba0Freq(int *chba0Freq);
+
+/**
  * @Description Obtains the frequencies supported by a specified frequency band.
  *
  * @param band - Band type.

@@ -115,6 +115,8 @@ void StandByListerner::UnRegisterStandByEvent()
 {
     WIFI_LOGI("UnRegisterStandByEvent enter");
     std::unique_lock<std::mutex> lock(standByEventMutex);
+    allowScan = true;
+    WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
     if (!isStandBySubscribered) {
         WIFI_LOGI("isStandBySubscribered is false!");
         return;

@@ -35,6 +35,7 @@ WifiControllerMachine::WifiControllerMachine()
 WifiControllerMachine::~WifiControllerMachine()
 {
     WIFI_LOGI("WifiControllerMachine::~WifiControllerMachine");
+    StopHandlerThread();
     ParsePointer(pEnableState);
     ParsePointer(pDisableState);
     ParsePointer(pDefaultState);

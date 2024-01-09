@@ -1255,7 +1255,7 @@ ErrCode ScanService::AllowExternScan()
 #ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
     std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
         return WIFI_OPT_SUCCESS;
     }
@@ -1335,7 +1335,7 @@ ErrCode ScanService::AllowExternScan()
 #ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
     std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
         return WIFI_OPT_SUCCESS;
     }
@@ -1751,7 +1751,7 @@ bool ScanService::AllowExternScanByInterval(int appId, int staScene, ScanMode sc
     int noChargerPlugModeState = WifiSettings::GetInstance().GetNoChargerPlugModeState();
     if (noChargerPlugModeState == MODE_STATE_OPEN) {
         WIFI_LOGI("No charger plug mode state.");
-        if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_CUSTOM, scanMode)) {
+        if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_CUSTOM, ScanMode::ALL_EXTERN_SCAN)) {
             return false;
         }
     }

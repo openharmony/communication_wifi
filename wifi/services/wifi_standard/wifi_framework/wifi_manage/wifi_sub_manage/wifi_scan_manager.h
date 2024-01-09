@@ -38,7 +38,6 @@ public:
 
 private:
     void InitScanCallback(void);
-    void UnloadScanSaTimerCallback();
     void DealScanOpenRes(int instId = 0);
     void DealScanCloseRes(int instId = 0);
     void DealScanFinished(int state, int instId = 0);

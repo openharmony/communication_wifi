@@ -1641,6 +1641,12 @@ WifiErrorNo WifiIdlClient::ReqGetP2pPeer(const std::string &deviceAddress, WifiP
     return ret;
 }
 
+WifiErrorNo WifiIdlClient::ReqP2pGetChba0Freq(int &chba0Freq) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    return P2pGetChba0Freq(&chba0Freq);
+}
+
 WifiErrorNo WifiIdlClient::ReqP2pGetSupportFrequencies(int band, std::vector<int> &frequencies) const
 {
     CHECK_CLIENT_NOT_NULL;

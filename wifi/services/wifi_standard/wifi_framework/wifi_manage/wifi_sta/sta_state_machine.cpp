@@ -717,15 +717,20 @@ void StaStateMachine::StopWifiProcess()
         /* Callback result to InterfaceService. */
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
     }
-    
-    if ((WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId)
-        && WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK)
-        || WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
+
+    if (WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId) == WifiOprMidState::RUNNING) {
+        WifiErrorNo disconnectRet = WifiStaHalInterface::GetInstance().Disconnect();
+        /* Callback result to InterfaceService. */
+        WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
+        InvokeOnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
+        WIFI_LOGI("Stop WifiProcess successfully! disconnectRet:%{public}d", disconnectRet);
+        /* The current state of StaStateMachine transfers to InitState. */
+        SwitchState(pInitState);
+    } else if (WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
         /* Callback result to InterfaceService. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
         InvokeOnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
         WIFI_LOGI("Stop WifiProcess successfully!");
-
         /* The current state of StaStateMachine transfers to InitState. */
         SwitchState(pInitState);
     } else {
@@ -733,6 +738,7 @@ void StaStateMachine::StopWifiProcess()
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::UNKNOWN), m_instId);
         InvokeOnStaCloseRes(OperateResState::CLOSE_WIFI_FAILED);
     }
+
     WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
 }
 

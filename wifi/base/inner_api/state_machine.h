@@ -146,14 +146,16 @@ public:
     InternalMessage *CreateMessage(int msgName, int param1, int param2, const std::any &messageObj);
 
     /**
-     * @Description : send the message queue of the state machine.
+     * @Description : Constructs internal messages and places the
+     * message in the message queue of the state machine.
      *
      * @param msgName - Message name.[in]
      */
     virtual void SendMessage(int msgName);
 
     /**
-     * @Description : send the message queue of the state machine.
+     * @Description : Constructs internal messages and places the messages
+     * in the message queue of the state machine.
      * 
      * @param msgName - Message name.[in]
      * @param param1 - Message parameter.[in]
@@ -161,7 +163,8 @@ public:
     virtual void SendMessage(int msgName, int param1);
 
     /**
-     * @Description : send the message queue of the state machine.
+     * @Description : Constructs internal messages and places the messages
+     * in the message queue of the state machine.
      *
      * @param msgName - Message name.[in]
      * @param param1 - Message parameter.[in]
@@ -195,7 +198,8 @@ public:
     virtual void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
 
     /**
-     * @Description  Executed the message queue of the state machine. The messages are processed
+     * @Description : Constructs internal messages and places them in the
+     * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
      * @param msgName - Message Name.[in]
@@ -204,7 +208,8 @@ public:
     void MessageExecutedLater(int msgName, int64_t delayTimeMs);
 
     /**
-     * @Description : Executed the message queue of the state machine. The messages are processed
+     * @Description : Constructs internal messages and places them in the
+     * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
      * @param msgName - Message Name.[in]
@@ -214,7 +219,8 @@ public:
     void MessageExecutedLater(int msgName, int param1, int64_t delayTimeMs);
 
     /**
-     * @Description : Executed the message queue of the state machine. The messages are processed
+     * @Description : Constructs internal messages and places them in the
+     * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
      * @param msgName - Message Name.[in]
@@ -225,7 +231,8 @@ public:
     void MessageExecutedLater(int msgName, int param1, int param2, int64_t delayTimeMs);
 
     /**
-     * @Description : Executed the message queue of the state machine. The messages are processed
+     * @Description : Constructs internal messages and places them in the
+     * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
      * @param msg - Message to be sent.[in]
@@ -234,7 +241,8 @@ public:
     void MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs);
 
     /**
-     * @Description : Executed the message queue of the state machine. The messages are processed
+     * @Description : Constructs internal messages and places them in the
+     * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
      * @param msgName - Message Name.[in]
@@ -244,7 +252,8 @@ public:
     void MessageExecutedLater(int msgName, const std::any &messageObj, int64_t delayTimeMs);
 
     /**
-     * @Description : Executed the message queue of the state machine. The messages are processed
+     * @Description : Constructs internal messages and places them in the
+     * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
      * @param msgName - Message Name.[in]

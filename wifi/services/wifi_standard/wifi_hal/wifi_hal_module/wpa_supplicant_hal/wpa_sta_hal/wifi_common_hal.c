@@ -28,7 +28,7 @@
 
 WifiWpaChbaInterface *g_wpaChbaInterface = NULL;
 
-#define WPA_CMD_BUF_LEN 256
+#define WPA_CMD_BUF_LEN 400
 #define WPA_CMD_REPLY_BUF_SMALL_LEN 64
 
 int SendComCmd(const char* sendcmd)

@@ -83,13 +83,17 @@ ErrCode ConcreteMangerMachine::InitConcreteMangerStates()
     pDefaultState = new (std::nothrow) DefaultState(this);
     tmpErrNumber = JudgmentEmpty(pDefaultState);
     pIdleState = new (std::nothrow) IdleState(this);
-    tmpErrNumber = JudgmentEmpty(pIdleState);
+    tmpErrNumber += JudgmentEmpty(pIdleState);
     pConnectState = new (std::nothrow) ConnectState(this);
-    tmpErrNumber = JudgmentEmpty(pConnectState);
+    tmpErrNumber += JudgmentEmpty(pConnectState);
     pScanonlyState = new (std::nothrow) ScanonlyState(this);
-    tmpErrNumber = JudgmentEmpty(pScanonlyState);
+    tmpErrNumber += JudgmentEmpty(pScanonlyState);
     pMixState = new (std::nothrow) MixState(this);
-    tmpErrNumber = JudgmentEmpty(pMixState);
+    tmpErrNumber += JudgmentEmpty(pMixState);
+    if (tmpErrNumber != 0) {
+        WIFI_LOGE("InitConcreteMangerStates some one state is null\n");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 

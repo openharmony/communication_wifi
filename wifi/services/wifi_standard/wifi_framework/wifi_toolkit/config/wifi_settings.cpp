@@ -1537,7 +1537,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
     cfg.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
-    cfg.SetPreSharedKey("12345678");
+    cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {
         mHotspotConfig[0] = cfg;

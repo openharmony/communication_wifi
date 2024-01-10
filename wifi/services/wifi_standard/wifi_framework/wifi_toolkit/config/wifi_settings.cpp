@@ -2419,6 +2419,17 @@ long int WifiSettings::GetRandom()
         if (fd >= 0) {
             length = read(fd, &random, sizeof(random));
             close(fd);
+        } else {
+            LOGW("%{public}s: failed to open, try again", __func__);
+        }
+        if (random == 0) {
+            fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
+            if (fd >= 0) {
+                length = read(fd, &random, sizeof(random));
+                close(fd);
+            } else {
+                LOGE("%{public}s: retry failed", __func__);
+            }
         }
     } while (0);
     return (random >= 0 ? random : -random);

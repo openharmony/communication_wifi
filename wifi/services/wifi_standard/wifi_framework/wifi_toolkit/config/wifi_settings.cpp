@@ -58,7 +58,7 @@ WifiSettings::WifiSettings()
       mP2pConnectState(0),
       mApMaxConnNum(0),
       mMaxNumConfigs(0),
-      mScreenState(MODE_STATE_OPEN),
+      mScreenState(MODE_STATE_DEFAULT),
       mScanGenieState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
       mPowerSleepState(MODE_STATE_CLOSE),
@@ -988,7 +988,7 @@ int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
             iter->second.channelWidth = channelWidth;
         }
     }
-    
+
     return 0;
 }
 

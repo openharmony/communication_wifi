@@ -542,7 +542,7 @@ public:
      * @return int - 0 success
      */
     void GetPortalUri(WifiPortalConf &urlInfo);
-    
+
     /**
      * @Description add random mac address
      *
@@ -1131,7 +1131,7 @@ public:
      * @return freeze mode.
      */
     int GetFreezeModeState() const;
-    
+
     /**
      * @Description Set no charger plugged in mode.
      *
@@ -1590,7 +1590,7 @@ public:
      * @Description Clear MAC address pair
      *
      * @param type - MAC address type[in]
-     * @return std::string - an empty string indicates failure  
+     * @return std::string - an empty string indicates failure
      */
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
 #endif
@@ -1646,7 +1646,7 @@ private:
     int mMaxNumConfigs;          /* max saved configs numbers */
     std::map <int, int> mLastSelectedNetworkId;  /* last selected networkid */
     std::map <int, time_t> mLastSelectedTimeVal; /* last selected time */
-    int mScreenState;            /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
+    int mScreenState;            /* -1 MODE_STATE_DEFAULT 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
     int mIdelState;              /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
     int mBatteryChargeState;     /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */

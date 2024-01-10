@@ -623,17 +623,18 @@ State *StateMachineHandler::ExecuteTreeStateMsg(InternalMessage *msg)
 {
     LOGD("StateMachineHandler::ExecuteTreeStateMsg mStateVectorTopIndex:%{public}d", mStateVectorTopIndex);
     if (msg == nullptr) {
+        LOGE("ExecuteTreeStateMsg, msg is nullptr.");
         return nullptr;
     }
 
     StateInfo *curStateInfo = mStateVector[mStateVectorTopIndex];
     if (curStateInfo == nullptr) {
-        LOGE("StateInfo is null.");
+        LOGE("ExecuteTreeStateMsg, curStateInfo is nullptr.");
         return nullptr;
     }
 
     if (curStateInfo->state) {
-        LOGI("State machine: %{public}s execute Cmd:%{public}d",
+        LOGI("ExecuteTreeStateMsg, State machine: %{public}s execute Cmd:%{public}d",
             curStateInfo->state->GetStateName().c_str(), msg->GetMessageName());
     }
 

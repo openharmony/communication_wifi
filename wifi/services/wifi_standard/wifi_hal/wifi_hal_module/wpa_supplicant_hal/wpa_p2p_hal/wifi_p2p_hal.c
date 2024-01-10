@@ -1152,7 +1152,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetChba0Freq(WifiWpaP2pInterface *thi
         LOGE("chba0 STATUS command failed!");
         return P2P_SUP_ERRCODE_FAILED;
     }
-    for (int i = 0; i < bufLen; i++) {
+    for (size_t i = 0; i < bufLen; i++) {
         buf[i] = buf[i] == '\n' ? '*' : buf[i];
     }
     char *ptr = NULL;

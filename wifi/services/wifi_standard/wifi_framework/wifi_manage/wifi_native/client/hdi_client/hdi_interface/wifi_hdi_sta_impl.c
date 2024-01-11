@@ -366,6 +366,9 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
         HdiNotifyScanResult(HDI_STA_CB_SCAN_FAILED);
         return WIFI_IDL_OPT_FAILED;
     }
+    for (int i = 0; i < WIFI_IDL_GET_MAX_SCAN_INFO; i++) {
+        ReleaseScanResultsInfoElems(&g_hdiWifiScanResults[i]);
+    }
     if (memset_s(g_hdiWifiScanResults, WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo),
         0, WIFI_IDL_GET_MAX_SCAN_INFO * sizeof(struct ScanInfo)) != EOK) {
         pthread_mutex_unlock(&g_hdiWifiMutex);
@@ -407,7 +410,7 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
             g_hdiWifiScanResults[g_hdiWifiScanResultsCount].ssid);
         g_hdiWifiScanResultsCount++;
     }
-    
+    LOGI("%{public}s: the number of scan results is %{public}d", __func__, g_hdiWifiScanResultsCount);
     pthread_mutex_unlock(&g_hdiWifiMutex);
     HdiNotifyScanResult(HDI_STA_CB_SCAN_OVER_OK);
     return WIFI_IDL_OPT_OK;

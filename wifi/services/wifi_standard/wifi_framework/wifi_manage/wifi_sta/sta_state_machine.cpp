@@ -1488,7 +1488,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         LOGE("StartConnectToNetwork get GetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-    SyncDeviceConfigToWpa();
+    ConvertDeviceCfg(deviceConfig);
     if (bssid.empty()) {
         WifiStaHalInterface::GetInstance().SetBssid(networkId, deviceConfig.userSelectBssid);
     } else {

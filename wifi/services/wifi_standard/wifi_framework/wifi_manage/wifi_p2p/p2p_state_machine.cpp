@@ -18,6 +18,7 @@
 #include <map>
 #include "dhcpd_interface.h"
 #include "ip_tools.h"
+#include "ipv4_address.h"
 #include "wifi_broadcast_helper.h"
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
@@ -673,8 +674,15 @@ void P2pStateMachine::ClearWifiP2pInfo()
 
 bool P2pStateMachine::StartDhcpServer()
 {
-    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    IpInfo ipInfo;
+    WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
+    std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
+    Ipv4Address ipv4(Ipv4Address::DEFAULT_INET_ADDRESS);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    if (ipAddress.find("192.168.62") != std::string::npos) {
+        WIFI_LOGI("IP conflict, change dhcp address");
+        ipv4 = Ipv4Address::CONFLICT_INET_ADDRESS;
+    }
     if (!m_DhcpdInterface.StartDhcpServerFromInterface(groupManager.GetCurrentGroup().GetInterface(), ipv4, ipv6)) {
         return false;
     }

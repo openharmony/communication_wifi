@@ -64,6 +64,8 @@ public:
 
 public:
     static const Ipv4Address INVALID_INET_ADDRESS; /* Invalid IPv4 object constant. */
+    static const Ipv4Address DEFAULT_INET_ADDRESS;
+    static const Ipv4Address CONFLICT_INET_ADDRESS;
 
 public:
     /**

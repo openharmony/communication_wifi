@@ -34,7 +34,7 @@ constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 }
 
-std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreateDataShareHelper()
+std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreateDataShareHelper(bool onlySettingsData)
 {
     auto remote = sptr<IWifiDataShareRemoteBroker>(new (std::nothrow) IRemoteStub<IWifiDataShareRemoteBroker>());
     if (remote == nullptr) {
@@ -46,12 +46,15 @@ std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreate
         WIFI_LOGE("%{public}s remoteObj_ is nullptr", __func__);
         return nullptr;
     }
+    if (onlySettingsData) {
+        return DataShare::DataShareHelper::Creator(remoteObj, SETTINGS_DATA_EXT_URI);
+    }
     return DataShare::DataShareHelper::Creator(remoteObj, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
 }
 
-ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::string &value)
+ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::string &value, bool onlySettingsData)
 {
-    std::shared_ptr<DataShare::DataShareHelper> queryHelper = WifiCreateDataShareHelper();
+    std::shared_ptr<DataShare::DataShareHelper> queryHelper = WifiCreateDataShareHelper(onlySettingsData);
     CHECK_NULL_AND_RETURN(queryHelper, WIFI_OPT_FAILED);
 
     DataShare::DataSharePredicates predicates;

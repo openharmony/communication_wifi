@@ -332,8 +332,12 @@ int WifiEventSubscriberManager::GetLastStaStateByDatashare()
     Uri uri(SETTINGS_DATASHARE_URI_WIFI_ON);
     int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ON, lastStaState);
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("GetLastStaStateByDatashare, Query lastStaState fail!");
-        return 0;
+        WIFI_LOGW("Query lastStaState fail, query settingsdata again!");
+        ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ON, lastStaState, true);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("GetLastStaStateByDatashare Query lastStaState fail!");
+            return 0;
+        }
     }
 
     WIFI_LOGI("GetLastStaStateByDatashare, lastStaState:%{public}s", lastStaState.c_str());

@@ -101,6 +101,13 @@ void ApStartedState::GoOutState()
     StopMonitor();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_IDLE);
     WifiSettings::GetInstance().ClearStationList();
+    WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id);
+    if (m_hotspotConfig.GetIpAddress().find("192.168.63") != std::string::npos) {
+        WIFI_LOGI("IP conflict, change dhcp address");
+        m_hotspotConfig.SetIpAddress("192.168.62.1");
+        WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id);
+        WifiSettings::GetInstance().SyncHotspotConfig();
+    }
 }
 
 void ApStartedState::Init()
@@ -225,6 +232,13 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     }
 #endif
 
+    IpInfo ipInfo;
+    WifiSettings::GetInstance().GetIpInfo(ipInfo, m_id);
+    std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
+    if (ipAddress.find("192.168.62") != std::string::npos) {
+        WIFI_LOGI("IP conflict, change dhcp address");
+        apConfig.SetIpAddress("192.168.63.1");
+    }
     WifiSettings::GetInstance().SetHotspotConfig(apConfig, m_id);
     WifiSettings::GetInstance().SyncHotspotConfig();
     m_ApConfigUse.LogConfig(apConfig);

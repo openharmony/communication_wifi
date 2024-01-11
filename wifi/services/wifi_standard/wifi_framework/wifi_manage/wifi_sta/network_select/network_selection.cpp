@@ -73,7 +73,7 @@ std::string AndWifiFilter::GetFilterMsg()
 {
     std::stringstream filterMsg;
     filterMsg << "(";
-    for (auto i = 0; i < filters.size(); i++) {
+    for (std::size_t i = 0; i < filters.size(); i++) {
         filterMsg << filters.at(i)->GetFilterMsg();
         if (i < filters.size() - 1) {
             filterMsg << "&&";
@@ -94,7 +94,7 @@ std::string OrWifiFilter::GetFilterMsg()
 {
     std::stringstream filterMsg;
     filterMsg << "(";
-    for (auto i = 0; i < filters.size(); i++) {
+    for (std::size_t i = 0; i < filters.size(); i++) {
         filterMsg << filters.at(i)->GetFilterMsg();
         if (i < filters.size() - 1) {
             filterMsg << "||";
@@ -116,7 +116,9 @@ CompositeWifiScorer::CompositeWifiScorer(const std::string &scorerName) : IWifiS
 
 void CompositeWifiScorer::AddScorer(const std::shared_ptr<IWifiScorer> &scorer)
 {
-    scorers.emplace_back(scorer);
+    if (scorer) {
+        scorers.emplace_back(scorer);
+    }
 }
 
 void CompositeWifiScorer::DoScore(NetworkCandidate &networkCandidate,
@@ -193,7 +195,9 @@ CompositeNetworkSelector::CompositeNetworkSelector(const std::string &networkSel
 
 void CompositeNetworkSelector::AddSubNetworkSelector(const std::shared_ptr<INetworkSelector> &subNetworkSelector)
 {
-    subNetworkSelectors.emplace_back(subNetworkSelector);
+    if (subNetworkSelector) {
+        subNetworkSelectors.emplace_back(subNetworkSelector);
+    }
 }
 
 void CompositeNetworkSelector::GetBestCandidates(std::vector<NetworkCandidate *> &selectedNetworkCandidates)
@@ -211,7 +215,7 @@ std::string CompositeNetworkSelector::GetNetworkSelectorMsg()
     }
     if (!subNetworkSelectors.empty()) {
         networkSelectorMsg << R"(,"subNetworkSelectors": [)";
-        for (auto i = 0; i < subNetworkSelectors.size(); i++) {
+        for (std::size_t i = 0; i < subNetworkSelectors.size(); i++) {
             networkSelectorMsg << subNetworkSelectors.at(i)->GetNetworkSelectorMsg();
             if (i < subNetworkSelectors.size() - 1) {
                 networkSelectorMsg << ",";

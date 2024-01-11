@@ -42,10 +42,10 @@ void WifiScorerComparator::GetBestCandidates(const std::vector<NetworkCandidate 
     std::vector<NetworkCandidate *> bestNetworkCandidates; //bestNetworkCandidates have founded.
     std::vector<ScoreResult> bestNetworkScoreResults; //score records of bestNetworkCandidates.
     bestNetworkCandidates.emplace_back(candidates.at(0)); //at first,we assume the first one is the best.
-    for (int i = 1; i < candidates.size(); ++i) {
+    for (std::size_t i = 1; i < candidates.size(); ++i) {
         bool isWorseNetworkCandidate = false;
         auto networkCandidate = candidates.at(i);
-        for (int j = 0; j < scorers.size(); j++) {
+        for (std::size_t j = 0; j < scorers.size(); j++) {
             auto scorer = scorers.at(j);
             ScoreResult scoreResult;
             if (bestNetworkScoreResults.size() <= j) {
@@ -124,7 +124,7 @@ std::string WifiScorerComparator::getAllNetworkCandidateMsg(std::vector<NetworkC
 {
     std::stringstream scoreMsg;
     scoreMsg << "[";
-    for (auto i = 0; i < networkCandidates.size(); i++) {
+    for (std::size_t i = 0; i < networkCandidates.size(); i++) {
         scoreMsg << NetworkSelectionUtils::GetNetworkCandidateInfo(*networkCandidates.at(i));
         if (i < networkCandidates.size() - 1) {
             scoreMsg << ", ";
@@ -138,7 +138,7 @@ std::string WifiScorerComparator::getAllScoreMsg(std::vector<ScoreResult> &score
 {
     std::stringstream scoreMsg;
     scoreMsg << "[";
-    for (auto i = 0; i < scoreResults.size(); i++) {
+    for (std::size_t i = 0; i < scoreResults.size(); i++) {
         scoreMsg << NetworkSelectionUtils::GetScoreMsg(scoreResults.at(i));
         if (i < scoreResults.size() - 1) {
             scoreMsg << ", ";

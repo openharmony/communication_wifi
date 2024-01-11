@@ -1087,7 +1087,7 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
 
     int state = WifiSettings::GetInstance().GetScreenState();
     WIFI_LOGI("Screen state(1:OPEN, 2:CLOSE): %{public}d.", state);
-    if (state == MODE_STATE_OPEN) {
+    if (state == MODE_STATE_OPEN || state == MODE_STATE_DEFAULT) {
         {
             std::unique_lock<std::mutex> lock(scanControlInfoMutex);
             int i = 0;
@@ -1301,7 +1301,7 @@ ErrCode ScanService::AllowExternScan()
         WIFI_LOGW("extern scan not allow by sta connection state");
         return WIFI_OPT_FAILED;
     }
-    
+
     int appId = GetCallingUid();
     if (!AllowExternScanByInterval(appId, staScene, scanMode)) {
         WIFI_LOGW("extern scan not allow by interval mode");
@@ -1327,7 +1327,7 @@ ErrCode ScanService::AllowExternScan()
         WIFI_LOGW("extern scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
-    
+
     WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }
@@ -1379,7 +1379,7 @@ ErrCode ScanService::AllowExternScan()
             return WIFI_OPT_FAILED;
         }
     }
-    
+
     WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }
@@ -2272,7 +2272,7 @@ bool ScanService::SystemScanByInterval(int staScene, int &interval, int &count)
 {
     WIFI_LOGI("Enter ScanService::SystemScanByInterval.\n");
     int state = WifiSettings::GetInstance().GetScreenState();
-    if (state == MODE_STATE_OPEN) {
+    if (state == MODE_STATE_OPEN || state == MODE_STATE_DEFAULT) {
         if (staScene == SCAN_SCENE_CONNECTED) {
             SystemScanConnectedPolicy(interval);
         } else if (staScene == SCAN_SCENE_DISCONNCTED) {

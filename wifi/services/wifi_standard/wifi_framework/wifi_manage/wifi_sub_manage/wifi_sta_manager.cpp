@@ -186,7 +186,6 @@ void WifiStaManager::DealStaOpenRes(OperateResState state, int instId)
         WIFI_LOGI("DealStaOpenRes: wifi scan only state notify scan result!");
         IScanSerivceCallbacks &scanCallback = WifiManager::GetInstance().GetWifiScanManager()->GetScanCallback();
         scanCallback.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), instId);
-        
     }
 #ifdef FEATURE_P2P_SUPPORT
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();

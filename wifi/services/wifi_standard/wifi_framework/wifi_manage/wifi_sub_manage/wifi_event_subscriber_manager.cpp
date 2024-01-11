@@ -695,36 +695,19 @@ void ScreenEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
         bool isScreenOn = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) ? true : false;
         WifiProtectManager::GetInstance().HandleScreenStateChanged(isScreenOn);
 #endif
-        if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF &&
-            screenState == MODE_STATE_OPEN) {
-            if (pScanService->OnScreenStateChanged(MODE_STATE_CLOSE) != WIFI_OPT_SUCCESS) {
+        if (screenStateNew != screenState) {
+            if (pScanService->OnScreenStateChanged(screenStateNew) != WIFI_OPT_SUCCESS) {
                 WIFI_LOGE("OnScreenStateChanged failed");
             }
             /* Send suspend to wpa */
-            if (pService->SetSuspendMode(true) != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("SetSuspendMode failed");
+            bool canSetSuspendMode = screenStateNew == MODE_STATE_CLOSE;
+            if (pService->SetSuspendMode(canSetSuspendMode) != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("SetSuspendMode failed canSetSuspendMode = %{public}d", canSetSuspendMode);
             }
-            pService->OnScreenStateChanged(MODE_STATE_CLOSE);
+            pService->OnScreenStateChanged(screenStateNew);
 #ifdef FEATURE_HPF_SUPPORT
-            WifiManager::GetInstance().InstallPacketFilterProgram(screenState, i);
+            WifiManager::GetInstance().InstallPacketFilterProgram(screenStateNew, i);
 #endif
-            return;
-        }
-
-        if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
-            screenState == MODE_STATE_CLOSE) {
-            if (pScanService->OnScreenStateChanged(MODE_STATE_OPEN) != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("OnScreenStateChanged failed");
-            }
-            /* Send resume to wpa */
-            if (pService->SetSuspendMode(false) != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("SetSuspendMode failed");
-            }
-            pService->OnScreenStateChanged(MODE_STATE_OPEN);
-#ifdef FEATURE_HPF_SUPPORT
-            WifiManager::GetInstance().InstallPacketFilterProgram(screenState, i);
-#endif
-            return;
         }
     }
 }
@@ -868,7 +851,7 @@ void AppEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &d
 }
 
 ThermalLevelSubscriber::ThermalLevelSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-    : CommonEventSubscriber(subscriberInfo) 
+    : CommonEventSubscriber(subscriberInfo)
 {
     WIFI_LOGI("ThermalLevelSubscriber enter");
 }

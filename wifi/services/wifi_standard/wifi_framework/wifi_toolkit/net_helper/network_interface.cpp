@@ -298,16 +298,13 @@ bool NetworkInterface::FetchApOrP2pIpAddress(
             continue;
         }
         std::string subInterfaceName = interfaceName.substr(0, PREFIX_P2P);
-        // char* ifaName = new char[PREFIX_INTERFACENAME];
         char ifaName[PREFIX_INTERFACENAME];
         if (strncpy_s(ifaName, sizeof(ifaName), ifa->ifa_name, PREFIX_INTERFACENAME) != EOK) {
             return false;
         }
-
         if ((subInterfaceName == "wla") && (strncmp(interfaceName.c_str(), ifa->ifa_name, IF_NAMESIZE) == 0)) {
             continue;
         }
-
         if ((subInterfaceName == "p2p") &&
             (strncmp("p2p0", ifa->ifa_name, IF_NAMESIZE) == 0 || strncmp("p2p-", ifaName, IF_NAMESIZE) == 0)) {
             continue;

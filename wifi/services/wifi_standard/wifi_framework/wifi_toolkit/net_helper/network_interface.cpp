@@ -286,8 +286,8 @@ bool NetworkInterface::FetchApOrP2pIpAddress(
     struct ifaddrs *ifa = nullptr;
     bool ret = false;
     int n = 0;
-    constexpr int PREFIX_P2P = 3;
-    constexpr int PREFIX_INTERFACENAME = 4;
+    constexpr int prefixP2P = 3;
+    constexpr int PrefixInterface = 4;
 
     if (getifaddrs(&ifaddr) == -1) {
         WIFI_LOGE("getifaddrs failed, error is %{public}d", errno);
@@ -297,9 +297,9 @@ bool NetworkInterface::FetchApOrP2pIpAddress(
         if (ifa->ifa_addr == nullptr) {
             continue;
         }
-        std::string subInterfaceName = interfaceName.substr(0, PREFIX_P2P);
-        char ifaName[PREFIX_INTERFACENAME];
-        if (strncpy_s(ifaName, sizeof(ifaName), ifa->ifa_name, PREFIX_INTERFACENAME) != EOK) {
+        std::string subInterfaceName = interfaceName.substr(0, prefixP2P);
+        char ifaName[PrefixInterface];
+        if (strncpy_s(ifaName, sizeof(ifaName), ifa->ifa_name, PrefixInterface) != EOK) {
             return false;
         }
         if ((subInterfaceName == "wla") && (strncmp(interfaceName.c_str(), ifa->ifa_name, IF_NAMESIZE) == 0)) {

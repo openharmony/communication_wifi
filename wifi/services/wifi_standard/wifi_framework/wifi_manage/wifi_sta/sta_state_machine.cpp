@@ -831,6 +831,7 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[CMD_START_GET_DHCP_IP_TIMEOUT] = &StaStateMachine::DealGetDhcpIpTimeout;
     staSmHandleFuncMap[CMD_START_RENEWAL_TIMEOUT] = &StaStateMachine::DealRenewalTimeout;
     staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = &StaStateMachine::DealScreenStateChangedEvent;
+    staSmHandleFuncMap[CMD_AP_ROAMING_TIMEOUT_CHECK] = &StaStateMachine::DealApRoamingStateTimeout;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -2548,6 +2549,17 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
     return ret;
 }
 
+void StaStateMachine::DealApRoamingStateTimeout(InternalMessage *msg)
+{
+    if (msg == nullptr) {
+        LOGE("DealApRoamingStateTimeout InternalMessage msg is null.");
+        return;
+    }
+    LOGI("DealApRoamingStateTimeout StopTimer aproaming timer");
+    StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
+    DisConnectProcess();
+}
+
 /* --------------------------- state machine Roaming State ------------------------------ */
 StaStateMachine::ApRoamingState::ApRoamingState(StaStateMachine *staStateMachine)
     : State("ApRoamingState"), pStaStateMachine(staStateMachine)
@@ -2558,12 +2570,14 @@ StaStateMachine::ApRoamingState::~ApRoamingState()
 
 void StaStateMachine::ApRoamingState::GoInState()
 {
-    WIFI_LOGI("ApRoamingState GoInState function.");
+    WIFI_LOGI("ApRoamingState GoInState function. start aproaming timer!");
+    pStaStateMachine->StartTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK), STA_AP_ROAMING_TIMEOUT);
 }
 
 void StaStateMachine::ApRoamingState::GoOutState()
 {
-    WIFI_LOGI("ApRoamingState GoOutState function.");
+    WIFI_LOGI("ApRoamingState GoOutState function. stop aproaming timer!");
+    pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
 }
 
 bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
@@ -2579,6 +2593,7 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
             WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT event.");
             ret = EXECUTED;
             pStaStateMachine->isRoam = true;
+            pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
             pStaStateMachine->ConnectToNetworkProcess(msg);
             /* Notify result to InterfaceService. */
@@ -2599,6 +2614,11 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
             }
             break;
         }
+        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
+            WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT event.");
+            pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
+            pStaStateMachine->DisConnectProcess();
+            break;
         default:
             WIFI_LOGI("ApRoamingState-msgCode=%d not handled.", msg->GetMessageName());
             break;

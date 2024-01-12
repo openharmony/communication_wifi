@@ -44,12 +44,14 @@ constexpr int STA_DISABLED_MODE = 4;
 constexpr int STA_RENEWAL_MIN_TIME = 120;
 constexpr int STREAM_TXPACKET_THRESHOLD = 0;
 constexpr int STREAM_RXPACKET_THRESHOLD = 0;
+constexpr int STA_AP_ROAMING_TIMEOUT = 15000; // 15s->15000 ms
 
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
 constexpr int CMD_START_RENEWAL_TIMEOUT = 0X05;
+constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
@@ -455,7 +457,7 @@ public:
      */
     void HandlePortalNetworkPorcess();
     int GetInstanceId();
-
+    void DealApRoamingStateTimeout(InternalMessage *msg);
 private:
     /**
      * @Description  Destruct state.

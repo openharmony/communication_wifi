@@ -38,7 +38,7 @@ ApConfigUse::ApConfigUse(int id) : m_id(id)
     m_softapChannelPolicyPtr = std::make_unique<SoftapChannelPolicyParser>();
 }
 
-void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig)
+void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig) const
 {
     int bestChannel = AP_CHANNEL_INVALID;
     switch (apConfig.GetBand()) {
@@ -65,7 +65,7 @@ void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig)
         SsidAnonymize(apConfig.GetSsid()).c_str(), m_id, static_cast<int>(apConfig.GetBand()), apConfig.GetChannel());
 }
 
-int ApConfigUse::GetBestChannelFor2G()
+int ApConfigUse::GetBestChannelFor2G() const
 {
     std::vector<int> channels = GetChannelFromDrvOrXmlByBand(BandType::BAND_2GHZ);
     if (channels.empty()) {
@@ -77,7 +77,7 @@ int ApConfigUse::GetBestChannelFor2G()
     return channels[GetRandomInt(0, channels.size() - 1)];
 }
 
-int ApConfigUse::GetBestChannelFor5G()
+int ApConfigUse::GetBestChannelFor5G() const
 {
     std::vector<int> channels = GetChannelFromDrvOrXmlByBand(BandType::BAND_5GHZ);
     FilterIndoorChannel(channels);
@@ -96,7 +96,7 @@ int ApConfigUse::GetBestChannelFor5G()
     return channels[GetRandomInt(0, channels.size() - 1)];
 }
 
-std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandType)
+std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandType) const
 {
     CHECK_NULL_AND_RETURN(m_softapChannelPolicyPtr, {});
     std::vector<int> preferredChannels = m_softapChannelPolicyPtr->GetPreferredChannels(bandType);
@@ -120,7 +120,7 @@ std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandT
     return channels;
 }
 
-void ApConfigUse::FilterIndoorChannel(std::vector<int> &channels)
+void ApConfigUse::FilterIndoorChannel(std::vector<int> &channels) const
 {
     if (channels.empty()) {
         return;
@@ -148,7 +148,7 @@ void ApConfigUse::FilterIndoorChannel(std::vector<int> &channels)
 
 /* Channel 165 cannot be combined with a channel with a bandwidth of 40 MHz or higher.
    Therefore, channel 165 is not recommended */
-void ApConfigUse::Filter165Channel(std::vector<int> &channels)
+void ApConfigUse::Filter165Channel(std::vector<int> &channels) const
 {
     if (channels.empty()) {
         return;
@@ -164,7 +164,7 @@ void ApConfigUse::Filter165Channel(std::vector<int> &channels)
     }
 }
 
-void ApConfigUse::JudgeDbacWithP2p(HotspotConfig &apConfig)
+void ApConfigUse::JudgeDbacWithP2p(HotspotConfig &apConfig) const
 {
     WifiP2pLinkedInfo p2pLinkedInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pLinkedInfo);
@@ -184,7 +184,7 @@ void ApConfigUse::JudgeDbacWithP2p(HotspotConfig &apConfig)
     }
 }
 
-std::set<int> ApConfigUse::SoftapChannelPolicyParser::GetIndoorChannels(const std::string &countryCode)
+std::set<int> ApConfigUse::SoftapChannelPolicyParser::GetIndoorChannels(const std::string &countryCode) const
 {
     std::set<int> indoorChannelByCode;
     if (countryCode.empty() || m_indoorChannels.find(countryCode) == m_indoorChannels.end()) {
@@ -194,7 +194,7 @@ std::set<int> ApConfigUse::SoftapChannelPolicyParser::GetIndoorChannels(const st
     return indoorChannelByCode;
 }
 
-std::vector<int> ApConfigUse::SoftapChannelPolicyParser::GetPreferredChannels(const BandType &bandType)
+std::vector<int> ApConfigUse::SoftapChannelPolicyParser::GetPreferredChannels(const BandType &bandType) const
 {
     std::vector<int> preferredChannelByBand;
     if (m_preferredChannels.find(bandType) == m_preferredChannels.end()) {
@@ -304,7 +304,7 @@ std::set<int> ApConfigUse::SoftapChannelPolicyParser::ParseChannels(xmlNodePtr i
     return channelsSet;
 }
 
-xmlNodePtr ApConfigUse::SoftapChannelPolicyParser::GotoCountryPolicy(xmlNodePtr innode)
+xmlNodePtr ApConfigUse::SoftapChannelPolicyParser::GotoCountryPolicy(xmlNodePtr innode) const
 {
     if (innode == nullptr) {
         WIFI_LOGE("goto SoftapChannelsPolicy node is null");
@@ -365,7 +365,7 @@ void ApConfigUse::SoftapChannelPolicyParser::ParsePreferredChannelsList(xmlNodeP
     WIFI_LOGI("parse SoftapSupportChannels final");
 }
 
-xmlNodePtr ApConfigUse::SoftapChannelPolicyParser::GotoSoftapSupportChannels(xmlNodePtr innode)
+xmlNodePtr ApConfigUse::SoftapChannelPolicyParser::GotoSoftapSupportChannels(xmlNodePtr innode) const
 {
     if (innode == nullptr) {
         WIFI_LOGE("goto SoftapSupportChannels node is null");

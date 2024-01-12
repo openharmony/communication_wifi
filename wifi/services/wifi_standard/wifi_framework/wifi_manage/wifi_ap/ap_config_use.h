@@ -48,7 +48,7 @@ public:
      *
      * @param apConfig - ap configuration input
      */
-    void UpdateApChannelConfig(HotspotConfig &apConfig);
+    void UpdateApChannelConfig(HotspotConfig &apConfig) const;
 private:
     static constexpr int DEFAULT_STA_INSTANCE_ID = 0;
 
@@ -73,8 +73,8 @@ private:
 
         SoftapChannelPolicyParser();
         ~SoftapChannelPolicyParser();
-        std::set<int> GetIndoorChannels(const std::string &countryCode);
-        std::vector<int> GetPreferredChannels(const BandType &bandType);
+        std::set<int> GetIndoorChannels(const std::string &countryCode) const;
+        std::vector<int> GetPreferredChannels(const BandType &bandType) const;
     private:
         std::map<std::string, std::set<int>> m_indoorChannels;
         std::map<BandType, std::vector<int>> m_preferredChannels;
@@ -86,9 +86,9 @@ private:
         void ParseCountryPolicyList(xmlNodePtr innode);
         void ParsePreferredChannelsList(xmlNodePtr innode);
         std::set<int> ParseChannels(xmlNodePtr innode);
-        xmlNodePtr GotoCountryPolicy(xmlNodePtr innode);
+        xmlNodePtr GotoCountryPolicy(xmlNodePtr innode) const;
         ApConfigUse::SoftapChannelPolicyParser::SoftapChannelsPolicyType GetPolicyItem(xmlNodePtr node);
-        xmlNodePtr GotoSoftapSupportChannels(xmlNodePtr innode);
+        xmlNodePtr GotoSoftapSupportChannels(xmlNodePtr innode) const;
         BandType GetSupportChannelsItem(xmlNodePtr node);
         std::vector<int> ParseSupportChannels(xmlNodePtr innode, const char* const &bandXml);
     };
@@ -96,12 +96,12 @@ private:
     std::unique_ptr<SoftapChannelPolicyParser> m_softapChannelPolicyPtr;
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
 
-    int GetBestChannelFor2G();
-    int GetBestChannelFor5G();
-    std::vector<int> GetChannelFromDrvOrXmlByBand(const BandType &bandType);
-    void FilterIndoorChannel(std::vector<int> &channels);
-    void Filter165Channel(std::vector<int> &channels);
-    void JudgeDbacWithP2p(HotspotConfig &apConfig);
+    int GetBestChannelFor2G() const;
+    int GetBestChannelFor5G() const;
+    std::vector<int> GetChannelFromDrvOrXmlByBand(const BandType &bandType) const;
+    void FilterIndoorChannel(std::vector<int> &channels) const;
+    void Filter165Channel(std::vector<int> &channels) const;
+    void JudgeDbacWithP2p(HotspotConfig &apConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

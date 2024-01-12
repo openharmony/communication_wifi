@@ -143,6 +143,7 @@ void StandBySubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &ev
             lastSleepState = sleeping;
         }
     }
+    StandByListerner::allowScan = !sleeping;
     if (napped || sleeping) {
         WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
     } else {

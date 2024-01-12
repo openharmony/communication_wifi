@@ -78,8 +78,9 @@ public:
      *
      */
     void UnRegisterStandByEvent();
-private:
+
     static bool allowScan;
+private:
     std::shared_ptr<StandBySubscriber> standBySubscriber_ = nullptr;
     bool isStandBySubscribered = false;
     std::mutex standByEventMutex;

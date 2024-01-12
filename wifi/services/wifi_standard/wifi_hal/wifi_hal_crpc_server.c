@@ -538,7 +538,6 @@ static void DealStaApCallback(int event, Context *context)
             DealBssidChangedCbk(event, context);
             break;
         default:
-            LOGE("DealStaApCallback, Invalid event: %{public}d", event);
             break;
     }
     return;

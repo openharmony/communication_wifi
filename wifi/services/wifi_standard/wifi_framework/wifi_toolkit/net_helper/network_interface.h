@@ -124,6 +124,17 @@ bool FetchIpAddress(
     const std::string &interfaceName, std::vector<Ipv4Address> &vecipv4, std::vector<Ipv6Address> &vecIPv6);
 
 /**
+ * @Description  obtain IPv4 and IPv6 address of Ap and P2p from interfaceName
+ *
+ * @param interfaceName - Network Interface Name [input]
+ * @param ipv4 - IPv4 address. [output]
+ * @param vecIPv6 - IPv6 address. [output]
+ * @return true - success    false - failed
+ */
+bool FetchApOrP2pIpAddress(
+    const std::string &interfaceName, std::vector<Ipv4Address> &vecipv4, std::vector<Ipv6Address> &vecIPv6);
+
+/**
  * @Description  Saves the IP address obtained through ifaddrs.
  *
  * @param ifa - Source address. [input]

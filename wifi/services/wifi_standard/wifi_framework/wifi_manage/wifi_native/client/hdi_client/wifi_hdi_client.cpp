@@ -159,7 +159,7 @@ WifiErrorNo WifiHdiClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
     int size = HDI_GET_MAX_SCAN_INFO;
     ScanInfo results[HDI_GET_MAX_SCAN_INFO];
-    if (memset_s(&results, sizeof(results), 0, sizeof(results)) != EOK) {
+    if (memset_s(results, sizeof(results), 0, sizeof(results)) != EOK) {
         LOGE("%{public}s: failed to memset", __func__);
         return WIFI_IDL_OPT_FAILED;
     }

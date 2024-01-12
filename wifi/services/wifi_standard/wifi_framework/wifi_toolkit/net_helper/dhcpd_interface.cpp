@@ -56,7 +56,7 @@ bool DhcpdInterface::StartDhcpServerFromInterface(const std::string &ifaceName, 
     g_startDhcpServerFlag = true;
     std::vector<Ipv4Address> vecIpv4Addr;
     std::vector<Ipv6Address> vecIpv6Addr;
-    if (!NetworkInterface::FetchIpAddress(std::string(""), vecIpv4Addr, vecIpv6Addr)) {
+    if (!NetworkInterface::FetchApOrP2pIpAddress(ifaceName, vecIpv4Addr, vecIpv6Addr)) {
         WIFI_LOGW("Get ipaddress failed!");
     }
 

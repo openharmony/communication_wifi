@@ -97,30 +97,35 @@ bool WifiScanImpl::GetWifiScanProxy(void)
 
 ErrCode WifiScanImpl::SetScanControlInfo(const ScanControlInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->SetScanControlInfo(info);
 }
 
 ErrCode WifiScanImpl::Scan()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->Scan();
 }
 
 ErrCode WifiScanImpl::AdvanceScan(const WifiScanParams &params)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->AdvanceScan(params);
 }
 
 ErrCode WifiScanImpl::IsWifiClosedScan(bool &bOpen)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->IsWifiClosedScan(bOpen);
 }
 
 ErrCode WifiScanImpl::GetScanInfoList(std::vector<WifiScanInfo> &result)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->GetScanInfoList(result);
 }
@@ -131,18 +136,21 @@ ErrCode WifiScanImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> 
 ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback)
 #endif
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->RegisterCallBack(callback);
 }
 
 ErrCode WifiScanImpl::GetSupportedFeatures(long &features)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     return client_->GetSupportedFeatures(features);
 }
 
 bool WifiScanImpl::IsFeatureSupported(long feature)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
     long tmpFeatures = 0;
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {

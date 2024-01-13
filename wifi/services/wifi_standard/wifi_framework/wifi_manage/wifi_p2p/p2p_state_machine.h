@@ -264,6 +264,8 @@ private:
      */
     bool IsInterfaceReuse() const;
 
+    void ClearGroup() const;
+
 private:
     /**
      * @Description - Broadcast state change event.

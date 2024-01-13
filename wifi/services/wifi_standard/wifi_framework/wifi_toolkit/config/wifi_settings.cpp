@@ -61,7 +61,7 @@ WifiSettings::WifiSettings()
       mP2pConnectState(0),
       mApMaxConnNum(0),
       mMaxNumConfigs(0),
-      mScreenState(MODE_STATE_OPEN),
+      mScreenState(MODE_STATE_DEFAULT),
       mScanGenieState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
       mPowerSleepState(MODE_STATE_CLOSE),
@@ -991,7 +991,7 @@ int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
             iter->second.channelWidth = channelWidth;
         }
     }
-    
+
     return 0;
 }
 
@@ -1546,8 +1546,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetSsid(ssid);
 #else
     cfg.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
-#endif
-    cfg.SetPreSharedKey("12345678");
+    cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {
         mHotspotConfig[0] = cfg;
@@ -2436,6 +2435,17 @@ long int WifiSettings::GetRandom()
         if (fd >= 0) {
             length = read(fd, &random, sizeof(random));
             close(fd);
+        } else {
+            LOGW("%{public}s: failed to open, try again", __func__);
+        }
+        if (random == 0) {
+            fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
+            if (fd >= 0) {
+                length = read(fd, &random, sizeof(random));
+                close(fd);
+            } else {
+                LOGE("%{public}s: retry failed", __func__);
+            }
         }
     } while (0);
     return (random >= 0 ? random : -random);

@@ -303,6 +303,12 @@ WifiErrorNo WifiP2PHalInterface::GetP2pPeer(const std::string &deviceAddress, Wi
     return mIdlClient->ReqGetP2pPeer(deviceAddress, device);
 }
 
+WifiErrorNo WifiP2PHalInterface::GetChba0Freq(int &chba0Freq) const
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqP2pGetChba0Freq(chba0Freq);
+}
+
 WifiErrorNo WifiP2PHalInterface::P2pGetSupportFrequenciesByBand(int band, std::vector<int> &frequencies) const
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);

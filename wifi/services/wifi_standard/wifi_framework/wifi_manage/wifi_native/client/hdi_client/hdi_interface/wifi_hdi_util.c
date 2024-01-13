@@ -401,8 +401,11 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
     struct NeedParseIe iesNeedParse = {NULL};
     ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
     if (infoElemsTemp == NULL) {
+        LOGE("failed to alloc memory");
         return;
     }
+    memset_s(infoElemsTemp, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem),
+        0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem));
     while (remainingLength > 1 && start < length) {
         if (srcBuf[start] == '[') {
             ++start;

@@ -116,7 +116,7 @@ WifiProtectMode WifiProtectManager::GetNearlyProtectMode()
     mWifiConnected = (linkedInfo.connState == ConnState::CONNECTED) ? true : false;
 
     int screenState = WifiSettings::GetInstance().GetScreenState();
-    mScreenOn = (screenState == MODE_STATE_OPEN) ? true : false;
+    mScreenOn = (screenState == MODE_STATE_OPEN || screenState == MODE_STATE_DEFAULT) ? true : false;
     int foregroudCount = GetFgLowlatyProtectCount();
     LOGI("%{public}s mWifiConnected: %{public}d, mScreenOn: %{public}d,"
         "ForegroundProtectCount: %{public}d, mForceHiPerfMode: %{public}d, mForceLowLatencyMode: %{public}d",

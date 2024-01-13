@@ -98,7 +98,6 @@ WifiErrorNo WifiHdiClient::Scan(const WifiScanParam &scanParam)
 
 WifiErrorNo WifiHdiClient::ReqRegisterSupplicantEventCallback(const SupplicantEventCallback &callback)
 {
-    LOGI("[DEBUG] enter to %{public}s", __func__);
     ISupplicantEventCallback cEventCallback;
     if (memset_s(&cEventCallback, sizeof(cEventCallback), 0, sizeof(cEventCallback)) != EOK) {
         LOGE("%{public}s: failed to memset", __func__);
@@ -160,7 +159,7 @@ WifiErrorNo WifiHdiClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
     int size = HDI_GET_MAX_SCAN_INFO;
     ScanInfo results[HDI_GET_MAX_SCAN_INFO];
-    if (memset_s(&results, sizeof(results), 0, sizeof(results)) != EOK) {
+    if (memset_s(results, sizeof(results), 0, sizeof(results)) != EOK) {
         LOGE("%{public}s: failed to memset", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
@@ -185,22 +184,6 @@ WifiErrorNo WifiHdiClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
         tmp.isHeInfoExist = results[i].isHeInfoExist;
         tmp.isErpExist = results[i].isErpExist;
         tmp.maxRates = results[i].maxRates > results[i].extMaxRates ? results[i].maxRates : results[i].extMaxRates;
-
-        for (int j = 0; j < results[i].ieSize; ++j) {
-            WifiInfoElem infoElemTmp;
-            int infoElemSize = results[i].infoElems[j].size;
-            infoElemTmp.id = results[i].infoElems[j].id;
-            for (int k = 0; k < infoElemSize; ++k) {
-                infoElemTmp.content.emplace_back(results[i].infoElems[j].content[k]);
-            }
-            if (results[i].infoElems[j].content) {
-                free(results[i].infoElems[j].content);
-            }
-            tmp.infoElems.emplace_back(infoElemTmp);
-        }
-        if (results[i].infoElems) {
-            free(results[i].infoElems);
-        }
         scanInfos.emplace_back(tmp);
     }
     return WIFI_IDL_OPT_OK;
@@ -231,7 +214,18 @@ WifiErrorNo WifiHdiClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
 /* ************************ softAp Interface ************************** */
 WifiErrorNo WifiHdiClient::StartAp(int id)
 {
-    return StartHdiWifi();
+    WifiErrorNo ret = WIFI_IDL_OPT_OK;
+    ret = StartHdiWifi();
+    if (ret != WIFI_IDL_OPT_OK) {
+        LOGE("%{public}s: failed to StartHdiWifi", __func__);
+        return ret;
+    }
+    ret = CheckHdiNormalStart(PROTOCOL_80211_IFTYPE_AP);
+    if (ret != WIFI_IDL_OPT_OK) {
+        LOGE("%{public}s: check hdi abnormal start, failed to start hdi wifi!", __func__);
+        return ret;
+    }
+    return ret;
 }
 
 WifiErrorNo WifiHdiClient::StopAp(int id)

@@ -37,7 +37,6 @@ public:
 
 private:
     void InitApCallback(void);
-    void UnloadHotspotSaTimerCallback();
     void DealApStateChanged(ApState bState, int id = 0);
     void DealApGetStaJoin(const StationInfo &info, int id = 0);
     void DealApGetStaLeave(const StationInfo &info, int id = 0);

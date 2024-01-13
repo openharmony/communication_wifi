@@ -48,6 +48,8 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isPortal = false;
     item.lastHasInternetTime = -1;
     item.noInternetAccess = false;
+    item.callProcessName.clear();
+    item.ancoCallProcessName.clear();
     return;
 }
 
@@ -190,6 +192,10 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.uid = std::stoi(value);
     } else if (key == "lastConnectTime") {
         item.lastConnectTime = std::stol(value);
+    } else if (key == "callProcessName") {
+        item.callProcessName = value;
+    } else if (key == "ancoCallProcessName") {
+        item.ancoCallProcessName = value;
     } else {
         return SetWifiDeviceConfigExternal(item, key, value);
     }
@@ -488,6 +494,8 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
         ss << "    " <<"wepKeys_" << i << "=" << item.wepKeys[i] << std::endl;
     }
 #endif
+    ss << "    " <<"callProcessName=" << item.callProcessName << std::endl;
+    ss << "    " <<"ancoCallProcessName=" << item.ancoCallProcessName << std::endl;
     ss << "    " <<"</WifiDeviceConfig>" << std::endl;
     return ss.str();
 }

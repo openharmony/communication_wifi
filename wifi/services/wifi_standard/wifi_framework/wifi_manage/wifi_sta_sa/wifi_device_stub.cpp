@@ -942,7 +942,6 @@ void WifiDeviceStub::OnGet5GHzChannelList(uint32_t code, MessageParcel &data, Me
 void WifiDeviceStub::OnStartPortalCertification(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    std::vector<int> channelList;
     ErrCode ret = StartPortalCertification();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -1003,7 +1002,6 @@ void WifiDeviceStub::OnEnableAutoJoin(uint32_t code, MessageParcel& data, Messag
 void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    std::vector<int> channelList;
     ErrCode ret = FactoryReset();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);

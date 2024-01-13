@@ -433,7 +433,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(OHOS::Wifi::WifiLinkedInfo &in
     if (info.connState == DISCONNECTED || info.connState == UNKNOWN) {
         return true;
     }
-    WIFI_LOGI("Current linkInfo is not in DISCONNECTED state, skip network selection.\n");
+    WIFI_LOGI("Current linkInfo is not in DISCONNECTED state, skip network selection.");
     return false;
 }
 
@@ -634,29 +634,33 @@ void StaAutoConnectService::GetAvailableScanInfos(std::vector<InterScanInfo> &av
 void StaAutoConnectService::DisableAutoJoin(const std::string &conditionName)
 {
     std::lock_guard<std::mutex> lock(autoJoinMutex);
-    WIFI_LOGI("Auto Join is disabled by %{public}s.\n", conditionName.c_str());
+    WIFI_LOGI("Auto Join is disabled by %{public}s.", conditionName.c_str());
     autoJoinConditionsMap.insert_or_assign(conditionName, []() { return false; });
 }
 
 void StaAutoConnectService::EnableAutoJoin(const std::string &conditionName)
 {
     std::lock_guard<std::mutex> lock(autoJoinMutex);
-    WIFI_LOGI("Auto Join disabled by %{public}s is released.\n", conditionName.c_str());
+    WIFI_LOGI("Auto Join disabled by %{public}s is released.", conditionName.c_str());
     autoJoinConditionsMap.erase(conditionName);
 }
 
 void StaAutoConnectService::RegisterAutoJoinCondition(const std::string &conditionName,
                                                       const std::function<bool()> &autoJoinCondition)
 {
+    if (!autoJoinCondition) {
+        WIFI_LOGE("the condition of %{public}s is empty.", conditionName.c_str());
+        return;
+    }
     std::lock_guard<std::mutex> lock(autoJoinMutex);
-    WIFI_LOGI("Auto Join condition of %{public}s is registered.\n", conditionName.c_str());
+    WIFI_LOGI("Auto Join condition of %{public}s is registered.", conditionName.c_str());
     autoJoinConditionsMap.insert_or_assign(conditionName, autoJoinCondition);
 }
 
 void StaAutoConnectService::DeregisterAutoJoinCondition(const std::string &conditionName)
 {
     std::lock_guard<std::mutex> lock(autoJoinMutex);
-    WIFI_LOGI("Auto Join condition of %{public}s is deregistered.\n", conditionName.c_str());
+    WIFI_LOGI("Auto Join condition of %{public}s is deregistered.", conditionName.c_str());
     autoJoinConditionsMap.erase(conditionName);
 }
 
@@ -665,7 +669,7 @@ bool StaAutoConnectService::IsAllowAutoJoin()
     std::lock_guard<std::mutex> lock(autoJoinMutex);
     for (auto condition = autoJoinConditionsMap.rbegin(); condition != autoJoinConditionsMap.rend(); ++condition) {
         if (!condition->second.operator()()) {
-            WIFI_LOGI("Auto Join is not allowed because of  %{public}s.\n", condition->first.c_str());
+            WIFI_LOGI("Auto Join is not allowed because of %{public}s.", condition->first.c_str());
             return false;
         }
     }

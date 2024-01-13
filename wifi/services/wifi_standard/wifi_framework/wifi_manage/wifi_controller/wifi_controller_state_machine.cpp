@@ -35,6 +35,7 @@ WifiControllerMachine::WifiControllerMachine()
 WifiControllerMachine::~WifiControllerMachine()
 {
     WIFI_LOGI("WifiControllerMachine::~WifiControllerMachine");
+    StopHandlerThread();
     ParsePointer(pEnableState);
     ParsePointer(pDisableState);
     ParsePointer(pDefaultState);
@@ -73,9 +74,13 @@ ErrCode WifiControllerMachine::InitWifiStates()
     pDefaultState = new (std::nothrow) DefaultState(this);
     tmpErrNumber = JudgmentEmpty(pDefaultState);
     pEnableState = new (std::nothrow) EnableState(this);
-    tmpErrNumber = JudgmentEmpty(pEnableState);
+    tmpErrNumber += JudgmentEmpty(pEnableState);
     pDisableState = new (std::nothrow) DisableState(this);
-    tmpErrNumber = JudgmentEmpty(pDisableState);
+    tmpErrNumber += JudgmentEmpty(pDisableState);
+    if (tmpErrNumber != 0) {
+        WIFI_LOGE("InitWifiStates some one state is null\n");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 

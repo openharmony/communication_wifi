@@ -143,7 +143,8 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         }
     }
     pScanMonitor->SetScanStateMachine(pScanStateMachine);
-    pScanStateMachine->SendMessage(static_cast<int>(CMD_SCAN_PREPARE));
+    int delayMs = 100;
+    pScanStateMachine->MessageExecutedLater(static_cast<int>(CMD_SCAN_PREPARE), delayMs);
     GetScanControlInfo();
 
     return true;
@@ -1048,6 +1049,10 @@ void ScanService::HandleMovingFreezeChanged()
         WIFI_LOGW("set movingFreeze scanned false.");
         SetMovingFreezeScaned(false);
     }
+    if (movingFreezeBakup == movingFreeze) {
+        WIFI_LOGD("AbsFreezeState not change, no need to restart system timer scan.");
+        return;
+    }
     SystemScanProcess(false);
 }
 
@@ -1082,7 +1087,7 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
 
     int state = WifiSettings::GetInstance().GetScreenState();
     WIFI_LOGI("Screen state(1:OPEN, 2:CLOSE): %{public}d.", state);
-    if (state == MODE_STATE_OPEN) {
+    if (state == MODE_STATE_OPEN || state == MODE_STATE_DEFAULT) {
         {
             std::unique_lock<std::mutex> lock(scanControlInfoMutex);
             int i = 0;
@@ -1117,6 +1122,7 @@ void ScanService::StopSystemScan()
         WIFI_LOGE("pScanStateMachine is null.\n");
         return;
     }
+    lastSystemScanTime = 0;
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     EndPnoScan();
     pnoScanFailedNum = 0;
@@ -1255,7 +1261,7 @@ ErrCode ScanService::AllowExternScan()
 #ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
     std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
         return WIFI_OPT_SUCCESS;
     }
@@ -1295,7 +1301,7 @@ ErrCode ScanService::AllowExternScan()
         WIFI_LOGW("extern scan not allow by sta connection state");
         return WIFI_OPT_FAILED;
     }
-    
+
     int appId = GetCallingUid();
     if (!AllowExternScanByInterval(appId, staScene, scanMode)) {
         WIFI_LOGW("extern scan not allow by interval mode");
@@ -1321,7 +1327,7 @@ ErrCode ScanService::AllowExternScan()
         WIFI_LOGW("extern scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
-    
+
     WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }
@@ -1335,7 +1341,7 @@ ErrCode ScanService::AllowExternScan()
 #ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
     std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
         return WIFI_OPT_SUCCESS;
     }
@@ -1373,7 +1379,7 @@ ErrCode ScanService::AllowExternScan()
             return WIFI_OPT_FAILED;
         }
     }
-    
+
     WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }
@@ -1751,7 +1757,7 @@ bool ScanService::AllowExternScanByInterval(int appId, int staScene, ScanMode sc
     int noChargerPlugModeState = WifiSettings::GetInstance().GetNoChargerPlugModeState();
     if (noChargerPlugModeState == MODE_STATE_OPEN) {
         WIFI_LOGI("No charger plug mode state.");
-        if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_CUSTOM, scanMode)) {
+        if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_CUSTOM, ScanMode::ALL_EXTERN_SCAN)) {
             return false;
         }
     }
@@ -2266,7 +2272,7 @@ bool ScanService::SystemScanByInterval(int staScene, int &interval, int &count)
 {
     WIFI_LOGI("Enter ScanService::SystemScanByInterval.\n");
     int state = WifiSettings::GetInstance().GetScreenState();
-    if (state == MODE_STATE_OPEN) {
+    if (state == MODE_STATE_OPEN || state == MODE_STATE_DEFAULT) {
         if (staScene == SCAN_SCENE_CONNECTED) {
             SystemScanConnectedPolicy(interval);
         } else if (staScene == SCAN_SCENE_DISCONNCTED) {

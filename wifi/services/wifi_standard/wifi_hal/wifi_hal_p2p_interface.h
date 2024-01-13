@@ -381,6 +381,14 @@ WifiErrorNo P2pSetPersistentReconnect(int mode);
 WifiErrorNo P2pGetPeer(const char *bssid, P2pDeviceInfo *peerInfo);
 
 /**
+ * @Description Get chba0 frequency.
+ *
+ * @param chba0Freq
+ * @return WifiErrorNo
+ */
+WifiErrorNo P2pGetChba0Freq(int *chba0Freq);
+
+/**
  * @Description Obtains the frequencies supported by a specified frequency band.
  *
  * @param band - Band type.

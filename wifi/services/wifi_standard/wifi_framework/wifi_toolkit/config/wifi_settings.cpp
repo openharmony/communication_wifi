@@ -1546,6 +1546,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetSsid(ssid);
 #else
     cfg.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
+#endif
     cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {

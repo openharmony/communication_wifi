@@ -268,6 +268,9 @@ static int HdiRsnKeyMgmtToAuthMgmt(const uint8_t *s)
     if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_OWE) {
         return HDI_KEY_MGMT_OWE;
     }
+    if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_PSK_SHA256) {
+        return HDI_KEY_MGMT_PSK_SHA256;
+    }
     return 0;
 }
 
@@ -591,26 +594,14 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     }
 
     start = pos;
-    if (data.keyMgmt & HDI_KEY_MGMT) {
-        HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sEAP");
-    }
-    if (data.keyMgmt & HDI_KEY_MGMT_PSK) {
-        HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sPSK");
-    }
-    if (data.keyMgmt & HDI_KEY_MGMT_HDI_NONE) {
-        HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sNone");
-    }
-    if (data.keyMgmt & HDI_KEY_MGMT_SAE) {
-        HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sSAE");
-    }
 
-    if (data.keyMgmt & HDI_KEY_MGMT_OSEN) {
-        HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sOSEN");
-    }
-
-    if (data.keyMgmt & HDI_KEY_MGMT_OWE) {
-        HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, "+", "%sOWE");
-    }
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT, ret, pos, end, "+", "%sEAP");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_PSK, ret, pos, end, "+", "%sPSK");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_HDI_NONE, ret, pos, end, "+", "%sNone");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_SAE, ret, pos, end, "+", "%sSAE");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_OSEN, ret, pos, end, "+", "%sOSEN");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_OWE, ret, pos, end, "+", "%sOWE");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_PSK_SHA256, ret, pos, end, "+", "%sPSK");
 
     pos = HdiGetCipherTxt(pos, end, data.pairwiseCipher);
 

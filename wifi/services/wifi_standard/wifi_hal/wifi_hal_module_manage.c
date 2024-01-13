@@ -258,9 +258,9 @@ ModuleManageRetCode StartModule(const char *moduleName, const char *startCmd)
     if (p != NULL) {
         p->referenceCount += 1;
         if (p->referenceCount > REFERENCE_CNT_MAX) {
-            p->referenceCount = 1;
+            p->referenceCount = REFERENCE_CNT_MAX;
         }
-        LOGD("module %{public}s has been started, current reference is %{public}d", moduleName, p->referenceCount);
+        LOGI("module %{public}s has been started, current reference is %{public}d", moduleName, p->referenceCount);
         return MM_SUCCESS;
     }
     p = (ModuleInfo *)calloc(1, sizeof(ModuleInfo));
@@ -295,7 +295,7 @@ ModuleManageRetCode StopModule(const char *moduleName, bool isHostapd)
     }
     p->referenceCount -= 1;
     if (p->referenceCount > 0) {
-        LOGD("module %{public}s reference left %{public}d, return ok", moduleName, p->referenceCount);
+        LOGI("module %{public}s reference left %{public}d, return ok", moduleName, p->referenceCount);
         return MM_REDUCE_REFERENCE;
     } else if (p->referenceCount < 0) {
         p->referenceCount = 1;

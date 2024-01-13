@@ -244,6 +244,7 @@ static int InitRpcFuncMapP2p(void)
     ret += PushRpcFunc("P2pSetServDiscExternal", RpcP2pSetServDiscExternal);
     ret += PushRpcFunc("P2pSetPersistentReconnect", RpcP2pSetPersistentReconnect);
     ret += PushRpcFunc("P2pGetPeer", RpcP2pGetPeer);
+    ret += PushRpcFunc("P2pGetChba0Freq", RpcP2pGetChba0Freq);
     ret += PushRpcFunc("P2pGetFrequencies", RpcP2pGetFrequencies);
     ret += PushRpcFunc("P2pSetGroupConfig", RpcP2pSetGroupConfig);
     ret += PushRpcFunc("P2pGetGroupConfig", RpcP2pGetGroupConfig);
@@ -537,7 +538,6 @@ static void DealStaApCallback(int event, Context *context)
             DealBssidChangedCbk(event, context);
             break;
         default:
-            LOGE("DealStaApCallback, Invalid event: %{public}d", event);
             break;
     }
     return;

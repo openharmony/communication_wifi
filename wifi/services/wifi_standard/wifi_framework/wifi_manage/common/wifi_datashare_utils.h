@@ -62,9 +62,10 @@ public:
      * @param uri - Querying the database path
      * @param key - key
      * @param value - value
+     * @param onlySettingsData - false
      * @return query error code
      */
-    ErrCode Query(Uri &uri, const std::string &key, std::string &value);
+    ErrCode Query(Uri &uri, const std::string &key, std::string &value, bool onlySettingsData = false);
 
     /**
      * @Description : Insert function
@@ -109,7 +110,7 @@ public:
     std::string GetLoactionDataShareUri();
 
 private:
-    std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper();
+    std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(bool onlySettingsData = false);
     std::shared_ptr<DataShare::DataShareHelper> m_registerHelper = nullptr;
 };
 

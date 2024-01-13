@@ -29,7 +29,7 @@ const int EU_I64_ADDR_LEN = 64;
 const int GENE_V6_ADDR_LEN = 64; /* Generally, the prefix length cannot exceed 64 characters. */
 const int IP_V6_ADDR_LEN = 128;
 const std::string IP_V4_MASK("255.255.255.0");
-const std::string IP_V4_DEFAULT("192.168.62.2");
+const std::string IP_V4_DEFAULT("192.168.62.1");
 static bool g_startDhcpServerFlag = false;
 
 DhcpdInterface::DhcpdInterface()
@@ -56,7 +56,7 @@ bool DhcpdInterface::StartDhcpServerFromInterface(const std::string &ifaceName, 
     g_startDhcpServerFlag = true;
     std::vector<Ipv4Address> vecIpv4Addr;
     std::vector<Ipv6Address> vecIpv6Addr;
-    if (!NetworkInterface::FetchIpAddress(std::string(""), vecIpv4Addr, vecIpv6Addr)) {
+    if (!NetworkInterface::FetchApOrP2pIpAddress(ifaceName, vecIpv4Addr, vecIpv6Addr)) {
         WIFI_LOGW("Get ipaddress failed!");
     }
 

@@ -37,7 +37,6 @@ public:
 private:
     void InitStaCallback(void);
     void ForceStopWifi(int instId = 0);
-    void UnloadStaSaTimerCallback();
     void DealStaOpenRes(OperateResState state, int instId = 0);
     void DealStaCloseRes(OperateResState state, int instId = 0);
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);

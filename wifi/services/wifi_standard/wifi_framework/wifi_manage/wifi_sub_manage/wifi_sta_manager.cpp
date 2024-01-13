@@ -45,17 +45,21 @@ StaServiceCallback& WifiStaManager::GetStaCallback()
 }
 
 #ifndef OHOS_ARCH_LITE
-void WifiStaManager::UnloadStaSaTimerCallback()
+static void UnloadStaSaTimerCallback()
 {
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
-    StopUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 }
 
 void WifiStaManager::StopUnloadStaSaTimer(void)
 {
     WIFI_LOGI("StopUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
     std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
-    WifiTimer::GetInstance()->UnRegister(unloadStaSaTimerId);
+    if (unloadStaSaTimerId == 0) {
+        return;
+    }
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(unloadStaSaTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(unloadStaSaTimerId);
     unloadStaSaTimerId = 0;
     return;
 }
@@ -65,8 +69,12 @@ void WifiStaManager::StartUnloadStaSaTimer(void)
     WIFI_LOGI("StartUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
     std::unique_lock<std::mutex> lock(unloadStaSaTimerMutex);
     if (unloadStaSaTimerId == 0) {
-        WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiStaManager::UnloadStaSaTimerCallback, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, unloadStaSaTimerId, TIMEOUT_UNLOAD_WIFI_SA);
+        std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+        wifiSysTimer->SetCallbackInfo(UnloadStaSaTimerCallback);
+        unloadStaSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+        MiscServices::TimeServiceClient::GetInstance()->StartTimer(unloadStaSaTimerId,
+            currentTime + TIMEOUT_UNLOAD_WIFI_SA);
         WIFI_LOGI("StartUnloadStaSaTimer success! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
     }
     return;
@@ -178,7 +186,6 @@ void WifiStaManager::DealStaOpenRes(OperateResState state, int instId)
         WIFI_LOGI("DealStaOpenRes: wifi scan only state notify scan result!");
         IScanSerivceCallbacks &scanCallback = WifiManager::GetInstance().GetWifiScanManager()->GetScanCallback();
         scanCallback.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), instId);
-        
     }
 #ifdef FEATURE_P2P_SUPPORT
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();

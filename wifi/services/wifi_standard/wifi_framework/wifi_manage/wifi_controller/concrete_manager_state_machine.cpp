@@ -39,6 +39,7 @@ ConcreteMangerMachine::ConcreteMangerMachine()
 ConcreteMangerMachine::~ConcreteMangerMachine()
 {
     WIFI_LOGE("ConcreteMangerMachine::~ConcreteMangerMachine");
+    StopHandlerThread();
     ParsePointer(pDefaultState);
     ParsePointer(pIdleState);
     ParsePointer(pConnectState);
@@ -83,13 +84,17 @@ ErrCode ConcreteMangerMachine::InitConcreteMangerStates()
     pDefaultState = new (std::nothrow) DefaultState(this);
     tmpErrNumber = JudgmentEmpty(pDefaultState);
     pIdleState = new (std::nothrow) IdleState(this);
-    tmpErrNumber = JudgmentEmpty(pIdleState);
+    tmpErrNumber += JudgmentEmpty(pIdleState);
     pConnectState = new (std::nothrow) ConnectState(this);
-    tmpErrNumber = JudgmentEmpty(pConnectState);
+    tmpErrNumber += JudgmentEmpty(pConnectState);
     pScanonlyState = new (std::nothrow) ScanonlyState(this);
-    tmpErrNumber = JudgmentEmpty(pScanonlyState);
+    tmpErrNumber += JudgmentEmpty(pScanonlyState);
     pMixState = new (std::nothrow) MixState(this);
-    tmpErrNumber = JudgmentEmpty(pMixState);
+    tmpErrNumber += JudgmentEmpty(pMixState);
+    if (tmpErrNumber != 0) {
+        WIFI_LOGE("InitConcreteMangerStates some one state is null\n");
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -146,7 +151,7 @@ void ConcreteMangerMachine::IdleState::GoOutState()
     WIFI_LOGE("IdleState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __attribute__((no_sanitize("cfi")))
 {
     if (msg == nullptr) {
         return false;
@@ -180,6 +185,7 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToConnectOrMixMode(InternalMe
     }
     ErrCode ret = AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
+        WifiSettings::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
@@ -190,6 +196,7 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessag
 {
     ErrCode ret = AutoStartScanOnly(mid);
     if (ret != WIFI_OPT_SUCCESS) {
+        WifiSettings::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
@@ -207,6 +214,7 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *m
         }
         ErrCode ret = AutoStartStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
+            WifiSettings::GetInstance().SetWifiStopState(true);
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }
@@ -214,6 +222,7 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *m
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
         ErrCode ret = AutoStartScanOnly(mid);
         if (ret != WIFI_OPT_SUCCESS) {
+            WifiSettings::GetInstance().SetWifiStopState(true);
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }

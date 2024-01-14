@@ -37,6 +37,11 @@ public:
     ErrCode AutoSelectDevice(WifiDeviceConfig &electedDevice, const std::vector<InterScanInfo> &scanInfos,
         std::vector<std::string> &blockedBssids, WifiLinkedInfo &info) override;
     bool RegisterDeviceAppraisal(StaDeviceAppraisal *appraisal, int priority) override;
+    void DisableAutoJoin(const std::string &conditionName) override;
+    void EnableAutoJoin(const std::string &conditionName) override;
+    void RegisterAutoJoinCondition(const std::string &conditionName,
+                                   const std::function<bool()> &autoJoinCondition) override;
+    void DeregisterAutoJoinCondition(const std::string &conditionName) override;
 };
 }  // namespace Wifi
 } //  namespace OHOS

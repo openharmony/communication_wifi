@@ -105,6 +105,12 @@ public:
     void StaServiceSetPowerModeTest();
     void StaServiceOnSystemAbilityChangedTest();
     void StaServiceStartPortalCertificationTest();
+    void DisableAutoJoin();
+    void EnableAutoJoin();
+    void RegisterAutoJoinCondition();
+    void DeregisterAutoJoinCondition();
+    void RegisterFilterBuilder();
+    void DeregisterFilterBuilder();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -717,6 +723,43 @@ void StaServiceTest::StaServiceStartPortalCertificationTest()
     EXPECT_TRUE(pStaService->StartPortalCertification() == WIFI_OPT_FAILED);
 }
 
+void StaServiceTest::DisableAutoJoin()
+{
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->DisableAutoJoin("testCondition"));
+}
+
+void StaServiceTest::EnableAutoJoin()
+{
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->EnableAutoJoin("testCondition"));
+}
+
+void StaServiceTest::RegisterAutoJoinCondition()
+{
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->RegisterAutoJoinCondition("testCondition",[](){return true;}));
+}
+
+void StaServiceTest::DeregisterAutoJoinCondition()
+{
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->DeregisterAutoJoinCondition("testCondition"));
+}
+
+void StaServiceTest::RegisterFilterBuilder()
+{
+    FilterBuilder filterBuilder = [](auto & filterFunc){
+        filterFunc = [](NetworkCandidate & network_candidate){
+            return true;
+        };
+    };
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
+                                                                    "testFilterBuilder",
+                                                                    filterBuilder));
+}
+
+void StaServiceTest::DeregisterFilterBuilder() {
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->DeregisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
+                                                                       "testFilterBuilder"));
+}
+
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
     StaServiceStartPortalCertificationTest();
@@ -935,6 +978,36 @@ HWTEST_F(StaServiceTest, StaServiceReConnectTestSucc, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceSetSuspendMode, TestSize.Level1)
 {
     StaServiceSetSuspendModeTest();
+}
+
+HWTEST_F(StaServiceTest, DisableAutoJoin, TestSize.Level1)
+{
+    DisableAutoJoin();
+}
+
+HWTEST_F(StaServiceTest, EnableAutoJoin, TestSize.Level1)
+{
+    EnableAutoJoin();
+}
+
+HWTEST_F(StaServiceTest, RegisterAutoJoinCondition, TestSize.Level1)
+{
+    RegisterAutoJoinCondition();
+}
+
+HWTEST_F(StaServiceTest, DeregisterAutoJoinCondition, TestSize.Level1)
+{
+    DeregisterAutoJoinCondition();
+}
+
+HWTEST_F(StaServiceTest, RegisterFilterBuilder, TestSize.Level1)
+{
+    RegisterFilterBuilder();
+}
+
+HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level1)
+{
+    DeregisterFilterBuilder();
 }
 } // namespace Wifi
 } // namespace OHOS

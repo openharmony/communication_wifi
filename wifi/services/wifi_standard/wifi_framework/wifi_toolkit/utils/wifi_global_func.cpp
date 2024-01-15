@@ -500,7 +500,7 @@ int WatchParamValue(const char *keyprefix, ParameterChgPtr callback, void *conte
 #endif
 }
 
-bool IsfreqDbac(int freqA, int freqB)
+bool IsFreqDbac(int freqA, int freqB)
 {
     if (freqA == freqB) {
         return false;

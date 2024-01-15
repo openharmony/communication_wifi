@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_AP_CONFIG_UTIL_H
 #define OHOS_AP_CONFIG_UTIL_H
 
@@ -73,8 +74,8 @@ private:
 
         SoftapChannelPolicyParser();
         ~SoftapChannelPolicyParser();
-        std::set<int> GetIndoorChannels(const std::string &countryCode) const;
-        std::vector<int> GetPreferredChannels(const BandType &bandType) const;
+        std::map<std::string, std::set<int>> GetAllIndoorChannels() const;
+        std::map<BandType, std::vector<int>> GetAllPreferredChannels() const;
     private:
         std::map<std::string, std::set<int>> m_indoorChannels;
         std::map<BandType, std::vector<int>> m_preferredChannels;
@@ -94,6 +95,8 @@ private:
     };
     int m_id;
     std::unique_ptr<SoftapChannelPolicyParser> m_softapChannelPolicyPtr;
+    std::map<std::string, std::set<int>> m_softapIndoorChannels;
+    std::map<BandType, std::vector<int>> m_softapPreferredChannels;
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
 
     int GetBestChannelFor2G() const;
@@ -102,6 +105,8 @@ private:
     void FilterIndoorChannel(std::vector<int> &channels) const;
     void Filter165Channel(std::vector<int> &channels) const;
     void JudgeDbacWithP2p(HotspotConfig &apConfig) const;
+    std::set<int> GetIndoorChannelsByCode(const std::string &countryCode) const;
+    std::vector<int> GetPreferredChannelsByBand(const BandType &bandType) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

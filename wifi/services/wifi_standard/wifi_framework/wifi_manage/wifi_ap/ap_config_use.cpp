@@ -36,6 +36,10 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApConfigUse");
 ApConfigUse::ApConfigUse(int id) : m_id(id)
 {
     m_softapChannelPolicyPtr = std::make_unique<SoftapChannelPolicyParser>();
+    CHECK_NULL_AND_RETURN_NULL(m_softapChannelPolicyPtr);
+    m_softapIndoorChannels = m_softapChannelPolicyPtr->GetAllIndoorChannels();
+    m_softapPreferredChannels = m_softapChannelPolicyPtr->GetAllPreferredChannels();
+    m_softapChannelPolicyPtr = nullptr;  // xml loading completed, release pointer
 }
 
 void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig) const
@@ -98,8 +102,7 @@ int ApConfigUse::GetBestChannelFor5G() const
 
 std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandType) const
 {
-    CHECK_NULL_AND_RETURN(m_softapChannelPolicyPtr, {});
-    std::vector<int> preferredChannels = m_softapChannelPolicyPtr->GetPreferredChannels(bandType);
+    std::vector<int> preferredChannels = GetPreferredChannelsByBand(bandType);
     if (!preferredChannels.empty()) {
         WIFI_LOGI("get freqs from xml success, bandType=%{public}d, channel size=%{public}d",
             static_cast<int>(bandType), static_cast<int>(preferredChannels.size()));
@@ -127,8 +130,7 @@ void ApConfigUse::FilterIndoorChannel(std::vector<int> &channels) const
     }
     std::string wifiCountryCode;
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(wifiCountryCode);
-    CHECK_NULL_AND_RETURN_NULL(m_softapChannelPolicyPtr);
-    std::set<int> indoorChannels = m_softapChannelPolicyPtr->GetIndoorChannels(wifiCountryCode);
+    std::set<int> indoorChannels = GetIndoorChannelsByCode(wifiCountryCode);
     if (indoorChannels.empty()) {
         WIFI_LOGI("indoor channel is empty");
         return;
@@ -157,7 +159,7 @@ void ApConfigUse::Filter165Channel(std::vector<int> &channels) const
     while (iter != channels.end()) {
         if (AP_CHANNEL_5G_NOT_RECOMMEND == *iter) {
             channels.erase(iter);
-            WIFI_LOGI("filter not recommand channel=165");
+            WIFI_LOGI("filter not recommend channel=165");
             return;
         }
         iter++;
@@ -184,24 +186,34 @@ void ApConfigUse::JudgeDbacWithP2p(HotspotConfig &apConfig) const
     }
 }
 
-std::set<int> ApConfigUse::SoftapChannelPolicyParser::GetIndoorChannels(const std::string &countryCode) const
+std::set<int> ApConfigUse::GetIndoorChannelsByCode(const std::string &countryCode) const
 {
     std::set<int> indoorChannelByCode;
-    if (countryCode.empty() || m_indoorChannels.find(countryCode) == m_indoorChannels.end()) {
+    if (countryCode.empty() || m_softapIndoorChannels.find(countryCode) == m_softapIndoorChannels.end()) {
         return indoorChannelByCode;
     }
-    indoorChannelByCode = m_indoorChannels.find(countryCode)->second;
+    indoorChannelByCode = m_softapIndoorChannels.find(countryCode)->second;
     return indoorChannelByCode;
 }
 
-std::vector<int> ApConfigUse::SoftapChannelPolicyParser::GetPreferredChannels(const BandType &bandType) const
+std::vector<int> ApConfigUse::GetPreferredChannelsByBand(const BandType &bandType) const
 {
     std::vector<int> preferredChannelByBand;
-    if (m_preferredChannels.find(bandType) == m_preferredChannels.end()) {
+    if (m_softapPreferredChannels.find(bandType) == m_softapPreferredChannels.end()) {
         return preferredChannelByBand;
     }
-    preferredChannelByBand = m_preferredChannels.find(bandType)->second;
+    preferredChannelByBand = m_softapPreferredChannels.find(bandType)->second;
     return preferredChannelByBand;
+}
+
+std::map<std::string, std::set<int>> ApConfigUse::SoftapChannelPolicyParser::GetAllIndoorChannels() const
+{
+    return m_indoorChannels;
+}
+
+std::map<BandType, std::vector<int>> ApConfigUse::SoftapChannelPolicyParser::GetAllPreferredChannels() const
+{
+    return m_preferredChannels;
 }
 
 ApConfigUse::SoftapChannelPolicyParser::SoftapChannelPolicyParser()

@@ -285,7 +285,7 @@ struct WifiConfig {
         strDnsBak = "8.8.8.8";
         isLoadStabak = true;
         preLoadEnhance = false;
-        scanOnlySwitch = false;
+        scanOnlySwitch = true;
         realMacAddress = "";
         staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
     }

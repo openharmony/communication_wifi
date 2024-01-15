@@ -126,5 +126,23 @@ SystemNetWorkState NetStateObserver::GetCellNetState()
     WIFI_LOGI("GetCellNetState is cell no work");
     return NETWORK_CELL_NOWORK;
 }
+
+int32_t NetStateObserver::GetWifiNetId()
+{
+    std::list<sptr<NetHandle>> netList;
+    int32_t ret = NetConnClient::GetInstance().GetAllNets(netList);
+    if (ret != NETMANAGER_SUCCESS) {
+        WIFI_LOGE("GetAllNets failed!");
+        return 0;
+    }
+    for (auto iter : netList) {
+        NetManagerStandard::NetAllCapabilities netAllCap;
+        NetConnClient::GetInstance().GetNetCapabilities(*iter, netAllCap);
+        if (netAllCap.bearerTypes_.count(NetManagerStandard::BEARER_WIFI) > 0) {
+            return iter->GetNetId();
+        }
+    }
+    return 0;
+}
 }
 }

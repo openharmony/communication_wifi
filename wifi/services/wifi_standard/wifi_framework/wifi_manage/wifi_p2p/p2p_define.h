@@ -153,6 +153,7 @@ enum class P2P_STATE_MACHINE_CMD {
     EXCEPTION_TIMED_OUT,             /* P2P exception timeout */
     DISABLE_P2P_TIMED_OUT,
     REMOVE_SERVICE_REQUEST_RECORD,
+    P2P_CONNECT_FAILED,
 };
 
 enum class DHCPTYPE {

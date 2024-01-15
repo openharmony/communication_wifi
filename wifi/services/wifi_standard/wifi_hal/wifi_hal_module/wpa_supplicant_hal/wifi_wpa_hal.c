@@ -365,6 +365,32 @@ static void DealP2pGoNegotiationFailure(const char *buf)
     return;
 }
 
+static void DealP2pConnectFailed(const char *buf)
+{
+    if (buf == NULL) {
+        return;
+    }
+    const char *bssidPos = strstr(buf, "bssid=");
+    if (bssidPos == NULL) {
+        LOGE("bssidPos is null!");
+        return;
+    }
+    bssidPos += strlen("bssid=");
+    char macAddr[WIFI_MAC_LENGTH + 1] = {0};
+    if (strncpy_s(macAddr, sizeof(macAddr), bssidPos, WIFI_MAC_LENGTH) != EOK) {
+        LOGE("strncpy_s failed!");
+        return;
+    }
+    const char *reaPos = strstr(buf, "reason=");
+    if (reaPos == NULL) {
+        LOGE("reaPos is null!");
+        return;
+    }
+    int reason = atoi(reaPos + strlen("reason="));
+    P2pHalCbP2pConnectFailed(macAddr, reason);
+    return;
+}
+
 static void DealGroupFormationFailureEvent(const char *buf)
 {
     if (buf == NULL) {
@@ -544,6 +570,8 @@ static int DealWpaP2pCallBackSubFun(char *p)
         DealP2pGroupRemove(p + strlen(P2P_EVENT_GROUP_REMOVED));
     } else if (strncmp(p, P2P_INTERFACE_CREATED, strlen(P2P_INTERFACE_CREATED)) == 0) {
         DealP2pInterfaceCreated(p + strlen(P2P_INTERFACE_CREATED));
+    } else if (strncmp(p, CTRL_EVENT_DISCONNECTED, strlen(CTRL_EVENT_DISCONNECTED)) == 0) {
+        DealP2pConnectFailed(p);
     } else {
         return 1;
     }

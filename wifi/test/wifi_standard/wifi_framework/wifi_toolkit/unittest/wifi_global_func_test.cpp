@@ -331,10 +331,10 @@ HWTEST_F(WifiGlobalFuncTest, WatchParamValueTest, TestSize.Level1)
     WatchParamValue(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
 }
 
-HWTEST_F(WifiGlobalFuncTest, IsfreqDbacTest, TestSize.Level1)
+HWTEST_F(WifiGlobalFuncTest, IsFreqDbacTest, TestSize.Level1)
 {
-    EXPECT_TRUE(IsfreqDbac(2412, 2417));
-    EXPECT_FALSE(IsfreqDbac(2412, 5200));
+    EXPECT_TRUE(IsFreqDbac(2412, 2417));
+    EXPECT_FALSE(IsFreqDbac(2412, 5200));
 }
 
 HWTEST_F(WifiGlobalFuncTest, IsChannelDbacTest, TestSize.Level1)

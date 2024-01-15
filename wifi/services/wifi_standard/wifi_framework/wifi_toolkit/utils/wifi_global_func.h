@@ -411,7 +411,7 @@ int WatchParamValue(const char *keyprefix, ParameterChgPtr callback, void *conte
  * @return true - dbac
  * @return false - not dbac
  */
-bool IsfreqDbac(int freqA, int freqB);
+bool IsFreqDbac(int freqA, int freqB);
 
 /**
  * @Description are the two channels dbac

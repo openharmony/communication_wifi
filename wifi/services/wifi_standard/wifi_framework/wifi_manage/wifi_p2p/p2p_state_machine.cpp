@@ -990,6 +990,16 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
     return;
 }
 
+void P2pStateMachine::RemoveGroupByDevice(WifiP2pDevice &device) const
+{
+    int networkId = groupManager.GetGroupNetworkId(device);
+    if (networkId != -1) {
+        RemoveGroupByNetworkId(networkId);
+    }
+    return;
+}
+
+
 DHCPTYPE P2pStateMachine::GetIsNeedDhcp() const
 {
     WIFI_LOGI("Get need dhcp flag %{public}d", (int)m_isNeedDhcp);

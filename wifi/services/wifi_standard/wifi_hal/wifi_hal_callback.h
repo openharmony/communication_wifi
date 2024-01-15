@@ -140,6 +140,14 @@ void P2pHalCbGoNegotiationSuccess();
 void P2pHalCbGoNegotiationFailure(int status);
 
 /**
+ * @Description P2p Connect Failed
+ *
+ * @param bssid
+ * @param reason
+ */
+void P2pHalCbP2pConnectFailed(const char *bssid, int reason);
+
+/**
  * @Description Receive a P2P invitation
  *
  * @param info

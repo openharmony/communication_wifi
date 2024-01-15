@@ -677,6 +677,16 @@ static void DealP2pServerDiscReqCbk(int event, Context *context)
     return;
 }
 
+static void DealP2pConnectFailedCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.connMsg.status);
+        WriteStr(context, cbmsg->msg.connMsg.bssid);
+    }
+    return;
+}
+
 static void DealP2pCallback(int event, Context *context)
 {
     switch (event) {
@@ -716,6 +726,10 @@ static void DealP2pCallback(int event, Context *context)
             break;
         case P2P_IFACE_CREATED_EVENT:
             DealIfaceCbk(event, context);
+            break;
+        case P2P_CONNECT_FAILED:
+            DealP2pConnectFailedCbk(event, context);
+            break;
         default:
             break;
     }

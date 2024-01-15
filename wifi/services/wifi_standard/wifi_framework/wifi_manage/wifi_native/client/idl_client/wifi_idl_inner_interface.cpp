@@ -432,3 +432,14 @@ void OnP2pIfaceCreated(const char *ifName, int isGo)
         cbk.onP2pIfaceCreated(ifName, isGo);
     }
 }
+
+void OnP2pConnectFailed(const char *bssid, int reason)
+{
+    if (bssid == nullptr) {
+        return;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onP2pConnectFailed) {
+        cbk.onP2pConnectFailed(bssid, reason);
+    }
+}

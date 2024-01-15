@@ -101,6 +101,8 @@ void P2pEnabledState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO, &P2pEnabledState::ProcessCmdSetWfdInfo));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &P2pEnabledState::ProcessCmdCancelConnect));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED, &P2pEnabledState::ProcessCmdConnectFailed));
 }
 bool P2pEnabledState::ProcessCmdDisable(InternalMessage &msg) const
 {
@@ -577,6 +579,22 @@ bool P2pEnabledState::ProcessCmdCancelConnect(InternalMessage &msg) const
 {
     WIFI_LOGI("P2P ProcessCmdCancelConnect recv CMD: %{public}d", msg.GetMessageName());
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pCancelConnect, ErrCode::WIFI_OPT_FAILED);
+    return EXECUTED;
+}
+bool P2pEnabledState::ProcessCmdConnectFailed(InternalMessage &msg) const
+{
+    WIFI_LOGI("P2P ProcessCmdConnectFailed recv CMD: %{public}d", msg.GetMessageName());
+    constexpr int connectFailed = 2;
+    constexpr int connectTimeout = 15;
+    WifiP2pDevice device;
+    if (!msg.GetMessageObj(device)) {
+        WIFI_LOGE("Failed to obtain device information.");
+        return EXECUTED;
+    }
+    if (msg.GetParam1() == connectFailed || msg.GetParam1() == connectTimeout) {
+        WIFI_LOGD("P2P ProcessCmdConnectFailed: filed reason = %{public}d", msg.GetParam1());
+        p2pStateMachine.RemoveGroupByDevice(device);
+    }
     return EXECUTED;
 }
 } // namespace Wifi

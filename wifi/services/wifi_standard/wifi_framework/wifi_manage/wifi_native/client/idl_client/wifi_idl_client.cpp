@@ -1245,6 +1245,7 @@ WifiErrorNo WifiIdlClient::ReqP2pRegisterCallback(const P2pHalCallback &callback
         cEventCallback.connectSupplicantFailed = OnP2pConnectSupplicantFailed;
         cEventCallback.onP2pServDiscReq = OnP2pServDiscReq;
         cEventCallback.onP2pIfaceCreated = OnP2pIfaceCreated;
+        cEventCallback.onP2pConnectFailed = OnP2pConnectFailed;
     }
 
     return RegisterP2pEventCallback(cEventCallback);

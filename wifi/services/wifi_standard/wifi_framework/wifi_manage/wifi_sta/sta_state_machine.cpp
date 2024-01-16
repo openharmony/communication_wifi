@@ -718,7 +718,7 @@ void StaStateMachine::StopWifiProcess()
         /* Callback result to InterfaceService. */
         linkedInfo.ssid = ssid;
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
-         linkedInfo.ssid = "";
+        linkedInfo.ssid = "";
     }
 
     if (WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId) == WifiOprMidState::RUNNING) {

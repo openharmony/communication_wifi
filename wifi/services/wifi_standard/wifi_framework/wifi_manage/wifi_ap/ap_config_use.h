@@ -105,8 +105,8 @@ private:
     void FilterIndoorChannel(std::vector<int> &channels) const;
     void Filter165Channel(std::vector<int> &channels) const;
     void JudgeDbacWithP2p(HotspotConfig &apConfig) const;
-    std::set<int> GetIndoorChannelsByCode(const std::string &countryCode) const;
-    std::vector<int> GetPreferredChannelsByBand(const BandType &bandType) const;
+    std::set<int> GetIndoorChanByCountryCode(const std::string &countryCode) const;
+    std::vector<int> GetPreferredChannelByBand(const BandType &bandType) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

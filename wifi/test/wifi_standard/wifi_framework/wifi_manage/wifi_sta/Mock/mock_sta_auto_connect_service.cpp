@@ -59,24 +59,28 @@ bool MockStaAutoConnectService::RegisterDeviceAppraisal(StaDeviceAppraisal *appr
     WIFI_LOGI("Enter MockStaAutoConnectService::RegisterDeviceAppraisal.\n");
     return true;
 }
-void MockStaAutoConnectService::EnableAutoJoin(const std::string &conditionName) {
+void MockStaAutoConnectService::EnableAutoJoin(const std::string &conditionName)
+{
     (void) conditionName;
     WIFI_LOGI("Enter MockStaAutoConnectService::EnableAutoJoin.");
 }
 
-void MockStaAutoConnectService::DisableAutoJoin(const std::string &conditionName) {
+void MockStaAutoConnectService::DisableAutoJoin(const std::string &conditionName)
+{
     (void) conditionName;
     WIFI_LOGI("Enter MockStaAutoConnectService::DisableAutoJoin.");
 }
 
 void MockStaAutoConnectService::RegisterAutoJoinCondition(const std::string &conditionName,
-                                                          const std::function<bool()> &autoJoinCondition) {
+                                                          const std::function<bool()> &autoJoinCondition)
+{
     (void) conditionName;
     (void) autoJoinCondition;
     WIFI_LOGI("Enter MockStaAutoConnectService::RegisterAutoJoinCondition.");
 }
 
-void MockStaAutoConnectService::DeregisterAutoJoinCondition(const std::string &conditionName) {
+void MockStaAutoConnectService::DeregisterAutoJoinCondition(const std::string &conditionName)
+{
     (void) conditionName;
     WIFI_LOGI("Enter MockStaAutoConnectService::DeregisterAutoJoinCondition.");
 }

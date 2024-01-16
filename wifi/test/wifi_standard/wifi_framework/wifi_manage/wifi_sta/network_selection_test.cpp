@@ -380,38 +380,37 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentSignalLevels,
 
 HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentSecurities, TestSize.Level1)
 {
-NetworkSelectionResult selectionResult;
-std::vector<InterScanInfo> scanInfos;
-auto &scanInfo1 = scanInfos.emplace_back();
-scanInfo1.bssid = "11:11:11:11:11";
-scanInfo1.ssid = "test1";
-scanInfo1.frequency = 5028;
-scanInfo1.rssi = -80;
-auto &scanInfo2 = scanInfos.emplace_back();
-scanInfo2.bssid = "22:22:22:22:22";
-scanInfo2.ssid = "test2";
-scanInfo2.frequency = 5028;
-scanInfo2.rssi = -80;
-scanInfo2.capabilities = "SAE";
-NetworkSelectionManager selectionManager;
-EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
-EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
-EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
-EXPECT_CALL(WifiSettings::GetInstance(),
-    GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _)).WillRepeatedly(Invoke([](const std::string &ssid,
-                                                                const std::string &,
-                                                                WifiDeviceConfig &wifiDeviceConfig) {
-    if (ssid == "test1") {
-        wifiDeviceConfig.networkId = 0;
-    } else if (ssid == "test2") {
-        wifiDeviceConfig.networkId = 1;
-    }
-    wifiDeviceConfig.networkStatusHistory = 0b01;
-    wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
-    return 0;
-}));
-EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
-EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 1);
+    NetworkSelectionResult selectionResult;
+    std::vector<InterScanInfo> scanInfos;
+    auto &scanInfo1 = scanInfos.emplace_back();
+    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.ssid = "test1";
+    scanInfo1.frequency = 5028;
+    scanInfo1.rssi = -80;
+    auto &scanInfo2 = scanInfos.emplace_back();
+    scanInfo2.bssid = "22:22:22:22:22";
+    scanInfo2.ssid = "test2";
+    scanInfo2.frequency = 5028;
+    scanInfo2.rssi = -80;
+    scanInfo2.capabilities = "SAE";
+    NetworkSelectionManager selectionManager;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
+    EXPECT_CALL(WifiSettings::GetInstance(),
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig) {
+        if (ssid == "test1") {
+            wifiDeviceConfig.networkId = 0;
+        } else if (ssid == "test2") {
+            wifiDeviceConfig.networkId = 1;
+        }
+        wifiDeviceConfig.networkStatusHistory = 0b01;
+        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
+        return 0;
+    }));
+    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
+    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 1);
 }
 
 HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentBands, TestSize.Level1)

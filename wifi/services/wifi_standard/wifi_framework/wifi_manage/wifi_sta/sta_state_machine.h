@@ -44,12 +44,14 @@ constexpr int STA_DISABLED_MODE = 4;
 constexpr int STA_RENEWAL_MIN_TIME = 120;
 constexpr int STREAM_TXPACKET_THRESHOLD = 0;
 constexpr int STREAM_RXPACKET_THRESHOLD = 0;
+constexpr int STA_AP_ROAMING_TIMEOUT = 15000; // 15s->15000 ms
 
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
 constexpr int CMD_START_RENEWAL_TIMEOUT = 0X05;
+constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
@@ -104,6 +106,13 @@ const std::map<int, int> wpa3FailreasonMap {
     {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
     {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
 };
+
+typedef enum EnumDhcpReturnCode {
+    DHCP_RESULT,
+    DHCP_JUMP,
+    DHCP_RENEW_FAIL,
+    DHCP_FAIL,
+} DhcpReturnCode;
 
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
@@ -332,6 +341,12 @@ public:
         static void OnSuccess(int status, const char *ifname, DhcpResult *result);
 
         /**
+         * @Description : deal dhcp result
+         *
+         */
+        void DealDhcpResult(int ipType);
+
+        /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
          *
          * @param status - int
@@ -339,12 +354,20 @@ public:
          * @param reason - failed reason
          */
         static void OnFailed(int status, const char *ifname, const char *reason);
+        /**
+         * @Description : deal dhcp result failed
+         *
+         */
+        void DealDhcpResultFailed();
         static void SetStaStateMachine(StaStateMachine *staStateMachine);
         static void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToCloseDhcpClient(int iptype);
+        static void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
     private:
         static StaStateMachine *pStaStateMachine;
+        static DhcpResult DhcpIpv4Result;
+        static DhcpResult DhcpIpv6Result;
     };
 
 public:
@@ -402,7 +425,7 @@ public:
      *
      * @param result: true-success, false-fail(in)
      */
-    void OnDhcpResultNotifyEvent(bool result);
+    void OnDhcpResultNotifyEvent(DhcpReturnCode result, int ipType = -1);
     /**
      * @Description Register sta callback function
      *
@@ -455,7 +478,7 @@ public:
      */
     void HandlePortalNetworkPorcess();
     int GetInstanceId();
-
+    void DealApRoamingStateTimeout(InternalMessage *msg);
 private:
     /**
      * @Description  Destruct state.

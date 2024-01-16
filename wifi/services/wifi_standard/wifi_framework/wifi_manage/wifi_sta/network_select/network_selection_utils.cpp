@@ -172,7 +172,7 @@ std::string NetworkSelectionUtils::GetScoreMsg(ScoreResult &scoreResult)
         return scoreMsg.str();
     }
     scoreMsg << "{ ";
-    for (auto i = 0; i < scoreResult.scoreDetails.size(); i++) {
+    for (std::size_t i = 0; i < scoreResult.scoreDetails.size(); i++) {
         scoreMsg << NetworkSelectionUtils::GetScoreMsg(scoreResult.scoreDetails.at(i));
         if (i < (scoreResult.scoreDetails.size() - 1)) {
             scoreMsg << ", ";

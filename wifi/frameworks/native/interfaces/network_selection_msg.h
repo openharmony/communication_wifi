@@ -38,7 +38,7 @@ enum class FilterTag {
 };
 
 using FilterFunc = std::function<bool(NetworkCandidate &)>;
-using FilterBuilder = std::function<bool(FilterFunc &)>;
+using FilterBuilder = std::function<void(FilterFunc &)>;
 }
 }
 #endif

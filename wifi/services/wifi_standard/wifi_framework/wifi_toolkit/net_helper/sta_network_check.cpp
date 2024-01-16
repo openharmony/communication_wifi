@@ -219,7 +219,8 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
     });
 
     task->OnFail([this](const NetStack::HttpClient::HttpClientRequest &request,
-        const NetStack::HttpClient::HttpClientResponse &response, const NetStack::HttpClient::HttpClientError &error) {
+        const NetStack::HttpClient::HttpClientResponse &response, const NetStack::HttpClient::HttpClientError &error)
+        __attribute__((no_sanitize("cfi"))) {
         std::string url = request.GetURL();
         int codeNum = response.GetResponseCode();
         StaNetState netState = CheckResponseCode(url, codeNum);

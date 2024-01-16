@@ -35,14 +35,18 @@ WifiSaLoadManager& WifiSaLoadManager::GetInstance()
 ErrCode WifiSaLoadManager::LoadWifiSa(int32_t systemAbilityId)
 {
     WIFI_LOGD("%{public}s enter, systemAbilityId = [%{public}d] loading", __func__, systemAbilityId);
-    InitLoadState();
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         WIFI_LOGE("%{public}s: get system ability manager failed!", __func__);
         return WIFI_OPT_FAILED;
     }
-
+    auto object = samgr->CheckSystemAbility(systemAbilityId);
+    if (object != nullptr) {
+        WIFI_LOGE("get system ability %{public}d manager!", systemAbilityId);
+        return WIFI_OPT_SUCCESS;
+    }
+    InitLoadState();
     sptr<WifiSaLoadCallback> loadCallback = new (std::nothrow) WifiSaLoadCallback();
     if (loadCallback == nullptr) {
         WIFI_LOGE("%{public}s: wifi sa load callback failed!", __func__);

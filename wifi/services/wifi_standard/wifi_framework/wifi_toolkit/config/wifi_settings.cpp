@@ -35,6 +35,9 @@
 #include "network_parser.h"
 #include "softap_parser.h"
 #endif
+#ifdef INIT_LIB_ENABLE
+#include "parameter.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -58,7 +61,7 @@ WifiSettings::WifiSettings()
       mP2pConnectState(0),
       mApMaxConnNum(0),
       mMaxNumConfigs(0),
-      mScreenState(MODE_STATE_OPEN),
+      mScreenState(MODE_STATE_DEFAULT),
       mScanGenieState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
       mPowerSleepState(MODE_STATE_CLOSE),
@@ -988,7 +991,7 @@ int WifiSettings::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
             iter->second.channelWidth = channelWidth;
         }
     }
-    
+
     return 0;
 }
 
@@ -1532,12 +1535,19 @@ int WifiSettings::GetApMaxConnNum()
 void WifiSettings::InitDefaultHotspotConfig()
 {
     HotspotConfig cfg;
+#ifdef INIT_LIB_ENABLE
+    std::string ssid = GetMarketName();
+#endif
     cfg.SetSecurityType(KeyMgmt::WPA2_PSK);
     cfg.SetBand(BandType::BAND_2GHZ);
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
+#ifdef INIT_LIB_ENABLE
+    cfg.SetSsid(ssid);
+#else
     cfg.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
-    cfg.SetPreSharedKey("12345678");
+#endif
+    cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {
         mHotspotConfig[0] = cfg;
@@ -1548,11 +1558,18 @@ void WifiSettings::ClearHotspotConfig()
 {
     mHotspotConfig.clear();
     HotspotConfig config;
+#ifdef INIT_LIB_ENABLE
+    std::string ssid = GetMarketName();
+#endif
     config.SetSecurityType(KeyMgmt::WPA2_PSK);
     config.SetBand(BandType::BAND_2GHZ);
     config.SetChannel(AP_CHANNEL_DEFAULT);
     config.SetMaxConn(GetApMaxConnNum());
+#ifdef INIT_LIB_ENABLE
+    config.SetSsid(ssid);
+#else
     config.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
+#endif
     config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, config);
     if (!ret.second) {
@@ -2419,6 +2436,17 @@ long int WifiSettings::GetRandom()
         if (fd >= 0) {
             length = read(fd, &random, sizeof(random));
             close(fd);
+        } else {
+            LOGW("%{public}s: failed to open, try again", __func__);
+        }
+        if (random == 0) {
+            fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
+            if (fd >= 0) {
+                length = read(fd, &random, sizeof(random));
+                close(fd);
+            } else {
+                LOGE("%{public}s: retry failed", __func__);
+            }
         }
     } while (0);
     return (random >= 0 ? random : -random);

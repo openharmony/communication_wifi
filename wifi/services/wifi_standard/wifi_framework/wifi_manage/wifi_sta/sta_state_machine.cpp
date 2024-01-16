@@ -223,6 +223,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastRxPackets = 0;
     linkedInfo.lastTxPackets = 0;
     linkedInfo.retryedConnCount = 0;
+    linkedInfo.isAncoConnected = 0;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -709,13 +710,15 @@ void StaStateMachine::StopWifiProcess()
 
     ConnState curConnState = linkedInfo.connState;
     WIFI_LOGI("current connect state is %{public}d\n", curConnState);
-
+    std::string ssid = linkedInfo.ssid;
     /* clear connection information. */
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     if (curConnState == ConnState::CONNECTED) {
         /* Callback result to InterfaceService. */
+        linkedInfo.ssid = ssid;
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+         linkedInfo.ssid = "";
     }
     
     if ((WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId)
@@ -1034,14 +1037,16 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
     }
     linkedInfo.retryedConnCount++;
     DealSetStaConnectFailedCount(1, false);
-
+    std::string ssid = linkedInfo.ssid;
     WifiSettings::GetInstance().SetConnectTimeoutBssid(linkedInfo.bssid, m_instId);
     InitWifiLinkedInfo();
     SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_TIMEOUT);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+    linkedInfo.ssid = ssid;
     InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTING_TIMEOUT, linkedInfo);
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    linkedInfo.ssid = "";
     WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
 }
 
@@ -1128,6 +1133,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     IfConfig::GetInstance().FlushIpAddr(IF_NAME + std::to_string(m_instId), IPTYPE_IPV4);
 #endif
     /* Initialize connection information. */
+    std::string ssid = linkedInfo.ssid;
     InitWifiLinkedInfo();
     if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
         linkedInfo.networkId = lastLinkedInfo.networkId;
@@ -1138,8 +1144,10 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     } else {
         WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     }
+    linkedInfo.ssid = ssid;
     /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    linkedInfo.ssid = "";
     WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     SwitchState(pSeparatedState);
     return;
@@ -1160,7 +1168,9 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
     }
     
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+    std::string ssid = linkedInfo.ssid;
     InitWifiLinkedInfo();
+    linkedInfo.ssid = ssid;
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT) {
         SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
@@ -1182,6 +1192,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
         WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     }
+    linkedInfo.ssid = "";
 }
 
 bool StaStateMachine::DealReconnectSavedNetwork()
@@ -2712,6 +2723,7 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
             linkedInfo.platformType = lastLinkedInfo.platformType;
             linkedInfo.portalUrl = lastLinkedInfo.portalUrl;
             linkedInfo.detailedState = lastLinkedInfo.detailedState;
+            linkedInfo.isAncoConnected = lastLinkedInfo.isAncoConnected;
         } else if (networkId != INVALID_NETWORK_ID) {
             linkedInfo.retryedConnCount = 0;
             linkedInfo.networkId = networkId;
@@ -3041,6 +3053,8 @@ void StaStateMachine::SaveLinkstate(ConnState state, DetailedState detailState)
     linkedInfo.detailedState = detailState;
     lastLinkedInfo.connState = state;
     lastLinkedInfo.detailedState = detailState;
+    linkedInfo.isAncoConnected = WifiConfigCenter::GetInstance().GetWifiConnectedMode(m_instId);
+    lastLinkedInfo.isAncoConnected = linkedInfo.isAncoConnected;
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
 }
 

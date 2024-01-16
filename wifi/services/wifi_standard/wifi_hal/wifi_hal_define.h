@@ -123,8 +123,9 @@ typedef enum WifiHalEvent {
     AP_STA_CONNECTED_EVENT,              /* STA and AP connected event */
     P2P_SERV_DISC_REQ_EVENT,             /* Service discovery request event */
     P2P_IFACE_CREATED_EVENT,             /* P2P interface created event */
-    WIFI_HAL_COMMON_EVENT,               /* CHBA recv common event*/
-    AP_STA_PSK_MISMATH_EVENT,            /* AP STA possible PSK mismatch event*/
+    WIFI_HAL_COMMON_EVENT,               /* CHBA recv common event */
+    AP_STA_PSK_MISMATH_EVENT,            /* AP STA possible PSK mismatch event */
+    P2P_CONNECT_FAILED,                  /* P2P connect failed */
     WIFI_HAL_MAX_EVENT,
 } WifiHalEvent;
 

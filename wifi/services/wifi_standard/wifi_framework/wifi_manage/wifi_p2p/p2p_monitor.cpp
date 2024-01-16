@@ -69,6 +69,7 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
         std::bind(&P2pMonitor::OnConnectSupplicantFailed, this),
         std::bind(&P2pMonitor::WpaEventServDiscReq, this, _1),
         std::bind(&P2pMonitor::WpaEventP2pIfaceCreated, this, _1, _2),
+        std::bind(&P2pMonitor::WpaEventP2pConnectFailed, this, _1, _2),
     };
 
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
@@ -294,6 +295,12 @@ void P2pMonitor::Broadcast2SmP2pIfaceCreated(const std::string &iface, int type,
 {
     std::any anyEvent = event;
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_IFACE_CREATED, type, 0, anyEvent);
+}
+
+void P2pMonitor::Broadcast2SmConnectFailed(const std::string &iface, int reason, const WifiP2pDevice &device) const
+{
+    std::any anyDevice = device;
+    MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED, reason, 0, anyDevice);
 }
 
 void P2pMonitor::OnConnectSupplicant(int status) const
@@ -616,6 +623,15 @@ void P2pMonitor::WpaEventP2pIfaceCreated(const std::string &ifName, int isGo) co
         return;
     }
     Broadcast2SmP2pIfaceCreated(selectIfacName, isGo, ifName);
+}
+
+void P2pMonitor::WpaEventP2pConnectFailed(const std::string &bssid, int reason) const
+{
+    WIFI_LOGD("WpaEventP2pConnectFailed callback, bssid:%{public}s, reason:%{public}d",
+        MacAnonymize(bssid).c_str(), reason);
+    WifiP2pDevice device;
+    device.SetDeviceAddress(bssid);
+    Broadcast2SmConnectFailed(selectIfacName, reason, device);
 }
 }  // namespace Wifi
 }  // namespace OHOS

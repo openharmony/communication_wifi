@@ -451,9 +451,17 @@ bool ConcreteMangerMachine::CheckCanOptSta()
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::OPENING) {
+        WIFI_LOGE("wifi is closing or starting, open wifi fail");
+        WifiSettings::GetInstance().SetWifiStopState(true);
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        ins->SendMessage(CMD_STA_START_FAILURE, mid);
         return false;
     }
     if (p2pState == WifiOprMidState::CLOSING || p2pState == WifiOprMidState::OPENING) {
+        WIFI_LOGE("p2p is closing or starting, open wifi fail");
+        WifiSettings::GetInstance().SetWifiStopState(true);
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        ins->SendMessage(CMD_STA_START_FAILURE, mid);
         return false;
     }
     return true;
@@ -462,7 +470,7 @@ bool ConcreteMangerMachine::CheckCanOptSta()
 ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
 {
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-    WIFI_LOGE("AutoStartStaService, current sta state:%{public}d", staState);
+    WIFI_LOGI("AutoStartStaService, current sta state:%{public}d", staState);
     if (staState == WifiOprMidState::RUNNING) {
         return WIFI_OPT_SUCCESS;
     }
@@ -519,7 +527,7 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
 ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
 {
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-    WIFI_LOGE("AutoStopStaService, current sta state:%{public}d", staState);
+    WIFI_LOGI("AutoStopStaService, current sta state:%{public}d", staState);
     if (staState == WifiOprMidState::CLOSED) {
         return WIFI_OPT_SUCCESS;
     }
@@ -558,7 +566,7 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
 ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId);
-    WIFI_LOGE("AutoStartScanOnly, Wifi scan only state is %{public}d", static_cast<int>(curState));
+    WIFI_LOGI("AutoStartScanOnly, Wifi scan only state is %{public}d", static_cast<int>(curState));
 
     if (curState != WifiOprMidState::CLOSED) {
         WIFI_LOGE("ScanOnly State  is not closed, return\n");
@@ -592,7 +600,7 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
 ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId)
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId);
-    WIFI_LOGE("AutoStopScanOnly, current wifi scan only state is %{public}d", static_cast<int>(curState));
+    WIFI_LOGI("AutoStopScanOnly, current wifi scan only state is %{public}d", static_cast<int>(curState));
     if (curState != WifiOprMidState::RUNNING) {
         return WIFI_OPT_SUCCESS;
     }

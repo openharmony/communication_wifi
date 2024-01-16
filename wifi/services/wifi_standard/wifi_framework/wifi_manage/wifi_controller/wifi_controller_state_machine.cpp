@@ -361,7 +361,7 @@ void WifiControllerMachine::MakeSoftapManager(SoftApManager::Role role, int id)
 
 bool WifiControllerMachine::ShouldEnableSoftap()
 {
-    WIFI_LOGE("Enter ShouldEnableSoftap");
+    WIFI_LOGI("Enter ShouldEnableSoftap");
     if (WifiSettings::GetInstance().GetSoftapToggledState()) {
         return true;
     }
@@ -371,15 +371,17 @@ bool WifiControllerMachine::ShouldEnableSoftap()
 
 bool WifiControllerMachine::ShouldEnableWifi()
 {
-    WIFI_LOGE("Enter ShouldEnableWifi");
+    WIFI_LOGI("Enter ShouldEnableWifi");
 #ifndef OHOS_ARCH_LITE
     if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
         return false;
     }
 #endif
     if (WifiSettings::GetInstance().GetWifiToggledState() || IsScanOnlyEnable()) {
+        WIFI_LOGI("Should to start Wifi or scanonly");
         return true;
     }
+    WIFI_LOGI("no need to start Wifi or scanonly");
     return false;
 }
 
@@ -410,13 +412,13 @@ bool WifiControllerMachine::IsScanOnlyEnable()
     ) {
         return true;
     }
-    WIFI_LOGE("No need to StartScanOnly,return.");
+    WIFI_LOGI("No need to StartScanOnly,return.");
     return false;
 }
 
 void WifiControllerMachine::StopAllConcreteManagers()
 {
-    WIFI_LOGE("Enter StopAllConcreteManagers.");
+    WIFI_LOGI("Enter StopAllConcreteManagers.");
     if (!HasAnyConcreteManager()) {
         return;
     }

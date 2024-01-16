@@ -49,6 +49,7 @@ typedef struct IWifiEventP2pCallback {
     void (*connectSupplicantFailed)(void);
     void (*onP2pServDiscReq)(const P2pServDiscReqInfo *info);
     void (*onP2pIfaceCreated)(const char *ifName, int isGo);
+    void (*onP2pConnectFailed)(const char *bssid, int reason);
 } IWifiEventP2pCallback;
 
 #ifdef __cplusplus

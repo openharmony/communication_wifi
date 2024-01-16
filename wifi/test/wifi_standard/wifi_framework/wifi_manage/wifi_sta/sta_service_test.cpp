@@ -735,7 +735,7 @@ void StaServiceTest::EnableAutoJoin()
 
 void StaServiceTest::RegisterAutoJoinCondition()
 {
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->RegisterAutoJoinCondition("testCondition",[](){return true;}));
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->RegisterAutoJoinCondition("testCondition", []() {return true;}));
 }
 
 void StaServiceTest::DeregisterAutoJoinCondition()
@@ -745,19 +745,20 @@ void StaServiceTest::DeregisterAutoJoinCondition()
 
 void StaServiceTest::RegisterFilterBuilder()
 {
-    FilterBuilder filterBuilder = [](auto & filterFunc){
-        filterFunc = [](NetworkCandidate & network_candidate){
+    FilterBuilder filterBuilder = [](auto & filterFunc) {
+        filterFunc = [](NetworkCandidate & network_candidate) {
             return true;
         };
     };
     EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
-                                                                    "testFilterBuilder",
-                                                                    filterBuilder));
+                                                                   "testFilterBuilder",
+                                                                   filterBuilder));
 }
 
-void StaServiceTest::DeregisterFilterBuilder() {
+void StaServiceTest::DeregisterFilterBuilder()
+{
     EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->DeregisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
-                                                                       "testFilterBuilder"));
+                                                                     "testFilterBuilder"));
 }
 
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)

@@ -35,23 +35,22 @@ void NetworkStatusHistoryManager::Update(uint32_t &networkStatusHistory, Network
     Insert(networkStatusHistory, networkStatus);
 }
 
-NetworkStatus NetworkStatusHistoryManager::GetLastNetworkStatus(const uint32_t &networkHistory)
+NetworkStatus NetworkStatusHistoryManager::GetLastNetworkStatus(uint32_t networkHistory)
 {
     return static_cast<NetworkStatus>(networkHistory & NETWORK_STATUS_MASK);
 }
 
-void NetworkStatusHistoryManager::CountNetworkStatus(const uint32_t &networkStatusHistory,
+void NetworkStatusHistoryManager::CountNetworkStatus(uint32_t networkStatusHistory,
                                                      int counts[NETWORK_STATUS_NUM])
 {
-    auto history = networkStatusHistory;
-    while (history) {
-        NetworkStatus networkStatus = GetLastNetworkStatus(history);
+    while (networkStatusHistory != 0) {
+        NetworkStatus networkStatus = GetLastNetworkStatus(networkStatusHistory);
         counts[static_cast<int>(networkStatus)]++;
-        history = history >> ITEM_BIT_NUM;
+        networkStatusHistory = networkStatusHistory >> ITEM_BIT_NUM;
     }
 }
 
-bool NetworkStatusHistoryManager::IsInternetAccessByHistory(const uint32_t &networkStatusHistory)
+bool NetworkStatusHistoryManager::IsInternetAccessByHistory(uint32_t networkStatusHistory)
 {
     int counts[NETWORK_STATUS_NUM] = {0};
     CountNetworkStatus(networkStatusHistory, counts);
@@ -71,7 +70,7 @@ bool NetworkStatusHistoryManager::IsInternetAccessByHistory(const uint32_t &netw
     return counts[static_cast<int>(NetworkStatus::HAS_INTERNET)] >= checkedNum * RECOVERY_PERCENTAGE;
 }
 
-bool NetworkStatusHistoryManager::IsAllowRecoveryByHistory(const uint32_t &networkStatusHistory)
+bool NetworkStatusHistoryManager::IsAllowRecoveryByHistory(uint32_t networkStatusHistory)
 {
     int counts[NETWORK_STATUS_NUM] = {0};
     CountNetworkStatus(networkStatusHistory, counts);
@@ -101,33 +100,32 @@ bool NetworkStatusHistoryManager::IsAllowRecoveryByHistory(const uint32_t &netwo
     return counts[static_cast<int>(NetworkStatus::HAS_INTERNET)] >= checkedNum * RECOVERY_PERCENTAGE;
 }
 
-bool NetworkStatusHistoryManager::IsPortalByHistory(const uint32_t &networkStatusHistory)
+bool NetworkStatusHistoryManager::IsPortalByHistory(uint32_t networkStatusHistory)
 {
     int counts[NETWORK_STATUS_NUM] = {0};
     CountNetworkStatus(networkStatusHistory, counts);
     return counts[static_cast<int>(NetworkStatus::PORTAL)] > 0;
 }
 
-bool NetworkStatusHistoryManager::HasInternetEverByHistory(const uint32_t &networkStatusHistory)
+bool NetworkStatusHistoryManager::HasInternetEverByHistory(uint32_t networkStatusHistory)
 {
     int counts[NETWORK_STATUS_NUM] = {0};
     CountNetworkStatus(networkStatusHistory, counts);
     return counts[static_cast<int>(NetworkStatus::HAS_INTERNET)] > 0;
 }
 
-bool NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(const uint32_t &networkStatusHistory)
+bool NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(uint32_t networkStatusHistory)
 {
     return !networkStatusHistory;
 }
 
-std::string NetworkStatusHistoryManager::ToString(const uint32_t &networkStatusHistory)
+std::string NetworkStatusHistoryManager::ToString(uint32_t networkStatusHistory)
 {
     std::stringstream networkStatusString;
-    auto history = networkStatusHistory;
-    while (history) {
-        NetworkStatus networkStatus = GetLastNetworkStatus(history);
+    while (networkStatusHistory != 0) {
+        NetworkStatus networkStatus = GetLastNetworkStatus(networkStatusHistory);
         networkStatusString << static_cast<int>(networkStatus) << "/";
-        history = history >> ITEM_BIT_NUM;
+        networkStatusHistory = networkStatusHistory >> ITEM_BIT_NUM;
     }
     return networkStatusString.str();
 }

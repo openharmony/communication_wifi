@@ -468,6 +468,10 @@ ErrCode WifiDeviceImpl::EnableAutoJoin(const std::string &conditionName)
 ErrCode WifiDeviceImpl::RegisterAutoJoinCondition(const std::string &conditionName,
                                                   const std::function<bool()> &autoJoinCondition)
 {
+    if (!autoJoinCondition) {
+        WIFI_LOGE("the target of autoJoinCondition for %{public}s is empty", conditionName.c_str());
+        return WIFI_OPT_FAILED;
+    }
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RegisterAutoJoinCondition(conditionName, autoJoinCondition);
@@ -484,6 +488,10 @@ ErrCode WifiDeviceImpl::RegisterFilterBuilder(const FilterTag &filterTag,
                                               const std::string &filterName,
                                               const FilterBuilder &filterBuilder)
 {
+    if (!filterBuilder) {
+        WIFI_LOGE("the target of filterBuilder for %{public}s is empty", filterName.c_str());
+        return WIFI_OPT_FAILED;
+    }
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RegisterFilterBuilder(filterTag, filterName, filterBuilder);

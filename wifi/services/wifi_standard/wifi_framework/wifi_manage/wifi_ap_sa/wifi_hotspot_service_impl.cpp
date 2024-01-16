@@ -404,7 +404,15 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
         return WIFI_OPT_AP_NOT_OPENED;
     }
-    return pService->AddBlockList(info);
+    if (pService->AddBlockList(info) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AddBlockList: request add hotspot blocklist failed!");
+        return WIFI_OPT_FAILED;
+    }
+    if (pService->DisconnetStation(info) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AddBlockList: request disconnet station failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)

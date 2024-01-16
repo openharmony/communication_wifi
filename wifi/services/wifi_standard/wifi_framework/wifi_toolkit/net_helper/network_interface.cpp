@@ -279,6 +279,43 @@ bool NetworkInterface::FetchIpAddress(
     return ret;
 }
 
+bool NetworkInterface::FetchApOrP2pIpAddress(
+    const std::string &interfaceName, std::vector<Ipv4Address> &vecipv4, std::vector<Ipv6Address> &vecIPv6)
+{
+    struct ifaddrs *ifaddr = nullptr;
+    struct ifaddrs *ifa = nullptr;
+    bool ret = false;
+    int n = 0;
+    constexpr int prefixInterfaceName = 3;
+    constexpr int prefixP2P = 4;
+
+    if (getifaddrs(&ifaddr) == -1) {
+        WIFI_LOGE("getifaddrs failed, error is %{public}d", errno);
+        return false;
+    }
+    for (ifa = ifaddr, n = 0; ifa != nullptr; ifa = ifa->ifa_next, n++) {
+        if (ifa->ifa_addr == nullptr) {
+            continue;
+        }
+        std::string subInterfaceName = interfaceName.substr(0, prefixInterfaceName);
+        char ifaName[prefixP2P + 1];
+        if (strncpy_s(ifaName, sizeof(ifaName), ifa->ifa_name, prefixP2P) != EOK) {
+            return false;
+        }
+        if ((subInterfaceName == "wla") && (strncmp(interfaceName.c_str(), ifa->ifa_name, IF_NAMESIZE) == 0)) {
+            continue;
+        }
+        if ((subInterfaceName == "p2p") &&
+            (strncmp("p2p0", ifa->ifa_name, IF_NAMESIZE) == 0 || strncmp("p2p-", ifaName, IF_NAMESIZE) == 0)) {
+            continue;
+        }
+        ret |= SaveIpAddress(*ifa, vecipv4, vecIPv6);
+    }
+
+    freeifaddrs(ifaddr);
+    return ret;
+}
+
 bool NetworkInterface::IpAddressChange(
     const std::string &interface, const BaseAddress &ipAddress, bool action, bool dad)
 {

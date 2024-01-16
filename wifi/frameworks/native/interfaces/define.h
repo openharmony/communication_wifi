@@ -96,6 +96,7 @@
 #define MODE_STATE_FREEZE (5)
 #define MODE_STATE_NO_CHARGER_PLUG (6)
 
+#define MODE_STATE_DEFAULT (-1)
 #define MODE_STATE_OPEN (1)
 #define MODE_STATE_CLOSE (2)
 #define INTERFACEDESCRIPTORL1  u"ohos.wifi.IWifiDeviceService"

@@ -32,6 +32,10 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
                                             NetworkSelectType type,
                                             const std::vector<InterScanInfo> &scanInfos)
 {
+    if (scanInfos.empty()) {
+        WIFI_LOGI("scanInfos is empty, ignore this selection");
+        return false;
+    }
     auto networkSelectorOptional = pNetworkSelectorFactory->GetNetworkSelector(type);
     if (!(networkSelectorOptional.has_value())) {
         WIFI_LOGE("Get NetworkSelector failed for type %{public}d", static_cast<int>(type));
@@ -88,7 +92,7 @@ std::string NetworkSelectionManager::VectorToJson(std::vector<std::string> &stri
 {
     std::stringstream ss;
     ss << "[";
-    for (int i = 0; i < strings.size(); ++i) {
+    for (std::size_t i = 0; i < strings.size(); ++i) {
         ss << strings[i];
         if (i < strings.size() - 1) {
             ss << " ,";

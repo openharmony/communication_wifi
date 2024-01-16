@@ -31,6 +31,12 @@ void ExternalWifiFilterBuildManager::RegisterFilterBuilder(const FilterTag &filt
                                                            const std::string &filterName,
                                                            const FilterBuilder &filterBuilder)
 {
+    if (!filterBuilder) {
+        WIFI_LOGE("the filterBuilder for filterTag: %{public}d, filterName: %{public}s is empty",
+                  static_cast<int>(filterTag),
+                  filterName.c_str());
+        return;
+    }
     std::lock_guard<std::mutex> lock(mutex);
     WIFI_LOGI("RegisterFilterBuilder for filterTag: %{public}d, filterName: %{public}s",
               static_cast<int>(filterTag),
@@ -56,11 +62,8 @@ void ExternalWifiFilterBuildManager::BuildFilter(const FilterTag &filterTag, Com
             continue;
         }
         FilterFunc filterFunc;
-        if (filterBuilderPair.second.operator()(filterFunc)) {
-            /**
-             * if the build function return true,
-             * transfer the filterFunc to compositeFilter and put it into the compositeFilter
-             */
+        filterBuilderPair.second.operator()(filterFunc);
+        if (filterFunc) {
             compositeFilter.AddFilter(std::make_shared<WifiFunctionFilterAdapter>(
                 filterFunc, filterBuilderPair.first.second));
         }

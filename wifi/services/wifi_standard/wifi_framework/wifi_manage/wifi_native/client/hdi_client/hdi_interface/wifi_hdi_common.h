@@ -53,12 +53,14 @@ extern "C" {
             return -1; \
         pos += ret; \
 
-#define HDI_HANDLE_CIPHER_POS_INFO(ret, pos, end, delim, format) \
-        ret = HdiTxtPrintf(pos, (end) - (pos), format, \
-            pos == (start) ? "" : (delim)); \
-        if (HdiCheckError((end) - (pos), ret)) \
-            return pos; \
-        pos += ret; \
+#define HDI_HANDLE_CIPHER_POS_INFO(flag, ret, pos, end, delim, format) \
+        if (flag) { \
+            ret = HdiTxtPrintf(pos, (end) - (pos), format, \
+                pos == (start) ? "" : (delim)); \
+            if (HdiCheckError((end) - (pos), ret)) \
+                return pos; \
+            pos += ret; \
+        } \
 
 static inline int HdiCheckCompleted(const struct HdiElem *e,
     const uint8_t *data, size_t datalen)
@@ -117,7 +119,7 @@ int CheckMacIsValid(const char *macStr);
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
 uint8_t FillIfrName(char *ifrName, int ifrNameLen, int portType);
 int32_t GetFeatureType(int portType);
-void UpDownLink(int flag, int type);
+void UpDownLink(int flag, int type, char *iface);
 WifiErrorNo HdiSetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType);
 #endif
 #ifdef __cplusplus

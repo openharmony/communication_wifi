@@ -79,6 +79,7 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteString(info.portalUrl);
     data.WriteInt32((int)info.supplicantState);
     data.WriteInt32((int)info.detailedState);
+    data.WriteBool(info.isAncoConnected);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE), data,
         reply, option);
     if (error != ERR_NONE) {

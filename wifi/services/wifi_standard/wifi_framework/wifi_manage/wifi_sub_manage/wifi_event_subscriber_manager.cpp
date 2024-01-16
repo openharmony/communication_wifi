@@ -375,8 +375,8 @@ void WifiEventSubscriberManager::UnRegisterScreenEvent()
         WIFI_LOGE("ScreenEvent UnSubscribeCommonEvent() failed");
     } else {
         WIFI_LOGI("ScreenEvent UnSubscribeCommonEvent() OK");
-        isScreenEventSubscribered = false;
     }
+    isScreenEventSubscribered = false;
 }
 
 void WifiEventSubscriberManager::RegisterAirplaneModeEvent()

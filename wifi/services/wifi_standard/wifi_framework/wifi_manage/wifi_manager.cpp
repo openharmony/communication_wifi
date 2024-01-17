@@ -117,6 +117,10 @@ int WifiManager::Init()
          * The sta service automatically starts upon startup. After the sta
          * service is started, the scanning is directly started.
          */
+        if (WifiSettings::GetInstance().GetScanOnlySwitchState()) {
+            WIFI_LOGI("Auto start scan only!");
+            wifiTogglerManager->ScanOnlyToggled(1);
+        }
         AutoStartEnhanceService();
         wifiScanManager->CheckAndStartScanService();
     }

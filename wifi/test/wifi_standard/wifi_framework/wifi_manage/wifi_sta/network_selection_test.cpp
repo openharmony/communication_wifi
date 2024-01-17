@@ -190,9 +190,8 @@ HWTEST_F(NetworkSelectionTest, TestEphemeralNetwork, TestSize.Level1)
     NetworkSelectionManager selectionManager;
     EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _)).WillRepeatedly(Invoke([](const std::string &ssid,
-                                                                    const std::string &,
-                                                                    WifiDeviceConfig &wifiDeviceConfig) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig) {
         wifiDeviceConfig.networkId = 0;
         wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         wifiDeviceConfig.isEphemeral = false;

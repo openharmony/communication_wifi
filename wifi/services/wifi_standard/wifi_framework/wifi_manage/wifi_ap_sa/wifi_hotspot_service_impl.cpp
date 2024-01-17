@@ -27,6 +27,7 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
+#include "mac_address.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
@@ -288,6 +289,39 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
     return errCode;
 }
 
+ErrCode WifiHotspotServiceImpl::TransRandomToRealMac(StationInfo &updateInfo, const StationInfo &info)
+{
+    if (MacAddress::IsValidMac(info.bssid)) {
+        if (info.bssidType > REAL_DEVICE_ADDRESS) {
+            WIFI_LOGE("%{public}s: invalid bssidType:%{public}d",
+                __func__, info.bssidType);
+            return WIFI_OPT_INVALID_PARAM;
+        }
+        WifiMacAddrInfo macAddrInfo;
+        macAddrInfo.bssid = info.bssid;
+        macAddrInfo.bssidType = info.bssidType;
+        std::string MacAddr =
+            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
+        if (MacAddr.empty()) {
+            WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
+                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
+        } else {
+            WIFI_LOGI("%{public}s: find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
+                __func__, info.bssid.c_str(), info.bssidType, MacAddr.c_str());
+            /* random MAC address are translated into real MAC address */
+            if (info.bssidType == RANDOM_DEVICE_ADDRESS) {
+                updateInfo.bssid = MacAddr;
+                updateInfo.bssidType = REAL_DEVICE_ADDRESS;
+                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    __func__, updateInfo.bssid.c_str(), updateInfo.bssidType);
+            }
+        }
+    } else {
+        WIFI_LOGW("invalid mac address");
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
 {
     WIFI_LOGI("Instance %{public}d %{public}s device name [%{private}s]", m_id, __func__,
@@ -302,13 +336,16 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
     if (!IsApServiceRunning()) {
         return WIFI_OPT_AP_NOT_OPENED;
     }
-
+    StationInfo updateInfo = info;
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    TransRandomToRealMac(updateInfo, info);
+#endif
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
     if (pService == nullptr) {
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
         return WIFI_OPT_AP_NOT_OPENED;
     }
-    return pService->DisconnetStation(info);
+    return pService->DisconnetStation(updateInfo);
 }
 
 int WifiHotspotServiceImpl::CheckOperHotspotSwitchPermission(const ServiceType type)
@@ -394,8 +431,11 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
         WIFI_LOGE("ApService is not running!");
         return WIFI_OPT_AP_NOT_OPENED;
     }
-
-    if (WifiConfigCenter::GetInstance().AddBlockList(info, m_id) < 0) {
+    StationInfo updateInfo = info;
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    TransRandomToRealMac(updateInfo, info);
+#endif
+    if (WifiConfigCenter::GetInstance().AddBlockList(updateInfo, m_id) < 0) {
         WIFI_LOGE("Add block list failed!");
         return WIFI_OPT_FAILED;
     }
@@ -404,11 +444,11 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
         return WIFI_OPT_AP_NOT_OPENED;
     }
-    if (pService->AddBlockList(info) != WIFI_OPT_SUCCESS) {
+    if (pService->AddBlockList(updateInfo) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("AddBlockList: request add hotspot blocklist failed!");
         return WIFI_OPT_FAILED;
     }
-    if (pService->DisconnetStation(info) != WIFI_OPT_SUCCESS) {
+    if (pService->DisconnetStation(updateInfo) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("AddBlockList: request disconnet station failed!");
         return WIFI_OPT_FAILED;
     }
@@ -436,20 +476,23 @@ ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
     if (CheckMacIsValid(info.bssid)) {
         return WIFI_OPT_INVALID_PARAM;
     }
-
+    StationInfo updateInfo = info;
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    TransRandomToRealMac(updateInfo, info);
+#endif
     if (IsApServiceRunning()) {
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
         if (pService == nullptr) {
             WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
             return WIFI_OPT_AP_NOT_OPENED;
         }
-        if (pService->DelBlockList(info) != WIFI_OPT_SUCCESS) {
+        if (pService->DelBlockList(updateInfo) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("request del hotspot blocklist failed!");
             return WIFI_OPT_FAILED;
         }
     }
 
-    if (WifiConfigCenter::GetInstance().DelBlockList(info, m_id) < 0) {
+    if (WifiConfigCenter::GetInstance().DelBlockList(updateInfo, m_id) < 0) {
         WIFI_LOGE("Delete block list failed!");
         return WIFI_OPT_FAILED;
     }
@@ -507,7 +550,29 @@ ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
         WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED", __func__);
+        for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
+            WifiMacAddrInfo macAddrInfo;
+            macAddrInfo.bssid = iter->bssid;
+            macAddrInfo.bssidType = iter->bssidType;
+            std::string randomMacAddr =
+                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
+            if (randomMacAddr.empty()) {
+                WIFI_LOGI("%{public}s: GenerateRandomMacAddress", __func__);
+                WifiSettings::GetInstance().GenerateRandomMacAddress(randomMacAddr);
+            }
+            if (!randomMacAddr.empty() &&
+                (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+                iter->bssid = randomMacAddr;
+                iter->bssidType = RANDOM_DEVICE_ADDRESS;
+                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    __func__, iter->bssid.c_str(), iter->bssidType);
+            }
+        }
+    }
+#endif
     if (WifiConfigCenter::GetInstance().GetBlockLists(infos, m_id) < 0) {
         WIFI_LOGE("Get block list failed!");
         return WIFI_OPT_FAILED;

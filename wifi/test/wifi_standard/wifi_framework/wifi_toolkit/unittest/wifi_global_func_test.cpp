@@ -16,6 +16,7 @@
 #include "wifi_global_func_test.h"
 #include "wifi_global_func.h"
 #include "wifi_country_code_define.h"
+#include "wifi_ap_msg.h"
 
 using namespace testing::ext;
 
@@ -42,6 +43,18 @@ HWTEST_F(WifiGlobalFuncTest, GetRandomStr, TestSize.Level1)
     EXPECT_TRUE(str.length() == MAX_PSK_LEN);
     str = GetRandomStr(MAX_PSK_LEN + 1);
     EXPECT_TRUE(str.length() == MAX_PSK_LEN);
+}
+
+HWTEST_F(WifiGlobalFuncTest, GetRandomInt, TestSize.Level1)
+{
+    int res = GetRandomInt(0, 100);
+    EXPECT_TRUE(res >= 0 && res <= 100);
+
+    res = GetRandomInt(2000, 100);
+    EXPECT_TRUE(res == 2000);
+
+    res = GetRandomInt(100, 100);
+    EXPECT_TRUE(res == 100);
 }
 
 HWTEST_F(WifiGlobalFuncTest, CheckMacIsValid, TestSize.Level1)
@@ -113,6 +126,22 @@ HWTEST_F(WifiGlobalFuncTest, HexStringToVecTest, TestSize.Level1)
     EXPECT_TRUE(HexStringToVec("0000", plainText, PLAIN_LENGTH, resultLength) == 0);
 }
 
+HWTEST_F(WifiGlobalFuncTest, IsValidateNumTest, TestSize.Level1)
+{
+    EXPECT_TRUE(IsValidateNum("4564"));
+    EXPECT_FALSE(IsValidateNum("/*"));
+    EXPECT_FALSE(IsValidateNum("sdfs"));
+    EXPECT_FALSE(IsValidateNum("1ss11"));
+}
+
+HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest, TestSize.Level1)
+{
+    EXPECT_TRUE(TransformFrequencyIntoChannel(2412) == 1);
+    EXPECT_TRUE(TransformFrequencyIntoChannel(5200) == 40);
+    EXPECT_TRUE(TransformFrequencyIntoChannel(52000) == -1);
+    EXPECT_TRUE(TransformFrequencyIntoChannel(200) == -1);
+}
+
 HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest1, TestSize.Level1)
 {
     std::vector<int> freqVector, chanVector;
@@ -150,6 +179,42 @@ HWTEST_F(WifiGlobalFuncTest, TransformFrequencyIntoChannelTest4, TestSize.Level1
     EXPECT_TRUE(count(chanVector.begin(), chanVector.end(), CHANNEL_5G) != 0);
 }
 
+HWTEST_F(WifiGlobalFuncTest, TransformFreqToBandTest, TestSize.Level1)
+{
+    EXPECT_TRUE(TransformFreqToBand(2412) == BandType::BAND_2GHZ);
+    EXPECT_TRUE(TransformFreqToBand(5200) == BandType::BAND_5GHZ);
+}
+
+HWTEST_F(WifiGlobalFuncTest, TransformChannelToBandTest, TestSize.Level1)
+{
+    EXPECT_TRUE(TransformChannelToBand(1) == BandType::BAND_2GHZ);
+    EXPECT_TRUE(TransformChannelToBand(40) == BandType::BAND_5GHZ);
+}
+
+HWTEST_F(WifiGlobalFuncTest, IsValid24GHzTest, TestSize.Level1)
+{
+    EXPECT_TRUE(IsValid24GHz(2412));
+    EXPECT_FALSE(IsValid24GHz(5200));
+}
+
+HWTEST_F(WifiGlobalFuncTest, IsValid5GHzTest, TestSize.Level1)
+{
+    EXPECT_FALSE(IsValid24GHz(2412));
+    EXPECT_TRUE(IsValid24GHz(5200));
+}
+
+HWTEST_F(WifiGlobalFuncTest, IsValid24GChannelTest, TestSize.Level1)
+{
+    EXPECT_TRUE(IsValid24GChannel(1));
+    EXPECT_FALSE(IsValid24GChannel(40));
+}
+
+HWTEST_F(WifiGlobalFuncTest, IsValid5GChannelTest, TestSize.Level1)
+{
+    EXPECT_FALSE(IsValid24GChannel(1));
+    EXPECT_TRUE(IsValid24GChannel(40));
+}
+
 HWTEST_F(WifiGlobalFuncTest, SplitStringTest, TestSize.Level1)
 {
     std::string str = "upnp 10 uuid:xxxxxxxxxxxxx-xxxxx";
@@ -163,6 +228,23 @@ HWTEST_F(WifiGlobalFuncTest, SplitStringTest, TestSize.Level1)
     EXPECT_TRUE(vec[0] == "upnp");
     EXPECT_TRUE(vec[1] == "10");
     EXPECT_TRUE(vec[2] == "uuid:xxxxxxxxxxxxx-xxxxx");
+}
+
+HWTEST_F(WifiGlobalFuncTest, SplitStringToIntVectorTest, TestSize.Level1)
+{
+    std::string str = "1,2,3,4";
+    std::vector<int> res = SplitStringToIntVector(str, ",");
+    EXPECT_TRUE(res.size() == 4);
+
+    res = SplitStringToIntVector(str, "|");
+    EXPECT_TRUE(res.size() == 0);
+
+    res = SplitStringToIntVector(str, "");
+    EXPECT_TRUE(res.size() == 0);
+
+    str = "1,2,3,aaa";
+    res = SplitStringToIntVector(str, ",");
+    EXPECT_TRUE(res.size() == 3);
 }
 
 HWTEST_F(WifiGlobalFuncTest, Vec2StreamTest, TestSize.Level1)
@@ -247,6 +329,18 @@ void MdmPropChangeEvt(const char *key, const char *value, void *context)
 HWTEST_F(WifiGlobalFuncTest, WatchParamValueTest, TestSize.Level1)
 {
     WatchParamValue(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
+}
+
+HWTEST_F(WifiGlobalFuncTest, IsFreqDbacTest, TestSize.Level1)
+{
+    EXPECT_TRUE(IsFreqDbac(2412, 2417));
+    EXPECT_FALSE(IsFreqDbac(2412, 5200));
+}
+
+HWTEST_F(WifiGlobalFuncTest, IsChannelDbacTest, TestSize.Level1)
+{
+    EXPECT_TRUE(IsChannelDbac(1, 2));
+    EXPECT_FALSE(IsChannelDbac(1, 40));
 }
 }  // namespace Wifi
 }  // namespace OHOS

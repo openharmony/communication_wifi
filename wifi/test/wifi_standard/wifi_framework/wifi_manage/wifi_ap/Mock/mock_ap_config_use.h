@@ -21,19 +21,22 @@
 #include "ap_macro.h"
 #include "wifi_msg.h"
 #include "ap_config_use.h"
+#include "wifi_ap_msg.h"
+
 namespace OHOS {
 namespace Wifi {
 class MockApConfigUse : public ApConfigUse {
 public:
-    MOCK_CONST_METHOD2(
-        TransformFrequencyIntoChannel, void(const std::vector<int> &FreqVector, std::vector<int> &ChanVector));
-    MOCK_CONST_METHOD1(LogConfig, void(HotspotConfig &apConfig));
-    MOCK_CONST_METHOD1(IsValid24GHz, bool(int freq));
-    MOCK_CONST_METHOD1(IsValid5GHz, bool(int freq));
-    MOCK_CONST_METHOD2(CheckBandChannel, void(HotspotConfig &apConfig, const ChannelsTable &validChanTable));
-    MOCK_CONST_METHOD1(TransformFrequencyIntoChannel, int(int freq));
-private:
-    using ApConfigUse::CheckBandChannel;
+    MOCK_CONST_METHOD1(UpdateApChannelConfig, void(HotspotConfig &apConfig));
+    MOCK_CONST_METHOD1(JudgeConflictBand, void(HotspotConfig &apConfig));
+    MOCK_CONST_METHOD0(GetBestChannelFor2G, int());
+    MOCK_CONST_METHOD0(GetBestChannelFor5G, int());
+    MOCK_CONST_METHOD1(GetChannelFromDrvOrXmlByBand, std::vector<int>(const BandType &bandType));
+    MOCK_CONST_METHOD1(FilterIndoorChannel, void(std::vector<int> &channels));
+    MOCK_CONST_METHOD1(Filter165Channel, void(std::vector<int> &channels));
+    MOCK_CONST_METHOD1(JudgeDbacWithP2p, void(HotspotConfig &apConfig));
+    MOCK_CONST_METHOD1(GetIndoorChannels, std::set<int>(const std::string &countryCode));
+    MOCK_CONST_METHOD1(GetPreferredChannels, std::set<int>(const BandType &bandType));
 };
 } // namespace Wifi
 } // namespace OHOS

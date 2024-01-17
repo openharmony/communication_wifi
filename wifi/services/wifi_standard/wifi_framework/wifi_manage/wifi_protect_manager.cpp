@@ -27,6 +27,7 @@
 #include "define.h"
 #include "wifi_rx_listen_arbitration.h"
 #endif
+#include "wifi_settings.h"
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MANAGER_LOCK_MANAGER"

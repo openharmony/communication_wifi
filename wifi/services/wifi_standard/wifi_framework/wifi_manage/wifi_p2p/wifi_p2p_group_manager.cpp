@@ -284,6 +284,17 @@ void WifiP2pGroupManager::UpdateGroupsNetwork(std::map<int, WifiP2pGroupInfo> wp
         }
     }
 }
+
+void WifiP2pGroupManager::SetCurrentGroup(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
+{
+    currentGroup = group;
+    WifiSettings::GetInstance().SetCurrentP2pGroupInfo(group);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    AddMacAddrPairInfo(type, group);
+#endif
+    RefreshCurrentGroupFromGroups();
+}
+
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 void WifiP2pGroupManager::AddMacAddrPairInfo(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
 {

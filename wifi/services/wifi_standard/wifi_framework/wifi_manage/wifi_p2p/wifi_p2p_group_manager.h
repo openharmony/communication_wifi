@@ -184,14 +184,13 @@ public:
         return currentGroup.IsClientDevicesEmpty();
     }
 
-    inline void SetCurrentGroup(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
-    {
-        currentGroup = group;
-#ifdef SUPPORT_RANDOM_MAC_ADDR
-        AddMacAddrPairInfo(type, group);
-#endif
-        RefreshCurrentGroupFromGroups();
-    }
+    /**
+     * @Description set current group
+     *
+     * @param type wifi mac addr info type
+     * @param group wifi p2p group info
+     */
+    void SetCurrentGroup(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group);
 
     inline const WifiP2pGroupInfoProxy &GetCurrentGroup() const
     {

@@ -27,6 +27,7 @@
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {

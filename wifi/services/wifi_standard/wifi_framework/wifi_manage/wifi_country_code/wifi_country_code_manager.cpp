@@ -100,7 +100,6 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
     }
     StrToUpper(wifiCountryCode);
     WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
-    WifiSettings::GetInstance().SetCountryCode(wifiCountryCode);
     UpdateWifiCountryCodeCache(wifiCountryCode);
     m_wifiCountryCode = wifiCountryCode;
     NotifyWifiCountryCodeChangeListeners(wifiCountryCode);

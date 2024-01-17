@@ -125,21 +125,21 @@ ErrCode WifiDataShareHelperUtils::Update(Uri &uri, const std::string &key, const
 
 ErrCode WifiDataShareHelperUtils::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer)
 {
-    if (m_registerHelper == nullptr) {
-        m_registerHelper = WifiCreateDataShareHelper();  // the listening callback handle is not released
-    }
-
-    CHECK_NULL_AND_RETURN(m_registerHelper, WIFI_OPT_FAILED);
+    std::shared_ptr<DataShare::DataShareHelper> registerHelper = WifiCreateDataShareHelper();
+    CHECK_NULL_AND_RETURN(registerHelper, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(observer, WIFI_OPT_FAILED);
-    m_registerHelper->RegisterObserver(uri, observer);
+    registerHelper->RegisterObserver(uri, observer);
+    registerHelper->Release();
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDataShareHelperUtils::UnRegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer)
 {
-    CHECK_NULL_AND_RETURN(m_registerHelper, WIFI_OPT_FAILED);
+    std::shared_ptr<DataShare::DataShareHelper> unregisterHelper = WifiCreateDataShareHelper();
+    CHECK_NULL_AND_RETURN(unregisterHelper, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(observer, WIFI_OPT_FAILED);
-    m_registerHelper->UnregisterObserver(uri, observer);
+    unregisterHelper->UnregisterObserver(uri, observer);
+    unregisterHelper->Release();
     return WIFI_OPT_SUCCESS;
 }
 

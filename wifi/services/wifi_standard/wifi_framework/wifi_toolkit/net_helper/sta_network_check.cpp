@@ -194,7 +194,7 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
         return -1;
     }
 
-    task->OnSuccess([task, this](const NetStack::HttpClient::HttpClientRequest &request,
+    task->OnSuccess([this](const NetStack::HttpClient::HttpClientRequest &request,
         const NetStack::HttpClient::HttpClientResponse &response) {
         std::string url = request.GetURL();
         int codeNum = response.GetResponseCode();
@@ -352,6 +352,7 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
 void StaNetworkCheck::StopNetCheckThread()
 {
     WIFI_LOGI("enter StopNetCheckThread!\n");
+    dnsChecker.StopDnsCheck();
     isStopNetCheck = true;
 }
 

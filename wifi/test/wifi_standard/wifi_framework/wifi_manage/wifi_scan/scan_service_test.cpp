@@ -1900,7 +1900,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetFreezeModeState()).Times(AtLeast(0));
         std::map<int, time_t> sceneMap;
         pScanService->HandleGetCustomSceneState(sceneMap);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetNoChargerPlugModeState()).Times(AtLeast(0));
         pScanService->HandleMovingFreezeChanged();
     }
 

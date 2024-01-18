@@ -328,6 +328,10 @@ bool DhcpdInterface::CallAdapterSetRange(std::string &ipAddr, const std::string 
 bool DhcpdInterface::GetConnectedStaInfo(const std::string &ifaceName, int staNumber, DhcpStationInfo *staInfos,
     int *staSize)
 {
+    if (staInfos == nullptr || staSize == nullptr) {
+        WIFI_LOGI("GetConnectedStaInfo param is null!\n");
+        return false;
+    }
     if (GetDhcpClientInfos(ifaceName.c_str(), staNumber, staInfos, staSize) != 0) {
         return false;
     }

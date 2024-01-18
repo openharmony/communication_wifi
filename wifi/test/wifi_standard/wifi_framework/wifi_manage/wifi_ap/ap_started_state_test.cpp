@@ -177,7 +177,6 @@ public:
 HWTEST_F(ApStartedState_test, GoInState_SUCCESS,TestSize.Level1)
 {
     std::vector<StationInfo> results;
-    IpInfo ipinfo;
     EXPECT_CALL(MockNetworkInterface::GetInstance(), FetchIpAddress(_, _, _)).WillRepeatedly(Return(true));
     EXPECT_CALL(MockNetworkInterface::GetInstance(), AddIpAddress(_, _)).WillRepeatedly(Return(true));
     EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(A<int>(), 0)).WillRepeatedly(Return(0));

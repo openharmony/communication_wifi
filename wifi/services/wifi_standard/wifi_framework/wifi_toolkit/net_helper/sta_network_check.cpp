@@ -352,6 +352,7 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
 void StaNetworkCheck::StopNetCheckThread()
 {
     WIFI_LOGI("enter StopNetCheckThread!\n");
+    dnsChecker.StopDnsCheck();
     isStopNetCheck = true;
 }
 

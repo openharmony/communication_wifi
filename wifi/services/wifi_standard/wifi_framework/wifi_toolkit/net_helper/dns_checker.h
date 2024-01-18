@@ -18,7 +18,7 @@
 #include <arpa/inet.h>
 #include <netinet/if_ether.h>
 #include <string>
-
+#include <atomic>
 namespace OHOS {
 namespace Wifi {
 
@@ -28,6 +28,7 @@ public:
     ~DnsChecker();
     void Start(std::string priDns, std::string secondDns);
     void Stop();
+    void StopDnsCheck();
     bool DoDnsCheck(std::string url, int timeoutMillis);
 private:
     void formatHostAdress(char* hostAddress, const char* host);
@@ -38,6 +39,7 @@ private:
     std::string primaryDnsAddress;
     std::string secondDnsAddress;
     bool socketCreated;
+    std::atomic<bool> isRunning;
 };
 }
 }

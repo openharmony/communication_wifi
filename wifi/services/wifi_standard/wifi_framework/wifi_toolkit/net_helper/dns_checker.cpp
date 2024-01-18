@@ -60,7 +60,7 @@ struct QUESTION {
     unsigned short qclass;
 };
 
-DnsChecker::DnsChecker() : socketCreated(false)
+DnsChecker::DnsChecker() : socketCreated(false), isRunning(true)
 {
 }
 
@@ -74,6 +74,7 @@ void DnsChecker::Start(std::string priDns, std::string secondDns)
     if (socketCreated) {
         Stop();
     }
+    isRunning = true;
     dnsSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (dnsSocket < 0) {
         LOGE("DnsChecker:socket error : %{public}d", errno);
@@ -84,11 +85,13 @@ void DnsChecker::Start(std::string priDns, std::string secondDns)
     if (strncpy_s(ifaceReq.ifr_name, sizeof(ifaceReq.ifr_name), "wlan0", strlen("wlan0")) != EOK) {
         LOGE("DnsChecker copy ifaceReq failed.");
         close(dnsSocket);
+        dnsSocket = 0;
         return;
     }
     if (setsockopt(dnsSocket, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifaceReq, sizeof(ifaceReq)) == -1) {
         LOGE("DnsChecker start wlan0 SO_BINDTODEVICE error:%{public}d.", errno);
         close(dnsSocket);
+        dnsSocket = 0;
         return;
     }
     socketCreated = true;
@@ -124,6 +127,10 @@ void DnsChecker::formatHostAdress(char* hostAddress, const char* host)
     }
     *hostAddress++ = '\0';
 }
+void DnsChecker::StopDnsCheck()
+{
+    isRunning = false;
+}
 
 bool DnsChecker::DoDnsCheck(std::string url, int timeoutMillis)
 {
@@ -133,6 +140,9 @@ bool DnsChecker::DoDnsCheck(std::string url, int timeoutMillis)
     std::string host = url.substr(strlen("http://"), len);
     host = host + ".";
     LOGD("DoDnsCheck url=%{public}s", host.c_str());
+    if (!isRunning) {
+        return false;
+    }
     bool dnsValid = checkDnsValid(host, primaryDnsAddress, timeoutMillis) ||
         checkDnsValid(host, secondDnsAddress, timeoutMillis);
     if (!dnsValid) {
@@ -162,14 +172,14 @@ int DnsChecker::recvDnsData(char* buff, int size, int timeout)
             LOGE("recvfrom failed %{public}d", errno);
             return false;
         }
-    } while (nBytes == -1);
+    } while (nBytes == -1 && isRunning);
 
     return nBytes < 0 ? 0 : nBytes;
 }
 
 bool DnsChecker::checkDnsValid(std::string host, std::string dnsAddress, int timeoutMillis)
 {
-    if (!socketCreated) {
+    if (!socketCreated && !isRunning) {
         LOGE("DnsChecker checkDnsValid failed, socket not created");
         return false;
     }
@@ -200,7 +210,7 @@ bool DnsChecker::checkDnsValid(std::string host, std::string dnsAddress, int tim
     uint64_t elapsed = 0;
     int leftMillis = timeoutMillis;
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
-    while (leftMillis > 0) {
+    while (leftMillis > 0 && isRunning) {
         int readLen = recvDnsData(buff, sizeof(buff), leftMillis);
         if (readLen >= static_cast<int>(sizeof(struct DNS_HEADER))) {
             dns = (struct DNS_HEADER*)buff;

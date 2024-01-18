@@ -61,7 +61,7 @@ int WifiManager::Init()
 {
 #ifndef OHOS_ARCH_LITE
     if (WifiCountryCodeManager::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiCountryCodeManager Init failed!");
+        WIFI_LOGE("WifiCountryCodeManager Init failed !");
         mInitStatus = WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED;
         return -1;
     }

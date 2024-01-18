@@ -408,6 +408,12 @@ public:
      */
     void OnNetworkDisconnectEvent(int reason);
     /**
+     * @Description  sta chr events
+     *
+     * @param reason - the state of wifi sta
+     */
+    void OnNetworkHiviewEvent(int reason);
+    /**
      * @Description  Assoc events
      *
      * @param reason - the state of wifi assoc

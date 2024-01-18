@@ -55,6 +55,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define WPA3_BLACKMAP_RSSI_THRESHOLD (-70)
 #define WPA3_CONNECT_FAIL_COUNT_THRESHOLD 2
 #define WPA_CB_ASSOCIATING 3
+#define WPA_CB_CONNECTED 1
+#define WPA_CB_ASSOCIATED 4
 #define TRANSFORMATION_TO_MBPS 10
 #define DEFAULT_NUM_ARP_PINGS 3
 #define MAX_ARP_CHECK_TIME 300
@@ -1793,8 +1795,6 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
     msg->SetParam1(networkId);
     msg->AddStringMessageBody(bssid);
     SendMessage(msg);
-    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
-        static_cast<int>(WifiOperateState::STA_CONNECTED));
 }
 
 void StaStateMachine::OnNetworkDisconnectEvent(int reason)
@@ -1806,12 +1806,22 @@ void StaStateMachine::OnNetworkAssocEvent(int assocState)
 {
     if (assocState == WPA_CB_ASSOCIATING) {
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
-        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
-            static_cast<int>(WifiOperateState::STA_ASSOCIATING));
     } else {
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED, linkedInfo);
+    }
+}
+
+void StaStateMachine::OnNetworkHiviewEvent(int state)
+{
+    if (state == WPA_CB_ASSOCIATING) {
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
+            static_cast<int>(WifiOperateState::STA_ASSOCIATING));
+    } else if (state == WPA_CB_ASSOCIATED) {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
             static_cast<int>(WifiOperateState::STA_ASSOCIATED));
+    } else if (state == WPA_CB_CONNECTED) {
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+            static_cast<int>(WifiOperateState::STA_CONNECTED));
     }
 }
 

@@ -194,6 +194,7 @@ NO_SANITIZE("cfi") napi_value GetScanInfos(napi_env env, napi_callback_info info
 
     asyncContext->executeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        context->vecScanInfos.clear();
         TRACE_FUNC_CALL_NAME("wifiScanPtr->GetScanInfoList");
         bool compatible = true;
         context->errorCode = wifiScanPtr->GetScanInfoList(context->vecScanInfos, compatible);
@@ -230,6 +231,7 @@ NO_SANITIZE("cfi") napi_value GetScanInfoResults(napi_env env, napi_callback_inf
 
     asyncContext->executeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        context->vecScanInfos.clear();
         TRACE_FUNC_CALL_NAME("wifiScanPtr->GetScanInfoList");
         bool compatible = false;
         context->errorCode = wifiScanPtr->GetScanInfoList(context->vecScanInfos, compatible);

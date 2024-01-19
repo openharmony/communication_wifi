@@ -300,17 +300,17 @@ ErrCode WifiHotspotServiceImpl::TransRandomToRealMac(StationInfo &updateInfo, co
         WifiMacAddrInfo macAddrInfo;
         macAddrInfo.bssid = info.bssid;
         macAddrInfo.bssidType = info.bssidType;
-        std::string MacAddr =
+        std::string macAddr =
             WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
-        if (MacAddr.empty()) {
+        if (macAddr.empty()) {
             WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
                 macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
         } else {
             WIFI_LOGI("%{public}s: find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-                __func__, info.bssid.c_str(), info.bssidType, MacAddr.c_str());
+                __func__, info.bssid.c_str(), info.bssidType, macAddr.c_str());
             /* random MAC address are translated into real MAC address */
             if (info.bssidType == RANDOM_DEVICE_ADDRESS) {
-                updateInfo.bssid = MacAddr;
+                updateInfo.bssid = macAddr;
                 updateInfo.bssidType = REAL_DEVICE_ADDRESS;
                 WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
                     __func__, updateInfo.bssid.c_str(), updateInfo.bssidType);

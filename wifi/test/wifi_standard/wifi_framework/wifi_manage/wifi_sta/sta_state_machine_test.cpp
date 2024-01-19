@@ -805,7 +805,7 @@ public:
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartConnectToNetwork(0);
+        pStaStateMachine->StartConnectToNetwork(0, "wifitest/123");
     }
 
     void StartConnectToNetworkFail1()
@@ -814,7 +814,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        EXPECT_TRUE(pStaStateMachine->StartConnectToNetwork(0) == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pStaStateMachine->StartConnectToNetwork(0, "wifitest/123") == WIFI_OPT_FAILED);
     }
 
     void StartConnectToNetworkFail4()
@@ -823,7 +823,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), EnableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        EXPECT_TRUE(pStaStateMachine->StartConnectToNetwork(0) == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pStaStateMachine->StartConnectToNetwork(0, "wifitest/123") == WIFI_OPT_FAILED);
     }
 
     void StartConnectToNetworkFail2()
@@ -834,7 +834,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Connect(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartConnectToNetwork(0);
+        pStaStateMachine->StartConnectToNetwork(0, "wifitest/123");
     }
 
     void StartConnectToNetworkFali3()
@@ -846,7 +846,7 @@ public:
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartConnectToNetwork(0);
+        pStaStateMachine->StartConnectToNetwork(0, "wifitest/123");
     }
 
     void SetRandomMacSuccess1()

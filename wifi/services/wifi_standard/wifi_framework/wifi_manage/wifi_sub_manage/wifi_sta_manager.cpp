@@ -85,6 +85,9 @@ void WifiStaManager::CloseStaService(int instId)
 {
     WIFI_LOGI("close sta service");
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+#endif
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
     auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaClose(instId);
@@ -141,6 +144,9 @@ void WifiStaManager::ForceStopWifi(int instId)
         cbMsg.id = instId;
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+#endif
         return;
     }
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);

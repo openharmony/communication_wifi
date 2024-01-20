@@ -490,6 +490,23 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        // load wifi self cure service
+        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SELFCURE) < 0) {
+            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_SELFCURE);
+            break;
+        }
+        ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+        if (pSelfCureService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_SELFCURE);
+            break;
+        }
+        errCode = pSelfCureService->InitSelfCureService();
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Service enable self cure failed, ret %{public}d!", static_cast<int>(errCode));
+            break;
+        }
+#endif
         errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Register sta service callback failed!");
@@ -512,6 +529,9 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
     if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE);
+#endif
         return errCode;
     }
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
@@ -551,7 +571,14 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
         return WIFI_OPT_SUCCESS;
     }
-
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGE("StopSelfCureService, Instance get self cure service is null!");
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+        return WIFI_OPT_SUCCESS;
+    }
+#endif
     ret = pService->DisableWifi();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("service disable sta failed, ret %{public}d!", static_cast<int>(ret));

@@ -246,6 +246,7 @@ struct WifiConfig {
     bool scanOnlySwitch;
     std::string realMacAddress;
     int staApExclusionType;
+    std::string internetSelfCureHistory;
 
     WifiConfig()
     {
@@ -288,6 +289,7 @@ struct WifiConfig {
         scanOnlySwitch = true;
         realMacAddress = "";
         staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
+        internetSelfCureHistory = "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
     }
 };
 

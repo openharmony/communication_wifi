@@ -265,6 +265,13 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetApIfaceName(std::string& ifaceName) override;
+    /**
+     * @Description convert randomMac to realMac
+     *
+     * @param ifaceName - the ifaceName to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode TransRandomToRealMac(StationInfo &updateInfo, const StationInfo &info);
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
     int CheckOperHotspotSwitchPermission(const ServiceType type);

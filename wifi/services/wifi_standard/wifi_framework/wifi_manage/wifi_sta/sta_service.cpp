@@ -575,7 +575,8 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
         LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s",
             outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str());
         if (config.ancoCallProcessName != ANCO_CALLBACK_CONNECT_PACKAGENAME && (!outConfig.callProcessName.empty())) {
-            outConfig.ancoCallProcessName = config.ancoCallProcessName;
+            LOGI("The anco same network name already exists in setting! ancoCallProcessName:%{public}s.",
+                outConfig.ancoCallProcessName.c_str());
         }
     } else {
         return WIFI_OPT_FAILED;

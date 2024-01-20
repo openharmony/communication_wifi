@@ -575,7 +575,6 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
             "ancoCallProcessName:%{public}s,OancoCallProcessName%{public}s", outConfig.networkId,
             SsidAnonymize(outConfig.ssid).c_str(),
             config.ancoCallProcessName.c_str(), outConfig.ancoCallProcessName.c_str());
-        }
     } else {
         return WIFI_OPT_FAILED;
     }

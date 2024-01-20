@@ -246,6 +246,7 @@ private:
      */
     bool UpdatMacAddress(const std::string ssid, KeyMgmt securityType);
 
+    void SetRandomMac() const;
 private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result
     HotspotConfig m_hotspotConfig;

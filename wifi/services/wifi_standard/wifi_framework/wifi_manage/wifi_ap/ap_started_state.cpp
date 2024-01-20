@@ -61,7 +61,9 @@ void ApStartedState::GoInState()
     WIFI_LOGI("Instance %{public}d %{public}s  GoInState", m_id, GetStateName().c_str());
     m_ApStateMachine.RegisterEventHandler();
     StartMonitor();
-
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    SetRandomMac();
+#endif
     if (StartAp() == false) {
         WIFI_LOGE("enter ApstartedState is failed.");
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
@@ -74,7 +76,6 @@ void ApStartedState::GoInState()
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
         return;
     }
-
     if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
         WIFI_LOGE("Set Blocklist failed.");
     }
@@ -241,18 +242,6 @@ bool ApStartedState::StartAp() const
         WIFI_LOGE("startAp is failed!");
         return false;
     }
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-    std::string macAddress;
-    WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
-    if (MacAddress::IsValidMac(macAddress.c_str())) {
-        if (WifiApHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
-            LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
-            return false;
-        }
-    } else {
-        LOGE("%{public}s: macAddress is invalid", __func__);
-    }
-#endif
     WriteWifiApStateHiSysEvent(1);
     return true;
 }
@@ -446,6 +435,19 @@ void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg)
         return;
     }
     WifiSettings::GetInstance().SetHotspotIdleTimeout(mTimeoutDelay);
+}
+
+void ApStartedState::SetRandomMac() const
+{
+    std::string macAddress;
+    WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+    if (MacAddress::IsValidMac(macAddress.c_str())) {
+        if (WifiApHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
+            LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
+        }
+    } else {
+        LOGE("%{public}s: macAddress is invalid", __func__);
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

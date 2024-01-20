@@ -37,6 +37,7 @@ namespace Wifi {
 
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
+
 StaService::StaService(int instId)
     : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
 {}
@@ -570,7 +571,7 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
             outConfig.ancoCallProcessName.c_str());
     } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
         outConfig) == 0) {
-        LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s",
+        LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
             "ancoCallProcessName:%{public}s,OancoCallProcessName%{public}s", outConfig.networkId,
             SsidAnonymize(outConfig.ssid).c_str(),
             config.ancoCallProcessName.c_str(), outConfig.ancoCallProcessName.c_str());

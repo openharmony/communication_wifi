@@ -37,7 +37,6 @@ namespace Wifi {
 
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
-constexpr const char *ANCO_CALLBACK_CONNECT_PACKAGENAME = "android";
 StaService::StaService(int instId)
     : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
 {}
@@ -567,16 +566,15 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ancoCallProcessName, config.ssid, config.keyMgmt,
         outConfig) == 0 && (!config.ancoCallProcessName.empty()) &&
         config.ancoCallProcessName != ANCO_CALLBACK_CONNECT_PACKAGENAME) {
-        LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
+        LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s,"
             "ancoCallProcessName:%{public}s.", outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
             outConfig.ancoCallProcessName.c_str());
     } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
         outConfig) == 0) {
         LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s",
-            outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str());
-        if (config.ancoCallProcessName != ANCO_CALLBACK_CONNECT_PACKAGENAME && (!outConfig.callProcessName.empty())) {
-            LOGI("The anco same network name already exists in setting! ancoCallProcessName:%{public}s.",
-                outConfig.ancoCallProcessName.c_str());
+            "ancoCallProcessName:%{public}s,OancoCallProcessName%{public}s", outConfig.networkId,
+            SsidAnonymize(outConfig.ssid).c_str(),
+            config.ancoCallProcessName.c_str(), outConfig.ancoCallProcessName.c_str());
         }
     } else {
         return WIFI_OPT_FAILED;

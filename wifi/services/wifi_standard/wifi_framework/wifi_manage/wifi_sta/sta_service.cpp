@@ -564,8 +564,7 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const
 {
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ancoCallProcessName, config.ssid, config.keyMgmt,
-        outConfig) == 0 && (!config.ancoCallProcessName.empty()) &&
-        config.ancoCallProcessName != ANCO_CALLBACK_CONNECT_PACKAGENAME) {
+        outConfig) == 0 && (!config.ancoCallProcessName.empty())) {
         LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s,"
             "ancoCallProcessName:%{public}s.", outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
             outConfig.ancoCallProcessName.c_str());

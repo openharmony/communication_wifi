@@ -29,4 +29,5 @@ declare_args() {
   wifi_feature_with_wifi_hdi = false
   wifi_feature_with_hpf_supported = false
   wifi_feature_with_rx_listen_supported = false
+  wifi_feature_with_self_cure = false
 }

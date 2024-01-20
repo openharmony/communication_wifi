@@ -1525,6 +1525,20 @@ public:
      * @return void
      */
     void ClearHotspotConfig();
+    /**
+     * @Description get internet self cure history
+     *
+     * @return std::string - result internetSelfCureHistory
+     */
+    std::string GetSelfCureHistoryInfo(int instId = 0);
+
+    /**
+     * @Description set internet self cure history
+     *
+     * @param internetSelfCureHistory - internetSelfCureHistory
+     * @return int - 0 success
+     */
+    int SetSelfCureHistoryInfo(std::string internetSelfCureHistory, int instId = 0);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address

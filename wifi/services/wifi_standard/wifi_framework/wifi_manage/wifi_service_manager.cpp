@@ -44,6 +44,9 @@ int WifiServiceManager::Init()
 #ifdef FEATURE_AP_SUPPORT
     mApServiceHandle.Clear();
 #endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    mSelfCureServiceHandle.Clear();
+#endif
     mStaServiceHandle.Clear();
     mScanServiceHandle.Clear();
     mEnhanceServiceHandle.Clear();
@@ -60,6 +63,9 @@ int WifiServiceManager::Init()
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AWARE, "libwifi_aware_service.so"));
 #else
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.z.so"));
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SELFCURE, "libwifi_self_cure.z.so"));
+#endif
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.z.so"));
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_ENHANCE, "libwifi_enhance_service.z.so"));
 #ifdef FEATURE_AP_SUPPORT
@@ -125,6 +131,36 @@ int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
     return 0;
 }
+
+#ifdef FEATURE_SELF_CURE_SUPPORT
+int WifiServiceManager::LoadSelfCureService(const std::string &dlname, bool bCreate)
+{
+    WIFI_LOGI("WifiServiceManager::LoadSelfCureService");
+    std::unique_lock<std::mutex> lock(mSelfCureMutex);
+    if (mSelfCureServiceHandle.handle != nullptr) {
+        WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
+        return 0;
+    }
+    mSelfCureServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
+    if (mSelfCureServiceHandle.handle == nullptr) {
+        WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
+        return -1;
+    }
+    mSelfCureServiceHandle.create = (ISelfCureService *(*)(int)) dlsym(mSelfCureServiceHandle.handle, "Create");
+    mSelfCureServiceHandle.destroy = (void *(*)(ISelfCureService *))dlsym(mSelfCureServiceHandle.handle, "Destroy");
+    if (mSelfCureServiceHandle.create == nullptr || mSelfCureServiceHandle.destroy == nullptr) {
+        WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
+        dlclose(mSelfCureServiceHandle.handle);
+        mSelfCureServiceHandle.Clear();
+        return -1;
+    }
+    if (bCreate) {
+        ISelfCureService *service = mSelfCureServiceHandle.create(0);
+        mSelfCureServiceHandle.pService[0] = service;
+    }
+    return 0;
+}
+#endif
 
 int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
 {
@@ -258,6 +294,11 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
     if (name == WIFI_SERVICE_STA) {
         return LoadStaService(dlname, bCreate);
     }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (name == WIFI_SERVICE_SELFCURE) {
+        return LoadSelfCureService(dlname, bCreate);
+    }
+#endif
     if (name == WIFI_SERVICE_SCAN) {
         return LoadScanService(dlname, bCreate);
     }
@@ -297,6 +338,29 @@ IStaService *WifiServiceManager::GetStaServiceInst(int instId)
     mStaServiceHandle.pService[instId] = service;
     return service;
 }
+
+#ifdef FEATURE_SELF_CURE_SUPPORT
+ISelfCureService *WifiServiceManager::GetSelfCureServiceInst(int instId)
+{
+    WIFI_LOGD("WifiServiceManager::GetSelfCureServiceInst, instId: %{public}d", instId);
+    std::unique_lock<std::mutex> lock(mSelfCureMutex);
+    if (mSelfCureServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager, SelfCure handle is null");
+        return nullptr;
+    }
+
+    auto iter = mSelfCureServiceHandle.pService.find(instId);
+    if (iter != mSelfCureServiceHandle.pService.end()) {
+        WIFI_LOGD("find a new self cure service instance, instId: %{public}d", instId);
+        return iter->second;
+    }
+
+    WIFI_LOGD("create a new self cure service instance, instId: %{public}d", instId);
+    ISelfCureService *service = mSelfCureServiceHandle.create(instId);
+    mSelfCureServiceHandle.pService[instId] = service;
+    return service;
+}
+#endif
 
 IScanService *WifiServiceManager::GetScanServiceInst(int instId)
 {
@@ -396,6 +460,34 @@ IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
     }
     return mEnhanceServiceHandle.pService;
 }
+
+#ifdef FEATURE_SELF_CURE_SUPPORT
+NO_SANITIZE("cfi") int WifiServiceManager::UnloadSelfCureService(bool bPreLoad, int instId)
+{
+    WIFI_LOGI("WifiServiceManager::UnloadSelfCureService, instId: %{public}d", instId);
+    std::unique_lock<std::mutex> lock(mSelfCureMutex);
+    if (mSelfCureServiceHandle.handle == nullptr) {
+        WIFI_LOGE("WifiServiceManager::UnloadSelfCureService handle is null");
+        return 0;
+    }
+
+    auto iter = mSelfCureServiceHandle.pService.find(instId);
+    if (iter != mSelfCureServiceHandle.pService.end()) {
+        if (iter->second != nullptr) {
+            mSelfCureServiceHandle.destroy(iter->second);
+            iter->second = nullptr;
+        }
+        mSelfCureServiceHandle.pService.erase(iter);
+    }
+
+    if (!bPreLoad && mSelfCureServiceHandle.pService.empty()) {
+        dlclose(mSelfCureServiceHandle.handle);
+        mSelfCureServiceHandle.handle = nullptr;
+        mSelfCureServiceHandle.Clear();
+    }
+    return 0;
+}
+#endif
 
 NO_SANITIZE("cfi") int WifiServiceManager::UnloadStaService(bool bPreLoad, int instId)
 {
@@ -525,6 +617,11 @@ int WifiServiceManager::UnloadService(const std::string &name, int id)
     if (name == WIFI_SERVICE_STA) {
         return UnloadStaService(bPreLoad, id);
     }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (name == WIFI_SERVICE_SELFCURE) {
+        return UnloadSelfCureService(bPreLoad, id);
+    }
+#endif
     if (name == WIFI_SERVICE_SCAN) {
         return UnloadScanService(bPreLoad, id);
     }
@@ -550,6 +647,9 @@ void WifiServiceManager::UninstallAllService()
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         UnloadStaService(false, i);
         UnloadScanService(false, i);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        UnloadSelfCureService(false, i);
+#endif
     }
 #ifdef FEATURE_AP_SUPPORT
     for (int i = 0; i < AP_INSTANCE_MAX_NUM; ++i) {

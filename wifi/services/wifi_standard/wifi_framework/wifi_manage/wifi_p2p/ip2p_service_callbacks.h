@@ -24,6 +24,8 @@ namespace OHOS {
 namespace Wifi {
 /* The callbacks of P2P service provided */
 struct IP2pServiceCallbacks {
+    /* The name of module. */
+    std::string callbackModuleName;
     /* The event of status change. */
     std::function<void(P2pState)> OnP2pStateChangedEvent;
     /* Report the latest devices discovery information. */

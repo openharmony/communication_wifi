@@ -57,6 +57,7 @@ constexpr int FEATURE_RCV_AP_CONNECTED = 1;
 constexpr int FEATURE_RCV_SCAN_RESLUT = 2;
 constexpr int FEATURE_USE_REGION = 3;
 constexpr int FEATURE_USE_ZZ = 4;
+constexpr int COUNTRY_CODE_LEN = 2;
 
 struct MccEntry {
     int mnc;

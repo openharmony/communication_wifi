@@ -50,6 +50,7 @@ ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
         WIFI_LOGI("set softap toggled false");
         WifiSettings::GetInstance().SetSoftapToggledState(false);
     }
+    pWifiControllerMachine->ClearStartFailCount();
     pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
 }

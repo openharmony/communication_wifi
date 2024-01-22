@@ -472,29 +472,6 @@ void WifiDeviceStub::OnGetIpV6Info(uint32_t code, IpcIo *req, IpcIo *reply)
     }
 }
 
-void WifiDeviceStub::OnSetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply)
-{
-    WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    size_t size;
-    std::string countrycode = (char *)ReadString(req, &size);
-    ErrCode ret = SetCountryCode(countrycode);
-    (void)WriteInt32(reply, 0);
-    (void)WriteInt32(reply, ret);
-}
-
-void WifiDeviceStub::OnGetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply)
-{
-    WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
-    std::string countryCode;
-    ErrCode ret = GetCountryCode(countryCode);
-    (void)WriteInt32(reply, 0);
-    (void)WriteInt32(reply, ret);
-
-    if (ret == WIFI_OPT_SUCCESS) {
-        (void)WriteString(reply, countryCode.c_str());
-    }
-}
-
 void WifiDeviceStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);

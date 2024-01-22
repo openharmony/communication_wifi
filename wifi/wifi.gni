@@ -41,5 +41,4 @@ declare_args() {
   wifi_feature_with_hpf_supported = true
   wifi_feature_with_rx_listen_supported = false
   wifi_feature_with_scan_control = true
-  wifi_feature_with_self_cure = true
 }

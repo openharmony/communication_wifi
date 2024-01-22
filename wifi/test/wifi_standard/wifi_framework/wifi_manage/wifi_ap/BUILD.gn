@@ -94,6 +94,7 @@ ohos_unittest("WifiApServiceTest") {
     "--coverage",
     "-Wl,-E",
     "-Wl,-rpath=/system/lib/platformsdk",
+    "-Wl,--wrap=system",
     "-Wl,--wrap=RegisterDhcpClientCallBack",
     "-Wl,--wrap=StartDhcpClient",
     "-Wl,--wrap=StopDhcpClient",

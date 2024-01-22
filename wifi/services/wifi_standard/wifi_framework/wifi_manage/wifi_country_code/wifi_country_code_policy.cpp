@@ -126,7 +126,8 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByFactory(std::string &wifiCoun
     char roRunModeValue[WIFI_COUNTRY_CODE_RUN_MODE_SIZE] = {0};
     int errorCode = GetParamValue(WIFI_COUNTRY_CODE_RUN_MODE, DEFAULT_RO_RUN_MODE, roRunModeValue,
         WIFI_COUNTRY_CODE_RUN_MODE_SIZE);
-    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE || strcasecmp(FACTORY_RO_RUN_MODE, roRunModeValue) != 0) {
+    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE ||
+        strncasecmp(FACTORY_RO_RUN_MODE, roRunModeValue, COUNTRY_CODE_LEN) != 0) {
         WIFI_LOGI("wifi country code factory mode does not take effect or fail, ret=%{public}d, "
             "runMode=%{public}s", errorCode, roRunModeValue);
         return WIFI_OPT_FAILED;

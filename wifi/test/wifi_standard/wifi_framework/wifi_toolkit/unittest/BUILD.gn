@@ -50,6 +50,7 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/xml_parser.cpp",
     "../../wifi_manage/wifi_sta/Mock/mock_sta_network_check.cpp",
+    "../../wifi_manage/wifi_sta/Mock/mock_dhcp_service.cpp",
     "arp_checker_test.cpp",
     "base_address_test.cpp",
     "dhcpd_interface_test.cpp",
@@ -91,7 +92,23 @@ ohos_unittest("toolkit_unittest") {
   ldflags = [
     "-fPIC",
     "--coverage",
+    "-Wl,-E",
+    "-Wl,-rpath=/system/lib/platformsdk",
+    "-Wl,--wrap=RegisterDhcpClientCallBack",
+    "-Wl,--wrap=StartDhcpClient",
+    "-Wl,--wrap=StopDhcpClient",
+    "-Wl,--wrap=RenewDhcpClient",
+    "-Wl,--wrap=RegisterDhcpServerCallBack",
+    "-Wl,--wrap=StartDhcpServer",
+    "-Wl,--wrap=StopDhcpServer",
+    "-Wl,--wrap=PutDhcpRange",
+    "-Wl,--wrap=RemoveDhcpRange",
+    "-Wl,--wrap=RemoveAllDhcpRange",
+    "-Wl,--wrap=SetDhcpRange",
+    "-Wl,--wrap=SetDhcpName",
+    "-Wl,--wrap=GetDhcpClientInfos",
   ]
+
 
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",

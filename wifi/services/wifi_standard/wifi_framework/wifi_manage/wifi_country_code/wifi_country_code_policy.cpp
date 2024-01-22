@@ -126,8 +126,7 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByFactory(std::string &wifiCoun
     char roRunModeValue[WIFI_COUNTRY_CODE_RUN_MODE_SIZE] = {0};
     int errorCode = GetParamValue(WIFI_COUNTRY_CODE_RUN_MODE, DEFAULT_RO_RUN_MODE, roRunModeValue,
         WIFI_COUNTRY_CODE_RUN_MODE_SIZE);
-    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE ||
-        strncasecmp(FACTORY_RO_RUN_MODE, roRunModeValue, COUNTRY_CODE_LEN) != 0) {
+    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE || strcasecmp(FACTORY_RO_RUN_MODE, roRunModeValue) != 0) {
         WIFI_LOGI("wifi country code factory mode does not take effect or fail, ret=%{public}d, "
             "runMode=%{public}s", errorCode, roRunModeValue);
         return WIFI_OPT_FAILED;
@@ -282,11 +281,11 @@ ErrCode WifiCountryCodePolicy::ParseCountryCodeElement(
         return WIFI_OPT_FAILED;
     }
     for (const auto &ie : infoElems) {
-        if (ie.id != COUNTRY_CODE_EID || ie.content.size() < COUNTRY_CODE_LENGTH) {
+        if (ie.id != COUNTRY_CODE_EID || ie.content.size() < WIFI_COUNTRY_CODE_LEN) {
             continue;
         }
         std::string tempWifiCountryCode;
-        for (int i = 0 ; i < COUNTRY_CODE_LENGTH; i++) {
+        for (int i = 0 ; i < WIFI_COUNTRY_CODE_LEN; i++) {
             tempWifiCountryCode.push_back(ie.content[i]);
         }
         if (!IsValidCountryCode(tempWifiCountryCode)) {

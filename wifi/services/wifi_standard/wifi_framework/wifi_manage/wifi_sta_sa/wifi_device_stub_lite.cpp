@@ -637,10 +637,6 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO)] = &WifiDeviceStub::OnGetIpInfo;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO)] =
         &WifiDeviceStub::OnGetIpV6Info;
-    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_COUNTRY_CODE)] =
-        &WifiDeviceStub::OnSetCountryCode;
-    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE)] =
-        &WifiDeviceStub::OnGetCountryCode;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT)] =
         &WifiDeviceStub::OnRegisterCallBack;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL)] =

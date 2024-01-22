@@ -50,6 +50,12 @@ WifiDeviceStub::~WifiDeviceStub()
 
 void WifiDeviceStub::InitHandleMapEx()
 {
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL)] =
+        &WifiDeviceStub::OnGetSignalLevel;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
+        &WifiDeviceStub::OnGetSupportedFeatures;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO)] =
+        &WifiDeviceStub::OnGetIpV6Info;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DERVICE_MAC_ADD)] =
         &WifiDeviceStub::OnGetDeviceMacAdd;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED)] =
@@ -125,12 +131,6 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO)] = &WifiDeviceStub::OnGetIpInfo;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT)] =
         &WifiDeviceStub::OnRegisterCallBack;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL)] =
-        &WifiDeviceStub::OnGetSignalLevel;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
-        &WifiDeviceStub::OnGetSupportedFeatures;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO)] =
-        &WifiDeviceStub::OnGetIpV6Info;
     InitHandleMapEx();
     return;
 }

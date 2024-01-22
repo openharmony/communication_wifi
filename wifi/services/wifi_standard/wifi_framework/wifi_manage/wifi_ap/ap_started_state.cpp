@@ -230,6 +230,14 @@ bool ApStartedState::SetConfig()
         WIFI_LOGE("get config failed");
         return false;
     }
+    std::string countryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
+    if (countryCode.empty() || !IsValidCountryCode(countryCode) ||
+        WifiApHalInterface::GetInstance().SetWifiCountryCode(countryCode, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("set countryCode=%{public}s failed", countryCode.c_str());
+        return false;
+    }
+    m_wifiCountryCode = std::move(countryCode);
     return SetConfig(m_hotspotConfig);
 }
 
@@ -404,15 +412,19 @@ void ApStartedState::ProcessCmdDisconnectStation(InternalMessage &msg) const
 void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessage &msg) const
 {
     std::string wifiCountryCode = msg.GetStringFromMessage();
-    if (wifiCountryCode.empty()) {
+    if (wifiCountryCode.empty() ||
+        strncasecmp(wifiCountryCode.c_str(), m_wifiCountryCode.c_str(), COUNTRY_CODE_LEN) == 0) {
+        WIFI_LOGI("wifi country code is same or empty, code=%{public}s", wifiCountryCode.c_str());
         return;
     }
     WifiErrorNo ret = WifiApHalInterface::GetInstance().SetWifiCountryCode(wifiCountryCode, m_id);
     if (ret == WifiErrorNo::WIFI_IDL_OPT_OK) {
+        m_wifiCountryCode = wifiCountryCode;
         WIFI_LOGI("update wifi country code success, wifiCountryCode=%{public}s", wifiCountryCode.c_str());
         return;
     }
-    WIFI_LOGE("update wifi country code fail, wifiCountryCode=%{public}s, %{public}d", wifiCountryCode.c_str(), ret);
+    WIFI_LOGE("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",
+        wifiCountryCode.c_str(), ret);
 }
 
 void ApStartedState::UpdatePowerMode() const

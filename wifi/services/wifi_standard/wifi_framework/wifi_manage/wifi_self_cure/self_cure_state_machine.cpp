@@ -541,8 +541,11 @@ bool SelfCureStateMachine::InternetSelfCureState::ExecuteStateMsg(InternalMessag
             ret = EXECUTED;
             HandleRssiChanged();
             break;
+        case WIFI_CURE_CMD_PERIODIC_ARP_DETECTED:
+            ret = EXECUTED;
+            pSelfCureStateMachine->PeriodicArpDetection();
+            break;
         default:
-            WIFI_LOGI("InternetSelfCureState-msgCode = %{public}d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;
@@ -995,7 +998,7 @@ bool SelfCureStateMachine::IsHttpReachable()
     std::lock_guard<std::mutex> lock(mMutex);
     int respCode = 0;
     pNetcheck->GetHttpCodeNum(respCode);
-    WIFI_LOGI("IsHttpReachable, respCode is : %{public}d", respCode);
+    WIFI_LOGD("IsHttpReachable, respCode is : %{public}d", respCode);
     if (pNetcheck->UnreachableRespCode(respCode)) {
         return false;
     }
@@ -1044,7 +1047,7 @@ int SelfCureStateMachine::GetLegalIpConfiguration(IpInfo &dhcpResults)
             if (DoSlowArpTest(testIpAddr)) {
                 WIFI_LOGI("GetLegalIpConfiguration, find a new unconflicted one.");
                 std::string newIpAddress = testIpAddr;
-                WIFI_LOGI("newIpAddress, newIpAddress = %{public}s.", newIpAddress.c_str());
+                WIFI_LOGI("newIpAddress, newIpAddress = %{private}s", newIpAddress.c_str());
                 dhcpResults.ipAddress = IpTools::ConvertIpv4Address(newIpAddress);
                 return 0;
             }
@@ -1071,7 +1074,7 @@ bool SelfCureStateMachine::CanArpReachable()
     std::string ifName = "wlan" + std::to_string(m_instId);
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
-    for (int i = 0; i< DEFAULT_SLOW_NUM_ARP_PINGS; i++) {
+    for (int i = 0; i < DEFAULT_SLOW_NUM_ARP_PINGS; i++) {
         if (arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true)) {
             return true;
         }

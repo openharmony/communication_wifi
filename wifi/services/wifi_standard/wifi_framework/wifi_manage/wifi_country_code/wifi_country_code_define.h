@@ -45,7 +45,6 @@ constexpr int PLMN_SUBSTR_LEFT = 0;
 constexpr int PLMN_SUBSTR_RIGHT = 3;
 constexpr int SLOT_ID = 0;
 constexpr int MAX_SCAN_SAVED_SIZE = 3;
-constexpr int COUNTRY_CODE_LENGTH = 2;
 constexpr unsigned int COUNTRY_CODE_EID = 7;
 constexpr int DEFAULT_REGION_SIZE = 16;
 constexpr int BSSID_VECTOR_INDEX_ZERO = 0;

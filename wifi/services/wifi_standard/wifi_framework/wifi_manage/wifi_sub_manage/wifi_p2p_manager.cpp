@@ -228,6 +228,7 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
         bool ret = WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         if (ret) {
             WIFI_LOGE("P2p start failed, stop wifi!");
+            WifiSettings::GetInstance().SetWifiToggledState(false);
             WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 0);
             cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
             cbMsg.msgData = static_cast<int>(WifiState::DISABLED);

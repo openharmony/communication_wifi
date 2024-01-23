@@ -114,4 +114,5 @@ ohos_shared_library("wifi_ap_service") {
 
   part_name = "wifi"
   subsystem_name = "communication"
+  version_script = "libwifi_ap_service.map"
 }

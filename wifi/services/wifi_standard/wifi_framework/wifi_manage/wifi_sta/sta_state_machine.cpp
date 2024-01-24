@@ -716,7 +716,8 @@ void StaStateMachine::StopWifiProcess()
     /* clear connection information. */
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    if (curConnState == ConnState::CONNECTED) {
+    if (curConnState == ConnState::CONNECTING || curConnState == ConnState::AUTHENTICATING
+        || curConnState == ConnState::OBTAINING_IPADDR ||curConnState == ConnState::CONNECTED) {
         /* Callback result to InterfaceService. */
         linkedInfo.ssid = ssid;
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);

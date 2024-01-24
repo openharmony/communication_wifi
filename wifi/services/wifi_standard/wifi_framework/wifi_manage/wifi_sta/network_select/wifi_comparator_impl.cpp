@@ -18,8 +18,7 @@
 #include "network_selection_utils.h"
 #include "wifi_logger.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi::NetworkSelection {
 DEFINE_WIFILOG_LABEL("WifiComparatorImpl")
 
 WifiScorerComparator::WifiScorerComparator(const std::string &comparatorName)
@@ -92,8 +91,8 @@ void WifiScorerComparator::LogSelectedCandidates(std::vector<NetworkCandidate *>
 {
     WIFI_LOGI("%{public}s get best candidates %{public}s which get scores %{public}s",
               comparatorName.c_str(),
-              getAllNetworkCandidateMsg(selectedCandidates).c_str(),
-              getAllScoreMsg(scoreResults).c_str());
+              NetworkSelectionUtils::GetNetworkCandidatesInfo(selectedCandidates).c_str(),
+              NetworkSelectionUtils::GetScoreResultsInfo(scoreResults).c_str());
 }
 
 void WifiScorerComparator::LogWorseSelectedCandidates(std::vector<NetworkCandidate *> &worseNetworkCandidates,
@@ -103,9 +102,9 @@ void WifiScorerComparator::LogWorseSelectedCandidates(std::vector<NetworkCandida
     WIFI_LOGD("%{public}s find a better candidate %{public}s, "
               "abandon candidates %{public}s which get scores %{public}s",
               comparatorName.c_str(),
-              NetworkSelectionUtils::GetNetworkCandidateInfo(betterNetworkCandidate).c_str(),
-              getAllNetworkCandidateMsg(worseNetworkCandidates).c_str(),
-              getAllScoreMsg(scoreResults).c_str());
+              betterNetworkCandidate.ToString().c_str(),
+              NetworkSelectionUtils::GetNetworkCandidatesInfo(worseNetworkCandidates).c_str(),
+              NetworkSelectionUtils::GetScoreResultsInfo(scoreResults).c_str());
 }
 
 void WifiScorerComparator::LogWorseCandidate(NetworkCandidate &worseNetworkCandidates,
@@ -115,37 +114,9 @@ void WifiScorerComparator::LogWorseCandidate(NetworkCandidate &worseNetworkCandi
     WIFI_LOGD("%{public}s find a worse candidate %{public}s which getScore %{public}s"
               ",and current best candidate is %{public}s",
               comparatorName.c_str(),
-              NetworkSelectionUtils::GetNetworkCandidateInfo(worseNetworkCandidates).c_str(),
-              NetworkSelectionUtils::GetScoreMsg(scoreResult).c_str(),
-              NetworkSelectionUtils::GetNetworkCandidateInfo(selectedNetworkCandidate).c_str());
-}
-
-std::string WifiScorerComparator::getAllNetworkCandidateMsg(std::vector<NetworkCandidate *> &networkCandidates)
-{
-    std::stringstream scoreMsg;
-    scoreMsg << "[";
-    for (std::size_t i = 0; i < networkCandidates.size(); i++) {
-        scoreMsg << NetworkSelectionUtils::GetNetworkCandidateInfo(*networkCandidates.at(i));
-        if (i < networkCandidates.size() - 1) {
-            scoreMsg << ", ";
-        }
-    }
-    scoreMsg << "]";
-    return scoreMsg.str();
-}
-
-std::string WifiScorerComparator::getAllScoreMsg(std::vector<ScoreResult> &scoreResults)
-{
-    std::stringstream scoreMsg;
-    scoreMsg << "[";
-    for (std::size_t i = 0; i < scoreResults.size(); i++) {
-        scoreMsg << NetworkSelectionUtils::GetScoreMsg(scoreResults.at(i));
-        if (i < scoreResults.size() - 1) {
-            scoreMsg << ", ";
-        }
-    }
-    scoreMsg << "]";
-    return scoreMsg.str();
+              worseNetworkCandidates.ToString().c_str(),
+              scoreResult.ToString().c_str(),
+              selectedNetworkCandidate.ToString().c_str());
 }
 }
-} // namespace OHOS::Wifi
+// namespace OHOS::Wifi

@@ -1819,9 +1819,6 @@ void StaStateMachine::OnNetworkHiviewEvent(int state)
     } else if (state == WPA_CB_ASSOCIATED) {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
             static_cast<int>(WifiOperateState::STA_ASSOCIATED));
-    } else if (state == WPA_CB_CONNECTED) {
-        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
-            static_cast<int>(WifiOperateState::STA_CONNECTED));
     }
 }
 
@@ -1940,6 +1937,8 @@ StaStateMachine::ApLinkedState::~ApLinkedState()
 void StaStateMachine::ApLinkedState::GoInState()
 {
     WIFI_LOGI("ApLinkedState GoInState function.");
+    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+        static_cast<int>(WifiOperateState::STA_CONNECTED));
     return;
 }
 

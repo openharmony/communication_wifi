@@ -13,14 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_NETWORK_SELECTION_H_
-#define OHOS_WIFI_NETWORK_SELECTION_H_
-
+#ifndef OHOS_WIFI_NETWORK_SELECTION_H
+#define OHOS_WIFI_NETWORK_SELECTION_H
+#include <functional>
 #include <memory>
-#include "network_selection_msg.h"
+#include "wifi_msg.h"
+#include "inter_scan_info.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi {
+namespace NetworkSelection {
+struct NetworkCandidate {
+    const InterScanInfo &interScanInfo;
+    WifiDeviceConfig wifiDeviceConfig;
+    explicit NetworkCandidate(const InterScanInfo &interScanInfo) : interScanInfo(interScanInfo), wifiDeviceConfig() {}
+    std::string ToString() const;
+};
+
+struct ScoreResult {
+    double score;
+    std::string scorerName;
+    std::vector<ScoreResult> scoreDetails;
+    ScoreResult() : score(0) {}
+    std::string ToString() const;
+};
 
 class IWifiFilter {
 public:
@@ -53,65 +68,59 @@ protected:
 class SimpleWifiFilter : public IWifiFilter {
 public:
     explicit SimpleWifiFilter(const std::string &networkSelectorFilterName);
+    ~SimpleWifiFilter() override;
     std::string GetFilterMsg() final;
 protected:
-    void AfterFilter(NetworkCandidate &networkCandidate, bool filterResult) override;
+    void AfterFilter(NetworkCandidate &networkCandidate, bool filterResult) final;
+    std::vector<NetworkCandidate *> filteredNetworkCandidates;
     std::string filterName;
 };
 
-class WifiFunctionFilterAdapter : public SimpleWifiFilter {
+class WifiFunctionFilterAdapter : public IWifiFilter {
 public:
 
     /**
      *
      * @param filter the point to filterFunction
-     * @param networkSelectorFilterName the filterName
+     * @param filterName the filterName
      * @param reverse for default it should be filtered when the function return true, And it can be modified;
      */
     WifiFunctionFilterAdapter(const std::function<bool(NetworkCandidate &)> &filter,
-                              const std::string &networkSelectorFilterName,
+                              const std::string &filterName,
                               bool reverse = false);
+    ~WifiFunctionFilterAdapter() override;
+    std::string GetFilterMsg() override;
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
     std::function<bool(NetworkCandidate &)> targetFunction;
+    std::string filterName;
     bool iSReverse;
 };
 
-
 class CompositeWifiFilter : public IWifiFilter {
 public:
-    CompositeWifiFilter() = default;
     /**
      *  Add Filter for composite network selector filter
      * @param filter filter
      */
     virtual void AddFilter(const std::shared_ptr<IWifiFilter> &filter);
+    ~CompositeWifiFilter() override;
 protected:
     std::vector<std::shared_ptr<IWifiFilter>> filters;
 };
 
 class AndWifiFilter : public CompositeWifiFilter {
 public:
-    AndWifiFilter() = default;
+    ~AndWifiFilter() override;
     bool Filter(NetworkCandidate &networkCandidate) override;
     std::string GetFilterMsg() override;
 };
 
 class OrWifiFilter : public CompositeWifiFilter {
 public:
-    OrWifiFilter() = default;
     bool Filter(NetworkCandidate &networkCandidate) override;
+    ~OrWifiFilter() override;
     std::string GetFilterMsg() override;
-};
-
-struct ScoreResult {
-    double score;
-    std::string scorerName;
-    std::vector<ScoreResult> scoreDetails;
-    ScoreResult()
-    {
-        score = 0;
-    }
 };
 
 class IWifiScorer {
@@ -123,6 +132,7 @@ public:
 class SimpleWifiScorer : public IWifiScorer {
 public:
     explicit SimpleWifiScorer(const std::string &scorerName);
+    ~SimpleWifiScorer() override;
     void DoScore(NetworkCandidate &networkCandidate, ScoreResult &scoreResult) final;
 protected:
     virtual double Score(NetworkCandidate &networkCandidate) = 0;
@@ -132,6 +142,7 @@ protected:
 class CompositeWifiScorer : public IWifiScorer {
 public:
     explicit CompositeWifiScorer(const std::string &scorerName);
+    ~CompositeWifiScorer() override;
     void DoScore(NetworkCandidate &networkCandidate, ScoreResult &scoreResult) final;
     void AddScorer(const std::shared_ptr<IWifiScorer> &scorer);
 protected:
@@ -180,9 +191,8 @@ public:
 
 class NetworkSelector : public INetworkSelector {
 public:
-
     explicit NetworkSelector(const std::string &networkSelectorName);
-
+    ~NetworkSelector() override;
     /**
      * the function to set comparator。
      *
@@ -222,14 +232,6 @@ protected:
      */
     virtual bool Nominate(NetworkCandidate &networkCandidate) = 0;
 
-    /**
-     * deal with the candidate network after nominate.
-     *
-     * @param networkCandidate candidate network
-     * @param nominateResult whether the candidate network is added to networkCandidates
-     */
-    virtual void AfterNominate(NetworkCandidate &networkCandidate, bool nominateResult);
-
     std::vector<NetworkCandidate *> networkCandidates;
     std::shared_ptr<IWifiComparator> comparator;
     std::shared_ptr<IWifiFilter> filter;
@@ -239,6 +241,7 @@ protected:
 class SimpleNetworkSelector : public NetworkSelector {
 public:
     explicit SimpleNetworkSelector(const std::string &networkSelectorName);
+    ~SimpleNetworkSelector() override;
     std::string GetNetworkSelectorMsg() override;
     void GetBestCandidates(std::vector<NetworkCandidate *> &selectedNetworkCandidates) final;
 protected:
@@ -248,7 +251,7 @@ protected:
 class CompositeNetworkSelector : public NetworkSelector {
 public:
     explicit CompositeNetworkSelector(const std::string &networkSelectorName);
-
+    ~CompositeNetworkSelector() override;
     /**
      * Add subnetworkSelector for compositeNetworkSelector
      *
@@ -265,5 +268,15 @@ protected:
     std::vector<std::shared_ptr<INetworkSelector>> subNetworkSelectors;
 };
 }
+
+enum class FilterTag {
+    SAVED_NETWORK_SELECTOR_FILTER_TAG,
+    HAS_INTERNET_NETWORK_SELECTOR_FILTER_TAG,
+    RECOVERY_NETWORK_SELECTOR_FILTER_TAG,
+    PORTAL_NETWORK_SELECTOR_FILTER_TAG,
+    IT_NETWORK_SELECTOR_FILTER_TAG
+};
+
+using FilterBuilder = std::function<void(NetworkSelection::CompositeWifiFilter &)>;
 }
 #endif

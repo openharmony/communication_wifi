@@ -636,11 +636,7 @@ HWTEST_F(StaInterfaceTest, DeregisterAutoJoinCondition, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, RegisterFilterBuilderSuccess, TestSize.Level1)
 {
     EXPECT_CALL(*pMockStaService, RegisterFilterBuilder(_, _, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-    FilterBuilder filterBuilder = [](auto & filterFunc) {
-        filterFunc = [](NetworkCandidate & network_candidate) {
-            return true;
-        };
-    };
+    FilterBuilder filterBuilder = [](auto & compositeWifiFilter) {};
     EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
                                                                      "testFilterBuilder",
                                                                      filterBuilder));
@@ -649,11 +645,7 @@ HWTEST_F(StaInterfaceTest, RegisterFilterBuilderSuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, RegisterFilterBuilderFail, TestSize.Level1)
 {
     EXPECT_CALL(*pMockStaService, RegisterFilterBuilder(_, _, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-    FilterBuilder filterBuilder = [](auto &filterFunc) {
-        filterFunc = [](NetworkCandidate &network_candidate) {
-            return true;
-        };
-    };
+    FilterBuilder filterBuilder = [](auto &filterFunc) {};
     EXPECT_EQ(WIFI_OPT_FAILED, pStaInterface->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
                                                                     "testFilterBuilder",
                                                                     filterBuilder));

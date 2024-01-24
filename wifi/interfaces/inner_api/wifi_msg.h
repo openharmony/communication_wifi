@@ -490,6 +490,7 @@ struct WifiDeviceConfig {
     WifiPrivacyConfig wifiPrivacySetting;
     std::string callProcessName;
     std::string ancoCallProcessName;
+    std::string internetSelfCureHistory;
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -518,6 +519,7 @@ struct WifiDeviceConfig {
         noInternetAccess = false;
         callProcessName = "";
         ancoCallProcessName = "";
+        internetSelfCureHistory = "";
     }
 };
 

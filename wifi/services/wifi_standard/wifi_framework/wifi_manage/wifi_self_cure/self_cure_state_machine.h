@@ -295,12 +295,14 @@ private:
     bool IfP2pConnected();
     bool ShouldTransToWifi6SelfCure(InternalMessage *msg, std::string lastConnectedBssid);
     void PeriodicArpDetection();
-    bool IfArpDetectionSucc();
     bool IsSuppOnCompletedState();
     bool IfPeriodicArpDetection();
     std::string GetAuthType();
     int GetIpAssignment(AssignIpMethod &ipAssignment);
     time_t GetLastHasInternetTime();
+    std::string GetSelfCureHistoryInfo();
+    int SetSelfCureHistoryInfo(std::string internetSelfCureHistory);
+    WifiDeviceConfig GetCurrentWifiDeviceConfig();
     bool SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel);
     void HandleNetworkConnected();
     bool UpdateConnSelfCureFailedHistory();
@@ -335,8 +337,7 @@ private:
     std::atomic<bool> selfCureOnGoing;
     std::atomic<bool> p2pConnected;
     std::atomic<bool> hmlConnected;
-    int arpDetectionFailedCnt;
-    std::string lastConnectedBssid;
+    int arpDetectionFailedCnt = 0;
     int selfCureReason;
     int noTcpRxCounter = 0;
     bool internetUnknown = false;

@@ -89,7 +89,7 @@ namespace Wifi {
 #define RECOVERY_PERCENTAGE (float)0.8
 #define SELF_CURE_WIFI_OFF_TIMEOUT 2000
 #define SELF_CURE_WIFI_ON_TIMEOUT 5000
-#define MAX_ARP_DNS_CHECK_TIME 1000
+#define MAX_ARP_DNS_CHECK_TIME 300
 #define SELF_CURE_DELAYED_MS 100
 #define FAST_ARP_DETECTED_MS (10 * 1000)
 #define DEFAULT_ARP_DETECTED_MS (60 * 1000)
@@ -111,9 +111,6 @@ namespace Wifi {
 #define MIN_VAL_LEVEL_3_24G (-75)
 #define MIN_VAL_LEVEL_3_5G (-72)
 #define MIN_VAL_LEVEL_4 (-65)
-
-#define INTERNET_HISTORY_INIT "-1/-1/-1/-1/-1/-1/-1/-1/-1/-1"
-#define INTERNET_SELF_CURE_HISTORY_INIT "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0"
 } //namespace Wifi
 } //namespace OHOS
 #endif

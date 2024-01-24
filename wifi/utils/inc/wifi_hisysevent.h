@@ -94,7 +94,7 @@ void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes);
 
 void WriteSoftApAbDisconnectHiSysEvent(int errorCode);
 
-void WriteIsInternetHiSysEvent(bool isInternet);
+void WriteIsInternetHiSysEvent(int isInternet);
 
 void WriteSoftApConnectFailHiSysEvent(int errorCnt);
 

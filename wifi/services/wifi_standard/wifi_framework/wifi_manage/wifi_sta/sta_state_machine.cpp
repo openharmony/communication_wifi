@@ -60,6 +60,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define TRANSFORMATION_TO_MBPS 10
 #define DEFAULT_NUM_ARP_PINGS 3
 #define MAX_ARP_CHECK_TIME 300
+#define NETWORK 1
+#define NO_NETWORK 0
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -2458,19 +2460,20 @@ void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState)
     }
 }
 
+
 void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::string portalUrl)
 {
     WIFI_LOGI("Enter HandleNetCheckResult, netState:%{public}d screen:%{public}d.", netState, enableSignalPoll);
     if (linkedInfo.connState != ConnState::CONNECTED) {
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
-        WriteIsInternetHiSysEvent(false);
+        WriteIsInternetHiSysEvent(NO_NETWORK);
         return;
     }
     mPortalUrl = portalUrl;
     if (netState == StaNetState::NETWORK_STATE_WORKING) {
         WIFI_LOGI("HandleNetCheckResult network state is working\n");
         /* Save connection information to WifiSettings. */
-        WriteIsInternetHiSysEvent(true);
+        WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         if (portalFlag == true) {
@@ -2484,8 +2487,10 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         GetLinkedInfo(linkedInfo);
         if ((linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK || portalFlag == false) &&
            m_netState == NETWORK_CELL_NOWORK) {
+            WriteIsInternetHiSysEvent(NO_NETWORK);
             HandlePortalNetworkPorcess();
         }
+        WriteIsInternetHiSysEvent(NETWORK);
         StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
@@ -2493,7 +2498,7 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         netNoWorkNum = 0;
     } else {
         WIFI_LOGI("HandleNetCheckResult network state is notworking.\n");
-        WriteIsInternetHiSysEvent(false);
+        WriteIsInternetHiSysEvent(NO_NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         int delay = 1 << netNoWorkNum;

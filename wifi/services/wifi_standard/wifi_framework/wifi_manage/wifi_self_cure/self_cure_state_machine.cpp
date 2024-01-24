@@ -483,7 +483,7 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     currentRssi = linkedInfo.rssi;
     currentBssid = linkedInfo.bssid;
     pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
-    pSelfCureStateMachine->String2InternetSelfCureHistoryInfo(WifiSettings::GetInstance().GetSelfCureHistoryInfo(),
+    pSelfCureStateMachine->String2InternetSelfCureHistoryInfo(pSelfCureStateMachine->GetSelfCureHistoryInfo(),
                                                               selfCureHistoryInfo);
     AssignIpMethod ipAssignment;
     pSelfCureStateMachine->GetIpAssignment(ipAssignment);
@@ -592,7 +592,7 @@ int SelfCureStateMachine::InternetSelfCureState::SelectBestSelfCureSolution(int 
     bool multipleDhcpServer = pSelfCureStateMachine->dhcpOfferPackets.size() >= 2;
     bool noInternetWhenConnected =
         (lastHasInetTimeMillis <= 0 || lastHasInetTimeMillis < pSelfCureStateMachine->connectedTimeMills);
-    WIFI_LOGI("SelectBestSelfCureSolution, multipleDhcpServer = %{public}d, noInternetWhenConnected = %{public}d",
+    WIFI_LOGD("SelectBestSelfCureSolution, multipleDhcpServer = %{public}d, noInternetWhenConnected = %{public}d",
               multipleDhcpServer, noInternetWhenConnected);
     if (internetFailedType == WIFI_CURE_INTERNET_FAILED_INVALID_IP) {
         bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_RECONNECT_4_INVALID_IP;
@@ -609,7 +609,7 @@ int SelfCureStateMachine::InternetSelfCureState::SelectBestSelfCureSolution(int 
                pSelfCureStateMachine->SelfCureAcceptable(selfCureHistoryInfo, WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC)) {
         bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
     }
-    WIFI_LOGI("SelectBestSelfCureSolution, internetFailedType = %{public}d, bestSelfCureLevel = %{public}d",
+    WIFI_LOGD("SelectBestSelfCureSolution, internetFailedType = %{public}d, bestSelfCureLevel = %{public}d",
               internetFailedType, bestSelfCureLevel);
     return bestSelfCureLevel;
 }
@@ -817,10 +817,9 @@ bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int cu
     }
     selfCureFailedCounter++;
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, currentCureLevel, true);
-    WifiSettings::GetInstance().SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory(),
-                                                       pSelfCureStateMachine->m_instId);
+    pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
     WIFI_LOGI("HTTP unreachable, self cure failed for %{public}d, selfCureHistoryInfo = %{public}s", currentCureLevel,
-              selfCureHistoryInfo.GetSelfCureHistory().c_str());
+              pSelfCureStateMachine->GetSelfCureHistoryInfo().c_str());
     pSelfCureStateMachine->selfCureOnGoing = false;
     if (finalSelfCureUsed) {
         HandleHttpUnreachableFinally();
@@ -1254,7 +1253,7 @@ int SelfCureStateMachine::GetBssidCounter(std::vector<WifiScanInfo> &scanResults
 
 bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
 {
-    if (WifiSettings::GetInstance().GetSelfCureHistoryInfo() == INTERNET_SELF_CURE_HISTORY_INIT) {
+    if (GetSelfCureHistoryInfo().empty()) {
         WIFI_LOGI("SelfCureHistoryInfo is null!");
         return false;
     }
@@ -1275,7 +1274,7 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
         return false;
     }
     WifiSelfCureHistoryInfo selfCureInfo;
-    std::string internetSelfCureHistory = WifiSettings::GetInstance().GetSelfCureHistoryInfo();
+    std::string internetSelfCureHistory = GetSelfCureHistoryInfo();
     String2InternetSelfCureHistoryInfo(internetSelfCureHistory, selfCureInfo);
     if (selfCureInfo.randMacSelfCureConnectFailedCnt > SELF_CURE_RAND_MAC_CONNECT_FAIL_MAX_COUNT ||
         selfCureInfo.randMacSelfCureFailedCnt > SELF_CURE_RAND_MAC_MAX_COUNT) {
@@ -1297,7 +1296,7 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
 
 int SelfCureStateMachine::String2InternetSelfCureHistoryInfo(std::string selfCureHistory, WifiSelfCureHistoryInfo &info)
 {
-    if (selfCureHistory.empty() || selfCureHistory == INTERNET_SELF_CURE_HISTORY_INIT) {
+    if (selfCureHistory.empty()) {
         WIFI_LOGE("InternetSelfCureHistoryInfo is empty!");
         return -1;
     }
@@ -1393,21 +1392,6 @@ bool SelfCureStateMachine::IsSuppOnCompletedState()
     return false;
 }
 
-bool SelfCureStateMachine::IfArpDetectionSucc()
-{
-    std::string macAddress;
-    WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);
-    WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    std::string ipAddress = IpTools::ConvertIpv4Address(linkedInfo.ipAddress);
-    std::string ifName = "wlan" + std::to_string(m_instId);
-    IpInfo ipinfo;
-    WifiSettings::GetInstance().GetIpInfo(ipinfo, m_instId);
-    std::string gateway = IpTools::ConvertIpv4Address(ipinfo.gateway);
-    arpChecker.Start(ifName, macAddress, ipAddress, gateway);
-    return arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true);
-}
-
 bool SelfCureStateMachine::IfPeriodicArpDetection()
 {
     int curSignalLevel = GetCurSignalLevel();
@@ -1422,20 +1406,21 @@ void SelfCureStateMachine::PeriodicArpDetection()
     StopTimer(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
     if (!IfPeriodicArpDetection()) {
         WIFI_LOGI("PeriodicArpDetection, no need detection, just jump");
-        MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, FAST_ARP_DETECTED_MS);
+        MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
         return;
     }
-    while (arpDetectionFailedCnt < ARP_DETECTED_FAILED_COUNT) {
-        if (!IfArpDetectionSucc()) {
-            arpDetectionFailedCnt++;
-            WIFI_LOGI("Periodic Arp Detection failed, times : %{public}d", arpDetectionFailedCnt);
-            if (arpDetectionFailedCnt == ARP_DETECTED_FAILED_COUNT) {
-                SendMessage(WIFI_CURE_CMD_ARP_FAILED_DETECTED);
-            }
-        } else {
-            arpDetectionFailedCnt = 0;
-            break;
+    if (!CanArpReachable()) {
+        arpDetectionFailedCnt++;
+        WIFI_LOGI("Periodic Arp Detection failed, times : %{public}d", arpDetectionFailedCnt);
+        if (arpDetectionFailedCnt == ARP_DETECTED_FAILED_COUNT) {
+            SendMessage(WIFI_CURE_CMD_ARP_FAILED_DETECTED);
+        } else if (arpDetectionFailedCnt > 0 && arpDetectionFailedCnt < ARP_DETECTED_FAILED_COUNT) {
+            MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, FAST_ARP_DETECTED_MS);
+            return;
         }
+    } else {
+        WIFI_LOGI("Periodic Arp Detection success");
+        arpDetectionFailedCnt = 0;
     }
     MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
 }
@@ -1455,16 +1440,7 @@ bool SelfCureStateMachine::IfP2pConnected()
 
 std::string SelfCureStateMachine::GetAuthType()
 {
-    WifiLinkedInfo wifiLinkedInfo;
-    WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
-        WIFI_LOGE("Get current link info failed!");
-        return "";
-    }
-    if (WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, config) != 0) {
-        WIFI_LOGE("Get device config failed!");
-        return "";
-    }
+    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
     std::string keyMgmt = config.keyMgmt;
     WIFI_LOGI("keyMgmt is : %{public}s", keyMgmt.c_str());
     return keyMgmt;
@@ -1472,31 +1448,48 @@ std::string SelfCureStateMachine::GetAuthType()
 
 int SelfCureStateMachine::GetIpAssignment(AssignIpMethod &ipAssignment)
 {
-    WifiLinkedInfo wifiLinkedInfo;
-    WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
-        WIFI_LOGE("Get current link info failed!");
-    }
-    if (WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, config) != 0) {
-        WIFI_LOGE("Get device config failed!");
-    }
+    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
     ipAssignment = config.wifiIpConfig.assignMethod;
     return 0;
 }
 
 time_t SelfCureStateMachine::GetLastHasInternetTime()
 {
+    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    time_t lastHasInternetTime = config.lastHasInternetTime;
+    return lastHasInternetTime;
+}
+
+std::string SelfCureStateMachine::GetSelfCureHistoryInfo()
+{
+    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    std::string internetSelfCureHistory = config.internetSelfCureHistory;
+    return internetSelfCureHistory;
+}
+
+int SelfCureStateMachine::SetSelfCureHistoryInfo(std::string selfCureHistory)
+{
+    if (selfCureHistory =="0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0") {
+        WIFI_LOGW("selfCureHistory is zero");
+        return -1;
+    }
+    WifiDeviceConfig wifiDeviceConfig = GetCurrentWifiDeviceConfig();
+    wifiDeviceConfig.internetSelfCureHistory = selfCureHistory;
+    WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    return 0;
+}
+WifiDeviceConfig SelfCureStateMachine::GetCurrentWifiDeviceConfig()
+{
     WifiLinkedInfo wifiLinkedInfo;
     WifiDeviceConfig config;
-    time_t lastHasInternetTime;
     if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
         WIFI_LOGE("Get current link info failed!");
     }
     if (WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, config) != 0) {
         WIFI_LOGE("Get device config failed!");
     }
-    lastHasInternetTime = config.lastHasInternetTime;
-    return lastHasInternetTime;
+    return config;
 }
 
 bool AllowSelfCure(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel)
@@ -1622,7 +1615,7 @@ bool SelfCureStateMachine::SelfCureAcceptable(WifiSelfCureHistoryInfo &historyIn
         default:
             break;
     }
-    WIFI_LOGI("SelfCureAcceptable, requestCureLevel = %{public}d, currentMs = %{public}lld, ifAcceptable = %{public}d",
+    WIFI_LOGD("SelfCureAcceptable, requestCureLevel = %{public}d, currentMs = %{public}lld, ifAcceptable = %{public}d",
               requestCureLevel, currentMs, ifAcceptable);
     return ifAcceptable;
 }

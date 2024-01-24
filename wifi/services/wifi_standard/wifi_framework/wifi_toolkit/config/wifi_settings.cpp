@@ -2489,24 +2489,6 @@ void WifiSettings::GenerateRandomMacAddress(std::string &randomMacAddr)
     LOGD("%{public}s: randomMacAddr: %{private}s", __func__, randomMacAddr.c_str());
 }
 
-std::string WifiSettings::GetSelfCureHistoryInfo(int instId)
-{
-    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    auto iter = mWifiConfig.find(instId);
-    if (iter != mWifiConfig.end()) {
-        return iter->second.internetSelfCureHistory;
-    }
-    return mWifiConfig[0].internetSelfCureHistory;
-}
-
-int WifiSettings::SetSelfCureHistoryInfo(std::string internetSelfCureHistory, int instId)
-{
-    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig[instId].internetSelfCureHistory = internetSelfCureHistory;
-    SyncWifiConfig();
-    return 0;
-}
-
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 static std::string GetPairMacAddress(std::map<WifiMacAddrInfo,
     std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo)

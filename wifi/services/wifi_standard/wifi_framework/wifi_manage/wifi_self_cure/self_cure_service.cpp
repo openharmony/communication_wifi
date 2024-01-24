@@ -80,11 +80,8 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
     WIFI_LOGD("self cure wifi connection state change, state = %{public}d", state);
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD, info);
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_IP_CONFIG_COMPLETED, info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD, info);
-    } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, info);
     } else if (state == OperateResState::CONNECT_ASSOCIATED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, info);
     }

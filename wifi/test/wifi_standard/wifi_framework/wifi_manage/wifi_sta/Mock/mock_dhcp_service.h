@@ -20,26 +20,27 @@
 
 namespace OHOS {
 namespace Wifi {
-class DhcpService {
+class MockDhcpService {
 public:
-    DhcpService() = default;
-    ~DhcpService() = default;
-    
-    int RegisterDhcpClientCallBack(const char *ifname, const ClientCallBack *event);
-    int StartDhcpClient(const char *ifname, bool bIpv6);
-    int StopDhcpClient(const char *ifname, bool bIpv6);
-    int RenewDhcpClient(const char *ifname);
+    MOCK_METHOD2(RegisterDhcpClientCallBack, DhcpErrorCode(const char *ifname, const ClientCallBack *event));
+    MOCK_METHOD2(StartDhcpClient, DhcpErrorCode(const char *ifname, bool bIpv6));
+    MOCK_METHOD2(StopDhcpClient, DhcpErrorCode(const char *ifname, bool bIpv6));
+    MOCK_METHOD1(RenewDhcpClient, DhcpErrorCode(const char *ifname));
+    MOCK_METHOD2(RegisterDhcpServerCallBack, DhcpErrorCode(const char *ifname, const ServerCallBack *event));
+    MOCK_METHOD1(StartDhcpServer, DhcpErrorCode(const char *ifname));
+    MOCK_METHOD1(StopDhcpServer, DhcpErrorCode(const char *ifname));
+    MOCK_METHOD2(PutDhcpRange, DhcpErrorCode(const char *tagName, const DhcpRange *range));
+    MOCK_METHOD2(RemoveDhcpRange, DhcpErrorCode(const char *tagName, const void *range));
+    MOCK_METHOD1(RemoveAllDhcpRange, DhcpErrorCode(const char *tagName));
+    MOCK_METHOD2(SetDhcpRange, DhcpErrorCode(const char *ifname, const DhcpRange *range));
+    MOCK_METHOD2(SetDhcpName, DhcpErrorCode(const char *ifname, const char *tagName));
+    MOCK_METHOD4(GetDhcpClientInfos, DhcpErrorCode(const char *ifname, int staNumber, DhcpStationInfo *staInfo, int *staSize));
+    MOCK_METHOD1(UpdateLeasesTime, DhcpErrorCode(const char *leaseTime));
 
-    int RegisterDhcpServerCallBack(const char *ifname, const ServerCallBack *event);
-    int StartDhcpServer(const char *ifname);
-    int StopDhcpServer(const char *ifname);
-    int PutDhcpRange(const char *tagName, const DhcpRange *range);
-    int RemoveDhcpRange(const char *tagName, const DhcpRange *range);
-    int RemoveAllDhcpRange(const char *tagName);
-    int SetDhcpRange(const char *ifname, const DhcpRange *range);
-    int SetDhcpName(const char *ifname, const char *tagName);
-    int GetDhcpClientInfos(const char *ifname, int staNumber, DhcpStationInfo *staInfo, int *staSize);
-    int UpdateLeasesTime(const char *leaseTime);
+    static MockDhcpService &GetInstance();
+private:
+    MockDhcpService();
+    ~MockDhcpService();
 };
 }  // namespace Wifi
 }  // namespace OHOS

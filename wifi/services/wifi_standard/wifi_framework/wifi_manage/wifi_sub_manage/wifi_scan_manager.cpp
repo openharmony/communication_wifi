@@ -223,6 +223,12 @@ void WifiScanManager::DealScanFinished(int state, int instId)
 
 void WifiScanManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)
 {
+    WIFI_LOGI("DealScanInfoNotify: InterScanInfo size: %{public}d", static_cast<int>(results.size()));
+    if (results.empty()
+        && WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId) == WifiOprMidState::RUNNING) {
+        ConvertScanInfo(results);
+    }
+
     if (WifiConfigCenter::GetInstance().GetWifiMidState(instId) == WifiOprMidState::RUNNING) {
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
         if (pService != nullptr) {
@@ -234,6 +240,32 @@ void WifiScanManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, in
 void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)
 {
     WIFI_LOGI("DealStoreScanInfoEvent");
+}
+
+void WifiScanManager::ConvertScanInfo(std::vector<InterScanInfo> &interScanInfo)
+{
+    std::vector<WifiScanInfo> scanInfo;
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfo);
+    for (auto &item : scanInfo) {
+        InterScanInfo tmp;
+        tmp.ssid = item.ssid;
+        tmp.bssid = item.bssid;
+        tmp.frequency = item.frequency;
+        tmp.rssi = item.rssi;
+        tmp.timestamp = item.timestamp;
+        tmp.capabilities = item.capabilities;
+        tmp.channelWidth = item.channelWidth;
+        tmp.centerFrequency0 = item.centerFrequency0;
+        tmp.centerFrequency1 = item.centerFrequency1;
+        tmp.securityType = item.securityType;
+        tmp.infoElems = item.infoElems;
+        tmp.features = item.features;
+        tmp.band = item.band;
+        interScanInfo.emplace_back(tmp);
+    }
+    WIFI_LOGI("ConvertScanInfo: scanInfo size: %{public}d, interScanInfo size: %{public}d",
+        static_cast<int>(scanInfo.size()), static_cast<int>(interScanInfo.size()));
+    return;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1063,10 +1063,10 @@ void ScanStateMachine::FilterScanResult(std::vector<InterScanInfo> &scanInfoList
         validScanInfosEnd++;
     }
     scanInfoList.erase(validScanInfosEnd, scanInfoList.end());
-    WIFI_LOGI("scanInfoValidSinceTime: %{public}ld, total number of valid scan results: %{public}d, filtered invalid "
+    WIFI_LOGI("scanInfoValidSinceTime: %{public}lu, total number of valid scan results: %{public}lu, filtered invalid "
               "scan results total num: %{public}d, filtered savedNetworks: [%{public}s]",
               scanInfoValidSinceTime,
-              static_cast<int>(scanInfoList.size()),
+              scanInfoList.size(),
               numFilteredScanResults,
               records.GetFilteredScanResultMsg().c_str());
 }

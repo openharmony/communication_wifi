@@ -18,8 +18,14 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_hdi_util.h"
+#include "wifi_p2p_hal_interface.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
+constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
+constexpr int PD_STATUS_CODE_ENTER_PIN = 1;
+constexpr int PD_STATUS_CODE_PBC_REQ = 2;
+constexpr int PD_STATUS_CODE_PBC_RSP = 3;
+constexpr int PD_STATUS_CODE_FAIL = 4;
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaCallback"
 
@@ -46,6 +52,9 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     const struct HdiWpaConnectParam *connectParam, const char* ifName)
 {
     LOGI("OnEventConnected: callback enter!");
+    if (strcmp(ifName, "wlan0") != 0) {
+        return 1;
+    }
     if (connectParam == NULL) {
         LOGE("OnEventConnected: invalid parameter!");
         return 1;
@@ -84,6 +93,9 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
     const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
 {
     LOGI("OnEventStateChanged: callback enter!");
+    if (strcmp(ifName, "wlan0") != 0) {
+        return 1;
+    }
     if (statechangedParam == NULL) {
         LOGE("OnEventStateChanged: invalid parameter!");
         return 1;
@@ -157,6 +169,362 @@ int32_t OnEventScanResult(struct IWpaCallback *self,
         OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onScanNotify) {
         cbk.onScanNotify(SINGLE_SCAN_OVER_OK);
+    }
+    return 0;
+}
+
+int32_t OnEventP2pStateChanged(struct IWpaCallback *self,
+    const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
+{
+    LOGI("OnEventP2pStateChanged ifName=%{public}s", ifName);
+    if (strcmp(ifName, "p2p0") != 0) {
+        return 1;
+    }
+    if (statechangedParam == NULL) {
+        LOGE("OnEventStateChanged: invalid parameter!");
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onConnectSupplicant) {
+        cbk.onConnectSupplicant(statechangedParam->status);
+    }
+    return 0;
+}
+
+int32_t OnEventDeviceFound(struct IWpaCallback *self,
+    const struct HdiP2pDeviceInfoParam *deviceInfoParam, const char* ifName)
+{
+    LOGI("OnEventDeviceFound");
+    if (deviceInfoParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onDeviceFound) {
+        OHOS::Wifi::IdlP2pDeviceFound cbInfo;
+        uint32_t srcAddressLen = deviceInfoParam->srcAddressLen;
+        char srcAddress[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(deviceInfoParam->srcAddress, srcAddressLen, srcAddress, sizeof(srcAddress));
+        cbInfo.srcAddress = srcAddress;
+
+        uint32_t p2pDeviceAddressLen = deviceInfoParam->p2pDeviceAddressLen;
+        char p2pDeviceAddress[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(deviceInfoParam->p2pDeviceAddress, p2pDeviceAddressLen,
+            p2pDeviceAddress, sizeof(p2pDeviceAddress));
+        cbInfo.p2pDeviceAddress = p2pDeviceAddress;
+
+        cbInfo.primaryDeviceType = (char *)(deviceInfoParam->primaryDeviceType);
+        cbInfo.deviceName = (char *)(deviceInfoParam->deviceName);
+        cbInfo.configMethods = deviceInfoParam->configMethods;
+        cbInfo.deviceCapabilities = deviceInfoParam->deviceCapabilities;
+        cbInfo.groupCapabilities = deviceInfoParam->groupCapabilities;
+        const int wfdLength = 14; /* wfd info type: 0x000000000000 */
+        const int wfdStartPos = 2; /* skip 0x */
+        if (deviceInfoParam->wfdLength >= wfdLength && strlen((char *)(deviceInfoParam->wfdDeviceInfo)) >= wfdLength) {
+            OHOS::Wifi::HexStringToVec((char *)(deviceInfoParam->wfdDeviceInfo) + wfdStartPos, cbInfo.wfdDeviceInfo);
+        }
+        cbk.onDeviceFound(cbInfo);
+        LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{public}s",
+            deviceInfoParam->wfdDeviceInfo, p2pDeviceAddress, deviceInfoParam->deviceName);
+    }
+    return 0;
+}
+
+int32_t OnEventDeviceLost(struct IWpaCallback *self,
+    const struct HdiP2pDeviceLostParam *deviceLostParam, const char* ifName)
+{
+    LOGI("OnEventDeviceLost");
+    if (deviceLostParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onDeviceLost) {
+        uint32_t p2pDeviceAddressLen = deviceLostParam->p2pDeviceAddressLen;
+        char p2pDeviceAddress[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(deviceLostParam->p2pDeviceAddress, p2pDeviceAddressLen,
+            p2pDeviceAddress, sizeof(p2pDeviceAddress));
+        cbk.onDeviceLost(p2pDeviceAddress);
+        LOGI("OnEventDeviceLost p2pDeviceAddress=%{private}s", p2pDeviceAddress);
+    }
+    return 0;
+}
+
+int32_t OnEventGoNegotiationRequest(struct IWpaCallback *self,
+    const struct HdiP2pGoNegotiationRequestParam *goNegotiationRequestParam, const char* ifName)
+{
+    LOGI("OnEventGoNegotiationRequest");
+    if (goNegotiationRequestParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onGoNegotiationRequest) {
+        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(goNegotiationRequestParam->srcAddress,
+            goNegotiationRequestParam->srcAddressLen, address, sizeof(address));
+
+        cbk.onGoNegotiationRequest(address, goNegotiationRequestParam->passwordId);
+    }
+    return 0;
+}
+
+int32_t OnEventGoNegotiationCompleted(struct IWpaCallback *self,
+    const struct HdiP2pGoNegotiationCompletedParam *goNegotiationCompletedParam, const char* ifName)
+{
+    LOGI("OnEventGoNegotiationRequest");
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onGoNegotiationSuccess) {
+        cbk.onGoNegotiationSuccess();
+    }
+    return 0;
+}
+
+int32_t OnEventInvitationReceived(struct IWpaCallback *self,
+    const struct HdiP2pInvitationReceivedParam *invitationReceivedParam, const char *ifName)
+{
+    LOGI("OnEventInvitationReceived");
+    if (invitationReceivedParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onInvitationReceived) {
+        OHOS::Wifi::IdlP2pInvitationInfo cbInfo;
+        cbInfo.type = invitationReceivedParam->type;
+        cbInfo.persistentNetworkId = invitationReceivedParam->persistentNetworkId;
+        cbInfo.operatingFrequency = invitationReceivedParam->operatingFrequency;
+
+        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(invitationReceivedParam->srcAddress,
+            invitationReceivedParam->srcAddressLen, address, sizeof(address));
+        cbInfo.srcAddress = address;
+
+        char address1[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(invitationReceivedParam->goDeviceAddress,
+            invitationReceivedParam->goDeviceAddressLen, address1, sizeof(address1));
+        cbInfo.goDeviceAddress = address1;
+
+        char address2[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(invitationReceivedParam->bssid,
+            invitationReceivedParam->bssidLen, address2, sizeof(address2));
+        cbInfo.bssid = address2;
+
+        cbk.onInvitationReceived(cbInfo);
+    }
+    return 0;
+}
+
+int32_t OnEventInvitationResult(struct IWpaCallback *self,
+    const struct HdiP2pInvitationResultParam *invitationResultParam, const char *ifName)
+{
+    LOGI("OnEventInvitationResult");
+    if (invitationResultParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onInvitationResult) {
+        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(invitationResultParam->bssid,
+            invitationResultParam->bssidLen, address, sizeof(address));
+        cbk.onInvitationResult(address, invitationResultParam->status);
+    }
+    return 0;
+}
+
+int32_t OnEventGroupFormationSuccess(struct IWpaCallback *self, const char *ifName)
+{
+    LOGI("OnEventGroupFormationSuccess");
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onGroupFormationSuccess) {
+        cbk.onGroupFormationSuccess();
+    }
+    return 0;
+}
+
+int32_t OnEventGroupFormationFailure(struct IWpaCallback *self, const char *reason, const char *ifName)
+{
+    LOGI("OnEventGroupFormationFailure");
+    if (reason == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onGroupFormationFailure) {
+        cbk.onGroupFormationFailure(reason);
+    }
+    return 0;
+}
+
+int32_t OnEventGroupStarted(struct IWpaCallback *self,
+    const struct HdiP2pGroupStartedParam *groupStartedParam, const char* ifName)
+{
+    LOGI("OnEventGroupStarted");
+    if (groupStartedParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onGroupStarted) {
+        OHOS::Wifi::IdlP2pGroupInfo cbInfo;
+        cbInfo.isGo = groupStartedParam->isGo;
+        cbInfo.isPersistent = groupStartedParam->isPersistent;
+        cbInfo.frequency = groupStartedParam->frequency;
+        cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
+        cbInfo.ssid = (char *)(groupStartedParam->ssid);
+        cbInfo.psk = (char *)(groupStartedParam->psk);
+        cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
+        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{public}s",
+            cbInfo.groupName.c_str(), groupStartedParam->ssid);
+
+        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(groupStartedParam->goDeviceAddress,
+            groupStartedParam->goDeviceAddressLen, address, sizeof(address));
+        cbInfo.goDeviceAddress = address;
+
+        cbk.onGroupStarted(cbInfo);
+    }
+    return 0;
+}
+
+int32_t OnEventGroupRemoved(struct IWpaCallback *self,
+    const struct HdiP2pGroupRemovedParam *groupRemovedParam, const char* ifName)
+{
+    LOGI("OnEventGroupRemoved");
+    if (groupRemovedParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onGroupRemoved) {
+        cbk.onGroupRemoved((char *)(groupRemovedParam->groupIfName), (groupRemovedParam->isGo == 1));
+    }
+    return 0;
+}
+
+int32_t OnEventProvisionDiscoveryCompleted(struct IWpaCallback *self,
+    const struct HdiP2pProvisionDiscoveryCompletedParam *provisionDiscoveryCompletedParam, const char* ifName)
+{
+    LOGI("OnEventProvisionDiscoveryCompleted provDiscStatusCode=%{public}d",
+        provisionDiscoveryCompletedParam->provDiscStatusCode);
+    if (provisionDiscoveryCompletedParam == nullptr) {
+        return 1;
+    }
+    uint32_t addressLen = provisionDiscoveryCompletedParam->p2pDeviceAddressLen;
+    char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+    ConvertMacArr2String(provisionDiscoveryCompletedParam->p2pDeviceAddress,
+        addressLen, address, sizeof(address));
+
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (provisionDiscoveryCompletedParam->provDiscStatusCode == PD_STATUS_CODE_SHOW_PIN) {
+        if (cbk.onProvisionDiscoveryShowPin) {
+            cbk.onProvisionDiscoveryShowPin(address,
+                (char *)(provisionDiscoveryCompletedParam->generatedPin));
+        }
+    } else if (provisionDiscoveryCompletedParam->provDiscStatusCode == PD_STATUS_CODE_ENTER_PIN) {
+        if (cbk.onProvisionDiscoveryEnterPin) {
+            cbk.onProvisionDiscoveryEnterPin(address);
+        }
+    } else if (provisionDiscoveryCompletedParam->provDiscStatusCode == PD_STATUS_CODE_PBC_REQ) {
+        if (cbk.onProvisionDiscoveryPbcRequest) {
+            cbk.onProvisionDiscoveryPbcRequest(address);
+        }
+    } else if (provisionDiscoveryCompletedParam->provDiscStatusCode == PD_STATUS_CODE_PBC_RSP) {
+        if (cbk.onProvisionDiscoveryPbcResponse) {
+        cbk.onProvisionDiscoveryPbcResponse(address);
+    }
+    } else if (provisionDiscoveryCompletedParam->provDiscStatusCode == PD_STATUS_CODE_FAIL) {
+        if (cbk.onProvisionDiscoveryFailure) {
+            cbk.onProvisionDiscoveryFailure();
+        }
+    }
+    return 0;
+}
+
+int32_t OnEventFindStopped(struct IWpaCallback *self, const char* ifName)
+{
+    LOGI("OnEventFindStopped");
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onFindStopped) {
+        cbk.onFindStopped();
+    }
+    return 0;
+}
+
+int32_t OnEventServDiscReq(struct IWpaCallback *self,
+    const struct HdiP2pServDiscReqInfoParam *servDiscReqInfoParam, const char* ifName)
+{
+    LOGI("OnEventServDiscReq");
+    if (servDiscReqInfoParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onP2pServDiscReq) {
+        OHOS::Wifi::IdlP2pServDiscReqInfo cbInfo;
+        cbInfo.freq = servDiscReqInfoParam->freq;
+        cbInfo.dialogToken = servDiscReqInfoParam->dialogToken;
+        cbInfo.updateIndic = servDiscReqInfoParam->updateIndic;
+
+        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(servDiscReqInfoParam->mac, servDiscReqInfoParam->macLen,
+            address, sizeof(address));
+        cbInfo.mac = address;
+
+        if (servDiscReqInfoParam->tlvsLen > 0 && servDiscReqInfoParam->tlvs != nullptr) {
+            OHOS::Wifi::Char2Vec(servDiscReqInfoParam->tlvs, servDiscReqInfoParam->tlvsLen, cbInfo.tlvList);
+        }
+        cbk.onP2pServDiscReq(cbInfo);
+    }
+    return 0;
+}
+
+int32_t OnEventServDiscResp(struct IWpaCallback *self,
+    const struct HdiP2pServDiscRespParam *servDiscRespParam, const char* ifName)
+{
+    LOGI("OnEventServDiscResp");
+    if (servDiscRespParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onServiceDiscoveryResponse) {
+        std::vector<unsigned char> tlvList;
+        if (servDiscRespParam->tlvs != nullptr) {
+            OHOS::Wifi::Char2Vec(servDiscRespParam->tlvs, servDiscRespParam->tlvsLen, tlvList);
+        }
+        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(servDiscRespParam->srcAddress, servDiscRespParam->srcAddressLen,
+            address, sizeof(address));
+        cbk.onServiceDiscoveryResponse(address, servDiscRespParam->updateIndicator, tlvList);
+    }
+    return 0;
+}
+
+int32_t OnEventStaConnectState(struct IWpaCallback *self,
+    const struct HdiP2pStaConnectStateParam *staConnectStateParam, const char* ifName)
+{
+    LOGI("OnEventStaConnectState");
+    if (staConnectStateParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
+    ConvertMacArr2String(staConnectStateParam->p2pDeviceAddress,
+        staConnectStateParam->p2pDeviceAddressLen, address, sizeof(address));
+    if (staConnectStateParam->state == 1) {
+        if (cbk.onStaAuthorized) {
+            cbk.onStaAuthorized(address);
+        }
+    } else {
+        if (cbk.onStaDeauthorized) {
+            cbk.onStaDeauthorized(address);
+        }
+    }
+    return 0;
+}
+
+int32_t OnEventIfaceCreated(struct IWpaCallback *self,
+    const struct HdiP2pIfaceCreatedParam *ifaceCreatedParam, const char* ifName)
+{
+    LOGI("OnEventIfaceCreated");
+    if (ifaceCreatedParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onP2pIfaceCreated) {
+        cbk.onP2pIfaceCreated(ifName, ifaceCreatedParam->isGo);
     }
     return 0;
 }

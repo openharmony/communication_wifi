@@ -1005,7 +1005,8 @@ bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
     return true;
 }
 
-void ScanStateMachine::FilterScanResultRecord::RecordFilteredScanResult(const InterScanInfo &interScanInfo) {
+void ScanStateMachine::FilterScanResultRecord::RecordFilteredScanResult(const InterScanInfo &interScanInfo)
+{
     std::string keyMgmt;
     interScanInfo.GetDeviceMgmt(keyMgmt);
     WifiDeviceConfig wifiDeviceConfig;
@@ -1015,18 +1016,20 @@ void ScanStateMachine::FilterScanResultRecord::RecordFilteredScanResult(const In
     auto iter = filteredMsgs.find(interScanInfo.ssid);
     if (iter == filteredMsgs.end()) {
         filteredMsgs.insert({interScanInfo.ssid, GetScanInfoMsg(interScanInfo)});
-    } else{
+    } else {
         iter->second << "|" << GetScanInfoMsg(interScanInfo).str();
     }
 }
 
-std::stringstream ScanStateMachine::FilterScanResultRecord::GetScanInfoMsg(const InterScanInfo &interScanInfo) {
+std::stringstream ScanStateMachine::FilterScanResultRecord::GetScanInfoMsg(const InterScanInfo &interScanInfo)
+{
     std::stringstream filterSavedScanInfo;
     filterSavedScanInfo << MacAnonymize(interScanInfo.bssid) << "_" << interScanInfo.timestamp;
     return filterSavedScanInfo;
 }
 
-std::string ScanStateMachine::FilterScanResultRecord::GetFilteredScanResultMsg() {
+std::string ScanStateMachine::FilterScanResultRecord::GetFilteredScanResultMsg()
+{
     std::stringstream filterSavedScanInfo;
     for (auto &filteredMsg : filteredMsgs) {
         if (filterSavedScanInfo.rdbuf() ->in_avail() != 0) {

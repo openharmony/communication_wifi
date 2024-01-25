@@ -442,8 +442,47 @@ WifiErrorNo WifiHdiWpaClient::CheckValidDeviceConfig(const WifiIdlDeviceConfig &
 
 WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList)
 {
-    return WIFI_IDL_OPT_NOT_SUPPORT;
+    HdiWifiWpaNetworkInfo *listNetwork = nullptr;
+    uint32_t *size = 0;
+    if (WIFI_IDL_OPT_OK != HdiWpaListNetworks(listNetwork, size)) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    for (uint32_t i = 0; i < *size; i++) {
+        WifiWpaNetworkInfo  networkInfo;
+        networkInfo.id = listNetwork[i].id;
+        char szssid[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
+        for (uint32_t j = 0; j < listNetwork[i].ssidLen; j++) {
+            szssid[j] = listNetwork[i].ssid[j];
+        }
+        networkInfo.ssid = szssid;
+        char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(listNetwork[i].bssid, listNetwork[i].bssidLen, szBssid, sizeof(szBssid));
+        networkInfo.bssid = szBssid;
+        char flags[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
+        for (uint32_t j = 0; j < listNetwork[i].flagsLen;j++) {
+            flags[j] = listNetwork[i].flags[j];
+        }
+        networkInfo.flag = flags;
+        networkList.push_back(networkInfo);
+    }
+    return WIFI_IDL_OPT_OK;
 }
+
+WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
+{
+    int32_t networkId = 0;
+    char param[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
+    char value[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
+    uint32_t valueLen = 0;
+    if (WIFI_IDL_OPT_OK != HdiWpaGetNetwork(networkId, param, value, valueLen)) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    config.networkId = networkId ;
+    config.param = param ;
+    config.value = value;
+    return WIFI_IDL_OPT_OK;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

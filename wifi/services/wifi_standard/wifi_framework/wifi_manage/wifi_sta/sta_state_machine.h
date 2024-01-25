@@ -410,9 +410,9 @@ public:
     /**
      * @Description  sta chr events
      *
-     * @param reason - the state of wifi sta
+     * @param state - the state of wifi sta
      */
-    void OnNetworkHiviewEvent(int reason);
+    void OnNetworkHiviewEvent(int state);
     /**
      * @Description  Assoc events
      *

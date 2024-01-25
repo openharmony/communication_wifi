@@ -473,7 +473,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &ne
 
 WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 {
-    int32_t networkId = 0;
+    int32_t networkId = config.networkId;
     char param[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
     char value[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
     uint32_t valueLen = 0;

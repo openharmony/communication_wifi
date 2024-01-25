@@ -775,7 +775,7 @@ WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32
 
 WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen)
 {
-     LOGI("HdiWpaGetNetwork enter");
+    LOGI("HdiWpaGetNetwork enter,networkId:%{public}d", networkId);
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaGetNetwork: wpaObj is NULL");

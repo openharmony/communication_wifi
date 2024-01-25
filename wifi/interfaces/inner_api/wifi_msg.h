@@ -47,6 +47,7 @@ const std::string EAP_METHOD_TLS = "TLS";
 const std::string EAP_METHOD_TTLS = "TTLS";
 const std::string EAP_METHOD_SIM = "SIM";
 const std::string EAP_METHOD_PEAP = "PEAP";
+const std::string EAP_METHOD_PWD = "PWD";
 
 enum class SupplicantState {
     DISCONNECTED = 0,

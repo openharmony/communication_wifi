@@ -17,6 +17,7 @@
 #include "wifi_hdi_wpa_client.h"
 #include "wifi_hdi_wpa_sta_impl.h"
 #include "wifi_hdi_wpa_callback.h"
+#include "wifi_hdi_util.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaClient"
@@ -25,6 +26,8 @@ namespace OHOS {
 namespace Wifi {
 constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
+constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
+constexpr int WIFI_HDI_MAX_STR_LENGTH = 512;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(void)
 {

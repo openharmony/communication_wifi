@@ -304,7 +304,8 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
-
+    WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
+    WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

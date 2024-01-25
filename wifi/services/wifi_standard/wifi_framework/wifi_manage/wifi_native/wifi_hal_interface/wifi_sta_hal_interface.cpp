@@ -263,7 +263,7 @@ WifiErrorNo WifiStaHalInterface::GetNetworkList(std::vector<WifiWpaNetworkInfo> 
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiStaHalInterface::%{public}s!", __func__);
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
-    return mHdiWpaClient->ListNetWork(networkList);
+    return mHdiWpaClient->GetNetworkList(networkList);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqGetNetworkList(networkList);
@@ -363,7 +363,7 @@ WifiErrorNo WifiStaHalInterface::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiStaHalInterface::%{public}s!", __func__);
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
-    return mHdiWpaClient->GetNetWork(config);
+    return mHdiWpaClient->GetDeviceConfig(config);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->GetDeviceConfig(config);

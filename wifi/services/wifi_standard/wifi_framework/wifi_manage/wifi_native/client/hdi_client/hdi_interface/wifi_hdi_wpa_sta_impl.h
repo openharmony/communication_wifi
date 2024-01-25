@@ -70,6 +70,10 @@ WifiErrorNo HdiWpaStaSetCountryCode(const char *countryCode);
 
 WifiErrorNo HdiWpaStaSetSuspendMode(int mode);
 
+WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32_t *size);
+
+WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen);
+
 #ifdef __cplusplus
 }
 #endif

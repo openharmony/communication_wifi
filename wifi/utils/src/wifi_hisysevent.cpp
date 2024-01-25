@@ -196,7 +196,7 @@ void WriteSoftApAbDisconnectHiSysEvent(int errorCode)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteIsInternetHiSysEvent(bool isInternet)
+void WriteIsInternetHiSysEvent(int isInternet)
 {
     Json::Value root;
     Json::FastWriter writer;

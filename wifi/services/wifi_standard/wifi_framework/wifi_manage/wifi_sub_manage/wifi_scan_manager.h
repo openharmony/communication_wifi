@@ -43,6 +43,7 @@ private:
     void DealScanFinished(int state, int instId = 0);
     void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId = 0);
     void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0);
+    void ConvertScanInfo(std::vector<InterScanInfo> &interScanInfo);
 
 private:
     IScanSerivceCallbacks mScanCallback;

@@ -754,4 +754,41 @@ WifiErrorNo HdiWpaStaSetSuspendMode(int mode)
     return WIFI_IDL_OPT_OK;
 }
 
+WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32_t *size)
+{
+    LOGI("HdiWpaListNetworks enter");
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaListNetworks: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->ListNetworks(wpaObj, "wlan0", networkList, size);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaListNetworks: ListNetworks failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiWpaListNetworks success.");
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen)
+{
+     LOGI("HdiWpaGetNetwork enter");
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaGetNetwork: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->GetNetwork(wpaObj, "wlan0", networkId, param, value, valueLen);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaGetNetwork: GetNetwork failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiWpaGetNetwork success.");
+    return WIFI_IDL_OPT_OK;
+}
 #endif

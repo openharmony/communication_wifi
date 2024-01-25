@@ -753,4 +753,5 @@ WifiErrorNo HdiWpaStaSetSuspendMode(int mode)
     LOGI("HdiWpaStaSetSuspendMode success.");
     return WIFI_IDL_OPT_OK;
 }
+
 #endif

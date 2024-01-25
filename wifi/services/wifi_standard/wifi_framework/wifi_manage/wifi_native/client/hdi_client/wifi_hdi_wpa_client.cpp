@@ -439,6 +439,11 @@ WifiErrorNo WifiHdiWpaClient::CheckValidDeviceConfig(const WifiIdlDeviceConfig &
     }
     return WIFI_IDL_OPT_OK;
 }
+
+WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList)
+{
+    return WIFI_IDL_OPT_NOT_SUPPORT;
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

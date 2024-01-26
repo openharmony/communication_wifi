@@ -110,12 +110,13 @@ void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLe
 
 void StaNetworkCheck::DnsDetection(std::string url)
 {
+    std::string detecturl = url;
     if (dnsStateHandler) {
 #ifndef OHOS_ARCH_LITE
         if (mDetectionEventHandler) {
             mDetectionEventHandler->PostSyncTask(
-                [this, &url]() {
-                    if (!dnsChecker.DoDnsCheck(url, MAX_ARP_DNS_CHECK_TIME)) {
+                [this, detecturl]() {
+                    if (!dnsChecker.DoDnsCheck(detecturl, MAX_ARP_DNS_CHECK_TIME)) {
                         WIFI_LOGE("RunNetCheckThreadFunc dns check unreachable.");
                         dnsStateHandler(StaDnsState::DNS_STATE_UNREACHABLE);
                     } else {
@@ -352,6 +353,7 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
 void StaNetworkCheck::StopNetCheckThread()
 {
     WIFI_LOGI("enter StopNetCheckThread!\n");
+    StopHttpProbeTimer();
     dnsChecker.StopDnsCheck();
     isStopNetCheck = true;
 }

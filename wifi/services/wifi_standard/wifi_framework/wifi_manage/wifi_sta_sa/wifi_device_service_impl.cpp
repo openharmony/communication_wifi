@@ -216,7 +216,7 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
             return false;
         }
         return true;
-    } else if (config.wifiEapConfig.eap == EAP_METHOD_PEAP) {
+    } else if ((config.wifiEapConfig.eap == EAP_METHOD_PEAP) || (config.wifiEapConfig.eap == EAP_METHOD_PWD)) {
         if (config.wifiEapConfig.identity.empty() || config.wifiEapConfig.password.empty()) {
             WIFI_LOGE("CheckConfigEap: with invalid PEAP params!");
             return false;

@@ -553,18 +553,6 @@ void StaStateMachine::StartWifiProcess()
         } else {
             WIFI_LOGI("GetStaDeviceMacAddress failed!");
         }
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-        std::string macAddress;
-        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
-        if (MacAddress::IsValidMac(macAddress.c_str())) {
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
-                LOGE("%{public}s: failed to set sta MAC address:%{private}s", __func__, macAddress.c_str());
-            }
-            WifiSettings::GetInstance().SetMacAddress(macAddress, m_instId);
-        } else {
-            LOGE("%{public}s: macAddress is invalid", __func__);
-        }
-#endif
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
         WifiNetAgent::GetInstance().OnStaMachineWifiStart();
@@ -2015,16 +2003,6 @@ void StaStateMachine::DisConnectProcess()
             NetSupplierInfo->isAvailable_ = false;
             WIFI_LOGI("Disconnect process update netsupplierinfo");
             WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
-        }
-#endif
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-        std::string macAddress;
-        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
-        if (MacAddress::IsValidMac(macAddress.c_str())) {
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
-                LOGE("%{public}s: failed to set sta MAC address:%{private}s", __func__, macAddress.c_str());
-            }
-            WifiSettings::GetInstance().SetMacAddress(macAddress, m_instId);
         }
 #endif
         WIFI_LOGI("Disconnect update wifi status");

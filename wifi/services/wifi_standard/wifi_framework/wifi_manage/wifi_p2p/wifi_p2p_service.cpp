@@ -340,14 +340,6 @@ int WifiP2pService::GetSharedLinkCount(void)
 int WifiP2pService::GetP2pRecommendChannel(void)
 {
     WIFI_LOGI("GetP2pRecommendChannel");
-    int frequency;
-    WifiErrorNo ret = P2pGetChba0Freq(&frequency);
-    if (ret == WIFI_IDL_OPT_OK && frequency != 0) {
-        WIFI_LOGI("P2pGetChba0Freq success, frequency = %{public}d", frequency);
-        int channel = FrequencyToChannel(frequency);
-        WIFI_LOGI("Recommend hml channel: %{public}d", channel);
-        return channel;
-    }
 
     int channel = 0; // 0 is invalid channel
     int COMMON_USING_5G_CHANNEL = 149;

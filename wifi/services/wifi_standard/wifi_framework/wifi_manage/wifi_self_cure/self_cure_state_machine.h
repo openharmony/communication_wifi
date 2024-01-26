@@ -326,7 +326,6 @@ private:
     bool IfMultiGateway();
 
 private:
-    StaNetworkCheck *pNetcheck;
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;
     std::map<std::string, SelfCureServiceCallback> mSelfCureCallback;
     std::mutex mMutex;

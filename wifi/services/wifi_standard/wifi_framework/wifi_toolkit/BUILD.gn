@@ -38,7 +38,6 @@ local_base_sources = [
   "net_helper/mac_address.cpp",
   "net_helper/network_interface.cpp",
   "net_helper/raw_socket.cpp",
-  "net_helper/sta_network_check.cpp",
   "utils/wifi_common_event_helper.cpp",
   "utils/wifi_encryption_util.cpp",
   "utils/wifi_global_func.cpp",
@@ -117,7 +116,6 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/curl:curl",
       "//third_party/libxml2:xml2",
     ]
 
@@ -146,7 +144,6 @@ if (defined(ohos_lite)) {
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "huks:libhukssdk",
-      "netstack:http_client",
     ]
 
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {

@@ -36,9 +36,9 @@ typedef enum WifiIdlEvent {
     WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM,  /* WPA status change notification */
     WIFI_IDL_CBK_CMD_SSID_WRONG_KEY,     /* Password error status notification */
     WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL,   /* network connection full */
-    WIFI_IDL_CBK_CMD_WPS_TIME_OUT,       /* wps connect time out */
-    WIFI_IDL_CBK_CMD_WPS_OVERLAP,        /* wps PBC overlap */
     WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT, /* network connection reject */
+    WIFI_IDL_CBK_CMD_WPS_OVERLAP,        /* wps PBC overlap */
+    WIFI_IDL_CBK_CMD_WPS_TIME_OUT,       /* wps connect time out */
     /* P2p callback */
     WIFI_IDL_CBK_CMD_P2P_SUPPLICANT_CONNECT,            /* p2p connect supplicant */
     WIFI_IDL_CBK_CMD_SUP_CONN_FAILED_EVENT,             /* Wpa_supplicant client connection failure event */

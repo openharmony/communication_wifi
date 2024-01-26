@@ -448,12 +448,20 @@ WifiErrorNo WifiHdiWpaClient::CheckValidDeviceConfig(const WifiIdlDeviceConfig &
 
 WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList)
 {
-    HdiWifiWpaNetworkInfo *listNetwork = nullptr;
-    uint32_t *size = 0;
-    if (WIFI_IDL_OPT_OK != HdiWpaListNetworks(listNetwork, size)) {
+    HdiWifiWpaNetworkInfo *listNetwork = new HdiWifiWpaNetworkInfo[WIFI_MAX_SCAN_COUNT];
+    if (listNetwork == nullptr) {
+        LOGE("WifiHdiWpaClient::%{public}s alloc mem failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-    for (uint32_t i = 0; i < *size; i++) {
+    uint32_t size = WIFI_MAX_SCAN_COUNT;
+    if (WIFI_IDL_OPT_OK != HdiWpaListNetworks(listNetwork, &size)) {
+        if (listNetwork != nullptr) {
+            delete[] listNetwork;
+        }
+        LOGE("WifiHdiWpaClient::%{public}s failed", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    for (uint32_t i = 0; i < size; i++) {
         WifiWpaNetworkInfo  networkInfo;
         networkInfo.id = listNetwork[i].id;
         char szssid[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
@@ -471,6 +479,9 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &ne
         networkInfo.flag = flags;
         networkList.push_back(networkInfo);
     }
+    if (listNetwork != nullptr) {
+            delete[] listNetwork;
+    }
     return WIFI_IDL_OPT_OK;
 }
 
@@ -478,13 +489,17 @@ WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 {
     int32_t networkId = config.networkId;
     char param[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
-    char value[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
     uint32_t valueLen = 0;
-    if (WIFI_IDL_OPT_OK != HdiWpaGetNetwork(networkId, param, value, valueLen)) {
+    if (memcpy_s(param, WIFI_HDI_MAX_STR_LENGTH, config.param.c_str(), config.param.length()) != EOK) {
+        LOGE("WifiHdiWpaClient::%{public}s memcpy_s failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-    config.networkId = networkId ;
-    config.param = param ;
+    char value[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
+    uint32_t valueLen = WIFI_HDI_MAX_STR_LENGTH;
+    if (WIFI_IDL_OPT_OK != HdiWpaGetNetwork(networkId, param, value, valueLen)) {
+        LOGE("WifiHdiWpaClient::%{public}s failed", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
     config.value = value;
     return WIFI_IDL_OPT_OK;
 }

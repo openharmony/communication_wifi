@@ -18,7 +18,6 @@
 #include "mock_chip_capability.h"
 #include "mock_dhcp_service.h"
 #include "mock_if_config.h"
-#include "mock_sta_network_check.h"
 #include "mock_wifi_chip_hal_interface.h"
 #include "mock_wifi_manager.h"
 #include "mock_wifi_settings.h"
@@ -63,7 +62,6 @@ public:
         NetStateHandler handle = nullptr;
         ArpStateHandler arpHandle = nullptr;
         DnsStateHandler dnsHandle = nullptr;
-        pStaStateMachine->pNetcheck = new MockStaNetworkCheck(handle, arpHandle, dnsHandle);
         pStaStateMachine->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
     }
     virtual void TearDown()
@@ -1565,7 +1563,6 @@ public:
     {
         InternalMessage msg;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
-        pStaStateMachine->pNetcheck = nullptr;
         pStaStateMachine->DealNetworkCheck(&msg);
         pStaStateMachine->DealNetworkCheck(nullptr);
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reconnect())

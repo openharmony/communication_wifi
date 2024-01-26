@@ -15,89 +15,118 @@
 #include "mock_dhcp_service.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_DHCP_LABEL("DhcpService");
+DEFINE_WIFILOG_DHCP_LABEL("MockDhcpService");
 
-namespace OHOS {
-namespace Wifi {
+using namespace OHOS::Wifi;
 
-int DhcpService::RegisterDhcpClientCallBack(const char *ifname, const ClientCallBack *event)
+
+MockDhcpService &MockDhcpService::GetInstance()
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
-    return 0;
+    static MockDhcpService gMockDhcpService;
+    return gMockDhcpService;
+};
+
+MockDhcpService::MockDhcpService() {}
+
+MockDhcpService::~MockDhcpService() {}
+
+
+extern "C" {
+DhcpErrorCode __real_RegisterDhcpClientCallBack(const char *ifname, const ClientCallBack *event);
+DhcpErrorCode __wrap_RegisterDhcpClientCallBack(const char *ifname, const ClientCallBack *event)
+{
+    WIFI_LOGI("SUN MockDhcpService::RegisterDhcpClientCallBackl");
+    return MockDhcpService::GetInstance().RegisterDhcpClientCallBack(ifname, event);
 }
 
-int DhcpService::StartDhcpClient(const char *ifname, bool bIpv6)
+DhcpErrorCode __real_StartDhcpClient(const char *ifname, bool bIpv6);
+DhcpErrorCode __wrap_StartDhcpClient(const char *ifname, bool bIpv6)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, isIpv6:%{public}d", __FUNCTION__, ifname,
-        bIpv6);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::StartDhcpClient");
+    return MockDhcpService::GetInstance().StartDhcpClient(ifname, bIpv6);
 }
 
-int DhcpService::StopDhcpClient(const char *ifname, bool bIpv6)
+DhcpErrorCode __real_StopDhcpClient(const char *ifname, bool bIpv6);
+DhcpErrorCode __wrap_StopDhcpClient(const char *ifname, bool bIpv6)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s, isIpv6:%{public}d", __FUNCTION__, ifname,
-        bIpv6);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::StopDhcpClient");
+    return MockDhcpService::GetInstance().StopDhcpClient(ifname, bIpv6);
 }
 
-int DhcpService::RenewDhcpClient(const char *ifname)
+DhcpErrorCode __real_RenewDhcpClient(const char *ifname);
+DhcpErrorCode __wrap_RenewDhcpClient(const char *ifname)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::RenewDhcpClient");
+    return MockDhcpService::GetInstance().RenewDhcpClient(ifname);
 }
 
-int DhcpService::RegisterDhcpServerCallBack(const char *ifname, const ServerCallBack *event)
+DhcpErrorCode __real_RegisterDhcpServerCallBack(const char *ifname, const ServerCallBack *event);
+DhcpErrorCode __wrap_RegisterDhcpServerCallBack(const char *ifname, const ServerCallBack *event)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::RegisterDhcpServerCallBack");
+    return MockDhcpService::GetInstance().RegisterDhcpServerCallBack(ifname, event);
 }
 
-int DhcpService::StartDhcpServer(const char *ifname)
+DhcpErrorCode __real_StartDhcpServer(const char *ifname);
+DhcpErrorCode __wrap_StartDhcpServer(const char *ifname)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::StartDhcpServer");
+    return MockDhcpService::GetInstance().StartDhcpServer(ifname);
 }
 
-int DhcpService::StopDhcpServer(const char *ifname)
+DhcpErrorCode __real_StopDhcpServer(const char *ifname);
+DhcpErrorCode __wrap_StopDhcpServer(const char *ifname)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::StopDhcpServer");
+    return MockDhcpService::GetInstance().StopDhcpServer(ifname);
 }
 
-int DhcpService::PutDhcpRange(const char *tagName, const DhcpRange *range)
+DhcpErrorCode __real_SetDhcpRange(const char *ifname, const DhcpRange *range);
+DhcpErrorCode __wrap_SetDhcpRange(const char *ifname, const DhcpRange *range)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s]", __FUNCTION__);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::SetDhcpRange");
+    return MockDhcpService::GetInstance().SetDhcpRange(ifname, range);
 }
 
-int DhcpService::RemoveDhcpRange(const char *tagName, const DhcpRange *range)
+DhcpErrorCode __real_SetDhcpName(const char *ifname, const char *tagName);
+DhcpErrorCode __wrap_SetDhcpName(const char *ifname, const char *tagName)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s]", __FUNCTION__);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::SetDhcpName");
+    return MockDhcpService::GetInstance().SetDhcpName(ifname, tagName);
 }
 
-int DhcpService::RemoveAllDhcpRange(const char *tagName)
+DhcpErrorCode __real_PutDhcpRange(const char *tagName, const DhcpRange *range);
+DhcpErrorCode __wrap_PutDhcpRange(const char *tagName, const DhcpRange *range)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].tagName:%{public}s", __FUNCTION__, tagName);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::PutDhcpRange");
+    return MockDhcpService::GetInstance().PutDhcpRange(tagName, range);
 }
 
-int DhcpService::SetDhcpRange(const char *ifname, const DhcpRange *range)
+DhcpErrorCode __real_RemoveAllDhcpRange(const char *tagName);
+DhcpErrorCode __wrap_RemoveAllDhcpRange(const char *tagName)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s]", __FUNCTION__);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::RemoveAllDhcpRange");
+    return MockDhcpService::GetInstance().RemoveAllDhcpRange(tagName);
 }
 
-int DhcpService::GetDhcpClientInfos(const char *ifname, int staNumber, DhcpStationInfo *staInfo, int *staSize)
+DhcpErrorCode __real_RemoveDhcpRange(const char *tagName, const void *range);
+DhcpErrorCode __wrap_RemoveDhcpRange(const char *tagName, const void *range)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].ifname:%{public}s", __FUNCTION__, ifname);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::RemoveDhcpRange");
+    return MockDhcpService::GetInstance().RemoveDhcpRange(tagName, range);
 }
 
-int DhcpService::UpdateLeasesTime(const char *leaseTime)
+DhcpErrorCode __real_GetDhcpClientInfos(const char *ifname, int staNumber, DhcpStationInfo *staInfo, int *staSize);
+DhcpErrorCode __wrap_GetDhcpClientInfos(const char *ifname, int staNumber, DhcpStationInfo *staInfo, int *staSize)
 {
-    WIFI_LOGD("Enter DhcpService::[%{public}s].", __FUNCTION__);
-    return 0;
+    WIFI_LOGI("SUN MockDhcpService::GetDhcpClientInfos");
+    return MockDhcpService::GetInstance().GetDhcpClientInfos(ifname, staNumber, staInfo,  staSize);
 }
-} // namespace Wifi
-} // namespace OHOS
+
+DhcpErrorCode __real_UpdateLeasesTime(const char *leaseTime);
+DhcpErrorCode __wrap_UpdateLeasesTime(const char *leaseTime)
+{
+    WIFI_LOGI("SUN MockDhcpService::UpdateLeasesTime");
+    return MockDhcpService::GetInstance().UpdateLeasesTime(leaseTime);
+}
+}

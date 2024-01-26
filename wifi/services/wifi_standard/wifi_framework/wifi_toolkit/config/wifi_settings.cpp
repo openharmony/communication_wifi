@@ -1572,6 +1572,16 @@ void WifiSettings::ClearHotspotConfig()
     }
 }
 
+std::string WifiSettings::GetConnectedBssid(int instId)
+{
+    WifiLinkedInfo linkedInfo;
+    GetLinkedInfo(linkedInfo, instId);
+    if (linkedInfo.connState == ConnState::CONNECTED) {
+        return linkedInfo.bssid;
+    }
+    return "";
+}
+
 void WifiSettings::InitDefaultP2pVendorConfig()
 {
     mP2pVendorConfig.SetRandomMacSupport(false);

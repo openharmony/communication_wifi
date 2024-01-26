@@ -39,7 +39,37 @@ int32_t OnEventWpsOverlap(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventWpsTimeout(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventScanResult(struct IWpaCallback *self,
     const struct HdiWpaRecvScanResultParam *recvScanResultParam, const char* ifName);
-
+int32_t OnEventP2pStateChanged(struct IWpaCallback *self,
+    const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName);
+int32_t OnEventDeviceFound(struct IWpaCallback *self,
+    const struct HdiP2pDeviceInfoParam *deviceInfoParam, const char* ifName);
+int32_t OnEventDeviceLost(struct IWpaCallback *self,
+    const struct HdiP2pDeviceLostParam *deviceLostParam, const char* ifName);
+int32_t OnEventGoNegotiationRequest(struct IWpaCallback *self,
+    const struct HdiP2pGoNegotiationRequestParam *goNegotiationRequestParam, const char* ifName);
+int32_t OnEventGoNegotiationCompleted(struct IWpaCallback *self,
+    const struct HdiP2pGoNegotiationCompletedParam *goNegotiationCompletedParam, const char* ifName);
+int32_t OnEventInvitationReceived(struct IWpaCallback *self,
+    const struct HdiP2pInvitationReceivedParam *invitationReceivedParam, const char *ifName);
+int32_t OnEventInvitationResult(struct IWpaCallback *self,
+    const struct HdiP2pInvitationResultParam *invitationResultParam, const char *ifName);
+int32_t OnEventGroupFormationSuccess(struct IWpaCallback *self, const char *ifName);
+int32_t OnEventGroupFormationFailure(struct IWpaCallback *self, const char *reason, const char *ifName);
+int32_t OnEventGroupStarted(struct IWpaCallback *self,
+    const struct HdiP2pGroupStartedParam *groupStartedParam, const char* ifName);
+int32_t OnEventGroupRemoved(struct IWpaCallback *self,
+    const struct HdiP2pGroupRemovedParam *groupRemovedParam, const char* ifName);
+int32_t OnEventProvisionDiscoveryCompleted(struct IWpaCallback *self,
+    const struct HdiP2pProvisionDiscoveryCompletedParam *provisionDiscoveryCompletedParam, const char* ifName);
+int32_t OnEventFindStopped(struct IWpaCallback *self, const char* ifName);
+int32_t OnEventServDiscReq(struct IWpaCallback *self,
+    const struct HdiP2pServDiscReqInfoParam *servDiscReqInfoParam, const char* ifName);
+int32_t OnEventServDiscResp(struct IWpaCallback *self,
+    const struct HdiP2pServDiscRespParam *servDiscRespParam, const char* ifName);
+int32_t OnEventStaConnectState(struct IWpaCallback *self,
+    const struct HdiP2pStaConnectStateParam *staConnectStateParam, const char* ifName);
+int32_t OnEventIfaceCreated(struct IWpaCallback *self,
+    const struct HdiP2pIfaceCreatedParam *ifaceCreatedParam, const char* ifName);
 #ifdef __cplusplus
 }
 #endif

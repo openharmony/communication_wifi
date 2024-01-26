@@ -446,7 +446,6 @@ WifiErrorNo WifiHdiWpaClient::CheckValidDeviceConfig(const WifiIdlDeviceConfig &
     return WIFI_IDL_OPT_OK;
 }
 
-<<<<<<< HEAD
 WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList)
 {
     HdiWifiWpaNetworkInfo *listNetwork = nullptr;
@@ -488,7 +487,8 @@ WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
     config.param = param ;
     config.value = value;
     return WIFI_IDL_OPT_OK;
-=======
+}
+
 WifiErrorNo WifiHdiWpaClient::ReqP2pStart()
 {
     return HdiWpaP2pStart();
@@ -1047,7 +1047,6 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &confi
     info.frequency = config.GetFrequency();
     WifiErrorNo ret = HdiP2pHid2dConnect(&info);
     return ret;
->>>>>>> 6c58754d3cb063656840a009633fa418e51afaa8
 }
 
 }  // namespace Wifi

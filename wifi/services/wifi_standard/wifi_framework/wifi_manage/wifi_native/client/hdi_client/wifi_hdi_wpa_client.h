@@ -305,10 +305,9 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
-<<<<<<< HEAD
+
     WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
     WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
-=======
 
     /* ************************ P2p Interface ************************** */
     /**
@@ -714,8 +713,6 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetPowerMode(bool mode) const;
-
->>>>>>> 6c58754d3cb063656840a009633fa418e51afaa8
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

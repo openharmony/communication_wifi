@@ -63,7 +63,6 @@
 #define MAC_AUTH_RSP2_TIMEOUT 5201
 #define MAC_AUTH_RSP4_TIMEOUT 5202
 #define MAC_ASSOC_RSP_TIMEOUT 5203
-#define CONNECTION_REJECT_STATUS_NETWORK_LOST 5251
 #define SSID_EMPTY_LENGTH 1
 
 #ifdef WPA_CTRL_IFACE_UNIX
@@ -647,8 +646,7 @@ static void WpaCallBackFuncTwo(const char *p)
                        || status == WLAN_STATUS_AUTH_TIMEOUT
                        || status == MAC_AUTH_RSP2_TIMEOUT
                        || status == MAC_AUTH_RSP4_TIMEOUT
-                       || status == MAC_ASSOC_RSP_TIMEOUT
-                       || status == CONNECTION_REJECT_STATUS_NETWORK_LOST) {
+                       || status == MAC_ASSOC_RSP_TIMEOUT) {
                 WifiHalCbNotifyConnectionReject(status);
             }
         }

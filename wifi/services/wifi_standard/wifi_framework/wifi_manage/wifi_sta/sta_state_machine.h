@@ -632,9 +632,9 @@ private:
      */
     void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
 
-    void NetDetectionProcess(StaNetState netState, const std::string portalUrl);
+    void RegisterWifiDetection();
 
-    void NetStateObserverCallback(SystemNetWorkState netState);
+    void NetStateObserverCallback(SystemNetWorkState netState, std::string url);
     /**
      * @Description  the process of handling arp check results.
      *
@@ -914,8 +914,7 @@ private:
     WifiLinkedInfo lastLinkedInfo;
     DhcpResultNotify *pDhcpResultNotify;
     ClientCallBack clientCallBack;
-    StaNetworkCheck *pNetcheck;
-
+    WifiPortalConf mUrlInfo;
     RootState *pRootState;
     InitState *pInitState;
     WpaStartingState *pWpaStartingState; /* Starting wpa_supplicant state. */
@@ -929,7 +928,6 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-    SystemNetWorkState m_netState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];

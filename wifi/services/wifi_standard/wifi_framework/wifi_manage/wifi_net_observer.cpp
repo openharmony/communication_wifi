@@ -104,7 +104,7 @@ sptr<NetHandle> NetStateObserver::GetWifiNetworkHandle()
         if (netAllCap.bearerTypes_.count(NetManagerStandard::BEARER_WIFI) > 0) {
             return iter;
         }
-     }
+    }
     WIFI_LOGE("GetWifiNetworkHandle not find wifi network");
     return nullptr;
 }

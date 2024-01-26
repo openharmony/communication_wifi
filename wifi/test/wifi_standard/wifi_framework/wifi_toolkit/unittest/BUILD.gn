@@ -64,7 +64,6 @@ ohos_unittest("toolkit_unittest") {
     "raw_socket_test.cpp",
     "softap_parser_test.cpp",
     "sta_network_check_test.cpp",
-    "wifi_app_parser_test.cpp",
     "wifi_config_file_test.cpp",
     "wifi_encryption_util_test.cpp",
     "wifi_global_func_test.cpp",

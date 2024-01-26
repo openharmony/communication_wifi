@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("WifiTimer");
 
 WifiSysTimer::WifiSysTimer()
 {}
@@ -28,13 +27,13 @@ WifiSysTimer::WifiSysTimer()
 WifiSysTimer::~WifiSysTimer()
 {}
 
-WifiSysTimer::WifiSysTimer(bool repeat, uint64_t interval, bool isExact, bool isIdle)
+WifiSysTimer::WifiSysTimer(bool repeat, uint64_t interval, bool isNoWakeUp, bool isIdle)
 {
     this->repeat = repeat;
     this->interval = interval;
-    this->type = TIMER_TYPE_WAKEUP;
-    if (isExact) {
-        this->type = TIMER_TYPE_WAKEUP + TIMER_TYPE_EXACT;
+    this->type = TIMER_TYPE_REALTIME;
+    if (!isNoWakeUp) {
+        this->type = TIMER_TYPE_WAKEUP + TIMER_TYPE_REALTIME;
     }
     if (isIdle) {
         this->type = TIMER_TYPE_IDLE;
@@ -71,57 +70,6 @@ void WifiSysTimer::SetInterval(const uint64_t &interval)
 void WifiSysTimer::SetWantAgent(std::shared_ptr<OHOS::AbilityRuntime::WantAgent::WantAgent> wantAgent)
 {
     this->wantAgent = wantAgent;
-}
-
-WifiTimer *WifiTimer::GetInstance()
-{
-    static WifiTimer instance;
-    return &instance;
-}
-
-WifiTimer::WifiTimer() : timer_(std::make_unique<Utils::Timer>("WifiManagerTimer"))
-{
-    timer_->Setup();
-}
-
-WifiTimer::~WifiTimer()
-{
-    if (timer_) {
-        timer_->Shutdown(true);
-    }
-}
-
-bool WifiTimer::Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval, bool once)
-{
-    if (timer_ == nullptr) {
-        WIFI_LOGE("timer_ is nullptr");
-        return false;
-    }
-
-    uint32_t ret = timer_->Register(callback, interval, once);
-    if (ret == Utils::TIMER_ERR_DEAL_FAILED) {
-        WIFI_LOGE("Register timer failed");
-        return false;
-    }
-
-    outTimerId = ret;
-    return true;
-}
-
-void WifiTimer::UnRegister(uint32_t timerId)
-{
-    if (timerId == 0) {
-        WIFI_LOGE("timerId is 0, no register timer");
-        return;
-    }
-
-    if (timer_ == nullptr) {
-        WIFI_LOGE("timer_ is nullptr");
-        return;
-    }
-
-    timer_->Unregister(timerId);
-    return;
 }
 } // namespace Wifi
 } // namespace OHOS

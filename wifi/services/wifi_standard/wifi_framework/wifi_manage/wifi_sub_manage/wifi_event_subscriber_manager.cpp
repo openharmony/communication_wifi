@@ -25,6 +25,7 @@
 #include "common_event_support.h"
 #include "wifi_datashare_utils.h"
 #include "wifi_location_mode_observer.h"
+#include "wifi_common_util.h"
 #ifdef HAS_POWERMGR_PART
 #include "wifi_power_state_listener.h"
 #include "suspend/sleep_priority.h"

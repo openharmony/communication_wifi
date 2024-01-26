@@ -151,6 +151,7 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
 #endif
 }
 
+
 WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const
 {
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);

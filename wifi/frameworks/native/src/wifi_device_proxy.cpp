@@ -279,6 +279,29 @@ void WifiDeviceProxy::WriteIpAddress(MessageParcel &data, const WifiIpAddress &a
     return;
 }
 
+void WifiDeviceProxy::WriteEapConfig(MessageParcel &data, const WifiEapConfig &wifiEapConfig)
+{
+    data.WriteString(wifiEapConfig.eap);
+    data.WriteInt32(static_cast<int>(wifiEapConfig.phase2Method));
+    data.WriteString(wifiEapConfig.identity);
+    data.WriteString(wifiEapConfig.anonymousIdentity);
+    data.WriteString(wifiEapConfig.password);
+
+    data.WriteString(wifiEapConfig.caCertPath);
+    data.WriteString(wifiEapConfig.caCertAlias);
+    data.WriteUInt8Vector(wifiEapConfig.certEntry);
+
+    data.WriteString(wifiEapConfig.clientCert);
+    data.WriteString(std::string(wifiEapConfig.certPassword));
+    data.WriteString(wifiEapConfig.privateKey);
+
+    data.WriteString(wifiEapConfig.altSubjectMatch);
+    data.WriteString(wifiEapConfig.domainSuffixMatch);
+    data.WriteString(wifiEapConfig.realm);
+    data.WriteString(wifiEapConfig.plmn);
+    data.WriteInt32(wifiEapConfig.eapSubId);
+}
+
 void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data)
 {
     data.WriteInt32(config.networkId);
@@ -309,14 +332,7 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     WriteIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer1);
     WriteIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer2);
     data.WriteString(config.wifiIpConfig.staticIpAddress.domains);
-    data.WriteString(config.wifiEapConfig.eap);
-    data.WriteString(config.wifiEapConfig.identity);
-    data.WriteString(config.wifiEapConfig.password);
-    data.WriteString(config.wifiEapConfig.clientCert);
-    data.WriteString(config.wifiEapConfig.privateKey);
-    data.WriteUInt8Vector(config.wifiEapConfig.certEntry);
-    data.WriteString(std::string(config.wifiEapConfig.certPassword));
-    data.WriteInt32(static_cast<int>(config.wifiEapConfig.phase2Method));
+    WriteEapConfig(data, config.wifiEapConfig);
     data.WriteInt32((int)config.wifiProxyconfig.configureMethod);
     data.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
     data.WriteString(config.wifiProxyconfig.manualProxyConfig.serverHostName);
@@ -536,6 +552,29 @@ void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address
     return;
 }
 
+void WifiDeviceProxy::ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEapConfig)
+{
+    wifiEapConfig.eap = reply.ReadString();
+    wifiEapConfig.phase2Method = Phase2Method(reply.ReadInt32());
+    wifiEapConfig.identity = reply.ReadString();
+    wifiEapConfig.anonymousIdentity = reply.ReadString();
+    wifiEapConfig.password = reply.ReadString();
+    wifiEapConfig.caCertPath = reply.ReadString();
+    wifiEapConfig.caCertAlias = reply.ReadString();
+    reply.ReadUInt8Vector(&wifiEapConfig.certEntry);
+    wifiEapConfig.clientCert = reply.ReadString();
+    if (strcpy_s(wifiEapConfig.certPassword, sizeof(wifiEapConfig.certPassword),
+        reply.ReadString().c_str()) != EOK) {
+        WIFI_LOGE("%{public}s: failed to copy", __func__);
+    }
+    wifiEapConfig.privateKey = reply.ReadString();
+    wifiEapConfig.altSubjectMatch = reply.ReadString();
+    wifiEapConfig.domainSuffixMatch = reply.ReadString();
+    wifiEapConfig.realm = reply.ReadString();
+    wifiEapConfig.plmn = reply.ReadString();
+    wifiEapConfig.eapSubId = reply.ReadInt32();
+}
+
 void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
 {
     constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
@@ -574,12 +613,7 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
         config.wifiIpConfig.staticIpAddress.domains = reply.ReadString();
-        config.wifiEapConfig.eap = reply.ReadString();
-        config.wifiEapConfig.identity = reply.ReadString();
-        config.wifiEapConfig.password = reply.ReadString();
-        config.wifiEapConfig.clientCert = reply.ReadString();
-        config.wifiEapConfig.privateKey= reply.ReadString();
-        config.wifiEapConfig.phase2Method = Phase2Method(reply.ReadInt32());
+        ReadEapConfig(reply, config.wifiEapConfig);
         config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(reply.ReadInt32());
         config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reply.ReadString();
         config.wifiProxyconfig.manualProxyConfig.serverHostName = reply.ReadString();

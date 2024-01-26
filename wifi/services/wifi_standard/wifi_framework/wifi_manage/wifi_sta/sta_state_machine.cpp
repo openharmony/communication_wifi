@@ -433,6 +433,34 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
     return ret;
 }
 
+ErrCode StaStateMachine::FillEapCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const
+{
+    idlConfig.eapConfig.eap = config.wifiEapConfig.eap;
+    idlConfig.eapConfig.phase2Method = static_cast<int>(config.wifiEapConfig.phase2Method);
+    idlConfig.eapConfig.identity = config.wifiEapConfig.identity;
+    idlConfig.eapConfig.anonymousIdentity = config.wifiEapConfig.anonymousIdentity;
+    if (memcpy_s(idlConfig.eapConfig.password, sizeof(idlConfig.eapConfig.password),
+        config.wifiEapConfig.password.c_str(), config.wifiEapConfig.password.length()) != EOK) {
+        LOGE("%{public}s: failed to copy the content", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    idlConfig.eapConfig.caCertPath = config.wifiEapConfig.caCertPath;
+    idlConfig.eapConfig.caCertAlias = config.wifiEapConfig.caCertAlias;
+    idlConfig.eapConfig.clientCert = config.wifiEapConfig.clientCert;
+    if (memcpy_s(idlConfig.eapConfig.certPassword, sizeof(idlConfig.eapConfig.certPassword),
+        config.wifiEapConfig.certPassword, sizeof(config.wifiEapConfig.certPassword)) != EOK) {
+        LOGE("%{public}s: failed to copy the content", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    idlConfig.eapConfig.privateKey = config.wifiEapConfig.privateKey;
+    idlConfig.eapConfig.altSubjectMatch = config.wifiEapConfig.altSubjectMatch;
+    idlConfig.eapConfig.domainSuffixMatch = config.wifiEapConfig.domainSuffixMatch;
+    idlConfig.eapConfig.realm = config.wifiEapConfig.realm;
+    idlConfig.eapConfig.plmn = config.wifiEapConfig.plmn;
+    idlConfig.eapConfig.eapSubId = config.wifiEapConfig.eapSubId;
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
     LOGI("Enter StaStateMachine::ConvertDeviceCfg.\n");
@@ -444,12 +472,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     idlConfig.keyMgmt = config.keyMgmt;
     idlConfig.priority = config.priority;
     idlConfig.scanSsid = config.hiddenSSID ? 1 : 0;
-    idlConfig.eap = config.wifiEapConfig.eap;
-    idlConfig.identity = config.wifiEapConfig.identity;
-    idlConfig.password = config.wifiEapConfig.password;
-    idlConfig.clientCert = config.wifiEapConfig.clientCert;
-    idlConfig.privateKey = config.wifiEapConfig.privateKey;
-    idlConfig.phase2Method = static_cast<int>(config.wifiEapConfig.phase2Method);
+    FillEapCfg(config, idlConfig);
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
     if (strcmp(config.keyMgmt.c_str(), "WEP") == 0) {
         /* for wep */
@@ -1464,13 +1487,7 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
     idlConfig.keyMgmt = network.keyMgmt;
     idlConfig.priority = network.priority;
     idlConfig.scanSsid = network.hiddenSSID ? 1 : 0;
-    idlConfig.eap = network.wifiEapConfig.eap;
-    idlConfig.identity = network.wifiEapConfig.identity;
-    idlConfig.password = network.wifiEapConfig.password;
-    idlConfig.clientCert = network.wifiEapConfig.clientCert;
-    idlConfig.privateKey = network.wifiEapConfig.privateKey;
-    idlConfig.phase2Method = static_cast<int>(network.wifiEapConfig.phase2Method);
-
+    FillEapCfg(network, idlConfig);
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(linkedInfo.networkId, idlConfig) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("DealStartRoamCmd SetDeviceConfig() failed!");
         return;
@@ -2138,12 +2155,7 @@ void StaStateMachine::SyncAllDeviceConfigs()
                 idlConfig.keyMgmt = it->keyMgmt;
                 idlConfig.priority = it->priority;
                 idlConfig.scanSsid = it->hiddenSSID ? 1 : 0;
-                idlConfig.eap = it->wifiEapConfig.eap;
-                idlConfig.identity = it->wifiEapConfig.identity;
-                idlConfig.password = it->wifiEapConfig.password;
-                idlConfig.clientCert = it->wifiEapConfig.clientCert;
-                idlConfig.privateKey = it->wifiEapConfig.privateKey;
-                idlConfig.phase2Method = static_cast<int>(it->wifiEapConfig.phase2Method);
+                FillEapCfg(*it, idlConfig);
                 if (WifiStaHalInterface::GetInstance().SetDeviceConfig(it->networkId, idlConfig) != WIFI_IDL_OPT_OK) {
                     WIFI_LOGE("SetDeviceConfig failed!");
                 }
@@ -2278,6 +2290,7 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)
                 default:
                     break;
             }
+            break;
         }
         default:
             break;

@@ -200,11 +200,50 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
     } else {
         num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
     }
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eap);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.identity);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.password);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_CLIENT_CERT, config.clientCert);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_PRIVATE_KEY, config.privateKey);
+    EapMethod eapMethod = WifiEapConfig::Str2EapMethod(config.eapConfig.eap);
+    LOGI("%{public}s, eap:%{public}s, eapMethod:%{public}d, num:%{public}d",
+        __func__, config.eapConfig.eap.c_str(), eapMethod, num);
+    switch (eapMethod) {
+        case EapMethod::EAP_PEAP:
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.eapConfig.password);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_CA_CERT, config.eapConfig.caCertPath);
+            if (config.eapConfig.phase2Method != static_cast<int>(Phase2Method::NONE)) {
+                std::string strPhase2Method = WifiEapConfig::Phase2MethodToStr(config.eapConfig.eap,
+                    config.eapConfig.phase2Method);
+                num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_PHASE2METHOD, strPhase2Method);
+            }
+            break;
+        case EapMethod::EAP_TLS:
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_CA_CERT, config.eapConfig.caCertPath);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_CLIENT_CERT, config.eapConfig.clientCert);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_PRIVATE_KEY, config.eapConfig.privateKey);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.eapConfig.password);
+            break;
+        case EapMethod::EAP_TTLS:
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_CA_CERT, config.eapConfig.caCertPath);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.eapConfig.password);
+            if (config.eapConfig.phase2Method != static_cast<int>(Phase2Method::NONE)) {
+                std::string strPhase2Method = WifiEapConfig::Phase2MethodToStr(config.eapConfig.eap,
+                    config.eapConfig.phase2Method);
+                num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_PHASE2METHOD, strPhase2Method);
+            }
+            break;
+        case EapMethod::EAP_PWD:
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.eapConfig.password);
+            break;
+        default:
+            LOGE("%{public}s, invalid eapMethod:%{public}d", __func__, eapMethod);
+            break;
+    }
+
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_BSSID, config.bssid);
     int i = 0;
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WEP_KEY_0, config.wepKeys[i++]);
@@ -222,10 +261,6 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
     }
     if (config.authAlgorithms > 0) {
         num += PushDeviceConfigAuthAlgorithm(conf + num, DEVICE_CONFIG_AUTH_ALGORITHMS, config.authAlgorithms);
-    }
-    if (config.phase2Method != static_cast<int>(Phase2Method::NONE)) {
-        std::string strPhase2Method = WifiEapConfig::Phase2MethodToStr(config.eap, config.phase2Method);
-        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP_PHASE2METHOD, strPhase2Method);
     }
     if (config.isRequirePmf) {
         num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_IEEE80211W, PMF_REQUIRED);

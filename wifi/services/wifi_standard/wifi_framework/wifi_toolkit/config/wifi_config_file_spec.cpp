@@ -83,6 +83,10 @@ static void ClearWifiDeviceConfigEap(WifiDeviceConfig &item)
     item.wifiEapConfig.identity.clear();
     item.wifiEapConfig.password.clear();
     item.wifiEapConfig.clientCert.clear();
+    if (memset_s(item.wifiEapConfig.certPassword, sizeof(item.wifiEapConfig.certPassword),
+        0x0, sizeof(item.wifiEapConfig.certPassword)) != EOK) {
+        LOGW("%{public}s: failed to memset", __func__);
+    }
     item.wifiEapConfig.privateKey.clear();
     item.wifiEapConfig.phase2Method = Phase2Method::NONE;
     return;

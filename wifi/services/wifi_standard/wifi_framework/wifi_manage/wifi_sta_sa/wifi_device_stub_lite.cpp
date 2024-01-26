@@ -54,6 +54,35 @@ void WifiDeviceStub::ReadIpAddress(IpcIo *req, WifiIpAddress &address)
     }
 }
 
+void WifiDeviceStub::ReadEapConfig(IpcIo *req, WifiEapConfig &wifiEapConfig)
+{
+    size_t size;
+    wifiEapConfig.eap = (char *)ReadString(req, &size);
+    int phase2Method = 0;
+    (void)ReadInt32(req, &phase2Method);
+    wifiEapConfig.phase2Method = Phase2Method(phase2Method);
+
+    wifiEapConfig.identity = (char *)ReadString(req, &size);
+    wifiEapConfig.anonymousIdentity = (char *)ReadString(req, &size);
+    wifiEapConfig.password = (char *)ReadString(req, &size);
+
+    wifiEapConfig.caCertPath = (char *)ReadString(req, &size);
+    wifiEapConfig.caCertAlias = (char *)ReadString(req, &size);
+
+    wifiEapConfig.clientCert = (char *)ReadString(req, &size);
+    if (strcpy_s(wifiEapConfig.certPassword, sizeof(wifiEapConfig.certPassword),
+        (char *)ReadString(req, &size)) != EOK) {
+        WIFI_LOGE("%{public}s: failed to copy", __func__);
+    }
+    wifiEapConfig.privateKey = (char *)ReadString(req, &size);
+
+    wifiEapConfig.altSubjectMatch = (char *)ReadString(req, &size);
+    wifiEapConfig.domainSuffixMatch = (char *)ReadString(req, &size);
+    wifiEapConfig.realm = (char *)ReadString(req, &size);
+    wifiEapConfig.plmn = (char *)ReadString(req, &size);
+    (void)ReadInt32(req, &wifiEapConfig.eapSubId);
+}
+
 void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
 {
     int tmpInt;
@@ -110,6 +139,28 @@ void WifiDeviceStub::WriteIpAddress(IpcIo *reply, const WifiIpAddress &address)
     }
 }
 
+void WifiDeviceStub::WriteEapConfig(IpcIo *reply, const WifiEapConfig &wifiEapConfig)
+{
+    (void)WriteString(reply, wifiEapConfig.eap.c_str());
+    (void)WriteInt32(reply, static_cast<int>(wifiEapConfig.phase2Method));
+    (void)WriteString(reply, wifiEapConfig.identity.c_str());
+    (void)WriteString(reply, wifiEapConfig.anonymousIdentity.c_str());
+    (void)WriteString(reply, wifiEapConfig.password.c_str());
+
+    (void)WriteString(reply, wifiEapConfig.caCertPath.c_str());
+    (void)WriteString(reply, wifiEapConfig.caCertAlias.c_str());
+
+    (void)WriteString(reply, wifiEapConfig.clientCert.c_str());
+    (void)WriteString(reply, std::string(wifiEapConfig.certPassword).c_str());
+    (void)WriteString(reply, wifiEapConfig.privateKey.c_str());
+
+    (void)WriteString(reply, wifiEapConfig.altSubjectMatch.c_str());
+    (void)WriteString(reply, wifiEapConfig.domainSuffixMatch.c_str());
+    (void)WriteString(reply, wifiEapConfig.realm.c_str());
+    (void)WriteString(reply, wifiEapConfig.plmn.c_str());
+    (void)WriteInt32(reply, wifiEapConfig.eapSubId);
+}
+
 void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig &config)
 {
     (void)WriteInt32(reply, config.networkId);
@@ -139,9 +190,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig 
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
     (void)WriteString(reply, config.wifiIpConfig.staticIpAddress.domains.c_str());
-    (void)WriteString(reply, config.wifiEapConfig.eap.c_str());
-    (void)WriteString(reply, config.wifiEapConfig.identity.c_str());
-    (void)WriteString(reply, config.wifiEapConfig.password.c_str());
+    WriteEapConfig(reply, config.wifiEapConfig);
     (void)WriteInt32(reply, (int)config.wifiProxyconfig.configureMethod);
     (void)WriteString(reply, config.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str());
     (void)WriteString(reply, config.wifiProxyconfig.manualProxyConfig.serverHostName.c_str());

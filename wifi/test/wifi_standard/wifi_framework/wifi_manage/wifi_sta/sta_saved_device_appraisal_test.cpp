@@ -145,7 +145,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess1()
         .WillOnce(Return(""))
         .WillRepeatedly(Return(""));
 
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
 }
 
 void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess2()
@@ -168,7 +168,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess2()
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).Times(AtLeast(1));
 
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
 }
 
 void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess3()
@@ -190,7 +190,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess3()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).Times(AtLeast(1));
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) == WIFI_OPT_FAILED);
 }
 
 void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorFail1()
@@ -210,7 +210,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorFail1()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(0)).WillOnce(Return(0));
 
-    EXPECT_TRUE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) != WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaSavedDeviceAppraisal->DeviceAppraisals(deviceConfig, scanInfos, info) != WIFI_OPT_SUCCESS);
 }
 
 void StaSavedDeviceAppraisalTest::AppraiseDeviceQualitySuccess1()

@@ -345,7 +345,19 @@ public:
          *
          */
         void DealDhcpResult(int ipType);
+#ifndef OHOS_ARCH_LITE
+        /**
+         * @Description : start renew timeout timer
+         *
+         */
+        void StartRenewTimeout(int64_t interval);
 
+        /**
+         * @Description : stop renew timeout timer
+         *
+         */
+        static void StopRenewTimeout();
+#endif
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
          *
@@ -368,6 +380,9 @@ public:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;
         static DhcpResult DhcpIpv6Result;
+#ifndef OHOS_ARCH_LITE
+        static uint64_t renewTimerId_;
+#endif
     };
 
 public:
@@ -407,6 +422,12 @@ public:
      * @param reason - the reason of wifi disconnection
      */
     void OnNetworkDisconnectEvent(int reason);
+    /**
+     * @Description  sta chr events
+     *
+     * @param state - the state of wifi sta
+     */
+    void OnNetworkHiviewEvent(int state);
     /**
      * @Description  Assoc events
      *
@@ -468,9 +489,12 @@ public:
     /**
      * @Description : Deal renewal timeout.
      *
-     * @param msg - Message body received by the state machine[in]
      */
+#ifndef OHOS_ARCH_LITE
+    void DealRenewalTimeout();
+#else
     void DealRenewalTimeout(InternalMessage *msg);
+#endif
 
     /**
      * @Description  start browser to login portal

@@ -21,6 +21,8 @@ namespace OHOS {
 namespace Wifi {
 
 #define SFOT_AP_TIME_OUT 10000
+#define WIFI_OPEN_RETRY_MAX_COUNT 3
+#define WIFI_OPEN_RETRY_TIMEOUT 1000
 
 #define CMD_WIFI_TOGGLED 0x1
 #define CMD_SOFTAP_TOGGLED 0x2
@@ -34,6 +36,7 @@ namespace Wifi {
 
 #define CMD_AP_START_TIME 0x10
 #define CMD_AP_STOP_TIME 0x11
+#define CMD_OPEN_WIFI_RETRY 0x12
 
 #define CONCRETE_CMD_START 0x101
 #define CONCRETE_CMD_SWITCH_TO_CONNECT_MODE 0x102

@@ -31,7 +31,7 @@ namespace Wifi {
 class WifiSysTimer : public MiscServices::ITimerInfo {
 public:
     WifiSysTimer();
-    WifiSysTimer(bool repeat, uint64_t interval, bool isExact, bool isIdle = false);
+    WifiSysTimer(bool repeat, uint64_t interval, bool isNoWakeUp, bool isIdle = false);
     virtual ~WifiSysTimer();
     void OnTrigger() override;
     void SetType(const int &type) override;
@@ -43,22 +43,6 @@ private:
     std::function<void()> callBack_ = nullptr;
 };
 
-class WifiTimer {
-public:
-    using TimerCallback = std::function<void()>;
-    static constexpr uint32_t DEFAULT_TIMEROUT = 10000;
-    static WifiTimer *GetInstance(void);
-
-    WifiTimer();
-    ~WifiTimer();
-
-    bool Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT,
-        bool once = true);
-    void UnRegister(uint32_t timerId);
-
-private:
-    std::unique_ptr<Utils::Timer> timer_{nullptr};
-};
 } // namespace Wifi
 } // namespace OHOS
 #endif

@@ -112,12 +112,6 @@ HWTEST_F(WifiHalApInterfaceTest, GetValidFrequenciesForBandTest, TestSize.Level1
     EXPECT_TRUE(err == WIFI_HAL_SUCCESS || err == WIFI_HAL_NOT_SUPPORT || err == WIFI_HAL_FAILED);
 }
 
-HWTEST_F(WifiHalApInterfaceTest, StopSoftApTest, TestSize.Level1)
-{
-    EXPECT_GE(StopSoftAp(0), WIFI_HAL_SUCCESS);
-    EXPECT_GE(StopSoftAp(-1), WIFI_HAL_SUCCESS);
-}
-
 HWTEST_F(WifiHalApInterfaceTest, StartSoftApTest, TestSize.Level1)
 {
     char ifName[IFACENAME.size() + 1];

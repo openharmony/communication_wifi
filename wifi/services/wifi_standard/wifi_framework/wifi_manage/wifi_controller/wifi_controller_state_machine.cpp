@@ -28,6 +28,8 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
+int WifiControllerMachine::mWifiStartFailCount{0};
+
 WifiControllerMachine::WifiControllerMachine()
     : StateMachine("WifiControllerMachine"), pEnableState(nullptr), pDisableState(nullptr), pDefaultState(nullptr)
 {}
@@ -172,6 +174,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
     switch (msg->GetMessageName()) {
         case CMD_WIFI_TOGGLED:
         case CMD_SCAN_ALWAYS_MODE_CHANGED:
+            pWifiControllerMachine->StopTimer(CMD_OPEN_WIFI_RETRY);
             HandleWifiToggleChangeInEnabledState(msg);
             break;
 #ifdef FEATURE_AP_SUPPORT
@@ -196,7 +199,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             break;
 #endif
         case CMD_STA_START_FAILURE:
-            pWifiControllerMachine->HandleStaStartFailure(msg->GetParam1());
+            HandleStaStartFailure(msg->GetParam1());
             break;
         case CMD_CONCRETE_STOPPED:
             pWifiControllerMachine->HandleConcreteStop(msg->GetParam1());
@@ -207,6 +210,9 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             } else {
                 pWifiControllerMachine->HandleAirplaneClose();
             }
+            break;
+        case CMD_OPEN_WIFI_RETRY:
+            pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, 0);
             break;
         default:
             break;
@@ -595,20 +601,25 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
 }
 #endif
 
-void WifiControllerMachine::HandleStaStartFailure(int id)
+void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 {
     WIFI_LOGE("HandleStaStartFailure");
-    RmoveConcreteManager(id);
-    if (!(ShouldEnableWifi())) {
-        return;
+    pWifiControllerMachine->RmoveConcreteManager(id);
+    mWifiStartFailCount++;
+    if (pWifiControllerMachine->ShouldEnableWifi() && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {
+        pWifiControllerMachine->StartTimer(CMD_OPEN_WIFI_RETRY, WIFI_OPEN_RETRY_TIMEOUT);
     }
-    ConcreteManagerRole presentRole = GetWifiRole();
-    MakeConcreteManager(presentRole, id);
-    return;
+}
+
+void WifiControllerMachine::ClearStartFailCount()
+{
+    mWifiStartFailCount = 0;
 }
 
 void WifiControllerMachine::HandleStaStart(int id)
 {
+    mWifiStartFailCount = 0;
+    this->StopTimer(CMD_OPEN_WIFI_RETRY);
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
         (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STA_START);

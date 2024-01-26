@@ -30,6 +30,8 @@
 #include "dhcp_c_api.h"
 #include "sta_define.h"
 #include "network_status_history_manager.h"
+#include "wifi_idl_struct.h"
+
 #ifndef OHOS_ARCH_LITE
 #include "wifi_net_agent.h"
 #include "wifi_net_observer.h"
@@ -438,6 +440,15 @@ public:
      * @param callback - Callback function pointer storage structure
      */
     void RegisterStaServiceCallback(const StaServiceCallback &callback);
+
+    /**
+     * @Description  Convert the deviceConfig structure and set it to idl structure
+     *
+     * @param config -The Network info(in)
+     * @param idlConfig -The Network info(in)
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode FillEapCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const;
 
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant

@@ -325,6 +325,32 @@ void WifiDeviceStub::OnUpdateDeviceConfig(uint32_t code, MessageParcel &data, Me
     return;
 }
 
+void WifiDeviceStub::ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig)
+{
+    wifiEapConfig.eap = data.ReadString();
+    wifiEapConfig.phase2Method = Phase2Method(data.ReadInt32());
+    wifiEapConfig.identity = data.ReadString();
+    wifiEapConfig.anonymousIdentity = data.ReadString();
+    wifiEapConfig.password = data.ReadString();
+
+    wifiEapConfig.caCertPath = data.ReadString();
+    wifiEapConfig.caCertAlias = data.ReadString();
+    data.ReadUInt8Vector(&wifiEapConfig.certEntry);
+
+    wifiEapConfig.clientCert = data.ReadString();
+    if (strcpy_s(wifiEapConfig.certPassword, sizeof(wifiEapConfig.certPassword),
+        data.ReadString().c_str()) != EOK) {
+        WIFI_LOGE("%{public}s: failed to copy", __func__);
+    }
+    wifiEapConfig.privateKey = data.ReadString();
+
+    wifiEapConfig.altSubjectMatch = data.ReadString();
+    wifiEapConfig.domainSuffixMatch = data.ReadString();
+    wifiEapConfig.realm = data.ReadString();
+    wifiEapConfig.plmn = data.ReadString();
+    wifiEapConfig.eapSubId = data.ReadInt32();
+}
+
 void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config)
 {
     config.networkId = data.ReadInt32();
@@ -355,17 +381,7 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer1);
     ReadIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer2);
     config.wifiIpConfig.staticIpAddress.domains = data.ReadString();
-    config.wifiEapConfig.eap = data.ReadString();
-    config.wifiEapConfig.identity = data.ReadString();
-    config.wifiEapConfig.password = data.ReadString();
-    config.wifiEapConfig.clientCert = data.ReadString();
-    config.wifiEapConfig.privateKey = data.ReadString();
-    data.ReadUInt8Vector(&config.wifiEapConfig.certEntry);
-    if (strcpy_s(config.wifiEapConfig.certPassword, sizeof(config.wifiEapConfig.certPassword),
-        data.ReadString().c_str()) != EOK) {
-        WIFI_LOGE("ReadWifiDeviceConfig strcpy_s failed!");
-    }
-    config.wifiEapConfig.phase2Method = Phase2Method(data.ReadInt32());
+    ReadEapConfig(data, config.wifiEapConfig);
     config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(data.ReadInt32());
     config.wifiProxyconfig.autoProxyConfig.pacWebAddress = data.ReadString();
     config.wifiProxyconfig.manualProxyConfig.serverHostName = data.ReadString();
@@ -392,6 +408,29 @@ void WifiDeviceStub::ReadIpAddress(MessageParcel &data, WifiIpAddress &address)
         address.addressIpv6.push_back(data.ReadInt8());
     }
     return;
+}
+
+void WifiDeviceStub::WriteEapConfig(MessageParcel &reply, const WifiEapConfig &wifiEapConfig)
+{
+    reply.WriteString(wifiEapConfig.eap);
+    reply.WriteInt32(static_cast<int>(wifiEapConfig.phase2Method));
+    reply.WriteString(wifiEapConfig.identity);
+    reply.WriteString(wifiEapConfig.anonymousIdentity);
+    reply.WriteString(wifiEapConfig.password);
+
+    reply.WriteString(wifiEapConfig.caCertPath);
+    reply.WriteString(wifiEapConfig.caCertAlias);
+    reply.WriteUInt8Vector(wifiEapConfig.certEntry);
+
+    reply.WriteString(wifiEapConfig.clientCert);
+    reply.WriteString(std::string(wifiEapConfig.certPassword));
+    reply.WriteString(wifiEapConfig.privateKey);
+
+    reply.WriteString(wifiEapConfig.altSubjectMatch);
+    reply.WriteString(wifiEapConfig.domainSuffixMatch);
+    reply.WriteString(wifiEapConfig.realm);
+    reply.WriteString(wifiEapConfig.plmn);
+    reply.WriteInt32(wifiEapConfig.eapSubId);
 }
 
 void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config)
@@ -424,12 +463,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
     reply.WriteString(config.wifiIpConfig.staticIpAddress.domains);
-    reply.WriteString(config.wifiEapConfig.eap);
-    reply.WriteString(config.wifiEapConfig.identity);
-    reply.WriteString(config.wifiEapConfig.password);
-    reply.WriteString(config.wifiEapConfig.clientCert);
-    reply.WriteString(config.wifiEapConfig.privateKey);
-    reply.WriteInt32(static_cast<int>(config.wifiEapConfig.phase2Method));
+    WriteEapConfig(reply, config.wifiEapConfig);
     reply.WriteInt32((int)config.wifiProxyconfig.configureMethod);
     reply.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
     reply.WriteString(config.wifiProxyconfig.manualProxyConfig.serverHostName);

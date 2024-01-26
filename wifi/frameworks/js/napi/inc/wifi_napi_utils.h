@@ -148,13 +148,13 @@ enum class AddressTypeJs {
 };
 
 enum class EapMethodJs {
-    EAP_NONE = 0,
+    EAP_NONE = 0, // Not specified, inital value
     EAP_PEAP = 1,
-    EAP_TLS = 2,
+    EAP_TLS  = 2,
     EAP_TTLS = 3,
-    EAP_PWD = 4,
-    EAP_SIM = 5,
-    EAP_AKA = 6,
+    EAP_PWD  = 4,
+    EAP_SIM  = 5,
+    EAP_AKA  = 6,
     EAP_AKA_PRIME = 7,
     EAP_UNAUTH_TLS = 8,
 };

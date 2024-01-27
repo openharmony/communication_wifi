@@ -735,6 +735,25 @@ WifiErrorNo HdiWpaStaSetCountryCode(const char *countryCode)
     return WIFI_IDL_OPT_OK;
 }
 
+WifiErrorNo HdiWpaStaGetCountryCode(char *countryCode, uint32_t size)
+{
+    LOGI("HdiWpaStaGetCountryCode enter, enable:%{public}s", countryCode);
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaStaGetCountryCode: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->GetCountryCode(wpaObj, "wlan0", countryCode, size);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaStaGetCountryCode: SetCountryCode failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiWpaStaGetCountryCode success.");
+    return WIFI_IDL_OPT_OK;
+}
+
 WifiErrorNo HdiWpaStaSetSuspendMode(int mode)
 {
     LOGI("HdiWpaStaSetSuspendMode enter, mode:%{public}d", mode);

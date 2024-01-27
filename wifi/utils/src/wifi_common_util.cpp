@@ -47,6 +47,8 @@ constexpr int MIN_5G_CHANNEL = 36;
 constexpr int MAX_5G_CHANNEL = 165;
 constexpr int FREQ_CHANNEL_1 = 2412;
 constexpr int FREQ_CHANNEL_36 = 5180;
+constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
+constexpr int MICROSECOND_TO_NANOSECOND = 1000;
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 static std::pair<std::string, int> g_brokerProcessInfo;
 
@@ -231,6 +233,13 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
         first{ str.begin(), str.end(), re, -1 },
         last;
     return { first, last };
+}
+
+int64_t GetElapsedMicrosecondsSinceBoot()
+{
+    struct timespec times = {0, 0};
+    clock_gettime(CLOCK_MONOTONIC, &times);
+    return static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICROSECOND + times.tv_nsec / MICROSECOND_TO_NANOSECOND;
 }
 
 #ifndef OHOS_ARCH_LITE

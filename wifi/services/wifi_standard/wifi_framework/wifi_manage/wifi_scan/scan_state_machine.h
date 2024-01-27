@@ -291,7 +291,29 @@ private:
     bool runningSwPnoFlag;                   /* Software PNO scanning is in progress. */
 
     static std::shared_mutex lock;                  /* data lock */
+    int64_t lastScanStartTime;                   /* the scan time for last single scan */
     int m_instId;
+
+    class FilterScanResultRecord {
+    public:
+        /**
+         * record filtered scanResult
+         *
+         * @param interScanInfo the scanInfo filtered
+         */
+        void RecordFilteredScanResult(const InterScanInfo& interScanInfo);
+
+        /**
+         *  GetFilteredScanResultMsg
+         *
+         * @return filterMsg
+         */
+        std::string GetFilteredScanResultMsg();
+    private:
+
+        std::stringstream GetScanInfoMsg(const InterScanInfo& interScanInfo);
+        std::map<std::string, std::stringstream> filteredMsgs;
+    };
 
     /**
      * @Description  Processing of Scan Requests Received in Idle State.
@@ -349,6 +371,13 @@ private:
     * @return success: true, failed: false
     */
     bool ActiveCoverNewScan(InterScanConfig &interScanConfig);
+
+    /**
+     * Filter the scanResults
+     *
+     * @param scanInfoList scanResult
+     */
+    void FilterScanResult(std::vector<InterScanInfo> &scanInfoList);
     /**
      * @Description  Processing after the ScanMonitor scan success message is received.
      *

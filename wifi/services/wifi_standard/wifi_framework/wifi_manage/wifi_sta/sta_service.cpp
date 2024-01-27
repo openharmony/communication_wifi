@@ -149,6 +149,10 @@ ErrCode StaService::EnableWifi()
     // notification of registration country code change
     std::string moduleName = "StaService_" + std::to_string(m_instId);
     m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
+    if (m_staObserver == nullptr) {
+        WIFI_LOGI("m_staObserver is null\n");
+        return WIFI_OPT_FAILED;
+    }
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
 #endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
@@ -562,13 +566,15 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
 {
     if (WifiSettings::GetInstance().GetDeviceConfig(config.ancoCallProcessName, config.ssid, config.keyMgmt,
         outConfig) == 0 && (!config.ancoCallProcessName.empty())) {
-        LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
+        LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s,"
             "ancoCallProcessName:%{public}s.", outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
             outConfig.ancoCallProcessName.c_str());
     } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
-        outConfig) == 0 && config.callProcessName.empty()) {
-        LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s",
-            outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str());
+        outConfig) == 0) {
+        LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
+            "ancoCallProcessName:%{public}s,OancoCallProcessName%{public}s", outConfig.networkId,
+            SsidAnonymize(outConfig.ssid).c_str(),
+            config.ancoCallProcessName.c_str(), outConfig.ancoCallProcessName.c_str());
     } else {
         return WIFI_OPT_FAILED;
     }

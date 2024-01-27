@@ -18,6 +18,8 @@
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #endif
+#include "wifi_log.h"
+
 namespace OHOS {
 namespace Wifi {
 static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
@@ -858,7 +860,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.fourthRssiLevel5G = RSSI_LEVEL_4_5G;
     item.strDnsBak = "8.8.8.8";
     item.isLoadStabak = true;
-    item.scanOnlySwitch = false;
+    item.scanOnlySwitch = true;
     item.realMacAddress = "";
     item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
     return;

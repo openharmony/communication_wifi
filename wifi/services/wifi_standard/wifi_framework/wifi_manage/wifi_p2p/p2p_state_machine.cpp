@@ -31,6 +31,7 @@
 #include "wifi_p2p_dns_sd_service_response.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_p2p_upnp_service_response.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -989,6 +990,16 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
     }
     return;
 }
+
+void P2pStateMachine::RemoveGroupByDevice(WifiP2pDevice &device) const
+{
+    int networkId = groupManager.GetGroupNetworkId(device);
+    if (networkId != -1) {
+        RemoveGroupByNetworkId(networkId);
+    }
+    return;
+}
+
 
 DHCPTYPE P2pStateMachine::GetIsNeedDhcp() const
 {

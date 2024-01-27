@@ -252,6 +252,15 @@ private:
      */
     virtual void Broadcast2SmP2pIfaceCreated(const std::string &iface, int type, const std::string &event) const;
 
+    /**
+     * @Description Broadcast p2p connect failed event.
+     *
+     * @param iface - network interface for event processing
+     * @param reason - failed reason
+     * @param device - device information
+     */
+    virtual void Broadcast2SmConnectFailed(const std::string &iface, int reason, const WifiP2pDevice &device) const;
+
 private:
     /**
      * @Description - Register the connection supplicant result callback function.
@@ -401,6 +410,12 @@ private:
      */
     void WpaEventP2pIfaceCreated(const std::string &ifName, int isGo) const;
 
+    /**
+     * @Description Register the callback function for p2p connect failed
+     * @param bssid - group name
+     * @param reason - connect failed reason
+     */
+    void WpaEventP2pConnectFailed(const std::string &bssid, int reason) const;
 private:
     /**
      * The current implementation cannot obtain abundant HAL instances like Andoird and cannot distinguish which

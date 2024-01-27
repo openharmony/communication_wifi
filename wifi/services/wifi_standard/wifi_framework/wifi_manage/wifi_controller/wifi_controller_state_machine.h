@@ -53,7 +53,8 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
-
+        void HandleStaStartFailure(int id);
+        
     private:
         void HandleApStart(int id);
         void HandleWifiToggleChangeInEnabledState(InternalMessage *msg);
@@ -81,8 +82,8 @@ public:
     void RmoveConcreteManager(int id);
     void HandleStaClose(int id);
     void HandleStaStart(int id);
-    void HandleStaStartFailure(int id);
     void HandleConcreteStop(int id);
+    void ClearStartFailCount();
 #ifdef FEATURE_AP_SUPPORT
     void RmoveSoftapManager(int id);
     void HandleSoftapStop(int id);
@@ -138,6 +139,7 @@ private:
     DefaultState *pDefaultState;
     std::vector<ConcreteClientModeManager *> concreteManagers;
     mutable std::mutex concreteManagerMutex;
+    static int mWifiStartFailCount;
 #ifdef FEATURE_AP_SUPPORT
     std::vector<SoftApManager *> softapManagers;
     mutable std::mutex softapManagerMutex;

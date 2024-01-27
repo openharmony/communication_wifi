@@ -85,6 +85,9 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
+    if (status == WPA_CB_ASSOCIATING || status == WPA_CB_ASSOCIATED) {
+        pStaStateMachine->OnNetworkHiviewEvent(status);
+    }
 
     WifiLinkedInfo linkedInfo;
     pStaStateMachine->GetLinkedInfo(linkedInfo);

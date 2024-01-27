@@ -173,6 +173,13 @@ std::string Number2Ip(unsigned int intIp);
  */
 std::vector<std::string> StrSplit(const std::string& str, const std::string& delim);
 
+/**
+ * @Description GetElapsedMicrosecondsSinceBoot
+ *
+ * @return microseconds;
+ */
+int64_t GetElapsedMicrosecondsSinceBoot();
+
 #ifndef OHOS_ARCH_LITE
 /**
  * @Description get bundle name, it can only be obtained at the interfaces layer.

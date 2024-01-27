@@ -351,6 +351,29 @@ void P2pHalCbGoNegotiationFailure(int status)
     return;
 }
 
+void P2pHalCbP2pConnectFailed(const char *bssid, int reason)
+{
+    if (bssid == NULL) {
+        LOGE("P2p connect failed event bssid is NULL");
+        return;
+    }
+    LOGI("P2p connect failed event bssid: %{private}s, reason: %{public}d", bssid, reason);
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+    pCbkMsg->msg.connMsg.status = reason;
+    if (strncpy_s(pCbkMsg->msg.connMsg.bssid, sizeof(pCbkMsg->msg.connMsg.bssid), bssid,
+        sizeof(pCbkMsg->msg.connMsg.bssid) - 1) != EOK) {
+        free(pCbkMsg);
+        pCbkMsg = NULL;
+        return;
+    }
+    EmitEventCallbackMsg(pCbkMsg, P2P_CONNECT_FAILED);
+    return;
+}
+
 void P2pHalCbInvitationReceived(const P2pInvitationInfo *info)
 {
     if (info == NULL) {

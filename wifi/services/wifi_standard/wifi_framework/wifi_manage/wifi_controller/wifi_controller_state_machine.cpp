@@ -28,6 +28,8 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
+int WifiControllerMachine::mWifiStartFailCount{0};
+
 WifiControllerMachine::WifiControllerMachine()
     : StateMachine("WifiControllerMachine"), pEnableState(nullptr), pDisableState(nullptr), pDefaultState(nullptr)
 {}
@@ -172,6 +174,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
     switch (msg->GetMessageName()) {
         case CMD_WIFI_TOGGLED:
         case CMD_SCAN_ALWAYS_MODE_CHANGED:
+            pWifiControllerMachine->StopTimer(CMD_OPEN_WIFI_RETRY);
             HandleWifiToggleChangeInEnabledState(msg);
             break;
 #ifdef FEATURE_AP_SUPPORT
@@ -196,7 +199,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             break;
 #endif
         case CMD_STA_START_FAILURE:
-            pWifiControllerMachine->HandleStaStartFailure(msg->GetParam1());
+            HandleStaStartFailure(msg->GetParam1());
             break;
         case CMD_CONCRETE_STOPPED:
             pWifiControllerMachine->HandleConcreteStop(msg->GetParam1());
@@ -207,6 +210,9 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             } else {
                 pWifiControllerMachine->HandleAirplaneClose();
             }
+            break;
+        case CMD_OPEN_WIFI_RETRY:
+            pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, 0);
             break;
         default:
             break;
@@ -361,7 +367,7 @@ void WifiControllerMachine::MakeSoftapManager(SoftApManager::Role role, int id)
 
 bool WifiControllerMachine::ShouldEnableSoftap()
 {
-    WIFI_LOGE("Enter ShouldEnableSoftap");
+    WIFI_LOGI("Enter ShouldEnableSoftap");
     if (WifiSettings::GetInstance().GetSoftapToggledState()) {
         return true;
     }
@@ -371,15 +377,17 @@ bool WifiControllerMachine::ShouldEnableSoftap()
 
 bool WifiControllerMachine::ShouldEnableWifi()
 {
-    WIFI_LOGE("Enter ShouldEnableWifi");
+    WIFI_LOGI("Enter ShouldEnableWifi");
 #ifndef OHOS_ARCH_LITE
     if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
         return false;
     }
 #endif
     if (WifiSettings::GetInstance().GetWifiToggledState() || IsScanOnlyEnable()) {
+        WIFI_LOGI("Should to start Wifi or scanonly");
         return true;
     }
+    WIFI_LOGI("no need to start Wifi or scanonly");
     return false;
 }
 
@@ -410,13 +418,13 @@ bool WifiControllerMachine::IsScanOnlyEnable()
     ) {
         return true;
     }
-    WIFI_LOGE("No need to StartScanOnly,return.");
+    WIFI_LOGI("No need to StartScanOnly,return.");
     return false;
 }
 
 void WifiControllerMachine::StopAllConcreteManagers()
 {
-    WIFI_LOGE("Enter StopAllConcreteManagers.");
+    WIFI_LOGI("Enter StopAllConcreteManagers.");
     if (!HasAnyConcreteManager()) {
         return;
     }
@@ -593,20 +601,25 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
 }
 #endif
 
-void WifiControllerMachine::HandleStaStartFailure(int id)
+void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 {
     WIFI_LOGE("HandleStaStartFailure");
-    RmoveConcreteManager(id);
-    if (!(ShouldEnableWifi())) {
-        return;
+    pWifiControllerMachine->RmoveConcreteManager(id);
+    mWifiStartFailCount++;
+    if (pWifiControllerMachine->ShouldEnableWifi() && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {
+        pWifiControllerMachine->StartTimer(CMD_OPEN_WIFI_RETRY, WIFI_OPEN_RETRY_TIMEOUT);
     }
-    ConcreteManagerRole presentRole = GetWifiRole();
-    MakeConcreteManager(presentRole, id);
-    return;
+}
+
+void WifiControllerMachine::ClearStartFailCount()
+{
+    mWifiStartFailCount = 0;
 }
 
 void WifiControllerMachine::HandleStaStart(int id)
 {
+    mWifiStartFailCount = 0;
+    this->StopTimer(CMD_OPEN_WIFI_RETRY);
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
         (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STA_START);
@@ -708,7 +721,7 @@ void WifiControllerMachine::StartSoftapCloseTimer()
     std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
     wifiSysTimer->SetCallbackInfo(AlarmStopSoftap);
     stopSoftapTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
-    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
     MiscServices::TimeServiceClient::GetInstance()->StartTimer(stopSoftapTimerId_, currentTime + mTimeoutDelay);
 }
 

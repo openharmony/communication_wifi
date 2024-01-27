@@ -61,7 +61,7 @@ int WifiManager::Init()
 {
 #ifndef OHOS_ARCH_LITE
     if (WifiCountryCodeManager::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiCountryCodeManager Init failed!");
+        WIFI_LOGE("WifiCountryCodeManager Init failed !");
         mInitStatus = WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED;
         return -1;
     }
@@ -117,6 +117,10 @@ int WifiManager::Init()
          * The sta service automatically starts upon startup. After the sta
          * service is started, the scanning is directly started.
          */
+        if (WifiSettings::GetInstance().GetScanOnlySwitchState()) {
+            WIFI_LOGI("Auto start scan only!");
+            wifiTogglerManager->ScanOnlyToggled(1);
+        }
         AutoStartEnhanceService();
         wifiScanManager->CheckAndStartScanService();
     }

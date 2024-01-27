@@ -230,6 +230,12 @@ private:
      */
     virtual bool ProcessCmdCancelConnect(InternalMessage &msg) const;
 
+    /**
+     * @Description Process the p2p connect failed command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdConnectFailed(InternalMessage &msg) const;
 private:
     using ProcessFun = bool (P2pEnabledState::*)(InternalMessage &msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;

@@ -724,6 +724,21 @@ static void IdlCbP2pIfaceCreatedEvent(Context *context)
     }
 }
 
+static void IdlCbP2pConnectFailedEvent(Context *context)
+{
+    int reason = 0;
+    char macAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
+    if (ReadInt(context, &reason) < 0 || ReadStr(context, macAddress, sizeof(macAddress)) != 0) {
+        LOGE("Failed to read P2pConnectFailedEvent");
+        return;
+    }
+    IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();
+    if (callback != NULL && callback->onP2pConnectFailed != NULL) {
+        callback->onP2pConnectFailed(macAddress, reason);
+    }
+    return;
+}
+
 static int IdlDealP2pEventFirst(Context *context, int event)
 {
     switch (event) {
@@ -801,6 +816,9 @@ static int IdlDealP2pEventSecond(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_P2P_IFACE_CREATED_EVENT:
             IdlCbP2pIfaceCreatedEvent(context);
+            break;
+        case WIFI_IDL_CBK_CMD_P2P_CONNECT_FAILED:
+            IdlCbP2pConnectFailedEvent(context);
             break;
         default:
             return -1;

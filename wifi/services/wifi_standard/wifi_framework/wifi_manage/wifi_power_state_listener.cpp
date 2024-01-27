@@ -71,9 +71,6 @@ void WifiPowerStateListener::DealPowerEnterSleepEvent()
             bWifiStateBeforeSleep[idx] = true;
             WifiSettings::GetInstance().SetWifiToggledState(false);
             WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, idx);
-
-            /* For the forced sleep mode, the final status does not need to be stored. */
-            WifiConfigCenter::GetInstance().SetStaLastRunState(true, idx);
         }
     }
     return;

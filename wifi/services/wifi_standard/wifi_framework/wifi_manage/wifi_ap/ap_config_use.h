@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_AP_CONFIG_UTIL_H
 #define OHOS_AP_CONFIG_UTIL_H
 
@@ -20,90 +21,93 @@
 #include "ap_define.h"
 #include "ap_macro.h"
 #include "wifi_ap_msg.h"
+#include "xml_parser.h"
 
 namespace OHOS {
 namespace Wifi {
-constexpr int FREP_2G_MIN = 2412;
-constexpr int FREP_2G_MAX = 2472;
-constexpr int FREP_5G_MIN = 5170;
-constexpr int FREP_5G_MAX = 5825;
-constexpr int CHANNEL_14_FREP = 2484;
-constexpr int CHANNEL_14 = 14;
-constexpr int CENTER_FREP_DIFF = 5;
-constexpr int CHANNEL_2G_MIN = 1;
-constexpr int CHANNEL_5G_MIN = 34;
-
-using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 class ApConfigUse {
     FRIEND_GTEST(ApIdleState);
-
 public:
     /**
-     * @Description  Convert the frequency in the container into a channel.
-     * @param freqVector - frequency vector input
-     * @param chanVector - Channel vector output
-     * @return None
-     */
-    virtual void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector) const;
-    /**
-     * @Description  Printf the hostapd cfg to log display.
-     * @param apConfig - configuration input
-     * @return None
-     */
-    virtual void LogConfig(HotspotConfig &apConfig) const;
-    /**
-     * @Description  Check is a valid 2.4G frequency.
-     * @param freq - Frequency input
-     * @return true: is valid    false: bad frequency
-     */
-    virtual bool IsValid24GHz(int freq) const;
-    /**
-     * @Description  Check is a valid 5G frequency.
-     * @param freq - Frequency input
-     * @return true: is valid    false: bad frequency
-     */
-    virtual bool IsValid5GHz(int freq) const;
-
-    /**
-     * @Description  Obtain and report available channel information.
-     * @param apConfig - configuration input
-     * @param validChanTable - Valid channel tables.
-     * @return None
-     */
-    virtual void CheckBandChannel(HotspotConfig &apConfig, const ChannelsTable &validChanTable) const;;
-
-    /**
      * @Description  construction method
+     *
      * @param None
      * @return None
      */
     explicit ApConfigUse(int id = 0);
+
     /**
      * @Description  destructor method
+     *
      * @param None
      * @return None
      */
-    virtual ~ApConfigUse();
-    /**
-     * @Description  Convert frequency to channel number.
-     * @param freq - frequency to convert
-     * @return success: channel num    failed: -1
-     */
-    virtual int TransformFrequencyIntoChannel(const int freq) const;
+    virtual ~ApConfigUse() = default;
 
+    /**
+     * @Description update ap channel config
+     *
+     * @param apConfig - ap configuration input
+     */
+    void UpdateApChannelConfig(HotspotConfig &apConfig) const;
 private:
-    /**
-     * @Description  apply default configuration.
-     * @param apConfig
-     * @param vecChannels
-     * @return None
-     */
-    void ApplyDefaultConfig(HotspotConfig &apConfig, std::vector<int32_t> &vecChannels) const;;
-    int m_id;
+    static constexpr int DEFAULT_STA_INSTANCE_ID = 0;
 
+    class SoftapChannelPolicyParser : public XmlParser {
+    public:
+        enum class SoftapChannelsPolicyType {
+            UNVALID,
+            COUNTRY_CODE,
+            INDOOR_CHANNELS
+        };
+        static constexpr const char* SOFTAP_CHANNELS_POLICY_FILE_PATH = "/system/etc/wifi/softap_channels_policy.xml";
+        static constexpr const char* XML_TAG_SOFTAP_CHANNELS_POLICY = "SoftapChannelsPolicy";
+        static constexpr const char* XML_TAG_CHANNELS_POLICY = "CountryPolicy";
+        static constexpr const char* XML_TAG_POLICY_ITEM = "PolicyItem";
+        static constexpr const char* XML_TAG_COUNTRY_CODE = "CountryCode";
+        static constexpr const char* XML_TAG_INDOOR_CHANNELS = "IndoorChannels";
+        static constexpr const char* XML_TAG_SOFTAP_SUPPORT_CHANNELS = "SoftapSupportChannels";
+        static constexpr const char* XML_TAG_CHANNEL_2G_LIST = "Channel2gList";
+        static constexpr const char* XML_TAG_CHANNEL_5G_LIST = "Channel5gList";
+        static constexpr const char* XML_TAG_CHANNEL_6G_LIST = "Channel6gList";
+        static constexpr const char* XML_TAG_CHANNEL_60G_LIST = "Channel60gList";
+
+        SoftapChannelPolicyParser();
+        ~SoftapChannelPolicyParser();
+        std::map<std::string, std::set<int>> GetAllIndoorChannels() const;
+        std::map<BandType, std::vector<int>> GetAllPreferredChannels() const;
+    private:
+        std::map<std::string, std::set<int>> m_indoorChannels;
+        std::map<BandType, std::vector<int>> m_preferredChannels;
+        std::unordered_map<std::string, SoftapChannelPolicyParser::SoftapChannelsPolicyType> g_softapChannelsPolicyMap;
+        std::unordered_map<std::string, BandType> g_bandTypeMap;
+
+        bool InitParser();
+        bool ParseInternal(xmlNodePtr node) override;
+        void ParseCountryPolicyList(xmlNodePtr innode);
+        void ParsePreferredChannelsList(xmlNodePtr innode);
+        std::set<int> ParseChannels(xmlNodePtr innode);
+        xmlNodePtr GotoCountryPolicy(xmlNodePtr innode) const;
+        ApConfigUse::SoftapChannelPolicyParser::SoftapChannelsPolicyType GetPolicyItem(xmlNodePtr node);
+        xmlNodePtr GotoSoftapSupportChannels(xmlNodePtr innode) const;
+        BandType GetSupportChannelsItem(xmlNodePtr node);
+        std::vector<int> ParseSupportChannels(xmlNodePtr innode, const char* const &bandXml);
+    };
+    int m_id;
+    std::unique_ptr<SoftapChannelPolicyParser> m_softapChannelPolicyPtr;
+    std::map<std::string, std::set<int>> m_softapIndoorChannels;
+    std::map<BandType, std::vector<int>> m_softapPreferredChannels;
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
+
+    int GetBestChannelFor2G() const;
+    int GetBestChannelFor5G() const;
+    std::vector<int> GetChannelFromDrvOrXmlByBand(const BandType &bandType) const;
+    void FilterIndoorChannel(std::vector<int> &channels) const;
+    void Filter165Channel(std::vector<int> &channels) const;
+    void JudgeDbacWithP2p(HotspotConfig &apConfig) const;
+    std::set<int> GetIndoorChanByCountryCode(const std::string &countryCode) const;
+    std::vector<int> GetPreferredChannelByBand(const BandType &bandType) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS
-
 #endif

@@ -25,6 +25,9 @@ namespace Wifi {
 DEFINE_WIFILOG_SCAN_LABEL("ScanStateMachine");
 std::shared_mutex ScanStateMachine::lock;
 
+constexpr int SCAN_INFO_VALIDITY = 1 * 1000 * 1000;
+constexpr int MILLISECOND_TO_MICROSECOND = 1000;
+
 ScanStateMachine::ScanStateMachine(int instId)
     : StateMachine("ScanStateMachine"),
       quitFlag(false),
@@ -931,6 +934,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
      * fails
      */
     StartTimer(static_cast<int>(WAIT_SCAN_RESULT_TIMER), MAX_WAIT_SCAN_RESULT_TIME);
+    lastScanStartTime = GetElapsedMicrosecondsSinceBoot();
     return true;
 }
 
@@ -1001,6 +1005,75 @@ bool ScanStateMachine::ActiveCoverNewScan(InterScanConfig &interScanConfig)
     return true;
 }
 
+void ScanStateMachine::FilterScanResultRecord::RecordFilteredScanResult(const InterScanInfo &interScanInfo)
+{
+    std::string keyMgmt;
+    interScanInfo.GetDeviceMgmt(keyMgmt);
+    WifiDeviceConfig wifiDeviceConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(interScanInfo.ssid, keyMgmt, wifiDeviceConfig) != 0) {
+        return;
+    }
+    auto iter = filteredMsgs.find(interScanInfo.ssid);
+    if (iter == filteredMsgs.end()) {
+        filteredMsgs.insert({interScanInfo.ssid, GetScanInfoMsg(interScanInfo)});
+    } else {
+        iter->second << "|" << GetScanInfoMsg(interScanInfo).str();
+    }
+}
+
+std::stringstream ScanStateMachine::FilterScanResultRecord::GetScanInfoMsg(const InterScanInfo &interScanInfo)
+{
+    std::stringstream filterSavedScanInfo;
+    filterSavedScanInfo << MacAnonymize(interScanInfo.bssid) << "_" << interScanInfo.timestamp;
+    return filterSavedScanInfo;
+}
+
+std::string ScanStateMachine::FilterScanResultRecord::GetFilteredScanResultMsg()
+{
+    std::stringstream filterSavedScanInfo;
+    for (auto &filteredMsg : filteredMsgs) {
+        if (filterSavedScanInfo.rdbuf() ->in_avail() != 0) {
+            filterSavedScanInfo << ",";
+        }
+        filterSavedScanInfo << "\"" << SsidAnonymize(filteredMsg.first) << "\"" <<
+            " : \"" << filteredMsg.second.str() << "\"";
+    }
+    return filterSavedScanInfo.str();
+}
+
+void ScanStateMachine::FilterScanResult(std::vector<InterScanInfo> &scanInfoList)
+{
+    std::string connectedBssid = WifiSettings::GetInstance().GetConnectedBssid(m_instId);
+    auto validScanInfosEnd = scanInfoList.begin();
+    int numFilteredScanResults = 0;
+    const int64_t scanInfoValidSinceTime = lastScanStartTime - SCAN_INFO_VALIDITY;
+    FilterScanResultRecord records;
+    for (auto &scanInfo : scanInfoList) {
+        if (scanInfo.timestamp <= scanInfoValidSinceTime && connectedBssid != scanInfo.bssid) {
+            records.RecordFilteredScanResult(scanInfo);
+            numFilteredScanResults++;
+            continue;
+        }
+        if (scanInfo.timestamp <= lastScanStartTime) {
+            if (connectedBssid == scanInfo.bssid) {
+                scanInfo.timestamp = GetElapsedMicrosecondsSinceBoot();
+            } else {
+                scanInfo.timestamp += 1 * MILLISECOND_TO_MICROSECOND;
+            }
+        }
+        // move valid scanInfo to the end of valid scanInfos;
+        *validScanInfosEnd = std::move(scanInfo);
+        validScanInfosEnd++;
+    }
+    scanInfoList.erase(validScanInfosEnd, scanInfoList.end());
+    WIFI_LOGI("scanInfoValidSinceTime: %{public}s, total number of valid scan results: %{public}zd, filtered invalid "
+              "scan results total num: %{public}d, filtered savedNetworks: [%{public}s]",
+              std::to_string(scanInfoValidSinceTime).c_str(),
+              scanInfoList.size(),
+              numFilteredScanResults,
+              records.GetFilteredScanResultMsg().c_str());
+}
+
 void ScanStateMachine::CommonScanInfoProcess()
 {
     WIFI_LOGI("Enter ScanStateMachine::CommonScanInfoProcess.\n");
@@ -1011,6 +1084,7 @@ void ScanStateMachine::CommonScanInfoProcess()
         ReportCommonScanFailedAndClear(true);
         return;
     }
+    FilterScanResult(scanStatusReport.scanInfoList);
     GetRunningIndexList(scanStatusReport.requestIndexList);
 
     scanStatusReport.status = COMMON_SCAN_SUCCESS;

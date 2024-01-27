@@ -36,7 +36,6 @@ public:
     virtual ScanMode GetAppRunningState() const = 0;
     virtual const std::string GetAppPackageName() const = 0;
     virtual int GetFreezeModeState() const = 0;
-    virtual int GetNoChargerPlugModeState() const = 0;
     virtual void SetSupportHwPnoFlag(bool supportHwPnoFlag) = 0;
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     virtual int GetMinRssi2Dot4Ghz(int instId = 0) = 0;
@@ -69,7 +68,6 @@ public:
     MOCK_CONST_METHOD0(GetAppRunningState, ScanMode());
     MOCK_CONST_METHOD0(GetAppPackageName, const std::string());
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
-    MOCK_CONST_METHOD0(GetNoChargerPlugModeState, int());
     MOCK_METHOD1(SetSupportHwPnoFlag, void(bool supportHwPnoFlag));
     MOCK_METHOD1(GetSupportHwPnoFlag, bool(int));
     MOCK_METHOD1(GetMinRssi2Dot4Ghz, int(int));

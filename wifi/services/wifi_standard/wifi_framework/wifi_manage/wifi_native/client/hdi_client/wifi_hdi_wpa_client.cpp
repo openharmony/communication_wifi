@@ -491,7 +491,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &ne
         networkList.push_back(networkInfo);
     }
     if (listNetwork != nullptr) {
-            delete[] listNetwork;
+        delete[] listNetwork;
     }
     return WIFI_IDL_OPT_OK;
 }
@@ -500,7 +500,6 @@ WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 {
     int32_t networkId = config.networkId;
     char param[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
-    uint32_t valueLen = 0;
     if (memcpy_s(param, WIFI_HDI_MAX_STR_LENGTH, config.param.c_str(), config.param.length()) != EOK) {
         LOGE("WifiHdiWpaClient::%{public}s memcpy_s failed", __func__);
         return WIFI_IDL_OPT_FAILED;

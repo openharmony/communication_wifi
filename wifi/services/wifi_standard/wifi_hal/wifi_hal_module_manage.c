@@ -293,7 +293,11 @@ ModuleManageRetCode StopModule(const char *moduleName, bool isHostapd)
     if (p == NULL) {
         return MM_SUCCESS;
     }
-    p->referenceCount -= 1;
+    if (isHostapd) {
+        p->referenceCount = 0;
+    } else {
+        p->referenceCount -= 1;
+    }
     if (p->referenceCount > 0) {
         LOGI("module %{public}s reference left %{public}d, return ok", moduleName, p->referenceCount);
         return MM_REDUCE_REFERENCE;

@@ -50,12 +50,14 @@ struct HttpResult {
     int httpResultLen;
     StaNetState netState;
     bool hasResult;
+    void* task;
 
     void HttpClear() {
         httpCodeNum = 0;
         httpResultLen = 0;
         netState = NETWORK_STATE_UNKNOWN;
         hasResult = false;
+        task = nullptr;
     }
 };
 class StaNetworkCheck {
@@ -122,6 +124,8 @@ private:
     StaNetState CheckResponseCode(std::string url, int codeNum);
 
     void ClearHttpResultInfo();
+
+    HttpResult* GetResultInfoByUrl(std::string url);
 
     void SetHttpResultInfo(std::string url, int codeNum, int codeLenNum, StaNetState netState);
 

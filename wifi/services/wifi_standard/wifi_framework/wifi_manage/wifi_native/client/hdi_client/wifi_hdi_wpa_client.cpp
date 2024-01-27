@@ -31,6 +31,7 @@ constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int WIFI_HDI_MAX_STR_LENGTH = 512;
+constexpr int WIFI_MAX_SCAN_COUNT = 256;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(void)
 {
@@ -366,6 +367,16 @@ WifiErrorNo WifiHdiWpaClient::ReqSetPowerSave(bool enable)
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCode)
 {
     return HdiWpaStaSetCountryCode(countryCode.c_str());
+}
+
+WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
+{
+    char szCountryCode[WIFI_MAX_SCAN_COUNT + 1] = "";
+    if (WIFI_IDL_OPT_OK != HdiWpaStaSetCountryCode(szCountryCode, WIFI_MAX_SCAN_COUNT)) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    countryCode = szCountryCode;
+    return WIFI_IDL_OPT_OK;
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetSuspendMode(bool mode) const

@@ -52,7 +52,7 @@ WifiErrorNo WifiSupplicantHalInterface::StartSupplicant(void) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
-    return WIFI_OPT_NOT_SUPPORTED;
+    return WIFI_IDL_OPT_FAILED;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqStartSupplicant();
@@ -63,7 +63,7 @@ WifiErrorNo WifiSupplicantHalInterface::StopSupplicant(void) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
-    return WIFI_OPT_NOT_SUPPORTED;
+    return WIFI_IDL_OPT_FAILED;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqStopSupplicant();
@@ -85,7 +85,7 @@ WifiErrorNo WifiSupplicantHalInterface::DisconnectSupplicant(void) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
-    return WIFI_OPT_NOT_SUPPORTED;
+    return WIFI_IDL_OPT_FAILED;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqDisconnectSupplicant();
@@ -96,7 +96,7 @@ WifiErrorNo WifiSupplicantHalInterface::RequestToSupplicant(const std::string &r
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
-    return WIFI_OPT_NOT_SUPPORTED;
+    return WIFI_IDL_OPT_FAILED;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqRequestToSupplicant(request);
@@ -161,7 +161,7 @@ WifiErrorNo WifiSupplicantHalInterface::WpaGetCountryCode(std::string &countryCo
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
-    return mHdiWpaClient->ReqWpaSetSuspendMode(mode);
+    return mHdiWpaClient->ReqWpaGetCountryCode(countryCode);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqWpaGetCountryCode(countryCode);

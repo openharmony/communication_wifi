@@ -297,7 +297,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetCountryCode(const std::string &countryCode);
-
+    WifiErrorNo ReqWpaGetCountryCode(std::string &countryCode);
     /**
      * @Description Send suspend mode to wpa
      *

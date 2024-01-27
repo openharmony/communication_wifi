@@ -371,8 +371,8 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCod
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
 {
-    char szCountryCode[WIFI_MAX_SCAN_COUNT + 1] = "";
-    if (WIFI_IDL_OPT_OK != HdiWpaStaSetCountryCode(szCountryCode, WIFI_MAX_SCAN_COUNT)) {
+    char szCountryCode[WIFI_IDL_COUNTRY_CODE_LENGTH + 1] = "";
+    if (WIFI_IDL_OPT_OK != HdiWpaStaSetCountryCode(szCountryCode, WIFI_IDL_COUNTRY_CODE_LENGTH)) {
         return WIFI_IDL_OPT_FAILED;
     }
     countryCode = szCountryCode;

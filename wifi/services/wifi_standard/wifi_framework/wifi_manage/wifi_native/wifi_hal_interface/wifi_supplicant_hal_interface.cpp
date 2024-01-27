@@ -74,7 +74,7 @@ WifiErrorNo WifiSupplicantHalInterface::ConnectSupplicant(void) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
-    return WIFI_OPT_NOT_SUPPORTED;
+    return WIFI_IDL_OPT_FAILED;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqConnectSupplicant();

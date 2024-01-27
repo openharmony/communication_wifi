@@ -194,6 +194,7 @@ NO_SANITIZE("cfi") napi_value GetScanInfos(napi_env env, napi_callback_info info
 
     asyncContext->executeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        context->vecScanInfos.clear();
         TRACE_FUNC_CALL_NAME("wifiScanPtr->GetScanInfoList");
         bool compatible = true;
         context->errorCode = wifiScanPtr->GetScanInfoList(context->vecScanInfos, compatible);
@@ -230,6 +231,7 @@ NO_SANITIZE("cfi") napi_value GetScanInfoResults(napi_env env, napi_callback_inf
 
     asyncContext->executeFunc = [&](void* data) -> void {
         ScanInfoAsyncContext *context = static_cast<ScanInfoAsyncContext *>(data);
+        context->vecScanInfos.clear();
         TRACE_FUNC_CALL_NAME("wifiScanPtr->GetScanInfoList");
         bool compatible = false;
         context->errorCode = wifiScanPtr->GetScanInfoList(context->vecScanInfos, compatible);
@@ -353,6 +355,17 @@ static void ProcessEapTlsConfig(const napi_env& env, const napi_value& object, W
     eapConfig.certEntry = JsObjectToU8Vector(env, object, "certEntry");
 }
 
+static void ProcessEapPwdConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
+{
+    eapConfig.eap = EAP_METHOD_PWD;
+    JsObjectToString(env, object, "identity", NAPI_MAX_STR_LENT, eapConfig.identity);
+    JsObjectToString(env, object, "password", NAPI_MAX_STR_LENT, eapConfig.password);
+
+    int phase2 = static_cast<int>(Phase2Method::NONE);
+    JsObjectToInt(env, object, "phase2Method", phase2);
+    eapConfig.phase2Method = Phase2Method(phase2);
+}
+
 napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
 {
     bool hasProperty = false;
@@ -373,6 +386,9 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
             break;
         case EapMethodJs::EAP_TLS:
             ProcessEapTlsConfig(env, napiEap, devConfig.wifiEapConfig);
+            break;
+        case EapMethodJs::EAP_PWD:
+            ProcessEapPwdConfig(env, napiEap, devConfig.wifiEapConfig);
             break;
         default:
             WIFI_LOGE("EapMethod: %{public}d unsupported", eapMethod);

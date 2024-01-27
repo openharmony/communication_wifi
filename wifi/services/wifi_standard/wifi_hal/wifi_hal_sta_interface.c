@@ -326,7 +326,7 @@ WifiErrorNo StopPnoScan(void)
 
 WifiErrorNo Connect(int networkId)
 {
-    LOGD("Connect() networkid %{public}d", networkId);
+    LOGI("Connect() networkid %{public}d", networkId);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
     if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;
@@ -591,7 +591,7 @@ WifiErrorNo AddNetwork(int *networkId)
 
 WifiErrorNo EnableNetwork(int networkId)
 {
-    LOGD("EnableNetwork() networkid [%{public}d]", networkId);
+    LOGI("EnableNetwork() networkid [%{public}d]", networkId);
     WifiWpaStaInterface *pStaIfc = GetWifiStaInterface(0);
     if (pStaIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;

@@ -110,12 +110,13 @@ void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLe
 
 void StaNetworkCheck::DnsDetection(std::string url)
 {
+    std::string detecturl = url;
     if (dnsStateHandler) {
 #ifndef OHOS_ARCH_LITE
         if (mDetectionEventHandler) {
             mDetectionEventHandler->PostSyncTask(
-                [this, &url]() {
-                    if (!dnsChecker.DoDnsCheck(url, MAX_ARP_DNS_CHECK_TIME)) {
+                [this, detecturl]() {
+                    if (!dnsChecker.DoDnsCheck(detecturl, MAX_ARP_DNS_CHECK_TIME)) {
                         WIFI_LOGE("RunNetCheckThreadFunc dns check unreachable.");
                         dnsStateHandler(StaDnsState::DNS_STATE_UNREACHABLE);
                     } else {
@@ -193,7 +194,7 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
         return -1;
     }
 
-    task->OnSuccess([task, this](const NetStack::HttpClient::HttpClientRequest &request,
+    task->OnSuccess([this](const NetStack::HttpClient::HttpClientRequest &request,
         const NetStack::HttpClient::HttpClientResponse &response) {
         std::string url = request.GetURL();
         int codeNum = response.GetResponseCode();
@@ -218,7 +219,8 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
     });
 
     task->OnFail([this](const NetStack::HttpClient::HttpClientRequest &request,
-        const NetStack::HttpClient::HttpClientResponse &response, const NetStack::HttpClient::HttpClientError &error) {
+        const NetStack::HttpClient::HttpClientResponse &response, const NetStack::HttpClient::HttpClientError &error)
+        __attribute__((no_sanitize("cfi"))) {
         std::string url = request.GetURL();
         int codeNum = response.GetResponseCode();
         StaNetState netState = CheckResponseCode(url, codeNum);
@@ -350,6 +352,8 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
 void StaNetworkCheck::StopNetCheckThread()
 {
     WIFI_LOGI("enter StopNetCheckThread!\n");
+    StopHttpProbeTimer();
+    dnsChecker.StopDnsCheck();
     isStopNetCheck = true;
 }
 

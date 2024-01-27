@@ -157,7 +157,7 @@ void WifiP2pManager::StartUnloadP2PSaTimer(void)
         std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         wifiSysTimer->SetCallbackInfo(UnloadP2PSaTimerCallback);
         unloadP2PSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
-        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
         MiscServices::TimeServiceClient::GetInstance()->StartTimer(unloadP2PSaTimerId,
             currentTime + TIMEOUT_UNLOAD_WIFI_SA);
         WIFI_LOGI("StartUnloadP2PSaTimer success! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
@@ -228,6 +228,7 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
         bool ret = WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         if (ret) {
             WIFI_LOGE("P2p start failed, stop wifi!");
+            WifiSettings::GetInstance().SetWifiToggledState(false);
             WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 0);
             cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
             cbMsg.msgData = static_cast<int>(WifiState::DISABLED);

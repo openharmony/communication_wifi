@@ -72,7 +72,7 @@ void WifiStaManager::StartUnloadStaSaTimer(void)
         std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         wifiSysTimer->SetCallbackInfo(UnloadStaSaTimerCallback);
         unloadStaSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
-        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
         MiscServices::TimeServiceClient::GetInstance()->StartTimer(unloadStaSaTimerId,
             currentTime + TIMEOUT_UNLOAD_WIFI_SA);
         WIFI_LOGI("StartUnloadStaSaTimer success! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);

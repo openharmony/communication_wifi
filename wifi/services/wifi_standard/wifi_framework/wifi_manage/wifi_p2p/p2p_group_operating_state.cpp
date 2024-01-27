@@ -14,12 +14,12 @@
  */
 
 #include "p2p_group_operating_state.h"
+#include <dlfcn.h>
 #include "wifi_p2p_hal_interface.h"
 #include "p2p_state_machine.h"
 #include "wifi_logger.h"
 #include "if_config.h"
-
-#include <dlfcn.h>
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupOperatingState");
 

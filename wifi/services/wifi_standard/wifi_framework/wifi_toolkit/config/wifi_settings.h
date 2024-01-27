@@ -409,6 +409,20 @@ public:
     int SetWifiP2pGroupInfo(const std::vector<WifiP2pGroupInfo> &groups);
 
     /**
+     * @Description set current WifiP2pGroupInfo
+     *
+     * @param group - input wifi p2p group config
+     */
+    void SetCurrentP2pGroupInfo(const WifiP2pGroupInfo &group);
+
+    /**
+     * @Description get current WifiP2pGroupInfo
+     *
+     * @return WifiP2pGroupInfo - WifiP2pGroupInfo result
+     */
+    WifiP2pGroupInfo GetCurrentP2pGroupInfo();
+
+    /**
      * @brief increase sta connected failed count
      *
      * @param index - bssid string or ssid string
@@ -491,6 +505,14 @@ public:
     int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0);
 
     /**
+     * @Description getConnectedBssid
+     *
+     * @param connectedBssid connectedBssid
+     * @param instId target wlan id
+     */
+    std::string GetConnectedBssid(int instId = 0);
+
+    /**
      * @Description Save link info
      *
      * @param info - input WifiLinkedInfo struct
@@ -567,16 +589,6 @@ public:
      * @return int - 1 success
      */
     bool RemoveRandomMac(const std::string &bssid, const std::string &randomMac);
-
-#ifndef OHOS_ARCH_LITE
-    /**
-     * @Description Save the country code
-     *
-     * @param countryCode - input country code
-     * @return int - 0 success
-     */
-    int SetCountryCode(const std::string &countryCode);
-#endif
 
     /**
      * @Description Get current hotspot state
@@ -1626,12 +1638,12 @@ private:
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
     std::map <int, ScanControlInfo> mScanControlInfo;
     WifiP2pLinkedInfo mWifiP2pInfo;
+    WifiP2pGroupInfo m_P2pGroupInfo;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
     std::map <int, IpInfo> mWifiIpInfo;
     std::map <int, IpV6Info> mWifiIpV6Info;
     std::map <int, WifiLinkedInfo> mWifiLinkedInfo;
     std::map <int, std::string> mMacAddress;
-    std::string m_countryCode;
     WifiPortalConf mPortalUri;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map <int, HotspotConfig> mHotspotConfig;

@@ -21,8 +21,9 @@
 #include <string>
 #include "wifi_errcode.h"
 #include "wifi_ap_msg.h"
+#include "wifi_internal_msg.h"
+#include "wifi_msg.h"
 #include "wifi_scan_msg.h"
-#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -43,6 +44,15 @@ typedef void (*ParameterChgPtr)(const char *key, const char *value, void *contex
  * @return std::string - Random String
  */
 std::string GetRandomStr(int len);
+
+/**
+ * @Description get a random num
+ *
+ * @param start - The lower limit of the range of random numbers
+ * @param end - The upper limit of the range of random numbers
+ * @return random num
+ */
+int GetRandomInt(int start, int end);
 
 /**
  * @Description If allowed scan always according the scan control policy
@@ -165,6 +175,15 @@ int Val2HexChar(const std::vector<T> &vec, char *pHexChar, unsigned memSize)
 }
 
 /**
+ * @Description splitting numeric strings based on characters
+ *
+ * @param str - split string
+ * @param split - characters used for splitting
+ * @return number vector
+ */
+std::vector<int> SplitStringToIntVector(const std::string &str, const std::string &split);
+
+/**
  * @Description  Output vecChar to stream.
  * @param prefix  - prefix string[in]
  * @param vecChar - vector char[in]
@@ -208,6 +227,31 @@ std::string ConvertArrayToHex(const uint8_t plainText[], uint32_t size);
  * @return string - validate string wrapped by ""
  */
 std::string ValidateString(const std::string  &str);
+
+/**
+ * @Description is unm
+ *
+ * @param str - input string
+ * @return result
+ */
+bool IsValidateNum(const std::string &str);
+
+/**
+ * @Description transform freq to bandType
+ *
+ * @param freq - freq
+ * @return BandType
+ */
+BandType TransformFreqToBand(int freq);
+
+/**
+ * @Description transform channel to bandType
+ *
+ * @param channel - channel
+ * @return BandType
+ */
+BandType TransformChannelToBand(int channel);
+
 /**
  * @Description Check is a valid 5G frequency.
  *
@@ -227,12 +271,53 @@ bool IsValid5GHz(int freq);
 bool IsValid24GHz(int freq);
 
 /**
+ * @Description Check is a valid 2.4G channel.
+ *
+ * @param channel - channel input
+ * @return true - valid
+ * @return false - invalid
+ */
+bool IsValid24GChannel(int channel);
+
+/**
+ * @Description Check is a valid 5G channel.
+ *
+ * @param channel - channel input
+ * @return true - valid
+ * @return false - invalid
+ */
+bool IsValid5GChannel(int channel);
+
+/**
+ * @Description  Convert frequency to channel number.
+ * @param freq - frequency to convert
+ * @return success: channel num    failed: -1
+ */
+int TransformFrequencyIntoChannel(int freq);
+
+/**
  * @Description Convert the frequency in the container into a channel.
  *
  * @param freqVector - frequency vector input
  * @param chanVector - Channel vector output
  */
 void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector);
+
+/**
+ * @Description transform freq to band
+ *
+ * @param freq - freq
+ * @return band
+ */
+BandType TransformFreqToBand(int freq);
+
+/**
+ * @Description transform channel to band
+ *
+ * @param channel - channel
+ * @return band
+ */
+BandType TransformChannelToBand(int channel);
 
 #ifndef OHOS_ARCH_LITE
 /**
@@ -317,6 +402,26 @@ int SetParamValue(const char *key, const char *value);
  * @return Returns 0 if the operation is successful;
  */
 int WatchParamValue(const char *keyprefix, ParameterChgPtr callback, void *context);
+
+/**
+ * @Description are the two frequencies dbac
+ *
+ * @param freqA - one freq
+ * @param freqB - other freq
+ * @return true - dbac
+ * @return false - not dbac
+ */
+bool IsFreqDbac(int freqA, int freqB);
+
+/**
+ * @Description are the two channels dbac
+ *
+ * @param freqA - one channel
+ * @param freqB - other channel
+ * @return true - dbac
+ * @return false - not dbac
+ */
+bool IsChannelDbac(int channelA, int channelB);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

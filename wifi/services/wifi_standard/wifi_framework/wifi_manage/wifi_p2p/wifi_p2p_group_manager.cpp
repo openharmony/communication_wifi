@@ -107,12 +107,9 @@ void WifiP2pGroupManager::UpdateWpaGroup(const WifiP2pGroupInfo &group)
 {
     std::unique_lock<std::mutex> lock(groupMutex);
     for (auto it = groupsInfo.begin(); it != groupsInfo.end(); ++it) {
-        if (*it == group) {
-            WifiP2pDevice owner = it->GetOwner();
-            owner.SetDeviceAddress(group.GetOwner().GetDeviceAddress());
-            owner.SetDeviceAddressType(group.GetOwner().GetDeviceAddressType());
-            it->SetOwner(owner);
-            it->SetGroupName(group.GetGroupName());
+        if (it->GetGroupName() == group.GetGroupName() &&
+            it->GetOwner().GetDeviceAddress() == group.GetOwner().GetDeviceAddress()) {
+            WIFI_LOGD("UpdateWpaGroup: ssid equal, return");
             return;
         }
     }
@@ -284,6 +281,17 @@ void WifiP2pGroupManager::UpdateGroupsNetwork(std::map<int, WifiP2pGroupInfo> wp
         }
     }
 }
+
+void WifiP2pGroupManager::SetCurrentGroup(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
+{
+    currentGroup = group;
+    WifiSettings::GetInstance().SetCurrentP2pGroupInfo(group);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    AddMacAddrPairInfo(type, group);
+#endif
+    RefreshCurrentGroupFromGroups();
+}
+
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 void WifiP2pGroupManager::AddMacAddrPairInfo(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
 {

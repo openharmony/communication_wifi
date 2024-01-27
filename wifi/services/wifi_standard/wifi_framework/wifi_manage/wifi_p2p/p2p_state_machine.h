@@ -253,6 +253,12 @@ private:
     virtual void UpdateGroupInfoToWpa() const;
 
     /**
+     * @Description RemoveGroupByDevice
+     *
+     */
+    void RemoveGroupByDevice(WifiP2pDevice &device) const;
+
+    /**
      * @Description Get is need dhcp.
      *
      */

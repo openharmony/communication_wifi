@@ -47,6 +47,10 @@ public:
     MOCK_CONST_METHOD1(SetSuspendMode, ErrCode(bool mode));
     MOCK_CONST_METHOD0(RemoveAllDevice, ErrCode());
     MOCK_CONST_METHOD3(AddCandidateConfig, ErrCode(const int uid, const WifiDeviceConfig &config, int& netWorkId));
+    MOCK_METHOD2(RegisterAutoJoinCondition, ErrCode(const std::string&, const std::function<bool()> &));
+    MOCK_METHOD1(DeregisterAutoJoinCondition, ErrCode(const std::string&));
+    MOCK_METHOD3(RegisterFilterBuilder, ErrCode(const FilterTag &, const std::string &, const FilterBuilder &));
+    MOCK_METHOD2(DeregisterFilterBuilder, ErrCode(const FilterTag &, const std::string &));
 };
 }  // namespace OHOS
 }  // namespace OHOS

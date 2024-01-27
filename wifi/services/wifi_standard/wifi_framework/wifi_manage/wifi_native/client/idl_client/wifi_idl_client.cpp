@@ -26,6 +26,7 @@
 #include "i_wifi_sta_iface.h"
 #include "i_wifi_supplicant_iface.h"
 #include "i_wifi_p2p_iface.h"
+#include "wifi_common_def.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlClient"
@@ -1245,6 +1246,7 @@ WifiErrorNo WifiIdlClient::ReqP2pRegisterCallback(const P2pHalCallback &callback
         cEventCallback.connectSupplicantFailed = OnP2pConnectSupplicantFailed;
         cEventCallback.onP2pServDiscReq = OnP2pServDiscReq;
         cEventCallback.onP2pIfaceCreated = OnP2pIfaceCreated;
+        cEventCallback.onP2pConnectFailed = OnP2pConnectFailed;
     }
 
     return RegisterP2pEventCallback(cEventCallback);

@@ -198,11 +198,6 @@ int WifiSettings::ReloadPortalconf()
 
 int WifiSettings::Init()
 {
-#ifndef OHOS_ARCH_LITE
-    m_countryCode = DEFAULT_WIFI_COUNTRY_CODE;
-#else
-    m_countryCode = "CN";
-#endif
     InitSettingsNum();
 
     /* read ini config */
@@ -455,6 +450,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
         results.push_back(*iter);
         ++iter;
     }
+    LOGI("WifiSettings::GetScanInfoList size = %{public}u", results.size());
     return 0;
 }
 
@@ -754,6 +750,18 @@ int WifiSettings::SetWifiP2pGroupInfo(const std::vector<WifiP2pGroupInfo> &group
     std::unique_lock<std::mutex> lock(mP2pMutex);
     mGroupInfoList = groups;
     return 0;
+}
+
+void WifiSettings::SetCurrentP2pGroupInfo(const WifiP2pGroupInfo &group)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    m_P2pGroupInfo = group;
+}
+
+WifiP2pGroupInfo WifiSettings::GetCurrentP2pGroupInfo()
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    return m_P2pGroupInfo;
 }
 
 int WifiSettings::IncreaseDeviceConnFailedCount(const std::string &index, const int &indexType, int count)
@@ -1098,19 +1106,6 @@ bool WifiSettings::RemoveRandomMac(const std::string &bssid, const std::string &
     }
     return false;
 }
-
-#ifndef OHOS_ARCH_LITE
-int WifiSettings::SetCountryCode(const std::string &countryCode)
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    if (strcasecmp(m_countryCode.c_str(), countryCode.c_str()) == 0) {
-        return 0;
-    }
-    m_countryCode = countryCode;
-    StrToUpper(m_countryCode);
-    return 0;
-}
-#endif
 
 int WifiSettings::GetHotspotState(int id)
 {
@@ -1575,6 +1570,16 @@ void WifiSettings::ClearHotspotConfig()
     if (!ret.second) {
         mHotspotConfig[0] = config;
     }
+}
+
+std::string WifiSettings::GetConnectedBssid(int instId)
+{
+    WifiLinkedInfo linkedInfo;
+    GetLinkedInfo(linkedInfo, instId);
+    if (linkedInfo.connState == ConnState::CONNECTED) {
+        return linkedInfo.bssid;
+    }
+    return "";
 }
 
 void WifiSettings::InitDefaultP2pVendorConfig()

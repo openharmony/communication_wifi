@@ -29,6 +29,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
+int WifiControllerMachine::mSoftapStartFailCount{0};
 
 WifiControllerMachine::WifiControllerMachine()
     : StateMachine("WifiControllerMachine"), pEnableState(nullptr), pDisableState(nullptr), pDefaultState(nullptr)
@@ -213,6 +214,9 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             break;
         case CMD_OPEN_WIFI_RETRY:
             pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, 0);
+            break;
+        case CMD_AP_SERVICE_START_FAILURE:
+            HandleAPServiceStartFail(msg->GetParam1());
             break;
         default:
             break;
@@ -611,9 +615,26 @@ void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
     }
 }
 
-void WifiControllerMachine::ClearStartFailCount()
+void WifiControllerMachine::EnableState::HandleAPServiceStartFail(int id)
 {
+    mSoftapStartFailCount++;
+    WIFI_LOGI("Softap start fail count %{public}d", mSoftapStartFailCount);
+    if (mSoftapStartFailCount >= AP_OPEN_RETRY_MAX_COUNT) {
+        WIFI_LOGE("Ap start fail, set softap toggled false");
+        WifiSettings::GetInstance().SetSoftapToggledState(false);
+    }
+}
+
+void WifiControllerMachine::ClearWifiStartFailCount()
+{
+    WIFI_LOGD("Clear wifi start fail count");
     mWifiStartFailCount = 0;
+}
+
+void WifiControllerMachine::ClearApStartFailCount()
+{
+    WIFI_LOGD("Clear ap start fail count");
+    mSoftapStartFailCount = 0;
 }
 
 void WifiControllerMachine::HandleStaStart(int id)
@@ -629,6 +650,7 @@ void WifiControllerMachine::HandleStaStart(int id)
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleApStart(int id)
 {
+    mSoftapStartFailCount = 0;
     if (!pWifiControllerMachine->ShouldEnableSoftap()) {
         pWifiControllerMachine->StopSoftapManager(id);
         return;

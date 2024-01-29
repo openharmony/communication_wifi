@@ -1456,15 +1456,14 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
 {
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId);
-
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
         LOGE("StartConnectToNetwork get GetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiStaHalInterface::GetInstance.ClearDeviceConfig();
+    WifiStaHalInterface::GetInstance().ClearDeviceConfig();
     int networkId = INVALID_NETWORK_ID;
-    if (WifiStaHalInterface::GetInstance.GetNextNetworkId(networkId) != WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().GetNextNetworkId(networkId) != WIFI_IDL_OPT_OK) {
         LOGE("StartConnectToNetwork GetNextNetworkId failed!");
         return WIFI_OPT_FAILED;
     }
@@ -1474,7 +1473,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     } else {
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid);
     }
-
     if (WifiStaHalInterface::GetInstance().EnableNetwork(WPA_DEFAULT_NETWORKID) != WIFI_IDL_OPT_OK) {
         LOGE("EnableNetwork() failed!");
         return WIFI_OPT_FAILED;
@@ -1485,7 +1483,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);
         return WIFI_OPT_FAILED;
     }
-
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),

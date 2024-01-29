@@ -610,12 +610,6 @@ private:
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid);
     /**
-     * @Description  Disable network
-     *
-     * @param networkId - the networkId of network which is going to be disabled.(in)
-     */
-    ErrCode DisableNetwork(int networkId);
-    /**
      * @Description  Disconnect network
      *
      */

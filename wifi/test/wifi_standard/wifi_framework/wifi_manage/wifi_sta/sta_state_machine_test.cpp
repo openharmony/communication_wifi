@@ -1421,26 +1421,6 @@ public:
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
     }
 
-    void DisableNetworkSuccess()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        pStaStateMachine->DisableNetwork(0);
-    }
-
-    void DisableNetworkFail1()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->DisableNetwork(0);
-    }
-
-    void DisableNetworkFail2()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->DisableNetwork(0);
-    }
-
     void ConvertFreqToChannelTest()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillOnce(Return(1));
@@ -2499,21 +2479,6 @@ HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest3, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, SaveLinkstateSuccess, TestSize.Level1)
 {
     SaveLinkstateSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, DisableNetworkSuccess, TestSize.Level1)
-{
-    DisableNetworkSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, DisableNetworkFail1, TestSize.Level1)
-{
-    DisableNetworkFail1();
-}
-
-HWTEST_F(StaStateMachineTest, DisableNetworkFail2, TestSize.Level1)
-{
-    DisableNetworkFail2();
 }
 
 HWTEST_F(StaStateMachineTest, ConvertFreqToChannelTest, TestSize.Level1)

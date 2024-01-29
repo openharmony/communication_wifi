@@ -1462,8 +1462,8 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         return WIFI_OPT_FAILED;
     }
     WifiStaHalInterface::GetInstance().ClearDeviceConfig();
-    int networkId = INVALID_NETWORK_ID;
-    if (WifiStaHalInterface::GetInstance().GetNextNetworkId(networkId) != WIFI_IDL_OPT_OK) {
+    int wpaNetworkId = INVALID_NETWORK_ID;
+    if (WifiStaHalInterface::GetInstance().GetNextNetworkId(wpaNetworkId) != WIFI_IDL_OPT_OK) {
         LOGE("StartConnectToNetwork GetNextNetworkId failed!");
         return WIFI_OPT_FAILED;
     }

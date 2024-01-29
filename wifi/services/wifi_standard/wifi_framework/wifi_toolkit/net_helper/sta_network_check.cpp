@@ -66,6 +66,7 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpH
 StaNetworkCheck::~StaNetworkCheck()
 {
     WIFI_LOGI("StaNetworkCheck::~StaNetworkCheck enter\n");
+    StopNetCheckThread();
 #ifndef OHOS_ARCH_LITE
     if (mDetectionEventHandler) {
         mDetectionEventHandler.reset();
@@ -87,7 +88,7 @@ void StaNetworkCheck::ClearHttpResultInfo()
     bakHttpsResult.httpUrl = mUrlInfo.portalBakHttpsUrl;
 }
 
-void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLenNum, StaNetState netState)
+HttpResult* StaNetworkCheck::GetResultInfoByUrl(std::string url)
 {
     bool isHttps = (url == mUrlInfo.portalHttpsUrl || url == mUrlInfo.portalBakHttpsUrl);
     bool isMain = (url == mUrlInfo.portalHttpUrl || url == mUrlInfo.portalHttpsUrl);
@@ -101,6 +102,12 @@ void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLe
     } else {
         httpResult = &bakHttpResult;
     }
+    return httpResult;
+}
+
+void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLenNum, StaNetState netState)
+{
+    HttpResult* httpResult = GetResultInfoByUrl(url);
     httpResult->httpUrl = url;
     httpResult->httpCodeNum = codeNum;
     httpResult->httpResultLen = codeLenNum;
@@ -241,6 +248,11 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
         return -1;
     }
     task->Start();
+#ifndef OHOS_ARCH_LITE
+    HttpResult* httpResult = GetResultInfoByUrl(url);
+    NetStack::HttpClient::HttpClientTask* taskPoint = task.get();
+    httpResult->task = (void*)taskPoint;
+#endif
     return 0;
 }
 #endif
@@ -353,9 +365,23 @@ ErrCode StaNetworkCheck::InitNetCheckThread()
 void StaNetworkCheck::StopNetCheckThread()
 {
     WIFI_LOGI("enter StopNetCheckThread!\n");
+    std::vector<void*> vecTaskInfo;
     StopHttpProbeTimer();
     dnsChecker.StopDnsCheck();
     isStopNetCheck = true;
+    vecTaskInfo.push_back(mainHttpResult.task);
+    vecTaskInfo.push_back(mainHttpsResult.task);
+    vecTaskInfo.push_back(bakHttpResult.task);
+    vecTaskInfo.push_back(bakHttpsResult.task);
+#ifndef OHOS_ARCH_LITE
+    for (auto it = vecTaskInfo.begin(); it != vecTaskInfo.end(); ++it) {
+        NetStack::HttpClient::HttpClientTask* task = static_cast<NetStack::HttpClient::HttpClientTask*>(*it);
+        if (task != nullptr && task->GetStatus() != NetStack::HttpClient::TaskStatus::IDLE) {
+            task->Cancel();
+        }
+    }
+#endif
+    vecTaskInfo.clear();
 }
 
 void StaNetworkCheck::SignalNetCheckThread()

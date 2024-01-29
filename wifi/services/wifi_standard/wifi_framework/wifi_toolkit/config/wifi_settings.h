@@ -1606,8 +1606,16 @@ public:
      */
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
 #endif
+    /**
+     * @Description Get next networkId
+     *
+     * @return int - next network id
+     */
+    void GetNextNetworkId();
+
 private:
     WifiSettings();
+    int mNetworkId;
     void InitDefaultWifiConfig();
     void InitWifiConfig();
     void InitDefaultHotspotConfig();

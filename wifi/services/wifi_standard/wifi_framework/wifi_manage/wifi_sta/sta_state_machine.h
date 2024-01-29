@@ -585,10 +585,7 @@ private:
      *
      */
     void StartWifiProcess();
-    /**
-     * @Description  Synchronize the deviceConfig structure to wpa_supplicant
-     */
-    void SyncDeviceConfigToWpa() const;
+
     /**
      * @Description  Update wifi status and save connection information.
      *
@@ -675,11 +672,6 @@ private:
      *
      */
     void RemoveAllDeviceConfigs();
-    /**
-     * @Description  Synchronize all networks saved in the configuration center to the WPA.
-     *
-     */
-    void SyncAllDeviceConfigs();
     /**
      * @Description  Initialize the connection state processing message map
      *

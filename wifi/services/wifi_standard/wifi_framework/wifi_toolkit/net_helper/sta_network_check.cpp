@@ -66,6 +66,7 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpH
 StaNetworkCheck::~StaNetworkCheck()
 {
     WIFI_LOGI("StaNetworkCheck::~StaNetworkCheck enter\n");
+    StopNetCheckThread();
 #ifndef OHOS_ARCH_LITE
     if (mDetectionEventHandler) {
         mDetectionEventHandler.reset();
@@ -375,7 +376,7 @@ void StaNetworkCheck::StopNetCheckThread()
 #ifndef OHOS_ARCH_LITE
     for (auto it = vecTaskInfo.begin(); it != vecTaskInfo.end(); ++it) {
         NetStack::HttpClient::HttpClientTask* task = static_cast<NetStack::HttpClient::HttpClientTask*>(*it);
-        if (task->GetStatus() != NetStack::HttpClient::TaskStatus::IDLE) {
+        if (task != nullptr && task->GetStatus() != NetStack::HttpClient::TaskStatus::IDLE) {
             task->Cancel();
         }
     }

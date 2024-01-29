@@ -1153,14 +1153,14 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
     } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT) {
-        DisableNetwork(WPA_DEFAULT_NETWORKID);
+        WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
         SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_FULL);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL, linkedInfo);
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
         WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT) {
-        DisableNetwork(WPA_DEFAULT_NETWORKID);
+        WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
         SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
@@ -1383,7 +1383,7 @@ void StaStateMachine::DealCancelWpsCmd(InternalMessage *msg)
             wpsState = SetupMethod::INVALID;
 
             if (WifiStaHalInterface::GetInstance().EnableNetwork(WPA_DEFAULT_NETWORKID) == WIFI_IDL_OPT_OK) {
-                WIFI_LOGI("EnableNetwork success! networkId is %{public}d", lastNetworkId);
+                WIFI_LOGI("EnableNetwork success!");
             } else {
                 WIFI_LOGE("EnableNetwork failed");
             }
@@ -1977,7 +1977,7 @@ void StaStateMachine::DisConnectProcess()
         WIFI_LOGI("Disconnect update wifi status");
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
-        DisableNetwork(WPA_DEFAULT_NETWORKID);
+        WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
 
         getIpSucNum = 0;
         /* The current state of StaStateMachine transfers to SeparatedState. */
@@ -3112,17 +3112,6 @@ void StaStateMachine::SaveLinkstate(ConnState state, DetailedState detailState)
 int StaStateMachine::GetLinkedInfo(WifiLinkedInfo& linkedInfo)
 {
     return WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-}
-
-ErrCode StaStateMachine::DisableNetwork(int networkId)
-{
-    if (WifiStaHalInterface::GetInstance().DisableNetwork(networkId) != WIFI_IDL_OPT_OK) {
-        LOGE("DisableNetwork() failed, networkId=%d.", networkId);
-        return WIFI_OPT_FAILED;
-    }
-
-    LOGI("DisableNetwork-SaveDeviceConfig() succeed!");
-    return WIFI_OPT_SUCCESS;
 }
 
 void StaStateMachine::SetOperationalMode(int mode)

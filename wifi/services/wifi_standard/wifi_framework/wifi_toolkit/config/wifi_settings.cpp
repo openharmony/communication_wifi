@@ -50,7 +50,7 @@ WifiSettings &WifiSettings::GetInstance()
 }
 
 WifiSettings::WifiSettings()
-    : mNetworkId(-1),
+    : mNetworkId(0),
       mWifiStaCapabilities(0),
       mWifiToggled(false),
       mWifiStoping(false),

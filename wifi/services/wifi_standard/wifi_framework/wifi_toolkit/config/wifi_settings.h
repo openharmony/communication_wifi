@@ -1615,7 +1615,6 @@ public:
 
 private:
     WifiSettings();
-    int mNetworkId;
     void InitDefaultWifiConfig();
     void InitWifiConfig();
     void InitDefaultHotspotConfig();
@@ -1634,6 +1633,7 @@ private:
     void InitPackageFilterConfig();
 
 private:
+    int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
     bool mWifiToggled;

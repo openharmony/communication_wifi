@@ -320,7 +320,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     LOGI("Enter RemoveDevice, networkId = %{public}d.\n", networkId);
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if (linkedInfo.netWorkId == networkId) {
+    if (linkedInfo.networkId == networkId) {
         WifiStaHalInterface::GetInstance().ClearDeviceConfig();
     }
 

@@ -50,7 +50,8 @@ WifiSettings &WifiSettings::GetInstance()
 }
 
 WifiSettings::WifiSettings()
-    : mWifiStaCapabilities(0),
+    : mNetworkId(-1),
+      mWifiStaCapabilities(0),
       mWifiToggled(false),
       mWifiStoping(false),
       mSoftapToggled(false),
@@ -906,10 +907,11 @@ int WifiSettings::ReloadDeviceConfig()
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
     std::unique_lock<std::mutex> lock(mConfigMutex);
+    mNetworkId = 0;
     mWifiDeviceConfig.clear();
     for (std::size_t i = 0; i < tmp.size(); ++i) {
         WifiDeviceConfig &item = tmp[i];
-        item.networkId = i;
+        item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
     return 0;
@@ -918,6 +920,12 @@ int WifiSettings::ReloadDeviceConfig()
     mWifiDeviceConfig.clear();
     return 0;
 #endif
+}
+
+int WifiSettings::GetNextNetworkId()
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    return mNetworkId++;
 }
 
 int WifiSettings::AddWpsDeviceConfig(const WifiDeviceConfig &config)
@@ -931,10 +939,11 @@ int WifiSettings::AddWpsDeviceConfig(const WifiDeviceConfig &config)
     mSavedDeviceConfig.GetValue(tmp);
     std::unique_lock<std::mutex> lock(mConfigMutex);
     mWifiDeviceConfig.clear();
-    mWifiDeviceConfig.emplace(0, config);
+    mNetworkId = 0;
+    mWifiDeviceConfig.emplace(mNetworkId++, config);
     for (std::size_t i = 0; i < tmp.size(); ++i) {
         WifiDeviceConfig &item = tmp[i];
-        item.networkId = i + 1;
+        item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
     return 0;

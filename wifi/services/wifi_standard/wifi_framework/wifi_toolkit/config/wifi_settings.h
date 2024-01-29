@@ -1611,7 +1611,7 @@ public:
      *
      * @return int - next network id
      */
-    void GetNextNetworkId();
+    int GetNextNetworkId();
 
 private:
     WifiSettings();

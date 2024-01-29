@@ -411,14 +411,20 @@ bool WifiControllerMachine::IsWifiEnable()
 
 bool WifiControllerMachine::IsScanOnlyEnable()
 {
-    if (WifiSettings::GetInstance().CheckScanOnlyAvailable(0)
+    if (WifiSettings::GetInstance().GetScanOnlySwitchState()) {
+        WIFI_LOGI("scanonly available is true");
 #ifndef OHOS_ARCH_LITE
-        && WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetLocationModeByDatashare()
+        if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetLocationModeByDatashare()) {
+            WIFI_LOGI("location mode is 1");
+            return true;
+        } else {
+            WIFI_LOGI("No need to StartScanOnly");
+            return false;
+        }
 #endif
-    ) {
         return true;
     }
-    WIFI_LOGI("No need to StartScanOnly,return.");
+    WIFI_LOGI("No need to StartScanOnly");
     return false;
 }
 

@@ -27,11 +27,18 @@
 #include "common_timer_errors.h"
 #endif
 #include "wifi_logger.h"
+#include <ifaddrs.h>
+#include <net/if.h>
+#include <netdb.h>
 
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCommonUtil");
 
+constexpr int PRIFIX_IP_LEN = 3;
+constexpr int PRIFIX_P2P_LEN = 3;
+constexpr int PRIFIX_CHBA_LEN = 4;
+constexpr int PRIFIX_WLAN1_LEN = 5;
 constexpr int FREQ_2G_MIN = 2412;
 constexpr int FREQ_2G_MAX = 2472;
 constexpr int FREQ_5G_MIN = 5170;
@@ -440,6 +447,54 @@ int ChannelToFrequency(int channel)
         return ((channel - MIN_5G_CHANNEL) * CENTER_FREQ_DIFF + FREQ_CHANNEL_36);
     }
     return INVALID_FREQ_OR_CHANNEL;
+}
+
+bool IsOtherVapConnect()
+{
+    WIFI_LOGD("Enter IsOtherVapConnect");
+    int n;
+    int ret;
+    struct ifaddrs *ifaddr = nullptr;
+    struct ifaddrs *ifa = nullptr;
+    bool p2pOrHmlConnected = false;
+    bool hotspotEnable = false;
+    if (getifaddrs(&ifaddr) == -1) {
+        WIFI_LOGE("getifaddrs failed, error is %{public}d", errno);
+        return false;
+    }
+    for (ifa = ifaddr, n = 0; ifa != nullptr; ifa = ifa->ifa_next, n++) {
+        if (ifa->ifa_addr == nullptr) {
+            continue;
+        }
+        /* For an AF_INET interface address, display the address */
+        int family = ifa->ifa_addr->sa_family;
+        char ipAddress[NI_MAXHOST] = {0}; /* IP address storage */
+        if (family == AF_INET) {
+            ret = getnameinfo(ifa->ifa_addr,
+                sizeof(struct sockaddr_in),
+                ipAddress,
+                NI_MAXHOST,
+                nullptr,
+                0,
+                NI_NUMERICHOST);
+            if (ret != 0) {
+                WIFI_LOGE("getnameinfo() failed: %{public}s\n", gai_strerror(ret));
+                return false;
+            }
+        }
+        if (strncmp("192", ipAddress, PRIFIX_IP_LEN) != 0 && strncmp("172", ipAddress, PRIFIX_IP_LEN) != 0) {
+            continue;
+        }
+        if ((strncmp("p2p", ifa->ifa_name, PRIFIX_P2P_LEN) == 0 ||
+             strncmp("chba", ifa->ifa_name, PRIFIX_CHBA_LEN) == 0)) {
+            p2pOrHmlConnected = true;
+        }
+        if (strncmp("wlan1", ifa->ifa_name, PRIFIX_WLAN1_LEN) == 0) {
+            hotspotEnable = true;
+        }
+    }
+    freeifaddrs(ifaddr);
+    return p2pOrHmlConnected && hotspotEnable;
 }
 
 }  // namespace Wifi

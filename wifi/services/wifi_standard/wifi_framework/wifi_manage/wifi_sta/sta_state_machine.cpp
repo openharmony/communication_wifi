@@ -542,18 +542,6 @@ void StaStateMachine::StartWifiProcess()
         } else {
             WIFI_LOGI("GetStaDeviceMacAddress failed!");
         }
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-        std::string macAddress;
-        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
-        if (MacAddress::IsValidMac(macAddress.c_str())) {
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
-                LOGE("%{public}s: failed to set sta MAC address:%{private}s", __func__, macAddress.c_str());
-            }
-            WifiSettings::GetInstance().SetMacAddress(macAddress, m_instId);
-        } else {
-            LOGE("%{public}s: macAddress is invalid", __func__);
-        }
-#endif
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
         WifiNetAgent::GetInstance().OnStaMachineWifiStart();
@@ -710,7 +698,8 @@ void StaStateMachine::StopWifiProcess()
     /* clear connection information. */
     InitWifiLinkedInfo();
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    if (curConnState == ConnState::CONNECTED) {
+    if (curConnState == ConnState::CONNECTING || curConnState == ConnState::AUTHENTICATING
+        || curConnState == ConnState::OBTAINING_IPADDR ||curConnState == ConnState::CONNECTED) {
         /* Callback result to InterfaceService. */
         linkedInfo.ssid = ssid;
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
@@ -2013,16 +2002,6 @@ void StaStateMachine::DisConnectProcess()
             WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
         }
 #endif
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-        std::string macAddress;
-        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
-        if (MacAddress::IsValidMac(macAddress.c_str())) {
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(macAddress) != WIFI_IDL_OPT_OK) {
-                LOGE("%{public}s: failed to set sta MAC address:%{private}s", __func__, macAddress.c_str());
-            }
-            WifiSettings::GetInstance().SetMacAddress(macAddress, m_instId);
-        }
-#endif
         WIFI_LOGI("Disconnect update wifi status");
         /* Save connection information to WifiSettings. */
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
@@ -2965,7 +2944,7 @@ void StaStateMachine::DhcpResultNotify::StartRenewTimeout(int64_t interval)
     std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, false, false);
     wifiSysTimer->SetCallbackInfo(RenewTimeOutCallback);
     renewTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
-    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
     MiscServices::TimeServiceClient::GetInstance()->StartTimer(renewTimerId_, currentTime + interval);
 
     return;

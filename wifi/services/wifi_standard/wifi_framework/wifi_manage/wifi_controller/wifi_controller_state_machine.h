@@ -54,6 +54,7 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
         void HandleStaStartFailure(int id);
+        void HandleAPServiceStartFail(int id);
         
     private:
         void HandleApStart(int id);
@@ -83,7 +84,8 @@ public:
     void HandleStaClose(int id);
     void HandleStaStart(int id);
     void HandleConcreteStop(int id);
-    void ClearStartFailCount();
+    void ClearWifiStartFailCount();
+    void ClearApStartFailCount();
 #ifdef FEATURE_AP_SUPPORT
     void RmoveSoftapManager(int id);
     void HandleSoftapStop(int id);
@@ -140,6 +142,7 @@ private:
     std::vector<ConcreteClientModeManager *> concreteManagers;
     mutable std::mutex concreteManagerMutex;
     static int mWifiStartFailCount;
+    static int mSoftapStartFailCount;
 #ifdef FEATURE_AP_SUPPORT
     std::vector<SoftApManager *> softapManagers;
     mutable std::mutex softapManagerMutex;

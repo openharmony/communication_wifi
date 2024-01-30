@@ -56,6 +56,7 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpH
 #ifndef OHOS_ARCH_LITE
     mDetectionEventHandler = std::make_unique<WifiEventHandler>("DnsArpDetectionThread");
 #endif
+    ClearHttpResultInfo();
     WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
     m_instId = instId;
     WIFI_LOGI("HttpPortalDetection http=%{public}s, https=%{public}s, httpbak=%{public}s, httpsbak=%{public}s,",
@@ -113,6 +114,7 @@ void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLe
     httpResult->httpResultLen = codeLenNum;
     httpResult->netState = netState;
     httpResult->hasResult = true;
+    httpResult->task = nullptr;
 }
 
 void StaNetworkCheck::DnsDetection(std::string url)

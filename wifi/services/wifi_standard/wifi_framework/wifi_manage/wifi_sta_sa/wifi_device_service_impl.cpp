@@ -696,6 +696,10 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
 
 ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
+    if (IsOtherVapConnect()) {
+        LOGI("ConnectToNetwork: p2p or hml connected, and hotspot is enable");
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+    }
     if (isCandidate) {
         if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("ConnectToCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");

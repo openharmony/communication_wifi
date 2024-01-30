@@ -25,6 +25,7 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "state_machine.h"
+#include "sta_network_check.h"
 #include "sta_service_callback.h"
 #include "dhcp_c_api.h"
 #include "sta_define.h"

@@ -505,6 +505,14 @@ public:
     int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0);
 
     /**
+     * @Description getConnectedBssid
+     *
+     * @param connectedBssid connectedBssid
+     * @param instId target wlan id
+     */
+    std::string GetConnectedBssid(int instId = 0);
+
+    /**
      * @Description Save link info
      *
      * @param info - input WifiLinkedInfo struct

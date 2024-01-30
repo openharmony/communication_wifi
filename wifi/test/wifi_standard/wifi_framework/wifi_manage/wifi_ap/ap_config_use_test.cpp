@@ -140,7 +140,8 @@ HWTEST_F(ApConfigUse_Test, JudgeDbacWithP2pTest, TestSize.Level1)
     WifiP2pLinkedInfo p2pLinkedInfo;
     p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
     EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
-        .WillOnce(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)));
+        .WillOnce(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)))
+        .WillRepeatedly(Return(0));
     WifiP2pGroupInfo wifiP2pGroupInfo;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCurrentP2pGroupInfo())
         .WillOnce(DoAll(Return(wifiP2pGroupInfo)));

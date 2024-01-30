@@ -281,6 +281,7 @@ int FrequencyToChannel(int freq);
  * @return int - frequency
  */
 int ChannelToFrequency(int channel);
+bool IsOtherVapConnect();
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

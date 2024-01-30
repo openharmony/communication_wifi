@@ -40,6 +40,8 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
 namespace OHOS {
 namespace Wifi {
+const std::string AP_DEFAULT_IP = "192.168.43.1";
+
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
       m_hotspotConfig(HotspotConfig()),
@@ -104,9 +106,9 @@ void ApStartedState::GoOutState()
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_IDLE);
     WifiSettings::GetInstance().ClearStationList();
     WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id);
-    if (m_hotspotConfig.GetIpAddress().find("192.168.63") != std::string::npos) {
-        WIFI_LOGI("IP conflict, change dhcp address");
-        m_hotspotConfig.SetIpAddress("192.168.62.1");
+    if (!m_hotspotConfig.GetIpAddress().empty() && m_hotspotConfig.GetIpAddress() != AP_DEFAULT_IP) {
+        WIFI_LOGI("reset ip");
+        m_hotspotConfig.SetIpAddress(AP_DEFAULT_IP);
         WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id);
         WifiSettings::GetInstance().SyncHotspotConfig();
     }
@@ -210,12 +212,9 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     }
 #endif
 
-    IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, m_id);
-    std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
-    if (ipAddress.find("192.168.62") != std::string::npos) {
-        WIFI_LOGI("IP conflict, change dhcp address");
-        apConfig.SetIpAddress("192.168.63.1");
+    if (apConfig.GetIpAddress().empty()) {
+        WIFI_LOGI("IP is empty, set default ipaddr");
+        apConfig.SetIpAddress(AP_DEFAULT_IP);
     }
     WifiSettings::GetInstance().SetHotspotConfig(apConfig, m_id);
     WifiSettings::GetInstance().SyncHotspotConfig();

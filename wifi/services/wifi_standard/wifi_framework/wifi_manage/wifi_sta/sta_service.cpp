@@ -496,6 +496,10 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
     WIFI_LOGI("Enter AutoConnectService.\n");
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
 #ifndef OHOS_ARCH_LITE
+    if (IsOtherVapConnect()) {
+        LOGI("AutoConnectService: p2p or hml connected, and hotspot is enable");
+        return WIFI_OPT_FAILED;
+    }
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
     std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {

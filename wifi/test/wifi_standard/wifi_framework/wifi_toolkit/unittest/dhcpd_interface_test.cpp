@@ -46,7 +46,7 @@ public:
     {
         bool isIpV4 = false;
         std::string ifaceName = "wlan0";
-        Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+        Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
         Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
         pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
     }
@@ -91,7 +91,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_002, TestSize.Level1)
     WIFI_LOGI("StartDhcpServer_002 enter");
     std::string ifaceName = "p2p";
     bool isIpV4 = false;
-    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
 }
@@ -106,7 +106,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_003, TestSize.Level1)
     WIFI_LOGI("StartDhcpServer_003 enter");
     bool isIpV4 = true;
     std::string ifaceName = "wlan0";
-    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     std::string ipAddress = "10";
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
@@ -122,7 +122,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_004, TestSize.Level1)
     WIFI_LOGI("StartDhcpServer_004 enter");
     bool isIpV4 = true;
     std::string ifaceName = "wlan0";
-    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     std::string ipAddress = "192.168.62.0";
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
@@ -138,7 +138,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_005, TestSize.Level1)
     WIFI_LOGI("StartDhcpServer_005 enter");
     bool isIpV4 = true;
     std::string ifaceName = "p2p";
-    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
 }

@@ -681,7 +681,7 @@ void P2pStateMachine::ClearWifiP2pInfo()
 
 bool P2pStateMachine::StartDhcpServer()
 {
-    Ipv4Address ipv4(Ipv4Address::DEFAULT_INET_ADDRESS);
+    Ipv4Address ipv4(Ipv4Address::defaultInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     const std::string ipAddress = DEFAULT_P2P_IPADDR;
     if (!m_DhcpdInterface.StartDhcpServerFromInterface(groupManager.GetCurrentGroup().GetInterface(),

@@ -567,10 +567,7 @@ private:
      *
      */
     void StartWifiProcess();
-    /**
-     * @Description  Synchronize the deviceConfig structure to wpa_supplicant
-     */
-    void SyncDeviceConfigToWpa() const;
+
     /**
      * @Description  Update wifi status and save connection information.
      *
@@ -594,12 +591,6 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid);
-    /**
-     * @Description  Disable network
-     *
-     * @param networkId - the networkId of network which is going to be disabled.(in)
-     */
-    ErrCode DisableNetwork(int networkId);
     /**
      * @Description  Disconnect network
      *
@@ -657,11 +648,6 @@ private:
      *
      */
     void RemoveAllDeviceConfigs();
-    /**
-     * @Description  Synchronize all networks saved in the configuration center to the WPA.
-     *
-     */
-    void SyncAllDeviceConfigs();
     /**
      * @Description  Initialize the connection state processing message map
      *

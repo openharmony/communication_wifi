@@ -63,9 +63,9 @@ public:
     static Ipv4Address Create(const in_addr &ipv4, const in_addr &mask);
 
 public:
-    static const Ipv4Address INVALID_INET_ADDRESS; /* Invalid IPv4 object constant. */
-    static const Ipv4Address DEFAULT_INET_ADDRESS;
-    static const Ipv4Address CONFLICT_INET_ADDRESS;
+    static const Ipv4Address invalidInetAddress; /* Invalid IPv4 object constant. */
+    static const Ipv4Address defaultInetAddress;
+    static const Ipv4Address conflictInetAddress;
 
 public:
     /**

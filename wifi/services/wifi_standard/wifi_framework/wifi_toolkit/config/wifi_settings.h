@@ -1606,6 +1606,13 @@ public:
      */
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
 #endif
+    /**
+     * @Description Get next networkId
+     *
+     * @return int - next network id
+     */
+    int GetNextNetworkId();
+
 private:
     WifiSettings();
     void InitDefaultWifiConfig();
@@ -1626,6 +1633,7 @@ private:
     void InitPackageFilterConfig();
 
 private:
+    int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
     bool mWifiToggled;

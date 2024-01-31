@@ -175,20 +175,6 @@ public:
         EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config));
     }
 
-    void SyncDeviceConfigToWpaSuccess0()
-    {
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->SyncDeviceConfigToWpa();
-    }
-
-    void SyncDeviceConfigToWpaSuccess1()
-    {
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig())
-            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->SyncDeviceConfigToWpa();
-    }
-
     void StartWifiProcessSuccess()
     {
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
@@ -1077,33 +1063,6 @@ public:
         EXPECT_FALSE(pStaStateMachine->pWpsState->ExecuteStateMsg(nullptr));
     }
 
-    void SyncAllDeviceConfigsSuccess()
-    {
-        std::vector<WifiDeviceConfig> result;
-        WifiDeviceConfig wifiDeviceConfig;
-        result.push_back(wifiDeviceConfig);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(result), Return(0)));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_))
-            .WillOnce(Return(WIFI_IDL_OPT_OK))
-            .WillOnce(Return(WIFI_IDL_OPT_OK))
-            .WillOnce(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetDeviceConfig(_, _))
-            .WillOnce(Return(WIFI_IDL_OPT_OK))
-            .WillOnce(Return(WIFI_IDL_OPT_FAILED));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
-            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->SyncAllDeviceConfigs();
-        pStaStateMachine->SyncAllDeviceConfigs();
-        pStaStateMachine->SyncAllDeviceConfigs();
-    }
-
-    void SyncAllDeviceConfigsFail()
-    {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->SyncAllDeviceConfigs();
-    }
-
     void GetIpStateStateGoInStateSuccess1()
     {
         WifiDeviceConfig config;
@@ -1458,26 +1417,6 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-    }
-
-    void DisableNetworkSuccess()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        pStaStateMachine->DisableNetwork(0);
-    }
-
-    void DisableNetworkFail1()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->DisableNetwork(0);
-    }
-
-    void DisableNetworkFail2()
-    {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), DisableNetwork(_)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig()).WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
-        pStaStateMachine->DisableNetwork(0);
     }
 
     void ConvertFreqToChannelTest()
@@ -1838,16 +1777,6 @@ HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail2, TestSize.Level1)
 {
     ConvertDeviceCfgFail2();
-}
-
-HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess0, TestSize.Level1)
-{
-    SyncDeviceConfigToWpaSuccess0();
-}
-
-HWTEST_F(StaStateMachineTest, SyncDeviceConfigToWpaSuccess1, TestSize.Level1)
-{
-    SyncDeviceConfigToWpaSuccess1();
 }
 
 HWTEST_F(StaStateMachineTest, StartWifiProcessSuccess, TestSize.Level1)
@@ -2385,16 +2314,6 @@ HWTEST_F(StaStateMachineTest, WpsStateExeMsgFail2, TestSize.Level1)
     WpsStateExeMsgFail2();
 }
 
-HWTEST_F(StaStateMachineTest, SyncAllDeviceConfigsSuccess, TestSize.Level1)
-{
-    SyncAllDeviceConfigsSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, SyncAllDeviceConfigsFail, TestSize.Level1)
-{
-    SyncAllDeviceConfigsFail();
-}
-
 HWTEST_F(StaStateMachineTest, GetIpStateStateGoInStateSuccess1, TestSize.Level1)
 {
     GetIpStateStateGoInStateSuccess1();
@@ -2557,21 +2476,6 @@ HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest3, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, SaveLinkstateSuccess, TestSize.Level1)
 {
     SaveLinkstateSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, DisableNetworkSuccess, TestSize.Level1)
-{
-    DisableNetworkSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, DisableNetworkFail1, TestSize.Level1)
-{
-    DisableNetworkFail1();
-}
-
-HWTEST_F(StaStateMachineTest, DisableNetworkFail2, TestSize.Level1)
-{
-    DisableNetworkFail2();
 }
 
 HWTEST_F(StaStateMachineTest, ConvertFreqToChannelTest, TestSize.Level1)

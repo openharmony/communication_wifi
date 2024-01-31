@@ -38,6 +38,11 @@ NetStateObserver::NetStateObserver(): m_Callback(nullptr)
     WIFI_LOGD("construct NetStateObserver");
 }
 
+NetStateObserver::~NetStateObserver()
+{
+    WIFI_LOGD("~NetStateObserver");
+}
+
 void NetStateObserver::SetNetStateCallback(std::function<void(SystemNetWorkState, std::string)> callback)
 {
     m_Callback = callback;

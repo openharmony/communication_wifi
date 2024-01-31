@@ -18,6 +18,8 @@
 #define OHOS_WIFI_HDI_WPA_PROXY_H
 
 #include <pthread.h>
+#include "v1_0/ihostapd_interface.h"
+#include "v1_0/ihostapd_callback.h"
 #include "v1_0/iwpa_interface.h"
 #include "v1_0/iwpa_callback.h"
 #include "v1_0/wpa_types.h"
@@ -77,6 +79,20 @@ WifiErrorNo HdiWpaStart();
 WifiErrorNo HdiWpaStop();
 
 /**
+ * @Description Create a ap channel between the HAL and the driver.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiApStart(int id, char *hostapdCfg);
+
+/**
+ * @Description Stop the created ap channel.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiApStop(int id, char *ifaceName);
+
+/**
  * @Description Add interface.
  *
  * @return WifiErrorNo - operation result
@@ -96,6 +112,13 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName);
  * @return WifiErrorNo - operation result
  */
 struct IWpaInterface* GetWpaInterface();
+
+/**
+ * @Description Create the Ap object.
+ *
+ * @return WifiErrorNo - operation result
+ */
+struct IHostapdInterface* GetApInterface();
 
 /**
  * @Description copy file.

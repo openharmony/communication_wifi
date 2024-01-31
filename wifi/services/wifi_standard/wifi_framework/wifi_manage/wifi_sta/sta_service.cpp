@@ -267,10 +267,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
         isUpdate = true;
     } else {
-        if (WifiStaHalInterface::GetInstance().GetNextNetworkId(netWorkId) != WIFI_IDL_OPT_OK) {
-            LOGE("AddDeviceConfig GetNextNetworkId failed!");
-            return INVALID_NETWORK_ID;
-        }
+        netWorkId = WifiSettings::GetInstance().GetNextNetworkId();
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
@@ -302,11 +299,6 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
             LOGE("install cert: %{public}d, alias: %{public}s", ret, alias.c_str());
         }
     }
-    /* Setting the network to wpa */
-    if(pStaStateMachine->ConvertDeviceCfg(tempDeviceConfig) != WIFI_OPT_SUCCESS) {
-        LOGE("AddDeviceConfig ConvertDeviceCfg failed!");
-        return INVALID_NETWORK_ID;
-    }
 
     /* Add the new network to WifiSettings. */
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
@@ -326,16 +318,12 @@ int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
 ErrCode StaService::RemoveDevice(int networkId) const
 {
     LOGI("Enter RemoveDevice, networkId = %{public}d.\n", networkId);
-    /* Remove network configuration. */
-    if (WifiStaHalInterface::GetInstance().RemoveDevice(networkId) != WIFI_IDL_OPT_OK) {
-        LOGE("RemoveDeviceConfig() failed!");
-        return WIFI_OPT_FAILED;
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if (linkedInfo.networkId == networkId) {
+        WifiStaHalInterface::GetInstance().ClearDeviceConfig();
     }
-    if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
-        LOGW("RemoveDevice-SaveDeviceConfig() failed!");
-    } else {
-        LOGD("RemoveDevice-SaveDeviceConfig() succeed!");
-    }
+
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
@@ -363,9 +351,6 @@ ErrCode StaService::RemoveAllDevice() const
     LOGI("Enter RemoveAllDevice.\n");
     if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_IDL_OPT_OK) {
         LOGD("Remove all device config successfully!");
-        if (WifiStaHalInterface::GetInstance().SaveDeviceConfig() != WIFI_IDL_OPT_OK) {
-            LOGE("WifiStaHalInterface:RemoveAllDevice:SaveDeviceConfig failed!");
-        }
     } else {
         LOGE("WifiStaHalInterface:RemoveAllDevice failed!");
         return WIFI_OPT_FAILED;

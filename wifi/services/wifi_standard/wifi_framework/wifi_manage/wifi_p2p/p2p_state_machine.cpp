@@ -1026,6 +1026,9 @@ void P2pStateMachine::ClearGroup() const
             WIFI_LOGE("has p2p group, remove");
             iface.assign(ifa->ifa_name);
             WifiP2PHalInterface::GetInstance().GroupRemove(iface);
+            // current p2p group can be created only one,
+            // if there are multiple groups can be created in the future, the break need to be modified.
+            break;
         }
     }
     freeifaddrs(ifaddr);

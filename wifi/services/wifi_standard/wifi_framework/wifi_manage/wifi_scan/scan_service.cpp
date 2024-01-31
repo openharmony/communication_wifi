@@ -992,14 +992,9 @@ void ScanService::HandleStaStatusChanged(int status)
             SystemScanProcess(true);
             break;
         }
-#ifdef SUPPORT_SCAN_CONTROL
-        case static_cast<int>(OperateResState::CONNECT_AP_CONNECTED):
-        case static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED):
-        case static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED): {
-#else
         case static_cast<int>(OperateResState::CONNECT_AP_CONNECTED): {
-#endif
             SystemScanProcess(false);
+            scanConfigMap.clear();
             break;
         }
         default: {

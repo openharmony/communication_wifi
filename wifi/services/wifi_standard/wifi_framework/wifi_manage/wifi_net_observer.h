@@ -32,6 +32,8 @@ class NetStateObserver : public NetManagerStandard::NetDetectionCallbackStub {
 public:
     NetStateObserver();
 
+    ~NetStateObserver();
+
     static NetStateObserver &GetInstance();
 
     void StartNetStateObserver();

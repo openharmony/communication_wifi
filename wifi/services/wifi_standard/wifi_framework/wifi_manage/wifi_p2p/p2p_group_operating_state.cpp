@@ -335,16 +335,19 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessage &m
     WifiErrorNo ret = WIFI_IDL_OPT_FAILED;
     int freq = 0;
     int freqEnhance = 0;
-    msg.GetMessageObj(freq);
-    WIFI_LOGI("Create a hid2d group, frequency: %{public}d.", freq);
+    bool isFreqEnhance = false;
+    std::pair<int, FreqType> info;
+    msg.GetMessageObj(info);
+    freq = info.first;
+    isFreqEnhance = (info.second == FreqType::FREQUENCY_160M);
+    WIFI_LOGI("Create a hid2d group, frequency: %{public}d, isFreqEnhance: %{public}d.", freq, isFreqEnhance);
     do {
         const char *so = "libwifi_enhance_service.z.so";
         void *handle;
-        bool isFreqEnhance = true;
         int (*FreqEnhance)(int, bool);
         handle = dlopen(so, RTLD_LAZY);
-        if (handle == nullptr) {
-            WIFI_LOGE("wifi_enhance_service:P2P enhance so empty;can not open libwifi_enhance_service.z.so.");
+        if ((handle == nullptr) || (!isFreqEnhance)) {
+            WIFI_LOGE("wifi_enhance_service:P2P enhance is empty or is FreqEnhance is false");
             break;
         }
         FreqEnhance = (int(*)(int, bool))dlsym(handle, "FreqEnhance");

@@ -2616,7 +2616,7 @@ bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std:
     } else {
         randomMacAddr = randomAddr;
     }
-    LOGI("%{public}s: type:%{public}d, address:%{private}s, randomAddr:%{private}s, randomMacAddr:%{private}s",
+    LOGD("%{public}s: type:%{public}d, address:%{private}s, randomAddr:%{private}s, randomMacAddr:%{private}s",
         __func__, type, realMacAddr.c_str(), randomAddr.c_str(), randomMacAddr.c_str());
     WifiMacAddrInfo realMacAddrInfo;
     realMacAddrInfo.bssid = realMacAddr;

@@ -34,9 +34,9 @@ WifiPowerStateListener::WifiPowerStateListener()
 
 void WifiPowerStateListener::OnSyncSleep(bool onForceSleep)
 {
-    WIFI_LOGI("Enter WifiPowerStateListener::OnSyncSleep");
+    WIFI_LOGI("Enter OnSyncSleep");
     if (!onForceSleep) {
-        WIFI_LOGI("WifiPowerStateListener::OnSyncSleep not force sleep");
+        WIFI_LOGI("OnSyncSleep not force sleep");
         return;
     }
 
@@ -45,9 +45,9 @@ void WifiPowerStateListener::OnSyncSleep(bool onForceSleep)
 
 void WifiPowerStateListener::OnSyncWakeup(bool onForceSleep)
 {
-    WIFI_LOGI("Enter WifiPowerStateListener::OnSyncWakeup");
+    WIFI_LOGI("Enter OnSyncWakeup");
     if (!onForceSleep) {
-        WIFI_LOGI("WifiPowerStateListener::OnSyncWakeup not force sleep");
+        WIFI_LOGI("OnSyncWakeup not force sleep");
         return;
     }
 

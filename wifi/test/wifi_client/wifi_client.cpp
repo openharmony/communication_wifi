@@ -230,7 +230,10 @@ static bool GetNetworkId(int argc, const char *argv[], int &nid)
     nid = -1;
     for (int i = ARG_IDX; i < argc; i++) {
         if (strncmp(argv[i], "nid=", strlen("nid=")) == 0) {
-            (void)sscanf_s(argv[i], "nid=%d", &nid);
+            if (sscanf_s(argv[i], "nid=%d", &nid) < 0) {
+                Logd("%s : sscanf_s fatch failed", __func__);
+                return false;
+            }
         }
     }
     if (nid < 0) {
@@ -584,7 +587,10 @@ static void HandleGetSignalLevel(int argc, const char* argv[])
     string band = "";
     for (int i = ARG_IDX; i < argc; i++) {
         if (strncmp(argv[i], "rssi=", strlen("rssi=")) == 0) {
-            (void)sscanf_s(argv[i], "rssi=%d", &rssi);
+            if (sscanf_s(argv[i], "rssi=%d", &rssi) < 0) {
+                Logd("%s : sscanf_s fatch failed", __func__);
+                return;
+            }
         } else if (strncmp(argv[i], "band=", strlen("band=")) == 0) {
             band = argv[i] + strlen("band=");
         }
@@ -626,7 +632,10 @@ static void HandleEnableConfig(int argc, const char* argv[])
     string disableOthers = "";
     for (int i = ARG_IDX; i < argc; i++) {
         if (strncmp(argv[i], "nid=", strlen("nid=")) == 0) {
-            (void)sscanf_s(argv[i], "nid=%d", &nid);
+            if (sscanf_s(argv[i], "nid=%d", &nid) < 0) {
+                Logd("%s : sscanf_s fatch failed", __func__);
+                return;
+            }
         } else if (strncmp(argv[i], "disableothers=", strlen("disableothers=")) == 0) {
             disableOthers = argv[i] + strlen("disableothers=");
         }

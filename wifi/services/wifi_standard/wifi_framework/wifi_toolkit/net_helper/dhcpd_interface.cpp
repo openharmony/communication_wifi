@@ -33,7 +33,7 @@ const std::string IP_V4_DEFAULT("192.168.62.1");
 static bool g_startDhcpServerFlag = false;
 
 DhcpdInterface::DhcpdInterface()
-    : mBindIpv4(Ipv4Address::INVALID_INET_ADDRESS), mBindIpv6(Ipv6Address::INVALID_INET6_ADDRESS)
+    : mBindIpv4(Ipv4Address::invalidInetAddress), mBindIpv6(Ipv6Address::INVALID_INET6_ADDRESS)
 {}
 
 DhcpdInterface::~DhcpdInterface()
@@ -170,7 +170,7 @@ bool DhcpdInterface::AssignIpAddr(Ipv4Address &ipv4, Ipv6Address &ipv6, const st
 {
     if (isIpV4) {
         ipv4 = AssignIpAddrV4(vecIpv4Addr, IP_V4_MASK, ipAddress);
-        if (ipv4 == Ipv4Address::INVALID_INET_ADDRESS) {
+        if (ipv4 == Ipv4Address::invalidInetAddress) {
             WIFI_LOGE("Failed to allocate the IP address.");
             return false;
         }
@@ -219,13 +219,13 @@ Ipv4Address DhcpdInterface::AssignIpAddrV4(const std::vector<Ipv4Address> &vecIp
     struct in_addr maskAddr = {INADDR_ANY};
     if (inet_aton(mask.c_str(), &maskAddr) == 0) {
         WIFI_LOGE("convert mask to ipaddress failed![%s].", mask.c_str());
-        return Ipv4Address::INVALID_INET_ADDRESS;
+        return Ipv4Address::invalidInetAddress;
     }
     struct in_addr initAddr = {INADDR_ANY};
     std::string destIpAddress = ipAddress.empty() ? IP_V4_DEFAULT : ipAddress;
     if (inet_aton(destIpAddress.c_str(), &initAddr) == 0) {
         WIFI_LOGE("convert default ipaddress failed![%s].", destIpAddress.c_str());
-        return Ipv4Address::INVALID_INET_ADDRESS;
+        return Ipv4Address::invalidInetAddress;
     }
     struct in_addr tmpAddr = {INADDR_ANY};
     while (true) {
@@ -238,13 +238,13 @@ Ipv4Address DhcpdInterface::AssignIpAddrV4(const std::vector<Ipv4Address> &vecIp
         cSubnet++;
         if (cSubnet == 0xFF) {
             WIFI_LOGE("No available IPv4 address is found.\n");
-            return Ipv4Address::INVALID_INET_ADDRESS;
+            return Ipv4Address::invalidInetAddress;
         } else {
             tmpAddr.s_addr = (tmpAddr.s_addr & htonl(IN_CLASSB_NET)) | htonl(cSubnet << IN_CLASSC_NSHIFT);
             initAddr.s_addr = tmpAddr.s_addr | (initAddr.s_addr & htonl(IN_CLASSC_HOST));
         }
     }
-    return Ipv4Address::INVALID_INET_ADDRESS;
+    return Ipv4Address::invalidInetAddress;
 }
 
 Ipv6Address DhcpdInterface::AssignIpAddrV6(const std::vector<Ipv6Address> &vecIpAddr)

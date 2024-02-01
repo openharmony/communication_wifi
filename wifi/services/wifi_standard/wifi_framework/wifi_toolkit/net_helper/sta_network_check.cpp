@@ -58,21 +58,18 @@ StaNetworkCheck::StaNetworkCheck(NetStateHandler nethandle, ArpStateHandler arpH
 #endif
     WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
     m_instId = instId;
-    WIFI_LOGI("HttpPortalDetection http=%{public}s, https=%{public}s, httpbak=%{public}s, httpsbak=%{public}s,",
-        mUrlInfo.portalHttpUrl.c_str(), mUrlInfo.portalHttpsUrl.c_str(), mUrlInfo.portalBakHttpUrl.c_str(),
-        mUrlInfo.portalBakHttpsUrl.c_str());
 }
 
 StaNetworkCheck::~StaNetworkCheck()
 {
-    WIFI_LOGI("StaNetworkCheck::~StaNetworkCheck enter\n");
+    WIFI_LOGI("~StaNetworkCheck enter\n");
 #ifndef OHOS_ARCH_LITE
     if (mDetectionEventHandler) {
         mDetectionEventHandler.reset();
     }
 #endif
     ExitNetCheckThread();
-    WIFI_LOGI("StaNetworkCheck::~StaNetworkCheck complete\n");
+    WIFI_LOGI("~StaNetworkCheck complete\n");
 }
 
 void StaNetworkCheck::ClearHttpResultInfo()
@@ -394,7 +391,7 @@ void StaNetworkCheck::SignalNetCheckThread()
 
 void StaNetworkCheck::ExitNetCheckThread()
 {
-    WIFI_LOGI("enter StaNetworkCheck::ExitNetCheckThread");
+    WIFI_LOGI("enter ExitNetCheckThread");
     int timeout = TIME_OUT_COUNT;
     isStopNetCheck = false;
     isExitNetCheckThread = true;

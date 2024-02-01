@@ -70,7 +70,7 @@ std::map<std::string, std::int32_t> g_EventSysCapMap = {
 
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
-    WIFI_LOGI("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
+    WIFI_LOGD("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
     uv_loop_s* loop = nullptr;
     napi_get_uv_event_loop(asyncEvent->env, &loop);
 
@@ -122,7 +122,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
                 }
             }
             res = napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
-            WIFI_LOGI("uv_queue_work, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
+            WIFI_LOGD("uv_queue_work, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
                 res, asyncData->callbackRef, refCount);
             if (res != napi_ok || refCount <= 1) {
                 WIFI_LOGE("uv_queue_work, do NOT call back, res: %{public}d!", res);
@@ -145,7 +145,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_close_handle_scope(asyncData->env, scope);
             if (unrefRef) {
                 res = napi_reference_unref(asyncData->env, asyncData->callbackRef, &refCount);
-                WIFI_LOGI("uv_queue_work, unref, res: %{public}d, refCount: %{public}d", res, refCount);
+                WIFI_LOGD("uv_queue_work, unref, res: %{public}d, refCount: %{public}d", res, refCount);
             }
             delete asyncData;
             delete work;

@@ -606,7 +606,7 @@ std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
  
 void StaService::HandleScreenStatusChanged(int screenState)
 {
-    WIFI_LOGI("Enter StaService::HandleScreenStatusChanged screenState:%{public}d.", screenState);
+    WIFI_LOGI("Enter HandleScreenStatusChanged screenState:%{public}d.", screenState);
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("pStaStateMachine is null!");

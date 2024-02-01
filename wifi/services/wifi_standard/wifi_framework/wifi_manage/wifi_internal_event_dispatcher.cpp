@@ -536,7 +536,7 @@ void WifiInternalEventDispatcher::Exit()
 void WifiInternalEventDispatcher::DealStaCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
-    WIFI_LOGI("WifiInternalEventDispatcher:: Deal Sta Event Callback Msg: %{public}d", msg.msgCode);
+    WIFI_LOGD("Deal Sta Event Callback Msg: %{public}d", msg.msgCode);
 
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_STATE_CHANGE:
@@ -638,7 +638,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
                 %{public}d", uid, pid, isFrozen);
 #endif
             if (mScanCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
-                WIFI_LOGI("InvokeScanCallbacks, Not registered callback event! msg.msgCode: %{public}d,"
+                WIFI_LOGI("Not registered callback event! msg.msgCode: %{public}d,"
                     "instId: %{public}d", msg.msgCode, msg.id);
                 continue;
             }
@@ -755,7 +755,7 @@ void WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallback
 void WifiInternalEventDispatcher::DealHotspotCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
-    WIFI_LOGI("WifiInternalEventDispatcher:: Deal Hotspot Event Callback Msg: %{public}d", msg.msgCode);
+    WIFI_LOGI("Deal Hotspot Event Callback Msg: %{public}d", msg.msgCode);
     auto callback = instance.GetSingleHotspotCallback(msg.id);
     if (callback != nullptr) {
         switch (msg.msgCode) {
@@ -901,7 +901,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
 void WifiInternalEventDispatcher::DealP2pCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
-    WIFI_LOGI("WifiInternalEventDispatcher:: Deal P2P Event Callback Msg: %{public}d", msg.msgCode);
+    WIFI_LOGI("Deal P2P Event Callback Msg: %{public}d", msg.msgCode);
 
     auto callback = instance.GetSingleP2pCallback();
     if (callback != nullptr) {
@@ -1020,7 +1020,7 @@ bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackE
 
 void WifiInternalEventDispatcher::SetAppFrozen(int uid, bool isFrozen)
 {
-    WIFI_LOGI("WifiInternalEventDispatcher::Set App Frozen:%{private}d, isFrozen:%{public}d", uid, isFrozen);
+    WIFI_LOGD("WifiInternalEventDispatcher::Set App Frozen:%{private}d, isFrozen:%{public}d", uid, isFrozen);
     auto it = std::find_if(vecFrozenAppInfo.begin(), vecFrozenAppInfo.end(),
         [&uid](const int tmp) {
             return tmp == uid;

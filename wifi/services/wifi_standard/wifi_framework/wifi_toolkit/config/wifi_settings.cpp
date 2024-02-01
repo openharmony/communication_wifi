@@ -974,7 +974,7 @@ int WifiSettings::SaveIpV6Info(const IpV6Info &info, int instId)
     return 0;
 }
 
-std::map <int, WifiLinkedInfo> WifiSettings::GetAllWifiLinkedInfo()
+std::map<int, WifiLinkedInfo> WifiSettings::GetAllWifiLinkedInfo()
 {
     return mWifiLinkedInfo;
 }

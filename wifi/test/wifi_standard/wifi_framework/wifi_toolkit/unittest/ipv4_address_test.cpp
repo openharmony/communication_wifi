@@ -47,10 +47,10 @@ HWTEST_F(Ipv4AddressTest, Create_001, TestSize.Level1)
     WIFI_LOGI("Create_001");
     std::string ipv4 = "192.168.15";
     size_t prefixLength = 0;
-    EXPECT_TRUE(Ipv4Address::Create(ipv4, prefixLength) == Ipv4Address::INVALID_INET_ADDRESS);
+    EXPECT_TRUE(Ipv4Address::Create(ipv4, prefixLength) == Ipv4Address::invalidInetAddress);
     ipv4 = "192.168.15.23";
     prefixLength = MAX_IPV4_PREFIX_LENGTH;
-    EXPECT_TRUE(Ipv4Address::Create(ipv4, prefixLength) == Ipv4Address::INVALID_INET_ADDRESS);
+    EXPECT_TRUE(Ipv4Address::Create(ipv4, prefixLength) == Ipv4Address::invalidInetAddress);
     prefixLength = MAX_IPV4_PREFIX_LENGTH - 1;
     Ipv4Address::Create(ipv4, prefixLength);
 }
@@ -65,9 +65,9 @@ HWTEST_F(Ipv4AddressTest, Create_002, TestSize.Level1)
     WIFI_LOGI("Create_002");
     std::string ipv4 = "192.168.15";
     std::string mask = "255.255";
-    EXPECT_TRUE(Ipv4Address::Create(ipv4, mask) == Ipv4Address::INVALID_INET_ADDRESS);
+    EXPECT_TRUE(Ipv4Address::Create(ipv4, mask) == Ipv4Address::invalidInetAddress);
     mask = "255.255.255.0";
-    EXPECT_TRUE(Ipv4Address::Create(ipv4, mask) == Ipv4Address::INVALID_INET_ADDRESS);
+    EXPECT_TRUE(Ipv4Address::Create(ipv4, mask) == Ipv4Address::invalidInetAddress);
     ipv4 = "192.168.15.23";
     Ipv4Address::Create(ipv4, mask);
 }

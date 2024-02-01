@@ -38,6 +38,7 @@ config("wifi_fw_common_header") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
+    "$WIFI_ROOT_DIR/utils/inc",
   ]
   if (defined(ohos_lite)) {
     include_dirs += [
@@ -176,6 +177,7 @@ if (defined(ohos_lite)) {
       ":wifi_utils",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
     ]
 

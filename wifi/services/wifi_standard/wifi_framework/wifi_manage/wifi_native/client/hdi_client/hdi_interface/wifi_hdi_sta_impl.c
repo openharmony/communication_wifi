@@ -31,6 +31,7 @@
 #define WIFI_PNO_SCAN_SECOND_TO_MS 1000
 #define WIFI_MAX_BUFFER_LENGTH 1024
 #define WIFI_IDL_GET_MAX_SCAN_INFO 256 /* Maximum number of scan infos obtained at a time */
+#define WIFI_HDI_STOP_SLEEP_MS 300000
 
 #ifndef CHECK_STA_HDI_WIFI_PROXY_AND_RETURN
 #define CHECK_STA_HDI_WIFI_PROXY_AND_RETURN(isRemoteDied) \
@@ -221,12 +222,14 @@ WifiErrorNo HdiWifiStart()
 
 WifiErrorNo HdiWifiStop()
 {
-    LOGI("%{public}s: begin to stop wifi", __func__);
+    LOGI("%{public}s: begin to stop wifi enter", __func__);
     HdiUnRegisterStaCallbackEvent();
+    usleep(WIFI_HDI_STOP_SLEEP_MS); /* 300ms */
     if (HdiStop() != WIFI_IDL_OPT_OK) {
         LOGE("failed to stop hdi");
         return WIFI_IDL_OPT_FAILED;
     }
+    LOGI("%{public}s: begin to stop wifi exit", __func__);
     return WIFI_IDL_OPT_OK;
 }
 

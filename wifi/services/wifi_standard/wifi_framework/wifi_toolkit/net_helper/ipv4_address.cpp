@@ -27,14 +27,13 @@ namespace OHOS {
 namespace Wifi {
 const int MAX_IPV4_PREFIX_LENGTH = 32;
 const int MAX_IPV4_STRING_LENGTH = 64;
-const Ipv4Address Ipv4Address::INVALID_INET_ADDRESS("255.255.255.255", MAX_IPV4_PREFIX_LENGTH);
-const Ipv4Address Ipv4Address::DEFAULT_INET_ADDRESS("192.168.62.1", MAX_IPV4_PREFIX_LENGTH);
-const Ipv4Address Ipv4Address::CONFLICT_INET_ADDRESS("192.168.63.1", MAX_IPV4_PREFIX_LENGTH);
+const Ipv4Address Ipv4Address::invalidInetAddress("255.255.255.255", MAX_IPV4_PREFIX_LENGTH);
+const Ipv4Address Ipv4Address::defaultInetAddress("192.168.49.1", MAX_IPV4_PREFIX_LENGTH);
 bool Ipv4Address::IsValidIPv4(const std::string &ipv4)
 {
     struct in_addr ipv4Addr = {INADDR_ANY};
     if (inet_pton(AF_INET, ipv4.c_str(), (void *)&ipv4Addr) != 1 ||
-        ipv4 == INVALID_INET_ADDRESS.GetAddressWithString()) {
+        ipv4 == invalidInetAddress.GetAddressWithString()) {
         return false;
     } else {
         return true;
@@ -44,7 +43,7 @@ bool Ipv4Address::IsValidIPv4(const std::string &ipv4)
 Ipv4Address Ipv4Address::Create(const std::string &ipv4, size_t prefixLength)
 {
     if (!IsValidIPv4(ipv4) || prefixLength > MAX_IPV4_PREFIX_LENGTH - 1) {
-        return INVALID_INET_ADDRESS;
+        return invalidInetAddress;
     }
     return Ipv4Address(ipv4, prefixLength);
 }
@@ -54,7 +53,7 @@ Ipv4Address Ipv4Address::Create(const std::string &ipv4, const std::string &mask
     size_t prefixLength = 0;
     struct in_addr maskAddr = {INADDR_ANY};
     if ((inet_aton(mask.c_str(), &maskAddr) != 1) || (!IsValidIPv4(ipv4))) {
-        return INVALID_INET_ADDRESS;
+        return invalidInetAddress;
     }
     for (int i = 0; i < MAX_MASK_LENGTH; i++) {
         if (maskAddr.s_addr != 0) {
@@ -77,7 +76,7 @@ Ipv4Address Ipv4Address::Create(const in_addr &ipv4, const in_addr &mask)
     }
     char ipStr[MAX_IPV4_STRING_LENGTH] = {0};
     if (inet_ntop(AF_INET, &ipv4, ipStr, sizeof(ipStr)) == nullptr) {
-        return INVALID_INET_ADDRESS;
+        return invalidInetAddress;
     }
     return Ipv4Address(ipStr, prefixLength);
 }

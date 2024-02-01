@@ -130,6 +130,7 @@ if (defined(ohos_lite)) {
       "system",
       "updater",
     ]
+    version_script = "libcrpc_client_updater.map"
   }
 }
 

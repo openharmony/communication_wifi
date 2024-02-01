@@ -347,7 +347,19 @@ public:
          *
          */
         void DealDhcpResult(int ipType);
+#ifndef OHOS_ARCH_LITE
+        /**
+         * @Description : start renew timeout timer
+         *
+         */
+        void StartRenewTimeout(int64_t interval);
 
+        /**
+         * @Description : stop renew timeout timer
+         *
+         */
+        static void StopRenewTimeout();
+#endif
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
          *
@@ -370,6 +382,9 @@ public:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;
         static DhcpResult DhcpIpv6Result;
+#ifndef OHOS_ARCH_LITE
+        static uint64_t renewTimerId_;
+#endif
     };
 
 public:
@@ -485,9 +500,12 @@ public:
     /**
      * @Description : Deal renewal timeout.
      *
-     * @param msg - Message body received by the state machine[in]
      */
+#ifndef OHOS_ARCH_LITE
+    void DealRenewalTimeout();
+#else
     void DealRenewalTimeout(InternalMessage *msg);
+#endif
 
     /**
      * @Description  start browser to login portal
@@ -578,10 +596,7 @@ private:
      *
      */
     void StartWifiProcess();
-    /**
-     * @Description  Synchronize the deviceConfig structure to wpa_supplicant
-     */
-    void SyncDeviceConfigToWpa() const;
+
     /**
      * @Description  Update wifi status and save connection information.
      *
@@ -605,12 +620,6 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid);
-    /**
-     * @Description  Disable network
-     *
-     * @param networkId - the networkId of network which is going to be disabled.(in)
-     */
-    ErrCode DisableNetwork(int networkId);
     /**
      * @Description  Disconnect network
      *
@@ -668,11 +677,6 @@ private:
      *
      */
     void RemoveAllDeviceConfigs();
-    /**
-     * @Description  Synchronize all networks saved in the configuration center to the WPA.
-     *
-     */
-    void SyncAllDeviceConfigs();
     /**
      * @Description  Initialize the connection state processing message map
      *

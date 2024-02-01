@@ -160,15 +160,18 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "ability_runtime:ability_manager",
+      "ability_runtime:wantagent_innerkits",
       "c_utils:utils",
       "dhcp:dhcp_sdk",
       "hilog:libhilog",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "samgr:samgr_proxy",
+      "time_service:time_client",
     ]
 
     part_name = "wifi"
     subsystem_name = "communication"
+    version_script = "libwifi_sta_service.map"
   }
 }

@@ -37,6 +37,8 @@ DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
 namespace OHOS {
 namespace Wifi {
+const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
+
 DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
 P2pStateMachine::P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &groupMgr,
     WifiP2pDeviceManager &setDeviceMgr,
@@ -679,16 +681,11 @@ void P2pStateMachine::ClearWifiP2pInfo()
 
 bool P2pStateMachine::StartDhcpServer()
 {
-    IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
-    std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
-    Ipv4Address ipv4(Ipv4Address::DEFAULT_INET_ADDRESS);
+    Ipv4Address ipv4(Ipv4Address::defaultInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-    if (ipAddress.find("192.168.62") != std::string::npos) {
-        WIFI_LOGI("IP conflict, change dhcp address");
-        ipv4 = Ipv4Address::CONFLICT_INET_ADDRESS;
-    }
-    if (!m_DhcpdInterface.StartDhcpServerFromInterface(groupManager.GetCurrentGroup().GetInterface(), ipv4, ipv6)) {
+    const std::string ipAddress = DEFAULT_P2P_IPADDR;
+    if (!m_DhcpdInterface.StartDhcpServerFromInterface(groupManager.GetCurrentGroup().GetInterface(),
+                                                       ipv4, ipv6, ipAddress, true)) {
         return false;
     }
     SetWifiP2pInfoWhenGroupFormed(ipv4.GetAddressWithString());

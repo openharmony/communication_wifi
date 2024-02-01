@@ -27,6 +27,7 @@
 #include "i_wifi_supplicant_iface.h"
 #include "i_wifi_p2p_iface.h"
 #include "wifi_common_def.h"
+#include "wifi_common_util.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlClient"
@@ -155,6 +156,12 @@ WifiErrorNo WifiIdlClient::SetConnectMacAddr(const std::string &mac, const int p
     CHECK_CLIENT_NOT_NULL;
     if (CheckMacIsValid(mac) != 0) {
         return WIFI_IDL_OPT_INPUT_MAC_INVALID;
+    }
+    if (portType == 0) {
+        if (IsOtherVapConnect()) {
+            LOGI("SetConnectMacAddr: p2p or hml connected, and hotspot is enable");
+            return WIFI_IDL_OPT_OK;
+        }
     }
     int len = mac.length();
     return SetAssocMacAddr((unsigned char *)mac.c_str(), len, portType);

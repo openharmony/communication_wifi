@@ -20,7 +20,7 @@
 #include "wifi_log.h"
 #include "wifi_errcode.h"
 #include "state_machine.h"
-#include "self_cure_define.h"
+#include "self_cure_common.h"
 #include "self_cure_service_callback.h"
 #include "sta_service_callback.h"
 #include "ista_service.h"
@@ -47,23 +47,30 @@ constexpr int STATIC_IP_ADDR = 156;
 constexpr int GET_NEXT_IP_MAC_CNT = 10;
 constexpr int IP_ADDR_SIZE = 4;
 constexpr int NET_MASK_LENGTH = 24;
-constexpr int SELF_CURE_NUM_1 = 1;
-constexpr int SELF_CURE_NUM_2 = 2;
-constexpr int SELF_CURE_NUM_3 = 3;
-constexpr int SELF_CURE_NUM_4 = 4;
-constexpr int SELF_CURE_NUM_5 = 5;
-constexpr int SELF_CURE_NUM_6 = 6;
-constexpr int SELF_CURE_NUM_7 = 7;
-constexpr int SELF_CURE_NUM_8 = 8;
-constexpr int SELF_CURE_NUM_9 = 9;
-constexpr int SELF_CURE_NUM_10 = 10;
-constexpr int SELF_CURE_NUM_11 = 11;
-constexpr int SELF_CURE_NUM_12 = 12;
-constexpr int SELF_CURE_NUM_13 = 13;
-constexpr int SELF_CURE_NUM_14 = 14;
-constexpr int SELF_CURE_NUM_15 = 15;
-constexpr int SELF_CURE_NUM_16 = 16;
-constexpr int SELF_CURE_NUM_17 = 17;
+constexpr int SELF_CURE_FAILED_ONE_CNT = 1;
+constexpr int SELF_CURE_FAILED_TWO_CNT = 2;
+constexpr int SELF_CURE_FAILED_THREE_CNT = 3;
+constexpr int SELF_CURE_FAILED_FOUR_CNT = 4;
+constexpr int SELF_CURE_FAILED_FIVE_CNT = 5;
+constexpr int SELF_CURE_FAILED_SIX_CNT = 6;
+constexpr int SELF_CURE_FAILED_SEVEN_CNT = 7;
+constexpr int POS_DNS_FAILED_TS = 1;
+constexpr int POS_RENEW_DHCP_FAILED_CNT = 2;
+constexpr int POS_RENEW_DHCP_FAILED_TS = 3;
+constexpr int POS_STATIC_IP_FAILED_CNT = 4;
+constexpr int POS_STATIC_IP_FAILED_TS = 5;
+constexpr int POS_REASSOC_FAILED_CNT = 6;
+constexpr int POS_REASSOC_FAILED_TS = 7;
+constexpr int POS_RANDMAC_FAILED_CNT = 8;
+constexpr int POS_RANDMAC_FAILED_TS = 9;
+constexpr int POS_RESET_FAILED_CNT = 10;
+constexpr int POS_RESET_FAILED_TS = 11;
+constexpr int POS_REASSOC_CONNECT_FAILED_CNT = 12;
+constexpr int POS_REASSOC_CONNECT_FAILED_TS = 13;
+constexpr int POS_RANDMAC_CONNECT_FAILED_CNT = 14;
+constexpr int POS_RANDMAC_CONNECT_FAILED_TS = 15;
+constexpr int POS_RESET_CONNECT_FAILED_CNT = 16;
+constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
 
 class SelfCureStateMachine : public StateMachine {
     FRIEND_GTEST(SelfCureStateMachine);

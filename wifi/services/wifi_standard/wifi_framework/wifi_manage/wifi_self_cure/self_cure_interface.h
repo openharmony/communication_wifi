@@ -19,7 +19,7 @@
 #include "iself_cure_service.h"
 #include "wifi_errcode.h"
 #include "define.h"
-#include "self_cure_define.h"
+#include "self_cure_common.h"
 #include "ip2p_service_callbacks.h"
 #include "sta_service_callback.h"
 
@@ -59,7 +59,7 @@ public:
      *
      * @return StaServiceCallback - sta callback
      */
-    virtual StaServiceCallback GetStaCallback();
+    virtual StaServiceCallback GetStaCallback() override;
 
     /**
     * @Description  init callback function.
@@ -74,43 +74,22 @@ public:
      * @param state - OperateResState
      * @param info -  const WifiLinkedInfo
      */
-    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
+    void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
 
     /**
      * @Description rssi level changed
      *
      * @param rssi
      */
-    static void DealRssiLevelChanged(int rssi, int instId = 0);
+    void DealRssiLevelChanged(int rssi, int instId = 0);
 
     /**
      * @Description deal p2p connection change
      *
      * @param info -  const WifiP2pLinkedInfo
      */
-    static void DealP2pConnChanged(const WifiP2pLinkedInfo &info);
+    void DealP2pConnChanged(const WifiP2pLinkedInfo &info);
 
-    /**
-     * @Description rssi level change
-     *
-     * @param info -  const WifiP2pLinkedInfo
-     */
-    void OnRssiLevelChanged(int rssi) override;
-
-    /**
-     * @Description p2p connection change
-     *
-     * @param info -  const WifiP2pLinkedInfo
-     */
-    void OnP2pConnChanged(const WifiP2pLinkedInfo &info) override;
-
-    /**
-     * @Description sta connection change
-     *
-     * @param state - OperateResState
-     * @param info -  const WifiLinkedInfo
-     */
-    void OnStaConnChanged(OperateResState state, const WifiLinkedInfo &info) override;
 private:
     std::mutex mutex;
     std::vector<SelfCureServiceCallback> mSelfCureCallback;

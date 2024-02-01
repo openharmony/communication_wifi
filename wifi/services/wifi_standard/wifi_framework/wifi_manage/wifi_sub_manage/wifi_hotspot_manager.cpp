@@ -71,7 +71,7 @@ void WifiHotspotManager::StartUnloadApSaTimer(void)
         std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         wifiSysTimer->SetCallbackInfo(UnloadHotspotSaTimerCallback);
         unloadHotspotSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
-        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
         MiscServices::TimeServiceClient::GetInstance()->StartTimer(unloadHotspotSaTimerId,
             currentTime + TIMEOUT_UNLOAD_WIFI_SA);
         WIFI_LOGI("RegisterUnloadHotspotSaTimer success! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
@@ -124,6 +124,10 @@ void WifiHotspotManager::DealApStateChanged(ApState state, int id)
     cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     if (state == ApState::AP_STATE_IDLE) {
+        if (WifiConfigCenter::GetInstance().GetApMidState() == WifiOprMidState::OPENING) {
+            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+            ins->SendMessage(CMD_AP_SERVICE_START_FAILURE, id);
+        }
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, id);
         WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
     }

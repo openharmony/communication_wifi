@@ -29,6 +29,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
+int WifiControllerMachine::mSoftapStartFailCount{0};
 
 WifiControllerMachine::WifiControllerMachine()
     : StateMachine("WifiControllerMachine"), pEnableState(nullptr), pDisableState(nullptr), pDefaultState(nullptr)
@@ -213,6 +214,9 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             break;
         case CMD_OPEN_WIFI_RETRY:
             pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, 0);
+            break;
+        case CMD_AP_SERVICE_START_FAILURE:
+            HandleAPServiceStartFail(msg->GetParam1());
             break;
         default:
             break;
@@ -411,14 +415,20 @@ bool WifiControllerMachine::IsWifiEnable()
 
 bool WifiControllerMachine::IsScanOnlyEnable()
 {
-    if (WifiSettings::GetInstance().CheckScanOnlyAvailable(0)
+    if (WifiSettings::GetInstance().GetScanOnlySwitchState()) {
+        WIFI_LOGI("scanonly available is true");
 #ifndef OHOS_ARCH_LITE
-        && WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetLocationModeByDatashare()
+        if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetLocationModeByDatashare()) {
+            WIFI_LOGI("location mode is 1");
+            return true;
+        } else {
+            WIFI_LOGI("No need to StartScanOnly");
+            return false;
+        }
 #endif
-    ) {
         return true;
     }
-    WIFI_LOGI("No need to StartScanOnly,return.");
+    WIFI_LOGI("No need to StartScanOnly");
     return false;
 }
 
@@ -611,9 +621,26 @@ void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
     }
 }
 
-void WifiControllerMachine::ClearStartFailCount()
+void WifiControllerMachine::EnableState::HandleAPServiceStartFail(int id)
 {
+    mSoftapStartFailCount++;
+    WIFI_LOGI("Softap start fail count %{public}d", mSoftapStartFailCount);
+    if (mSoftapStartFailCount >= AP_OPEN_RETRY_MAX_COUNT) {
+        WIFI_LOGE("Ap start fail, set softap toggled false");
+        WifiSettings::GetInstance().SetSoftapToggledState(false);
+    }
+}
+
+void WifiControllerMachine::ClearWifiStartFailCount()
+{
+    WIFI_LOGD("Clear wifi start fail count");
     mWifiStartFailCount = 0;
+}
+
+void WifiControllerMachine::ClearApStartFailCount()
+{
+    WIFI_LOGD("Clear ap start fail count");
+    mSoftapStartFailCount = 0;
 }
 
 void WifiControllerMachine::HandleStaStart(int id)
@@ -629,6 +656,7 @@ void WifiControllerMachine::HandleStaStart(int id)
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleApStart(int id)
 {
+    mSoftapStartFailCount = 0;
     if (!pWifiControllerMachine->ShouldEnableSoftap()) {
         pWifiControllerMachine->StopSoftapManager(id);
         return;
@@ -721,7 +749,7 @@ void WifiControllerMachine::StartSoftapCloseTimer()
     std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
     wifiSysTimer->SetCallbackInfo(AlarmStopSoftap);
     stopSoftapTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
-    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
     MiscServices::TimeServiceClient::GetInstance()->StartTimer(stopSoftapTimerId_, currentTime + mTimeoutDelay);
 }
 

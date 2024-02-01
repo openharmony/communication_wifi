@@ -505,6 +505,14 @@ public:
     int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0);
 
     /**
+     * @Description getConnectedBssid
+     *
+     * @param connectedBssid connectedBssid
+     * @param instId target wlan id
+     */
+    std::string GetConnectedBssid(int instId = 0);
+
+    /**
      * @Description Save link info
      *
      * @param info - input WifiLinkedInfo struct
@@ -1598,6 +1606,13 @@ public:
      */
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
 #endif
+    /**
+     * @Description Get next networkId
+     *
+     * @return int - next network id
+     */
+    int GetNextNetworkId();
+
 private:
     WifiSettings();
     void InitDefaultWifiConfig();
@@ -1618,6 +1633,7 @@ private:
     void InitPackageFilterConfig();
 
 private:
+    int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
     bool mWifiToggled;

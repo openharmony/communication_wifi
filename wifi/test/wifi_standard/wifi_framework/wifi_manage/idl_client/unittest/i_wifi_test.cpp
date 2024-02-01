@@ -33,7 +33,12 @@
 #undef LOG_TAG
 #define LOG_TAG "IWifiTest"
 
-using namespace testing::ext;
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 
@@ -352,10 +357,6 @@ HWTEST_F(IWifiTest, OnTransactTest1, TestSize.Level1)
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
-    MockWifiPublic::SetMockFlag(true);
-    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(OnTransact(mTestContext) == WIFI_IDL_OPT_FAILED);
-    MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(IWifiTest, OnTransactTest2, TestSize.Level1)

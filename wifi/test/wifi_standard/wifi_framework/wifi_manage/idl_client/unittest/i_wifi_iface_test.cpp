@@ -64,7 +64,7 @@ HWTEST_F(IWifiIfaceTest, GetTypeTest, TestSize.Level1)
     GetType(&type);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(GetName(ifname, size) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(GetType(&type) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -215,7 +215,7 @@ HWTEST_F(IWifiIfaceTest, IsChipSupportCsaTest, TestSize.Level1)
     IsChipSupportCsa(&isSupport);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(IsChipSupportCsa(&isSupport) == WIFI_IDL_OPT_FAILED);
+    EXPECT_FALSE(IsChipSupportCsa(&isSupport));
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -225,7 +225,7 @@ HWTEST_F(IWifiIfaceTest, IsChipSupportRadarDetectTest, TestSize.Level1)
     IsChipSupportRadarDetect(&isSupport);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(IsChipSupportRadarDetect(&isSupport) == WIFI_IDL_OPT_FAILED);
+    EXPECT_FALSE(IsChipSupportRadarDetect(&isSupport));
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -235,7 +235,7 @@ HWTEST_F(IWifiIfaceTest, IsChipSupportDfsChannelTest, TestSize.Level1)
     IsChipSupportDfsChannel(&isSupport);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(IsChipSupportDfsChannel(&isSupport) == WIFI_IDL_OPT_FAILED);
+    EXPECT_FALSE(IsChipSupportDfsChannel(&isSupport));
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -245,7 +245,7 @@ HWTEST_F(IWifiIfaceTest, IsChipSupportIndoorChannelTest, TestSize.Level1)
     IsChipSupportIndoorChannel(&isSupport);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(IsChipSupportIndoorChannel(&isSupport) == WIFI_IDL_OPT_FAILED);
+    EXPECT_FALSE(IsChipSupportIndoorChannel(&isSupport));
     MockWifiPublic::SetMockFlag(false);
 }
 

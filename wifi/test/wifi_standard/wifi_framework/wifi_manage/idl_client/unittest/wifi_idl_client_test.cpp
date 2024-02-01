@@ -413,7 +413,7 @@ HWTEST_F(WifiIdlClientTest, ExitAllClientTest, TestSize.Level1)
     mClient.ExitAllClient();
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(mClient.ExitAllClient() == WIFI_IDL_OPT_FAILED);
+    mClient.ExitAllClient();
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -672,7 +672,7 @@ HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest4, TestSize.Level1)
     mClient.SetDeviceConfig(networkId, config);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(mClient.GetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -834,10 +834,6 @@ HWTEST_F(WifiIdlClientTest, AddBlockByMacTest1, TestSize.Level1)
     int id = 1;
     std::string mac = "123456";
     EXPECT_TRUE(mClient.AddBlockByMac(mac, id) == WIFI_IDL_OPT_INPUT_MAC_INVALID);
-    MockWifiPublic::SetMockFlag(true);
-    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(mClient.GetStationList(mac, id) == WIFI_IDL_OPT_FAILED);
-    MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, AddBlockByMacTest2, TestSize.Level1)
@@ -1140,8 +1136,8 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1
     mClient.ReqP2pSetWpsSecondaryDeviceType(type);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(mClient.ReqP2pSetWpsSecondaryDeviceType(countryCode) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pSetWpsDeviceType(countryCode) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetWpsSecondaryDeviceType(type) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetWpsDeviceType(type) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1362,6 +1358,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pRemoveGroupTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqP2pInviteTest, TestSize.Level1)
 {
+    uint32_t cap = 1;
     WifiP2pGroupInfo group;
     std::string deviceAddr = "aa:bb:cc:dd:ee:ff";
     mClient.ReqP2pInvite(group, deviceAddr);
@@ -1369,7 +1366,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pInviteTest, TestSize.Level1)
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
     EXPECT_TRUE(mClient.ReqP2pInvite(group, deviceAddr) == WIFI_IDL_OPT_FAILED);
     EXPECT_TRUE(mClient.ReqP2pReinvoke(1, deviceAddr) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pGetGroupCapability(deviceAddr, 1) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pGetGroupCapability(deviceAddr, cap) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1519,7 +1516,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetGroupConfigTest, TestSize.Level1)
     mClient.ReqP2pSetGroupConfig(networkId, config);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(mClient.ReqP2pGetSupportFrequencies(networkId, config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetGroupConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 

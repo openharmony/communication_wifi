@@ -23,7 +23,6 @@
 #endif
 #include "uri.h"
 #include "wifi_country_code_manager.h"
-#include "wifi_datashare_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
@@ -151,20 +150,38 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByFactory(std::string &wifiCoun
 
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByMcc(std::string &wifiCountryCode)
 {
-    std::string regPlmn1;
+    // get cached plmn
+    char cachedPlmn[OPERATOR_NUMERIC_SIZE] = {0};
+    int errorCode = GetParamValue(OPERATOR_NUMERIC_KEY, DEFAULT_OPERATOR_NUMERIC, cachedPlmn, OPERATOR_NUMERIC_SIZE);
+    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE || strcasecmp(DEFAULT_OPERATOR_NUMERIC, cachedPlmn) == 0) {
+        WIFI_LOGE("get wifi country code by cached mcc fail, ret=%{public}d, cachedPlmn=%{public}s",
+            errorCode, cachedPlmn);
+        return WIFI_OPT_FAILED;
+    }
+    std::string cachedPlmnStr(cachedPlmn);
+    int integerCachedMcc = ConvertStringToInt(cachedPlmnStr.substr(PLMN_SUBSTR_LEFT, PLMN_SUBSTR_RIGHT));
+    if (ConvertMncToIso(integerCachedMcc, wifiCountryCode) != true) {
+        WIFI_LOGE("get wifi country code by cached mcc fail, cached plmn invalid, mcc=%{public}d", integerCachedMcc);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    // get dynamic plmn
+    std::string dynamicPlmn;
 #ifdef TELEPHONE_CORE_SERVICE_ENABLE
-    regPlmn1 = Str16ToStr8(Telephony::CoreServiceClient::GetInstance().GetOperatorNumeric(SLOT_ID));
+    dynamicPlmn = Str16ToStr8(Telephony::CoreServiceClient::GetInstance().GetOperatorNumeric(SLOT_ID));
 #endif
-    if (regPlmn1.empty() || regPlmn1.length() < PLMN_LEN) {
-        WIFI_LOGE("get wifi country code by mcc fail, plmn invalid, plmn=%{public}s", regPlmn1.c_str());
-        return WIFI_OPT_FAILED;
+    if (dynamicPlmn.empty() || dynamicPlmn.length() < PLMN_LEN) {
+        WIFI_LOGI("get wifi country code by dynamic mcc fail, plmn invalid, plmn=%{public}s, use cached plmn, "
+            "cache code=%{public}s", dynamicPlmn.c_str(), wifiCountryCode.c_str());
+        return WIFI_OPT_SUCCESS;
     }
-    int integerMcc = ConvertStringToInt(regPlmn1.substr(PLMN_SUBSTR_LEFT, PLMN_SUBSTR_RIGHT));
+    int integerMcc = ConvertStringToInt(dynamicPlmn.substr(PLMN_SUBSTR_LEFT, PLMN_SUBSTR_RIGHT));
     if (ConvertMncToIso(integerMcc, wifiCountryCode) != true) {
-        WIFI_LOGE("get wifi country code by mcc fail, mcc=%{public}d", integerMcc);
-        return WIFI_OPT_FAILED;
+        WIFI_LOGI("get wifi country code by dynamic mcc fail, convert fail, mcc=%{public}d, use cached plmn, "
+            "cache code=%{public}s", integerMcc, wifiCountryCode.c_str());
+        return WIFI_OPT_SUCCESS;
     }
-    WIFI_LOGI("get wifi country code by mcc success, mcc=%{public}d, code=%{public}s",
+    WIFI_LOGI("get wifi country code by dynamic mcc success, mcc=%{public}d, code=%{public}s",
         integerMcc, wifiCountryCode.c_str());
     return WIFI_OPT_SUCCESS;
 }
@@ -264,11 +281,11 @@ ErrCode WifiCountryCodePolicy::ParseCountryCodeElement(
         return WIFI_OPT_FAILED;
     }
     for (const auto &ie : infoElems) {
-        if (ie.id != COUNTRY_CODE_EID || ie.content.size() < COUNTRY_CODE_LENGTH) {
+        if (ie.id != COUNTRY_CODE_EID || ie.content.size() < WIFI_COUNTRY_CODE_LEN) {
             continue;
         }
         std::string tempWifiCountryCode;
-        for (int i = 0 ; i < COUNTRY_CODE_LENGTH; i++) {
+        for (int i = 0 ; i < WIFI_COUNTRY_CODE_LEN; i++) {
             tempWifiCountryCode.push_back(ie.content[i]);
         }
         if (!IsValidCountryCode(tempWifiCountryCode)) {

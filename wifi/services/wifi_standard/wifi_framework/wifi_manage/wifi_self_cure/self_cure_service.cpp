@@ -71,7 +71,7 @@ void SelfCureService::HandleRssiLevelChanged(int rssi)
 
 void SelfCureService::HandleP2pConnChanged(const WifiP2pLinkedInfo &info)
 {
-    WIFI_LOGI("HandleP2pConnChanged.\n");
+    WIFI_LOGD("self cure p2p connection state change, connectState = %{public}d", info.GetConnectState());
 }
 
 

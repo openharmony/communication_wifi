@@ -20,7 +20,7 @@
 #include "self_cure_state_machine.h"
 #include "wifi_errcode.h"
 #include "define.h"
-#include "self_cure_define.h"
+#include "self_cure_common.h"
 #include "wifi_service_manager.h"
 #include "ip2p_service_callbacks.h"
 

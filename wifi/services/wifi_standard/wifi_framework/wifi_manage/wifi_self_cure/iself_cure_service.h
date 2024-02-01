@@ -20,6 +20,7 @@
 #include "wifi_msg.h"
 #include "self_cure_service_callback.h"
 #include "ip2p_service_callbacks.h"
+#include "sta_service_callback.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -48,26 +49,11 @@ public:
     virtual IP2pServiceCallbacks GetP2pCallback();
 
     /**
-     * @Description rssi level changed
+     * @Description Get register sta callback
      *
-     * @param rssi
+     * @return StaServiceCallback - sta callback
      */
-    virtual void OnRssiLevelChanged(int rssi);
-
-    /**
-     * @Description sta connection change
-
-     * @param state - OperateResState
-     * @param info -  const WifiLinkedInfo
-     */
-    virtual void OnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
-
-    /**
-     * @Description sta connection change
-
-     * @param info -  const WifiP2pLinkedInfo
-     */
-    virtual void OnP2pConnChanged(const WifiP2pLinkedInfo &info);
+    virtual StaServiceCallback GetStaCallback();
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -66,19 +66,14 @@ ohos_shared_library("wifi_self_cure") {
 
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
 
   external_deps = [
-    "ability_base:want",
-    "ability_runtime:ability_manager",
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
-    "ipc:ipc_single",
-    "netmanager_base:net_conn_manager_if",
     "netstack:http_client",
   ]
 
@@ -86,10 +81,6 @@ ohos_shared_library("wifi_self_cure") {
 
   if (wifi_feature_with_local_random_mac) {
     defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
-  }
-
-  if (wifi_feature_with_random_mac_addr) {
-    defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   }
 
   cflags_cc = [

@@ -17,7 +17,6 @@
 #include <vector>
 #include <string>
 #include "wifi_logger.h"
-#include "wifi_net_agent.h"
 #include "mac_address.h"
 #include "wifi_sta_hal_interface.h"
 
@@ -816,7 +815,7 @@ bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int cu
         return false;
     }
     selfCureFailedCounter++;
-    pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, currentCureLevel, true);
+    pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, currentCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
     WIFI_LOGI("HTTP unreachable, self cure failed for %{public}d, selfCureHistoryInfo = %{public}s", currentCureLevel,
               pSelfCureStateMachine->GetSelfCureHistoryInfo().c_str());
@@ -1071,6 +1070,10 @@ bool SelfCureStateMachine::CanArpReachable()
     WifiSettings::GetInstance().GetIpInfo(ipInfo, m_instId);
     std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
     std::string ifName = "wlan" + std::to_string(m_instId);
+    if (ipInfo.gateway == 0) {
+        WIFI_LOGE("gateway is null");
+        return false;
+    }
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
     for (int i = 0; i < DEFAULT_SLOW_NUM_ARP_PINGS; i++) {
@@ -1325,27 +1328,27 @@ int SelfCureStateMachine::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info, std
     for (int i = 0; i < cnt; i++) {
         if (i == 0) {
             info.dnsSelfCureFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_1) {
+        } else if (i == POS_DNS_FAILED_TS) {
             info.lastDnsSelfCureFailedTs = stol(histories[i]);
-        } else if (i == SELF_CURE_NUM_2) {
+        } else if (i == POS_RENEW_DHCP_FAILED_CNT) {
             info.renewDhcpSelfCureFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_3) {
+        } else if (i == POS_RENEW_DHCP_FAILED_TS) {
             info.lastRenewDhcpSelfCureFailedTs = stol(histories[i]);
-        } else if (i == SELF_CURE_NUM_4) {
+        } else if (i == POS_STATIC_IP_FAILED_CNT) {
             info.staticIpSelfCureFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_5) {
+        } else if (i == POS_STATIC_IP_FAILED_TS) {
             info.lastStaticIpSelfCureFailedTs = stol(histories[i]);
-        } else if (i == SELF_CURE_NUM_6) {
+        } else if (i == POS_REASSOC_FAILED_CNT) {
             info.reassocSelfCureFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_7) {
+        } else if (i == POS_REASSOC_FAILED_TS) {
             info.lastReassocSelfCureFailedTs = stol(histories[i]);
-        } else if (i == SELF_CURE_NUM_8) {
+        } else if (i == POS_RANDMAC_FAILED_CNT) {
             info.randMacSelfCureFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_9) {
+        } else if (i == POS_RANDMAC_FAILED_TS) {
             info.lastRandMacSelfCureFailedCntTs = stol(histories[i]);
-        } else if (i == SELF_CURE_NUM_10) {
+        } else if (i == POS_RESET_FAILED_CNT) {
             info.resetSelfCureFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_11) {
+        } else if (i == POS_RESET_FAILED_TS) {
             info.lastResetSelfCureFailedTs = stol(histories[i]);
         } else {
             WIFI_LOGI("exception happen.");
@@ -1363,17 +1366,17 @@ int SelfCureStateMachine::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &in
     }
     // 12 to 17 is history subscript, which record the selfcure connect failed info, covert array to calss member
     for (int i = cnt; i < SELFCURE_HISTORY_LENGTH; i++) {
-        if (i == SELF_CURE_NUM_12) {
+        if (i == POS_REASSOC_CONNECT_FAILED_CNT) {
             info.reassocSelfCureConnectFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_13) {
+        } else if (i == POS_REASSOC_CONNECT_FAILED_TS) {
             info.lastReassocSelfCureConnectFailedTs = stol(histories[i]);
-        } else if (i == SELF_CURE_NUM_14) {
+        } else if (i == POS_RANDMAC_CONNECT_FAILED_CNT) {
             info.randMacSelfCureConnectFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_15) {
+        } else if (i == POS_RANDMAC_CONNECT_FAILED_TS) {
             info.lastRandMacSelfCureConnectFailedCntTs = stol(histories[i]);
-        } else if (i == SELF_CURE_NUM_16) {
+        } else if (i == POS_RESET_CONNECT_FAILED_CNT) {
             info.resetSelfCureConnectFailedCnt = stoi(histories[i]);
-        } else if (i == SELF_CURE_NUM_17) {
+        } else if (i == POS_RESET_CONNECT_FAILED_TS) {
             info.lastResetSelfCureConnectFailedTs = stol(histories[i]);
         } else {
             WIFI_LOGI("exception happen.");
@@ -1517,11 +1520,11 @@ bool AllowSelfCure(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel)
 bool DealDns(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
 {
     if (historyInfo.dnsSelfCureFailedCnt == 0 ||
-        (historyInfo.dnsSelfCureFailedCnt == SELF_CURE_NUM_1 &&
+        (historyInfo.dnsSelfCureFailedCnt == SELF_CURE_FAILED_ONE_CNT &&
          (currentMs - historyInfo.lastDnsSelfCureFailedTs > DELAYED_DAYS_LOW)) ||
-        (historyInfo.dnsSelfCureFailedCnt == SELF_CURE_NUM_2 &&
+        (historyInfo.dnsSelfCureFailedCnt == SELF_CURE_FAILED_TWO_CNT &&
          (currentMs - historyInfo.lastDnsSelfCureFailedTs > DELAYED_DAYS_MID)) ||
-        (historyInfo.dnsSelfCureFailedCnt >= SELF_CURE_NUM_3 &&
+        (historyInfo.dnsSelfCureFailedCnt >= SELF_CURE_FAILED_THREE_CNT &&
          (currentMs - historyInfo.lastDnsSelfCureFailedTs > DELAYED_DAYS_HIGH))) {
         return true;
     }
@@ -1538,12 +1541,12 @@ bool DealRenewDhcp(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, l
 
 bool DealStaticIp(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
 {
-    if (historyInfo.staticIpSelfCureFailedCnt <= SELF_CURE_NUM_4 ||
-        (historyInfo.staticIpSelfCureFailedCnt == SELF_CURE_NUM_5 &&
+    if (historyInfo.staticIpSelfCureFailedCnt <= SELF_CURE_FAILED_FOUR_CNT ||
+        (historyInfo.staticIpSelfCureFailedCnt == SELF_CURE_FAILED_FIVE_CNT &&
          (currentMs - historyInfo.lastStaticIpSelfCureFailedTs > DELAYED_DAYS_LOW)) ||
-        (historyInfo.staticIpSelfCureFailedCnt == SELF_CURE_NUM_6 &&
+        (historyInfo.staticIpSelfCureFailedCnt == SELF_CURE_FAILED_SIX_CNT &&
          (currentMs - historyInfo.lastStaticIpSelfCureFailedTs > DELAYED_DAYS_MID)) ||
-        (historyInfo.staticIpSelfCureFailedCnt >= SELF_CURE_NUM_7 &&
+        (historyInfo.staticIpSelfCureFailedCnt >= SELF_CURE_FAILED_SEVEN_CNT &&
          (currentMs - historyInfo.lastStaticIpSelfCureFailedTs > DELAYED_DAYS_HIGH))) {
         return true;
     }
@@ -1553,11 +1556,11 @@ bool DealStaticIp(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, lo
 bool DealMiddleReassoc(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
 {
     if ((historyInfo.reassocSelfCureFailedCnt == 0 ||
-        (historyInfo.reassocSelfCureFailedCnt == SELF_CURE_NUM_1 &&
+        (historyInfo.reassocSelfCureFailedCnt == SELF_CURE_FAILED_ONE_CNT &&
          (currentMs - historyInfo.lastReassocSelfCureFailedTs > DELAYED_DAYS_LOW)) ||
-        (historyInfo.reassocSelfCureFailedCnt == SELF_CURE_NUM_2 &&
+        (historyInfo.reassocSelfCureFailedCnt == SELF_CURE_FAILED_TWO_CNT &&
          (currentMs - historyInfo.lastReassocSelfCureFailedTs > DELAYED_DAYS_MID)) ||
-        (historyInfo.reassocSelfCureFailedCnt >= SELF_CURE_NUM_3 &&
+        (historyInfo.reassocSelfCureFailedCnt >= SELF_CURE_FAILED_THREE_CNT &&
          (currentMs - historyInfo.lastReassocSelfCureFailedTs > DELAYED_DAYS_HIGH))) &&
         AllowSelfCure(historyInfo, requestCureLevel)) {
         return true;
@@ -1575,12 +1578,12 @@ bool DealRandMacReassoc(WifiSelfCureHistoryInfo &historyInfo, int requestCureLev
 
 bool DealHighReset(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
 {
-    if ((historyInfo.resetSelfCureFailedCnt <= SELF_CURE_NUM_1 ||
-        (historyInfo.resetSelfCureFailedCnt == SELF_CURE_NUM_2 &&
+    if ((historyInfo.resetSelfCureFailedCnt <= SELF_CURE_FAILED_ONE_CNT ||
+        (historyInfo.resetSelfCureFailedCnt == SELF_CURE_FAILED_TWO_CNT &&
          (currentMs - historyInfo.lastResetSelfCureFailedTs > DELAYED_DAYS_LOW)) ||
-        (historyInfo.resetSelfCureFailedCnt == SELF_CURE_NUM_3 &&
+        (historyInfo.resetSelfCureFailedCnt == SELF_CURE_FAILED_THREE_CNT &&
          (currentMs - historyInfo.lastResetSelfCureFailedTs > DELAYED_DAYS_MID)) ||
-        (historyInfo.resetSelfCureFailedCnt >= SELF_CURE_NUM_4 &&
+        (historyInfo.resetSelfCureFailedCnt >= SELF_CURE_FAILED_FOUR_CNT &&
          (currentMs - historyInfo.lastResetSelfCureFailedTs > DELAYED_DAYS_HIGH))) &&
         AllowSelfCure(historyInfo, requestCureLevel)) {
         return true;

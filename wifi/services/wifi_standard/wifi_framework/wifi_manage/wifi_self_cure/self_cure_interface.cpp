@@ -36,7 +36,7 @@ SelfCureInterface::~SelfCureInterface()
 
 extern "C" ISelfCureService *Create(int instId = 0)
 {
-    return new (std::nothrow)SelfCureInterface(instId);
+    return new (std::nothrow) SelfCureInterface(instId);
 }
 
 extern "C" void Destroy(ISelfCureService *pservice)
@@ -56,8 +56,6 @@ ErrCode SelfCureInterface::InitSelfCureService()
             return WIFI_OPT_FAILED;
         }
         InitCallback();
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-        pService->RegisterStaServiceCallback(GetStaCallback());
         if (pSelfCureService->InitSelfCureService() != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("InitSelfCureService failed.\n");
             delete pSelfCureService;
@@ -70,12 +68,13 @@ ErrCode SelfCureInterface::InitSelfCureService()
 
 ErrCode SelfCureInterface::InitCallback()
 {
+    using namespace std::placeholders;
     WIFI_LOGD("Enter SelfCureInterface::InitCallback");
     mStaCallback.callbackModuleName = "SelfCureService";
-    mStaCallback.OnStaConnChanged = DealStaConnChanged;
-    mStaCallback.OnStaRssiLevelChanged = DealRssiLevelChanged;
+    mStaCallback.OnStaConnChanged = std::bind(&SelfCureInterface::DealStaConnChanged, this, _1, _2, _3);
+    mStaCallback.OnStaRssiLevelChanged = std::bind(&SelfCureInterface::DealRssiLevelChanged, this, _1, _2);
     mP2pCallback.callbackModuleName = "SelfCureService";
-    mP2pCallback.OnP2pConnectionChangedEvent = DealP2pConnChanged;
+    mP2pCallback.OnP2pConnectionChangedEvent = std::bind(&SelfCureInterface::DealP2pConnChanged, this, _1);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -91,43 +90,19 @@ IP2pServiceCallbacks SelfCureInterface::GetP2pCallback()
     return mP2pCallback;
 }
 
-void SelfCureInterface::OnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
+void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     pSelfCureService->HandleStaConnChanged(state, info);
 }
 
-void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
-{
-    ISelfCureService *mSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
-    if (mSelfCureService != nullptr) {
-        mSelfCureService->OnStaConnChanged(state, info);
-    }
-}
-
-void SelfCureInterface::OnRssiLevelChanged(int rssi)
+void SelfCureInterface::DealRssiLevelChanged(int rssi, int instId)
 {
     pSelfCureService->HandleRssiLevelChanged(rssi);
 }
 
-void SelfCureInterface::OnP2pConnChanged(const WifiP2pLinkedInfo &info)
-{
-    pSelfCureService->HandleP2pConnChanged(info);
-}
-
-void SelfCureInterface::DealRssiLevelChanged(int rssi, int instId)
-{
-    ISelfCureService *mSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
-    if (mSelfCureService != nullptr) {
-        mSelfCureService->OnRssiLevelChanged(rssi);
-    }
-}
-
 void SelfCureInterface::DealP2pConnChanged(const WifiP2pLinkedInfo &info)
 {
-    ISelfCureService *mSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst();
-    if (mSelfCureService != nullptr) {
-        mSelfCureService->OnP2pConnChanged(info);
-    }
+    pSelfCureService->HandleP2pConnChanged(info);
 }
 
 ErrCode SelfCureInterface::RegisterSelfCureServiceCallback(const SelfCureServiceCallback &callbacks)

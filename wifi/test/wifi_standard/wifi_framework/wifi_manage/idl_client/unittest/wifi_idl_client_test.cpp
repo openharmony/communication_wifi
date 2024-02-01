@@ -1011,7 +1011,7 @@ HWTEST_F(WifiIdlClientTest, ReqWpaSetCountryCodeTest1, TestSize.Level1)
     std::string countryCode = "adaf";
     EXPECT_TRUE(mClient.ReqWpaSetCountryCode(countryCode) == WIFI_IDL_OPT_INVALID_PARAM);
     countryCode = "af";
-    mClient.ReqWpaSetCountryCode(countryCode)
+    mClient.ReqWpaSetCountryCode(countryCode);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_TRUE(mClient.ReqWpaSetCountryCode(countryCode) == WIFI_IDL_OPT_FAILED);
     EXPECT_TRUE(mClient.ReqWpaGetCountryCode(countryCode) == WIFI_IDL_OPT_FAILED);

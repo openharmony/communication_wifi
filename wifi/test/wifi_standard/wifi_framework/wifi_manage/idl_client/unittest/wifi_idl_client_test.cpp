@@ -456,7 +456,6 @@ HWTEST_F(WifiIdlClientTest, ScanTest2, TestSize.Level1)
     scanParam.scanFreqs.push_back(FREQUENCY2);
     scanParam.scanStyle = 1;
     EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_IDL_OPT_FAILED);
-
 }
 
 HWTEST_F(WifiIdlClientTest, ScanTest3, TestSize.Level1)

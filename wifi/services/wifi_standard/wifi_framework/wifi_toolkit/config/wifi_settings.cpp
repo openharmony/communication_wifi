@@ -339,7 +339,6 @@ void WifiSettings::ConfigsDeduplicateAndSave(const std::vector<WifiDeviceConfig>
         std::string configKey = config.ssid + config.keyMgmt;
         auto iter = tmp.find(configKey);
         if (iter == tmp.end()) {
-            diffConfigs.push_back(config);
             localConfigs.push_back(config);
         }
     }

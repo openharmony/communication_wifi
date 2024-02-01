@@ -25,6 +25,7 @@
 #include "wifi_common_def.h"
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
+
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int RANDOM_PASSWD_LEN = 8;
 constexpr int MSEC = 1000;
@@ -48,7 +49,6 @@ constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
-
 
 constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
 constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
@@ -1613,6 +1613,15 @@ public:
      */
     int GetNextNetworkId();
 
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Merge Localconfigs with cloneConfigs
+     *
+     * @param cloneData - wifi xml config
+     */
+    void MergeWifiCloneConfig(const std::string &cloneData);
+#endif
+
 private:
     WifiSettings();
     void InitDefaultWifiConfig();
@@ -1629,6 +1638,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     void MergeSoftapConfig();
     void MergeWifiConfig();
+    void ConfigsDeduplicateAndSave(const std::vector<WifiDeviceConfig> &newConfigs);
 #endif
     void InitPackageFilterConfig();
 

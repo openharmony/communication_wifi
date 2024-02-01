@@ -292,13 +292,61 @@ void WifiSettings::MergeSoftapConfig()
         LOGE("MergeSoftapConfig Parse fail");
         return;
     }
-    std::vector<HotspotConfig> hotspotConfig =  xmlParser->GetSoftapConfigs();
+    std::vector<HotspotConfig> hotspotConfig = xmlParser->GetSoftapConfigs();
     if (hotspotConfig.size() == 0) {
         LOGE("MergeSoftapConfig hotspotConfig empty");
         return;
     }
     mSavedHotspotConfig.SetValue(hotspotConfig);
     mSavedHotspotConfig.SaveConfig();
+}
+
+void WifiSettings::MergeWifiCloneConfig(const std::string &cloneData)
+{
+    LOGI("MergeWifiCloneConfig enter");
+    std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
+    bool ret = xmlParser->LoadConfigurationMemory(cloneData.c_str());
+    if (!ret) {
+        LOGE("MergeWifiCloneConfig load fail");
+        return;
+    }
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("MergeWifiCloneConfig Parse fail");
+        return;
+    }
+    std::vector<WifiDeviceConfig> cloneConfigs = xmlParser->GetNetworks();
+
+    ConfigsDeduplicateAndSave(cloneConfigs);
+}
+
+void WifiSettings::ConfigsDeduplicateAndSave(const std::vector<WifiDeviceConfig> &newConfigs)
+{
+    if (newConfigs.size() == 0) {
+        LOGE("NewConfigs is empty!");
+        return;
+    }
+    mSavedDeviceConfig.LoadConfig();
+    std::vector<WifiDeviceConfig> localConfigs;
+    mSavedDeviceConfig.GetValue(localConfigs);
+
+    std::set<std::string> tmp;
+    for (const auto &localConfig : localConfigs) {
+        std::string configKey = localConfig.ssid + localConfig.keyMgmt;
+        tmp.insert(configKey);
+    }
+    for (const auto &config : newConfigs) {
+        std::string configKey = config.ssid + config.keyMgmt;
+        auto iter = tmp.find(configKey);
+        if (iter == tmp.end()) {
+            diffConfigs.push_back(config);
+            localConfigs.push_back(config);
+        }
+    }
+
+    mSavedDeviceConfig.SetValue(localConfigs);
+    mSavedDeviceConfig.SaveConfig();
+    ReloadDeviceConfig();
 }
 #endif
 

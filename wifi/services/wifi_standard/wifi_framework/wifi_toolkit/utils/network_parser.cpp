@@ -19,6 +19,8 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("NetworkXmlParser");
+constexpr auto XML_TAG_MIGRATE_DOCUMENT_HEADER = "WifiConfigStoreData";
+constexpr auto XML_TAG_CLONE_DOCUMENT_HEADER = "WifiBackupData";
 constexpr auto XML_TAG_SECTION_HEADER_NETWORK_LIST = "NetworkList";
 constexpr auto XML_TAG_SECTION_HEADER_NETWORK = "Network";
 constexpr auto XML_TAG_SECTION_HEADER_WIFI_CONFIGURATION = "WifiConfiguration";
@@ -440,19 +442,50 @@ void NetworkXmlParser::ParseMacMap()
     }
 }
 
+NetworkParseType NetworkXmlParser::GetParseType(xmlNodePtr node)
+{
+    if (node == nullptr) {
+        WIFI_LOGE("GetParseType node null");
+        return NetworkParseType::UNKNOWN;
+    }
+
+    if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_MIGRATE_DOCUMENT_HEADER)) == 0) {
+        return NetworkParseType::MIGRATE;
+    } else if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_CLONE_DOCUMENT_HEADER)) == 0) {
+        return NetworkParseType::CLONE;
+    }
+    return NetworkParseType::UNKNOWN;
+}
+
 bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
 {
     if (node == nullptr) {
         WIFI_LOGE("ParseInternal node null");
         return false;
     }
-    if (IsDocValid(node) != true) {
-        WIFI_LOGE("ParseInternal Doc invalid");
+
+    NetworkParseType parseType = GetParseType(node);
+    if (parseType == NetworkParseType::UNKNOWN) {
+        WIFI_LOGE("ParseInternal Doc invaild");
         return false;
     }
+    WIFI_LOGI("ParseInternal parseType: %{public}d.", static_cast<int>(parseType));
+
     ParseNetworkList(node);
-    ParseMacMap();
+    if (parseType == NetworkParseType::CLONE) {
+        // Enable all networks restored and no need to parse randommac.
+        EnableNetworks();
+    } else if (parseType == NetworkParseType::MIGRATE) {
+        ParseMacMap();
+    }
     return true;
+}
+
+void NetworkXmlParser::EnableNetworks()
+{
+    for (auto &wifiConfig : wifiConfigs) {
+        wifiConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
+    }
 }
 
 bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)

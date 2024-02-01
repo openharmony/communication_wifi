@@ -45,6 +45,7 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_p2p_hal_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_supplicant_hal_interface.cpp",
+    "mock_wifi_public.cpp",
     "i_wifi_iface_test.cpp",
     "i_wifi_test.cpp",
     "wifi_chip_hal_interface_test.cpp",
@@ -87,6 +88,9 @@ ohos_unittest("idl_client_unittest") {
   ldflags = [
     "-fPIC",
     "--coverage",
+    "-Wl,-E",
+    "-Wl,-rpath=/system/lib/",
+    "-Wl,--wrap=RemoteCall",
   ]
 
   external_deps = [

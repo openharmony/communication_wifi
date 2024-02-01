@@ -52,6 +52,15 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+class CustNetPreferredNetworkSelector : public SimpleNetworkSelector, public SimpleWifiFilter {
+public:
+    CustNetPreferredNetworkSelector();
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+#endif
+
 class RecoveryNetworkSelector : public SimpleNetworkSelector, public SimpleWifiFilter {
 public:
     RecoveryNetworkSelector();

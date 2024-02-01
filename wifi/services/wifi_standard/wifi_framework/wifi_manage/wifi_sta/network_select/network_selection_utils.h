@@ -170,6 +170,15 @@ public:
      * @return json format string
      */
     static std::string GetScoreMsg(ScoreResult &scoreResult);
+
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    /**
+     * Get vendor country from param to determine it is ItDevice.
+     * @param non
+     * @return return true if the vendor country is ItDevice
+     */
+    static bool CheckDeviceTypeByVendorCountry();
+#endif
 };
 }
 }

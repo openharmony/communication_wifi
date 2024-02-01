@@ -73,12 +73,22 @@ SavedNetworkSelector::SavedNetworkSelector() : CompositeNetworkSelector("savedNe
     andFilter->AddFilter(make_shared<WifiFunctionFilterAdapter>(NetworkSelectionUtils::IsMatchUserSelected,
                                                                 "matchUserSelected"));
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG, *andFilter);
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    shared_ptr<CustNetPreferredNetworkSelector> custNetPreferredNetworkSelector = nullptr;
+    if (NetworkSelectionUtils::CheckDeviceTypeByVendorCountry()) {
+        custNetPreferredNetworkSelector = make_shared<CustNetPreferredNetworkSelector>();
+    }
+#endif
     auto blackListNetworkSelector = make_shared<BlackListNetworkSelector>();
     auto hasInternetNetworkSelector = make_shared<HasInternetNetworkSelector>();
     auto recoveryNetworkSelector = make_shared<RecoveryNetworkSelector>();
     auto portalNetworkSelector = make_shared<PortalNetworkSelector>();
     portalNetworkSelector->InitFilter();
     auto noInternetNetworkSelector = make_shared<NoInternetNetworkSelector>();
+
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    andFilter->AddFilter(custNetPreferredNetworkSelector);
+#endif
     andFilter->AddFilter(blackListNetworkSelector);
     andFilter->AddFilter(hasInternetNetworkSelector);
     andFilter->AddFilter(recoveryNetworkSelector);
@@ -91,6 +101,9 @@ SavedNetworkSelector::SavedNetworkSelector() : CompositeNetworkSelector("savedNe
      * subNetworkSelectors is not empty, the network selection result of other subNetworkSelectors inserted later will
      * be abandoned.
      */
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    AddSubNetworkSelector(custNetPreferredNetworkSelector);
+#endif
     AddSubNetworkSelector(hasInternetNetworkSelector);
     AddSubNetworkSelector(recoveryNetworkSelector);
     AddSubNetworkSelector(portalNetworkSelector);
@@ -156,6 +169,26 @@ bool HasInternetNetworkSelector::Filter(NetworkCandidate &networkCandidate)
     TryNominate(networkCandidate);
     return networkCandidates.empty();
 }
+
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+CustNetPreferredNetworkSelector::CustNetPreferredNetworkSelector()
+    : SimpleNetworkSelector("custNetPreferredNetworkSelector"), SimpleWifiFilter("custNetPreferredNetworkSelector")
+{
+    auto filters = make_shared<OrWifiFilter>();
+    ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::IT_NETWORK_SELECTOR_FILTER_TAG,
+                                                              *filters);
+    SetWifiFilter(filters);
+    auto networkScoreComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
+    networkScoreComparator->AddScorer(make_shared<SavedNetworkScorer>("custNetPreferredNetworkScorer"));
+    networkScoreComparator->AddScorer(make_shared<RssiScorer>());
+    SetWifiComparator(networkScoreComparator);
+}
+
+bool CustNetPreferredNetworkSelector::Filter(NetworkCandidate &networkCandidate)
+{
+    return !NetworkSelector::TryNominate(networkCandidate);
+}
+#endif
 
 RecoveryNetworkSelector::RecoveryNetworkSelector() : SimpleNetworkSelector("recoveryNetworkSelector"),
                                                      SimpleWifiFilter("recoveryNetworkSelector")

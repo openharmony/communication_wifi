@@ -2082,40 +2082,6 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
     return ret;
 }
 
-void StaStateMachine::SyncAllDeviceConfigs()
-{
-    std::vector<WifiDeviceConfig> result;
-    WifiIdlDeviceConfig idlConfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(result) != -1) {
-        for (std::vector<WifiDeviceConfig>::iterator it = result.begin(); it != result.end(); ++it) {
-            if (isWpsConnect == IsWpsConnected::WPS_CONNECTED && it->networkId == 0) {
-                continue;
-            }
-            if (WifiStaHalInterface::GetInstance().GetNextNetworkId(it->networkId) == WIFI_IDL_OPT_OK) {
-                WIFI_LOGI("GetNextNetworkId succeed");
-                idlConfig.networkId = it->networkId;
-                idlConfig.ssid = it->ssid;
-                idlConfig.psk = it->preSharedKey;
-                idlConfig.keyMgmt = it->keyMgmt;
-                idlConfig.priority = it->priority;
-                idlConfig.scanSsid = it->hiddenSSID ? 1 : 0;
-                FillEapCfg(*it, idlConfig);
-                if (WifiStaHalInterface::GetInstance().SetDeviceConfig(it->networkId, idlConfig) != WIFI_IDL_OPT_OK) {
-                    WIFI_LOGE("SetDeviceConfig failed!");
-                }
-                WIFI_LOGD("SetDeviceConfig succeed!");
-            } else {
-                WIFI_LOGE("GetNextNetworkId failed!");
-            }
-            WIFI_LOGD("networkId = %{public}d", it->networkId);
-            WifiStaHalInterface::GetInstance().SaveDeviceConfig();
-        }
-        WIFI_LOGD("Synchronizing network information!");
-    } else {
-        WIFI_LOGE("The Device config in WifiSettings is empty!");
-    }
-}
-
 int StaStateMachine::RegisterCallBack()
 {
     clientCallBack.OnIpSuccessChanged = DhcpResultNotify::OnSuccess;

@@ -24,5 +24,10 @@ void WifiLocationModeObserver::OnChange()
 {
     WifiManager::GetInstance().GetWifiEventSubscriberManager()->DealLocationModeChangeEvent();
 }
+
+void WifiCloneModeObserver::OnChange()
+{
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->DealCloneDataChangeEvent();
+}
 }
 }

@@ -147,6 +147,44 @@ HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare();
 }
 
+HWTEST_F(WifiManagerTest, GetCloneDataByDatashareTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetCloneDataByDatashareTest enter!");
+    std::string result;
+    wifiManager.wifiEventSubscriberManager->GetCloneDataByDatashare(result);
+}
+
+HWTEST_F(WifiManagerTest, SetCloneDataByDatashareTest, TestSize.Level1)
+{
+    WIFI_LOGI("SetCloneDataByDatashareTest enter!");
+    std::string result = "";
+    wifiManager.wifiEventSubscriberManager->SetCloneDataByDatashare(result);
+}
+
+HWTEST_F(WifiManagerTest, DealCloneDataChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealCloneDataChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->DealCloneDataChangeEvent();
+}
+
+HWTEST_F(WifiManagerTest, IsDataMgrServiceActiveTest, TestSize.Level1)
+{
+    WIFI_LOGI("IsDataMgrServiceActiveTest enter!");
+    wifiManager.wifiEventSubscriberManager->IsDataMgrServiceActive();
+}
+
+HWTEST_F(WifiManagerTest, RegisterCloneEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("RegisterCloneEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->RegisterCloneEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterCloneEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("UnRegisterCloneEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->UnRegisterCloneEvent();
+}
+
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)
 {
     WIFI_LOGE("CheckAndStartScanService_001 enter!");

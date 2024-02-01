@@ -805,7 +805,6 @@ HWTEST_F(WifiIdlClientTest, DelBlockByMacTest1, TestSize.Level1)
     int id = 1;
     std::string mac = "00:00:11";
     EXPECT_TRUE(mClient.DelBlockByMac(mac, id) == WIFI_IDL_OPT_INPUT_MAC_INVALID);
-    
 }
 
 HWTEST_F(WifiIdlClientTest, DelBlockByMacTest2, TestSize.Level1)

@@ -47,7 +47,7 @@ int __wrap_RemoteCall(RpcClient *client)
     if (g_mockTag) {
         return MockWifiPublic::GetInstance().RemoteCall(client);
     } else {
-        return __real_open(client);
+        return __real_RemoteCall(client);
     }
 }
 #ifdef __cplusplus

@@ -79,20 +79,6 @@ WifiErrorNo HdiWpaStart();
 WifiErrorNo HdiWpaStop();
 
 /**
- * @Description Create a ap channel between the HAL and the driver.
- *
- * @return WifiErrorNo - operation result
- */
-WifiErrorNo HdiApStart(int id, char *hostapdCfg);
-
-/**
- * @Description Stop the created ap channel.
- *
- * @return WifiErrorNo - operation result
- */
-WifiErrorNo HdiApStop(int id, char *ifaceName);
-
-/**
  * @Description Add interface.
  *
  * @return WifiErrorNo - operation result
@@ -114,13 +100,6 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName);
 struct IWpaInterface* GetWpaInterface();
 
 /**
- * @Description Create the Ap object.
- *
- * @return WifiErrorNo - operation result
- */
-struct IHostapdInterface* GetApInterface();
-
-/**
  * @Description copy file.
  *
  * @return WifiErrorNo - operation result
@@ -135,6 +114,29 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath);
 WifiErrorNo CopyConfigFile(const char* configName);
 
 void HdiWpaResetGlobalObj();
+
+/**
+ * @Description Create a ap channel between the HAL and the driver.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiApStart(int id);
+
+/**
+ * @Description Stop the created ap channel.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiApStop(int id);
+
+/**
+ * @Description Create the Ap object.
+ *
+ * @return WifiErrorNo - operation result
+ */
+struct IHostapdInterface* GetApInterface();
+void InitCfg(char *ifaceName);
+char *GetApIfaceName();
 
 #ifdef __cplusplus
 }

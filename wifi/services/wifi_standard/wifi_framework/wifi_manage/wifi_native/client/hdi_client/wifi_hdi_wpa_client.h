@@ -298,7 +298,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetCountryCode(const std::string &countryCode);
-
+    WifiErrorNo ReqWpaGetCountryCode(std::string &countryCode);
     /**
      * @Description Send suspend mode to wpa
      *
@@ -306,6 +306,8 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
+    WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
+    WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
 
     /* ************************ softAp Interface ************************** */
     /**
@@ -782,7 +784,6 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetPowerMode(bool mode) const;
-
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

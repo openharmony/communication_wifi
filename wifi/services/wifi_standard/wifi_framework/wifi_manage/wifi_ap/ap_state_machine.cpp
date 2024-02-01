@@ -112,7 +112,7 @@ bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t
 {
     WIFI_LOGI("Enter:StartDhcpServer leaseTime:%{public}d", leaseTime);
 #ifndef WIFI_DHCP_DISABLED
-    Ipv4Address ipv4(Ipv4Address::INVALID_INET_ADDRESS);
+    Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
     if (!m_DhcpdInterface.StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, true, leaseTime)) {

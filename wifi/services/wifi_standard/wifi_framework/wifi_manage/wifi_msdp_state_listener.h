@@ -24,6 +24,7 @@ namespace Wifi {
 class DeviceMovementCallback : public Msdp::MovementCallbackStub {
 public:
     DeviceMovementCallback() = default;
+    ~DeviceMovementCallback() = default;
     void OnMovementChanged(const Msdp::MovementDataUtils::MovementData &movementData) override;
 };
 

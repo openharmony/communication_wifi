@@ -29,6 +29,8 @@ public:
         ApStartedState &apStartedState, ApMonitor &apMonitor)
         : ApStateMachine(apStationsManager, apRootState, apIdleState, apStartedState, apMonitor)
     {}
+    ~MockApStateMachine()
+    {}
     void SwitchState(State *targetState);
     void CreateMessage();
     void SendMessage(int what);

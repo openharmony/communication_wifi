@@ -43,7 +43,6 @@ WifiErrorNo HdiSetMacFilter(const char *mac, int id);
 WifiErrorNo HdiDelMacFilter(const char *mac, int id);
 WifiErrorNo HdiGetStaInfos(char *buf, int size, int id);
 WifiErrorNo HdiDisassociateSta(const char *mac, int id);
-void InitCfg(char *ifaceName);
 
 #ifdef __cplusplus
 }

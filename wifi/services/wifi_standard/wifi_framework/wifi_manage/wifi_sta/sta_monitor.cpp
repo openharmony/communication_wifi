@@ -29,12 +29,12 @@ StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 
 StaMonitor::~StaMonitor()
 {
-    WIFI_LOGI("StaMonitor::~StaMonitor");
+    WIFI_LOGI("~StaMonitor");
 }
 
 ErrCode StaMonitor::InitStaMonitor()
 {
-    WIFI_LOGI("Enter StaMonitor::InitStaMonitor.\n");
+    WIFI_LOGI("Enter InitStaMonitor.\n");
     using namespace std::placeholders;
     WifiEventCallback callBack = {
         std::bind(&StaMonitor::OnConnectChangedCallBack, this, _1, _2, _3),
@@ -48,7 +48,7 @@ ErrCode StaMonitor::InitStaMonitor()
     };
 
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("StaMonitor::InitStaMonitor RegisterStaEventCallback failed!");
+        WIFI_LOGE("InitStaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -56,10 +56,10 @@ ErrCode StaMonitor::InitStaMonitor()
 
 NO_SANITIZE("cfi") ErrCode StaMonitor::UnInitStaMonitor() const
 {
-    WIFI_LOGI("Enter StaMonitor::UnInitStaMonitor.\n");
+    WIFI_LOGI("Enter UnInitStaMonitor.\n");
     WifiEventCallback callBack;
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("StaMonitor::~StaMonitor RegisterStaEventCallback failed!");
+        WIFI_LOGE("~StaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

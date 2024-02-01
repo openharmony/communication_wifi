@@ -38,7 +38,7 @@ ConcreteMangerMachine::ConcreteMangerMachine()
 
 ConcreteMangerMachine::~ConcreteMangerMachine()
 {
-    WIFI_LOGE("ConcreteMangerMachine::~ConcreteMangerMachine");
+    WIFI_LOGE("~ConcreteMangerMachine");
     StopHandlerThread();
     ParsePointer(pDefaultState);
     ParsePointer(pIdleState);
@@ -52,7 +52,7 @@ ConcreteMangerMachine::~ConcreteMangerMachine()
 /* --------------------------Initialization functions--------------------------*/
 ErrCode ConcreteMangerMachine::InitConcreteMangerMachine()
 {
-    WIFI_LOGE("Enter ConcreteMangerMachine::InitConcreteMangerMachine.\n");
+    WIFI_LOGE("Enter InitConcreteMangerMachine.\n");
     if (!InitialStateMachine()) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;

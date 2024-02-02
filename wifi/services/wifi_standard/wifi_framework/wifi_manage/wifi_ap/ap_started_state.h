@@ -260,6 +260,7 @@ private:
     ApMonitor &m_ApMonitor;
     int m_id;
     bool idleTimerExist = false;
+    mutable std::string m_wifiCountryCode;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -60,8 +60,6 @@ private:
     void OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnGetIpInfo(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnGetIpV6Info(uint32_t code, IpcIo *req, IpcIo *reply);
-    void OnSetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply);
-    void OnGetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnGetSignalLevel(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnGetSupportedFeatures(uint32_t code, IpcIo *req, IpcIo *reply);

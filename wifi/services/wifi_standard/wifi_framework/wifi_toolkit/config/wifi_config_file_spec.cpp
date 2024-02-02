@@ -52,6 +52,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.noInternetAccess = false;
     item.callProcessName.clear();
     item.ancoCallProcessName.clear();
+    item.internetSelfCureHistory.clear();
     return;
 }
 
@@ -145,6 +146,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.lastHasInternetTime = std::stol(value);
     } else if (key == "noInternetAccess") {
         item.noInternetAccess = std::stoi(value);
+    } else if (key == "internetSelfCureHistory") {
+        item.internetSelfCureHistory = value;
     } else {
         return -1;
     }
@@ -487,6 +490,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"isPortal=" << item.isPortal << std::endl;
     ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
     ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
+    ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else

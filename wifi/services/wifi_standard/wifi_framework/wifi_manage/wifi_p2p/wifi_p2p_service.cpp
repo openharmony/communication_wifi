@@ -263,8 +263,7 @@ ErrCode WifiP2pService::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &
 
 void WifiP2pService::UnRegisterP2pServiceCallbacks()
 {
-    IP2pServiceCallbacks callbacks = {};
-    RegisterP2pServiceCallbacks(callbacks);
+    p2pStateMachine.UnRegisterP2pServiceCallbacks();
 }
 
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)

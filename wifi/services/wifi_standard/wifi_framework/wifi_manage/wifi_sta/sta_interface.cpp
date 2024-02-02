@@ -398,5 +398,13 @@ ErrCode StaInterface::StartPortalCertification()
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::RenewDhcp()
+{
+    WIFI_LOGI("Enter StaInterface::RenewDhcp");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->RenewDhcp();
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

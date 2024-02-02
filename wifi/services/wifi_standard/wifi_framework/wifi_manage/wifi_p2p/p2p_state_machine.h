@@ -102,6 +102,11 @@ public:
     virtual void RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback);
 
     /**
+     * @Description - Callbacks of event unregistered by the p2pService.
+     */
+    virtual void UnRegisterP2pServiceCallbacks();
+
+    /**
      * @Description - Set is need dhcp.
      * @param  isNeedDhcp - true: need, false: not need
      */
@@ -366,7 +371,7 @@ private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;
 
 private:
-    IP2pServiceCallbacks p2pServiceCallbacks;  /* state machine -> service callback */
+    std::map<std::string, IP2pServiceCallbacks> p2pServiceCallbacks;  /* state machine -> service callback */
     std::string p2pIface;               /* P2P iface */
     WifiP2pConfigInternal savedP2pConfig;    /* record P2P config when communicating with the peer device */
     P2pMonitor &p2pMonitor;          /* P2P monitor */

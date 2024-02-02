@@ -453,5 +453,40 @@ void StaNetworkCheck::ExitNetCheckThread()
         WIFI_LOGI("Exit net check done");
     }
 }
+
+ErrCode StaNetworkCheck::GetHttpCodeNum(int &respCode)
+{
+    WIFI_LOGI("enter StaNetworkCheck::GetHttpCodeNum");
+#ifndef OHOS_ARCH_LITE
+    WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
+    WIFI_LOGD("GetHttpCodeNum http=%{public}s, https=%{public}s, httpbak=%{public}s, httpsbak=%{public}s,",
+        mUrlInfo.portalHttpUrl.c_str(), mUrlInfo.portalHttpsUrl.c_str(), mUrlInfo.portalBakHttpUrl.c_str(),
+        mUrlInfo.portalBakHttpsUrl.c_str());
+    HttpPortalDetection(mUrlInfo.portalHttpUrl);
+    WIFI_LOGD("GetHttpCodeNum, mainHttpResult.httpCodeNum =  %{public}d!\n", mainHttpResult.httpCodeNum);
+    if (mainHttpResult.httpCodeNum >= NET_ERR_OK && mainHttpResult.httpCodeNum <= NET_ERR_REDIRECT_CLASS_MAX &&
+        mainHttpResult.httpCodeNum != NET_ERR_NO_CONTENT) {
+        respCode = mainHttpResult.httpCodeNum;
+        return WIFI_OPT_SUCCESS;
+    }
+    HttpPortalDetection(mUrlInfo.portalHttpsUrl);
+    WIFI_LOGD("GetHttpCodeNum, mainHttpsResult.httpCodeNum =  %{public}d!\n", mainHttpsResult.httpCodeNum);
+    respCode = mainHttpsResult.httpCodeNum;
+#endif
+    return WIFI_OPT_SUCCESS;
+}
+
+bool StaNetworkCheck::IsRedirectedRespCode(int respCode)
+{
+    if (respCode != NET_ERR_NO_CONTENT && respCode >= NET_ERR_OK && respCode <= NET_ERR_REDIRECT_CLASS_MAX) {
+        return true;
+    }
+    return false;
+}
+
+bool StaNetworkCheck::UnreachableRespCode(int respCode)
+{
+    return respCode != NET_ERR_NO_CONTENT && !IsRedirectedRespCode(respCode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

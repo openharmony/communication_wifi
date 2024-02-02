@@ -17,18 +17,22 @@
 #include "wifi_hdi_wpa_client.h"
 #include "wifi_hdi_wpa_sta_impl.h"
 #include "wifi_hdi_wpa_callback.h"
+#include "wifi_hdi_wpa_ap_impl.h"
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
 #include <securec.h>
-
+#include <unistd.h>
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaClient"
+
+#define HOSTAPD_CFG_VALUE_ON 1
 
 namespace OHOS {
 namespace Wifi {
 constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
+const int BUFFER_SIZE = 4096;
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int WIFI_HDI_MAX_STR_LENGTH = 512;
 constexpr int WIFI_MAX_SCAN_COUNT = 256;
@@ -512,6 +516,113 @@ WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
     }
     config.value = value;
     return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::StartAp(int id, std::string ifaceName)
+{
+    char ifName[ifaceName.size() + 1];
+    ifaceName.copy(ifName, ifaceName.size() + 1);
+    ifName[ifaceName.size()] = '\0';
+    return HdiStartAp(ifName, id);
+}
+
+WifiErrorNo WifiHdiWpaClient::StopAp(int id)
+{
+    return HdiStopAp(id);
+}
+
+WifiErrorNo WifiHdiWpaClient::RegisterApEvent(IWifiApMonitorEventCallback callback, int id) const
+{
+    IHostapdCallback cEventCallback;
+    if (memset_s(&cEventCallback, sizeof(cEventCallback), 0, sizeof(cEventCallback)) != EOK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (callback.onStaJoinOrLeave != nullptr) {
+        cEventCallback.OnEventStaJoin = onEventStaJoin;
+        cEventCallback.OnEventApState = onEventApState;
+    }
+    return HdiRegisterApEventCallback(&cEventCallback);
+}
+
+WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int id)
+{
+    if (HdiSetApPasswd(config.GetPreSharedKey().c_str(), id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiSetApName(config.GetSsid().c_str(), id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiSetApWpaValue(static_cast<int>(config.GetSecurityType()), id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiSetApBand(static_cast<int>(config.GetBand()), id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiSetApChannel(config.GetChannel(), id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiSetApMaxConn(config.GetMaxConn(), id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiSetAp80211n(HOSTAPD_CFG_VALUE_ON, id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiSetApWmm(HOSTAPD_CFG_VALUE_ON, id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    HdiReloadApConfigInfo(id);
+    HdiDisableAp(id);
+    HdiEnableAp(id);
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::GetStationList(std::vector<std::string> &result, int id)
+{
+    char *staInfos = new (std::nothrow) char[BUFFER_SIZE]();
+    if (staInfos == nullptr) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    WifiErrorNo err = HdiGetStaInfos(staInfos, BUFFER_SIZE, id);
+    if (err != WIFI_IDL_OPT_OK) {
+        delete[] staInfos;
+        return WIFI_IDL_OPT_FAILED;
+    }
+    std::string strStaInfo = std::string(staInfos);
+    SplitString(strStaInfo, ",", result);
+    delete[] staInfos;
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::AddBlockByMac(const std::string &mac, int id)
+{
+    if (CheckMacIsValid(mac) != 0) {
+        return WIFI_IDL_OPT_INPUT_MAC_INVALID;
+    }
+    return HdiSetMacFilter(mac.c_str(), id);
+}
+
+WifiErrorNo WifiHdiWpaClient::DelBlockByMac(const std::string &mac, int id)
+{
+    if (CheckMacIsValid(mac) != 0) {
+        return WIFI_IDL_OPT_INPUT_MAC_INVALID;
+    }
+    return HdiDelMacFilter(mac.c_str(), id);
+}
+
+WifiErrorNo WifiHdiWpaClient::RemoveStation(const std::string &mac, int id)
+{
+    if (CheckMacIsValid(mac) != 0) {
+        return WIFI_IDL_OPT_INPUT_MAC_INVALID;
+    }
+    return HdiDisassociateSta(mac.c_str(), id);
+}
+
+WifiErrorNo WifiHdiWpaClient::ReqDisconnectStaByMac(const std::string &mac, int id)
+{
+    if (CheckMacIsValid(mac) != 0) {
+        return WIFI_IDL_OPT_INPUT_MAC_INVALID;
+    }
+    return HdiDisassociateSta(mac.c_str(), id);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pStart()

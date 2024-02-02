@@ -286,7 +286,7 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
         }
         cbk.onDeviceFound(cbInfo);
         LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{public}s",
-            deviceInfoParam->wfdDeviceInfo, p2pDeviceAddress, deviceInfoParam->deviceName);
+            p2pDeviceAddress, deviceInfoParam->deviceName);
     }
     return 0;
 }

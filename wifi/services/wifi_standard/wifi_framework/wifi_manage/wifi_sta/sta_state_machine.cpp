@@ -3255,6 +3255,24 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
     WifiSettings::GetInstance().SyncDeviceConfig();
 }
 
+void StaStateMachine::RenewDhcp()
+{
+    WIFI_LOGI("enter RenewDhcp!");
+    WifiLinkedInfo linkedInfo;
+    GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGE("StartDhcpRenewal network is not connected, connState:%{public}d", linkedInfo.connState);
+        return;
+    }
+    std::string ifname = IF_NAME + std::to_string(m_instId);
+    int dhcpRet = RenewDhcpClient(ifname.c_str());
+    if (dhcpRet != 0) {
+        WIFI_LOGE("StartDhcpRenewal dhcp renew failed, dhcpRet:%{public}d", dhcpRet);
+    } else {
+        WIFI_LOGI("StartDhcpRenewal dhcp renew success.");
+    }
+}
+
 int StaStateMachine::GetInstanceId()
 {
     return m_instId;

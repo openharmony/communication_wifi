@@ -501,6 +501,12 @@ public:
      *
      */
     void HandlePortalNetworkPorcess();
+    
+    /**
+     * @Description renew dhcp.
+     *
+     */
+    void RenewDhcp();
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
 private:

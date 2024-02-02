@@ -675,5 +675,15 @@ ErrCode StaService::StartPortalCertification()
     pStaStateMachine->HandlePortalNetworkPorcess();
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaService::RenewDhcp()
+{
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
+    pStaStateMachine->RenewDhcp();
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

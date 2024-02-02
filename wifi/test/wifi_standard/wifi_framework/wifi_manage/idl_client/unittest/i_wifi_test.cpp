@@ -28,10 +28,17 @@
 #include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
+#include "mock_wifi_public.h"
+
 #undef LOG_TAG
 #define LOG_TAG "IWifiTest"
 
-using namespace testing::ext;
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 
@@ -316,16 +323,28 @@ HWTEST_F(IWifiTest, GetWifiChipTest, TestSize.Level1)
     uint8_t id = 1;
     IWifiChip chip;
     GetWifiChip(id, &chip);
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
+    EXPECT_TRUE(GetWifiChip(id, &chip) == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(IWifiTest, StopTest, TestSize.Level1)
 {
     Stop();
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
+    EXPECT_TRUE(Stop() == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(IWifiTest, NotifyClearTest, TestSize.Level1)
 {
     NotifyClear();
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
+    EXPECT_TRUE(NotifyClear() == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(IWifiTest, OnTransactTest1, TestSize.Level1)

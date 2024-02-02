@@ -270,7 +270,7 @@ void WifiP2pService::UnRegisterP2pServiceCallbacks()
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
 {
     WIFI_LOGI("Create hid2d group");
-    const std::any info = frequency;
+    const std::any info = std::pair<int, FreqType>(frequency, type);
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP), info);
     return ErrCode::WIFI_OPT_SUCCESS;
 }

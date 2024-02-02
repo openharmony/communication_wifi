@@ -20,6 +20,8 @@
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaP2pImpl"
 #define REPLY_BUF_LENGTH (1024)
+#define BUFF_SIZE 256
+#define P2P_RANDOM_MAC_FLAG "p2p_device_random_mac_addr=1\n"
 
 typedef struct HdiP2pWpaNetworkField {
     P2pGroupConfigType field;
@@ -96,6 +98,36 @@ static WifiErrorNo UnRegisterP2pEventCallback()
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("UnRegisterP2pEventCallback success.");
+    return WIFI_IDL_OPT_OK;
+}
+
+static WifiErrorNo AddP2pRandomMacFlag()
+{
+    char str[BUFF_SIZE] = { 0 };
+    int indicate = 0;
+    FILE *fp = fopen(P2P_WPA_CONFIG_FILE, "a+");
+    if (fp == NULL) {
+        LOGE("%{public}s: failed to open the file", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    while (fgets(str, BUFF_SIZE, fp)) {
+        if (strstr(str, P2P_RANDOM_MAC_FLAG) != NULL) {
+            indicate = 1;
+            break;
+        }
+        memset_s(str, sizeof(str), 0x0, sizeof(str));
+    }
+    if (indicate == 0) {
+        int ret = fputs(P2P_RANDOM_MAC_FLAG, fp);
+        if (ret < 0) {
+            LOGE("%{public}s: failed to update the file", __func__);
+            fclose(fp);
+            return WIFI_IDL_OPT_FAILED;
+        } else {
+            LOGD("%{public}s: success to update the file, ret:%{public}d", __func__, ret);
+        }
+    }
+    fclose(fp);
     return WIFI_IDL_OPT_OK;
 }
 
@@ -449,7 +481,9 @@ WifiErrorNo HdiP2pSetRandomMac(int enable)
         LOGE("HdiP2pSetRandomMac: P2pSetRandomMac failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
     }
-
+    if (AddP2pRandomMacFlag() != WIFI_IDL_OPT_OK) {
+        LOGW("%{public}s: failed to write %{public}s", __func__, P2P_RANDOM_MAC_FLAG);
+    }
     LOGI("HdiP2pSetRandomMac success.");
     return WIFI_IDL_OPT_OK;
 }

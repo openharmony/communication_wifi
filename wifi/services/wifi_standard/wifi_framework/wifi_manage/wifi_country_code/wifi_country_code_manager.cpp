@@ -51,7 +51,6 @@ ErrCode WifiCountryCodeManager::Init()
     m_staCallback.callbackModuleName = CLASS_NAME;
     m_staCallback.OnStaOpenRes = DealStaOpenRes;
     m_staCallback.OnStaCloseRes = DealStaCloseRes;
-    m_staCallback.OnStaConnChanged = DealStaConnChanged;
     m_apCallback.callbackModuleName = CLASS_NAME;
     m_apCallback.OnApStateChangedEvent = DealApStateChanged;
     return WIFI_OPT_SUCCESS;
@@ -78,17 +77,33 @@ ErrCode WifiCountryCodeManager::SetWifiCountryCodeFromExternal(const std::string
     return UpdateWifiCountryCode(wifiCountryCode);
 }
 
+bool IsAllowUpdateWifiCountryCode()
+{
+    bool ret = true;
+    std::map <int, WifiLinkedInfo> allLinkedInfo = WifiSettings::GetInstance().GetAllWifiLinkedInfo();
+    for (auto item : allLinkedInfo) {
+        if (item.second.connState == ConnState::CONNECTED) {
+            WIFI_LOGI("wifi connected, not allow update wifi country code, instId=%{public}d", item.first);
+            ret = false;
+            break;
+        }
+    }
+    return ret;
+}
+
 /*
- * Scenario for updating wifi country code:
+ * Scenarios that trigger country code update, with configuration files controlling the effectiveness of the scenario:
  * 1 Received a telephone network search state change notify;
  * 2 Wifi open success;
- * 4 Wifi connected or disconnected;
- * 5 Softap started;
- * 6 Update the country code by calling the SetWifiCountryCode interface externally;
+ * 3 Softap started;
+ * 4 Update the country code by calling the SetWifiCountryCode interface externally;
  * 5 Report the scanning result.
  */
 ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externalCode)
 {
+    if (!IsAllowUpdateWifiCountryCode()) {
+        return WIFI_OPT_FAILED;
+    }
     std::string wifiCountryCode;
     if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
         WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
@@ -98,7 +113,6 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
         WIFI_LOGE("calculate wifi country code failed");
         return WIFI_OPT_FAILED;
     }
-    StrToUpper(wifiCountryCode);
     WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
     UpdateWifiCountryCodeCache(wifiCountryCode);
     m_wifiCountryCode = wifiCountryCode;
@@ -109,11 +123,9 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
 void WifiCountryCodeManager::NotifyWifiCountryCodeChangeListeners(const std::string &wifiCountryCode)
 {
     std::lock_guard<std::mutex> lock(m_countryCodeMutex);
-    if (!m_codeChangeListeners.empty()) {
-        for (auto &callBackItem : m_codeChangeListeners) {
-            WIFI_LOGI("notify wifi country code change, module name=%{public}s", callBackItem.first.c_str());
-            callBackItem.second->OnWifiCountryCodeChanged(wifiCountryCode);
-        }
+    for (auto &callBackItem : m_codeChangeListeners) {
+        WIFI_LOGI("notify wifi country code change, module name=%{public}s", callBackItem.first.c_str());
+        callBackItem.second->OnWifiCountryCodeChanged(wifiCountryCode);
     }
 }
 
@@ -165,14 +177,6 @@ void WifiCountryCodeManager::DealStaCloseRes(OperateResState state, int instId)
     if (state == OperateResState::CLOSE_WIFI_FAILED || state == OperateResState::CLOSE_WIFI_SUCCEED) {
         std::string moduleName = "StaService_" + std::to_string(instId);
         WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
-    }
-}
-
-void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
-{
-    WIFI_LOGI("wifi connection state change, state=%{public}d, id=%{public}d", state, instId);
-    if (state == OperateResState::CONNECT_AP_CONNECTED) {
-        WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
     }
 }
 

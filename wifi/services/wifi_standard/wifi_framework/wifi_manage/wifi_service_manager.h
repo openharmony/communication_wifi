@@ -29,6 +29,9 @@
 #include "ip2p_service.h"
 #endif
 #include "ienhance_service.h"
+#ifdef FEATURE_SELF_CURE_SUPPORT
+#include "iself_cure_service.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -49,6 +52,26 @@ struct StaServiceHandle {
         pService.clear();
     }
 };
+
+#ifdef FEATURE_SELF_CURE_SUPPORT
+struct SelfCureServiceHandle {
+    void *handle;
+    ISelfCureService *(*create)(int instId);
+    void *(*destroy)(ISelfCureService *);
+    std::map<int, ISelfCureService *> pService;
+    SelfCureServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr)
+    {}
+    ~SelfCureServiceHandle()
+    {}
+    void Clear()
+    {
+        handle = nullptr;
+        create = nullptr;
+        destroy = nullptr;
+        pService.clear();
+    }
+};
+#endif
 
 struct ScanServiceHandle {
     void *handle;
@@ -159,6 +182,15 @@ public:
      */
     IStaService *GetStaServiceInst(int instId = 0);
 
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    /**
+     * @Description Get the SelfCure Service Inst object
+     *
+     * @return ISelfCureService* - self cure service pointer, if self cure not supported, nullptr is returned
+     */
+    ISelfCureService *GetSelfCureServiceInst(int instId = 0);
+#endif
+
     /**
      * @Description Get the Scan Service Inst object
      *
@@ -214,6 +246,10 @@ private:
     int GetServiceDll(const std::string &name, std::string &dlname);
     int LoadStaService(const std::string &dlname, bool bCreate);
     int UnloadStaService(bool bPreLoad, int instId = 0);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    int LoadSelfCureService(const std::string &dlname, bool bCreate);
+    int UnloadSelfCureService(bool bPreLoad, int instId = 0);
+#endif
     int LoadScanService(const std::string &dlname, bool bCreate);
     int UnloadScanService(bool bPreLoad, int instId = 0);
 #ifdef FEATURE_AP_SUPPORT
@@ -228,12 +264,16 @@ private:
     int UnloadEnhanceService(bool bPreLoad);
 private:
     std::mutex mStaMutex;
+    std::mutex mSelfCureMutex;
     std::mutex mScanMutex;
     std::mutex mP2pMutex;
     std::mutex mApMutex;
     std::mutex mEnhanceMutex;
     std::unordered_map<std::string, std::string> mServiceDllMap;
     StaServiceHandle mStaServiceHandle;
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    SelfCureServiceHandle mSelfCureServiceHandle;
+#endif
     ScanServiceHandle mScanServiceHandle;
 #ifdef FEATURE_AP_SUPPORT
     ApServiceHandle mApServiceHandle;

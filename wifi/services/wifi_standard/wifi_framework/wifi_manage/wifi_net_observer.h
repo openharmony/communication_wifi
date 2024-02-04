@@ -45,6 +45,8 @@ public:
         const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override;
 
     SystemNetWorkState GetCellNetState();
+    
+    int32_t GetWifiNetId();
 public:
     std::function<void(SystemNetWorkState)> m_Callback;
 };

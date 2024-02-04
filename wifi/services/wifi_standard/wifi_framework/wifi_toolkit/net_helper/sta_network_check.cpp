@@ -192,7 +192,6 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
     httpReq.SetHeader("Accept", "*/*");
     httpReq.SetHeader("Accept-Language", "cn");
     httpReq.SetHeader("User-Agent", "Mozilla/4.0");
-    httpReq.SetHeader("Host", "connectivitycheck.platform.hicloud.com");
     httpReq.SetHeader("Cache-Control", "no-cache");
     httpReq.SetHeader("Connection", "Keep-Alive");
     httpReq.SetTimeout(HTTP_DETECTION_TIMEOUT);

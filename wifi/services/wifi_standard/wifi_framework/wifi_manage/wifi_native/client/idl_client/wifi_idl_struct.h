@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#define WIFI_PASSWORD_LEN 128
 namespace OHOS {
 namespace Wifi {
 struct WifiApConnectionNofify {
@@ -34,6 +35,45 @@ struct WifiApConnectionNofify {
 
 constexpr int MAX_WEPKEYS_SIZE = 4;
 constexpr int AUTH_ALGORITHM_MAX = 8;
+
+enum class IdlPhase2Method {
+    PHASE2_NONE      = 0,
+    PHASE2_PAP       = 1,  // EAP-TTLS
+    PHASE2_MSCHAP    = 2,  // EAP-TTLS
+    PHASE2_MSCHAPV2  = 3,  // EAP-PEAP/EAP-TTLS
+    PHASE2_GTC       = 4,  // EAP-PEAP/EAP-TTLS
+    PHASE2_SIM       = 5,  // EAP-PEAP
+    PHASE2_AKA       = 6,  // EAP-PEAP
+    PHASE2_AKA_PRIME = 7   // EAP-PEAP
+};
+
+struct WifiIdlEapConfig {
+    std::string eap;                        /* EAP authentication mode:PEAP/TLS/TTLS/PWD/SIM/AKA/AKA' */
+    int phase2Method;                       /* Second stage authentication method */
+    std::string identity;                   /* Identity information */
+    std::string anonymousIdentity;          /* Anonymous identity information */
+    char password[WIFI_PASSWORD_LEN];       /* EAP mode password */
+
+    std::string caCertPath;                 /* CA certificate path */
+    std::string caCertAlias;                /* CA certificate alias */
+    std::vector<uint8_t> certEntry;       /* CA certificate entry */
+
+    std::string clientCert;                 /* Client certificate */
+    char certPassword[WIFI_PASSWORD_LEN];   /* Certificate password */
+    std::string privateKey;                 /* Client certificate private key */
+
+    std::string altSubjectMatch;            /* Alternative topic matching */
+    std::string domainSuffixMatch;          /* Domain suffix matching */
+    std::string realm;                      /* The field of passport credentials */
+    std::string plmn;                       /* PLMN */
+    int eapSubId;                           /* Sub ID of SIM card */
+    WifiIdlEapConfig() : phase2Method(0), eapSubId(-1)
+    {}
+
+    ~WifiIdlEapConfig()
+    {}
+};
+
 struct WifiIdlDeviceConfig {
     int networkId;
     int priority;
@@ -44,19 +84,13 @@ struct WifiIdlDeviceConfig {
     std::string ssid;
     std::string psk;
     std::string keyMgmt;
-    std::string eap;
-    std::string identity;
-    std::string password;
-    std::string clientCert;
-    std::string privateKey;
+    WifiIdlEapConfig eapConfig;
     std::string bssid;
-    int phase2Method;
     bool isRequirePmf;
     int allowedProtocols;
     int allowedPairwiseCiphers;
     int allowedGroupCiphers;
-    WifiIdlDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1),
-        phase2Method(0)
+    WifiIdlDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1)
     {}
 
     ~WifiIdlDeviceConfig()

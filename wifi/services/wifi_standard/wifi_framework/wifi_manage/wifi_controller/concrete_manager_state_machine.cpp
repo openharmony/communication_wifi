@@ -180,9 +180,6 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __a
 
 void ConcreteMangerMachine::IdleState::HandleSwitchToConnectOrMixMode(InternalMessage *msg)
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiSettings::GetInstance().SetWifiStopState(true);
@@ -209,9 +206,6 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *m
     mid = msg->GetParam2();
     if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX) ||
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
-        if (!CheckCanOptSta()) {
-            return;
-        }
         ErrCode ret = AutoStartStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WifiSettings::GetInstance().SetWifiStopState(true);
@@ -278,9 +272,6 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ret = AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
@@ -339,9 +330,6 @@ bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessage *msg)
 
 void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);
@@ -356,9 +344,6 @@ void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
 
 void ConcreteMangerMachine::ScanonlyState::SwitchMixInScanOnlyState()
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);
@@ -408,9 +393,6 @@ bool ConcreteMangerMachine::MixState::ExecuteStateMsg(InternalMessage *msg)
 
 void ConcreteMangerMachine::MixState::SwitchConnectInMixState()
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStopScanOnly(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop scanonly failed ret = %{public}d", ret);
@@ -420,9 +402,6 @@ void ConcreteMangerMachine::MixState::SwitchConnectInMixState()
 
 void ConcreteMangerMachine::MixState::SwitchScanOnlyInMixState()
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
@@ -444,27 +423,6 @@ bool ConcreteMangerMachine::HandleCommonMessage(InternalMessage *msg)
         default:
             return false;
     }
-}
-
-bool ConcreteMangerMachine::CheckCanOptSta()
-{
-    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
-    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::OPENING) {
-        WIFI_LOGE("wifi is closing or starting, open wifi fail");
-        WifiSettings::GetInstance().SetWifiStopState(true);
-        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-        ins->SendMessage(CMD_STA_START_FAILURE, mid);
-        return false;
-    }
-    if (p2pState == WifiOprMidState::CLOSING || p2pState == WifiOprMidState::OPENING) {
-        WIFI_LOGE("p2p is closing or starting, open wifi fail");
-        WifiSettings::GetInstance().SetWifiStopState(true);
-        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-        ins->SendMessage(CMD_STA_START_FAILURE, mid);
-        return false;
-    }
-    return true;
 }
 
 #ifdef FEATURE_SELF_CURE_SUPPORT

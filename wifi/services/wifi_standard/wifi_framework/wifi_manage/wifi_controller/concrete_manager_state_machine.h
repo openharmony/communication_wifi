@@ -133,6 +133,9 @@ private:
     static ErrCode AutoStartScanOnly(int instId);
     static ErrCode AutoStopStaService(int instId);
     static ErrCode AutoStartStaService(int instId);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    static ErrCode StartSelfCureService(int instId);
+#endif
     static bool CheckCanOptSta(void);
     bool HandleCommonMessage(InternalMessage *msg);
     void checkAndContinueToStopWifi(InternalMessage *msg);

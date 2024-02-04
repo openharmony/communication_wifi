@@ -18,6 +18,9 @@
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+#include "parameter.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -181,5 +184,25 @@ std::string NetworkSelectionUtils::GetScoreMsg(ScoreResult &scoreResult)
     scoreMsg << " }";
     return scoreMsg.str();
 }
+
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+bool NetworkSelectionUtils::CheckDeviceTypeByVendorCountry()
+{
+    constexpr const char* VENDOR_COUNTRY_KEY = "const.cust.custPath";
+    constexpr const char* VENDOR_COUNTRY_DEFAULT = "";
+    constexpr const int32_t SYS_PARAMETER_SIZE = 256;
+    constexpr const int32_t SYSTEM_PARAMETER_ERROR_CODE = 0;
+    char param[SYS_PARAMETER_SIZE] = { 0 };
+    int errorCode = GetParameter(VENDOR_COUNTRY_KEY, VENDOR_COUNTRY_DEFAULT, param, SYS_PARAMETER_SIZE);
+    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
+        WIFI_LOGE("get vendor country fail, errorCode: %{public}d", errorCode);
+        return false;
+    }
+
+    WIFI_LOGI("vendor country: %{public}s, errorCode: %{public}d.", param, errorCode);
+    auto iter = std::string(param).find("hwit");
+    return iter != std::string::npos;
+}
+#endif
 }
 }

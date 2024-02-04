@@ -145,6 +145,7 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
 ErrCode StaService::EnableWifi()
 {
     WIFI_LOGI("Enter EnableWifi.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 #ifndef OHOS_ARCH_LITE
     // notification of registration country code change
     std::string moduleName = "StaService_" + std::to_string(m_instId);
@@ -155,7 +156,6 @@ ErrCode StaService::EnableWifi()
     }
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
 #endif
-    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
 }
@@ -591,6 +591,7 @@ ErrCode StaService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(cons
     }
     WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
     InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    CHECK_NULL_AND_RETURN(msg, WIFI_OPT_FAILED);
     msg->SetMessageName(static_cast<int>(WIFI_SVR_CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(wifiCountryCode);
     m_stateMachineObj.SendMessage(msg);
@@ -673,6 +674,16 @@ ErrCode StaService::StartPortalCertification()
         return WIFI_OPT_FAILED;
     }
     pStaStateMachine->HandlePortalNetworkPorcess();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::RenewDhcp()
+{
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
+    pStaStateMachine->RenewDhcp();
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

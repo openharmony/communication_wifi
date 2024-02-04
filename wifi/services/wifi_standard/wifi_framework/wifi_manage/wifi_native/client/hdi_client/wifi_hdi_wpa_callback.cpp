@@ -18,6 +18,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_hdi_util.h"
+#include "wifi_ap_hal_interface.h"
 #include "wifi_p2p_hal_interface.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
@@ -173,6 +174,67 @@ int32_t OnEventScanResult(struct IWpaCallback *self,
     return 0;
 }
 
+int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName)
+{
+    LOGI("onEvenStaJoin: callback enter!");
+    if (apCbParm == nullptr || apCbParm->content == NULL) {
+        LOGE("onEvenStaJoin: invalid parameter!");
+        return 1;
+    }
+    WifiIdlEvent event;
+    uint8_t len = 0;
+    char tmpBuf[WIFI_BSSID_LENGTH] = {0};
+    if (strncmp(apCbParm->content, "AP-STA-CONNECTED", strlen("AP-STA-CONNECTED")) == 0) {
+        event = WIFI_IDL_CBK_CMD_STA_JOIN;
+        len = strlen("AP-STA-CONNECTED");
+    } else if (strncmp(apCbParm->content, "AP-STA-DISCONNECTED", strlen("AP-STA-DISCONNECTED")) == 0) {
+        event = WIFI_IDL_CBK_CMD_STA_LEAVE;
+        len = strlen("AP-STA-DISCONNECTED");
+    } else {
+        LOGE("onEvenStaJoin: unknown content!");
+        return 1;
+    }
+
+    if (strcpy_s(tmpBuf, sizeof(tmpBuf), apCbParm->content + len + 1) != 0) {
+        LOGE("onEvenStaJoin: strcpy_s failed!");
+    }
+
+    const OHOS::Wifi::IWifiApMonitorEventCallback &cbk =
+            OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst(apCbParm->id);
+    if (cbk.onStaJoinOrLeave) {
+        OHOS::Wifi::WifiApConnectionNofify cbInfo;
+        cbInfo.type = static_cast<int>(event);
+        cbInfo.mac = tmpBuf;
+        cbk.onStaJoinOrLeave(cbInfo);
+    }
+    return 0;
+}
+
+int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName)
+{
+    LOGI("onEvenApState: callback enter!");
+    if (apCbParm == nullptr || apCbParm->content == NULL) {
+        LOGE("onEvenApState: invalid parameter!");
+        return 1;
+    }
+    WifiIdlEvent event;
+    if (strncmp(apCbParm->content, "AP-ENABLED", strlen("AP-ENABLED")) == 0) {
+        event = WIFI_IDL_CBK_CMD_AP_ENABLE;
+    } else if (strncmp(apCbParm->content, "AP-DISABLED", strlen("AP-DISABLED")) == 0 ||
+               strncmp(apCbParm->content, "CRTL-EVENT-TERMINATING", strlen("CRTL-EVENT-TERMINATING")) == 0) {
+        event = WIFI_IDL_CBK_CMD_AP_DISABLE;
+    } else {
+        return 1;
+    }
+
+    const OHOS::Wifi::IWifiApMonitorEventCallback &cbk =
+            OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst(apCbParm->id);
+    if (cbk.onApEnableOrDisable) {
+        cbk.onApEnableOrDisable(static_cast<int>(event));
+    }
+    return 0;
+}
+
 int32_t OnEventP2pStateChanged(struct IWpaCallback *self,
     const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
 {
@@ -224,7 +286,7 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
         }
         cbk.onDeviceFound(cbInfo);
         LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{public}s",
-            deviceInfoParam->wfdDeviceInfo, p2pDeviceAddress, deviceInfoParam->deviceName);
+            p2pDeviceAddress, deviceInfoParam->deviceName);
     }
     return 0;
 }

@@ -264,6 +264,20 @@ public:
      */
     void MessageExecutedLater(int msgName, int param1, int param2, const std::any &messageObj, int64_t delayTimeMs);
 
+    /**
+     * @Description : Constructs internal messages and places them in the
+     * front of message queue of the state machine.
+     *
+     * @param msgName - Message Name.[in]
+     * @param param1 - Message parameters.[in]
+     */
+    void SendMessageAtFrontOfQueue(int msgName, int param1);
+
+    /**
+     * @Description : get current state name.
+     */
+    std::string GetCurStateName();
+
 protected:
     /**
      * @Description : Construct a new State Machine:: State Machine object.
@@ -393,6 +407,11 @@ public:
      *
      */
     void BuildTreeComplete();
+
+    /**
+     * @Description : get current state name.
+     */
+    std::string GetCurStateName();
 
 private:
     /**

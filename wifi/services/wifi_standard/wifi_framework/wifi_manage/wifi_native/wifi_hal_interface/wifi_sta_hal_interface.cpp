@@ -60,6 +60,9 @@ WifiErrorNo WifiStaHalInterface::StartWifi(void)
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     ret |= mIdlClient->StartWifi();
 #endif
+    if (ret != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
 
 #ifdef HDI_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);

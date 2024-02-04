@@ -69,8 +69,10 @@ private:
     void OnIsBandTypeSupported(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnGet5GHzChannelList(uint32_t code, IpcIo *req, IpcIo *reply);
 private:
+    void ReadEapConfig(IpcIo *req, WifiEapConfig &wifiEapConfig);
     void ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config);
     void ReadIpAddress(IpcIo *req, WifiIpAddress &address);
+    void WriteEapConfig(IpcIo *reply, const WifiEapConfig &wifiEapConfig);
     void WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig &config);
     void WriteIpAddress(IpcIo *reply, const WifiIpAddress &address);
 

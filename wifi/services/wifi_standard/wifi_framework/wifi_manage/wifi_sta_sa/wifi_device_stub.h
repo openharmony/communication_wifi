@@ -66,6 +66,8 @@ private:
     void OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpV6Info(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetSignalLevel(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply);

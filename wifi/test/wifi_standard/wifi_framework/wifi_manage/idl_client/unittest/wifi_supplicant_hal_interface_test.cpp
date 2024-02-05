@@ -14,6 +14,8 @@
  */
 #include "wifi_supplicant_hal_interface_test.h"
 #include "wifi_supplicant_hal_interface.h"
+#include "wifi_hdi_util.h"
+
 
 using namespace testing::ext;
 
@@ -84,6 +86,15 @@ HWTEST_F(WifiSupplicantHalInterfaceTest, StopSupplicantTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiSupplicantHalInterface::GetInstance().StopSupplicant();
     EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+}
+
+HWTEST_F(WifiHalStaInterfaceTest, DelScanInfoLineTest, TestSize.Level1)
+{
+    ScanInfo pcmd;
+    char srcBuf[] = "00:00:00:00\tfreq=1024\trssid=70\tflags=WPA=PSK\t\t\t[ 255sdF1dwxansa][ 61sdF1dwansa]"
+                    "[ 1sdFe1dansas][ 50sdF1dwansas][ 0sdF1dwansas][ 42sdF1dwansas]\t";
+    int length = g_Lenth;
+    DelScanInfoLine(&pcmd, srcBuf, length);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -64,7 +64,7 @@ static pthread_mutex_t g_apObjMutex = PTHREAD_MUTEX_INITIALIZER;
 static unsigned int g_apRefCount = 0x0;
 static struct IHostapdInterface *g_apObj = NULL;
 static struct HDIDeviceManager *g_apDevMgr = NULL;
-struct HdiWpaIfaceInfo{
+struct HdiWpaIfaceInfo {
     char ifName[BUFF_SIZE];
     struct HdiWpaIfaceInfo* next;
 };
@@ -73,7 +73,7 @@ struct HdiWpaIfaceInfo* g_HdiWpaIfaceInfoHead = NULL;
 bool FindHdiWpaIface(const char* ifName)
 {
     LOGI("%{public}s enter", __func__);
-    if(ifName == NULL || strlen(ifName) == 0) {
+    if (ifName == NULL || strlen(ifName) == 0) {
         LOGI("%{public}s err1", __func__);
         return true;
     }
@@ -92,7 +92,7 @@ bool FindHdiWpaIface(const char* ifName)
 void AddHdiWpaIface(const char* ifName)
 {
     LOGI("%{public}s enter", __func__);
-    if(ifName == NULL || strlen(ifName) == 0) {
+    if (ifName == NULL || strlen(ifName) == 0) {
         LOGI("%{public}s err", __func__);
         return;
     }
@@ -114,7 +114,7 @@ void AddHdiWpaIface(const char* ifName)
         LOGI("%{public}s err3", __func__);
         return;
     }
-     if (pre != NULL) {
+    if (pre != NULL) {
         pre->next = currernt;
     } else {
         g_HdiWpaIfaceInfoHead = currernt;
@@ -139,8 +139,7 @@ void RemoveHdiWpaIface(const char* ifName)
         }
         if (pre == NULL) {
             g_HdiWpaIfaceInfoHead = currernt->next;
-        }
-        else {
+        } else {
             pre->next = currernt->next;
         }
         free(currernt);
@@ -261,7 +260,7 @@ WifiErrorNo HdiWpaStop()
         return WIFI_IDL_OPT_FAILED;
     }
     int count = GetHdiWpaIfaceCount();
-    if (count > 0 ) {
+    if (count > 0) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGI("%{public}s wlan count:%{public}d", __func__, count);
         return WIFI_IDL_OPT_OK;

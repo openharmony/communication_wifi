@@ -1562,7 +1562,7 @@ HWTEST_F(WifiIdlClientTest, ReqWpaSetPowerModeTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqStopPnoScanTest, TestSize.Level1)
 {
-    mClient.ReqStopPnoScan(void);
+    mClient.ReqStopPnoScan();
     MockWifiPublic::SetMockFlag(true);
     EXPECT_TRUE(mClient.ReqStopPnoScan() == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
@@ -1586,11 +1586,12 @@ HWTEST_F(WifiIdlClientTest, ReqP2pGetChba0FreqTest, TestSize.Level1)
     MockWifiPublic::SetMockFlag(false);
 }
 
-HWTEST_F(WifiIdlClientTest, ReqP2pGetChba0FreqTest, TestSize.Level1)
+HWTEST_F(WifiIdlClientTest, ReqIsSupportDbdcTest, TestSize.Level1)
 {
-    mClient.ReqIsSupportDbdc(true);
+    bool isSupport = true;
+    mClient.ReqIsSupportDbdc(isSupport);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqIsSupportDbdc(true) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqIsSupportDbdc(isSupport) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 }  // namespace Wifi

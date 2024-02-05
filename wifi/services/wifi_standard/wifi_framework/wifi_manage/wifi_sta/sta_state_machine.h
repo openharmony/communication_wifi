@@ -435,7 +435,7 @@ public:
      *
      * @param reason - the state of wifi assoc
      */
-    void OnNetworkAssocEvent(int assocState);
+    void OnNetworkAssocEvent(int assocState, std::string bssid, StaStateMachine *pStaStateMachine);
     /**
      * @Description  Bssid change events
      *
@@ -810,6 +810,14 @@ private:
      * @param networkId - network id[in]
      */
     bool SetRandomMac(int networkId);
+
+    /**
+     * @Description  check whether the current bssid are consistent.
+     *
+     * @param bssid - bssid
+     */
+    bool CheckRoamingBssidIsSame(std::string bssid);
+
     /**
      * @Description  Generate a random MAC address.
      *

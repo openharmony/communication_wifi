@@ -608,6 +608,12 @@ void WifiDeviceStub::OnGet5GHzChannelList(uint32_t code, IpcIo *req, IpcIo *repl
 
 void WifiDeviceStub::InitHandleMapEx()
 {
+    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT)] =
+        &WifiDeviceStub::OnRegisterCallBack;
+    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL)] =
+        &WifiDeviceStub::OnGetSignalLevel;
+    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
+        &WifiDeviceStub::OnGetSupportedFeatures;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DERVICE_MAC_ADD)] =
         &WifiDeviceStub::OnGetDeviceMacAdd;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED)] =
@@ -664,12 +670,6 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnSetCountryCode;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE)] =
         &WifiDeviceStub::OnGetCountryCode;
-    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT)] =
-        &WifiDeviceStub::OnRegisterCallBack;
-    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL)] =
-        &WifiDeviceStub::OnGetSignalLevel;
-    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
-        &WifiDeviceStub::OnGetSupportedFeatures;
     InitHandleMapEx();
     return;
 }

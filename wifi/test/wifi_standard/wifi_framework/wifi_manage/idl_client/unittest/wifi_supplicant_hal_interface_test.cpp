@@ -21,7 +21,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-static int g_Lenth = 180;
+static int g_lenth = 180;
 HWTEST_F(WifiSupplicantHalInterfaceTest, StartSupplicantTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiSupplicantHalInterface::GetInstance().StartSupplicant();
@@ -94,7 +94,7 @@ HWTEST_F(WifiHalStaInterfaceTest, DelScanInfoLineTest, TestSize.Level1)
     ScanInfo pcmd;
     char srcBuf[] = "00:00:00:00\tfreq=1024\trssid=70\tflags=WPA=PSK\t\t\t[ 255sdF1dwxansa][ 61sdF1dwansa]"
                     "[ 1sdFe1dansas][ 50sdF1dwansas][ 0sdF1dwansas][ 42sdF1dwansas]\t";
-    int length = g_Lenth;
+    int length = g_lenth;
     DelScanInfoLine(&pcmd, srcBuf, length);
 }
 }  // namespace Wifi

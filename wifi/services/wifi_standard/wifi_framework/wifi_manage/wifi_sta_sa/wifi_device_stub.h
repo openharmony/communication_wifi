@@ -84,8 +84,10 @@ private:
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
+    void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);
     void ReadIpAddress(MessageParcel &data, WifiIpAddress &address);
+    void WriteEapConfig(MessageParcel &reply, const WifiEapConfig &wifiEapConfig);
     void WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config);
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
 

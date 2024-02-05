@@ -609,7 +609,7 @@ HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest4, TestSize.Level1)
     config.priority = 1;
     config.scanSsid = 1;
     config.wepKeyIdx = 1;
-    config.phase2Method = 0;
+    config.eapConfig.phase2Method = 0;
     mClient.SetDeviceConfig(networkId, config);
     config.keyMgmt = "WEP";
     mClient.SetDeviceConfig(networkId, config);
@@ -623,7 +623,7 @@ HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest4, TestSize.Level1)
     mClient.SetDeviceConfig(networkId, config);
     config.authAlgorithms = 0;
     mClient.SetDeviceConfig(networkId, config);
-    config.phase2Method = 1;
+    config.eapConfig.phase2Method = 1;
     mClient.SetDeviceConfig(networkId, config);
     config.ssid = "";
     mClient.SetDeviceConfig(networkId, config);

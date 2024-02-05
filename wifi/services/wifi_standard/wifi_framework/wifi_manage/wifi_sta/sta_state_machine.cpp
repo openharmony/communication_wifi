@@ -80,6 +80,7 @@ StaStateMachine::StaStateMachine(int instId)
       enableSignalPoll(true),
       isRoam(false),
       netNoWorkNum(0),
+      portalFlag(false),
       networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr),
       pNetcheck(nullptr),

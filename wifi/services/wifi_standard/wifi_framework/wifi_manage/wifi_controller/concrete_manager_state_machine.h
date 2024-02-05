@@ -136,7 +136,6 @@ private:
 #ifdef FEATURE_SELF_CURE_SUPPORT
     static ErrCode StartSelfCureService(int instId);
 #endif
-    static bool CheckCanOptSta(void);
     bool HandleCommonMessage(InternalMessage *msg);
     void checkAndContinueToStopWifi(InternalMessage *msg);
     void HandleStaStop();

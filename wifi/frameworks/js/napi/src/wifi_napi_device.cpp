@@ -329,41 +329,13 @@ static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& c
     }
 }
 
-static void ProcessEapPeapConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
+static std::string EapMethod2Str(const int& method)
 {
-    // identity, password, phase2Method filed is necessary
-    eapConfig.eap = EAP_METHOD_PEAP;
-    JsObjectToString(env, object, "identity", NAPI_MAX_STR_LENT, eapConfig.identity);
-    JsObjectToString(env, object, "password", NAPI_MAX_STR_LENT, eapConfig.password);
-
-    int phase2 = static_cast<int>(Phase2Method::NONE);
-    JsObjectToInt(env, object, "phase2Method", phase2);
-    eapConfig.phase2Method = Phase2Method(phase2);
-}
-
-static void ProcessEapTlsConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
-{
-    eapConfig.eap = EAP_METHOD_TLS;
-    std::string certPassword;
-    JsObjectToString(env, object, "identity", NAPI_MAX_STR_LENT, eapConfig.identity);
-    JsObjectToString(env, object, "certPassword", NAPI_MAX_STR_LENT, certPassword);
-    if (strncpy_s(eapConfig.certPassword, sizeof(eapConfig.certPassword), certPassword.c_str(),
-        sizeof(eapConfig.certPassword) - 1) != EOK) {
-        WIFI_LOGE("ProcessEapTlsConfig strcpy_s failed!");
+    const std::string eapMethod[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", "SIM", "AKA", "AKA'" };
+    if (method < 0 || method >= static_cast<int>(sizeof(eapMethod) / sizeof(eapMethod[0]))) {
+        return "NONE";
     }
-    std::string().swap(certPassword);
-    eapConfig.certEntry = JsObjectToU8Vector(env, object, "certEntry");
-}
-
-static void ProcessEapPwdConfig(const napi_env& env, const napi_value& object, WifiEapConfig& eapConfig)
-{
-    eapConfig.eap = EAP_METHOD_PWD;
-    JsObjectToString(env, object, "identity", NAPI_MAX_STR_LENT, eapConfig.identity);
-    JsObjectToString(env, object, "password", NAPI_MAX_STR_LENT, eapConfig.password);
-
-    int phase2 = static_cast<int>(Phase2Method::NONE);
-    JsObjectToInt(env, object, "phase2Method", phase2);
-    eapConfig.phase2Method = Phase2Method(phase2);
+    return eapMethod[method];
 }
 
 napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
@@ -378,22 +350,34 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
     napi_value napiEap;
     napi_get_named_property(env, object, "eapConfig", &napiEap);
     int eapMethod = static_cast<int>(EapMethodJs::EAP_NONE);
+
+    // EAP authentication mode
     JsObjectToInt(env, napiEap, "eapMethod", eapMethod);
-    WIFI_LOGI("ProcessEapConfig, eapMethod: %{public}d.", eapMethod);
-    switch (EapMethodJs(eapMethod)) {
-        case EapMethodJs::EAP_PEAP:
-            ProcessEapPeapConfig(env, napiEap, devConfig.wifiEapConfig);
-            break;
-        case EapMethodJs::EAP_TLS:
-            ProcessEapTlsConfig(env, napiEap, devConfig.wifiEapConfig);
-            break;
-        case EapMethodJs::EAP_PWD:
-            ProcessEapPwdConfig(env, napiEap, devConfig.wifiEapConfig);
-            break;
-        default:
-            WIFI_LOGE("EapMethod: %{public}d unsupported", eapMethod);
-            return UndefinedNapiValue(env);
+    devConfig.wifiEapConfig.eap = EapMethod2Str(eapMethod);
+    WIFI_LOGI("%{public}s eapMethod: %{public}s", __func__, devConfig.wifiEapConfig.eap.c_str());
+
+    int phase2 = static_cast<int>(Phase2Method::NONE);
+    JsObjectToInt(env, napiEap, "phase2Method", phase2);
+    devConfig.wifiEapConfig.phase2Method = Phase2Method(phase2);
+    JsObjectToString(env, napiEap, "identity", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.identity);
+    JsObjectToString(env, napiEap, "anonymousIdentity", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.anonymousIdentity);
+    JsObjectToString(env, napiEap, "password", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.password);
+    JsObjectToString(env, napiEap, "caCertAlias", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.caCertAlias);
+    JsObjectToString(env, napiEap, "caPath", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.caCertPath);
+    JsObjectToString(env, napiEap, "clientCertAlias", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.clientCert);
+    devConfig.wifiEapConfig.certEntry = JsObjectToU8Vector(env, napiEap, "certEntry");
+
+    std::string certPwd;
+    JsObjectToString(env, napiEap, "certPassword", NAPI_MAX_STR_LENT, certPwd);
+    if (strncpy_s(devConfig.wifiEapConfig.certPassword, sizeof(devConfig.wifiEapConfig.certPassword),
+        certPwd.c_str(), certPwd.length()) != EOK) {
+        WIFI_LOGE("%{public}s: failed to copy", __func__);
     }
+    JsObjectToString(env, napiEap, "altSubjectMatch", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.altSubjectMatch);
+    JsObjectToString(env, napiEap, "domainSuffixMatch", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.domainSuffixMatch);
+    JsObjectToString(env, napiEap, "realm", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.realm);
+    JsObjectToString(env, napiEap, "plmn", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.plmn);
+    JsObjectToInt(env, napiEap, "eapSubId", devConfig.wifiEapConfig.eapSubId);
     return CreateInt32(env);
 }
 

@@ -463,6 +463,7 @@ private:
     SvcIdentity svcIdentity_ = { 0 };
     bool remoteDied_;
     void WriteIpAddress(IpcIo &req, const WifiIpAddress &address);
+    void WriteEapConfig(IpcIo &req, const WifiEapConfig &wifiEapConfig);
     void WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &req);
 #else
 private:
@@ -485,7 +486,9 @@ private:
     */
     void OnRemoteDied(const wptr<IRemoteObject> &remoteObject);
     void WriteIpAddress(MessageParcel &data, const WifiIpAddress &address);
+    void WriteEapConfig(MessageParcel &data, const WifiEapConfig &wifiEapConfig);
     void ReadIpAddress(MessageParcel &reply, WifiIpAddress &address);
+    void ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEapConfig);
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);

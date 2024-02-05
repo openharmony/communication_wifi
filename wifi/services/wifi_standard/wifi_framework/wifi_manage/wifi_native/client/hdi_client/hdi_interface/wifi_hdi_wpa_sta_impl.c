@@ -735,6 +735,25 @@ WifiErrorNo HdiWpaStaSetCountryCode(const char *countryCode)
     return WIFI_IDL_OPT_OK;
 }
 
+WifiErrorNo HdiWpaStaGetCountryCode(char *countryCode, uint32_t size)
+{
+    LOGI("HdiWpaStaGetCountryCode enter, enable:%{public}s", countryCode);
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaStaGetCountryCode: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->GetCountryCode(wpaObj, "wlan0", countryCode, size);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaStaGetCountryCode: SetCountryCode failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiWpaStaGetCountryCode success.");
+    return WIFI_IDL_OPT_OK;
+}
+
 WifiErrorNo HdiWpaStaSetSuspendMode(int mode)
 {
     LOGI("HdiWpaStaSetSuspendMode enter, mode:%{public}d", mode);
@@ -751,6 +770,44 @@ WifiErrorNo HdiWpaStaSetSuspendMode(int mode)
     }
 
     LOGI("HdiWpaStaSetSuspendMode success.");
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32_t *size)
+{
+    LOGI("HdiWpaListNetworks enter");
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaListNetworks: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->ListNetworks(wpaObj, "wlan0", networkList, size);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaListNetworks: ListNetworks failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiWpaListNetworks success.");
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen)
+{
+    LOGI("HdiWpaGetNetwork enter,networkId:%{public}d", networkId);
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaGetNetwork: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->GetNetwork(wpaObj, "wlan0", networkId, param, value, valueLen);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaGetNetwork: GetNetwork failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiWpaGetNetwork success.");
     return WIFI_IDL_OPT_OK;
 }
 #endif

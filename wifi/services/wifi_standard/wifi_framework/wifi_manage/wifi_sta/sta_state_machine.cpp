@@ -1158,7 +1158,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT) {
         WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
-        SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
+        SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_REJECTED);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);

@@ -21,6 +21,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+static int g_Lenth = 180;
 HWTEST_F(WifiSupplicantHalInterfaceTest, StartSupplicantTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiSupplicantHalInterface::GetInstance().StartSupplicant();

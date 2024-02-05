@@ -32,7 +32,11 @@ int WifiControllerMachine::mWifiStartFailCount{0};
 int WifiControllerMachine::mSoftapStartFailCount{0};
 
 WifiControllerMachine::WifiControllerMachine()
-    : StateMachine("WifiControllerMachine"), pEnableState(nullptr), pDisableState(nullptr), pDefaultState(nullptr)
+    : StateMachine("WifiControllerMachine"),
+      mApidStopWifi(0),
+      pEnableState(nullptr),
+      pDisableState(nullptr),
+      pDefaultState(nullptr)
 {}
 
 WifiControllerMachine::~WifiControllerMachine()

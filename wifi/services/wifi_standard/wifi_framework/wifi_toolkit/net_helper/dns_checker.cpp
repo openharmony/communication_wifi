@@ -60,9 +60,8 @@ struct QUESTION {
     unsigned short qclass;
 };
 
-DnsChecker::DnsChecker() : socketCreated(false), isRunning(true)
-{
-}
+DnsChecker::DnsChecker() : dnsSocket(0), socketCreated(false), isRunning(true)
+{}
 
 DnsChecker::~DnsChecker()
 {
@@ -135,7 +134,7 @@ void DnsChecker::StopDnsCheck()
 bool DnsChecker::DoDnsCheck(std::string url, int timeoutMillis)
 {
     LOGI("DoDnsCheck Enter.");
-    int len1 = url.find("/generate_204");
+    int len1 = (int)url.find("/generate_204");
     int len =  len1 - strlen("http://");
     std::string host = url.substr(strlen("http://"), len);
     host = host + ".";

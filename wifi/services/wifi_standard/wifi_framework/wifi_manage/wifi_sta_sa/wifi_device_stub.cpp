@@ -129,6 +129,10 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO)] =
         &WifiDeviceStub::OnGetLinkedInfo;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO)] = &WifiDeviceStub::OnGetIpInfo;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_COUNTRY_CODE)] =
+         &WifiDeviceStub::OnSetCountryCode;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE)] =
+         &WifiDeviceStub::OnGetCountryCode;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT)] =
         &WifiDeviceStub::OnRegisterCallBack;
     InitHandleMapEx();
@@ -777,6 +781,32 @@ void WifiDeviceStub::OnGetIpV6Info(uint32_t code, MessageParcel &data, MessagePa
         reply.WriteString(info.primaryDns);
         reply.WriteString(info.secondDns);
     }
+    return;
+}
+
+void WifiDeviceStub::OnSetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
+    std::string countrycode = data.ReadString();
+    ret = SetCountryCode(countrycode);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+ 
+void WifiDeviceStub::OnGetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::string countryCode;
+    ErrCode ret = GetCountryCode(countryCode);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+ 
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteString(countryCode);
+    }
+ 
     return;
 }
 

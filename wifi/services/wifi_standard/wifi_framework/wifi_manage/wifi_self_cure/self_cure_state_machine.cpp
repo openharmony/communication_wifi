@@ -28,7 +28,6 @@ DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 
 SelfCureStateMachine::SelfCureStateMachine(int instId)
     : StateMachine("SelfCureStateMachine"),
-      pNetcheck(nullptr),
       pDefaultState(nullptr),
       pConnectedMonitorState(nullptr),
       pDisconnectedMonitorState(nullptr),
@@ -43,7 +42,6 @@ SelfCureStateMachine::~SelfCureStateMachine()
 {
     WIFI_LOGD("~SelfCureStateMachine");
     StopHandlerThread();
-    ParsePointer(pNetcheck);
     ParsePointer(pDefaultState);
     ParsePointer(pConnectedMonitorState);
     ParsePointer(pDisconnectedMonitorState);
@@ -97,7 +95,6 @@ ErrCode SelfCureStateMachine::Initialize()
     BuildStateTree();
     SetFirstState(pDisconnectedMonitorState);
     StartStateMachine();
-    pNetcheck = new (std::nothrow) StaNetworkCheck(nullptr, nullptr, nullptr, m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -995,11 +992,6 @@ bool SelfCureStateMachine::IsHttpReachable()
 {
     std::lock_guard<std::mutex> lock(mMutex);
     int respCode = 0;
-    pNetcheck->GetHttpCodeNum(respCode);
-    WIFI_LOGD("IsHttpReachable, respCode is : %{public}d", respCode);
-    if (pNetcheck->UnreachableRespCode(respCode)) {
-        return false;
-    }
     mIsHttpRedirected = respCode == NET_ERR_HTTP_REDIRECTED;
     return true;
 }

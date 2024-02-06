@@ -16,6 +16,8 @@
 #ifndef OHOS_WIFI_PERMISSION_HELPER
 #define OHOS_WIFI_PERMISSION_HELPER
 
+#include <string>
+
 namespace OHOS {
 namespace Wifi {
 enum IsGranted {

@@ -144,11 +144,11 @@ void WifiEventSubscriberManager::RegisterCesEvent()
     WIFI_LOGI("RegisterCesEvent start");
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     cesEventSubscriber_ = std::make_shared<CesEventSubscriber>(subscriberInfo);
-    if (!EventFwk::CommonEventMannager::SubscribeCommonEvent(cesEventSubscriber_)) {
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(cesEventSubscriber_)) {
         WIFI_LOGE("CesEvent SubscribeCommonEvent() failed");
         cesEventSubscriber_ = nullptr;
         WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterCesEvent, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, cesTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WifiTimer::GetInstance()->Register(timeoutCallBack, cesTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterCesEvent retry, cesTimerId = %{public}u", cesTimerId);
     } else {
         WIFI_LOGI("RegisterCesEvent success");
@@ -165,7 +165,7 @@ void WifiEventSubscriberManager::UnRegisterCesEvent()
     if (!isCesEventSubscribered) {
         return;
     }
-    if (!EventFwk::CommonEventMannager::UnSubscribeCommonEvent(cesEventSubscriber_)) {
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(cesEventSubscriber_)) {
         WIFI_LOGE("UnRegisterCesEvent failed");
     }
     cesEventSubscriber_ = nullptr;
@@ -618,7 +618,7 @@ void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEven
     }
 }
 
-void CesEventSubscriber::OnReceiveBatteryEventEvent(const OHOS::EventFwk::CommonEventData &eventData)
+void CesEventSubscriber::OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("BatteryEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());

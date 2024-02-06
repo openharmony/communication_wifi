@@ -15,11 +15,13 @@
 #ifndef OHOS_WIFI_PERMISSION_UTILS_H
 #define OHOS_WIFI_PERMISSION_UTILS_H
 
-#include <map>
-#include "permission_def.h"
-
 namespace OHOS {
 namespace Wifi {
+enum IsGranted {
+    PERMISSION_DENIED = 0,  /* Not granted */
+    PERMISSION_GRANTED = 1, /* Granted */
+};
+
 class WifiPermissionUtils {
 public:
     static int VerifySetWifiInfoPermission();

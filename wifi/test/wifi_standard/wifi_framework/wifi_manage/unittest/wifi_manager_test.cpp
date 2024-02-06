@@ -308,30 +308,6 @@ HWTEST_F(WifiManagerTest, MdmPropChangeEvtTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->MdmPropChangeEvt(key.c_str(), value.c_str(), nullptr);
 }
 
-HWTEST_F(WifiManagerTest, RegisterAppRemovedTest, TestSize.Level1)
-{
-    WIFI_LOGI("RegisterAppRemovedTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterAppRemoved();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterAppRemovedTest, TestSize.Level1)
-{
-    WIFI_LOGI("UnRegisterAppRemoved enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterAppRemoved();
-}
-
-HWTEST_F(WifiManagerTest, RegisterThermalLevelTest, TestSize.Level1)
-{
-    WIFI_LOGI("RegisterThermalLevelTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterThermalLevel();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterThermalLevelTest, TestSize.Level1)
-{
-    WIFI_LOGI("UnRegisterThermalLevelTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterThermalLevel();
-}
-
 HWTEST_F(WifiManagerTest, ScreenEventSubscriberOnReceiveEventTest, TestSize.Level1)
 {
     WIFI_LOGI("ScreenEventSubscriberOnReceiveEventTest enter!");
@@ -339,7 +315,7 @@ HWTEST_F(WifiManagerTest, ScreenEventSubscriberOnReceiveEventTest, TestSize.Leve
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     EventFwk::CommonEventData data;
     data.SetWant(want);
-    wifiManager.wifiEventSubscriberManager->screenEventSubscriber_->OnReceiveEvent(data);
+    wifiManager.wifiEventSubscriberManager->cesEventSubscriber_->OnReceiveEvent(data);
 }
 
 HWTEST_F(WifiManagerTest, AirplaneModeEventSubscriberOnReceiveEventTest, TestSize.Level1)
@@ -350,9 +326,9 @@ HWTEST_F(WifiManagerTest, AirplaneModeEventSubscriberOnReceiveEventTest, TestSiz
     EventFwk::CommonEventData data;
     data.SetWant(want);
     data.SetCode(1);
-    wifiManager.wifiEventSubscriberManager->airplaneModeEventSubscriber_->OnReceiveEvent(data);
+    wifiManager.wifiEventSubscriberManager->cesEventSubscriber_->OnReceiveEvent(data);
     data.SetCode(0);
-    wifiManager.wifiEventSubscriberManager->airplaneModeEventSubscriber_->OnReceiveEvent(data);
+    wifiManager.wifiEventSubscriberManager->cesEventSubscriber_->OnReceiveEvent(data);
 }
 
 HWTEST_F(WifiManagerTest, BatteryEventSubscriberOnReceiveEventTest, TestSize.Level1)
@@ -362,10 +338,10 @@ HWTEST_F(WifiManagerTest, BatteryEventSubscriberOnReceiveEventTest, TestSize.Lev
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_POWER_CONNECTED);
     EventFwk::CommonEventData data;
     data.SetWant(want);
-    wifiManager.wifiEventSubscriberManager->airplaneModeEventSubscriber_->OnReceiveEvent(data);
+    wifiManager.wifiEventSubscriberManager->cesEventSubscriber_->OnReceiveEvent(data);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_POWER_DISCONNECTED);
     data.SetWant(want);
-    wifiManager.wifiEventSubscriberManager->airplaneModeEventSubscriber_->OnReceiveEvent(data);
+    wifiManager.wifiEventSubscriberManager->cesEventSubscriber_->OnReceiveEvent(data);
 }
 
 HWTEST_F(WifiManagerTest, AppEventSubscriberOnReceiveEventTest, TestSize.Level1)
@@ -375,7 +351,7 @@ HWTEST_F(WifiManagerTest, AppEventSubscriberOnReceiveEventTest, TestSize.Level1)
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
     EventFwk::CommonEventData data;
     data.SetWant(want);
-    wifiManager.wifiEventSubscriberManager->eventSubscriber_->OnReceiveEvent(data);
+    wifiManager.wifiEventSubscriberManager->cesEventSubscriber_->OnReceiveEvent(data);
 }
 
 HWTEST_F(WifiManagerTest, ThermalLevelSubscriberOnReceiveEventTest, TestSize.Level1)
@@ -385,7 +361,7 @@ HWTEST_F(WifiManagerTest, ThermalLevelSubscriberOnReceiveEventTest, TestSize.Lev
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED);
     EventFwk::CommonEventData data;
     data.SetWant(want);
-    wifiManager.wifiEventSubscriberManager->thermalLevelSubscriber_->OnReceiveEvent(data);
+    wifiManager.wifiEventSubscriberManager->cesEventSubscriber_->OnReceiveEvent(data);
 }
 }  // namespace Wifi
 }  // namespace OHOS

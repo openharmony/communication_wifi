@@ -23,8 +23,6 @@
 #include "wifi_global_func.h"
 #include "wifi_system_timer.h"
 #include "common_event_support.h"
-#include "common_event_manager.h"
-#include "common_event_manager.h"
 #include "wifi_datashare_utils.h"
 #include "wifi_location_mode_observer.h"
 #include "wifi_common_util.h"
@@ -64,22 +62,6 @@ static sptr<WifiPowerStateListener> powerStateListener_ = nullptr;
 #ifdef HAS_MOVEMENT_PART
 static sptr<DeviceMovementCallback> deviceMovementCallback_ = nullptr;
 #endif
-
-class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-    virtual ~CesEventSubscriber();
-    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
-    void OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    void OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    void OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    void OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    bool lastSleepState = false;
-};
-
-static std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
 
 using CesFuncType = void (CesEventSubscriber::*)(const OHOS::EventFwk::CommonEventData &eventData);
 

@@ -22,9 +22,24 @@
 #include "wifi_errcode.h"
 #include "wifi_internal_msg.h"
 #include "wifi_system_ability_listerner.h"
+#include "common_event_manager.h"
 
 namespace OHOS {
 namespace Wifi {
+class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~CesEventSubscriber();
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+    void OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    bool lastSleepState = false;
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
@@ -59,10 +74,6 @@ private:
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);
     void RegisterPowerStateListener();
     void UnRegisterPowerStateListener();
-    void RegisterAppRemoved();
-    void UnRegisterAppRemoved();
-    void RegisterThermalLevel();
-    void UnRegisterThermalLevel();
 #ifdef HAS_MOVEMENT_PART
     void RegisterMovementCallBack();
     void UnRegisterMovementCallBack();
@@ -72,6 +83,7 @@ private:
     uint32_t cesTimerId{0};
     std::mutex cesEventMutex;
     bool isCesEventSubscribered;
+    std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
 #ifdef HAS_POWERMGR_PART
     std::mutex powerStateEventMutex;
 #endif

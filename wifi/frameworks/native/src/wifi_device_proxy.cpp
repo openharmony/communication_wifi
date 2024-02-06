@@ -1095,7 +1095,7 @@ ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
         return ErrCode(ret);
     }
     int tempReason = reply.ReadInt32();
-    if (tempReason >= 0 && tempReason <= (int)DisconnectedReason::DISC_REASON_CONNECTION_FULL) {
+    if (tempReason >= 0 && tempReason <= (int)DisconnectedReason::DISC_REASON_CONNECTION_REJECTED) {
         reason = (DisconnectedReason)tempReason;
     } else {
         reason = DisconnectedReason::DISC_REASON_DEFAULT;

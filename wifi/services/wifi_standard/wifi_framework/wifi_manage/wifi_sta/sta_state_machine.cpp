@@ -48,7 +48,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define FIRST_DNS "8.8.8.8"
 #define SECOND_DNS "180.76.76.76"
 #define PORTAL_ACTION "ohos.want.action.viewData"
-#define PORTAL_ENTITY "entity.system.browsable"
+#define PORTAL_ENTITY "entity.browser.hbct"
+#define BROWSER_BUNDLE "com.huawei.hmos.browser"
 #define PORTAL_CHECK_TIME (10 * 60)
 #define PORTAL_MILLSECOND  1000
 #define WPA3_BLACKMAP_MAX_NUM 20
@@ -2346,10 +2347,14 @@ void StaStateMachine::HandlePortalNetworkPorcess()
 {
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("portal uri is %{public}s\n", mPortalUrl.c_str());
+    int netId = m_NetWorkState->GetWifiNetId();
     AAFwk::Want want;
     want.SetAction(PORTAL_ACTION);
     want.SetUri(mPortalUrl);
     want.AddEntity(PORTAL_ENTITY);
+    want.SetBundle(BROWSER_BUNDLE);
+    want.SetParam("netId", netId);
+    WIFI_LOGI("wifi netId is %{public}d", netId);
     portalFlag = true;
     OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
@@ -2397,8 +2402,7 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
     } else if (netState == StaNetState::NETWORK_CHECK_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
-        if ((linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK || portalFlag == false) &&
-           m_netState == NETWORK_CELL_NOWORK) {
+        if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
             WriteIsInternetHiSysEvent(NO_NETWORK);
             HandlePortalNetworkPorcess();
         }

@@ -161,28 +161,16 @@ HWTEST_F(WifiManagerTest, CheckAndStartScanService_002, TestSize.Level1)
     wifiManager.wifiScanManager->CheckAndStartScanService();
 }
 
-HWTEST_F(WifiManagerTest, RegisterScreenEventTest, TestSize.Level1)
+HWTEST_F(WifiManagerTest, RegisterCesEventTest, TestSize.Level1)
 {
-    WIFI_LOGE("RegisterScreenEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterScreenEvent();
+    WIFI_LOGE("RegisterCesEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->RegisterCesEvent();
 }
 
-HWTEST_F(WifiManagerTest, UnRegisterScreenEventTest, TestSize.Level1)
+HWTEST_F(WifiManagerTest, UnRegisterCesEventTest, TestSize.Level1)
 {
-    WIFI_LOGE("UnRegisterScreenEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterScreenEvent();
-}
-
-HWTEST_F(WifiManagerTest, RegisterAirplaneModeEventTest, TestSize.Level1)
-{
-    WIFI_LOGE("RegisterAirplaneModeEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterAirplaneModeEvent();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterAirplaneModeEventTest, TestSize.Level1)
-{
-    WIFI_LOGE("UnRegisterAirplaneModeEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterAirplaneModeEvent();
+    WIFI_LOGE("UnRegisterCesEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->UnRegisterCesEvent();
 }
 
 HWTEST_F(WifiManagerTest, RegisterLocationEventTest, TestSize.Level1)
@@ -195,18 +183,6 @@ HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterLocationEventTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterLocationEvent();
-}
-
-HWTEST_F(WifiManagerTest, RegisterBatteryEventTest, TestSize.Level1)
-{
-    WIFI_LOGE("RegisterBatteryEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterBatteryEvent();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterBatteryEventTest, TestSize.Level1)
-{
-    WIFI_LOGE("UnRegisterBatteryEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterBatteryEvent();
 }
 
 HWTEST_F(WifiManagerTest, RegisterPowerStateListenerTest, TestSize.Level1)

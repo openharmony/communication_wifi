@@ -42,7 +42,6 @@ DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 namespace OHOS {
 namespace Wifi {
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
-constexpr uint32_t TIMEOUT_CHECK_LAST_STA_STATE_EVENT = 10 * 1000;
 constexpr uint32_t PROP_LEN = 26;
 constexpr uint32_t PROP_SUBCHIPTYPE_LEN = 10;
 constexpr uint32_t SUPPORT_COEXCHIP_LEN = 7;

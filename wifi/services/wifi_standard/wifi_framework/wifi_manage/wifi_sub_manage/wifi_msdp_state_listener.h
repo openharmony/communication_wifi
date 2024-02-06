@@ -16,8 +16,8 @@
 #ifndef OHOS_WIFI_MSDP_STATE_LISTENER_H
 #define OHOS_WIFI_MSDP_STATE_LISTENER_H
 
-#include "movement_client.h" 
-#include "movement_callback_stub.h" 
+#include "movement_client.h"
+#include "movement_callback_stub.h"
 
 namespace OHOS {
 namespace Wifi {

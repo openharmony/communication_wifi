@@ -20,7 +20,6 @@
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
 #endif
-
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MANAGER_PERMISSION_HELPER"
 

@@ -18,6 +18,10 @@
 
 namespace OHOS {
 namespace Wifi {
+enum IsGranted {
+    PERMISSION_DENIED = 0,  /* Not granted */
+    PERMISSION_GRANTED = 1, /* Granted */
+};
 class WifiPermissionHelper {
 public:
     /**

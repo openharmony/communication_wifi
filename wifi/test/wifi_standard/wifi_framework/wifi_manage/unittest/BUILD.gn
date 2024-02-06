@@ -61,7 +61,6 @@ ohos_unittest("manager_unittest") {
     "//foundation/systemabilitymgr/samgr/services/samgr/native/source/service_registry.cpp",
     "common/wifi_permission_helper_test.cpp",
     "mock_wifi_system_ability_listerner.cpp",
-    "wifi_auth_center_test.cpp",
     "wifi_config_center_test.cpp",
     "wifi_country_code_manager_test.cpp",
     "wifi_country_code_policy_test.cpp",

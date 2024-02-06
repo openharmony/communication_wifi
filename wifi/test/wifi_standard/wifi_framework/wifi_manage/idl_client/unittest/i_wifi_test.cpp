@@ -1221,7 +1221,7 @@ HWTEST_F(IWifiTest, OnTransactTest44, TestSize.Level1)
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
 }
 
-HWTEST_F(IWifiTest, GetWifiChipTest, TestSize.Level1)
+HWTEST_F(IWifiTest, GetWifiChipIdsTest, TestSize.Level1)
 {
     uint8_t id = 1;
     int32_t chip = 1;

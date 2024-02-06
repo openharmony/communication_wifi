@@ -646,7 +646,10 @@ int RpcP2pReqServiceDiscovery(RpcServer *server, Context *context)
         if (pDiscoverInfo == NULL) {
             return HAL_FAILURE;
         }
-        ReadStr(context, pDiscoverInfo, len + 1);
+        if (ReadStr(context, pDiscoverInfo, len + 1) != 0) {
+            free(pDiscoverInfo);
+            return HAL_FAILURE;
+        }
     }
     int retSize = 0;
     if (ReadInt(context, &retSize) < 0 || retSize <= 0) {
@@ -728,7 +731,10 @@ int RpcP2pRespServerDiscovery(RpcServer *server, Context *context)
     if (info.tlvs == NULL) {
         return HAL_FAILURE;
     }
-    ReadStr(context, info.tlvs, tlvsLen + 1);
+    if (ReadStr(context, info.tlvs, tlvsLen + 1) != 0) {
+        free(info.tlvs);
+        return HAL_FAILURE;
+    }
     WifiErrorNo err = P2pRespServerDiscovery(&info);
     WriteBegin(context, 0);
     WriteInt(context, err);

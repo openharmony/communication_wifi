@@ -70,19 +70,19 @@ class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     virtual ~CesEventSubscriber();
-    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-    void OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEventData &data);
-    void OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &data);
-    void OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &data);
-    void OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEventData &data);
-    void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &data);
-    void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &data);
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+    void OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     bool lastSleepState = false;
 };
 
 static std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
 
-using CesFuncType = void (CesEventSubscriber::*)(const OHOS::EventFwk::CommonEventData &data);
+using CesFuncType = void (CesEventSubscriber::*)(const OHOS::EventFwk::CommonEventData &eventData);
 
 const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON, &CesEventSubscriber::OnReceiveScreenEvent},
@@ -541,23 +541,23 @@ CesEventSubscriber::~CesEventSubscriber()
     WIFI_LOGI("~CesEventSubscriber enter");
 }
 
-void CesEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
+void CesEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    std::string action = data.getWant().GetAction();
+    std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("CesEventSubscriber OnReceiveEvent: %{public}s", action.c_str());
     auto itFunc = CES_REQUEST_MAP.find(action);
     if (itFunc != CES_REQUEST_MAP.end()) {
         auto requestFunc = itFunc->second;
         if (requestFunc != nullptr) {
-            return (this->*requestFunc)(data);
+            return (this->*requestFunc)(eventData);
         }
     }
     WIFI_LOGE("CesEventSubscriber OnReceiveEvent unknown Event: %{public}s", action.c_str());
 }
 
-void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &data)
+void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    std::string action = data.GetWant().GetAction();
+    std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("ScreenEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
 
     int screenState = WifiSettings::GetInstance().GetScreenState();
@@ -598,7 +598,7 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
 }
 
 
-void CesEventSubscriber::OnReceiveAirplaneEventEvent(const OHOS::EventFwk::CommonEventData &data)
+void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     const auto &action = eventData.GetWant().GetAction();
     const auto &data = eventData.GetData();
@@ -618,9 +618,9 @@ void CesEventSubscriber::OnReceiveAirplaneEventEvent(const OHOS::EventFwk::Commo
     }
 }
 
-void CesEventSubscriber::OnReceiveBatteryEventEvent(const OHOS::EventFwk::CommonEventData &data)
+void CesEventSubscriber::OnReceiveBatteryEventEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    std::string action = data.GetWant().GetAction();
+    std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("BatteryEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_CONNECTED) {
         WifiSettings::GetInstance().SetNoChargerPlugModeState(MODE_STATE_CLOSE);
@@ -670,11 +670,11 @@ void CesEventSubscriber::OnReceiveBatteryEventEvent(const OHOS::EventFwk::Common
     }
 }
 
-void CesEventSubscriber::OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &data)
+void CesEventSubscriber::OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    std::string action = data.GetWant().GetAction();
+    std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("AppEventSubscriber::OnReceiveEvent : %{public}s.", action.c_str());
-    auto wantTemp = data.GetWant();
+    auto wantTemp = eventData.GetWant();
     auto uid = wantTemp.GetIntParam(AppExecFwk::Constants::UID, -1);
     if (uid == -1) {
         WIFI_LOGE("%{public}s getPackage uid is illegal.", __func__);
@@ -691,23 +691,23 @@ void CesEventSubscriber::OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData
     WifiSettings::GetInstance().SyncDeviceConfig();
 }
 
-void CesEventSubscriber::OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &data)
+void CesEventSubscriber::OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    std::string action = data.GetWant().GetAction();
+    std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("ThermalLevelSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED) {
         static const std::string THERMAL_EVENT_ID = "0";
-        int level = data.GetWant().GetIntParam(THERMAL_EVENT_ID, 0);
+        int level = eventData.GetWant().GetIntParam(THERMAL_EVENT_ID, 0);
         WifiSettings::GetInstance().SetThermalLevel(level);
         WIFI_LOGI("ThermalLevelSubscriber SetThermalLevel: %{public}d.", level);
     }
 }
 
-void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEventData &data)
+void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    const auto &action = event.GetWant().GetAction();
-    const bool napped = event.GetWant().GetBoolParam(WIFI_STANDBY_NAP, 0);
-    const bool sleeping = event.GetWant().GetBoolParam(WIFI_STANDBY_SLEEPING, 0);
+    const auto &action = eventData.GetWant().GetAction();
+    const bool napped = eventData.GetWant().GetBoolParam(WIFI_STANDBY_NAP, 0);
+    const bool sleeping = eventData.GetWant().GetBoolParam(WIFI_STANDBY_SLEEPING, 0);
     WIFI_LOGI("StandByListerner OnReceiveEvent action[%{public}s], napped[%{public}d], sleeping[%{public}d]",
         action.c_str(), napped, sleeping);
     int state = WifiSettings::GetInstance().GetScreenState();

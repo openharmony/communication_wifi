@@ -28,7 +28,6 @@ local_base_sources = [
   "scan_interface.cpp",
   "scan_monitor.cpp",
   "scan_service.cpp",
-  "scan_standby_listerner.cpp",
   "scan_state_machine.cpp",
 ]
 

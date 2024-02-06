@@ -71,6 +71,7 @@ private:
 private:
     uint32_t cesTimerId{0};
     std::mutex cesEventMutex;
+    bool isCesEventSubscribered;
 #ifdef HAS_POWERMGR_PART
     std::mutex powerStateEventMutex;
 #endif
@@ -80,6 +81,7 @@ private:
     static bool mIsMdmForbidden;
     bool isPowerStateListenerSubscribered = false;
     bool islocationModeObservered = false;
+    std::mutex locationEventMutex;
 };
 
 }  // namespace Wifi

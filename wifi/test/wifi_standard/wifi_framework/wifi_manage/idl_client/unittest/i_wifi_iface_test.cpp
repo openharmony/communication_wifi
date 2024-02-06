@@ -18,6 +18,7 @@
 #include "i_wifi_iface.h"
 #include "mock_wifi_public.h"
 #include "i_wifi_sta_iface.h"
+#include "i_wifi_p2p_iface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -358,20 +359,7 @@ HWTEST_F(IWifiIfaceTest, RunCmdTest, TestSize.Level1)
     MockWifiPublic::SetMockFlag(false);
 }
 
-HWTEST_F(IWifiIfaceTest, RunCmdTest, TestSize.Level1)
-{
-    int32_t cmdId = LENTH;
-    int32_t bufSize = LENMAC;
-    char ifname[LENTH] = "test";
-    unsigned char mac[] = "00:00:00:00:00";
-    RunCmd(ifname, cmdId, mac, bufSize);
-    MockWifiPublic::SetMockFlag(true);
-    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(RunCmd(ifname, cmdId, mac, bufSize) == WIFI_IDL_OPT_FAILED);
-    MockWifiPublic::SetMockFlag(false);
-}
-
-HWTEST_F(IWifiIfaceTest, RunCmdTest, TestSize.Level1)
+HWTEST_F(IWifiIfaceTest, P2pConnectTest, TestSize.Level1)
 {
     P2pConnectInfo info;
     P2pConnect(&info);

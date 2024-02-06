@@ -408,7 +408,7 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCod
     return HdiWpaStaSetCountryCode(countryCode.c_str());
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
+static WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
 {
     char szCountryCode[WIFI_IDL_COUNTRY_CODE_LENGTH + 1] = "";
     if (WIFI_IDL_OPT_OK != HdiWpaStaGetCountryCode(szCountryCode, WIFI_IDL_COUNTRY_CODE_LENGTH)) {
@@ -535,7 +535,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &ne
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
+static WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 {
     int32_t networkId = config.networkId;
     char param[WIFI_HDI_MAX_STR_LENGTH +1] = {0};

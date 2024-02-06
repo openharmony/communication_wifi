@@ -14,7 +14,6 @@
  */
 #include "wifi_permission_helper.h"
 #include <mutex>
-#include <string>
 #include "wifi_log.h"
 #ifndef OHOS_ARCH_LITE
 #include "ipc_skeleton.h"

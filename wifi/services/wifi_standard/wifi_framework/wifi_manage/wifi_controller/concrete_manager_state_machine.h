@@ -133,7 +133,6 @@ private:
     static ErrCode AutoStartScanOnly(int instId);
     static ErrCode AutoStopStaService(int instId);
     static ErrCode AutoStartStaService(int instId);
-    static bool CheckCanOptSta(void);
     bool HandleCommonMessage(InternalMessage *msg);
     void checkAndContinueToStopWifi(InternalMessage *msg);
     void HandleStaStop();

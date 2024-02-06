@@ -135,4 +135,5 @@ ohos_shared_library("wifi_p2p_service") {
 
   part_name = "wifi"
   subsystem_name = "communication"
+  version_script = "libwifi_p2p_service.map"
 }

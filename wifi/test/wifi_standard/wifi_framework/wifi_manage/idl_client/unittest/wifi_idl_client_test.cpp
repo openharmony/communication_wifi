@@ -633,6 +633,14 @@ HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest4, TestSize.Level1)
     mClient.SetDeviceConfig(networkId, config);
     config.authAlgorithms = 0;
     mClient.SetDeviceConfig(networkId, config);
+    config.isRequirePmf = true;
+    mClient.SetDeviceConfig(networkId, config);
+    config.allowedProtocols = 1;
+    mClient.SetDeviceConfig(networkId, config);
+    config.allowedPairwiseCiphers = 1;
+    mClient.SetDeviceConfig(networkId, config);
+    config.allowedGroupCiphers = 1;
+    mClient.SetDeviceConfig(networkId, config);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
@@ -1550,6 +1558,41 @@ HWTEST_F(WifiIdlClientTest, ReqP2pFlushServiceTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqWpaSetPowerModeTest, TestSize.Level1)
 {
     mClient.ReqWpaSetPowerMode(true);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqStopPnoScanTest, TestSize.Level1)
+{
+    mClient.ReqStopPnoScan();
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_TRUE(mClient.ReqStopPnoScan() == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqRegisterStaEventCallbackt, TestSize.Level1)
+{
+    WifiEventCallback callback;
+    mClient.ReqRegisterStaEventCallback(callback);
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_TRUE(mClient.ReqRegisterStaEventCallback(callback) == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqP2pGetChba0FreqTest, TestSize.Level1)
+{
+    int chba0Freq = 0;
+    mClient.ReqP2pGetChba0Freq(chba0Freq);
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_TRUE(mClient.ReqP2pGetChba0Freq(chba0Freq) == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
+}
+
+HWTEST_F(WifiIdlClientTest, ReqIsSupportDbdcTest, TestSize.Level1)
+{
+    bool isSupport = true;
+    mClient.ReqIsSupportDbdc(isSupport);
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_TRUE(mClient.ReqIsSupportDbdc(isSupport) == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -16,9 +16,6 @@
 #ifndef OHOS_WIFI_PERMISSION_HELPER
 #define OHOS_WIFI_PERMISSION_HELPER
 
-#include <map>
-#include "permission_def.h"
-
 namespace OHOS {
 namespace Wifi {
 class WifiPermissionHelper {

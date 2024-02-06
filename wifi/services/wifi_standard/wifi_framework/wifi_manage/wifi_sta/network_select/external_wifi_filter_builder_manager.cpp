@@ -54,7 +54,7 @@ void ExternalWifiFilterBuildManager::DeregisterFilterBuilder(const FilterTag &fi
 }
 
 void ExternalWifiFilterBuildManager::BuildFilter(const FilterTag &filterTag,
-     NetworkSelection::CompositeWifiFilter &compositeFilter)
+    NetworkSelection::CompositeWifiFilter &compositeFilter)
 {
     std::lock_guard<std::mutex> lock(mutex);
     for (const auto &filterBuilderPair : filterBuilders) {

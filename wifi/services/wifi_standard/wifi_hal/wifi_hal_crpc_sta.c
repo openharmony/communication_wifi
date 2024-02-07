@@ -480,7 +480,10 @@ int RpcRunCmd(RpcServer *server, Context *context)
         if (pIfName == NULL) {
             return HAL_FAILURE;
         }
-        ReadStr(context, pIfName, len);
+        if (ReadStr(context, pIfName, len) != 0) {
+            free(pIfName);
+            return HAL_FAILURE;
+        }
     }
     int cmdid = 0;
     int bufsize = 0;
@@ -746,7 +749,10 @@ static char **ReadRoamBlockList(Context *context, int size)
         if (list[i] == NULL) {
             break;
         }
-        ReadStr(context, list[i], len);
+        if (ReadStr(context, list[i], len) != 0) {
+            free(list[i]);
+            return NULL;
+        }
     }
     if (i < size) {
         for (int j = 0; j <= i; ++j) {

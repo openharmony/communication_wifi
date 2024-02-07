@@ -108,20 +108,7 @@ void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLe
 void StaNetworkCheck::DnsDetection(std::string url)
 {
     if (dnsStateHandler) {
-#ifndef OHOS_ARCH_LITE
-        if (mDetectionEventHandler) {
-            mDetectionEventHandler->PostSyncTask(
-                [this, &url]() {
-                    if (!dnsChecker.DoDnsCheck(url, MAX_ARP_DNS_CHECK_TIME)) {
-                        WIFI_LOGE("RunNetCheckThreadFunc dns check unreachable.");
-                        dnsStateHandler(StaDnsState::DNS_STATE_UNREACHABLE);
-                    } else {
-                        WIFI_LOGI("RunNetCheckThreadFunc dns check normal.");
-                        dnsStateHandler(StaDnsState::DNS_STATE_WORKING);
-                    }
-                });
-        }
-#endif
+        return;
     }
 }
 
@@ -179,7 +166,6 @@ int StaNetworkCheck::HttpPortalDetection(const std::string &url) __attribute__((
     httpReq.SetHeader("Accept", "*/*");
     httpReq.SetHeader("Accept-Language", "cn");
     httpReq.SetHeader("User-Agent", "Mozilla/4.0");
-    httpReq.SetHeader("Host", "connectivitycheck.platform.hicloud.com");
     httpReq.SetHeader("Cache-Control", "no-cache");
     httpReq.SetHeader("Connection", "Keep-Alive");
     httpReq.SetTimeout(HTTP_DETECTION_TIMEOUT);

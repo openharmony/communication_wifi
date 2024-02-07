@@ -26,7 +26,6 @@ DEFINE_WIFILOG_LABEL("WifiNetObserver");
 namespace OHOS {
 namespace Wifi {
 using namespace NetManagerStandard;
-constexpr int32_t RETRY_MAX_TIMES = 10;
 
 NetStateObserver &NetStateObserver::GetInstance()
 {
@@ -52,39 +51,11 @@ void NetStateObserver::SetNetStateCallback(std::function<void(SystemNetWorkState
 void NetStateObserver::StartNetStateObserver()
 {
     WIFI_LOGI("StartNetObserver");
-    std::thread th = std::thread([this]() {
-        NetManagerStandard::NetSpecifier netSpecifier;
-        NetManagerStandard::NetAllCapabilities netAllCapabilities;
-        netAllCapabilities.netCaps_.insert(NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET);
-        netSpecifier.ident_ = "";
-        netSpecifier.netCapabilities_ = netAllCapabilities;
-        int32_t retryCount = 0;
-        int32_t ret = 0;
-        do {
-            ret = NetManagerStandard::NetConnClient::GetInstance().RegisterNetConnCallback(this);
-            if (ret == 0) {
-                WIFI_LOGI("StartNetObserver register success");
-                return;
-            }
-            retryCount++;
-            WIFI_LOGI("StartNetObserver retry, ret = %{public}d", ret);
-            sleep(1);
-        } while (retryCount < RETRY_MAX_TIMES);
-        WIFI_LOGI("StartNetObserver failed");
-    });
-    th.detach();
 }
 
 void NetStateObserver::StopNetStateObserver()
 {
     WIFI_LOGI("StopNetObserver");
-    int32_t ret = 0;
-    ret = NetManagerStandard::NetConnClient::GetInstance().UnregisterNetConnCallback(this);
-    if (ret == 0) {
-        WIFI_LOGI("StopNetObserver unregister success");
-        return;
-    }
-    WIFI_LOGE("StopNetObserver unregister failed!");
 }
 
 int32_t NetStateObserver::NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
@@ -130,6 +101,24 @@ SystemNetWorkState NetStateObserver::GetCellNetState()
     }
     WIFI_LOGI("GetCellNetState is cell no work");
     return NETWORK_CELL_NOWORK;
+}
+
+int32_t NetStateObserver::GetWifiNetId()
+{
+    std::list<sptr<NetHandle>> netList;
+    int32_t ret = NetConnClient::GetInstance().GetAllNets(netList);
+    if (ret != NETMANAGER_SUCCESS) {
+        WIFI_LOGE("GetAllNets failed!");
+        return 0;
+    }
+    for (auto iter : netList) {
+        NetManagerStandard::NetAllCapabilities netAllCap;
+        NetConnClient::GetInstance().GetNetCapabilities(*iter, netAllCap);
+        if (netAllCap.bearerTypes_.count(NetManagerStandard::BEARER_WIFI) > 0) {
+            return iter->GetNetId();
+        }
+    }
+    return 0;
 }
 }
 }

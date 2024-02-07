@@ -230,7 +230,7 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
 
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
-    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
+    if ((config.ssid.length() <= 0) || (config.ssid.length() > DEVICE_NAME_LENGTH) || (config.keyMgmt.length()) <= 0) {
         WIFI_LOGE("CheckConfigPwd: invalid ssid or keyMgmt!");
         return false;
     }
@@ -240,8 +240,11 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return CheckConfigEap(config);
     }
 
-    if ((config.keyMgmt != KEY_MGMT_NONE && config.keyMgmt != KEY_MGMT_WEP) &&
-        config.preSharedKey.empty()) {
+    if (config.keyMgmt == KEY_MGMT_NONE) {
+        return config.preSharedKey.empty();
+    }
+
+    if (config.keyMgmt != KEY_MGMT_WEP && config.preSharedKey.empty()) {
         WIFI_LOGE("CheckConfigPwd: preSharedKey is empty!");
         return false;
     }
@@ -267,9 +270,6 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
             }
         }
         return true;
-    }
-    if (config.keyMgmt == KEY_MGMT_NONE) {
-        return config.preSharedKey.empty();
     }
     int minLen = config.keyMgmt == KEY_MGMT_SAE ? MIN_SAE_LEN : MIN_PSK_LEN;
     int maxLen = isAllHex ? MAX_HEX_LEN : MAX_PRESHAREDKEY_LEN;

@@ -372,6 +372,14 @@ public:
     {
         pP2pStateMachine->HandleP2pServiceResp(resp, dev);
     }
+    void OnSuccessTest()
+    {
+        char ifname[] = "  ";
+        DhcpResult result;
+        pP2pStateMachine->pDhcpResultNotify->OnSuccess(1, nullptr, &result);
+        pP2pStateMachine->pDhcpResultNotify->OnSuccess(1, ifname, nullptr);
+        pP2pStateMachine->pDhcpResultNotify->OnSuccess(1, ifname, &result);
+    }
 };
 
 void ButtonTest(AlertDialog &dialog, std::any ctx)
@@ -877,6 +885,11 @@ HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp4, TestSize.Level1)
     resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC);
     WifiP2pDevice dev;
     WarpHandleP2pServiceResp(resp, dev);
+}
+
+HWTEST_F(P2pStateMachineTest, OnSuccessTest, TestSize.Level1)
+{
+    OnSuccessTest();
 }
 }  // namespace Wifi
 }  // namespace OHOS

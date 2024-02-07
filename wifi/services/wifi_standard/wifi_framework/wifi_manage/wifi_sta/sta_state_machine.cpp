@@ -1691,14 +1691,14 @@ bool StaStateMachine::SetRandomMac(int networkId)
             std::string macAddress;
             WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
             randomMacInfo.randomMac = macAddress;
-            LOGD("%{public}s: generate a random mac, randomMac:%{private}s, ssid:%{private}s, peerbssid:%{private}s",
-                __func__, randomMacInfo.randomMac.c_str(), randomMacInfo.ssid.c_str(),
-                randomMacInfo.peerBssid.c_str());
+            LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                MacAnonymize(randomMacInfo.peerBssid).c_str());
             WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
         } else {
-            LOGD("%{public}s: randomMac:%{private}s, ssid:%{private}s, peerbssid:%{private}s",
-                __func__, randomMacInfo.randomMac.c_str(), randomMacInfo.ssid.c_str(),
-                randomMacInfo.peerBssid.c_str());
+            LOGI("%{public}s: randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                MacAnonymize(randomMacInfo.peerBssid).c_str());
         }
         currentMac = randomMacInfo.randomMac;
     }
@@ -1708,7 +1708,8 @@ bool StaStateMachine::SetRandomMac(int networkId)
         return false;
     }
 
-    LOGD("%{public}s, currentMac:%{private}s, lastMac:%{private}s", __func__, currentMac.c_str(), lastMac.c_str());
+    LOGI("%{public}s, currentMac:%{public}s, lastMac:%{public}s",
+        __func__, MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {

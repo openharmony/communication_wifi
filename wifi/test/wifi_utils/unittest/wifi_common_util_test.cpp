@@ -28,6 +28,8 @@ constexpr int MIN_24G_CHANNEL = 1;
 constexpr int MIN_5G_CHANNEL = 36;
 constexpr int FREQ_2G_MIN = 2412;
 constexpr int CHANNEL_14 = 14;
+constexpr int WIFI_MAC_LEN = 6;
+
 
 
 class WifiCommonUtilTest : public testing::Test {
@@ -41,7 +43,7 @@ HWTEST_F(WifiCommonUtilTest, MacStrToArrayTest, TestSize.Level1)
 {
     std::string strmac = "00:55:DD:ff:MM";
     unsigned char mac[WIFI_MAC_LEN]
-    MacStrToArray();
+    MacStrToArray(strmac, mac);
 }
 
 HWTEST_F(WifiCommonUtilTest, Ip2NumberTest, TestSize.Level1)

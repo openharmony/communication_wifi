@@ -656,7 +656,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetPersistentReconnectTest, TestSize.Le
     mContext->nPos = strlen("N\tP2pSetPersistentReconnect\t");
     mContext->nSize = strlen(buff);
     EXPECT_TRUE(RpcP2pSetPersistentReconnect(mServer, mContext) < 0);
-    char buff1[] = "N\tP2pSetPersistentReconnect\t17\t";
+    char buff1[] = "N\tP2pSetPersistentReconnect\t1\t";
     mContext->oneProcess = buff1;
     mContext->nPos = strlen("N\tP2pSetPersistentReconnect\t");
     mContext->nSize = strlen(buff1);

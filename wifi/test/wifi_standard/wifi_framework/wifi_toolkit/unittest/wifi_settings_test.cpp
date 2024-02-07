@@ -744,7 +744,6 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiSettingsTest, RemoveWifiP2pSupplicantGroupInfoTets, TestSize.Level1)
 {
-
     WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();
 }
 }  // namespace Wifi

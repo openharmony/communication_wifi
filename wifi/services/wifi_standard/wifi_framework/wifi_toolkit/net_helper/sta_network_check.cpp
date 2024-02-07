@@ -84,7 +84,8 @@ void StaNetworkCheck::ClearHttpResultInfo()
     bakHttpsResult.httpUrl = mUrlInfo.portalBakHttpsUrl;
 }
 
-void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLenNum, StaNetState netState)
+void StaNetworkCheck::SetHttpResultInfo(std::string url, int codeNum, int codeLenNum,
+    StaNetState netState) __attribute__((no_sanitize("cfi")))
 {
     bool isHttps = (url == mUrlInfo.portalHttpsUrl || url == mUrlInfo.portalBakHttpsUrl);
     bool isMain = (url == mUrlInfo.portalHttpUrl || url == mUrlInfo.portalHttpsUrl);

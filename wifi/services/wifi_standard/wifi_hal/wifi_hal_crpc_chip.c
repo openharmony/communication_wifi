@@ -135,7 +135,10 @@ int RpcGetIface(RpcServer *server, Context *context)
         if (pstr == NULL) {
             return HAL_FAILURE;
         }
-        ReadStr(context, pstr, len);
+        if (ReadStr(context, pstr, len) != 0) {
+            free(pstr);
+            return HAL_FAILURE;
+        }
     }
     WifiErrorNo err = GetIface((pstr == NULL) ? ifname : pstr, &wifiIface);
     WriteBegin(context, 0);
@@ -196,7 +199,10 @@ int RpcRemoveIface(RpcServer *server, Context *context)
         if (pstr == NULL) {
             return HAL_FAILURE;
         }
-        ReadStr(context, pstr, len);
+        if (ReadStr(context, pstr, len) != 0) {
+            free(pstr);
+            return HAL_FAILURE;
+        }
     }
     WifiErrorNo err = RemoveIface((pstr == NULL) ? ifname : pstr);
     WriteBegin(context, 0);

@@ -48,7 +48,7 @@ public:
 HWTEST_F(WifiCommonUtilTest, MacStrToArrayTest, TestSize.Level1)
 {
     std::string strmac = "00:55:DD:ff:MM";
-    unsigned char mac[WIFI_MAC_LENS]
+    unsigned char mac[WIFI_MAC_LENS];
     MacStrToArray(strmac, mac);
 }
 

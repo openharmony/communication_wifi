@@ -255,11 +255,13 @@ ErrCode WifiCountryCodePolicy::FindLargestCountCountryCode(std::string &wifiCoun
         return a.second > b.second;
     });
     if (sortCode.size() == 0) {
+        WIFI_LOGI("country code count is zero");
         return WIFI_OPT_FAILED;
     }
     if (sortCode.size() == 1) {
         std::pair<std::string, int> oneCode = sortCode[0];
         wifiCountryCode = oneCode.first;
+        WIFI_LOGI("only one country, code=%{public}s", wifiCountryCode.c_str());
         return WIFI_OPT_SUCCESS;
     }
     std::pair<std::string, int> firstCode = sortCode[0];
@@ -271,6 +273,7 @@ ErrCode WifiCountryCodePolicy::FindLargestCountCountryCode(std::string &wifiCoun
         return WIFI_OPT_FAILED;
     }
     wifiCountryCode = firstCode.first;
+    WIFI_LOGI("largest num of country code=%{public}s", wifiCountryCode.c_str());
     return WIFI_OPT_SUCCESS;
 }
 

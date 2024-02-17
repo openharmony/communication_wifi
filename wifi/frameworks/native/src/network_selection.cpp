@@ -85,7 +85,8 @@ WifiFunctionFilterAdapter::WifiFunctionFilterAdapter(const std::function<bool(Ne
 
 WifiFunctionFilterAdapter::~WifiFunctionFilterAdapter() = default;
 
-std::string WifiFunctionFilterAdapter::GetFilterMsg() {
+std::string WifiFunctionFilterAdapter::GetFilterMsg()
+{
     return filterName;
 }
 

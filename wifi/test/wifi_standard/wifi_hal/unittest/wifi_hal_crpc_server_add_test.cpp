@@ -665,12 +665,9 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetPersistentReconnectTest, TestSize.Le
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetChba0FreqTest, TestSize.Level1)
 {
-    RpcServer svr, *server = nullptr;
-    Context cont, *context = nullptr;
-    EXPECT_EQ(RpcP2pGetChba0Freq(server, &cont), -1);
-    EXPECT_EQ(RpcP2pGetChba0Freq(&svr, context), -1);
-    context = CreateContext(CONTEXT_BUFFER);
-    RpcP2pGetChba0Freq(&svr, context);
+    EXPECT_EQ(RpcP2pGetChba0Freq(nullptr, mContext), -1);
+    EXPECT_EQ(RpcP2pGetChba0Freq(mServer, nullptr), -1);
+    RpcP2pGetChba0Freq(mServer, mContext);
 }
 
 HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetGroupConfigTest, TestSize.Level1)
@@ -679,7 +676,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetGroupConfigTest, TestSize.Level1)
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tRP2pRemoveNetwork\t");
     mContext->nSize = strlen(buff);
-    EXPECT_EQ(RpcP2pGetGroupConfig(mServer, mContext) < 0);
+    EXPECT_TRUE(RpcP2pGetGroupConfig(mServer, mContext) < 0);
     char buff1[] = "N\tRpcP2pGetGroupConfig\t-1\t";
     mContext->oneProcess = buff1;
     mContext->nPos = strlen("N\tRpcP2pGetGroupConfig\t");
@@ -693,7 +690,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pSetGroupConfigTest, TestSize.Level1)
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tRpcP2pSetGroupConfig\t");
     mContext->nSize = strlen(buff);
-    EXPECT_EQ(RpcP2pSetGroupConfig(mServer, mContext) < 0);
+    EXPECT_TRUE(RpcP2pSetGroupConfig(mServer, mContext) < 0);
     char buff1[] = "N\tRpcP2pSetGroupConfig\t-1\t";
     mContext->oneProcess = buff1;
     mContext->nPos = strlen("N\tRpcP2pSetGroupConfig\t");
@@ -707,7 +704,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetFrequenciesTest, TestSize.Level1)
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tRpcP2pGetFrequencies\t");
     mContext->nSize = strlen(buff);
-    EXPECT_EQ(RpcP2pGetFrequencies(mServer, mContext) < 0);
+    EXPECT_TRUE(RpcP2pGetFrequencies(mServer, mContext) < 0);
     char buff1[] = "N\tRpcP2pGetFrequencies\t-1\t";
     mContext->oneProcess = buff1;
     mContext->nPos = strlen("N\tRpcP2pGetFrequencies\t");
@@ -721,7 +718,7 @@ HWTEST_F(WifiHalCRpcServerAddTest, RpcP2pGetPeerTest, TestSize.Level1)
     mContext->oneProcess = buff;
     mContext->nPos = strlen("N\tRpcP2pGetPeer\t");
     mContext->nSize = strlen(buff);
-    EXPECT_EQ(RpcP2pGetPeer(mServer, mContext) < 0);
+    EXPECT_TRUE(RpcP2pGetPeer(mServer, mContext) < 0);
     char buff1[] = "N\tRpcP2pGetPeer\t-1\t";
     mContext->oneProcess = buff1;
     mContext->nPos = strlen("N\tRpcP2pGetPeer\t");

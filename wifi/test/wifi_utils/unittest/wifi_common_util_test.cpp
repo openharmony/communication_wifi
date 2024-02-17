@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "wifi_event_handler_test.h"
+#include "wifi_common_util.h"
 
 using namespace testing::ext;
 
@@ -26,7 +26,6 @@ constexpr int FREQ_5G_MIN = 5170;
 constexpr int CHANNEL_5G_MIN = 34;
 constexpr int MIN_24G_CHANNEL = 1;
 constexpr int MIN_5G_CHANNEL = 36;
-constexpr int FREQ_2G_MIN = 2412;
 constexpr int CHANNEL_14 = 14;
 constexpr int WIFI_MAC_LEN = 6;
 
@@ -84,10 +83,10 @@ HWTEST_F(WifiCommonUtilTest, SsidAnonymizeTest, TestSize.Level1)
 {
     std::string str = "00:55:DD:ff:MM";
     SsidAnonymize(str);
-    str = "00";
-    SsidAnonymize(str);
-    strIp = "00:55:DD";
-    SsidAnonymize(str);
+    std::string strs = "00";
+    SsidAnonymize(strs);
+    std::string strIp = "00:55:DD";
+    SsidAnonymize(strIp);
 }
 }  // namespace Wifi
 }  // namespace OHOS

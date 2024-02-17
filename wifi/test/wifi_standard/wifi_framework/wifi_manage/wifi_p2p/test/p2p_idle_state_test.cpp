@@ -415,8 +415,7 @@ HWTEST_F(P2pIdleStateTest, RetryConnectTest, TestSize.Level1)
     EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
 }
 
-
-HWTEST_F(P2pIdleStateTest, RetryConnectTest, TestSize.Level1)
+HWTEST_F(P2pIdleStateTest, RetryConnectTest2, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT));

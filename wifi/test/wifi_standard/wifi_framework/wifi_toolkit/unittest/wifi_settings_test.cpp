@@ -181,7 +181,7 @@ HWTEST_F(WifiSettingsTest, AddRandomMacTest2, TestSize.Level1)
     EXPECT_TRUE(result);
     randomMacInfo.ssid = "wifitest221";
     randomMacInfo.keyMgmt = "keyM3gmt";
-    bool result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+    result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
     WIFI_LOGE("AddRandomMacTest result(%{public}d)", result);
     EXPECT_FALSE(result);
 }

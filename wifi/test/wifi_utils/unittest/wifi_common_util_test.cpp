@@ -14,12 +14,21 @@
  */
 
 #include "wifi_common_util.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-using namespace testing::ext;
+using namespace testing::ext;using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::Eq;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+using ::testing::StrEq;
+using ::testing::TypedEq;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-
 constexpr int FREQ_2G_MIN = 2412;
 constexpr int CHANNEL_14_FREQ = 2484;
 constexpr int FREQ_5G_MIN = 5170;
@@ -28,8 +37,6 @@ constexpr int MIN_24G_CHANNEL = 1;
 constexpr int MIN_5G_CHANNEL = 36;
 constexpr int CHANNEL_14 = 14;
 constexpr int WIFI_MAC_LEN = 6;
-
-
 
 class WifiCommonUtilTest : public testing::Test {
 public:

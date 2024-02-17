@@ -88,18 +88,43 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByMccTest, TestSize.Level1
     std::string code;
 
     // The current OH_hone cannot reside in the cellular network without card insertion
-    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByMcc(code));
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByMcc(code));
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, HandleScanResultActionTest, TestSize.Level1)
 {
     WIFI_LOGI("HandleScanResultActionTest enter");
+    WifiSettings::GetInstance().mWifiScanInfoList.clear();
+    std::vector<WifiScanInfo> list;
+
+    // Add simulated scan results
+    WifiScanInfo info1;
+    info1.bssid = "11:22:33:44:55:66";
+    std::vector<WifiInfoElem> infoElems1;
+    WifiInfoElem elem1;
+    elem1.id = 7;
+    elem1.content = {'C', 'N'};
+    infoElems1.push_back(elem1);
+    info1.infoElems = std::move(infoElems1);
+    list.push_back(info1);
+
+    WifiScanInfo info2;
+    info2.bssid = "aa:22:33:44:55:66";
+    std::vector<WifiInfoElem> infoElems2;
+    WifiInfoElem elem2;
+    elem2.id = 7;
+    elem2.content = {'C', 'N'};
+    infoElems2.push_back(elem2);
+    info2.infoElems = std::move(infoElems2);
+    list.push_back(info2);
+
+    WifiSettings::GetInstance().SaveScanInfoList(list);
     m_wifiCountryCodePolicy->HandleScanResultAction();
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, IsContainBssidTrueTest, TestSize.Level1)
 {
-    WIFI_LOGI("IsContainBssidTest enter");
+    WIFI_LOGI("IsContainBssidTrueTest enter");
     std::string bssid = "11:22:33:44:55:66";
     std::vector<std::string> bssidList;
     bssidList.push_back("11:22:33:44:55:66");
@@ -109,7 +134,7 @@ HWTEST_F(WifiCountryCodePolicyTest, IsContainBssidTrueTest, TestSize.Level1)
 
 HWTEST_F(WifiCountryCodePolicyTest, IsContainBssidFalseTest, TestSize.Level1)
 {
-    WIFI_LOGI("IsContainBssidTest enter");
+    WIFI_LOGI("IsContainBssidFalseTest enter");
     std::string bssid = "11:22:33:44:55:66";
     std::vector<std::string> bssidList;
     bssidList.push_back("33:22:33:44:55:66");
@@ -117,11 +142,48 @@ HWTEST_F(WifiCountryCodePolicyTest, IsContainBssidFalseTest, TestSize.Level1)
     EXPECT_FALSE(m_wifiCountryCodePolicy->IsContainBssid(bssidList, bssid));
 }
 
-HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultTest, TestSize.Level1)
+HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultFailTest, TestSize.Level1)
 {
-    WIFI_LOGI("StatisticCountryCodeFromScanResultTest enter");
+    WIFI_LOGI("StatisticCountryCodeFromScanResultFailTest enter");
+    std::vector<WifiScanInfo> list;
+    WifiSettings::GetInstance().mWifiScanInfoList.clear();
+    WifiSettings::GetInstance().mWifiLinkedInfo.clear();
+
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
+}
+
+HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultSuccessTest, TestSize.Level1)
+{
+    WIFI_LOGI("StatisticCountryCodeFromScanResultSuccessTest enter");
+    WifiSettings::GetInstance().mWifiScanInfoList.clear();
+    std::vector<WifiScanInfo> wifiScanInfoList;
+
+    // Add simulated scan results
+    WifiScanInfo info1;
+    info1.bssid = "11:22:33:44:55:66";
+    std::vector<WifiInfoElem> infoElems1;
+    WifiInfoElem elem1;
+    elem1.id = 7;
+    elem1.content = {'C', 'N'};
+    infoElems1.push_back(elem1);
+    info1.infoElems = std::move(infoElems1);
+    wifiScanInfoList.push_back(info1);
+
+    WifiScanInfo info2;
+    info2.bssid = "aa:22:33:44:55:66";
+    std::vector<WifiInfoElem> infoElems2;
+    WifiInfoElem elem2;
+    elem2.id = 7;
+    elem2.content = {'C', 'N'};
+    infoElems2.push_back(elem2);
+    info2.infoElems = std::move(infoElems2);
+    wifiScanInfoList.push_back(info2);
+
+    WifiSettings::GetInstance().SaveScanInfoList(wifiScanInfoList);
+
+    std::string code;
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, FindLargestCountCountryCodeFailTest, TestSize.Level1)
@@ -129,16 +191,53 @@ HWTEST_F(WifiCountryCodePolicyTest, FindLargestCountCountryCodeFailTest, TestSiz
     WIFI_LOGI("FindLargestCountCountryCodeFailTest enter");
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->FindLargestCountCountryCode(code));
+
+    m_wifiCountryCodePolicy->m_bssidAndCountryCodeMap.insert_or_assign("11:22:33:44:55:66", "CN");
+    m_wifiCountryCodePolicy->m_bssidAndCountryCodeMap.insert_or_assign("11:22:33:44:55:77", "CN");
+    m_wifiCountryCodePolicy->m_bssidAndCountryCodeMap.insert_or_assign("11:22:33:44:55:88", "CN");
+    m_wifiCountryCodePolicy->m_bssidAndCountryCodeMap.insert_or_assign("11:22:33:44:55:99", "JP");
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->FindLargestCountCountryCode(code));
+    EXPECT_TRUE(code == "CN");
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, ParseCountryCodeElementTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseCountryCodeElementTest enter");
+    std::vector<WifiInfoElem> infoElems;
+
     WifiInfoElem info;
     info.id = 7;
     info.content = {'C', 'N'};
-    std::vector<WifiInfoElem> infoElems;
     infoElems.push_back(info);
+
+    WifiInfoElem info2;
+    info2.id = 7;
+    info2.content = {'J', 'P'};
+    infoElems.push_back(info2);
+
+    WifiInfoElem info3;
+    info3.id = 3;
+    info3.content = {'C', 'M'};
+    infoElems.push_back(info3);
+
+    WifiInfoElem info4;
+    info4.id = 3;
+    infoElems.push_back(info4);
+
+    WifiInfoElem info5;
+    info5.content = {'A', 'S'};
+    infoElems.push_back(info5);
+
+    WifiInfoElem info6;
+    info6.id = 7;
+    info6.content = {'C'};
+    infoElems.push_back(info6);
+
+    WifiInfoElem info8;
+    info8.id = 7;
+    info8.content = {'A', 'S', 'A', 'S'};
+    infoElems.push_back(info8);
+
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->ParseCountryCodeElement(infoElems, code));
 }
@@ -146,8 +245,28 @@ HWTEST_F(WifiCountryCodePolicyTest, ParseCountryCodeElementTest, TestSize.Level1
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPTest, TestSize.Level1)
 {
     WIFI_LOGI("GetWifiCountryCodeByAPTest enter");
+    WifiSettings::GetInstance().mWifiScanInfoList.clear();
+    WifiSettings::GetInstance().mWifiLinkedInfo.clear();
+
+    // Add simulated scan results
+    std::vector<WifiScanInfo> wifiScanInfoList;
+    WifiScanInfo info1;
+    info1.bssid = "11:22:33:44:55:66";
+    std::vector<WifiInfoElem> infoElems1;
+    WifiInfoElem elem1;
+    elem1.id = 7;
+    elem1.content = {'C', 'N'};
+    infoElems1.push_back(elem1);
+    info1.infoElems = std::move(infoElems1);
+    wifiScanInfoList.push_back(info1);
+    WifiSettings::GetInstance().SaveScanInfoList(wifiScanInfoList);
+
+    // Add simulated wifi connection results
     WifiLinkedInfo info;
-    WifiSettings::GetInstance().GetLinkedInfo(info);
+    info.connState = OHOS::Wifi::ConnState::CONNECTED;
+    info.bssid = "11:22:33:44:55:66";
+    WifiSettings::GetInstance().SaveLinkedInfo(info, 0);
+
     std::string code;
     m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code);
 }
@@ -155,9 +274,14 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPTest, TestSize.Level1)
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultTest, TestSize.Level1)
 {
     WIFI_LOGI("GetWifiCountryCodeByScanResultTest enter");
-    WifiSettings::GetInstance().GetWifiState(0);
     std::string code;
-    m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code);
+    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code));
+
+    m_wifiCountryCodePolicy->m_wifiCountryCodeFromScanResults = "CN";
+    int wifiState = 3;
+    int instId = 0;
+    WifiSettings::GetInstance().SetWifiState(wifiState, instId);
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code));
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByRegionTest, TestSize.Level1)

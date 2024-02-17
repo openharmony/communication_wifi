@@ -97,8 +97,3 @@ HWTEST_F(WifiCommonUtilTest, SsidAnonymizeTest, TestSize.Level1)
 }
 }  // namespace Wifi
 }  // namespace OHOS
-
-
-
-
-

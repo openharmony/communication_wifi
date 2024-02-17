@@ -244,7 +244,8 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbProvisionDiscoveryFailureTest, TestSize.Le
 HWTEST_F(WifiHalCallbackTest, P2pHalCbServiceDiscoveryResponseTest, TestSize.Level1)
 {
     P2pServDiscRespInfo info;
-    info.tlvs = "\t1002callback";
+    char buff[] = "\t1002callback";
+    info.tlvs = buff;
     P2pHalCbServiceDiscoveryResponse(NULL);
     P2pHalCbServiceDiscoveryResponse(&info);
 }
@@ -260,7 +261,8 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbStaConnectStateTest, TestSize.Level1)
 HWTEST_F(WifiHalCallbackTest, P2pHalCbServDiscReqTest, TestSize.Level1)
 {
     P2pServDiscReqInfo info;
-    info.tlvs = "\t1002request";
+    char buff[] = "\t1002request";
+    info.tlvs = buff;
     P2pHalCbServDiscReq(NULL);
     P2pHalCbServDiscReq(&info);
 }

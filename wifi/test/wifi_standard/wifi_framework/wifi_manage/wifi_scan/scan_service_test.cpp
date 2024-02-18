@@ -1901,10 +1901,10 @@ public:
 
     void HandleNetworkQualityChangedTest()
     {
-        int status = static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED)
+        int status = static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED);
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->HandleNetworkQualityChanged(status);
-        status = static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED)
+        status = static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED);
         pScanService->HandleNetworkQualityChanged(status);
     }
 

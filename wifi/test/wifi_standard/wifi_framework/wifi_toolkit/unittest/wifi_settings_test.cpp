@@ -169,6 +169,23 @@ HWTEST_F(WifiSettingsTest, AddRandomMacTest, TestSize.Level1)
     EXPECT_FALSE(result);
 }
 
+HWTEST_F(WifiSettingsTest, AddRandomMacTest2, TestSize.Level1)
+{
+    WIFI_LOGE("AddRandomMacTest2 enter!");
+    WifiStoreRandomMac randomMacInfo;
+    randomMacInfo.ssid = "wifitest1";
+    randomMacInfo.keyMgmt = "keyMgmt";
+    WifiSettings::GetInstance().mWifiStoreRandomMac.push_back(randomMacInfo);
+    bool result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+    WIFI_LOGE("AddRandomMacTest result(%{public}d)", result);
+    EXPECT_TRUE(result);
+    randomMacInfo.ssid = "wifitest221";
+    randomMacInfo.keyMgmt = "keyM3gmt";
+    result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+    WIFI_LOGE("AddRandomMacTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
+}
+
 HWTEST_F(WifiSettingsTest, GetRandomMacTest, TestSize.Level1)
 {
     WIFI_LOGE("GetRandomMacTest enter!");
@@ -723,6 +740,11 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
     result = WifiSettings::GetInstance().GetDeviceConfig(ssid, keymgmt, config);
     EXPECT_EQ(result, -1);
     WifiSettings::GetInstance().ClearDeviceConfig();
+}
+
+HWTEST_F(WifiSettingsTest, RemoveWifiP2pSupplicantGroupInfoTets, TestSize.Level1)
+{
+    WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();
 }
 }  // namespace Wifi
 }  // namespace OHO

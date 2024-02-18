@@ -673,6 +673,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_)).Times(AtLeast(0));
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->SystemScanProcess(true);
     }
 
@@ -738,6 +739,7 @@ public:
 
     void HandleSystemScanTimeoutSuccess()
     {
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->HandleSystemScanTimeout();
     }
 

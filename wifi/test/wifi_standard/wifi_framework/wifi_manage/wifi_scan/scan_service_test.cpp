@@ -80,7 +80,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
             .WillRepeatedly(Return(defaultValue));
@@ -100,7 +99,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
             .WillRepeatedly(Return(refVecTrustList));
@@ -115,8 +113,6 @@ public:
 
     void HandleScanStatusReportSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_))
-            .WillRepeatedly(Return(true));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
@@ -187,9 +183,6 @@ public:
 
     void HandleInnerEventReportSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_))
-            .Times(AtLeast(1))
-            .WillRepeatedly(Return(true));
         ScanInnerEventType innerEvent;
         innerEvent = SYSTEM_SCAN_TIMER;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
@@ -605,7 +598,6 @@ public:
 
     void EndPnoScanSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->isPnoScanBegined = true;
         pScanService->EndPnoScan();
@@ -651,7 +643,6 @@ public:
 
     void HandleCustomStatusChangedSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         int customScene = 0;
         int customSceneStatus = MODE_STATE_CLOSE;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
@@ -660,7 +651,6 @@ public:
 
     void HandleCustomStatusChangedSuccess2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         int customScene = 0;
         int customSceneStatus = MODE_STATE_OPEN;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
@@ -681,7 +671,6 @@ public:
 
     void SystemScanProcessSuccess2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_)).Times(AtLeast(0));
         pScanService->SystemScanProcess(true);
@@ -695,7 +684,6 @@ public:
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).WillRepeatedly(Return(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->SystemScanProcess(true);
     }
@@ -717,7 +705,6 @@ public:
 
     void StartSystemTimerScanFail2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
         pScanService->systemScanIntervalMode.scanIntervalMode.interval = 1;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
@@ -726,7 +713,6 @@ public:
 
     void StartSystemTimerScanFail3()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
         pScanService->systemScanIntervalMode.scanIntervalMode.interval = INVAL;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
@@ -735,7 +721,6 @@ public:
 
     void StartSystemTimerScanFail4()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
         pScanService->systemScanIntervalMode.scanIntervalMode.interval = 1;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
@@ -753,8 +738,6 @@ public:
 
     void HandleSystemScanTimeoutSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_))
-            .WillRepeatedly(Return(true));
         pScanService->HandleSystemScanTimeout();
     }
 
@@ -867,7 +850,6 @@ public:
 
     void AllowSystemTimerScanSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true, _));
         ScanIntervalMode mode;
         mode.scanScene = SCAN_SCENE_ALL;
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
@@ -885,7 +867,6 @@ public:
 
     void AllowSystemTimerScanFail3()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true, _));
         pScanService->staStatus = FREQ_2_DOT_4_GHZ;
         EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
     }
@@ -905,7 +886,6 @@ public:
         forbidMode.forbidTime = 0;
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true, _));
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->scanTrustMode = false;
         EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);

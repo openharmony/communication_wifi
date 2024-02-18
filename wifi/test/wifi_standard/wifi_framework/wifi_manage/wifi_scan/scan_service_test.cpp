@@ -120,6 +120,7 @@ public:
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         ScanStatusReport scanStatusReport;
         scanStatusReport.status = SCAN_STARTED_STATUS;
         pScanService->HandleScanStatusReport(scanStatusReport);
@@ -191,6 +192,7 @@ public:
             .WillRepeatedly(Return(true));
         ScanInnerEventType innerEvent;
         innerEvent = SYSTEM_SCAN_TIMER;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->HandleInnerEventReport(innerEvent);
     }
 
@@ -208,6 +210,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_)).Times(AtLeast(0));
         ScanInnerEventType innerEvent;
         innerEvent = RESTART_PNO_SCAN_TIMER;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->HandleInnerEventReport(innerEvent);
     }
 
@@ -603,6 +606,7 @@ public:
     void EndPnoScanSuccess()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->isPnoScanBegined = true;
         pScanService->EndPnoScan();
     }
@@ -650,6 +654,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         int customScene = 0;
         int customSceneStatus = MODE_STATE_CLOSE;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->HandleCustomStatusChanged(customScene, customSceneStatus);
     }
 
@@ -658,6 +663,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         int customScene = 0;
         int customSceneStatus = MODE_STATE_OPEN;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->HandleCustomStatusChanged(customScene, customSceneStatus);
     }
 
@@ -668,6 +674,7 @@ public:
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).WillRepeatedly(Return(1));
         pScanService->SystemScanProcess(true);
     }
@@ -689,6 +696,7 @@ public:
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).WillRepeatedly(Return(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->SystemScanProcess(true);
     }
 
@@ -703,6 +711,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         pScanService->staStatus = 0;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->StartSystemTimerScan(true);
     }
 
@@ -711,6 +720,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
         pScanService->systemScanIntervalMode.scanIntervalMode.interval = 1;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->StartSystemTimerScan(true);
     }
 
@@ -719,6 +729,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
         pScanService->systemScanIntervalMode.scanIntervalMode.interval = INVAL;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->StartSystemTimerScan(false);
     }
 
@@ -727,6 +738,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).Times(AtLeast(0));
         pScanService->lastSystemScanTime = 1;
         pScanService->systemScanIntervalMode.scanIntervalMode.interval = 1;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->StartSystemTimerScan(false);
     }
 
@@ -735,6 +747,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         pScanService->lastSystemScanTime = 0;
         pScanService->systemScanIntervalMode.scanIntervalMode.interval = MAX_SCAN_CONFIG;
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->StartSystemTimerScan(false);
     }
 
@@ -860,6 +873,7 @@ public:
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->AllowSystemTimerScan();
     }
 
@@ -892,7 +906,7 @@ public:
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         EXPECT_CALL(WifiSettings::GetInstance(), SetWhetherToAllowNetworkSwitchover(true, _));
-        pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->scanTrustMode = false;
         EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
     }
@@ -1905,7 +1919,11 @@ public:
 
     void HandleNetworkQualityChangedTest()
     {
-        pScanService->HandleNetworkQualityChanged(19);
+        int status = static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED)
+        pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
+        pScanService->HandleNetworkQualityChanged(status);
+        status = static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED)
+        pScanService->HandleNetworkQualityChanged(status);
     }
 
     void WifiMaxThroughputTest()

@@ -79,7 +79,7 @@ bool FindHdiWpaIface(const char* ifName)
     }
     struct HdiWpaIfaceInfo* currernt = g_HdiWpaIfaceInfoHead;
     while (currernt != NULL) {
-        if (strncmp(currernt->ifName, ifName, strlen(ifName)) == 0 ) {
+        if (strncmp(currernt->ifName, ifName, strlen(ifName)) == 0) {
             LOGI("%{public}s out1", __func__);
             return true;
         }

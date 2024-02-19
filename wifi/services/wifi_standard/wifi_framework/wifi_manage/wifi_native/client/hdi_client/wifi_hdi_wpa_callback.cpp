@@ -187,7 +187,8 @@ int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *
     if (strncmp(apCbParm->content, "AP-STA-CONNECTED", strlen("AP-STA-CONNECTED")) == 0) {
         event = WIFI_IDL_CBK_CMD_STA_JOIN;
         len = strlen("AP-STA-CONNECTED");
-    } else if (strncmp(apCbParm->content, "AP-STA-DISCONNECTED", strlen("AP-STA-DISCONNECTED")) == 0) {
+    } else if (strncmp(apCbParm->content, "AP-STA-DISCONNECTED",
+        strlen("AP-STA-DISCONNECTED")) == 0) {
         event = WIFI_IDL_CBK_CMD_STA_LEAVE;
         len = strlen("AP-STA-DISCONNECTED");
     } else {

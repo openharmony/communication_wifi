@@ -51,8 +51,12 @@ pid_t GetPID(const char *pidFile)
         return -1;
     }
 
-    lseek(fd, 0, SEEK_SET);
-
+    off_t offset = lseek(fd, 0, SEEK_SET);
+    if (offset < 0) {
+        LOGE("GetPID lseek fail!");
+        close(fd);
+        return -1;
+    }
     char buf[PID_MAX_LENGTH] = {0};
     ssize_t bytes;
     if ((bytes = read(fd, buf, sb.st_size)) < 0) {

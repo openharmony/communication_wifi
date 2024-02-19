@@ -31,7 +31,9 @@ int RpcStartSoftAp(RpcServer *server, Context *context)
         return HAL_FAILURE;
     }
     char ifaceName[IFACENAME_LEN];
-    ReadStr(context, ifaceName, sizeof(ifaceName));
+    if (ReadStr(context, ifaceName, sizeof(ifaceName)) != 0) {
+        return HAL_FAILURE;
+    }
     WifiErrorNo err = StartSoftAp(id, ifaceName);
     WriteBegin(context, 0);
     WriteInt(context, err);

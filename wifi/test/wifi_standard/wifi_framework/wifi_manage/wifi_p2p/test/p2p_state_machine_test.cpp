@@ -378,7 +378,6 @@ public:
         DhcpResult result;
         pP2pStateMachine->pDhcpResultNotify->OnSuccess(1, nullptr, &result);
         pP2pStateMachine->pDhcpResultNotify->OnSuccess(1, ifname, nullptr);
-        pP2pStateMachine->pDhcpResultNotify->OnSuccess(1, ifname, &result);
     }
 };
 

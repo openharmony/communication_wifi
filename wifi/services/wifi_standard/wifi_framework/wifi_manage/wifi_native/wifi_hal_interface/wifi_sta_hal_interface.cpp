@@ -504,6 +504,40 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &endBssi
 #endif
 }
 
+WifiErrorNo WifiStaHalInterface::SetPowerSaveMode(int frequency, int mode)
+{
+#ifdef HDI_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
+    return mHdiClient->ReqSetPowerSaveMode(frequency, mode);
+#else
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqSetPowerSaveMode(frequency, mode);
+#endif
+}
+
+WifiErrorNo WifiStaHalInterface::SetDpiMarkRule(int uid, int protocol, int enable)
+{
+#ifdef HDI_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
+    return mHdiClient->ReqSetDpiMarkRule(uid, protocol, enable);
+#else
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqSetDpiMarkRule(uid, protocol, enable);
+#endif
+}
+
+WifiErrorNo WifiStaHalInterface::SetBgLimitMode(int mode)
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqSetBgLimitMode(mode);
+}
+
+WifiErrorNo WifiStaHalInterface::SetBgLimitIdList(std::vector<int> idList, int size, int type)
+{
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqSetBgLimitIdList(idList, size, type);
+}
+
 const WifiEventCallback &WifiStaHalInterface::GetCallbackInst(void) const
 {
     return mStaCallback;

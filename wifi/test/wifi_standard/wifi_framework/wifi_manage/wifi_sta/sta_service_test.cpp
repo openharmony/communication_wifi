@@ -746,14 +746,14 @@ void StaServiceTest::DeregisterAutoJoinCondition()
 void StaServiceTest::RegisterFilterBuilder()
 {
     FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG,
                                                                    "testFilterBuilder",
                                                                    filterBuilder));
 }
 
 void StaServiceTest::DeregisterFilterBuilder()
 {
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->DeregisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->DeregisterFilterBuilder(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG,
                                                                      "testFilterBuilder"));
 }
 

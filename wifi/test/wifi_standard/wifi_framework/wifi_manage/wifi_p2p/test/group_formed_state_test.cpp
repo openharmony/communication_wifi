@@ -172,9 +172,8 @@ HWTEST_F(GroupFormedStateTest, ProcessCmdConnect1, TestSize.Level1)
 {
     WifiP2pConfigInternal config;
     InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
-    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
     msg.SetMessageObj(config);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
 

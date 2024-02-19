@@ -126,9 +126,11 @@ bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::
     return true;
 }
 
-bool DhcpdInterface::StopDhcpServer(const std::string &ifaceName)
+bool DhcpdInterface::StopDhcp(const std::string &ifaceName)
 {
+    WIFI_LOGI("StopDhcp ifaceName:%{public}s, flag:%{public}d", ifaceName.c_str(), g_startDhcpServerFlag);
     if (ifaceName.empty() || g_startDhcpServerFlag == false) {
+        WIFI_LOGE("StopDhcp return!");
         return false;
     }
     g_startDhcpServerFlag = false;
@@ -141,10 +143,10 @@ bool DhcpdInterface::StopDhcpServer(const std::string &ifaceName)
         rangeName = ifaceName;
     }
 
+    WIFI_LOGI("StopDhcp ifaceName:%{public}s, rangeName:%{public}s", ifaceName.c_str(), rangeName.c_str());
     if (RemoveAllDhcpRange(rangeName.c_str()) != 0) {
         WIFI_LOGW("failed to remove [%{public}s] dhcp range.", rangeName.c_str());
     }
-
     if (StopDhcpServer(ifaceName.c_str()) != 0) {
         WIFI_LOGE("Dhcp server stop failed or already stopped!");
         return false;
@@ -152,7 +154,6 @@ bool DhcpdInterface::StopDhcpServer(const std::string &ifaceName)
     if (!NetworkInterface::ClearAllIpAddress(ifaceName)) {
         WIFI_LOGW("Clear interface binding ip address failed!");
     }
-
     return true;
 }
 

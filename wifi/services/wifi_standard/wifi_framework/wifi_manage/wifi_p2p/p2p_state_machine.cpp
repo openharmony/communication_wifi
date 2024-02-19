@@ -32,6 +32,7 @@
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_p2p_upnp_service_response.h"
 #include "wifi_settings.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -726,11 +727,15 @@ bool P2pStateMachine::StartDhcpServer()
     WifiNetAgent::GetInstance().AddRoute(groupManager.GetCurrentGroup().GetInterface(),
         ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
     WIFI_LOGI("Start dhcp server for P2p finished.");
+    WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GO, P2P_ON);
     return true;
 }
 
 bool P2pStateMachine::StopDhcpServer()
 {
+    if (!groupManager.GetCurrentGroup().GetInterface().empty()) {
+        WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GO, P2P_OFF);
+    }
     return m_DhcpdInterface.StopDhcpServer(groupManager.GetCurrentGroup().GetInterface());
 }
 
@@ -787,6 +792,7 @@ void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname,
 
 void P2pStateMachine::StartDhcpClientInterface()
 {
+    WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GC, P2P_ON);
     if (GetIsNeedDhcp() == DHCPTYPE::NO_DHCP) {
         WIFI_LOGI("The service of this time does not need DHCP.");
         return;

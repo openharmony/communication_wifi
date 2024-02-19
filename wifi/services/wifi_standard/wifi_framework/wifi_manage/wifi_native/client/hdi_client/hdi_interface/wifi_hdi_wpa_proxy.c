@@ -64,11 +64,11 @@ static pthread_mutex_t g_apObjMutex = PTHREAD_MUTEX_INITIALIZER;
 static unsigned int g_apRefCount = 0x0;
 static struct IHostapdInterface *g_apObj = NULL;
 static struct HDIDeviceManager *g_apDevMgr = NULL;
-struct HdiWpaIfaceInfo {
+struct IfaceNameInfo {
     char ifName[BUFF_SIZE];
-    struct HdiWpaIfaceInfo* next;
+    struct IfaceNameInfo* next;
 };
-struct HdiWpaIfaceInfo* g_HdiWpaIfaceInfoHead = NULL;
+struct IfaceNameInfo* g_IfaceNameInfoHead = NULL;
 
 bool FindifaceName(const char* ifName)
 {
@@ -77,7 +77,7 @@ bool FindifaceName(const char* ifName)
         LOGI("%{public}s err1", __func__);
         return true;
     }
-    struct HdiWpaIfaceInfo* currernt = g_HdiWpaIfaceInfoHead;
+    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
     while (currernt != NULL) {
         if (strncmp(currernt->ifName, ifName, strlen(ifName)) == 0) {
             LOGI("%{public}s out1", __func__);
@@ -96,13 +96,13 @@ void AddIfaceName(const char* ifName)
         LOGI("%{public}s err", __func__);
         return;
     }
-    struct HdiWpaIfaceInfo* pre = NULL;
-    struct HdiWpaIfaceInfo* currernt = g_HdiWpaIfaceInfoHead;
+    struct IfaceNameInfo* pre = NULL;
+    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
     while (currernt != NULL) {
         pre = currernt;
         currernt = currernt->next;
     }
-    currernt =(struct HdiWpaIfaceInfo*) malloc(sizeof(struct HdiWpaIfaceInfo));
+    currernt =(struct IfaceNameInfo*) malloc(sizeof(struct IfaceNameInfo));
     if (currernt == NULL) {
         LOGI("%{public}s err2", __func__);
         return;
@@ -117,7 +117,7 @@ void AddIfaceName(const char* ifName)
     if (pre != NULL) {
         pre->next = currernt;
     } else {
-        g_HdiWpaIfaceInfoHead = currernt;
+        g_IfaceNameInfoHead = currernt;
     }
     LOGI("%{public}s out", __func__);
     return;
@@ -129,8 +129,8 @@ void RemoveIfaceName(const char* ifName)
     if (ifName == NULL || strlen(ifName) == 0) {
         return;
     }
-    struct HdiWpaIfaceInfo* pre = NULL;
-    struct HdiWpaIfaceInfo* currernt = g_HdiWpaIfaceInfoHead;
+    struct IfaceNameInfo* pre = NULL;
+    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
     while (currernt != NULL) {
         if (strncmp(currernt->ifName, ifName, BUFF_SIZE) != 0) {
             pre = currernt;
@@ -138,7 +138,7 @@ void RemoveIfaceName(const char* ifName)
             continue;
         }
         if (pre == NULL) {
-            g_HdiWpaIfaceInfoHead = currernt->next;
+            g_IfaceNameInfoHead = currernt->next;
         } else {
             pre->next = currernt->next;
         }
@@ -152,7 +152,7 @@ void RemoveIfaceName(const char* ifName)
 int GetIfaceCount()
 {
     int count = 0;
-    struct HdiWpaIfaceInfo* currernt = g_HdiWpaIfaceInfoHead;
+    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
     while (currernt != NULL) {
         currernt = currernt->next;
         count++;

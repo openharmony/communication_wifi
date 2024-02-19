@@ -79,6 +79,7 @@ idl_client_sources = [
   "client/hdi_client/hdi_interface/wifi_hdi_sta_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_util.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_ap_impl.c",
+  "client/hdi_client/hdi_interface/wifi_hdi_wpa_p2p_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_proxy.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_sta_impl.c",
   "client/hdi_client/wifi_hdi_callback.cpp",

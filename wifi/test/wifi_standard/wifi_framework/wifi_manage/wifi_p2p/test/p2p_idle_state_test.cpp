@@ -23,6 +23,7 @@
 #include "mock_wifi_settings.h"
 
 using ::testing::_;
+using ::testing::AtLeast;
 using ::testing::Return;
 using ::testing::ext::TestSize;
 

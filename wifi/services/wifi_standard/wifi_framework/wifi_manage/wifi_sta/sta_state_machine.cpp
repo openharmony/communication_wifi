@@ -49,7 +49,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define FIRST_DNS "8.8.8.8"
 #define SECOND_DNS "180.76.76.76"
 #define PORTAL_ACTION "ohos.want.action.viewData"
-#define PORTAL_ENTITY "entity.browser.hbct"
+#define PORTAL_ENTITY_NEW "entity.browser.hbct"
+#define PORTAL_ENTITY "entity.system.browsable"
 #define BROWSER_BUNDLE "com.huawei.hmos.browser"
 #define PORTAL_CHECK_TIME (10 * 60)
 #define PORTAL_MILLSECOND  1000

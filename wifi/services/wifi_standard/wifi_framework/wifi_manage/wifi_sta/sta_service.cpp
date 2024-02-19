@@ -43,7 +43,6 @@ StaService::StaService(int instId)
       pStaMonitor(nullptr),
       pStaAutoConnectService(nullptr),
       pStaAppAcceleration(nullptr),
-      pWifiAppStateAware(nullptr),
       m_instId(instId)
 {}
 

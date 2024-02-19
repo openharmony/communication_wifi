@@ -19,6 +19,7 @@
 #include "wifi_logger.h"
 #include "mac_address.h"
 #include "wifi_sta_hal_interface.h"
+#include "network_status_history_manager.cpp"
 
 namespace OHOS {
 namespace Wifi {
@@ -227,6 +228,25 @@ bool SelfCureStateMachine::ConnectedMonitorState::ExecuteStateMsg(InternalMessag
             break;
         }
         default:
+            ExecuteStateMsgExt(msg);
+            break;
+    }
+    return ret;
+}
+
+bool SelfCureStateMachine::ConnectedMonitorState::ExecuteStateMsgExt(InternalMessage *msg)
+{
+    bool ret = NOT_EXECUTED;
+    switch (msg->GetMessageName()) {
+        case WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED:
+            ret = EXECUTED;
+            if (mobileHotspot) {
+                WIFI_LOGI("don't support selfcure, do nothing, mobileHotspot = %{public}d", mobileHotspot);
+                break;
+            }
+            HandleInternetFailedDetected(msg);
+            break;
+        default:
             WIFI_LOGI("ConnectedMonitorState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
     }
@@ -280,6 +300,12 @@ bool SelfCureStateMachine::ConnectedMonitorState::SetupSelfCureMonitor()
     AssignIpMethod ipAssignment;
     pSelfCureStateMachine->GetIpAssignment(ipAssignment);
     userSetStaticIpConfig = ipAssignment == AssignIpMethod::STATIC;
+    pSelfCureStateMachine->internetUnknown = NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(
+        pSelfCureStateMachine->GetNetworkStatusHistory());
+    hasInternetRecently = NetworkStatusHistoryManager::IsInternetAccessByHistory(
+        pSelfCureStateMachine->GetNetworkStatusHistory());
+    portalUnthenEver = NetworkStatusHistoryManager::IsPortalByHistory(
+        pSelfCureStateMachine->GetNetworkStatusHistory());
     if (!mobileHotspot) {
         if ((!pSelfCureStateMachine->staticIpCureSuccess) &&
             (hasInternetRecently || pSelfCureStateMachine->internetUnknown) &&
@@ -481,6 +507,10 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
     pSelfCureStateMachine->String2InternetSelfCureHistoryInfo(pSelfCureStateMachine->GetSelfCureHistoryInfo(),
                                                               selfCureHistoryInfo);
+    hasInternetRecently = NetworkStatusHistoryManager::IsInternetAccessByHistory(
+        pSelfCureStateMachine->GetNetworkStatusHistory());
+    portalUnthenEver = NetworkStatusHistoryManager::IsPortalByHistory(
+        pSelfCureStateMachine->GetNetworkStatusHistory());
     AssignIpMethod ipAssignment;
     pSelfCureStateMachine->GetIpAssignment(ipAssignment);
     userSetStaticIpConfig = ipAssignment == AssignIpMethod::STATIC;
@@ -685,9 +715,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc()
     pSelfCureStateMachine->selfCureOnGoing = true;
     delayedReassocSelfCure = false;
     pSelfCureStateMachine->useWithRandMacAddress = FAC_MAC_REASSOC;
-    pSelfCureStateMachine->isReassocSelfCureWithRealMacAddress = true;
-    std::string macAddress;
-    WifiSettings::GetInstance().GetRealMacAddress(macAddress);
+    pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(FAC_MAC_REASSOC);
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
@@ -695,7 +723,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc()
     if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("ConnectToNetwork failed.\n");
     }
-    pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM);
+    pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, INTERNET_RECOVERY_TIME);
 }
 
 bool SelfCureStateMachine::InternetSelfCureState::SelectedSelfCureAcceptable()
@@ -801,7 +829,7 @@ bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int cu
         if (currentCureLevel == WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC &&
             pSelfCureStateMachine->useWithRandMacAddress == FAC_MAC_REASSOC &&
             pSelfCureStateMachine->IsUseFactoryMac()) {
-            pSelfCureStateMachine->isReassocSelfCureWithRealMacAddress = true;
+            pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(FAC_MAC_REASSOC);
         }
         HandleHttpReachableAfterSelfCure(currentCureLevel);
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
@@ -841,7 +869,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
     if (pSelfCureStateMachine->useWithRandMacAddress == FAC_MAC_REASSOC && pSelfCureStateMachine->IsUseFactoryMac()) {
         WIFI_LOGI("HTTP unreachable, factory mac failed and use rand mac instead of");
         pSelfCureStateMachine->useWithRandMacAddress = RAND_MAC_REASSOC;
-        pSelfCureStateMachine->isReassocSelfCureWithRealMacAddress = false;
+        pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(RAND_MAC_REASSOC);
         WifiLinkedInfo linkedInfo;
         WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
         int networkId = linkedInfo.networkId;
@@ -855,6 +883,8 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
     UpdateSelfCureHistoryInfo(selfCureHistoryInfo, WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC, false);
     WIFI_LOGI("HTTP unreachable, self cure failed for rand mac reassoc");
     pSelfCureStateMachine->selfCureOnGoing = false;
+    pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE, WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
+    return;
 }
 
 void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableAfterSelfCure(int currentCureLevel)
@@ -1194,8 +1224,7 @@ bool SelfCureStateMachine::IsUseFactoryMac()
     WifiLinkedInfo wifiLinkedInfo;
     std::string currMacAddress;
     std::string realMacAddress;
-    WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo);
-    currMacAddress = wifiLinkedInfo.macAddress;
+    WifiSettings::GetInstance().GetMacAddress(currMacAddress);
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddress);
     if (!currMacAddress.empty() && !realMacAddress.empty() && currMacAddress == realMacAddress) {
         WIFI_LOGI("use factory mac address currently.");
@@ -1266,6 +1295,12 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
     WifiSettings::GetInstance().GetScanInfoList(scanResults);
     if (GetBssidCounter(scanResults) < MULTI_BSSID_NUM) {
         WIFI_LOGI("not multi bssid condition!");
+        return false;
+    }
+    bool hasInternetEver = NetworkStatusHistoryManager::HasInternetEverByHistory(GetNetworkStatusHistory());
+    bool hasPortalHistory = NetworkStatusHistoryManager::IsPortalByHistory(GetNetworkStatusHistory());
+    if (hasInternetEver || hasPortalHistory) {
+        WIFI_LOGI("has internethistory, don't to reassoc with factory mac!");
         return false;
     }
     WifiSelfCureHistoryInfo selfCureInfo;
@@ -1455,6 +1490,13 @@ time_t SelfCureStateMachine::GetLastHasInternetTime()
     return lastHasInternetTime;
 }
 
+uint32_t SelfCureStateMachine::GetNetworkStatusHistory()
+{
+    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    uint32_t networkStatusHistory = config.networkStatusHistory;
+    return networkStatusHistory;
+}
+
 std::string SelfCureStateMachine::GetSelfCureHistoryInfo()
 {
     WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
@@ -1474,6 +1516,23 @@ int SelfCureStateMachine::SetSelfCureHistoryInfo(std::string selfCureHistory)
     WifiSettings::GetInstance().SyncDeviceConfig();
     return 0;
 }
+
+int SelfCureStateMachine::GetIsReassocWithFactoryMacAddress()
+{
+    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    int isReassocWithFactoryMacAddress = config.isReassocSelfCureWithFactoryMacAddress;
+    return isReassocWithFactoryMacAddress;
+}
+
+int SelfCureStateMachine::SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress)
+{
+    WifiDeviceConfig wifiDeviceConfig = GetCurrentWifiDeviceConfig();
+    wifiDeviceConfig.isReassocSelfCureWithFactoryMacAddress = isReassocWithFactoryMacAddress;
+    WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    return 0;
+}
+
 WifiDeviceConfig SelfCureStateMachine::GetCurrentWifiDeviceConfig()
 {
     WifiLinkedInfo wifiLinkedInfo;

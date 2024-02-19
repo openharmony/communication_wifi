@@ -39,7 +39,12 @@ constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 
 StaService::StaService(int instId)
-    : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
+    : pStaStateMachine(nullptr),
+      pStaMonitor(nullptr),
+      pStaAutoConnectService(nullptr),
+      pStaAppAcceleration(nullptr),
+      pWifiAppStateAware(nullptr),
+      m_instId(instId)
 {}
 
 StaService::~StaService()
@@ -59,6 +64,12 @@ StaService::~StaService()
     if (pStaStateMachine != nullptr) {
         delete pStaStateMachine;
         pStaStateMachine = nullptr;
+    }
+
+    if (pStaAppAcceleration != nullptr) {
+        delete pStaAppAcceleration;
+        pStaAppAcceleration = nullptr;
+    }
     }
 }
 
@@ -137,6 +148,14 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     if (pStaAutoConnectService->InitAutoConnectService() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitAutoConnectService failed.\n");
         return WIFI_OPT_FAILED;
+    }
+    pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
+    if (pStaAppAcceleration == nullptr) {
+        WIFI_LOGE("Alloc pStaAppAcceleration failed.\n");
+    }
+
+    if (pStaAppAcceleration->InitAppAcceleration() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("InitAppAcceleration failed.\n");
     }
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;
@@ -618,7 +637,9 @@ void StaService::HandleScreenStatusChanged(int screenState)
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
-    
+    if (pStaAppAcceleration != nullptr) {
+        pStaAppAcceleration->HandleScreenStatusChanged(screenState);
+    }
     pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
 #endif
     return;
@@ -686,5 +707,17 @@ ErrCode StaService::RenewDhcp()
     pStaStateMachine->RenewDhcp();
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaService::HandleForegroundAppChangedAction(const std::string bundleName,
+                                                            int uid, int pid, const int state)
+{
+    if (pStaAppAcceleration == nullptr) {
+        WIFI_LOGE("pStaAppAcceleration is null");
+        return WIFI_OPT_FAILED;
+    }
+    pStaAppAcceleration->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

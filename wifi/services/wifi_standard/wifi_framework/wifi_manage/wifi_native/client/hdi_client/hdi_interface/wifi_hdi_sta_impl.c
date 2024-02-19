@@ -549,4 +549,33 @@ void HdiNotifyScanResult(int status)
         callback->onScanNotify(status);
     }
 }
+
+WifiErrorNo HdiSetPowerSaveMode(int frequency, int mode)
+{
+    LOGI("Enter %{public}s", __func__);
+    int32_t ret = 0;
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
+    const char *ifName = "wlan0";
+    ret = proxy.wlanObj->SetPowerSaveMode(proxy.wlanObj, ifName, frequency, mode);
+    if (ret != 0) {
+        LOGE("%{public}s: failed to set power save mode, ret:%{public}d.", __func__, ret);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiSetDpiMarkRule(int uid, int protocol, int enable)
+{
+    LOGI("Enter %{public}s", __func__);
+    int32_t ret = 0;
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
+    ret = proxy.wlanObj->SetDpiMarkRule(proxy.wlanObj, uid, protocol, enable);
+    if (ret != 0) {
+        LOGE("%{public}s: failed to set dpi mark rule, ret:%{public}d.", __func__, ret);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return WIFI_IDL_OPT_OK;
+}
 #endif

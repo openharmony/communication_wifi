@@ -343,6 +343,43 @@ public:
      */
     WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info) const;
 
+    /**
+     * @Description set power save mode
+     *
+     * @param frequency - connected ap frequency
+     * @param mode - power save mode
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetPowerSaveMode(int frequency, int mode) const;
+
+    /**
+     * @Description set data packet identification mark rule
+     *
+     * @param uid - target app uid
+     * @param protocol - target protocol type
+     * @param enable - enable/disable dpi mark rule
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetDpiMarkRule(int uid, int protocol, int enable) const;
+
+    /**
+     * @Description set background limit speed mode
+     *
+     * @param mode - limit mode
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetBgLimitMode(int mode) const;
+
+    /**
+     * @Description set background limit speed uid&pid list
+     *
+     * @param idList - foreground and background app list
+     * @param size - idList size
+     * @param type - enable/disable dpi mark
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetBgLimitIdList(std::vector<int> idList, int size, int type) const;
+
     /* -------------------AP Interface-------------------------- */
 
     /**

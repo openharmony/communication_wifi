@@ -40,6 +40,7 @@ local_base_sources = [
   "sta_saved_device_appraisal.cpp",
   "sta_service.cpp",
   "sta_state_machine.cpp",
+  "sta_app_acceleration.cpp",
 ]
 
 local_base_include_dirs = [
@@ -173,6 +174,9 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_conn_manager_if",
       "samgr:samgr_proxy",
       "time_service:time_client",
+      "ability_runtime:app_manager",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
     ]
 
     part_name = "wifi"

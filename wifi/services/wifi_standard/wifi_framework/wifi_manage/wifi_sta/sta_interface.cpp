@@ -407,5 +407,15 @@ ErrCode StaInterface::RenewDhcp()
     pStaService->RenewDhcp();
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::HandleForegroundAppChangedAction(const std::string bundleName,
+                                                            int uid, int pid, const int state)
+{
+    WIFI_LOGI("Enter StaInterface::HandleForegroundAppChangedAction");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

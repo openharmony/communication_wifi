@@ -180,7 +180,6 @@ HWTEST_F(P2pEnabledStateTest, ProcessDeviceFoundEvt1, TestSize.Level1)
     InternalMessage msg;
     WifiP2pDevice device;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
     msg.SetMessageObj(device);
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -229,7 +228,6 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg10, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
     WifiP2pServiceInfo service;
     msg.SetMessageObj(service);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceAdd(_))
@@ -243,7 +241,6 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg11, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
     WifiP2pServiceInfo service;
     msg.SetMessageObj(service);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceRemove(_))
@@ -268,7 +265,6 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg13, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REQUEST_SERVICE));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
     std::pair<WifiP2pDevice, WifiP2pServiceRequest> info;
     msg.SetMessageObj(info);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ReqServiceDiscovery(_, _, _))
@@ -287,7 +283,6 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg14, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_REQ));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
     WifiP2pServiceRequestList reqList;
     const WifiP2pServiceRequest req;
     reqList.AddServiceRequest(req);
@@ -305,7 +300,6 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg15, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_RESP));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
 
     WifiP2pServiceResponseList respList;
     std::vector<unsigned char> data;
@@ -414,9 +408,8 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdSetDeviceName1, TestSize.Level1)
 {
     InternalMessage msg;
     std::string devAddr;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
     msg.SetMessageObj(devAddr);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pDeviceName(Eq(devAddr)))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
@@ -442,10 +435,8 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdSetWfdInfo1, TestSize.Level1)
 {
     InternalMessage msg;
     WifiP2pWfdInfo wfdInfo;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
-
     msg.SetMessageObj(wfdInfo);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdDeviceConfig(_))
         .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
@@ -490,7 +481,6 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdConnectFailed, TestSize.Level1)
     constexpr int connectFailed = 2;
     constexpr int connectTimeout = 15;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
     msg.SetMessageObj(device);
     msg.SetParam1(connectFailed);
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));

@@ -51,7 +51,7 @@ typedef enum {
 
 class StaAppAcceleration {
 public:
-    StaAppAcceleration(int instId = 0);
+    explicit StaAppAcceleration(int instId = 0);
     ~StaAppAcceleration();
     static StaAppAcceleration &GetInstance();
     ErrCode InitAppAcceleration();

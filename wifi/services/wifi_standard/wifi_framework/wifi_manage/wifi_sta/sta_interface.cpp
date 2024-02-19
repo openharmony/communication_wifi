@@ -409,7 +409,7 @@ ErrCode StaInterface::RenewDhcp()
 }
 
 ErrCode StaInterface::HandleForegroundAppChangedAction(const std::string bundleName,
-                                                            int uid, int pid, const int state)
+    int uid, int pid, const int state)
 {
     WIFI_LOGI("Enter StaInterface::HandleForegroundAppChangedAction");
     std::lock_guard<std::mutex> lock(mutex);

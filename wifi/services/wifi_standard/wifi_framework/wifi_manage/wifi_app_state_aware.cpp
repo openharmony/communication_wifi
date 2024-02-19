@@ -103,7 +103,7 @@ void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, in
     }
     WifiProtectManager::GetInstance().OnAppForegroudChanged(bundleName, state);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if(pService != nullptr) {
+    if (pService != nullptr) {
         pService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     }
 }
@@ -142,9 +142,8 @@ void AppStateObserver::OnAppStopped(const AppExecFwk::AppStateData &appStateData
 void AppStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData)
 {
     WIFI_LOGI("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
-        __func__, appStateData.bundleName.c_str(), appStateData.uid,
-        appStateData.state, appStateData.isFocused);
-    WifiAppStateAware::GetInstance().OnForegroundAppChanged(appStateData.bundleName, appStateData.uid, 
+        __func__, appStateData.bundleName.c_str(), appStateData.uid, appStateData.state, appStateData.isFocused);
+    WifiAppStateAware::GetInstance().OnForegroundAppChanged(appStateData.bundleName, appStateData.uid,
         appStateData.pid, appStateData.state);
 }
 } // namespace Wifi

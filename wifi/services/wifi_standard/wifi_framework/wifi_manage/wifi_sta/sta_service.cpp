@@ -708,7 +708,7 @@ ErrCode StaService::RenewDhcp()
 }
 
 ErrCode StaService::HandleForegroundAppChangedAction(const std::string bundleName,
-                                                            int uid, int pid, const int state)
+    int uid, int pid, const int state)
 {
     if (pStaAppAcceleration == nullptr) {
         WIFI_LOGE("pStaAppAcceleration is null");

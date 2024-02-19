@@ -70,7 +70,7 @@ struct HdiWpaIfaceInfo {
 };
 struct HdiWpaIfaceInfo* g_HdiWpaIfaceInfoHead = NULL;
 
-bool FindHdiWpaIface(const char* ifName)
+bool FindifaceName(const char* ifName)
 {
     LOGI("%{public}s enter", __func__);
     if (ifName == NULL || strlen(ifName) == 0) {
@@ -89,7 +89,7 @@ bool FindHdiWpaIface(const char* ifName)
     return false;
 }
 
-void AddHdiWpaIface(const char* ifName)
+void AddIfaceName(const char* ifName)
 {
     LOGI("%{public}s enter", __func__);
     if (ifName == NULL || strlen(ifName) == 0) {
@@ -123,7 +123,7 @@ void AddHdiWpaIface(const char* ifName)
     return;
 }
 
-void RemoveHdiWpaIface(const char* ifName)
+void RemoveIfaceName(const char* ifName)
 {
     LOGI("%{public}s enter", __func__);
     if (ifName == NULL || strlen(ifName) == 0) {
@@ -149,7 +149,7 @@ void RemoveHdiWpaIface(const char* ifName)
     return;
 }
 
-int GetHdiWpaIfaceCount()
+int GetIfaceCount()
 {
     int count = 0;
     struct HdiWpaIfaceInfo* currernt = g_HdiWpaIfaceInfoHead;
@@ -259,7 +259,7 @@ WifiErrorNo HdiWpaStop()
         LOGE("%{public}s g_wpaObj is NULL or ref count is 0", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-    int count = GetHdiWpaIfaceCount();
+    int count = GetIfaceCount();
     if (count > 0) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGI("%{public}s wlan count:%{public}d", __func__, count);
@@ -283,10 +283,8 @@ WifiErrorNo HdiWpaStop()
 WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName)
 {
     pthread_mutex_lock(&g_wpaObjMutex);
-    int count = GetHdiWpaIfaceCount();
     if (ifName == NULL || confName == NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
-        (count == 0)?(g_wpaStartSucceed = false):(g_wpaStartSucceed = true);
         LOGE("HdiAddWpaIface: invalid parameter!");
         return WIFI_IDL_OPT_INVALID_PARAM;
     }
@@ -297,9 +295,9 @@ WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName)
         LOGE("%{public}s g_wpaObj is NULL or ref count is 0", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-    
+    int count = GetIfaceCount();
     LOGI("HdiAddWpaIface ifName:%{public}s, confName:%{public}s", ifName, confName);
-    if (!FindHdiWpaIface(ifName)) {
+    if (!FindifaceName(ifName)) {
         int32_t ret = g_wpaObj->AddWpaIface(g_wpaObj, ifName, confName);
         if (ret != HDF_SUCCESS) {
             (count == 0)?(g_wpaStartSucceed = false):(g_wpaStartSucceed = true);
@@ -307,7 +305,7 @@ WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName)
             pthread_mutex_unlock(&g_wpaObjMutex);
             return WIFI_IDL_OPT_FAILED;
         }
-        AddHdiWpaIface(ifName);
+        AddIfaceName(ifName);
     }
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("%{public}s AddWpaIface success!", __func__);
@@ -330,14 +328,14 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
     }
     
     LOGI("HdiRemoveWpaIface ifName:%{public}s", ifName);
-    if (FindHdiWpaIface(ifName)) {
+    if (FindifaceName(ifName)) {
         int32_t ret = g_wpaObj->RemoveWpaIface(g_wpaObj, ifName);
         if (ret != HDF_SUCCESS) {
             LOGE("%{public}s RemoveWpaIface failed: %{public}d", __func__, ret);
             pthread_mutex_unlock(&g_wpaObjMutex);
             return WIFI_IDL_OPT_FAILED;
         }
-        RemoveHdiWpaIface(ifName);
+        RemoveIfaceName(ifName);
     }
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("%{public}s RemoveWpaIface success!", __func__);

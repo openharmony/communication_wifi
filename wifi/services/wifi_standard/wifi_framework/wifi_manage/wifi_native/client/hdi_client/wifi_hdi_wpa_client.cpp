@@ -1183,7 +1183,6 @@ static WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &con
     }
     config.value = value;
     return WIFI_IDL_OPT_OK;
-
 }
 }  // namespace Wifi
 }  // namespace OHOS

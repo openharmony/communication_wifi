@@ -223,7 +223,8 @@ int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *
         event = WIFI_IDL_CBK_CMD_AP_ENABLE;
     } else if (strncmp(apCbParm->content, "CRTL-EVENT-TERMINATING", strlen("CRTL-EVENT-TERMINATING")) == 0) {
         event = WIFI_IDL_CBK_CMD_AP_DISABLE;
-    } else if (strncmp(apCbParm->content, "AP-STA-POSSIBLE-PSK-MISMATCH ", strlen("AP-STA-POSSIBLE-PSK-MISMATCH ")) == 0) {
+    } else if (strncmp(apCbParm->content, "AP-STA-POSSIBLE-PSK-MISMATCH ",
+        strlen("AP-STA-POSSIBLE-PSK-MISMATCH ")) == 0) {
         event = WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT;
     } else {
         return 1;

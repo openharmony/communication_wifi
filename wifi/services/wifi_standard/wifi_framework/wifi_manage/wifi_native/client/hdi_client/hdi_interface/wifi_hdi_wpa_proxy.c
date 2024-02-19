@@ -283,7 +283,7 @@ WifiErrorNo HdiWpaStop()
 WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName)
 {
     pthread_mutex_lock(&g_wpaObjMutex);
-    if (ifName == NULL || confName == NULL) {
+    if (ifName == NULL || confName == NULL || strlen(ifName) == 0) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("HdiAddWpaIface: invalid parameter!");
         return WIFI_IDL_OPT_INVALID_PARAM;

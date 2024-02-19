@@ -23,8 +23,8 @@
 #include "network_selection_msg.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
-#include "sta_app_acceleration.h"
 #endif
+#include "sta_app_acceleration.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -316,7 +316,7 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode HandleForegroundAppChangedAction(const std::string bundleName,
-                                                        int uid, int pid, const int state) override;
+                                                        int uid, int pid, const int state);
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;

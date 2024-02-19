@@ -73,16 +73,13 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
 {
     std::map<int, std::size_t> wifiDeviceConfigs;
     for (auto &scanInfo : scanInfos) {
-        networkCandidates.emplace_back(scanInfo);
+        auto& networkCandidate = networkCandidates.emplace_back(scanInfo);
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid,
-                                                    deviceKeyMgmt,
-                                                    networkCandidates.back().wifiDeviceConfig);
+        WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeyMgmt, networkCandidate.wifiDeviceConfig);
         // save the indexes of saved network candidate in networkCandidates;
         if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID) {
-            wifiDeviceConfigs.insert({ networkCandidates.back().wifiDeviceConfig.networkId,
-                                       networkCandidates.size() - 1});
+            wifiDeviceConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
         }
     }
     std::stringstream wifiDevicesInfo;

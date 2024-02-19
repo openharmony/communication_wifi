@@ -36,14 +36,13 @@ void AutoConnectIntegrator::GetCandidatesFromSubNetworkSelector()
 }
 
 AutoConnectIntegrator::AutoConnectIntegrator() : CompositeNetworkSelector(
-    "autoConnectedNetworkSelectorManager")
+    "autoConnectIntegrator")
 {
     auto filters = make_shared<AndWifiFilter>();
     filters->AddFilter(make_shared<HiddenWifiFilter>());
     filters->AddFilter(make_shared<SignalStrengthWifiFilter>());
     SetWifiFilter(filters);
-    auto savedNetworkSelector = make_shared<SavedNetworkTracker>();
-    AddSubNetworkSelector(savedNetworkSelector);
+    AddSubNetworkSelector(make_shared<SavedNetworkTracker>());
     auto comparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     comparator->AddScorer(make_shared<ThroughputScorer>());
     SetWifiComparator(comparator);
@@ -57,7 +56,7 @@ bool AutoConnectIntegrator::Nominate(NetworkCandidate &networkCandidate)
     return false;
 }
 
-SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetworkSelector")
+SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetworkTracker")
 {
     auto andFilter = make_shared<AndWifiFilter>();
     andFilter->AddFilter(make_shared<SavedWifiFilter>());
@@ -65,7 +64,7 @@ SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetw
     andFilter->AddFilter(make_shared<EphemeralWifiFilter>());
     andFilter->AddFilter(make_shared<DisableWifiFilter>());
     andFilter->AddFilter(make_shared<MatchedUserSelectBssidWifiFilter>());
-    ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG, *andFilter);
+    ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG, *andFilter);
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
     shared_ptr<CustNetPreferredNetworkSelector> custNetPreferredNetworkSelector = nullptr;
     if (NetworkSelectionUtils::CheckDeviceTypeByVendorCountry()) {

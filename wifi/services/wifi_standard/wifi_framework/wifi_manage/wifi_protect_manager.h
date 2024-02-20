@@ -153,7 +153,6 @@ private:
     sptr<AppExecFwk::IAppMgr> mAppObject {nullptr};
 #endif
 };
-
 } // namespace Wifi
 } // namespace OHOS
 

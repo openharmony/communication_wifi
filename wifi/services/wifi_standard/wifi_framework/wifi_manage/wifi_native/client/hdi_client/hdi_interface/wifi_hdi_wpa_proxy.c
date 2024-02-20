@@ -41,6 +41,7 @@
 #define IFACENAME_LEN 6
 #define CFGNAME_LEN 30
 #define WIFI_MULTI_CMD_MAX_LEN 1024
+#define EXEC_DISABLE 1
 #define WPA_HOSTAPD_NAME "hostapd"
 #define AP_IFNAME "wlan0"
 #define AP_IFNAME_COEX "wlan1"
@@ -52,6 +53,7 @@ static char g_hostapdCfg[CTRL_LEN] = {0};
 static char g_apIfaceName[IFACENAME_LEN] = {0};
 static char g_apCfgName[CFGNAME_LEN] = {0};
 static int g_id;
+static int g_execDisable;
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -532,6 +534,16 @@ void InitCfg(char *ifaceName)
             LOGE("memcpy hostapdCfg fail");
         }
     }
+}
+
+void SetExecDisable(int execDisable)
+{
+    g_execDisable = execDisable;
+}
+
+int GetExecDisable()
+{
+    return g_execDisable;
 }
 
 #endif

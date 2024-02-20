@@ -332,15 +332,14 @@ void WifiSettings::ConfigsDeduplicateAndSave(const std::vector<WifiDeviceConfig>
 
     std::set<std::string> tmp;
     for (const auto &localConfig : localConfigs) {
-        std::string tmpConfigKey = localConfig.ssid + localConfig.keyMgmt;
-        tmp.insert(tmpConfigKey);
+        std::string configKey = localConfig.ssid + localConfig.keyMgmt;
+        tmp.insert(configKey);
     }
     for (const auto &config : newConfigs) {
         std::string configKey = config.ssid + config.keyMgmt;
         auto iter = tmp.find(configKey);
         if (iter == tmp.end()) {
-            std::string tmpConfigKey = localConfig.ssid + localConfig.keyMgmt;
-            tmp.insert(tmpConfigKey);
+            tmp.insert(configKey);
             localConfigs.push_back(config);
         }
     }

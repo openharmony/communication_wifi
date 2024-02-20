@@ -166,7 +166,7 @@ HWTEST_F(NetworkParserTest, ParseMacMapTest, TestSize.Level1)
 HWTEST_F(NetworkParserTest, GetParseTypeTest, TestSize.Level1)
 {
     WIFI_LOGI("GetParseTypeTest enter");
-    m_networkXmlParser->GetParseType(nullptr);
+    EXPECT_TRUE(m_networkXmlParser->GetParseType(nullptr) == NetworkParseType::UNKNOWN);
 }
 
 HWTEST_F(NetworkParserTest, EnableNetworksTest, TestSize.Level1)

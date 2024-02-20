@@ -13,16 +13,15 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import prompt from '@ohos.prompt'
 import { PswDialog } from '../Component/pswDialog'
 import { WifiModel } from '../entryability/model/wifiModel'
 import { WifiView } from '../Component/wifiView'
 import wifi from '@ohos.wifi'
+import wifiManager from '@ohos.wifiManager';
+import ConfigData from '../Utils/ConfigData'
 
 const TAG = "[availableWiFi]"
-let self = null
 
 /**
  * available wifi page of WiFi test
@@ -31,21 +30,27 @@ let self = null
 @Component
 export struct AvailableWifi {
   private wifiModel: WifiModel = new WifiModel()
-  @Prop wifiList:Array<wifi.WifiScanInfo>
-  private linkedInfo: any
-  @State selectIndex: Number = -1
+  @Link wifiList!: Array<wifi.WifiScanInfo>
+  @Link linkedInfo!: wifi.WifiLinkedInfo
+  @State selectIndex: number = - 1
   private pswDialogController: CustomDialogController = new CustomDialogController({
-    builder: PswDialog({ scanInfo: this.wifiList[this.selectIndex], action: this.onAccept }),
-    autoCancel: true
+    builder : PswDialog({ scanInfo : this.wifiList[ this.selectIndex ] , action : this.onAccept }) ,
+    autoCancel : true
   })
 
-  onAccept(scanInfo, psw) {
-   console.log(TAG, 'connect wifi')
-    self.wifiModel.connectNetwork(scanInfo, psw)
+  onAccept(scanInfo: wifi.WifiScanInfo , psw: string) {
+    console.log(TAG , 'connect wifi')
+    let connectInfo: wifiManager.WifiDeviceConfig
+    connectInfo = {
+      ssid : scanInfo.ssid ,
+      preSharedKey : psw ,
+      securityType : scanInfo.securityType
+    }
+    this.wifiModel.connectNetwork(connectInfo , psw)
   }
 
   aboutToAppear() {
-    self = this
+    console.info(TAG , "wifiList:" + this.wifiList)
   }
 
   build() {
@@ -56,32 +61,38 @@ export struct AvailableWifi {
           .layoutWeight(1)
           .align(Alignment.TopStart)
       }
-      .width('95%')
+      .width(ConfigData.WH_95_100)
 
       List() {
-        ForEach(this.wifiList, (item, index) => {
+        ForEach(this.wifiList , (item: wifi.WifiScanInfo , index) => {
           ListItem() {
-            WifiView({ wifi: item })
+            WifiView({ wifi : item })
           }
           .onClick(() => {
-           console.log(TAG, 'wifi click')
+            console.log(TAG , 'wifi click')
             this.selectIndex = index
-            if (this.linkedInfo !== null && item.ssid === this.linkedInfo.ssid) {
-              prompt.showToast({ message: 'this wifi is connected' })
+            if ( this.linkedInfo !== null && item.ssid === this.linkedInfo.ssid ) {
+              prompt.showToast({ message : 'this wifi is connected' })
               return
             }
-            if (item.securityType === 0 || item.securityType === 1) {
-              this.wifiModel.connectNetwork(item, '')
+            if ( item.securityType === 0 || item.securityType === 1 ) {
+              let connectInfo: wifiManager.WifiDeviceConfig
+              connectInfo = {
+                ssid : item.ssid ,
+                preSharedKey : '' ,
+                securityType : item.securityType
+              }
+              this.wifiModel.connectNetwork(connectInfo , index.toString())
               return
             }
             this.pswDialogController.open()
           })
-        }, item => JSON.stringify(item))
+        } , (item: wifi.WifiScanInfo) => JSON.stringify(item))
       }
       .layoutWeight(1)
-      .divider({ strokeWidth: 1, color: Color.Gray, startMargin: 10, endMargin: 10 })
+      .divider({ strokeWidth : 1 , color : Color.Gray , startMargin : 10 , endMargin : 10 })
       .margin(10)
     }
-    .margin({ top: 15, bottom: 100 })
+    .margin({ top : 15 , bottom : 100 })
   }
 }

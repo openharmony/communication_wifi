@@ -209,7 +209,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
     g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
     g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
     g_hdiWpaP2pCallbackObj->OnEventBssidChanged = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventStateChanged = callback->OnEventStateChanged;
+    g_hdiWpaP2pCallbackObj->OnEventStateChanged = NULL;
     g_hdiWpaP2pCallbackObj->OnEventTempDisabled = NULL;
     g_hdiWpaP2pCallbackObj->OnEventAssociateReject = NULL;
     g_hdiWpaP2pCallbackObj->OnEventWpsOverlap = NULL;

@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import ConfigData from '../utils/ConfigData';
 
 const TAG = "[subEntryComponent]"
@@ -28,57 +26,55 @@ export struct SubEntryComponent {
   private title: string | Resource;
   @State isTouched: boolean = false;
   private date: any = null;
-  private deviceId: any = n
+  private deviceId: any = null;
 
   build() {
-    Navigator( { target : this.targetPage } ) {
-      Flex( { justifyContent : FlexAlign.SpaceBetween , alignItems : ItemAlign.Center } ) {
+    Navigator({ target : this.targetPage }) {
+      Flex({ justifyContent : FlexAlign.SpaceBetween , alignItems : ItemAlign.Center }) {
         Row() {
-          Text( this.title )
-            .fontSize( $r( 'app.float.font_30' ) )
-            .lineHeight( $r( 'app.float.wh_value_32' ) )
-            .fontColor( $r( 'app.color.font_color_182431' ) )
-            .fontWeight( FontWeight.Medium )
-            .margin( { left : $r( 'app.float.distance_8' ) } )
-            .textAlign( TextAlign.Start )
-            .height( $r( 'app.float.wh_value_32' ) );
+          Text(this.title)
+            .fontSize($r('app.float.font_30'))
+            .lineHeight($r('app.float.wh_value_32'))
+            .fontColor($r('app.color.font_color_182431'))
+            .fontWeight(FontWeight.Medium)
+            .margin({ left : $r('app.float.distance_8') })
+            .textAlign(TextAlign.Start)
+            .height($r('app.float.wh_value_32'));
         }
 
-        Image( ( 'app.media.ic_settings_arrow' ) )
-          .width( $r( 'app.float.wh_value_12' ) )
-          .height( $r( 'app.float.wh_value_100' ) )
-          .margin( { right : $r( 'app.float.distance_8' ) } );
+        Image(('app.media.ic_settings_arrow'))
+          .width($r('app.float.wh_value_12'))
+          .height($r('app.float.wh_value_100'))
+          .margin({ right : $r('app.float.distance_8') });
       }
-      .height( ConfigData.WH_100_100 )
-      .width( ConfigData.WH_100_100 )
-      .borderRadius( $r( 'app.float.radius_12' ) )
-      .linearGradient( this.isTouched ? {
-                                          angle : 90 ,
-                                          direction : GradientDirection.Right ,
-                                          colors : [ [ $r( "app.color.DCEAF9" ), 0.0 ], [ $r( "app.color.FAFAFA" ), 1.0 ] ]
-                                        } : {
-                                              angle : 90 ,
-                                              direction : GradientDirection.Right ,
-                                              colors : [ [ $r( "sys.color.ohos_id_color_foreground_contrary" ), 1 ], [ $r( "sys.color.ohos_id_color_foreground_contrary" ), 1 ] ]
-                                            } )
-      .onTouch( ( event: TouchEvent ) => {
+      .height(ConfigData.WH_100_100)
+      .width(ConfigData.WH_100_100)
+      .borderRadius($r('app.float.radius_12'))
+      .linearGradient(this.isTouched ? {
+        angle : 90 ,
+        direction : GradientDirection.Right ,
+        colors : [ [ $r("app.color.DCEAF9"), 0.0 ], [ $r("app.color.FAFAFA"), 1.0 ] ]
+      } : {
+        angle : 90 ,
+        direction : GradientDirection.Right ,
+        colors : [ [ $r("sys.color.ohos_id_color_foreground_contrary"), 1 ], [ $r("sys.color.ohos_id_color_foreground_contrary"), 1 ] ]
+      })
+      .onTouch((event: TouchEvent) => {
         if ( event.type === TouchType.Down ) {
           this.isTouched = true;
-        } else {
-          console.log( TAG , "event.type /= TouchType.Down" )
-        }
-        if ( event.type === TouchType.Up ) {
+        } else if ( event.type === TouchType.Up ) {
           this.isTouched = false;
         } else {
-          console.log( TAG , "event.type /= TouchType.Up" )
+          console.log(TAG , "event.type /= TouchType.Down")
+          console.log(TAG , "event.type /= TouchType.Up")
         }
-      } )
+      })
     }
-    .params( { date : this.date , deviceId : this.deviceId } )
-    .padding( $r( 'app.float.distance_4' ) )
-    .height( $r( 'app.float.wh_value_100' ) )
-    .borderRadius( $r( 'app.float.radius_24' ) )
-    .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) );
+    .params({ date : this.date , deviceId : this.deviceId })
+    .padding($r('app.float.distance_4'))
+    .height($r('app.float.wh_value_100'))
+    .borderRadius($r('app.float.radius_24'))
+    .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"));
   }
 }
 
@@ -93,60 +89,58 @@ export struct SubEntryComponentWithEndText {
   private title: string | Resource;
 
   build() {
-    Navigator( { target : this.targetPage } ) {
-      Flex( { justifyContent : FlexAlign.SpaceBetween , alignItems : ItemAlign.Center } ) {
+    Navigator({ target : this.targetPage }) {
+      Flex({ justifyContent : FlexAlign.SpaceBetween , alignItems : ItemAlign.Center }) {
         Row() {
-          Text( this.title )
-            .fontSize( $r( 'app.float.font_16' ) )
-            .lineHeight( $r( 'app.float.wh_value_22' ) )
-            .fontWeight( FontWeight.Medium )
-            .fontColor( $r( 'app.color.font_color_182431' ) )
-            .margin( { left : $r( 'app.float.distance_8' ) } )
-            .textAlign( TextAlign.Start );
+          Text(this.title)
+            .fontSize($r('app.float.font_16'))
+            .lineHeight($r('app.float.wh_value_22'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.font_color_182431'))
+            .margin({ left : $r('app.float.distance_8') })
+            .textAlign(TextAlign.Start);
         }
 
         Row() {
-          Text( this.endText )
-            .fontSize( $r( 'app.float.font_14' ) )
-            .lineHeight( $r( 'app.float.wh_value_19' ) )
-            .fontWeight( FontWeight.Regular )
-            .fontColor( $r( 'sys.color.ohos_id_color_text_secondary' ) )
-            .margin( { right : $r( 'app.float.distance_4' ) } )
-            .textAlign( TextAlign.End );
-          Image( ( 'app.media.ic_settings_arrow' ) )
-            .width( $r( 'app.float.wh_value_12' ) )
-            .height( $r( 'app.float.wh_value_24' ) )
-            .margin( { right : $r( 'app.float.distance_8' ) } );
+          Text(this.endText)
+            .fontSize($r('app.float.font_14'))
+            .lineHeight($r('app.float.wh_value_19'))
+            .fontWeight(FontWeight.Regular)
+            .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+            .margin({ right : $r('app.float.distance_4') })
+            .textAlign(TextAlign.End);
+          Image(('app.media.ic_settings_arrow'))
+            .width($r('app.float.wh_value_12'))
+            .height($r('app.float.wh_value_24'))
+            .margin({ right : $r('app.float.distance_8') });
         }
       }
-      .height( ConfigData.WH_100_100 )
-      .width( ConfigData.WH_100_100 )
-      .borderRadius( $r( 'app.float.radius_20' ) )
-      .linearGradient( this.isTouched ? {
-                                          angle : 90 ,
-                                          direction : GradientDirection.Right ,
-                                          colors : [ [ $r( "app.color.DCEAF9" ), 0.0 ], [ $r( "app.color.FAFAFA" ), 1.0 ] ]
-                                        } : {
-                                              angle : 90 ,
-                                              direction : GradientDirection.Right ,
-                                              colors : [ [ $r( "sys.color.ohos_id_color_foreground_contrary" ), 1 ], [ $r( "sys.color.ohos_id_color_foreground_contrary" ), 1 ] ]
-                                            } )
-      .onTouch( ( event: TouchEvent ) => {
+      .height(ConfigData.WH_100_100)
+      .width(ConfigData.WH_100_100)
+      .borderRadius($r('app.float.radius_20'))
+      .linearGradient(this.isTouched ? {
+        angle : 90 ,
+        direction : GradientDirection.Right ,
+        colors : [ [ $r("app.color.DCEAF9"), 0.0 ], [ $r("app.color.FAFAFA"), 1.0 ] ]
+      } : {
+        angle : 90 ,
+        direction : GradientDirection.Right ,
+        colors : [ [ $r("sys.color.ohos_id_color_foreground_contrary"), 1 ], [ $r("sys.color.ohos_id_color_foreground_contrary"), 1 ] ]
+      })
+      .onTouch((event: TouchEvent) => {
         if ( event.type === TouchType.Down ) {
           this.isTouched = true;
-        } else {
-          console.log( TAG , "event.type /= TouchType.Down" )
-        }
-        if ( event.type === TouchType.Up ) {
+        } else if ( event.type === TouchType.Up ) {
           this.isTouched = false;
         } else {
-          console.log( TAG , "event.type /= TouchType.Up" )
+          console.log(TAG , "event.type /= TouchType.Down")
+          console.log(TAG , "event.type /= TouchType.Up")
         }
-      } );
+      });
     }
-    .padding( $r( 'app.float.distance_4' ) )
-    .height( $r( 'app.float.wh_value_56' ) )
-    .borderRadius( $r( 'app.float.radius_24' ) )
-    .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) );
+    .padding($r('app.float.distance_4'))
+    .height($r('app.float.wh_value_56'))
+    .borderRadius($r('app.float.radius_24'))
+    .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"));
   }
 }

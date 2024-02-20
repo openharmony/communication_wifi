@@ -13,29 +13,28 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import screenshot from '@ohos.screenshot'
 import image from '@ohos.multimedia.image'
 import MediaUtils from '../entryability/model/MediaUtils'
+import ConfigData from '../utils/ConfigData';
 
 const TAG = "[mainPageTitle]"
-import ConfigData from '../utils/ConfigData';
+
 /**
  * Main-Page Title Of WiFi test
  */
 
 @Component
 export struct MainPageTitle {
-  @State colOpacity: Number = 1
-  @State count: Number = 0
-  @State myborderWidth: Number = 0
-  @State myborderRadius: Number = 0
-  @State offsetX: Number = 0
-  @State offsetY: Number = 0
-  @State myscale: Number = 1
-  @State angle: Number = 0
-  getScreen = ( isFullScreen: boolean ) => {
+  @State colOpacity: number = 1
+  @State count: number = 0
+  @State myborderWidth: number = 0
+  @State myborderRadius: number = 0
+  @State offsetX: number = 0
+  @State offsetY: number = 0
+  @State myscale: number = 1
+  @State angle: number = 0
+  getScreen = (isFullScreen: boolean) => {
     let screenshotOptions: screenshot.ScreenshotOptions = {
       screenRect : { left : 0 , top : 0 , width : 400 , height : 400 } ,
       imageSize : { width : 400 , height : 400 } ,
@@ -47,118 +46,115 @@ export struct MainPageTitle {
         rotation : 0
       }
     } else {
-      console.log( TAG , "error-----" )
+      console.log(TAG , "error-----")
     }
     try {
-      screenshot.save( screenshotOptions , ( err , data: image.PixelMap ) => {
+      screenshot.save(screenshotOptions , (err , data: image.PixelMap) => {
         if ( err ) {
-          console.log( TAG , `Failed to save the screenshot. Error:${ JSON.stringify( err ) }` )
+          console.log(TAG , `Failed to save the screenshot. Error:${ JSON.stringify(err) }`)
         }
-        console.log( TAG , 'save callback' )
-        MediaUtils.savePicture( data , getContext( this ) as any )
-      } )
+        console.log(TAG , 'save callback')
+        MediaUtils.savePicture(data , getContext(this))
+      })
     } catch( err ) {
-      console.log( TAG , `save failed, code is ${ err.code }, message is ${ err.message }` )
+      console.log(TAG , `save failed, code is ${ err.code }, message is ${ err.message }`)
     }
   }
 
   @Builder
-  CustomBtn( text: Resource , isFullScreen: boolean ) {
+  CustomBtn(text: Resource , isFullScreen: boolean) {
     Button() {
-      Image( $r( 'app.media.screenShot' ) )
-        .height( 50 )
-        .width( 50 )
+      Image($r('app.media.screenShot'))
+        .height(50)
+        .width(50)
     }
-    .key( isFullScreen + 'FullScreenShot' )
-    .type( ButtonType.Normal )
-    .backgroundColor( $r( "app.color.blue" ) )
-    .height( ConfigData.WH_100_100 )
-    .width( ConfigData.WH_100_100 )
-    //    .size({ width: 55, height: 55 })
-    .margin( { left : 6 , right : 6 , top : 3 } )
-    .onClick( () => {
-      console.log( TAG , 'onClick,screenshot' )
-      this.getScreen( isFullScreen )
-    } )
-
+    .key(isFullScreen + 'FullScreenShot')
+    .type(ButtonType.Normal)
+    .backgroundColor($r("app.color.blue"))
+    .height(ConfigData.WH_100_100)
+    .width(ConfigData.WH_100_100)
+    .margin({ left : 6 , right : 6 , top : 3 })
+    .onClick(() => {
+      console.log(TAG , 'onClick,screenshot')
+      this.getScreen(isFullScreen)
+    })
   }
 
   build() {
-    Flex( { alignItems : ItemAlign.Start } ) {
-      Text( 'WIFI调试助手' )
-        .fontSize( 26 )
-        .margin( { left : 15 } )
-        .padding( { top : 28 } )
-
+    Flex({ alignItems : ItemAlign.Start }) {
+      Text('WIFI调试助手')
+        .fontSize(26)
+        .margin({ left : 15 })
+        .padding({ top : 28 })
       Scroll() {
         Column() {
-          this.CustomBtn( $r( 'app.string.btn_fullscreen' ) , true )
+          this.CustomBtn($r('app.string.btn_fullscreen') , true)
         }
-        .width( ConfigData.WH_100_100 )
-        .height( ConfigData.WH_100_100 )
-        .borderWidth( this.myborderWidth )
-        .borderRadius( this.myborderRadius )
-        .borderColor( Color.Green )
+        .width(ConfigData.WH_100_100)
+        .height(ConfigData.WH_100_100)
+        .borderWidth(this.myborderWidth)
+        .borderRadius(this.myborderRadius)
+        .borderColor(Color.Green)
         .gesture(
-          GestureGroup( GestureMode.Parallel ,
-            TapGesture( { count : 2 , fingers : 1 } )
-              .onAction( () => {
+          GestureGroup(GestureMode.Parallel ,
+            TapGesture({ count : 2 , fingers : 1 })
+              .onAction(() => {
                 this.myborderWidth += 1
-              } ) ,
-            LongPressGesture( { fingers : 1 , repeat : true , duration : 1000 } )
-              .onAction( ( event: GestureEvent ) => {
+              }) ,
+            LongPressGesture({ fingers : 1 , repeat : true , duration : 1000 })
+              .onAction((event: GestureEvent) => {
                 this.colOpacity -= 0.1
                 if ( event.repeat ) {
                   this.count ++
                 }
-              } )
-              .onActionEnd( () => {
+              })
+              .onActionEnd(() => {
                 this.colOpacity = 1;
                 this.count = 0;
-              } ) ,
-            PanGesture( { fingers : 1 , direction : PanDirection.All , distance : 5.0 } )
-              .onActionStart( () => {
-                console.log( TAG , 'Pan start' )
-              } )
-              .onActionUpdate( ( event: GestureEvent ) => {
+              }) ,
+            PanGesture({ fingers : 1 , direction : PanDirection.All , distance : 5.0 })
+              .onActionStart(() => {
+                console.log(TAG , 'Pan start')
+              })
+              .onActionUpdate((event: GestureEvent) => {
                 this.offsetY = event.offsetY;
                 this.offsetX = event.offsetX;
-              } )
-              .onActionEnd( () => {
-                console.log( TAG , 'Pan end' )
-              } ) ,
-            PinchGesture( { fingers : 2 , distance : 4 } )
-              .onActionStart( () => {
-                console.log( TAG , 'PinchGesture start' )
-              } )
-              .onActionUpdate( ( event: GestureEvent ) => {
+              })
+              .onActionEnd(() => {
+                console.log(TAG , 'Pan end')
+              }) ,
+            PinchGesture({ fingers : 2 , distance : 4 })
+              .onActionStart(() => {
+                console.log(TAG , 'PinchGesture start')
+              })
+              .onActionUpdate((event: GestureEvent) => {
                 this.myscale = event.scale
                 this.myborderRadius = 10
-              } )
-              .onActionEnd( () => {
-                console.log( TAG , 'PinchGesture end' )
-                this.getScreen( true );
-              } ) ,
-            RotationGesture( { fingers : 2 , angle : 2 } )
-              .onActionStart( () => {
-                console.log( TAG , 'RotationGesture start' )
-              } )
-              .onActionUpdate( ( event: GestureEvent ) => {
+              })
+              .onActionEnd(() => {
+                console.log(TAG , 'PinchGesture end')
+                this.getScreen(true);
+              }) ,
+            RotationGesture({ fingers : 2 , angle : 2 })
+              .onActionStart(() => {
+                console.log(TAG , 'RotationGesture start')
+              })
+              .onActionUpdate((event: GestureEvent) => {
                 this.angle = event.angle
-              } )
-              .onActionEnd( () => {
-                console.log( TAG , 'RotationGesture end' )
-              } )
+              })
+              .onActionEnd(() => {
+                console.log(TAG , 'RotationGesture end')
+              })
           )
-            .onCancel( () => {
-              console.log( TAG , 'Parallel gesture canceled' )
-            } )
+            .onCancel(() => {
+              console.log(TAG , 'Parallel gesture canceled')
+            })
         )
       }
-      .layoutWeight( 1 )
+      .layoutWeight(1)
     }
-    .height( 80 )
-    .backgroundColor( $r( "app.color.blue" ) )
-    .padding( { left : 20 } )
+    .height(80)
+    .backgroundColor($r("app.color.blue"))
+    .padding({ left : 20 })
   }
 }

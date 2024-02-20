@@ -504,14 +504,14 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &endBssi
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::SetPowerSaveMode(int frequency, int mode)
+WifiErrorNo WifiStaHalInterface::SetPmMode(int frequency, int mode)
 {
 #ifdef HDI_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
-    return mHdiClient->ReqSetPowerSaveMode(frequency, mode);
+    return mHdiClient->ReqSetPmMode(frequency, mode);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->ReqSetPowerSaveMode(frequency, mode);
+    return mIdlClient->ReqSetPmMode(frequency, mode);
 #endif
 }
 

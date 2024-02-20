@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ARCH_LITE
 #include "wifi_app_state_aware.h"
 #include "app_mgr_constants.h"
 #include "iservice_registry.h"
@@ -91,7 +90,7 @@ void WifiAppStateAware::RegisterAppStateObserver()
 }
 
 void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, int uid, int pid,
-    const int state)
+    const int state, const int m_instId)
 {
     if (state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND)) {
         foregroundAppBundleName_ = bundleName;
@@ -148,4 +147,3 @@ void AppStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppState
 }
 } // namespace Wifi
 } // namespace OHOS
-#endif

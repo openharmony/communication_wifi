@@ -340,7 +340,7 @@ public:
      * @param frequency - connected ap frequency
      * @param mode - power save mode
      */
-    WifiErrorNo SetPowerSaveMode(int frequency, int mode);
+    WifiErrorNo SetPmMode(int frequency, int mode);
 
     /**
      * @Description set data packet identification mark rule

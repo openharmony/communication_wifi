@@ -108,7 +108,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqSetPowerSaveMode(int frequency, int mode);
+    WifiErrorNo ReqSetPmMode(int frequency, int mode);
 
     /**
      * @Description set data packet identification mark rule

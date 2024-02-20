@@ -831,10 +831,10 @@ WifiErrorNo WifiIdlClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
     return err;
 }
 
-WifiErrorNo WifiIdlClient::ReqSetPowerSaveMode(int frequency, int mode) const
+WifiErrorNo WifiIdlClient::ReqSetPmMode(int frequency, int mode) const
 {
     CHECK_CLIENT_NOT_NULL;
-    LOGE("not support set power save mode.");
+    LOGE("not support set pm mode.");
     return WIFI_IDL_OPT_NOT_SUPPORT;
 }
 

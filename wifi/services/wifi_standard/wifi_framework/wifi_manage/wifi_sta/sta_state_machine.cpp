@@ -65,6 +65,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define NETWORK 1
 #define NO_NETWORK 0
 #define WPA_DEFAULT_NETWORKID 0
+#define SELF_CURE_FAC_MAC_REASSOC 2
+#define SELF_CURE_RAND_MAC_REASSOC 3
 
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
@@ -82,6 +84,7 @@ StaStateMachine::StaStateMachine(int instId)
       enableSignalPoll(true),
       isRoam(false),
       netNoWorkNum(0),
+      portalFlag(false),
       networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr),
       pRootState(nullptr),
@@ -977,8 +980,13 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
         linkedInfo.retryedConnCount = 0;
     }
     WriteWifiConnectionInfoHiSysEvent(networkId);
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("GetDeviceConfig failed!");
+        return;
+    }
     if (networkId == linkedInfo.networkId) {
-        if (linkedInfo.connState == ConnState::CONNECTED) {
+        if (linkedInfo.connState == ConnState::CONNECTED && config.isReassocSelfCureWithFactoryMacAddress == 0) {
             InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
             WIFI_LOGI("This network is in use and does not need to be reconnected.\n");
             return;
@@ -1458,6 +1466,19 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
 
 ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string & bssid)
 {
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("GetDeviceConfig failed!");
+        return WIFI_OPT_FAILED;
+    }
+    if (config.isReassocSelfCureWithFactoryMacAddress == SELF_CURE_FAC_MAC_REASSOC) {
+        config.wifiPrivacySetting = WifiPrivacyConfig::DEVICEMAC;
+    } else if (config.isReassocSelfCureWithFactoryMacAddress == SELF_CURE_RAND_MAC_REASSOC) {
+        config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+    }
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId);
     WifiDeviceConfig deviceConfig;
@@ -1691,14 +1712,14 @@ bool StaStateMachine::SetRandomMac(int networkId)
             std::string macAddress;
             WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
             randomMacInfo.randomMac = macAddress;
-            LOGD("%{public}s: generate a random mac, randomMac:%{private}s, ssid:%{private}s, peerbssid:%{private}s",
-                __func__, randomMacInfo.randomMac.c_str(), randomMacInfo.ssid.c_str(),
-                randomMacInfo.peerBssid.c_str());
+            LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                MacAnonymize(randomMacInfo.peerBssid).c_str());
             WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
         } else {
-            LOGD("%{public}s: randomMac:%{private}s, ssid:%{private}s, peerbssid:%{private}s",
-                __func__, randomMacInfo.randomMac.c_str(), randomMacInfo.ssid.c_str(),
-                randomMacInfo.peerBssid.c_str());
+            LOGI("%{public}s: randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                MacAnonymize(randomMacInfo.peerBssid).c_str());
         }
         currentMac = randomMacInfo.randomMac;
     }
@@ -1708,7 +1729,8 @@ bool StaStateMachine::SetRandomMac(int networkId)
         return false;
     }
 
-    LOGD("%{public}s, currentMac:%{private}s, lastMac:%{private}s", __func__, currentMac.c_str(), lastMac.c_str());
+    LOGI("%{public}s, currentMac:%{public}s, lastMac:%{public}s",
+        __func__, MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {

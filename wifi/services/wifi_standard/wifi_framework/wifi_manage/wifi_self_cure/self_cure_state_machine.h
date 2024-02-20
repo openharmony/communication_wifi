@@ -128,6 +128,7 @@ public:
         void RequestReassocWithFactoryMac();
         void HandleInvalidIp(InternalMessage *msg);
         void HandleInternetFailedDetected(InternalMessage *msg);
+        bool ExecuteStateMsgExt(InternalMessage *msg);
     };
 
     /* *
@@ -307,8 +308,11 @@ private:
     std::string GetAuthType();
     int GetIpAssignment(AssignIpMethod &ipAssignment);
     time_t GetLastHasInternetTime();
+    uint32_t GetNetworkStatusHistory();
     std::string GetSelfCureHistoryInfo();
     int SetSelfCureHistoryInfo(std::string internetSelfCureHistory);
+    int GetIsReassocWithFactoryMacAddress();
+    int SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress);
     WifiDeviceConfig GetCurrentWifiDeviceConfig();
     bool SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel);
     void HandleNetworkConnected();

@@ -718,7 +718,7 @@ bool P2pStateMachine::StartDhcpServer()
 
 bool P2pStateMachine::StopDhcpServer()
 {
-    return m_DhcpdInterface.StopDhcpServer(groupManager.GetCurrentGroup().GetInterface());
+    return m_DhcpdInterface.StopDhcp(groupManager.GetCurrentGroup().GetInterface());
 }
 
 P2pStateMachine* P2pStateMachine::DhcpResultNotify::pP2pStateMachine = nullptr;

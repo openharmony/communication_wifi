@@ -199,8 +199,8 @@ HWTEST_F(WifiGlobalFuncTest, IsValid24GHzTest, TestSize.Level1)
 
 HWTEST_F(WifiGlobalFuncTest, IsValid5GHzTest, TestSize.Level1)
 {
-    EXPECT_FALSE(IsValid24GHz(2412));
-    EXPECT_TRUE(IsValid24GHz(5200));
+    EXPECT_FALSE(IsValid5GHz(2412));
+    EXPECT_TRUE(IsValid5GHz(5200));
 }
 
 HWTEST_F(WifiGlobalFuncTest, IsValid24GChannelTest, TestSize.Level1)
@@ -211,8 +211,8 @@ HWTEST_F(WifiGlobalFuncTest, IsValid24GChannelTest, TestSize.Level1)
 
 HWTEST_F(WifiGlobalFuncTest, IsValid5GChannelTest, TestSize.Level1)
 {
-    EXPECT_FALSE(IsValid24GChannel(1));
-    EXPECT_TRUE(IsValid24GChannel(40));
+    EXPECT_FALSE(IsValid5GChannel(1));
+    EXPECT_TRUE(IsValid5GChannel(40));
 }
 
 HWTEST_F(WifiGlobalFuncTest, SplitStringTest, TestSize.Level1)

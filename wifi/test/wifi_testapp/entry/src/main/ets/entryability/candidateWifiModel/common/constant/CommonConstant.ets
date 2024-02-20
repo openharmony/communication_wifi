@@ -56,12 +56,12 @@ export class CommonConstants {
   /**
    * Toast Duration.
    */
-  static readonly TOAST_TIME: Number = 3000;
+  static readonly TOAST_TIME: number = 3000;
 
   /**
    * Bottom toast.
    */
-  static readonly TOAST_MARGIN_BOTTOM: Number = 64;
+  static readonly TOAST_MARGIN_BOTTOM: number = 64;
 
   /**
    * Width of title.
@@ -76,7 +76,7 @@ export class CommonConstants {
   /**
    * Radius of bookInfo area.
    */
-  static readonly IMAGE_BORDER_RADIUS: Number = 12;
+  static readonly IMAGE_BORDER_RADIUS: number = 12;
 
   /**
    * Margin left of book item.
@@ -96,7 +96,7 @@ export class CommonConstants {
   /**
    * Radius of dialog.
    */
-  static readonly DIALOG_BORDER_RADIUS: Number = 32;
+  static readonly DIALOG_BORDER_RADIUS: number = 32;
 
   /**
    * Button width of dialog.
@@ -121,7 +121,7 @@ export class CommonConstants {
   /**
    * Horizontal offset of dialog.
    */
-  static readonly DIALOG_OFFSET_X: Number = 0;
+  static readonly DIALOG_OFFSET_X: number = 0;
 
   /**
    * TextInput offset of dialog.
@@ -216,7 +216,7 @@ export class CommonConstants {
   /**
    * The fraction or number of seconds is less than 10.
    */
-  static readonly TEN: Number = 10;
+  static readonly TEN: number = 10;
 
   /**
    * One task of data.
@@ -231,17 +231,17 @@ export class CommonConstants {
   /**
    * default click index.
    */
-  static readonly DEFAULT_CLICK_INDEX: Number = -1;
+  static readonly DEFAULT_CLICK_INDEX: number = - 1;
 
   /**
    * default SliderChangeMode.
    */
-  static readonly DEFAULT_SLIDER_MODE: Number = -1;
+  static readonly DEFAULT_SLIDER_MODE: number = - 1;
 
   /**
    * click SliderChangeMode.
    */
-  static readonly CLICK_SLIDER_MODE: Number = 3;
+  static readonly CLICK_SLIDER_MODE: number = 3;
 
   /**
    * x-axis transition animation.

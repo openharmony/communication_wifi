@@ -384,7 +384,7 @@ bool WifiEventSubscriberManager::IsDataMgrServiceActive()
         WIFI_LOGE("Failed to get SystemAbilityManager!");
         return false;
     }
-    sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    sptr<IRemoteObject> object = sa_mgr->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
     if (object == nullptr) {
         WIFI_LOGE("Failed to get DataMgrService!");
         return false;

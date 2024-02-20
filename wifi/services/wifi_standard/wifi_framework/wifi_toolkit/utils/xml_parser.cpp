@@ -47,6 +47,10 @@ bool XmlParser::LoadConfiguration(const char *xmlPath)
 
 bool XmlParser::LoadConfigurationMemory(const char *xml)
 {
+    if (xml == nullptr) {
+        WIFI_LOGE("LoadConfigurationMemory xml is nullptr");
+        return false;
+    }
     mDoc_ = xmlReadMemory(xml, strlen(xml), nullptr, nullptr, 0);
     if (mDoc_ == nullptr) {
         WIFI_LOGE("LoadConfigurationMemory fail");

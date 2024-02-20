@@ -132,7 +132,7 @@ bool ApStateMachine::StopDhcpServer()
 #ifndef WIFI_DHCP_DISABLED
     WIFI_LOGI("Enter:StopDhcpServer");
     std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
-    if (!m_DhcpdInterface.StopDhcpServer(ifaceName)) {
+    if (!m_DhcpdInterface.StopDhcp(ifaceName)) {
         WIFI_LOGE("Close dhcpd fail.");
         return false;
     }

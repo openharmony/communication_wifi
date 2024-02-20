@@ -14,7 +14,6 @@
  */
 
 #include "wifi_app_state_aware.h"
-#include "app_mgr_constants.h"
 #include "iservice_registry.h"
 #include "ability_manager_client.h"
 #include "system_ability_definition.h"

@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include <memory>
 #include "external_wifi_filter_builder_manager.h"
 #include "wifi_logger.h"
+#include "wifi_filter_impl.h"
 
-namespace OHOS {
-namespace Wifi {
+
+namespace OHOS::Wifi {
 DEFINE_WIFILOG_LABEL("WifiFilterBuilderManager")
 
 ExternalWifiFilterBuildManager &ExternalWifiFilterBuildManager::GetInstance()
@@ -53,7 +53,8 @@ void ExternalWifiFilterBuildManager::DeregisterFilterBuilder(const FilterTag &fi
     filterBuilders.erase({filterTag, filterName});
 }
 
-void ExternalWifiFilterBuildManager::BuildFilter(const FilterTag &filterTag, CompositeWifiFilter &compositeFilter)
+void ExternalWifiFilterBuildManager::BuildFilter(const FilterTag &filterTag,
+    NetworkSelection::CompositeWifiFilter &compositeFilter)
 {
     std::lock_guard<std::mutex> lock(mutex);
     for (const auto &filterBuilderPair : filterBuilders) {
@@ -61,13 +62,7 @@ void ExternalWifiFilterBuildManager::BuildFilter(const FilterTag &filterTag, Com
         if (filterBuilderPair.first.first != filterTag) {
             continue;
         }
-        FilterFunc filterFunc;
-        filterBuilderPair.second.operator()(filterFunc);
-        if (filterFunc) {
-            compositeFilter.AddFilter(std::make_shared<WifiFunctionFilterAdapter>(
-                filterFunc, filterBuilderPair.first.second));
-        }
+        filterBuilderPair.second.operator()(compositeFilter);
     }
-}
 }
 }

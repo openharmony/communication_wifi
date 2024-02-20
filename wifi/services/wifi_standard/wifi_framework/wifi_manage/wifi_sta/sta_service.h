@@ -20,7 +20,7 @@
 #include "sta_auto_connect_service.h"
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
-#include "network_selection_msg.h"
+#include "network_selection.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
 #endif

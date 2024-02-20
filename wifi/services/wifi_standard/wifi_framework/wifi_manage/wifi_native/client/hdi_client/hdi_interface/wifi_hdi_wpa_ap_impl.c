@@ -178,7 +178,7 @@ WifiErrorNo HdiDisableAp(int id)
         LOGE("HdiDisableAp: apObj is NULL");
         return WIFI_IDL_OPT_FAILED;
     }
-
+    SetExecDisable(EXEC_DISABLE);
     int32_t result = apObj->DisableAp(apObj, GetApIfaceName(), id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiDisableAp failed result:%{public}d", result);

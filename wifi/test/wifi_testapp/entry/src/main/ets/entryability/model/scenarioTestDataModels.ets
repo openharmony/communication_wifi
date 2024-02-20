@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 /**
  * scenario DataModel of wifi test
  */
@@ -179,7 +177,16 @@ import {
 
 import wifi from '@ohos.wifi';
 
-export const WifiConnectScenarioTestCase: [] = [
+interface ScenarioTest {
+  name: string;
+  detail: string;
+  method: string;
+  api: Function;
+  result: string;
+  category: ScenarioCategory;
+}
+
+export const WifiConnectScenarioTestCase: ScenarioTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '1' ,
@@ -315,17 +322,10 @@ export const WifiConnectScenarioTestCase: [] = [
     'api' : testGetDeviceConfigs ,
     'result' : 'None' ,
     'category' : ScenarioCategory.WifiScanScenario
-  },
-  //  { 'name': '断开连接的网络', 'detail': '18', 'method': 'disconnect', 'api': testDisconnect, 'result': 'None', 'category': ScenarioCategory.WifiScanScenario },
-  //  { 'name': '移除所有网络配置', 'detail': '19', 'method': 'removeAllNetwork', 'api': testRemoveAllNetwork, 'result': 'None', 'category': ScenarioCategory.WifiScanScenario },
-  //  { 'name': '关闭WLAN状态改变事件', 'detail': '20', 'method': 'on.WifiStateChange', 'api': testOnWifiStateChange, 'result': 'None', 'category': ScenarioCategory.WifiScanScenario },
-  //  { 'name': '关闭WLAN连接状态改变事件', 'detail': '21', 'method': 'on.WifiConnectionChange', 'api': testOnWifiConnectionChange, 'result': 'None', 'category': ScenarioCategory.WifiScanScenario },
-  //  { 'name': '关闭扫描状态改变事件', 'detail': '22', 'method': 'on.WifiScanStateChange', 'api': testOnWifiScanStateChange, 'result': 'None', 'category': ScenarioCategory.WifiScanScenario },
-  //  { 'name': '关闭RSSI状态改变事件', 'detail': '23', 'method': 'on.WifiRssiChange', 'api': testOnWifiRssiChange, 'result': 'None', 'category': ScenarioCategory.WifiScanScenario },
-  //  { 'name': '关wifi', 'detail': '24', 'method': 'disableWifi', 'api': testDisableWifi, 'result': 'None', 'category': ScenarioCategory.WifiScanScenario }
+  }
 ]
 
-export const WifiManagerConnectScenarioTestCase: [] = [
+export const WifiManagerConnectScenarioTestCase: ScenarioTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '1' ,
@@ -382,7 +382,6 @@ export const WifiManagerConnectScenarioTestCase: [] = [
     'result' : 'None' ,
     'category' : ScenarioCategory.WifiManagerScanScenario
   },
-  //  { 'name': '获取扫描信息列表', 'detail': '8', 'method': 'getScanInfoList', 'api': testGetScanInfoListManager, 'result': 'None', 'category': ScenarioCategory.WifiManagerScanScenario },
   {
     'name' : '添加网络配置Callback' ,
     'detail' : '9' ,
@@ -455,15 +454,9 @@ export const WifiManagerConnectScenarioTestCase: [] = [
     'result' : 'None' ,
     'category' : ScenarioCategory.WifiManagerScanScenario
   },
-  //  { 'name': '移除指定的网络配置', 'detail': '18', 'method': 'removeDeviceConfig', 'api': testRemoveDeviceConfigManager, 'result': 'None', 'category': ScenarioCategory.WifiManagerScanScenario },
-  //  { 'name': '移除所有网络配置', 'detail': '19', 'method': 'removeAllDeviceConfigs', 'api': testRemoveAllDeviceConfigsManager, 'result': 'None', 'category': ScenarioCategory.WifiManagerScanScenario },
-  //  { 'name': '注册流改变事件', 'detail': '20', 'method': 'on.streamChange', 'api': testOnStreamChangeManager, 'result': 'None', 'category': ScenarioCategory.WifiManagerScanScenario },
-  //  { 'name': '断开连接的网络', 'detail': '21', 'method': 'disconnect', 'api': testDisconnectManager, 'result': 'None', 'category': ScenarioCategory.WifiManagerScanScenario },
-  //  { 'name': '关闭设备配置改变事件', 'detail': '22', 'method': 'on.deviceConfigChange', 'api': testOnDeviceConfigChangeManager, 'result': 'None', 'category': ScenarioCategory.WifiManagerScanScenario },
-  //  { 'name': '关wifi', 'detail': '23', 'method': 'disableWifi', 'api': testDisableWifiManager, 'result': 'None', 'category': ScenarioCategory.WifiManagerScanScenario }
 ]
 
-export const HotspotCreateScenarioTestCase: [] = [
+export const HotspotCreateScenarioTestCase: ScenarioTest[] = [
   {
     'name' : '注册热点状态改变事件' ,
     'detail' : '1' ,
@@ -511,12 +504,10 @@ export const HotspotCreateScenarioTestCase: [] = [
     'api' : testGetHotspotConfig ,
     'result' : 'None' ,
     'category' : ScenarioCategory.HotspotCreateScenario
-  },
-  //  { 'name': '去使能热点', 'detail': '7', 'method': 'disableHotspot', 'api': testDisableHotspot, 'result': 'None', 'category': ScenarioCategory.HotspotCreateScenario },
-  //  { 'name': '关闭热点状态改变事件', 'detail': '1', 'method': 'on.hotspotStateChange', 'api': testOnHotspotStateChange, 'result': 'None', 'category': ScenarioCategory.HotspotCreateScenario },
+  }
 ]
 
-export const HotspotManagerCreateScenarioTestCase: [] = [
+export const HotspotManagerCreateScenarioTestCase: ScenarioTest[] = [
   {
     'name' : '注册热点状态改变事件' ,
     'detail' : '1' ,
@@ -564,12 +555,10 @@ export const HotspotManagerCreateScenarioTestCase: [] = [
     'api' : testGetHotspotConfigManager ,
     'result' : 'None' ,
     'category' : ScenarioCategory.HotspotManagerCreateScenario
-  },
-  //  { 'name': '去使能热点', 'detail': '7', 'method': 'disableHotspot', 'api': testDisableHotspotManager, 'result': 'None', 'category': ScenarioCategory.HotspotManagerCreateScenario },
-  //  { 'name': '注册热点状态改变事件', 'detail': '1', 'method': 'on.hotspotStateChange', 'api': testOnHotspotStateChangeManager, 'result': 'None', 'category': ScenarioCategory.HotspotManagerCreateScenario },
+  }
 ]
 
-export const P2pConnectScenarioTestCase: [] = [
+export const P2pConnectScenarioTestCase: ScenarioTest[] = [
   {
     'name' : '注册P2P开关状态改变事件' ,
     'detail' : '1' ,
@@ -676,7 +665,7 @@ export const P2pConnectScenarioTestCase: [] = [
   },
 ]
 
-export const P2pManagerConnectScenarioTestCase: [] = [
+export const P2pManagerConnectScenarioTestCase: ScenarioTest[] = [
   {
     'name' : '注册P2P开关状态改变事件' ,
     'detail' : '1' ,
@@ -801,48 +790,48 @@ export const P2pManagerConnectScenarioTestCase: [] = [
 
 export function initWifiConnectScenarioData(): Array<TestScenario> {
   let TestScenarioArray: Array<TestScenario> = []
-  WifiConnectScenarioTestCase.forEach( item => {
-    TestScenarioArray.push( new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  WifiConnectScenarioTestCase.forEach(item => {
+    TestScenarioArray.push(new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestScenarioArray;
 }
 
 export function initWifiManagerConnectScenarioData(): Array<TestScenario> {
   let TestScenarioArray: Array<TestScenario> = []
-  WifiManagerConnectScenarioTestCase.forEach( item => {
-    TestScenarioArray.push( new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  WifiManagerConnectScenarioTestCase.forEach(item => {
+    TestScenarioArray.push(new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestScenarioArray;
 }
 
 export function initHotspotCreateScenarioData(): Array<TestScenario> {
   let TestScenarioArray: Array<TestScenario> = []
-  HotspotCreateScenarioTestCase.forEach( item => {
-    TestScenarioArray.push( new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  HotspotCreateScenarioTestCase.forEach(item => {
+    TestScenarioArray.push(new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestScenarioArray;
 }
 
 export function initHotspotManagerCreateScenarioData(): Array<TestScenario> {
   let TestScenarioArray: Array<TestScenario> = []
-  HotspotManagerCreateScenarioTestCase.forEach( item => {
-    TestScenarioArray.push( new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  HotspotManagerCreateScenarioTestCase.forEach(item => {
+    TestScenarioArray.push(new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestScenarioArray;
 }
 
 export function initP2pConnectScenarioData(): Array<TestScenario> {
   let TestScenarioArray: Array<TestScenario> = []
-  P2pConnectScenarioTestCase.forEach( item => {
-    TestScenarioArray.push( new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  P2pConnectScenarioTestCase.forEach(item => {
+    TestScenarioArray.push(new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestScenarioArray;
 }
 
 export function initP2pManagerConnectScenarioData(): Array<TestScenario> {
   let TestScenarioArray: Array<TestScenario> = []
-  P2pManagerConnectScenarioTestCase.forEach( item => {
-    TestScenarioArray.push( new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  P2pManagerConnectScenarioTestCase.forEach(item => {
+    TestScenarioArray.push(new TestScenario(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestScenarioArray;
 }

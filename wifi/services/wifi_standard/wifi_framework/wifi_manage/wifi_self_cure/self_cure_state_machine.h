@@ -108,6 +108,8 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
+        using selfCureCmsHandleFunc = void (SelfCureStateMachine::ConnectedMonitorState::*)(InternalMessage *msg);
+        using SelfCureCmsHandleFuncMap = std::map<int, selfCureCmsHandleFunc>;
 
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
@@ -121,14 +123,20 @@ public:
         bool portalUnthenEver;
         bool userSetStaticIpConfig;
         bool wifiSwitchAllowed;
+        SelfCureCmsHandleFuncMap selfCureCmsHandleFuncMap;
+        int InitSelfCureCmsHandleMap();
+        void HandleResetupSelfCure(InternalMessage *msg);
+        void HandlePeriodicArpDetection(InternalMessage *msg);
+        void HandleNetworkConnect(InternalMessage *msg);
+        void HandleNetworkDisconnect(InternalMessage *msg);
+        void HandleRssiLevelChange(InternalMessage *msg);
         void TransitionToSelfCureState(int reason);
-        void HandArpDetectionFailed(InternalMessage *msg);
+        void HandleArpDetectionFailed(InternalMessage *msg);
         bool SetupSelfCureMonitor();
         void UpdateInternetAccessHistory();
         void RequestReassocWithFactoryMac();
         void HandleInvalidIp(InternalMessage *msg);
         void HandleInternetFailedDetected(InternalMessage *msg);
-        bool ExecuteStateMsgExt(InternalMessage *msg);
     };
 
     /* *
@@ -175,6 +183,8 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
+        using selfCureIssHandleFunc = void (SelfCureStateMachine::InternetSelfCureState::*)(InternalMessage *msg);
+        using SelfCureIssHandleFuncMap = std::map<int, selfCureIssHandleFunc>;
 
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
@@ -203,6 +213,15 @@ public:
         WifiSelfCureHistoryInfo selfCureHistoryInfo;
         std::string currentGateway;
         int selfCureForInvalidIpCnt = 0;
+        SelfCureIssHandleFuncMap selfCureIssHandleFuncMap;
+        int InitSelfCureIssHandleMap();
+        void HandleInternetFailedSelfCure(InternalMessage *msg);
+        void HandleSelfCureWifiLink(InternalMessage *msg);
+        void HandleNetworkDisconnected(InternalMessage *msg);
+        void HandleInternetRecovery(InternalMessage *msg);
+        void HandleRssiChangedEvent(InternalMessage *msg);
+        void HandleP2pDisconnected(InternalMessage *msg);
+        void HandlePeriodicArpDetecte(InternalMessage *msg);
         void SelectSelfCureByFailedReason(int internetFailedType);
         int SelectBestSelfCureSolution(int internetFailedType);
         void SelfCureWifiLink(int requestCureLevel);

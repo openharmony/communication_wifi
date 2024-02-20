@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import image from '@ohos.multimedia.image'
 import fileio from '@ohos.fileio'
 import prompt from '@ohos.prompt'

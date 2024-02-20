@@ -540,6 +540,7 @@ struct WifiDeviceConfig {
     std::string callProcessName;
     std::string ancoCallProcessName;
     std::string internetSelfCureHistory;
+    int isReassocSelfCureWithFactoryMacAddress;
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -569,6 +570,7 @@ struct WifiDeviceConfig {
         callProcessName = "";
         ancoCallProcessName = "";
         internetSelfCureHistory = "";
+        isReassocSelfCureWithFactoryMacAddress = 0;
     }
 };
 

@@ -19,7 +19,7 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
-#include "network_selection_msg.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {

@@ -45,7 +45,11 @@ static int ReadConfigModuleName(char *name, int size)
     }
     int flag = 0;
     do {
-        fseek(fp, 0, SEEK_END);
+        if (fseek(fp, 0, SEEK_END) != 0) {
+            LOGE("ReadConfigModuleName fseek failed!");
+            fclose(fp);
+            return HAL_FAILURE;
+        }
         int len = ftell(fp);
         if ((len >= size) || (len == -1)) {
             LOGE("config file size too big, config file may not correct!");

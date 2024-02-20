@@ -198,11 +198,14 @@ WifiErrorNo HdiWpaStaStart()
 
     if (RegisterEventCallback() != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaStaStart: RegisterEventCallback failed!");
+        HdiWpaStop();
         return WIFI_IDL_OPT_FAILED;
     }
 
     if (HdiAddWpaIface("wlan0", CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaStaStart: HdiAddWpaIface failed!");
+        UnRegisterEventCallback();
+        HdiWpaStop();
         return WIFI_IDL_OPT_FAILED;
     }
     

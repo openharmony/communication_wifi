@@ -647,9 +647,6 @@ void WifiServiceManager::UninstallAllService()
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         UnloadStaService(false, i);
         UnloadScanService(false, i);
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        UnloadSelfCureService(false, i);
-#endif
     }
 #ifdef FEATURE_AP_SUPPORT
     for (int i = 0; i < AP_INSTANCE_MAX_NUM; ++i) {
@@ -658,6 +655,9 @@ void WifiServiceManager::UninstallAllService()
 #endif
 #ifdef FEATURE_P2P_SUPPORT
     UnloadP2pService(false);
+#endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    UnloadSelfCureService(false);
 #endif
     return;
 }

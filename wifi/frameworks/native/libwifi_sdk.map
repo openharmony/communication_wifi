@@ -92,6 +92,7 @@
             "OHOS::Wifi::WifiEapConfig::Phase2MethodFromStr(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             OHOS::Wifi::WifiP2pCallbackStub::*;
             OHOS::Wifi::WifiScanCallbackStub::*;
+            OHOS::Wifi::NetworkSelection::*;
         };
     local:
         *;

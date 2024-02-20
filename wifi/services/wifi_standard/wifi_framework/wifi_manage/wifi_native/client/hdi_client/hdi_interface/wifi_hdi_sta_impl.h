@@ -135,7 +135,7 @@ void HdiReleaseLocalResources();
  *
  * @return WifiErrorNo
  */
-WifiErrorNo HdiSetPowerSaveMode(int frequency, int mode);
+WifiErrorNo HdiSetPmMode(int frequency, int mode);
 
 /**
  * @Description set data packet identification mark rule

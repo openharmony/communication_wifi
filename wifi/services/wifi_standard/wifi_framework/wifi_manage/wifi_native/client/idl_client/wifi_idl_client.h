@@ -350,7 +350,7 @@ public:
      * @param mode - power save mode
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqSetPowerSaveMode(int frequency, int mode) const;
+    WifiErrorNo ReqSetPmMode(int frequency, int mode) const;
 
     /**
      * @Description set data packet identification mark rule

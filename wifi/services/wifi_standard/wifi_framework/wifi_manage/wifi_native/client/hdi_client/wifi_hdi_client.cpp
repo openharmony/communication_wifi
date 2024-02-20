@@ -211,9 +211,9 @@ WifiErrorNo WifiHdiClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
     return err;
 }
 
-WifiErrorNo WifiHdiClient::ReqSetPowerSaveMode(int frequency, int mode)
+WifiErrorNo WifiHdiClient::ReqSetPmMode(int frequency, int mode)
 {
-    return HdiSetPowerSaveMode(frequency, mode);
+    return HdiSetPmMode(frequency, mode);
 }
 
 WifiErrorNo WifiHdiClient::ReqSetDpiMarkRule(int uid, int protocol, int enable)

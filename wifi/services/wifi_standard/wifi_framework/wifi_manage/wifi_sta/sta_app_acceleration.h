@@ -16,7 +16,6 @@
 #ifndef OHOS_WIFI_STA_APP_ACCELERATION_H
 #define OHOS_WIFI_STA_APP_ACCELERATION_H
 
-#ifndef OHOS_ARCH_LITE
 #include "wifi_errcode.h"
 #include "define.h"
 #include "app_mgr_client.h"
@@ -61,7 +60,7 @@ public:
 
 private:
     static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
-    void SetPowerSaveMode(int mode);
+    void SetPmMode(int mode);
     void StartGameBoost(int uid);
     void StopGameBoost(int uid);
     void SetGameBoostMode(int enable, int uid, int type, int limitMode);
@@ -82,5 +81,4 @@ private:
 
 } // namespace Wifi
 } // namespace OHOS
-#endif
 #endif

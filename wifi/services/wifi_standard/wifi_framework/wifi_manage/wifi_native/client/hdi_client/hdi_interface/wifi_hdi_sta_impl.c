@@ -550,7 +550,7 @@ void HdiNotifyScanResult(int status)
     }
 }
 
-WifiErrorNo HdiSetPowerSaveMode(int frequency, int mode)
+WifiErrorNo HdiSetPmMode(int frequency, int mode)
 {
     LOGI("Enter %{public}s", __func__);
     int32_t ret = 0;

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ARCH_LITE
 #include "sta_app_acceleration.h"
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
@@ -71,9 +70,9 @@ void StaAppAcceleration::HandleScreenStatusChanged(int screenState)
     WIFI_LOGI("Enter HandleScreenStatusChanged.\n");
 
     if (screenState == MODE_STATE_OPEN) {
-        SetPowerSaveMode(POWER_SAVE_DISABLE);
+        SetPmMode(POWER_SAVE_DISABLE);
     } else if (screenState == MODE_STATE_CLOSE) {
-        SetPowerSaveMode(POWER_SAVE_ENABLE);
+        SetPmMode(POWER_SAVE_ENABLE);
     } else {
         WIFI_LOGI("mode not handle.\n");
     }
@@ -92,7 +91,7 @@ void StaAppAcceleration::HandleForegroundAppChangedAction(const std::string &bun
     return;
 }
 
-void StaAppAcceleration::SetPowerSaveMode(int mode)
+void StaAppAcceleration::SetPmMode(int mode)
 {
     if (mode != POWER_SAVE_DISABLE && POWER_SAVE_ENABLE) {
         WIFI_LOGI("Unsupported mode %{public}d.", mode);
@@ -101,9 +100,9 @@ void StaAppAcceleration::SetPowerSaveMode(int mode)
 
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPowerSaveMode(linkedInfo.frequency, mode);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode(linkedInfo.frequency, mode);
     if (ret != 0) {
-        WIFI_LOGE("SetPowerSaveMode failed, ret = %{public}d.", ret);
+        WIFI_LOGE("SetPmMode failed, ret = %{public}d.", ret);
         return;
     }
 }
@@ -256,11 +255,10 @@ void StaAppAcceleration::SetBgLimitIdList(std::vector<int> idList, int size, int
 void StaAppAcceleration::StopAllAppAcceleration()
 {
     WIFI_LOGI("Wifi disconnected, stop game boost.\n");
-    SetPowerSaveMode(POWER_SAVE_ENABLE);
+    SetPmMode(POWER_SAVE_ENABLE);
     HighPriorityTransmit(UNKNOWN_UID, BOOST_UDP_TYPE, GAME_BOOST_DISABLE);
     LimitedSpeed(BG_LIMIT_CONTROL_ID_GAME, GAME_BOOST_DISABLE, BG_LIMIT_OFF);
 }
 
 } // namespace Wifi
 } // namespace OHOS
-#endif

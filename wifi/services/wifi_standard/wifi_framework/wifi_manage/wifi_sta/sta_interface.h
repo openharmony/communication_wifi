@@ -305,7 +305,7 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode HandleForegroundAppChangedAction(const std::string bundleName,
-                                                        int uid, int pid, const int state) override;
+                                                        int uid, int pid, const int state);
 private:
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;

@@ -23,8 +23,8 @@
 #include "network_selection_msg.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
-#endif
 #include "sta_app_acceleration.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -335,7 +335,9 @@ private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
+#ifndef OHOS_ARCH_LITE
     StaAppAcceleration *pStaAppAcceleration;
+#endif
     int m_instId;
 };
 }  // namespace Wifi

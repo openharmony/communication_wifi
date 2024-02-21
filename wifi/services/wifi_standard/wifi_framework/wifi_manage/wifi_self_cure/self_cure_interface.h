@@ -55,6 +55,13 @@ public:
     virtual IP2pServiceCallbacks GetP2pCallback() override;
 
     /**
+     * @Description Get unregister p2p callback
+     *
+     * @return IP2pServiceCallbacks - p2p callback
+     */
+    virtual IP2pServiceCallbacks UnloadP2pCallback() override;
+
+    /**
      * @Description Get register sta callback
      *
      * @return StaServiceCallback - sta callback

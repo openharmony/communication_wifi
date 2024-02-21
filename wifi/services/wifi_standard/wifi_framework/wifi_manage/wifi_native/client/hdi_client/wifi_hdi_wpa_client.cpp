@@ -513,9 +513,15 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiSetApWmm(HOSTAPD_CFG_VALUE_ON, id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    HdiReloadApConfigInfo(id);
-    HdiDisableAp(id);
-    HdiEnableAp(id);
+    if (HdiReloadApConfigInfo(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiDisableAp(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiEnableAp(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
     return WIFI_IDL_OPT_OK;
 }
 

@@ -180,9 +180,6 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __a
 
 void ConcreteMangerMachine::IdleState::HandleSwitchToConnectOrMixMode(InternalMessage *msg)
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiSettings::GetInstance().SetWifiStopState(true);
@@ -209,9 +206,6 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *m
     mid = msg->GetParam2();
     if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX) ||
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
-        if (!CheckCanOptSta()) {
-            return;
-        }
         ErrCode ret = AutoStartStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WifiSettings::GetInstance().SetWifiStopState(true);
@@ -278,9 +272,6 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ret = AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
@@ -339,9 +330,6 @@ bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessage *msg)
 
 void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);
@@ -356,9 +344,6 @@ void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
 
 void ConcreteMangerMachine::ScanonlyState::SwitchMixInScanOnlyState()
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);
@@ -408,9 +393,6 @@ bool ConcreteMangerMachine::MixState::ExecuteStateMsg(InternalMessage *msg)
 
 void ConcreteMangerMachine::MixState::SwitchConnectInMixState()
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStopScanOnly(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop scanonly failed ret = %{public}d", ret);
@@ -420,9 +402,6 @@ void ConcreteMangerMachine::MixState::SwitchConnectInMixState()
 
 void ConcreteMangerMachine::MixState::SwitchScanOnlyInMixState()
 {
-    if (!CheckCanOptSta()) {
-        return;
-    }
     ErrCode ret = AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
@@ -446,26 +425,32 @@ bool ConcreteMangerMachine::HandleCommonMessage(InternalMessage *msg)
     }
 }
 
-bool ConcreteMangerMachine::CheckCanOptSta()
+#ifdef FEATURE_SELF_CURE_SUPPORT
+ErrCode ConcreteMangerMachine::StartSelfCureService(int instId)
 {
-    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
-    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::OPENING) {
-        WIFI_LOGE("wifi is closing or starting, open wifi fail");
-        WifiSettings::GetInstance().SetWifiStopState(true);
-        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-        ins->SendMessage(CMD_STA_START_FAILURE, mid);
-        return false;
+    if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SELFCURE) < 0) {
+        WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_SELFCURE);
+        return WIFI_OPT_FAILED;
     }
-    if (p2pState == WifiOprMidState::CLOSING || p2pState == WifiOprMidState::OPENING) {
-        WIFI_LOGE("p2p is closing or starting, open wifi fail");
-        WifiSettings::GetInstance().SetWifiStopState(true);
-        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-        ins->SendMessage(CMD_STA_START_FAILURE, mid);
-        return false;
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_SELFCURE);
+        return WIFI_OPT_FAILED;
     }
-    return true;
+    ErrCode errCode = pSelfCureService->InitSelfCureService();
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Service enable self cure failed, ret %{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
+    errCode = pService->RegisterStaServiceCallback(pSelfCureService->GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SelfCure register sta service callback failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
+#endif
 
 ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
 {
@@ -490,6 +475,12 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("StartSelfCureService failed!");
+            break;
+        }
+#endif
         errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Register sta service callback failed!");
@@ -512,6 +503,9 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
     if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE);
+#endif
         return errCode;
     }
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
@@ -549,9 +543,11 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
         WIFI_LOGE("AutoStopStaService, Instance get sta service is null!");
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+#endif
         return WIFI_OPT_SUCCESS;
     }
-
     ret = pService->DisableWifi();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("service disable sta failed, ret %{public}d!", static_cast<int>(ret));

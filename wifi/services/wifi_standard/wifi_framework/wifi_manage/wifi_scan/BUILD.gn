@@ -28,7 +28,6 @@ local_base_sources = [
   "scan_interface.cpp",
   "scan_monitor.cpp",
   "scan_service.cpp",
-  "scan_standby_listerner.cpp",
   "scan_state_machine.cpp",
 ]
 
@@ -51,6 +50,8 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
   "$WIFI_ROOT_DIR/utils/inc",
 ]

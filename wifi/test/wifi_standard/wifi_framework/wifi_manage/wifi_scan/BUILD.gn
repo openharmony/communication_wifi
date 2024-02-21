@@ -34,7 +34,6 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_monitor.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_service.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_standby_listerner.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_state_machine.cpp",
     "Mock/mock_scan_service.cpp",
     "Mock/mock_scan_state_machine.cpp",
@@ -43,7 +42,9 @@ ohos_unittest("wifi_scan_unittest") {
     "Mock/mock_wifi_sta_hal_interface.cpp",
     "Mock/mock_wifi_supplicant_hal_interface.cpp",
     "global_test.cpp",
+    "scan_interface_test.cpp",
     "scan_monitor_test.cpp",
+    "scan_service_test.cpp",
     "scan_state_machine_test.cpp",
   ]
 
@@ -68,6 +69,8 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/hardware/libhardware/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/include",

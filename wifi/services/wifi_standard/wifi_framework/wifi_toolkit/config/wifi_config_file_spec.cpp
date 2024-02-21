@@ -52,6 +52,8 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.noInternetAccess = false;
     item.callProcessName.clear();
     item.ancoCallProcessName.clear();
+    item.internetSelfCureHistory.clear();
+    item.isReassocSelfCureWithFactoryMacAddress = 0;
     return;
 }
 
@@ -83,6 +85,10 @@ static void ClearWifiDeviceConfigEap(WifiDeviceConfig &item)
     item.wifiEapConfig.identity.clear();
     item.wifiEapConfig.password.clear();
     item.wifiEapConfig.clientCert.clear();
+    if (memset_s(item.wifiEapConfig.certPassword, sizeof(item.wifiEapConfig.certPassword),
+        0x0, sizeof(item.wifiEapConfig.certPassword)) != EOK) {
+        LOGW("%{public}s: failed to memset", __func__);
+    }
     item.wifiEapConfig.privateKey.clear();
     item.wifiEapConfig.phase2Method = Phase2Method::NONE;
     return;
@@ -145,6 +151,10 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.lastHasInternetTime = std::stol(value);
     } else if (key == "noInternetAccess") {
         item.noInternetAccess = std::stoi(value);
+    } else if (key == "internetSelfCureHistory") {
+        item.internetSelfCureHistory = value;
+    } else if (key == "isReassocSelfCureWithFactoryMacAddress") {
+        item.isReassocSelfCureWithFactoryMacAddress = std::stoi(value);
     } else {
         return -1;
     }
@@ -487,6 +497,9 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"isPortal=" << item.isPortal << std::endl;
     ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
     ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
+    ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;
+    ss << "    " <<"isReassocSelfCureWithFactoryMacAddress=" << item.isReassocSelfCureWithFactoryMacAddress
+       << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else

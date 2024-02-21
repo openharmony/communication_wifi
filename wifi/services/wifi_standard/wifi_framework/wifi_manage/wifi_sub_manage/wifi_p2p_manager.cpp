@@ -77,6 +77,14 @@ ErrCode WifiP2pManager::AutoStartP2pService()
             WIFI_LOGE("Register p2p service callback failed!");
             break;
         }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        ret = pService->RegisterP2pServiceCallbacks(
+            WifiServiceManager::GetInstance().GetSelfCureServiceInst()->GetP2pCallback());
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SelfCure register p2p service callback failed!");
+            break;
+        }
+#endif
         ret = pService->EnableP2p();
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service EnableP2p failed, ret %{public}d!", static_cast<int>(ret));
@@ -118,6 +126,13 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        if (pService->RegisterP2pServiceCallbacks(
+            WifiServiceManager::GetInstance().GetSelfCureServiceInst()->UnloadP2pCallback()) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SelfCure unregister p2p service callback failed!");
+            return WIFI_OPT_FAILED;
+        }
+#endif
         
     ErrCode ret = pService->DisableP2p();
     if (ret != WIFI_OPT_SUCCESS) {

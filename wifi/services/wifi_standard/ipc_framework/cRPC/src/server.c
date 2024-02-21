@@ -49,8 +49,16 @@ static int OnAccept(RpcServer *server, unsigned int mask)
     if (fd < 0) {
         return -1;
     }
-    SetNonBlock(fd, 1);
-    fcntl(fd, F_SETFD, FD_CLOEXEC);
+    if (SetNonBlock(fd, 1) != 0) {
+        LOGE("OnAccept  SetNonBlock failed!");
+        close(fd);
+        return -1;
+    }
+    if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
+        LOGE("OnAccept  fcntl failed!");
+        close(fd);
+        return -1;
+    }
     Context *context = CreateContext(CONTEXT_BUFFER_MIN_SIZE);
     if (context != NULL) {
         context->fd = fd;

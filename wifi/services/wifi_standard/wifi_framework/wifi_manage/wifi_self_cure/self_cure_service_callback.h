@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,36 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_WIFI_AUTH_CENTER_TEST_H
-#define OHOS_WIFI_AUTH_CENTER_TEST_H
+#ifndef OHOS_SELF_CURE_SERVICE_CALLBACK_H
+#define OHOS_SELF_CURE_SERVICE_CALLBACK_H
 
-#include <gtest/gtest.h>
-#include "wifi_auth_center.h"
+#include <functional>
+#include <string>
+#include "wifi_internal_msg.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
-const int ARRAY_PERMISSION = 9;
-const int PID_NUM_1001 = 1001;
-const int UID_NUM_1001 = 1001;
-class WifiAuthCenterTest : public testing::Test {
-public:
-    static void SetUpTestCase()
-    {
-        WifiAuthCenter::GetInstance().Init();
-    }
-    static void TearDownTestCase()
-    {}
-    virtual void SetUp()
-    {
-        pid = PID_NUM_1001;
-        uid = UID_NUM_1001;
-    }
-    virtual void TearDown()
-    {}
-
-public:
-    int pid;
-    int uid;
+struct SelfCureServiceCallback {
+    std::string callbackModuleName;
 };
 }  // namespace Wifi
 }  // namespace OHOS

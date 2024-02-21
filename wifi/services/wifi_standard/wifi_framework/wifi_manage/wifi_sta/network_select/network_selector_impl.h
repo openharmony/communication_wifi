@@ -19,25 +19,30 @@
 #include <memory>
 #include "network_selection.h"
 
-namespace OHOS {
-namespace Wifi {
-class AutoConnectNetworkSelector : public CompositeNetworkSelector {
+namespace OHOS::Wifi::NetworkSelection  {
+class AutoConnectIntegrator : public CompositeNetworkSelector {
 public:
-    AutoConnectNetworkSelector();
+    AutoConnectIntegrator();
 protected:
     bool Nominate(NetworkCandidate &networkCandidate) override;
     void GetCandidatesFromSubNetworkSelector() override;
 };
 
-class SavedNetworkSelector : public CompositeNetworkSelector {
+class SavedNetworkTracker final: public CompositeNetworkSelector {
 public:
-    SavedNetworkSelector();
+    SavedNetworkTracker();
 protected:
     bool Nominate(NetworkCandidate &networkCandidate) override;
     void GetCandidatesFromSubNetworkSelector() override;
 };
 
-class BlackListNetworkSelector : public SimpleNetworkSelector, public SimpleWifiFilter {
+class SimpleFilterNetworkSelector : public SimpleNetworkSelector, public SimpleWifiFilter {
+public:
+    explicit SimpleFilterNetworkSelector(const std::string &networkSelectorName);
+    ~SimpleFilterNetworkSelector() override;
+};
+
+class BlackListNetworkSelector final: public SimpleFilterNetworkSelector {
 public:
     BlackListNetworkSelector();
 protected:
@@ -45,14 +50,23 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
-class HasInternetNetworkSelector : public SimpleNetworkSelector, public SimpleWifiFilter {
+class HasInternetNetworkSelector final: public SimpleFilterNetworkSelector {
 public:
     HasInternetNetworkSelector();
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
-class RecoveryNetworkSelector : public SimpleNetworkSelector, public SimpleWifiFilter {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+class CustNetPreferredNetworkSelector : public SimpleFilterNetworkSelector {
+public:
+    CustNetPreferredNetworkSelector();
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+#endif
+
+class RecoveryNetworkSelector final: public SimpleFilterNetworkSelector {
 public:
     RecoveryNetworkSelector();
 protected:
@@ -62,19 +76,19 @@ protected:
 class PortalNetworkSelector final : public SimpleNetworkSelector, public OrWifiFilter {
 public:
     PortalNetworkSelector();
+    ~PortalNetworkSelector() override;
     void InitFilter();
-    std::string GetFilterMsg() override;
     std::string GetNetworkSelectorMsg() override;
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
+    std::vector<NetworkCandidate*> filteredNetworkCandidates;
 };
 
-class NoInternetNetworkSelector : public SimpleNetworkSelector, public SimpleWifiFilter {
+class NoInternetNetworkSelector final: public SimpleFilterNetworkSelector {
 public:
     NoInternetNetworkSelector();
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
-}
 }
 #endif

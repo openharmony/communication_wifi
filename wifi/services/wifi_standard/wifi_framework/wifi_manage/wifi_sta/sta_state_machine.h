@@ -30,6 +30,8 @@
 #include "dhcp_c_api.h"
 #include "sta_define.h"
 #include "network_status_history_manager.h"
+#include "wifi_idl_struct.h"
+
 #ifndef OHOS_ARCH_LITE
 #include "wifi_net_agent.h"
 #include "wifi_net_observer.h"
@@ -455,6 +457,15 @@ public:
     void RegisterStaServiceCallback(const StaServiceCallback &callback);
 
     /**
+     * @Description  Convert the deviceConfig structure and set it to idl structure
+     *
+     * @param config -The Network info(in)
+     * @param idlConfig -The Network info(in)
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode FillEapCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const;
+
+    /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
      *
      * @param config -The Network info(in)
@@ -501,6 +512,12 @@ public:
      *
      */
     void HandlePortalNetworkPorcess();
+    
+    /**
+     * @Description renew dhcp.
+     *
+     */
+    void RenewDhcp();
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
 private:
@@ -641,9 +658,9 @@ private:
      */
     void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
 
-    void NetDetectionProcess(StaNetState netState, const std::string portalUrl);
+    void RegisterWifiDetection();
 
-    void NetStateObserverCallback(SystemNetWorkState netState);
+    void NetStateObserverCallback(SystemNetWorkState netState, std::string url);
     /**
      * @Description  the process of handling arp check results.
      *
@@ -918,8 +935,7 @@ private:
     WifiLinkedInfo lastLinkedInfo;
     DhcpResultNotify *pDhcpResultNotify;
     ClientCallBack clientCallBack;
-    StaNetworkCheck *pNetcheck;
-
+    WifiPortalConf mUrlInfo;
     RootState *pRootState;
     InitState *pInitState;
     WpaStartingState *pWpaStartingState; /* Starting wpa_supplicant state. */
@@ -933,7 +949,6 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-    SystemNetWorkState m_netState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];

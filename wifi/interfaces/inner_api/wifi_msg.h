@@ -43,11 +43,13 @@ const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
 const std::string KEY_MGMT_EAP = "WPA-EAP";
 
+const std::string EAP_METHOD_PEAP = "PEAP";
 const std::string EAP_METHOD_TLS = "TLS";
 const std::string EAP_METHOD_TTLS = "TTLS";
-const std::string EAP_METHOD_SIM = "SIM";
-const std::string EAP_METHOD_PEAP = "PEAP";
 const std::string EAP_METHOD_PWD = "PWD";
+const std::string EAP_METHOD_SIM = "SIM";
+const std::string EAP_METHOD_AKA = "AKA";
+const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
 enum class SupplicantState {
     DISCONNECTED = 0,
@@ -123,7 +125,10 @@ enum class DisconnectedReason {
     DISC_REASON_WRONG_PWD = 1,
 
     /* The number of router's connection reaches the maximum number limit */
-    DISC_REASON_CONNECTION_FULL = 2
+    DISC_REASON_CONNECTION_FULL = 2,
+
+    /* Connection Rejected */
+    DISC_REASON_CONNECTION_REJECTED = 3
 };
 
 enum class WifiOperateType {
@@ -351,24 +356,59 @@ public:
     {}
 };
 
-enum class Phase2Method { NONE, PAP, MSCHAP, MSCHAPV2, GTC, SIM, AKA, AKA_PRIME };
+enum class EapMethod {
+    EAP_NONE       = 0,
+    EAP_PEAP       = 1,
+    EAP_TLS        = 2,
+    EAP_TTLS       = 3,
+    EAP_PWD        = 4,
+    EAP_SIM        = 5,
+    EAP_AKA        = 6,
+    EAP_AKA_PRIME  = 7,
+    EAP_UNAUTH_TLS = 8
+};
+
+enum class Phase2Method {
+    NONE      = 0,
+    PAP       = 1,  // only EAP-TTLS support this mode
+    MSCHAP    = 2,  // only EAP-TTLS support this mode
+    MSCHAPV2  = 3,  // only EAP-PEAP/EAP-TTLS support this mode
+    GTC       = 4,  // only EAP-PEAP/EAP-TTLS support this mode
+    SIM       = 5,  // only EAP-PEAP support this mode
+    AKA       = 6,  // only EAP-PEAP support this mode
+    AKA_PRIME = 7   // only EAP-PEAP support this mode
+};
 
 class WifiEapConfig {
 public:
-    std::string eap;      /* EAP mode Encryption Mode: PEAP/TLS/TTLS/PWD/SIM/AKA/AKA */
-    std::string identity; /* EAP mode identity */
-    std::string password; /* EAP mode password */
-    std::string clientCert; /* EAP mode client certificate */
-    std::string privateKey; /* EAP mode client private key */
-    Phase2Method phase2Method;
-    std::vector<uint8_t> certEntry;
-    char certPassword[WIFI_PASSWORD_LEN];
+    std::string eap;                        /* EAP authentication mode:PEAP/TLS/TTLS/PWD/SIM/AKA/AKA' */
+    Phase2Method phase2Method;              /* Second stage authentication method */
+    std::string identity;                   /* Identity information */
+    std::string anonymousIdentity;          /* Anonymous identity information */
+    std::string password;                   /* EAP mode password */
+
+    std::string caCertPath;                 /* CA certificate path */
+    std::string caCertAlias;                /* CA certificate alias */
+    std::vector<uint8_t> certEntry;         /* CA certificate entry */
+
+    std::string clientCert;                 /* Client certificate */
+    char certPassword[WIFI_PASSWORD_LEN];   /* Certificate password */
+    std::string privateKey;                 /* Client certificate private key */
+
+    std::string altSubjectMatch;            /* Alternative topic matching */
+    std::string domainSuffixMatch;          /* Domain suffix matching */
+    std::string realm;                      /* The field of passport credentials */
+    std::string plmn;                       /* PLMN */
+    int eapSubId;                           /* Sub ID of SIM card */
 
     WifiEapConfig()
     {
         phase2Method = Phase2Method::NONE;
         (void) memset_s(certPassword, sizeof(certPassword), 0, sizeof(certPassword));
+        eapSubId = -1;
     }
+    ~WifiEapConfig()
+    {}
     /**
      * @Description convert Phase2Method to string
      *
@@ -385,6 +425,14 @@ public:
      * @return Phase2Method
      */
     static Phase2Method Phase2MethodFromStr(const std::string& str);
+
+    /**
+     * @Description convert string to EapMethod
+     *
+     * @param str - EapMethod string
+     * @return EapMethod
+     */
+    static EapMethod Str2EapMethod(const std::string& str);
 };
 
 enum class ConfigureProxyMethod { CLOSED, AUTOCONFIGUE, MANUALCONFIGUE };
@@ -491,6 +539,8 @@ struct WifiDeviceConfig {
     WifiPrivacyConfig wifiPrivacySetting;
     std::string callProcessName;
     std::string ancoCallProcessName;
+    std::string internetSelfCureHistory;
+    int isReassocSelfCureWithFactoryMacAddress;
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -519,6 +569,8 @@ struct WifiDeviceConfig {
         noInternetAccess = false;
         callProcessName = "";
         ancoCallProcessName = "";
+        internetSelfCureHistory = "";
+        isReassocSelfCureWithFactoryMacAddress = 0;
     }
 };
 

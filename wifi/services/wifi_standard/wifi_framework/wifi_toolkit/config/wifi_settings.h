@@ -497,6 +497,13 @@ public:
     int SaveIpV6Info(const IpV6Info &info, int instId = 0);
 
     /**
+     * @Description Get all wifi linked info
+     *
+     * @return map - all wifi linked info
+     */
+    std::map<int, WifiLinkedInfo> GetAllWifiLinkedInfo();
+
+    /**
      * @Description Get current link info
      *
      * @param info - output WifiLinkedInfo struct

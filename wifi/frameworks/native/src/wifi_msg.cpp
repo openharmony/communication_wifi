@@ -50,5 +50,16 @@ Phase2Method WifiEapConfig::Phase2MethodFromStr(const std::string& str)
     }
     return Phase2Method::NONE;
 }
+EapMethod WifiEapConfig::Str2EapMethod(const std::string& str)
+{
+    const std::string eapMethod[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", "SIM", "AKA", "AKA'" };
+    int len = sizeof(eapMethod) / sizeof(eapMethod[0]);
+    for (int i = 0; i < len; i++) {
+        if (eapMethod[i] == str) {
+            return EapMethod(i);
+        }
+    }
+    return EapMethod::EAP_NONE;
+}
 } // namespace Wifi
 } // namespace OHOS

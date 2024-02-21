@@ -11,7 +11,7 @@
         ReadUStr;
         WriteEnd;
         WriteBegin;
-        WriteUStr;
+        WriteStr;
         RemoteCall;
         CreateContext;
         CreateUnixServer;

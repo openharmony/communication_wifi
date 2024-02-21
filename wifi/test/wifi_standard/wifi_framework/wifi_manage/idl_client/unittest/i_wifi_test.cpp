@@ -28,10 +28,17 @@
 #include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
+#include "mock_wifi_public.h"
+
 #undef LOG_TAG
 #define LOG_TAG "IWifiTest"
 
-using namespace testing::ext;
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 
@@ -316,16 +323,28 @@ HWTEST_F(IWifiTest, GetWifiChipTest, TestSize.Level1)
     uint8_t id = 1;
     IWifiChip chip;
     GetWifiChip(id, &chip);
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
+    EXPECT_TRUE(GetWifiChip(id, &chip) == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(IWifiTest, StopTest, TestSize.Level1)
 {
     Stop();
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
+    EXPECT_TRUE(Stop() == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(IWifiTest, NotifyClearTest, TestSize.Level1)
 {
     NotifyClear();
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
+    EXPECT_TRUE(NotifyClear() == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(IWifiTest, OnTransactTest1, TestSize.Level1)
@@ -1166,6 +1185,51 @@ HWTEST_F(IWifiTest, NumStrToNumArryTest, TestSize.Level1)
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;
     EXPECT_TRUE(OnTransact(mTestContext) == 0);
+}
+
+HWTEST_F(IWifiTest, OnTransactTest44, TestSize.Level1)
+{
+    char test4[] = "144\t1\t2\t3\t00:11:22:33:44:55\t0\tTlv\t";
+    mTestContext->oneProcess = test4;
+    mTestContext->nPos = 0;
+    mTestContext->nSize = strlen(test4) + 1;
+    SetWifiP2pEventCallbackTest();
+    EXPECT_TRUE(OnTransact(mTestContext) == 0);
+    char test[] = "144\t5";
+    mTestContext->oneProcess = test;
+    mTestContext->nPos = 0;
+    mTestContext->nSize = strlen(test) + 1;
+    ResetWifiP2pEventCallbackTest();
+    EXPECT_TRUE(OnTransact(mTestContext) == 0);
+    char test1[] = "144\t5\t1";
+    mTestContext->oneProcess = test1;
+    mTestContext->nPos = 0;
+    mTestContext->nSize = strlen(test1) + 1;
+    EXPECT_TRUE(OnTransact(mTestContext) == 0);
+    char test2[] = "144\t5\t1\tname";
+    mTestContext->oneProcess = test2;
+    mTestContext->nPos = 0;
+    mTestContext->nSize = strlen(test2) + 1;
+    EXPECT_TRUE(OnTransact(mTestContext) == 0);
+    char test3[] = "144\t5\t1\tname\t";
+    mTestContext->oneProcess = test3;
+    mTestContext->nPos = 0;
+    mTestContext->nSize = strlen(test3) + 1;
+    EXPECT_TRUE(OnTransact(mTestContext) == 0);
+    mTestContext->nPos = 0;
+    SetWifiP2pEventCallbackTest();
+    EXPECT_TRUE(OnTransact(mTestContext) == 0);
+}
+
+HWTEST_F(IWifiTest, GetWifiChipIdsTest, TestSize.Level1)
+{
+    uint8_t id = 1;
+    int32_t chip = 1;
+    GetWifiChipIds(&id, &chip);
+    MockWifiPublic::SetMockFlag(true);
+    EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
+    EXPECT_TRUE(GetWifiChipIds(&id, &chip) == WIFI_IDL_OPT_FAILED);
+    MockWifiPublic::SetMockFlag(false);
 }
 }  // namespace Wifi
 }  // namespace OHOS

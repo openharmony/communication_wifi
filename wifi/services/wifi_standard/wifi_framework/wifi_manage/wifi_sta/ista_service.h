@@ -19,7 +19,7 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
-#include "network_selection_msg.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -290,6 +290,13 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode StartPortalCertification() = 0;
+	
+    /**
+     * @Description renew dhcp.
+     *
+	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode RenewDhcp() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

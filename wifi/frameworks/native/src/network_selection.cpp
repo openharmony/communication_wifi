@@ -14,11 +14,42 @@
  */
 
 #include "network_selection.h"
-#include "wifi_logger.h"
 
-namespace OHOS {
-namespace Wifi {
-DEFINE_WIFILOG_LABEL("NetworkSelection")
+namespace OHOS::Wifi::NetworkSelection {
+
+std::string NetworkCandidate::ToString() const
+{
+    std::stringstream networkCandidateInfo;
+    networkCandidateInfo << wifiDeviceConfig.networkId << "_";
+    constexpr int BSSID_MIN_SIZE = 2;
+    if (interScanInfo.bssid.size() <= BSSID_MIN_SIZE) {
+        networkCandidateInfo << interScanInfo.bssid;
+    } else {
+        networkCandidateInfo << interScanInfo.bssid.substr(interScanInfo.bssid.size() - BSSID_MIN_SIZE);
+    }
+    return networkCandidateInfo.str();
+}
+
+std::string ScoreResult::ToString() const
+{
+    constexpr int precision = 2;
+    std::stringstream scoreMsg;
+    scoreMsg << "{ ";
+    scoreMsg << scorerName << " : " << std::fixed << std::setprecision(precision) << score;
+    if (scoreDetails.empty()) {
+        scoreMsg << " }";
+        return scoreMsg.str();
+    }
+    scoreMsg << ", \"details\" : { ";
+    for (std::size_t i = 0; i < scoreDetails.size(); i++) {
+        scoreMsg << scoreDetails.at(i).ToString();
+        if (i < (scoreDetails.size() - 1)) {
+            scoreMsg << ", ";
+        }
+    }
+    scoreMsg << " }";
+    return scoreMsg.str();
+}
 
 bool IWifiFilter::DoFilter(NetworkCandidate &networkCandidate)
 {
@@ -33,10 +64,12 @@ void IWifiFilter::AfterFilter(NetworkCandidate &networkCandidate,
 SimpleWifiFilter::SimpleWifiFilter(const std::string &networkSelectorFilterName)
     : IWifiFilter(), filterName(networkSelectorFilterName) {}
 
+SimpleWifiFilter::~SimpleWifiFilter() = default;
+
 void SimpleWifiFilter::AfterFilter(NetworkCandidate &networkCandidate, bool filterResult)
 {
     if (!filterResult) {
-        networkCandidate.filteredMsg.emplace_back(filterName);
+        filteredNetworkCandidates.emplace_back(&networkCandidate);
     }
 }
 
@@ -46,14 +79,23 @@ std::string SimpleWifiFilter::GetFilterMsg()
 }
 
 WifiFunctionFilterAdapter::WifiFunctionFilterAdapter(const std::function<bool(NetworkCandidate &)> &filter,
-                                                     const std::string &networkSelectorFilterName,
+                                                     const std::string &filterName,
                                                      bool reverse)
-    : SimpleWifiFilter(networkSelectorFilterName), targetFunction(filter), iSReverse(reverse) {}
+    : IWifiFilter(), targetFunction(filter), filterName(filterName), iSReverse(reverse) {}
+
+WifiFunctionFilterAdapter::~WifiFunctionFilterAdapter() = default;
+
+std::string WifiFunctionFilterAdapter::GetFilterMsg()
+{
+    return filterName;
+}
 
 bool WifiFunctionFilterAdapter::Filter(NetworkCandidate &networkCandidate)
 {
     return iSReverse != targetFunction.operator()(networkCandidate);
 }
+
+CompositeWifiFilter::~CompositeWifiFilter() = default;
 
 void CompositeWifiFilter::AddFilter(const std::shared_ptr<IWifiFilter> &filter)
 {
@@ -61,6 +103,8 @@ void CompositeWifiFilter::AddFilter(const std::shared_ptr<IWifiFilter> &filter)
         filters.emplace_back(filter);
     }
 }
+
+AndWifiFilter::~AndWifiFilter() = default;
 
 bool AndWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
@@ -82,6 +126,8 @@ std::string AndWifiFilter::GetFilterMsg()
     filterMsg << ")";
     return filterMsg.str();
 }
+
+OrWifiFilter::~OrWifiFilter() = default;
 
 bool OrWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
@@ -106,6 +152,8 @@ std::string OrWifiFilter::GetFilterMsg()
 
 SimpleWifiScorer::SimpleWifiScorer(const std::string &scorerName) : IWifiScorer(), m_scoreName(scorerName) {}
 
+SimpleWifiScorer::~SimpleWifiScorer() = default;
+
 void SimpleWifiScorer::DoScore(NetworkCandidate &networkCandidate, ScoreResult &scoreResult)
 {
     scoreResult.scorerName = m_scoreName;
@@ -113,6 +161,8 @@ void SimpleWifiScorer::DoScore(NetworkCandidate &networkCandidate, ScoreResult &
 }
 
 CompositeWifiScorer::CompositeWifiScorer(const std::string &scorerName) : IWifiScorer(), m_scoreName(scorerName) {}
+
+CompositeWifiScorer::~CompositeWifiScorer() = default;
 
 void CompositeWifiScorer::AddScorer(const std::shared_ptr<IWifiScorer> &scorer)
 {
@@ -137,6 +187,8 @@ void CompositeWifiScorer::DoScore(NetworkCandidate &networkCandidate,
 
 NetworkSelector::NetworkSelector(const std::string &networkSelectorName) : m_networkSelectorName(networkSelectorName) {}
 
+NetworkSelector::~NetworkSelector() = default;
+
 void NetworkSelector::SetWifiComparator(const std::shared_ptr<IWifiComparator> &networkSelectorComparator)
 {
     comparator = networkSelectorComparator;
@@ -152,7 +204,6 @@ bool NetworkSelector::TryNominate(NetworkCandidate &networkCandidate)
     bool ret = false;
     if (DoFilter(networkCandidate)) {
         ret = Nominate(networkCandidate);
-        AfterNominate(networkCandidate, ret);
     }
     return ret;
 }
@@ -162,24 +213,37 @@ bool NetworkSelector::DoFilter(NetworkCandidate &networkCandidate)
     return !filter || filter->DoFilter(networkCandidate);
 }
 
-void NetworkSelector::AfterNominate(NetworkCandidate &networkCandidate, bool nominateResult)
-{
-    if (nominateResult) {
-        networkCandidate.nominateMsg.emplace_back(m_networkSelectorName);
-    }
-}
-
 void NetworkSelector::GetBestCandidatesByComparator(std::vector<NetworkCandidate *> &selectedNetworkCandidates)
 {
     if (comparator) {
         comparator->GetBestCandidates(networkCandidates, selectedNetworkCandidates);
     } else {
-        WIFI_LOGI("comparator in %{public}s is null, select all networkCandidates as result",
-                  m_networkSelectorName.c_str());
         selectedNetworkCandidates.insert(selectedNetworkCandidates.end(),
                                          networkCandidates.begin(),
                                          networkCandidates.end());
     }
+}
+
+SimpleNetworkSelector::SimpleNetworkSelector(const std::string &networkSelectorName)
+    : NetworkSelector(networkSelectorName) {}
+
+SimpleNetworkSelector::~SimpleNetworkSelector() = default;
+
+bool SimpleNetworkSelector::Nominate(NetworkCandidate &networkCandidate)
+{
+    networkCandidates.emplace_back(&networkCandidate);
+    return true;
+}
+
+std::string SimpleNetworkSelector::GetNetworkSelectorMsg()
+{
+    std::stringstream networkSelectorMsg;
+    networkSelectorMsg << R"({ "name": ")" << m_networkSelectorName << "\" ";
+    if (filter) {
+        networkSelectorMsg << R"(,"filter": ")" << filter->GetFilterMsg() << "\"";
+    }
+    networkSelectorMsg << "}";
+    return networkSelectorMsg.str();
 }
 
 void SimpleNetworkSelector::GetBestCandidates(std::vector<NetworkCandidate *> &selectedNetworkCandidates)
@@ -187,11 +251,10 @@ void SimpleNetworkSelector::GetBestCandidates(std::vector<NetworkCandidate *> &s
     GetBestCandidatesByComparator(selectedNetworkCandidates);
 }
 
-SimpleNetworkSelector::SimpleNetworkSelector(const std::string &networkSelectorName)
-    : NetworkSelector(networkSelectorName) {}
-
 CompositeNetworkSelector::CompositeNetworkSelector(const std::string &networkSelectorName) : NetworkSelector(
     networkSelectorName) {}
+
+CompositeNetworkSelector::~CompositeNetworkSelector() = default;
 
 void CompositeNetworkSelector::AddSubNetworkSelector(const std::shared_ptr<INetworkSelector> &subNetworkSelector)
 {
@@ -225,23 +288,5 @@ std::string CompositeNetworkSelector::GetNetworkSelectorMsg()
     }
     networkSelectorMsg << "}";
     return networkSelectorMsg.str();
-}
-
-bool SimpleNetworkSelector::Nominate(NetworkCandidate &networkCandidate)
-{
-    networkCandidates.emplace_back(&networkCandidate);
-    return true;
-}
-
-std::string SimpleNetworkSelector::GetNetworkSelectorMsg()
-{
-    std::stringstream networkSelectorMsg;
-    networkSelectorMsg << R"({ "name": ")" << m_networkSelectorName << "\" ";
-    if (filter) {
-        networkSelectorMsg << R"(,"filter": ")" << filter->GetFilterMsg() << "\"";
-    }
-    networkSelectorMsg << "}";
-    return networkSelectorMsg.str();
-}
 }
 }

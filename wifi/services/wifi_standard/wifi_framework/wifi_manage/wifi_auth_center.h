@@ -47,25 +47,6 @@ public:
     static bool IsNativeProcess();
 
     /**
-     * @Description Initialize the rights of the simulated app
-     *
-     * @param pid - define the app's process id
-     * @param uid - define the app id
-     * @return int - when 0 means success, other means some fails happened
-     */
-    int InitPermission(const int &pid, const int &uid);
-
-    /**
-     * @Description Simulating app permission adjustment
-     *
-     * @param permissions - the app's new permission
-     * @param pid - the app's process id
-     * @param uid - the app id
-     * @return int - when 0 means success, other means some fails happened
-     */
-    int ChangePermission(const std::map<std::string, int> &permissions, const int &pid, const int &uid);
-
-    /**
      * @Description Verify whether the app has the permission to operator wifi
      *
      * @param pid - the app's process id

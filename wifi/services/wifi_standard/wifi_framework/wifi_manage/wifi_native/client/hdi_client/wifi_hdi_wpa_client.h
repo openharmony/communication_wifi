@@ -28,6 +28,7 @@
 #include "wifi_global_func.h"
 #include "i_wifi_struct.h"
 #include "wifi_event_callback.h"
+#inlcude "wifi_ap_event_callback.h"
 #include "wifi_p2p_event_callback.h"
 
 namespace OHOS {
@@ -297,7 +298,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetCountryCode(const std::string &countryCode);
-
+    static WifiErrorNo ReqWpaGetCountryCode(std::string &countryCode);
     /**
      * @Description Send suspend mode to wpa
      *
@@ -305,6 +306,79 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
+    WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
+    static WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
+
+    /* ************************ softAp Interface ************************** */
+    /**
+     * @Description Start Ap.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo StartAp(int id, std::string ifaceName);
+
+    /**
+     * @Description Close Ap.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo StopAp(int id = 0);
+
+    /**
+     * @Description Save callback.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo RegisterApEvent(IWifiApMonitorEventCallback callback, int id = 0) const;
+
+    /**
+     * @Description Setting SoftAp Configurations.
+     *
+     * @param config
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetSoftApConfig(const HotspotConfig &config, int id = 0);
+
+    /**
+     * @Description Obtain information about all connected STAs.
+     *
+     * @param result
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetStationList(std::vector<std::string> &result, int id = 0);
+
+     /**
+     * @Description To set the blocked list filtering in AP mode to prohibit the MAC address connection.
+     *
+     * @param mac The mac is going to be added
+     * @return WifiErrorNo
+     */
+    WifiErrorNo AddBlockByMac(const std::string &mac, int id = 0);
+
+    /**
+     * @Description To set the blocked list filtering in AP mode and delete a specified MAC address
+     *              from the blocked list.
+     *
+     * @param mac The mac is going to be deleted
+     * @return WifiErrorNo
+     */
+    WifiErrorNo DelBlockByMac(const std::string &mac, int id = 0);
+
+    /**
+     * @Description Disconnect the STA with a specified MAC address.
+     *
+     * @param mac The mac is going to be removed
+     * @return WifiErrorNo
+     */
+    WifiErrorNo RemoveStation(const std::string &mac, int id = 0);
+
+    /**
+     * @Description Disconnect the STA connection based on the MAC address.
+     *
+     * @param mac The mac is going to be disconnected
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqDisconnectStaByMac(const std::string &mac, int id = 0);
 
     /* ************************ P2p Interface ************************** */
     /**
@@ -710,7 +784,6 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetPowerMode(bool mode) const;
-
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

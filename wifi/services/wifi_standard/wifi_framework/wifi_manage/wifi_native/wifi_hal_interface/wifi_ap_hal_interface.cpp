@@ -32,9 +32,15 @@ WifiApHalInterface &WifiApHalInterface::GetInstance(void)
     if (initFlag == 0) {
         std::unique_lock<std::mutex> lock(initMutex);
         if (initFlag == 0) {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+            if (inst.InitHdiWpaClient()) {
+                initFlag = 1;
+            }
+#else
             if (inst.InitIdlClient()) {
                 initFlag = 1;
             }
+#endif
 #ifdef HDI_INTERFACE_SUPPORT
             if (inst.InitHdiClient()) {
                 initFlag = 1;
@@ -47,8 +53,13 @@ WifiApHalInterface &WifiApHalInterface::GetInstance(void)
 
 WifiErrorNo WifiApHalInterface::StartAp(int id, std::string ifaceName)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    WifiErrorNo ret = mHdiWpaClient->StartAp(id, ifaceName);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo ret = mIdlClient->StartAp(id, ifaceName);
+#endif
 #ifdef HDI_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
     ret = mHdiClient->StartAp(id);
@@ -58,8 +69,13 @@ WifiErrorNo WifiApHalInterface::StartAp(int id, std::string ifaceName)
 
 WifiErrorNo WifiApHalInterface::StopAp(int id)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    WifiErrorNo ret = mHdiWpaClient->StopAp(id);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo ret = mIdlClient->StopAp(id);
+#endif
 #ifdef HDI_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
     ret = mHdiClient->StopAp(id);
@@ -69,32 +85,57 @@ WifiErrorNo WifiApHalInterface::StopAp(int id)
 
 WifiErrorNo WifiApHalInterface::SetSoftApConfig(const HotspotConfig &config, int id)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->SetSoftApConfig(config, id);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->SetSoftApConfig(config, id);
+#endif
 }
 
 WifiErrorNo WifiApHalInterface::GetStationList(std::vector<std::string> &result, int id)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->GetStationList(result, id);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->GetStationList(result, id);
+#endif
 }
 
 WifiErrorNo WifiApHalInterface::AddBlockByMac(const std::string &mac, int id)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->AddBlockByMac(mac, id);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->AddBlockByMac(mac, id);
+#endif
 }
 
 WifiErrorNo WifiApHalInterface::DelBlockByMac(const std::string &mac, int id)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->DelBlockByMac(mac, id);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->DelBlockByMac(mac, id);
+#endif
 }
 
 WifiErrorNo WifiApHalInterface::RemoveStation(const std::string &mac, int id)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->RemoveStation(mac, id);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->RemoveStation(mac, id);
+#endif
 }
 
 WifiErrorNo WifiApHalInterface::GetFrequenciesByBand(int band, std::vector<int> &frequencies, int id)
@@ -110,8 +151,13 @@ WifiErrorNo WifiApHalInterface::GetFrequenciesByBand(int band, std::vector<int> 
 
 WifiErrorNo WifiApHalInterface::RegisterApEvent(IWifiApMonitorEventCallback callback, int id)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    WifiErrorNo err = mHdiWpaClient->RegisterApEvent(callback, id);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo err = mIdlClient->RegisterApEvent(callback, id);
+#endif
     if (err == WIFI_IDL_OPT_OK || callback.onStaJoinOrLeave == nullptr) {
         mApCallback[id] = callback;
     }
@@ -131,8 +177,13 @@ WifiErrorNo WifiApHalInterface::SetWifiCountryCode(const std::string &code, int 
 
 WifiErrorNo WifiApHalInterface::DisconnectStaByMac(const std::string &mac, int id)
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqDisconnectStaByMac(mac, id);
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqDisconnectStaByMac(mac, id);
+#endif
 }
 
 const IWifiApMonitorEventCallback &WifiApHalInterface::GetApCallbackInst(int id) const

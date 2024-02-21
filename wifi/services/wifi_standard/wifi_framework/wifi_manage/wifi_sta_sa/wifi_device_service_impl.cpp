@@ -218,7 +218,8 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
         return true;
     } else if ((config.wifiEapConfig.eap == EAP_METHOD_PEAP) || (config.wifiEapConfig.eap == EAP_METHOD_PWD)) {
         if (config.wifiEapConfig.identity.empty() || config.wifiEapConfig.password.empty()) {
-            WIFI_LOGE("CheckConfigEap: with invalid PEAP params!");
+            WIFI_LOGE("CheckConfigEap: invalid parameter, the identity length is:%{public}zu",
+                config.wifiEapConfig.identity.length());
             return false;
         }
         return true;
@@ -1095,6 +1096,7 @@ ErrCode WifiDeviceServiceImpl::SetCountryCode(const std::string &countryCode)
         return WIFI_OPT_STA_NOT_OPENED;
     }
 #ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("set country code from external");
     return WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal(countryCode);
 #else
     return WIFI_OPT_SUCCESS;

@@ -249,6 +249,12 @@ void StateMachine::MessageExecutedLater(
     return;
 }
 
+void StateMachine::SendMessageAtFrontOfQueue(int msgName, int param1)
+{
+    pStateMachineHandler->PlaceMessageTopOfQueue(CreateMessage(msgName, param1));
+    return;
+}
+
 void StateMachine::StartTimer(int timerName, int64_t interval)
 {
     LOGD("Enter StateMachine::StartTimer, timerName is %{public}d, interval is %" PRId64 ".", timerName, interval);
@@ -261,6 +267,16 @@ void StateMachine::StopTimer(int timerName)
     LOGD("Enter StateMachine::StopTimer, timerName is %{public}d.", timerName);
     pStateMachineHandler->DeleteMessageFromQueue(timerName);
     return;
+}
+
+std::string StateMachine::GetCurStateName()
+{
+    LOGD("StateMachine::GetCurStateName");
+    if (pStateMachineHandler == nullptr) {
+        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        return "";
+    }
+    return pStateMachineHandler->GetCurStateName();
 }
 
 StateMachineHandler::StateMachineHandler(StateMachine *pStateMgr)
@@ -681,6 +697,16 @@ void StateMachineHandler::CallTreeStateEnters(int index)
     }
     /* ensure flag set to false if no methods called. */
     mSwitchingStateFlag = false;
+}
+
+std::string StateMachineHandler::GetCurStateName()
+{
+    StateInfo *curStateInfo = mStateVector[mStateVectorTopIndex];
+    if (curStateInfo == nullptr) {
+        LOGE("StateInfo is null.");
+        return "";
+    }
+    return curStateInfo->state->GetStateName();
 }
 }  // namespace Wifi
 }  // namespace OHOS

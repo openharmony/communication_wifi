@@ -89,6 +89,24 @@ public:
      */
     virtual void ExitNetCheckThread();
 
+    /**
+     * @Description : get the http code num.
+     *
+     */
+    virtual ErrCode GetHttpCodeNum(int &respCode);
+
+    /**
+     * @Description : whether the response code is directe code.
+     *
+     */
+    virtual bool IsRedirectedRespCode(int respCode);
+
+    /**
+     * @Description : whether the response code is unreachable code.
+     *
+     */
+    virtual bool UnreachableRespCode(int respCode);
+
     virtual void NetWorkCheckSetScreenState(int state);
 
 private:

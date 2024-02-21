@@ -193,7 +193,11 @@ WifiErrorNo P2pStart(void)
 
     if (AddP2pIface() != WIFI_HAL_SUCCESS || P2pConnectSupplicant() != WIFI_HAL_SUCCESS) {
         LOGE("SupplicantHal connect p2p_wpa_supplicant failed!");
-        StopP2pWpaAndWpaHal();
+        WifiErrorNo ret = StopP2pWpaAndWpaHal();
+        if (ret == WIFI_HAL_FAILED) {
+            LOGE("StopP2pWpaAndWpaHal failed!");
+            return WIFI_HAL_FAILED;
+        }
         P2pHalCbConnectSupplicantFailed();
         return WIFI_HAL_CONN_SUPPLICANT_FAILED;
     }

@@ -340,7 +340,7 @@ static napi_value DoCallBackAsyncWork(const napi_env& env, AsyncContext *asyncCo
         },
         (void *)asyncContext,
         &asyncContext->work);
-    NAPI_CALL(env, napi_queue_async_work(env, asyncContext->work));
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_user_initiated));
     return UndefinedNapiValue(env);
 }
 
@@ -371,7 +371,7 @@ static napi_value DoPromiseAsyncWork(const napi_env& env, AsyncContext *asyncCon
         },
         (void *)asyncContext,
         &asyncContext->work);
-    napi_queue_async_work(env, asyncContext->work);
+    napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_user_initiated);
     return UndefinedNapiValue(env);
 }
 

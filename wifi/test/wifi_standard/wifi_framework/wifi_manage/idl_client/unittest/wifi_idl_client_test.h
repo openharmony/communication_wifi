@@ -17,6 +17,14 @@
 
 #include <gtest/gtest.h>
 #include "wifi_idl_client.h"
+#include "mock_wifi_public.h"
+
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
@@ -31,6 +39,7 @@ public:
                 g_failnums = 0;
             }
         }
+        EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillRepeatedly(Return(-1));
     }
     static void TearDownTestCase()
     {}

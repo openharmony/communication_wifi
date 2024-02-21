@@ -101,6 +101,9 @@ void WifiStaManager::CloseStaService(int instId)
         WifiManager::GetInstance().GetWifiP2pManager()->AutoStopP2pService();
     }
 #endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+#endif
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close sta SA!");
@@ -141,6 +144,9 @@ void WifiStaManager::ForceStopWifi(int instId)
         cbMsg.id = instId;
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+#endif
         return;
     }
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);

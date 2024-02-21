@@ -12,30 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_MOCK_WIFI_PUBILC_H
+#define OHOS_MOCK_WIFI_PUBILC_H
 
-#ifndef OHOS_PERMISSION_DEF_H
-#define OHOS_PERMISSION_DEF_H
-
-#define PERMISSION_NAME_LEN 96
+#include <gmock/gmock.h>
+#include <dlfcn.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include "client.h"
 
 namespace OHOS {
 namespace Wifi {
-enum GrantType { USER_GRANT = 0, SYSTEM_GRANT = 1 };
+class MockWifiPublic {
+public:
+    MOCK_METHOD1(RemoteCall, int(RpcClient *client));
+    static MockWifiPublic &GetInstance(void);
+    static void SetMockFlag(bool flag);
+    static bool GetMockFlag(void);
 
-enum IsUpdate { FIRST_INSTALL = 0, UPDATE = 1 };
-
-enum IsRestricted { RESTRICTED = 0, NOT_RESTRICTED = 1 };
-
-enum IsGranted {
-    PERMISSION_DENIED = 0,  /* Not granted */
-    PERMISSION_GRANTED = 1, /* Granted */
+private:
+    MockWifiPublic();
+    ~MockWifiPublic()
+    {}
 };
-
-typedef struct {
-    char name[PERMISSION_NAME_LEN];
-    enum GrantType type;
-    enum IsRestricted isRestricted;
-} PermissionDef;
 }  // namespace Wifi
 }  // namespace OHOS
+
+extern "C" {}
+
 #endif

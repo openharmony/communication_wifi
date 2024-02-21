@@ -15,171 +15,90 @@
 
 #include "network_selection_utils.h"
 #include "network_status_history_manager.h"
-#include "wifi_settings.h"
 #include "wifi_common_util.h"
+
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
 #include "wifi_logger.h"
+#include "parameter.h"
+#endif
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi::NetworkSelection {
 
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
 DEFINE_WIFILOG_LABEL("NetworkSelectionUtils")
+#endif
 
-constexpr int RECHECK_DELAYED_SECONDS = 1 * 60 * 60;
-constexpr int MAX_RETRY_COUNT = 3;
-constexpr int MIN_5GHZ_BAND_FREQUENCY = 5000;
-constexpr int MIN_RSSI_VALUE_24G = -77;
-constexpr int MIN_RSSI_VALUE_5G = -80;
-constexpr int SIGNAL_LEVEL_TWO = 2;
-constexpr int POOR_PORTAL_RECHECK_DELAYED_SECONDS = 2 * RECHECK_DELAYED_SECONDS;
-constexpr int SCORE_PRECISION = 2;
-
-bool NetworkSelectionUtils::isOpenNetwork(NetworkCandidate &networkCandidate)
+bool NetworkSelectionUtils::IsOpenNetwork(const NetworkCandidate &networkCandidate)
 {
     return networkCandidate.wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE;
 };
 
-bool NetworkSelectionUtils::isOpenAndMaybePortal(NetworkCandidate &networkCandidate)
+bool NetworkSelectionUtils::IsOpenAndMaybePortal(const NetworkCandidate &networkCandidate)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    return isOpenNetwork(networkCandidate) && !wifiDeviceConfig.noInternetAccess
+    return IsOpenNetwork(networkCandidate) && !wifiDeviceConfig.noInternetAccess
         && NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory);
 }
 
-bool NetworkSelectionUtils::isScanResultForOweNetwork(NetworkCandidate &networkCandidate)
+bool NetworkSelectionUtils::IsScanResultForOweNetwork(const NetworkCandidate &networkCandidate)
 {
     return networkCandidate.interScanInfo.capabilities.find("OWE") != std::string::npos;
 }
 
-bool NetworkSelectionUtils::IsRecoveryNetwork(NetworkCandidate &networkCandidate)
+bool NetworkSelectionUtils::IsBlackListNetwork(const NetworkCandidate &networkCandidate)
 {
-    auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    return wifiDeviceConfig.noInternetAccess && !wifiDeviceConfig.isPortal
-        && NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory);
+    constexpr int maxRetryCount = 3;
+    return networkCandidate.wifiDeviceConfig.connFailedCount >= maxRetryCount;
 }
 
-bool NetworkSelectionUtils::IsHasInternetNetwork(NetworkCandidate &networkCandidate)
+std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates)
 {
-    auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    if (wifiDeviceConfig.noInternetAccess || wifiDeviceConfig.isPortal) {
-        return false;
+    std::stringstream networkCandidatesInfo;
+    networkCandidatesInfo << "[";
+    for (std::size_t i = 0; i < networkCandidates.size(); i++) {
+        if (networkCandidates.at(i)->wifiDeviceConfig.networkId == INVALID_NETWORK_ID) {
+            continue;
+        }
+        networkCandidatesInfo << "\"" << networkCandidates.at(i)->ToString() << "\"";
+        if (i < networkCandidates.size() - 1) {
+            networkCandidatesInfo << ", ";
+        }
     }
-    if (NetworkStatusHistoryManager::IsInternetAccessByHistory(wifiDeviceConfig.networkStatusHistory)) {
-        return true;
-    }
-    if (NetworkSelectionUtils::isOpenNetwork(networkCandidate)) {
-        return false;
-    }
-    return NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory);
+    networkCandidatesInfo << "]";
+    return networkCandidatesInfo.str();
 }
 
-bool NetworkSelectionUtils::IsBlackListNetwork(NetworkCandidate &networkCandidate)
-{
-    return networkCandidate.wifiDeviceConfig.connFailedCount >= MAX_RETRY_COUNT;
-}
-
-bool NetworkSelectionUtils::MayBePortalNetwork(NetworkCandidate &networkCandidate)
-{
-    return !NetworkSelectionUtils::isScanResultForOweNetwork(networkCandidate)
-        && NetworkSelectionUtils::isOpenAndMaybePortal(networkCandidate);
-}
-
-bool NetworkSelectionUtils::IsPortalNetwork(NetworkCandidate &networkCandidate)
-{
-    return networkCandidate.wifiDeviceConfig.isPortal;
-}
-
-bool NetworkSelectionUtils::IsNoInternetNetwork(NetworkCandidate &networkCandidate)
-{
-    auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    return wifiDeviceConfig.noInternetAccess
-        && !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory);
-}
-
-bool NetworkSelectionUtils::IsSavedNetwork(NetworkCandidate &networkCandidate)
-{
-    return networkCandidate.wifiDeviceConfig.networkId != INVALID_NETWORK_ID;
-}
-
-bool NetworkSelectionUtils::IsNetworkEnabled(NetworkCandidate &networkCandidate)
-{
-    return networkCandidate.wifiDeviceConfig.status == static_cast<int>(WifiDeviceConfigStatus::ENABLED);
-}
-
-bool NetworkSelectionUtils::IsEphemeralNetwork(NetworkCandidate &networkCandidate)
-{
-    return networkCandidate.wifiDeviceConfig.isEphemeral;
-}
-
-bool NetworkSelectionUtils::IsHiddenNetwork(NetworkCandidate &networkCandidate)
-{
-    return networkCandidate.interScanInfo.ssid.empty();
-}
-
-bool NetworkSelectionUtils::IsSignalTooWeak(NetworkCandidate &networkCandidate)
-{
-    auto &scanInfo = networkCandidate.interScanInfo;
-    auto rssiThreshold = scanInfo.frequency < MIN_5GHZ_BAND_FREQUENCY ? MIN_RSSI_VALUE_24G : MIN_RSSI_VALUE_5G;
-    return scanInfo.rssi < rssiThreshold;
-}
-
-bool NetworkSelectionUtils::IsPoorPortalNetwork(NetworkCandidate &networkCandidate)
-{
-    auto &interScanInfo = networkCandidate.interScanInfo;
-    int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(interScanInfo.rssi, interScanInfo.band);
-    if (currentSignalLevel > SIGNAL_LEVEL_TWO) {
-        return false;
-    }
-    if (currentSignalLevel < SIGNAL_LEVEL_TWO) {
-        return true;
-    }
-    auto lastHasInternetTime = networkCandidate.wifiDeviceConfig.lastHasInternetTime;
-    auto now = time(nullptr);
-    if (now < 0) {
-        WIFI_LOGW("time return invalid!\n.");
-        return true;
-    }
-    return (now - lastHasInternetTime) > POOR_PORTAL_RECHECK_DELAYED_SECONDS;
-}
-
-bool NetworkSelectionUtils::IsMatchUserSelected(NetworkCandidate &networkCandidate)
-{
-    if (networkCandidate.wifiDeviceConfig.userSelectBssid.empty()) {
-        return true;
-    }
-    return networkCandidate.interScanInfo.bssid == networkCandidate.wifiDeviceConfig.userSelectBssid;
-}
-
-bool NetworkSelectionUtils::IsPassPointNetwork(NetworkCandidate &networkCandidate)
-{
-    return networkCandidate.wifiDeviceConfig.isPasspoint;
-}
-
-std::string NetworkSelectionUtils::GetNetworkCandidateInfo(NetworkCandidate &networkCandidate)
-{
-    std::stringstream networkCandidateInfo;
-    networkCandidateInfo << R"({ "ssid" : ")" << SsidAnonymize(networkCandidate.interScanInfo.ssid)
-                         << R"(", "bssid" : ")"
-                         << MacAnonymize(networkCandidate.interScanInfo.bssid) << R"(" })";
-    return networkCandidateInfo.str();
-}
-
-std::string NetworkSelectionUtils::GetScoreMsg(ScoreResult &scoreResult)
+std::string NetworkSelectionUtils::GetScoreResultsInfo(const std::vector<ScoreResult> &scoreResults)
 {
     std::stringstream scoreMsg;
-    scoreMsg << scoreResult.scorerName << " : " << std::fixed << std::setprecision(SCORE_PRECISION) <<
-    scoreResult.score;
-    if (scoreResult.scoreDetails.empty()) {
-        return scoreMsg.str();
-    }
-    scoreMsg << "{ ";
-    for (std::size_t i = 0; i < scoreResult.scoreDetails.size(); i++) {
-        scoreMsg << NetworkSelectionUtils::GetScoreMsg(scoreResult.scoreDetails.at(i));
-        if (i < (scoreResult.scoreDetails.size() - 1)) {
+    scoreMsg << "[ ";
+    for (std::size_t i = 0; i < scoreResults.size(); i++) {
+        scoreMsg << scoreResults.at(i).ToString();
+        if (i < scoreResults.size() - 1) {
             scoreMsg << ", ";
         }
     }
-    scoreMsg << " }";
+    scoreMsg << " ]";
     return scoreMsg.str();
 }
+
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+bool NetworkSelectionUtils::CheckDeviceTypeByVendorCountry()
+{
+    constexpr const char* VENDOR_COUNTRY_KEY = "const.cust.custPath";
+    constexpr const char* VENDOR_COUNTRY_DEFAULT = "";
+    constexpr const int32_t SYS_PARAMETER_SIZE = 256;
+    constexpr const int32_t SYSTEM_PARAMETER_ERROR_CODE = 0;
+    char param[SYS_PARAMETER_SIZE] = { 0 };
+    int errorCode = GetParameter(VENDOR_COUNTRY_KEY, VENDOR_COUNTRY_DEFAULT, param, SYS_PARAMETER_SIZE);
+    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
+        WIFI_LOGE("get vendor country fail, errorCode: %{public}d", errorCode);
+        return false;
+    }
+
+    WIFI_LOGI("vendor country: %{public}s, errorCode: %{public}d.", param, errorCode);
+    auto iter = std::string(param).find("hwit");
+    return iter != std::string::npos;
 }
+#endif
 }

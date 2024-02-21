@@ -144,6 +144,8 @@ static napi_value DisconnectedReasonInit(napi_env env)
         static_cast<int>(DisconnectedReason::DISC_REASON_WRONG_PWD), "DISC_REASON_WRONG_PWD");
     SetNamedPropertyByInteger(env, reason,
         static_cast<int>(DisconnectedReason::DISC_REASON_CONNECTION_FULL), "DISC_REASON_CONNECTION_FULL");
+    SetNamedPropertyByInteger(env, reason,
+        static_cast<int>(DisconnectedReason::DISC_REASON_CONNECTION_REJECTED), "DISC_REASON_CONNECTION_REJECTED");
     return reason;
 }
 

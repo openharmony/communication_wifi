@@ -26,41 +26,19 @@
 
 namespace OHOS {
 namespace Wifi {
-class ScreenEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
-    explicit ScreenEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-    virtual ~ScreenEventSubscriber();
-    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-};
-
-class AirplaneModeEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit AirplaneModeEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-    virtual ~AirplaneModeEventSubscriber();
+    explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~CesEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+    void OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    bool lastSleepState = false;
 };
-
-class BatteryEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit BatteryEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-    ~BatteryEventSubscriber();
-    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
-};
-
-class AppEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit AppEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-    virtual ~AppEventSubscriber();
-    virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-};
-
-class ThermalLevelSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    explicit ThermalLevelSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-    virtual ~ThermalLevelSubscriber();
-    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-};
-
 
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
@@ -86,57 +64,36 @@ private:
 #endif
     void HandleDistributedKvDataServiceChange(bool add);
     int GetLastStaStateByDatashare();
-    void RegisterScreenEvent();
-    void UnRegisterScreenEvent();
-    void RegisterAirplaneModeEvent();
-    void UnRegisterAirplaneModeEvent();
+    void RegisterCesEvent();
+    void UnRegisterCesEvent();
     void RegisterLocationEvent();
     void UnRegisterLocationEvent();
-    void RegisterBatteryEvent();
-    void UnRegisterBatteryEvent();
     void GetMdmProp();
     void GetChipProp();
     void RegisterMdmPropListener();
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);
     void RegisterPowerStateListener();
     void UnRegisterPowerStateListener();
-    void RegisterAppRemoved();
-    void UnRegisterAppRemoved();
-    void RegisterThermalLevel();
-    void UnRegisterThermalLevel();
 #ifdef HAS_MOVEMENT_PART
     void RegisterMovementCallBack();
     void UnRegisterMovementCallBack();
 #endif
 
 private:
-    std::mutex screenEventMutex;
-    std::mutex airplaneModeEventMutex;
-    std::mutex locationEventMutex;
-    std::mutex batteryEventMutex;
-    std::mutex appEventMutex;
-    std::mutex thermalEventMutex;
-    std::mutex settingsMigrateMutex;
+    uint32_t cesTimerId{0};
+    std::mutex cesEventMutex;
+    bool isCesEventSubscribered;
+    std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
 #ifdef HAS_POWERMGR_PART
     std::mutex powerStateEventMutex;
 #endif
-    uint32_t screenTimerId{0};
-    bool isScreenEventSubscribered = false;
-    std::shared_ptr<ScreenEventSubscriber> screenEventSubscriber_ = nullptr;
-    uint32_t airplaneModeTimerId{0};
-    bool isAirplaneModeEventSubscribered = false;
-    std::shared_ptr<AirplaneModeEventSubscriber> airplaneModeEventSubscriber_ = nullptr;
-    uint32_t batteryTimerId{0};
-    std::shared_ptr<BatteryEventSubscriber> batterySubscriber_ = nullptr;
-    uint32_t locationTimerId{0};
-    uint32_t migrateTimerId{0};
+#ifdef HAS_MOVEMENT_PART
+    std::mutex deviceMovementEventMutex;
+#endif
     static bool mIsMdmForbidden;
     bool isPowerStateListenerSubscribered = false;
     bool islocationModeObservered = false;
-    uint32_t appEventTimerId{0};
-	std::shared_ptr<AppEventSubscriber> eventSubscriber_ = nullptr;
-    uint32_t thermalTimerId{0};
-    std::shared_ptr<ThermalLevelSubscriber> thermalLevelSubscriber_ = nullptr;
+    std::mutex locationEventMutex;
 };
 
 }  // namespace Wifi

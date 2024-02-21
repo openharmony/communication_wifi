@@ -42,7 +42,9 @@ StaService::StaService(int instId)
     : pStaStateMachine(nullptr),
       pStaMonitor(nullptr),
       pStaAutoConnectService(nullptr),
+#ifndef OHOS_ARCH_LITE
       pStaAppAcceleration(nullptr),
+#endif
       m_instId(instId)
 {}
 
@@ -65,11 +67,12 @@ StaService::~StaService()
         pStaStateMachine = nullptr;
     }
 
+#ifndef OHOS_ARCH_LITE
     if (pStaAppAcceleration != nullptr) {
         delete pStaAppAcceleration;
         pStaAppAcceleration = nullptr;
     }
-    }
+#endif
 }
 
 ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callbacks)
@@ -148,6 +151,7 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
         WIFI_LOGE("InitAutoConnectService failed.\n");
         return WIFI_OPT_FAILED;
     }
+#ifndef OHOS_ARCH_LITE
     pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
     if (pStaAppAcceleration == nullptr) {
         WIFI_LOGE("Alloc pStaAppAcceleration failed.\n");
@@ -156,6 +160,7 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     if (pStaAppAcceleration->InitAppAcceleration() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitAppAcceleration failed.\n");
     }
+#endif
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;
 }
@@ -707,6 +712,7 @@ ErrCode StaService::RenewDhcp()
     return WIFI_OPT_SUCCESS;
 }
 
+#ifndef OHOS_ARCH_LITE
 ErrCode StaService::HandleForegroundAppChangedAction(const std::string bundleName,
     int uid, int pid, const int state)
 {
@@ -717,6 +723,6 @@ ErrCode StaService::HandleForegroundAppChangedAction(const std::string bundleNam
     pStaAppAcceleration->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     return WIFI_OPT_SUCCESS;
 }
-
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

@@ -90,6 +90,14 @@ IP2pServiceCallbacks SelfCureInterface::GetP2pCallback()
     return mP2pCallback;
 }
 
+IP2pServiceCallbacks SelfCureInterface::UnloadP2pCallback()
+{
+    WIFI_LOGD("self cure UnloadP2pCallback");
+    mP2pCallback = {};
+    mP2pCallback.callbackModuleName = "SelfCureService";
+    return mP2pCallback;
+}
+
 void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     pSelfCureService->HandleStaConnChanged(state, info);

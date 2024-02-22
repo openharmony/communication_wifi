@@ -408,7 +408,7 @@ ErrCode StaInterface::RenewDhcp()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::HandleForegroundAppChangedAction(const std::string bundleName,
+ErrCode StaInterface::HandleForegroundAppChangedAction(const std::string &bundleName,
     int uid, int pid, const int state)
 {
     WIFI_LOGI("Enter StaInterface::HandleForegroundAppChangedAction");

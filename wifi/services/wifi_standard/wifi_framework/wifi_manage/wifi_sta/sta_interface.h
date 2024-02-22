@@ -304,8 +304,8 @@ public:
      * @param state app state.
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode HandleForegroundAppChangedAction(const std::string bundleName,
-                                                        int uid, int pid, const int state);
+    virtual ErrCode HandleForegroundAppChangedAction(const std::string &bundleName,
+                                                        int uid, int pid, const int state) override;
 private:
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;

@@ -713,7 +713,7 @@ ErrCode StaService::RenewDhcp()
 }
 
 #ifndef OHOS_ARCH_LITE
-ErrCode StaService::HandleForegroundAppChangedAction(const std::string bundleName,
+ErrCode StaService::HandleForegroundAppChangedAction(const std::string &bundleName,
     int uid, int pid, const int state)
 {
     if (pStaAppAcceleration == nullptr) {

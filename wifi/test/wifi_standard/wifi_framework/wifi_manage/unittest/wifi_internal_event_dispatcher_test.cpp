@@ -14,7 +14,6 @@
  */
 #include "wifi_internal_event_dispatcher_test.h"
 #include "wifi_internal_event_dispatcher.h"
-#include "permission_def.h"
 
 using namespace testing::ext;
 

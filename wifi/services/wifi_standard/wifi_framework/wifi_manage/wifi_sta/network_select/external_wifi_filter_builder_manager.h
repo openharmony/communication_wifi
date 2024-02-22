@@ -19,8 +19,7 @@
 #include <mutex>
 #include "network_selection.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi {
 class ExternalWifiFilterBuildManager {
 public:
     static ExternalWifiFilterBuildManager &GetInstance();
@@ -52,7 +51,7 @@ public:
      * @param filterTag filterTag which define where the compositeFilter should be inserted.
      * @param compositeFilter the target Filter to build.
      */
-    void BuildFilter(const FilterTag &filterTag, CompositeWifiFilter &compositeFilter);
+    void BuildFilter(const FilterTag &filterTag, NetworkSelection::CompositeWifiFilter &compositeFilter);
 private:
     ExternalWifiFilterBuildManager() = default;
 
@@ -62,5 +61,5 @@ private:
     std::mutex mutex;
 };
 }
-}
+
 #endif

@@ -15,7 +15,6 @@
 
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_logger.h"
-#include "wifi_permission_helper.h"
 #include "wifi_errcode.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_common_util.h"
@@ -157,6 +156,7 @@ ErrCode WifiInternalEventDispatcher::AddStaCallback(
     std::unique_lock<std::mutex> lock(mStaCallbackMutex);
     auto iter = mStaCallbacks.find(instId);
     if (iter != mStaCallbacks.end()) {
+        (iter->second)[remote] = callback;
         (iter->second)[remote] = callback;
         auto itr = mStaCallBackInfo[instId].find(remote);
         if (itr != mStaCallBackInfo[instId].end()) {

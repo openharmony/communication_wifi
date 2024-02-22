@@ -359,6 +359,12 @@ public:
          *
          */
         static void StopRenewTimeout();
+
+        /**
+         * @Description : deal renew timeout
+         *
+         */
+        static void DealRenewTimeout();
 #endif
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
@@ -435,7 +441,7 @@ public:
      *
      * @param reason - the state of wifi assoc
      */
-    void OnNetworkAssocEvent(int assocState);
+    void OnNetworkAssocEvent(int assocState, std::string bssid, StaStateMachine *pStaStateMachine);
     /**
      * @Description  Bssid change events
      *
@@ -501,11 +507,7 @@ public:
      * @Description : Deal renewal timeout.
      *
      */
-#ifndef OHOS_ARCH_LITE
-    void DealRenewalTimeout();
-#else
     void DealRenewalTimeout(InternalMessage *msg);
-#endif
 
     /**
      * @Description  start browser to login portal
@@ -810,6 +812,14 @@ private:
      * @param networkId - network id[in]
      */
     bool SetRandomMac(int networkId);
+
+    /**
+     * @Description  check whether the current bssid are consistent.
+     *
+     * @param bssid - bssid
+     */
+    bool CheckRoamingBssidIsSame(std::string bssid);
+
     /**
      * @Description  Generate a random MAC address.
      *

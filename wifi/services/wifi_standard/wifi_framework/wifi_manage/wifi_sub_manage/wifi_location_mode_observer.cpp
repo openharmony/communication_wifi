@@ -13,21 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_LOCATION_MODE_OBSERVER_H
-#define OHOS_WIFI_LOCATION_MODE_OBSERVER_H
+#include "wifi_location_mode_observer.h"
 
-#include "data_ability_observer_stub.h"
+#include "wifi_manager.h"
 
 namespace OHOS {
 namespace Wifi {
-class WifiLocationModeObserver : public AAFwk::DataAbilityObserverStub {
-public:
-    WifiLocationModeObserver() = default;
 
-    ~WifiLocationModeObserver() = default;
+void WifiLocationModeObserver::OnChange()
+{
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->DealLocationModeChangeEvent();
+}
 
-    void OnChange() override;
-};
+void WifiCloneModeObserver::OnChange()
+{
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->DealCloneDataChangeEvent();
 }
 }
-#endif
+}

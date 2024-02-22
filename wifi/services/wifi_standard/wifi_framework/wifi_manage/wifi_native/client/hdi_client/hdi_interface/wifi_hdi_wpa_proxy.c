@@ -37,11 +37,35 @@
 #define MAX_FILE_BLOCK_SIZE 1024
 #define FILE_OPEN_PRIV 0666
 
+#define CTRL_LEN 128
+#define IFACENAME_LEN 6
+#define CFGNAME_LEN 30
+#define WIFI_MULTI_CMD_MAX_LEN 1024
+#define EXEC_DISABLE 1
+#define WPA_HOSTAPD_NAME "hostapd"
+#define AP_IFNAME "wlan0"
+#define AP_IFNAME_COEX "wlan1"
+#define WIFI_DEFAULT_CFG "hostapd.conf"
+#define WIFI_COEX_CFG "hostapd_coex.conf"
+#define HOSTAPD_DEFAULT_CFG CONFIG_ROOT_DIR"wap_supplicant"WIFI_DEFAULT_CFG
+#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOT_DIR"wap_supplicant"WIFI_COEX_CFG
+static char g_hostapdCfg[CTRL_LEN] = {0};
+static char g_apIfaceName[IFACENAME_LEN] = {0};
+static char g_apCfgName[CFGNAME_LEN] = {0};
+static int g_id;
+static int g_execDisable;
+
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
 static unsigned int g_wpaRefCount = 0x0;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
+
+const char *HDI_AP_SERVICE_NAME = "hostapd_interface_service";
+static pthread_mutex_t g_apObjMutex = PTHREAD_MUTEX_INITIALIZER;
+static unsigned int g_apRefCount = 0x0;
+static struct IHostapdInterface *g_apObj = NULL;
+static struct HDIDeviceManager *g_apDevMgr = NULL;
 
 static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
 {
@@ -311,4 +335,215 @@ void HdiWpaResetGlobalObj()
     LOGE("%{public}s reset wpa g_wpaObj", __func__);
     HdiWpaStart();
 }
+
+void HdiApResetGlobalObj()
+{
+    g_apRefCount = 0;
+    g_apObj = NULL;
+    g_apDevMgr = NULL;
+    LOGE("%{public}s reset ap g_apObj", __func__);
+    HdiApStart(g_id, g_apIfaceName);
+}
+
+static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
+{
+    LOGI("%{public}s enter", __func__);
+    if (recipient == NULL || service == NULL) {
+        LOGE("%{public}s input param is null", __func__);
+        HdiApResetGlobalObj();
+        return;
+    }
+    HdfRemoteServiceRemoveDeathRecipient(service, recipient);
+    HdfRemoteServiceRecycle(service);
+    if (recipient == NULL) {
+        LOGE("%{public}s param recipient is null", __func__);
+        HdiApResetGlobalObj();
+        return;
+    }
+    OsalMemFree(recipient);
+    recipient = NULL;
+    HdiApResetGlobalObj();
+}
+
+WifiErrorNo RegistHdfApDeathCallBack()
+{
+    struct HDIServiceManager* serviceMgr = HDIServiceManagerGet();
+    if (serviceMgr == NULL) {
+        LOGE("%{public}s: failed to get HDIServiceManager", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    struct HdfRemoteService* remote = serviceMgr->GetService(serviceMgr, HDI_AP_SERVICE_NAME);
+    HDIServiceManagerRelease(serviceMgr);
+    if (remote == NULL) {
+        LOGE("%{public}s: failed to get HdfRemoteService", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    LOGI("%{public}s: success to get HdfRemoteService", __func__);
+    struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
+    recipient->OnRemoteDied = ProxyOnApRemoteDied;
+    HdfRemoteServiceAddDeathRecipient(remote, recipient);
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo GetApInstance()
+{
+    g_devMgr = HDIDeviceManagerGet();
+    if (g_devMgr == NULL) {
+        LOGE("%{public}s HDIDeviceManagerGet failed", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    if (g_devMgr->LoadDevice(g_devMgr, HDI_AP_SERVICE_NAME) != HDF_SUCCESS) {
+        g_devMgr = NULL;
+        LOGE("%{public}s LoadDevice failed", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    g_apObj = IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, false);
+    if (g_apObj == NULL) {
+        g_devMgr->UnloadDevice(g_devMgr, HDI_AP_SERVICE_NAME);
+        g_devMgr = NULL;
+        LOGE("%{public}s HostapdInterfaceGetInstance failed", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo StartAp(int id, char *ifaceName)
+{
+    int32_t ret = g_apObj->StartApWithCmd(g_apObj, ifaceName, id);
+    if (ret != HDF_SUCCESS) {
+        LOGE("%{public}s Start failed: %{public}d", __func__, ret);
+        IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
+        g_apObj = NULL;
+        g_devMgr->UnloadDevice(g_devMgr, HDI_AP_SERVICE_NAME);
+        g_devMgr = NULL;
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiApStart(int id, char *ifaceName)
+{
+    LOGI("HdiApStart start...");
+    pthread_mutex_lock(&g_apObjMutex);
+    if (g_apRefCount != 0 && g_apObj != NULL && g_devMgr != NULL) {
+        ++g_apRefCount;
+        pthread_mutex_unlock(&g_apObjMutex);
+        LOGI("%{public}s ap ref count: %{public}d", __func__, g_apRefCount);
+        return WIFI_IDL_OPT_OK;
+    } else {
+        g_apRefCount = 0x0;
+    }
+
+    g_id = id;
+    WifiErrorNo result = WIFI_IDL_OPT_FAILED;
+    result = CopyConfigFile(g_apCfgName);
+    if (result != WIFI_IDL_OPT_OK) {
+        LOGE("HdiApStart: CopyConfigFile failed.");
+        pthread_mutex_unlock(&g_apObjMutex);
+        return result;
+    }
+
+    result = GetApInstance();
+    if (result != WIFI_IDL_OPT_OK) {
+        pthread_mutex_unlock(&g_apObjMutex);
+        return result;
+    }
+
+    result = StartAp(id, ifaceName);
+    if (result != WIFI_IDL_OPT_OK) {
+        pthread_mutex_unlock(&g_apObjMutex);
+        return result;
+    }
+
+    ++g_apRefCount;
+    RegistHdfApDeathCallBack();
+    pthread_mutex_unlock(&g_apObjMutex);
+    LOGI("HdiApStart is started");
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiApStop(int id)
+{
+    LOGI("HdiApStop stop...");
+    pthread_mutex_lock(&g_apObjMutex);
+    if (g_apObj == NULL || g_apRefCount == 0) {
+        g_apRefCount = 0x0;
+        pthread_mutex_unlock(&g_apObjMutex);
+        LOGE("%{public}s g_apObj is NULL or ref count is 0", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    const unsigned int ONE_REF_COUNT = 1;
+    if (g_apRefCount > ONE_REF_COUNT) {
+        --g_apRefCount;
+        pthread_mutex_unlock(&g_apObjMutex);
+        LOGI("%{public}s wlan ref count: %d", __func__, g_apRefCount);
+        return WIFI_IDL_OPT_OK;
+    }
+    int32_t ret;
+    ret = g_apObj->DisableAp(g_apObj, g_apIfaceName, id);
+    ret = g_apObj->StopAp(g_apObj);
+    if (ret != HDF_SUCCESS) {
+        LOGE("%{public}s Stop failed: %{public}d", __func__, ret);
+    }
+    IWpaInterfaceReleaseInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
+    g_apRefCount = 0;
+    g_apObj = NULL;
+    g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
+    g_apDevMgr = NULL;
+    pthread_mutex_unlock(&g_apObjMutex);
+    LOGI("HdiApStop is stopped");
+    return (ret == HDF_SUCCESS) ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+struct IHostapdInterface* GetApInterface()
+{
+    struct IHostapdInterface *apObj = NULL;
+    pthread_mutex_lock(&g_apObjMutex);
+    apObj = g_apObj;
+    pthread_mutex_unlock(&g_apObjMutex);
+    return apObj;
+}
+
+char *GetApIfaceaName()
+{
+    return g_apIfaceName;
+}
+
+void InitCfg(char *ifaceName)
+{
+    if (strncmp(ifaceName, AP_IFNAME_COEX, IFACENAME_LEN -1) == 0) {
+        if (memcpy_s(g_apCfgName, CFGNAME_LEN, WIFI_COEX_CFG, sizeof(WIFI_DEFAULT_CFG)) != EOK) {
+            LOGE("memcpy cfg fail");
+        }
+        if (memcpy_s(g_apIfaceName, IFACENAME_LEN, AP_IFNAME_COEX, sizeof(AP_IFNAME)) != EOK) {
+            LOGE("memcpy ap name fail");
+        }
+        if (memcpy_s(g_hostapdCfg, CTRL_LEN, HOSTAPD_DEFAULT_CFG_COEX, sizeof(HOSTAPD_DEFAULT_CFG_COEX)) != EOK) {
+            LOGE("memcpy hostapdCfg fail");
+        }
+    } else {
+        if (memcpy_s(g_apCfgName, CFGNAME_LEN, WIFI_DEFAULT_CFG, sizeof(WIFI_DEFAULT_CFG)) != EOK) {
+            LOGE("memcpy cfg fail");
+        }
+        if (memcpy_s(g_apIfaceName, IFACENAME_LEN, AP_IFNAME, sizeof(AP_IFNAME)) != EOK) {
+            LOGE("memcpy ap name fail");
+        }
+        if (memcpy_s(g_hostapdCfg, CTRL_LEN, HOSTAPD_DEFAULT_CFG, sizeof(HOSTAPD_DEFAULT_CFG)) != EOK) {
+            LOGE("memcpy hostapdCfg fail");
+        }
+    }
+}
+
+void SetExecDisable(int execDisable)
+{
+    g_execDisable = execDisable;
+}
+
+int GetExecDisable()
+{
+    return g_execDisable;
+}
+
 #endif

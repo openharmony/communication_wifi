@@ -809,9 +809,7 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     staSmHandleFuncMap[CMD_START_NETCHECK] = &StaStateMachine::DealNetworkCheck;
     staSmHandleFuncMap[CMD_START_GET_DHCP_IP_TIMEOUT] = &StaStateMachine::DealGetDhcpIpTimeout;
-#ifdef OHOS_ARCH_LITE
     staSmHandleFuncMap[CMD_START_RENEWAL_TIMEOUT] = &StaStateMachine::DealRenewalTimeout;
-#endif
     staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = &StaStateMachine::DealScreenStateChangedEvent;
     staSmHandleFuncMap[CMD_AP_ROAMING_TIMEOUT_CHECK] = &StaStateMachine::DealApRoamingStateTimeout;
     return WIFI_OPT_SUCCESS;
@@ -2890,11 +2888,20 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
 }
 
 #ifndef OHOS_ARCH_LITE
+
+void StaStateMachine::DhcpResultNotify::DealRenewTimeout(void)
+{
+    WIFI_LOGI("DealRenewTimeout start");
+    StaStateMachine::DhcpResultNotify::StopRenewTimeout();
+    pStaStateMachine->SendMessage(CMD_START_RENEWAL_TIMEOUT);
+
+    return;
+}
+
 static void RenewTimeOutCallback(void)
 {
     WIFI_LOGI("RenewTimeOutCallback start");
-    StaStateMachine staStateMachine;
-    staStateMachine.DealRenewalTimeout();
+    StaStateMachine::DhcpResultNotify::DealRenewTimeout();
 
     return;
 }
@@ -3195,25 +3202,20 @@ void StaStateMachine::DhcpResultNotify::StopRenewTimeout()
     return;
 }
 
-void StaStateMachine::DealRenewalTimeout()
-{
-    WIFI_LOGI("DealRenewalTimeout start");
-    StaStateMachine::DhcpResultNotify::StopRenewTimeout();
-    StaStateMachine staStateMachine;
-    staStateMachine.StartDhcpRenewal(); // start renewal
-}
-#else
+#endif
+
 void StaStateMachine::DealRenewalTimeout(InternalMessage *msg)
 {
+#ifdef OHOS_ARCH_LITE
     if (msg == nullptr) {
         LOGE("DealRenewalTimeout InternalMessage msg is null.");
         return;
     }
     LOGI("StopTimer CMD_START_RENEWAL_TIMEOUT DealRenewalTimeout");
     StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
+#endif
     StartDhcpRenewal(); // start renewal
 }
-#endif
 
 void StaStateMachine::StartDhcpRenewal()
 {

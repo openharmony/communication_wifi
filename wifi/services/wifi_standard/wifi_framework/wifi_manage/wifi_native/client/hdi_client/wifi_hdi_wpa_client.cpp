@@ -36,6 +36,8 @@ const int BUFFER_SIZE = 4096;
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int WIFI_HDI_MAX_STR_LENGTH = 512;
 constexpr int WIFI_MAX_SCAN_COUNT = 256;
+constexpr int P2P_SUPPLICANT_DISCONNECTED = 0;
+constexpr int P2P_SUPPLICANT_CONNECTED = 1;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(void)
 {
@@ -662,12 +664,20 @@ WifiErrorNo WifiHdiWpaClient::ReqDisconnectStaByMac(const std::string &mac, int 
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pStart()
 {
-    return HdiWpaP2pStart();
+    WifiErrorNo ret = HdiWpaP2pStart();
+    if (ret == WIFI_IDL_OPT_OK) {
+        OnEventP2pStateChanged(P2P_SUPPLICANT_CONNECTED);
+    }
+    return ret;
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pStop()
 {
-    return HdiWpaP2pStop();
+    WifiErrorNo ret = HdiWpaP2pStop();
+    if (ret == WIFI_IDL_OPT_OK) {
+        OnEventP2pStateChanged(P2P_SUPPLICANT_DISCONNECTED);
+    }
+    return ret;
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pSetDeviceName(const std::string &name) const
@@ -728,7 +738,6 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
     }
 
     if (callbacks.onConnectSupplicant != nullptr) {
-        cWifiHdiWpaCallback.OnEventStateChanged = OnEventP2pStateChanged;
         cWifiHdiWpaCallback.OnEventDeviceFound = OnEventDeviceFound;
         cWifiHdiWpaCallback.OnEventDeviceLost = OnEventDeviceLost;
         cWifiHdiWpaCallback.OnEventGoNegotiationRequest = OnEventGoNegotiationRequest;

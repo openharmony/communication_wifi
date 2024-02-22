@@ -1040,13 +1040,32 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
     WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
 }
 
+bool StaStateMachine::CheckRoamingBssidIsSame(std::string bssid)
+{
+    WifiLinkedInfo linkedInfo;
+    GetLinkedInfo(linkedInfo);
+    WIFI_LOGI("CheckRoamingBssidIsSame bssid = %{public}s linkedinfo.bssid = %{public}s connState = %{public}d",
+              MacAnonymize(bssid).c_str(), MacAnonymize(linkedInfo.bssid).c_str(), linkedInfo.connState);
+    /* P2P affects STA, causing problems or incorrect data updates */
+    if ((linkedInfo.connState == ConnState::CONNECTED) &&
+        (linkedInfo.bssid != bssid) && (!IsRoaming())) {
+        WIFI_LOGE("Sta ignored the event for bssid is mismatch, isRoam:%{public}d.", IsRoaming());
+        return true;
+    }
+
+    return false;
+}
+
 void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("DealConnectionEvent, msg is nullptr.\n");
         return;
     }
-
+    if (CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+        WIFI_LOGE("DealConnectionEvent inconsistent bssid in connecter");
+        return;
+    }
     WIFI_LOGI("enter DealConnectionEvent");
     WifiSettings::GetInstance().SetDeviceAfterConnect(targetNetworkId);
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
@@ -1090,6 +1109,10 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     }
     if (wpsState != SetupMethod::INVALID) {
         WIFI_LOGE("wpsState is INVALID\n");
+        return;
+    }
+    if (CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+        WIFI_LOGE("DealDisconnectEvent inconsistent bssid in connecter");
         return;
     }
 #ifndef OHOS_ARCH_LITE
@@ -1785,8 +1808,12 @@ void StaStateMachine::OnNetworkDisconnectEvent(int reason)
     WriteWifiAbnormalDisconnectHiSysEvent(reason);
 }
 
-void StaStateMachine::OnNetworkAssocEvent(int assocState)
+void StaStateMachine::OnNetworkAssocEvent(int assocState, std::string bssid, StaStateMachine *pStaStateMachine)
 {
+    if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
+        WIFI_LOGE("OnNetworkAssocEvent inconsistent bssid in connecter");
+        return;
+    }
     if (assocState == WPA_CB_ASSOCIATING) {
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
     } else {
@@ -1891,8 +1918,13 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
     WIFI_LOGI("SeparatedState-msgCode=%{public}d received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
+        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT: {
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("SeparatedState inconsistent bssid in connecter");
+                return false;
+            }
             break;
+        }
 
         case WIFI_SVR_CMD_STA_ENABLE_WIFI: {
             ret = EXECUTED;
@@ -1950,6 +1982,10 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             ret = EXECUTED;
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("ApLinkedState inconsistent bssid in connecter");
+                return false;
+            }
             pStaStateMachine->StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
             WIFI_LOGI("Stop clearing wpa block list");
             /* Save linkedinfo */
@@ -2044,6 +2080,10 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             ret = EXECUTED;
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("StaWpsState inconsistent bssid in connecter");
+                return false;
+            }
             /* Stop clearing the Wpa_blocklist. */
             pStaStateMachine->StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
 
@@ -2572,6 +2612,10 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT event.");
             ret = EXECUTED;
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("ApRoamingState inconsistent bssid in connecter");
+                return false;
+            }
             pStaStateMachine->isRoam = true;
             pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
@@ -2594,11 +2638,16 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
             }
             break;
         }
-        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
+        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT: {
             WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT event.");
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("ApRoamingState inconsistent bssid in connecter");
+                return false;
+            }
             pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
             pStaStateMachine->DisConnectProcess();
             break;
+        }
         default:
             WIFI_LOGI("ApRoamingState-msgCode=%d not handled.", msg->GetMessageName());
             break;

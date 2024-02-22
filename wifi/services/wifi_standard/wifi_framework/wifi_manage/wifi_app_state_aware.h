@@ -36,7 +36,8 @@ public:
     static WifiAppStateAware &GetInstance();
     ErrCode InitAppStateAware();
     void RegisterAppStateObserver();
-    void OnForegroundAppChanged(const std::string &bundleName, const int uid, const int pid, const int state);
+    void OnForegroundAppChanged(const std::string &bundleName, int uid, int pid,
+        const int state, const int m_instId = 0);
     bool IsForegroundApp(std::string &bundleName);
     std::string GetForegroundApp();
 

@@ -2839,6 +2839,14 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResult(DhcpResult *dest, DhcpRes
         LOGE("SaveDhcpResult strOptVendor strcpy_s failed!");
         return;
     }
+    if (strcpy_s(dest->strOptLinkIpv6Addr, DHCP_MAX_FILE_BYTES, source->strOptLinkIpv6Addr) != EOK) {
+        LOGE("SaveDhcpResult strOptLinkIpv6Addr strcpy_s failed!");
+        return;
+    }
+    if (strcpy_s(dest->strOptRandIpv6Addr, DHCP_MAX_FILE_BYTES, source->strOptRandIpv6Addr) != EOK) {
+        LOGE("SaveDhcpResult strOptRandIpv6Addr strcpy_s failed!");
+        return;
+    }
     LOGI("SaveDhcpResult ok, ipType:%{public}d", dest->iptype);
 }
 
@@ -3018,16 +3026,18 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     }
     if (result->iptype == 1 &&  /* 0-ipv4,1-ipv6 */
         (ipv6Info.globalIpV6Address != result->strOptClientId || ipv6Info.gateway != result->strOptRouter1)) {
-        ipv6Info.linkIpV6Address = "";
+        ipv6Info.linkIpV6Address = result->strOptLinkIpv6Addr;
         ipv6Info.globalIpV6Address = result->strOptClientId;
-        ipv6Info.randGlobalIpV6Address = "";
+        ipv6Info.randGlobalIpV6Address = result->strOptRandIpv6Addr;
         ipv6Info.gateway = result->strOptRouter1;
         ipv6Info.netmask = result->strOptSubnet;
         ipv6Info.primaryDns = result->strOptRouter1;
         ipv6Info.secondDns = result->strOptRouter2;
         WifiSettings::GetInstance().SaveIpV6Info(ipv6Info, pStaStateMachine->GetInstanceId());
-        WIFI_LOGI("SaveIpV6 addr=%{private}s, gateway=%{private}s, mask=%{private}s, dns=%{private}s, dns2=%{private}s",
-            ipv6Info.globalIpV6Address.c_str(), ipv6Info.gateway.c_str(), ipv6Info.netmask.c_str(),
+        WIFI_LOGI("SaveIpV6 addr=%{private}s, linkaddr=%{private}s, randaddr=%{private}s, gateway=%{private}s, "
+            "mask=%{private}s, dns=%{private}s, dns2=%{private}s",
+            ipv6Info.globalIpV6Address.c_str(), ipv6Info.linkIpV6Address.c_str(),
+            ipv6Info.randGlobalIpV6Address.c_str(), ipv6Info.gateway.c_str(), ipv6Info.netmask.c_str(),
             ipv6Info.primaryDns.c_str(), ipv6Info.secondDns.c_str());
 #ifndef OHOS_ARCH_LITE
         WifiDeviceConfig config;

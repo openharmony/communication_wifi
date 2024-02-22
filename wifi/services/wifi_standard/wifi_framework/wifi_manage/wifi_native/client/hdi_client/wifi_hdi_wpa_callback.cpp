@@ -235,20 +235,12 @@ int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *
     return 0;
 }
 
-int32_t OnEventP2pStateChanged(struct IWpaCallback *self,
-    const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
+int32_t OnEventP2pStateChanged(int status)
 {
-    LOGI("OnEventP2pStateChanged ifName=%{public}s", ifName);
-    if (strcmp(ifName, "p2p0") != 0) {
-        return 1;
-    }
-    if (statechangedParam == NULL) {
-        LOGE("OnEventStateChanged: invalid parameter!");
-        return 1;
-    }
+    LOGI("OnEventP2pStateChanged %{public}d", status);
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onConnectSupplicant) {
-        cbk.onConnectSupplicant(statechangedParam->status);
+        cbk.onConnectSupplicant(status);
     }
     return 0;
 }
@@ -331,7 +323,7 @@ int32_t OnEventGoNegotiationRequest(struct IWpaCallback *self,
 int32_t OnEventGoNegotiationCompleted(struct IWpaCallback *self,
     const struct HdiP2pGoNegotiationCompletedParam *goNegotiationCompletedParam, const char* ifName)
 {
-    LOGI("OnEventGoNegotiationRequest");
+    LOGI("OnEventGoNegotiationCompleted");
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onGoNegotiationSuccess) {
         cbk.onGoNegotiationSuccess();

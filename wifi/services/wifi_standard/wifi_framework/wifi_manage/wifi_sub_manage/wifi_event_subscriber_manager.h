@@ -49,11 +49,13 @@ public:
     void GetAirplaneModeByDatashare();
     bool GetLocationModeByDatashare();
     void DealLocationModeChangeEvent();
+    void DealCloneDataChangeEvent();
     void CheckAndStartStaByDatashare();
     bool IsMdmForbidden(void);
 
 private:
     void InitSubscribeListener();
+    bool IsDataMgrServiceActive();
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
     void HandleCommonEventServiceChange(int systemAbilityId, bool add);
 #ifdef HAS_POWERMGR_PART
@@ -64,6 +66,10 @@ private:
 #endif
     void HandleDistributedKvDataServiceChange(bool add);
     int GetLastStaStateByDatashare();
+    void GetCloneDataByDatashare(std::string &cloneData);
+    void SetCloneDataByDatashare(const std::string &cloneData);
+    void RegisterCloneEvent();
+    void UnRegisterCloneEvent();
     void RegisterCesEvent();
     void UnRegisterCesEvent();
     void RegisterLocationEvent();
@@ -80,6 +86,7 @@ private:
 #endif
 
 private:
+    std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
     std::mutex cesEventMutex;
     bool isCesEventSubscribered;

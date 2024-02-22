@@ -543,6 +543,7 @@ void StaStateMachine::StartWifiProcess()
         InitWifiLinkedInfo();
         InitLastWifiLinkedInfo();
         WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+        WifiSettings::GetInstance().ReloadDeviceConfig();
 #ifndef OHOS_ARCH_LITE
         ChipCapability::GetInstance().InitializeChipCapability();
 #endif

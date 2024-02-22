@@ -15,7 +15,6 @@
 
 #include "wifi_scan_service_impl.h"
 #include "define.h"
-#include "permission_def.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
 #ifdef OHOS_ARCH_LITE

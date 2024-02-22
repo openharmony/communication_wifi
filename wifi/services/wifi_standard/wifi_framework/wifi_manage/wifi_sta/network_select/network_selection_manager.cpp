@@ -18,9 +18,9 @@
 #include "wifi_settings.h"
 #include "wifi_logger.h"
 #include "network_selection_utils.h"
+#include "wifi_common_util.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi {
 DEFINE_WIFILOG_LABEL("networkSelectionManager")
 
 NetworkSelectionManager::NetworkSelectionManager()
@@ -36,6 +36,10 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
         WIFI_LOGI("scanInfos is empty, ignore this selection");
         return false;
     }
+
+    /* networkCandidates must be declared before networkSelector,
+     * so it can be accessed in the destruct of networkSelector and wifiFilter */
+    std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
     auto networkSelectorOptional = pNetworkSelectorFactory->GetNetworkSelector(type);
     if (!(networkSelectorOptional.has_value())) {
         WIFI_LOGE("Get NetworkSelector failed for type %{public}d", static_cast<int>(type));
@@ -43,7 +47,6 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     }
     auto &networkSelector = networkSelectorOptional.value();
     WIFI_LOGI("NetworkSelector: %{public}s", networkSelector->GetNetworkSelectorMsg().c_str());
-    std::vector<NetworkCandidate> networkCandidates;
 
     /* Get the device config for each scanInfo, then create networkCandidate and put it into networkCandidates */
     GetAllDeviceConfigs(networkCandidates, scanInfos);
@@ -52,7 +55,7 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     TryNominate(networkCandidates, networkSelector);
 
     /* Get best networkCandidate from the reserved networkCandidates */
-    std::vector<NetworkCandidate *> bestNetworkCandidates;
+    std::vector<NetworkSelection::NetworkCandidate *> bestNetworkCandidates;
     networkSelector->GetBestCandidates(bestNetworkCandidates);
     if (bestNetworkCandidates.empty()) {
         return false;
@@ -65,49 +68,36 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     return true;
 }
 
-void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkCandidate> &networkCandidates,
+void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
                                                   const std::vector<InterScanInfo> &scanInfos)
 {
+    std::map<int, std::size_t> wifiDeviceConfigs;
     for (auto &scanInfo : scanInfos) {
-        networkCandidates.emplace_back(scanInfo);
+        auto& networkCandidate = networkCandidates.emplace_back(scanInfo);
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid,
-                                                    deviceKeyMgmt,
-                                                    networkCandidates.back().wifiDeviceConfig);
+        WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeyMgmt, networkCandidate.wifiDeviceConfig);
+        // save the indexes of saved network candidate in networkCandidates;
+        if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID) {
+            wifiDeviceConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
+        }
     }
+    std::stringstream wifiDevicesInfo;
+    for (auto &pair: wifiDeviceConfigs) {
+        if (wifiDevicesInfo.rdbuf() ->in_avail() != 0) {
+            wifiDevicesInfo << ",";
+        }
+        wifiDevicesInfo << "\"" << pair.first << "_" <<
+            SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "\"";
+    }
+    WIFI_LOGI("Find savedNetworks in scanInfos: [%{public}s]", wifiDevicesInfo.str().c_str());
 }
 
-void NetworkSelectionManager::TryNominate(std::vector<NetworkCandidate> &networkCandidates,
-                                          const std::unique_ptr<INetworkSelector> &networkSelector)
+void NetworkSelectionManager::TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
+                                          const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector)
 {
     std::for_each(networkCandidates.begin(), networkCandidates.end(), [&networkSelector](auto &networkCandidate) {
         networkSelector->TryNominate(networkCandidate);
-        /* log the nominate result for current networkCandidate */
-        LogNominateResult(networkCandidate);
     });
-}
-
-std::string NetworkSelectionManager::VectorToJson(std::vector<std::string> &strings)
-{
-    std::stringstream ss;
-    ss << "[";
-    for (std::size_t i = 0; i < strings.size(); ++i) {
-        ss << strings[i];
-        if (i < strings.size() - 1) {
-            ss << " ,";
-        }
-    }
-    ss << "]";
-    return ss.str();
-}
-
-void NetworkSelectionManager::LogNominateResult(NetworkCandidate &networkCandidate)
-{
-    WIFI_LOGD("NetworkCandidate %{public}s is filtered by  %{public}s, is nominated by %{public}s",
-        NetworkSelectionUtils::GetNetworkCandidateInfo(networkCandidate).c_str(),
-        VectorToJson(networkCandidate.filteredMsg).c_str(),
-        VectorToJson(networkCandidate.nominateMsg).c_str());
-}
 }
 }

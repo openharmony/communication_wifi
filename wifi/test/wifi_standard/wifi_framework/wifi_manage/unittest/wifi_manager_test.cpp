@@ -149,6 +149,12 @@ HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare();
 }
 
+HWTEST_F(WifiManagerTest, DealCloneDataChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealCloneDataChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->DealCloneDataChangeEvent();
+}
+
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)
 {
     WIFI_LOGI("CheckAndStartScanService_001 enter!");

@@ -590,6 +590,24 @@ HWTEST_F(WifiSettingsTest, MergeSoftapConfigTest, TestSize.Level1)
     WifiSettings::GetInstance().MergeSoftapConfig();
 }
 
+HWTEST_F(WifiSettingsTest, MergeWifiCloneConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("MergeWifiCloneConfigTest enter");
+    std::string cloneConfig = "wifitest";
+    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneConfig);
+}
+
+HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)
+{
+    WIFI_LOGI("ConfigsDeduplicateAndSaveTest enter");
+    WifiDeviceConfig config;
+    config.ssid = "test";
+    config.keyMgmt = "WPA-PSK";
+    std::vector<WifiDeviceConfig> configs;
+    configs.push_back(config);
+    WifiSettings::GetInstance().ConfigsDeduplicateAndSave(configs);
+}
+
 HWTEST_F(WifiSettingsTest, RemoveMacAddrPairInfoTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoveMacAddrPairInfoTest enter");

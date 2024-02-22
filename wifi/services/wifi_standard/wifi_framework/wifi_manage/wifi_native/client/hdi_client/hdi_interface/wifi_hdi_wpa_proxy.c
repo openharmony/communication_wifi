@@ -41,6 +41,7 @@
 #define IFACENAME_LEN 6
 #define CFGNAME_LEN 30
 #define WIFI_MULTI_CMD_MAX_LEN 1024
+#define EXEC_DISABLE 1
 #define WPA_HOSTAPD_NAME "hostapd"
 #define AP_IFNAME "wlan0"
 #define AP_IFNAME_COEX "wlan1"
@@ -52,6 +53,7 @@ static char g_hostapdCfg[CTRL_LEN] = {0};
 static char g_apIfaceName[IFACENAME_LEN] = {0};
 static char g_apCfgName[CFGNAME_LEN] = {0};
 static int g_id;
+static int g_execDisable;
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -437,7 +439,7 @@ void HdiApResetGlobalObj()
     g_apObj = NULL;
     g_apDevMgr = NULL;
     LOGE("%{public}s reset ap g_apObj", __func__);
-    HdiApStart(g_id);
+    HdiApStart(g_id, g_apIfaceName);
 }
 
 static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
@@ -503,24 +505,9 @@ WifiErrorNo GetApInstance()
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo StartAp()
+WifiErrorNo StartAp(int id, char *ifaceName)
 {
-    char startCmd[WIFI_MULTI_CMD_MAX_LEN] = {0};
-    char *p = startCmd;
-    int onceMove = 0;
-    onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
-        WIFI_MULTI_CMD_MAX_LEN - sumMove -1, "%s", WPA_HOSTAPD_NAME);
-    if (onceMove < 0) {
-        return WIFI_IDL_OPT_FAILED;
-    }
-    p = p + onceMove;
-    onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
-        WIFI_MULTI_CMD_MAX_LEN - sumMove -1, " %s", cfg[i].config);
-    if (onceMove < 0) {
-        return WIFI_IDL_OPT_FAILED;
-    }
-
-    int32_t ret = g_apObj->StartApWithCmd(g_apObj, startCmd);
+int32_t ret = g_apObj->StartApWithCmd(g_apObj, ifaceName, id);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);
         IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
@@ -532,7 +519,7 @@ WifiErrorNo StartAp()
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo HdiApStart(int id)
+WifiErrorNo HdiApStart(int id, char *ifaceName)
 {
     LOGI("HdiApStart start...");
     pthread_mutex_lock(&g_apObjMutex);
@@ -560,7 +547,7 @@ WifiErrorNo HdiApStart(int id)
         return result;
     }
 
-    result = StartAp();
+    result = StartAp(id, ifaceName);
     if (result != WIFI_IDL_OPT_OK) {
         pthread_mutex_unlock(&g_apObjMutex);
         return result;
@@ -644,6 +631,16 @@ void InitCfg(char *ifaceName)
             LOGE("memcpy hostapdCfg fail");
         }
     }
+}
+
+void SetExecDisable(int execDisable)
+{
+    g_execDisable = execDisable;
+}
+
+int GetExecDisable()
+{
+    return g_execDisable;
 }
 
 #endif

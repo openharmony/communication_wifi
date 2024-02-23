@@ -46,6 +46,14 @@ namespace Wifi {
 const int MIN_GROUP_NAME_LENGTH = 9;
 const int MAX_GROUP_NAME_LENGTH = 32;
 const int DISC_TIMEOUT_S = 120;
+enum {
+    P2P_GC,
+    P2P_GO,
+};
+enum {
+    P2P_OFF,
+    P2P_ON,
+};
 class P2pStateMachine : public StateMachine {
     class DhcpResultNotify {
     public:

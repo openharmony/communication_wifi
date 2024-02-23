@@ -20,6 +20,7 @@
 #include "wifi_logger.h"
 #include "if_config.h"
 #include "wifi_settings.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupOperatingState");
 
@@ -216,6 +217,7 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
         }
     } else {
         StopDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
+        WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GC, P2P_OFF);
     }
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {

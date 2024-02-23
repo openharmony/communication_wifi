@@ -18,7 +18,6 @@
 
 #include "wifi_errcode.h"
 #include "define.h"
-#include "app_mgr_client.h"
 #include "app_mgr_interface.h"
 #include "sta_service_callback.h"
 

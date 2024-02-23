@@ -79,13 +79,13 @@ bool FindifaceName(const char* ifName)
         LOGI("%{public}s err1", __func__);
         return true;
     }
-    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
-    while (currernt != NULL) {
-        if (strncmp(currernt->ifName, ifName, strlen(ifName)) == 0) {
+    struct IfaceNameInfo* current = g_IfaceNameInfoHead;
+    while (current != NULL) {
+        if (strncmp(current->ifName, ifName, strlen(ifName)) == 0) {
             LOGI("%{public}s out1", __func__);
             return true;
         }
-        currernt = currernt->next;
+        current = current->next;
     }
     LOGI("%{public}s out", __func__);
     return false;
@@ -99,27 +99,27 @@ void AddIfaceName(const char* ifName)
         return;
     }
     struct IfaceNameInfo* pre = NULL;
-    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
-    while (currernt != NULL) {
-        pre = currernt;
-        currernt = currernt->next;
+    struct IfaceNameInfo* current = g_IfaceNameInfoHead;
+    while (current != NULL) {
+        pre = current;
+        current = current->next;
     }
-    currernt =(struct IfaceNameInfo*) malloc(sizeof(struct IfaceNameInfo));
-    if (currernt == NULL) {
+    current =(struct IfaceNameInfo*) malloc(sizeof(struct IfaceNameInfo));
+    if (current == NULL) {
         LOGI("%{public}s err2", __func__);
         return;
     }
-    memset_s(currernt->ifName, BUFF_SIZE, 0, strlen(ifName));
-    currernt->next = NULL;
-    if (strncpy_s(currernt->ifName, BUFF_SIZE, ifName, strlen(ifName)) != EOK) {
-        free(currernt);
+    memset_s(current->ifName, BUFF_SIZE, 0, strlen(ifName));
+    current->next = NULL;
+    if (strncpy_s(current->ifName, BUFF_SIZE, ifName, strlen(ifName)) != EOK) {
+        free(current);
         LOGI("%{public}s err3", __func__);
         return;
     }
     if (pre != NULL) {
-        pre->next = currernt;
+        pre->next = current;
     } else {
-        g_IfaceNameInfoHead = currernt;
+        g_IfaceNameInfoHead = current;
     }
     LOGI("%{public}s out", __func__);
     return;
@@ -132,20 +132,20 @@ void RemoveIfaceName(const char* ifName)
         return;
     }
     struct IfaceNameInfo* pre = NULL;
-    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
-    while (currernt != NULL) {
-        if (strncmp(currernt->ifName, ifName, BUFF_SIZE) != 0) {
-            pre = currernt;
-            currernt = currernt->next;
+    struct IfaceNameInfo* current = g_IfaceNameInfoHead;
+    while (current != NULL) {
+        if (strncmp(current->ifName, ifName, BUFF_SIZE) != 0) {
+            pre = current;
+            current = current->next;
             continue;
         }
         if (pre == NULL) {
-            g_IfaceNameInfoHead = currernt->next;
+            g_IfaceNameInfoHead = current->next;
         } else {
-            pre->next = currernt->next;
+            pre->next = current->next;
         }
-        free(currernt);
-        currernt = NULL;
+        free(current);
+        current = NULL;
     }
     LOGI("%{public}s out", __func__);
     return;
@@ -154,9 +154,9 @@ void RemoveIfaceName(const char* ifName)
 int GetIfaceCount()
 {
     int count = 0;
-    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
-    while (currernt != NULL) {
-        currernt = currernt->next;
+    struct IfaceNameInfo* current = g_IfaceNameInfoHead;
+    while (current != NULL) {
+        current = current->next;
         count++;
     }
     return count;

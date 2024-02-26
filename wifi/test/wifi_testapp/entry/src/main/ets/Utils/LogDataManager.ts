@@ -14,7 +14,7 @@
  */
 
 export class LogDataManager {
-  TAG = 'WIFI_Manager_Test '
+  TAG = 'WIFI_Manager_Test'
   //wifi
   testEnableWifiManager_StartLog = "testEnableWifiManager Start----------"
   testEnableWifiManager_EndLog = "testEnableWifi End----------"
@@ -56,13 +56,10 @@ export class LogDataManager {
   testRemoveCandidateConfigCallbackManager_StartLog = "testRemoveCandidateConfigCallback Start----------"
   testRemoveCandidateConfigCallbackManager_EndLog = "testRemoveCandidateConfigCallback End----------"
   testRemoveCandidateConfigCallbackManager_successfulLog = "removeCandidateConfig Callback successful"
-
-  testGetCandidateConfigsManager_StartLog ="testGetCandidateConfigsManager Start----------"
+  testGetCandidateConfigsManager_StartLog = "testGetCandidateConfigsManager Start----------"
   testGetCandidateConfigsManager_EndLog = "testGetCandidateConfigsManager End----------"
-
-  testConnectToCandidateConfigManager_StartLog ="testConnectToCandidateConfigManager Start----------"
+  testConnectToCandidateConfigManager_StartLog = "testConnectToCandidateConfigManager Start----------"
   testConnectToCandidateConfigManager_EndLog = "testConnectToCandidateConfigManager End----------"
-
   testConnectToNetworkManager_StartLog = "testConnectToNetwork Start----------"
   testConnectToNetworkManager_EndLog = "testConnectToNetwork End----------"
   testConnectToDeviceManager_StartLog = "testConnectToDevice Start----------"
@@ -115,7 +112,6 @@ export class LogDataManager {
   testOnStreamChangeManager_EndLog = "testOnStreamChange End----------"
   testOnDeviceConfigChangeManager_StartLog = "testOnDeviceConfigChangeManager Start----------"
   testOnDeviceConfigChangeManager_EndLog = "testOnDeviceConfigChangeManager End----------"
-
   //hotspot
   testEnableHotspotManager_StartLog = "testEnableHotspot start--------------"
   testEnableHotspotManager_EndLog = "testEnableHotspot End--------------"

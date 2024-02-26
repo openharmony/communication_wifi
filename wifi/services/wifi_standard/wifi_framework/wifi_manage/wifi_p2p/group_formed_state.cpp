@@ -55,6 +55,8 @@ void GroupFormedState::Init()
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED, &GroupFormedState::ProcessGroupRemovedEvt));
     mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP_CLIENT, &GroupFormedState::ProcessCmdRemoveGroupClient));
+    mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CONNECT, &GroupFormedState::ProcessCmdConnect));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ, &GroupFormedState::ProcessProvDiscEvt));
@@ -163,6 +165,34 @@ bool GroupFormedState::ProcessGroupRemovedEvt(const InternalMessage &msg) const
     return EXECUTED;
 }
 
+bool GroupFormedState::ProcessCmdRemoveGroupClient(const InternalMessage &msg) const
+{
+    GcInfo info;
+    if (!msg.GetMessageObj(info)) {
+        return EXECUTED;
+    }
+    std::string deviceMac;
+    WifiP2pGroupInfo currentGroup = groupManager.GetCurrentGroup();
+    for(auto client : currentGroup.clientDevices) {
+        if (info.mac == clientDevices.devAddr) {
+            deviceMac = clientDevices.devAddr;
+            break;
+        }
+        if (info.host == clientDevices.deviceName) {
+            deviceMac = clientDevices.devAddr;
+            break;
+        }
+    }
+    if (WifiP2PHalInterface::GetInstance().GroupClientRemove(info)) {
+        WIFI_LOGE("p2p remove client failed.");
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroupClient, WIFI_OPT_FAILED);
+    } else {
+        WIFI_LOGI("p2p remove client successful.");
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroupClient, WIFI_OPT_SUCCESS);
+    }
+    return EXECUTED;
+}
+
 bool GroupFormedState::ProcessCmdRemoveGroup(const InternalMessage &msg) const
 {
     p2pStateMachine.DelayMessage(&msg);
@@ -209,14 +239,25 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessage &msg) const
     IpPool::ReleaseIp(device.GetDeviceAddress());
     device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
     deviceManager.UpdateDeviceStatus(device); // used for peers change event querying device infos
+    deviceManager.UpdateGroupAddress(device);
     groupManager.RemoveCurrGroupClient(device);
+    if (WIFI_OPT_SUCCESS != p2pStateMachine.RemoveClientInfo(device.GetDeviceAddress())) {
+        WIFI_LOGE("Connect: remove client info faild");
+    }
+    auto iter = std::find(p2pStateMachine.curClientList.begin(),
+    p2pStateMachine.curClientList.end(), device.GetDeviceAddress());
+    if (iter != p2pStateMachine.curClientList.end()) {
+        p2pStateMachine.curClientList.erase(iter);
+    } else {
+        WIFI_LOGD("curClientList(%s) has been erased", device.GetDeviceAddress().c_str());
+    }
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();
+    p2pStateMachine.BroadcastP2pGcLeaveGroup(device);
     deviceManager.RemoveDevice(device);
     if (groupManager.IsCurrGroupClientEmpty() && !groupManager.GetCurrentGroup().IsExplicitGroup()) {
         WIFI_LOGE("Clients empty, remove p2p group.");
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
-        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
     }
     return EXECUTED;
 }
@@ -242,7 +283,7 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
     } else {
         groupManager.UpdateCurrGroupClient(device);
     }
-
+    p2pStateMachine.curClientList.emplace_back(device.GetDeviceAddress());
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();
     return EXECUTED;

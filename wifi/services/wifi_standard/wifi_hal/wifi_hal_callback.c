@@ -486,6 +486,26 @@ void P2pHalCbGroupRemoved(const char *groupIfName, int isGo)
     return;
 }
 
+void P2pHalCbclientRemoved(const char *deviceMac)
+{
+    if (deviceMac == NULL) {
+        LOGI("P2p group removed event deviceMac is NULL");
+        return;
+    }
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+    if (strncpy_s(pCbkMsg->msg.deviceInfo.p2pDeviceAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pDeviceAddress),
+        deviceMac, sizeof(pCbkMsg->msg.deviceInfo.p2pDeviceAddress) - 1) != EOK) {
+        free(pCbkMsg);
+        return;
+    }
+    EmitEventCallbackMsg(pCbkMsg, P2P_CLIENT_REMOVED_EVENT);
+    return;
+}
+
 void P2pHalCbProvisionDiscoveryPbcRequest(const char *address)
 {
     if (address == NULL) {
@@ -637,7 +657,7 @@ void P2pHalCbServiceDiscoveryResponse(const P2pServDiscRespInfo *info)
     return;
 }
 
-void P2pHalCbStaConnectState(const char *p2pDeviceAddress, int state)
+void P2pHalCbStaConnectState(const char *p2pDeviceAddress, const char *p2pGroupAddress, int state)
 {
     if (p2pDeviceAddress == NULL) {
         LOGI("P2p sta authorized/deauthorized event devAddress is NULL");
@@ -653,6 +673,11 @@ void P2pHalCbStaConnectState(const char *p2pDeviceAddress, int state)
         p2pDeviceAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pDeviceAddress) - 1) != EOK) {
         free(pCbkMsg);
         pCbkMsg = NULL;
+        return;
+    }
+    if (strncpy_s(pCbkMsg->msg.deviceInfo.p2pGroupAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pGroupAddress),
+        p2pGroupAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pGroupAddress) - 1) != EOK) {
+        free(pCbkMsg);
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, ((state == 0) ? AP_STA_DISCONNECTED_EVENT : AP_STA_CONNECTED_EVENT));

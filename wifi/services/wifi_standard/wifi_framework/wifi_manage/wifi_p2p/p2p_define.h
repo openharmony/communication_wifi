@@ -114,6 +114,7 @@ enum class P2P_STATE_MACHINE_CMD {
     CMD_CANCEL_CONNECT,          /* cancel connect */
     CMD_HID2D_CREATE_GROUP, /* hid2d create group */
     CMD_HID2D_CONNECT,
+    CMD_REMOVE_GROUP_CLIENT,
 
     /* monitor to state machine */
     WPA_CONNECTED_EVENT = 100,  // result of connect

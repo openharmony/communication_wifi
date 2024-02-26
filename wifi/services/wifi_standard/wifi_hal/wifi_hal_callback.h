@@ -191,6 +191,13 @@ void P2pHalCbGroupStarted(const P2pGroupInfo *info);
 void P2pHalCbGroupRemoved(const char *groupIfName, int isGo);
 
 /**
+ * @Description Deletes a P2P client
+ *
+ * @param groupIfName
+ * @param gcMacAddress
+ */
+void P2pHalCbclientRemoved(const char *deviceMac);
+/**
  * @Description Sets the PBC discovery request
  *
  * @param address
@@ -245,9 +252,10 @@ void P2pHalCbServiceDiscoveryResponse(const P2pServDiscRespInfo *info);
  * @Description Indicates when a STA device is connected/disconnected to this device
  *
  * @param p2pDeviceAddress
+ * @param p2pGroupAddress
  * @param type - 0 disconnect, 1 connected
  */
-void P2pHalCbStaConnectState(const char *p2pDeviceAddress, int state);
+void P2pHalCbStaConnectState(const char *p2pDeviceAddress, const char *p2pGroupAddress, int type);
 
 /**
  * @Description Reporting Link Failure Events

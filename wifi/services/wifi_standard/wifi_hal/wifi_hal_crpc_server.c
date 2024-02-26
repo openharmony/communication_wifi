@@ -101,6 +101,7 @@ static int InitRpcFuncMapChip(void)
     ret += PushRpcFunc("GetIface", RpcGetIface);
     ret += PushRpcFunc("GetIfaceNames", RpcGetIfaceNames);
     ret += PushRpcFunc("RemoveIface", RpcRemoveIface);
+    ret += PushRpcFunc("P2pRemoveClient", RpcP2pRemoveClient);
     ret += PushRpcFunc("GetCapabilities", RpcGetCapabilities);
     ret += PushRpcFunc("GetSupportedComboModes", RpcGetSupportedComboModes);
     ret += PushRpcFunc("ConfigComboModes", RpcConfigComboModes);

@@ -183,6 +183,13 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_p2p_proxy_impl") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+      blocklist = "../wifi_frameworks_sdk_block.txt"
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_p2p_impl.cpp",

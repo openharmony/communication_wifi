@@ -48,6 +48,8 @@ private:
     void DealP2pGroupsChanged(void);
     void DealP2pActionResult(P2pActionCallback action, ErrCode code);
     void DealConfigChanged(CfgType type, char* data, int dataLen);
+    void DealP2pGcJoinGroup(const GcInfo &info);
+    void DealP2pGcLeaveGroup(const GcInfo &info);
 
 private:
     IP2pServiceCallbacks mP2pCallback;

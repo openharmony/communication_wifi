@@ -413,7 +413,8 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         return WIFI_OPT_PERMISSION_DENIED;
     }
     int passLen = config.GetPassphrase().length();
-    if (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN) {
+    if ((!config.GetPassphrase().empty()) &&
+              (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN)) {
         WIFI_LOGE("CreateGroup:VerifyPassphrase length failed!");
         return WIFI_OPT_INVALID_PARAM;
     }
@@ -461,6 +462,27 @@ ErrCode WifiP2pServiceImpl::RemoveGroup()
         return WIFI_OPT_FAILED;
     }
     return pService->RemoveGroup();
+}
+
+ErrCode WifiP2pServiceImpl::RemoveGroupClient(const GcInfo &info)
+{
+    WIFI_LOGI("RemoveGroupClient");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RemoveGroupClient:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->RemoveGroupClient(deviceMac);
 }
 
 ErrCode WifiP2pServiceImpl::DeleteGroup(const WifiP2pGroupInfo &group)

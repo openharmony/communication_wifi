@@ -332,6 +332,85 @@ void P2pStateMachine::SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwne
     groupManager.SaveP2pInfo(p2pInfo);
 }
 
+ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
+{
+    std::lock_guard<std::mutex> lock(m_gcJoinmutex);
+    WifiP2pGroupInfo groupInfo = groupManager.GetCurrentGroup();
+    if (!groupInfo.IsGroupOwner()) {
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList;
+    if (deviceManager.GetDevicesList(deviceList) <= 0) {
+        WIFI_LOGE("deviceList.size <=0 ");
+        return WIFI_OPT_FAILED;
+    }
+    WifiP2pDevice curDev;
+    GcInfo curGc;
+    bool isFound = false;
+    for (auto iterClientList : curClientList) {
+        for (auto iterDeviceList : deviceList) {
+            if (iterDeviceList.GetDeviceAddress() == iterClientList) {
+                curDev = iterDeviceList;
+                auto p2pDeviceMac = curDev.GetDeviceAddress();
+                auto p2pGroupMac = curDev.GetGroupAddress();
+                curGc = MatchDevInGcInfos(p2pDeviceMac, p2pGroupMac, gcInfos);
+                isFound = !(curGc.ip.empty());
+                break;
+            }
+        }
+        if (isFound) {
+            break;
+        }
+    }
+    if (!isFound) {
+        return ErrCode::WIFI_OPT_FAILED;
+    } else {
+        auto iter = std::find(curClientList.begin(), curClientList.end(), curDev.GetDeviceAddress().c_str());
+        curClientList.erase(iter);
+    }
+    WifiP2pLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
+    linkedInfo.ClearClientInfo();
+    linkedInfo.AddClientInfoList(curGc.mac, curGc.ip, curDev.GetDeviceName());
+
+    if (WifiSettings::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
+        groupManager.SaveP2pInfo(linkedInfo);
+        BroadcastP2pGcJoinGroup(curGc);
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
+    return ErrCode::WIFI_OPT_FAILED;
+}
+
+GcInfo P2pStateMachine::MatchDevInGcInfos(const std::string &deviceAddr,
+    const std::string &groupAddr, std::vector<GcInfo> &gcInfos)
+{
+    WIFI_LOGD("P2pStateMachine::MatchDevInGcInfos: devAddr = %s, groupAddr = %s",
+        MacAnonymize(deviceAddr).c_str(), MacAnonymize(groupAddr).c_str());
+    GcInfo info;
+    for (auto gcInfo : gcInfos) {
+        if ((gcInfo.mac == deviceAddr) || (gcInfo.mac == groupAddr)) {
+            WIFI_LOGD("find curDev Ip:%s", gcInfo.ip.c_str());
+            info = gcInfo;
+            break;
+        }
+    }
+    return info;
+}
+
+ErrCode P2pStateMachine::RemoveClientInfo(std::string mac)
+{
+    WIFI_LOGD("P2pStateMachine::RemoveClientInfo: mac = %s",
+        MacAnonymize(mac).c_str());
+    WifiP2pLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
+    linkedInfo.RemoveClientInfo(mac);
+    if (WifiSettings::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
+        groupManager.SaveP2pInfo(linkedInfo);
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
+    return ErrCode::WIFI_OPT_FAILED;
+}
+
 void P2pStateMachine::BroadcastP2pStatusChanged(P2pState state) const
 {
     WifiSettings::GetInstance().SetP2pState(static_cast<int>(state));
@@ -393,6 +472,35 @@ void P2pStateMachine::BroadcastP2pDiscoveryChanged(bool isActive) const
             callBackItem.second.OnP2pDiscoveryChangedEvent(isActive);
         }
     }
+}
+
+void P2pStateMachine::BroadcastP2pGcJoinGroup(GcInfo &info) const
+{
+    for (const auto &callBackItem : p2pServiceCallbacks) {
+        if (callBackItem.second.OnP2pGcJoinGroupEvent) {
+            callBackItem.second.OnP2pGcJoinGroupEvent(info);
+        }
+    }
+    WifiBroadCastHelper::Send("P2pGcJoinGroup", info);
+}
+
+void P2pStateMachine::BroadcastP2pGcLeaveGroup(WifiP2pDevice &device) const
+{
+    WifiP2pLinkedInfo p2pInfo;
+    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    auto gcInfos = p2pInfo.GetClientInfoList();
+    GcInfo curGcInfo;
+    for (auto gcInfo : gcInfos) {
+        if (device.GetDeviceAddress() == gcInfo.mac) {
+            curGcInfo = gcInfo;
+        }
+    }
+    for (const auto &callBackItem : p2pServiceCallbacks) {
+        if (callBackItem.second.OnP2pGcLeaveGroupEvent) {
+            callBackItem.second.OnP2pGcLeaveGroupEvent(curGcInfo);
+        }
+    }
+    WifiBroadCastHelper::Send("P2pGcLeaveGroup", curGcInfo);
 }
 
 void P2pStateMachine::BroadcastPersistentGroupsChanged() const
@@ -700,6 +808,9 @@ bool P2pStateMachine::StartDhcpServer()
 {
     Ipv4Address ipv4(Ipv4Address::defaultInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    pDhcpResultNotify->SetP2pStateMachine(this, &groupManager);
+    serverCallBack.OnServerSuccess = P2pStateMachine::DhcpResultNotify::OnDhcpServerSuccess;
+    m_DhcpdInterface.RegisterDhcpCallBack(groupManager.GetCurrentGroup().GetInterface(), serverCallBack);
     const std::string ipAddress = DEFAULT_P2P_IPADDR;
     if (!m_DhcpdInterface.StartDhcpServerFromInterface(groupManager.GetCurrentGroup().GetInterface(),
                                                        ipv4, ipv6, ipAddress, true)) {
@@ -775,6 +886,23 @@ void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname,
         pP2pStateMachine->p2pDevIface = "";
     }
     WifiP2PHalInterface::GetInstance().GroupRemove(ifaceifname);
+}
+
+void P2pStateMachine::DhcpResultNotify::OnDhcpServerSuccess(const char *ifname,
+    DhcpStationInfo *stationInfos, size_t size)
+{
+    WIFI_LOGI("Dhcp notify ServerSuccess. ifname:%s", ifname);
+    std::vector<GcInfo> gcInfos;
+    for (size_t i = 0; i < size; i++) {
+        GcInfo gcInfo;
+        gcInfo.mac = stationInfos[i].macAddr;
+        gcInfo.ip = stationInfos[i].ipAddr;
+        gcInfo.host = stationInfos[i].deviceName;
+        gcInfos.emplace_back(gcInfo);
+    }
+    if (ErrCode::WIFI_OPT_SUCCESS != pP2pStateMachine->AddClientInfo(gcInfos)) {
+        WIFI_LOGE("AddClientInfo failed");
+    }
 }
 
 void P2pStateMachine::StartDhcpClientInterface()

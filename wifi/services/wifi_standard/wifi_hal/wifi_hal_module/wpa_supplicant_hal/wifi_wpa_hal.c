@@ -275,7 +275,11 @@ static void DealP2pConnectChanged(const char *buf, int type)
     if (strncpy_s(devAddr, sizeof(devAddr), pos + strlen("p2p_dev_addr="), WIFI_MAC_LENGTH) != EOK) {
         return;
     }
-    P2pHalCbStaConnectState(devAddr, type);
+    char groupAddr[WIFI_MAC_LENGTH + 1] = {0};
+    if (strncpy_s(groupAddr, sizeof(groupAddr), buf, WIFI_MAC_LENGTH) != EOK) {
+        return;
+    }
+    P2pHalCbStaConnectState(devAddr, groupAddr, type);
     return;
 }
 
@@ -599,9 +603,9 @@ static int WpaP2pCallBackFunc(char *p)
     } else if (strncmp(p, P2P_EVENT_PROV_DISC_FAILURE, strlen(P2P_EVENT_PROV_DISC_FAILURE)) == 0) {
         P2pHalCbProvisionDiscoveryFailure();
     } else if (strncmp(p, AP_STA_DISCONNECTED, strlen(AP_STA_DISCONNECTED)) == 0) {
-        DealP2pConnectChanged(p, 0);
+        DealP2pConnectChanged(p + strlen(AP_STA_DISCONNECTED), 0);
     } else if (strncmp(p, AP_STA_CONNECTED, strlen(AP_STA_CONNECTED)) == 0) {
-        DealP2pConnectChanged(p, 1);
+        DealP2pConnectChanged(p + strlen(AP_STA_CONNECTED), 1);
     } else if (strncmp(p, P2P_EVENT_SERV_DISC_REQ, strlen(P2P_EVENT_SERV_DISC_REQ)) == 0) {
         DealP2pServDiscReqEvent(p);
     } else {

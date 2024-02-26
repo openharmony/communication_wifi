@@ -278,6 +278,14 @@ WifiErrorNo P2pAddGroup(int isPersistent, int networkId, int freq);
 WifiErrorNo P2pRemoveGroup(const char *interface);
 
 /**
+ * @Description Terminate a group.
+ *
+ * @param deviceMac
+ * @return WifiErrorNo
+ */
+WifiErrorNo P2pRemoveClient(const char *deviceMac);
+
+/**
  * @Description Inviting a Device to Join a Persistent Group.
  *
  * @param persistent

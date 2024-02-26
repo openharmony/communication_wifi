@@ -22,10 +22,11 @@ import { TestList } from './testList';
 @Component
 export struct ProfileTest {
   private testItems: TestData[]
+
   build() {
     Column() {
       TestList({
-        testItems: this.testItems
+        testItems : this.testItems
       })
     }
   }

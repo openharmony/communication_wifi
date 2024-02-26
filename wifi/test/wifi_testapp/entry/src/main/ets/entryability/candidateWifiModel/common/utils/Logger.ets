@@ -31,20 +31,20 @@ class Logger {
     this.domain = domain;
   }
 
-  debug(...args: any[]): void {
-    hilog.debug(this.domain, this.prefix, this.format, args);
+  debug(...args: string[]) {
+    hilog.debug(this.domain, this.prefix, this.format, args)
   }
 
-  info(...args: any[]): void {
-    hilog.info(this.domain, this.prefix, this.format, args);
+  info(...args: string[]) {
+    hilog.info(this.domain, this.prefix, this.format, args)
   }
 
-  warn(...args: any[]): void {
-    hilog.warn(this.domain, this.prefix, this.format, args);
+  warn(...args: string[]) {
+    hilog.warn(this.domain, this.prefix, this.format, args)
   }
 
-  error(...args: any[]): void {
-    hilog.error(this.domain, this.prefix, this.format, args);
+  error(...args: string[]) {
+    hilog.error(this.domain, this.prefix, this.format, args)
   }
 }
 

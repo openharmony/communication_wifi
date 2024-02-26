@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import prompt from '@ohos.prompt'
 import { P2pPswDialog } from '../Component/p2pPswDialog'
 import { P2pModel } from '../entryability/model/p2pModel'
 import { P2pView } from '../Component/p2pView'
 import wifi from '@ohos.wifi'
+import ConfigData from '../Utils/ConfigData'
 
 const TAG = "[availableP2p]"
-let self = null
 
 /**
  * available p2p page of WiFi test
@@ -31,54 +29,50 @@ let self = null
 @Component
 export struct AvailableP2p {
   private p2pModel: P2pModel = new P2pModel()
-  @Prop p2pList: Array<any>
-  private p2pLinkedInfo: any
-  private selectIndex: Number = - 1
+  @Link p2pList!: Array<wifi.WifiP2pDevice>
+  @Link p2pLinkedInfo!: wifi.WifiP2pLinkedInfo
+  private selectIndex: number = - 1
   private p2pPswDialogController: CustomDialogController = new CustomDialogController({
-    builder : P2pPswDialog( { p2pScanInfo : this.p2pList[ this.selectIndex ] , action : this.onAccept } ) ,
+    builder : P2pPswDialog({ p2pScanInfo : this.p2pList[ this.selectIndex ] , action : this.onAccept }) ,
     autoCancel : true
   })
 
-  onAccept( p2pScanInfo , psw ) {
-    console.log( TAG , 'connect p2p' )
-    self.p2pModel.connectP2p( p2pScanInfo , psw )
-  }
-
-  aboutToAppear() {
-    self = this
+  onAccept(p2pScanInfo: wifi.WifiP2pDevice) {
+    console.log(TAG , 'connect p2p')
+    this.p2pModel.connectP2p(p2pScanInfo)
   }
 
   build() {
     Column() {
       Row() {
-        Text( $r( 'app.string.p2p_available' ) )
-          .align( Alignment.TopStart )
-          .fontSize( 22 )
-          .layoutWeight( 1 )
+        Text($r('app.string.p2p_available'))
+          .align(Alignment.TopStart)
+          .fontSize(22)
+          .layoutWeight(1)
       }
-      .width( '95%' )
+      .width(ConfigData.WH_95_100)
 
       List() {
-        ForEach( this.p2pList , ( item , index ) => {
+        ForEach(this.p2pList , (item: wifi.WifiP2pDevice , index: number) => {
           ListItem() {
-            P2pView( { p2p : item } )
+            P2pView({ p2p : item })
           }
-          .onClick( () => {
-            console.log( TAG , 'p2p click' )
+          .onClick(() => {
+            console.log(TAG , 'p2p click')
             this.selectIndex = index
-            if ( this.p2pLinkedInfo !== null && item.deviceName === this.p2pLinkedInfo.deviceName ) {
-              prompt.showToast( { message : 'this p2p is connected' } )
+            if ( this.p2pLinkedInfo !== null && this.p2pLinkedInfo.connectState == 1 ) {
+              prompt.showToast({ message : 'this p2p is connected' })
               return
             }
-            this.p2pModel.connectP2p( item , '' )
+            this.p2pModel.connectP2p(item)
             //            this.p2pPswDialogController.open()
-          } )
-        } , item => JSON.stringify( item ) )
+          })
+        } , (item: wifi.WifiP2pDevice) => JSON.stringify(item))
       }
-      .layoutWeight( 1 )
-      .divider( { strokeWidth : 1 , color : Color.Gray , startMargin : 10 , endMargin : 10 } )
-      .margin( 10 )
+      .layoutWeight(1)
+      .divider({ strokeWidth : 1 , color : Color.Gray , startMargin : 10 , endMargin : 10 })
+      .margin(10)
     }
-    .margin( { top : 15 , bottom : 100 } )
+    .margin({ top : 15 , bottom : 100 })
   }
 }

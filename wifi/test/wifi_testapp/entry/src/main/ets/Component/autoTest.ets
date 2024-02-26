@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { TestData } from '../entryability/model/testData'
 import { TestList } from './testList';
 
@@ -24,13 +22,13 @@ import { TestList } from './testList';
 
 @Component
 export struct AutoTest {
-  private testItems: TestData[]
+  private testItems!: TestData[]
 
   build() {
     Column() {
-      TestList( {
+      TestList({
         testItems : this.testItems
-      } )
+      })
     }
   }
 }

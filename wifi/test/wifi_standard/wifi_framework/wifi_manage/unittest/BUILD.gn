@@ -59,6 +59,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_toggler_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_system_timer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_app_state_aware.cpp",
     "//foundation/systemabilitymgr/samgr/services/samgr/native/source/service_registry.cpp",
     "common/wifi_broadcast_helper_test.cpp",
     "common/wifi_permission_helper_test.cpp",

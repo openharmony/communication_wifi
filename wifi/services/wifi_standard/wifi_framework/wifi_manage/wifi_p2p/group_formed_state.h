@@ -170,6 +170,13 @@ private:
      */
     virtual bool ProcessCmdStartListen(const InternalMessage &msg) const;
 
+    /**
+     * @Description Process the remove client command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdRemoveGroupClient(const InternalMessage &msg) const;
+
 private:
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

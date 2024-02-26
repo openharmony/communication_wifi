@@ -100,6 +100,8 @@ void WifiP2pStub::InitHandleMap()
         &WifiP2pStub::OnCreateGroup;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP)] =
         &WifiP2pStub::OnRemoveGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT)] =
+        &WifiP2pStub::OnRemoveClient;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_GROUP)] =
         &WifiP2pStub::OnDeleteGroup;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CONNECT)] = &WifiP2pStub::OnP2pConnect;
@@ -290,6 +292,16 @@ void WifiP2pStub::OnRemoveGroup(uint32_t code, MessageParcel &data, MessageParce
     return;
 }
 
+void WifiP2pStub::OnRemoveGroupClient(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::string deviceMac = data.ReadString();
+    ErrCode ret = RemoveGroupClient(deviceMac);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
 void WifiP2pStub::OnDeleteGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -338,6 +350,14 @@ void WifiP2pStub::OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, Messa
         reply.WriteInt32(static_cast<int>(config.GetConnectState()));
         reply.WriteBool(config.IsGroupOwner());
         reply.WriteString(config.GetGroupOwnerAddress());
+        std::vector<GcInfo> gcInfos = config.GetClientInfoList();
+        int size = gcInfos.size();
+        reply.WriteInt32(size);
+        for (int i = 0; i < size; i++) {
+            reply.WriteString(gcInfos[i].mac);
+            reply.WriteString(gcInfos[i].ip);
+            reply.WriteString(gcInfos[i].host);
+        }
     }
     return;
 }

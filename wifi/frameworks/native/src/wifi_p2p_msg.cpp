@@ -113,6 +113,45 @@ const std::string &WifiP2pDevice::GetDeviceAddress() const
     return mDeviceAddress;
 }
 
+void WifiP2pDevice::SetGroupAddress(const std::string &groupAddress)
+{
+    mGroupAddress = groupAddress;
+}
+
+const std::string &WifiP2pDevice::GetGroupAddress() const
+{
+    return mGroupAddress;
+}
+
+void WifiP2pLinkedInfo::AddClientInfoList(const std::string &mac, const std::string &ip, const std::string &host)
+{
+    GcInfo gc_info;
+    gc_info->mac = mac;
+    gc_info->ip = ip;
+    gc_info->host = host;
+    gc_info_list.push_back(gc_info);
+}
+
+void WifiP2pLinkedInfo::RemoveClientInfo(std::string mac)
+{
+    for (auto iter = gc_info_list.begin(); iter !=gc_info_list.end(); iter++) {
+        if (mac == iter->mac) {
+            iter = gc_info_list.erase(iter);
+            return;
+        }
+    }
+}
+
+void WifiP2pLinkedInfo::ClearClientInfo()
+{
+    gc_info_list.clear();
+}
+
+const std::vector<GcInfo> &WifiP2pLinkedInfo::GetClientInfoList() const
+{
+    return gc_info_list;
+}
+
 void WifiP2pDevice::SetPrimaryDeviceType(const std::string &setPrimaryDeviceType)
 {
     primaryDeviceType = setPrimaryDeviceType;

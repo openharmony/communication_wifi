@@ -464,6 +464,16 @@ void WifiP2pCEventCallback::OnConfigChanged(OHOS::Wifi::CfgType type, char* data
     }
 }
 
+void WifiP2pCEventCallback::OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info)
+{
+    WIFI_LOGI("%{public}s, received p2p gcJoin event", __func__);
+}
+
+void WifiP2pCEventCallback::OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info)
+{
+    WIFI_LOGI("%{public}s, received p2p gcLeave event", __func__);
+}
+
 OHOS::sptr<OHOS::IRemoteObject> WifiP2pCEventCallback::AsObject()
 {
     return nullptr;

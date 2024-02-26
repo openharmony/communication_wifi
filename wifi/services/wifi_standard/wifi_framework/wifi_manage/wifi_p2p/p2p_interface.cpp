@@ -122,6 +122,11 @@ ErrCode P2pInterface::RemoveGroup()
     return p2pService.RemoveGroup();
 }
 
+ErrCode P2pInterface::RemoveGroupClient(const GcInfo &info)
+{
+    return p2pService.RemoveGroupClient(info);
+}
+
 ErrCode P2pInterface::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     return p2pService.DeleteGroup(group);

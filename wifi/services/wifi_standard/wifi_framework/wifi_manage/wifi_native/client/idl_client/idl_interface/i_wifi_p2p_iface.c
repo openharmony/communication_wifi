@@ -710,6 +710,25 @@ WifiErrorNo P2pRemoveGroup(const char *interface)
     return result;
 }
 
+WifiErrorNo P2pRemoveGroupClient(const char *deviceMac)
+{
+    RpcClient *client = GetP2pRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "P2pRemoveClient");
+    WriteStr(context, deviceMac);
+    WriteEnd(context);
+    if (RpcClientCall(client, "P2pRemoveClient") != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
 WifiErrorNo P2pInvite(int persisitent, const char *peerBssid, const char *goBssid, const char *ifname)
 {
     RpcClient *client = GetP2pRpcClient();

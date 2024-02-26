@@ -129,6 +129,14 @@ public:
     virtual ErrCode RemoveGroup(void) = 0;
 
     /**
+     * @Description Remove a P2P client of current group.
+     *
+     * @param deviceMac - client deviceMac address
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveGroupClient(const GcInfo &info) = 0;
+
+    /**
      * @Description Delete a p2p Group.
      *
      * @param group - WifiP2pGroupInfo object

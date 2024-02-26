@@ -217,6 +217,8 @@ void WifiP2pManager::InitP2pCallback(void)
     mP2pCallback.OnP2pGroupsChangedEvent = std::bind(&WifiP2pManager::DealP2pGroupsChanged, this);
     mP2pCallback.OnP2pActionResultEvent = std::bind(&WifiP2pManager::DealP2pActionResult, this, _1, _2);
     mP2pCallback.OnConfigChangedEvent = std::bind(&WifiP2pManager::DealConfigChanged, this, _1, _2, _3);
+    mP2pCallback.OnP2pGcJoinGroupEvent = std::bind(&WifiP2pManager::DealP2pGcJoinGroup, this, _1);
+    mP2pCallback.OnP2pGcLeaveGroupEvent = std::bind(&WifiP2pManager::DealP2pGcLeaveGroup, this, _1);
     return;
 }
 
@@ -279,6 +281,18 @@ void WifiP2pManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     cbMsg.p2pInfo = info;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     WifiCommonEventHelper::PublishP2pConnStateEvent((int)info.GetConnectState(), "OnP2pConnectStateChanged");
+    WifiP2pGroupInfo group;
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return;
+    }
+    ErrCode errCode = pService->GetCurrentGroup(group);
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get current group info failed!");
+        return;
+    }
+    WriteWifiP2pStateHiSysEvent(group.GetInterface(), (int32_t)info.IsGroupOwner(), (int32_t)info.GetConnectState());
     return;
 }
 
@@ -317,6 +331,24 @@ void WifiP2pManager::DealP2pActionResult(P2pActionCallback action, ErrCode code)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_ACTION_RESULT;
     cbMsg.p2pAction = action;
     cbMsg.msgData = static_cast<int>(code);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiP2pManager::DealP2pGcJoinGroup(const GcInfo &info)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_P2P_GC_JOIN_GROUP;
+    cbMsg.gcInfo = info;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiP2pManager::DealP2pGcLeaveGroup(const GcInfo &info)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP;
+    cbMsg.gcInfo = info;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }

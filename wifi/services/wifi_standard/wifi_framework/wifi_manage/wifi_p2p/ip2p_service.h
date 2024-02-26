@@ -116,6 +116,14 @@ public:
     virtual ErrCode RemoveGroup() = 0;
 
     /**
+     * @Description Remove a P2P client of current group.
+     *
+     * @param deviceMac - client deviceMac address
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveGroupClient(const GcInfo &info) = 0;
+
+    /**
      * @Description - The interface of delete a saved group.
      * @param  group - information of group.
      * @return ErrCode - operation result

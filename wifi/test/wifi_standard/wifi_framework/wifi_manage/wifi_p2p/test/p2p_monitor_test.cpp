@@ -285,9 +285,9 @@ public:
         pP2pMonitor->WpaEventApStaDisconnected(p2pDeviceAddress);
     }
 
-    void WrapMethodWpaEventApStaConnected(const std::string &p2pDeviceAddress)
+    void WrapMethodWpaEventApStaConnected(const std::string &p2pDeviceAddress, const std::string &p2pGroupAddress)
     {
-        pP2pMonitor->WpaEventApStaConnected(p2pDeviceAddress);
+        pP2pMonitor->WpaEventApStaConnected(p2pDeviceAddress, p2pGroupAddress);
     }
 
     void WrapMethodOnConnectSupplicantFailed()

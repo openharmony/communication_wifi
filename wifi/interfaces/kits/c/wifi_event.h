@@ -116,7 +116,10 @@ typedef enum {
     DISC_REASON_WRONG_PWD = 1,
 
     /* The number of router's connection reaches the maximum number limit */
-    DISC_REASON_CONNECTION_FULL = 2
+    DISC_REASON_CONNECTION_FULL = 2,
+
+    /* Connection Rejected */
+    DISC_REASON_CONNECTION_REJECTED = 3
 } DisconnectedReason;
 
 #ifdef __cplusplus

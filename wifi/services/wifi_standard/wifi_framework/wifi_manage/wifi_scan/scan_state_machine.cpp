@@ -48,6 +48,7 @@ ScanStateMachine::ScanStateMachine(int instId)
       runningHwPnoFlag(false),
       remainWaitResultTimer(false),
       runningSwPnoFlag(false),
+      lastScanStartTime(0),
       m_instId(instId)
 {}
 

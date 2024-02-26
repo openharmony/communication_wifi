@@ -19,8 +19,7 @@
 #include "network_status_history_manager.h"
 #include "wifi_logger.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi::NetworkSelection {
 DEFINE_WIFILOG_LABEL("WifiScorerImpl")
 
 constexpr int SUFFICIENT_RSSI_5G = -70;
@@ -222,6 +221,5 @@ SavedNetworkScorer::SavedNetworkScorer(const std::string &scorerName) : Composit
     AddScorer(std::make_shared<RssiLevelBonusScorer>());
     AddScorer(std::make_shared<SecurityBonusScorer>());
     AddScorer(std::make_shared<Network5gBonusScorer>());
-}
 }
 }

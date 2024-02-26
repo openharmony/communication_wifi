@@ -36,6 +36,8 @@ const int BUFFER_SIZE = 4096;
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int WIFI_HDI_MAX_STR_LENGTH = 512;
 constexpr int WIFI_MAX_SCAN_COUNT = 256;
+constexpr int P2P_SUPPLICANT_DISCONNECTED = 0;
+constexpr int P2P_SUPPLICANT_CONNECTED = 1;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(void)
 {
@@ -408,7 +410,7 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCod
     return HdiWpaStaSetCountryCode(countryCode.c_str());
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
+static WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
 {
     char szCountryCode[WIFI_IDL_COUNTRY_CODE_LENGTH + 1] = "";
     if (WIFI_IDL_OPT_OK != HdiWpaStaGetCountryCode(szCountryCode, WIFI_IDL_COUNTRY_CODE_LENGTH)) {
@@ -535,7 +537,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &ne
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
+static WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 {
     int32_t networkId = config.networkId;
     char param[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
@@ -605,9 +607,15 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiSetApWmm(HOSTAPD_CFG_VALUE_ON, id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    HdiReloadApConfigInfo(id);
-    HdiDisableAp(id);
-    HdiEnableAp(id);
+    if (HdiReloadApConfigInfo(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiDisableAp(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiEnableAp(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
     return WIFI_IDL_OPT_OK;
 }
 
@@ -662,12 +670,20 @@ WifiErrorNo WifiHdiWpaClient::ReqDisconnectStaByMac(const std::string &mac, int 
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pStart()
 {
-    return HdiWpaP2pStart();
+    WifiErrorNo ret = HdiWpaP2pStart();
+    if (ret == WIFI_IDL_OPT_OK) {
+        OnEventP2pStateChanged(P2P_SUPPLICANT_CONNECTED);
+    }
+    return ret;
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pStop()
 {
-    return HdiWpaP2pStop();
+    WifiErrorNo ret = HdiWpaP2pStop();
+    if (ret == WIFI_IDL_OPT_OK) {
+        OnEventP2pStateChanged(P2P_SUPPLICANT_DISCONNECTED);
+    }
+    return ret;
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pSetDeviceName(const std::string &name) const
@@ -728,7 +744,6 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
     }
 
     if (callbacks.onConnectSupplicant != nullptr) {
-        cWifiHdiWpaCallback.OnEventStateChanged = OnEventP2pStateChanged;
         cWifiHdiWpaCallback.OnEventDeviceFound = OnEventDeviceFound;
         cWifiHdiWpaCallback.OnEventDeviceLost = OnEventDeviceLost;
         cWifiHdiWpaCallback.OnEventGoNegotiationRequest = OnEventGoNegotiationRequest;

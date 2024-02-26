@@ -41,6 +41,7 @@ void P2pIdleState::GoInState()
 void P2pIdleState::GoOutState()
 {
     WIFI_LOGI("             GoOutState");
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
     const int exceptionTimeOut = 120000;
     p2pStateMachine.MessageExecutedLater(
         static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT), exceptionTimeOut);

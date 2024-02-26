@@ -19,6 +19,7 @@ if (defined(ohos_lite)) {
     sources = [
       "c_adapter/src/wifi_c_device.cpp",
       "c_adapter/src/wifi_c_utils.cpp",
+      "src/network_selection.cpp",
       "src/wifi_device.cpp",
       "src/wifi_device_callback_stub_lite.cpp",
       "src/wifi_device_impl.cpp",
@@ -219,6 +220,7 @@ if (defined(ohos_lite)) {
       "c_adapter/src/wifi_c_hotspot.cpp",
       "c_adapter/src/wifi_c_p2p.cpp",
       "c_adapter/src/wifi_c_utils.cpp",
+      "src/network_selection.cpp",
       "src/wifi_device.cpp",
       "src/wifi_device_callback_stub.cpp",
       "src/wifi_hid2d.cpp",

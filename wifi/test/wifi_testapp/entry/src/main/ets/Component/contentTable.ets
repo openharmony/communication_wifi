@@ -14,420 +14,143 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { TestData , TestApi } from '../entryability/model/testData'
 import prompt from '@system.prompt';
 import ConfigData from '../utils/ConfigData';
 
 const TAG = "[contentTable]"
+
 /**
  *  ContentTable Component Page Of Wifi test
  */
 
-@CustomDialog
-export struct GetProfileConnSateDialog {
-  private hitText: string
-  private getProfileList: [] = [
-    { value : 'A2DP_SOURCE' },
-    { value : 'HANDS_FREE_AUDIO_GATEWAY' },
-    { value : 'HID_HOST' }
-  ]
-  @State currentClick: Number = 1;
-  @Link textValue: string
-  @Link inputValue: string
-  @Link apiItem: TestApi
-  @Link currentIndex: Number
-  @Link changeIndex: Number
-  controller: CustomDialogController
-  cancel: () => void
-  confirm: ( string ) => void
-
-  build() {
-    Column() {
-      Text( this.hitText )
-        .fontSize( 20 )
-        .margin( { top : 10 , bottom : 10 } )
-      Select( this.getProfileList )
-        .selected( this.currentClick )
-        .value( this.getProfileList[ this.currentClick ].value )
-        .font( { size : 20 } )
-        .selectedOptionFont( { size : 20 } )
-        .optionFont( { size : 17 } )
-        .height( 80 )
-        .width( ConfigData.WH_90_100 )
-        .onSelect( ( index: Number ) => {
-          console.log( "Select:" + index )
-          this.currentClick = index
-        } )
-
-      Flex( { justifyContent : FlexAlign.SpaceAround } ) {
-        Button( '取消' )
-          .onClick( () => {
-            this.controller.close()
-            this.cancel()
-          } )
-          .backgroundColor( 0xffffff ).fontColor( Color.Black )
-        Button( '确认' )
-          .onClick( () => {
-            this.inputValue = this.currentClick
-            this.changeIndex = this.currentIndex
-            //TODO: 设备调试时候需要打开
-            if ( true ) {
-              let message = ""
-              message = this.apiItem.api( this.currentClick , this.pairedMac )
-              this.apiItem.result = this.getProfileList[ this.currentClick ].value + "状态:" + message
-              console.log( TAG , "this.apiItem.result:" + this.apiItem.result )
-            } else {
-              let message = ""
-              this.apiItem.result = this.getProfileList[ this.currentClick ].value
-              console.log( TAG , "this.apiItem.result:" + this.apiItem.result )
-            }
-            this.controller.close()
-            this.confirm( this.inputValue )
-          } )
-          .backgroundColor( 0xffffff ).fontColor( Color.Red )
-      }
-      .margin( { bottom : 10 } )
-    }
-  }
-}
-
-@CustomDialog
-export struct SetScanModeDialog {
-  private hitText: string
-  private scanModeList: [] = [
-    { value : 'SCAN_MODE_NONE' },
-    { value : 'CONNECTABLE' },
-    { value : 'GENERAL_DISCOVERABLE' },
-    { value : 'LIMITED_DISCOVERABLE' },
-    { value : 'CONNECTABLE_GENERAL_DISCOVERABLE' },
-    { value : 'CONNECTABLE_LIMITED_DISCOVERABLE' }
-  ]
-  @State currentClick: Number = 4;
-  @Link textValue: string
-  @Link inputValue: string
-  @Link apiItem: TestApi
-  @Link currentIndex: Number
-  @Link changeIndex: Number
-  @State duration: Number = 0
-  controller: CustomDialogController
-  cancel: () => void
-  confirm: ( string ) => void
-
-  build() {
-    Column() {
-      Text( this.hitText )
-        .fontSize( 20 )
-        .margin( { top : 10 , bottom : 10 } )
-      Select( this.scanModeList )
-        .selected( this.currentClick )
-        .value( this.scanModeList[ this.currentClick ].value )
-        .font( { size : 12 } )
-        .selectedOptionFont( { size : 12 } )
-        .optionFont( { size : 12 } )
-        .height( 60 )
-        .width( ConfigData.WH_90_100 )
-        .onSelect( ( index: Number ) => {
-          console.log( TAG , "Select:" + index )
-          this.currentClick = index
-        } )
-      TextInput( {
-        placeholder : '请输入延迟时间' ,
-        text : this.duration.toString() ,
-        type : InputType.Number ,
-      } )
-        .height( 60 ).width( ConfigData.WH_90_100 )
-        .onChange( ( value: string ) => {
-          if ( value == "" ) {
-            this.duration = 0
-          } else {
-            this.duration = parseInt( value ) == nil ? 0 : parseInt( value )
-          }
-        } )
-      Flex( { justifyContent : FlexAlign.SpaceAround } ) {
-        Button( '取消' )
-          .onClick( () => {
-            this.controller.close()
-            this.cancel()
-          } )
-          .backgroundColor( 0xffffff ).fontColor( Color.Black )
-        Button( '确认' )
-          .onClick( () => {
-            this.inputValue = this.currentClick
-            this.changeIndex = this.currentIndex
-            //TODO: 设备调试时候需要打开
-            if ( true ) {
-              let message = {}
-              message = this.apiItem.api( this.currentClick , this.duration )
-              //              this.apiItem.result = message.mod.toString() + message.duration.toString()
-              this.apiItem.result = "类型:" + this.scanModeList[ message.mod ].value + "延迟:" + message.duration.toString()
-              console.log( TAG , "this.apiItem.result:" + this.apiItem.result )
-            } else {
-              let message = ""
-              this.apiItem.result = this.scanModeList[ this.currentClick ].value
-              console.log( TAG , "this.apiItem.result:" + this.apiItem.result )
-            }
-            this.controller.close()
-            this.confirm( this.inputValue )
-          } )
-          .backgroundColor( 0xffffff )
-          .fontColor( Color.Red )
-      }
-      .margin( { bottom : 10 } )
-    }
-  }
-}
-
-@CustomDialog
-export struct InputDialog {
-  private hitText: string
-  @Link textValue: string
-  @Link inputValue: string
-  @Link apiItem: TestApi
-  @Link currentIndex: Number
-  @Link changeIndex: Number
-  controller: CustomDialogController
-  cancel: () => void
-  confirm: ( string ) => void
-
-  build() {
-    Column() {
-      Text( this.hitText )
-        .fontSize( 20 )
-        .margin( { top : 10 , bottom : 10 } )
-      TextInput( { placeholder : '' , text : this.textValue } )
-        .height( 60 )
-        .width( ConfigData.WH_90_100 )
-        .onChange( ( value: string ) => {
-          this.textValue = value
-        } )
-
-      Flex( { justifyContent : FlexAlign.SpaceAround } ) {
-        Button( '取消' )
-          .onClick( () => {
-            this.controller.close()
-            this.cancel()
-          } )
-          .backgroundColor( 0xffffff ).fontColor( Color.Black )
-        Button( '确认' )
-          .onClick( () => {
-            this.inputValue = this.textValue
-            this.changeIndex = this.currentIndex
-            //TODO: 设备调试时候需要打开
-            let message = ""
-            if ( true ) {
-              message = this.apiItem.api( this.textValue )
-              this.apiItem.result = message
-            } else {
-              this.apiItem.result = this.textValue
-            }
-            this.controller.close()
-            this.confirm( this.inputValue )
-          } )
-          .backgroundColor( 0xffffff ).fontColor( Color.Red )
-      }
-      .margin( { bottom : 10 } )
-    }
-  }
-}
-
-/**
- * ContentTable
- */
 @Component
 export struct ContentTable {
-  private testItem: TestData
-  @State currentApiItem: TestApi = {}
+  private testItem!: TestData
+  private currentApiItem!: TestApi
   @State apiItems: TestApi[] = [];
-  @State changeIndex: Number = - 1
+  @State changeIndex: number = - 1
   @State localName: string = 'MyTestDevice'
-  @State currentIndex: Number = 1
-  @StorageLink( 'pairedMac' ) pairedMac: string = "";
-  getProfileConnSateDialog: CustomDialogController = new CustomDialogController({
-    builder : GetProfileConnSateDialog( {
-      hitText : "请设置配置类型" ,
-      cancel : this.onCancel ,
-      confirm : this.onAccept ,
-      textValue : $localName ,
-      inputValue : $localName ,
-      currentIndex : $currentIndex ,
-      apiItem : $currentApiItem ,
-      changeIndex : $changeIndex ,
-    } ) ,
-    cancel : this.onCancel() ,
-    autoCancel : true
-  })
-  setScanModelDialog: CustomDialogController = new CustomDialogController({
-    builder : SetScanModeDialog( {
-      hitText : "请设置扫描模式" ,
-      cancel : this.onCancel ,
-      confirm : this.onAccept ,
-      textValue : $localName ,
-      inputValue : $localName ,
-      currentIndex : $currentIndex ,
-      apiItem : $currentApiItem ,
-      changeIndex : $changeIndex ,
-    } ) ,
-    cancel : this.onCancel() ,
-    autoCancel : true
-  })
-  inputDialog: CustomDialogController = new CustomDialogController({
-    builder : InputDialog( {
-      hitText : "请设置设备名称" ,
-      cancel : this.onCancel ,
-      confirm : this.onAccept ,
-      textValue : $localName ,
-      inputValue : $localName ,
-      currentIndex : $currentIndex ,
-      apiItem : $currentApiItem ,
-      changeIndex : $changeIndex ,
-    } ) ,
-    cancel : this.onCancel() ,
-    autoCancel : true
-  })
+  @State currentIndex: number = 1
+  @StorageLink('pairedMac') pairedMac: string = "";
 
   onCancel() {
-    console.log( TAG , '取消1' )
+    console.log(TAG , '取消1')
   }
 
-  onAccept( text: string ) {
-    console.log( TAG , 'input text:' , text )
+  onAccept(text: string) {
+    console.log(TAG , 'input text:' , text)
   }
 
-  @Builder IngredientItem( apiItem: TestApi , index: Number ) {
+  @Builder IngredientItem(apiItem: TestApi , index: number) {
     Stack() {
       Flex() {
-        Flex( { alignItems : ItemAlign.Center } ) {
-          Image( $r( 'app.media.WLAN' ) )
-            .objectFit( ImageFit.Contain )
-            .autoResize( false )
-            .height( 50 )
-            .width( 40 )
-            .padding( { top : "15vp" } )
+        Flex({ alignItems : ItemAlign.Center }) {
+          Image($r('app.media.WLAN'))
+            .objectFit(ImageFit.Contain)
+            .autoResize(false)
+            .height(50)
+            .width(40)
+            .padding({ top : "15vp" })
         }
-        .layoutWeight( 1 )
-        .padding( { left : 10 } )
+        .layoutWeight(1)
+        .padding({ left : 10 })
 
-        Flex( { direction : FlexDirection.Column , alignItems : ItemAlign.Start } ) {
-          Text( apiItem.name )
-            .fontSize( 17.4 )
-            .fontWeight( FontWeight.Bold )
-            .layoutWeight( 1 )
-            .padding( { left : "10vp" , top : "10vp" } )
-          Text( apiItem.method )
-            .fontSize( 17.4 )
-            .fontWeight( FontWeight.Bold )
-            .layoutWeight( 1 )
-            .padding( { left : "10vp" , top : "5vp" } )
+        Flex({ direction : FlexDirection.Column , alignItems : ItemAlign.Start }) {
+          Text(apiItem.name)
+            .fontSize(17.4)
+            .fontWeight(FontWeight.Bold)
+            .layoutWeight(1)
+            .padding({ left : "10vp" , top : "10vp" })
+          Text(apiItem.method)
+            .fontSize(17.4)
+            .fontWeight(FontWeight.Bold)
+            .layoutWeight(1)
+            .padding({ left : "10vp" , top : "5vp" })
         }
-        .layoutWeight( 6 )
-        .width( ConfigData.WH_80_100 )
+        .layoutWeight(6)
+        .width(ConfigData.WH_80_100)
 
-        Flex( { alignItems : ItemAlign.Center } ) {
-          Text( this.changeIndex >= 0 ? this.getCurrentState( index ) : apiItem.result )
-            .fontSize( 17.4 )
-            .flexGrow( 1 )
-            .padding( { top : "15vp" } )
+        Flex({ alignItems : ItemAlign.Center }) {
+          Text(this.changeIndex >= 0 ? this.getCurrentState(index) : apiItem.result)
+            .fontSize(17.4)
+            .flexGrow(1)
+            .padding({ top : "15vp" })
         }
-        .layoutWeight( 3 )
-        .padding( { left : 25 } )
+        .layoutWeight(3)
+        .padding({ left : 25 })
       }
     }
-    .height( 80 )
-    .borderRadius( 10 )
-    .margin( { top : 5 , bottom : 5 } )
-    .backgroundColor( $r( "app.color.white" ) )
-    .onClick( () => {
+    .height(80)
+    .borderRadius(10)
+    .margin({ top : 5 , bottom : 5 })
+    .backgroundColor($r("app.color.white"))
+    .onClick(() => {
       switch ( apiItem.method ) {
-        case "setDeviceName": {
-          this.currentApiItem = apiItem;
-          this.currentIndex += 1;
-          this.inputDialog.open();
-        }
-          break;
-        case "setScanMode": {
-          this.currentApiItem = apiItem;
-          this.currentIndex += 1;
-          this.setScanModelDialog.open();
-        }
-          break;
         case "pairDevice": {
-          let message = apiItem.api( this.pairedMac );
+          let message: string = apiItem.api!(this.pairedMac);
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast( { message : message } );
+          prompt.showToast({ message : message });
         }
           break;
         case "unpairDevice": {
-          let message = apiItem.api( this.pairedMac );
+          let message: string = apiItem.api!(this.pairedMac);
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast( { message : message } );
+          prompt.showToast({ message : message });
         }
           break;
         case "getDeviceName": {
-          let message = apiItem.api( this.pairedMac );
+          let message: string = apiItem.api!(this.pairedMac);
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast( { message : message } );
+          prompt.showToast({ message : message });
         }
           break;
         case "getDeviceType": {
-          let message = apiItem.api( this.pairedMac );
+          let message: string = apiItem.api!(this.pairedMac);
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast( { message : message } );
-        }
-          break;
-        case "getProfileConnState": {
-          this.currentApiItem = apiItem;
-          this.currentIndex += 1;
-          this.getProfileConnSateDialog.open();
-        }
-          break;
-        case "getDeviceState": {
-          this.currentApiItem = apiItem;
-          this.currentIndex += 1;
-          this.getProfileConnSateDialog.open();
+          prompt.showToast({ message : message });
         }
           break;
         default: {
-          let message = apiItem.api();
+          let message: string = apiItem.api!();
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast( { message : message } );
+          prompt.showToast({ message : message });
         }
           break;
       }
-    } )
+    })
   }
 
-  getCurrentState( index: Number ) {
+  getCurrentState(index: number) {
     return this.apiItems[ index ].result
   }
 
   build() {
     Column() {
       Scroll() {
-        Flex( {
+        Flex({
           direction : FlexDirection.Column ,
           justifyContent : FlexAlign.SpaceBetween ,
           alignItems : ItemAlign.Start
-        } ) {
-          ForEach( this.apiItems , ( item: TestApi , index: Number ) => {
-            this.IngredientItem( item , index )
-          } )
+        }) {
+          ForEach(this.apiItems , (item: TestApi , index: number) => {
+            this.IngredientItem(item , index)
+          })
         }
       }
-      .scrollBarWidth( 20 )
+      .scrollBarWidth(20)
     }
-    .height( ConfigData.WH_60_100 )
-    .padding( { top : 5 , right : 10 , left : 10 } )
+    .height(ConfigData.WH_60_100)
+    .padding({ top : 5 , right : 10 , left : 10 })
   }
 }

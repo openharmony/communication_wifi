@@ -181,6 +181,7 @@ enum class P2P_ERROR_CODE {
 
 enum class P2P_CHR_EVENT {
     CONN_CNT = 0,
+    CONN_SUC_CNT,
     MAGICLINK_CNT,
     P2P_SUC_2G4_CNT,
     P2P_SUC_5G_CNT

@@ -217,9 +217,9 @@ void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason)
 {
     Json::Value root;
     Json::FastWriter writer;
-    root["PACKAGE_NAME"] = pkgName;
+    root["PKG_NAME"] = pkgName;
     root["FAIL_REASON"] = failReason;
-    WriteEvent("WIFI_SCAN", "EVENT_NAME", "WIFI_SCAN_API_FAIL", "EVENT_VALUE", writer.write(root));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFISCANCONTROL_TRIGGER_API_FAIL", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi
 }  // namespace OHOS

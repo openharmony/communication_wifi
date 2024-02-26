@@ -261,6 +261,11 @@ ErrCode ScanService::Scan(bool externFlag)
         if (rlt != WIFI_OPT_SUCCESS) {
             return rlt;
         }
+    } else {
+        if (!AllowScanByHid2dState()) {
+            WIFI_LOGW("internal scan not allow by hid2d state");
+            return WIFI_OPT_FAILED;
+        }
     }
 
     ScanConfig scanConfig;

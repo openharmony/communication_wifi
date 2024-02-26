@@ -73,19 +73,6 @@ bool WifiAuthCenter::IsNativeProcess()
 }
 #endif
 
-int WifiAuthCenter::InitPermission(const int &pid, const int &uid)
-{
-    return WifiPermissionHelper::InitPermission(pid, uid);
-}
-
-int WifiAuthCenter::ChangePermission(const std::map<std::string, int> &permissions, const int &pid, const int &uid)
-{
-    if (g_permissinAlwaysGrant) {
-        return PERMISSION_GRANTED;
-    }
-    return WifiPermissionHelper::ChangePermission(permissions, pid, uid);
-}
-
 int WifiAuthCenter::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {
     if (g_permissinAlwaysGrant) {

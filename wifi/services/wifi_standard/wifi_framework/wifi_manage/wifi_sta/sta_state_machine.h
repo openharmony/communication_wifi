@@ -359,6 +359,12 @@ public:
          *
          */
         static void StopRenewTimeout();
+
+        /**
+         * @Description : deal renew timeout
+         *
+         */
+        static void DealRenewTimeout();
 #endif
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
@@ -435,7 +441,7 @@ public:
      *
      * @param reason - the state of wifi assoc
      */
-    void OnNetworkAssocEvent(int assocState);
+    void OnNetworkAssocEvent(int assocState, std::string bssid, StaStateMachine *pStaStateMachine);
     /**
      * @Description  Bssid change events
      *
@@ -501,11 +507,7 @@ public:
      * @Description : Deal renewal timeout.
      *
      */
-#ifndef OHOS_ARCH_LITE
-    void DealRenewalTimeout();
-#else
     void DealRenewalTimeout(InternalMessage *msg);
-#endif
 
     /**
      * @Description  start browser to login portal
@@ -658,9 +660,9 @@ private:
      */
     void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
 
-    void NetDetectionProcess(StaNetState netState, const std::string portalUrl);
+    void RegisterWifiDetection();
 
-    void NetStateObserverCallback(SystemNetWorkState netState);
+    void NetStateObserverCallback(SystemNetWorkState netState, std::string url);
     /**
      * @Description  the process of handling arp check results.
      *
@@ -810,6 +812,14 @@ private:
      * @param networkId - network id[in]
      */
     bool SetRandomMac(int networkId);
+
+    /**
+     * @Description  check whether the current bssid are consistent.
+     *
+     * @param bssid - bssid
+     */
+    bool CheckRoamingBssidIsSame(std::string bssid);
+
     /**
      * @Description  Generate a random MAC address.
      *
@@ -935,8 +945,7 @@ private:
     WifiLinkedInfo lastLinkedInfo;
     DhcpResultNotify *pDhcpResultNotify;
     ClientCallBack clientCallBack;
-    StaNetworkCheck *pNetcheck;
-
+    WifiPortalConf mUrlInfo;
     RootState *pRootState;
     InitState *pInitState;
     WpaStartingState *pWpaStartingState; /* Starting wpa_supplicant state. */
@@ -950,7 +959,6 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-    SystemNetWorkState m_netState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];

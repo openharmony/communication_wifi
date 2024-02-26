@@ -38,6 +38,10 @@ constexpr const char *SETTINGS_DATASHARE_KEY_AIRPLANE_MODE = "settings.telephony
 constexpr const char *SETTINGS_DATASHARE_KEY_LOCATION_MODE = "location_switch_enable";
 
 #ifndef OHOS_ARCH_LITE
+constexpr const char *SETTINGS_DATASHARE_URI_CLONE_DATA =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=WifiBackupData";
+constexpr const char *SETTINGS_DATASHARE_KEY_CLONE_DATA = "WifiBackupData";
+
 constexpr const char *SETTINGS_DATASHARE_URI_WIFI_ON =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=wifi_on";
 constexpr const char *SETTINGS_DATASHARE_KEY_WIFI_ON = "wifi_on";

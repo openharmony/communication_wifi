@@ -125,7 +125,10 @@ enum class DisconnectedReason {
     DISC_REASON_WRONG_PWD = 1,
 
     /* The number of router's connection reaches the maximum number limit */
-    DISC_REASON_CONNECTION_FULL = 2
+    DISC_REASON_CONNECTION_FULL = 2,
+
+    /* Connection Rejected */
+    DISC_REASON_CONNECTION_REJECTED = 3
 };
 
 enum class WifiOperateType {
@@ -537,6 +540,7 @@ struct WifiDeviceConfig {
     std::string callProcessName;
     std::string ancoCallProcessName;
     std::string internetSelfCureHistory;
+    int isReassocSelfCureWithFactoryMacAddress;
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -566,6 +570,7 @@ struct WifiDeviceConfig {
         callProcessName = "";
         ancoCallProcessName = "";
         internetSelfCureHistory = "";
+        isReassocSelfCureWithFactoryMacAddress = 0;
     }
 };
 

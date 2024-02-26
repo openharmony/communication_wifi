@@ -70,7 +70,7 @@ HWTEST_F(WifiNetObserverTest, GetCellNetStateTest, TestSize.Level1)
 {
     WIFI_LOGI("GetCellNetState enter!");
     SystemNetWorkState netState = NetStateObserver::GetInstance().GetCellNetState();
-    EXPECT_EQ(true, netState <= NETWORK_CELL_NOWORK);
+    EXPECT_EQ(true, netState <= NETWORK_IS_PORTAL);
 }
 
 

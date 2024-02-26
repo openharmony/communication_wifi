@@ -220,9 +220,17 @@ int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *
     WifiIdlEvent event;
     if (strncmp(apCbParm->content, "AP-ENABLED", strlen("AP-ENABLED")) == 0) {
         event = WIFI_IDL_CBK_CMD_AP_ENABLE;
-    } else if (strncmp(apCbParm->content, "AP-DISABLED", strlen("AP-DISABLED")) == 0 ||
-               strncmp(apCbParm->content, "CRTL-EVENT-TERMINATING", strlen("CRTL-EVENT-TERMINATING")) == 0) {
+    } else if (strncmp(apCbParm->content, "AP-DISABLE", strlen("AP-DISABLE")) == 0) {
         event = WIFI_IDL_CBK_CMD_AP_DISABLE;
+        if (GetExecDisable() == EXEC_DISABLE) {
+            SetExecDisable(0);
+            return 0;
+        }
+    } else if (strncmp(apCbParm->content, "CTRL-EVENT-TERMINATING", strlen("CTRL-EVENT-TERMINATING")) == 0) {
+        event = WIFI_IDL_CBK_CMD_AP_DISABLE;
+    } else if (strncmp(apCbParm->content, "AP-STA-POSSIBLE-PSK-MISMATCH ",
+        strlen("AP-STA-POSSIBLE-PSK-MISMATCH ")) == 0) {
+        event = WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT;
     } else {
         return 1;
     }
@@ -235,20 +243,12 @@ int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *
     return 0;
 }
 
-int32_t OnEventP2pStateChanged(struct IWpaCallback *self,
-    const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
+int32_t OnEventP2pStateChanged(int status)
 {
-    LOGI("OnEventP2pStateChanged ifName=%{public}s", ifName);
-    if (strcmp(ifName, "p2p0") != 0) {
-        return 1;
-    }
-    if (statechangedParam == NULL) {
-        LOGE("OnEventStateChanged: invalid parameter!");
-        return 1;
-    }
+    LOGI("OnEventP2pStateChanged %{public}d", status);
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onConnectSupplicant) {
-        cbk.onConnectSupplicant(statechangedParam->status);
+        cbk.onConnectSupplicant(status);
     }
     return 0;
 }
@@ -331,7 +331,7 @@ int32_t OnEventGoNegotiationRequest(struct IWpaCallback *self,
 int32_t OnEventGoNegotiationCompleted(struct IWpaCallback *self,
     const struct HdiP2pGoNegotiationCompletedParam *goNegotiationCompletedParam, const char* ifName)
 {
-    LOGI("OnEventGoNegotiationRequest");
+    LOGI("OnEventGoNegotiationCompleted");
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onGoNegotiationSuccess) {
         cbk.onGoNegotiationSuccess();

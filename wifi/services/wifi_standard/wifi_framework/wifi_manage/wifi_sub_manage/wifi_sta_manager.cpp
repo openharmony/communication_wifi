@@ -85,9 +85,6 @@ void WifiStaManager::CloseStaService(int instId)
 {
     WIFI_LOGI("close sta service");
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
-#ifdef FEATURE_SELF_CURE_SUPPORT
-    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
-#endif
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
     auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaClose(instId);
@@ -103,6 +100,9 @@ void WifiStaManager::CloseStaService(int instId)
     if (p2pState == WifiOprMidState::RUNNING) {
         WifiManager::GetInstance().GetWifiP2pManager()->AutoStopP2pService();
     }
+#endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
 #endif
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {

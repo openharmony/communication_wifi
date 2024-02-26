@@ -92,7 +92,7 @@ ErrCode WifiDataShareHelperUtils::Insert(Uri &uri, const std::string &key, const
     valuesBucket.Put(SETTINGS_DATA_COLUMN_KEYWORD, keyObj);
     valuesBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
     int result = insertHelper->Insert(uri, valuesBucket);
-    if (result != DataShare::DATA_SHARE_NO_ERROR) {
+    if (result <= 0) {
         WIFI_LOGE("WifiDataShareHelper insert failed, resultCode=%{public}d", result);
         return WIFI_OPT_FAILED;
     }
@@ -113,7 +113,7 @@ ErrCode WifiDataShareHelperUtils::Update(Uri &uri, const std::string &key, const
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
     int result = updateHelper->Update(uri, predicates, valuesBucket);
-    if (result != DataShare::DATA_SHARE_NO_ERROR) {
+    if (result <= 0) {
         WIFI_LOGE("WifiDataShareHelper update failed, resultCode=%{public}d", result);
         return WIFI_OPT_FAILED;
     }

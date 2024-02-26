@@ -65,6 +65,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define NETWORK 1
 #define NO_NETWORK 0
 #define WPA_DEFAULT_NETWORKID 0
+#define SELF_CURE_FAC_MAC_REASSOC 2
+#define SELF_CURE_RAND_MAC_REASSOC 3
 
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
@@ -82,9 +84,9 @@ StaStateMachine::StaStateMachine(int instId)
       enableSignalPoll(true),
       isRoam(false),
       netNoWorkNum(0),
+      portalFlag(false),
       networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr),
-      pNetcheck(nullptr),
       pRootState(nullptr),
       pInitState(nullptr),
       pWpaStartingState(nullptr),
@@ -98,7 +100,6 @@ StaStateMachine::StaStateMachine(int instId)
       pGetIpState(nullptr),
       pLinkedState(nullptr),
       pApRoamingState(nullptr),
-      m_netState(NETWORK_UNKNOWN),
       m_instId(instId)
 {
 }
@@ -127,7 +128,6 @@ StaStateMachine::~StaStateMachine()
         StopDhcpClient(ifname.c_str(), true);
     }
     ParsePointer(pDhcpResultNotify);
-    ParsePointer(pNetcheck);
 }
 
 /* ---------------------------Initialization functions------------------------------ */
@@ -146,21 +146,12 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-    pNetcheck = new (std::nothrow)
-        StaNetworkCheck(std::bind(&StaStateMachine::NetDetectionProcess, this,
-            std::placeholders::_1, std::placeholders::_2),
-            std::bind(&StaStateMachine::HandleArpCheckResult, this, std::placeholders::_1),
-            std::bind(&StaStateMachine::HandleDnsCheckResult, this, std::placeholders::_1), m_instId);
-    if (pNetcheck == nullptr) {
-        WIFI_LOGE("pNetcheck is null\n");
-        return WIFI_OPT_FAILED;
-    }
-    pNetcheck->InitNetCheckThread();
+    WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
 #ifndef OHOS_ARCH_LITE
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
     m_NetWorkState->SetNetStateCallback(
-        std::bind(&StaStateMachine::NetStateObserverCallback, this, std::placeholders::_1));
+        std::bind(&StaStateMachine::NetStateObserverCallback, this, std::placeholders::_1, std::placeholders::_2));
 #endif
     return WIFI_OPT_SUCCESS;
 }
@@ -547,12 +538,12 @@ void StaStateMachine::StartWifiProcess()
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");
         WifiNetAgent::GetInstance().OnStaMachineWifiStart();
-        m_NetWorkState->StartNetStateObserver();
 #endif
         /* Initialize Connection Information. */
         InitWifiLinkedInfo();
         InitLastWifiLinkedInfo();
         WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+        WifiSettings::GetInstance().ReloadDeviceConfig();
 #ifndef OHOS_ARCH_LITE
         ChipCapability::GetInstance().InitializeChipCapability();
 #endif
@@ -819,9 +810,7 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     staSmHandleFuncMap[CMD_START_NETCHECK] = &StaStateMachine::DealNetworkCheck;
     staSmHandleFuncMap[CMD_START_GET_DHCP_IP_TIMEOUT] = &StaStateMachine::DealGetDhcpIpTimeout;
-#ifdef OHOS_ARCH_LITE
     staSmHandleFuncMap[CMD_START_RENEWAL_TIMEOUT] = &StaStateMachine::DealRenewalTimeout;
-#endif
     staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = &StaStateMachine::DealScreenStateChangedEvent;
     staSmHandleFuncMap[CMD_AP_ROAMING_TIMEOUT_CHECK] = &StaStateMachine::DealApRoamingStateTimeout;
     return WIFI_OPT_SUCCESS;
@@ -990,8 +979,13 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
         linkedInfo.retryedConnCount = 0;
     }
     WriteWifiConnectionInfoHiSysEvent(networkId);
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("GetDeviceConfig failed!");
+        return;
+    }
     if (networkId == linkedInfo.networkId) {
-        if (linkedInfo.connState == ConnState::CONNECTED) {
+        if (linkedInfo.connState == ConnState::CONNECTED && config.isReassocSelfCureWithFactoryMacAddress == 0) {
             InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
             WIFI_LOGI("This network is in use and does not need to be reconnected.\n");
             return;
@@ -1046,13 +1040,32 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
     WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
 }
 
+bool StaStateMachine::CheckRoamingBssidIsSame(std::string bssid)
+{
+    WifiLinkedInfo linkedInfo;
+    GetLinkedInfo(linkedInfo);
+    WIFI_LOGI("CheckRoamingBssidIsSame bssid = %{public}s linkedinfo.bssid = %{public}s connState = %{public}d",
+              MacAnonymize(bssid).c_str(), MacAnonymize(linkedInfo.bssid).c_str(), linkedInfo.connState);
+    /* P2P affects STA, causing problems or incorrect data updates */
+    if ((linkedInfo.connState == ConnState::CONNECTED) &&
+        (linkedInfo.bssid != bssid) && (!IsRoaming())) {
+        WIFI_LOGE("Sta ignored the event for bssid is mismatch, isRoam:%{public}d.", IsRoaming());
+        return true;
+    }
+
+    return false;
+}
+
 void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("DealConnectionEvent, msg is nullptr.\n");
         return;
     }
-
+    if (CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+        WIFI_LOGE("DealConnectionEvent inconsistent bssid in connecter");
+        return;
+    }
     WIFI_LOGI("enter DealConnectionEvent");
     WifiSettings::GetInstance().SetDeviceAfterConnect(targetNetworkId);
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
@@ -1098,6 +1111,10 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
         WIFI_LOGE("wpsState is INVALID\n");
         return;
     }
+    if (CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+        WIFI_LOGE("DealDisconnectEvent inconsistent bssid in connecter");
+        return;
+    }
 #ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = false;
@@ -1113,7 +1130,6 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #else
     StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
 #endif
-    pNetcheck->StopNetCheckThread();
     std::string ifname = IF_NAME + std::to_string(m_instId);
     if (currentTpType == IPTYPE_IPV4) {
         StopDhcpClient(ifname.c_str(), false);
@@ -1185,7 +1201,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
     } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT) {
         WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
-        SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
+        SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_REJECTED);
         SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
@@ -1472,6 +1488,19 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
 
 ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string & bssid)
 {
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("GetDeviceConfig failed!");
+        return WIFI_OPT_FAILED;
+    }
+    if (config.isReassocSelfCureWithFactoryMacAddress == SELF_CURE_FAC_MAC_REASSOC) {
+        config.wifiPrivacySetting = WifiPrivacyConfig::DEVICEMAC;
+    } else if (config.isReassocSelfCureWithFactoryMacAddress == SELF_CURE_RAND_MAC_REASSOC) {
+        config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+    }
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId);
     WifiDeviceConfig deviceConfig;
@@ -1705,14 +1734,14 @@ bool StaStateMachine::SetRandomMac(int networkId)
             std::string macAddress;
             WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
             randomMacInfo.randomMac = macAddress;
-            LOGD("%{public}s: generate a random mac, randomMac:%{private}s, ssid:%{private}s, peerbssid:%{private}s",
-                __func__, randomMacInfo.randomMac.c_str(), randomMacInfo.ssid.c_str(),
-                randomMacInfo.peerBssid.c_str());
+            LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                MacAnonymize(randomMacInfo.peerBssid).c_str());
             WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
         } else {
-            LOGD("%{public}s: randomMac:%{private}s, ssid:%{private}s, peerbssid:%{private}s",
-                __func__, randomMacInfo.randomMac.c_str(), randomMacInfo.ssid.c_str(),
-                randomMacInfo.peerBssid.c_str());
+            LOGI("%{public}s: randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                MacAnonymize(randomMacInfo.peerBssid).c_str());
         }
         currentMac = randomMacInfo.randomMac;
     }
@@ -1722,7 +1751,8 @@ bool StaStateMachine::SetRandomMac(int networkId)
         return false;
     }
 
-    LOGD("%{public}s, currentMac:%{private}s, lastMac:%{private}s", __func__, currentMac.c_str(), lastMac.c_str());
+    LOGI("%{public}s, currentMac:%{public}s, lastMac:%{public}s",
+        __func__, MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {
@@ -1778,8 +1808,12 @@ void StaStateMachine::OnNetworkDisconnectEvent(int reason)
     WriteWifiAbnormalDisconnectHiSysEvent(reason);
 }
 
-void StaStateMachine::OnNetworkAssocEvent(int assocState)
+void StaStateMachine::OnNetworkAssocEvent(int assocState, std::string bssid, StaStateMachine *pStaStateMachine)
 {
+    if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
+        WIFI_LOGE("OnNetworkAssocEvent inconsistent bssid in connecter");
+        return;
+    }
     if (assocState == WPA_CB_ASSOCIATING) {
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
     } else {
@@ -1884,8 +1918,13 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
     WIFI_LOGI("SeparatedState-msgCode=%{public}d received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
+        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT: {
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("SeparatedState inconsistent bssid in connecter");
+                return false;
+            }
             break;
+        }
 
         case WIFI_SVR_CMD_STA_ENABLE_WIFI: {
             ret = EXECUTED;
@@ -1943,6 +1982,10 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             ret = EXECUTED;
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("ApLinkedState inconsistent bssid in connecter");
+                return false;
+            }
             pStaStateMachine->StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
             WIFI_LOGI("Stop clearing wpa block list");
             /* Save linkedinfo */
@@ -2037,6 +2080,10 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             ret = EXECUTED;
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("StaWpsState inconsistent bssid in connecter");
+                return false;
+            }
             /* Stop clearing the Wpa_blocklist. */
             pStaStateMachine->StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
 
@@ -2374,17 +2421,10 @@ void StaStateMachine::HandlePortalNetworkPorcess()
 #endif
 }
 
-void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState)
+void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std::string url)
 {
-    WIFI_LOGI("NetStateObserverCallback is %{public}d\n", netState);
-    m_netState = netState;
-    if (netState == NETWORK_CELL_NOWORK) {
-        WifiLinkedInfo linkedInfo;
-        GetLinkedInfo(linkedInfo);
-        if (linkedInfo.detailedState == DetailedState::CAPTIVE_PORTAL_CHECK && portalFlag == false) {
-            SendMessage(WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT, NETWORK_CHECK_PORTAL, 0, mPortalUrl);
-        }
-    }
+    WIFI_LOGD("NetStateObserverCallback is %{public}d url:%{public}s\n", netState, url.c_str());
+    SendMessage(WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT, netState, 0, url);
 }
 
 
@@ -2434,9 +2474,11 @@ void StaStateMachine::HandleNetCheckResult(StaNetState netState, const std::stri
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET);
     }
 }
-void StaStateMachine::NetDetectionProcess(StaNetState netState, const std::string portalUrl)
+void StaStateMachine::RegisterWifiDetection()
 {
-    SendMessage(WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT, netState, 0, portalUrl);
+#ifndef OHOS_ARCH_LITE
+    m_NetWorkState->StartNetStateObserver();
+#endif
 }
 
 void StaStateMachine::HandleArpCheckResult(StaArpState arpState)
@@ -2458,7 +2500,7 @@ StaStateMachine::LinkedState::~LinkedState()
 void StaStateMachine::LinkedState::GoInState()
 {
     WIFI_LOGI("LinkedState GoInState function.");
-
+    pStaStateMachine->RegisterWifiDetection();
     return;
 }
 
@@ -2570,6 +2612,10 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT event.");
             ret = EXECUTED;
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("ApRoamingState inconsistent bssid in connecter");
+                return false;
+            }
             pStaStateMachine->isRoam = true;
             pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
@@ -2592,11 +2638,16 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
             }
             break;
         }
-        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
+        case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT: {
             WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT event.");
+            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+                WIFI_LOGE("ApRoamingState inconsistent bssid in connecter");
+                return false;
+            }
             pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
             pStaStateMachine->DisConnectProcess();
             break;
+        }
         default:
             WIFI_LOGI("ApRoamingState-msgCode=%d not handled.", msg->GetMessageName());
             break;
@@ -2754,16 +2805,9 @@ void StaStateMachine::DealNetworkCheck(InternalMessage *msg)
         LOGE("InternalMessage msg is null.");
         return;
     }
-
-    if (pNetcheck == nullptr) {
-        LOGE("pNetcheck is null.");
-        return;
-    }
-    if (linkedInfo.connState != ConnState::CONNECTED) {
-        WIFI_LOGE("DealNetworkCheck NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
-        return;
-    }
-    pNetcheck->SignalNetCheckThread();
+#ifndef OHOS_ARCH_LITE
+    m_NetWorkState->StartWifiDetection();
+#endif
 }
 
 void StaStateMachine::DealGetDhcpIpTimeout(InternalMessage *msg)
@@ -2789,13 +2833,11 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessage *msg)
     if (screenState == MODE_STATE_OPEN) {
         enableSignalPoll = true;
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
-        pNetcheck->NetWorkCheckSetScreenState(MODE_STATE_OPEN);
     }
 
     if (screenState == MODE_STATE_CLOSE) {
         enableSignalPoll = false;
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-        pNetcheck->NetWorkCheckSetScreenState(MODE_STATE_CLOSE);
     }
 
     return;
@@ -2896,11 +2938,20 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
 }
 
 #ifndef OHOS_ARCH_LITE
+
+void StaStateMachine::DhcpResultNotify::DealRenewTimeout(void)
+{
+    WIFI_LOGI("DealRenewTimeout start");
+    StaStateMachine::DhcpResultNotify::StopRenewTimeout();
+    pStaStateMachine->SendMessage(CMD_START_RENEWAL_TIMEOUT);
+
+    return;
+}
+
 static void RenewTimeOutCallback(void)
 {
     WIFI_LOGI("RenewTimeOutCallback start");
-    StaStateMachine staStateMachine;
-    staStateMachine.DealRenewalTimeout();
+    StaStateMachine::DhcpResultNotify::DealRenewTimeout();
 
     return;
 }
@@ -3063,10 +3114,9 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
             OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
         WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
         /* Delay to wait for the network adapter information to take effect. */
-        constexpr int NETCHECK_DELAY_TIME = 2000; // 2000 ms
         pStaStateMachine->portalFlag = false;
         pStaStateMachine->netNoWorkNum = 0;
-        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), NETCHECK_DELAY_TIME);
+        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
         pStaStateMachine->DealSetStaConnectFailedCount(0, true);
     }
     pStaStateMachine->getIpSucNum++;
@@ -3146,7 +3196,6 @@ void StaStateMachine::OnNetManagerRestart(void)
     if (state != static_cast<int>(WifiState::ENABLED)) {
         return;
     }
-    m_NetWorkState->StartNetStateObserver();
     WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo, m_instId);
 }
 
@@ -3203,25 +3252,20 @@ void StaStateMachine::DhcpResultNotify::StopRenewTimeout()
     return;
 }
 
-void StaStateMachine::DealRenewalTimeout()
-{
-    WIFI_LOGI("DealRenewalTimeout start");
-    StaStateMachine::DhcpResultNotify::StopRenewTimeout();
-    StaStateMachine staStateMachine;
-    staStateMachine.StartDhcpRenewal(); // start renewal
-}
-#else
+#endif
+
 void StaStateMachine::DealRenewalTimeout(InternalMessage *msg)
 {
+#ifdef OHOS_ARCH_LITE
     if (msg == nullptr) {
         LOGE("DealRenewalTimeout InternalMessage msg is null.");
         return;
     }
     LOGI("StopTimer CMD_START_RENEWAL_TIMEOUT DealRenewalTimeout");
     StopTimer(static_cast<int>(CMD_START_RENEWAL_TIMEOUT));
+#endif
     StartDhcpRenewal(); // start renewal
 }
-#endif
 
 void StaStateMachine::StartDhcpRenewal()
 {

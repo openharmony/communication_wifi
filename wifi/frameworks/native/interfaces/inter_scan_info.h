@@ -109,6 +109,9 @@ struct InterScanInfo {
             case WifiSecurity::OWE:
                 mgmt = "OWE";
                 break;
+            case WifiSecurity::WEP:
+                mgmt = "WEP";
+                break;
             default:
                 mgmt = "NONE";
                 break;

@@ -435,7 +435,7 @@ ErrCode ProcessProxyConfig(const napi_env& env, const napi_value& object, WifiDe
             WIFI_LOGE("ProcessProxyConfig, proxyConfig is null.");
             return ret;
         }
-        
+
         int proxyConfigMethod = static_cast<int>(ConfigureProxyMethod::CLOSED);
         JsObjectToInt(env, proxyConfig, "proxyMethod", proxyConfigMethod);
         cppConfig.wifiProxyconfig.configureMethod = ConfigureProxyMethod::CLOSED;
@@ -1180,6 +1180,36 @@ static void IpConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, 
     }
 }
 
+static void ProxyConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDeviceConfig, napi_value& result)
+{
+    napi_value proxyCfgObj;
+    napi_create_object(env, &proxyCfgObj);
+    SetValueInt32(env, "proxyMethod", static_cast<int>(wifiDeviceConfig.wifiProxyconfig.configureMethod), proxyCfgObj);
+    switch (wifiDeviceConfig.wifiProxyconfig.configureMethod) {
+        case ConfigureProxyMethod::CLOSED:
+            WIFI_LOGI("%{public}s get config method closed", __FUNCTION__);
+            break;
+        case ConfigureProxyMethod::AUTOCONFIGUE:
+            SetValueUtf8String(env, "preSharedKey",
+                wifiDeviceConfig.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str(), proxyCfgObj);
+            break;
+        case ConfigureProxyMethod::MANUALCONFIGUE:
+            SetValueUtf8String(env, "serverHostName",
+                wifiDeviceConfig.wifiProxyconfig.manualProxyConfig.serverHostName.c_str(), proxyCfgObj);
+            SetValueInt32(env, "serverPort",
+                wifiDeviceConfig.wifiProxyconfig.manualProxyConfig.serverPort, proxyCfgObj);
+            SetValueUtf8String(env, "exclusionObjects",
+                wifiDeviceConfig.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str(), proxyCfgObj);
+            break;
+        default:
+            break;
+    }
+    napi_status status = napi_set_named_property(env, result, "proxyConfig", proxyCfgObj);
+    if (status != napi_ok) {
+        WIFI_LOGE("%{public}s set proxy config failed!", __FUNCTION__);
+    }
+}
+
 static void UpdateSecurityTypeAndPreSharedKey(WifiDeviceConfig& cppConfig)
 {
     if (cppConfig.keyMgmt != KEY_MGMT_NONE) {
@@ -1225,6 +1255,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     if (status != napi_ok) {
         WIFI_LOGE("Set staticIp field!");
     }
+    ProxyConfigToJs(env, vecDeviceConfigs[idx], result);
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
         WIFI_LOGE("Wifi napi set element error: %{public}d", status);

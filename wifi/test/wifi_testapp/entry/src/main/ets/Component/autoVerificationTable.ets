@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { TestData , TestApi } from '../entryability/model/testData'
 import prompt from '@system.prompt';
 import ConfigData from '../utils/ConfigData';
@@ -24,88 +22,87 @@ import ConfigData from '../utils/ConfigData';
 
 @Component
 export struct AutoVerificationTable {
-  private testItem: TestData
-  @State currentApiItem: TestApi = {}
+  private testItem!: TestData
   @State apiItems: TestApi[] = [];
-  @State changeIndex: Number = - 1
+  @State changeIndex: number = - 1
   @State localName: string = 'DaYuBlue'
-  @State currentIndex: Number = 1
-  @StorageLink( 'pairedMac' ) pairedMac: string = "";
+  @State currentIndex: number = 1
+  @StorageLink('pairedMac') pairedMac: string = "";
 
-  @Builder IngredientItem( apiItem: TestApi , index: Number ) {
+  @Builder IngredientItem(apiItem: TestApi , index: number) {
     Stack() {
       Flex() {
-        Flex( { alignItems : ItemAlign.Center } ) {
-          Image( $r( 'app.media.wifi' ) )
-            .objectFit( ImageFit.Contain )
-            .autoResize( false )
-            .height( 30 )
-            .width( 30 )
+        Flex({ alignItems : ItemAlign.Center }) {
+          Image($r('app.media.wifi'))
+            .objectFit(ImageFit.Contain)
+            .autoResize(false)
+            .height(30)
+            .width(30)
         }
-        .layoutWeight( 1 )
-        .padding( { left : 10 } )
+        .layoutWeight(1)
+        .padding({ left : 10 })
 
-        Flex( { direction : FlexDirection.Column , alignItems : ItemAlign.Start } ) {
-          Text( apiItem.name )
-            .fontSize( 17.4 )
-            .fontWeight( FontWeight.Bold )
-            .layoutWeight( 1 )
-            .padding( { left : 10 , top : 15 } )
-          Text( apiItem.detail )
-            .fontSize( 17.4 )
-            .fontWeight( FontWeight.Bold )
-            .layoutWeight( 1 )
-            .padding( { left : 10 , top : 5 } )
+        Flex({ direction : FlexDirection.Column , alignItems : ItemAlign.Start }) {
+          Text(apiItem.name)
+            .fontSize(17.4)
+            .fontWeight(FontWeight.Bold)
+            .layoutWeight(1)
+            .padding({ left : 10 , top : 15 })
+          Text(apiItem.detail)
+            .fontSize(17.4)
+            .fontWeight(FontWeight.Bold)
+            .layoutWeight(1)
+            .padding({ left : 10 , top : 5 })
         }
-        .layoutWeight( 6 )
+        .layoutWeight(6)
 
-        Flex( { alignItems : ItemAlign.Center } ) {
-          Text( this.changeIndex >= 0 ? this.getCurrentState( index ) : apiItem.result )
-            .fontSize( 17.4 )
-            .flexGrow( 1 )
+        Flex({ alignItems : ItemAlign.Center }) {
+          Text(this.changeIndex >= 0 ? this.getCurrentState(index) : apiItem.result)
+            .fontSize(17.4)
+            .flexGrow(1)
         }
-        .layoutWeight( 3 )
-        .padding( { left : 10 } )
+        .layoutWeight(3)
+        .padding({ left : 10 })
       }
     }
-    .height( 80 )
-    .borderRadius( 10 )
-    .margin( { top : 5 , bottom : 5 } )
-    .backgroundColor( $r( "app.color.white" ) )
-    .onClick( () => {
+    .height(80)
+    .borderRadius(10)
+    .margin({ top : 5 , bottom : 5 })
+    .backgroundColor($r("app.color.white"))
+    .onClick(() => {
       switch ( apiItem.method ) {
         default: {
           let message = apiItem.api();
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast( { message : message } );
+          prompt.showToast({ message : message });
         }
           break;
       }
-    } )
+    })
   }
 
-  getCurrentState( index: Number ) {
-    return this.apiItems[index].result
+  getCurrentState(index: number) {
+    return this.apiItems[ index ].result
   }
 
   build() {
     Column() {
       Scroll() {
-        Flex( {
+        Flex({
           direction : FlexDirection.Column ,
           justifyContent : FlexAlign.SpaceBetween ,
           alignItems : ItemAlign.Start
-        } ) {
-          ForEach( this.apiItems , ( item: TestApi , index: Number ) => {
-            this.IngredientItem( item , index )
-          } )
+        }) {
+          ForEach(this.apiItems , (item: TestApi , index: number) => {
+            this.IngredientItem(item , index)
+          })
         }
       }
-      .scrollBarWidth( 20 )
+      .scrollBarWidth(20)
     }
-    .height( ConfigData.WH_88_100 )
-    .padding( { top : 5 , right : 10 , left : 10 } )
+    .height(ConfigData.WH_88_100)
+    .padding({ top : 5 , right : 10 , left : 10 })
   }
 }

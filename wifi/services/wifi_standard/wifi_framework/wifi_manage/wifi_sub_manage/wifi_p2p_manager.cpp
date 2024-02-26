@@ -21,6 +21,8 @@
 #include "wifi_logger.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_system_timer.h"
+#include "wifi_hisysevent.h"
+#include "p2p_define.h"
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
@@ -279,6 +281,9 @@ void WifiP2pManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     cbMsg.p2pInfo = info;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     WifiCommonEventHelper::PublishP2pConnStateEvent((int)info.GetConnectState(), "OnP2pConnectStateChanged");
+    if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
+        WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_SUC_CNT));
+    }
     return;
 }
 

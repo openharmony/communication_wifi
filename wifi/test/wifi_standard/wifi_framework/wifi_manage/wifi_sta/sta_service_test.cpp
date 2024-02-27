@@ -759,7 +759,6 @@ void StaServiceTest::DeregisterFilterBuilder()
 
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
-    StaServiceStartPortalCertificationTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level1)

@@ -126,9 +126,9 @@ const std::string &WifiP2pDevice::GetGroupAddress() const
 void WifiP2pLinkedInfo::AddClientInfoList(const std::string &mac, const std::string &ip, const std::string &host)
 {
     GcInfo gc_info;
-    gc_info->mac = mac;
-    gc_info->ip = ip;
-    gc_info->host = host;
+    gc_info.mac = mac;
+    gc_info.ip = ip;
+    gc_info.host = host;
     gc_info_list.push_back(gc_info);
 }
 

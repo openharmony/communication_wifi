@@ -716,10 +716,10 @@ WifiErrorNo P2pRemoveGroupClient(const char *deviceMac)
     LockRpcClient(client);
     Context *context = client->context;
     WriteBegin(context, 0);
-    WriteFunc(context, "P2pRemoveClient");
+    WriteFunc(context, "P2pRemoveGroupClient");
     WriteStr(context, deviceMac);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pRemoveClient") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "P2pRemoveGroupClient") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;

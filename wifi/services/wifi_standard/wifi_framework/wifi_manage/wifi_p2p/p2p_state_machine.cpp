@@ -32,12 +32,14 @@
 #include "wifi_p2p_upnp_service_response.h"
 #include "wifi_settings.h"
 #include "wifi_hisysevent.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
 namespace OHOS {
 namespace Wifi {
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
+std::mutex P2pStateMachine::m_gcJoinmutex;
 
 DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
 P2pStateMachine::P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &groupMgr,
@@ -481,7 +483,6 @@ void P2pStateMachine::BroadcastP2pGcJoinGroup(GcInfo &info) const
             callBackItem.second.OnP2pGcJoinGroupEvent(info);
         }
     }
-    WifiBroadCastHelper::Send("P2pGcJoinGroup", info);
 }
 
 void P2pStateMachine::BroadcastP2pGcLeaveGroup(WifiP2pDevice &device) const
@@ -500,7 +501,6 @@ void P2pStateMachine::BroadcastP2pGcLeaveGroup(WifiP2pDevice &device) const
             callBackItem.second.OnP2pGcLeaveGroupEvent(curGcInfo);
         }
     }
-    WifiBroadCastHelper::Send("P2pGcLeaveGroup", curGcInfo);
 }
 
 void P2pStateMachine::BroadcastPersistentGroupsChanged() const

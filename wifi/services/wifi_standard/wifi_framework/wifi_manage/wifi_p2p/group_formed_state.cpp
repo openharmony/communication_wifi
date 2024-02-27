@@ -171,19 +171,19 @@ bool GroupFormedState::ProcessCmdRemoveGroupClient(const InternalMessage &msg) c
     if (!msg.GetMessageObj(info)) {
         return EXECUTED;
     }
-    std::string deviceMac;
+    std::string deviceMac = info.mac;
     WifiP2pGroupInfo currentGroup = groupManager.GetCurrentGroup();
-    for(auto client : currentGroup.clientDevices) {
-        if (info.mac == clientDevices.devAddr) {
-            deviceMac = clientDevices.devAddr;
+    for (auto client : currentGroup.GetClientDevices()) {
+        if (info.mac == client.GetDeviceAddress()) {
+            deviceMac = client.GetDeviceAddress();
             break;
         }
-        if (info.host == clientDevices.deviceName) {
-            deviceMac = clientDevices.devAddr;
+        if (info.host == client.GetDeviceName()) {
+            deviceMac = client.GetDeviceAddress();
             break;
         }
     }
-    if (WifiP2PHalInterface::GetInstance().GroupClientRemove(info)) {
+    if (WifiP2PHalInterface::GetInstance().GroupClientRemove(deviceMac)) {
         WIFI_LOGE("p2p remove client failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroupClient, WIFI_OPT_FAILED);
     } else {

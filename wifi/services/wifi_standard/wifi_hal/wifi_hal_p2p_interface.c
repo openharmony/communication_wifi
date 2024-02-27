@@ -744,13 +744,13 @@ WifiErrorNo P2pRemoveGroup(const char *interface)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pRemoveClient(const char *deviceMac)
+WifiErrorNo P2pRemoveGroupClient(const char *deviceMac)
 {
     if (deviceMac == NULL) {
-        LOGE("P2pRemoveClient, deviceMac is NULL");
+        LOGE("P2pRemoveGroupClient, deviceMac is NULL");
         return WIFI_HAL_FAILED;
     }
-    LOGD("P2pRemoveClient");
+    LOGD("P2pRemoveGroupClient");
     WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
     if (pMainIfc == NULL) {
         return WIFI_HAL_SUPPLICANT_NOT_INIT;

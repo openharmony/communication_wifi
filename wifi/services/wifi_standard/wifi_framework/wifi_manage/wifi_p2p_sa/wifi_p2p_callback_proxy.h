@@ -93,6 +93,20 @@ public:
      */
     void OnConfigChanged(CfgType type, char* cfgData, int dataLen) override;
 
+    /**
+     * @Description The go dhcp server send ack to gc event.
+     *
+     * @param info - WifiP2pLinkedInfo object
+     */
+    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info) override;
+
+    /**
+     * @Description The go dhcp server send ack to gc event.
+     *
+     * @param info - WifiP2pLinkedInfo object
+     */
+    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override;
+
 private:
     void WriteWifiP2pDeviceData(MessageParcel &data, const WifiP2pDevice &device);
 

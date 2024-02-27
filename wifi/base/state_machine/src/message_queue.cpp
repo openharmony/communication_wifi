@@ -26,12 +26,12 @@ namespace OHOS {
 namespace Wifi {
 MessageQueue::MessageQueue() : pMessageQueue(nullptr), mIsBlocked(false), mNeedQuit(false)
 {
-    LOGI("MessageQueue::MessageQueue");
+    LOGI("MessageQueue");
 }
 
 MessageQueue::~MessageQueue()
 {
-    LOGI("MessageQueue::~MessageQueue");
+    LOGI("~MessageQueue");
     /* Releasing Messages in a Queue */
     std::unique_lock<std::mutex> lock(mMtxQueue);
     InternalMessage *current = pMessageQueue;
@@ -51,7 +51,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
         return false;
     }
 
-    LOGD("MessageQueue::AddMessageToQueue, msg: %{public}d, timestamp:%" PRId64 "\n",
+    LOGD("AddMessageToQueue, msg: %{public}d, timestamp:%" PRId64 "\n",
         message->GetMessageName(), handleTime);
 
     if (mNeedQuit) {
@@ -105,7 +105,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
 
 bool MessageQueue::DeleteMessageFromQueue(int messageName)
 {
-    LOGI("MessageQueue::DeleteMessageFromQueue");
+    LOGI("DeleteMessageFromQueue");
     std::unique_lock<std::mutex> lck(mMtxQueue);
     InternalMessage *pTop = pMessageQueue;
     if (pTop == nullptr) {
@@ -133,7 +133,7 @@ bool MessageQueue::DeleteMessageFromQueue(int messageName)
 
 InternalMessage *MessageQueue::GetNextMessage()
 {
-    LOGD("MessageQueue::GetNextMessage");
+    LOGD("GetNextMessage");
     int nextBlockTime = 0;
 
     while (!mNeedQuit) {

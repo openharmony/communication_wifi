@@ -1316,7 +1316,7 @@ ErrCode ScanService::AllowExternScan()
 #else
 ErrCode ScanService::AllowExternScan()
 {
-    WIFI_LOGI("Enter ScanService::AllowExternScan.\n");
+    WIFI_LOGI("Enter AllowExternScan.\n");
     int staScene = GetStaScene();
     ScanMode scanMode = WifiSettings::GetInstance().GetAppRunningState();
     WIFI_LOGI("AllowExternScan, staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
@@ -1586,7 +1586,7 @@ bool ScanService::IsMovingFreezeScaned() const
 
 ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
 {
-    LOGI("Enter ScanService::ApplyTrustListPolicy.");
+    LOGI("Enter ApplyTrustListPolicy.");
     ErrCode policyResult = WIFI_OPT_SUCCESS;
 
     SetScanTrustMode();

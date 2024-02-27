@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Wifi {
 void WifiDeviceDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
 {
-    WIFI_LOGW("WifiDeviceDeathRecipient::OnRemoteDied!");
+    WIFI_LOGW("OnRemoteDied!");
     WifiInternalEventDispatcher::GetInstance().RemoveStaCallback(remoteObject.promote());
 }
 }  // namespace Wifi

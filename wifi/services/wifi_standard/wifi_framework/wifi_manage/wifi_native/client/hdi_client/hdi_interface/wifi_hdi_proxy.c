@@ -71,7 +71,7 @@ static struct HdfFeatureInfo* GetFeatureInner(const int32_t wlanType)
             continue;
         }
         if (g_featureArray[i]->type == wlanType) {
-            LOGI("%{public}s: get an exist feature, wlanType:%{public}d", __func__, wlanType);
+            LOGD("%{public}s: get an exist feature, wlanType:%{public}d", __func__, wlanType);
             feature = g_featureArray[i];
             return feature;
         }

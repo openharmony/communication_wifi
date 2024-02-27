@@ -288,7 +288,7 @@ StateMachineHandler::StateMachineHandler(StateMachine *pStateMgr)
 
 StateMachineHandler::~StateMachineHandler()
 {
-    LOGI("StateMachineHandler::~StateMachineHandler");
+    LOGI("~StateMachineHandler");
     StopHandlerThread();
     ReleaseDelayedMessages();
     ClearWhenQuit();

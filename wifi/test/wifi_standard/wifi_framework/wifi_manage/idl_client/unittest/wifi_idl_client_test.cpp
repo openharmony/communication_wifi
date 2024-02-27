@@ -1589,9 +1589,9 @@ HWTEST_F(WifiIdlClientTest, ReqP2pGetChba0FreqTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqIsSupportDbdcTest, TestSize.Level1)
 {
     bool isSupport = true;
-    mClient.ReqIsSupportDbdc(&isSupport);
+    mClient.ReqIsSupportDbdc(isSupport);
     MockWifiPublic::SetMockFlag(true);
-    mClient.ReqIsSupportDbdc(&isSupport);
+    mClient.ReqIsSupportDbdc(isSupport);
     MockWifiPublic::SetMockFlag(false);
 }
 }  // namespace Wifi

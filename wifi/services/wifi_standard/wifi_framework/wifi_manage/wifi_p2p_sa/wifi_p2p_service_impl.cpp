@@ -482,7 +482,7 @@ ErrCode WifiP2pServiceImpl::RemoveGroupClient(const GcInfo &info)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->RemoveGroupClient(deviceMac);
+    return pService->RemoveGroupClient(info);
 }
 
 ErrCode WifiP2pServiceImpl::DeleteGroup(const WifiP2pGroupInfo &group)

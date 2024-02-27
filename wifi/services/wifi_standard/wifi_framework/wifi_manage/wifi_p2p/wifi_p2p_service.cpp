@@ -138,14 +138,10 @@ ErrCode WifiP2pService::RemoveGroup()
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiP2pService::RemoveGroupClient(const GcInfo &info)
+ErrCode WifiP2pService::RemoveGroupClient(const GcInfo &gcInfo)
 {
     WIFI_LOGI("RemoveGroupClient");
-    if (deviceMac.empty()) {
-        WIFI_LOGW("deviceMac is null");
-        return WIFI_OPT_INVALID_PARAM;
-    }
-    const std::any info = info;
+    const std::any info = gcInfo;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP_CLIENT), info);
     return ErrCode::WIFI_OPT_SUCCESS;
 }

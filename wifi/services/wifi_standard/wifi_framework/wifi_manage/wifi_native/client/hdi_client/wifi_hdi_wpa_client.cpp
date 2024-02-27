@@ -744,6 +744,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
     }
 
     if (callbacks.onConnectSupplicant != nullptr) {
+        cWifiHdiWpaCallback.OnEventStateChanged = OnEventP2pStateChanged;
         cWifiHdiWpaCallback.OnEventDeviceFound = OnEventDeviceFound;
         cWifiHdiWpaCallback.OnEventDeviceLost = OnEventDeviceLost;
         cWifiHdiWpaCallback.OnEventGoNegotiationRequest = OnEventGoNegotiationRequest;

@@ -254,8 +254,9 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbStaConnectStateTest, TestSize.Level1)
 {
     int state = STATUS_MSG;
     char p2pDeviceAddress[] = "wifibssid";
-    P2pHalCbStaConnectState(NULL, state);
-    P2pHalCbStaConnectState(p2pDeviceAddress, state);
+    char p2pDeviceAddress[] = "wifiinterface";
+    P2pHalCbStaConnectState(NULL, NULL, state);
+    P2pHalCbStaConnectState(p2pDeviceAddress, p2pDeviceAddress, state);
 }
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbServDiscReqTest, TestSize.Level1)

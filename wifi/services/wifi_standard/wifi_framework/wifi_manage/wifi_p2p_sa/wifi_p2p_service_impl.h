@@ -142,7 +142,7 @@ public:
      * @param deviceMac - client deviceMac address
      * @return ErrCode - operation result
      */
-    ErrCode GroupRemoveClient(const std::string &deviceMac) override;
+    ErrCode RemoveGroupClient(const GcInfo &info) override;
 
     /**
      * @Description Delete a p2p Group

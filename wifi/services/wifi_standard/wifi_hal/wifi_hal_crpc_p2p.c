@@ -274,7 +274,7 @@ int RpcP2pRemoveClient(RpcServer *server, Context *context)
     if (ReadStr(context, deviceMac, sizeof(deviceMac)) != 0) {
         return HAL_FAILURE;
     }
-    WifiErrorNo err = P2pRemoveClient(deviceMac);
+    WifiErrorNo err = P2pRemoveGroupClient(deviceMac);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);

@@ -89,7 +89,7 @@ private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
     std::mutex cesEventMutex;
-    bool isCesEventSubscribered;
+    bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
 #ifdef HAS_POWERMGR_PART
     std::mutex powerStateEventMutex;

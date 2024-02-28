@@ -768,7 +768,7 @@ HWTEST_F(P2pMonitorTest, WpaEventApStaDisconnected, TestSize.Level1)
 
 HWTEST_F(P2pMonitorTest, WpaEventApStaConnected, TestSize.Level1)
 {
-    WrapMethodWpaEventApStaConnected("ff:ff:ff:ff:ff:ff");
+    WrapMethodWpaEventApStaConnected("ff:ff:ff:ff:ff:ff", "ff:ff:ff:ff:ff:ff");
 }
 
 HWTEST_F(P2pMonitorTest, OnConnectSupplicantFailed, TestSize.Level1)

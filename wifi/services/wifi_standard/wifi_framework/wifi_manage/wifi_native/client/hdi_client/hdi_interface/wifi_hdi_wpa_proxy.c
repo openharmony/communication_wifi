@@ -42,6 +42,11 @@
 #define CFGNAME_LEN 30
 #define WIFI_MULTI_CMD_MAX_LEN 1024
 #define EXEC_DISABLE 1
+
+#if (AP_NUM > 1)
+#define WIFI_5G_CFG "hostapd_0.conf"
+#define WIFI_2G_CFG "hostapd_1.conf"
+#else
 #define WPA_HOSTAPD_NAME "hostapd"
 #define AP_IFNAME "wlan0"
 #define AP_IFNAME_COEX "wlan1"
@@ -49,11 +54,7 @@
 #define WIFI_COEX_CFG "hostapd_coex.conf"
 #define HOSTAPD_DEFAULT_CFG CONFIG_ROOT_DIR"wap_supplicant"WIFI_DEFAULT_CFG
 #define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOT_DIR"wap_supplicant"WIFI_COEX_CFG
-static char g_hostapdCfg[CTRL_LEN] = {0};
-static char g_apIfaceName[IFACENAME_LEN] = {0};
-static char g_apCfgName[CFGNAME_LEN] = {0};
-static int g_id;
-static int g_execDisable;
+#endif
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -63,9 +64,15 @@ static struct HDIDeviceManager *g_devMgr = NULL;
 
 const char *HDI_AP_SERVICE_NAME = "hostapd_interface_service";
 static pthread_mutex_t g_apObjMutex = PTHREAD_MUTEX_INITIALIZER;
-static unsigned int g_apRefCount = 0x0;
 static struct IHostapdInterface *g_apObj = NULL;
 static struct HDIDeviceManager *g_apDevMgr = NULL;
+static char g_hostapdCfg[CTRL_LEN] = {0};
+static char g_apIfaceName[IFACENAME_LEN] = {0};
+static char g_apCfgName[CFGNAME_LEN] = {0};
+static int g_id;
+static int g_execDisable;
+static int g_apIsRunning;
+
 struct IfaceNameInfo {
     char ifName[BUFF_SIZE];
     struct IfaceNameInfo* next;
@@ -428,18 +435,24 @@ void HdiWpaResetGlobalObj()
 {
     g_wpaStartSucceed = 0;
     g_wpaObj = NULL;
-    g_devMgr = NULL;
+    g_apDevMgr = NULL;
     LOGE("%{public}s reset wpa g_wpaObj", __func__);
     HdiWpaStart();
 }
 
 void HdiApResetGlobalObj()
 {
-    g_apRefCount = 0;
+    LOGI("%{public}s try reset ap", __func__);
+    pthread_mutex_lock(&g_apObjMutex);
+    if (!g_apIsRunning) {
+        LOGE("%{public}s ap is not running", __func__);
+        pthread_mutex_unlock(&g_apObjMutex);
+        return;
+    }
     g_apObj = NULL;
     g_apDevMgr = NULL;
-    LOGE("%{public}s reset ap g_apObj", __func__);
     HdiApStart(g_id, g_apIfaceName);
+    pthread_mutex_unlock(&g_apObjMutex);
 }
 
 static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
@@ -484,21 +497,21 @@ WifiErrorNo RegistHdfApDeathCallBack()
 
 WifiErrorNo GetApInstance()
 {
-    g_devMgr = HDIDeviceManagerGet();
-    if (g_devMgr == NULL) {
+    g_apDevMgr = HDIDeviceManagerGet();
+    if (g_apDevMgr == NULL) {
         LOGE("%{public}s HDIDeviceManagerGet failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
 
-    if (g_devMgr->LoadDevice(g_devMgr, HDI_AP_SERVICE_NAME) != HDF_SUCCESS) {
-        g_devMgr = NULL;
+    if (g_apDevMgr->LoadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME) != HDF_SUCCESS) {
+        g_apDevMgr = NULL;
         LOGE("%{public}s LoadDevice failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
     g_apObj = IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, false);
     if (g_apObj == NULL) {
-        g_devMgr->UnloadDevice(g_devMgr, HDI_AP_SERVICE_NAME);
-        g_devMgr = NULL;
+        g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
+        g_apDevMgr = NULL;
         LOGE("%{public}s HostapdInterfaceGetInstance failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
@@ -512,8 +525,8 @@ int32_t ret = g_apObj->StartApWithCmd(g_apObj, ifaceName, id);
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);
         IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
         g_apObj = NULL;
-        g_devMgr->UnloadDevice(g_devMgr, HDI_AP_SERVICE_NAME);
-        g_devMgr = NULL;
+        g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
+        g_apDevMgr = NULL;
         return WIFI_IDL_OPT_FAILED;
     }
     return WIFI_IDL_OPT_OK;
@@ -523,61 +536,46 @@ WifiErrorNo HdiApStart(int id, char *ifaceName)
 {
     LOGI("HdiApStart start...");
     pthread_mutex_lock(&g_apObjMutex);
-    if (g_apRefCount != 0 && g_apObj != NULL && g_devMgr != NULL) {
-        ++g_apRefCount;
-        pthread_mutex_unlock(&g_apObjMutex);
-        LOGI("%{public}s ap ref count: %{public}d", __func__, g_apRefCount);
-        return WIFI_IDL_OPT_OK;
-    } else {
-        g_apRefCount = 0x0;
-    }
 
     g_id = id;
     WifiErrorNo result = WIFI_IDL_OPT_FAILED;
-    result = CopyConfigFile(g_apCfgName);
-    if (result != WIFI_IDL_OPT_OK) {
-        LOGE("HdiApStart: CopyConfigFile failed.");
-        pthread_mutex_unlock(&g_apObjMutex);
-        return result;
-    }
-
-    result = GetApInstance();
-    if (result != WIFI_IDL_OPT_OK) {
-        pthread_mutex_unlock(&g_apObjMutex);
-        return result;
-    }
-
-    result = StartAp(id, ifaceName);
-    if (result != WIFI_IDL_OPT_OK) {
-        pthread_mutex_unlock(&g_apObjMutex);
-        return result;
-    }
-
-    ++g_apRefCount;
-    RegistHdfApDeathCallBack();
+    do {
+#if (AP_NUM > 1)
+        result = CopyConfigFile(WIFI_5G_CFG);
+        if (result != WIFI_IDL_OPT_OK) {
+            break;
+        }
+        result = CopyConfigFile(WIFI_2G_CFG);
+#else
+        result = CopyConfigFile(g_apCfgName);
+#endif
+        if (result != WIFI_IDL_OPT_OK) {
+            break;
+        }
+            result = GetApInstance();
+        if (result != WIFI_IDL_OPT_OK) {
+            break;
+        }
+        result = StartAp(id, ifaceName);
+        if (result != WIFI_IDL_OPT_OK) {
+            break;
+        }
+        result = RegistHdfApDeathCallBack();
+        if (result != WIFI_IDL_OPT_OK) {
+            break;
+        }
+        g_apIsRunning = true;
+        LOGI("HdiApStart is started");
+    } while (0);
     pthread_mutex_unlock(&g_apObjMutex);
-    LOGI("HdiApStart is started");
-    return WIFI_IDL_OPT_OK;
+    return result;
 }
 
 WifiErrorNo HdiApStop(int id)
 {
     LOGI("HdiApStop stop...");
     pthread_mutex_lock(&g_apObjMutex);
-    if (g_apObj == NULL || g_apRefCount == 0) {
-        g_apRefCount = 0x0;
-        pthread_mutex_unlock(&g_apObjMutex);
-        LOGE("%{public}s g_apObj is NULL or ref count is 0", __func__);
-        return WIFI_IDL_OPT_FAILED;
-    }
 
-    const unsigned int ONE_REF_COUNT = 1;
-    if (g_apRefCount > ONE_REF_COUNT) {
-        --g_apRefCount;
-        pthread_mutex_unlock(&g_apObjMutex);
-        LOGI("%{public}s wlan ref count: %d", __func__, g_apRefCount);
-        return WIFI_IDL_OPT_OK;
-    }
     int32_t ret;
     ret = g_apObj->DisableAp(g_apObj, g_apIfaceName, id);
     ret = g_apObj->StopAp(g_apObj);
@@ -585,10 +583,10 @@ WifiErrorNo HdiApStop(int id)
         LOGE("%{public}s Stop failed: %{public}d", __func__, ret);
     }
     IWpaInterfaceReleaseInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
-    g_apRefCount = 0;
     g_apObj = NULL;
     g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
     g_apDevMgr = NULL;
+    g_apIsRunning = false;
     pthread_mutex_unlock(&g_apObjMutex);
     LOGI("HdiApStop is stopped");
     return (ret == HDF_SUCCESS) ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;

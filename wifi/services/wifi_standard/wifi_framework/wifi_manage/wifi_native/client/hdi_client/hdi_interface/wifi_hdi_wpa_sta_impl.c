@@ -574,7 +574,11 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->OnEventAssociateReject = callback->OnEventAssociateReject;
     g_hdiWpaStaCallbackObj->OnEventWpsOverlap = callback->OnEventWpsOverlap;
     g_hdiWpaStaCallbackObj->OnEventWpsTimeout = callback->OnEventWpsTimeout;
+#ifdef HDI_INTERFACE_SUPPORT
+    g_hdiWpaStaCallbackObj->OnEventScanResult = NULL;
+#else
     g_hdiWpaStaCallbackObj->OnEventScanResult = callback->OnEventScanResult;
+#endif
     g_hdiWpaStaCallbackObj->GetVersion = NULL;
     g_hdiWpaStaCallbackObj->AsObject = NULL;
 

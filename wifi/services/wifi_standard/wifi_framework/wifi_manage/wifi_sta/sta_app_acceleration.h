@@ -71,9 +71,7 @@ private:
     void StopAllAppAcceleration();
 
 private:
-#ifdef FEATURE_STA_SUPPORT
     StaServiceCallback m_staCallback;
-#endif
     bool gameBoostingFlag;
     std::map<int, int> mBgLimitRecordMap;
 };

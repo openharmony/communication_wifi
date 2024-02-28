@@ -751,6 +751,7 @@ static char **ReadRoamBlockList(Context *context, int size)
         }
         if (ReadStr(context, list[i], len) != 0) {
             free(list[i]);
+            list[i] = NULL;
             return NULL;
         }
     }

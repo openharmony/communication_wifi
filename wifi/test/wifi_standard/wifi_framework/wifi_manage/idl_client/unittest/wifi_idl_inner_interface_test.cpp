@@ -170,7 +170,7 @@ static void OnStaDeauthorizedMock(const std::string &address)
     LOGI("OnStaDeauthorizedMock");
 }
 
-static void OnStaAuthorizedMock(const std::string &address)
+static void OnStaAuthorizedMock(const std::string &devAddress, const std::string &groupAddress)
 {
     LOGI("OnStaAuthorizedMock");
 }
@@ -744,14 +744,15 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pStaDeauthorizedTest, TestSize.Level1)
 {
     LOGI("OnP2pStaDeauthorizedTest enter");
     char *p2pDeviceAddress = nullptr;
+    char *p2pGroupAddress = nullptr;
     OnP2pStaDeauthorized(p2pDeviceAddress);
-    OnP2pStaAuthorized(p2pDeviceAddress);
+    OnP2pStaAuthorized(p2pGroupAddress);
     char p2pDeviceAdd[] = "AA:BB:CC:DD:EE:FF";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pStaDeauthorized(p2pDeviceAdd);
-    OnP2pStaAuthorized(p2pDeviceAdd);
+    OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAddress);
     UnRegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pStaDeauthorized(p2pDeviceAdd);

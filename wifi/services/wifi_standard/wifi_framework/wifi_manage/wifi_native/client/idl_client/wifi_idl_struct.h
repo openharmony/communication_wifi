@@ -67,7 +67,7 @@ struct WifiIdlEapConfig {
     std::string realm;                      /* The field of passport credentials */
     std::string plmn;                       /* PLMN */
     int eapSubId;                           /* Sub ID of SIM card */
-    WifiIdlEapConfig() : phase2Method(0), eapSubId(-1)
+    WifiIdlEapConfig() : phase2Method(0), password{0}, certPassword{0}, eapSubId(-1)
     {}
 
     ~WifiIdlEapConfig()

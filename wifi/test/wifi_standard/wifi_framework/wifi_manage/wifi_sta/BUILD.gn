@@ -153,6 +153,9 @@ ohos_unittest("wifi_sta_unittest") {
     "netstack:http_client",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "ability_runtime:app_manager",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
   ]
   defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   part_name = "wifi"

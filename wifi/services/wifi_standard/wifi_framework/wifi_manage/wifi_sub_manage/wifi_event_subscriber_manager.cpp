@@ -564,7 +564,7 @@ void WifiEventSubscriberManager::RegisterPowerStateListener()
 
     bool ret = powerManagerClient.RegisterSyncSleepCallback(powerStateListener_, SleepPriority::HIGH);
     if (!ret) {
-        delete powerStateListener_;
+        powerStateListener_ = nullptr;
         WIFI_LOGE("RegisterPowerStateListener, register power state callback failed");
     } else {
         WIFI_LOGI("RegisterPowerStateListener OK!");
@@ -588,7 +588,7 @@ void WifiEventSubscriberManager::UnRegisterPowerStateListener()
     } else {
         WIFI_LOGI("UnRegisterPowerStateListener OK!");
     }
-    delete powerStateListener_;
+    powerStateListener_ = nullptr;
     isPowerStateListenerSubscribered = false;
 }
 #endif

@@ -746,17 +746,18 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pStaDeauthorizedTest, TestSize.Level1)
     char *p2pDeviceAddress = nullptr;
     char *p2pGroupAddress = nullptr;
     OnP2pStaDeauthorized(p2pDeviceAddress);
-    OnP2pStaAuthorized(p2pGroupAddress);
+    OnP2pStaAuthorized(p2pDeviceAddress, p2pGroupAddress);
     char p2pDeviceAdd[] = "AA:BB:CC:DD:EE:FF";
+    char p2pGroupAdd[] = "AA:BB:CC:DD:EE:FF";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pStaDeauthorized(p2pDeviceAdd);
-    OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAddress);
+    OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAdd);
     UnRegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pStaDeauthorized(p2pDeviceAdd);
-    OnP2pStaAuthorized(p2pDeviceAdd);
+    OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAdd);
 }
 /**
  * @tc.name: OnP2pConnectSupplicantFailedTest

@@ -855,7 +855,10 @@ WifiErrorNo WifiIdlClient::ReqSetBgLimitIdList(std::vector<int> idList, int size
 {
     CHECK_CLIENT_NOT_NULL;
     int idArray[size];
-    memcpy_s(idArray, sizeof(idArray), idList.data(), size);
+    if (memcpy_s(idArray, sizeof(idArray), idList.data(), size) != EOK) {
+        LOGE("convert data failed.");
+        return WIFI_IDL_OPT_FAILED;
+    }
     return SetBgLimitIdList(idArray, size, type);
 }
 

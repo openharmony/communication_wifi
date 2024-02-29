@@ -37,7 +37,7 @@ public:
     ErrCode InitAppStateAware();
     void RegisterAppStateObserver();
     void OnForegroundAppChanged(const std::string &bundleName, int uid, int pid,
-        const int state, const int m_instId = 0);
+        const int state, const int mInstId = 0);
     bool IsForegroundApp(std::string &bundleName);
     std::string GetForegroundApp();
 
@@ -58,14 +58,14 @@ public:
      * @param appStateData Application state data.
      */
     void OnAppStarted(const AppExecFwk::AppStateData &appStateData) override;
-    
+
     /**
      * Will be called when the application stop.
      *
      * @param appStateData Application state data.
      */
     void OnAppStopped(const AppExecFwk::AppStateData &appStateData) override;
-    
+
     /**
      * Application foreground state changed callback.
      *

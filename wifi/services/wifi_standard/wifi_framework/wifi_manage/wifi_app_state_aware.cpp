@@ -89,7 +89,7 @@ void WifiAppStateAware::RegisterAppStateObserver()
 }
 
 void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, int uid, int pid,
-    const int state, const int m_instId)
+    const int state, const int mInstId)
 {
     if (state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND)) {
         foregroundAppBundleName_ = bundleName;
@@ -100,7 +100,7 @@ void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, in
         WIFI_LOGI("state = %{pubilc}d, not handle.", state);
     }
     WifiProtectManager::GetInstance().OnAppForegroudChanged(bundleName, state);
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(mInstId);
     if (pService != nullptr) {
         pService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     }
@@ -128,7 +128,7 @@ void AppStateObserver::OnAppStopped(const AppExecFwk::AppStateData &appStateData
     WIFI_LOGI("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
         __func__, appStateData.bundleName.c_str(), appStateData.uid,
         appStateData.state, appStateData.isFocused);
-    
+
     if (appStateData.bundleName.empty()) {
         WIFI_LOGE("App bundle name is empty");
         return;

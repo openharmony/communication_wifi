@@ -35,7 +35,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr const int WIFI_PROTECT_APP_MAX_COUNT = 100;
-constexpr const char *WIFI_APP_CHANGE_MGR_WORK_THREAD = "WIFI_APP_CHANGE_MGR_WORK_THREAD";
+
 WifiProtectManager::WifiProtectManager()
 {
     mWifiConnected = false;
@@ -48,30 +48,10 @@ WifiProtectManager::WifiProtectManager()
     mFullLowLatencyProtectsAcquired = 0;
     mFullLowLatencyProtectsReleased = 0;
     mWifiProtects.clear();
-#ifndef OHOS_ARCH_LITE
-    appChangeEventHandler = std::make_unique<WifiEventHandler>(WIFI_APP_CHANGE_MGR_WORK_THREAD);
-    if (appChangeEventHandler) {
-        std::function<void()> RegisterAppStateObserverFunc =
-                            std::bind(&WifiProtectManager::RegisterAppStateObserver, this);
-        appChangeEventHandler->PostSyncTask(RegisterAppStateObserverFunc);
-    } else {
-        LOGE("Create event handler failed.");
-    }
-    LOGI("Register app state observer successful.");
-#endif
 }
 
 WifiProtectManager::~WifiProtectManager()
 {
-#ifndef OHOS_ARCH_LITE
-    if (appChangeEventHandler) {
-        appChangeEventHandler.reset();
-    }
-
-    if (mAppStateObserver) {
-        mAppStateObserver = nullptr;
-    }
-#endif
 }
 
 WifiProtectManager &WifiProtectManager::GetInstance()
@@ -451,29 +431,6 @@ int WifiProtectManager::GetFgLowlatyProtectCount()
     return count;
 }
 
-void WifiProtectManager::RegisterAppStateObserver()
-{
-    LOGD("%{public}s called", __func__);
-    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-    mAppStateObserver = sptr<AppStateObserver>(new (std::nothrow) AppStateObserver());
-    int regAppStatusObsRetry = 0;
-    while (appMgrClient->ConnectAppMgrService() != AppExecFwk::AppMgrResultCode::RESULT_OK) {
-        LOGE("ConnectAppMgrService fail, try again! retryTimes=%{public}d", ++regAppStatusObsRetry);
-    }
-    auto systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    mAppObject = iface_cast<AppExecFwk::IAppMgr>(systemAbilityManager->GetSystemAbility(APP_MGR_SERVICE_ID));
-    if (mAppObject) {
-        int ret = mAppObject->RegisterApplicationStateObserver(mAppStateObserver);
-        if (ret == ERR_OK) {
-            LOGI("register application state observer success.");
-            return;
-        }
-        LOGE("register application state observer fail, ret = %{public}d", ret);
-        return;
-    }
-    LOGE("get SystemAbilityManager fail");
-}
-
 void WifiProtectManager::OnAppDied(const std::string bundlename)
 {
     LOGI("Enter %{public}s, remove app bundlename %{public}s.",
@@ -522,39 +479,6 @@ void WifiProtectManager::OnAppForegroudChanged(const std::string &bundleName, in
     }
 }
 
-void AppStateObserver::OnAppStarted(const AppExecFwk::AppStateData &appStateData)
-{
-    LOGD("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
-        __func__, appStateData.bundleName.c_str(), appStateData.uid,
-        appStateData.state, appStateData.isFocused);
-}
-
-void AppStateObserver::OnAppStopped(const AppExecFwk::AppStateData &appStateData)
-{
-    LOGI("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
-        __func__, appStateData.bundleName.c_str(), appStateData.uid,
-        appStateData.state, appStateData.isFocused);
-
-    if (appStateData.bundleName.empty()) {
-        LOGE("App bundle name is empty");
-        return;
-    }
-    WifiProtectManager::GetInstance().OnAppDied(appStateData.bundleName);
-    return;
-}
-
-void AppStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData)
-{
-    LOGI("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
-        __func__, appStateData.bundleName.c_str(), appStateData.uid,
-        appStateData.state, appStateData.isFocused);
-
-    WifiProtectManager::GetInstance().OnAppForegroudChanged(
-        appStateData.bundleName, appStateData.state);
-    #ifdef FEATURE_RX_LISTEN_SUPPORT
-        RxListenArbitration::GetInstance().OnForegroundAppChanged(appStateData);
-    #endif
-}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

@@ -103,6 +103,20 @@ public:
      */
     WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info) const;
 
+    /**
+     * @Description set power save mode
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetPmMode(int frequency, int mode);
+
+    /**
+     * @Description set data packet identification mark rule
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetDpiMarkRule(int uid, int protocol, int enable);
+
     /* ************************ softAp Interface ************************** */
     /**
      * @Description Start Ap.

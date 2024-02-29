@@ -644,7 +644,7 @@ WifiErrorNo WifiIdlClient::SetBssid(int networkId, const std::string &bssid)
         LOGE("SetBssid, PushDeviceConfigString return error!");
         return WIFI_IDL_OPT_OK;
     }
-    
+
     return SetNetwork(networkId, &conf, num);
 }
 
@@ -855,7 +855,7 @@ WifiErrorNo WifiIdlClient::ReqSetBgLimitIdList(std::vector<int> idList, int size
 {
     CHECK_CLIENT_NOT_NULL;
     int idArray[size];
-    memcpy(idArray, &idList[0], size * sizeof(idList[0]));
+    memcpy_s(idArray, sizeof(idArray), idList.data(), size);
     return SetBgLimitIdList(idArray, size, type);
 }
 

@@ -24,6 +24,7 @@
 #else
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_app_state_aware.h"
 #endif
 #include "wifi_service_manager.h"
 #include "wifi_common_def.h"
@@ -64,6 +65,10 @@ int WifiManager::Init()
         WIFI_LOGE("WifiCountryCodeManager Init failed !");
         mInitStatus = WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED;
         return -1;
+    }
+
+    if (WifiAppStateAware::GetInstance().InitAppStateAware() < 0) {
+        WIFI_LOGE("WifiAppStateAware Init failed!");
     }
 #endif
     if (WifiConfigCenter::GetInstance().Init() < 0) {

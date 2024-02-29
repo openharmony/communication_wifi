@@ -17,7 +17,7 @@
 #define OHOS_WIFI_HDI_UTIL_H
 
 #include "wifi_hdi_struct.h"
-#include "v1_1/wlan_types.h"
+#include "v1_2/wlan_types.h"
 
 #ifdef __cplusplus
 extern "C" {

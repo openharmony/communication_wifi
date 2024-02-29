@@ -117,6 +117,7 @@ if (defined(ohos_lite)) {
     }
     install_enable = true
     sources = local_base_sources
+    sources += [ "sta_app_acceleration.cpp" ]
 
     include_dirs = local_base_include_dirs
     include_dirs += [
@@ -165,7 +166,10 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "ability_runtime:ability_manager",
+      "ability_runtime:app_manager",
       "ability_runtime:wantagent_innerkits",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
       "c_utils:utils",
       "dhcp:dhcp_sdk",
       "hilog:libhilog",

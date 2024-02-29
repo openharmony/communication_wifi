@@ -328,6 +328,9 @@ ErrCode StaService::RemoveDevice(int networkId) const
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    } else {
+        LOGE("RemoveDevice, networkId = %{public}d do not exist.\n", networkId);
+        return WIFI_OPT_FAILED;
     }
     /* Remove network configuration directly without notification to InterfaceService. */
     WifiSettings::GetInstance().RemoveDevice(networkId);

@@ -119,7 +119,7 @@ WifiProtectMode WifiProtectManager::GetNearlyProtectMode()
     int screenState = WifiSettings::GetInstance().GetScreenState();
     mScreenOn = (screenState == MODE_STATE_OPEN || screenState == MODE_STATE_DEFAULT) ? true : false;
     int foregroudCount = GetFgLowlatyProtectCount();
-    LOGI("%{public}s mWifiConnected: %{public}d, mScreenOn: %{public}d,"
+    LOGD("%{public}s mWifiConnected: %{public}d, mScreenOn: %{public}d,"
         "ForegroundProtectCount: %{public}d, mForceHiPerfMode: %{public}d, mForceLowLatencyMode: %{public}d",
         __func__, mWifiConnected, mScreenOn, foregroudCount, mForceHiPerfMode, mForceLowLatencyMode);
 #endif
@@ -240,7 +240,7 @@ void WifiProtectManager::HandleScreenStateChanged(bool screenOn)
 
 #ifndef OHOS_ARCH_LITE
     if (ChangeWifiPowerMode()) {
-        LOGE("Failed to update wifi power mode for screen state change");
+        LOGD("Failed to update wifi power mode for screen state change");
     }
 #endif
 }
@@ -344,7 +344,7 @@ bool WifiProtectManager::ChangeWifiPowerMode()
         __func__, static_cast<int>(mCurrentOpMode), static_cast<int>(newProtectMode));
     if (newProtectMode == mCurrentOpMode) {
         /* No action is needed */
-        LOGI("newProtectMode %{public}d equal to mCurrentOpMode %{public}d, no action is needed",
+        LOGD("newProtectMode %{public}d equal to mCurrentOpMode %{public}d, no action is needed",
             static_cast<int>(newProtectMode), static_cast<int>(mCurrentOpMode));
         return true;
     }

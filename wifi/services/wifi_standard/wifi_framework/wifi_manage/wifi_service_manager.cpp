@@ -105,7 +105,7 @@ int WifiServiceManager::CheckPreLoadService(void)
 
 int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
 {
-    WIFI_LOGI("WifiServiceManager::LoadStaService");
+    WIFI_LOGI("LoadStaService");
     std::unique_lock<std::mutex> lock(mStaMutex);
     if (mStaServiceHandle.handle != nullptr) {
         WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
@@ -491,7 +491,7 @@ NO_SANITIZE("cfi") int WifiServiceManager::UnloadSelfCureService(bool bPreLoad, 
 
 NO_SANITIZE("cfi") int WifiServiceManager::UnloadStaService(bool bPreLoad, int instId)
 {
-    WIFI_LOGI("WifiServiceManager::UnloadStaService, instId: %{public}d", instId);
+    WIFI_LOGI("UnloadStaService, instId: %{public}d", instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
     if (mStaServiceHandle.handle == nullptr) {
         WIFI_LOGE("WifiServiceManager::UnloadStaService handle is null");
@@ -517,7 +517,7 @@ NO_SANITIZE("cfi") int WifiServiceManager::UnloadStaService(bool bPreLoad, int i
 
 NO_SANITIZE("cfi") int WifiServiceManager::UnloadScanService(bool bPreLoad, int instId)
 {
-    WIFI_LOGI("WifiServiceManager::UnloadScanService, instId: %{public}d", instId);
+    WIFI_LOGI("UnloadScanService, instId: %{public}d", instId);
     std::unique_lock<std::mutex> lock(mScanMutex);
     if (mScanServiceHandle.handle == nullptr) {
         WIFI_LOGE("WifiServiceManager::UnloadScanService handle is null");
@@ -613,7 +613,7 @@ NO_SANITIZE("cfi") int WifiServiceManager::UnloadEnhanceService(bool bPreLoad)
 int WifiServiceManager::UnloadService(const std::string &name, int id)
 {
     bool bPreLoad = WifiSettings::GetInstance().IsModulePreLoad(name);
-    WIFI_LOGI("WifiServiceManager::UnloadService name: %{public}s", name.c_str());
+    WIFI_LOGI("UnloadService name: %{public}s", name.c_str());
     if (name == WIFI_SERVICE_STA) {
         return UnloadStaService(bPreLoad, id);
     }

@@ -106,7 +106,7 @@ StaStateMachine::StaStateMachine(int instId)
 
 StaStateMachine::~StaStateMachine()
 {
-    WIFI_LOGI("StaStateMachine::~StaStateMachine");
+    WIFI_LOGI("~StaStateMachine");
     StopHandlerThread();
     ParsePointer(pRootState);
     ParsePointer(pInitState);
@@ -133,7 +133,7 @@ StaStateMachine::~StaStateMachine()
 /* ---------------------------Initialization functions------------------------------ */
 ErrCode StaStateMachine::InitStaStateMachine()
 {
-    WIFI_LOGI("Enter StaStateMachine::InitStaStateMachine.\n");
+    WIFI_LOGI("Enter InitStaStateMachine.\n");
     if (!InitialStateMachine()) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
@@ -458,7 +458,7 @@ ErrCode StaStateMachine::FillEapCfg(const WifiDeviceConfig &config, WifiIdlDevic
 
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter StaStateMachine::ConvertDeviceCfg.\n");
+    LOGI("Enter ConvertDeviceCfg.\n");
     WifiIdlDeviceConfig idlConfig;
     idlConfig.ssid = config.ssid;
     idlConfig.bssid = config.bssid;
@@ -497,7 +497,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     }
 
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, idlConfig) != WIFI_IDL_OPT_OK) {
-        LOGE("StaStateMachine::ConvertDeviceCfg SetDeviceConfig failed!");
+        LOGE("ConvertDeviceCfg SetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -830,7 +830,7 @@ int setRssi(int rssi)
 
 void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
 {
-    LOGD("enter DealSignalPollResult.");
+    LOGD("enter SignalPoll.");
     if (msg == nullptr) {
         LOGE("msg is nullptr.");
         return;
@@ -841,7 +841,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         LOGE("GetConnectSignalInfo return fail: %{public}d.", ret);
         return;
     }
-    LOGI("DealSignalPollResult, bssid:%{public}s, freq:%{public}d, rssi:%{public}d, noise:%{public}d, "
+    LOGI("SignalPoll, bssid:%{public}s, freq:%{public}d, rssi:%{public}d, noise:%{public}d, "
         "chload:%{public}d, snr:%{public}d, ulDelay:%{public}d, txLinkSpeed:%{public}d, rxLinkSpeed:%{public}d, "
         "txBytes:%{public}d, rxBytes:%{public}d, txFailed:%{public}d, txPackets:%{public}d, rxPackets:%{public}d.",
         MacAnonymize(linkedInfo.bssid).c_str(), signalInfo.frequency, signalInfo.signal, signalInfo.noise,
@@ -859,12 +859,10 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
             linkedInfo.rssi = setRssi(signalInfo.signal);
         }
         int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
-        LOGI("DealSignalPollResult, networkId:%{public}d, ssid:%{public}s, rssi:%{public}d, band:%{public}d, "
-            "connState:%{public}d, detailedState:%{public}d.",
+        LOGI("SignalPoll, networkId:%{public}d, ssid:%{public}s, rssi:%{public}d, band:%{public}d, "
+            "connState:%{public}d, detailedState:%{public}d, currentSignal:%{public}d, lastSignal:%{public}d.\n",
             linkedInfo.networkId, SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.rssi, linkedInfo.band,
-            linkedInfo.connState, linkedInfo.detailedState);
-        LOGI("DealSignalPollResult currentSignalLevel:%{public}d, lastSignalLevel:%{public}d.\n",
-            currentSignalLevel, lastSignalLevel);
+            linkedInfo.connState, linkedInfo.detailedState, currentSignalLevel, lastSignalLevel);
         if (currentSignalLevel != lastSignalLevel) {
             WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
             InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
@@ -897,21 +895,20 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiSettings::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
-    LOGI("DealSignalPollResult GetWifiStandard:%{public}d, bssid:%{public}s rxmax:%{public}d txmax:%{public}d.",
+    LOGD("SignalPoll GetWifiStandard:%{public}d, bssid:%{public}s rxmax:%{public}d txmax:%{public}d.",
          linkedInfo.wifiStandard, MacAnonymize(linkedInfo.bssid).c_str(), linkedInfo.maxSupportedRxLinkSpeed,
          linkedInfo.maxSupportedTxLinkSpeed);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
 
     if (enableSignalPoll) {
-        WIFI_LOGD("DealSignalPollResult, StartTimer for SIGNAL_POLL.\n");
+        WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
     }
 }
 
 void StaStateMachine::DealSignalPacketChanged(int txPackets, int rxPackets)
 {
-    WIFI_LOGI("DealSignalPacketChanged.\n");
     int send = txPackets - linkedInfo.lastTxPackets;
     int received = rxPackets - linkedInfo.lastRxPackets;
     int direction = 0;
@@ -2516,7 +2513,6 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
 
-    WIFI_LOGI("LinkedState, reveived msgCode=%{public}d msg.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {

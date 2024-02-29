@@ -77,6 +77,7 @@ public:
     void StaServiceUpdateDeviceConfigSuccess();
     void StaServiceRemoveDeviceConfigSuccess();
     void StaServiceRemoveDeviceConfigFail1();
+    void StaServiceRemoveDeviceConfigFail2();
     void StaServiceEnableDeviceConfigSuccess();
     void StaServiceEnableDeviceConfigFail1();
     void StaServiceEnableDeviceConfigFail2();
@@ -418,6 +419,13 @@ void StaServiceTest::StaServiceRemoveDeviceConfigFail1()
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
     EXPECT_CALL(WifiStaHalInterface::GetInstance(), SaveDeviceConfig())
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
+}
+
+void StaServiceTest::StaServiceRemoveDeviceConfigFail2()
+{
+    int networkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
 }
 
@@ -845,6 +853,11 @@ HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigSuccess, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigFail1, TestSize.Level1)
 {
     StaServiceRemoveDeviceConfigFail1();
+}
+
+HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigFail2, TestSize.Level1)
+{
+    StaServiceRemoveDeviceConfigFail2();
 }
 
 HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigSuccess, TestSize.Level1)

@@ -12,14 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mock_wifi_supplicant_hal_interface.h"
+ #include "mock_wifi_sta_hal_interface.h"
+#include <string>
+#include "supplicant_event_callback.h"
+#include "wifi_error_no.h"
+#include "i_wifi_struct.h"
 
 namespace OHOS {
 namespace Wifi {
-WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
+std::unique_ptr<MockWifiScanInterface> pScanInterface = std::make_unique<MockWifiScanInterface>();
+namespace WifiSupplicantHalInterface {
+WifiErrorNo UnRegisterSupplicantEventCallback()
 {
-    static WifiSupplicantHalInterface inst;
-    return inst;
+    return pScanInterface->pSupplicant.unCallback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
+{
+    return pScanInterface->pSupplicant.callback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -25,31 +25,31 @@
 
 namespace OHOS {
 namespace Wifi {
-class MockWifiStaHalInterface {
-public:
-    virtual ~MockWifiStaHalInterface() = default;
-    virtual WifiErrorNo Scan(const WifiScanParam &scanParam) = 0;
-    virtual WifiErrorNo QueryScanInfos(std::vector<InterScanInfo> &scanInfos) = 0;
-    virtual WifiErrorNo StartPnoScan(const WifiPnoScanParam &scanParam) = 0;
-    virtual WifiErrorNo StopPnoScan(void) = 0;
-    virtual WifiErrorNo GetSupportFrequencies(int band, std::vector<int> &frequencies) = 0;
-    virtual WifiErrorNo StartWifi() = 0;
-    virtual WifiErrorNo StopWifi() = 0;
-};
 
-class WifiStaHalInterface : public MockWifiStaHalInterface {
-public:
-    static WifiStaHalInterface &GetInstance(void);
+struct WifiStaHalInfo {
+    bool scan = true;
+    bool scanInfo = true;
+    bool startPno = true;
+    bool stopPno = true;
+    bool frequencies = true;
+    bool startWifi = true;
+    bool stopWifi = true;
+}
 
+struct SupplicantHalInfo {
+    bool unCallback = true;
+    bool callback = true;
+}
+
+class MockWifiScanInterface {
 public:
-    MOCK_METHOD1(Scan, WifiErrorNo(const WifiScanParam &scanParam));
-    MOCK_METHOD1(QueryScanInfos, WifiErrorNo(std::vector<InterScanInfo> &scanInfos));
-    MOCK_METHOD1(StartPnoScan, WifiErrorNo(const WifiPnoScanParam &scanParam));
-    MOCK_METHOD0(StopPnoScan, WifiErrorNo(void));
-    MOCK_METHOD2(GetSupportFrequencies, WifiErrorNo(int band, std::vector<int> &frequencies));
-    MOCK_METHOD0(StartWifi, WifiErrorNo());
-    MOCK_METHOD0(StopWifi, WifiErrorNo());
+    MockWifiScanInterface() = default;
+    virtual ~MockWifiScanInterface() = default;
+public:
+    WifiStaHalInfo pWifiStaHalInfo;
+    SupplicantHalInfo pSupplicant;
 };
 }  // namespace Wifi
 }  // namespace OHOS
 #endif
+ScanParam

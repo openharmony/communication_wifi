@@ -54,18 +54,20 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetHid2dUpperScene(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetP2pBusinessType(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         pScanService = std::make_unique<ScanService>();
         pScanService->pScanStateMachine = new MockScanStateMachine();
+        pMockWifiScanInterface = std::make_unique<MockWifiScanInterface>();
         pScanService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
     }
     virtual void TearDown()
     {
         pScanService.reset();
+        pMockWifiScanInterface.reset();
     }
 
 public:
     std::unique_ptr<ScanService> pScanService;
+    std::unique_ptr<MockWifiScanInterface> pMockWifiScanInterface;
     std::vector<TrustListPolicy> refVecTrustList;
     MovingFreezePolicy defaultValue;
 
@@ -75,11 +77,8 @@ public:
         std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
             .WillRepeatedly(Return(defaultValue));
@@ -91,14 +90,11 @@ public:
         std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
         std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetSupportFrequencies(_, _))
-            .WillRepeatedly(Return(WIFI_IDL_OPT_FAILED));
+        pMockWifiScanInterface->pWifiStaHalInfo.frequencies = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), RegisterSupplicantEventCallback(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSupplicantHalInterface::GetInstance(), UnRegisterSupplicantEventCallback()).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
             .WillRepeatedly(Return(refVecTrustList));
@@ -107,7 +103,7 @@ public:
 
     void UnInitScanServiceSuccess()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        pMockWifiScanInterface->pWifiStaHalInfo.stopPno = true;
         pScanService->UnInitScanService();
     }
 
@@ -115,7 +111,6 @@ public:
     {
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         ScanStatusReport scanStatusReport;
         scanStatusReport.status = SCAN_STARTED_STATUS;
@@ -539,7 +534,7 @@ public:
         pScanService->isPnoScanBegined = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
+        pMockWifiScanInterface->pWifiStaHalInfo.stopPno = true;
         EXPECT_EQ(false, pScanService->BeginPnoScan());
     }
 
@@ -786,14 +781,12 @@ public:
 
     void GetScanControlInfoSuccess()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(0));
         pScanService->GetScanControlInfo();
     }
 
     void GetScanControlInfoFail()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(-1));
         pScanService->GetScanControlInfo();
     }
@@ -1791,8 +1784,6 @@ public:
 
     void AllowScanByIntervalContinueSuccess3()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
-
         const int timeTest = 5;
         time_t continueScanTime = time(nullptr) - timeTest;
         int lessThanIntervalCount = 0;
@@ -1833,8 +1824,6 @@ public:
 
     void AllowScanByIntervalBlocklistSuccess2()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopPnoScan()).Times(AtLeast(0));
-
         int appId = 0;
         const int timeTest = 2;
         time_t blockListScanTime = 0;
@@ -1952,25 +1941,25 @@ public:
 
     void StartWpaSuccessTest()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillOnce(Return(WIFI_IDL_OPT_OK));
+        pMockWifiScanInterface->pWifiStaHalInfo.startWifi = true;
         EXPECT_TRUE(pScanService->StartWpa() == WIFI_OPT_SUCCESS);
     }
 
     void StartWpaFailTest()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillOnce(Return(WIFI_IDL_OPT_FAILED));
+        pMockWifiScanInterface->pWifiStaHalInfo.startWifi = false;
         EXPECT_TRUE(pScanService->StartWpa() == WIFI_OPT_FAILED);
     }
 
     void CloseWpaSuccessTest()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillOnce(Return(WIFI_IDL_OPT_OK));
+        pMockWifiScanInterface->pWifiStaHalInfo.stopWifi = false;
         EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_SUCCESS);
     }
 
     void CloseWpaFailTest()
     {
-        EXPECT_CALL(WifiStaHalInterface::GetInstance(), StopWifi()).WillOnce(Return(WIFI_IDL_OPT_FAILED));
+        pMockWifiScanInterface->pWifiStaHalInfo.stopWifi = false;
         EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_FAILED);
     }
 

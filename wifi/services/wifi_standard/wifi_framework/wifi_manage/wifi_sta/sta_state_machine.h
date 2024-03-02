@@ -664,7 +664,7 @@ private:
      * @param netState the state of connecting network(in)
      * @param portalUrl portal network redirection address
      */
-    void HandleNetCheckResult(StaNetState netState, const std::string &portalUrl);
+    void HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl);
 
     /**
      * @Description implementation of the network detection callback function

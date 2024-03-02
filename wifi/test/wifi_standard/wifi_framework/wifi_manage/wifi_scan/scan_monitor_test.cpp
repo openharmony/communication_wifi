@@ -37,30 +37,27 @@ public:
     {
         pScanMonitor = std::make_unique<ScanMonitor>();
         pScanStateMachine = std::make_unique<MockScanStateMachine>();
-        pMockWifiScanInterface = std::make_unique<MockWifiScanInterface>();
         pScanMonitor->SetScanStateMachine(pScanStateMachine.get());
     }
     void TearDown() override
     {
         pScanMonitor.reset();
         pScanStateMachine.reset();
-        pMockWifiScanInterface.reset();
     }
 
 public:
     std::unique_ptr<ScanMonitor> pScanMonitor;
     std::unique_ptr<MockScanStateMachine> pScanStateMachine;
-    std::unique_ptr<MockWifiScanInterface> pMockWifiScanInterface;
 
     void InitScanMonitorSuccessTest()
     {
-        pMockWifiScanInterface->pSupplicant.callback = true;
+        MockWifiScanInterface::GetInstance().pSupplicant.callback = true;
         EXPECT_EQ(pScanMonitor->InitScanMonitor(), true);
     }
 
     void InitScanMonitorFailTest()
     {
-        pMockWifiScanInterface->pSupplicant.callback = false;
+        MockWifiScanInterface::GetInstance().pSupplicant.callback = false;
         pScanMonitor->ReceiveScanEventFromIdl(0);
         EXPECT_EQ(pScanMonitor->InitScanMonitor(), false);
     }

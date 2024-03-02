@@ -20,38 +20,38 @@ std::unique_ptr<MockWifiScanInterface> pScanInterface = std::make_unique<MockWif
 namespace WifiStaHalInterface {
 WifiErrorNo Scan(const WifiScanParam &scanParam)
 {
-    return pScanInterface->pWifiStaHalInfo.scan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
-    return pScanInterface->pWifiStaHalInfo.scanInfo ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo StartPnoScan(const WifiPnoScanParam &scanParam)
 {
-    return pScanInterface->pWifiStaHalInfo.startPno ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo StopPnoScan(void)
 {
-    return pScanInterface->pWifiStaHalInfo.stopPno ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo GetSupportFrequencies(int band, std::vector<int> &frequencies)
 {
-    return pScanInterface->pWifiStaHalInfo.frequencies ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFrequencies ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo StartWifi()
 {
-    return pScanInterface->pWifiStaHalInfo.startWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 
 }
 
 WifiErrorNo StoPWifi()
 {
-    return pScanInterface->pWifiStaHalInfo.stopWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 };
 }  // namespace Wifi

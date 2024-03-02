@@ -25,29 +25,29 @@
 #include "supplicant_event_callback.h"
 #include "i_wifi_struct.h"
 
-
 namespace OHOS {
 namespace Wifi {
 
 struct WifiStaHalInfo {
     bool scan = true;
-    bool scanInfo = true;
-    bool startPno = true;
-    bool stopPno = true;
-    bool frequencies = true;
+    bool queryScanInfos = true;
+    bool startPnoScan = true;
+    bool stopPnoScan = true;
+    bool getSupportFrequencies = true;
     bool startWifi = true;
     bool stopWifi = true;
-}
+};
 
 struct SupplicantHalInfo {
     bool unCallback = true;
     bool callback = true;
-}
+};
 
 class MockWifiScanInterface {
 public:
     MockWifiScanInterface() = default;
     virtual ~MockWifiScanInterface() = default;
+    static MockWifiScanInterface &GetInstance(void);
 public:
     WifiStaHalInfo pWifiStaHalInfo;
     SupplicantHalInfo pSupplicant;

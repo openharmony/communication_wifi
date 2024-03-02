@@ -39,19 +39,16 @@ public:
     virtual void SetUp()
     {
         pStaMonitor = std::make_unique<StaMonitor>();
-        pStaInterface = std::make_unique<MockWifiStaInterface>();
         pStaMonitor->pStaStateMachine = new MockStaStateMachine();
         InitStaMonitorSuccess();
     }
     virtual void TearDown()
     {
         pStaMonitor.reset();
-        pStaInterface.reset();
     }
 
 public:
     std::unique_ptr<StaMonitor> pStaMonitor;
-    std::unique_ptr<MockWifiStaInterface> pStaInterface;
 
     void InitStaMonitorSuccess();
     void InitStaMonitorFail();
@@ -88,25 +85,25 @@ public:
 
 void StaMonitorTest::InitStaMonitorSuccess()
 {
-    pStaInterface->pWifiStaHalInfo.callback = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::InitStaMonitorFail()
 {
-    pStaInterface->pWifiStaHalInfo.callback = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_FAILED);
 }
 
 void StaMonitorTest::UnInitStaMonitorSuccess()
 {
-    pStaInterface->pWifiStaHalInfo.callback = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::UnInitStaMonitorFail()
 {
-    pStaInterface->pWifiStaHalInfo.callback = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     pStaMonitor->SetStateMachine(pStaMonitor->pStaStateMachine);
     pStaMonitor->SetStateMachine(nullptr);
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);

@@ -55,18 +55,15 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         pScanService = std::make_unique<ScanService>();
         pScanService->pScanStateMachine = new MockScanStateMachine();
-        pMockWifiScanInterface = std::make_unique<MockWifiScanInterface>();
         pScanService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
     }
     virtual void TearDown()
     {
         pScanService.reset();
-        pMockWifiScanInterface.reset();
     }
 
 public:
     std::unique_ptr<ScanService> pScanService;
-    std::unique_ptr<MockWifiScanInterface> pMockWifiScanInterface;
     std::vector<TrustListPolicy> refVecTrustList;
     MovingFreezePolicy defaultValue;
 
@@ -89,7 +86,7 @@ public:
         std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
         std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
-        pMockWifiScanInterface->pWifiStaHalInfo.frequencies = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFrequencies = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(1));
@@ -102,7 +99,7 @@ public:
 
     void UnInitScanServiceSuccess()
     {
-        pMockWifiScanInterface->pWifiStaHalInfo.stopPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         pScanService->UnInitScanService();
     }
 
@@ -533,7 +530,7 @@ public:
         pScanService->isPnoScanBegined = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
-        pMockWifiScanInterface->pWifiStaHalInfo.stopPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         EXPECT_EQ(false, pScanService->BeginPnoScan());
     }
 
@@ -1940,25 +1937,25 @@ public:
 
     void StartWpaSuccessTest()
     {
-        pMockWifiScanInterface->pWifiStaHalInfo.startWifi = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
         EXPECT_TRUE(pScanService->StartWpa() == WIFI_OPT_SUCCESS);
     }
 
     void StartWpaFailTest()
     {
-        pMockWifiScanInterface->pWifiStaHalInfo.startWifi = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi = false;
         EXPECT_TRUE(pScanService->StartWpa() == WIFI_OPT_FAILED);
     }
 
     void CloseWpaSuccessTest()
     {
-        pMockWifiScanInterface->pWifiStaHalInfo.stopWifi = false;
-        EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_SUCCESS);
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi = false;
+        EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_FAILED);
     }
 
     void CloseWpaFailTest()
     {
-        pMockWifiScanInterface->pWifiStaHalInfo.stopWifi = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi = false;
         EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_FAILED);
     }
 

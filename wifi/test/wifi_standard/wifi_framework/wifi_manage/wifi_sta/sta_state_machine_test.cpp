@@ -1189,13 +1189,13 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOWORKING, "");
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
     }
 
     void HandleNetCheckResultFail()
     {
         pStaStateMachine->linkedInfo.connState = ConnState::DISCONNECTED;
-        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOWORKING, "");
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
     }
 
     void LinkedStateGoInStateSuccess()

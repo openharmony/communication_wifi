@@ -656,7 +656,7 @@ void StaStateMachine::StopWifiProcess()
     WIFI_LOGI("Enter StaStateMachine::StopWifiProcess.\n");
 #ifndef OHOS_ARCH_LITE
     WifiNetAgent::GetInstance().UnregisterNetSupplier();
-    m_NetWorkState->StopNetStateObserver();
+    m_NetWorkState->StopNetStateObserver(m_NetWorkState);
 #endif
     WIFI_LOGI("Stop wifi is in process...\n");
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), m_instId);
@@ -2433,7 +2433,6 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     }
     mPortalUrl = portalUrl;
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
-        WIFI_LOGI("HandleNetCheckResult network state is working\n");
         /* Save connection information to WifiSettings. */
         WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);

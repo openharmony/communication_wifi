@@ -83,7 +83,7 @@ public:
      *
      * @return 0 is success, 1 is fail
      */
-    int32_t StartNetStateObserver(sptr<NetStateObserver> &netStateObserverPtr);
+    int32_t StartWifiDetection();
 private:
     sptr<NetManagerStandard::NetHandle> GetWifiNetworkHandle();
 public:

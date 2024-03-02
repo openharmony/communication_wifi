@@ -52,14 +52,12 @@ public:
     virtual void SetUp()
     {
         pStaService = std::make_unique<StaService>();
-        pStaInterface = std::make_unique<MockWifiStaInterface>();
         pStaService->pStaStateMachine = new MockStaStateMachine();
         pStaService->pStaAutoConnectService = new MockStaAutoConnectService(pStaService->pStaStateMachine);
     }
     virtual void TearDown()
     {
         pStaService.reset();
-        pStaInterface.reset();
     }
 
     void StaServiceInitStaServiceSuccess();
@@ -114,7 +112,6 @@ public:
     void DeregisterFilterBuilder();
 public:
     std::unique_ptr<StaService> pStaService;
-    std::unique_ptr<MockWifiStaInterface> pStaInterface;
 };
 
 void StaServiceTest::StaServiceInitStaServiceSuccess()
@@ -124,10 +121,10 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
     std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
     ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
-    pStaInterface->pWifiStaHalInfo.callback = true;
-    pStaInterface->pWifiStaHalInfo.startWifi = true;
-    pStaInterface->pWifiStaHalInfo.wpaAutoConnect = true;
-    pStaInterface->pWifiStaHalInfo.getDeviceAddress = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
     EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsInitScore(_)).Times(AtLeast(0));
@@ -167,10 +164,10 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigSuccess()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
-    pStaInterface->pWifiStaHalInfo.setDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = true;
     EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_TRUE(pStaService->ConnectToDevice(config) == WIFI_OPT_SUCCESS);
 }
 
@@ -190,11 +187,11 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail1()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(-1)));
-    pStaInterface->pWifiStaHalInfo.getNextNetworkId = true;
-    pStaInterface->pWifiStaHalInfo.setDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = true;
     EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_TRUE(pStaService->ConnectToDevice(config) == WIFI_OPT_FAILED);
 }
 
@@ -214,7 +211,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail2()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(-1)));
-    pStaInterface->pWifiStaHalInfo.getNextNetworkId = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = false;
     EXPECT_TRUE(pStaService->ConnectToDevice(config) == WIFI_OPT_FAILED);
 }
 
@@ -235,7 +232,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail3()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
-    pStaInterface->pWifiStaHalInfo.setDeviceConfig = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = false;
     EXPECT_TRUE(pStaService->ConnectToDevice(config) == WIFI_OPT_FAILED);
 }
 
@@ -278,11 +275,11 @@ void StaServiceTest::StaServiceAddDeviceConfigSuccess()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
-    pStaInterface->pWifiStaHalInfo.getNextNetworkId = true;
-    pStaInterface->pWifiStaHalInfo.setDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = true;
     EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_TRUE(pStaService->AddDeviceConfig(config) != INVALID_NETWORK_ID);
 }
 
@@ -302,11 +299,11 @@ void StaServiceTest::StaServiceAddDeviceConfigFail1()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(-1)));
-    pStaInterface->pWifiStaHalInfo.getNextNetworkId = true;
-    pStaInterface->pWifiStaHalInfo.setDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = true;
     EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_TRUE(pStaService->AddDeviceConfig(config) == INVALID_NETWORK_ID);
 }
 
@@ -326,7 +323,7 @@ void StaServiceTest::StaServiceAddDeviceConfigFail2()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(-1)));
-    pStaInterface->pWifiStaHalInfo.getNextNetworkId = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = false;
     EXPECT_TRUE(pStaService->AddDeviceConfig(config) == INVALID_NETWORK_ID);
 }
 
@@ -347,7 +344,7 @@ void StaServiceTest::StaServiceAddDeviceConfigFail3()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
-    pStaInterface->pWifiStaHalInfo.setDeviceConfig = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = false;
     EXPECT_TRUE(pStaService->AddDeviceConfig(config) == INVALID_NETWORK_ID);
 }
 
@@ -367,19 +364,19 @@ void StaServiceTest::StaServiceUpdateDeviceConfigSuccess()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<2>(config), Return(0)));
-    pStaInterface->pWifiStaHalInfo.getNextNetworkId = true;
-    pStaInterface->pWifiStaHalInfo.setDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = true;
     EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_TRUE(pStaService->UpdateDeviceConfig(config) != INVALID_NETWORK_ID);
 }
 
 void StaServiceTest::StaServiceRemoveDeviceConfigSuccess()
 {
     int networkId = NETWORK_ID;
-    pStaInterface->pWifiStaHalInfo.removeDevice = true;
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_SUCCESS);
@@ -388,8 +385,8 @@ void StaServiceTest::StaServiceRemoveDeviceConfigSuccess()
 void StaServiceTest::StaServiceRemoveDeviceConfigFail1()
 {
     int networkId = NETWORK_ID;
-    pStaInterface->pWifiStaHalInfo.removeDevice = false;
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = false;
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
 }
 
@@ -427,7 +424,7 @@ void StaServiceTest::StaServiceDisableDeviceConfigSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(),
         SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED, attemptEnable))
         .WillRepeatedly(Return(0));
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_SUCCESS);
 }
 
@@ -438,7 +435,7 @@ void StaServiceTest::StaServiceDisableDeviceConfigFail1()
     EXPECT_CALL(WifiSettings::GetInstance(),
         SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED, attemptEnable))
         .WillRepeatedly(Return(-1));
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_FAILED);
 }
 
@@ -502,7 +499,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestSucc()
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
-    pStaInterface->pWifiStaHalInfo.getNextNetworkId = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = true;
     EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
 }
 
@@ -533,7 +530,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestFail1()
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(1)));
-    pStaInterface->pWifiStaHalInfo.getNextNetworkId = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = false;
     EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_FAILED);
 }
 
@@ -543,8 +540,8 @@ void StaServiceTest::StaServiceRemoveCandidateConfigTestSucc()
     int networkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
     .WillRepeatedly(Return(0));
-    pStaInterface->pWifiStaHalInfo.removeDevice = true;
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillRepeatedly(Return(1));
     EXPECT_CALL(WifiSettings::GetInstance(), RemoveDevice(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
@@ -564,7 +561,7 @@ void StaServiceTest::StaServiceRemoveAllCandidateConfigTestSucc()
 {
     int uid = UID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
-    pStaInterface->pWifiStaHalInfo.removeDevice = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = false;
     EXPECT_TRUE(pStaService->RemoveAllCandidateConfig(uid) == WIFI_OPT_SUCCESS);
 }
 
@@ -615,8 +612,8 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestFail1()
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestSucc()
 {
-    pStaInterface->pWifiStaHalInfo.clearDeviceConfig = true;
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
     EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
         .WillRepeatedly(Return(0));
@@ -625,14 +622,14 @@ void StaServiceTest::StaServiceRemoveAllDeviceTestSucc()
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestFail0()
 {
-    pStaInterface->pWifiStaHalInfo.clearDeviceConfig = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = false;
     EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestFail1()
 {
-    pStaInterface->pWifiStaHalInfo.clearDeviceConfig = true;
-    pStaInterface->pWifiStaHalInfo.saveDeviceConfig = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = false;
     EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
         .WillRepeatedly(Return(1));
@@ -651,18 +648,18 @@ void StaServiceTest::StaServiceReConnectTestSucc()
  */
 void StaServiceTest::StaServiceSetSuspendModeTest()
 {
-    pStaInterface->pSupplicant.wpaSetSuspendMode = false;
+    MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = false;
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_FAILED);
-    pStaInterface->pSupplicant.wpaSetSuspendMode = true;
+    MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = true;
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->SetSuspendMode(true) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceSetPowerModeTest()
 {
-    pStaInterface->pSupplicant.wpaSetSuspendMode = false;
+    MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = false;
     EXPECT_TRUE(pStaService->SetPowerMode(false) == WIFI_OPT_SUCCESS);
-    pStaInterface->pSupplicant.wpaSetSuspendMode = true;
+    MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = true;
     EXPECT_TRUE(pStaService->SetPowerMode(true) == WIFI_OPT_SUCCESS);
 }
 

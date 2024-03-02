@@ -16,26 +16,33 @@
 
 namespace OHOS {
 namespace Wifi {
-std::unique_ptr<MockWifiStaInterface> pStaInterface = std::make_unique<MockWifiStaInterface>();
+
+MockWifiStaInterface &MockWifiStaInterface::GetInstance(void)
+{
+    static MockWifiStaInterface inst;
+    return inst;
+}
+
 namespace WifiSupplicantHalInterface {
+
 WifiErrorNo StartSupplicant()
 {
-    return pStaInterface->pSupplicant.startSipplicant ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pSupplicant.startSipplicant ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo WpaSetCountryCode(const std::string &countryCode)
 {
-    return pStaInterface->pSupplicant.wpaSetCountryCode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetCountryCode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo WpaSetSuspendMode(bool mode)
 {
-    return pStaInterface->pSupplicant.wpaSetSuspendMode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo WpaSetPowerMode(bool mode)
 {
-    return pStaInterface->pSupplicant.wpaSetPowerMode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetPowerMode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 };
 }  // namespace Wifi

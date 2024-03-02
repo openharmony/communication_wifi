@@ -16,16 +16,23 @@
 
 namespace OHOS {
 namespace Wifi {
-std::unique_ptr<MockWifiScanInterface> pScanInterface = std::make_unique<MockWifiScanInterface>();
+
+MockWifiScanInterface &MockWifiScanInterface::GetInstance(void)
+{
+    static MockWifiScanInterface inst;
+    return inst;
+}
+
 namespace WifiSupplicantHalInterface {
+
 WifiErrorNo UnRegisterSupplicantEventCallback()
 {
-    return pScanInterface->pSupplicant.unCallback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pSupplicant.unCallback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
 {
-    return pScanInterface->pSupplicant.callback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pSupplicant.callback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 };
 }  // namespace Wifi

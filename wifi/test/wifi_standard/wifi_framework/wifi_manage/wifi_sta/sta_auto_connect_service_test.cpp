@@ -56,7 +56,6 @@ public:
         pStaStateMachine = new (std::nothrow) MockStaStateMachine();
         pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine);
         pMockDeviceAppraisal = new (std::nothrow) MockDeviceAppraisal();
-        pStaInterface = std::make_unique<MockWifiStaInterface>();
         InitAutoConnectService();
     }
     virtual void TearDown()
@@ -75,14 +74,12 @@ public:
             delete pMockDeviceAppraisal;
             pMockDeviceAppraisal = nullptr;
         }
-        pStaInterface.reset();
     }
 
 public:
     StaStateMachine *pStaStateMachine;
     StaAutoConnectService *pStaAutoConnectService;
     MockDeviceAppraisal *pMockDeviceAppraisal;
-    std::unique_ptr<MockWifiStaInterface> pStaInterface;
 
 public:
     void InitAutoConnectService();
@@ -176,10 +173,10 @@ void StaAutoConnectServiceTest::InitAutoConnectService()
 {
     WifiIdlRoamCapability capability;
     capability.maxBlocklistSize = TWO;
-    pStaInterface->pWifiStaHalInfo.callback = true;
-    pStaInterface->pWifiStaHalInfo.startWifi = true;
-    pStaInterface->pWifiStaHalInfo.wpaAutoConnect = true;
-    pStaInterface->pWifiStaHalInfo.getDeviceAddress = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
     EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsInitScore(_)).Times(AtLeast(0));
@@ -192,7 +189,7 @@ void StaAutoConnectServiceTest::InitAutoConnectService()
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsNormalScore(_)).Times(AtLeast(0));
-    pStaInterface->pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
 
     pStaAutoConnectService->InitAutoConnectService();
     for (int i = 0; i < MAX_APPRAISAL_NUM; i++) {
@@ -246,10 +243,10 @@ void StaAutoConnectServiceTest::GetAllDeviceInfos(WifiDeviceConfig &deviceConfig
 
 void StaAutoConnectServiceTest::InitAutoConnectServiceSuccess()
 {
-    pStaInterface->pWifiStaHalInfo.callback = true;
-    pStaInterface->pWifiStaHalInfo.startWifi = true;
-    pStaInterface->pWifiStaHalInfo.wpaAutoConnect = true;
-    pStaInterface->pWifiStaHalInfo.getDeviceAddress = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
     EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_))
         .Times(AtLeast(1))
@@ -263,9 +260,9 @@ void StaAutoConnectServiceTest::InitAutoConnectServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
 
     int capabilities = 1;
-    pStaInterface->pWifiStaHalInfo.getCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = true;
 
-    pStaInterface->pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
     EXPECT_CALL(WifiSettings::GetInstance(), GetSavedDeviceAppraisalPriority(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
 
@@ -619,21 +616,21 @@ void StaAutoConnectServiceTest::AddOrDelBlockedBssidsFail()
 
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareSuccess()
 {
-    pStaInterface->pWifiStaHalInfo.getCapabilities = false;
-    pStaInterface->pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
     EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == true);
 }
 
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail1()
 {
-    pStaInterface->pWifiStaHalInfo.getCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = true;
     EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
 }
 
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail2()
 {
-    pStaInterface->pWifiStaHalInfo.getCapabilities = false;
-    pStaInterface->pWifiStaHalInfo.getRoamingCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = false;
 
     EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
 }
@@ -644,7 +641,7 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareSuccess()
     std::vector<std::string> blockedBssids;
     std::string bssid = "2a:76:93:47:e2:8a";
     blockedBssids.push_back(bssid);
-    pStaInterface->pWifiStaHalInfo.setRoamConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = true;
     EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == true);
 }
 
@@ -654,7 +651,7 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail1()
     std::string bssid = "2a:76:93:47:e2:8a";
     blockedBssids.push_back(bssid);
 
-    pStaInterface->pWifiStaHalInfo.setRoamConfig = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = false;
     EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
 }
 
@@ -685,7 +682,7 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail4()
     std::vector<std::string> blockedBssids;
     std::string bssid1 = "2a:76:93:47:e2:8a";
     blockedBssids.push_back(bssid1);
-    pStaInterface->pWifiStaHalInfo.setRoamConfig = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = false;
     EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
 }
 
@@ -1283,18 +1280,18 @@ void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareSuccess()
 
     pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason);
 
-    pStaInterface->pWifiStaHalInfo.getCapabilities = false;
-    pStaInterface->pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
     pStaAutoConnectService->ObtainRoamCapFromFirmware();
 
-    pStaInterface->pWifiStaHalInfo.setRoamConfig = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = true;
     pStaAutoConnectService->SyncBlockedSsidFirmware();
 }
 
 void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareFail()
 {
-    pStaInterface->pWifiStaHalInfo.getCapabilities = false;
-    pStaInterface->pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
     pStaAutoConnectService->ObtainRoamCapFromFirmware();
 
     pStaAutoConnectService->SyncBlockedSsidFirmware();

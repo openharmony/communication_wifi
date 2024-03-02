@@ -70,6 +70,7 @@ class MockWifiStaInterface {
 public:
     MockWifiStaInterface() = default;
     virtual ~MockWifiStaInterface() = default;
+    static MockWifiStaInterface &GetInstance(void);
 public:
     WifiStaHalInfo pWifiStaHalInfo;
     SupplicantHalInfo pSupplicant;

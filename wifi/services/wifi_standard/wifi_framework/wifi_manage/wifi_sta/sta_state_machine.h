@@ -661,7 +661,8 @@ private:
     /**
      * @Description  the process of handling network check results.
      *
-     * @param netState - the state of connecting network(in)
+     * @param netState the state of connecting network(in)
+     * @param portalUrl portal network redirection address
      */
     void HandleNetCheckResult(StaNetState netState, const std::string &portalUrl);
 

@@ -45,7 +45,8 @@ void NetStateObserver::SetNetStateCallback(const std::function<void(SystemNetWor
 void NetStateObserver::StartNetStateObserver(sptr<NetStateObserver> &netStateObserverPtr)
 {
     int32_t netId = GetWifiNetId();
-    int32_t ret = NetManagerStandard::NetConnClient::GetInstance().RegisterNetDetectionCallback(netId, netStateObserverPtr);
+    int32_t ret = NetManagerStandard::NetConnClient::GetInstance().RegisterNetDetectionCallback(
+        netId, netStateObserverPtr);
     if (ret == 0) {
         WIFI_LOGI("StartNetObserver register success, netId=%{public}d", netId);
         return;
@@ -56,7 +57,8 @@ void NetStateObserver::StartNetStateObserver(sptr<NetStateObserver> &netStateObs
 void NetStateObserver::StopNetStateObserver(sptr<NetStateObserver> &netStateObserverPtr)
 {
     int32_t netId = GetWifiNetId();
-    int32_t ret = NetManagerStandard::NetConnClient::GetInstance().UnRegisterNetDetectionCallback(netId, netStateObserverPtr);
+    int32_t ret = NetManagerStandard::NetConnClient::GetInstance().UnRegisterNetDetectionCallback(
+        netId, netStateObserverPtr);
     if (ret == 0) {
         WIFI_LOGI("StopNetObserver unregister success, netId=%{public}d", netId);
         return;
@@ -81,6 +83,9 @@ int32_t NetStateObserver::OnNetDetectionResultChanged(
             m_callback(SystemNetWorkState::NETWORK_IS_WORKING, "");
             break;
         }
+        default:
+            // do nothing
+            break;
     }
     return 0;
 }

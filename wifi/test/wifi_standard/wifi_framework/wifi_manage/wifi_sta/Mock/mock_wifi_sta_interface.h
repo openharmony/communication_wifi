@@ -16,8 +16,15 @@
 #define OHOS_MOCK_WIFI_STA_INTERFACE_H
 
 #include <string>
+#include <map>
 #include "wifi_error_no.h"
 #include "i_wifi_struct.h"
+#include <string>
+#include <vector>
+#include "wifi_msg.h"
+#include "wifi_idl_struct.h"
+#include "wifi_sta_request.h"
+#include "wifi_event_callback.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -57,14 +64,19 @@ struct WifiStaHalInfo {
     bool getNetworkList = true;
     bool getConnectSignalInfo = true;
     bool setBssid = true;
-}
+    bool setBssid = true;
+    bool setBssid = true;
+};
 
 struct SupplicantHalInfo {
     bool startSipplicant = true;
     bool setCountrycode = true;
     bool setSuspend = true;
     bool setPower = true;
-}
+    bool wpaSetSuspendMode = true;
+    bool wpaSetCountryCode = true;
+    bool wpaSetPowerMode = true;
+};
 
 class MockWifiStaInterface {
 public:

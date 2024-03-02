@@ -628,16 +628,19 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid);
+ 
     /**
      * @Description  Disconnect network
      *
      */
     void DisConnectProcess();
+
     /**
      * @Description  Disable wifi process.
      *
      */
     void StopWifiProcess();
+
     /**
      * @Description  Setting statemachine status during the process of enable or disable wifi.
      *
@@ -647,159 +650,190 @@ private:
     void SetSuspendMode(bool enabled);
     void SetPowerMode(bool mode);
     void SetPowerSave(bool enabled);
+
     /**
      * @Description  Configure static ipaddress.
      *
      * @param staticIpAddress- static ip address(in)
      */
     bool ConfigStaticIpAddress(StaticIpAddress &staticIpAddress);
+
     /**
      * @Description  the process of handling network check results.
      *
      * @param netState - the state of connecting network(in)
      */
-    void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
+    void HandleNetCheckResult(StaNetState netState, const std::string &portalUrl);
 
-    void RegisterWifiDetection();
-
+    /**
+     * @Description implementation of the network detection callback function
+     *
+     * @param netState the state of connecting network
+     * @param url portal network redirection address
+     */
     void NetStateObserverCallback(SystemNetWorkState netState, std::string url);
+
     /**
      * @Description  the process of handling arp check results.
      *
      * @param arpState - the state of arp proto(in)
      */
     void HandleArpCheckResult(StaArpState arpState);
+
     /**
      * @Description  the process of handling network check results.
      *
      * @param dnsState - the state of dns protol(in)
      */
     void HandleDnsCheckResult(StaDnsState dnsState);
+
     /**
      * @Description  notification portal network.
      *
      */
     void PublishPortalNetworkNotification();
+
     /**
      * @Description  Remove all device configurations before enabling WPS.
      *
      */
     void RemoveAllDeviceConfigs();
+
     /**
      * @Description  Initialize the connection state processing message map
      *
      */
     int InitStaSMHandleMap();
+
     /**
      * @Description : Deal SignalPoll Result.
      *
      * @param  msg - Message body received by the state machine[in]
      */
     void DealSignalPollResult(InternalMessage *msg);
+
     /**
      * @Description : Converting frequencies to channels.
      *
      */
     void ConvertFreqToChannel();
+
     /**
      * @Description : send packet direction to hisysevent
      *
      */
     void DealSignalPacketChanged(int txPackets, int rxPackets);
+
     /**
      * @Description  Connect to selected network.
      *
      * @param  msg - Message body received by the state machine[in]
      */
     void DealConnectToSelectedNetCmd(InternalMessage *msg);
+
     /**
      * @Description : Ready to connect to the network selected by user.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealConnectToUserSelectedNetwork(InternalMessage *msg);
+
     /**
      * @Description  Operations after the disconnection Event is reported.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealDisconnectEvent(InternalMessage *msg);
+
     /**
      * @Description  Operations after the Connection Event is reported.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealConnectionEvent(InternalMessage *msg);
+
     /**
      * @Description  Operations after Disable specified network commands.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealConnectTimeOutCmd(InternalMessage *msg);
+
     /**
      * @Description  Operations after Clear blocklist is reported.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealWpaBlockListClearEvent(InternalMessage *msg);
+
     /**
      * @Description  Operations after StartWps commands.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealStartWpsCmd(InternalMessage *msg);
+
     /**
      * @Description  Operations after the Wps Connect TimeOut Event is reported.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealWpsConnectTimeOutEvent(InternalMessage *msg);
+
     /**
      * @Description  Cancel wps connection
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealCancelWpsCmd(InternalMessage *msg);
+
     /**
      * @Description  Reconnect network
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealReConnectCmd(InternalMessage *msg);
+
     /**
      * @Description  Operations after the Reassociate lead is issued
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealReassociateCmd(InternalMessage *msg);
+
     /**
      * @Description  Roaming connection.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealStartRoamCmd(InternalMessage *msg);
+
     /**
      * @Description  Operation after the password error is reported
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealWpaLinkFailEvent(InternalMessage *msg);
+
     /**
      * @Description  try to connect the saved network for three times
      *@Return true: try to reconnect  fail: try max
      */
     bool DealReconnectSavedNetwork();
+
     /**
      * @Description  set sta connect failed count
      *@Return void
      */
     void DealSetStaConnectFailedCount(int count, bool set);
+
     /**
      * @Description  Wps mode is ON
      *
      * @param msg - Message body received by the state machine[in]
      */
     void StartWpsMode(InternalMessage *msg);
+
     /**
      * @Description  Reassociate network.
      *
@@ -826,6 +860,7 @@ private:
      * @param strMac - Randomly generated MAC address[out]
      */
     void MacAddressGenerate(WifiStoreRandomMac &randomMacInfo);
+
     /**
      * @Description  Compare the encryption mode of the current network with that of the network in the scanning result.
      *
@@ -833,6 +868,7 @@ private:
      * @param deviceKeymgmt - Encryption mode of the current network[in]
      */
     bool ComparedKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt);
+
     /**
      * @Description : Deal network check cmd.
      *

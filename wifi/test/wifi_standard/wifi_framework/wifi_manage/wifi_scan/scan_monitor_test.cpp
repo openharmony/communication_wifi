@@ -14,7 +14,7 @@
  */
 #include "scan_monitor.h"
 #include "mock_scan_state_machine.h"
-#include "mock_wifi_supplicant_hal_interface.h"
+#include "mock_wifi_scan_interface.h"
 #include <gtest/gtest.h>
 
 using ::testing::_;

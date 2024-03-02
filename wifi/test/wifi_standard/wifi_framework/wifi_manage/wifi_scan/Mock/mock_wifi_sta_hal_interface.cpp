@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_scan_interface.h"
 
 namespace OHOS {
 namespace Wifi {

@@ -12,31 +12,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MOCK_WIFISUPPLICANTHALINTERFACE_H
-#define OHOS_MOCK_WIFISUPPLICANTHALINTERFACE_H
+#ifndef OHOS_MOCK_WIFI_SCAN_INTERFACE_H
+#define OHOS_MOCK_WIFI_SCAN_INTERFACE_H
 
-#include <gmock/gmock.h>
 #include <string>
-#include "supplicant_event_callback.h"
+#include <vector>
+#include <gmock/gmock.h>
 #include "wifi_error_no.h"
+#include "wifi_internal_msg.h"
+#include "wifi_idl_struct.h"
+#include "wifi_scan_param.h"
+#include "supplicant_event_callback.h"
 #include "i_wifi_struct.h"
+
 
 namespace OHOS {
 namespace Wifi {
-class MockWifiSupplicantHalInterface {
-public:
-    virtual ~MockWifiSupplicantHalInterface() = default;
-    virtual WifiErrorNo UnRegisterSupplicantEventCallback() = 0;
-    virtual WifiErrorNo RegisterSupplicantEventCallback(SupplicantEventCallback &callback) = 0;
-};
 
-class WifiSupplicantHalInterface : public MockWifiSupplicantHalInterface {
-public:
-    static WifiSupplicantHalInterface &GetInstance(void);
+struct WifiStaHalInfo {
+    bool scan = true;
+    bool scanInfo = true;
+    bool startPno = true;
+    bool stopPno = true;
+    bool frequencies = true;
+    bool startWifi = true;
+    bool stopWifi = true;
+}
 
+struct SupplicantHalInfo {
+    bool unCallback = true;
+    bool callback = true;
+}
+
+class MockWifiScanInterface {
 public:
-    MOCK_METHOD0(UnRegisterSupplicantEventCallback, WifiErrorNo());
-    MOCK_METHOD1(RegisterSupplicantEventCallback, WifiErrorNo(SupplicantEventCallback &callback));
+    MockWifiScanInterface() = default;
+    virtual ~MockWifiScanInterface() = default;
+public:
+    WifiStaHalInfo pWifiStaHalInfo;
+    SupplicantHalInfo pSupplicant;
 };
 }  // namespace Wifi
 }  // namespace OHOS

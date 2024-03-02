@@ -14,7 +14,7 @@
  */
 #include "sta_auto_connect_service.h"
 #include "mock_sta_state_machine.h"
-#include "mock_wifi_supplicant_hal_interface.h"
+#include "mock_wifi_sta_interface.h"
 #include "mock_wifi_settings.h"
 #include "mock_device_appraisal.h"
 #include <gtest/gtest.h>
@@ -259,7 +259,6 @@ void StaAutoConnectServiceTest::InitAutoConnectServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSecurityScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
 
-    int capabilities = 1;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = true;
 
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;

@@ -391,6 +391,23 @@ static void DealP2pConnectFailed(const char *buf)
     return;
 }
 
+static void DealP2pChannelSwitch(const char *buf)
+{
+    if (buf == NULL) {
+        return;
+    }
+    const char *freqPos = strstr(buf, "freq=");
+    const char *dfsPos = strstr(buf, "dfs=");
+    if (freqPos == NULL || dfsPos == NULL) {
+        LOGE("freqPos or dfsPos is null!");
+        return;
+    }
+    int freq = atoi(freqPos + strlen("freq="));
+    LOGI("DealP2pChannelSwitch freq=%{public}d", freq);
+    P2pHalCbP2pChannelSwitch(freq);
+    return;
+}
+
 static void DealGroupFormationFailureEvent(const char *buf)
 {
     if (buf == NULL) {
@@ -572,6 +589,8 @@ static int DealWpaP2pCallBackSubFun(char *p)
         DealP2pInterfaceCreated(p + strlen(P2P_INTERFACE_CREATED));
     } else if (strncmp(p, CTRL_EVENT_DISCONNECTED, strlen(CTRL_EVENT_DISCONNECTED)) == 0) {
         DealP2pConnectFailed(p);
+    } else if (strncmp(p, CTRL_EVENT_CHANNEL_SWITCH, strlen(CTRL_EVENT_CHANNEL_SWITCH)) == 0) {
+        DealP2pChannelSwitch(p);
     } else {
         return 1;
     }

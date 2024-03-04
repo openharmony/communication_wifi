@@ -16,7 +16,6 @@
 
 namespace OHOS {
 namespace Wifi {
-std::unique_ptr<MockWifiScanInterface> pScanInterface = std::make_unique<MockWifiScanInterface>();
 namespace WifiStaHalInterface {
 WifiErrorNo Scan(const WifiScanParam &scanParam)
 {
@@ -40,13 +39,12 @@ WifiErrorNo StopPnoScan(void)
 
 WifiErrorNo GetSupportFrequencies(int band, std::vector<int> &frequencies)
 {
-    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFrequencies ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFre ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo StartWifi()
 {
     return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
-
 }
 
 WifiErrorNo StoPWifi()

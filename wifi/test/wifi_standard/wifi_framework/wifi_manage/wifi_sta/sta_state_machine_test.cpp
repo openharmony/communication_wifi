@@ -123,7 +123,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = true;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
         EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(testing::AtLeast(0));
@@ -177,7 +177,7 @@ public:
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
         EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(1));
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = true;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
         EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
@@ -214,7 +214,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_IDL_OPT_OK));
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
         EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(0));
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = true;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
         WifiDeviceConfig wifiDeviceConfig;
@@ -541,7 +541,7 @@ public:
     void DealStartWpsCmdSuccess()
     {
         EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = true;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         InternalMessage msg;
         pStaStateMachine->DealStartWpsCmd(nullptr);
@@ -550,16 +550,16 @@ public:
 
     void DealStartWpsCmdFail1()
     {
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = false;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = false;
         EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::KEYPAD;
         InternalMessage msg;
         msg.SetParam1(static_cast<int>(SetupMethod::INVALID));
         pStaStateMachine->DealStartWpsCmd(&msg);
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = true;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
         pStaStateMachine->DealStartWpsCmd(&msg);
         pStaStateMachine->wpsState = SetupMethod::DISPLAY;
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig = true;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
         pStaStateMachine->DealStartWpsCmd(&msg);
     }
 
@@ -635,14 +635,14 @@ public:
 
     void DealWpaBlockListClearEventSuccess()
     {
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaBlocklistClear = true;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaBlocklist = true;
         InternalMessage msg;
         pStaStateMachine->DealWpaBlockListClearEvent(&msg);
     }
 
     void DealWpaBlockListClearEventFail()
     {
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaBlocklistClear = false;
+        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaBlocklist = false;
         InternalMessage msg;
         pStaStateMachine->DealWpaBlockListClearEvent(&msg);
     }

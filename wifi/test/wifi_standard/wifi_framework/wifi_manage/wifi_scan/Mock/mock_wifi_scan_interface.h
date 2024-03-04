@@ -33,7 +33,7 @@ struct WifiStaHalInfo {
     bool queryScanInfos = true;
     bool startPnoScan = true;
     bool stopPnoScan = true;
-    bool getSupportFrequencies = true;
+    bool getSupportFre = true;
     bool startWifi = true;
     bool stopWifi = true;
 };

@@ -29,7 +29,8 @@
 #include "iself_cure_service.h"
 #include "wifi_service_manager.h"
 #include "wifi_msg.h"
-#include "sta_network_check.h"
+#include <fcntl.h>
+#include "arp_checker.h"
 #include "self_cure_msg.h"
 #include "wifi_settings.h"
 #include "wifi_common_util.h"

@@ -1176,26 +1176,26 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_STATE_WORKING, "");
+        pStaStateMachine->HandleNetCheckResult(StaNetState::1, "");
     }
 
     void HandleNetCheckResultSuccess3()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_CHECK_PORTAL, "");
+        pStaStateMachine->HandleNetCheckResult(StaNetState::2, "");
     }
     void HandleNetCheckResultSuccess4()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_STATE_UNKNOWN, "");
+        pStaStateMachine->HandleNetCheckResult(StaNetState::0, "");
     }
 
     void HandleNetCheckResultFail()
     {
         pStaStateMachine->linkedInfo.connState = ConnState::DISCONNECTED;
-        pStaStateMachine->HandleNetCheckResult(StaNetState::NETWORK_STATE_UNKNOWN, "");
+        pStaStateMachine->HandleNetCheckResult(StaNetState::0, "");
     }
 
     void LinkedStateGoInStateSuccess()

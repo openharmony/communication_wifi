@@ -239,7 +239,7 @@ public:
 
     void CommonScanningExeMsgSuccess2()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         InternalMessage msg;
         msg.SetMessageName(SCAN_RESULT_EVENT);
         EXPECT_TRUE(pScanStateMachine->commonScanningState->ExecuteStateMsg(&msg) == true);
@@ -293,7 +293,7 @@ public:
 
     void PnoScanHardwareExeMsgSuccess1()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
         InternalMessage msg;
         pScanStateMachine->pnoScanHardwareState->GoInState();
         pScanStateMachine->pnoScanHardwareState->GoOutState();
@@ -303,7 +303,7 @@ public:
 
     void PnoScanHardwareExeMsgSuccess2()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         InternalMessage msg;
         msg.SetMessageName(CMD_STOP_PNO_SCAN);
         EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
@@ -311,8 +311,8 @@ public:
 
     void PnoScanHardwareExeMsgSuccess3()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPno = true;
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         InternalMessage msg;
         msg.SetMessageName(CMD_RESTART_PNO_SCAN);
         EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
@@ -320,7 +320,7 @@ public:
 
     void PnoScanHardwareExeMsgSuccess4()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         InternalMessage msg;
         msg.SetMessageName(PNO_SCAN_RESULT_EVENT);
         EXPECT_TRUE(pScanStateMachine->pnoScanHardwareState->ExecuteStateMsg(&msg) == true);
@@ -347,7 +347,7 @@ public:
 
     void CommonScanAfterPnoGoInStateTest()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = true;
         pScanStateMachine->commonScanAfterPnoState->GoInState();
         pScanStateMachine->commonScanAfterPnoState->GoOutState();
@@ -355,7 +355,7 @@ public:
 
     void CommonScanAfterPnoExeMsgSuccess1()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         InternalMessage msg;
         msg.SetMessageName(SCAN_RESULT_EVENT);
         EXPECT_TRUE(pScanStateMachine->commonScanAfterPnoState->ExecuteStateMsg(&msg) == true);
@@ -481,7 +481,7 @@ public:
 
     void PnoSwScanningExeMsgSuccess1()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         InternalMessage msg;
         msg.SetMessageName(SCAN_RESULT_EVENT);
         pScanStateMachine->pnoSwScanningState->GoInState();
@@ -748,7 +748,7 @@ public:
         pScanStateMachine->pnoConfigStoredFlag = true;
         InternalMessage msg;
         pScanStateMachine->ContinuePnoScanProcess();
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPno = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = false;
         pScanStateMachine->PnoScanHardwareProcess(&msg);
     }
 
@@ -762,7 +762,7 @@ public:
 
     void StartPnoScanHardwareSuccess1()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = true;
         EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
@@ -770,7 +770,7 @@ public:
 
     void StartPnoScanHardwareSuccess2()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
         pScanStateMachine->runningHwPnoFlag = true;
         pScanStateMachine->pnoConfigStoredFlag = true;
         EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
@@ -778,7 +778,7 @@ public:
 
     void StartPnoScanHardwareSuccess3()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = false;
         EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
@@ -786,7 +786,7 @@ public:
 
     void StartPnoScanHardwareFail()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPno = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = false;
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = true;
         EXPECT_EQ(false, pScanStateMachine->StartPnoScanHardware());
@@ -794,7 +794,7 @@ public:
 
     void StopPnoScanHardwareTest1()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         pScanStateMachine->supportHwPnoFlag = true;
         pScanStateMachine->runningHwPnoFlag = true;
         pScanStateMachine->StopPnoScanHardware();
@@ -802,7 +802,7 @@ public:
 
     void StopPnoScanHardwareTest2()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPno = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         pScanStateMachine->supportHwPnoFlag = false;
         pScanStateMachine->runningHwPnoFlag = true;
         pScanStateMachine->StopPnoScanHardware();
@@ -810,7 +810,7 @@ public:
 
     void StopPnoScanHardwareTest3()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPno = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = false;
         pScanStateMachine->supportHwPnoFlag = true;
         pScanStateMachine->runningHwPnoFlag = true;
         pScanStateMachine->StopPnoScanHardware();
@@ -870,21 +870,21 @@ public:
 
     void HwPnoScanInfoProcessTest1()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         pScanStateMachine->runningHwPnoFlag = true;
         pScanStateMachine->HwPnoScanInfoProcess();
     }
 
     void HwPnoScanInfoProcessTest2()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->HwPnoScanInfoProcess();
     }
 
     void HwPnoScanInfoProcessTest3()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = false;
         pScanStateMachine->runningHwPnoFlag = true;
         pScanStateMachine->HwPnoScanInfoProcess();
     }
@@ -915,26 +915,26 @@ public:
 
     void CommonScanAfterPnoResultTest1()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         pScanStateMachine->CommonScanAfterPnoResult();
     }
 
     void CommonScanAfterPnoResultTest2()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = false;
         pScanStateMachine->CommonScanAfterPnoResult();
     }
 
     void GetScanInfosSuccess()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         std::vector<InterScanInfo> scanInfos;
         EXPECT_EQ(true, pScanStateMachine->GetScanInfos(scanInfos));
     }
 
     void GetScanInfosFail()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = false;
         std::vector<InterScanInfo> scanInfos;
         EXPECT_EQ(false, pScanStateMachine->GetScanInfos(scanInfos));
     }
@@ -1025,13 +1025,13 @@ public:
 
     void SoftwareScanInfoProcessTest1()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = true;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         pScanStateMachine->SoftwareScanInfoProcess();
     }
 
     void SoftwareScanInfoProcessTest2()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scanInfo = false;
+        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = false;
         pScanStateMachine->SoftwareScanInfoProcess();
     }
 

@@ -122,6 +122,7 @@ ohos_unittest("toolkit_unittest") {
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "netstack:http_client",
   ]
   if (wifi_feature_with_encryption) {

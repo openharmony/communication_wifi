@@ -2553,7 +2553,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
             if (!msg->GetMessageObj(url)) {
                 WIFI_LOGW("Failed to obtain portal url.");
             }
-            WIFI_LOGI("netdetection, netstate:%{public}d url:%{public}s.\n", netstate, url.c_str());
+            WIFI_LOGI("netdetection, netstate:%{public}d url:%{private}s.\n", netstate, url.c_str());
             pStaStateMachine->HandleNetCheckResult(netstate, url);
             break;
         }

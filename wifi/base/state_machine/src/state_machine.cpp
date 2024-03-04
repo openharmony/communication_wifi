@@ -55,7 +55,7 @@ bool StateMachine::InitialStateMachine()
 void StateMachine::StartStateMachine()
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("StartStateMachine failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -79,7 +79,7 @@ void StateMachine::NotExecutedMessage(const InternalMessage *msg)
 void StateMachine::StatePlus(State *state, State *upper)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("StatePlus failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -89,7 +89,7 @@ void StateMachine::StatePlus(State *state, State *upper)
 void StateMachine::StateDelete(State *state)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("StateDelete failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -99,7 +99,7 @@ void StateMachine::StateDelete(State *state)
 void StateMachine::SetFirstState(State *firstState)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("SetFirstState failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -109,7 +109,7 @@ void StateMachine::SetFirstState(State *firstState)
 void StateMachine::SwitchState(State *targetState)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("SwitchState failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -119,7 +119,7 @@ void StateMachine::SwitchState(State *targetState)
 void StateMachine::DelayMessage(const InternalMessage *msg)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("DelayMessage failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -129,7 +129,7 @@ void StateMachine::DelayMessage(const InternalMessage *msg)
 void StateMachine::StopHandlerThread()
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("StopHandlerThread failed, pStateMachineHandler is nullptr!");
         return;
     }
     pStateMachineHandler->StopHandlerThread();
@@ -514,7 +514,7 @@ void StateMachineHandler::SwitchState(State *targetState)
         LOGE("targetState is null.");
         return;
     }
-    LOGE("SwitchState, Switch to targetState: %{public}s.", targetState->GetStateName().c_str());
+    LOGI("Switch to targetState: %{public}s.", targetState->GetStateName().c_str());
     pTargetState = static_cast<State *>(targetState);
 }
 

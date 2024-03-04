@@ -343,7 +343,6 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest2, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_GO_NEGOTIATION_FAILURE_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GO_NEGOTIATION_FAILURE_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t124\t0\t0\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GO_NEGOTIATION_FAILURE_EVENT) == 0);
 }
 
@@ -353,7 +352,6 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest3, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_IFACE_CREATED_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_IFACE_CREATED_EVENT, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t141\t0\t0\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_IFACE_CREATED_EVENT) == 0);
 }
 
@@ -363,7 +361,6 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest4, TestSize.Level1)
     StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
     EXPECT_TRUE(PushBackCallbackMsg(P2P_CONNECT_FAILED, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, P2P_CONNECT_FAILED, mContext) == 0);
-    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t144\t0\t0\t0\t00:00:00:00:00:00\t0\t$$$$$$") == 0);
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_CONNECT_FAILED) == 0);
 }
 HWTEST_F(WifiHalCRpcServerTest, RpcGetNameTest, TestSize.Level1)

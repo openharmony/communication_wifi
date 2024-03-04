@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include "mock_sta_state_machine.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_sta_interface.h"
 #include "wifi_idl_define.h"
 #include <string>
 
@@ -85,29 +85,25 @@ public:
 
 void StaMonitorTest::InitStaMonitorSuccess()
 {
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::InitStaMonitorFail()
 {
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_FAILED);
 }
 
 void StaMonitorTest::UnInitStaMonitorSuccess()
 {
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::UnInitStaMonitorFail()
 {
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     pStaMonitor->SetStateMachine(pStaMonitor->pStaStateMachine);
     pStaMonitor->SetStateMachine(nullptr);
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);

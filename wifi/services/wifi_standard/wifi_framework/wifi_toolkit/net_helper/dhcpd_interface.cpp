@@ -20,6 +20,9 @@
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "securec.h"
+#ifndef OHOS_ARCH_LITE
+#include "ipc_skeleton.h"
+#endif
 
 DEFINE_WIFILOG_DHCP_LABEL("WifiDhcpdInterface");
 
@@ -333,7 +336,14 @@ bool DhcpdInterface::GetConnectedStaInfo(const std::string &ifaceName, int staNu
         WIFI_LOGI("GetConnectedStaInfo param is null!\n");
         return false;
     }
-    if (GetDhcpClientInfos(ifaceName.c_str(), staNumber, staInfos, staSize) != 0) {
+#ifndef OHOS_ARCH_LITE
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+#endif
+    int result = GetDhcpClientInfos(ifaceName.c_str(), staNumber, staInfos, staSize);
+#ifndef OHOS_ARCH_LITE
+    IPCSkeleton::SetCallingIdentity(identity);
+#endif
+    if (result != 0) {
         return false;
     }
     if (staInfos == NULL) {

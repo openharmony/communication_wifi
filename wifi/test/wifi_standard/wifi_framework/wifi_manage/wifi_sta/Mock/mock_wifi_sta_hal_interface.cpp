@@ -13,14 +13,6 @@
  * limitations under the License.
  */
 
-#include <map>
-#include <string>
-#include <vector>
-#include "wifi_msg.h"
-#include "wifi_error_no.h"
-#include "wifi_idl_struct.h"
-#include "wifi_sta_request.h"
-#include "wifi_event_callback.h"
 #include "mock_wifi_sta_interface.h"
 
 namespace OHOS {
@@ -89,7 +81,7 @@ WifiErrorNo DisconnectLastRoamingBssid(const std::string &mac)
 
 WifiErrorNo GetSupportFeature(long &feature)
 {
-    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getSupportFeature ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getSupport ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo SendRequest(const WifiStaRequest &request)
@@ -109,7 +101,7 @@ WifiErrorNo RemoveDevice(int networkId)
 
 WifiErrorNo ClearDeviceConfig()
 {
-    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDeviceConfig ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo GetNextNetworkId(int &networkId)
@@ -164,7 +156,7 @@ WifiErrorNo StopWps()
 
 WifiErrorNo GetRoamingCapabilities(WifiIdlRoamCapability &capability)
 {
-    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo SetRoamConfig(const WifiIdlRoamConfig &config)
@@ -179,7 +171,7 @@ WifiErrorNo WpaAutoConnect(int enable)
 
 WifiErrorNo WpaBlocklistClear()
 {
-    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaBlocklistClear ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaBlocklist ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList)
@@ -189,7 +181,7 @@ WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList)
 
 WifiErrorNo GetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info)
 {
-    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getConnectSignalInfo ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getConnect ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
 WifiErrorNo SetBssid(int networkId, const std::string &bssid)

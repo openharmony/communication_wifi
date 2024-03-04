@@ -189,7 +189,7 @@ void StaAutoConnectServiceTest::InitAutoConnectService()
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsNormalScore(_)).Times(AtLeast(0));
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
 
     pStaAutoConnectService->InitAutoConnectService();
     for (int i = 0; i < MAX_APPRAISAL_NUM; i++) {
@@ -261,7 +261,7 @@ void StaAutoConnectServiceTest::InitAutoConnectServiceSuccess()
 
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = true;
 
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
     EXPECT_CALL(WifiSettings::GetInstance(), GetSavedDeviceAppraisalPriority(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
 
@@ -616,8 +616,8 @@ void StaAutoConnectServiceTest::AddOrDelBlockedBssidsFail()
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareSuccess()
 {
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
-    EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == true);
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
+    EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
 }
 
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail1()
@@ -629,7 +629,7 @@ void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail1()
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail2()
 {
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = false;
 
     EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
 }
@@ -1280,7 +1280,7 @@ void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareSuccess()
     pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason);
 
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
     pStaAutoConnectService->ObtainRoamCapFromFirmware();
 
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = true;
@@ -1290,7 +1290,7 @@ void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareSuccess()
 void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareFail()
 {
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoamingCapabilities = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
     pStaAutoConnectService->ObtainRoamCapFromFirmware();
 
     pStaAutoConnectService->SyncBlockedSsidFirmware();

@@ -42,11 +42,11 @@ struct WifiStaHalInfo {
     bool setConnectMac = true;
     bool setScanMac = true;
     bool disconnectLast = true;
-    bool getSupportFeature = true;
+    bool getSupport = true;
     bool sendRequest = true;
     bool setTxPower = true;
     bool removeDevice = true;
-    bool clearDeviceConfig = true;
+    bool clearDevice = true;
     bool getNextNetworkId = true;
     bool enableNetwork = true;
     bool getDeviceConfig = true;
@@ -57,14 +57,12 @@ struct WifiStaHalInfo {
     bool stopWps = true;
     bool startWpsPbcMode = true;
     bool startWpsPinMode = true;
-    bool getRoamingCapabilities = true;
+    bool getRoaming = true;
     bool setRoamConfig = true;
     bool wpaAutoConnect = true;
-    bool wpaBlocklistClear = true;
+    bool wpaBlocklist = true;
     bool getNetworkList = true;
-    bool getConnectSignalInfo = true;
-    bool setBssid = true;
-    bool setBssid = true;
+    bool getConnect = true;
     bool setBssid = true;
 };
 

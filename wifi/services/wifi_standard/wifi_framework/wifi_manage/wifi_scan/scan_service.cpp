@@ -670,6 +670,9 @@ bool ScanService::StoreFullScanInfo(
         for (auto iter = results.begin(); iter != results.end(); ++iter) {
             iter->disappearCount++;
         }
+        if (WifiSettings::GetInstance().SaveScanInfoList(results) != 0) {
+            WIFI_LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
+        }
         return true;
     }
 

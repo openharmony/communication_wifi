@@ -77,7 +77,7 @@ static OHOS::Wifi::ErrCode ConvertedLinkedInfo(const OHOS::Wifi::WifiLinkedInfo&
 NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnWifiConnectionChanged(int state,
     const OHOS::Wifi::WifiLinkedInfo &info)
 {
-    WIFI_LOGI("sta received connection changed event: %{public}d", state);
+    WIFI_LOGI("sta connection changed event: %{public}d", state);
     auto &eventHandler = EventManager::GetInstance().GetWifiCEventHandler();
     if (eventHandler) {
         eventHandler->PostSyncTask([=]() {
@@ -139,7 +139,7 @@ std::vector<std::string> WifiCScanEventCallback::scanCallbackEvent = {
 
 NO_SANITIZE("cfi") void WifiCScanEventCallback::OnWifiScanStateChanged(int state)
 {
-    WIFI_LOGI("scan received state changed event: %{public}d", state);
+    WIFI_LOGI("ScanStateChanged event: %{public}d", state);
     auto &eventHandler = EventManager::GetInstance().GetWifiCEventHandler();
     if (eventHandler) {
         eventHandler->PostSyncTask([=]() {

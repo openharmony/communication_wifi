@@ -22,7 +22,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalCallback"
-#define MAC_OFFSET 2
+#define MAC_OFFSET 1
 
 static void EmitEventCallbackMsg(WifiHalEventCallbackMsg *pCbkMsg, WifiHalEvent event)
 {

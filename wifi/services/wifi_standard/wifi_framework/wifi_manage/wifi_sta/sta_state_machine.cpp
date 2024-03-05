@@ -495,7 +495,8 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     for (int i = 0; i < MAX_WEPKEYS_SIZE; i++) {
         idlConfig.wepKeys[i] = config.wepKeys[i];
     }
-
+    LOGI("ConvertDeviceCfg SetDeviceConfig selected network ssid=%{public}s, bssid=%{public}s",
+        SsidAnonymize(idlConfig.ssid).c_str(), MacAnonymize(idlConfig.bssid).c_str());
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, idlConfig) != WIFI_IDL_OPT_OK) {
         LOGE("ConvertDeviceCfg SetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
@@ -1503,8 +1504,10 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     }
     ConvertDeviceCfg(deviceConfig);
     if (bssid.empty()) {
+        LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid);
     } else {
+        LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid);
     }
     if (WifiStaHalInterface::GetInstance().EnableNetwork(WPA_DEFAULT_NETWORKID) != WIFI_IDL_OPT_OK) {

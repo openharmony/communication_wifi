@@ -198,6 +198,13 @@ public:
     virtual ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) override;
 
     /**
+     * @Description - Register all callbacks provided by the P2P.
+     * @param  callbacks - all callbacks added
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) override;
+
+    /**
      * @Description set p2p wifi display info
      *
      * @param wfdInfo - wifi display info
@@ -299,7 +306,7 @@ private:
     /**
      * @Description - P2P state machine deregistration event callback.
      */
-    virtual void UnRegisterP2pServiceCallbacks();
+    virtual void ClearAllP2pServiceCallbacks();
 
 private:
     P2pStateMachine &p2pStateMachine;

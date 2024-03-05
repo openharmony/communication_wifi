@@ -212,6 +212,13 @@ public:
     virtual ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) = 0;
 
     /**
+     * @Description - The interface of unregister p2p service callbacks,
+     * @param  callbacks - information of callbacks.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) = 0;
+
+    /**
      * @Description set p2p wifi display info
      *
      * @param wfdInfo - wifi display info

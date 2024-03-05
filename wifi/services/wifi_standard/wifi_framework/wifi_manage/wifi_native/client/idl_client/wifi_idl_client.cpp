@@ -709,6 +709,9 @@ char **WifiIdlClient::ConVectorToCArrayString(const std::vector<std::string> &ve
     for (; i < size; ++i) {
         int len = vec[i].length();
         list[i] = (char *)calloc(len + 1, sizeof(char));
+        if (len <= 0) {
+            break;
+        }
         if (list[i] == nullptr) {
             break;
         }

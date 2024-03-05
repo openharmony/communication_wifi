@@ -43,7 +43,6 @@ ErrCode WifiSaLoadManager::LoadWifiSa(int32_t systemAbilityId)
     }
     auto object = samgr->CheckSystemAbility(systemAbilityId);
     if (object != nullptr) {
-        WIFI_LOGE("get system ability %{public}d manager!", systemAbilityId);
         return WIFI_OPT_SUCCESS;
     }
     InitLoadState();

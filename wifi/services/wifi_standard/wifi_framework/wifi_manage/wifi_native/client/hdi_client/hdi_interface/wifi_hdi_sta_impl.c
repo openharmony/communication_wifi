@@ -355,7 +355,7 @@ WifiErrorNo HdiWifiStopPnoScan(void)
 int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
     const struct HdfWifiScanResults *scanResults, const char* ifName)
 {
-    LOGI("%{public}s: begin to register scan result callback", __func__);
+    LOGI("%{public}s: register scan result callback", __func__);
     pthread_mutex_lock(&g_hdiWifiMutex);
     g_hdiWifiScanResultsCount = 0;
     if (g_hdiWifiScanResults == NULL) {
@@ -543,7 +543,7 @@ void HdiReleaseLocalResources()
 
 void HdiNotifyScanResult(int status)
 {
-    LOGI("%{public}s: report the scanning status:%{public}d", __func__, status);
+    LOGI("%{public}s: scan status:%{public}d", __func__, status);
     ISupplicantEventCallback *callback = HdiGetSupplicantEventCallback();
     if (callback != NULL && callback->onScanNotify != NULL) {
         callback->onScanNotify(status);

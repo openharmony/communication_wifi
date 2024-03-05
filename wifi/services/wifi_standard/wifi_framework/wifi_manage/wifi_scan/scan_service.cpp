@@ -1610,7 +1610,7 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
 
 ErrCode ScanService::ApplyScanPolices(ScanType type)
 {
-    LOGD("Enter ScanService::ApplyScanPolices, type: %{public}d", type);
+    LOGD("Enter ApplyScanPolices, type: %{public}d", type);
     /* Obtains app parameters and scenario status parameters. */
     auto appPackageName = WifiSettings::GetInstance().GetAppPackageName();
     auto trustListPolicies = WifiSettings::GetInstance().ReloadTrustListPolicies();
@@ -1651,15 +1651,15 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
 
 bool ScanService::AllowExternScanByThermal()
 {
-    WIFI_LOGI("Enter ScanService::AllowExternScanByThermal.\n");
+    WIFI_LOGI("Enter AllowExternScanByThermal.\n");
     if (IsAppInFilterList(scan_thermal_trust_list)) {
-        WIFI_LOGI("ScanService::AllowExternScanByThermal, no need to control this scan");
+        WIFI_LOGI("AllowExternScanByThermal, no need to control this scan");
         return true;
     }
     auto level = WifiSettings::GetInstance().GetThermalLevel();
     static const int THERMAL_LEVEL_HOT = 4;
     if (level >= THERMAL_LEVEL_HOT) {
-        WIFI_LOGW("ScanService::AllowExternScanByThermal, level=%{public}d is higher than hot\n", level);
+        WIFI_LOGW("AllowExternScanByThermal, level=%{public}d is higher than hot\n", level);
         return false;
     }
     return true;

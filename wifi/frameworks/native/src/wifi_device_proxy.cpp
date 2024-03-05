@@ -58,7 +58,6 @@ WifiDeviceProxy::~WifiDeviceProxy()
 
 void WifiDeviceProxy::RemoveDeathRecipient(void)
 {
-    WIFI_LOGI("enter RemoveDeathRecipient!");
     std::lock_guard<std::mutex> lock(mutex_);
     if (remote_ == nullptr) {
         WIFI_LOGI("remote_ is nullptr!");

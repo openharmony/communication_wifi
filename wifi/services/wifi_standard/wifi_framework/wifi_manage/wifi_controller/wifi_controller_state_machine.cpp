@@ -391,6 +391,11 @@ bool WifiControllerMachine::ShouldEnableWifi()
         return false;
     }
 #endif
+    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
+        !WifiSettings::GetInstance().GetWifiToggledState()) {
+        WIFI_LOGI("Disable wifi when airplane mode open.");
+        return false;
+    }
     if (WifiSettings::GetInstance().GetWifiToggledState() || IsScanOnlyEnable()) {
         WIFI_LOGI("Should to start Wifi or scanonly");
         return true;

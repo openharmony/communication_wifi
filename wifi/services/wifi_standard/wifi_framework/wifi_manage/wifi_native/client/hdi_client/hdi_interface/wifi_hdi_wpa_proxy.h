@@ -64,6 +64,8 @@ if (ret < 0) { \
 }
 #endif
 
+#define EXEC_DISABLE 1
+
 /**
  * @Description Create a channel between the HAL and the driver.
  *
@@ -140,7 +142,6 @@ char *GetApIfaceName();
 
 void SetExecDisable(int execDisable);
 int GetExecDisable();
-
 
 #ifdef __cplusplus
 }

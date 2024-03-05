@@ -417,7 +417,7 @@ WifiErrorNo HdiGetStaInfos(char *buf, int size, int id)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo HdiDisassociateSta(const char *mac, int id);
+WifiErrorNo HdiDisassociateSta(const char *mac, int id)
 {
     LOGI("HdiDisassociateSta enter");
     struct IHostapdInterface *apObj = GetApInterface();

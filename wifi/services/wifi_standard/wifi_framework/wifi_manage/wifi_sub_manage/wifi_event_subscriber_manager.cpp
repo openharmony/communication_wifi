@@ -648,7 +648,7 @@ void CesEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &e
 void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
-    WIFI_LOGI("ScreenEventSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
+    WIFI_LOGI("OnReceiveScreenEvent: %{public}s.", action.c_str());
 
     int screenState = WifiSettings::GetInstance().GetScreenState();
     int screenStateNew = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON)

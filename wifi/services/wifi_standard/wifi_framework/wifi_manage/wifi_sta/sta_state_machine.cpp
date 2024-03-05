@@ -866,16 +866,6 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         if (currentSignalLevel != lastSignalLevel) {
             WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
             InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
-#ifndef OHOS_ARCH_LITE
-            if (NetSupplierInfo != nullptr) {
-                TimeStats timeStats("Call UpdateNetSupplierInfo");
-                NetSupplierInfo->isAvailable_ = true;
-                NetSupplierInfo->isRoaming_ = isRoam;
-                NetSupplierInfo->strength_ = linkedInfo.rssi;
-                NetSupplierInfo->frequency_ = linkedInfo.frequency;
-                WifiNetAgent::GetInstance().UpdateNetSupplierInfo(NetSupplierInfo);
-            }
-#endif
             lastSignalLevel = currentSignalLevel;
         }
     } else {

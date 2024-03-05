@@ -41,7 +41,6 @@
 #define IFACENAME_LEN 6
 #define CFGNAME_LEN 30
 #define WIFI_MULTI_CMD_MAX_LEN 1024
-#define EXEC_DISABLE 1
 
 #if (AP_NUM > 1)
 #define WIFI_5G_CFG "hostapd_0.conf"
@@ -52,8 +51,8 @@
 #define AP_IFNAME_COEX "wlan1"
 #define WIFI_DEFAULT_CFG "hostapd.conf"
 #define WIFI_COEX_CFG "hostapd_coex.conf"
-#define HOSTAPD_DEFAULT_CFG CONFIG_ROOT_DIR"wap_supplicant"WIFI_DEFAULT_CFG
-#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOT_DIR"wap_supplicant"WIFI_COEX_CFG
+#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"wap_supplicant"WIFI_DEFAULT_CFG
+#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOR_DIR"wap_supplicant"WIFI_COEX_CFG
 #endif
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
@@ -435,7 +434,7 @@ void HdiWpaResetGlobalObj()
 {
     g_wpaStartSucceed = 0;
     g_wpaObj = NULL;
-    g_apDevMgr = NULL;
+    g_devMgr = NULL;
     LOGE("%{public}s reset wpa g_wpaObj", __func__);
     HdiWpaStart();
 }
@@ -520,10 +519,10 @@ WifiErrorNo GetApInstance()
 
 WifiErrorNo StartAp(int id, char *ifaceName)
 {
-int32_t ret = g_apObj->StartApWithCmd(g_apObj, ifaceName, id);
+    int32_t ret = g_apObj->StartApWithCmd(g_apObj, ifaceName, id);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);
-        IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
+        IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, false);
         g_apObj = NULL;
         g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
         g_apDevMgr = NULL;
@@ -582,7 +581,7 @@ WifiErrorNo HdiApStop(int id)
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Stop failed: %{public}d", __func__, ret);
     }
-    IWpaInterfaceReleaseInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
+    IHostapdInterfaceReleaseInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
     g_apObj = NULL;
     g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
     g_apDevMgr = NULL;
@@ -601,7 +600,7 @@ struct IHostapdInterface* GetApInterface()
     return apObj;
 }
 
-char *GetApIfaceaName()
+char *GetApIfaceName()
 {
     return g_apIfaceName;
 }

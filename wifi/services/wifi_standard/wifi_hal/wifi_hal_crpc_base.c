@@ -54,6 +54,9 @@ char **ReadCharArray(Context *context, int size)
         if (ReadInt(context, &len) < 0) {
             break;
         }
+        if (len <= 0) {
+            break;
+        }
         pArray[i] = (char *)calloc(len + 1, sizeof(char));
         if (pArray[i] == NULL) {
             break;

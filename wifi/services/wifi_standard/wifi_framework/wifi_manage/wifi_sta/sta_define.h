@@ -84,14 +84,6 @@ const int MAX_RETRY_COUNT = 3;
 #define BAND_2_G 1
 #define BAND_5_G 2
 
-typedef enum EnumStaNetState {
-    NETWORK_STATE_UNKNOWN,
-    NETWORK_STATE_WORKING,
-    NETWORK_CHECK_PORTAL,
-    NETWORK_STATE_NOINTERNET,
-    NETWORK_STATE_BUTT,
-} StaNetState;
-
 typedef enum EnumStaArpState {
     ARP_STATE_WORKING,
     ARP_STATE_UNREACHABLE,
@@ -108,7 +100,6 @@ typedef enum EnumNetWorkState {
     NETWORK_IS_PORTAL,
 }SystemNetWorkState;
 
-using NetStateHandler = std::function<void(StaNetState netState, std::string portalUrl)>;
 using ArpStateHandler = std::function<void(StaArpState arpState)>;
 using DnsStateHandler = std::function<void(StaDnsState dnsState)>;
 }  // namespace Wifi

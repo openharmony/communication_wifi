@@ -12,14 +12,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_scan_interface.h"
 
 namespace OHOS {
 namespace Wifi {
-WifiStaHalInterface &WifiStaHalInterface::GetInstance(void)
+namespace WifiStaHalInterface {
+WifiErrorNo Scan(const WifiScanParam &scanParam)
 {
-    static WifiStaHalInterface inst;
-    return inst;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
+
+WifiErrorNo QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
+{
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo StartPnoScan(const WifiPnoScanParam &scanParam)
+{
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo StopPnoScan(void)
+{
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo GetSupportFrequencies(int band, std::vector<int> &frequencies)
+{
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFre ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo StartWifi()
+{
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo StoPWifi()
+{
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+};
 }  // namespace Wifi
 }  // namespace OHOS

@@ -19,7 +19,7 @@
 #include "wifi_logger.h"
 #include "mac_address.h"
 #include "wifi_sta_hal_interface.h"
-#include "network_status_history_manager.cpp"
+#include "network_status_history_manager.h"
 
 namespace OHOS {
 namespace Wifi {

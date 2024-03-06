@@ -25,6 +25,7 @@
 #include "wifi_chip_capability.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
+#include "wifi_protect_manager.h"
 #include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
@@ -2822,7 +2823,13 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessage *msg)
         enableSignalPoll = false;
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     }
-
+#ifndef OHOS_ARCH_LITE
+    WifiProtectManager::GetInstance().HandleScreenStateChanged(screenState == MODE_STATE_OPEN);
+#endif
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
+        != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("WpaSetSuspendMode failed!");
+    }
     return;
 }
 

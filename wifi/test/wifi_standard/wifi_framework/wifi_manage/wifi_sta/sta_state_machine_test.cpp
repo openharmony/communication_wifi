@@ -833,7 +833,7 @@ public:
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
         EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setConnectMac = true;
-        pStaStateMachine->SetRandomMac(0);
+        pStaStateMachine->SetRandomMac(0, "");
     }
 
     void SetRandomMacFail1()
@@ -849,7 +849,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(-1)));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        pStaStateMachine->SetRandomMac(0);
+        pStaStateMachine->SetRandomMac(0, "");
     }
 
     void SetRandomMacFail2()
@@ -861,7 +861,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        pStaStateMachine->SetRandomMac(0);
+        pStaStateMachine->SetRandomMac(0, "");
     }
 
     void StartRoamToNetworkSuccess()

@@ -842,11 +842,21 @@ private:
     void ReassociateProcess();
 
     /**
+     * @Description  Set value of randomMacInfo.
+     *
+     * @param deviceConfig - deviceConfig[in]
+     * @param bssid - bssid[in]
+     * @param deviceConfig - randomMacInfo[out]
+     */
+    void InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, const std::string &bssid,
+        WifiStoreRandomMac &randomMacInfo);
+
+    /**
      * @Description  Set a random MAC address.
      *
      * @param networkId - network id[in]
      */
-    bool SetRandomMac(int networkId);
+    bool SetRandomMac(int networkId, const std::string &bssid);
 
     /**
      * @Description  check whether the current bssid are consistent.

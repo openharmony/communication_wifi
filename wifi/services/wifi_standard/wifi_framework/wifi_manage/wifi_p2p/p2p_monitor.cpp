@@ -70,6 +70,7 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
         std::bind(&P2pMonitor::WpaEventServDiscReq, this, _1),
         std::bind(&P2pMonitor::WpaEventP2pIfaceCreated, this, _1, _2),
         std::bind(&P2pMonitor::WpaEventP2pConnectFailed, this, _1, _2),
+        std::bind(&P2pMonitor::WpaEventP2pChannelSwitch, this, _1),
     };
 
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
@@ -307,6 +308,12 @@ void P2pMonitor::OnConnectSupplicant(int status) const
 {
     WIFI_LOGD("OnConnectSupplicant callback");
     Broadcast2SmConnectSupplicant(selectIfacName, status);
+}
+
+void P2pMonitor::Broadcast2SmChSwitch(const std::string &iface, const WifiP2pGroupInfo &group) const
+{
+    std::any anyGroup = group;
+    MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, 0, 0, anyGroup);
 }
 
 void P2pMonitor::WpaEventDeviceFound(const IdlP2pDeviceFound &deviceInfo) const
@@ -632,6 +639,14 @@ void P2pMonitor::WpaEventP2pConnectFailed(const std::string &bssid, int reason) 
     WifiP2pDevice device;
     device.SetDeviceAddress(bssid);
     Broadcast2SmConnectFailed(selectIfacName, reason, device);
+}
+
+void P2pMonitor::WpaEventP2pChannelSwitch(int freq) const
+{
+    WIFI_LOGI("WpaEventP2pChannelSwitch callback, freq:%{public}d", freq);
+    WifiP2pGroupInfo group;
+    group.SetFrequency(freq);
+    Broadcast2SmChSwitch(selectIfacName, group);
 }
 }  // namespace Wifi
 }  // namespace OHOS

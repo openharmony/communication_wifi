@@ -19,7 +19,6 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
-
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
@@ -33,6 +32,7 @@
 #include "wifi_idl_struct.h"
 
 #ifndef OHOS_ARCH_LITE
+#include "want.h"
 #include "wifi_net_agent.h"
 #include "wifi_net_observer.h"
 #endif
@@ -1013,6 +1013,9 @@ private:
     WifiDeviceConfig getCurrentWifiDeviceConfig();
     void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
     bool CanArpReachable();
+#ifndef OHOS_ARCH_LITE
+    int32_t StaStartAbility(OHOS::AAFwk::Want& want);
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

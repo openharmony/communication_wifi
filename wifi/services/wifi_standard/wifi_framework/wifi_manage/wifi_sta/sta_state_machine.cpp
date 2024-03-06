@@ -33,9 +33,14 @@
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #ifndef OHOS_ARCH_LITE
-#include "ability_manager_client.h"
-#include "wifi_net_observer.h"
 #include <dlfcn.h>
+#include "ability_manager_ipc_interface_code.h"
+#include "iremote_broker.h"
+#include "iremote_proxy.h"
+#include "iservice_registry.h"
+#include "message_parcel.h"
+#include "system_ability_definition.h"
+#include "wifi_net_observer.h"
 #include "wifi_system_timer.h"
 #endif // OHOS_ARCH_LITE
 
@@ -45,6 +50,10 @@
 #endif
 namespace OHOS {
 namespace Wifi {
+namespace {
+constexpr int DEFAULT_INVAL_VALUE = -1;
+const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
+}
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
 #define FIRST_DNS "8.8.8.8"
@@ -2404,13 +2413,60 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     want.SetParam("netId", netId);
     WIFI_LOGI("wifi netId is %{public}d", netId);
     portalFlag = true;
-    OHOS::ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    OHOS::ErrCode err = StaStartAbility(want);
     if (err != ERR_OK) {
         WIFI_LOGI("StartAbility is failed %{public}d", err);
         WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
     }
 #endif
 }
+
+#ifndef OHOS_ARCH_LITE
+int32_t StaStateMachine::StaStartAbility(OHOS::AAFwk::Want& want)
+{
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        WIFI_LOGE("systemAbilityManager is nullptr");
+        return -1;
+    }
+    sptr<IRemoteObject> remote = systemAbilityManager->GetSystemAbility(ABILITY_MGR_SERVICE_ID);
+    if (remote == nullptr) {
+        WIFI_LOGE("remote is nullptr");
+        return -1;
+    }
+
+    int error;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+ 
+    if (!data.WriteInterfaceToken(ABILITY_MGR_DESCRIPTOR)) {
+        return -1;
+    }
+    if (!data.WriteParcelable(&want)) {
+        WIFI_LOGE("want write failed.");
+        return -1;
+    }
+ 
+    if (!data.WriteInt32(DEFAULT_INVAL_VALUE)) {
+        WIFI_LOGE("userId write failed.");
+        return -1;
+    }
+ 
+    if (!data.WriteInt32(DEFAULT_INVAL_VALUE)) {
+        WIFI_LOGE("requestCode write failed.");
+        return -1;
+    }
+    uint32_t task =  static_cast<uint32_t>(AAFwk::AbilityManagerInterfaceCode::START_ABILITY);
+    error = remote->SendRequest(task, data, reply, option);
+    if (error != NO_ERROR) {
+        WIFI_LOGE("Send request error: %{public}d", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+#endif
 
 void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std::string url)
 {

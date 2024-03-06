@@ -663,6 +663,9 @@ static void IdlCbP2pApStaConnectEvent(Context *context, int event)
     if (ReadStr(context, devAddress, sizeof(devAddress)) != 0) {
         return;
     }
+    if (ReadStr(context, devAddress, sizeof(groupAddress)) != 0) {
+        return;
+    }
     IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();
     if (callback == NULL) {
         return;

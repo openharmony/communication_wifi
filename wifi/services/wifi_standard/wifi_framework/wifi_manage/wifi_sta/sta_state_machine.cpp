@@ -2431,10 +2431,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
-        if (portalFlag == true) {
-            WIFI_LOGD("portal network normal working need redetect for expired!");
-            StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
-        }
+        StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET);
         netNoWorkNum = 0;
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {

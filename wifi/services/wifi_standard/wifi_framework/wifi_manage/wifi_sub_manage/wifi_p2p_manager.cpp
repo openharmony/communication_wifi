@@ -128,8 +128,8 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
 #ifdef FEATURE_SELF_CURE_SUPPORT
-        if (pService->RegisterP2pServiceCallbacks(
-            WifiServiceManager::GetInstance().GetSelfCureServiceInst()->UnloadP2pCallback()) != WIFI_OPT_SUCCESS) {
+        if (pService->UnRegisterP2pServiceCallbacks(
+            WifiServiceManager::GetInstance().GetSelfCureServiceInst()->GetP2pCallback()) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("SelfCure unregister p2p service callback failed!");
             return WIFI_OPT_FAILED;
         }

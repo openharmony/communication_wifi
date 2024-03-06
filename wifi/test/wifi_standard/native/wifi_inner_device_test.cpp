@@ -223,7 +223,10 @@ HWTEST_F(WifiInnerDeviceTest, SetAppFrozenTest, TestSize.Level1)
 {
     WIFI_LOGE("SetAppFrozenTest enter!");
     EXPECT_TRUE(devicePtr != nullptr);
-    ErrCode result = devicePtr->SetAppFrozen(11, true);
+    std::set<int> pidList;
+    pidList.insert(1011);
+    pidList.insert(1012);
+    ErrCode result = devicePtr->SetAppFrozen(pidList, true);
     WIFI_LOGE("SetAppFrozenTest result(0x%{public}x)", result);
     EXPECT_GE(result, WIFI_OPT_SUCCESS);
 }

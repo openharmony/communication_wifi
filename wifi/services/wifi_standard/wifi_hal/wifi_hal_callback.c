@@ -351,6 +351,18 @@ void P2pHalCbGoNegotiationFailure(int status)
     return;
 }
 
+void P2pHalCbP2pChannelSwitch(int freq)
+{
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+    pCbkMsg->msg.serDiscReqInfo.freq = freq;
+    EmitEventCallbackMsg(pCbkMsg, P2P_CHANNEL_SWITCH);
+    return;
+}
+
 void P2pHalCbP2pConnectFailed(const char *bssid, int reason)
 {
     if (bssid == NULL) {

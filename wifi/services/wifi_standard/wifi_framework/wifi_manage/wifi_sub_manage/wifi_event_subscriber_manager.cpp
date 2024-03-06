@@ -19,7 +19,6 @@
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
-#include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
 #include "wifi_system_timer.h"
 #include "common_event_support.h"
@@ -666,18 +665,9 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
             WIFI_LOGE("scan service is NOT start!");
             return;
         }
-#ifndef OHOS_ARCH_LITE
-        bool isScreenOn = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) ? true : false;
-        WifiProtectManager::GetInstance().HandleScreenStateChanged(isScreenOn);
-#endif
         if (screenStateNew != screenState) {
             if (pScanService->OnScreenStateChanged(screenStateNew) != WIFI_OPT_SUCCESS) {
                 WIFI_LOGE("OnScreenStateChanged failed");
-            }
-            /* Send suspend to wpa */
-            bool canSetSuspendMode = screenStateNew == MODE_STATE_CLOSE;
-            if (pService->SetSuspendMode(canSetSuspendMode) != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("SetSuspendMode failed canSetSuspendMode = %{public}d", canSetSuspendMode);
             }
             pService->OnScreenStateChanged(screenStateNew);
 #ifdef FEATURE_HPF_SUPPORT

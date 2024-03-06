@@ -60,6 +60,7 @@ WifiManager &WifiManager::GetInstance()
             if (gWifiManager.Init() != 0) {
                 WIFI_LOGE("Failed to `WifiManager::Init` !");
             }
+            gWifiManager.InitSubscribeListener();
         }
     }
 
@@ -632,6 +633,14 @@ int WifiManager::Init()
     return 0;
 }
 
+void WifiManager::InitSubscribeListener()
+{
+#ifndef OHOS_ARCH_LITE
+    SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
+    SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
+#endif
+}
+
 void WifiManager::Exit()
 {
     WIFI_LOGI("[WifiManager] Exit.");
@@ -1120,6 +1129,34 @@ void WifiManager::StartUnloadScanSaTimer(void)
     return;
 }
 #endif
+
+void WifiManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
+{
+#ifndef OHOS_ARCH_LITE
+    switch (systemAbilityId) {
+        case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID: {
+            if (!add) {
+                break;
+            }
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+            if (pService != nullptr) {
+                pService->OnSystemAbilityChanged(systemAbilityId, add);
+            }
+            break;
+        }
+        case COMMON_EVENT_SERVICE_ID: {
+            if (add) {
+                RegisterScreenEvent();
+            } else {
+                UnRegisterScreenEvent();
+            }
+            break;
+        }
+        default:
+            break;
+    }
+#endif
+}
 
 void WifiManager::CheckAndStartScanService(void)
 {

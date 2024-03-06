@@ -496,5 +496,17 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 #endif
 }
+
+ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
+{
+    WIFI_LOGI("Enter StaService::OnSystemAbilityChanged.");
+#ifndef OHOS_ARCH_LITE
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    if (systemAbilityid == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID && add) {
+        pStaStateMachine->OnNetManagerRestart();
+    }
+#endif
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

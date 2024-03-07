@@ -217,6 +217,14 @@ public:
      */
     virtual ErrCode SetSuspendMode(bool mode) const;
 
+    /**
+     * @Description systemabilitychanged
+     *
+     * @param mode: true for setup, false for shutdown.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add);
+
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
 

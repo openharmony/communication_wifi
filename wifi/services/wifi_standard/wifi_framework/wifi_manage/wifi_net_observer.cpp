@@ -27,13 +27,7 @@ namespace OHOS {
 namespace Wifi {
 using namespace NetManagerStandard;
 
-NetStateObserver &NetStateObserver::GetInstance()
-{
-    static NetStateObserver gNetStateObserver;
-    return gNetStateObserver;
-}
-
-NetStateObserver::NetStateObserver(): m_Callback(nullptr)
+NetStateObserver::NetStateObserver(): m_callback(nullptr)
 {
     WIFI_LOGD("construct NetStateObserver");
 }
@@ -43,35 +37,33 @@ NetStateObserver::~NetStateObserver()
     WIFI_LOGD("~NetStateObserver");
 }
 
-void NetStateObserver::SetNetStateCallback(std::function<void(SystemNetWorkState, std::string)> callback)
+void NetStateObserver::SetNetStateCallback(const std::function<void(SystemNetWorkState, std::string)> &callback)
 {
-    m_Callback = callback;
+    m_callback = callback;
 }
 
-void NetStateObserver::StartNetStateObserver()
+void NetStateObserver::StartNetStateObserver(sptr<NetStateObserver> &netStateObserverPtr)
 {
-    int32_t ret = 0;
     int32_t netId = GetWifiNetId();
-    WIFI_LOGI("StartNetObserver netId:%{public}d", netId);
-    ret = NetManagerStandard::NetConnClient::GetInstance().RegisterNetDetectionCallback(netId, this);
+    int32_t ret = NetManagerStandard::NetConnClient::GetInstance().RegisterNetDetectionCallback(
+        netId, netStateObserverPtr);
     if (ret == 0) {
-        WIFI_LOGI("StartNetObserver register success");
+        WIFI_LOGI("StartNetObserver register success, netId=%{public}d", netId);
         return;
     }
-    WIFI_LOGI("StartNetObserver failed ret = %{public}d", ret);
+    WIFI_LOGI("StartNetObserver failed, netId=%{public}d, ret=%{public}d", netId, ret);
 }
 
-void NetStateObserver::StopNetStateObserver()
+void NetStateObserver::StopNetStateObserver(sptr<NetStateObserver> &netStateObserverPtr)
 {
-    int32_t ret = 0;
     int32_t netId = GetWifiNetId();
-    WIFI_LOGI("StopNetObserver netId:%{public}d", netId);
-    ret = NetManagerStandard::NetConnClient::GetInstance().UnRegisterNetDetectionCallback(netId, this);
+    int32_t ret = NetManagerStandard::NetConnClient::GetInstance().UnRegisterNetDetectionCallback(
+        netId, netStateObserverPtr);
     if (ret == 0) {
-        WIFI_LOGI("StopNetObserver unregister success");
+        WIFI_LOGI("StopNetObserver unregister success, netId=%{public}d", netId);
         return;
     }
-    WIFI_LOGI("StopNetObserver failed ret = %{public}d", ret);
+    WIFI_LOGI("StopNetObserver failed, netId=%{public}d, ret=%{public}d", netId, ret);
 }
 
 int32_t NetStateObserver::OnNetDetectionResultChanged(
@@ -80,17 +72,20 @@ int32_t NetStateObserver::OnNetDetectionResultChanged(
     WIFI_LOGI("OnNetDetectionResultChanged nettype:%{public}d, url:%{public}s", detectionResult, urlRedirect.c_str());
     switch (detectionResult) {
         case NetManagerStandard::NET_DETECTION_CAPTIVE_PORTAL: {
-            m_Callback(NETWORK_IS_PORTAL, urlRedirect);
+            m_callback(SystemNetWorkState::NETWORK_IS_PORTAL, urlRedirect);
             break;
         }
         case NetManagerStandard::NET_DETECTION_FAIL: {
-            m_Callback(NETWORK_NOTWORKING, nullptr);
+            m_callback(SystemNetWorkState::NETWORK_NOTWORKING, "");
             break;
         }
         case NetManagerStandard::NET_DETECTION_SUCCESS: {
-            m_Callback(NETWORK_IS_WORKING, nullptr);
+            m_callback(SystemNetWorkState::NETWORK_IS_WORKING, "");
             break;
         }
+        default:
+            // do nothing
+            break;
     }
     return 0;
 }

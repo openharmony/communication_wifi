@@ -76,6 +76,8 @@ void GroupFormedState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE, &GroupFormedState::ProcessCmdDisable));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &GroupFormedState::ProcessCmdCancelConnect));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, &GroupFormedState::ProcessCmdChSwitch));
 }
 
 bool GroupFormedState::ProcessCmdConnect(const InternalMessage &msg) const
@@ -374,6 +376,21 @@ bool GroupFormedState::ExecuteStateMsg(InternalMessage *msg)
     } else {
         return NOT_EXECUTED;
     }
+}
+
+bool GroupFormedState::ProcessCmdChSwitch(const InternalMessage &msg) const
+{
+    WifiP2pGroupInfo group;
+    if (!msg.GetMessageObj(group)) {
+        WIFI_LOGE("Failed to obtain the group information.");
+        return EXECUTED;
+    }
+    WIFI_LOGI("p2p channel is switch");
+    int freq = group.GetFrequency();
+    WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
+    currGroup.SetFrequency(freq);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
+    return EXECUTED;
 }
 }  // namespace Wifi
 }  // namespace OHOS

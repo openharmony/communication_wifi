@@ -34,6 +34,7 @@ extern "C" {
 #define P2P_GROUP_IFACE_MAX_LENGTH 128
 #define P2P_INTERFACE_CREATED "P2P-INTERFACE-CREATED "
 #define CTRL_EVENT_DISCONNECTED "CTRL-EVENT-DISCONNECTED"
+#define CTRL_EVENT_CHANNEL_SWITCH "CTRL-EVENT-CHANNEL-SWITCH"
 
 typedef struct stWifiWpaP2pInterface WifiWpaP2pInterface;
 struct stWifiWpaP2pInterface {

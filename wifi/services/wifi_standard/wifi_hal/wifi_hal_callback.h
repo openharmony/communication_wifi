@@ -148,6 +148,13 @@ void P2pHalCbGoNegotiationFailure(int status);
 void P2pHalCbP2pConnectFailed(const char *bssid, int reason);
 
 /**
+ * @Description P2p Channel Switch
+ *
+ * @param freq
+ */
+void P2pHalCbP2pChannelSwitch(int freq);
+
+/**
  * @Description Receive a P2P invitation
  *
  * @param info

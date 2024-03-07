@@ -1216,18 +1216,18 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pAddNetwork(int &networkId) const
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &config) const
 {
-    HdiHid2dConnectInfo info;
+    Hid2dConnectInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (strncpy_s((char *)(info.ssid), sizeof(info.ssid), config.GetSsid().c_str(), config.GetSsid().length()) != EOK) {
+    if (strncpy_s(info.ssid, sizeof(info.ssid), config.GetSsid().c_str(), config.GetSsid().length()) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (strncpy_s((char *)(info.bssid), sizeof(info.bssid), config.GetBssid().c_str(),
+    if (strncpy_s(info.bssid, sizeof(info.bssid), config.GetBssid().c_str(),
         config.GetBssid().length()) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (strncpy_s((char *)(info.passphrase), sizeof(info.passphrase),
+    if (strncpy_s(info.passphrase, sizeof(info.passphrase),
         config.GetPreSharedKey().c_str(), config.GetPreSharedKey().length()) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }

@@ -19,7 +19,7 @@
 #include "wifi_logger.h"
 #include "mac_address.h"
 #include "wifi_sta_hal_interface.h"
-#include "network_status_history_manager.cpp"
+#include "network_status_history_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -318,7 +318,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleArpDetectionFailed(Inter
 
 bool SelfCureStateMachine::ConnectedMonitorState::SetupSelfCureMonitor()
 {
-    std::string configAuthType = pSelfCureStateMachine->GetAuthType();
+    configAuthType = pSelfCureStateMachine->GetAuthType();
     AssignIpMethod ipAssignment;
     pSelfCureStateMachine->GetIpAssignment(ipAssignment);
     userSetStaticIpConfig = ipAssignment == AssignIpMethod::STATIC;
@@ -1229,11 +1229,10 @@ bool SelfCureStateMachine::DoArpTest(std::string ipAddress, std::string gateway)
     return arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true);
 }
 
-std::string SelfCureStateMachine::GetNextIpAddr(std::string gateway, std::string currentAddr,
+std::string SelfCureStateMachine::GetNextIpAddr(const std::string gateway, const std::string currentAddr,
                                                 std::vector<std::string> testedAddr)
 {
     std::vector<int> ipAddr;
-    std::vector<int> gwAddr;
     if (gateway.empty() || currentAddr.empty() || testedAddr.size() ==0) {
         WIFI_LOGI("gateway is empty or currentAddr is empty or testedAddr.size() == 0");
         return "";
@@ -1244,6 +1243,7 @@ std::string SelfCureStateMachine::GetNextIpAddr(std::string gateway, std::string
     int iMAX = 250;
     int iMIN = 101;
     while (getCnt++ < GET_NEXT_IP_MAC_CNT) {
+        std::vector<int> gwAddr;
         bool reduplicate = false;
         time_t now = time(nullptr);
         if (now >= 0) {
@@ -1282,11 +1282,10 @@ std::string SelfCureStateMachine::GetNextIpAddr(std::string gateway, std::string
 bool SelfCureStateMachine::IsIpAddressInvalid()
 {
     IpInfo dhcpInfo;
-    std::string addr;
     std::vector<int> currAddr;
     WifiSettings::GetInstance().GetIpInfo(dhcpInfo);
     if (dhcpInfo.ipAddress != 0) {
-        addr = IpTools::ConvertIpv4Address(dhcpInfo.ipAddress);
+        std::string addr = IpTools::ConvertIpv4Address(dhcpInfo.ipAddress);
         currAddr = TransIpAddressToVec(addr);
         if ((currAddr.size() == IP_ADDR_SIZE)) {
             int intCurrAddr3 = (currAddr[VEC_POS_3] & 0xFF);
@@ -1344,7 +1343,7 @@ bool SelfCureStateMachine::IsSameEncryptType(const std::string scanInfoKeymgmt, 
     }
 }
 
-int SelfCureStateMachine::GetBssidCounter(std::vector<WifiScanInfo> &scanResults)
+int SelfCureStateMachine::GetBssidCounter(const std::vector<WifiScanInfo> &scanResults)
 {
     WifiLinkedInfo wifiLinkedInfo;
     WifiDeviceConfig config;
@@ -1419,7 +1418,8 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
     return false;
 }
 
-int SelfCureStateMachine::String2InternetSelfCureHistoryInfo(std::string selfCureHistory, WifiSelfCureHistoryInfo &info)
+int SelfCureStateMachine::String2InternetSelfCureHistoryInfo(const std::string selfCureHistory,
+                                                             WifiSelfCureHistoryInfo &info)
 {
     if (selfCureHistory.empty()) {
         WIFI_LOGE("InternetSelfCureHistoryInfo is empty!");
@@ -1550,7 +1550,7 @@ void SelfCureStateMachine::PeriodicArpDetection()
     MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
 }
 
-bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessage *msg, std::string lastConnectedBssid)
+bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessage *msg, const std::string lastConnectedBssid)
 {
     return false;
 }
@@ -1599,7 +1599,7 @@ std::string SelfCureStateMachine::GetSelfCureHistoryInfo()
     return internetSelfCureHistory;
 }
 
-int SelfCureStateMachine::SetSelfCureHistoryInfo(std::string selfCureHistory)
+int SelfCureStateMachine::SetSelfCureHistoryInfo(const std::string selfCureHistory)
 {
     if (selfCureHistory =="0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0") {
         WIFI_LOGW("selfCureHistory is zero");
@@ -1641,7 +1641,7 @@ WifiDeviceConfig SelfCureStateMachine::GetCurrentWifiDeviceConfig()
     return config;
 }
 
-bool AllowSelfCure(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel)
+bool AllowSelfCure(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel)
 {
     auto now = std::chrono::system_clock::now();
     long long currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
@@ -1663,7 +1663,7 @@ bool AllowSelfCure(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel)
     return false;
 }
 
-bool DealDns(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
+bool DealDns(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
 {
     if (historyInfo.dnsSelfCureFailedCnt == 0 ||
         (historyInfo.dnsSelfCureFailedCnt == SELF_CURE_FAILED_ONE_CNT &&
@@ -1677,7 +1677,7 @@ bool DealDns(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long lo
     return false;
 }
 
-bool DealRenewDhcp(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
+bool DealRenewDhcp(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
 {
     if (historyInfo.renewDhcpSelfCureFailedCnt >= 0) {
         return true;
@@ -1685,7 +1685,7 @@ bool DealRenewDhcp(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, l
     return false;
 }
 
-bool DealStaticIp(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
+bool DealStaticIp(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
 {
     if (historyInfo.staticIpSelfCureFailedCnt <= SELF_CURE_FAILED_FOUR_CNT ||
         (historyInfo.staticIpSelfCureFailedCnt == SELF_CURE_FAILED_FIVE_CNT &&
@@ -1714,7 +1714,7 @@ bool DealMiddleReassoc(WifiSelfCureHistoryInfo &historyInfo, int requestCureLeve
     return false;
 }
 
-bool DealRandMacReassoc(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
+bool DealRandMacReassoc(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, long long currentMs)
 {
     if (historyInfo.randMacSelfCureFailedCnt < SELF_CURE_RAND_MAC_MAX_COUNT) {
         return true;
@@ -1791,7 +1791,7 @@ void SelfCureStateMachine::HandleNetworkConnected()
     SwitchState(pConnectedMonitorState);
 }
 
-bool SelfCureStateMachine::IsEncryptedAuthType(std::string authType)
+bool SelfCureStateMachine::IsEncryptedAuthType(const std::string authType)
 {
     if (authType == KEY_MGMT_WPA_PSK || authType == KEY_MGMT_SAE) {
         return true;

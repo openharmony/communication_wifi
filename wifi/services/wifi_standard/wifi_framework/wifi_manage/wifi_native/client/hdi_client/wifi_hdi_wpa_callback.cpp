@@ -220,7 +220,7 @@ int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *
     WifiIdlEvent event;
     if (strncmp(apCbParm->content, "AP-ENABLED", strlen("AP-ENABLED")) == 0) {
         event = WIFI_IDL_CBK_CMD_AP_ENABLE;
-    } else if (strncmp(apCbParm->content, "AP-DISABLE", strlen("AP-DISABLE")) == 0) {
+    } else if (strncmp(apCbParm->content, "AP-DISABLED", strlen("AP-DISABLED")) == 0) {
         event = WIFI_IDL_CBK_CMD_AP_DISABLE;
         if (GetExecDisable() == EXEC_DISABLE) {
             SetExecDisable(0);

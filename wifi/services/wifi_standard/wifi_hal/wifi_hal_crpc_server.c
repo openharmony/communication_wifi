@@ -169,6 +169,8 @@ static int InitRpcFuncMapSta(void)
     ret += PushRpcFunc("GetConnectSignalInfo", RpcGetConnectSignalInfo);
     ret += PushRpcFunc("SetSuspendMode", RpcSetSuspendMode);
     ret += PushRpcFunc("SetPowerMode", RpcSetPowerMode);
+    ret += PushRpcFunc("SetBgLimitMode", RpcSetBgLimitMode);
+    ret += PushRpcFunc("SetBgLimitIdList", RpcSetBgLimitIdList);
     return ret;
 }
 
@@ -688,6 +690,15 @@ static void DealP2pConnectFailedCbk(int event, Context *context)
     return;
 }
 
+static void DealP2pChannelSwitchCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.serDiscReqInfo.freq);
+    }
+    return;
+}
+
 static void DealP2pCallback(int event, Context *context)
 {
     switch (event) {
@@ -730,6 +741,9 @@ static void DealP2pCallback(int event, Context *context)
             break;
         case P2P_CONNECT_FAILED:
             DealP2pConnectFailedCbk(event, context);
+            break;
+        case P2P_CHANNEL_SWITCH:
+            DealP2pChannelSwitchCbk(event, context);
             break;
         default:
             break;

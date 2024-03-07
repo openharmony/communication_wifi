@@ -751,6 +751,7 @@ static char **ReadRoamBlockList(Context *context, int size)
         }
         if (ReadStr(context, list[i], len) != 0) {
             free(list[i]);
+            list[i] = NULL;
             return NULL;
         }
     }
@@ -966,6 +967,51 @@ int RpcSetPowerMode(RpcServer *server, Context *context)
     }
     bool mode = (tmpMode == 0) ? false : true;
     WifiErrorNo err = SetPowerMode(mode);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcSetBgLimitMode(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    int mode = 0;
+    if (ReadInt(context, &mode) < 0) {
+        return HAL_FAILURE;
+    }
+
+    WifiErrorNo err = SetBgLimitMode(mode);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
+int RpcSetBgLimitIdList(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    int size = 0;
+    if (ReadInt(context, &size) < 0) {
+        return HAL_FAILURE;
+    }
+
+    int idArray[size];
+    for (int i = 0; i < size; i++) {
+        if (ReadInt(context, &idArray[i]) < 0) {
+            return HAL_FAILURE;
+        }
+    }
+    int type = 0;
+    if (ReadInt(context, &type) < 0) {
+        return HAL_FAILURE;
+    }
+
+    WifiErrorNo err = SetBgLimitIdList(idArray, size, type);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);

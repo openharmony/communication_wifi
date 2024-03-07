@@ -23,7 +23,7 @@
 #include "securec.h"
 #include "wifi_hdi_common.h"
 #include "wifi_log.h"
-#include "v1_1/iwlan_callback.h"
+#include "v1_2/iwlan_callback.h"
 #include "wifi_hdi_proxy.h"
 #include "wifi_hdi_sta_impl.h"
 

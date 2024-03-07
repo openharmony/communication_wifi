@@ -48,6 +48,7 @@ private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
+    int mLastWifiOpenState = -1;
 };
 
 }  // namespace Wifi

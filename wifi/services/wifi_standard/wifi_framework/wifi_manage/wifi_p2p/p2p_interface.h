@@ -251,6 +251,13 @@ public:
     virtual ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) override;
 
     /**
+     * @Description - UnRegister all callbacks provided by the P2P.
+     * @param  callbacks - all callbacks added
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) override;
+
+    /**
      * @Description Create hid2d group, used on the GO side.
      *
      * @param frequency - frequency

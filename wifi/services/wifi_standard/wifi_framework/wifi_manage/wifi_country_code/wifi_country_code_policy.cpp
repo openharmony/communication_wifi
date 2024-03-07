@@ -411,7 +411,7 @@ void WifiCountryCodePolicy::TelephoneNetworkSearchStateChangeListener::OnReceive
     const OHOS::EventFwk::CommonEventData &eventData)
 {
     const auto &action = eventData.GetWant().GetAction();
-    WIFI_LOGI("receive telephone network state change common event: %{public}s", action.c_str());
+    WIFI_LOGI("receive common event: %{public}s", action.c_str());
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED) {
         WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();
     }

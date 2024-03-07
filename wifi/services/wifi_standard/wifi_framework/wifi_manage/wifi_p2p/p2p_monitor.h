@@ -261,6 +261,13 @@ private:
      */
     virtual void Broadcast2SmConnectFailed(const std::string &iface, int reason, const WifiP2pDevice &device) const;
 
+    /**
+     * @Description Broadcast p2p channel switch event.
+     *
+     * @param iface - network interface for event processing
+     * @param group - group information
+     */
+    virtual void Broadcast2SmChSwitch(const std::string &iface, const WifiP2pGroupInfo &group) const;
 private:
     /**
      * @Description - Register the connection supplicant result callback function.
@@ -417,6 +424,12 @@ private:
      * @param reason - connect failed reason
      */
     void WpaEventP2pConnectFailed(const std::string &bssid, int reason) const;
+
+        /**
+     * @Description Register the callback function for p2p channel switch
+     * @param freq - channel switch freq
+     */
+    void WpaEventP2pChannelSwitch(int freq) const;
 private:
     /**
      * The current implementation cannot obtain abundant HAL instances like Andoird and cannot distinguish which

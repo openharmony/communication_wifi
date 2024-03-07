@@ -15,6 +15,7 @@
 #ifndef OHOS_P2P_STATE_MACHINE_H
 #define OHOS_P2P_STATE_MACHINE_H
 
+#include <mutex>
 #include "state_machine.h"
 #include "ip2p_service_callbacks.h"
 #include "p2p_define.h"
@@ -111,9 +112,15 @@ public:
     virtual void RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback);
 
     /**
+     * @Description - Callbacks of event registered by the p2pService.
+     * @param  callback - event callback object
+     */
+    virtual void UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback);
+
+    /**
      * @Description - Callbacks of event unregistered by the p2pService.
      */
-    virtual void UnRegisterP2pServiceCallbacks();
+    virtual void ClearAllP2pServiceCallbacks();
 
     /**
      * @Description - Set is need dhcp.
@@ -392,6 +399,7 @@ private:
     GcInfo MatchDevInGcInfos(const std::string &deviceAddr, const std::string &groupAddr, std::vector<GcInfo> &gcInfos);
 
 private:
+    mutable std::mutex cbMapMutex;
     std::map<std::string, IP2pServiceCallbacks> p2pServiceCallbacks;  /* state machine -> service callback */
     std::string p2pIface;               /* P2P iface */
     WifiP2pConfigInternal savedP2pConfig;    /* record P2P config when communicating with the peer device */

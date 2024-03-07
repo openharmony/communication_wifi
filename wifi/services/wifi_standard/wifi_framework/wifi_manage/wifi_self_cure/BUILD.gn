@@ -59,6 +59,7 @@ ohos_shared_library("wifi_self_cure") {
     "../common/message_queue.cpp",
     "../common/state.cpp",
     "../common/state_machine.cpp",
+    "../wifi_sta/network_status_history_manager.cpp",
     "self_cure_interface.cpp",
     "self_cure_service.cpp",
     "self_cure_state_machine.cpp",

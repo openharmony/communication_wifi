@@ -165,6 +165,7 @@ void WifiStaManager::DealStaOpenRes(OperateResState state, int instId)
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENING));
+        mLastWifiOpenState = static_cast<int>(state);
         return;
     }
     if ((state == OperateResState::OPEN_WIFI_FAILED) || (state == OperateResState::OPEN_WIFI_DISABLED)) {
@@ -176,7 +177,6 @@ void WifiStaManager::DealStaOpenRes(OperateResState state, int instId)
         DealStaCloseRes(state, instId);
         return;
     }
-
     WIFI_LOGI("DealStaOpenRes:wifi open successfully!");
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
     WifiConfigCenter::GetInstance().SetStaLastRunState(true, instId);
@@ -184,9 +184,11 @@ void WifiStaManager::DealStaOpenRes(OperateResState state, int instId)
     ins->HandleStaStart(instId);
     cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
+    if ((state == OperateResState::OPEN_WIFI_SUCCEED) &&
+        (mLastWifiOpenState == static_cast<int>(WifiOperateState::STA_OPENING))) {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENED));
+        mLastWifiOpenState = static_cast<int>(state);
     }
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId)) {
         WIFI_LOGI("DealStaOpenRes: wifi scan only state notify scan result!");

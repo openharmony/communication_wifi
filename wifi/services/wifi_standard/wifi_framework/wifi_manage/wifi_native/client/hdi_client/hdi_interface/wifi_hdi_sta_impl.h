@@ -20,7 +20,7 @@
 #include "wifi_hdi_define.h"
 #include "wifi_error_no.h"
 #include "wifi_hdi_struct.h"
-#include "v1_1/iwlan_interface.h"
+#include "v1_2/iwlan_interface.h"
 #include "wifi_hal_base_feature.h"
 
 #ifdef __cplusplus
@@ -129,6 +129,20 @@ ISupplicantEventCallback *HdiGetSupplicantEventCallback();
  * @return NONE
  */
 void HdiReleaseLocalResources();
+
+/**
+ * @Description set power save mode
+ *
+ * @return WifiErrorNo
+ */
+WifiErrorNo HdiSetPmMode(int frequency, int mode);
+
+/**
+ * @Description set data packet identification mark rule
+ *
+ * @return NONE
+ */
+WifiErrorNo HdiSetDpiMarkRule(int uid, int protocol, int enable);
 
 void HdiNotifyScanResult(int status);
 #ifdef __cplusplus

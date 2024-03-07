@@ -26,7 +26,7 @@ StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId)
 
 StaInterface::~StaInterface()
 {
-    WIFI_LOGI("StaInterface::~StaInterface");
+    WIFI_LOGI("~StaInterface");
     std::lock_guard<std::mutex> lock(mutex);
     if (pStaService != nullptr) {
         delete pStaService;
@@ -47,7 +47,7 @@ extern "C" void Destroy(IStaService *pservice)
 
 ErrCode StaInterface::EnableWifi()
 {
-    WIFI_LOGI("Enter StaInterface::EnableWifi.\n");
+    WIFI_LOGI("Enter EnableWifi.\n");
     std::lock_guard<std::mutex> lock(mutex);
     if(pStaService == nullptr) {
         pStaService = new (std::nothrow) StaService(m_instId);
@@ -292,7 +292,7 @@ ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callb
 
 ErrCode StaInterface::SetSuspendMode(bool mode)
 {
-    LOGI("Enter StaInterface::SetSuspendMode, mode=[%{public}d]!", mode);
+    LOGI("Enter SetSuspendMode, mode=[%{public}d]!", mode);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->SetSuspendMode(mode) != WIFI_OPT_SUCCESS) {
@@ -304,7 +304,7 @@ ErrCode StaInterface::SetSuspendMode(bool mode)
 
 ErrCode StaInterface::SetPowerMode(bool mode)
 {
-    LOGI("Enter StaInterface::SetPowerMode, mode=[%{public}d]!", mode);
+    LOGI("Enter SetPowerMode, mode=[%{public}d]!", mode);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->SetPowerMode(mode) != WIFI_OPT_SUCCESS) {
@@ -316,7 +316,7 @@ ErrCode StaInterface::SetPowerMode(bool mode)
 
 ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 {
-    LOGI("Enter StaInterface::OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
+    LOGI("Enter OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
         systemAbilityid, add);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
@@ -329,7 +329,7 @@ ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 
 ErrCode StaInterface::OnScreenStateChanged(int screenState)
 {
-    WIFI_LOGI("Enter StaInterface::OnScreenStateChanged, screenState=%{public}d.", screenState);
+    WIFI_LOGI("Enter OnScreenStateChanged, screenState=%{public}d.", screenState);
 
     if (screenState != MODE_STATE_OPEN && screenState != MODE_STATE_CLOSE) {
         WIFI_LOGE("screenState param is error");
@@ -392,7 +392,7 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
 
 ErrCode StaInterface::StartPortalCertification()
 {
-    WIFI_LOGI("Enter StaInterface::StartPortalCertification");
+    WIFI_LOGI("Enter StartPortalCertification");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->StartPortalCertification();
@@ -405,6 +405,16 @@ ErrCode StaInterface::RenewDhcp()
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->RenewDhcp();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::HandleForegroundAppChangedAction(const std::string &bundleName,
+    int uid, int pid, const int state)
+{
+    WIFI_LOGI("Enter StaInterface::HandleForegroundAppChangedAction");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

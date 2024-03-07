@@ -39,7 +39,13 @@ constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 
 StaService::StaService(int instId)
-    : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr), m_instId(instId)
+    : pStaStateMachine(nullptr),
+      pStaMonitor(nullptr),
+      pStaAutoConnectService(nullptr),
+#ifndef OHOS_ARCH_LITE
+      pStaAppAcceleration(nullptr),
+#endif
+      m_instId(instId)
 {}
 
 StaService::~StaService()
@@ -60,6 +66,13 @@ StaService::~StaService()
         delete pStaStateMachine;
         pStaStateMachine = nullptr;
     }
+
+#ifndef OHOS_ARCH_LITE
+    if (pStaAppAcceleration != nullptr) {
+        delete pStaAppAcceleration;
+        pStaAppAcceleration = nullptr;
+    }
+#endif
 }
 
 ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callbacks)
@@ -138,6 +151,16 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
         WIFI_LOGE("InitAutoConnectService failed.\n");
         return WIFI_OPT_FAILED;
     }
+#ifndef OHOS_ARCH_LITE
+    pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
+    if (pStaAppAcceleration == nullptr) {
+        WIFI_LOGE("Alloc pStaAppAcceleration failed.\n");
+    }
+
+    if (pStaAppAcceleration->InitAppAcceleration() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("InitAppAcceleration failed.\n");
+    }
+#endif
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;
 }
@@ -251,7 +274,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
 
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter AddDeviceConfig.\n");
+    LOGI("Enter AddDeviceConfig, bssid=%{public}s\n", MacAnonymize(config.bssid).c_str());
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = INVALID_NETWORK_ID;
     bool isUpdate = false;
@@ -328,6 +351,9 @@ ErrCode StaService::RemoveDevice(int networkId) const
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    } else {
+        LOGE("RemoveDevice, networkId = %{public}d do not exist.\n", networkId);
+        return WIFI_OPT_FAILED;
     }
     /* Remove network configuration directly without notification to InterfaceService. */
     WifiSettings::GetInstance().RemoveDevice(networkId);
@@ -607,7 +633,7 @@ std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
  
 void StaService::HandleScreenStatusChanged(int screenState)
 {
-    WIFI_LOGI("Enter StaService::HandleScreenStatusChanged screenState:%{public}d.", screenState);
+    WIFI_LOGI("Enter HandleScreenStatusChanged screenState:%{public}d.", screenState);
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("pStaStateMachine is null!");
@@ -618,7 +644,9 @@ void StaService::HandleScreenStatusChanged(int screenState)
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
-    
+    if (pStaAppAcceleration != nullptr) {
+        pStaAppAcceleration->HandleScreenStatusChanged(screenState);
+    }
     pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
 #endif
     return;
@@ -686,5 +714,18 @@ ErrCode StaService::RenewDhcp()
     pStaStateMachine->RenewDhcp();
     return WIFI_OPT_SUCCESS;
 }
+
+#ifndef OHOS_ARCH_LITE
+ErrCode StaService::HandleForegroundAppChangedAction(const std::string &bundleName,
+    int uid, int pid, const int state)
+{
+    if (pStaAppAcceleration == nullptr) {
+        WIFI_LOGE("pStaAppAcceleration is null");
+        return WIFI_OPT_FAILED;
+    }
+    pStaAppAcceleration->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    return WIFI_OPT_SUCCESS;
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

@@ -416,6 +416,7 @@ ErrCode P2pStateMachine::RemoveClientInfo(std::string mac)
 void P2pStateMachine::BroadcastP2pStatusChanged(P2pState state) const
 {
     WifiSettings::GetInstance().SetP2pState(static_cast<int>(state));
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pStateChangedEvent != nullptr) {
             callBackItem.second.OnP2pStateChangedEvent(state);
@@ -427,6 +428,7 @@ void P2pStateMachine::BroadcastP2pPeersChanged() const
 {
     std::vector<WifiP2pDevice> peers;
     deviceManager.GetDevicesList(peers);
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pPeersChangedEvent != nullptr) {
             callBackItem.second.OnP2pPeersChangedEvent(peers);
@@ -438,6 +440,7 @@ void P2pStateMachine::BroadcastP2pServicesChanged() const
 {
     std::vector<WifiP2pServiceInfo> svrInfoList;
     serviceManager.GetDeviceServices(svrInfoList);
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pServicesChangedEvent != nullptr) {
             callBackItem.second.OnP2pServicesChangedEvent(svrInfoList);
@@ -449,6 +452,7 @@ void P2pStateMachine::BroadcastP2pConnectionChanged() const
 {
     WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pConnectionChangedEvent != nullptr) {
             callBackItem.second.OnP2pConnectionChangedEvent(p2pInfo);
@@ -458,6 +462,7 @@ void P2pStateMachine::BroadcastP2pConnectionChanged() const
 
 void P2pStateMachine::BroadcastThisDeviceChanaged(const WifiP2pDevice &device) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pThisDeviceChangedEvent != nullptr) {
             callBackItem.second.OnP2pThisDeviceChangedEvent(device);
@@ -469,6 +474,7 @@ void P2pStateMachine::BroadcastP2pDiscoveryChanged(bool isActive) const
 {
     int status = isActive ? 1 : 0;
     WifiSettings::GetInstance().SetP2pDiscoverState(status);
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pDiscoveryChangedEvent != nullptr) {
             callBackItem.second.OnP2pDiscoveryChangedEvent(isActive);
@@ -505,6 +511,7 @@ void P2pStateMachine::BroadcastP2pGcLeaveGroup(WifiP2pDevice &device) const
 
 void P2pStateMachine::BroadcastPersistentGroupsChanged() const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pGroupsChangedEvent != nullptr) {
             callBackItem.second.OnP2pGroupsChangedEvent();
@@ -514,6 +521,7 @@ void P2pStateMachine::BroadcastPersistentGroupsChanged() const
 
 void P2pStateMachine::BroadcastActionResult(P2pActionCallback action, ErrCode result) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pActionResultEvent != nullptr) {
             callBackItem.second.OnP2pActionResultEvent(action, result);
@@ -524,6 +532,7 @@ void P2pStateMachine::BroadcastActionResult(P2pActionCallback action, ErrCode re
 void P2pStateMachine::BroadcastServiceResult(P2pServicerProtocolType serviceType,
     const std::vector<unsigned char> &respData, const WifiP2pDevice &srcDevice) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pServiceAvailable != nullptr) {
             callBackItem.second.OnP2pServiceAvailable(serviceType, respData, srcDevice);
@@ -534,6 +543,7 @@ void P2pStateMachine::BroadcastServiceResult(P2pServicerProtocolType serviceType
 void P2pStateMachine::BroadcastDnsSdServiceResult(
     const std::string &instName, const std::string &regType, const WifiP2pDevice &srcDevice) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pDnsSdServiceAvailable != nullptr) {
             callBackItem.second.OnP2pDnsSdServiceAvailable(instName, regType, srcDevice);
@@ -544,6 +554,7 @@ void P2pStateMachine::BroadcastDnsSdServiceResult(
 void P2pStateMachine::BroadcastDnsSdTxtRecordResult(const std::string &wholeDomainName,
     const std::map<std::string, std::string> &txtMap, const WifiP2pDevice &srcDevice) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pDnsSdTxtRecordAvailable != nullptr) {
             callBackItem.second.OnP2pDnsSdTxtRecordAvailable(wholeDomainName, txtMap, srcDevice);
@@ -554,6 +565,7 @@ void P2pStateMachine::BroadcastDnsSdTxtRecordResult(const std::string &wholeDoma
 void P2pStateMachine::BroadcastUpnpServiceResult(
     const std::vector<std::string> &uniqueServiceNames, const WifiP2pDevice &srcDevice) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pUpnpServiceAvailable != nullptr) {
             callBackItem.second.OnP2pUpnpServiceAvailable(uniqueServiceNames, srcDevice);
@@ -564,12 +576,21 @@ void P2pStateMachine::BroadcastUpnpServiceResult(
 void P2pStateMachine::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback)
 {
     WIFI_LOGI("RegisterP2pServiceCallbacks, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     p2pServiceCallbacks.insert_or_assign(callback.callbackModuleName, callback);
 }
 
-void P2pStateMachine::UnRegisterP2pServiceCallbacks()
+void P2pStateMachine::UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback)
 {
-    WIFI_LOGI("UnRegisterP2pServiceCallbacks");
+    WIFI_LOGI("UnRegisterP2pServiceCallbacks, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    std::unique_lock<std::mutex> lock(cbMapMutex);
+    p2pServiceCallbacks.erase(callback.callbackModuleName);
+}
+
+void P2pStateMachine::ClearAllP2pServiceCallbacks()
+{
+    WIFI_LOGI("ClearAllP2pServiceCallbacks");
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     p2pServiceCallbacks.clear();
 }
 

@@ -12,14 +12,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mock_wifi_supplicant_hal_interface.h"
+#include "mock_wifi_sta_interface.h"
 
 namespace OHOS {
 namespace Wifi {
-    WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
-    {
-        static WifiSupplicantHalInterface inst;
-        return inst;
-    }
+
+MockWifiStaInterface &MockWifiStaInterface::GetInstance(void)
+{
+    static MockWifiStaInterface inst;
+    return inst;
+}
+
+namespace WifiSupplicantHalInterface {
+
+WifiErrorNo StartSupplicant()
+{
+    return MockWifiStaInterface::GetInstance().pSupplicant.startSipplicant ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo WpaSetCountryCode(const std::string &countryCode)
+{
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetCountryCode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo WpaSetSuspendMode(bool mode)
+{
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo WpaSetPowerMode(bool mode)
+{
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetPowerMode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+};
 }  // namespace Wifi
-}  // namespace OHOS
+}  // namespace OHOS/ namespace OHOS

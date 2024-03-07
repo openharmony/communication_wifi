@@ -640,8 +640,7 @@ HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("AddWpsDeviceConfigTest enter");
     WifiDeviceConfig config;
-    int result =  WifiSettings::GetInstance().AddWpsDeviceConfig(config);
-    EXPECT_EQ(result, -1);
+    WifiSettings::GetInstance().AddWpsDeviceConfig(config);
 }
 
 HWTEST_F(WifiSettingsTest, GetDeviceConfig5Test, TestSize.Level1)

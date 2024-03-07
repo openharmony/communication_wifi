@@ -95,7 +95,7 @@ WifiErrorNo HdiP2pRespServerDiscovery(struct HdiP2pServDiscReqInfo *info);
 
 WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin);
 
-WifiErrorNo HdiP2pHid2dConnect(struct HdiHid2dConnectInfo *info);
+WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info);
 
 WifiErrorNo HdiP2pSetServDiscExternal(int mode);
 

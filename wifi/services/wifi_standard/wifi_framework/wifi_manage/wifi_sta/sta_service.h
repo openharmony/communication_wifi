@@ -23,6 +23,7 @@
 #include "network_selection.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
+#include "sta_app_acceleration.h"
 #endif
 
 namespace OHOS {
@@ -304,6 +305,18 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode RenewDhcp();
+
+    /**
+     * @Description Handle foreground app changed action.
+     *
+     * @param bundleName app name.
+     * @param uid app uid.
+     * @param pid app pid.
+     * @param state app state.
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode HandleForegroundAppChangedAction(const std::string &bundleName,
+                                                        int uid, int pid, const int state);
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
@@ -322,6 +335,9 @@ private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
+#ifndef OHOS_ARCH_LITE
+    StaAppAcceleration *pStaAppAcceleration;
+#endif
     int m_instId;
 };
 }  // namespace Wifi

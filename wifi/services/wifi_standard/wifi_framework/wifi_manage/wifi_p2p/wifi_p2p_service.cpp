@@ -35,7 +35,7 @@ WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceMa
 
 WifiP2pService::~WifiP2pService()
 {
-    UnRegisterP2pServiceCallbacks();
+    ClearAllP2pServiceCallbacks();
 }
 
 ErrCode WifiP2pService::EnableP2p()
@@ -276,9 +276,16 @@ ErrCode WifiP2pService::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-void WifiP2pService::UnRegisterP2pServiceCallbacks()
+ErrCode WifiP2pService::UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)
 {
-    p2pStateMachine.UnRegisterP2pServiceCallbacks();
+    WIFI_LOGI("UnRegisterP2pServiceCallbacks");
+    p2pStateMachine.UnRegisterP2pServiceCallbacks(callbacks);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+void WifiP2pService::ClearAllP2pServiceCallbacks()
+{
+    p2pStateMachine.ClearAllP2pServiceCallbacks();
 }
 
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)

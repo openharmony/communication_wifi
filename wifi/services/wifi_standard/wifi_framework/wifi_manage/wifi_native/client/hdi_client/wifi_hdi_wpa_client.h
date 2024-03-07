@@ -28,7 +28,7 @@
 #include "wifi_global_func.h"
 #include "i_wifi_struct.h"
 #include "wifi_event_callback.h"
-#inlcude "wifi_ap_event_callback.h"
+#include "wifi_ap_event_callback.h"
 #include "wifi_p2p_event_callback.h"
 
 namespace OHOS {

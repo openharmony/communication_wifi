@@ -202,6 +202,11 @@ ErrCode P2pInterface::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &ca
     return p2pService.RegisterP2pServiceCallbacks(callbacks);
 }
 
+ErrCode P2pInterface::UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)
+{
+    return p2pService.UnRegisterP2pServiceCallbacks(callbacks);
+}
+
 ErrCode P2pInterface::Hid2dCreateGroup(const int frequency, FreqType type)
 {
     return p2pService.Hid2dCreateGroup(frequency, type);

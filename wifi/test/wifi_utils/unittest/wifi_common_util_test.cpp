@@ -37,6 +37,7 @@ constexpr int MIN_24G_CHANNEL = 1;
 constexpr int MIN_5G_CHANNEL = 36;
 constexpr int CHANNEL_14 = 14;
 constexpr int WIFI_MAC_LENS = 6;
+constexpr int FREQ_CHANNEL_36 = 5180;
 
 class WifiCommonUtilTest : public testing::Test {
 public:
@@ -73,16 +74,16 @@ HWTEST_F(WifiCommonUtilTest, GetRunningProcessNameByPidTest, TestSize.Level1)
 
 HWTEST_F(WifiCommonUtilTest, FrequencyToChannelTest, TestSize.Level1)
 {
-    EXPECT_EQ(FrequencyToChannel(FREQ_2G_MIN), 0);
+    EXPECT_EQ(FrequencyToChannel(FREQ_2G_MIN), 1);
     EXPECT_EQ(FrequencyToChannel(CHANNEL_14_FREQ), CHANNEL_14);
-    EXPECT_EQ(FrequencyToChannel(FREQ_5G_MIN), 0);
+    EXPECT_EQ(FrequencyToChannel(FREQ_5G_MIN), CHANNEL_5G_MIN);
     EXPECT_EQ(FrequencyToChannel(CHANNEL_5G_MIN), INVALID_FREQ_OR_CHANNEL);
 }
 
 HWTEST_F(WifiCommonUtilTest, ChannelToFrequencyTest, TestSize.Level1)
 {
-    EXPECT_EQ(ChannelToFrequency(MIN_24G_CHANNEL), 0);
-    EXPECT_EQ(ChannelToFrequency(MIN_5G_CHANNEL), 0);
+    EXPECT_EQ(ChannelToFrequency(MIN_24G_CHANNEL), FREQ_2G_MIN);
+    EXPECT_EQ(ChannelToFrequency(MIN_5G_CHANNEL), FREQ_CHANNEL_36);
     EXPECT_EQ(ChannelToFrequency(FREQ_2G_MIN), INVALID_FREQ_OR_CHANNEL);
 }
 

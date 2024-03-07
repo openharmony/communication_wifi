@@ -210,6 +210,13 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode SetSuspendMode(bool mode) = 0;
+    /**
+     * @Description systemabilitychanged
+     *
+     * @param mode: true for setup, false for shutdown.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode OnSystemAbilityChanged(int systemAbilityid, bool add) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

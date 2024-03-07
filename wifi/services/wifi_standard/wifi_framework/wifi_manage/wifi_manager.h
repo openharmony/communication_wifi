@@ -30,6 +30,7 @@
 #include "sta_service_callback.h"
 #include "iscan_service_callbacks.h"
 #include "wifi_errcode.h"
+#include "wifi_system_ability_listerner.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service_callbacks.h"
 #endif
@@ -109,7 +110,7 @@ private:
 };
 #endif
 
-class WifiManager {
+class WifiManager : WifiSystemAbilityListener {
 public:
     WifiManager();
     ~WifiManager();
@@ -155,6 +156,9 @@ public:
     void StartUnloadStaSaTimer(void);
     void StopUnloadScanSaTimer(void);
     void StartUnloadScanSaTimer(void);
+
+    void OnSystemAbilityChanged(int systemAbilityId, bool add) override;
+    
 #ifdef FEATURE_AP_SUPPORT
     /**
      * @Description Get the ap callback object.
@@ -211,6 +215,7 @@ private:
     void PushServiceCloseMsg(WifiCloseServiceCode code);
     void InitStaCallback(void);
     void InitScanCallback(void);
+    void InitSubscribeListener();
 #ifdef FEATURE_AP_SUPPORT
     void InitApCallback(void);
 #endif

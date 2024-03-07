@@ -443,3 +443,11 @@ void OnP2pConnectFailed(const char *bssid, int reason)
         cbk.onP2pConnectFailed(bssid, reason);
     }
 }
+
+void OnP2pChannelSwitch(int freq)
+{
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onP2pChannelSwitch) {
+        cbk.onP2pChannelSwitch(freq);
+    }
+}

@@ -50,6 +50,12 @@ extern "C" {
 #define STA_CB_SCAN_FAILED 1
 #define STA_CB_SCAN_OVER_OK 2
 
+#define MAX_ARRAY_LENGTH 256
+static const char * const AWARE_CTRL_FILENAME = "/proc/net/aware/aware_ctrl";
+static const char * const FG_UID_PATH = "/proc/net/aware/fg_uids";
+static const char * const BG_UID_PATH = "/proc/net/aware/bg_uids";
+static const char * const BG_PID_PATH = "/proc/net/aware/bg_pids";
+
 typedef enum WifiErrorNo {
     WIFI_HAL_SUCCESS = 0,                /* Success. */
     WIFI_HAL_FAILED = 1,                 /* Failed. */
@@ -126,6 +132,7 @@ typedef enum WifiHalEvent {
     WIFI_HAL_COMMON_EVENT,               /* CHBA recv common event */
     AP_STA_PSK_MISMATH_EVENT,            /* AP STA possible PSK mismatch event */
     P2P_CONNECT_FAILED,                  /* P2P connect failed */
+    P2P_CHANNEL_SWITCH,                  /* P2P Channel switch*/
     WIFI_HAL_MAX_EVENT,
 } WifiHalEvent;
 
@@ -253,6 +260,12 @@ typedef enum HalPortType {
     HAL_PORT_TYPE_P2P_DEVICE = 4,
     HAL_PORT_TYPE_BUTT            // invalid type
 }HalPortType;
+
+typedef enum BgLimitType {
+    SET_BG_UID,
+    SET_BG_PID,
+    SET_FG_UID
+} BgLimitType;
 
 #ifdef __cplusplus
 }

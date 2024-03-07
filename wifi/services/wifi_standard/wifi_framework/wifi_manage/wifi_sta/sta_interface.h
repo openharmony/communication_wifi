@@ -294,6 +294,18 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode RenewDhcp() override;
+
+    /**
+     * @Description Handle foreground app changed action.
+     *
+     * @param bundleName app name.
+     * @param uid app uid.
+     * @param pid app pid.
+     * @param state app state.
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode HandleForegroundAppChangedAction(const std::string &bundleName,
+                                                        int uid, int pid, const int state) override;
 private:
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;

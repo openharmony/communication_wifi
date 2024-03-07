@@ -29,7 +29,6 @@
 #include "scan_common.h"
 #include "scan_monitor.h"
 #include "scan_state_machine.h"
-#include "scan_standby_listerner.h"
 #include "ienhance_service.h"
 
 namespace OHOS {
@@ -297,14 +296,6 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode CloseScanOnly() const;
-    /**
-     * @Description OnSystemAbilityChanged
-     *
-     * @param systemAbilityId system ability id
-     * @param add true or false
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_INVALID_PARAM
-     */
-    virtual ErrCode OnSystemAbilityChanged(int systemAbilityId, bool add);
 
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;
@@ -363,9 +354,6 @@ private:
     bool isAbsFreezeScaned;                          /* scanned in freeze state. */
     int scanResultBackup;                            /* scan result backup. */
     IEnhanceService *mEnhanceService;                /* EnhanceService handle */
-#ifndef OHOS_ARCH_LITE
-    StandByListerner standByListerner;         /* standby Listerner*/
-#endif
     int m_instId;
     int lastNetworkQuality;
     /**

@@ -22,7 +22,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalCallback"
-#define MAC_OFFSET 2
+#define MAC_OFFSET 1
 
 static void EmitEventCallbackMsg(WifiHalEventCallbackMsg *pCbkMsg, WifiHalEvent event)
 {
@@ -348,6 +348,18 @@ void P2pHalCbGoNegotiationFailure(int status)
     }
     pCbkMsg->msg.scanStatus = status;
     EmitEventCallbackMsg(pCbkMsg, P2P_GO_NEGOTIATION_FAILURE_EVENT);
+    return;
+}
+
+void P2pHalCbP2pChannelSwitch(int freq)
+{
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+    pCbkMsg->msg.serDiscReqInfo.freq = freq;
+    EmitEventCallbackMsg(pCbkMsg, P2P_CHANNEL_SWITCH);
     return;
 }
 

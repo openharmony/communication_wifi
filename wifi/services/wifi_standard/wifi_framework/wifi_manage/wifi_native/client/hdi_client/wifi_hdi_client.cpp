@@ -211,6 +211,16 @@ WifiErrorNo WifiHdiClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
     return err;
 }
 
+WifiErrorNo WifiHdiClient::ReqSetPmMode(int frequency, int mode)
+{
+    return HdiSetPmMode(frequency, mode);
+}
+
+WifiErrorNo WifiHdiClient::ReqSetDpiMarkRule(int uid, int protocol, int enable)
+{
+    return HdiSetDpiMarkRule(uid, protocol, enable);
+}
+
 /* ************************ softAp Interface ************************** */
 WifiErrorNo WifiHdiClient::StartAp(int id)
 {

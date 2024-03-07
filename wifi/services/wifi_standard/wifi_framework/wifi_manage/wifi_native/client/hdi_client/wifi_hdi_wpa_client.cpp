@@ -36,6 +36,8 @@ const int BUFFER_SIZE = 4096;
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int WIFI_HDI_MAX_STR_LENGTH = 512;
 constexpr int WIFI_MAX_SCAN_COUNT = 256;
+constexpr int P2P_SUPPLICANT_DISCONNECTED = 0;
+constexpr int P2P_SUPPLICANT_CONNECTED = 1;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(void)
 {
@@ -605,9 +607,15 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiSetApWmm(HOSTAPD_CFG_VALUE_ON, id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    HdiReloadApConfigInfo(id);
-    HdiDisableAp(id);
-    HdiEnableAp(id);
+    if (HdiReloadApConfigInfo(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiDisableAp(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    if (HdiEnableAp(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
     return WIFI_IDL_OPT_OK;
 }
 
@@ -662,12 +670,20 @@ WifiErrorNo WifiHdiWpaClient::ReqDisconnectStaByMac(const std::string &mac, int 
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pStart()
 {
-    return HdiWpaP2pStart();
+    WifiErrorNo ret = HdiWpaP2pStart();
+    if (ret == WIFI_IDL_OPT_OK) {
+        OnEventP2pStateChanged(P2P_SUPPLICANT_CONNECTED);
+    }
+    return ret;
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pStop()
 {
-    return HdiWpaP2pStop();
+    WifiErrorNo ret = HdiWpaP2pStop();
+    if (ret == WIFI_IDL_OPT_OK) {
+        OnEventP2pStateChanged(P2P_SUPPLICANT_DISCONNECTED);
+    }
+    return ret;
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pSetDeviceName(const std::string &name) const
@@ -728,7 +744,6 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
     }
 
     if (callbacks.onConnectSupplicant != nullptr) {
-        cWifiHdiWpaCallback.OnEventStateChanged = OnEventP2pStateChanged;
         cWifiHdiWpaCallback.OnEventDeviceFound = OnEventDeviceFound;
         cWifiHdiWpaCallback.OnEventDeviceLost = OnEventDeviceLost;
         cWifiHdiWpaCallback.OnEventGoNegotiationRequest = OnEventGoNegotiationRequest;
@@ -1200,18 +1215,18 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pAddNetwork(int &networkId) const
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &config) const
 {
-    HdiHid2dConnectInfo info;
+    Hid2dConnectInfo info;
     if (memset_s(&info, sizeof(info), 0, sizeof(info)) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (strncpy_s((char *)(info.ssid), sizeof(info.ssid), config.GetSsid().c_str(), config.GetSsid().length()) != EOK) {
+    if (strncpy_s(info.ssid, sizeof(info.ssid), config.GetSsid().c_str(), config.GetSsid().length()) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (strncpy_s((char *)(info.bssid), sizeof(info.bssid), config.GetBssid().c_str(),
+    if (strncpy_s(info.bssid, sizeof(info.bssid), config.GetBssid().c_str(),
         config.GetBssid().length()) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (strncpy_s((char *)(info.passphrase), sizeof(info.passphrase),
+    if (strncpy_s(info.passphrase, sizeof(info.passphrase),
         config.GetPreSharedKey().c_str(), config.GetPreSharedKey().length()) != EOK) {
         return WIFI_IDL_OPT_FAILED;
     }

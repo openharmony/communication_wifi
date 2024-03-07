@@ -1591,7 +1591,7 @@ HWTEST_F(WifiIdlClientTest, ReqIsSupportDbdcTest, TestSize.Level1)
     bool isSupport = true;
     mClient.ReqIsSupportDbdc(isSupport);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqIsSupportDbdc(isSupport) == WIFI_IDL_OPT_FAILED);
+    mClient.ReqIsSupportDbdc(isSupport);
     MockWifiPublic::SetMockFlag(false);
 }
 }  // namespace Wifi

@@ -120,7 +120,7 @@ WifiErrorNo HdiStartAp(char *ifaceName, int id)
 
     InitCfg(ifaceName);
 
-    if (HdiApStart(id) != WIFI_IDL_OPT_OK) {
+    if (HdiApStart(id, ifaceName) != WIFI_IDL_OPT_OK) {
         LOGE("HdiStartAp: HdiApStart failed.");
         return WIFI_IDL_OPT_FAILED;
     }
@@ -178,7 +178,7 @@ WifiErrorNo HdiDisableAp(int id)
         LOGE("HdiDisableAp: apObj is NULL");
         return WIFI_IDL_OPT_FAILED;
     }
-
+    SetExecDisable(EXEC_DISABLE);
     int32_t result = apObj->DisableAp(apObj, GetApIfaceName(), id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiDisableAp failed result:%{public}d", result);
@@ -417,7 +417,7 @@ WifiErrorNo HdiGetStaInfos(char *buf, int size, int id)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo HdiDisassociateSta(const char *mac, int id);
+WifiErrorNo HdiDisassociateSta(const char *mac, int id)
 {
     LOGI("HdiDisassociateSta enter");
     struct IHostapdInterface *apObj = GetApInterface();

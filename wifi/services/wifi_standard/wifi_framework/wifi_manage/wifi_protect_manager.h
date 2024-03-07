@@ -150,38 +150,9 @@ private:
     bool mForceLowLatencyMode {false};
     std::mutex mMutex;
 #ifndef OHOS_ARCH_LITE
-    std::unique_ptr<WifiEventHandler> appChangeEventHandler = nullptr;
-    sptr<AppStateObserver> mAppStateObserver {nullptr};
     sptr<AppExecFwk::IAppMgr> mAppObject {nullptr};
 #endif
 };
-
-#ifndef OHOS_ARCH_LITE
-class AppStateObserver : public AppExecFwk::ApplicationStateObserverStub {
-public:
-    /**
-     * Will be called when the application start.
-     *
-     * @param appStateData Application state data.
-     */
-    virtual void OnAppStarted(const AppExecFwk::AppStateData &appStateData) override;
-
-    /**
-     * Will be called when the application stop.
-     *
-     * @param appStateData Application state data.
-     */
-    virtual void OnAppStopped(const AppExecFwk::AppStateData &appStateData) override;
-
-    /**
-     * Application foreground state changed callback.
-     *
-     * @param appStateData Application Process data.
-     */
-    virtual void OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData) override;
-};
-#endif
-
 } // namespace Wifi
 } // namespace OHOS
 

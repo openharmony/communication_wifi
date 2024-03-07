@@ -142,6 +142,7 @@ enum class P2P_STATE_MACHINE_CMD {
     P2P_EVENT_IFACE_CREATED,
     P2P_REMOVE_DEVICE,
     P2P_RETRY_CONNECT,
+    P2P_EVENT_CH_SWITCH,
 
     /* if the requests to WPA is not synchronization need protected by a timeout mechanism */
     ENABLE_P2P_TIMED_OUT = 200,
@@ -180,6 +181,7 @@ enum class P2P_ERROR_CODE {
 
 enum class P2P_CHR_EVENT {
     CONN_CNT = 0,
+    CONN_SUC_CNT,
     MAGICLINK_CNT,
     P2P_SUC_2G4_CNT,
     P2P_SUC_5G_CNT

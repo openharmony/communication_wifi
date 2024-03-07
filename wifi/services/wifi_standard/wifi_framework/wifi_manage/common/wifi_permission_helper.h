@@ -16,51 +16,16 @@
 #ifndef OHOS_WIFI_PERMISSION_HELPER
 #define OHOS_WIFI_PERMISSION_HELPER
 
-#include <map>
-#include "permission_def.h"
+#include <string>
 
 namespace OHOS {
 namespace Wifi {
+enum IsGranted {
+    PERMISSION_DENIED = 0,  /* Not granted */
+    PERMISSION_GRANTED = 1, /* Granted */
+};
 class WifiPermissionHelper {
 public:
-    /**
-     * @Description : Initialization Permossion.
-     *
-     * @param pid - Process ID.[in]
-     * @param uid - User ID.[in]
-     * @return int
-     */
-    static int InitPermission(const int &pid, const int &uid);
-
-    /**
-     * @Description : Clearing Permissions.
-     *
-     * @param pid - Process ID.
-     * @param uid - User ID.
-     * @return int
-     */
-    static int ClearPermission(const int &pid, const int &uid);
-
-    /**
-     * @Description : Verify Permission.
-     *
-     * @param permissions - the permission.[in]
-     * @param pid - Process ID.[in]
-     * @param uid - User ID.[in]
-     * @return int
-     */
-    static int ChangePermission(const std::map<std::string, int> &permissions, const int &pid, const int &uid);
-
-    /**
-     * @Description : Mock Check Permission.
-     *
-     * @param permissionName - Permission name.[in]
-     * @param pid - Process ID.[in]
-     * @param uid - User ID.[in]
-     * @return IsGranted
-     */
-    static IsGranted MockVerifyPermission(const std::string &permissionName, const int &pid, const int &uid);
-
     /**
      * @Description : Verify Permission.
      *

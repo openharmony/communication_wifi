@@ -335,6 +335,39 @@ public:
     WifiErrorNo GetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info);
 
     /**
+     * @Description set power save mode
+     *
+     * @param frequency - connected ap frequency
+     * @param mode - power save mode
+     */
+    WifiErrorNo SetPmMode(int frequency, int mode);
+
+    /**
+     * @Description set data packet identification mark rule
+     *
+     * @param uid - target app uid
+     * @param protocol - target protocol type
+     * @param enable - enable/disable dpi mark
+     */
+    WifiErrorNo SetDpiMarkRule(int uid, int protocol, int enable);
+
+    /**
+     * @Description set background limit speed mode
+     *
+     * @param mode - limit mode
+     */
+    WifiErrorNo SetBgLimitMode(int mode);
+
+    /**
+     * @Description set background limit speed uid&pid list
+     *
+     * @param idList - foreground and background app list
+     * @param size - idList size
+     * @param type - enable/disable dpi mark
+     */
+    WifiErrorNo SetBgLimitIdList(std::vector<int> idList, int size, int type);
+
+    /**
      * @Description Get register callback objects
      *
      * @return const WifiEventCallback& - register sta callback objects

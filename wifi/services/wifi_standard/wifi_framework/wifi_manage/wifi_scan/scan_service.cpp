@@ -107,9 +107,6 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("InitScanMonitor failed.\n");
         return false;
     }
-#ifndef OHOS_ARCH_LITE
-    standByListerner.Init();
-#endif
 
     if ((WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_24_GHZ, freqs2G) != WIFI_IDL_OPT_OK) ||
         (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ, freqs5G) != WIFI_IDL_OPT_OK) ||
@@ -153,9 +150,6 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
 void ScanService::UnInitScanService()
 {
     WIFI_LOGI("Enter ScanService::UnInitScanService.\n");
-#ifndef OHOS_ARCH_LITE
-    standByListerner.Unit();
-#endif
     pScanMonitor->UnInitScanMonitor();
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
@@ -266,6 +260,11 @@ ErrCode ScanService::Scan(bool externFlag)
         ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_EXTERN);
         if (rlt != WIFI_OPT_SUCCESS) {
             return rlt;
+        }
+    } else {
+        if (!AllowScanByHid2dState()) {
+            WIFI_LOGW("internal scan not allow by hid2d state");
+            return WIFI_OPT_FAILED;
         }
     }
 
@@ -384,13 +383,6 @@ void ScanService::StopPnoScan()
 bool ScanService::SingleScan(ScanConfig &scanConfig)
 {
     WIFI_LOGI("Enter ScanService::SingleScan.\n");
-
-#ifndef OHOS_ARCH_LITE
-    if (!standByListerner.AllowScan()) {
-        WIFI_LOGE("Scan not allowed when device in standby state.\n");
-        return WIFI_OPT_FAILED;
-    }
-#endif
 
     GetAllowBandFreqsControlInfo(scanConfig.scanBand, scanConfig.scanFreqs);
     if ((scanConfig.scanBand == SCAN_BAND_UNSPECIFIED) && (scanConfig.scanFreqs.empty())) {
@@ -677,6 +669,9 @@ bool ScanService::StoreFullScanInfo(
         }
         for (auto iter = results.begin(); iter != results.end(); ++iter) {
             iter->disappearCount++;
+        }
+        if (WifiSettings::GetInstance().SaveScanInfoList(results) != 0) {
+            WIFI_LOGE("WifiSettings::GetInstance().SaveScanInfoList failed.\n");
         }
         return true;
     }
@@ -1329,7 +1324,7 @@ ErrCode ScanService::AllowExternScan()
 #else
 ErrCode ScanService::AllowExternScan()
 {
-    WIFI_LOGI("Enter ScanService::AllowExternScan.\n");
+    WIFI_LOGI("Enter AllowExternScan.\n");
     int staScene = GetStaScene();
     ScanMode scanMode = WifiSettings::GetInstance().GetAppRunningState();
     WIFI_LOGI("AllowExternScan, staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
@@ -1599,7 +1594,7 @@ bool ScanService::IsMovingFreezeScaned() const
 
 ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
 {
-    LOGI("Enter ScanService::ApplyTrustListPolicy.");
+    LOGI("Enter ApplyTrustListPolicy.");
     ErrCode policyResult = WIFI_OPT_SUCCESS;
 
     SetScanTrustMode();
@@ -1615,7 +1610,7 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
 
 ErrCode ScanService::ApplyScanPolices(ScanType type)
 {
-    LOGD("Enter ScanService::ApplyScanPolices, type: %{public}d", type);
+    LOGD("Enter ApplyScanPolices, type: %{public}d", type);
     /* Obtains app parameters and scenario status parameters. */
     auto appPackageName = WifiSettings::GetInstance().GetAppPackageName();
     auto trustListPolicies = WifiSettings::GetInstance().ReloadTrustListPolicies();
@@ -1656,15 +1651,15 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
 
 bool ScanService::AllowExternScanByThermal()
 {
-    WIFI_LOGI("Enter ScanService::AllowExternScanByThermal.\n");
+    WIFI_LOGI("Enter AllowExternScanByThermal.\n");
     if (IsAppInFilterList(scan_thermal_trust_list)) {
-        WIFI_LOGI("ScanService::AllowExternScanByThermal, no need to control this scan");
+        WIFI_LOGI("AllowExternScanByThermal, no need to control this scan");
         return true;
     }
     auto level = WifiSettings::GetInstance().GetThermalLevel();
     static const int THERMAL_LEVEL_HOT = 4;
     if (level >= THERMAL_LEVEL_HOT) {
-        WIFI_LOGW("ScanService::AllowExternScanByThermal, level=%{public}d is higher than hot\n", level);
+        WIFI_LOGW("AllowExternScanByThermal, level=%{public}d is higher than hot\n", level);
         return false;
     }
     return true;
@@ -2639,26 +2634,6 @@ ErrCode ScanService::OpenScanOnly() const
 ErrCode ScanService::CloseScanOnly() const
 {
     WIFI_LOGI("Enter ScanService::CloseScanOnly.\n");
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ScanService::OnSystemAbilityChanged(int systemAbilityId, bool add)
-{
-    WIFI_LOGI("Enter ScanService::OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
-        systemAbilityId, add);
-#ifndef OHOS_ARCH_LITE
-    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
-        WIFI_LOGE("systemAbilityId param is error");
-        return WIFI_OPT_INVALID_PARAM;
-    }
-
-    if (add) {
-        standByListerner.RegisterStandByEvent();
-    } else {
-        standByListerner.UnRegisterStandByEvent();
-    }
-#endif
-
     return WIFI_OPT_SUCCESS;
 }
 

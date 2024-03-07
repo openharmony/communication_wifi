@@ -58,7 +58,6 @@ public:
         pStaStateMachine->InitStaStateMachine();
         pStaStateMachine->InitWifiLinkedInfo();
         pStaStateMachine->InitLastWifiLinkedInfo();
-        NetStateHandler handle = nullptr;
         ArpStateHandler arpHandle = nullptr;
         DnsStateHandler dnsHandle = nullptr;
         pStaStateMachine->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());

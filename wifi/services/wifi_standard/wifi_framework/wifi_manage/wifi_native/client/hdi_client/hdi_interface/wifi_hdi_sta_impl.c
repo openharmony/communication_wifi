@@ -355,7 +355,7 @@ WifiErrorNo HdiWifiStopPnoScan(void)
 int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
     const struct HdfWifiScanResults *scanResults, const char* ifName)
 {
-    LOGI("%{public}s: begin to register scan result callback", __func__);
+    LOGI("%{public}s: register scan result callback", __func__);
     pthread_mutex_lock(&g_hdiWifiMutex);
     g_hdiWifiScanResultsCount = 0;
     if (g_hdiWifiScanResults == NULL) {
@@ -543,10 +543,39 @@ void HdiReleaseLocalResources()
 
 void HdiNotifyScanResult(int status)
 {
-    LOGI("%{public}s: report the scanning status:%{public}d", __func__, status);
+    LOGI("%{public}s: scan status:%{public}d", __func__, status);
     ISupplicantEventCallback *callback = HdiGetSupplicantEventCallback();
     if (callback != NULL && callback->onScanNotify != NULL) {
         callback->onScanNotify(status);
     }
+}
+
+WifiErrorNo HdiSetPmMode(int frequency, int mode)
+{
+    LOGI("Enter %{public}s", __func__);
+    int32_t ret = 0;
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
+    const char *ifName = "wlan0";
+    ret = proxy.wlanObj->SetPowerSaveMode(proxy.wlanObj, ifName, frequency, mode);
+    if (ret != 0) {
+        LOGE("%{public}s: failed to set power save mode, ret:%{public}d.", __func__, ret);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiSetDpiMarkRule(int uid, int protocol, int enable)
+{
+    LOGI("Enter %{public}s", __func__);
+    int32_t ret = 0;
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
+    ret = proxy.wlanObj->SetDpiMarkRule(proxy.wlanObj, uid, protocol, enable);
+    if (ret != 0) {
+        LOGE("%{public}s: failed to set dpi mark rule, ret:%{public}d.", __func__, ret);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return WIFI_IDL_OPT_OK;
 }
 #endif

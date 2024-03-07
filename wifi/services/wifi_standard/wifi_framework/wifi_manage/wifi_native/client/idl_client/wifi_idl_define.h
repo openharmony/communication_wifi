@@ -67,6 +67,7 @@ typedef enum WifiIdlEvent {
     WIFI_IDL_CBK_CMD_STA_AP_TEMP_EVENT,
     WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT,         /* AP STA possible PSK mismatch event*/
     WIFI_IDL_CBK_CMD_P2P_CONNECT_FAILED,                /* P2P connect failed event */
+    WIFI_IDL_CBK_CMD_P2P_CHANNEL_SWITCH_EVENT,          /* P2P Channel switch event */
 } WifiIdlEvent;
 
 typedef enum WifiHalPortType {

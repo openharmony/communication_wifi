@@ -143,7 +143,6 @@ if (defined(ohos_lite)) {
       "dhcp:dhcp_sdk",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
-      "huks:libhukssdk",
     ]
 
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {

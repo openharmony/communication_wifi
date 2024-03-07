@@ -209,7 +209,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
     g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
     g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
     g_hdiWpaP2pCallbackObj->OnEventBssidChanged = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventStateChanged = callback->OnEventStateChanged;
+    g_hdiWpaP2pCallbackObj->OnEventStateChanged = NULL;
     g_hdiWpaP2pCallbackObj->OnEventTempDisabled = NULL;
     g_hdiWpaP2pCallbackObj->OnEventAssociateReject = NULL;
     g_hdiWpaP2pCallbackObj->OnEventWpsOverlap = NULL;
@@ -915,7 +915,7 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo HdiP2pHid2dConnect(struct HdiHid2dConnectInfo *info)
+WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
 {
     LOGI("HdiP2pHid2dConnect enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
@@ -923,8 +923,17 @@ WifiErrorNo HdiP2pHid2dConnect(struct HdiHid2dConnectInfo *info)
         LOGE("HdiP2pHid2dConnect: wpaObj is NULL");
         return WIFI_IDL_OPT_FAILED;
     }
-
-    int32_t result = wpaObj->P2pHid2dConnect(wpaObj, "p2p0", info);
+    struct HdiHid2dConnectInfo wpsParam = {0};
+    uint8_t addr[ETH_ALEN];
+    hwaddr_aton(info->bssid, addr);
+    wpsParam.ssid = (uint8_t *)info->ssid;
+    wpsParam.ssidLen = strlen(info->ssid) + 1;
+    wpsParam.bssid = addr;
+    wpsParam.bssidLen = strlen(info->bssid);
+    wpsParam.passphrase = (uint8_t *)info->passphrase;
+    wpsParam.passphraseLen = strlen(info->passphrase) + 1;
+    wpsParam.frequency = info->frequency;
+    int32_t result = wpaObj->P2pHid2dConnect(wpaObj, "p2p0", &wpsParam);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pHid2dConnect: P2pHid2dConnect failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;

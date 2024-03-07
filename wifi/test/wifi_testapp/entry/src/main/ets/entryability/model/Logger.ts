@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import hilog from '@ohos.hilog'
 
 /*
@@ -22,7 +20,7 @@ import hilog from '@ohos.hilog'
  */
 
 class Logger {
-  private domain: Number
+  private domain: number
   private prefix: string
   private format: string = "%{public}s, %{public}s"
 

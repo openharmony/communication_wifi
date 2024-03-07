@@ -64,6 +64,8 @@ if (ret < 0) { \
 }
 #endif
 
+#define EXEC_DISABLE 1
+
 /**
  * @Description Create a channel between the HAL and the driver.
  *
@@ -120,7 +122,7 @@ void HdiWpaResetGlobalObj();
  *
  * @return WifiErrorNo - operation result
  */
-WifiErrorNo HdiApStart(int id);
+WifiErrorNo HdiApStart(int id, char *ifaceName);
 
 /**
  * @Description Stop the created ap channel.
@@ -137,6 +139,9 @@ WifiErrorNo HdiApStop(int id);
 struct IHostapdInterface* GetApInterface();
 void InitCfg(char *ifaceName);
 char *GetApIfaceName();
+
+void SetExecDisable(int execDisable);
+int GetExecDisable();
 
 #ifdef __cplusplus
 }

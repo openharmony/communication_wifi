@@ -198,11 +198,14 @@ WifiErrorNo HdiWpaStaStart()
 
     if (RegisterEventCallback() != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaStaStart: RegisterEventCallback failed!");
+        HdiWpaStop();
         return WIFI_IDL_OPT_FAILED;
     }
 
     if (HdiAddWpaIface("wlan0", CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaStaStart: HdiAddWpaIface failed!");
+        UnRegisterEventCallback();
+        HdiWpaStop();
         return WIFI_IDL_OPT_FAILED;
     }
     
@@ -571,7 +574,11 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->OnEventAssociateReject = callback->OnEventAssociateReject;
     g_hdiWpaStaCallbackObj->OnEventWpsOverlap = callback->OnEventWpsOverlap;
     g_hdiWpaStaCallbackObj->OnEventWpsTimeout = callback->OnEventWpsTimeout;
+#ifdef HDI_INTERFACE_SUPPORT
+    g_hdiWpaStaCallbackObj->OnEventScanResult = NULL;
+#else
     g_hdiWpaStaCallbackObj->OnEventScanResult = callback->OnEventScanResult;
+#endif
     g_hdiWpaStaCallbackObj->GetVersion = NULL;
     g_hdiWpaStaCallbackObj->AsObject = NULL;
 

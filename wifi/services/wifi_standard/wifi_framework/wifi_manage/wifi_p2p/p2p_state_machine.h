@@ -15,6 +15,7 @@
 #ifndef OHOS_P2P_STATE_MACHINE_H
 #define OHOS_P2P_STATE_MACHINE_H
 
+#include <mutex>
 #include "state_machine.h"
 #include "ip2p_service_callbacks.h"
 #include "p2p_define.h"
@@ -46,6 +47,14 @@ namespace Wifi {
 const int MIN_GROUP_NAME_LENGTH = 9;
 const int MAX_GROUP_NAME_LENGTH = 32;
 const int DISC_TIMEOUT_S = 120;
+enum {
+    P2P_GC,
+    P2P_GO,
+};
+enum {
+    P2P_OFF,
+    P2P_ON,
+};
 class P2pStateMachine : public StateMachine {
     class DhcpResultNotify {
     public:
@@ -102,9 +111,15 @@ public:
     virtual void RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback);
 
     /**
+     * @Description - Callbacks of event registered by the p2pService.
+     * @param  callback - event callback object
+     */
+    virtual void UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback);
+
+    /**
      * @Description - Callbacks of event unregistered by the p2pService.
      */
-    virtual void UnRegisterP2pServiceCallbacks();
+    virtual void ClearAllP2pServiceCallbacks();
 
     /**
      * @Description - Set is need dhcp.
@@ -371,6 +386,7 @@ private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;
 
 private:
+    mutable std::mutex cbMapMutex;
     std::map<std::string, IP2pServiceCallbacks> p2pServiceCallbacks;  /* state machine -> service callback */
     std::string p2pIface;               /* P2P iface */
     WifiP2pConfigInternal savedP2pConfig;    /* record P2P config when communicating with the peer device */

@@ -65,8 +65,14 @@ bool P2pGroupJoinState::ExecuteStateMsg(InternalMessage *msg)
             std::string result;
             std::string address;
             if (wps.GetWpsMethod() == WpsMethod::WPS_METHOD_PBC) {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+                if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+                    WifiP2PHalInterface::GetInstance().StartWpsPbc(group.GetInterface(),
+                        p2pStateMachine.savedP2pConfig.GetDeviceAddress())) {
+#else
                 if (WifiErrorNo::WIFI_IDL_OPT_OK !=
                     WifiP2PHalInterface::GetInstance().StartWpsPbc(group.GetInterface(), pin)) {
+#endif
                     WIFI_LOGE("WpsPbc operation failed.");
                 }
             } else {

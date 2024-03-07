@@ -14,7 +14,7 @@
  */
 
 export class MessageDataManager {
-  TAG = 'WIFI_Manager_Test '
+  TAG = 'WIFI_Manager_Test'
   //wifi
   testEnableWifi = "enableWifi test";
   testIsActive = "Wifi已经使能"
@@ -46,14 +46,7 @@ export class MessageDataManager {
   testRemoveCandidateConfig = "removeCandidateConfig: "
   testRemoveCandidateConfigCallback = "removeCandidateConfigCallback test"
   testGetCandidateConfigs = "GetCandidateConfigs test"
-
   testConnectToCandidateConfig = "ConnectToCandidateConfig test"
-
-
-
-
-
-
   testConnectToNetwork = "connectToNetwork test"
   testConnectToDevice = "connectToDevice test"
   testDisconnect = "disconnect test"

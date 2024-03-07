@@ -27,7 +27,7 @@ Handler::Handler() : pMyQueue(nullptr), handleThread(0), isRunning(true)
 
 Handler::~Handler()
 {
-    LOGI("Handler::~Handler");
+    LOGI("~Handler");
     StopHandlerThread();
     return;
 }

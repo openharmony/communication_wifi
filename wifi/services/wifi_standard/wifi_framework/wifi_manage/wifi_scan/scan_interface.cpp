@@ -258,17 +258,5 @@ ErrCode ScanInterface::CloseScanOnly()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanInterface::OnSystemAbilityChanged(int systemAbilityId, bool add)
-{
-    WIFI_LOGI("Enter ScanInterface::OnSystemAbilityChanged.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    if (pScanService->OnSystemAbilityChanged(systemAbilityId, add) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("OnSystemAbilityChanged() failed!");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
 }  // namespace Wifi
 }  // namespace OHOS

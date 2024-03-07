@@ -21,13 +21,12 @@
 #include "network_selector_impl.h"
 #include "wifi_errcode.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi {
 enum class NetworkSelectType { AUTO_CONNECT };
 class NetworkSelectorFactory {
 public:
     NetworkSelectorFactory();
-    using HandleFunc = std::unique_ptr<INetworkSelector> (NetworkSelectorFactory::*)();
+    using HandleFunc = std::unique_ptr<NetworkSelection::INetworkSelector> (NetworkSelectorFactory::*)();
     using HandleFuncMap = std::map<int, HandleFunc>;
 
     /**
@@ -35,16 +34,17 @@ public:
      * @param networkSelectType
      * @return the network selector
      */
-    std::optional<std::unique_ptr<INetworkSelector>> GetNetworkSelector(NetworkSelectType networkSelectType);
+    std::optional<std::unique_ptr<NetworkSelection::INetworkSelector>> GetNetworkSelector(
+        NetworkSelectType networkSelectType);
 
     /**
      * the function to create autoConnect networkSelector
      * @return the network selector
      */
-    std::unique_ptr<INetworkSelector> CreateAutoConnectNetworkSelector();
+    std::unique_ptr<NetworkSelection::INetworkSelector> CreateAutoConnectNetworkSelector();
 private:
     HandleFuncMap handleFuncMap;
 };
 }
-}
+
 #endif

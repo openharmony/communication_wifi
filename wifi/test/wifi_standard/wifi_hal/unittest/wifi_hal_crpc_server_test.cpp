@@ -327,7 +327,7 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerInfoCbkTest, TestSize.Level1)
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_SERV_DISC_RESP_EVENT) == 0);
 }
 
-HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest, TestSize.Level1)
+HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest1, TestSize.Level1)
 {
     WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
@@ -337,6 +337,32 @@ HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest, TestSize.Level1)
     EXPECT_TRUE(EndCallbackTransact(mServer, P2P_SERV_DISC_REQ_EVENT) == 0);
 }
 
+HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest2, TestSize.Level1)
+{
+    WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
+    EXPECT_TRUE(PushBackCallbackMsg(P2P_GO_NEGOTIATION_FAILURE_EVENT, cbmsg) == 0);
+    EXPECT_TRUE(OnCallbackTransact(mServer, P2P_GO_NEGOTIATION_FAILURE_EVENT, mContext) == 0);
+    EXPECT_TRUE(EndCallbackTransact(mServer, P2P_GO_NEGOTIATION_FAILURE_EVENT) == 0);
+}
+
+HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest3, TestSize.Level1)
+{
+    WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
+    EXPECT_TRUE(PushBackCallbackMsg(P2P_IFACE_CREATED_EVENT, cbmsg) == 0);
+    EXPECT_TRUE(OnCallbackTransact(mServer, P2P_IFACE_CREATED_EVENT, mContext) == 0);
+    EXPECT_TRUE(EndCallbackTransact(mServer, P2P_IFACE_CREATED_EVENT) == 0);
+}
+
+HWTEST_F(WifiHalCRpcServerTest, DealP2pServerDiscReqCbkTest4, TestSize.Level1)
+{
+    WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    StrSafeCopy(cbmsg->msg.serDiscReqInfo.mac, sizeof(cbmsg->msg.serDiscReqInfo.mac), "00:00:00:00:00:00");
+    EXPECT_TRUE(PushBackCallbackMsg(P2P_CONNECT_FAILED, cbmsg) == 0);
+    EXPECT_TRUE(OnCallbackTransact(mServer, P2P_CONNECT_FAILED, mContext) == 0);
+    EXPECT_TRUE(EndCallbackTransact(mServer, P2P_CONNECT_FAILED) == 0);
+}
 HWTEST_F(WifiHalCRpcServerTest, RpcGetNameTest, TestSize.Level1)
 {
     EXPECT_TRUE(RpcGetName(nullptr, nullptr) < 0);
@@ -1500,6 +1526,27 @@ HWTEST_F(WifiHalCRpcServerTest, RpcChbaStopTest, TestSize.Level1)
     EXPECT_TRUE(RpcChbaStop(nullptr, nullptr) < 0);
     EXPECT_TRUE(RpcChbaStop(mServer, nullptr) < 0);
     EXPECT_TRUE(RpcChbaStop(mServer, mContext) == 0);
+}
+/**
+ * @tc.name: RpcSetPowerModeTest
+ * @tc.desc: RpcSetPowerMode()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiHalCRpcServerTest, RpcSetPowerModeTest, TestSize.Level1)
+{
+    EXPECT_TRUE(RpcSetPowerMode(nullptr, nullptr) < 0);
+    EXPECT_TRUE(RpcSetPowerMode(mServer, nullptr) < 0);
+    char buff[] = "N\tRpcSetPowerMode\tx\t";
+    mContext->oneProcess = buff;
+    mContext->nPos = strlen("N\tRpcSetPowerMode\t");
+    mContext->nSize = strlen(buff);
+    EXPECT_TRUE(RpcSetPowerMode(mServer, mContext) < 0);
+    char buff1[] = "N\tRpcSetPowerMode\t1\t";
+    mContext->oneProcess = buff1;
+    mContext->nPos = strlen("N\tRpcSetPowerMode\t");
+    mContext->nSize = strlen(buff1);
+    EXPECT_TRUE(RpcSetPowerMode(mServer, mContext) == 0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

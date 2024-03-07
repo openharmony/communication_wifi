@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { TestAuto , AutoCategory } from './testData'
 
 import {
@@ -173,11 +171,20 @@ import {
   testOnP2pDiscoveryChangeManager
 } from './p2pManagerInterface'
 
+interface AutoTest {
+  name: string;
+  detail: string;
+  method: string;
+  api: Function;
+  result: string;
+  category: AutoCategory;
+}
+
 /**
  * autoTest DataModel of wifi test
  */
 
-export const WifiAutoTestCase: [] = [
+export const WifiAutoTestCase: AutoTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '注册WLAN状态改变事件' ,
@@ -250,7 +257,6 @@ export const WifiAutoTestCase: [] = [
     'result' : 'None' ,
     'category' : AutoCategory.WifiAuto
   },
-  //  { 'name': '添加网络配置Promise', 'detail': '添加网络配置Promise', 'method': 'addDeviceConfig', 'api': testAddDeviceConfigPromise, 'result': 'None', 'category': AutoCategory.WifiAuto },
   {
     'name' : '添加网络配置Callback' ,
     'detail' : '添加网络配置Callback' ,
@@ -453,7 +459,7 @@ export const WifiAutoTestCase: [] = [
   },
 ]
 
-export const WifiManagerAutoTestCase: [] = [
+export const WifiManagerAutoTestCase: AutoTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '注册WLAN状态改变事件' ,
@@ -760,7 +766,7 @@ export const WifiManagerAutoTestCase: [] = [
   },
 ]
 
-export const HotspotAutoTestCase: [] = [
+export const HotspotAutoTestCase: AutoTest[] = [
   {
     'name' : '注册热点状态改变事件' ,
     'detail' : '注册热点状态改变事件' ,
@@ -827,7 +833,7 @@ export const HotspotAutoTestCase: [] = [
   },
 ]
 
-export const HotspotManagerAutoTestCase: [] = [
+export const HotspotManagerAutoTestCase: AutoTest[] = [
   {
     'name' : '注册热点状态改变事件' ,
     'detail' : '注册热点状态改变事件' ,
@@ -910,7 +916,7 @@ export const HotspotManagerAutoTestCase: [] = [
   },
 ]
 
-export const P2pAutoTestCase: [] = [
+export const P2pAutoTestCase: AutoTest[] = [
   {
     'name' : '注册P2P开关状态改变事件' ,
     'detail' : '注册P2P开关状态改变事件' ,
@@ -1073,7 +1079,7 @@ export const P2pAutoTestCase: [] = [
   },
 ]
 
-export const P2pManagerAutoTestCase: [] = [
+export const P2pManagerAutoTestCase: AutoTest[] = [
   {
     'name' : '注册P2P开关状态改变事件' ,
     'detail' : '注册P2P开关状态改变事件' ,
@@ -1268,51 +1274,50 @@ export const P2pManagerAutoTestCase: [] = [
   },
 ]
 
-
 export function initWifiAutoData(): Array<TestAuto> {
   let TestAutoArray: Array<TestAuto> = []
-  WifiAutoTestCase.forEach( item => {
-    TestAutoArray.push( new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  WifiAutoTestCase.forEach(item => {
+    TestAutoArray.push(new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestAutoArray;
 }
 
 export function initHotspotAutoData(): Array<TestAuto> {
   let TestAutoArray: Array<TestAuto> = []
-  HotspotAutoTestCase.forEach( item => {
-    TestAutoArray.push( new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  HotspotAutoTestCase.forEach(item => {
+    TestAutoArray.push(new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestAutoArray;
 }
 
 export function initP2pAutoData(): Array<TestAuto> {
   let TestAutoArray: Array<TestAuto> = []
-  P2pAutoTestCase.forEach( item => {
-    TestAutoArray.push( new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  P2pAutoTestCase.forEach(item => {
+    TestAutoArray.push(new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestAutoArray;
 }
 
 export function initWifiManagerAutoData(): Array<TestAuto> {
   let TestAutoArray: Array<TestAuto> = []
-  WifiManagerAutoTestCase.forEach( item => {
-    TestAutoArray.push( new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  WifiManagerAutoTestCase.forEach(item => {
+    TestAutoArray.push(new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestAutoArray;
 }
 
 export function initHotspotManagerAutoData(): Array<TestAuto> {
   let TestAutoArray: Array<TestAuto> = []
-  HotspotManagerAutoTestCase.forEach( item => {
-    TestAutoArray.push( new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  HotspotManagerAutoTestCase.forEach(item => {
+    TestAutoArray.push(new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestAutoArray;
 }
 
 export function initP2pManagerAutoData(): Array<TestAuto> {
   let TestAutoArray: Array<TestAuto> = []
-  P2pManagerAutoTestCase.forEach( item => {
-    TestAutoArray.push( new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  P2pManagerAutoTestCase.forEach(item => {
+    TestAutoArray.push(new TestAuto(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestAutoArray;
 }

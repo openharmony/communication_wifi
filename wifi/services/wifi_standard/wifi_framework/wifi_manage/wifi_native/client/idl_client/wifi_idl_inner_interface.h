@@ -98,6 +98,7 @@ void OnP2pConnectSupplicantFailed(void);
 void OnP2pServDiscReq(const P2pServDiscReqInfo *info);
 void OnP2pIfaceCreated(const char *ifName, int isGo);
 void OnP2pConnectFailed(const char *bssid, int reason);
+void OnP2pChannelSwitch(int freq);
 #ifdef __cplusplus
 }
 #endif

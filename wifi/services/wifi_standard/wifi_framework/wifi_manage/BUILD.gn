@@ -451,15 +451,16 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code/wifi_country_code_policy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_event_subscriber_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_hotspot_manager.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_location_mode_observer.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_p2p_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_scan_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_toggler_manager.cpp",
+      "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
       "wifi_dumper.cpp",
       "wifi_internal_event_dispatcher.cpp",
-      "wifi_location_mode_observer.cpp",
       "wifi_manager.cpp",
       "wifi_net_agent.cpp",
       "wifi_net_observer.cpp",
@@ -471,11 +472,11 @@ if (defined(ohos_lite)) {
     ]
     if (defined(global_parts_info) &&
         defined(global_parts_info.msdp_movement)) {
-      sources += [ "wifi_msdp_state_listener.cpp" ]
+      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_msdp_state_listener.cpp" ]
     }
     if (defined(global_parts_info) &&
         defined(global_parts_info.powermgr_power_manager)) {
-      sources += [ "wifi_power_state_listener.cpp" ]
+      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_power_state_listener.cpp" ]
     }
 
     deps = [
@@ -507,7 +508,6 @@ if (defined(ohos_lite)) {
       "data_share:datashare_common",
       "data_share:datashare_consumer",
       "hilog:libhilog",
-      "huks:libhukssdk",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_native_manager_if",

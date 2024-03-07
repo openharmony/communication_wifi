@@ -739,6 +739,20 @@ static void IdlCbP2pConnectFailedEvent(Context *context)
     return;
 }
 
+static void IdlCbP2pChannelSwitchEvent(Context *context)
+{
+    int freq = 0;
+    if (ReadInt(context, &freq) < 0) {
+        LOGE("Failed to read P2pChannelSwitchEvent");
+        return;
+    }
+    IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();
+    if (callback != NULL && callback->onP2pChannelSwitch != NULL) {
+        callback->onP2pChannelSwitch(freq);
+    }
+    return;
+}
+
 static int IdlDealP2pEventFirst(Context *context, int event)
 {
     switch (event) {
@@ -819,6 +833,9 @@ static int IdlDealP2pEventSecond(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_P2P_CONNECT_FAILED:
             IdlCbP2pConnectFailedEvent(context);
+            break;
+        case WIFI_IDL_CBK_CMD_P2P_CHANNEL_SWITCH_EVENT:
+            IdlCbP2pChannelSwitchEvent(context);
             break;
         default:
             return -1;

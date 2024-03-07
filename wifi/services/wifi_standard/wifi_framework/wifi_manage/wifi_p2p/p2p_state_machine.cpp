@@ -23,7 +23,6 @@
 #include "dhcpd_interface.h"
 #include "ip_tools.h"
 #include "ipv4_address.h"
-#include "wifi_broadcast_helper.h"
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "wifi_net_agent.h"
@@ -32,6 +31,7 @@
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_p2p_upnp_service_response.h"
 #include "wifi_settings.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -335,145 +335,154 @@ void P2pStateMachine::SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwne
 void P2pStateMachine::BroadcastP2pStatusChanged(P2pState state) const
 {
     WifiSettings::GetInstance().SetP2pState(static_cast<int>(state));
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pStateChangedEvent != nullptr) {
             callBackItem.second.OnP2pStateChangedEvent(state);
         }
     }
-    WifiBroadCastHelper::Send("P2pStatusChanged", static_cast<int>(state));
 }
 
 void P2pStateMachine::BroadcastP2pPeersChanged() const
 {
     std::vector<WifiP2pDevice> peers;
     deviceManager.GetDevicesList(peers);
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pPeersChangedEvent != nullptr) {
             callBackItem.second.OnP2pPeersChangedEvent(peers);
         }
     }
-    WifiBroadCastHelper::Send("P2pPeersChanged", peers);
 }
 
 void P2pStateMachine::BroadcastP2pServicesChanged() const
 {
     std::vector<WifiP2pServiceInfo> svrInfoList;
     serviceManager.GetDeviceServices(svrInfoList);
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pServicesChangedEvent != nullptr) {
             callBackItem.second.OnP2pServicesChangedEvent(svrInfoList);
         }
     }
-    WifiBroadCastHelper::Send("P2pServicesChanged", svrInfoList);
 }
 
 void P2pStateMachine::BroadcastP2pConnectionChanged() const
 {
     WifiP2pLinkedInfo p2pInfo;
     WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pConnectionChangedEvent != nullptr) {
             callBackItem.second.OnP2pConnectionChangedEvent(p2pInfo);
         }
     }
-    WifiBroadCastHelper::Send("P2pConnectionChanged", p2pInfo);
 }
 
 void P2pStateMachine::BroadcastThisDeviceChanaged(const WifiP2pDevice &device) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pThisDeviceChangedEvent != nullptr) {
             callBackItem.second.OnP2pThisDeviceChangedEvent(device);
         }
     }
-    WifiBroadCastHelper::Send("ThisDeviceChanaged", device);
 }
 
 void P2pStateMachine::BroadcastP2pDiscoveryChanged(bool isActive) const
 {
     int status = isActive ? 1 : 0;
     WifiSettings::GetInstance().SetP2pDiscoverState(status);
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pDiscoveryChangedEvent != nullptr) {
             callBackItem.second.OnP2pDiscoveryChangedEvent(isActive);
         }
     }
-    WifiBroadCastHelper::Send("P2pDiscoveryChanged", isActive);
 }
 
 void P2pStateMachine::BroadcastPersistentGroupsChanged() const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pGroupsChangedEvent != nullptr) {
             callBackItem.second.OnP2pGroupsChangedEvent();
         }
     }
-    WifiBroadCastHelper::Send("PersistentGroupsChanged");
 }
 
 void P2pStateMachine::BroadcastActionResult(P2pActionCallback action, ErrCode result) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pActionResultEvent != nullptr) {
             callBackItem.second.OnP2pActionResultEvent(action, result);
         }
     }
-    WifiBroadCastHelper::Send("ActionResult", static_cast<int>(action), static_cast<int>(result));
 }
 
 void P2pStateMachine::BroadcastServiceResult(P2pServicerProtocolType serviceType,
     const std::vector<unsigned char> &respData, const WifiP2pDevice &srcDevice) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pServiceAvailable != nullptr) {
             callBackItem.second.OnP2pServiceAvailable(serviceType, respData, srcDevice);
         }
     }
-    WifiBroadCastHelper::Send("ServiceResult", static_cast<int>(serviceType), srcDevice);
 }
 
 void P2pStateMachine::BroadcastDnsSdServiceResult(
     const std::string &instName, const std::string &regType, const WifiP2pDevice &srcDevice) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pDnsSdServiceAvailable != nullptr) {
             callBackItem.second.OnP2pDnsSdServiceAvailable(instName, regType, srcDevice);
         }
     }
-    WifiBroadCastHelper::Send("DnsSdServiceResult", instName, regType, srcDevice);
 }
 
 void P2pStateMachine::BroadcastDnsSdTxtRecordResult(const std::string &wholeDomainName,
     const std::map<std::string, std::string> &txtMap, const WifiP2pDevice &srcDevice) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pDnsSdTxtRecordAvailable != nullptr) {
             callBackItem.second.OnP2pDnsSdTxtRecordAvailable(wholeDomainName, txtMap, srcDevice);
         }
     }
-    WifiBroadCastHelper::Send("DnsSdTxtRecordResult", wholeDomainName, txtMap, srcDevice);
 }
 
 void P2pStateMachine::BroadcastUpnpServiceResult(
     const std::vector<std::string> &uniqueServiceNames, const WifiP2pDevice &srcDevice) const
 {
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pUpnpServiceAvailable != nullptr) {
             callBackItem.second.OnP2pUpnpServiceAvailable(uniqueServiceNames, srcDevice);
         }
     }
-    WifiBroadCastHelper::Send("UpnpServiceResult", uniqueServiceNames, srcDevice);
 }
 
 void P2pStateMachine::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback)
 {
     WIFI_LOGI("RegisterP2pServiceCallbacks, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     p2pServiceCallbacks.insert_or_assign(callback.callbackModuleName, callback);
 }
 
-void P2pStateMachine::UnRegisterP2pServiceCallbacks()
+void P2pStateMachine::UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback)
 {
-    WIFI_LOGI("UnRegisterP2pServiceCallbacks");
+    WIFI_LOGI("UnRegisterP2pServiceCallbacks, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    std::unique_lock<std::mutex> lock(cbMapMutex);
+    p2pServiceCallbacks.erase(callback.callbackModuleName);
+}
+
+void P2pStateMachine::ClearAllP2pServiceCallbacks()
+{
+    WIFI_LOGI("ClearAllP2pServiceCallbacks");
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     p2pServiceCallbacks.clear();
 }
 
@@ -726,12 +735,16 @@ bool P2pStateMachine::StartDhcpServer()
     WifiNetAgent::GetInstance().AddRoute(groupManager.GetCurrentGroup().GetInterface(),
         ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
     WIFI_LOGI("Start dhcp server for P2p finished.");
+    WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GO, P2P_ON);
     return true;
 }
 
 bool P2pStateMachine::StopDhcpServer()
 {
-    return m_DhcpdInterface.StopDhcpServer(groupManager.GetCurrentGroup().GetInterface());
+    if (!groupManager.GetCurrentGroup().GetInterface().empty()) {
+        WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GO, P2P_OFF);
+    }
+    return m_DhcpdInterface.StopDhcp(groupManager.GetCurrentGroup().GetInterface());
 }
 
 P2pStateMachine* P2pStateMachine::DhcpResultNotify::pP2pStateMachine = nullptr;
@@ -787,6 +800,7 @@ void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname,
 
 void P2pStateMachine::StartDhcpClientInterface()
 {
+    WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GC, P2P_ON);
     if (GetIsNeedDhcp() == DHCPTYPE::NO_DHCP) {
         WIFI_LOGI("The service of this time does not need DHCP.");
         return;

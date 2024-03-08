@@ -1250,7 +1250,7 @@ ErrCode ScanService::AllowExternScan()
     }
 #ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPidGetCallingUid(), GetCallingPid());
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
         return WIFI_OPT_SUCCESS;
@@ -1330,7 +1330,7 @@ ErrCode ScanService::AllowExternScan()
     WIFI_LOGI("AllowExternScan, staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
 #ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPidGetCallingUid(), GetCallingPid());
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         LOGD("ScanService AllowExternScan %{public}s!", ANCO_SERVICE_BROKER);
         return WIFI_OPT_SUCCESS;

@@ -211,7 +211,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
         const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-        std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPidGetCallingUid(), GetCallingPid());
+        std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
         if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
             LOGE("AddCandidateConfig unsupport open or wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
@@ -361,7 +361,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
 #ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPidGetCallingUid(), GetCallingPid());
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;
     } else {
@@ -392,7 +392,7 @@ ErrCode StaService::RemoveAllDevice() const
     WifiDeviceConfig config;
     config.networkId = REMOVE_ALL_DEVICECONFIG;
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPidGetCallingUid(), GetCallingPid());
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;
     } else {
@@ -512,7 +512,7 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
         return WIFI_OPT_FAILED;
     }
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPidGetCallingUid(), GetCallingPid());
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
         WIFI_LOGD("StaService %{public}s, anco, %{public}d", __func__, m_instId);

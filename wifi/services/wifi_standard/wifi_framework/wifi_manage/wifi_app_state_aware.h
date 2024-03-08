@@ -51,7 +51,6 @@ private:
     std::unique_ptr<WifiEventHandler> appChangeEventHandler = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy_ {nullptr};
     sptr<AppStateObserver> mAppStateObserver {nullptr};
-
 };
 
 class AppStateObserver : public AppExecFwk::ApplicationStateObserverStub {

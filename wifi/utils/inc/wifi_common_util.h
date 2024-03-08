@@ -210,14 +210,6 @@ int GetCallingUid();
 int GetCallingTokenId();
 
 /**
- * @Description Check uid the app is a foregroud app
- *
- * @param uid - Input uid
- * @return bool - Returns true for yes, false for no.
- */
-bool IsForegroundApp(const int uid);
-
-/**
  * @Description by Process uid ,the app is a wifi broker process
  *
  * @param uid - Input uid

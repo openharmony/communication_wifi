@@ -59,17 +59,11 @@ HWTEST_F(WifiCommonUtilTest, Ip2NumberTest, TestSize.Level1)
     Ip2Number(strIp);
 }
 
-HWTEST_F(WifiCommonUtilTest, IsForegroundAppTest, TestSize.Level1)
-{
-    int uid = FREQ_5G_MIN;
-    IsForegroundApp(uid);
-}
-
-HWTEST_F(WifiCommonUtilTest, GetRunningProcessNameByPidTest, TestSize.Level1)
+HWTEST_F(WifiCommonUtilTest, GetBrokerProcessNameByPidTest, TestSize.Level1)
 {
     int uid = FREQ_5G_MIN;
     int pid = CHANNEL_14;
-    GetRunningProcessNameByPid(uid, pid);
+    GetBrokerProcessNameByPid(uid, pid);
 }
 
 HWTEST_F(WifiCommonUtilTest, FrequencyToChannelTest, TestSize.Level1)

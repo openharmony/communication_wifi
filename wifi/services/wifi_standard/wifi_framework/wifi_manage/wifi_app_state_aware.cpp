@@ -161,12 +161,14 @@ void WifiAppStateAware::GetForegroundApp()
         foregroundAppBundleName_ = fgAppList[0].bundleName;
         foregroundAppUid_ = fgAppList[0].uid;
         return;
-     }
-     return;
+    }
+    return;
 }
 
 bool WifiAppStateAware::IsForegroundApp(int32_t uid)
 {
+    WIFI_LOGD("IsForegroundApp %{public}s %{public}d, try uid: %{public}d",
+        foregroundAppBundleName_.c_str(), foregroundAppUid_, uid);
     return foregroundAppUid_ == uid;
 }
 

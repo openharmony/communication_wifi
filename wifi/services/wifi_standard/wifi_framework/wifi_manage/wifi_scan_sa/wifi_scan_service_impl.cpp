@@ -389,12 +389,11 @@ bool WifiScanServiceImpl::IsRemoteDied(void)
 void WifiScanServiceImpl::UpdateScanMode()
 {
     int uid = GetCallingUid();
-    if (WifiAppStateAware.getInstance().IsForegroundApp(uid)) {
+    if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
             WifiSettings::GetInstance().SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
         } else {
             WifiSettings::GetInstance().SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
         }
-    }
 }
 #endif
 }  // namespace Wifi

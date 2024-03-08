@@ -177,6 +177,7 @@ private:
      */
     virtual bool ProcessCmdRemoveGroupClient(const InternalMessage &msg) const;
 
+    /**
      * @Description Process the start p2p channel switch
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle

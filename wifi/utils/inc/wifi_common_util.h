@@ -224,7 +224,7 @@ bool IsForegroundApp(const int uid);
  * @param pid - Input pid
  * @return string - Returns processname
  */
-std::string GetRunningProcessNameByPid(const int uid, const int pid);
+std::string GetBrokerProcessNameByPid(const int uid, const int pid);
 
 /**
  * @Description set Process pid and processname

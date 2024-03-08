@@ -28,10 +28,10 @@ namespace Wifi {
 
 DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
-
+constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 WifiAppStateAware::WifiAppStateAware(int instId)
 {
-    foregroundAppBundleName_ = "";
+    GetForegroundApp();
     appChangeEventHandler = std::make_unique<WifiEventHandler>(WIFI_APP_STATE_AWARE_THREAD);
     if (appChangeEventHandler) {
         std::function<void()> RegisterAppStateObserverFunc =
@@ -48,9 +48,9 @@ WifiAppStateAware::~WifiAppStateAware()
     if (appChangeEventHandler) {
         appChangeEventHandler.reset();
     }
-
-    if (mAppStateObserver) {
-        mAppStateObserver = nullptr;
+    UnSubscribeAppState();
+    if (appMgrProxy_) {
+        appMgrProxy_ = nullptr;
     }
 }
 
@@ -65,27 +65,68 @@ ErrCode WifiAppStateAware::InitAppStateAware()
     return WIFI_OPT_SUCCESS;
 }
 
+bool WifiAppStateAware::Connect()
+{
+    if (appMgrProxy_ != nullptr) {
+        WIFI_LOGI("appManager already connect");
+        return true;
+    }
+
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        WIFI_LOGE("get SystemAbilityManager failed");
+        return false;
+    }
+
+    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(APP_MGR_SERVICE_ID);
+    if (remoteObject == nullptr) {
+        WIFI_LOGE("get App Manager Service failed");
+        return false;
+    }
+
+    appMgrProxy_ = iface_cast<AppExecFwk::IAppMgr>(remoteObject);
+    if (!appMgrProxy_ || !appMgrProxy_->AsObject()) {
+        WIFI_LOGE("get appManager proxy failed!");
+        return false;
+    }
+    return true;
+}
+
 void WifiAppStateAware::RegisterAppStateObserver()
 {
-    WIFI_LOGD("%{public}s called", __func__);
-    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-    mAppStateObserver = sptr<AppStateObserver>(new (std::nothrow) AppStateObserver());
-    int regAppStatusObsRetry = 0;
-    while (appMgrClient->ConnectAppMgrService() != AppExecFwk::AppMgrResultCode::RESULT_OK) {
-        WIFI_LOGE("ConnectAppMgrService fail, try again! retryTimes=%{public}d", ++regAppStatusObsRetry);
+    WIFI_LOGI("%{public}s called", __func__);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (mAppStateObserver) {
+        WIFI_LOGI("mAppStateObserver already registered");
     }
-    auto systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    mAppObject = iface_cast<AppExecFwk::IAppMgr>(systemAbilityManager->GetSystemAbility(APP_MGR_SERVICE_ID));
-    if (mAppObject) {
-        int ret = mAppObject->RegisterApplicationStateObserver(mAppStateObserver);
-        if (ret == ERR_OK) {
-            WIFI_LOGI("register application state observer success.");
-            return;
-        }
+    if (!Connect()) {
+        return;
+    }
+    mAppStateObserver = sptr<AppStateObserver>(new (std::nothrow) AppStateObserver());
+    int ret = appMgrProxy_->RegisterApplicationStateObserver(mAppStateObserver);
+    if (ret != ERR_OK) {
         WIFI_LOGE("register application state observer fail, ret = %{public}d", ret);
         return;
     }
-    WIFI_LOGE("get SystemAbilityManager fail");
+    WIFI_LOGI("register application state observer success.");
+}
+
+void WifiAppStateAware::UnSubscribeAppState()
+{
+    WIFI_LOGI("%{public}s called", __func__);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!mAppStateObserver) {
+        WIFI_LOGE("UnSubscribeAppState: mAppStateObserver is nullptr");
+        return;
+    }
+    if (appMgrProxy_) {
+        appMgrProxy_->UnregisterApplicationStateObserver(mAppStateObserver);
+        appMgrProxy_ = nullptr;
+        mAppStateObserver = nullptr;
+    }
+    WIFI_LOGI("UnSubscribeAppState end");
+    return;
 }
 
 void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, int uid, int pid,
@@ -93,9 +134,11 @@ void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, in
 {
     if (state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND)) {
         foregroundAppBundleName_ = bundleName;
+        foregroundAppUid_ = uid;
     } else if (state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_BACKGROUND) &&
         foregroundAppBundleName_ == bundleName) {
         foregroundAppBundleName_ = "";
+        foregroundAppUid_ = -1;
     } else {
         WIFI_LOGI("state = %{pubilc}d, not handle.", state);
     }
@@ -106,14 +149,49 @@ void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, in
     }
 }
 
-std::string WifiAppStateAware::GetForegroundApp()
+void WifiAppStateAware::GetForegroundApp()
 {
-    return foregroundAppBundleName_;
+    if (!Connect()) {
+        return ;
+    }
+    std::vector<AppExecFwk::AppStateData> fgAppList;
+    appMgrProxy_->GetForegroundApplications(fgAppList);
+    if (fgAppList.size() > 0) {
+        WIFI_LOGI("fgApp: %{public}s, state = %{public}d", fgAppList[0].bundleName.c_str(), fgAppList[0].state);
+        foregroundAppBundleName_ = fgAppList[0].bundleName;
+        foregroundAppUid_ = fgAppList[0].uid;
+        return;
+     }
+     return;
 }
 
-bool WifiAppStateAware::IsForegroundApp(std::string &bundleName)
+bool WifiAppStateAware::IsForegroundApp(int32_t uid)
 {
-    return bundleName == foregroundAppBundleName_;
+    return foregroundAppUid_ == uid;
+}
+
+std::string WifiAppStateAware::GetRunningProcessNameByPid(const int uid, const int pid)
+{
+    if (!Connect()) {
+        return "";
+    }
+    int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    int ret = appMgrProxy_->GetProcessRunningInfosByUserId(infos, userId);
+    if (ret != ERR_OK) {
+        WIFI_LOGE("GetProcessRunningInfosByUserId fail, ret = [%{public}d]", ret);
+        return "";
+    }
+    std::string processName = "";
+    auto iter = infos.begin();
+    while (iter != infos.end()) {
+        if (iter->pid_ == pid) {
+            processName = iter->processName_;
+            break;
+        }
+        iter++;
+    }
+    return processName;
 }
 
 void AppStateObserver::OnAppStarted(const AppExecFwk::AppStateData &appStateData)

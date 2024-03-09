@@ -88,6 +88,7 @@ private:
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
+    uint32_t migrateTimerId{0};
     std::mutex cesEventMutex;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;

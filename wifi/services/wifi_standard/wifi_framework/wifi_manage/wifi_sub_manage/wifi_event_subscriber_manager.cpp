@@ -39,6 +39,7 @@ DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 namespace OHOS {
 namespace Wifi {
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
+constexpr uint32_t TIMEOUT_CHECK_LAST_STA_STATE_EVENT = 10 * 1000;
 constexpr uint32_t PROP_LEN = 26;
 constexpr uint32_t PROP_SUBCHIPTYPE_LEN = 10;
 constexpr uint32_t SUPPORT_COEXCHIP_LEN = 7;
@@ -87,8 +88,11 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 
     RegisterCesEvent();
 
-    if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH)) {
-        CheckAndStartStaByDatashare();
+    if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && migrateTimerId == 0) {
+        WifiTimer::TimerCallback timeoutCallback = std::bind(
+            &WifiEventSubscriberManager::CheckAndStartStaByDatashare, this);
+        WifiTimer::GetInstance()->Register(timeoutCallback, migrateTimerId, TIMEOUT_CHECK_LAST_STA_STATE_EVENT);
+        WIFI_LOGI("CheckAndStartStaByDatashare register success! migrateTimerId:%{public}u", migrateTimerId);
     }
 #ifdef HAS_POWERMGR_PART
     RegisterPowerStateListener();
@@ -360,6 +364,11 @@ void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     } else if (lastStaState == closeWifiByAirplanemodeOpen) {
         WifiSettings::GetInstance().SetWifiToggledState(true);
+    }
+
+    if (migrateTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(migrateTimerId);
+        migrateTimerId = 0;
     }
 }
 

@@ -27,6 +27,7 @@
         </policylist>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
+                <filteritem type="filename" name="hvigorfile.ts" desc="The hvigorfile Files not to check."/>
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility, license header policies">
                 <filteritem type="filename" name="*.cfg" desc="The JSON format does not support comments."/>

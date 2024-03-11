@@ -40,7 +40,7 @@ ohos_fuzztest("WifiDeviceStubFuzzTest") {
   ]
   sources = [
     "wifidevicestub_fuzzer.cpp",
-    "mock_auth_center.cpp",
+    "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
   ]
 
   deps = [

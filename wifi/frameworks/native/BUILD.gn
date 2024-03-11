@@ -54,8 +54,9 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
@@ -242,10 +243,10 @@ if (defined(ohos_lite)) {
       ":wifi_p2p_proxy_impl",
       ":wifi_scan_proxy_impl",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "hilog:libhilog",
       "ipc:ipc_single",

@@ -127,6 +127,14 @@ public:
     ErrCode RemoveGroup(void) override;
 
     /**
+     * @Description Remove a P2P client of current group.
+     *
+     * @param info - client gcInfo
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveGroupClient(const GcInfo &info) override;
+
+    /**
      * @Description Delete a p2p Group
      *
      * @param group - WifiP2pGroupInfo object

@@ -138,6 +138,14 @@ ErrCode WifiP2pService::RemoveGroup()
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiP2pService::RemoveGroupClient(const GcInfo &gcInfo)
+{
+    WIFI_LOGI("RemoveGroupClient");
+    const std::any info = gcInfo;
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP_CLIENT), info);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     WIFI_LOGI("DeleteGroup");
@@ -187,6 +195,13 @@ ErrCode WifiP2pService::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
     WIFI_LOGI("QueryP2pLinkedInfo");
     linkedInfo = groupManager.GetP2pInfo();
+    if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
+    WifiP2pGroupInfo groupInfo = groupManager.GetCurrentGroup();
+    if (!groupInfo.IsGroupOwner()) {
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

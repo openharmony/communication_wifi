@@ -164,6 +164,13 @@ ErrCode WifiP2pImpl::RemoveGroup(void)
     return client_->RemoveGroup();
 }
 
+ErrCode WifiP2pImpl::RemoveGroupClient(const GcInfo &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->RemoveGroupClient(info);
+}
+
 ErrCode WifiP2pImpl::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     std::lock_guard<std::mutex> lock(mutex_);

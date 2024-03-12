@@ -65,7 +65,7 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
         std::bind(&P2pMonitor::WpaEventFindStopped, this),
         std::bind(&P2pMonitor::WpaEventServDiscResp, this, _1, _2, _3),
         std::bind(&P2pMonitor::WpaEventApStaDisconnected, this, _1),
-        std::bind(&P2pMonitor::WpaEventApStaConnected, this, _1),
+        std::bind(&P2pMonitor::WpaEventApStaConnected, this, _1, _2),
         std::bind(&P2pMonitor::OnConnectSupplicantFailed, this),
         std::bind(&P2pMonitor::WpaEventServDiscReq, this, _1),
         std::bind(&P2pMonitor::WpaEventP2pIfaceCreated, this, _1, _2),
@@ -607,11 +607,13 @@ void P2pMonitor::WpaEventApStaDisconnected(const std::string &p2pDeviceAddress) 
     Broadcast2SmApStaDisconnected(selectIfacName, device);
 }
 
-void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress) const
+void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress, const std::string &p2pGroupAddress) const
 {
-    WIFI_LOGD("onStaAuthorized callback, p2pDeviceAddress:%{private}s", p2pDeviceAddress.c_str());
+    WIFI_LOGD("onStaAuthorized callback, p2pDeviceAddress: %{private}s, p2pGroupAddress: %{private}s",
+        p2pDeviceAddress.c_str(), p2pGroupAddress.c_str());
     WifiP2pDevice device;
     device.SetDeviceAddress(p2pDeviceAddress);
+    device.SetGroupAddress(p2pGroupAddress);
     Broadcast2SmApStaConnected(selectIfacName, device);
 }
 

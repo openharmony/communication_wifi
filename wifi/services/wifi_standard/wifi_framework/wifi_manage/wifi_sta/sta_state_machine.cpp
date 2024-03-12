@@ -2839,14 +2839,6 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResult(DhcpResult *dest, DhcpRes
         LOGE("SaveDhcpResult strOptVendor strcpy_s failed!");
         return;
     }
-    if (strcpy_s(dest->strOptLinkIpv6Addr, DHCP_MAX_FILE_BYTES, source->strOptLinkIpv6Addr) != EOK) {
-        LOGE("SaveDhcpResult strOptLinkIpv6Addr strcpy_s failed!");
-        return;
-    }
-    if (strcpy_s(dest->strOptRandIpv6Addr, DHCP_MAX_FILE_BYTES, source->strOptRandIpv6Addr) != EOK) {
-        LOGE("SaveDhcpResult strOptRandIpv6Addr strcpy_s failed!");
-        return;
-    }
     LOGI("SaveDhcpResult ok, ipType:%{public}d", dest->iptype);
     StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(dest, source);
 }

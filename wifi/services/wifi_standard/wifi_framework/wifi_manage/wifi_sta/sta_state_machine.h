@@ -608,10 +608,9 @@ private:
     /**
      * @Description  Update wifi status and save connection information.
      *
-     * @param networkId - the networkId of selected network which is going to be connected(in)
      * @param bssid - the mac address of wifi(in)
      */
-    void ConnectToNetworkProcess(InternalMessage *msg);
+    void ConnectToNetworkProcess(std::string bssid);
 
     /**
      * @Description On connect fail.

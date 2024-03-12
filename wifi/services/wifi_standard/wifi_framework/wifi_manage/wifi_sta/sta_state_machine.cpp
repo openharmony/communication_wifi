@@ -1060,7 +1060,8 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
         WIFI_LOGE("DealConnectionEvent, msg is nullptr.\n");
         return;
     }
-    if (CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+    std::string bssid = msg->GetStringFromMessage();
+    if (CheckRoamingBssidIsSame(bssid)) {
         WIFI_LOGE("DealConnectionEvent inconsistent bssid in connecter");
         return;
     }
@@ -1073,7 +1074,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 #endif
     /* Stop clearing the Wpa_blocklist. */
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
-    ConnectToNetworkProcess(msg);
+    ConnectToNetworkProcess(bssid);
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
 
@@ -1982,7 +1983,8 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             ret = EXECUTED;
-            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+            std::string bssid = msg->GetStringFromMessage();
+            if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
                 WIFI_LOGE("ApLinkedState inconsistent bssid in connecter");
                 return false;
             }
@@ -1990,7 +1992,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
             WIFI_LOGI("Stop clearing wpa block list");
             /* Save linkedinfo */
             pStaStateMachine->linkedInfo.networkId = pStaStateMachine->targetNetworkId;
-            pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
+            pStaStateMachine->linkedInfo.bssid = bssid;
             WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
 
             break;
@@ -2080,7 +2082,8 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             ret = EXECUTED;
-            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+            std::string bssid = msg->GetStringFromMessage();
+            if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
                 WIFI_LOGE("StaWpsState inconsistent bssid in connecter");
                 return false;
             }
@@ -2088,7 +2091,7 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
             pStaStateMachine->StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
 
             WIFI_LOGI("WPS mode connect to a network!");
-            pStaStateMachine->ConnectToNetworkProcess(msg);
+            pStaStateMachine->ConnectToNetworkProcess(bssid);
             /* Callback result to InterfaceService. */
             pStaStateMachine->SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
             pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
@@ -2649,14 +2652,15 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT event.");
             ret = EXECUTED;
-            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+            std::string bssid = msg->GetStringFromMessage();
+            if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
                 WIFI_LOGE("ApRoamingState inconsistent bssid in connecter");
                 return false;
             }
             pStaStateMachine->isRoam = true;
             pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
-            pStaStateMachine->ConnectToNetworkProcess(msg);
+            pStaStateMachine->ConnectToNetworkProcess(bssid);
             /* Notify result to InterfaceService. */
             pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED,
                 pStaStateMachine->linkedInfo);
@@ -2716,15 +2720,9 @@ bool StaStateMachine::CanArpReachable()
     return false;
 }
 
-void StaStateMachine::ConnectToNetworkProcess(InternalMessage *msg)
+void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
 {
-    if (msg == nullptr) {
-        return;
-    }
-
-    std::string bssid = msg->GetStringFromMessage();
-    WIFI_LOGI("ConnectToNetworkProcess, Receive msg: wpa NetworkId=%{public}d, bssid=%{public}s",
-        msg->GetParam1(), MacAnonymize(bssid).c_str());
+    WIFI_LOGI("ConnectToNetworkProcess, Receive bssid=%{public}s", MacAnonymize(bssid).c_str());
     if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::PBC) || (wpsState == SetupMethod::KEYPAD)) {
         targetNetworkId = WPA_DEFAULT_NETWORKID;
     }

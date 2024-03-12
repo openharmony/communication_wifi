@@ -379,6 +379,23 @@ public:
         static void TryToCloseDhcpClient(int iptype);
         static void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
         static void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
+StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(dest, source);
+void StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source)
+{
+    if (dest == nullptr || source == nullptr) {
+        LOGE("SaveDhcpResultExt dest or source is nullptr.");
+        return;
+    }
+    if (strcpy_s(dest->strOptLinkIpv6Addr, DHCP_MAX_FILE_BYTES, source->strOptLinkIpv6Addr) != EOK) {
+        LOGE("SaveDhcpResultExt strOptLinkIpv6Addr strcpy_s failed!");
+        return;
+    }
+    if (strcpy_s(dest->strOptRandIpv6Addr, DHCP_MAX_FILE_BYTES, source->strOptRandIpv6Addr) != EOK) {
+        LOGE("SaveDhcpResultExt strOptRandIpv6Addr strcpy_s failed!");
+        return;
+    }
+    LOGI("SaveDhcpResultExt ok, ipType:%{public}d", dest->iptype);
+}
     private:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;

@@ -43,7 +43,7 @@ struct P2pHalCallback {
     std::function<void(void)> onFindStopped;
     std::function<void(const std::string &, short, const std::vector<unsigned char> &)> onServiceDiscoveryResponse;
     std::function<void(const std::string &)> onStaDeauthorized;
-    std::function<void(const std::string &)> onStaAuthorized;
+    std::function<void(const std::string &, const std::string &)> onStaAuthorized;
     std::function<void(void)> connectSupplicantFailed;
     std::function<void(const IdlP2pServDiscReqInfo &)> onP2pServDiscReq;
     std::function<void(const std::string &, int)> onP2pIfaceCreated;

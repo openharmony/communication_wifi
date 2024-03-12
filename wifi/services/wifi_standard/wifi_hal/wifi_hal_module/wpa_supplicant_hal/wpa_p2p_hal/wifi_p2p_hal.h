@@ -50,6 +50,7 @@ struct stWifiWpaP2pInterface {
     P2pSupplicantErrCode (*wpaP2pCliCmdFlushService)(WifiWpaP2pInterface *p);
     P2pSupplicantErrCode (*wpaP2pCliCmdP2pStopFind)(WifiWpaP2pInterface *p);
     P2pSupplicantErrCode (*wpaP2pCliCmdP2pRemoveGroup)(WifiWpaP2pInterface *p, const char *groupname);
+    P2pSupplicantErrCode (*wpaP2pCliCmdP2pRemoveClient)(WifiWpaP2pInterface *p, const char *deviceMac);
     P2pSupplicantErrCode (*wpaP2pCliCmdP2pFound)(WifiWpaP2pInterface *p, int timeout);
     P2pSupplicantErrCode (*wpaP2pCliCmdRemoveNetwork)(WifiWpaP2pInterface *p, int networkId);
     P2pSupplicantErrCode (*wpaP2pCliCmdSetWfdEnable)(WifiWpaP2pInterface *p, int enable);

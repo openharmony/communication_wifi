@@ -113,6 +113,12 @@ public:
      */
     virtual ErrCode RemoveGroup() override;
     /**
+     * @Description Remove a P2P client of current group.
+     * @param deviceMac - client deviceMac address
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveGroupClient(const GcInfo &info) override;
+    /**
      * @Description - Delete a persistent group.
      * @param  group - specified group
      * @return ErrCode - operation result

@@ -57,6 +57,7 @@ private:
     void OnStopP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnCreateGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnRemoveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnRemoveGroupClient(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDeleteGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnP2pConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnP2pCancelConnect(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

@@ -87,7 +87,7 @@ public:
      *
      * @param action - DiscoverDevices/StopDiscoverDevices/DiscoverServices/StopDiscoverServices
      *                 /PutLocalP2pService/StartP2pListen/StopP2pListen/CreateGroup/RemoveGroup
-     *                 /DeleteGroup/P2pConnect/P2pCancelConnect
+     *                 /DeleteGroup/P2pConnect/P2pCancelConnect/RemoveGroupClient
      * @param code   - Return code
      */
     void OnP2pActionResult(P2pActionCallback action, ErrCode code) override;
@@ -100,6 +100,20 @@ public:
      * @param len  - Config data length
      */
     void OnConfigChanged(CfgType type, char* data, int dataLen) override;
+
+    /**
+     * @Description The go dhcp server send ack to gc event.
+     *
+     * @param info - GcInfo object
+     */
+    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info) override;
+
+    /**
+     * @Description The cd is disconnected.
+     *
+     * @param info - GcInfo object
+     */
+    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override;
 
     void RegisterCallBack(const sptr<IWifiP2pCallback> &userCallback);
     bool IsRemoteDied() const;
@@ -117,6 +131,8 @@ private:
     void RemoteOnP2pDiscoveryChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pActionResult(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnConfigChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     HandleFuncMap handleFuncMap;

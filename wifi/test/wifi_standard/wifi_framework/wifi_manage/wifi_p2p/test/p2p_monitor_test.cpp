@@ -285,9 +285,9 @@ public:
         pP2pMonitor->WpaEventApStaDisconnected(p2pDeviceAddress);
     }
 
-    void WrapMethodWpaEventApStaConnected(const std::string &p2pDeviceAddress)
+    void WrapMethodWpaEventApStaConnected(const std::string &p2pDeviceAddress, const std::string &p2pGroupAddress)
     {
-        pP2pMonitor->WpaEventApStaConnected(p2pDeviceAddress);
+        pP2pMonitor->WpaEventApStaConnected(p2pDeviceAddress, p2pGroupAddress);
     }
 
     void WrapMethodOnConnectSupplicantFailed()
@@ -768,7 +768,7 @@ HWTEST_F(P2pMonitorTest, WpaEventApStaDisconnected, TestSize.Level1)
 
 HWTEST_F(P2pMonitorTest, WpaEventApStaConnected, TestSize.Level1)
 {
-    WrapMethodWpaEventApStaConnected("ff:ff:ff:ff:ff:ff");
+    WrapMethodWpaEventApStaConnected("ff:ff:ff:ff:ff:ff", "ff:ff:ff:ff:ff:ff");
 }
 
 HWTEST_F(P2pMonitorTest, OnConnectSupplicantFailed, TestSize.Level1)

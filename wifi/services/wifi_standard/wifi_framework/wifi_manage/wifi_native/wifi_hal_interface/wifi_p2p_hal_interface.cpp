@@ -341,6 +341,17 @@ WifiErrorNo WifiP2PHalInterface::GroupRemove(const std::string &groupInterface) 
 #endif
 }
 
+WifiErrorNo WifiP2PHalInterface::GroupClientRemove(const std::string &deviceMac) const
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqP2pRemoveGroupClient(deviceMac);
+#else
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqP2pRemoveGroupClient(deviceMac);
+#endif
+}
+
 WifiErrorNo WifiP2PHalInterface::Invite(const WifiP2pGroupInfo &group, const std::string &deviceAddr) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT

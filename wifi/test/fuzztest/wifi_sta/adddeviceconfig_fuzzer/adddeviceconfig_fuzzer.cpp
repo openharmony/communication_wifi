@@ -24,15 +24,36 @@ namespace Wifi {
         if (devicePtr == nullptr) {
             return false;
         }
+        WifiProtectType protectType;
+        WifiProtectMode protectMode;
+        std::vector<WifiDeviceConfig> wifiDeviceConfig;
 
+        protectType = static_cast<WifiProtectType*>(data) % 2;
+        protectMode = static_cast<WifiProtectType*>(data) % 5;
         WifiDeviceConfig config;
         int addResult;
         bool isCandidate = false;
+        std::string protectName = std::string(reinterpret_cast<const char*>(data), size);
+        int networkId = static_cast<int*>(data[0]);
         config.ssid = std::string(reinterpret_cast<const char*>(data), size);
         config.bssid = std::string(reinterpret_cast<const char*>(data), size);
         config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
         config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+        wifiDeviceConfig.push_back(config);
+
         devicePtr->AddDeviceConfig(config, addResult, isCandidate);
+        devicePtr->InitWifiProtect(protectType, protectName);
+        devicePtr->PutWifiProtectRef(protectName);
+        devicePtr->IsHeldWifiProtectRef(protectName, true);
+        devicePtr->GetWifiProtectRef(protectMode, protectName);
+        devicePtr->GetWifiProtectRef(networkId);
+        devicePtr->GetWifiProtectRef(config);
+        devicePtr->RemoveDevice(networkId);
+        devicePtr->GetDeviceConfigs(wifiDeviceConfig, true);
+        devicePtr->EnableDeviceConfig(networkId, true);
+        devicePtr->EnableDeviceConfig(networkId, true);
+
+
         return true;
     }
 }  // namespace Wifi

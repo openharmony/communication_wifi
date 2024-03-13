@@ -37,6 +37,7 @@ namespace Wifi {
         Hid2dGetSelfWifiCfgInfoTest(data, size);
         Hid2dSetPeerWifiCfgInfoTest(data, size);
         Hid2dSetUpperSceneTest(data, size);
+        Hid2dGetChannelListFor5GTest(data, size);
         return true;
     }
 }  // namespace Wifi
@@ -225,6 +226,15 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
     }
     (void)Hid2dSetUpperScene(ifName, &scene);
 }
+void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size)
+{
+    int *chanlist  = reinterpret_cast<const int*>(data);
+    int len = static_cast<unsigned int>(data[0]);
+    (void)Hid2dGetChannelListFor5G(chanlist, len);
+}
+
+
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

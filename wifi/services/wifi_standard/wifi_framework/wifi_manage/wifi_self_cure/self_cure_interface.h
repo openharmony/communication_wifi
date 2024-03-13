@@ -48,13 +48,6 @@ public:
     virtual ErrCode RegisterSelfCureServiceCallback(const SelfCureServiceCallback &callbacks) override;
 
     /**
-     * @Description Get register p2p callback
-     *
-     * @return IP2pServiceCallbacks - p2p callback
-     */
-    virtual IP2pServiceCallbacks GetP2pCallback() override;
-
-    /**
      * @Description Get register sta callback
      *
      * @return StaServiceCallback - sta callback
@@ -95,7 +88,6 @@ private:
     std::vector<SelfCureServiceCallback> mSelfCureCallback;
     SelfCureService *pSelfCureService;
     StaServiceCallback mStaCallback;
-    IP2pServiceCallbacks mP2pCallback;
     int m_instId;
 };
 }  // namespace Wifi

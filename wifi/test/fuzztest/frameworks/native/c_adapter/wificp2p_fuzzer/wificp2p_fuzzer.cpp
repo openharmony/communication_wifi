@@ -254,6 +254,10 @@ static void QueryP2pGroupsTest(const uint8_t* data, size_t size)
     (void)QueryP2pGroups(&groupInfo, msize);
 }
 
+static void UnregisterCfgChangCallbackTest(const uint8_t* data, size_t size)
+{
+    (void)UnregisterCfgChangCallback();
+}
 
 namespace OHOS {
 namespace Wifi {
@@ -278,6 +282,7 @@ namespace Wifi {
         QueryP2pLocalDeviceTest(data, size);
         QueryP2pDevicesTest(data, size);
         QueryP2pGroupsTest(data, size);
+        UnregisterCfgChangCallbackTest(data, size);
         return true;
     }
 }  // namespace Wifi

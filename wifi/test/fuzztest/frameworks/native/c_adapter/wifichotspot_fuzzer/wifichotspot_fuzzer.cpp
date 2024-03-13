@@ -89,6 +89,22 @@ static void DisassociateStaTest(const uint8_t* data, size_t size)
     (void)DisassociateSta(&mac, macLen);
 }
 
+static void IsHotspotDualBandSupportedTest(const uint8_t* data, size_t size)
+{
+    bool isSupported = true;
+    (void)IsHotspotDualBandSupported(&isSupported);
+}
+
+static void GetApIfaceNameTest(const uint8_t* data, size_t size)
+{
+    int macLen = 0;
+    char *ifname = reinterpret_cast<const char*>(data);
+    macLen = static_cast<int>(data[0]);
+
+    (void)GetApIfaceName(ifname, macLen);
+}
+
+
 namespace OHOS {
 namespace Wifi {
     bool WifiCHotSpotFuzzerTest(const uint8_t* data, size_t size)
@@ -101,6 +117,8 @@ namespace Wifi {
         GetHotspotConfigTest(data, size);
         GetStationListTest(data, size);
         DisassociateStaTest(data, size);
+        GetApIfaceNameTest(data, size);
+        IsHotspotDualBandSupportedTest(data, size);
         return true;
     }
 }  // namespace Wifi

@@ -18,7 +18,7 @@
 #include "securec.h"
 #include "wifichotspot_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
-#include "../../../../../../interfaces/kits/c/wifi_hotspot.h"
+#include "kits/c/wifi_hotspot.h"
 
 static void SetHotspotConfigTest(const uint8_t* data, size_t size)
 {

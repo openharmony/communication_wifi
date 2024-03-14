@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "wifip2pcallstub_fuzzer.h"
+#include "wifip2pcbkstub_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 #include "wifi_p2p_callback_stub.h"
 
@@ -24,7 +24,6 @@
 #include "securec.h"
 #include "define.h"
 #include "wifi_manager_service_ipc_interface_code.h"
-#include "wifi_log.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -36,7 +35,6 @@ std::shared_ptr<WifiP2pCallbackStub> pWifiP2pCallStub = std::make_shared<WifiP2p
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
     uint32_t code = U32_AT(data) % MAP_SCAN_NUMS + static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_STATE_CHANGE);
-    LOGI("wifiscanstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size); // code[0x1004, 0x101E]
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);

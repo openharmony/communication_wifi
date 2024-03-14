@@ -265,50 +265,16 @@ static void SetLowLatencyModeTest(const uint8_t* data, size_t size)
     (void)SetLowLatencyMode(enabled);
 }
 
-static void FactoryResetTest(const uint8_t* data, size_t size)
-{
-    (void)FactoryReset(eabled);
-}
-
-static void IsHeldWifiProtectTest(const uint8_t* data, size_t size)
-{
-    (void)IsHeldWifiProtect(true);
-}
-
-static void PutWifiProtectTest(const uint8_t* data, size_t size)
-{
-    (void)PutWifiProtect();
-}
-
-static void StartPortalCertificationTest(const uint8_t* data, size_t size)
-{
-    int rssi = 0;
-    int band = 0;
-    if (size >= TWO) {
-        int index = 0;
-        size = static_cast<unsigned int>(data[index++]);
-        result = static_cast<unsigned int>(data[index++]);
-    }
-    (void)StartPortalCertification(&result, &size);
-}
-
-static void PutWifiProtectTest(const uint8_t* data, size_t size)
-{
-    WifiProtectMode mode;
-    mode = static_cast<WifiProtectMode>(static_cast<int>(data[0]) % (WIFI_PROTECT_NO_HELD + 1))
-    (void)GetWifiProtect(mode);
-}
-
 static void Get5GHzChannelListTest(const uint8_t* data, size_t size)
 {
     int result = 0;
-    int size = 0;
+    int sizet = 0;
     if (size >= TWO) {
         int index = 0;
         result = static_cast<int>(data[index++]);
-        size = static_cast<int>(data[index++]);
+        sizet = static_cast<int>(data[index++]);
     }
-    (void)Get5GHzChannelList(&result, &size);
+    (void)Get5GHzChannelList(&result, &sizet);
 }
 
 static void IsBandTypeSupportedTest(const uint8_t* data, size_t size)
@@ -318,32 +284,11 @@ static void IsBandTypeSupportedTest(const uint8_t* data, size_t size)
     (void)IsBandTypeSupported(bandType, &supported);
 }
 
-static void GetIpv6InfoTest(const uint8_t* data, size_t size)
-{
-    IpV6Info ipInfo;
-    ipInfo.linkIpV6Address = std::string(reinterpret_cast<const char*>(data), size);
-    ipInfo.globalIpV6Address = std::string(reinterpret_cast<const char*>(data), size);
-    ipInfo.randGlobalIpV6Address = std::string(reinterpret_cast<const char*>(data), size);
-    ipInfo.gateway = std::string(reinterpret_cast<const char*>(data), size);
-    ipInfo.netmask = std::string(reinterpret_cast<const char*>(data), size);
-    ipInfo.primaryDns = std::string(reinterpret_cast<const char*>(data), size);
-    ipInfo.secondDns = std::string(reinterpret_cast<const char*>(data), size);
-
-    (void)GetIpv6Info(&info);
-}
-
 static void GetDisconnectedReasonTest(const uint8_t* data, size_t size)
 {
-    DisconnectedReason result;
+    DisconnectedReason result = DISC_REASON_DEFAULT;
     result = static_cast<DisconnectedReason>(static_cast<int>(data[0]) % (DISC_REASON_CONNECTION_REJECTED + 1));
     (void)GetDisconnectedReason(&result);
-}
-
-static void ConnectToNetworkTest(const uint8_t* data, size_t size)
-{
-    int networkId = 0;
-    int networkId = static_cast<int>(data[0]);
-    (void)ConnectToNetwork(&info);
 }
 
 namespace OHOS {
@@ -369,14 +314,9 @@ namespace Wifi {
         GetDeviceMacAddressTest(data, size);
         GetIpInfoTest(data, size);
         SetLowLatencyModeTest(data, size);
-        FactoryResetTest(data, size);
-        IsHeldWifiProtectTest(data, size);
-        PutWifiProtectTest(data, size);
         Get5GHzChannelListTest(data, size);
         IsBandTypeSupportedTest(data, size);
-        GetIpv6InfoTest(data, size);
         GetDisconnectedReasonTest(data, size);
-        ConnectToNetworkTest(data, size);
 
         return true;
     }

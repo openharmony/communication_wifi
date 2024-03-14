@@ -17,7 +17,7 @@ import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("WifiScanCbkStubFuzzTest") {
+ohos_fuzztest("WifiHotSpotCbkStubFuzzTest") {
   module_out_path = fuzz_test_output_path
   fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/frameworks/native/c_adapter/wifihotspotcbkstub_fuzzer"
 

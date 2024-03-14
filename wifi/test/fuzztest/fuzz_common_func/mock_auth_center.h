@@ -43,8 +43,6 @@ public:
 
     int VerifySetWifiConfigPermission(const int &pid, const int &uid);
 
-    int VerifyGetWifiConfigPermission(const int &pid, const int &uid);
-
     int VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid);
 
     int VerifyManageWifiHotspotPermission(const int &pid, const int &uid);

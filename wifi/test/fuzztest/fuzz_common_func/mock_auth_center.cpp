@@ -39,12 +39,12 @@ bool WifiAuthCenter::IsNativeProcess()
     return true;
 }
 
-int wifiauthcenter::VerifySetWifiInfoPermission(const int &pid, const int &uid)
+int WifiAuthCenter::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {
     return PERMISSION_GRANTED;
 }
 
-int wifiauthcenter::VerifyGetWifiInfoPermission(const int &pid, const int &uid)
+int WifiAuthCenter::VerifyGetWifiInfoPermission(const int &pid, const int &uid)
 {
     return PERMISSION_GRANTED;
 }
@@ -65,11 +65,6 @@ int WifiAuthCenter::VerifyWifiConnectionPermission(const int &pid, const int &ui
 }
 
 int WifiAuthCenter::VerifySetWifiConfigPermission(const int &pid, const int &uid)
-{
-    return PERMISSION_GRANTED;
-}
-
-int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid);
 {
     return PERMISSION_GRANTED;
 }

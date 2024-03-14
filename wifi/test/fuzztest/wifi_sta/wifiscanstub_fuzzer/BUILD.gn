@@ -38,8 +38,8 @@ ohos_fuzztest("WifiScanStubFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "wifiscanstub_fuzzer.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
+    "wifiscanstub_fuzzer.cpp",
   ]
 
   deps = [

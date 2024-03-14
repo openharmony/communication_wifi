@@ -16,6 +16,6 @@
 #ifndef WIFI_FUZZ_SCAN_CALL_STUB_H
 #define WIFI_FUZZ_SCAN_CALL_STUB_H
 
-#define FUZZ_PROJECT_NAME "wifiscancallstub_fuzzer"
+#define FUZZ_PROJECT_NAME "wifiscancbkstub_fuzzer"
 
 #endif

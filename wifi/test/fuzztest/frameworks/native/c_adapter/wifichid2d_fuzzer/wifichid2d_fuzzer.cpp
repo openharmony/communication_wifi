@@ -233,8 +233,6 @@ void Hid2dGetChannelListFor5GTest(const uint8_t* data, size_t size)
     (void)Hid2dGetChannelListFor5G(chanlist, len);
 }
 
-
-
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

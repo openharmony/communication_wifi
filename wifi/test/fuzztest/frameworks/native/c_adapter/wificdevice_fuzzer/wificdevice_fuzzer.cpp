@@ -286,8 +286,8 @@ static void StartPortalCertificationTest(const uint8_t* data, size_t size)
     int band = 0;
     if (size >= TWO) {
         int index = 0;
-        int size = static_cast<unsigned int>(data[index++]);
-        int result = static_cast<unsigned int>(data[index++]);
+        size = static_cast<unsigned int>(data[index++]);
+        result = static_cast<unsigned int>(data[index++]);
     }
     (void)StartPortalCertification(&result, &size);
 }
@@ -305,8 +305,8 @@ static void Get5GHzChannelListTest(const uint8_t* data, size_t size)
     int size = 0;
     if (size >= TWO) {
         int index = 0;
-        int result = static_cast<int>(data[index++]);
-        int size = static_cast<int>(data[index++]);
+        result = static_cast<int>(data[index++]);
+        size = static_cast<int>(data[index++]);
     }
     (void)Get5GHzChannelList(&result, &size);
 }
@@ -336,7 +336,7 @@ static void GetDisconnectedReasonTest(const uint8_t* data, size_t size)
 {
     DisconnectedReason result;
     result = static_cast<DisconnectedReason>(static_cast<int>(data[0]) % (DISC_REASON_CONNECTION_REJECTED + 1));
-    (void)GetDisconnectedReason(&info);
+    (void)GetDisconnectedReason(&result);
 }
 
 static void ConnectToNetworkTest(const uint8_t* data, size_t size)

@@ -34,7 +34,8 @@ std::shared_ptr<WifiScanCallbackStub> pWifiScanCallStub = std::make_shared<WifiS
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    uint32_t code = U32_AT(data) % MAP_SCAN_NUMS + static_cast<uint32_t>(ScanInterfaceCode::WIFI_CBK_CMD_SCAN_STATE_CHANGE);
+    uint32_t code = U32_AT(data) % MAP_SCAN_NUMS + static_cast<uint32_t>
+    (ScanInterfaceCode::WIFI_CBK_CMD_SCAN_STATE_CHANGE);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);

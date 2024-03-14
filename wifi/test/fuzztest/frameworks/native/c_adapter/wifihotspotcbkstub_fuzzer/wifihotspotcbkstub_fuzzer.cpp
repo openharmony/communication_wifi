@@ -34,7 +34,8 @@ std::shared_ptr<WifiHotspotCallbackStub> pWifiHotSpotCallStub = std::make_shared
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    uint32_t code = U32_AT(data) % MAP_NUMS + static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE);
+    uint32_t code = U32_AT(data) % MAP_NUMS + static_cast<uint32_t>
+    (HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);

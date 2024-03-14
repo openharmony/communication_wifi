@@ -18,7 +18,7 @@
 #include "securec.h"
 #include "wificp2p_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
-#include "../../../../../../interfaces/kits/c/wifi_p2p.h"
+#include "kits/c/wifi_p2p.h"
 
 static void GetP2pEnableStatusTest(const uint8_t* data, size_t size)
 {

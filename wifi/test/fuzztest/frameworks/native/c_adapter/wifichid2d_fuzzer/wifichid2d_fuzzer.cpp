@@ -17,8 +17,8 @@
 #include <cstring>
 #include "securec.h"
 #include "wifichid2d_fuzzer.h"
-#include "../../../../../../frameworks/native/c_adapter/inc/wifi_c_utils.h"
-#include "../../../../../../interfaces/kits/c/wifi_hid2d.h"
+#include "c_adapter/inc/wifi_c_utils.h"
+#include "kits/c/wifi_hid2d.h"
 
 namespace OHOS {
 namespace Wifi {

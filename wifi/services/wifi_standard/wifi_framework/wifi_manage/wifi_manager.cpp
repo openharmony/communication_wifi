@@ -24,7 +24,6 @@
 #else
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
-#include "wifi_app_state_aware.h"
 #endif
 #include "wifi_service_manager.h"
 #include "wifi_common_def.h"

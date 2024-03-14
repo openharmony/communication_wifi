@@ -301,7 +301,7 @@ ErrCode WifiDeviceServiceImpl::CheckCallingUid(int &uid)
 {
 #ifndef OHOS_ARCH_LITE
     uid = GetCallingUid();
-    if (!IsForegroundApp(uid)) {
+    if (!WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
         return WIFI_OPT_INVALID_PARAM;
     }
     return WIFI_OPT_SUCCESS;
@@ -315,7 +315,7 @@ bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
 #ifndef OHOS_ARCH_LITE
    int pid = GetCallingPid();
    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(uid, pid);
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(uid, pid);
     if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
         return false;
     }

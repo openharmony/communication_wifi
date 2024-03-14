@@ -212,21 +212,13 @@ int GetCallingUid();
 int GetCallingTokenId();
 
 /**
- * @Description Check uid the app is a foregroud app
- *
- * @param uid - Input uid
- * @return bool - Returns true for yes, false for no.
- */
-bool IsForegroundApp(const int uid);
-
-/**
  * @Description by Process uid ,the app is a wifi broker process
  *
  * @param uid - Input uid
  * @param pid - Input pid
  * @return string - Returns processname
  */
-std::string GetRunningProcessNameByPid(const int uid, const int pid);
+std::string GetBrokerProcessNameByPid(const int uid, const int pid);
 
 /**
  * @Description set Process pid and processname

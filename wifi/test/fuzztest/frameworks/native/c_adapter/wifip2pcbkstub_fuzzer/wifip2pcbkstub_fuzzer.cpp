@@ -34,7 +34,8 @@ std::shared_ptr<WifiP2pCallbackStub> pWifiP2pCallStub = std::make_shared<WifiP2p
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    uint32_t code = U32_AT(data) % MAP_SCAN_NUMS + static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_STATE_CHANGE);
+    uint32_t code = U32_AT(data) % MAP_SCAN_NUMS + static_cast<uint32_t>
+    (P2PInterfaceCode::WIFI_CBK_CMD_P2P_STATE_CHANGE);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);

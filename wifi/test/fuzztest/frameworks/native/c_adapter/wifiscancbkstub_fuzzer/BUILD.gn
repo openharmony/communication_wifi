@@ -36,9 +36,7 @@ ohos_fuzztest("WifiScanCbkStubFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [
-    "wifiscancbkstub_fuzzer.cpp",
-  ]
+  sources = [ "wifiscancbkstub_fuzzer.cpp" ]
 
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",

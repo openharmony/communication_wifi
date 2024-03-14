@@ -1110,7 +1110,9 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
         WIFI_LOGE("wpsState is INVALID\n");
         return;
     }
-    if (CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+    std::string bssid;
+    msg->GetMessageObj(bssid);
+    if (CheckRoamingBssidIsSame(bssid)) {
         WIFI_LOGE("DealDisconnectEvent inconsistent bssid in connecter");
         return;
     }
@@ -1920,7 +1922,9 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT: {
-            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+            std::string bssid;
+            msg->GetMessageObj(bssid);
+            if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
                 WIFI_LOGE("SeparatedState inconsistent bssid in connecter");
                 return false;
             }
@@ -2681,7 +2685,9 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
         }
         case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT: {
             WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT event.");
-            if (pStaStateMachine->CheckRoamingBssidIsSame(msg->GetStringFromMessage())) {
+            std::string bssid;
+            msg->GetMessageObj(bssid);
+            if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
                 WIFI_LOGE("ApRoamingState inconsistent bssid in connecter");
                 return false;
             }

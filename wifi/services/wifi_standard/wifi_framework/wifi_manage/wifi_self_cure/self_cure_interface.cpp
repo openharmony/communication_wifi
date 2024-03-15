@@ -73,8 +73,6 @@ ErrCode SelfCureInterface::InitCallback()
     mStaCallback.callbackModuleName = "SelfCureService";
     mStaCallback.OnStaConnChanged = std::bind(&SelfCureInterface::DealStaConnChanged, this, _1, _2, _3);
     mStaCallback.OnStaRssiLevelChanged = std::bind(&SelfCureInterface::DealRssiLevelChanged, this, _1, _2);
-    mP2pCallback.callbackModuleName = "SelfCureService";
-    mP2pCallback.OnP2pConnectionChangedEvent = std::bind(&SelfCureInterface::DealP2pConnChanged, this, _1);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -82,12 +80,6 @@ StaServiceCallback SelfCureInterface::GetStaCallback()
 {
     WIFI_LOGD("self cure GetStaCallback");
     return mStaCallback;
-}
-
-IP2pServiceCallbacks SelfCureInterface::GetP2pCallback()
-{
-    WIFI_LOGD("self cure GetP2pCallback");
-    return mP2pCallback;
 }
 
 void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)

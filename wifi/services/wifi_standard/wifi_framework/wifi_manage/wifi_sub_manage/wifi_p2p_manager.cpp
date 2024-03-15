@@ -78,14 +78,7 @@ ErrCode WifiP2pManager::AutoStartP2pService()
             WIFI_LOGE("Register p2p service callback failed!");
             break;
         }
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        ret = pService->RegisterP2pServiceCallbacks(
-            WifiServiceManager::GetInstance().GetSelfCureServiceInst()->GetP2pCallback());
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SelfCure register p2p service callback failed!");
-            break;
-        }
-#endif
+
         ret = pService->EnableP2p();
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service EnableP2p failed, ret %{public}d!", static_cast<int>(ret));
@@ -119,7 +112,7 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         WIFI_LOGE("AutoStopP2pService, set p2p mid state opening failed!");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
-    
+
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("AutoStopP2pService, Instance get p2p service is null!");
@@ -127,14 +120,7 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        if (pService->UnRegisterP2pServiceCallbacks(
-            WifiServiceManager::GetInstance().GetSelfCureServiceInst()->GetP2pCallback()) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SelfCure unregister p2p service callback failed!");
-            return WIFI_OPT_FAILED;
-        }
-#endif
-        
+
     ErrCode ret = pService->DisableP2p();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("service disable p2p failed, ret %{public}d!", static_cast<int>(ret));
@@ -210,6 +196,7 @@ void WifiP2pManager::CloseP2pService(void)
 void WifiP2pManager::InitP2pCallback(void)
 {
     using namespace std::placeholders;
+    mP2pCallback.callbackModuleName = "P2pManager";
     mP2pCallback.OnP2pStateChangedEvent = std::bind(&WifiP2pManager::DealP2pStateChanged, this, _1);
     mP2pCallback.OnP2pPeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPeersChanged, this, _1);
     mP2pCallback.OnP2pServicesChangedEvent = std::bind(&WifiP2pManager::DealP2pServiceChanged, this, _1);

@@ -516,6 +516,7 @@ public:
      */
     void HandlePortalNetworkPorcess();
     
+    void SetPortalBrowserFlag(bool flag);
     /**
      * @Description renew dhcp.
      *

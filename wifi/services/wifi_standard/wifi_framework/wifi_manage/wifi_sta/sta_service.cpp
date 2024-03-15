@@ -268,6 +268,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     }
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    pStaStateMachine->SetPortalBrowserFlag(false);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
@@ -429,6 +430,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     LOGI("ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    pStaStateMachine->SetPortalBrowserFlag(false);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }

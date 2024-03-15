@@ -169,11 +169,6 @@ if (defined(ohos_lite)) {
 } else {
   config("wifi_manager_service_header") {
     include_dirs = [
-      "//commonlibrary/c_utils/base/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "//foundation/arkui/ace_engine/frameworks/base/utils",
-      "//foundation/arkui/ace_engine/frameworks",
-      "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
@@ -202,15 +197,8 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa",
       "$WIFI_ROOT_DIR/utils/inc",
-      "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-      "//base/notification/common_event_service/interfaces/inner_api",
-      "//base/security/access_token/interfaces/innerkits/accesstoken/include",
-      "//base/powermgr/power_manager/interfaces/inner_api/native/include",
-      "//base/powermgr/power_manager/services/zidl/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
-      "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
-      "//foundation/ability/ability_base/interfaces/kits/native/configuration/include",
     ]
   }
 
@@ -264,6 +252,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "ability_runtime:app_manager",
       "c_utils:utils",
       "hilog:libhilog",
       "huks:libhukssdk",
@@ -322,6 +311,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "ability_runtime:app_manager",
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
@@ -357,6 +347,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "ability_runtime:app_manager",
       "c_utils:utils",
       "hilog:libhilog",
       "huks:libhukssdk",
@@ -406,6 +397,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "ability_runtime:app_manager",
       "c_utils:utils",
       "hilog:libhilog",
       "huks:libhukssdk",

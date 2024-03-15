@@ -384,6 +384,7 @@ public:
         static void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToCloseDhcpClient(int iptype);
         static void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
+        static void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
     private:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;

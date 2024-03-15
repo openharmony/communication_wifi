@@ -290,6 +290,21 @@ typedef enum HdiPortType {
     HDI_PORT_TYPE_P2P_DEVICE = 4,
     HDI_PORT_TYPE_BUTT            // invalid type
 } HdiPortType;
+
+typedef enum {
+    PROTOCOL_80211_IFTYPE_UNSPECIFIED, /**< Unspecified type */
+    PROTOCOL_80211_IFTYPE_ADHOC,       /**< Ad hoc network */
+    PROTOCOL_80211_IFTYPE_STATION,     /**< Station */
+    PROTOCOL_80211_IFTYPE_AP,          /**< Access point (AP) */
+    PROTOCOL_80211_IFTYPE_AP_VLAN,     /**< Virtual AP */
+    PROTOCOL_80211_IFTYPE_WDS,         /**< Wireless distributed system */
+    PROTOCOL_80211_IFTYPE_MONITOR,     /**< Listening */
+    PROTOCOL_80211_IFTYPE_MESH_POINT,  /**< Mesh network */
+    PROTOCOL_80211_IFTYPE_P2P_CLIENT,  /**< P2P client */
+    PROTOCOL_80211_IFTYPE_P2P_GO,      /**< P2P group owner */
+    PROTOCOL_80211_IFTYPE_P2P_DEVICE,  /**< P2P device */
+    PROTOCOL_80211_IFTYPE_NUM,         /**< Number of network ports */
+} FeatureType;
 #ifdef __cplusplus
 }
 #endif

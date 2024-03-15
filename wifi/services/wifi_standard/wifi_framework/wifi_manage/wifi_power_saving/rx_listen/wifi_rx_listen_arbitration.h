@@ -17,8 +17,8 @@
 #define OHOS_WIFI_POWER_RX_LISTEN_H
 
 #include <string>
-#include "app_mgr_interface.h"
-#include "app_mgr_constants.h"
+#include "appmgr/app_mgr_interface.h"
+#include "appmgr/app_mgr_constants.h"
 
 namespace OHOS {
 namespace Wifi {

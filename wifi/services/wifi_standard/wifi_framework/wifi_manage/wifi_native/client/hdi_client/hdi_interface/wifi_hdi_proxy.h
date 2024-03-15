@@ -19,7 +19,6 @@
 #include "wifi_hdi_define.h"
 #include "wifi_error_no.h"
 #include "v1_2/iwlan_interface.h"
-#include "wifi_hal_base_feature.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -56,7 +56,6 @@ constexpr int FREQ_CHANNEL_1 = 2412;
 constexpr int FREQ_CHANNEL_36 = 5180;
 constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
 constexpr int MICROSECOND_TO_NANOSECOND = 1000;
-constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 static std::pair<std::string, int> g_brokerProcessInfo;
 
 static std::string DataAnonymize(const std::string str, const char delim,
@@ -294,57 +293,10 @@ int GetCallingTokenId()
     return IPCSkeleton::GetCallingTokenID();
 }
 
-bool IsForegroundApp(const int uid)
+std::string GetBrokerProcessNameByPid(const int uid, const int pid)
 {
-    using namespace OHOS::AppExecFwk;
-    using namespace OHOS::AppExecFwk::Constants;
-    int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
-
-    auto appMgrClient = std::make_unique<AppMgrClient>();
-    appMgrClient->ConnectAppMgrService();
-    AppMgrResultCode ret;
-    std::vector<RunningProcessInfo> infos;
-    ret = appMgrClient->GetProcessRunningInfosByUserId(infos, userId);
-    if (ret != AppMgrResultCode::RESULT_OK) {
-        WIFI_LOGE("GetProcessRunningInfosByUserId fail, ret = [%{public}d]", ret);
-        return false;
-    }
-
-    auto iter = std::find_if(infos.begin(), infos.end(), [&uid](const RunningProcessInfo &rhs) {
-        return ((rhs.uid_ == uid) && (rhs.state_ == AppProcessState::APP_STATE_FOREGROUND ||
-                rhs.state_ == AppProcessState::APP_STATE_FOCUS));
-    });
-    if (iter != infos.end()) {
-        return true;
-    }
-    return false;
-}
-
-std::string GetRunningProcessNameByPid(const int uid, const int pid)
-{
-    using namespace OHOS::AppExecFwk;
-    using namespace OHOS::AppExecFwk::Constants;
-   
-    int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
-    auto appMgrClient = std::make_unique<AppMgrClient>();
-    appMgrClient->ConnectAppMgrService();
-    AppMgrResultCode ret;
-    std::vector<RunningProcessInfo> infos;
-    ret = appMgrClient->GetProcessRunningInfosByUserId(infos, userId);
-    if (ret != AppMgrResultCode::RESULT_OK) {
-        WIFI_LOGE("GetProcessRunningInfosByUserId fail, ret = [%{public}d]", ret);
-        return "";
-    }
     std::string processName = "";
-    auto iter = infos.begin();
-    while (iter != infos.end()) {
-        if (iter->pid_ == pid) {
-            processName = iter->processName_;
-            break;
-        }
-        iter++;
-    }
-    if (processName.empty() && g_brokerProcessInfo.second == pid) {
+    if (g_brokerProcessInfo.second == pid) {
         processName = g_brokerProcessInfo.first;
     }
     return processName;

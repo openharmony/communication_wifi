@@ -262,5 +262,53 @@ void WifiP2pCallbackProxy::OnConfigChanged(CfgType type, char* cfgData, int data
     }
     return;
 }
+
+void WifiP2pCallbackProxy::OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info)
+{
+    WIFI_LOGD("WifiP2pCallbackProxy::OnP2pGcJoinGroup");
+	MessageOption option = {MessageOption::TF_ASYNC};
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    data.WriteInt32(0);
+    data.WriteString(info.mac);
+    data.WriteString(info.ip);
+    data.WriteString(info.host);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_GC_JOIN_GROUP),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code %{public}d",
+            P2PInterfaceCode::WIFI_CBK_CMD_P2P_GC_JOIN_GROUP, error);
+        return;
+    }
+    return;
+}
+
+void WifiP2pCallbackProxy::OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info)
+{
+    WIFI_LOGD("WifiP2pCallbackProxy::OnP2pGcLeaveGroup");
+	MessageOption option = {MessageOption::TF_ASYNC};
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    data.WriteInt32(0);
+    data.WriteString(info.mac);
+    data.WriteString(info.ip);
+    data.WriteString(info.host);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_GC_LEAVE_GROUP),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code %{public}d",
+            P2PInterfaceCode::WIFI_CBK_CMD_P2P_GC_LEAVE_GROUP, error);
+        return;
+    }
+    return;
+}
 }  // namespace Wifi
 }  // namespace OHOS

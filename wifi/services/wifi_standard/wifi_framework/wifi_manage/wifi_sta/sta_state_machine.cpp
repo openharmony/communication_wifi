@@ -1501,7 +1501,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     WifiSettings::GetInstance().SyncDeviceConfig();
 
     targetNetworkId = networkId;
-    SetRandomMac(targetNetworkId);
+    SetRandomMac(targetNetworkId, bssid);
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig) != 0) {
         LOGE("StartConnectToNetwork get GetDeviceConfig failed!");
@@ -1697,7 +1697,29 @@ bool StaStateMachine::ComparedKeymgmt(const std::string scanInfoKeymgmt, const s
     }
 }
 
-bool StaStateMachine::SetRandomMac(int networkId)
+void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, const std::string &bssid,
+    WifiStoreRandomMac &randomMacInfo)
+{
+    randomMacInfo.ssid = deviceConfig.ssid;
+    randomMacInfo.keyMgmt = deviceConfig.keyMgmt;
+    randomMacInfo.preSharedKey = deviceConfig.preSharedKey;
+
+    if (!bssid.empty()) {
+        randomMacInfo.peerBssid = bssid;
+    } else {
+        std::vector<WifiScanInfo> scanInfoList;
+        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
+        for (auto scanInfo : scanInfoList) {
+            if ((deviceConfig.ssid == scanInfo.ssid) &&
+                (ComparedKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
+                randomMacInfo.peerBssid = scanInfo.bssid;
+                break;
+            }
+        }
+    }
+}
+
+bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
     LOGD("enter SetRandomMac.");
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
@@ -1712,20 +1734,10 @@ bool StaStateMachine::SetRandomMac(int networkId)
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
         WifiStoreRandomMac randomMacInfo;
-        std::vector<WifiScanInfo> scanInfoList;
-        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
-        for (auto scanInfo : scanInfoList) {
-            if ((deviceConfig.ssid == scanInfo.ssid) &&
-                (ComparedKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
-                randomMacInfo.ssid = scanInfo.ssid;
-                randomMacInfo.keyMgmt = deviceConfig.keyMgmt;
-                randomMacInfo.preSharedKey = deviceConfig.preSharedKey;
-                randomMacInfo.peerBssid = scanInfo.bssid;
-                break;
-            }
-        }
-        if (randomMacInfo.ssid.empty()) {
-            LOGE("scanInfo has no target wifi!");
+        InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
+
+        if (randomMacInfo.peerBssid.empty()) {
+            LOGE("scanInfo has no target wifi and bssid is empty!");
             return false;
         }
 

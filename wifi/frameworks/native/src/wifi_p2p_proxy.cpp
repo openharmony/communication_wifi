@@ -451,6 +451,38 @@ ErrCode WifiP2pProxy::RemoveGroup()
     return ErrCode(reply.ReadInt32());
 }
 
+ErrCode WifiP2pProxy::RemoveGroupClient(const GcInfo &info)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteString(info.ip);
+    data.WriteString(info.mac);
+    data.WriteString(info.host);
+
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
 ErrCode WifiP2pProxy::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     if (mRemoteDied) {
@@ -721,6 +753,10 @@ ErrCode WifiP2pProxy::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
     std::string groupOwnerAddr = reply.ReadString();
     linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddr);
 
+    int size = reply.ReadInt32();
+    for (int i = 0; i < size; i++) {
+        linkedInfo.AddClientInfoList(reply.ReadString(), reply.ReadString(), reply.ReadString());
+    }
     return WIFI_OPT_SUCCESS;
 }
 

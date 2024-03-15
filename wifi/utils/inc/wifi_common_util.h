@@ -77,6 +77,8 @@ static std::map<std::string, int> g_p2pCallBackNameEventIdMap = {
     { EVENT_P2P_DISCOVERY_CHANGE, WIFI_CBK_MSG_DISCOVERY_CHANGE },
     { EVENT_P2P_ACTION_RESULT, WIFI_CBK_MSG_P2P_ACTION_RESULT },
     { EVENT_P2P_CONFIG_CHANGE, WIFI_CBK_MSG_CFG_CHANGE },
+    { EVENT_P2P_GC_JOIN_GROUP, WIFI_CBK_MSG_P2P_GC_JOIN_GROUP},
+    { EVENT_P2P_GC_LEAVE_GROUP, WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP},
 };
 
 /**
@@ -210,21 +212,13 @@ int GetCallingUid();
 int GetCallingTokenId();
 
 /**
- * @Description Check uid the app is a foregroud app
- *
- * @param uid - Input uid
- * @return bool - Returns true for yes, false for no.
- */
-bool IsForegroundApp(const int uid);
-
-/**
  * @Description by Process uid ,the app is a wifi broker process
  *
  * @param uid - Input uid
  * @param pid - Input pid
  * @return string - Returns processname
  */
-std::string GetRunningProcessNameByPid(const int uid, const int pid);
+std::string GetBrokerProcessNameByPid(const int uid, const int pid);
 
 /**
  * @Description set Process pid and processname

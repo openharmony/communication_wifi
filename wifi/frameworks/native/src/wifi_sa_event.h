@@ -113,6 +113,10 @@ public:
 
     void OnConfigChanged(OHOS::Wifi::CfgType type, char* data, int dataLen) override;
 
+    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info) override;
+
+    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override;
+
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
 
 public:

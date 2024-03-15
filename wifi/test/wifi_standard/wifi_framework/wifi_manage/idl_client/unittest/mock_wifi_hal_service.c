@@ -595,13 +595,13 @@ WifiErrorNo P2pSetListenChannel(int channel, int regClass)
 
 WifiErrorNo P2pConnect(const P2pConnectInfo *info)
 {
-    P2pHalCbStaConnectState("00:00:00:00:00:00", 1);
+    P2pHalCbStaConnectState("00:00:00:00:00:00", "00:00:00:00:00:00", 1);
     return WIFI_HAL_SUCCESS;
 }
 
 WifiErrorNo P2pCancelConnect()
 {
-    P2pHalCbStaConnectState("00:00:00:00:00:00", 0);
+    P2pHalCbStaConnectState("00:00:00:00:00:00", "00:00:00:00:00:00", 0);
     return WIFI_HAL_SUCCESS;
 }
 

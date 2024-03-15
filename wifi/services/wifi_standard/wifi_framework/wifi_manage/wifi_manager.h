@@ -36,6 +36,7 @@
 #endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_event_subscriber_manager.h"
+#include "wifi_app_state_aware.h"
 #endif
 
 namespace OHOS {

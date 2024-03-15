@@ -888,6 +888,12 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
         case WIFI_CBK_MSG_P2P_ACTION_RESULT:
             callback->OnP2pActionResult(msg.p2pAction, static_cast<ErrCode>(msg.msgData));
             break;
+        case WIFI_CBK_MSG_P2P_GC_JOIN_GROUP:
+            callback->OnP2pGcJoinGroup(msg.gcInfo);
+            break;
+        case WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP:
+            callback->OnP2pGcLeaveGroup(msg.gcInfo);
+            break;
         case WIFI_CBK_MSG_CFG_CHANGE:
             SendConfigChangeEvent(callback, msg.cfgInfo);
             break;

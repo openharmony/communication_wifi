@@ -2415,13 +2415,17 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     want.SetBundle(BROWSER_BUNDLE);
     want.SetParam("netId", netId);
     WIFI_LOGI("wifi netId is %{public}d", netId);
-    portalFlag = true;
     OHOS::ErrCode err = StaStartAbility(want);
     if (err != ERR_OK) {
         WIFI_LOGI("StartAbility is failed %{public}d", err);
         WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
     }
 #endif
+}
+
+void StaStateMachine::SetPortalBrowserFlag(bool flag)
+{
+    portalFlag = flag;
 }
 
 #ifndef OHOS_ARCH_LITE
@@ -2496,9 +2500,10 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
-        if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
+        if (portalFlag == false) {
             WriteIsInternetHiSysEvent(NO_NETWORK);
             HandlePortalNetworkPorcess();
+            portalFlag = true;
         }
         WriteIsInternetHiSysEvent(NETWORK);
         StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
@@ -3175,7 +3180,6 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
             OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
         WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
         /* Delay to wait for the network adapter information to take effect. */
-        pStaStateMachine->portalFlag = false;
         pStaStateMachine->netNoWorkNum = 0;
         pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
         pStaStateMachine->DealSetStaConnectFailedCount(0, true);

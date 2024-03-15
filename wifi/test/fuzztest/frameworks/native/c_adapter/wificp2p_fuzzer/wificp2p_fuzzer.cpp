@@ -254,7 +254,6 @@ static void QueryP2pGroupsTest(const uint8_t* data, size_t size)
     (void)QueryP2pGroups(&groupInfo, msize);
 }
 
-
 namespace OHOS {
 namespace Wifi {
     bool WifiCP2PFuzzerTest(const uint8_t* data, size_t size)

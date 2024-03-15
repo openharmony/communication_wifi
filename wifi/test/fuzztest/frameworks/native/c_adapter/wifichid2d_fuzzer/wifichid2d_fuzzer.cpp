@@ -225,6 +225,7 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
     }
     (void)Hid2dSetUpperScene(ifName, &scene);
 }
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

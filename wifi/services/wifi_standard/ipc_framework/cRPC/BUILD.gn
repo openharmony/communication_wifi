@@ -124,6 +124,7 @@ if (defined(ohos_lite)) {
     cflags_cc = [ "-fno-rtti" ]
     ldflags = [ "-fPIC" ]
     deps = [ ":crpc_client" ]
+    external_deps = [ "hilog:libhilog" ]
     subsystem_name = "communication"
     part_name = "wifi"
     install_images = [

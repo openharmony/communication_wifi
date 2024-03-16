@@ -930,12 +930,10 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
     for (; iter != scanInfoList.end(); ++iter) {
         if ((iter->timestamp / SECOND_TO_MILLI_SECOND) > pnoScanStartTime) {
             filterScanInfo.push_back(*iter);
-            WIFI_LOGI("InterScanInfo.bssid is %{private}s.\n", MacAnonymize(iter->bssid).c_str());
-            WIFI_LOGI("InterScanInfo.ssid is %{public}s.\n", SsidAnonymize(iter->ssid).c_str());
-            WIFI_LOGI("InterScanInfo.capabilities is %{public}s.\n", iter->capabilities.c_str());
-            WIFI_LOGI("InterScanInfo.frequency is %{public}d.\n", iter->frequency);
-            WIFI_LOGI("InterScanInfo.rssi is %{public}d.\n", iter->rssi);
-            WIFI_LOGI("InterScanInfo.timestamp is %" PRId64 ".\n", iter->timestamp);
+            WIFI_LOGI("InterScanInfo bssid:%{public}s, ssid:%{public}s, capabilities:%{public}s,"
+                "frequency:%{public}d, rssi:%{public}d, timestamp:%" PRId64 ".\n",
+                MacAnonymize(iter->bssid).c_str(), SsidAnonymize(iter->ssid).c_str(), iter->capabilities.c_str(),
+                iter->frequency, iter->rssi, iter->timestamp);
         }
     }
 

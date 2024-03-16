@@ -103,12 +103,12 @@ typedef enum EnumStaDnsState {
 } StaDnsState;
 
 typedef enum EnumNetWorkState {
-    NETWORK_UNKNOWN,
-    NETWORK_CELL_WORKING,
-    NETWORK_CELL_NOWORK,
+    NETWORK_NOTWORKING,
+    NETWORK_IS_WORKING,
+    NETWORK_IS_PORTAL,
 }SystemNetWorkState;
 
-using NetStateHandler = std::function<void(StaNetState netState, std::string portalUrl)>;
+using NetStateHandler = std::function<void(SystemNetWorkState netState, std::string portalUrl)>;
 using ArpStateHandler = std::function<void(StaArpState arpState)>;
 using DnsStateHandler = std::function<void(StaDnsState dnsState)>;
 }  // namespace Wifi

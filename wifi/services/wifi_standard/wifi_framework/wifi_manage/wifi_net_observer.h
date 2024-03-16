@@ -21,13 +21,14 @@
 #include <vector>
 
 #include "wifi_log.h"
-#include "net_conn_callback_stub.h"
+#include "net_detection_callback_stub.h"
 #include "net_handle.h"
 #include "net_all_capabilities.h"
+#include "net_conn_client.h"
 #include "sta_define.h"
 namespace OHOS {
 namespace Wifi {
-class NetStateObserver : public NetManagerStandard::NetConnCallbackStub {
+class NetStateObserver : public NetManagerStandard::NetDetectionCallbackStub {
 public:
     NetStateObserver();
 
@@ -38,17 +39,19 @@ public:
     void StartNetStateObserver();
 
     void StopNetStateObserver();
-
-    void SetNetStateCallback(std::function<void(SystemNetWorkState)> callback);
-
-    int32_t NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
-        const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override;
-
-    SystemNetWorkState GetCellNetState();
+ 
+    void SetNetStateCallback(std::function<void(SystemNetWorkState, std::string)> callback);
+ 
+    int32_t OnNetDetectionResultChanged(
+        NetManagerStandard::NetDetectionResultCode detectionResult, const std::string &urlRedirect) override;
 
     int32_t GetWifiNetId();
+
+    int32_t StartWifiDetection();
+private:
+    sptr<NetManagerStandard::NetHandle> GetWifiNetworkHandle();
 public:
-    std::function<void(SystemNetWorkState)> m_Callback;
+    std::function<void(SystemNetWorkState, std::string)> m_Callback;
 };
 } // namespace Wifi
 } // namespace OHOS

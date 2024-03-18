@@ -2235,6 +2235,7 @@ void StaStateMachine::GetIpState::GoInState()
 void StaStateMachine::GetIpState::GoOutState()
 {
     WIFI_LOGI("GetIpState GoOutState function.");
+    pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
 }
 
 bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)

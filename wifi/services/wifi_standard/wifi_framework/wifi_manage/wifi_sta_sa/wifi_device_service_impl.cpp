@@ -31,6 +31,7 @@
 #include "mac_address.h"
 #include "wifi_p2p_service_impl.h"
 #include "wifi_country_code_manager.h"
+#include "app_network_speed_limit_service.h"
 #endif
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
@@ -1466,6 +1467,20 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     WifiSettings::GetInstance().ClearRandomMacConfig();
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset ok!");
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
+{
+    WIFI_LOGI("Enter LimitSpeed.");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("%{public}s NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    return AppNetworkSpeedLimitService::GetInstance().LimitSpeed(controlId, limitMode);
 }
 
 #ifndef OHOS_ARCH_LITE

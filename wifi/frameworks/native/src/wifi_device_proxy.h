@@ -452,6 +452,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode FactoryReset() override;
+
+    /**
+     * @Description  limit speed
+     *
+     * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit
+     * @param limitMode speed limit mode, ranges 1 to 9
+     * @return WifiErrorNo
+     */
+    ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

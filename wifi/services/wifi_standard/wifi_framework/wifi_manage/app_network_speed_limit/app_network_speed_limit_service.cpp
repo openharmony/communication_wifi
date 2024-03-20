@@ -28,6 +28,7 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("AppNetworkSpeedLimitService");
 const std::string APP_NETWORK_SPEED_LIMIT_CLASS_NAME = "AppNetworkSpeedLimitService";
 constexpr const int APP_INFO_USERID = 100;
+constexpr const int UNKNOWN_UID = -1;
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService() {
     Init();

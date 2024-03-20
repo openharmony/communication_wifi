@@ -15,13 +15,16 @@
 
 #include "speed_limit_configs_writer.h"
 #include "wifi_common_util.h"
+#include <fcntl.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 #include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiSpeedLimitConfigsWriter");
 
-const int MAX_ARRAY_LENGTH 256
+const int MAX_ARRAY_LENGTH = 256;
 static const char * const AWARE_CTRL_FILENAME = "/proc/net/aware/aware_ctrl";
 static const char * const FG_UID_PATH = "/proc/net/aware/fg_uids";
 static const char * const BG_UID_PATH = "/proc/net/aware/bg_uids";
@@ -40,17 +43,17 @@ ErrCode SetBgLimitMode(int mode)
     if (ret == -1) {
         WIFI_LOGE("SetBgLimitMode snprintf_s failed.");
         close(fd);
-        return WIFI_HAL_FAILED;
+        return WIFI_OPT_FAILED;
     }
 
     int len = strlen(awareCtrlStr);
     if (write(fd, awareCtrlStr, len) != len) {
         WIFI_LOGE("write awareCtrlStr failed, errno = %{public}d.", errno);
         close(fd);
-        return WIFI_HAL_FAILED;
+        return WIFI_OPT_FAILED;
     }
     close(fd);
-    return WIFI_HAL_SUCCESS;
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode SetBgLimitIdList(std::vector<int> idList, int size, int type)
@@ -58,7 +61,7 @@ ErrCode SetBgLimitIdList(std::vector<int> idList, int size, int type)
     int idArray[size];
     if (memcpy_s(idArray, sizeof(idArray), idList.data(), size) != EOK) {
         WIFI_LOGE("convert data failed.");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_OPT_FAILED;
     }
     switch (type) {
         case SET_BG_UID:
@@ -71,11 +74,11 @@ ErrCode SetBgLimitIdList(std::vector<int> idList, int size, int type)
             SetUidPids(FG_UID_PATH, idArray, size);
             break;
         default:
-            LOGD("Unknow type, not handle.");
+            WIFI_LOGD("Unknow type, not handle.");
             break;
     }
 
-    return WIFI_HAL_SUCCESS;
+    return WIFI_OPT_SUCCESS;
 }
 
 void SetUidPids(const char *filePath, const int *idArray, int size)

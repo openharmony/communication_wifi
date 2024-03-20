@@ -174,6 +174,18 @@ int Val2HexChar(const std::vector<T> &vec, char *pHexChar, unsigned memSize)
     return 0;
 }
 
+template <typename T>
+std::string JoinVecToString(const std::vector<T> &vec, const std::string &delimiter)
+{
+    std::stringstream ss;
+    std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(ss, delimiter.c_str()));
+    std::string joinedStr = ss.str();
+    if (joinedStr.size() > delimiter.size()) {
+        joinedStr.erase(joinedStr.size() - delimiter.size());
+    }
+    return joinedStr;
+}
+
 /**
  * @Description splitting numeric strings based on characters
  *

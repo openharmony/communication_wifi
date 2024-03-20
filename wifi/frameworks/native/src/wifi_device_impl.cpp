@@ -522,5 +522,12 @@ ErrCode WifiDeviceImpl::FactoryReset()
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->FactoryReset();
 }
+
+ErrCode WifiDeviceImpl::LimitSpeed(const int controlId, const int limitMode)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->LimitSpeed(controlId, limitMode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

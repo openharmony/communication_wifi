@@ -28,7 +28,6 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("AppNetworkSpeedLimitService");
 const std::string APP_NETWORK_SPEED_LIMIT_CLASS_NAME = "AppNetworkSpeedLimitService";
 constexpr const int APP_INFO_USERID = 100;
-constexpr const int UNKNOWN_UID = -1;
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService() {
     Init();
@@ -112,7 +111,6 @@ void AppNetworkSpeedLimitService::LimitSpeed(const int controlId, const int limi
     SetBgLimitIdList(std::vector<int>(m_bgUidSet.begin(), m_bgUidSet.end()), m_bgUidSet.size(), SET_BG_UID);
     SetBgLimitIdList(std::vector<int>(m_bgPidSet.begin(), m_bgPidSet.end()), m_bgPidSet.size(), SET_BG_PID);
     SetBgLimitIdList(std::vector<int>(m_fgUidSet.begin(), m_fgUidSet.end()), m_fgUidSet.size(), SET_FG_UID);
-    UpdateSpeedLimitState();
 #endif
 }
 
@@ -192,6 +190,7 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int controlId, c
         m_bgUidSet.insert(UNKNOWN_UID);
         m_bgPidSet.insert(UNKNOWN_UID);
         m_fgUidSet.insert(UNKNOWN_UID);
+        LogSpeedLimitConfigs();
         return;
     }
     std::vector<AppExecFwk::RunningProcessInfo> bgAppList;
@@ -219,11 +218,6 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int controlId, c
     LogSpeedLimitConfigs();
 }
 
-void AppNetworkSpeedLimitService::UpdateSpeedLimitState()
-{
-    m_isTempSpeedLimitRunning = m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] == BG_LIMIT_OFF ? false : true;
-}
-
 void AppNetworkSpeedLimitService::LogSpeedLimitConfigs()
 {
     std::string recordsStr;
@@ -233,8 +227,8 @@ void AppNetworkSpeedLimitService::LogSpeedLimitConfigs()
         recordsStr += std::to_string(record.second);
         recordsStr += ",";
     }
-    WIFI_LOGI("%{public}s current speed limit records= %{public}s, current limitMode: %{public}d", __FUNCTION__,
-        recordsStr.c_str(), m_currentLimitMode);
+    WIFI_LOGI("%{public}s speed limit records= %{public}s, limitMode: %{public}d, m_isWifiConnected: %{public}d",
+        __FUNCTION__, recordsStr.c_str(), m_currentLimitMode, m_isWifiConnected);
     WIFI_LOGI("%{public}s m_bgUidSet: %{public}s; m_bgPidSet: %{public}s; m_fgUidSet: %{public}s", __FUNCTION__,
         JoinVecToString(std::vector<int>(m_bgUidSet.begin(), m_bgUidSet.end()), ",").c_str(),
         JoinVecToString(std::vector<int>(m_bgPidSet.begin(), m_bgPidSet.end()), ",").c_str(),
@@ -246,6 +240,7 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
     switch (controlId) {
         case BgLimitControl::BG_LIMIT_CONTROL_ID_GAME:
             return AppParser::GetInstance().IsBlackListApp(bundleName);
+        case BgLimitControl::BG_LIMIT_CONTROL_ID_STREAM:
         case BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP:
             return AppParser::GetInstance().IsHighTempLimitSpeedApp(bundleName);
         case BgLimitControl::BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT:
@@ -253,6 +248,7 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
         default:
             break;
     }
+    WIFI_LOGI("%{public}s, ");
     return false;
 }
 

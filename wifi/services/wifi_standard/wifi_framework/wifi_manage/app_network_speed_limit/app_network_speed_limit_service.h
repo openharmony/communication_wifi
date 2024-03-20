@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr const int UNKNOWN_UID = -1;
 
 class AppNetworkSpeedLimitService {
 public:
@@ -45,13 +46,11 @@ private:
     ErrCode GetAppList(std::vector<AppExecFwk::RunningProcessInfo> &appList, bool getFgAppFlag);
     bool CheckNetWorkCanBeLimited(const int controlId);
     void UpdateSpeedLimitConfigs(const int controlId, const int limitMode);
-    void UpdateSpeedLimitState();
     void LogSpeedLimitConfigs();
     bool IsLimitSpeedBgApp(const int controlId, const std::string bundleName);
 
 private:
     StaServiceCallback m_staCallback;
-    bool m_isTempSpeedLimitRunning {false}; 
     bool m_isWifiConnected {false};
     std::map<int, int> m_bgLimitRecordMap;
     int m_currentLimitMode;

@@ -16,9 +16,16 @@
 #define OHOS_WIFI_SPEED_LIMIT_CONFIGS_WRITER_H
 
 #include <vector>
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
+
+typedef enum {
+    SET_BG_UID = 0,
+    SET_BG_PID,
+    SET_FG_UID,
+} BgLimitType;
 
 /**
  * @Description set background limit speed mode

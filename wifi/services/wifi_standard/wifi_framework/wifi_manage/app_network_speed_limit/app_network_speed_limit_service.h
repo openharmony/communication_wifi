@@ -25,12 +25,6 @@
 namespace OHOS {
 namespace Wifi {
 
-typedef enum {
-    SET_BG_UID = 0,
-    SET_BG_PID,
-    SET_FG_UID,
-} BgLimitType;
-
 class AppNetworkSpeedLimitService {
 public:
     explicit AppNetworkSpeedLimitService();
@@ -42,7 +36,6 @@ public:
     void LimitSpeed(const int controlId, const int level);
 
 private:
-    
     void Init();
     void InitWifiLimitRecord();
     void InitCellarLimitRecord();

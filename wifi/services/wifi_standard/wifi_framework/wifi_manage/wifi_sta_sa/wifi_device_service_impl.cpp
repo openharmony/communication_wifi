@@ -1480,7 +1480,8 @@ ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMo
         WIFI_LOGE("%{public}s PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    return AppNetworkSpeedLimitService::GetInstance().LimitSpeed(controlId, limitMode);
+    AppNetworkSpeedLimitService::GetInstance().LimitSpeed(controlId, limitMode);
+    return WIFI_OPT_SUCCESS;
 }
 
 #ifndef OHOS_ARCH_LITE

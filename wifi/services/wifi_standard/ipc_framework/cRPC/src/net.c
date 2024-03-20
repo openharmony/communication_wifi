@@ -193,7 +193,10 @@ int WaitFdEvent(int fd, unsigned int mask, int milliseconds)
     }
     int ret = poll(&pFd, 1, milliseconds);
     if (ret < 0) {
-        LOGE("poll failed!");
+        LOGE("poll failed! errno=%{public}d", errno);
+        if (errno == EINTR) {
+            return 0;
+        }
         return -1;
     } else if (ret == 0) {
         return 0;

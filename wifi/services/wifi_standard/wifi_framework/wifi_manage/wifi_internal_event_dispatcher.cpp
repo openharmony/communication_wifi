@@ -633,7 +633,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
 #ifdef FEATURE_APP_FROZEN
             int uid = mScanCallBackInfo[msg.id][remote].callingUid;
             int pid = mScanCallBackInfo[msg.id][remote].callingPid;
-            isFrozen = IsAppFrozen(uid);
+            isFrozen = IsAppFrozen(pid);
             WIFI_LOGI("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
                 %{public}d", uid, pid, isFrozen);
 #endif
@@ -676,7 +676,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
 #ifdef FEATURE_APP_FROZEN
             int uid = mStaCallBackInfo[msg.id][remote].callingUid;
             int pid = mStaCallBackInfo[msg.id][remote].callingPid;
-            isFrozen = IsAppFrozen(uid);
+            isFrozen = IsAppFrozen(pid);
             WIFI_LOGD("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
                 %{public}d", uid, pid, isFrozen);
 #endif
@@ -1024,33 +1024,31 @@ bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackE
     return hasPermission;
 }
 
-void WifiInternalEventDispatcher::SetAppFrozen(int uid, bool isFrozen)
+void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
-    WIFI_LOGD("Set App Frozen:%{private}d, isFrozen:%{public}d", uid, isFrozen);
-    auto it = std::find_if(vecFrozenAppInfo.begin(), vecFrozenAppInfo.end(),
-        [&uid](const int tmp) {
-            return tmp == uid;
-    });
-    if (isFrozen && it == vecFrozenAppInfo.end()) {
-        vecFrozenAppInfo.push_back(uid);
-    } else if (!isFrozen && it != vecFrozenAppInfo.end()) {
-        vecFrozenAppInfo.erase(it);
+    std::unique_lock<std::mutex> lock(mPidFrozenMutex);
+    WIFI_LOGI("%{public}s, list size:%{public}u, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
+    for (auto itr : pidList) {
+        if (isFrozen) {
+            frozenPidList.insert(itr);
+        } else {
+            frozenPidList.erase(itr);
+        }
     }
+    WIFI_LOGI("%{public}s finish, size:%{public}u", __func__, frozenPidList.size());
 }
 
 void WifiInternalEventDispatcher::ResetAllFrozenApp()
 {
+    std::unique_lock<std::mutex> lock(mPidFrozenMutex);
     WIFI_LOGI("WifiInternalEventDispatcher::Reset All Frozen App");
-    vecFrozenAppInfo.clear();
+    frozenPidList.clear();
 }
 
-bool WifiInternalEventDispatcher::IsAppFrozen(int uid)
+bool WifiInternalEventDispatcher::IsAppFrozen(int pid)
 {
-    auto it = std::find_if(vecFrozenAppInfo.begin(), vecFrozenAppInfo.end(),
-        [&uid](const int tmp) {
-            return tmp == uid;
-    });
-    if (it != vecFrozenAppInfo.end()) {
+    auto it = frozenPidList.find(pid);
+    if (it != frozenPidList.end()) {
         return true;
     }
     return false;

@@ -15,6 +15,7 @@
 #ifndef OHOS_WIFI_DEVICE_H
 #define OHOS_WIFI_DEVICE_H
 
+#include <set>
 #include "i_wifi_device_callback.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
@@ -372,11 +373,11 @@ public:
     /**
      * @Description set frozen app
      *
-     * @param uid - uid of frozen app
+     * @param pidList - pids of frozen app
      * @param isFrozen - is app frozen
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetAppFrozen(int uid, bool isFrozen) = 0;
+    virtual ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) = 0;
 
     /**
      * @Description reset all frozen app

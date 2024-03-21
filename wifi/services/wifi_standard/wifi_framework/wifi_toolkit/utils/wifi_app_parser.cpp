@@ -198,7 +198,7 @@ ChariotAppInfo AppParser::ParseChariotAppInfo(const xmlNodePtr &innode)
 HighTempLimitSpeedAppInfo AppParser::ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode)
 {
     HighTempLimitSpeedAppInfo appInfo;
-     appInfo.packageName =
+    appInfo.packageName =
         std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
     return appInfo;
 }

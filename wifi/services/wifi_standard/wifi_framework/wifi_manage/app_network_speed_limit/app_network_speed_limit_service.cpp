@@ -29,7 +29,8 @@ DEFINE_WIFILOG_LABEL("AppNetworkSpeedLimitService");
 const std::string APP_NETWORK_SPEED_LIMIT_CLASS_NAME = "AppNetworkSpeedLimitService";
 constexpr const int APP_INFO_USERID = 100;
 
-AppNetworkSpeedLimitService::AppNetworkSpeedLimitService() {
+AppNetworkSpeedLimitService::AppNetworkSpeedLimitService()
+{
     Init();
 }
 
@@ -51,7 +52,7 @@ void AppNetworkSpeedLimitService::Init()
 {
     using namespace std::placeholders;
     m_staCallback.callbackModuleName = APP_NETWORK_SPEED_LIMIT_CLASS_NAME;
-    m_staCallback.OnStaConnChanged = std::bind(&AppNetworkSpeedLimitService::DealStaConnChanged, this, _1, _2, _3);;
+    m_staCallback.OnStaConnChanged = std::bind(&AppNetworkSpeedLimitService::DealStaConnChanged, this, _1, _2, _3);
     InitWifiLimitRecord();
     InitCellarLimitRecord();
 }
@@ -98,7 +99,7 @@ void AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const std::st
 }
 
 void AppNetworkSpeedLimitService::LimitSpeed(const int controlId, const int limitMode)
-{   
+{
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("%{public}s enter, controlId=%{public}d, limitMode=%{public}d", __FUNCTION__, controlId, limitMode);
     std::lock_guard<std::mutex> lock(m_mutex);

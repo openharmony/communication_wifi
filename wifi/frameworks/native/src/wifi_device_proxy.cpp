@@ -1844,7 +1844,7 @@ ErrCode WifiDeviceProxy::LimitSpeed(const int controlId, const int limitMode)
         reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("LimitSpeed(%{public}d) failed, error code is %{public}d",
-            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED ), error);
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();

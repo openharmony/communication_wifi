@@ -40,24 +40,23 @@ StaAppAcceleration::StaAppAcceleration(int instId) : gameBoostingFlag(false)
 StaAppAcceleration::~StaAppAcceleration()
 {}
 
-StaAppAcceleration &StaAppAcceleration::GetInstance()
-{
-    static StaAppAcceleration gStaAppAcceleration;
-    return gStaAppAcceleration;
-}
-
 ErrCode StaAppAcceleration::InitAppAcceleration()
 {
+    using namespace std::placeholders;
     m_staCallback.callbackModuleName = CLASS_NAME;
-    m_staCallback.OnStaConnChanged = DealStaConnChanged;
-
+    m_staCallback.OnStaConnChanged = std::bind(&StaAppAcceleration::DealStaConnChanged, this, _1, _2, _3);
     return WIFI_OPT_SUCCESS;
+}
+
+StaServiceCallback StaAppAcceleration::GetStaCallback() const
+{
+    return m_staCallback;
 }
 
 void StaAppAcceleration::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
-        StaAppAcceleration::GetInstance().StopAllAppAcceleration();
+        StopAllAppAcceleration();
     }
 }
 

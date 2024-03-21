@@ -28,14 +28,14 @@ class StaAppAcceleration {
 public:
     explicit StaAppAcceleration(int instId = 0);
     ~StaAppAcceleration();
-    static StaAppAcceleration &GetInstance();
+    StaServiceCallback GetStaCallback() const;
     ErrCode InitAppAcceleration();
     void HandleScreenStatusChanged(int screenState);
     void HandleForegroundAppChangedAction(const std::string &bundleName,
         const int uid, const int pid, const int state);
 
 private:
-    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
+    void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     void SetPmMode(int mode);
     void StartGameBoost(int uid);
     void StopGameBoost(int uid);

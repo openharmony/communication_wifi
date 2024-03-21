@@ -526,18 +526,6 @@ WifiErrorNo WifiStaHalInterface::SetDpiMarkRule(int uid, int protocol, int enabl
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::SetBgLimitMode(int mode)
-{
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->ReqSetBgLimitMode(mode);
-}
-
-WifiErrorNo WifiStaHalInterface::SetBgLimitIdList(std::vector<int> idList, int size, int type)
-{
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->ReqSetBgLimitIdList(idList, size, type);
-}
-
 const WifiEventCallback &WifiStaHalInterface::GetCallbackInst(void) const
 {
     return mStaCallback;

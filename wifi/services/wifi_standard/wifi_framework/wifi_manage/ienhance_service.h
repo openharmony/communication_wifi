@@ -16,6 +16,7 @@
 #define OHOS_IENHANCE_SERVICE_H
 
 #include "wifi_errcode.h"
+#include "wifi_scan_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -59,6 +60,17 @@ public:
      */
     virtual ErrCode InstallFilterProgram(
         unsigned int ipAddr, int netMaskLen, const unsigned char *macAddr, int macLen, int screenState) = 0;
+
+    /**
+     * @Description Get wifi category
+     *
+     * @param infoElems - info elems
+     * @param chipsetCategory - chipset category
+     * @param chipsetFeatrureCapability - chipset featrure capability
+     * @return 1: DEFAULT, 2: WIFI6, 3: WIFI6_PLUS
+     */
+    virtual WifiCategory GetWifiCategory(
+        std::vector<WifiInfoElem> infoElems, int chipsetCategory, int chipsetFeatrureCapability);
 };
 }  // namespace Wifi
 }  // namespace OHOS

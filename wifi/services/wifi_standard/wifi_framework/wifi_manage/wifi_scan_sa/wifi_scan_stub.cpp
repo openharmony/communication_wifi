@@ -230,6 +230,8 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
                 reply.WriteInt8(result[i].infoElems[m].content[n]);
             }
         }
+        reply.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
+        reply.WriteBool(result[i].isHiLinkNetwork);
     }
     return ret;
 }

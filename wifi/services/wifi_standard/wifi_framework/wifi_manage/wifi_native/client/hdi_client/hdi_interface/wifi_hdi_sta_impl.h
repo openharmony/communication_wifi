@@ -145,6 +145,20 @@ WifiErrorNo HdiSetPmMode(int frequency, int mode);
 WifiErrorNo HdiSetDpiMarkRule(int uid, int protocol, int enable);
 
 void HdiNotifyScanResult(int status);
+
+/**
+ * @Description Get wifi chipset category form driver
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiGetChipsetCategory(int* chipsetCategory);
+
+/**
+ * @Description Get wifi featrure capability form driver
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiGetChipsetWifiFeatrureCapability(int* chipsetFeatrureCapability);
 #ifdef __cplusplus
 }
 #endif

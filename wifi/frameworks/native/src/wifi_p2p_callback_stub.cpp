@@ -52,6 +52,10 @@ void WifiP2pCallbackStub::InitHandleMap()
         &WifiP2pCallbackStub::RemoteOnP2pActionResult;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CFG_CHANGE)] =
         &WifiP2pCallbackStub::RemoteOnConfigChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_GC_JOIN_GROUP)] =
+        &WifiP2pCallbackStub::RemoteOnP2pGcJoinGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_GC_LEAVE_GROUP)] =
+        &WifiP2pCallbackStub::RemoteOnP2pGcLeaveGroup;
     return;
 }
 
@@ -176,6 +180,22 @@ void WifiP2pCallbackStub::OnConfigChanged(CfgType type, char* data, int dataLen)
     WIFI_LOGI("WifiP2pCallbackStub::OnConfigChanged");
     if (userCallback_) {
         userCallback_->OnConfigChanged(type, data, dataLen);
+    }
+}
+
+void WifiP2pCallbackStub::OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info)
+{
+    WIFI_LOGD("WifiP2pCallbackStub::OnP2pGcJoinGroup");
+    if (userCallback_) {
+        userCallback_->OnP2pGcJoinGroup(info);
+    }
+}
+
+void WifiP2pCallbackStub::OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info)
+{
+    WIFI_LOGD("WifiP2pCallbackStub::OnP2pGcLeaveGroup");
+    if (userCallback_) {
+        userCallback_->OnP2pGcLeaveGroup(info);
     }
 }
 
@@ -323,6 +343,26 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
     }
     OnConfigChanged(cfgType, cfgData, cfgLen);
     delete[] cfgData;
+}
+
+void WifiP2pCallbackStub::RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    GcInfo info;
+    info.mac = data.ReadString();
+    info.ip = data.ReadString();
+    info.host = data.ReadString();
+    OnP2pGcJoinGroup(info);
+}
+
+void WifiP2pCallbackStub::RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    GcInfo info;
+    info.mac = data.ReadString();
+    info.ip = data.ReadString();
+    info.host = data.ReadString();
+    OnP2pGcLeaveGroup(info);
 }
 }  // namespace Wifi
 }  // namespace OHOS

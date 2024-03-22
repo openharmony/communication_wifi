@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#include "../../../interfaces/kits/c/wifi_device.h"
-#include "../../../interfaces/inner_api/wifi_device.h"
-#include "../../../interfaces/inner_api/wifi_scan.h"
-#include "../../../interfaces/kits/c/wifi_scan_info.h"
-#include "../../../interfaces/kits/c/wifi_device_config.h"
+#include "kits/c/wifi_device.h"
+#include "inner_api/wifi_device.h"
+#include "inner_api/wifi_scan.h"
+#include "kits/c/wifi_scan_info.h"
+#include "kits/c/wifi_device_config.h"
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
-#include "../../../interfaces/inner_api/wifi_msg.h"
+#include "inner_api/wifi_msg.h"
 
 DEFINE_WIFILOG_LABEL("WifiCDevice");
 

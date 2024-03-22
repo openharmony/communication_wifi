@@ -202,6 +202,31 @@ bool WifiP2pDeviceManager::UpdateAllDeviceStatus(const P2pDeviceStatus status)
     return true;
 }
 
+bool WifiP2pDeviceManager::UpdateGroupAddress(const std::string &deviceAddress, const std::string &groupAddress)
+{
+    if (deviceAddress.empty() || groupAddress.empty()) {
+        return false;
+    }
+
+    std::unique_lock<std::mutex> lock(deviceMutex);
+    for (auto it = p2pDevices.begin(); it != p2pDevices.end(); it++) {
+        if (it->GetDeviceAddress() == deviceAddress) {
+            it->SetGroupAddress(groupAddress);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool WifiP2pDeviceManager::UpdateGroupAddress(const WifiP2pDevice &device)
+{
+    if (!device.IsValid()) {
+        return false;
+    }
+
+    return UpdateGroupAddress(device.GetDeviceAddress(), device.GetGroupAddress());
+}
+
 WifiP2pDevice WifiP2pDeviceManager::GetDevices(const std::string &deviceAddress)
 {
     std::unique_lock<std::mutex> lock(deviceMutex);

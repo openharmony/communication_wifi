@@ -40,10 +40,8 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
-    ]
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
     cflags_c = [
       "-fPIC",
       "-std=c99",
@@ -60,10 +58,10 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
-    ]
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
+
     configs -= [ "//build/lite/config:language_c" ]
     cflags_c = [
       "-fPIC",

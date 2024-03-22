@@ -384,6 +384,7 @@ public:
         static void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToCloseDhcpClient(int iptype);
         static void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
+        static void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
     private:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;
@@ -515,6 +516,7 @@ public:
      */
     void HandlePortalNetworkPorcess();
     
+    void SetPortalBrowserFlag(bool flag);
     /**
      * @Description renew dhcp.
      *
@@ -608,10 +610,9 @@ private:
     /**
      * @Description  Update wifi status and save connection information.
      *
-     * @param networkId - the networkId of selected network which is going to be connected(in)
      * @param bssid - the mac address of wifi(in)
      */
-    void ConnectToNetworkProcess(InternalMessage *msg);
+    void ConnectToNetworkProcess(std::string bssid);
 
     /**
      * @Description On connect fail.
@@ -842,11 +843,21 @@ private:
     void ReassociateProcess();
 
     /**
+     * @Description  Set value of randomMacInfo.
+     *
+     * @param deviceConfig - deviceConfig[in]
+     * @param bssid - bssid[in]
+     * @param deviceConfig - randomMacInfo[out]
+     */
+    void InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, const std::string &bssid,
+        WifiStoreRandomMac &randomMacInfo);
+
+    /**
      * @Description  Set a random MAC address.
      *
      * @param networkId - network id[in]
      */
-    bool SetRandomMac(int networkId);
+    bool SetRandomMac(int networkId, const std::string &bssid);
 
     /**
      * @Description  check whether the current bssid are consistent.

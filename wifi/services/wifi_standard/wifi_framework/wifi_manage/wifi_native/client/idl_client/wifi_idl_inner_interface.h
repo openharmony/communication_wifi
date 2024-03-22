@@ -93,7 +93,7 @@ void OnP2pFindStopped(void);
 void OnP2pServiceDiscoveryResponse(
     const char *srcAddress, short updateIndicator, const unsigned char *tlvs, size_t tlvsLength);
 void OnP2pStaDeauthorized(const char *p2pDeviceAddress);
-void OnP2pStaAuthorized(const char *p2pDeviceAddress);
+void OnP2pStaAuthorized(const char *p2pDeviceAddress, const char *p2pGroupAddress);
 void OnP2pConnectSupplicantFailed(void);
 void OnP2pServDiscReq(const P2pServDiscReqInfo *info);
 void OnP2pIfaceCreated(const char *ifName, int isGo);

@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "../../../interfaces/kits/c/wifi_p2p.h"
-#include "../../../interfaces/kits/c/wifi_hid2d.h"
+#include "kits/c/wifi_p2p.h"
+#include "kits/c/wifi_hid2d.h"
 #include "wifi_logger.h"
-#include "../../../interfaces/inner_api/wifi_p2p.h"
+#include "inner_api/wifi_p2p.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
-#include "../../src/wifi_sa_event.h"
+#include "wifi_sa_event.h"
 constexpr int INVALID_VALUE = -1;
 #define STR_END '\0'
 
@@ -462,6 +462,16 @@ void WifiP2pCEventCallback::OnConfigChanged(OHOS::Wifi::CfgType type, char* data
             }
         } );
     }
+}
+
+void WifiP2pCEventCallback::OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info)
+{
+    WIFI_LOGI("%{public}s, received p2p gcJoin event", __func__);
+}
+
+void WifiP2pCEventCallback::OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info)
+{
+    WIFI_LOGI("%{public}s, received p2p gcLeave event", __func__);
 }
 
 OHOS::sptr<OHOS::IRemoteObject> WifiP2pCEventCallback::AsObject()

@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "securec.h"
-#include "../../../interfaces/kits/c/wifi_device.h"
+#include "kits/c/wifi_device.h"
 #include "wifi_logger.h"
 #include "mock_wifi_c_device.h"
 

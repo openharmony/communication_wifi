@@ -151,7 +151,7 @@ enum class  P2PInterfaceCode {
     WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE = 0x2027, /* query the information about the local device */
     WIFI_SVR_CMD_SET_UPPER_SCENE = 0x2028,    /* set the scene of upper layer */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
-
+    WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT = 0x3000,
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_P2P_STATE_CHANGE = 0x3200,         /* p2p state change event */
     WIFI_CBK_CMD_PERSISTENT_GROUPS_CHANGE = 0x3201, /* Persistent Group Updated */
@@ -162,6 +162,8 @@ enum class  P2PInterfaceCode {
     WIFI_CBK_CMD_DISCOVERY_CHANGE = 0x3206,
     WIFI_CBK_CMD_P2P_ACTION_RESULT = 0x3207,
     WIFI_CBK_CMD_CFG_CHANGE = 0x3208,
+    WIFI_CBK_CMD_P2P_GC_JOIN_GROUP = 0x3209,    /* Gc joined group and obtained IP */
+    WIFI_CBK_CMD_P2P_GC_LEAVE_GROUP = 0x3210,    /* Gc disconnected */
 };
 
 /* SAID: 1124 */

@@ -1515,6 +1515,12 @@ WifiErrorNo WifiIdlClient::ReqP2pRemoveGroup(const std::string &groupInterface) 
     return P2pRemoveGroup(groupInterface.c_str());
 }
 
+WifiErrorNo WifiIdlClient::ReqP2pRemoveGroupClient(const std::string &deviceMac) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    return P2pRemoveGroupClient(deviceMac.c_str());
+}
+
 WifiErrorNo WifiIdlClient::ReqP2pInvite(const WifiP2pGroupInfo &group, const std::string &deviceAddr) const
 {
     CHECK_CLIENT_NOT_NULL;

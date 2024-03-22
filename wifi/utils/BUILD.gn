@@ -27,10 +27,9 @@ if (defined(ohos_lite)) {
 
     sources = [ "src/wifi_common_util.cpp" ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
-    ]
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     cflags_cc = [
       "-std=c++17",
@@ -71,7 +70,7 @@ if (defined(ohos_lite)) {
       "src/wifi_sa_manager.cpp",
     ]
 
-    deps = [ "//third_party/jsoncpp:jsoncpp" ]
+    deps = []
 
     external_deps = [
       "ability_base:want",
@@ -83,6 +82,7 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "hisysevent:libhisysevent",
       "ipc:ipc_single",
+      "jsoncpp:jsoncpp",
       "samgr:samgr_proxy",
     ]
 

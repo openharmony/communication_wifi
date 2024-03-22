@@ -127,9 +127,9 @@ public:
     void InvokeHotspotCallbacks(const WifiEventCallbackMsg &msg);
     void InvokeP2pCallbacks(const WifiEventCallbackMsg &msg);
     bool VerifyRegisterCallbackPermission(int callbackEventId);
-    void SetAppFrozen(int uid, bool isFrozen);
+    void SetAppFrozen(std::set<int> pidList, bool isFrozen);
     void ResetAllFrozenApp();
-    bool IsAppFrozen(int uid);
+    bool IsAppFrozen(int pid);
 private:
     static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
@@ -166,7 +166,8 @@ private:
     P2pCallbackMapType mP2pCallbacks;
     P2pCallbackInfo mP2pCallbackInfo;
     sptr<IWifiP2pCallback> mP2pSingleCallback;
-    std::vector<int> vecFrozenAppInfo;
+    std::mutex mPidFrozenMutex;
+    std::set<int> frozenPidList;
 };
 }  // namespace Wifi
 }  // namespace OHOS

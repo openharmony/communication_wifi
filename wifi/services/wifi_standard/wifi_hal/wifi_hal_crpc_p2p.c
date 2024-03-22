@@ -265,6 +265,22 @@ int RpcP2pRemoveNetwork(RpcServer *server, Context *context)
     return HAL_SUCCESS;
 }
 
+int RpcP2pRemoveClient(RpcServer *server, Context *context)
+{
+    if (server == NULL || context == NULL) {
+        return HAL_FAILURE;
+    }
+    char deviceMac[WIFI_BSSID_LENGTH] = {0};
+    if (ReadStr(context, deviceMac, sizeof(deviceMac)) != 0) {
+        return HAL_FAILURE;
+    }
+    WifiErrorNo err = P2pRemoveGroupClient(deviceMac);
+    WriteBegin(context, 0);
+    WriteInt(context, err);
+    WriteEnd(context);
+    return HAL_SUCCESS;
+}
+
 int RpcP2pListNetworks(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {

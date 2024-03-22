@@ -15,9 +15,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../../../interfaces/kits/c/wifi_hotspot.h"
-#include "../../../interfaces/kits/c/wifi_hotspot_config.h"
-#include "../../../interfaces/kits/c/wifi_device_config.h"
+#include "kits/c/wifi_hotspot.h"
+#include "kits/c/wifi_hotspot_config.h"
+#include "kits/c/wifi_device_config.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 

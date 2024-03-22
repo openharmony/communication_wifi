@@ -105,15 +105,12 @@
                 "safwk",
                 "samgr",
                 "power_manager",
-                "time_service"
-            ],
-            "third_party": [
+                "time_service",
                 "bounds_checking_function",
-                "wpa_supplicant",
                 "jsoncpp",
-                "libxml2",
-                "curl"
-            ]
+                "libxml2"
+            ],
+            "third_party": [ "wpa_supplicant" ]
         },
         "build": {
             "group_type": {

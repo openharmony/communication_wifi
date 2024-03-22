@@ -117,8 +117,9 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [
       "OHOS_ARCH_LITE",

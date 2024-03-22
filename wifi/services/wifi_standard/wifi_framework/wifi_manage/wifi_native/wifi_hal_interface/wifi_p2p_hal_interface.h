@@ -249,6 +249,15 @@ public:
     WifiErrorNo GroupRemove(const std::string &groupInterface) const;
 
     /**
+     * @Description Sends a request for remove group to the P2P
+     *
+     * @param groupInterface - p2p group
+     * @param deviceMac - p2p client mac address
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GroupClientRemove(const std::string &deviceMac) const;
+
+    /**
      * @Description Sends a request for invite to the P2P
      *
      * @param group - p2p group info

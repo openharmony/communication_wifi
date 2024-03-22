@@ -18,7 +18,7 @@
 #include <mutex>
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
-#include "../../interfaces/kits/c/wifi_event.h"
+#include "kits/c/wifi_event.h"
 #include "iremote_broker.h"
 #include "iremote_object.h"
 #include "iservice_registry.h"
@@ -27,8 +27,8 @@
 #include "i_wifi_hotspot_callback.h"
 #include "i_wifi_scan_callback.h"
 #include "i_wifi_p2p_callback.h"
-#include "../../interfaces/kits/c/wifi_p2p.h"
-#include "../../interfaces/kits/c/wifi_hid2d.h"
+#include "kits/c/wifi_p2p.h"
+#include "kits/c/wifi_hid2d.h"
 #include "wifi_event_handler.h"
 
 class WifiCDeviceEventCallback : public OHOS::Wifi::IWifiDeviceCallBack {
@@ -112,6 +112,10 @@ public:
     void OnP2pActionResult(OHOS::Wifi::P2pActionCallback action, OHOS::Wifi::ErrCode code) override;
 
     void OnConfigChanged(OHOS::Wifi::CfgType type, char* data, int dataLen) override;
+
+    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info) override;
+
+    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override;
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
 

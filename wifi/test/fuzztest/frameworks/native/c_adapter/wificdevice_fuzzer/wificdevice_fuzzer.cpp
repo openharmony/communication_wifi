@@ -17,7 +17,7 @@
 #include "securec.h"
 #include "wificdevice_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
-#include "../../../../../../interfaces/kits/c/wifi_device.h"
+#include "kits/c/wifi_device.h"
 
 
 static void EnableWifiTest()
@@ -265,6 +265,32 @@ static void SetLowLatencyModeTest(const uint8_t* data, size_t size)
     (void)SetLowLatencyMode(enabled);
 }
 
+static void Get5GHzChannelListTest(const uint8_t* data, size_t size)
+{
+    int result = 0;
+    int sizet = 0;
+    if (size >= TWO) {
+        int index = 0;
+        result = static_cast<int>(data[index++]);
+        sizet = static_cast<int>(data[index++]);
+    }
+    (void)Get5GHzChannelList(&result, &sizet);
+}
+
+static void IsBandTypeSupportedTest(const uint8_t* data, size_t size)
+{
+    bool supported = true;
+    int bandType = static_cast<int>(data[0]);
+    (void)IsBandTypeSupported(bandType, &supported);
+}
+
+static void GetDisconnectedReasonTest(const uint8_t* data, size_t size)
+{
+    DisconnectedReason result = DISC_REASON_DEFAULT;
+    result = static_cast<DisconnectedReason>(static_cast<int>(data[0]) % (DISC_REASON_CONNECTION_REJECTED + 1));
+    (void)GetDisconnectedReason(&result);
+}
+
 namespace OHOS {
 namespace Wifi {
     bool WifiCDeviceFuzzerTest(const uint8_t* data, size_t size)
@@ -288,6 +314,10 @@ namespace Wifi {
         GetDeviceMacAddressTest(data, size);
         GetIpInfoTest(data, size);
         SetLowLatencyModeTest(data, size);
+        Get5GHzChannelListTest(data, size);
+        IsBandTypeSupportedTest(data, size);
+        GetDisconnectedReasonTest(data, size);
+
         return true;
     }
 }  // namespace Wifi

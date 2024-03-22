@@ -384,14 +384,14 @@ void OnP2pStaDeauthorized(const char *p2pDeviceAddress)
     }
 }
 
-void OnP2pStaAuthorized(const char *p2pDeviceAddress)
+void OnP2pStaAuthorized(const char *p2pDeviceAddress, const char *p2pGroupAddress)
 {
     if (p2pDeviceAddress == nullptr) {
         return;
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onStaAuthorized) {
-        cbk.onStaAuthorized(p2pDeviceAddress);
+        cbk.onStaAuthorized(p2pDeviceAddress, p2pGroupAddress);
     }
 }
 

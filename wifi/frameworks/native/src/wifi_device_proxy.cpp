@@ -1584,7 +1584,7 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::SetAppFrozen(int uid, bool isFrozen)
+ErrCode WifiDeviceProxy::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -1597,12 +1597,17 @@ ErrCode WifiDeviceProxy::SetAppFrozen(int uid, bool isFrozen)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    data.WriteInt32(uid);
+    int size = pidList.size() < MAX_PID_LIST_SIZE ? pidList.size() : MAX_PID_LIST_SIZE;
+    int count = 0;
+    data.WriteInt32(size);
+    for (std::set<int>::iterator it = pidList.begin(); it != pidList.end() && count < size; it++, count++) {
+        data.WriteInt32(*it);
+    }
     data.WriteBool(isFrozen);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_FROZEN_APP), data,
         reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Get5GHzChannelList(%{public}d) failed,error code is %{public}d",
+        WIFI_LOGE("SetAppFrozen(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_FROZEN_APP), error);
         return WIFI_OPT_FAILED;
     }

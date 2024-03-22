@@ -17,8 +17,8 @@
 #include <cstring>
 #include "securec.h"
 #include "wifichid2d_fuzzer.h"
-#include "../../../../../../frameworks/native/c_adapter/inc/wifi_c_utils.h"
-#include "../../../../../../interfaces/kits/c/wifi_hid2d.h"
+#include "c_adapter/inc/wifi_c_utils.h"
+#include "kits/c/wifi_hid2d.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -225,6 +225,7 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
     }
     (void)Hid2dSetUpperScene(ifName, &scene);
 }
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

@@ -17,7 +17,6 @@ if (defined(ohos_lite)) {
   import("//foundation/communication/wifi/wifi/wifi_lite.gni")
 } else {
   import("//build/ohos.gni")
-  import("//foundation/communication/dhcp/dhcp.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 
@@ -109,10 +108,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/inc",
     ]
 
-    deps = [
-      "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/libxml2:xml2",
-    ]
+    deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
 
     defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
@@ -138,6 +134,7 @@ if (defined(ohos_lite)) {
       "dhcp:dhcp_sdk",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
+      "libxml2:libxml2",
     ]
 
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {

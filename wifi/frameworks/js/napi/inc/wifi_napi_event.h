@@ -25,7 +25,7 @@
 #include "wifi_p2p.h"
 #include "wifi_hotspot.h"
 #include "wifi_logger.h"
-#include "../../../native/src/wifi_sa_event.h"
+#include "wifi_sa_event.h"
 
 DEFINE_WIFILOG_LABEL("WifiNapiEvent");
 

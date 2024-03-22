@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "../../interfaces/kits/c/wifi_device.h"
+#include "kits/c/wifi_device.h"
 #include "wifi_scan.h"
 #include "wifi_p2p.h"
 #include "wifi_device.h"

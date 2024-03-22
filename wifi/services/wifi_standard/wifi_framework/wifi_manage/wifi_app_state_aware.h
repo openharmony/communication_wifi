@@ -35,19 +35,22 @@ public:
     ~WifiAppStateAware();
     static WifiAppStateAware &GetInstance();
     ErrCode InitAppStateAware();
+    bool Connect();
     void RegisterAppStateObserver();
+    void UnSubscribeAppState();
     void OnForegroundAppChanged(const std::string &bundleName, int uid, int pid,
         const int state, const int mInstId = 0);
-    bool IsForegroundApp(std::string &bundleName);
-    std::string GetForegroundApp();
+    void GetForegroundApp();
+    bool IsForegroundApp(int32_t uid);
+    std::string GetRunningProcessNameByPid(const int uid, const int pid);
 
 private:
     std::mutex mutex_ {};
-    sptr<AppExecFwk::IAppMgr> appMgrProxy_ {nullptr};
     std::string foregroundAppBundleName_;
+    int32_t foregroundAppUid_;
     std::unique_ptr<WifiEventHandler> appChangeEventHandler = nullptr;
+    sptr<AppExecFwk::IAppMgr> appMgrProxy_ {nullptr};
     sptr<AppStateObserver> mAppStateObserver {nullptr};
-    sptr<AppExecFwk::IAppMgr> mAppObject {nullptr};
 };
 
 class AppStateObserver : public AppExecFwk::ApplicationStateObserverStub {

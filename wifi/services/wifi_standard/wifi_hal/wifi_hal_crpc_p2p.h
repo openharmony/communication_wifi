@@ -282,6 +282,15 @@ int RpcP2pAddGroup(RpcServer *server, Context *context);
 int RpcP2pRemoveGroup(RpcServer *server, Context *context);
 
 /**
+ * @Description Terminate a group.
+ *
+ * @param server - Pointer to the global structure of the communication server.
+ * @param context - Pointer to the global communication context structure of the server.
+ * @return int - 0 Success, -1 Failed.
+ */
+int RpcP2pRemoveClient(RpcServer *server, Context *context);
+
+/**
  * @Description Invite
  *
  * @param server - Pointer to the global structure of the communication server.

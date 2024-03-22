@@ -108,7 +108,7 @@ public:
 
     ErrCode GetCountryCode(std::string &countryCode) override;
 
-    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+    ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) override;
 
     ErrCode ResetAllFrozenApp() override;
 

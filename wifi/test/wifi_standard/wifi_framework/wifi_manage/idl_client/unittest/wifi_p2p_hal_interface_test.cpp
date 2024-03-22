@@ -129,9 +129,9 @@ void onStaDeauthorized(const std::string &address)
     LOGD("onStaDeauthorized...address: %s\n", address.c_str());
 }
 
-void onStaAuthorized(const std::string &address)
+void onStaAuthorized(const std::string &devAddress, const std::string &GroupAddress)
 {
-    LOGD("onStaAuthorized...address: %s\n", address.c_str());
+    LOGD("onStaAuthorized...devAddress: %s  GroupAddress:%s\n", devAddress.c_str(), GroupAddress.c_str());
 }
 
 void connectSupplicantFailed()

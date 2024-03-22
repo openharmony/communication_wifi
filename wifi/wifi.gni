@@ -16,6 +16,7 @@ fuzz_test_output_path = "wifi/wifi/wifi_sta"
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
 DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"
+CONFIG_CTRL_IFACE = "unix"
 
 declare_args() {
   wifi_feature_with_p2p = true

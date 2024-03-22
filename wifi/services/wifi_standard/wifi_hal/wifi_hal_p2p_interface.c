@@ -744,6 +744,25 @@ WifiErrorNo P2pRemoveGroup(const char *interface)
     return WIFI_HAL_SUCCESS;
 }
 
+WifiErrorNo P2pRemoveGroupClient(const char *deviceMac)
+{
+    if (deviceMac == NULL) {
+        LOGE("P2pRemoveGroupClient, deviceMac is NULL");
+        return WIFI_HAL_FAILED;
+    }
+    LOGD("P2pRemoveGroupClient");
+    WifiWpaP2pInterface *pMainIfc = GetWifiWapP2pInterface();
+    if (pMainIfc == NULL) {
+        return WIFI_HAL_SUPPLICANT_NOT_INIT;
+    }
+    P2pSupplicantErrCode ret = pMainIfc->wpaP2pCliCmdP2pRemoveClient(pMainIfc, deviceMac);
+    if (ret != P2P_SUP_ERRCODE_SUCCESS) {
+        LOGE("wpaP2pCliCmdP2pRemoveClient fail, ret = %{public}d", ret);
+        return ConvertP2pErrCode(ret);
+    }
+    return WIFI_HAL_SUCCESS;
+}
+
 WifiErrorNo P2pInvite(int persistent, const char *peerBssid, const char *goBssid, const char *ifname)
 {
     if (peerBssid == NULL || goBssid == NULL || ifname == NULL) {

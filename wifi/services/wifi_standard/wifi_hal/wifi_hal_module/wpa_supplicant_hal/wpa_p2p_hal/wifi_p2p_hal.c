@@ -364,6 +364,24 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pRemoveGroup(WifiWpaP2pInterface *this
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
+static P2pSupplicantErrCode WpaP2pCliCmdP2pRemoveClient(WifiWpaP2pInterface *this, const char *deviceMac)
+{
+    if (this == NULL || deviceMac == NULL) {
+        return P2P_SUP_ERRCODE_INVALID;
+    }
+    char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
+    char cmd[P2P_CMD_BUF_LENGTH] = {0};
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "IFNAME=%s P2P_REMOVE_CLIENT %s", this->ifName, deviceMac) < 0) {
+        LOGE("snprintf err");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+    if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
+        LOGE("P2P_REMOVE_CLIENT command failed!");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
+    return P2P_SUP_ERRCODE_SUCCESS;
+}
+
 static P2pSupplicantErrCode WpaP2pCliCmdP2pFound(WifiWpaP2pInterface *this, int timeout)
 {
     if (this == NULL) {
@@ -1338,6 +1356,7 @@ static void InitGlobalWpaP2pFunc(void)
     g_wpaP2pInterface->wpaP2pCliCmdGetGroupConfig = WpaP2pCliCmdGetGroupConfig;
     g_wpaP2pInterface->wpaP2pCliCmdAddNetwork = WpaP2pCliCmdAddNetwork;
     g_wpaP2pInterface->wpaP2pCliCmdHid2dConnect = WpaP2pHid2dCliCmdConnect;
+    g_wpaP2pInterface->wpaP2pCliCmdP2pRemoveClient = WpaP2pCliCmdP2pRemoveClient;
     return;
 }
 

@@ -998,9 +998,14 @@ void WifiDeviceStub::OnGetDisconnectedReason(uint32_t code, MessageParcel &data,
 void WifiDeviceStub::OnSetFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int uid = data.ReadInt32();
+    int size = data.ReadInt32();
+    size = size < MAX_PID_LIST_SIZE ? size : MAX_PID_LIST_SIZE;
+    std::set<int> pidList;
+    for (int i = 0; i < size; i++) {
+        pidList.insert(data.ReadInt32());
+    }
     bool frozen = data.ReadBool();
-    ErrCode ret = SetAppFrozen(uid, frozen);
+    ErrCode ret = SetAppFrozen(pidList, frozen);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

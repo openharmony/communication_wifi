@@ -211,7 +211,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
         const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-        std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+        std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
         if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
             LOGE("AddCandidateConfig unsupport open or wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
@@ -268,6 +268,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     }
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    pStaStateMachine->SetPortalBrowserFlag(false);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
@@ -361,7 +362,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
 #ifndef OHOS_ARCH_LITE
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;
     } else {
@@ -392,7 +393,7 @@ ErrCode StaService::RemoveAllDevice() const
     WifiDeviceConfig config;
     config.networkId = REMOVE_ALL_DEVICECONFIG;
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;
     } else {
@@ -429,6 +430,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     LOGI("ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
+    pStaStateMachine->SetPortalBrowserFlag(false);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
@@ -512,7 +514,7 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
         return WIFI_OPT_FAILED;
     }
     const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
-    std::string ancoBrokerFrameProcessName = GetRunningProcessNameByPid(GetCallingUid(), GetCallingPid());
+    std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
         WIFI_LOGD("StaService %{public}s, anco, %{public}d", __func__, m_instId);

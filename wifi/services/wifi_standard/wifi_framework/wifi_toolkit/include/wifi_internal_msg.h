@@ -165,6 +165,7 @@ struct WifiEventCallbackMsg {
     WifiP2pDevice p2pDevice;
     P2pActionCallback p2pAction;
     CfgInfo* cfgInfo;
+    GcInfo gcInfo;
     WifiEventCallbackMsg()
     {
         msgCode = 0;

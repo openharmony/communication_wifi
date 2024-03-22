@@ -94,8 +94,9 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [
       "OHOS_ARCH_LITE",
@@ -157,8 +158,9 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [ "OHOS_ARCH_LITE" ]
     cflags_cc = [

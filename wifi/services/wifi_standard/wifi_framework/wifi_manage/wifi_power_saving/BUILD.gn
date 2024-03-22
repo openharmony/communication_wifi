@@ -43,12 +43,12 @@ ohos_shared_library("wifi_power_saving_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/libxml2:xml2",
   ]
 
   external_deps = [
     "ability_runtime:app_manager",
     "hilog:libhilog",
+    "libxml2:libxml2",
   ]
 
   cflags_cc = [

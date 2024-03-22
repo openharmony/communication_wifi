@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "securec.h"
-#include "../../../frameworks/native/c_adapter/inc/wifi_c_utils.h"
+#include "c_adapter/inc/wifi_c_utils.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

@@ -17,8 +17,8 @@
 #include <cstddef>
 #include <cstdint>
 #include "securec.h"
-#include "../../../interfaces/inner_api/wifi_msg.h"
-#include "../../../interfaces/inner_api/wifi_hotspot.h"
+#include "inner_api/wifi_msg.h"
+#include "inner_api/wifi_hotspot.h"
 #include "wifi_logger.h"
 
 using ::testing::_;

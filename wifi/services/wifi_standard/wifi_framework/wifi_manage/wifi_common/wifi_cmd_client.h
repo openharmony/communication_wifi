@@ -21,7 +21,10 @@
 
 namespace OHOS {
 namespace Wifi {
+
+#define CMD_SET_SOFTAP_MIMOMODE "SET_AP_MODE"
 const int CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH = 125;
+const int CMD_SET_SOFTAP_2G_MSS = 106;
 
 struct WifiPrivCmd {
     uint8_t *buf;
@@ -37,6 +40,7 @@ public:
 private:
     int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm) const;
     int SetRxListen(const std::string &ifName, const std::string &param) const;
+    int Set2gSoftapMss(const std::string &ifName, const std::string &param) const;
 };
 } // namespace Wifi
 } // namespace OHOS

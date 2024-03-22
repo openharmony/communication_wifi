@@ -35,12 +35,15 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_hisysevent.h"
 #include "wifi_global_func.h"
+#include "wifi_cmd_client.h"
+#include "battery_srv_client.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
 namespace OHOS {
 namespace Wifi {
 const std::string AP_DEFAULT_IP = "192.168.43.1";
+#define SET_DUAL_ANTENNAS 60
 
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
@@ -91,6 +94,15 @@ void ApStartedState::GoInState()
     UpdatePowerMode();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
     ChipCapability::GetInstance().InitializeChipCapability();
+
+    if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
+        HotspotConfig hotspotConfig;
+        WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
+        if (hotspotConfig.GetBand() == BandType::BAND_2GHZ) {
+            std::string ifName = "wlan0";
+            WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_SOFTAP_2G_MSS, CMD_SET_SOFTAP_MIMOMODE);
+        }
+    }
 }
 
 void ApStartedState::GoOutState()

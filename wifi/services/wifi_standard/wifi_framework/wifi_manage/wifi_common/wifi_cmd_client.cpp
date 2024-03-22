@@ -36,6 +36,9 @@ static const auto RX_LISTEN_OFF = "N";
 static const auto CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
 static const auto CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
 
+#define MSS_SOFTAP_MAX_IFNAMESIZE 5
+#define MSS_SOFTAP_CMDSIZE 30
+
 WifiCmdClient &WifiCmdClient::GetInstance()
 {
     static WifiCmdClient instance;
@@ -50,6 +53,8 @@ int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, con
     }
     if (commandId == CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH) {
         ret = SetRxListen(ifName, param);
+    } else if (commandId == CMD_SET_SOFTAP_2G_MSS) {
+        ret = Set2gSoftapMss(ifName, param);
     } else {
         WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
     }
@@ -112,5 +117,19 @@ int WifiCmdClient::SetRxListen(const std::string &ifName, const std::string &par
     }
     return SendCommandToDriverByInterfaceName(ifName, cmdParam);
 }
+
+int WifiCmdClient::Set2gSoftapMss(const std::string &ifName, const std::string &param) const
+{
+    if (ifName.empty() || ifName.size() > MSS_SOFTAP_MAX_IFNAMESIZE) {
+        WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
+        return -1;
+    }
+    if ((ifName.size() + param.size()) > MSS_SOFTAP_CMDSIZE) {
+        WIFI_LOGE("%{public}s ifNameLen + cmdLen overflow", __FUNCTION__);
+        return -1;
+    }
+    return SendCommandToDriverByInterfaceName(ifName, param);
+}
+
 } // namespace Wifi
 } // namespace OHOS

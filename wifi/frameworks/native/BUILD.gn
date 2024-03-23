@@ -77,12 +77,7 @@ if (defined(ohos_lite)) {
 
   config("wifi_sdk_header") {
     include_dirs = [
-      "//commonlibrary/c_utils/base/include",
-      "//utils/system/safwk/native/include",
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "//foundation/arkui/ace_engine/frameworks/base/utils",
-      "//foundation/arkui/ace_engine/frameworks",
-      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
       "$WIFI_ROOT_DIR/interfaces",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
@@ -91,11 +86,9 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/frameworks/native/src",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/",
-      "//foundation/systemabilitymgr/samgr/adapter/interfaces/innerkits/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
       "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
-      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include/bundlemgr",
     ]
   }
 
@@ -133,7 +126,11 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
-    external_deps = [ "ipc:ipc_single" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
   }
 
   ohos_source_set("wifi_hotspot_proxy_impl") {
@@ -156,7 +153,11 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
-    external_deps = [ "ipc:ipc_single" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
   }
 
   ohos_source_set("wifi_scan_proxy_impl") {
@@ -179,7 +180,11 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
-    external_deps = [ "ipc:ipc_single" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
   }
 
   ohos_source_set("wifi_p2p_proxy_impl") {
@@ -208,7 +213,11 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
-    external_deps = [ "ipc:ipc_single" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
   }
 
   ohos_shared_library("wifi_sdk") {

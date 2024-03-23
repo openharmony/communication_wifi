@@ -121,12 +121,6 @@ if (defined(ohos_lite)) {
     sources += [ "sta_app_acceleration.cpp" ]
 
     include_dirs = local_base_include_dirs
-    include_dirs += [
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-      "//foundation/systemability/safwk/interfaces/innerkits/safwk",
-      "//commonlibrary/c_utils/base/include",
-    ]
 
     cflags_cc = [
       "-std=c++17",

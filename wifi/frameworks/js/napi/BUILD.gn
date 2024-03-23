@@ -26,18 +26,12 @@ ohos_shared_library("wifi") {
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
   ]
@@ -87,16 +81,11 @@ ohos_shared_library("wifiext") {
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
   ]
 
   sources = [
@@ -141,19 +130,13 @@ ohos_shared_library("wifi_native_js") {
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/frameworks/native/src",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
 
@@ -202,18 +185,12 @@ ohos_shared_library("wifimanager") {
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
   ]
@@ -260,16 +237,11 @@ ohos_shared_library("wifimanagerext") {
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
   ]
 
   sources = [

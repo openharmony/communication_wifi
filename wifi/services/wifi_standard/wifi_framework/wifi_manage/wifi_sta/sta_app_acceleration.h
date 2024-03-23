@@ -18,7 +18,7 @@
 
 #include "wifi_errcode.h"
 #include "define.h"
-#include "app_mgr_interface.h"
+#include "appmgr/app_mgr_interface.h"
 #include "sta_service_callback.h"
 
 namespace OHOS {

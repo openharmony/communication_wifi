@@ -53,7 +53,7 @@ ConcreteMangerMachine::~ConcreteMangerMachine()
 ErrCode ConcreteMangerMachine::InitConcreteMangerMachine()
 {
     WIFI_LOGE("Enter InitConcreteMangerMachine.\n");
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("ConcreteManagerMachine")) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }

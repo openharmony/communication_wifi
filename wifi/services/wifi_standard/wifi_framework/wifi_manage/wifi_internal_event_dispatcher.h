@@ -16,23 +16,15 @@
 #ifndef OHOS_WIFI_INTERNAL_EVENT_DISPATCHER_H
 #define OHOS_WIFI_INTERNAL_EVENT_DISPATCHER_H
 
-#include <atomic>
 #include <chrono>
-#include <condition_variable>
-#include <deque>
 #include <memory>
 #include <mutex>
-#include <thread>
 #include <string>
 #include <map>
 #include <unordered_set>
 #include <functional>
-
 #include "wifi_internal_msg.h"
-#ifndef OHOS_ARCH_LITE
-#include "parcel.h"
-#include "iremote_object.h"
-#endif
+#include "wifi_event_handler.h"
 #include "i_wifi_device_callback.h"
 #include "i_wifi_scan_callback.h"
 #include "i_wifi_hotspot_callback.h"
@@ -94,7 +86,7 @@ public:
      * @param p WifiInternalEventDispatcher this Object
      * @return void* - nullptr, not care this now
      */
-    static void Run(WifiInternalEventDispatcher &instance);
+    static void Run(WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg);
 
     static WifiInternalEventDispatcher &GetInstance();
     ErrCode AddStaCallback(const sptr<IRemoteObject> &remote, const sptr<IWifiDeviceCallBack> &callback, int pid,
@@ -145,11 +137,7 @@ private:
     static void PublishRssiValueChangedEvent(int state);
     static void SendConfigChangeEvent(sptr<IWifiP2pCallback> &callback,  CfgInfo* cfgInfo);
 private:
-    std::thread mBroadcastThread;
-    std::atomic<bool> mRunFlag;
-    std::mutex mMutex;
-    std::condition_variable mCondition;
-    std::deque<WifiEventCallbackMsg> mEventQue;
+    std::unique_ptr<WifiEventHandler> mBroadcastThread = nullptr;
     std::mutex mStaCallbackMutex;
     std::map<int, StaCallbackMapType> mStaCallbacks;
     std::map<int, StaCallbackInfo> mStaCallBackInfo;

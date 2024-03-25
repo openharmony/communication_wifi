@@ -123,7 +123,7 @@ bool ScanStateMachine::InitScanStateMachine()
     /* init supportHwPnoFlag value */
     supportHwPnoFlag = WifiSettings::GetInstance().GetSupportHwPnoFlag(m_instId);
 
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("ScanStateMachine")) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return false;
     }

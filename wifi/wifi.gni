@@ -35,6 +35,10 @@ declare_args() {
       defined(global_parts_info.resourceschedule_efficiency_manager)) {
     wifi_feature_with_app_frozen = true
   }
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_ffrt)) {
+    wifi_ffrt_enable = true
+  }
   wifi_feature_sta_ap_exclusion = true
   wifi_feature_with_random_mac_addr = true
   wifi_feature_with_hdi_wpa_supported = false

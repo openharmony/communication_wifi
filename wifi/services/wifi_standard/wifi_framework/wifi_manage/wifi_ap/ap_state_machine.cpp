@@ -49,7 +49,7 @@ ApStateMachine::~ApStateMachine()
 
 void ApStateMachine::Init()
 {
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("ApStateMachine")) {
         WIFI_LOGE("Ap StateMachine Initialize failed.");
         return;
     }

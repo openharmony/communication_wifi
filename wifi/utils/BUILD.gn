@@ -25,7 +25,10 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
     ]
 
-    sources = [ "src/wifi_common_util.cpp" ]
+    sources = [
+      "src/wifi_common_util.cpp",
+      "src/wifi_event_handler.cpp",
+    ]
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
@@ -71,6 +74,7 @@ if (defined(ohos_lite)) {
       "src/wifi_event_handler.cpp",
       "src/wifi_hisysevent.cpp",
       "src/wifi_sa_manager.cpp",
+      "src/wifi_timer.cpp",
     ]
 
     deps = [ "//third_party/jsoncpp:jsoncpp" ]
@@ -87,6 +91,13 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]
+
+    defines = []
+
+    if (wifi_ffrt_enable) {
+      external_deps += [ "ffrt:libffrt" ]
+      defines += [ "WIFI_FFRT_ENABLE" ]
+    }
 
     cflags_cc = [
       "-std=c++17",

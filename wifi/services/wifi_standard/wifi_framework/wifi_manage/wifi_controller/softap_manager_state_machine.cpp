@@ -47,7 +47,7 @@ SoftapManagerMachine::~SoftapManagerMachine()
 ErrCode SoftapManagerMachine::InitSoftapManagerMachine()
 {
     WIFI_LOGE("Enter SoftapManagerMachine::InitSoftapManagerMachine.\n");
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("SoftapManagerMachine")) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }

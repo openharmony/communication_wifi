@@ -18,6 +18,7 @@
 
 #include "wifi_hdi_define.h"
 #include "wifi_error_no.h"
+#include "securec.h"
 #include "v1_2/iwlan_interface.h"
 
 #ifdef __cplusplus
@@ -50,6 +51,13 @@ WifiErrorNo StartHdiWifi();
  * @return WifiErrorNo - operation result
  */
 WifiErrorNo HdiStop();
+
+/**
+ * @Description check hdi already stopped.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo IsHdiStopped();
 
 /**
  * @Description Create the WiFi object.
@@ -95,6 +103,9 @@ void CleanLocalResources();
  * @return WifiErrorNo - operation result
  */
 WifiErrorNo CheckHdiNormalStart(const int32_t wlanType);
+
+WifiErrorNo SetWifiHdiStaIfaceName(const char *ifaceName);
+const char *GetWifiHdiStaIfaceName();
 #ifdef __cplusplus
 }
 #endif

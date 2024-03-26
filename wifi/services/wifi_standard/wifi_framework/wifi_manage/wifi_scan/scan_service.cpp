@@ -2617,10 +2617,10 @@ bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId
     return bFind;
 }
 
-ErrCode ScanService::StartWpa()
+ErrCode ScanService::StartWifiHdi()
 {
-    WIFI_LOGI("Enter ScanService::StartWpa.\n");
-    int res = WifiStaHalInterface::GetInstance().StartWifi();
+    WIFI_LOGI("Enter ScanService::StartWifiHdi.\n");
+    int res = WifiStaHalInterface::GetInstance().StartWifiHdi(WifiSettings::GetInstance().GetStaIfaceName());
     if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
         return WIFI_OPT_FAILED;
     }
@@ -2628,25 +2628,24 @@ ErrCode ScanService::StartWpa()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::CloseWpa()
+ErrCode ScanService::CloseWifiHdi()
 {
-    WIFI_LOGI("Enter ScanService::CloseWpa.\n");
-    int res = WifiStaHalInterface::GetInstance().StopWifi();
+    WIFI_LOGI("Enter ScanService::CloseWifiHdi.\n");
+    int res = WifiStaHalInterface::GetInstance().StopWifiHdi();
     if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::OpenScanOnly() const
+ErrCode ScanService::SetNetworkInterfaceUpDown(bool upDown)
 {
-    WIFI_LOGI("Enter ScanService::OpenScanOnly.\n");
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ScanService::CloseScanOnly() const
-{
-    WIFI_LOGI("Enter ScanService::CloseScanOnly.\n");
+    WIFI_LOGI("Enter ScanService::SetNetworkInterfaceUpDown.\n");
+    int res = WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(
+        WifiSettings::GetInstance().GetStaIfaceName(), upDown);
+    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 

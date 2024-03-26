@@ -40,10 +40,6 @@
 #define CHECK_STA_HDI_WIFI_PROXY_AND_RETURN(isRemoteDied) \
 if (isRemoteDied) { \
     HdiReleaseLocalResources(); \
-    if (HdiStop() != WIFI_IDL_OPT_OK) { \
-        LOGE("failed to stop sta hdi"); \
-        return WIFI_IDL_OPT_FAILED; \
-    } \
     if (StartHdiWifi() != WIFI_IDL_OPT_OK) { \
         LOGE("[STA] Start hdi failed!"); \
         return WIFI_IDL_OPT_FAILED; \
@@ -210,7 +206,7 @@ static WifiErrorNo GetSignalInfo(WpaSignalInfo *info)
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
     struct SignalPollResult signalResult = {0};
     
-    ret = proxy.wlanObj->GetSignalPollInfo(proxy.wlanObj, "wlan0", &signalResult);
+    ret = proxy.wlanObj->GetSignalPollInfo(proxy.wlanObj, GetWifiHdiStaIfaceName(), &signalResult);
     if (ret != 0) {
         LOGE("HdiWifiGetSignalInfo failed ret:%{public}d", ret);
     }
@@ -230,9 +226,13 @@ static WifiErrorNo GetSignalInfo(WpaSignalInfo *info)
     return (ret == 0) ? 0 : -1;
 }
 
-WifiErrorNo HdiWifiStart()
+WifiErrorNo HdiWifiStart(const char *ifaceName)
 {
     LOGI("%{public}s: begin to start wifi", __func__);
+    if (SetWifiHdiStaIfaceName(ifaceName) != WIFI_IDL_OPT_OK) {
+        LOGE("failed to set sta iface name!");
+        return WIFI_IDL_OPT_FAILED;
+    }
     if (StartHdiWifi() != WIFI_IDL_OPT_OK) {
         LOGE("failed to start hdi wifi!");
         return WIFI_IDL_OPT_FAILED;
@@ -258,6 +258,10 @@ WifiErrorNo HdiWifiStart()
 WifiErrorNo HdiWifiStop()
 {
     LOGI("%{public}s: begin to stop wifi enter", __func__);
+    if (IsHdiStopped() == WIFI_IDL_OPT_OK) {
+        LOGI("%{public}s: wifi hdi already stopped, HdiWifiStop success", __func__);
+        return WIFI_IDL_OPT_OK;
+    }
     HdiUnRegisterStaCallbackEvent();
     usleep(WIFI_HDI_STOP_SLEEP_MS); /* 300ms */
     if (HdiStop() != WIFI_IDL_OPT_OK) {
@@ -334,7 +338,6 @@ WifiErrorNo HdiWifiStartPnoScan(const PnoScanSettings * settings)
     int32_t ret = 0;
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
-    const char *ifName = "wlan0";
     struct PnoSettings pnoSettings;
     (void)memset_s(&pnoSettings, sizeof(struct PnoSettings), 0, sizeof(struct PnoSettings));
     if (settings->savedSsidSize > 0) {
@@ -360,7 +363,7 @@ WifiErrorNo HdiWifiStartPnoScan(const PnoScanSettings * settings)
         }
     }
 
-    ret = proxy.wlanObj->StartPnoScan(proxy.wlanObj, ifName, &pnoSettings);
+    ret = proxy.wlanObj->StartPnoScan(proxy.wlanObj, GetWifiHdiStaIfaceName(), &pnoSettings);
     if (ret != 0) {
         LOGE("HdiStartPnoScan failed ret:%{public}d.", ret);
     }
@@ -378,8 +381,7 @@ WifiErrorNo HdiWifiStopPnoScan(void)
     int32_t ret = 0;
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
-    const char *ifName = "wlan0";
-    ret = proxy.wlanObj->StopPnoScan(proxy.wlanObj, ifName);
+    ret = proxy.wlanObj->StopPnoScan(proxy.wlanObj, GetWifiHdiStaIfaceName());
     if (ret != 0) {
         LOGE("%{public}s: failed to stop pno scan, ret:%{public}d.", __func__, ret);
         return WIFI_IDL_OPT_FAILED;
@@ -508,7 +510,8 @@ void HdiUnRegisterStaCallbackEvent()
             LOGE("%{public}s: Hdi proxy is NULL!", __func__);
             return;
         }
-        int32_t ret = proxy.wlanObj->UnregisterEventCallback(proxy.wlanObj, g_hdiWifiCallbackObj, "wlan0");
+        int32_t ret = proxy.wlanObj->UnregisterEventCallback(proxy.wlanObj, g_hdiWifiCallbackObj,
+            GetWifiHdiStaIfaceName());
         if (ret != 0) {
             LOGE("%{public}s: failed to unregister event callback, ret:%{public}d", __func__, ret);
             pthread_mutex_unlock(&g_hdiWifiCallbackMutex);
@@ -569,7 +572,7 @@ WifiErrorNo HdiRegisterEventCallback(struct IWlanCallback *callback)
         LOGE("%{public}s:Hdi proxy is NULL!", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-    int32_t ret = proxy.wlanObj->RegisterEventCallback(proxy.wlanObj, g_hdiWifiCallbackObj, "wlan0");
+    int32_t ret = proxy.wlanObj->RegisterEventCallback(proxy.wlanObj, g_hdiWifiCallbackObj, GetWifiHdiStaIfaceName());
     if (ret != 0) {
         pthread_mutex_unlock(&g_hdiWifiCallbackMutex);
         LOGE("%{public}s: failed to register event Callback, ret:%{public}d", __func__, ret);
@@ -634,8 +637,7 @@ WifiErrorNo HdiSetPmMode(int frequency, int mode)
     int32_t ret = 0;
     WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
     CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
-    const char *ifName = "wlan0";
-    ret = proxy.wlanObj->SetPowerSaveMode(proxy.wlanObj, ifName, frequency, mode);
+    ret = proxy.wlanObj->SetPowerSaveMode(proxy.wlanObj, GetWifiHdiStaIfaceName(), frequency, mode);
     if (ret != 0) {
         LOGE("%{public}s: failed to set power save mode, ret:%{public}d.", __func__, ret);
         return WIFI_IDL_OPT_FAILED;

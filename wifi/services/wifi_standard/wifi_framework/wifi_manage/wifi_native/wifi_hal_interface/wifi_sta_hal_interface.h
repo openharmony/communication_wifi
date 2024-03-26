@@ -39,7 +39,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWifi(void);
+    WifiErrorNo StartWifi(const std::string &ifaceName = "wlan0");
 
     /**
      * @Description Close Wifi.
@@ -365,6 +365,27 @@ public:
      */
     WifiErrorNo GetChipsetWifiFeatrureCapability(int& chipsetFeatrureCapability);
     
+    /**
+     * @Description Open Wifi hdi.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo StartWifiHdi(const std::string &ifaceName = "wlan0");
+
+    /**
+     * @Description Close Wifi hdi.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo StopWifiHdi(void);
+
+    /**
+     * @Description Set network interface updown.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetNetworkInterfaceUpDown(const std::string &ifaceName, bool upDown);
+
     /**
      * @Description Get register callback objects
      *

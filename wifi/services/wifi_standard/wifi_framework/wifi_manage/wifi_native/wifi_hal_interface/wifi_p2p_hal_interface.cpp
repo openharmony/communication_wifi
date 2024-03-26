@@ -49,11 +49,11 @@ WifiP2PHalInterface &WifiP2PHalInterface::GetInstance(void)
     return inst;
 }
 
-WifiErrorNo WifiP2PHalInterface::StartP2p(void) const
+WifiErrorNo WifiP2PHalInterface::StartP2p(const std::string &ifaceName) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
-    return mHdiWpaClient->ReqP2pStart();
+    return mHdiWpaClient->ReqP2pStart(ifaceName);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqP2pStart();

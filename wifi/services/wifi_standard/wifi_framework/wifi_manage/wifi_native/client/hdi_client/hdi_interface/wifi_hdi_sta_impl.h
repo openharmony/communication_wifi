@@ -31,7 +31,7 @@ extern "C" {
  *
  * @return WifiErrorNo - operation result
  */
-WifiErrorNo HdiWifiStart();
+WifiErrorNo HdiWifiStart(const char *ifaceName);
 
 /**
  * @Description Disabling Wi-Fi

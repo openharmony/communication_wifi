@@ -22,11 +22,6 @@
 
 namespace OHOS {
 namespace Wifi {
-#ifdef NON_SEPERATE_P2P
-const std::string P2P_INTERFACE("p2p-dev-wlan0");
-#else
-const std::string P2P_INTERFACE("p2p0");
-#endif
 /* The timeout interval of enable p2p */
 constexpr long ENABLE_P2P_TIMED_OUT__INTERVAL = 15000;
 /* The time of clears service requests processed in records. */

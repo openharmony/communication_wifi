@@ -23,6 +23,7 @@
 
 #include "securec.h"
 #include "wifi_log.h"
+#include "wifi_settings.h"
 
 #ifdef LOG_TAG
 #undef LOG_TAG
@@ -80,15 +81,16 @@ void DnsChecker::Start(std::string priDns, std::string secondDns)
         dnsSocket = 0;
         return;
     }
+    std::string ifaceName = WifiSettings::GetInstance().GetStaIfaceName();
     struct ifreq ifaceReq;
-    if (strncpy_s(ifaceReq.ifr_name, sizeof(ifaceReq.ifr_name), "wlan0", strlen("wlan0")) != EOK) {
+    if (strncpy_s(ifaceReq.ifr_name, sizeof(ifaceReq.ifr_name), ifaceName.c_str(), ifaceName.size()) != EOK) {
         LOGE("DnsChecker copy ifaceReq failed.");
         close(dnsSocket);
         dnsSocket = 0;
         return;
     }
     if (setsockopt(dnsSocket, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifaceReq, sizeof(ifaceReq)) == -1) {
-        LOGE("DnsChecker start wlan0 SO_BINDTODEVICE error:%{public}d.", errno);
+        LOGE("DnsChecker start SO_BINDTODEVICE error:%{public}d.", errno);
         close(dnsSocket);
         dnsSocket = 0;
         return;

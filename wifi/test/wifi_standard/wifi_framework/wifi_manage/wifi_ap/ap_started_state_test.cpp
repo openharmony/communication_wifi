@@ -181,7 +181,7 @@ HWTEST_F(ApStartedState_test, GoInState_SUCCESS,TestSize.Level1)
     EXPECT_CALL(MockNetworkInterface::GetInstance(), AddIpAddress(_, _)).WillRepeatedly(Return(true));
     EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(A<int>(), 0)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), StartAp(0)).WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    std::string countryCode = "CN";
+    std::string countryCode = "HK";
     EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(Eq("")))
         .WillRepeatedly(DoAll(testing::SetArgReferee<0>(countryCode), Return(0)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(Eq(countryCode), 0))

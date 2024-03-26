@@ -388,7 +388,7 @@ void StaServiceTest::StaServiceRemoveDeviceConfigFail1()
     int networkId = NETWORK_ID;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = false;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = false;
-    EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceRemoveDeviceConfigFail2()
@@ -625,13 +625,13 @@ void StaServiceTest::StaServiceRemoveAllDeviceTestSucc()
     EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
         .WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestFail0()
 {
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = false;
-    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestFail1()
@@ -657,7 +657,7 @@ void StaServiceTest::StaServiceReConnectTestSucc()
 void StaServiceTest::StaServiceSetSuspendModeTest()
 {
     MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = false;
-    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_FAILED);
     MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = true;
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
 }

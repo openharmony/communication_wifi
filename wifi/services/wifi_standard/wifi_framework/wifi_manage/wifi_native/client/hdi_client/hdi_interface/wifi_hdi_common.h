@@ -117,9 +117,8 @@ int8_t IsValidHexCharAndConvert(char c);
 int CheckMacIsValid(const char *macStr);
 
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
-uint8_t FillIfrName(char *ifrName, int ifrNameLen, int portType);
 int32_t GetFeatureType(int portType);
-void UpDownLink(int flag, int type, char *iface);
+void UpDownLink(int flag, int type, const char *iface);
 WifiErrorNo HdiSetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType);
 #endif
 #ifdef __cplusplus

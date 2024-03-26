@@ -29,6 +29,9 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #endif
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+#include "hal_device_manage.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("WifiP2pManager");
 
@@ -56,6 +59,16 @@ ErrCode WifiP2pManager::AutoStartP2pService()
             return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
         }
     }
+
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface(
+        std::bind(&WifiP2pManager::IfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
+        ifaceName)) {
+        WIFI_LOGE("AutoStartP2pService, create iface failed!");
+        return WIFI_OPT_FAILED;
+    }
+    WifiSettings::GetInstance().SetP2pIfaceName(ifaceName);
+#endif
 
     if (!WifiConfigCenter::GetInstance().SetP2pMidState(p2pState, WifiOprMidState::OPENING)) {
         WIFI_LOGE("AutoStartP2pService, set p2p mid state opening failed!");
@@ -178,6 +191,13 @@ void WifiP2pManager::CloseP2pService(void)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(P2pState::P2P_STATE_CLOSED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!ifaceName.empty()) {
+        DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveP2pIface(ifaceName);
+        ifaceName.clear();
+        WifiSettings::GetInstance().SetP2pIfaceName("");
+    }
+#endif
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close p2p SA!");
@@ -376,6 +396,18 @@ void WifiP2pManager::DealConfigChanged(CfgType type, char* data, int dataLen)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+
+void WifiP2pManager::IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType)
+{
+    WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
+        destoryIfaceName.c_str(), createIfaceType);
+    if (destoryIfaceName == ifaceName) {
+        ifaceName.clear();
+        WifiSettings::GetInstance().SetP2pIfaceName("");
+    }
+    return;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

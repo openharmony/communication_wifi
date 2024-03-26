@@ -37,7 +37,6 @@
 
 namespace OHOS {
 namespace Wifi {
-#define DEFAULT_IFACENAME "wlan0"
 class WifiIdlClient {
 public:
     /**
@@ -369,7 +368,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartAp(int id = 0, std::string ifaceName = DEFAULT_IFACENAME);
+    WifiErrorNo StartAp(int id, const std::string &ifaceName);
 
     /**
      * @Description Close Ap.

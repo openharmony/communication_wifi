@@ -1186,7 +1186,7 @@ bool SelfCureStateMachine::CanArpReachable()
     IpInfo ipInfo;
     WifiSettings::GetInstance().GetIpInfo(ipInfo, m_instId);
     std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
-    std::string ifName = "wlan" + std::to_string(m_instId);
+    std::string ifName = WifiSettings::GetInstance().GetStaIfaceName();
     if (ipInfo.gateway == 0) {
         WIFI_LOGE("gateway is null");
         return false;
@@ -1207,7 +1207,7 @@ bool SelfCureStateMachine::DoSlowArpTest(std::string testIpAddr)
     std::string macAddress;
     WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);
     std::string ipAddress = testIpAddr;
-    std::string ifName = "wlan" + std::to_string(m_instId);
+    std::string ifName = WifiSettings::GetInstance().GetStaIfaceName();
     IpInfo ipInfo;
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
@@ -1224,7 +1224,7 @@ bool SelfCureStateMachine::DoArpTest(std::string ipAddress, std::string gateway)
     ArpChecker arpChecker;
     std::string macAddress;
     WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);
-    std::string ifName = "wlan" + std::to_string(m_instId);
+    std::string ifName = WifiSettings::GetInstance().GetStaIfaceName();
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
     return arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true);
 }

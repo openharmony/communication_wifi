@@ -140,6 +140,8 @@ private:
     void checkAndContinueToStopWifi(InternalMessage *msg);
     void HandleStaStop();
     void HandleStaStart();
+    void ReportClose();
+    static void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
 
     DefaultState *pDefaultState;
     IdleState *pIdleState;
@@ -149,6 +151,7 @@ private:
     static int mTargetRole;
     ConcreteModeCallback mcb;
     static int mid;
+    static std::string ifaceName;
 };
 } // namespace Wifi
 } // namespace OHOS

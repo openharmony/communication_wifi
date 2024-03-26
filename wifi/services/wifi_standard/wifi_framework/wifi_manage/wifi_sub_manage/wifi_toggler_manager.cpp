@@ -18,6 +18,9 @@
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+#include "hal_device_manage.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("WifiTogglerManager")
 
@@ -26,6 +29,9 @@ namespace Wifi {
 WifiTogglerManager::WifiTogglerManager()
 {
     WIFI_LOGI("create WifiTogglerManager");
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    DelayedSingleton<HalDeviceManager>::GetInstance()->StartChipHdi();
+#endif
     InitConcreteCallback();
     InitSoftapCallback();
     pWifiControllerMachine = std::make_unique<WifiControllerMachine>();
@@ -46,10 +52,6 @@ SoftApModeCallback& WifiTogglerManager::GetSoftApCallback()
 
 ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
 {
-    if (!WifiSettings::GetInstance().GetCoexSupport() && isOpen) {
-        WIFI_LOGI("set softap toggled false");
-        WifiSettings::GetInstance().SetSoftapToggledState(false);
-    }
     pWifiControllerMachine->ClearWifiStartFailCount();
     pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
@@ -74,10 +76,6 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
     int airplanState = WifiConfigCenter::GetInstance().GetAirplaneModeState();
     if (airplanState == MODE_STATE_OPEN) {
         WIFI_LOGE("Airplane mode do not start scanonly.");
-        return WIFI_OPT_FAILED;
-    }
-    if (!WifiSettings::GetInstance().GetCoexSupport() && HasAnyApRuning()) {
-        WIFI_LOGE("Softap mode do not start scanonly.");
         return WIFI_OPT_FAILED;
     }
     pWifiControllerMachine->SendMessage(CMD_SCAN_ALWAYS_MODE_CHANGED, isOpen, 0);
@@ -111,6 +109,7 @@ void WifiTogglerManager::InitConcreteCallback()
     using namespace std::placeholders;
     mConcreteModeCb.onStartFailure = std::bind(&WifiTogglerManager::DealConcreateStartFailure, this, _1);
     mConcreteModeCb.onStopped = std::bind(&WifiTogglerManager::DealConcreateStop, this, _1);
+    mConcreteModeCb.onRemoved = std::bind(&WifiTogglerManager::DealClientRemoved, this, _1);
 }
 
 void WifiTogglerManager::InitSoftapCallback()
@@ -145,6 +144,13 @@ void WifiTogglerManager::DealSoftapStartFailure(int id)
 {
     if (pWifiControllerMachine) {
         pWifiControllerMachine->SendMessage(CMD_AP_START_FAILURE, id);
+    }
+}
+
+void WifiTogglerManager::DealClientRemoved(int id)
+{
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->SendMessage(CMD_CONCRETECLIENT_REMOVED, id);
     }
 }
 

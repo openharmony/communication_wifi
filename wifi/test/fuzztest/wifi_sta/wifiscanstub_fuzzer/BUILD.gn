@@ -52,6 +52,7 @@ ohos_fuzztest("WifiScanStubFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 

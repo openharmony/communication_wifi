@@ -41,6 +41,7 @@ ohos_fuzztest("WifiCP2PFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 

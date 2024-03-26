@@ -610,7 +610,7 @@ if (defined(ohos_lite)) {
       ":wifi_device_service_impl",
       ":wifi_manager_service",
     ]
-
+    external_deps = [ "hilog:libhilog" ]
     shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
@@ -630,7 +630,7 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service",
       ":wifi_scan_service_impl",
     ]
-
+    external_deps = [ "hilog:libhilog" ]
     shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
@@ -650,7 +650,7 @@ if (defined(ohos_lite)) {
       ":wifi_hotspot_service_impl",
       ":wifi_manager_service",
     ]
-
+    external_deps = [ "hilog:libhilog" ]
     shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
@@ -671,7 +671,7 @@ if (defined(ohos_lite)) {
         ":wifi_manager_service",
         ":wifi_p2p_service_impl",
       ]
-
+      external_deps = [ "hilog:libhilog" ]
       shlib_type = "sa"
       part_name = "wifi"
       subsystem_name = "communication"

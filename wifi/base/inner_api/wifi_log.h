@@ -28,15 +28,11 @@
 #undef LOG_DOMAIN
 #define  LOG_DOMAIN    0xD001560
 
-#define LOGD(...) ((void)HiLogPrint(LOG_CORE, LOG_DEBUG, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
-
-#define LOGI(...) ((void)HiLogPrint(LOG_CORE, LOG_INFO, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
-
-#define LOGW(...) ((void)HiLogPrint(LOG_CORE, LOG_WARN, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
-
-#define LOGE(...) ((void)HiLogPrint(LOG_CORE, LOG_ERROR, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
-
-#define LOGF(...) ((void)HiLogPrint(LOG_CORE, LOG_FATAL, LOG_DOMAIN, LOG_TAG, __VA_ARGS__))
+#define LOGD(...) HILOG_DEBUG(LOG_CORE, ##__VA_ARGS__)
+#define LOGI(...) HILOG_INFO(LOG_CORE, ##__VA_ARGS__)
+#define LOGW(...) HILOG_WARN(LOG_CORE, ##__VA_ARGS__)
+#define LOGE(...) HILOG_ERROR(LOG_CORE, ##__VA_ARGS__)
+#define LOGF(...) HILOG_FATAL(LOG_CORE, ##__VA_ARGS__)
 
 #ifndef CHECK_NULL_AND_RETURN
 #define CHECK_NULL_AND_RETURN(ptr, retValue) \

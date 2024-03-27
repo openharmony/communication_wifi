@@ -110,6 +110,12 @@ ohos_shared_library("wifi_ap_service") {
     defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
   }
 
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.powermgr_battery_manager)) {
+    external_deps += [ "battery_manager:batterysrv_client" ]
+    defines += [ "HAS_BATTERY_MANAGER_PART" ]
+  }
+
   part_name = "wifi"
   subsystem_name = "communication"
   version_script = "libwifi_ap_service.map"

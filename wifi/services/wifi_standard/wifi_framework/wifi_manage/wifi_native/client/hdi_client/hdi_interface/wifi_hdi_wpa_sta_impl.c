@@ -579,6 +579,22 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
 #else
     g_hdiWpaStaCallbackObj->OnEventScanResult = callback->OnEventScanResult;
 #endif
+    g_hdiWpaStaCallbackObj->OnEventDeviceFound = NULL;
+    g_hdiWpaStaCallbackObj->OnEventDeviceLost = NULL;
+    g_hdiWpaStaCallbackObj->OnEventGoNegotiationRequest = NULL;
+    g_hdiWpaStaCallbackObj->OnEventGoNegotiationCompleted = NULL;
+    g_hdiWpaStaCallbackObj->OnEventInvitationReceived = NULL;
+    g_hdiWpaStaCallbackObj->OnEventInvitationResult = NULL;
+    g_hdiWpaStaCallbackObj->OnEventGroupFormationSuccess = NULL;
+    g_hdiWpaStaCallbackObj->OnEventGroupFormationFailure = NULL;
+    g_hdiWpaStaCallbackObj->OnEventGroupStarted = NULL;
+    g_hdiWpaStaCallbackObj->OnEventGroupRemoved = NULL;
+    g_hdiWpaStaCallbackObj->OnEventProvisionDiscoveryCompleted = NULL;
+    g_hdiWpaStaCallbackObj->OnEventFindStopped = NULL;
+    g_hdiWpaStaCallbackObj->OnEventServDiscReq = NULL;
+    g_hdiWpaStaCallbackObj->OnEventServDiscResp = NULL;
+    g_hdiWpaStaCallbackObj->OnEventStaConnectState = NULL;
+    g_hdiWpaStaCallbackObj->OnEventIfaceCreated = NULL;
     g_hdiWpaStaCallbackObj->GetVersion = NULL;
     g_hdiWpaStaCallbackObj->AsObject = NULL;
 

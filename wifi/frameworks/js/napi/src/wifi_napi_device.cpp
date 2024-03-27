@@ -169,6 +169,8 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
         SetValueInt32(env, "centerFrequency1", each.centerFrequency1, eachObj);
         NativeInfoElemsToJsObj(env, each.infoElems, eachObj);
         SetValueInt64(env, "timestamp", each.timestamp, eachObj);
+        SetValueInt32(env, "supportedWifiCategory", static_cast<int>(each.supportedWifiCategory), eachObj);
+        SetValueBool(env, "isHiLinkNetwork", each.isHiLinkNetwork, eachObj);
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);

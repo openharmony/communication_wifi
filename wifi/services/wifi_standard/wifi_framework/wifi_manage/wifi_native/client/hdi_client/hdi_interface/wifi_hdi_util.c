@@ -1270,4 +1270,43 @@ int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *dest
     }
     return 0;
 }
+
+void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
+{
+    const struct HdiElem *elem;
+    int ieIndex = 0;
+    ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
+    if (infoElemsTemp == NULL) {
+        LOGE("failed to alloc memory");
+        return;
+    }
+    memset_s(infoElemsTemp, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem),
+        0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem));
+    HDI_CHECK_ELEMENT(elem, start, len) {
+        uint8_t id = elem->id, elen = elem->datalen;
+        infoElemsTemp[ieIndex].id = id;
+        infoElemsTemp[ieIndex].size = elen;
+        infoElemsTemp[ieIndex].content = (char *)calloc(elen+1, sizeof(char));
+        if (infoElemsTemp[ieIndex].content == NULL) {
+            break;
+        }
+        if (memcpy_s(infoElemsTemp[ieIndex].content, elen+1, elem->data, elen) != EOK) {
+            LOGE("memcpy content fail");
+        }
+        ieIndex++;
+    }
+    // clear old infoElems first
+    if (scanInfo->infoElems != NULL) {
+        for (int i = 0; i < scanInfo->ieSize; i++) {
+            if (scanInfo->infoElems[i].content != NULL) {
+                free(scanInfo->infoElems[i].content);
+                scanInfo->infoElems[i].content = NULL;
+            }
+        }
+        free(scanInfo->infoElems);
+        scanInfo->infoElems = NULL;
+    }
+    scanInfo->infoElems = infoElemsTemp;
+    scanInfo->ieSize = ieIndex;
+}
 #endif

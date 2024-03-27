@@ -17,7 +17,6 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
-  import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 }
 
 group("etc") {

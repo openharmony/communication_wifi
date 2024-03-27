@@ -526,6 +526,26 @@ WifiErrorNo WifiStaHalInterface::SetDpiMarkRule(int uid, int protocol, int enabl
 #endif
 }
 
+WifiErrorNo WifiStaHalInterface::GetChipsetCategory(int& chipsetCategory)
+{
+#ifdef HDI_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
+    return mHdiClient->ReqGetChipsetCategory(chipsetCategory);
+#else
+    return WIFI_IDL_OPT_OK;
+#endif
+}
+
+WifiErrorNo WifiStaHalInterface::GetChipsetWifiFeatrureCapability(int& chipsetFeatrureCapability)
+{
+#ifdef HDI_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
+    return mHdiClient->ReqGetChipsetWifiFeatrureCapability(chipsetFeatrureCapability);
+#else
+    return WIFI_IDL_OPT_OK;
+#endif
+}
+
 const WifiEventCallback &WifiStaHalInterface::GetCallbackInst(void) const
 {
     return mStaCallback;

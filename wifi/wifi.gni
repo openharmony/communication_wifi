@@ -16,6 +16,7 @@ fuzz_test_output_path = "wifi/wifi/wifi_sta"
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
 DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"
+CONFIG_CTRL_IFACE = "unix"
 
 declare_args() {
   wifi_feature_with_p2p = true
@@ -34,6 +35,10 @@ declare_args() {
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_efficiency_manager)) {
     wifi_feature_with_app_frozen = true
+  }
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_ffrt)) {
+    wifi_ffrt_enable = true
   }
   wifi_feature_sta_ap_exclusion = true
   wifi_feature_with_random_mac_addr = true

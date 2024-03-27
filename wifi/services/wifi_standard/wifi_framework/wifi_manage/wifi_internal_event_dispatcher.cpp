@@ -112,7 +112,7 @@ WifiInternalEventDispatcher &WifiInternalEventDispatcher::GetInstance()
     return gWifiEventBroadcast;
 }
 
-WifiInternalEventDispatcher::WifiInternalEventDispatcher() : mRunFlag(true)
+WifiInternalEventDispatcher::WifiInternalEventDispatcher()
 {}
 
 WifiInternalEventDispatcher::~WifiInternalEventDispatcher()
@@ -121,9 +121,7 @@ WifiInternalEventDispatcher::~WifiInternalEventDispatcher()
 int WifiInternalEventDispatcher::Init()
 {
     /* first init system notify service client here ! */
-
-    mBroadcastThread = std::thread(WifiInternalEventDispatcher::Run, std::ref(*this));
-    pthread_setname_np(mBroadcastThread.native_handle(), "InnerDisThread");
+    mBroadcastThread = std::make_unique<WifiEventHandler>("InnerDisThread");
     return 0;
 }
 
@@ -156,7 +154,6 @@ ErrCode WifiInternalEventDispatcher::AddStaCallback(
     std::unique_lock<std::mutex> lock(mStaCallbackMutex);
     auto iter = mStaCallbacks.find(instId);
     if (iter != mStaCallbacks.end()) {
-        (iter->second)[remote] = callback;
         (iter->second)[remote] = callback;
         auto itr = mStaCallBackInfo[instId].find(remote);
         if (itr != mStaCallBackInfo[instId].end()) {
@@ -510,26 +507,43 @@ int WifiInternalEventDispatcher::RemoveP2pCallback(const sptr<IRemoteObject> &re
     return 0;
 }
 
+void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
+{
+    WIFI_LOGD("WifiInternalEventDispatcher::Run broad cast a msg %{public}d", msg.msgCode);
+    if (msg.msgCode >= WIFI_CBK_MSG_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_STA) {
+        DealStaCallbackMsg(instance, msg);
+    } else if (msg.msgCode == WIFI_CBK_MSG_SCAN_STATE_CHANGE) {
+        DealScanCallbackMsg(instance, msg);
+    } else if (msg.msgCode >= WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE &&
+               msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_HOTSPOT) {
+        DealHotspotCallbackMsg(instance, msg);
+    } else if (msg.msgCode >= WIFI_CBK_MSG_P2P_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_P2P) {
+        DealP2pCallbackMsg(instance, msg);
+    } else {
+        WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+    }
+    return;
+}
+
 int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddBroadCastMsg, msgcode %{public}d", msg.msgCode);
-    {
-        std::unique_lock<std::mutex> lock(mMutex);
-        mEventQue.push_back(msg);
+    std::function<void()> func = std::bind([this, msg]() {
+        Run(std::ref(*this), msg);
+    });
+    int delayTime = 0;
+    bool result = mBroadcastThread->PostAsyncTask(func, delayTime);
+    if (!result) {
+        WIFI_LOGF("WifiInternalEventDispatcher::AddBroadCastMsg failed %{public}d", msg.msgCode);
+        return -1;
     }
-    mCondition.notify_one();
     return 0;
 }
 
 void WifiInternalEventDispatcher::Exit()
 {
-    if (!mRunFlag) {
-        return;
-    }
-    mRunFlag = false;
-    mCondition.notify_one();
-    if (mBroadcastThread.joinable()) {
-        mBroadcastThread.join();
+    if (mBroadcastThread) {
+        mBroadcastThread.reset();
     }
 }
 
@@ -633,7 +647,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
 #ifdef FEATURE_APP_FROZEN
             int uid = mScanCallBackInfo[msg.id][remote].callingUid;
             int pid = mScanCallBackInfo[msg.id][remote].callingPid;
-            isFrozen = IsAppFrozen(uid);
+            isFrozen = IsAppFrozen(pid);
             WIFI_LOGI("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
                 %{public}d", uid, pid, isFrozen);
 #endif
@@ -676,7 +690,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
 #ifdef FEATURE_APP_FROZEN
             int uid = mStaCallBackInfo[msg.id][remote].callingUid;
             int pid = mStaCallBackInfo[msg.id][remote].callingPid;
-            isFrozen = IsAppFrozen(uid);
+            isFrozen = IsAppFrozen(pid);
             WIFI_LOGD("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
                 %{public}d", uid, pid, isFrozen);
 #endif
@@ -963,36 +977,6 @@ void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state)
     WIFI_LOGD("publish wifi state changed event.");
 }
 
-void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance)
-{
-    while (instance.mRunFlag) {
-        std::unique_lock<std::mutex> lock(instance.mMutex);
-        while (instance.mEventQue.empty() && instance.mRunFlag) {
-            instance.mCondition.wait(lock);
-        }
-        if (!instance.mRunFlag) {
-            break;
-        }
-        WifiEventCallbackMsg msg = instance.mEventQue.front();
-        instance.mEventQue.pop_front();
-        lock.unlock();
-        WIFI_LOGD("WifiInternalEventDispatcher::Run broad cast a msg %{public}d", msg.msgCode);
-        if (msg.msgCode >= WIFI_CBK_MSG_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_STA) {
-            DealStaCallbackMsg(instance, msg);
-        } else if (msg.msgCode == WIFI_CBK_MSG_SCAN_STATE_CHANGE) {
-            DealScanCallbackMsg(instance, msg);
-        } else if (msg.msgCode >= WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE &&
-                   msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_HOTSPOT) {
-            DealHotspotCallbackMsg(instance, msg);
-        } else if (msg.msgCode >= WIFI_CBK_MSG_P2P_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_P2P) {
-            DealP2pCallbackMsg(instance, msg);
-        } else {
-            WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
-        }
-    }
-    return;
-}
-
 bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackEventId)
 {
     if (g_CallbackEventChkSysAppList.find(callbackEventId) != g_CallbackEventChkSysAppList.end()) {
@@ -1024,33 +1008,31 @@ bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackE
     return hasPermission;
 }
 
-void WifiInternalEventDispatcher::SetAppFrozen(int uid, bool isFrozen)
+void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
-    WIFI_LOGD("Set App Frozen:%{private}d, isFrozen:%{public}d", uid, isFrozen);
-    auto it = std::find_if(vecFrozenAppInfo.begin(), vecFrozenAppInfo.end(),
-        [&uid](const int tmp) {
-            return tmp == uid;
-    });
-    if (isFrozen && it == vecFrozenAppInfo.end()) {
-        vecFrozenAppInfo.push_back(uid);
-    } else if (!isFrozen && it != vecFrozenAppInfo.end()) {
-        vecFrozenAppInfo.erase(it);
+    std::unique_lock<std::mutex> lock(mPidFrozenMutex);
+    WIFI_LOGI("%{public}s, list size:%{public}u, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
+    for (auto itr : pidList) {
+        if (isFrozen) {
+            frozenPidList.insert(itr);
+        } else {
+            frozenPidList.erase(itr);
+        }
     }
+    WIFI_LOGI("%{public}s finish, size:%{public}u", __func__, frozenPidList.size());
 }
 
 void WifiInternalEventDispatcher::ResetAllFrozenApp()
 {
+    std::unique_lock<std::mutex> lock(mPidFrozenMutex);
     WIFI_LOGI("WifiInternalEventDispatcher::Reset All Frozen App");
-    vecFrozenAppInfo.clear();
+    frozenPidList.clear();
 }
 
-bool WifiInternalEventDispatcher::IsAppFrozen(int uid)
+bool WifiInternalEventDispatcher::IsAppFrozen(int pid)
 {
-    auto it = std::find_if(vecFrozenAppInfo.begin(), vecFrozenAppInfo.end(),
-        [&uid](const int tmp) {
-            return tmp == uid;
-    });
-    if (it != vecFrozenAppInfo.end()) {
+    auto it = frozenPidList.find(pid);
+    if (it != frozenPidList.end()) {
         return true;
     }
     return false;

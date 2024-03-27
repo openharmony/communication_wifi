@@ -21,7 +21,6 @@
 #include "wifi_error_no.h"
 #include "wifi_hdi_struct.h"
 #include "v1_2/iwlan_interface.h"
-#include "wifi_hal_base_feature.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -145,6 +144,20 @@ WifiErrorNo HdiSetPmMode(int frequency, int mode);
 WifiErrorNo HdiSetDpiMarkRule(int uid, int protocol, int enable);
 
 void HdiNotifyScanResult(int status);
+
+/**
+ * @Description Get wifi chipset category form driver
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiGetChipsetCategory(int* chipsetCategory);
+
+/**
+ * @Description Get wifi featrure capability form driver
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo HdiGetChipsetWifiFeatrureCapability(int* chipsetFeatrureCapability);
 #ifdef __cplusplus
 }
 #endif

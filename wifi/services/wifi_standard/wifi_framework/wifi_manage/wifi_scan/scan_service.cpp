@@ -56,7 +56,9 @@ ScanService::ScanService(int instId)
       scanResultBackup(-1),
       mEnhanceService(nullptr),
       m_instId(instId),
-      lastNetworkQuality(0)
+      lastNetworkQuality(0),
+      chipsetCategory(static_cast<int>(WifiCategory::DEFAULT)),
+      chipsetFeatrureCapability(0)
 {}
 
 ScanService::~ScanService()
@@ -113,6 +115,13 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ_DFS_ONLY, freqsDfs) !=
         WIFI_IDL_OPT_OK)) {
         WIFI_LOGE("GetSupportFrequencies failed.\n");
+    }
+    if (WifiStaHalInterface::GetInstance().GetChipsetCategory(chipsetCategory) != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("GetChipsetCategory failed.\n");
+    }
+    if (WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(chipsetFeatrureCapability)
+        != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("GetChipsetWifiFeatrureCapability failed.\n");
     }
 
     ChannelsTable chanTbs;
@@ -726,6 +735,12 @@ bool ScanService::StoreFullScanInfo(
                 storedIter->bssid, "");
         #endif
         }
+        if (mEnhanceService != nullptr) {
+            storedIter->supportedWifiCategory = mEnhanceService->GetWifiCategory(storedIter->infoElems,
+                chipsetCategory, chipsetFeatrureCapability);
+            WIFI_LOGD("GetWifiCategory supportedWifiCategory=%{public}d.\n",
+                static_cast<int>(storedIter->supportedWifiCategory));
+        }
         results.push_back(*storedIter);
         WifiSettings::GetInstance().UpdateLinkedChannelWidth(storedIter->bssid, storedIter->channelWidth, m_instId);
     }
@@ -930,12 +945,10 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
     for (; iter != scanInfoList.end(); ++iter) {
         if ((iter->timestamp / SECOND_TO_MILLI_SECOND) > pnoScanStartTime) {
             filterScanInfo.push_back(*iter);
-            WIFI_LOGI("InterScanInfo.bssid is %{private}s.\n", MacAnonymize(iter->bssid).c_str());
-            WIFI_LOGI("InterScanInfo.ssid is %{public}s.\n", SsidAnonymize(iter->ssid).c_str());
-            WIFI_LOGI("InterScanInfo.capabilities is %{public}s.\n", iter->capabilities.c_str());
-            WIFI_LOGI("InterScanInfo.frequency is %{public}d.\n", iter->frequency);
-            WIFI_LOGI("InterScanInfo.rssi is %{public}d.\n", iter->rssi);
-            WIFI_LOGI("InterScanInfo.timestamp is %" PRId64 ".\n", iter->timestamp);
+            WIFI_LOGI("InterScanInfo bssid:%{public}s, ssid:%{public}s, capabilities:%{public}s,"
+                "frequency:%{public}d, rssi:%{public}d, timestamp:%" PRId64 ".\n",
+                MacAnonymize(iter->bssid).c_str(), SsidAnonymize(iter->ssid).c_str(), iter->capabilities.c_str(),
+                iter->frequency, iter->rssi, iter->timestamp);
         }
     }
 
@@ -989,6 +1002,7 @@ void ScanService::HandleStaStatusChanged(int status)
         }
         case static_cast<int>(OperateResState::CONNECT_AP_CONNECTED): {
             SystemScanProcess(false);
+            std::unique_lock<std::mutex> lock(scanConfigMapMutex);
             scanConfigMap.clear();
             break;
         }

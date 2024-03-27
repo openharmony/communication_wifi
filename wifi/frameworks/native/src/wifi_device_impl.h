@@ -389,11 +389,11 @@ public:
     /**
      * @Description set frozen app
      *
-     * @param uid - uid of frozen app
+     * @param pidList - pids of frozen app
      * @param isFrozen - is app frozen
      * @return ErrCode - operation result
      */
-    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+    ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) override;
 
     /**
      * @Description reset all frozen app

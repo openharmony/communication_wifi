@@ -19,26 +19,48 @@
 #include <string>
 #include <memory>
 
-#include "event_handler.h"
-#include "event_runner.h"
-
 namespace OHOS {
 namespace Wifi {
 class WifiEventHandler {
 public:
-    using Callback = AppExecFwk::EventHandler::Callback;
-    using Priority = AppExecFwk::EventHandler::Priority;
+    using Callback = std::function<void()>;
 
     explicit WifiEventHandler(const std::string &threadName);
     ~WifiEventHandler();
+/**
+ * @submit sync task to Handler
+ *
+ * @param Callback - Input task
+ * @return bool - true: submit success, false: submit failed
+ */
     bool PostSyncTask(const Callback &callback);
+/**
+ * @submit Async task to Handler
+ *
+ * @param Callback - Input task
+ * @param delayTime - Wait delayTime ms excute task
+ * @return bool - true: submit success, false: submit failed
+ */
     bool PostAsyncTask(const Callback &callback, int64_t delayTime = 0);
-    bool PostAsyncTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
+/**
+ * @submit Async task to Handler
+ *
+ * @param Callback - Input task
+ * @param name - Describer of task
+ * @param delayTime - Wait delayTime ms excute task
+ * @return bool - true: submit success, false: submit failed
+ */
+    bool PostAsyncTask(const Callback &callback, const std::string &name, int64_t delayTime = 0);
+/**
+ * @Remove Async task
+ *
+ * @param name - Describer of task
+ */
     void RemoveAsyncTask(const std::string &name);
 
 private:
-    std::shared_ptr<AppExecFwk::EventRunner> eventRunner = nullptr;
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    class WifiEventHandlerImpl;
+    std::unique_ptr<WifiEventHandlerImpl> ptr;
 };
 } // namespace Wifi
 } // namespace OHOS

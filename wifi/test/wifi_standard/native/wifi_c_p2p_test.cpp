@@ -14,8 +14,8 @@
  */
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "../../../interfaces/kits/c/wifi_p2p.h"
-#include "../../../interfaces/kits/c/wifi_hid2d.h"
+#include "kits/c/wifi_p2p.h"
+#include "kits/c/wifi_hid2d.h"
 #include "securec.h"
 #include "wifi_logger.h"
 

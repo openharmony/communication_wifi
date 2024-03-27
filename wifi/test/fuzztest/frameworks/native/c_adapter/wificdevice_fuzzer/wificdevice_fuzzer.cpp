@@ -17,7 +17,7 @@
 #include "securec.h"
 #include "wificdevice_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
-#include "../../../../../../interfaces/kits/c/wifi_device.h"
+#include "kits/c/wifi_device.h"
 
 
 static void EnableWifiTest()

@@ -81,6 +81,12 @@ enum class WifiChannelWidth {
     WIDTH_INVALID
 };
 
+enum class WifiCategory {
+    DEFAULT = 1,
+    WIFI6 = 2,
+    WIFI6_PLUS = 3
+};
+
 struct WifiInfoElem {
     unsigned int id;
     std::vector<char> content;
@@ -136,6 +142,8 @@ struct WifiScanInfo {
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
     int disappearCount;
+    bool isHiLinkNetwork;
+    WifiCategory supportedWifiCategory;
     WifiScanInfo()
     {
         bssidType = REAL_DEVICE_ADDRESS;
@@ -151,6 +159,8 @@ struct WifiScanInfo {
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
+        isHiLinkNetwork = false;
+        supportedWifiCategory = WifiCategory::DEFAULT;
     }
 };
 

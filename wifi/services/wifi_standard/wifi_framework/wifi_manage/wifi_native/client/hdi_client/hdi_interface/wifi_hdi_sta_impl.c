@@ -134,6 +134,35 @@ static WifiErrorNo InitScanResults()
     return WIFI_IDL_OPT_OK;
 }
 
+static void GetScanInfoElems(ScanInfo* src, ScanInfo* scanInfo)
+{
+    const int MAX_INFO_ELEMS_SIZE = 256;
+    scanInfo->ieSize = src->ieSize;
+    if (scanInfo->ieSize <= 0 || scanInfo->ieSize > MAX_INFO_ELEMS_SIZE) {
+        return;
+    }
+    scanInfo->infoElems = (ScanInfoElem *)calloc(scanInfo->ieSize, sizeof(ScanInfoElem));
+    if (scanInfo->infoElems == NULL) {
+        return;
+    }
+    for (int i = 0; i < scanInfo->ieSize; ++i) {
+        scanInfo->infoElems[i].id = src->infoElems[i].id;
+        scanInfo->infoElems[i].size = src->infoElems[i].size;
+        if (scanInfo->infoElems[i].size <= 0) {
+            continue;
+        }
+        /* This pointer will be released in its client */
+        scanInfo->infoElems[i].content = calloc(scanInfo->infoElems[i].size + 1, sizeof(char));
+        if (scanInfo->infoElems[i].content == NULL) {
+            return;
+        }
+        if (memcpy_s(scanInfo->infoElems[i].content, scanInfo->infoElems[i].size + 1,
+            src->infoElems[i].content, src->infoElems[i].size) != EOK) {
+            return;
+        }
+    }
+}
+
 static WifiErrorNo GetScanInfos(ScanInfo* infos, int *size)
 {
     if (infos == NULL || size == NULL || *size == 0) {
@@ -156,6 +185,9 @@ static WifiErrorNo GetScanInfos(ScanInfo* infos, int *size)
         return WIFI_IDL_OPT_FAILED;
     }
     *size = g_hdiWifiScanResultsCount;
+    for (int i = 0; i < *size; i++) {
+        GetScanInfoElems(&g_hdiWifiScanResults[i], &infos[i]);
+    }
     for (int i = 0; i < WIFI_IDL_GET_MAX_SCAN_INFO; i++) {
         ReleaseScanResultsInfoElems(&g_hdiWifiScanResults[i]);
     }
@@ -406,6 +438,8 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
             LOGE("%{public}s: failed to obtain the scanning result", __func__);
             continue;
         }
+        GetScanResultInfoElem(&g_hdiWifiScanResults[g_hdiWifiScanResultsCount],
+            (const uint8_t*)scanResult->ie, scanResult->ieLen);
         g_hdiWifiScanResults[g_hdiWifiScanResultsCount].timestamp = scanResult->tsf;
         LOGD("%{public}s: bssid:%{private}s, ssid:%{private}s",
             __func__,
@@ -575,6 +609,40 @@ WifiErrorNo HdiSetDpiMarkRule(int uid, int protocol, int enable)
     if (ret != 0) {
         LOGE("%{public}s: failed to set dpi mark rule, ret:%{public}d.", __func__, ret);
         return WIFI_IDL_OPT_FAILED;
+    }
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiGetChipsetCategory(int* chipsetCategory)
+{
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    if (proxy.wlanObj == NULL || proxy.feature == NULL) {
+        pthread_mutex_unlock(&g_hdiWifiCallbackMutex);
+        LOGE("%{public}s: Hdi proxy is NULL!", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int8_t param[1] = {0};
+    *chipsetCategory = proxy.wlanObj->WifiSendCmdIoctl(proxy.wlanObj, "wlan0",
+        CMD_GET_WIFI_CATEGORY, (const int8_t *)param, 1);
+    if (*chipsetCategory < 1) {
+        *chipsetCategory = 1;
+    }
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiGetChipsetWifiFeatrureCapability(int* chipsetFeatrureCapability)
+{
+    WifiHdiProxy proxy = GetHdiProxy(PROTOCOL_80211_IFTYPE_STATION);
+    if (proxy.wlanObj == NULL || proxy.feature == NULL) {
+        pthread_mutex_unlock(&g_hdiWifiCallbackMutex);
+        LOGE("%{public}s: Hdi proxy is NULL!", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int8_t param[1] = {0};
+    *chipsetFeatrureCapability = proxy.wlanObj->WifiSendCmdIoctl(proxy.wlanObj, "wlan0",
+        CMD_GET_FEATURE_CAPAB, (const int8_t *)param, 1);
+    if (*chipsetFeatrureCapability < WIFI_CAPABILITY_DEFAULT) {
+        *chipsetFeatrureCapability = WIFI_CAPABILITY_DEFAULT;
     }
     return WIFI_IDL_OPT_OK;
 }

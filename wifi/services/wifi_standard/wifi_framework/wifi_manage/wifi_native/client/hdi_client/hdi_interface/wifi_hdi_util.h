@@ -41,6 +41,15 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length);
  * @return int - return result. 0 is Failed ,1 is Success
  */
 int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *destMacStr, int strLen);
+
+/**
+ * @Description Get ie from scan result
+ *
+ * @param scanInfo - output scan info
+ * @param start - ie point
+ * @param len - ie length
+ */
+void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len);
 #ifdef __cplusplus
 }
 #endif

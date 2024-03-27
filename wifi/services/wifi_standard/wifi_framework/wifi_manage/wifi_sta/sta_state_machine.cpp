@@ -144,7 +144,7 @@ StaStateMachine::~StaStateMachine()
 ErrCode StaStateMachine::InitStaStateMachine()
 {
     WIFI_LOGI("Enter InitStaStateMachine.\n");
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("StaStateMachine")) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }

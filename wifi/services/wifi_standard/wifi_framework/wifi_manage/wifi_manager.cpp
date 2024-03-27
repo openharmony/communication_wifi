@@ -61,7 +61,7 @@ int WifiManager::Init()
 {
 #ifndef OHOS_ARCH_LITE
     if (WifiCountryCodeManager::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiCountryCodeManager Init failed !");
+        WIFI_LOGE("WifiCountryCodeManager Init failed!");
         mInitStatus = WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED;
         return -1;
     }
@@ -90,8 +90,7 @@ int WifiManager::Init()
         mInitStatus = EVENT_BROADCAST_INIT_FAILED;
         return -1;
     }
-    mCloseServiceThread = std::thread(&WifiManager::DealCloseServiceMsg, this);
-    pthread_setname_np(mCloseServiceThread.native_handle(), "WifiCloseThread");
+    mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
 #endif
@@ -113,9 +112,10 @@ int WifiManager::Init()
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread");
         WifiSettings::GetInstance().SetWifiToggledState(true);
-        std::thread startStaSrvThread(&WifiManager::AutoStartServiceThread, this);
-        pthread_setname_np(startStaSrvThread.native_handle(), "AutoStartThread");
-        startStaSrvThread.detach();
+        mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
+        mStartServiceThread->PostAsyncTask([this]() {
+            AutoStartServiceThread();
+        });
     } else {
         /**
          * The sta service automatically starts upon startup. After the sta
@@ -137,9 +137,12 @@ void WifiManager::Exit()
     WIFI_LOGI("[WifiManager] Exit.");
     WifiServiceManager::GetInstance().UninstallAllService();
     WifiInternalEventDispatcher::GetInstance().Exit();
-    if (mCloseServiceThread.joinable()) {
-        PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
-        mCloseServiceThread.join();
+    PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
+    if (mCloseServiceThread) {
+        mCloseServiceThread.reset();
+    }
+    if (mStartServiceThread) {
+        mStartServiceThread.reset();
     }
     if (wifiStaManager) {
         wifiStaManager.reset();
@@ -189,12 +192,38 @@ void WifiManager::AddSupportedFeatures(WifiFeatures feature)
 
 void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-    WifiCloseServiceMsg msg;
-    msg.code = code;
-    msg.instId = instId;
-    mEventQue.push_back(msg);
-    mCondition.notify_one();
+    switch (code) {
+        case WifiCloseServiceCode::STA_SERVICE_CLOSE:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiStaManager->CloseStaService(instId);
+            });
+            break;
+        case WifiCloseServiceCode::SCAN_SERVICE_CLOSE:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiScanManager->CloseScanService(instId);
+            });
+            break;
+#ifdef FEATURE_AP_SUPPORT
+        case WifiCloseServiceCode::AP_SERVICE_CLOSE:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiHotspotManager->CloseApService(instId);
+            });
+            break;
+#endif
+#ifdef FEATURE_P2P_SUPPORT
+        case WifiCloseServiceCode::P2P_SERVICE_CLOSE:
+            mCloseServiceThread->PostAsyncTask([this]() {
+                wifiP2pManager->CloseP2pService();
+            });
+            break;
+#endif
+        case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
+            WIFI_LOGI("DealCloseServiceMsg exit!");
+            return;
+        default:
+            WIFI_LOGW("Unknown message code, %{public}d", static_cast<int>(code));
+            break;
+    }
     return;
 }
 
@@ -302,47 +331,6 @@ void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
 InitStatus WifiManager::GetInitStatus()
 {
     return mInitStatus;
-}
-
-void WifiManager::DealCloseServiceMsg()
-{
-    const int waitDealTime = 10 * 1000; /* 10 ms */
-    while (true) {
-        std::unique_lock<std::mutex> lock(mMutex);
-        while (mEventQue.empty()) {
-            mCondition.wait(lock);
-        }
-        WifiCloseServiceMsg msg = mEventQue.front();
-        mEventQue.pop_front();
-        lock.unlock();
-        usleep(waitDealTime);
-        switch (msg.code) {
-            case WifiCloseServiceCode::STA_SERVICE_CLOSE:
-                wifiStaManager->CloseStaService(msg.instId);
-                break;
-            case WifiCloseServiceCode::SCAN_SERVICE_CLOSE:
-                wifiScanManager->CloseScanService(msg.instId);
-                break;
-#ifdef FEATURE_AP_SUPPORT
-            case WifiCloseServiceCode::AP_SERVICE_CLOSE:
-                wifiHotspotManager->CloseApService(msg.instId);
-                break;
-#endif
-#ifdef FEATURE_P2P_SUPPORT
-            case WifiCloseServiceCode::P2P_SERVICE_CLOSE:
-                wifiP2pManager->CloseP2pService();
-                break;
-#endif
-            case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
-                WIFI_LOGI("DealCloseServiceMsg thread exit!");
-                return;
-            default:
-                WIFI_LOGW("Unknown message code, %{public}d", static_cast<int>(msg.code));
-                break;
-        }
-    }
-    WIFI_LOGD("WifiManager Thread exit");
-    return;
 }
 
 void WifiManager::CheckAndStartSta()

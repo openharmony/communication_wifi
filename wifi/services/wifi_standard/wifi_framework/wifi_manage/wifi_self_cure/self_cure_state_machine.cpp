@@ -86,7 +86,7 @@ ErrCode SelfCureStateMachine::InitSelfCureStates()
 
 ErrCode SelfCureStateMachine::Initialize()
 {
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("SelfCureStateMachine")) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }

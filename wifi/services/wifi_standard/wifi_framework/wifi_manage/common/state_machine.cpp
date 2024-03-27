@@ -35,7 +35,7 @@ StateMachine::~StateMachine()
     }
 }
 
-bool StateMachine::InitialStateMachine()
+bool StateMachine::InitialStateMachine(const std::string &name)
 {
     LOGI("InitialStateMachine\n");
     pStateMachineHandler = new (std::nothrow) StateMachineHandler(this);
@@ -44,7 +44,7 @@ bool StateMachine::InitialStateMachine()
         return false;
     }
 
-    if (!pStateMachineHandler->InitialSmHandler()) {
+    if (!pStateMachineHandler->InitialSmHandler(name)) {
         LOGE("InitialStateMachineHandler failed.\n");
         return false;
     }
@@ -305,9 +305,9 @@ StateMachineHandler::~StateMachineHandler()
     return;
 }
 
-bool StateMachineHandler::InitialSmHandler()
+bool StateMachineHandler::InitialSmHandler(const std::string &name)
 {
-    if (!InitialHandler()) {
+    if (!InitialHandler(name)) {
         LOGE("InitialHandler failed.");
         return false;
     }

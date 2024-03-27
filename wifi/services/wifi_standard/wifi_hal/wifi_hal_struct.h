@@ -17,6 +17,7 @@
 #define OHOS_WIFI_HAL_STRUCT_H
 
 #include "wifi_hal_define.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,6 +103,7 @@ typedef struct ScanInfo {
     int isErpExist;
     int maxRates;
     int extMaxRates;
+    bool isHiLinkNetwork;
 } ScanInfo;
 
 typedef struct WifiNetworkInfo {

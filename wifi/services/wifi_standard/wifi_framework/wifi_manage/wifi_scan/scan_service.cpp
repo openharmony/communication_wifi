@@ -709,6 +709,7 @@ bool ScanService::StoreFullScanInfo(
         scanInfo.maxSupportedRxLinkSpeed = GetWifiMaxSupportedMaxSpeed(*iter, MAX_RX_SPATIAL_STREAMS);
         scanInfo.maxSupportedTxLinkSpeed = GetWifiMaxSupportedMaxSpeed(*iter, MAX_TX_SPATIAL_STREAMS);
         iter->GetWifiStandard(scanInfo.wifiStandard);
+        scanInfo.isHiLinkNetwork = iter->isHiLinkNetwork;
         storeInfoList.push_back(scanInfo);
     }
 

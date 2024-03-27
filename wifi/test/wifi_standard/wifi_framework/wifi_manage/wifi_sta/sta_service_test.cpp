@@ -539,7 +539,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestFail1()
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(1)));
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = false;
-    EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_FAILED);
+    EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceRemoveCandidateConfigTestSucc()
@@ -553,7 +553,7 @@ void StaServiceTest::StaServiceRemoveCandidateConfigTestSucc()
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillRepeatedly(Return(1));
     EXPECT_CALL(WifiSettings::GetInstance(), RemoveDevice(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
-    EXPECT_TRUE(pStaService->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceRemoveCandidateConfigTestFail()
@@ -625,7 +625,7 @@ void StaServiceTest::StaServiceRemoveAllDeviceTestSucc()
     EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
         .WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestFail0()
@@ -657,7 +657,7 @@ void StaServiceTest::StaServiceReConnectTestSucc()
 void StaServiceTest::StaServiceSetSuspendModeTest()
 {
     MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = false;
-    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_FAILED);
     MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = true;
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
 }

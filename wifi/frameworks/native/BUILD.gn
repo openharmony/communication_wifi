@@ -77,7 +77,6 @@ if (defined(ohos_lite)) {
 
   config("wifi_sdk_header") {
     include_dirs = [
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       "$WIFI_ROOT_DIR/interfaces",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",

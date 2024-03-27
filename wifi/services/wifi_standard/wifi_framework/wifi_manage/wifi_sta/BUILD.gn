@@ -91,8 +91,9 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
@@ -121,12 +122,6 @@ if (defined(ohos_lite)) {
     sources += [ "sta_app_acceleration.cpp" ]
 
     include_dirs = local_base_include_dirs
-    include_dirs += [
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-      "//foundation/systemability/safwk/interfaces/innerkits/safwk",
-      "//commonlibrary/c_utils/base/include",
-    ]
 
     cflags_cc = [
       "-std=c++17",

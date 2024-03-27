@@ -437,11 +437,11 @@ bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
     return client_->SetLowLatencyMode(enabled);
 }
 
-ErrCode WifiDeviceImpl::SetAppFrozen(int uid, bool isFrozen)
+ErrCode WifiDeviceImpl::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
-    return client_->SetAppFrozen(uid, isFrozen);
+    return client_->SetAppFrozen(pidList, isFrozen);
 }
 
 ErrCode WifiDeviceImpl::ResetAllFrozenApp()

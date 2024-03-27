@@ -271,6 +271,10 @@ extern "C" {
 #define HDI_STA_CB_SCAN_FAILED 1
 #define HDI_STA_CB_SCAN_OVER_OK 2
 
+#define WIFI_CAPABILITY_DEFAULT 0
+#define CMD_GET_FEATURE_CAPAB 101
+#define CMD_GET_WIFI_CATEGORY 127
+
 typedef long os_time_t;
 
 enum HDIVendorElementId {
@@ -290,6 +294,21 @@ typedef enum HdiPortType {
     HDI_PORT_TYPE_P2P_DEVICE = 4,
     HDI_PORT_TYPE_BUTT            // invalid type
 } HdiPortType;
+
+typedef enum {
+    PROTOCOL_80211_IFTYPE_UNSPECIFIED, /**< Unspecified type */
+    PROTOCOL_80211_IFTYPE_ADHOC,       /**< Ad hoc network */
+    PROTOCOL_80211_IFTYPE_STATION,     /**< Station */
+    PROTOCOL_80211_IFTYPE_AP,          /**< Access point (AP) */
+    PROTOCOL_80211_IFTYPE_AP_VLAN,     /**< Virtual AP */
+    PROTOCOL_80211_IFTYPE_WDS,         /**< Wireless distributed system */
+    PROTOCOL_80211_IFTYPE_MONITOR,     /**< Listening */
+    PROTOCOL_80211_IFTYPE_MESH_POINT,  /**< Mesh network */
+    PROTOCOL_80211_IFTYPE_P2P_CLIENT,  /**< P2P client */
+    PROTOCOL_80211_IFTYPE_P2P_GO,      /**< P2P group owner */
+    PROTOCOL_80211_IFTYPE_P2P_DEVICE,  /**< P2P device */
+    PROTOCOL_80211_IFTYPE_NUM,         /**< Number of network ports */
+} FeatureType;
 #ifdef __cplusplus
 }
 #endif

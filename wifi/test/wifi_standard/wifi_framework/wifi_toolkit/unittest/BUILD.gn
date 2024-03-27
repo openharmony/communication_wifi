@@ -111,7 +111,6 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/libxml2:xml2",
   ]
   defines = [
     "private = public",
@@ -122,6 +121,8 @@ ohos_unittest("toolkit_unittest") {
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "ipc:ipc_single",
+    "libxml2:libxml2",
     "netstack:http_client",
   ]
   if (wifi_feature_with_encryption) {

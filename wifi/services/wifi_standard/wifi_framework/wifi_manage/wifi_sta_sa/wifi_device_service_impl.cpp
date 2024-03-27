@@ -1503,13 +1503,21 @@ void WifiDeviceServiceImpl::StartWatchdog(void)
         WATCHDOG_INTERVAL_MS, WATCHDOG_DELAY_MS);
 }
 
-ErrCode WifiDeviceServiceImpl::SetAppFrozen(int uid, bool isFrozen)
+ErrCode WifiDeviceServiceImpl::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("SetAppFrozen:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    WifiInternalEventDispatcher::GetInstance().SetAppFrozen(uid, isFrozen);
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:SetAppFrozen() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:SetAppFrozen() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    WifiInternalEventDispatcher::GetInstance().SetAppFrozen(pidList, isFrozen);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1517,6 +1525,14 @@ ErrCode WifiDeviceServiceImpl::ResetAllFrozenApp()
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("ResetAllFrozenApp:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:ResetAllFrozenApp() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("WifiDeviceServiceImpl:ResetAllFrozenApp() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiInternalEventDispatcher::GetInstance().ResetAllFrozenApp();

@@ -52,7 +52,7 @@ WifiControllerMachine::~WifiControllerMachine()
 ErrCode WifiControllerMachine::InitWifiControllerMachine()
 {
     WIFI_LOGI("Enter WifiControllerMachine::InitWifiControllerMachine.\n");
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("WifiControllerMachine")) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }

@@ -356,6 +356,8 @@ private:
     IEnhanceService *mEnhanceService;                /* EnhanceService handle */
     int m_instId;
     int lastNetworkQuality;
+    int chipsetCategory;
+    int chipsetFeatrureCapability;
     /**
      * @Description Obtains the frequency of a specified band.
      *

@@ -117,12 +117,12 @@ ohos_unittest("WifiApServiceTest") {
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/libxml2:xml2",
   ]
   external_deps = [
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
   ]
 

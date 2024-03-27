@@ -20,12 +20,17 @@
 #include "net_conn_client.h"
 #include "net_conn_constants.h"
 #include "net_all_capabilities.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_LABEL("WifiNetObserver");
 
 namespace OHOS {
 namespace Wifi {
 using namespace NetManagerStandard;
+
+#define NETWORK 1
+#define NO_NETWORK 0
+#define ARP_OPT 0
 
 NetStateObserver::NetStateObserver(): m_callback(nullptr)
 {
@@ -76,10 +81,13 @@ int32_t NetStateObserver::OnNetDetectionResultChanged(
             break;
         }
         case NetManagerStandard::NET_DETECTION_FAIL: {
+            WriteWifiAccessIntFailedHiSysEvent(ARP_OPT, StaArpState::ARP_STATE_UNREACHABLE);
+            WriteIsInternetHiSysEvent(NO_NETWORK);
             m_callback(SystemNetWorkState::NETWORK_NOTWORKING, "");
             break;
         }
         case NetManagerStandard::NET_DETECTION_SUCCESS: {
+            WriteIsInternetHiSysEvent(NETWORK);
             m_callback(SystemNetWorkState::NETWORK_IS_WORKING, "");
             break;
         }

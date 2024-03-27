@@ -36,6 +36,7 @@ namespace Wifi {
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
 #define WIFI_PASSWORD_LEN 128
+#define MAX_PID_LIST_SIZE 128
 
 const std::string KEY_MGMT_NONE = "NONE";
 const std::string KEY_MGMT_WEP = "WEP";

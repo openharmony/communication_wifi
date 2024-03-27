@@ -45,7 +45,6 @@ ohos_unittest("utils_unittest") {
   deps = [
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [
@@ -58,6 +57,7 @@ ohos_unittest("utils_unittest") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
     "samgr:samgr_proxy",
   ]
 

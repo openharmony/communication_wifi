@@ -17,12 +17,12 @@
 #define OHOS_WIFI_APP_STATE_AWARE_H
 
 #ifndef OHOS_ARCH_LITE
-#include "app_mgr_interface.h"
-#include "app_state_data.h"
+#include "appmgr/app_mgr_interface.h"
+#include "appmgr/app_state_data.h"
 #include "iremote_object.h"
 #include "wifi_event_handler.h"
 #include "wifi_errcode.h"
-#include "application_state_observer_stub.h"
+#include "appmgr/application_state_observer_stub.h"
 
 namespace OHOS {
 namespace Wifi {

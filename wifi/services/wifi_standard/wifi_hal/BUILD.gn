@@ -17,7 +17,6 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
-  import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
 }
 
 local_base_sources = [
@@ -77,9 +76,10 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9:wpa_supplicant",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     cflags_cc = [ "-fno-rtti" ]
     defines = [
@@ -98,13 +98,8 @@ if (defined(ohos_lite)) {
     sources = local_base_sources
 
     include_dirs = local_base_include_dirs
-    include_dirs += [
-      "//commonlibrary/c_utils/base/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
-      "//third_party/bounds_checking_function/include/",
-      "//drivers/peripheral/wlan/interfaces/include/",
-    ]
+    include_dirs +=
+        [ "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/" ]
 
     deps = [
       "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
@@ -151,13 +146,8 @@ if (defined(ohos_lite)) {
     sources = local_base_sources
 
     include_dirs = local_base_include_dirs
-    include_dirs += [
-      "//commonlibrary/c_utils/base/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
-      "//third_party/bounds_checking_function/include/",
-      "//drivers/peripheral/wlan/interfaces/include/",
-    ]
+    include_dirs +=
+        [ "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/" ]
 
     symlink_target_name = [ "wifi_hal_service" ]
     deps = [

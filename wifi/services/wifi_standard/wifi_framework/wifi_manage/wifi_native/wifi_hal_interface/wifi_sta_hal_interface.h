@@ -352,6 +352,20 @@ public:
     WifiErrorNo SetDpiMarkRule(int uid, int protocol, int enable);
 
     /**
+     * @Description set background limit speed uid&pid list
+     *
+     * @param chipsetCategory - chipset category
+     */
+    WifiErrorNo GetChipsetCategory(int& chipsetCategory);
+
+    /**
+     * @Description set background limit speed uid&pid list
+     *
+     * @param chipsetFeatrureCapability - chipset featrure capability
+     */
+    WifiErrorNo GetChipsetWifiFeatrureCapability(int& chipsetFeatrureCapability);
+    
+    /**
      * @Description Get register callback objects
      *
      * @return const WifiEventCallback& - register sta callback objects

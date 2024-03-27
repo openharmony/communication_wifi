@@ -184,6 +184,22 @@ WifiErrorNo WifiHdiClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
         tmp.isHeInfoExist = results[i].isHeInfoExist;
         tmp.isErpExist = results[i].isErpExist;
         tmp.maxRates = results[i].maxRates > results[i].extMaxRates ? results[i].maxRates : results[i].extMaxRates;
+
+        for (int j = 0; j < results[i].ieSize; ++j) {
+            WifiInfoElem infoElemTmp;
+            int infoElemSize = results[i].infoElems[j].size;
+            infoElemTmp.id = results[i].infoElems[j].id;
+            for (int k = 0; k < infoElemSize; ++k) {
+                infoElemTmp.content.emplace_back(results[i].infoElems[j].content[k]);
+            }
+            if (results[i].infoElems[j].content) {
+                free(results[i].infoElems[j].content);
+            }
+            tmp.infoElems.emplace_back(infoElemTmp);
+        }
+        if (results[i].infoElems) {
+            free(results[i].infoElems);
+        }
         scanInfos.emplace_back(tmp);
     }
     return WIFI_IDL_OPT_OK;
@@ -219,6 +235,16 @@ WifiErrorNo WifiHdiClient::ReqSetPmMode(int frequency, int mode)
 WifiErrorNo WifiHdiClient::ReqSetDpiMarkRule(int uid, int protocol, int enable)
 {
     return HdiSetDpiMarkRule(uid, protocol, enable);
+}
+
+WifiErrorNo WifiHdiClient::ReqGetChipsetCategory(int& chipsetCategory) const
+{
+    return HdiGetChipsetCategory(&chipsetCategory);
+}
+
+WifiErrorNo WifiHdiClient::ReqGetChipsetWifiFeatrureCapability(int& chipsetFeatrureCapability) const
+{
+    return HdiGetChipsetWifiFeatrureCapability(&chipsetFeatrureCapability);
 }
 
 /* ************************ softAp Interface ************************** */

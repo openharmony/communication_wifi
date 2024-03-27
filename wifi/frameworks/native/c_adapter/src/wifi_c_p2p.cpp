@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "../../../interfaces/kits/c/wifi_p2p.h"
-#include "../../../interfaces/kits/c/wifi_hid2d.h"
+#include "kits/c/wifi_p2p.h"
+#include "kits/c/wifi_hid2d.h"
 #include "wifi_logger.h"
-#include "../../../interfaces/inner_api/wifi_p2p.h"
+#include "inner_api/wifi_p2p.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
-#include "../../src/wifi_sa_event.h"
+#include "wifi_sa_event.h"
 constexpr int INVALID_VALUE = -1;
 #define STR_END '\0'
 

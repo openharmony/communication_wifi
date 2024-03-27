@@ -39,7 +39,7 @@ ErrCode SetBgLimitMode(int mode)
     }
 
     char awareCtrlStr[MAX_ARRAY_LENGTH] = {0};
-    int ret = snprintf_s(awareCtrlStr, MAX_ARRAY_LENGTH, MAX_ARRAY_LENGTH - 1, "1:%d", mode);
+    int ret = snprintf_s(awareCtrlStr, sizeof(awareCtrlStr), MAX_ARRAY_LENGTH - 1, "1:%d", mode);
     if (ret == -1) {
         WIFI_LOGE("SetBgLimitMode snprintf_s failed.");
         close(fd);
@@ -82,16 +82,16 @@ void SetUidPids(const char *filePath, const int *idArray, int size)
 
     for (int i = 0; i < size; ++i) {
         if (i == 0) {
-            ret = snprintf_s(tempStr, MAX_ARRAY_LENGTH, MAX_ARRAY_LENGTH - 1, "%d", idArray[i]);
+            ret = snprintf_s(tempStr, sizeof(tempStr), MAX_ARRAY_LENGTH - 1, "%d", idArray[i]);
         } else {
-            ret = snprintf_s(tempStr, MAX_ARRAY_LENGTH, MAX_ARRAY_LENGTH - 1, "%s;%d", idStr, idArray[i]);
+            ret = snprintf_s(tempStr, sizeof(tempStr), MAX_ARRAY_LENGTH - 1, "%s;%d", idStr, idArray[i]);
         }
         if (ret == -1) {
             WIFI_LOGE("SetUidPids failed.");
             break;
         }
 
-        if (strcpy_s(idStr, MAX_ARRAY_LENGTH, tempStr) != 0) {
+        if (strcpy_s(idStr, sizeof(idStr), tempStr) != 0) {
             break;
         }
     }

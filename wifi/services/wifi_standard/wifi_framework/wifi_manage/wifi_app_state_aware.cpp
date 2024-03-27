@@ -144,11 +144,13 @@ void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, in
         WIFI_LOGI("state = %{pubilc}d, not handle.", state);
     }
     WifiProtectManager::GetInstance().OnAppForegroudChanged(bundleName, state);
+#ifndef OHOS_ARCH_LITE
     AppNetworkSpeedLimitService::GetInstance().HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(mInstId);
     if (pService != nullptr) {
         pService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     }
+#endif
 }
 
 void WifiAppStateAware::GetForegroundApp()

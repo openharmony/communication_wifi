@@ -109,9 +109,9 @@ void AppNetworkSpeedLimitService::LimitSpeed(const int controlId, const int limi
         WIFI_LOGE("SetBgLimitMode failed, ret = %{public}d.", ret);
         return;
     }
-    SetBgLimitIdList(std::vector<int>(m_bgUidSet.begin(), m_bgUidSet.end()), m_bgUidSet.size(), SET_BG_UID);
-    SetBgLimitIdList(std::vector<int>(m_bgPidSet.begin(), m_bgPidSet.end()), m_bgPidSet.size(), SET_BG_PID);
-    SetBgLimitIdList(std::vector<int>(m_fgUidSet.begin(), m_fgUidSet.end()), m_fgUidSet.size(), SET_FG_UID);
+    SetBgLimitIdList(std::vector<int>(m_bgUidSet.begin(), m_bgUidSet.end()), SET_BG_UID);
+    SetBgLimitIdList(std::vector<int>(m_bgPidSet.begin(), m_bgPidSet.end()), SET_BG_PID);
+    SetBgLimitIdList(std::vector<int>(m_fgUidSet.begin(), m_fgUidSet.end()), SET_FG_UID);
 #endif
 }
 

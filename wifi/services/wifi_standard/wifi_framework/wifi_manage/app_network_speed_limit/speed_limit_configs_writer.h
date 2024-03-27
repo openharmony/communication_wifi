@@ -39,11 +39,10 @@ ErrCode SetBgLimitMode(int mode);
  * @Description set background limit speed uid&pid list
  *
  * @param idList - foreground and background app list
- * @param size - idList size
  * @param type - enable/disable dpi mark
- * @return ErrCode
+ * @return void
  */
-ErrCode SetBgLimitIdList(std::vector<int> idList, int size, int type);
+void SetBgLimitIdList(std::vector<int> idList, int type);
 
 /**
  * @Description write background limit uid&pid data to file

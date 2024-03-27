@@ -56,29 +56,22 @@ ErrCode SetBgLimitMode(int mode)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode SetBgLimitIdList(std::vector<int> idList, int size, int type)
+void SetBgLimitIdList(std::vector<int> idList, int type)
 {
-    int idArray[size];
-    if (memcpy_s(idArray, sizeof(idArray), idList.data(), size) != EOK) {
-        WIFI_LOGE("convert data failed.");
-        return WIFI_OPT_FAILED;
-    }
     switch (type) {
         case SET_BG_UID:
-            SetUidPids(BG_UID_PATH, idArray, size);
+            SetUidPids(BG_UID_PATH, idList.data(), static_cast<int>(idList.size()));
             break;
         case SET_BG_PID:
-            SetUidPids(BG_PID_PATH, idArray, size);
+            SetUidPids(BG_PID_PATH, idList.data(), static_cast<int>(idList.size()));
             break;
         case SET_FG_UID:
-            SetUidPids(FG_UID_PATH, idArray, size);
+            SetUidPids(FG_UID_PATH, idList.data(), static_cast<int>(idList.size()));
             break;
         default:
             WIFI_LOGD("Unknow type, not handle.");
             break;
     }
-
-    return WIFI_OPT_SUCCESS;
 }
 
 void SetUidPids(const char *filePath, const int *idArray, int size)

@@ -415,11 +415,11 @@ static bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
         return false;
     }
 
-    HDI_CHECK_ELEMENT(elem, start. len) {
-        uint8_t id = elem->id, elem->datalen;
+    HDI_CHECK_ELEMENT(elem, start, len) {
+        uint8_t id = elem->id, elen = elem->datalen;
         const uint8_t *pos = elem->data;
         if (id == HDI_EID_VENDOR_SPECIFIC) {
-            num |= CheckHiLinkOUISection(pos. elen);
+            num |= CheckHiLinkOUISection(pos, elen);
         }
     }
 

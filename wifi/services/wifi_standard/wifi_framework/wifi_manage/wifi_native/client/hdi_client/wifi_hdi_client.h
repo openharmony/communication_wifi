@@ -117,6 +117,20 @@ public:
      */
     WifiErrorNo ReqSetDpiMarkRule(int uid, int protocol, int enable);
 
+    /**
+     * @Description get chipset category
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqGetChipsetCategory(int& chipsetCategory) const;
+
+    /**
+     * @Description get chipset feature capability
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqGetChipsetWifiFeatrureCapability(int& chipsetFeatrureCapability) const;
+
     /* ************************ softAp Interface ************************** */
     /**
      * @Description Start Ap.

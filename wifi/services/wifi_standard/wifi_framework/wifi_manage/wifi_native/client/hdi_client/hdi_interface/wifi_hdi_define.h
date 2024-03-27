@@ -271,6 +271,10 @@ extern "C" {
 #define HDI_STA_CB_SCAN_FAILED 1
 #define HDI_STA_CB_SCAN_OVER_OK 2
 
+#define WIFI_CAPABILITY_DEFAULT 0
+#define CMD_GET_FEATURE_CAPAB 101
+#define CMD_GET_WIFI_CATEGORY 127
+
 typedef long os_time_t;
 
 enum HDIVendorElementId {

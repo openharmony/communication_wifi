@@ -89,6 +89,7 @@
                 "drivers_interface_wpa",
                 "efficiency_manager",
                 "eventhandler",
+                "ffrt",
                 "hdf_core",
                 "hicollie",
                 "hilog",

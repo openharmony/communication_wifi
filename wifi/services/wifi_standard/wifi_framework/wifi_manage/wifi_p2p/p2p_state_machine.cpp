@@ -94,7 +94,7 @@ P2pStateMachine::~P2pStateMachine()
 
 void P2pStateMachine::Initialize()
 {
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("P2pStateMachine")) {
         WIFI_LOGE("P2P StateMachine Initialize failed.");
         return;
     }

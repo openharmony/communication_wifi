@@ -39,7 +39,7 @@ public:
      *
      * @return true :success, false : failed.
      */
-    bool InitialStateMachine();
+    bool InitialStateMachine(const std::string &name);
 
     /**
      * @Description : Start StateMachine.
@@ -363,7 +363,7 @@ public:
      *
      * @return true : success, false : failed.
      */
-    bool InitialSmHandler();
+    bool InitialSmHandler(const std::string &name);
 
     /**
      * @Description : Add a new state.

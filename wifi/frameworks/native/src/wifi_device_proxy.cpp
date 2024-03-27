@@ -1837,7 +1837,8 @@ ErrCode WifiDeviceProxy::LimitSpeed(const int controlId, const int limitMode)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;

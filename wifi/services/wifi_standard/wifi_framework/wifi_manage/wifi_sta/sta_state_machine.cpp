@@ -3296,8 +3296,8 @@ void StaStateMachine::ReUpdateNetLinkInfo(const WifiDeviceConfig &config)
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     LOGI("ReUpdateNetLinkInfo, detailedState:%{public}d, connState:%{public}d",
         linkedInfo.detailedState, linkedInfo.connState);
-    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)
-        && (linkedInfo.ssid == config.ssid) && (linkedInfo.bssid == config.bssid)) {
+    if ((linkedInfo.connState == ConnState::CONNECTED) && (linkedInfo.ssid == config.ssid) &&
+        (linkedInfo.bssid == config.bssid)) {
         IpInfo wifiIpInfo;
         WifiSettings::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
         IpV6Info wifiIpV6Info;

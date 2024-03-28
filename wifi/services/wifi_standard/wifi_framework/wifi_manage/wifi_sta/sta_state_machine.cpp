@@ -1023,6 +1023,7 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
         WIFI_LOGE("Currently connected and do not process timeout.\n");
         return;
     }
+    WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
     linkedInfo.retryedConnCount++;
     DealSetStaConnectFailedCount(1, false);
     std::string ssid = linkedInfo.ssid;

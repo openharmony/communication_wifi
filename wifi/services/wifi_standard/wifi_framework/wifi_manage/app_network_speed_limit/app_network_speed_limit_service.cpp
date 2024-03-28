@@ -249,7 +249,7 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
         default:
             break;
     }
-    WIFI_LOGI("%{public}s, ");
+    WIFI_LOGI("%{public}s invalid controlId", __FUNCTION__);
     return false;
 }
 

@@ -1469,6 +1469,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     return WIFI_OPT_SUCCESS;
 }
 
+#ifndef OHOS_ARCH_LITE
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
     WIFI_LOGI("Enter LimitSpeed.");
@@ -1484,7 +1485,6 @@ ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMo
     return WIFI_OPT_SUCCESS;
 }
 
-#ifndef OHOS_ARCH_LITE
 void WifiDeviceServiceImpl::StartWatchdog(void)
 {
     constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;

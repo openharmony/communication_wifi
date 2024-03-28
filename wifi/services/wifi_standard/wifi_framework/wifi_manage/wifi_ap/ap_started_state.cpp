@@ -36,14 +36,15 @@
 #include "wifi_hisysevent.h"
 #include "wifi_global_func.h"
 #include "wifi_cmd_client.h"
+#ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
-
+#define SET_DUAL_ANTENNAS 60
+#endif
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
 namespace OHOS {
 namespace Wifi {
 const std::string AP_DEFAULT_IP = "192.168.43.1";
-#define SET_DUAL_ANTENNAS 60
 
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
@@ -94,7 +95,7 @@ void ApStartedState::GoInState()
     UpdatePowerMode();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
     ChipCapability::GetInstance().InitializeChipCapability();
-
+#ifdef HAS_BATTERY_MANAGER_PART
     if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
         HotspotConfig hotspotConfig;
         WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
@@ -103,6 +104,7 @@ void ApStartedState::GoInState()
             WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_SOFTAP_2G_MSS, CMD_SET_SOFTAP_MIMOMODE);
         }
     }
+#endif
 }
 
 void ApStartedState::GoOutState()

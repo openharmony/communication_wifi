@@ -100,7 +100,6 @@ void AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const std::st
 
 void AppNetworkSpeedLimitService::LimitSpeed(const int controlId, const int limitMode)
 {
-#ifndef OHOS_ARCH_LITE
     WIFI_LOGI("%{public}s enter, controlId=%{public}d, limitMode=%{public}d", __FUNCTION__, controlId, limitMode);
     std::lock_guard<std::mutex> lock(m_mutex);
     UpdateSpeedLimitConfigs(controlId, limitMode);
@@ -112,7 +111,6 @@ void AppNetworkSpeedLimitService::LimitSpeed(const int controlId, const int limi
     SetBgLimitIdList(std::vector<int>(m_bgUidSet.begin(), m_bgUidSet.end()), SET_BG_UID);
     SetBgLimitIdList(std::vector<int>(m_bgPidSet.begin(), m_bgPidSet.end()), SET_BG_PID);
     SetBgLimitIdList(std::vector<int>(m_fgUidSet.begin(), m_fgUidSet.end()), SET_FG_UID);
-#endif
 }
 
 int AppNetworkSpeedLimitService::GetBgLimitMaxMode()

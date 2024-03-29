@@ -28,6 +28,9 @@ namespace Wifi {
 int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, const int &pid,
     const int &uid, const int &tokenId)
 {
+#ifdef DTFUZZ_TEST
+    return PERMISSION_GRANTED;
+#endif
 #ifdef OHOS_ARCH_LITE
     return PERMISSION_GRANTED;
 #else

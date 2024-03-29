@@ -1011,7 +1011,7 @@ bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackE
 void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     std::unique_lock<std::mutex> lock(mPidFrozenMutex);
-    WIFI_LOGI("%{public}s, list size:%{public}lu, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
+    WIFI_LOGI("%{public}s, list size:%{public}u, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
     for (auto itr : pidList) {
         if (isFrozen) {
             frozenPidList.insert(itr);

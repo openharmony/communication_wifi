@@ -38,14 +38,8 @@ class AppNetworkSpeedLimitServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp()
-    {
-
-    }
-    virtual void TearDown()
-    {
-
-    }
+    virtual void SetUp() {}
+    virtual void TearDown() {}
 };
 
 HWTEST_F(AppNetworkSpeedLimitServiceTest, Init, TestSize.Level1)

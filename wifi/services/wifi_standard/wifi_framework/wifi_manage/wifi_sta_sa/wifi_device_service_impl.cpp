@@ -1473,8 +1473,8 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
     WIFI_LOGI("Enter LimitSpeed.");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
-        WIFI_LOGE("%{public}s NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {

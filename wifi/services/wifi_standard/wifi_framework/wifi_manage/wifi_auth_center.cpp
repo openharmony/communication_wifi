@@ -47,6 +47,9 @@ int WifiAuthCenter::Init()
 
 #ifndef OHOS_ARCH_LITE
 bool WifiAuthCenter::IsSystemAppByToken() {
+#ifdef DTFUZZ_TEST
+    return true;
+#endif
     uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
     bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
@@ -62,6 +65,9 @@ bool WifiAuthCenter::IsSystemAppByToken() {
 }
 bool WifiAuthCenter::IsNativeProcess()
 {
+#ifdef DTFUZZ_TEST
+    return true;
+#endif
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
     Security::AccessToken::ATokenTypeEnum callingType =
         Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);

@@ -20,6 +20,7 @@
 #include "wifi_app_parser.h"
 #include "wifi_settings.h"
 #include "app_mgr_client.h"
+#include "app_network_speed_limit_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -32,8 +33,6 @@ constexpr const int POWER_SAVE_DISABLE = 4;
 constexpr const int GAME_BOOST_ENABLE = 1;
 constexpr const int GAME_BOOST_DISABLE = 0;
 constexpr const int BOOST_UDP_TYPE = 17;
-constexpr const int UNKNOWN_UID = -1;
-constexpr const int APP_INFO_USERID = 100;
 
 StaAppAcceleration::StaAppAcceleration(int instId) : gameBoostingFlag(false)
 {}
@@ -41,27 +40,23 @@ StaAppAcceleration::StaAppAcceleration(int instId) : gameBoostingFlag(false)
 StaAppAcceleration::~StaAppAcceleration()
 {}
 
-StaAppAcceleration &StaAppAcceleration::GetInstance()
-{
-    static StaAppAcceleration gStaAppAcceleration;
-    return gStaAppAcceleration;
-}
-
 ErrCode StaAppAcceleration::InitAppAcceleration()
 {
+    using namespace std::placeholders;
     m_staCallback.callbackModuleName = CLASS_NAME;
-    m_staCallback.OnStaConnChanged = DealStaConnChanged;
-
-    mBgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] = BG_LIMIT_OFF;
-    mBgLimitRecordMap[BG_LIMIT_CONTROL_ID_STREAM] = BG_LIMIT_OFF;
-    mBgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] = BG_LIMIT_OFF;
+    m_staCallback.OnStaConnChanged = std::bind(&StaAppAcceleration::DealStaConnChanged, this, _1, _2, _3);
     return WIFI_OPT_SUCCESS;
+}
+
+StaServiceCallback StaAppAcceleration::GetStaCallback() const
+{
+    return m_staCallback;
 }
 
 void StaAppAcceleration::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
-        StaAppAcceleration::GetInstance().StopAllAppAcceleration();
+        StopAllAppAcceleration();
     }
 }
 
@@ -131,7 +126,7 @@ void StaAppAcceleration::StopGameBoost(int uid)
 void StaAppAcceleration::SetGameBoostMode(int enable, int uid, int type, int limitMode)
 {
     HighPriorityTransmit(uid, type, enable);
-    LimitedSpeed(BG_LIMIT_CONTROL_ID_GAME, enable, limitMode);
+    AppNetworkSpeedLimitService::GetInstance().LimitSpeed(BG_LIMIT_CONTROL_ID_GAME, limitMode);
 }
 
 void StaAppAcceleration::HighPriorityTransmit(int uid, int protocol, int enable)
@@ -144,120 +139,12 @@ void StaAppAcceleration::HighPriorityTransmit(int uid, int protocol, int enable)
     }
 }
 
-void StaAppAcceleration::LimitedSpeed(int controlId, int enable, int limitMode)
-{
-    WIFI_LOGI("LimitedSpeed: %{public}d, mode: %{public}d.", enable, limitMode);
-    if (enable == 0) {
-        std::vector<int> resetIds;
-        resetIds.push_back(UNKNOWN_UID);
-        int resetSize = resetIds.size();
-        SetBgLimitIdList(resetIds, resetSize, SET_BG_UID);
-        SetBgLimitIdList(resetIds, resetSize, SET_BG_PID);
-        SetBgLimitIdList(resetIds, resetSize, SET_FG_UID);
-        int ret = WifiStaHalInterface::GetInstance().SetBgLimitMode(BG_LIMIT_OFF);
-        if (ret < 0) {
-            WIFI_LOGE("SetBgLimitMode failed, ret = %{public}d.", ret);
-        }
-        return;
-    }
-
-    if (!mBgLimitRecordMap.empty()) {
-        mBgLimitRecordMap[controlId] = (enable == 0) ? BG_LIMIT_OFF : limitMode;
-    }
-
-    int cmdMode = GetBgLimitMaxMode();
-    std::vector<AppExecFwk::RunningProcessInfo> bgAppList;
-    std::vector<int> bgUidList;
-    std::vector<int> bgPidList;
-    if (GetAppList(bgAppList, false) < 0) {
-        WIFI_LOGE("Get background app list fail.");
-    }
-    int bgAppSize = bgAppList.size();
-    for (auto iter = bgAppList.begin(); iter != bgAppList.end(); ++iter) {
-        if (AppParser::GetInstance().IsBlackListApp(iter->processName_)) {
-            bgUidList.push_back(iter->uid_);
-            bgPidList.push_back(iter->pid_);
-        }
-    }
-
-    std::vector<AppExecFwk::RunningProcessInfo> fgAppList;
-    std::vector<int> fgUidList;
-    if (GetAppList(fgAppList, true) < 0) {
-        WIFI_LOGE("Get foreground app list fail.");
-    }
-    int fgAppSize = fgAppList.size();
-    for (auto iter = fgAppList.begin(); iter != fgAppList.end(); ++iter) {
-        fgUidList.push_back(iter->uid_);
-    }
-    int ret = WifiStaHalInterface::GetInstance().SetBgLimitMode(cmdMode);
-    if (ret < 0) {
-        WIFI_LOGE("SetBgLimitMode failed, ret = %{public}d.", ret);
-        return;
-    }
-    SetBgLimitIdList(bgUidList, bgAppSize, SET_BG_UID);
-    SetBgLimitIdList(bgPidList, bgAppSize, SET_BG_PID);
-    SetBgLimitIdList(fgUidList, fgAppSize, SET_FG_UID);
-}
-
-ErrCode StaAppAcceleration::GetAppList(std::vector<AppExecFwk::RunningProcessInfo> &appList, bool getFgAppFlag)
-{
-    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-    appMgrClient->ConnectAppMgrService();
-    AppExecFwk::AppMgrResultCode ret;
-    std::vector<AppExecFwk::RunningProcessInfo> infos;
-    ret = appMgrClient->GetProcessRunningInfosByUserId(infos, APP_INFO_USERID);
-    if (ret != AppExecFwk::AppMgrResultCode::RESULT_OK) {
-        WIFI_LOGE("GetProcessRunningInfosByUserId failed.");
-        return WIFI_OPT_FAILED;
-    }
-    if (getFgAppFlag) {
-        for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
-                appList.push_back(*iter);
-            }
-        }
-    } else {
-        for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_BACKGROUND) {
-                appList.push_back(*iter);
-            }
-        }
-    }
-
-    return WIFI_OPT_SUCCESS;
-}
-
-int StaAppAcceleration::GetBgLimitMaxMode()
-{
-    if (mBgLimitRecordMap.empty()) {
-        WIFI_LOGE("mBgLimitRecordMap is empty.\n");
-        return -1;
-    }
-
-    int maxMode = 0;
-    std::map<int, int>::iterator iter;
-    for (iter = mBgLimitRecordMap.begin(); iter != mBgLimitRecordMap.end(); ++iter) {
-        if (iter->second > maxMode) {
-            maxMode = iter->second;
-        }
-    }
-    return maxMode;
-}
-
-void StaAppAcceleration::SetBgLimitIdList(std::vector<int> idList, int size, int type)
-{
-    int ret = WifiStaHalInterface::GetInstance().SetBgLimitIdList(idList, size, type);
-    if (ret < 0) {
-        WIFI_LOGE("SetBgLimitIdList failed, ret = %{public}d.", ret);
-    }
-}
-
 void StaAppAcceleration::StopAllAppAcceleration()
 {
     WIFI_LOGI("Wifi disconnected, stop game boost.\n");
     SetPmMode(POWER_SAVE_ENABLE);
     HighPriorityTransmit(UNKNOWN_UID, BOOST_UDP_TYPE, GAME_BOOST_DISABLE);
-    LimitedSpeed(BG_LIMIT_CONTROL_ID_GAME, GAME_BOOST_DISABLE, BG_LIMIT_OFF);
+    AppNetworkSpeedLimitService::GetInstance().LimitSpeed(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF);
 }
 
 } // namespace Wifi

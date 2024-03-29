@@ -450,6 +450,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode FactoryReset() = 0;
+
+    /**
+     * @Description LimitSpeed
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

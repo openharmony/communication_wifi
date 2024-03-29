@@ -64,6 +64,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_IS_METERED_HOTSPOT = 0x1038,       /* whether current link is metered hotspot */
     WIFI_SVR_CMD_DISABLE_AUTO_JOIN = 0x1039,         /* disable auto join */
     WIFI_SVR_CMD_ENABLE_AUTO_JOIN = 0x103A,          /* enable auto join */
+    WIFI_SVR_CMD_LIMIT_SPEED = 0x103B,               /* limit app speed */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */

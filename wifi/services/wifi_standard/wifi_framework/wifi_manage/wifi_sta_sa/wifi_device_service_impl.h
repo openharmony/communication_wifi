@@ -158,6 +158,8 @@ public:
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
 
     ErrCode FactoryReset() override;
+
+    ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

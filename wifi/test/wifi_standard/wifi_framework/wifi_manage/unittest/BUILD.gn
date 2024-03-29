@@ -23,6 +23,7 @@ config("module_private_config") {
   include_dirs = [
     "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/unittest",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/unittest/Mock",
   ]
 }
 

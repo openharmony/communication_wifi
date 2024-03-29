@@ -29,7 +29,7 @@ public:
     virtual bool IsBlackListApp(const std::string &bundleName);
     virtual bool IsChariotApp(const std::string &bundleName);
     virtual bool IsHighTempLimitSpeedApp(const std::string &bundleName);
-}
+};
 
 class AppParser : public MockWifiAppParser {
 public:
@@ -39,7 +39,7 @@ public:
     MOCK_METHOD1(IsBlackListApp, bool(const std::string &bundleName));
     MOCK_METHOD1(IsChariotApp, bool(const std::string &bundleName));
     MOCK_METHOD1(IsHighTempLimitSpeedApp, bool(const std::string &bundleName));
-}
+};
 } /* namespace Wifi */
 } /* namespace OHOS */
 #endif

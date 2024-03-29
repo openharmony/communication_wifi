@@ -22,6 +22,7 @@
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_manager.h"
 #include "wifi_common_util.h"
+#include "app_network_speed_limit_service.h"
 #endif
 
 namespace OHOS {
@@ -490,6 +491,13 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
         errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            break;
+        }
+
+        errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
                 static_cast<int>(errCode));
             break;
         }

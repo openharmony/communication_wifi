@@ -21,6 +21,7 @@
 #include "wifi_protect_manager.h"
 #include "wifi_service_manager.h"
 #include "sta_app_acceleration.h"
+#include "app_network_speed_limit_service.h"
 #include "wifi_logger.h"
 
 namespace OHOS {
@@ -143,10 +144,13 @@ void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, in
         WIFI_LOGI("state = %{pubilc}d, not handle.", state);
     }
     WifiProtectManager::GetInstance().OnAppForegroudChanged(bundleName, state);
+#ifndef OHOS_ARCH_LITE
+    AppNetworkSpeedLimitService::GetInstance().HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(mInstId);
     if (pService != nullptr) {
         pService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     }
+#endif
 }
 
 void WifiAppStateAware::GetForegroundApp()

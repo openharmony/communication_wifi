@@ -352,22 +352,6 @@ public:
     WifiErrorNo SetDpiMarkRule(int uid, int protocol, int enable);
 
     /**
-     * @Description set background limit speed mode
-     *
-     * @param mode - limit mode
-     */
-    WifiErrorNo SetBgLimitMode(int mode);
-
-    /**
-     * @Description set background limit speed uid&pid list
-     *
-     * @param idList - foreground and background app list
-     * @param size - idList size
-     * @param type - enable/disable dpi mark
-     */
-    WifiErrorNo SetBgLimitIdList(std::vector<int> idList, int size, int type);
-
-    /**
      * @Description set background limit speed uid&pid list
      *
      * @param chipsetCategory - chipset category

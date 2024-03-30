@@ -73,6 +73,7 @@ struct InterScanInfo {
     bool isHeInfoExist;
     bool isErpExist;
     int maxRates;
+    bool isHiLinkNetwork;
 
     InterScanInfo()
         : frequency(0),
@@ -90,7 +91,8 @@ struct InterScanInfo {
           isHtInfoExist(false),
           isHeInfoExist(false),
           isErpExist(false),
-          maxRates(0) {}
+          maxRates(0),
+          isHiLinkNetwork(false) {}
 
     ~InterScanInfo() {}
 

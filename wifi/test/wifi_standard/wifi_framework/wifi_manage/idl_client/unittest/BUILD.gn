@@ -59,7 +59,7 @@ ohos_unittest("idl_client_unittest") {
   include_dirs = [
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
@@ -80,7 +80,7 @@ ohos_unittest("idl_client_unittest") {
   defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
 
   deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
+    "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
@@ -129,14 +129,14 @@ ohos_unittest("mock_wifi_hal_service") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
+    "$WIFI_ROOT_DIR/base/cRPC:crpc_server",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
   ]
 

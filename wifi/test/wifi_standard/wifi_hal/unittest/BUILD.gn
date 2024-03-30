@@ -73,7 +73,7 @@ ohos_unittest("wifi_hal_unittest") {
 
   include_dirs = [
     "//commonlibrary/c_utils/base/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_module/hostapd_hal",
@@ -89,7 +89,7 @@ ohos_unittest("wifi_hal_unittest") {
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_server",
+    "$WIFI_ROOT_DIR/base/cRPC:crpc_server",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

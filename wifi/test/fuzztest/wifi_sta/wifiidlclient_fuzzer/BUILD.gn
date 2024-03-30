@@ -23,11 +23,11 @@ ohos_fuzztest("WifiIdlClientFuzzTest") {
       "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifiidlclient_fuzzer"
 
   include_dirs = [
+    "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
@@ -47,8 +47,8 @@ ohos_fuzztest("WifiIdlClientFuzzTest") {
   sources = [ "wifiidlclient_fuzzer.cpp" ]
 
   deps = [
+    "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC:crpc_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/utils:wifi_utils",

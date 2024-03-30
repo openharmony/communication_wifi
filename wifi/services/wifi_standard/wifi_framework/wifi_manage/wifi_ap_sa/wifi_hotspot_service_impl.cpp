@@ -140,8 +140,8 @@ ErrCode WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfig &result)
 
 ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
 {
-    WIFI_LOGI("Instance %{public}d %{public}s band %{public}d", m_id, __func__,
-        static_cast<int>(config.GetBand()));
+    WIFI_LOGI("Instance %{public}d %{public}s band:%{public}d, channel:%{public}d", m_id, __func__,
+        static_cast<int>(config.GetBand()), config.GetChannel());
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("SetHotspotConfig:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -885,16 +885,8 @@ ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, c
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
 
-    if (cfg.GetBand() != cfgFromCenter.GetBand()) {
+    if (cfg.GetBand() != cfgFromCenter.GetBand() && bandsFromCenter.size() != 0) {
         if (CfgCheckBand(cfg, bandsFromCenter) == ErrCode::WIFI_OPT_INVALID_PARAM) {
-            return ErrCode::WIFI_OPT_INVALID_PARAM;
-        }
-    }
-
-    LOGD("Config channel is: %{public}d", cfg.GetChannel());
-    if (cfg.GetChannel() != cfgFromCenter.GetChannel()) {
-        if (CfgCheckChannel(cfg, channInfoFromCenter) == ErrCode::WIFI_OPT_INVALID_PARAM) {
-            LOGE("Config channel is invalid!");
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }
     }

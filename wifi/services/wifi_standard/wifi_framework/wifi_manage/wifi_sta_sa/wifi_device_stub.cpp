@@ -190,7 +190,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &rem
             static_cast<void*>(deathRecipient_), static_cast<void*>(iter->second));
         remoteObject->RemoveDeathRecipient(iter->second);
         remoteDeathMap.erase(iter);
-        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}u.", remoteDeathMap.size());
+        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}lu.", remoteDeathMap.size());
     }
 }
 

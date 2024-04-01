@@ -499,7 +499,6 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
         results.push_back(*iter);
         ++iter;
     }
-    LOGI("WifiSettings::GetScanInfoList size = %{public}lu", results.size());
     return 0;
 }
 

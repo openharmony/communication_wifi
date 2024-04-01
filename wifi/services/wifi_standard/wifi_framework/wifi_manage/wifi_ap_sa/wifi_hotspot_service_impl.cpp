@@ -330,6 +330,10 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
         WIFI_LOGE("DisassociateSta:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("DisassociateSta:IsSystemAppByToken NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
     if (CheckMacIsValid(info.bssid)) {
         return WIFI_OPT_INVALID_PARAM;
     }

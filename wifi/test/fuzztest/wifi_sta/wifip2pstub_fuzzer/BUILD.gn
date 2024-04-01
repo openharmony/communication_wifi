@@ -41,6 +41,7 @@ ohos_fuzztest("WifiP2pStubFuzzTest") {
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
     "wifip2pstub_fuzzer.cpp",
   ]
+  sources = [ "wifip2pstub_fuzzer.cpp" ]
 
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",

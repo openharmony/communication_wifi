@@ -85,7 +85,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -151,7 +151,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_service_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -238,7 +238,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -294,7 +294,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       ":wifi_manager_service",
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -344,7 +344,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       ":wifi_manager_service",
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -395,7 +395,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -474,7 +474,7 @@ if (defined(ohos_lite)) {
     }
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",

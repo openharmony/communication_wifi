@@ -854,6 +854,8 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             if (iter == remoteDeathMap.end()) {
                 std::lock_guard<std::mutex> lock(mutex_);
                 remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
+                WIFI_LOGI("OnRegisterCallBack, AddDeathRecipient, remote: %{public}p, remoteDeathMap.size: %{public}d",
+                    static_cast<void*>(remote), remoteDeathMap.size());
                 if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                     WIFI_LOGI("AddDeathRecipient!");
                 }

@@ -225,9 +225,9 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
         }
         return true;
     } else {
-        WIFI_LOGE("EAP:%{public}s unsupported!", config.wifiEapConfig.eap.c_str());
+        WIFI_LOGW("EAP:%{public}s unsupported!", config.wifiEapConfig.eap.c_str());
     }
-    return false;
+    return true;
 }
 
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)

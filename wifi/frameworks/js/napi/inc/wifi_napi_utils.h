@@ -111,6 +111,8 @@ napi_status SetValueUnsignedInt32(const napi_env& env, const char* fieldStr, con
     napi_value& result);
 napi_status SetValueInt64(const napi_env& env, const char* fieldStr, const int64_t intValue, napi_value& result);
 napi_status SetValueBool(const napi_env& env, const char* fieldStr, const bool boolValue, napi_value& result);
+napi_status SetValueU8Vector(const napi_env& env, const char* fieldStr,
+    const std::vector<uint8_t> value, napi_value& result);
 napi_value DoAsyncWork(const napi_env& env, AsyncContext *asyncContext,
     const size_t argc, const napi_value *argv, const size_t nonCallbackArgNum);
 void SetNamedPropertyByInteger(napi_env, napi_value dstObj, int32_t objName, const char *propName);

@@ -352,6 +352,15 @@ public:
     WifiErrorNo SetDpiMarkRule(int uid, int protocol, int enable);
 
     /**
+     * @Description Send SIM/AKA/AKA' authentication to wpa
+     *
+     * @param ifName: Interface name
+     * @param cmd: Request message content
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ShellCmd(const std::string &ifName, const std::string &cmd);
+
+    /**
      * @Description set background limit speed uid&pid list
      *
      * @param chipsetCategory - chipset category

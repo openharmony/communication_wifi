@@ -526,6 +526,19 @@ WifiErrorNo WifiStaHalInterface::SetDpiMarkRule(int uid, int protocol, int enabl
 #endif
 }
 
+WifiErrorNo WifiStaHalInterface::ShellCmd(const std::string &ifName, const std::string &cmd)
+{
+    if ((ifName.length() <= 0) || (cmd.length() <= 0)) {
+        return WIFI_IDL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqWpaShellCmd(ifName, cmd);
+#else
+    return WIFI_IDL_OPT_OK;
+#endif
+}
+
 WifiErrorNo WifiStaHalInterface::GetChipsetCategory(int& chipsetCategory)
 {
 #ifdef HDI_INTERFACE_SUPPORT

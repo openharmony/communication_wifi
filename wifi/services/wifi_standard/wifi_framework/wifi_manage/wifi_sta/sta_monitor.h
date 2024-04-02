@@ -112,6 +112,13 @@ public:
      */
     void OnWpsTimeOutCallBack(int status);
 
+    /**
+     * @Description : Callback of the SIM/AKA/AKA' authentication event.
+     *
+     * @param notifyParam - authentication information [in]
+     */
+    void OnEventStaNotifyCallBack(const std::string &notifyParam);
+
 private:
     StaStateMachine *pStaStateMachine;
     int m_instId;

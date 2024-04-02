@@ -24,6 +24,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIDevice");
 static constexpr int DEFAULT_INVALID_VALUE = -1;
+static const std::string EAP_METHOD[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", "SIM", "AKA", "AKA'" };
 
 std::shared_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
@@ -333,11 +334,10 @@ static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& c
 
 static std::string EapMethod2Str(const int& method)
 {
-    const std::string eapMethod[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", "SIM", "AKA", "AKA'" };
-    if (method < 0 || method >= static_cast<int>(sizeof(eapMethod) / sizeof(eapMethod[0]))) {
+    if (method < 0 || method >= static_cast<int>(sizeof(EAP_METHOD) / sizeof(EAP_METHOD[0]))) {
         return "NONE";
     }
-    return eapMethod[method];
+    return EAP_METHOD[method];
 }
 
 napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
@@ -356,7 +356,11 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
     // EAP authentication mode
     JsObjectToInt(env, napiEap, "eapMethod", eapMethod);
     devConfig.wifiEapConfig.eap = EapMethod2Str(eapMethod);
-    WIFI_LOGI("%{public}s eapMethod: %{public}s", __func__, devConfig.wifiEapConfig.eap.c_str());
+    if (devConfig.wifiEapConfig.eap == EAP_METHOD_NONE) {
+        return UndefinedNapiValue(env);
+    }
+    WIFI_LOGI("%{public}s eapMethod: %{public}d[%{public}s]",
+        __func__, eapMethod, devConfig.wifiEapConfig.eap.c_str());
 
     int phase2 = static_cast<int>(Phase2Method::NONE);
     JsObjectToInt(env, napiEap, "phase2Method", phase2);
@@ -1225,6 +1229,38 @@ static void UpdateSecurityTypeAndPreSharedKey(WifiDeviceConfig& cppConfig)
     }
 }
 
+static int Str2EapMethod(const std::string& str)
+{
+    WIFI_LOGD("%{public}s: eapMethod is %{public}s", __func__, str.c_str());
+    int len = sizeof(EAP_METHOD) / sizeof(EAP_METHOD[0]);
+    for (int i = 0; i < len; i++) {
+        if (EAP_METHOD[i] == str) {
+            WIFI_LOGD("%{public}s: index is %{public}d", __func__, i);
+            return i;
+        }
+    }
+    return 0;
+}
+
+static void EapConfigToJs(const napi_env& env, const WifiEapConfig& wifiEapConfig, napi_value& cfgObj)
+{
+    SetValueInt32(env, "eapMethod", Str2EapMethod(wifiEapConfig.eap), cfgObj);
+    SetValueInt32(env, "phase2Method", static_cast<int>(wifiEapConfig.phase2Method), cfgObj);
+    SetValueUtf8String(env, "identity", wifiEapConfig.identity.c_str(), cfgObj);
+    SetValueUtf8String(env, "anonymousIdentity", wifiEapConfig.anonymousIdentity.c_str(), cfgObj);
+    SetValueUtf8String(env, "password", wifiEapConfig.password.c_str(), cfgObj);
+    SetValueUtf8String(env, "caCertAlias", wifiEapConfig.caCertAlias.c_str(), cfgObj);
+    SetValueUtf8String(env, "caPath", wifiEapConfig.caCertPath.c_str(), cfgObj);
+    SetValueUtf8String(env, "clientCertAlias", wifiEapConfig.caCertAlias.c_str(), cfgObj);
+    SetValueU8Vector(env, "certEntry", wifiEapConfig.certEntry, cfgObj);
+    SetValueUtf8String(env, "certPassword", wifiEapConfig.certPassword, cfgObj);
+    SetValueUtf8String(env, "altSubjectMatch", wifiEapConfig.altSubjectMatch.c_str(), cfgObj);
+    SetValueUtf8String(env, "domainSuffixMatch", wifiEapConfig.domainSuffixMatch.c_str(), cfgObj);
+    SetValueUtf8String(env, "realm", wifiEapConfig.realm.c_str(), cfgObj);
+    SetValueUtf8String(env, "plmn", wifiEapConfig.plmn.c_str(), cfgObj);
+    SetValueInt32(env, "eapSubId", wifiEapConfig.eapSubId, cfgObj);
+}
+
 static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceConfig>& vecDeviceConfigs,
     const int idx, napi_value& arrayResult)
 {
@@ -1258,6 +1294,15 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
         WIFI_LOGE("Set staticIp field!");
     }
     ProxyConfigToJs(env, vecDeviceConfigs[idx], result);
+
+    napi_value eapCfgObj;
+    napi_create_object(env, &eapCfgObj);
+    EapConfigToJs(env, vecDeviceConfigs[idx].wifiEapConfig, eapCfgObj);
+    status = napi_set_named_property(env, result, "eapConfig", eapCfgObj);
+    if (status != napi_ok) {
+        WIFI_LOGE("failed to set eapConfig!");
+    }
+
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
         WIFI_LOGE("Wifi napi set element error: %{public}d", status);

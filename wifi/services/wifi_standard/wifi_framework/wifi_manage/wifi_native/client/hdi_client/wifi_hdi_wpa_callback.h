@@ -39,6 +39,7 @@ int32_t OnEventWpsOverlap(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventWpsTimeout(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventScanResult(struct IWpaCallback *self,
     const struct HdiWpaRecvScanResultParam *recvScanResultParam, const char* ifName);
+int32_t OnEventStaNotify(struct IWpaCallback *self, const char *notifyParam, const char* ifName);
 int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName);
 int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName);
 int32_t OnEventP2pStateChanged(struct IWpaCallback *self,

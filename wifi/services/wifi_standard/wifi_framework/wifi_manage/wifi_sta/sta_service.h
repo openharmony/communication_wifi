@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_SERVICE_H
 #define OHOS_WIFI_SERVICE_H
 
+#include <codecvt>
 #include "wifi_internal_msg.h"
 #include "sta_auto_connect_service.h"
 #include "sta_monitor.h"
@@ -320,6 +321,13 @@ public:
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
+    std::string ConvertString(const std::u16string &wideText) const;
+    int32_t GetDataSlotId() const;
+    std::string GetImsi(int32_t slotId) const;
+    std::string GetPlmn(int32_t slotId) const;
+    std::string GetMcc(const std::string &imsi) const;
+    std::string GetMnc(const std::string &imsi, const int mncLen) const;
+    void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;
 private:
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {

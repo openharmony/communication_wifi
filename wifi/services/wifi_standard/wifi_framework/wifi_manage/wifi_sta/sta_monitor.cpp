@@ -44,7 +44,8 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
         std::bind(&StaMonitor::onWpaConnectionFullCallBack, this, _1),
-        std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1)
+        std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1),
+        std::bind(&StaMonitor::OnEventStaNotifyCallBack, this, _1)
     };
 
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
@@ -198,6 +199,53 @@ void StaMonitor::OnWpsTimeOutCallBack(int status)
     }
     /* Notification state machine WPS timeout event */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET, status);
+}
+
+/* SIM authentication data format: [GSM-AUTH][:][Rand1][:][Rand2] or [GSM-AUTH][:][Rand1][:][Rand2][:][Rand3]
+   AKA/AKA authentication data format: [UMTS-AUTH][:][rand][:][autn]
+*/
+void StaMonitor::OnEventStaNotifyCallBack(const std::string &notifyParam)
+{
+    WIFI_LOGD("OnEventStaNotifyCallBack, notifyParam:%{private}s", notifyParam.c_str());
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
+
+    std::string delimiter = ":";
+    std::vector<std::string> results = getAuthInfo(notifyParam, delimiter);
+    int size = results.size();
+    if (results[0] == "GSM-AUTH") {
+        if ((size != WIFI_SIM_GSM_AUTH_MIN_PARAM_COUNT) && (size != WIFI_SIM_GSM_AUTH_MAX_PARAM_COUNT)) {
+            WIFI_LOGE("invalid GSM-AUTH authentication data, size:%{public}d", size);
+            return;
+        }
+
+        EapSimGsmAuthParam param;
+        for (int i = 0; i < size; i++) {
+            if (i == 0) {
+                continue;
+            }
+            param.rands.push_back(results[i]);
+            WIFI_LOGI("results[%{public}d]:%{public}s", i, results[i].c_str());
+        }
+        WIFI_LOGI("%{public}s size:%{public}zu", __func__, param.rands.size());
+        pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT, param);
+    } else if ((results[0] == "UMTS-AUTH") || (results[0] == "UMTS-AUTS")) {
+        if (size != WIFI_SIM_UMTS_AUTH_PARAM_COUNT) {
+            WIFI_LOGE("invalid UMTS-AUTH authentication data, size:%{public}d", size);
+            return;
+        }
+        EapSimUmtsAuthParam param;
+        param.rand = results[1];  // get rand data
+        param.autn = results[2];  // get autn data
+        WIFI_LOGD("%{public}s rand:%{private}s, autn:%{private}s",
+            __func__, param.rand.c_str(), param.autn.c_str());
+        pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT, param);
+    } else {
+        WIFI_LOGE("Invalid authentication type, authType:%{public}s", results[0].c_str());
+        return;
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

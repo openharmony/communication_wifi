@@ -174,6 +174,20 @@ int32_t OnEventScanResult(struct IWpaCallback *self,
     return 0;
 }
 
+int32_t OnEventStaNotify(struct IWpaCallback *self, const char *notifyParam, const char* ifName)
+{
+    LOGI("OnEventStaNotify: callback enter!");
+    if (notifyParam == NULL) {
+        LOGE("OnEventStaNotify: invalid parameter!");
+        return 1;
+    }
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (cbk.OnEventStaNotify) {
+        cbk.OnEventStaNotify(notifyParam);
+    }
+    return 0;
+}
+
 int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName)
 {
     LOGI("onEvenStaJoin: callback enter!");

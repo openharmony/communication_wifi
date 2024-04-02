@@ -574,6 +574,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->OnEventAssociateReject = callback->OnEventAssociateReject;
     g_hdiWpaStaCallbackObj->OnEventWpsOverlap = callback->OnEventWpsOverlap;
     g_hdiWpaStaCallbackObj->OnEventWpsTimeout = callback->OnEventWpsTimeout;
+    g_hdiWpaStaCallbackObj->OnEventStaNotify = callback->OnEventStaNotify;
 #ifdef HDI_INTERFACE_SUPPORT
     g_hdiWpaStaCallbackObj->OnEventScanResult = NULL;
 #else
@@ -833,6 +834,24 @@ WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, 
     }
 
     LOGI("HdiWpaGetNetwork success.");
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd)
+{
+    LOGI("HdiWpaStaSetShellCmd enter, ifName:%{public}s, cmd:%{public}s", ifName, cmd);
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaStaSetShellCmd: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->StaShellCmd(wpaObj, ifName, cmd);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaStaSetShellCmd: failed to StaShellCmd, result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    LOGI("HdiWpaStaSetShellCmd success.");
     return WIFI_IDL_OPT_OK;
 }
 #endif

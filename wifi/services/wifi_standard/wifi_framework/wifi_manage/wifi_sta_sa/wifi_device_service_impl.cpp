@@ -1464,7 +1464,6 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     /* Hotspot */
     WifiSettings::GetInstance().ClearHotspotConfig();
     WifiSettings::GetInstance().SyncHotspotConfig();
-    WifiSettings::GetInstance().ClearRandomMacConfig();
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset ok!");
     return WIFI_OPT_SUCCESS;
 }

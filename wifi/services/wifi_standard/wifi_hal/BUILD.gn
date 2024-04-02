@@ -74,7 +74,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/base/cRPC:crpc_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
@@ -104,7 +104,7 @@ if (defined(ohos_lite)) {
         [ "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/" ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/base/cRPC:crpc_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
@@ -154,7 +154,7 @@ if (defined(ohos_lite)) {
 
     symlink_target_name = [ "wifi_hal_service" ]
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/base/cRPC:crpc_server",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/etc/init:etc",
       "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client_updater",

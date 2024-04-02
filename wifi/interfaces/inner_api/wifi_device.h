@@ -456,7 +456,7 @@ public:
      * @param limitMode speed limit mode, ranges 1 to 9
      * @return WifiErrorNo
      */
-    virtual ErrCode LimitSpeed(const int controlId, const int limitMode);
+    virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

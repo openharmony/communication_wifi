@@ -190,6 +190,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &rem
             static_cast<void*>(deathRecipient_), static_cast<void*>(iter->second));
         remoteObject->RemoveDeathRecipient(iter->second);
         remoteDeathMap.erase(iter);
+        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}d.", remoteDeathMap.size());
     }
 }
 
@@ -851,6 +852,8 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             if (iter == remoteDeathMap.end()) {
                 std::lock_guard<std::mutex> lock(mutex_);
                 remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
+                WIFI_LOGI("OnRegisterCallBack, AddDeathRecipient, remote: %{public}p, remoteDeathMap.size: %{public}d",
+                    static_cast<void*>(remote), remoteDeathMap.size());
                 if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                     WIFI_LOGI("AddDeathRecipient!");
                 }

@@ -76,6 +76,7 @@ WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32
 
 WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen);
 
+WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd);
 #ifdef __cplusplus
 }
 #endif

@@ -78,6 +78,38 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define SELF_CURE_FAC_MAC_REASSOC 2
 #define SELF_CURE_RAND_MAC_REASSOC 3
 
+#define CMD_BUFFER_SIZE 1024
+#define GSM_AUTH_RAND_LEN 16
+#define GSM_AUTH_CHALLENGE_SRES_LEN 4
+#define GSM_AUTH_CHALLENGE_KC_LEN 8
+
+#define MAX_SRES_STR_LEN (2 * GSM_AUTH_CHALLENGE_SRES_LEN)
+#define MAX_KC_STR_LEN (2 * GSM_AUTH_CHALLENGE_KC_LEN)
+
+#define UMTS_AUTH_TYPE_TAG 0xdb
+#define UMTS_AUTS_TYPE_TAG 0xdc
+
+#define UMTS_AUTH_CHALLENGE_RESULT_INDEX 0
+#define UMTS_AUTH_CHALLENGE_DATA_START_IDNEX 1
+
+#define UMTS_AUTH_CHALLENGE_RAND_LEN 16
+#define UMTS_AUTH_CHALLENGE_AUTN_LEN 16
+#define UMTS_AUTH_CHALLENGE_RES_LEN 8
+#define UMTS_AUTH_CHALLENGE_CK_LEN 16
+#define UMTS_AUTH_CHALLENGE_IK_LEN 16
+#define UMTS_AUTH_CHALLENGE_AUTS_LEN 16
+
+#define UMTS_AUTH_REQUEST_CONTENT_LEN (UMTS_AUTH_CHALLENGE_RAND_LEN + UMTS_AUTH_CHALLENGE_AUTN_LEN + 2)
+
+// res[9] + ck[17] + ik[17] + unknown[9]
+#define UMTS_AUTH_RESPONSE_CONENT_LEN 52
+
+#define MAX_RES_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RES_LEN)
+#define MAX_CK_STR_LEN (2 * UMTS_AUTH_CHALLENGE_CK_LEN)
+#define MAX_IK_STR_LEN (2 * UMTS_AUTH_CHALLENGE_IK_LEN)
+#define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
+#define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
+
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -446,7 +478,7 @@ ErrCode StaStateMachine::FillEapCfg(const WifiDeviceConfig &config, WifiIdlDevic
     idlConfig.eapConfig.anonymousIdentity = config.wifiEapConfig.anonymousIdentity;
     if (memcpy_s(idlConfig.eapConfig.password, sizeof(idlConfig.eapConfig.password),
         config.wifiEapConfig.password.c_str(), config.wifiEapConfig.password.length()) != EOK) {
-        LOGE("%{public}s: failed to copy the content", __func__);
+        WIFI_LOGE("%{public}s: failed to copy the content", __func__);
         return WIFI_OPT_FAILED;
     }
     idlConfig.eapConfig.caCertPath = config.wifiEapConfig.caCertPath;
@@ -454,7 +486,7 @@ ErrCode StaStateMachine::FillEapCfg(const WifiDeviceConfig &config, WifiIdlDevic
     idlConfig.eapConfig.clientCert = config.wifiEapConfig.clientCert;
     if (memcpy_s(idlConfig.eapConfig.certPassword, sizeof(idlConfig.eapConfig.certPassword),
         config.wifiEapConfig.certPassword, sizeof(config.wifiEapConfig.certPassword)) != EOK) {
-        LOGE("%{public}s: failed to copy the content", __func__);
+        WIFI_LOGE("%{public}s: failed to copy the content", __func__);
         return WIFI_OPT_FAILED;
     }
     idlConfig.eapConfig.privateKey = config.wifiEapConfig.privateKey;
@@ -463,6 +495,29 @@ ErrCode StaStateMachine::FillEapCfg(const WifiDeviceConfig &config, WifiIdlDevic
     idlConfig.eapConfig.realm = config.wifiEapConfig.realm;
     idlConfig.eapConfig.plmn = config.wifiEapConfig.plmn;
     idlConfig.eapConfig.eapSubId = config.wifiEapConfig.eapSubId;
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaStateMachine::SetExternalSim(const std::string ifName, const std::string &eap, int value) const
+{
+    if ((eap != EAP_METHOD_SIM) &&
+        (eap != EAP_METHOD_AKA) &&
+        (eap != EAP_METHOD_AKA_PRIME)) {
+        return WIFI_OPT_SUCCESS;
+    }
+
+    WIFI_LOGI("%{public}s ifName: %{public}s, eap: %{public}s, value: %{public}d",
+        __func__, ifName.c_str(), eap.c_str(), value);
+    char cmd[CMD_BUFFER_SIZE] = { 0 };
+    if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1, "set external_sim %d", value) < 0) {
+        WIFI_LOGE("StaStateMachine::ConvertDeviceCfg: failed to snprintf_s");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (WifiStaHalInterface::GetInstance().ShellCmd(ifName, cmd) != WIFI_IDL_OPT_OK) {
+        WIFI_LOGI("%{public}s: failed to set StaShellCmd, cmd:%{private}s", __func__, cmd);
+        return WIFI_OPT_FAILED;
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -509,6 +564,11 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
         SsidAnonymize(idlConfig.ssid).c_str(), MacAnonymize(idlConfig.bssid).c_str());
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, idlConfig) != WIFI_IDL_OPT_OK) {
         LOGE("ConvertDeviceCfg SetDeviceConfig failed!");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (SetExternalSim("wlan0", idlConfig.eapConfig.eap, WIFI_EAP_OPEN_EXTERNAL_SIM)) {
+        LOGE("StaStateMachine::ConvertDeviceCfg: failed to set external_sim");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -824,6 +884,10 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[CMD_START_RENEWAL_TIMEOUT] = &StaStateMachine::DealRenewalTimeout;
     staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = &StaStateMachine::DealScreenStateChangedEvent;
     staSmHandleFuncMap[CMD_AP_ROAMING_TIMEOUT_CHECK] = &StaStateMachine::DealApRoamingStateTimeout;
+#ifndef OHOS_ARCH_LITE
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT] = &StaStateMachine::DealWpaEapSimAuthEvent;
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT] = &StaStateMachine::DealWpaEapUmtsAuthEvent;
+#endif
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1873,6 +1937,479 @@ void StaStateMachine::OnDhcpResultNotifyEvent(DhcpReturnCode result, int ipType)
     msg->SetParam2(ipType);
     SendMessage(msg);
 }
+
+#ifndef OHOS_ARCH_LITE
+int32_t StaStateMachine::GetDataSlotId()
+{
+    auto slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if (slotId < 0 || slotId >= CoreServiceClient::GetInstance().GetMaxSimCount()) {
+        LOGE("failed to get default slotId, slotId:%{public}d", slotId);
+        return -1;
+    }
+    LOGI("slotId: %{public}d", slotId);
+    return slotId;
+}
+
+int32_t StaStateMachine::GetCardType(CardType &cardType)
+{
+    return CoreServiceClient::GetInstance().GetCardType(GetDataSlotId(), cardType);
+}
+
+int32_t StaStateMachine::GetDefaultId(int32_t slotId)
+{
+    LOGI("StaStateMachine::GetDefaultId in, slotId: %{public}d", slotId);
+    if (slotId == WIFI_INVALID_SIM_ID) {
+        return GetDataSlotId();
+    }
+    return slotId;
+}
+
+int32_t StaStateMachine::GetSimCardState(int32_t slotId)
+{
+    LOGI("StaStateMachine::GetSimCardState in, slotId: %{public}d", slotId);
+    slotId = GetDefaultId(slotId);
+    LOGI("slotId: %{public}d", slotId);
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    int32_t result = CoreServiceClient::GetInstance().GetSimState(slotId, simState);
+    if (result != WIFI_OPT_SUCCESS) {
+        LOGE("StaStateMachine::GetSimCardState result:%{public}d, simState:%{public}d", result, simState);
+        return static_cast<int32_t>(simState);
+    }
+    LOGI("StaStateMachine::GetSimCardState out, simState:%{public}d", simState);
+    return static_cast<int32_t>(simState);
+}
+
+bool StaStateMachine::IsValidSimId(int32_t simId)
+{
+    if (simId > 0) {
+        return true;
+    }
+    return false;
+}
+
+bool StaStateMachine::IsMultiSimEnabled() {
+    int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
+    LOGI("StaStateMachine::IsMultiSimEnabled simCount:%{public}d", simCount);
+    if (simCount > 1) {
+        return true;
+    }
+    return false;
+}
+
+std::string StaStateMachine::SimAkaAuth(const std::string &nonce, AuthType authType)
+{
+    LOGD("StaStateMachine::SimAkaAuth in, authType:%{public}d, nonce:%{private}s", authType, nonce.c_str());
+    auto slotId = GetDataSlotId();
+    SimAuthenticationResponse response;
+    int32_t result = CoreServiceClient::GetInstance().SimAuthentication(slotId, authType, nonce, response);
+    if (result != WIFI_OPT_SUCCESS) {
+        LOGE("StaStateMachine::SimAkaAuth: errCode=%{public}d", result);
+        return "";
+    }
+    return response.response;
+}
+
+/* Calculate SRES and KC as 2G authentication.
+ * Protocol: 3GPP TS 31.102 2G_authentication
+ * Request messge: [Length][RAND1][Length][RAND2]...[Length][RANDn]
+ * Response messge: [SRES Length][SRES][KC Length][Cipher Key Kc]
+*/
+std::string StaStateMachine::GetGsmAuthResponseWithLength(EapSimGsmAuthParam param)
+{
+    int i = 0;
+    std::string authRsp;
+    uint8_t randArray[GSM_AUTH_RAND_LEN] = { 0 };
+
+    LOGI("%{public}s size:%{public}zu", __func__, param.rands.size());
+    for (auto iter = param.rands.begin(); iter != param.rands.end(); ++iter) {
+        // data pre-processing
+        memset_s(randArray, sizeof(randArray), 0x0, sizeof(randArray));
+        char tmpRand[MAX_RAND_STR_LEN + 1] = { 0 };
+        if (strncpy_s(tmpRand, sizeof(tmpRand), (*iter).c_str(), (*iter).length()) != EOK) {
+            LOGE("%{public}s: failed to copy", __func__);
+            return "";
+        }
+        LOGD("%{public}s rand[%{public}d]: %{private}s, tmpRand: %{private}s",
+            __func__, i, (*iter).c_str(), tmpRand);
+
+        // converting a hexadecimal character string to an array
+        int ret = HexString2Byte(tmpRand, randArray, sizeof(randArray));
+        if (ret != 0) {
+            LOGE("%{public}s: failed to convert a hexadecimal character string to integer", __func__);
+            return "";
+        }
+        std::vector<uint8_t> randVec;
+        randVec.push_back(sizeof(randArray));
+        for (size_t j = 0; j < sizeof(randArray); j++) {
+            randVec.push_back(randArray[j]);
+        }
+
+        // encode data and initiate a challenge request
+        std::string base64Challenge = EncodeBase64(randVec);
+        std::string response = SimAkaAuth(base64Challenge, SIM_AUTH_EAP_SIM_TYPE);
+        if (response.empty()) {
+            LOGE("%{public}s: fail to sim authentication", __func__);
+            return "";
+        }
+        LOGD("telephony response: %{private}s", response.c_str());
+
+        // decode data: data format is [SRES Length][SRES][KC Length][Cipher Key Kc]
+        std::vector<uint8_t> nonce;
+        if (!DecodeBase64(response, nonce)) {
+            LOGE("%{public}s: failed to decode sim authentication, size:%{public}zu", __func__, nonce.size());
+            return "";
+        }
+
+        // [SRES Length]: the length is 4 bytes
+        uint8_t sresLen = nonce[0];
+        if (sresLen >= nonce.size()) {
+            LOGE("%{public}s: invalid length, sresLen: %{public}d, size: %{public}zu",
+                __func__, sresLen, nonce.size());
+            return "";
+        }
+
+        // [SRES]
+        int offset = 1; // offset [SRES Length]
+        char sresBuf[MAX_SRES_STR_LEN + 1] = { 0 };
+        Byte2HexString(&nonce[offset], sresLen, sresBuf, sizeof(sresBuf));
+        LOGD("%{public}s sresLen: %{public}d, sresBuf: %{private}s", __func__, sresLen, sresBuf);
+
+        // [KC Length]: the length is 8 bytes
+        size_t kcOffset = 1 + sresLen; // offset [SRES Length][SRES]
+        if (kcOffset >= nonce.size()) {
+            LOGE("%{public}s: invalid kcOffset: %{public}zu", __func__, kcOffset);
+            return "";
+        }
+        uint8_t kcLen = nonce[kcOffset];
+        if ((kcLen + kcOffset) >= nonce.size()) {
+            LOGE("%{public}s: invalid kcLen: %{public}d, kcOffset: %{public}zu", __func__, kcLen, kcOffset);
+            return "";
+        }
+
+        // [Cipher Key Kc]
+        char kcBuf[MAX_KC_STR_LEN + 1] = {0};
+        Byte2HexString(&nonce[kcOffset + 1], kcLen, kcBuf, sizeof(kcBuf));
+        LOGD("%{public}s kcLen:%{public}d, kcBuf:%{private}s", __func__, kcLen, kcBuf);
+
+        // strcat request message
+        if (i == 0) {
+            authRsp +=  std::string(kcBuf) + ":" + std::string(sresBuf);
+        } else {
+            authRsp +=  ":" + std::string(kcBuf) + ":" + std::string(sresBuf);
+        }
+        i++;
+    }
+    LOGD("%{public}s authRsp: %{private}s, len: %{public}zu", __func__, authRsp.c_str(), authRsp.length());
+    return authRsp;
+}
+
+/* Calculate SRES and KC as 2G authentication.
+ * Protocol: 3GPP TS 11.11  2G_authentication
+ * Request messge: [RAND1][RAND2]...[RANDn]
+ * Response messge: [SRES][Cipher Key Kc]
+*/
+std::string StaStateMachine::GetGsmAuthResponseWithoutLength(EapSimGsmAuthParam param)
+{
+    int i = 0;
+    std::string authRsp;
+    uint8_t randArray[GSM_AUTH_RAND_LEN];
+
+    LOGI("%{public}s size: %{public}zu", __func__, param.rands.size());
+    for (auto iter = param.rands.begin(); iter != param.rands.end(); ++iter) {
+        // data pre-processing
+        memset_s(randArray, sizeof(randArray), 0x0, sizeof(randArray));
+        char tmpRand[MAX_RAND_STR_LEN + 1] = { 0 };
+        if (strncpy_s(tmpRand, sizeof(tmpRand), (*iter).c_str(), (*iter).length()) != EOK) {
+            LOGE("%{public}s: failed to copy", __func__);
+            return "";
+        }
+        LOGD("%{public}s rand[%{public}d]: %{public}s, tmpRand: %{public}s", __func__, i, (*iter).c_str(), tmpRand);
+
+        // converting a hexadecimal character string to an array
+        int ret = HexString2Byte(tmpRand, randArray, sizeof(randArray));
+        if (ret != 0) {
+            LOGE("%{public}s: fail to data conversion", __func__);
+            return "";
+        }
+
+        std::vector<uint8_t> randVec;
+        for (size_t j = 0; j < sizeof(randArray); j++) {
+            randVec.push_back(randArray[j]);
+        }
+
+        // encode data and initiate a challenge request
+        std::string base64Challenge = EncodeBase64(randVec);
+        std::string response = SimAkaAuth(base64Challenge, SIM_AUTH_EAP_SIM_TYPE);
+        if (response.empty()) {
+            LOGE("%{public}s: fail to authenticate", __func__);
+            return "";
+        }
+        LOGD("telephony response: %{private}s", response.c_str());
+
+        // data format: [SRES][Cipher Key Kc]
+        std::vector<uint8_t> nonce;
+        if (!DecodeBase64(response, nonce)) {
+            LOGE("%{public}s: failed to decode sim authentication, size:%{public}zu", __func__, nonce.size());
+            return "";
+        }
+
+        if (GSM_AUTH_CHALLENGE_SRES_LEN + GSM_AUTH_CHALLENGE_KC_LEN != nonce.size()) {
+            LOGE("%{public}s: invalid length, size: %{public}zu", __func__, nonce.size());
+            return "";
+        }
+
+        // [SRES]
+        std::string sres;
+        char sresBuf[MAX_SRES_STR_LEN + 1] = {0};
+        Byte2HexString(&nonce[0], GSM_AUTH_CHALLENGE_SRES_LEN, sresBuf, sizeof(sresBuf));
+
+        // [Cipher Key Kc]
+        size_t kcOffset = GSM_AUTH_CHALLENGE_SRES_LEN;
+        if (kcOffset >= nonce.size()) {
+            LOGE("%{public}s: invalid length, kcOffset: %{public}zu", __func__, kcOffset);
+            return "";
+        }
+
+        std::string kc;
+        char kcBuf[MAX_KC_STR_LEN + 1] = {0};
+        Byte2HexString(&nonce[kcOffset], GSM_AUTH_CHALLENGE_KC_LEN, kcBuf, sizeof(kcBuf));
+
+        // strcat request message
+        if (i == 0) {
+            authRsp +=  std::string(kcBuf) + ":" + std::string(sresBuf);
+        } else {
+            authRsp +=  ":" + std::string(kcBuf) + ":" + std::string(sresBuf);
+        }
+        i++;
+    }
+    LOGI("%{public}s authReq: %{private}s, len: %{public}zu", __func__, authRsp.c_str(), authRsp.length());
+    return authRsp;
+}
+
+bool StaStateMachine::PreWpaEapUmtsAuthEvent()
+{
+    CardType cardType;
+    int32_t ret = GetCardType(cardType);
+    if (ret != 0) {
+        LOGE("failed to get cardType: %{public}d", ret);
+        return false;
+    }
+    if (cardType == CardType::SINGLE_MODE_SIM_CARD) {
+        LOGE("invalid cardType: %{public}d", cardType);
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t> StaStateMachine::FillUmtsAuthReq(EapSimUmtsAuthParam &param)
+{
+    // request data format: [RAND LENGTH][RAND][AUTN LENGTH][AUTN]
+    std::vector<uint8_t> inputChallenge;
+
+    // rand hexadecimal string convert to binary
+    char rand[MAX_RAND_STR_LEN + 1] = { 0 };
+    if (strncpy_s(rand, sizeof(rand), param.rand.c_str(), param.rand.length()) != EOK) {
+        LOGE("%{public}s: failed to copy rand", __func__);
+        return inputChallenge;
+    }
+    uint8_t randArray[UMTS_AUTH_CHALLENGE_RAND_LEN];
+    int32_t ret = HexString2Byte(rand, randArray, sizeof(randArray));
+    if (ret != 0) {
+        LOGE("%{public}s: failed to convert to rand", __func__);
+        return inputChallenge;
+    }
+
+    // [RAND LENGTH]: rand length
+    inputChallenge.push_back(sizeof(randArray));
+
+    // [RAND]: rand data
+    for (size_t i = 0; i < sizeof(randArray); i++) {
+        inputChallenge.push_back(randArray[i]);
+    }
+
+    // autn hexadecimal string convert to binary
+    char autn[MAX_AUTN_STR_LEN + 1] = { 0 };
+    if (strncpy_s(autn, sizeof(autn), param.autn.c_str(), param.autn.length()) != EOK) {
+        LOGE("%{public}s: failed to copy autn", __func__);
+        return inputChallenge;
+    }
+    uint8_t autnArray[UMTS_AUTH_CHALLENGE_RAND_LEN];
+    ret = HexString2Byte(autn, autnArray, sizeof(autnArray));
+    if (ret != 0) {
+        LOGE("%{public}s: failed to convert to autn", __func__);
+        return inputChallenge;
+    }
+
+    // [AUTN LENGTH]: autn length
+    inputChallenge.push_back(sizeof(autnArray));
+
+    // [AUTN]: autn data
+    for (size_t i = 0; i < sizeof(autnArray); i++) {
+        inputChallenge.push_back(autnArray[i]);
+    }
+    return inputChallenge;
+}
+
+std::string StaStateMachine::ParseAndFillUmtsAuthParam(std::vector<uint8_t> &nonce)
+{
+    std::string authReq;
+    uint8_t tag = nonce[UMTS_AUTH_CHALLENGE_RESULT_INDEX]; // nonce[0]: the 1st byte is authentication type
+    if (tag == UMTS_AUTH_TYPE_TAG) {
+        char nonceBuf[UMTS_AUTH_RESPONSE_CONENT_LEN * 2 + 1] = { 0 }; // length of auth data
+        Byte2HexString(&nonce[0], UMTS_AUTH_RESPONSE_CONENT_LEN, nonceBuf, sizeof(nonceBuf));
+        LOGD("Raw Response: %{private}s", nonceBuf);
+
+        authReq = "UMTS-AUTH:";
+
+        // res
+        uint8_t resLen = nonce[UMTS_AUTH_CHALLENGE_DATA_START_IDNEX]; // nonce[1]: the 2nd byte is the length of res
+        int resOffset = UMTS_AUTH_CHALLENGE_DATA_START_IDNEX + 1;
+        std::string res;
+        char resBuf[MAX_RES_STR_LEN + 1] = { 0 };
+        /* nonce[2]~nonce[9]: the 3rd byte ~ 10th byte is res data */
+        Byte2HexString(&nonce[resOffset], resLen, resBuf, sizeof(resBuf));
+        LOGD("%{public}s resLen: %{public}d, resBuf: %{private}s", __func__, resLen, resBuf);
+
+        // ck
+        int ckOffset = resOffset + resLen;
+        uint8_t ckLen = nonce[ckOffset]; // nonce[10]: the 11th byte is ck length
+        std::string ck;
+        char ckBuf[MAX_CK_STR_LEN + 1] = { 0 };
+
+        /* nonce[11]~nonce[26]: the 12th byte ~ 27th byte is ck data */
+        Byte2HexString(&nonce[ckOffset + 1], ckLen, ckBuf, sizeof(ckBuf));
+        LOGD("ckLen: %{public}d, ckBuf:%{private}s", ckLen, ckBuf);
+
+        // ik
+        int ikOffset = ckOffset + ckLen + 1;
+        uint8_t ikLen = nonce[ikOffset]; // nonce[27]: the 28th byte is the length of ik
+        std::string ik;
+        char ikBuf[MAX_IK_STR_LEN + 1] = { 0 };
+        /* nonce[28]~nonce[43]: the 29th byte ~ 44th byte is ck data */
+        Byte2HexString(&nonce[ikOffset + 1], ikLen, ikBuf, sizeof(ikBuf));
+        LOGD("ikLen: %{public}d, ikBuf:%{private}s", ikLen, ikBuf);
+
+        std::string authRsp = std::string(ikBuf) + ":" + std::string(ckBuf) + ":" + std::string(resBuf);
+        authReq += authRsp;
+        LOGD("%{public}s ik: %{private}s, ck: %{private}s, res: %{private}s, authRsp: %{private}s",
+            __func__, ikBuf, ckBuf, resBuf, authRsp.c_str());
+    } else {
+        authReq = "UMTS-AUTS:";
+
+        // auts
+        uint8_t autsLen = nonce[UMTS_AUTH_CHALLENGE_DATA_START_IDNEX];
+        LOGD("autsLen: %{public}d", autsLen);
+        int offset = UMTS_AUTH_CHALLENGE_DATA_START_IDNEX + 1;
+        std::string auts;
+        char autsBuf[MAX_AUTN_STR_LEN + 1] = { 0 };
+        Byte2HexString(&nonce[offset], autsLen, autsBuf, sizeof(autsBuf));
+        LOGD("%{public}s auts: %{private}s", __func__, auts.c_str());
+
+        std::string authRsp = auts;
+        authReq += authRsp;
+        LOGD("%{public}s authRsp: %{private}s", __func__, authRsp.c_str());
+    }
+    return authReq;
+}
+
+std::string StaStateMachine::GetUmtsAuthResponse(EapSimUmtsAuthParam &param)
+{
+    // request data format: [RAND LENGTH][RAND][AUTN LENGTH][AUTN]
+    std::vector<uint8_t> inputChallenge = FillUmtsAuthReq(param);
+    if (inputChallenge.size() != UMTS_AUTH_REQUEST_CONTENT_LEN) {
+        return "";
+    }
+
+    std::string challenge = EncodeBase64(inputChallenge);
+    return SimAkaAuth(challenge, SIM_AUTH_EAP_AKA_TYPE);
+}
+
+void StaStateMachine::DealWpaEapSimAuthEvent(InternalMessage *msg)
+{
+    if (msg == NULL) {
+        LOGE("%{public}s: msg is null", __func__);
+        return;
+    }
+
+    EapSimGsmAuthParam param;
+    msg->GetMessageObj(param);
+    LOGI("%{public}s size: %{public}zu", __func__, param.rands.size());
+
+    std::string cmd = "GSM-AUTH:";
+    if (param.rands.size() <= 0) {
+        LOGE("%{public}s: invalid rands", __func__);
+        return;
+    }
+
+    std::string authRsp = GetGsmAuthResponseWithLength(param);
+    if (authRsp.empty()) {
+        authRsp = GetGsmAuthResponseWithoutLength(param);
+        if (authRsp.empty()) {
+            LOGE("failed to sim authentication");
+            return;
+        }
+    }
+
+    cmd += authRsp;
+    if (WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd) != WIFI_IDL_OPT_OK) {
+        LOGI("%{public}s: failed to send the message, authReq: %{private}s", __func__, cmd.c_str());
+        return;
+    }
+    LOGD("%{public}s: success to send the message, authReq: %{private}s", __func__, cmd.c_str());
+}
+
+void StaStateMachine::DealWpaEapUmtsAuthEvent(InternalMessage *msg)
+{
+    if (msg == NULL) {
+        LOGE("%{public}s: msg is null", __func__);
+        return;
+    }
+
+    EapSimUmtsAuthParam param;
+    msg->GetMessageObj(param);
+    if (param.rand.empty() || param.autn.empty()) {
+        LOGE("invalid rand = %{public}zu or autn = %{public}zu", param.rand.length(), param.autn.length());
+        return;
+    }
+
+    LOGD("%{public}s rand: %{private}s, autn: %{private}s", __func__, param.rand.c_str(), param.autn.c_str());
+
+    if (!PreWpaEapUmtsAuthEvent()) {
+        return;
+    }
+
+    // get challenge information
+    std::string response = GetUmtsAuthResponse(param);
+    if (response.empty()) {
+        LOGE("response is empty");
+        return;
+    }
+
+    // parse authentication information
+    std::vector<uint8_t> nonce;
+    if (!DecodeBase64(response, nonce)) {
+        LOGE("%{public}s: failed to decode aka authentication, size:%{public}zu", __func__, nonce.size());
+        return;
+    }
+
+    // data format: [0xdb][RES Length][RES][CK Length][CK][IK Length][IK]
+    uint8_t tag = nonce[UMTS_AUTH_CHALLENGE_RESULT_INDEX];
+    if ((tag != UMTS_AUTH_TYPE_TAG) && (tag != UMTS_AUTS_TYPE_TAG)) {
+        LOGE("%{public}s: unsupport type: 0x%{public}02x", __func__, tag);
+        return;
+    }
+
+    LOGI("tag: 0x%{public}02x", tag);
+
+    // request authentication to wpa
+    std::string reqCmd = ParseAndFillUmtsAuthParam(nonce);
+    if (WifiStaHalInterface::GetInstance().ShellCmd("wlan0", reqCmd) != WIFI_IDL_OPT_OK) {
+        LOGI("%{public}s: failed to send the message, authReq: %{private}s", __func__, reqCmd.c_str());
+        return;
+    }
+    LOGD("%{public}s: success to send the message, authReq: %{private}s", __func__, reqCmd.c_str());
+}
+#endif
 
 /* --------------------------- state machine Separating State ------------------------------ */
 StaStateMachine::SeparatingState::SeparatingState() : State("SeparatingState")

@@ -30,6 +30,9 @@
 
 namespace OHOS {
 namespace Wifi {
+#define MAX_IFACENAME_LEN 6
+#define MAX_CMD_BUFFER_SIZE 1024
+
 constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
 const int BUFFER_SIZE = 4096;
@@ -212,8 +215,8 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
         num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
     }
     EapMethod eapMethod = WifiEapConfig::Str2EapMethod(config.eapConfig.eap);
-    LOGI("%{public}s, eap:%{public}s, eapMethod:%{public}d, num:%{public}d",
-        __func__, config.eapConfig.eap.c_str(), eapMethod, num);
+    LOGI("%{public}s, eap:%{public}s, eapMethod:%{public}d, identity:%{private}s, num:%{public}d",
+        __func__, config.eapConfig.eap.c_str(), eapMethod, config.eapConfig.identity.c_str(), num);
     switch (eapMethod) {
         case EapMethod::EAP_PEAP:
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
@@ -249,6 +252,12 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.eapConfig.password);
+            break;
+        case EapMethod::EAP_SIM:
+        case EapMethod::EAP_AKA:
+        case EapMethod::EAP_AKA_PRIME:
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
             break;
         default:
             LOGE("%{public}s, invalid eapMethod:%{public}d", __func__, eapMethod);
@@ -333,6 +342,7 @@ WifiErrorNo WifiHdiWpaClient::ReqRegisterStaEventCallback(const WifiEventCallbac
         cWifiHdiWpaCallback.OnEventWpsOverlap = OnEventWpsOverlap;
         cWifiHdiWpaCallback.OnEventWpsTimeout = OnEventWpsTimeout;
         cWifiHdiWpaCallback.OnEventScanResult = OnEventScanResult;
+        cWifiHdiWpaCallback.OnEventStaNotify = OnEventStaNotify;
     }
 
     return RegisterHdiWpaStaEventCallback(&cWifiHdiWpaCallback);
@@ -424,6 +434,22 @@ static WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCo
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetSuspendMode(bool mode) const
 {
     return HdiWpaStaSetSuspendMode(mode);
+}
+
+WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const std::string &cmd)
+{
+    char ifNameBuf[MAX_IFACENAME_LEN];
+    if (strncpy_s(ifNameBuf, sizeof(ifNameBuf), ifName.c_str(), ifName.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    char cmdBuf[MAX_CMD_BUFFER_SIZE];
+    if (strncpy_s(cmdBuf, sizeof(cmdBuf), cmd.c_str(), cmd.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return HdiWpaStaSetShellCmd(ifNameBuf, cmdBuf);
 }
 
 int WifiHdiWpaClient::PushDeviceConfigString(
@@ -762,6 +788,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
         cWifiHdiWpaCallback.OnEventServDiscResp = OnEventServDiscResp;
         cWifiHdiWpaCallback.OnEventStaConnectState = OnEventStaConnectState;
         cWifiHdiWpaCallback.OnEventIfaceCreated = OnEventIfaceCreated;
+        cWifiHdiWpaCallback.OnEventStaNotify = OnEventStaNotify;
     }
 
     return RegisterHdiWpaP2pEventCallback(&cWifiHdiWpaCallback);

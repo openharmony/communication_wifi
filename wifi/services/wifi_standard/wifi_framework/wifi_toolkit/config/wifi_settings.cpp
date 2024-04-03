@@ -1147,7 +1147,14 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto &item : mWifiStoreRandomMac) {
-        if (CompareMac(item.peerBssid, randomMacInfo.peerBssid) && item.ssid == randomMacInfo.ssid) {
+        if (item.ssid != randomMacInfo.ssid) {
+            continue;
+        }
+        if (randomMacInfo.keyMgmt == KEY_MGMT_NONE && item.peerBssid == randomMacInfo.peerBssid) {
+            randomMacInfo.randomMac = item.randomMac;
+            return true;
+        }
+        if (randomMacInfo.keyMgmt != KEY_MGMT_NONE && CompareMac(item.peerBssid, randomMacInfo.peerBssid)) {
             randomMacInfo.randomMac = item.randomMac;
             return true;
         }

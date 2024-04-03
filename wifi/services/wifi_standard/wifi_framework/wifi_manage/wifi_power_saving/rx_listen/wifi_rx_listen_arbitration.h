@@ -17,6 +17,7 @@
 #define OHOS_WIFI_POWER_RX_LISTEN_H
 
 #include <string>
+#include <mutex>
 #include "appmgr/app_mgr_interface.h"
 #include "appmgr/app_mgr_constants.h"
 
@@ -34,7 +35,8 @@ private:
 
 private:
     unsigned int m_arbitrationCond = 0x00;
-    bool m_isRxListenOn = false;
+    bool m_isRxListenOn = false;\
+    std::mutex m_condMutex;
 };
 } // namespace Wifi
 } // namespace OHOS

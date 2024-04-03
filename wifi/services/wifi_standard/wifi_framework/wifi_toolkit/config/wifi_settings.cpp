@@ -1859,6 +1859,7 @@ time_t WifiSettings::GetUserLastSelectedNetworkTimeVal(int instId)
 
 int WifiSettings::SyncWifiConfig()
 {
+    std::unique_lock<std::mutex> lock(mSyncWifiConfigMutex);
     std::vector<WifiConfig> tmp;
     for (auto &item : mWifiConfig) {
         tmp.push_back(item.second);

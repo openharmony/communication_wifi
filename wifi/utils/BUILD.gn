@@ -82,7 +82,6 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "c_utils:utils",
-      "core_service:tel_core_service_api",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "hisysevent:libhisysevent",

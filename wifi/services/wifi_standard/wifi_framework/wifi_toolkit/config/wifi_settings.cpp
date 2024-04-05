@@ -1156,9 +1156,8 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
             randomMacInfo.randomMac = item.randomMac;
             return true;
         }
-        if(randomMacInfo.keyMgmt == item.keyMgmt && item.peerBssid == randomMacInfo.peerBssid) {
+        if (randomMacInfo.keyMgmt == item.keyMgmt && item.peerBssid == randomMacInfo.peerBssid) {
             randomMacInfo.randomMac = item.randomMac;
-                randomMacInfo.peerBssid.c_str(), item.randomMac.c_str());
             return true;
         }
     }

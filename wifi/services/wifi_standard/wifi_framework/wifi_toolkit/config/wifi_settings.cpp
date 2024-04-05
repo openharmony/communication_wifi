@@ -1114,7 +1114,6 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     bool isConnected = false;
-
     for (auto &ele : mWifiStoreRandomMac) {
         if ((randomMacInfo.ssid == ele.ssid) && (randomMacInfo.keyMgmt == ele.keyMgmt)) {
             ele.peerBssid = randomMacInfo.peerBssid;
@@ -1122,13 +1121,15 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
             isConnected = true;
             break;
         } else if (CompareMac(randomMacInfo.peerBssid, ele.peerBssid) && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
-                   (randomMacInfo.keyMgmt == "NONE")) {
-            isConnected = false;
-        } else if (CompareMac(randomMacInfo.peerBssid, ele.peerBssid) && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
-                   (randomMacInfo.keyMgmt != "NONE")) {
+                   (randomMacInfo.keyMgmt == KEY_MGMT_WPA_PSK)) {
             ele.ssid = randomMacInfo.ssid;
             randomMacInfo.randomMac = ele.randomMac;
             isConnected = true;
+            break;
+        } else if (randomMacInfo.peerBssid == ele.peerBssid && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
+                   (randomMacInfo.keyMgmt != KEY_MGMT_WPA_PSK)) {
+            isConnected = true;
+            break;
         } else {
             isConnected = false;
         }
@@ -1150,12 +1151,14 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
         if (item.ssid != randomMacInfo.ssid) {
             continue;
         }
-        if (randomMacInfo.keyMgmt == KEY_MGMT_NONE && item.peerBssid == randomMacInfo.peerBssid) {
+        if ((randomMacInfo.keyMgmt == KEY_MGMT_WPA_PSK && item.keyMgmt == KEY_MGMT_WPA_PSK) &&
+            CompareMac(item.peerBssid, randomMacInfo.peerBssid)) {
             randomMacInfo.randomMac = item.randomMac;
             return true;
         }
-        if (randomMacInfo.keyMgmt != KEY_MGMT_NONE && CompareMac(item.peerBssid, randomMacInfo.peerBssid)) {
+        if(randomMacInfo.keyMgmt == item.keyMgmt && item.peerBssid == randomMacInfo.peerBssid) {
             randomMacInfo.randomMac = item.randomMac;
+                randomMacInfo.peerBssid.c_str(), item.randomMac.c_str());
             return true;
         }
     }

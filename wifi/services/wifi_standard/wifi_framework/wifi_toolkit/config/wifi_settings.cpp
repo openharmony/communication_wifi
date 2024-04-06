@@ -799,6 +799,9 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
                 config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+                DecryptionDeviceConfig(config);
+#endif
                 return 0;
             }
         }
@@ -806,6 +809,9 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index) {
                 config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+                DecryptionDeviceConfig(config);
+#endif
                 return 0;
             }
         }
@@ -823,6 +829,9 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)) {
             config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            DecryptionDeviceConfig(config);
+#endif
             return 0;
         }
     }
@@ -845,6 +854,9 @@ int WifiSettings::GetDeviceConfig(const std::string &ancoCallProcessName, const 
         if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt) &&
             iter->second.ancoCallProcessName == ancoCallProcessName) {
             config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            DecryptionDeviceConfig(config);
+#endif
             return 0;
         }
     }

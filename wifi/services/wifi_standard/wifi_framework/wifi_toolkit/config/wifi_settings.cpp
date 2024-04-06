@@ -1127,11 +1127,26 @@ int WifiSettings::ReloadDeviceConfig()
     std::unique_lock<std::mutex> lock(mConfigMutex);
     mNetworkId = 0;
     mWifiDeviceConfig.clear();
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    int count = 0;
+#endif
     for (std::size_t i = 0; i < tmp.size(); ++i) {
         WifiDeviceConfig &item = tmp[i];
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        if (item.version == -1 && EncryptionDeviceConfig(item)) {
+            count ++;
+            item.version = 1;
+        }
+#endif
         item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    if (count > 0) {
+        mSavedDeviceConfig.SetValue(tmp);
+        mSavedDeviceConfig.SaveConfig();
+    }
+#endif
     return 0;
 #else
     std::unique_lock<std::mutex> lock(mConfigMutex);

@@ -39,6 +39,7 @@
 #include "parameter.h"
 #endif
 
+
 namespace OHOS {
 namespace Wifi {
 const std::string DEFAULT_IFACENAME = "wlan0";

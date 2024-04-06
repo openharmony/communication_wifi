@@ -342,10 +342,14 @@ void WifiEventSubscriberManager::DealCloneDataChangeEvent()
         return;
     }
 
-    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData);
-    // Clone finished, clear settingsdata clonedata.
-    cloneData.clear();
-    SetCloneDataByDatashare(cloneData);
+    auto mergeCalback = [ = , &cloneData]() -> void {
+        // Clone finished, clear settingsdata clonedata.
+        cloneData.clear();
+        WIFI_LOGI("ohc_enc DealCloneDataChangeEvent MergeWifiCloneConfig callback cloneData.size:%{public}lu", cloneData.size());
+        SetCloneDataByDatashare(cloneData);
+    };
+    WIFI_LOGI("ohc_enc DealCloneDataChangeEvent MergeWifiCloneConfig start");
+    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData, mergeCalback);
 }
 
 void WifiEventSubscriberManager::CheckAndStartStaByDatashare()

@@ -328,6 +328,9 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     }
 
     /* Add the new network to WifiSettings. */
+    if (WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
+        LOGE("AddDeviceConfig EncryptionDeviceConfig failed");
+    }
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* update net link proxy info */

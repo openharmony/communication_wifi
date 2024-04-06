@@ -25,6 +25,8 @@
 #include "wifi_common_def.h"
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
+#include "wifi_hisysevent.h"
+#include "wifi_common_util.h"
 
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int RANDOM_PASSWD_LEN = 8;
@@ -1540,6 +1542,25 @@ public:
      * @return void
      */
     void ClearHotspotConfig();
+    /**
+     * @Description Encryption wifi device config
+     *
+     * @param config - Encryption wifiDeviceConfig
+     */
+    bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+
+    /**
+     * @Description Decryption wifi device config
+     *
+     * @param config - Decryption wifiDeviceConfig
+     */
+    int DecryptionDeviceConfig(WifiDeviceConfig &config);
+
+    bool IsEncryptionEdDeviceConfig(const WifiDeviceConfig config) const;
+
+    bool IsDecryptionEdDeviceConfig(const WifiDeviceConfig &config) const;
+#endif
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address
@@ -1621,12 +1642,13 @@ public:
     int GetNextNetworkId();
 
 #ifndef OHOS_ARCH_LITE
+    using MergeCallbackFunc = std::function<void(void)>;
     /**
      * @Description Merge Localconfigs with cloneConfigs
      *
      * @param cloneData - wifi xml config
      */
-    void MergeWifiCloneConfig(const std::string &cloneData);
+    void MergeWifiCloneConfig(std::string &cloneData, MergeCallbackFunc mergeCalback);
 #endif
 
 private:
@@ -1645,7 +1667,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     void MergeSoftapConfig();
     void MergeWifiConfig();
-    void ConfigsDeduplicateAndSave(const std::vector<WifiDeviceConfig> &newConfigs);
+    void ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs);
 #endif
     void InitPackageFilterConfig();
 

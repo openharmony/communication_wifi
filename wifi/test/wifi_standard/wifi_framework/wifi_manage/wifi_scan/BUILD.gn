@@ -26,11 +26,6 @@ config("module_private_config") {
 ohos_unittest("wifi_scan_unittest") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/handler.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/internal_message.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/message_queue.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_monitor.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_service.cpp",
@@ -53,7 +48,7 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
@@ -89,6 +84,7 @@ ohos_unittest("wifi_scan_unittest") {
     "--coverage",
   ]
   deps = [
+    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",

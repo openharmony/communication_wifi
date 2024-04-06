@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -139,6 +139,7 @@ RpcClient *CreateRpcClient(const char *path)
 {
     int fd = ConnectUnixServer(path);
     if (fd < 0) {
+        LOGE("connect server failed.");
         return NULL;
     }
     SetNonBlock(fd, 1);
@@ -149,6 +150,7 @@ RpcClient *CreateRpcClient(const char *path)
     }
     client->context = CreateContext(CONTEXT_BUFFER_MIN_SIZE);
     if (client->context == NULL) {
+        LOGE("create context failed.");
         close(fd);
         free(client);
         client = NULL;
@@ -205,6 +207,7 @@ int RemoteCall(RpcClient *client)
         return -1;
     }
     if (client->waitReply == CLIENT_STATE_EXIT) {
+        LOGE("remote call, but client exit.");
         return -1;
     }
     int ret = 0;
@@ -213,6 +216,7 @@ int RemoteCall(RpcClient *client)
         ret = ContextWriteNet(context);
     }
     if (ret < 0) {
+        LOGE("context write failed.");
         return ret;
     }
     ret = 0; /* reset ret value */
@@ -221,6 +225,7 @@ int RemoteCall(RpcClient *client)
         pthread_cond_wait(&client->condW, &client->mutex);
     }
     if (client->waitReply == CLIENT_STATE_EXIT) {
+        LOGE("client exit.");
         ret = -1;
     }
     pthread_mutex_unlock(&client->mutex);

@@ -321,6 +321,7 @@ WifiErrorNo WifiIdlClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
         if (results[i].infoElems) {
             free(results[i].infoElems);
         }
+        tmp.isHiLinkNetwork = results[i].isHiLinkNetwork;
         scanInfos.emplace_back(tmp);
     }
     free(results);
@@ -843,23 +844,6 @@ WifiErrorNo WifiIdlClient::ReqSetDpiMarkRule(int uid, int protocol, int enable) 
     CHECK_CLIENT_NOT_NULL;
     LOGE("not support set dpi mark rule.");
     return WIFI_IDL_OPT_NOT_SUPPORT;
-}
-
-WifiErrorNo WifiIdlClient::ReqSetBgLimitMode(int mode) const
-{
-    CHECK_CLIENT_NOT_NULL;
-    return SetBgLimitMode(mode);
-}
-
-WifiErrorNo WifiIdlClient::ReqSetBgLimitIdList(std::vector<int> idList, int size, int type) const
-{
-    CHECK_CLIENT_NOT_NULL;
-    int idArray[size];
-    if (memcpy_s(idArray, sizeof(idArray), idList.data(), size) != EOK) {
-        LOGE("convert data failed.");
-        return WIFI_IDL_OPT_FAILED;
-    }
-    return SetBgLimitIdList(idArray, size, type);
 }
 
 WifiErrorNo WifiIdlClient::StartAp(int id, std::string ifaceName)

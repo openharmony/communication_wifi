@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ public:
      *
      * @return true :success, false : failed.
      */
-    bool InitialStateMachine();
+    bool InitialStateMachine(const std::string &name = "RunHandleThread");
 
     /**
      * @Description : Start StateMachine.
@@ -147,7 +147,7 @@ public:
 
     /**
      * @Description : Constructs internal messages and places the
-     * message in the message queue of the state machine.
+     * messages in the message queue of the state machine.
      *
      * @param msgName - Message name.[in]
      */
@@ -156,7 +156,7 @@ public:
     /**
      * @Description : Constructs internal messages and places the messages
      * in the message queue of the state machine.
-     * 
+     *
      * @param msgName - Message name.[in]
      * @param param1 - Message parameter.[in]
      */
@@ -198,7 +198,7 @@ public:
     virtual void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
 
     /**
-     * @Description : Constructs internal messages and places them in the
+     * @Description  Constructs internal messages and places them in the
      * message queue of the state machine. The messages are processed
      * after the specified delay time.
      *
@@ -264,7 +264,7 @@ public:
      */
     void MessageExecutedLater(int msgName, int param1, int param2, const std::any &messageObj, int64_t delayTimeMs);
 
-   /**
+    /**
      * @Description : Constructs internal messages and places them in the
      * front of message queue of the state machine.
      *
@@ -272,7 +272,12 @@ public:
      * @param param1 - Message parameters.[in]
      */
     void SendMessageAtFrontOfQueue(int msgName, int param1);
-    
+
+    /**
+     * @Description : get current state name.
+     */
+    std::string GetCurStateName();
+
 protected:
     /**
      * @Description : Construct a new State Machine:: State Machine object.
@@ -358,7 +363,7 @@ public:
      *
      * @return true : success, false : failed.
      */
-    bool InitialSmHandler();
+    bool InitialSmHandler(const std::string &name);
 
     /**
      * @Description : Add a new state.
@@ -402,6 +407,11 @@ public:
      *
      */
     void BuildTreeComplete();
+
+    /**
+     * @Description : get current state name.
+     */
+    std::string GetCurStateName();
 
 private:
     /**

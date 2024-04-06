@@ -200,6 +200,7 @@ WifiErrorNo WifiHdiClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
         if (results[i].infoElems) {
             free(results[i].infoElems);
         }
+        tmp.isHiLinkNetwork = results[i].isHiLinkNetwork;
         scanInfos.emplace_back(tmp);
     }
     return WIFI_IDL_OPT_OK;

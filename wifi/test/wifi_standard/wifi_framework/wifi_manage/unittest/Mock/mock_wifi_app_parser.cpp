@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,23 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "state.h"
-
-#undef LOG_TAG
-#define LOG_TAG "OHWIFI_STATE"
+#include "mock_wifi_app_parser.h"
 
 namespace OHOS {
 namespace Wifi {
-State::State(const std::string &name) : mStateName(name)
-{}
-
-State::~State()
-{}
-
-std::string State::GetStateName()
+AppParser &AppParser::GetInstance()
 {
-    return mStateName;
+    static AppParser instance;
+    return instance;
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

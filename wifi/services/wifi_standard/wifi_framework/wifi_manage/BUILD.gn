@@ -26,11 +26,6 @@ if (defined(ohos_lite)) {
 if (defined(ohos_lite)) {
   shared_library("wifi_service_base") {
     sources = [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/handler.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/internal_message.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/message_queue.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
@@ -57,10 +52,11 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
+      "$WIFI_ROOT_DIR/base/state_machine/include",
+      "$WIFI_ROOT_DIR/base/cRPC/include",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-      "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
@@ -89,6 +85,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -124,10 +121,11 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
+      "$WIFI_ROOT_DIR/base/state_machine/include",
+      "$WIFI_ROOT_DIR/base/cRPC/include",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-      "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
@@ -153,6 +151,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_service_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -173,13 +172,13 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-      "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/app_network_speed_limit",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
@@ -239,6 +238,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -294,6 +294,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       ":wifi_manager_service",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -343,6 +344,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       ":wifi_manager_service",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -393,6 +395,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -428,11 +431,8 @@ if (defined(ohos_lite)) {
     }
     install_enable = true
     sources = [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/handler.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/internal_message.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/message_queue.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/app_network_speed_limit/app_network_speed_limit_service.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/app_network_speed_limit/speed_limit_configs_writer.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_datashare_utils.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_permission_utils.cpp",
@@ -474,6 +474,7 @@ if (defined(ohos_lite)) {
     }
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",

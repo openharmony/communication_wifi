@@ -84,6 +84,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnGetChangeDeviceConfig;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET)] =
         &WifiDeviceStub::OnFactoryReset;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED)] =
+        &WifiDeviceStub::OnLimitSpeed;
     return;
 }
 
@@ -190,7 +192,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &rem
             static_cast<void*>(deathRecipient_), static_cast<void*>(iter->second));
         remoteObject->RemoveDeathRecipient(iter->second);
         remoteDeathMap.erase(iter);
-        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}d.", remoteDeathMap.size());
+        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}u.", remoteDeathMap.size());
     }
 }
 
@@ -1042,6 +1044,17 @@ void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageP
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = FactoryReset();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int controlId = data.ReadInt32();
+    int limitMode = data.ReadInt32();
+    ErrCode ret = LimitSpeed(controlId, limitMode);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

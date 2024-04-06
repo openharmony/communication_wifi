@@ -448,6 +448,15 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode FactoryReset() = 0;
+    
+    /**
+     * @Description  limit speed
+     *
+     * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit
+     * @param limitMode speed limit mode, ranges 1 to 9
+     * @return WifiErrorNo
+     */
+    virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -663,6 +663,28 @@ struct IpV6Info {
         secondDns = "";
     }
 };
+
+typedef enum {
+    BG_LIMIT_CONTROL_ID_GAME = 1,
+    BG_LIMIT_CONTROL_ID_STREAM,
+    BG_LIMIT_CONTROL_ID_TEMP,
+    BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT,
+} BgLimitControl;
+
+typedef enum {
+    BG_LIMIT_OFF = 0,
+    BG_LIMIT_LEVEL_1,
+    BG_LIMIT_LEVEL_2,
+    BG_LIMIT_LEVEL_3,
+    BG_LIMIT_LEVEL_4,
+    BG_LIMIT_LEVEL_5,
+    BG_LIMIT_LEVEL_6,
+    BG_LIMIT_LEVEL_7,
+    BG_LIMIT_LEVEL_8,
+    BG_LIMIT_LEVEL_9,
+    BG_LIMIT_LEVEL_10,
+    BG_LIMIT_LEVEL_11,
+} BgLimitLevel;
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

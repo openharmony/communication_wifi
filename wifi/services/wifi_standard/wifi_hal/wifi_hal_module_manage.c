@@ -27,6 +27,7 @@
 #include "wifi_hal_define.h"
 #include "wifi_log.h"
 #include "wifi_wpa_hal.h"
+#include "wifi_hostapd_hal.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalModuleManage"
@@ -159,7 +160,7 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
 static int StopModuleInternalKillProcess(pid_t processId)
 {
     LOGI("Stop module kill process: %{public}d", processId);
-    if (kill(processId, SIGKILL) == -1) {
+    if (kill(processId, SIGTERM) == -1) {
         if (ESRCH == errno) {
             LOGI("kill [%{public}d] success, pid no exist", processId);
             return HAL_SUCCESS;
@@ -206,11 +207,25 @@ static int StopModuleInternalSendTerminate(void)
     return (ret == 0 ? HAL_SUCCESS : HAL_FAILURE);
 }
 
+static int StopModuleInternalSoftAp(void)
+{
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(0);
+    if (hostapdHalDevice == NULL) {
+        LOGE("Get hostap dev interface failed!");
+        return WIFI_HAL_FAILED;
+    }
+    if (hostapdHalDevice->terminateAp(0) != 0) {
+        LOGE("terminateAp failed!");
+        return WIFI_HAL_FAILED;
+    }
+    return WIFI_HAL_SUCCESS;
+}
+
 int StopModuleInternal(const char *moduleName, pid_t processId, bool isHostapd)
 {
     int ret;
     if (isHostapd) {
-        ret = StopModuleInternalKillProcess(processId);
+        ret = StopModuleInternalSoftAp();
     } else {
         ret = StopModuleInternalSendTerminate();
     }

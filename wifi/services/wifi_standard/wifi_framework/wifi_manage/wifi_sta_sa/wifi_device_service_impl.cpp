@@ -31,6 +31,7 @@
 #include "mac_address.h"
 #include "wifi_p2p_service_impl.h"
 #include "wifi_country_code_manager.h"
+#include "app_network_speed_limit_service.h"
 #endif
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
@@ -1463,12 +1464,26 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     /* Hotspot */
     WifiSettings::GetInstance().ClearHotspotConfig();
     WifiSettings::GetInstance().SyncHotspotConfig();
-    WifiSettings::GetInstance().ClearRandomMacConfig();
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset ok!");
     return WIFI_OPT_SUCCESS;
 }
 
 #ifndef OHOS_ARCH_LITE
+ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
+{
+    WIFI_LOGI("Enter LimitSpeed.");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    AppNetworkSpeedLimitService::GetInstance().LimitSpeed(controlId, limitMode);
+    return WIFI_OPT_SUCCESS;
+}
+
 void WifiDeviceServiceImpl::StartWatchdog(void)
 {
     constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;

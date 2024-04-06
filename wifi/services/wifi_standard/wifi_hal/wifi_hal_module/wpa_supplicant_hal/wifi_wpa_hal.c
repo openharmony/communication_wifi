@@ -400,10 +400,13 @@ static void DealP2pChannelSwitch(const char *buf)
     if (buf == NULL) {
         return;
     }
+    if (strstr(buf, "dfs=") != NULL) {
+        LOGE("return ap channel switch!");
+        return;
+    }
     const char *freqPos = strstr(buf, "freq=");
-    const char *dfsPos = strstr(buf, "dfs=");
-    if (freqPos == NULL || dfsPos == NULL) {
-        LOGE("freqPos or dfsPos is null!");
+    if (freqPos == NULL) {
+        LOGE("freqPos is null!");
         return;
     }
     int freq = atoi(freqPos + strlen("freq="));

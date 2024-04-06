@@ -160,6 +160,9 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     if (pStaAppAcceleration->InitAppAcceleration() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitAppAcceleration failed.\n");
     }
+    std::vector<StaServiceCallback> appAccelerationStaCallBacks;
+    appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
+    RegisterStaServiceCallback(appAccelerationStaCallBacks);
 #endif
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;

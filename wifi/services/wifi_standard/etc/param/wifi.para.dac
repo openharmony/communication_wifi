@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-const.wifi_country_code.conf="wifi:wifi:775"
-const.wifi_country_code.runmode="wifi:wifi:775"
-const.wifi_country_code.factory="wifi:wifi:775"
-persist.wifi_country_code.dynamic_update="wifi:wifi:775"
+const.wifi.country_code.conf="wifi:wifi:775"
+const.wifi.country_code.runmode="wifi:wifi:775"
+const.wifi.country_code.factory="wifi:wifi:775"
+persist.wifi.country_code.dynamic_update="wifi:wifi:775"

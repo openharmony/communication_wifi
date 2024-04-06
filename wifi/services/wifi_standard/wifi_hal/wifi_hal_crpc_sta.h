@@ -387,24 +387,6 @@ int RpcSetSuspendMode(RpcServer *server, Context *context);
  * @return int - 0 Success, -1 Failed.
  */
 int RpcSetPowerMode(RpcServer *server, Context *context);
-
-/**
- * @Description set background limit speed mode
- *
- * @param mode - limit mode
- * @return WifiErrorNo
- */
-int RpcSetBgLimitMode(RpcServer *server, Context *context);
-
-/**
- * @Description set background limit speed uid&pid list
- *
- * @param idList - foreground and background app list
- * @param size - idList size
- * @param type - enable/disable dpi mark
- * @return WifiErrorNo
- */
-int RpcSetBgLimitIdList(RpcServer *server, Context *context);
 #ifdef __cplusplus
 }
 #endif

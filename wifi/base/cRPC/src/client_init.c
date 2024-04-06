@@ -16,17 +16,13 @@
 #include "client.h"
 
 typedef int (*OnTransactPtr)(Context *);
-static OnTransactPtr g_onTransactPtr = NULL;
 
-void Register(OnTransactPtr handle)
+void __attribute__((weak)) Register(OnTransactPtr handle)
 {
-    g_onTransactPtr = handle;
+    return;
 }
 
-int OnTransact(Context *context)
+int __attribute__((weak)) OnTransact(Context *context)
 {
-    if (g_onTransactPtr != NULL) {
-        return g_onTransactPtr(context);
-    }
     return -1;
 }

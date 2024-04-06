@@ -1829,5 +1829,41 @@ ErrCode WifiDeviceProxy::FactoryReset()
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiDeviceProxy::LimitSpeed(const int controlId, const int limitMode)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to %{public}s,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(controlId);
+    data.WriteInt32(limitMode);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("LimitSpeed(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("LimitSpeed Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("LimitSpeed Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

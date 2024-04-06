@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-const.wifi_country_code.conf=1
-const.wifi_country_code.runmode=normal
-const.wifi_country_code.factory=HK
-persist.wifi_country_code.dynamic_update=CN
+const.wifi.country_code.conf=1
+const.wifi.country_code.runmode=normal
+const.wifi.country_code.factory=HK
+persist.wifi.country_code.dynamic_update=CN

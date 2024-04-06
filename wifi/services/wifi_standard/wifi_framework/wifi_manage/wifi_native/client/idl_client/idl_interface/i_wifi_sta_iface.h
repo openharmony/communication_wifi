@@ -315,24 +315,6 @@ WifiErrorNo SetSuspendMode(bool mode);
  */
 WifiErrorNo SetPowerMode(bool mode);
 
-/**
- * @Description set background limit speed mode
- *
- * @param mode - limit mode
- * @return WifiErrorNo
- */
-WifiErrorNo SetBgLimitMode(int mode);
-
-/**
- * @Description set background limit speed uid&pid list
- *
- * @param idList - foreground and background app list
- * @param size - idList size
- * @param type - enable/disable dpi mark
- * @return WifiErrorNo
- */
-WifiErrorNo SetBgLimitIdList(int *idArray, int size, int type);
-
 #ifdef __cplusplus
 }
 #endif

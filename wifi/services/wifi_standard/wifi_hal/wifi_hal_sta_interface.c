@@ -21,8 +21,6 @@
 #include "wifi_log.h"
 #include "wifi_supplicant_hal.h"
 #include "wifi_wpa_hal.h"
-#include <arpa/inet.h>
-#include <fcntl.h>
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHalStaInterface"
@@ -887,89 +885,5 @@ WifiErrorNo SetPowerMode(bool mode)
         return WIFI_HAL_FAILED;
     }
     return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo SetBgLimitMode(int mode)
-{
-    int fd = open(AWARE_CTRL_FILENAME, O_RDWR);
-    if (fd < 0) {
-        LOGE("open aware ctrl file failed, errno = %{public}d.", errno);
-        return WIFI_HAL_FAILED;
-    }
-
-    char awareCtrlStr[MAX_ARRAY_LENGTH] = {0};
-    int ret = snprintf_s(awareCtrlStr, MAX_ARRAY_LENGTH, MAX_ARRAY_LENGTH - 1, "1:%d", mode);
-    if (ret == -1) {
-        LOGE("SetBgLimitMode snprintf_s failed.");
-        close(fd);
-        return WIFI_HAL_FAILED;
-    }
-
-    int len = strlen(awareCtrlStr);
-    if (write(fd, awareCtrlStr, len) != len) {
-        LOGE("write awareCtrlStr failed, errno = %{public}d.", errno);
-    }
-    close(fd);
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo SetBgLimitIdList(int *idArray, int size, int type)
-{
-    switch (type) {
-        case SET_BG_UID:
-            SetUidPids(BG_UID_PATH, idArray, size);
-            break;
-        case SET_BG_PID:
-            SetUidPids(BG_PID_PATH, idArray, size);
-            break;
-        case SET_FG_UID:
-            SetUidPids(FG_UID_PATH, idArray, size);
-            break;
-        default:
-            LOGD("Unknow type, not handle.");
-            break;
-    }
-
-    return WIFI_HAL_SUCCESS;
-}
-
-void SetUidPids(const char *filePath, const int *idArray, int size)
-{
-    int ret;
-    char tempStr[MAX_ARRAY_LENGTH];
-    char idStr[MAX_ARRAY_LENGTH];
-
-    for (int i = 0; i < size; ++i) {
-        if (i == 0) {
-            ret = snprintf_s(tempStr, MAX_ARRAY_LENGTH, MAX_ARRAY_LENGTH - 1, "%d", idArray[i]);
-        } else {
-            ret = snprintf_s(tempStr, MAX_ARRAY_LENGTH, MAX_ARRAY_LENGTH - 1, "%s;%d", idStr, idArray[i]);
-        }
-        if (ret == -1) {
-            LOGE("SetUidPids failed.");
-            break;
-        }
-
-        if (strcpy_s(idStr, MAX_ARRAY_LENGTH, tempStr) != 0) {
-            break;
-        }
-    }
-
-    int len = strlen(idStr);
-    if (len <= 0) {
-        return;
-    }
-
-    int fd = open(filePath, O_RDWR);
-    if (fd < 0) {
-        LOGE("open file failed, errno = %{public}d.", errno);
-        return;
-    }
-
-    if (write(fd, idStr, len) != len) {
-        LOGE("write idStr failed, errno = %{public}d.", errno);
-    }
-    close(fd);
-    return;
 }
 

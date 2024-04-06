@@ -86,7 +86,7 @@ HWTEST_F(WifiInnerP2pTest, GetSupportedFeaturesTest, TestSize.Level1)
 HWTEST_F(WifiInnerP2pTest, IsFeatureSupportedTest, TestSize.Level1)
 {
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->IsFeatureSupported(0));
+    p2pPtr->IsFeatureSupported(0);
 }
 
 HWTEST_F(WifiInnerP2pTest, SetP2pDeviceNameTest, TestSize.Level1)

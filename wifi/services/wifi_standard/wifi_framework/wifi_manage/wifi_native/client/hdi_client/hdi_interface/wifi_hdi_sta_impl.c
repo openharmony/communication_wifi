@@ -33,6 +33,9 @@
 #define WIFI_IDL_GET_MAX_SCAN_INFO 256 /* Maximum number of scan infos obtained at a time */
 #define WIFI_HDI_STOP_SLEEP_MS 300000
 
+#define HILINK_OUI_HEAD_LEN 9
+#define MASK_HILINK 0xFF
+
 #ifndef CHECK_STA_HDI_WIFI_PROXY_AND_RETURN
 #define CHECK_STA_HDI_WIFI_PROXY_AND_RETURN(isRemoteDied) \
 if (isRemoteDied) { \
@@ -384,6 +387,45 @@ WifiErrorNo HdiWifiStopPnoScan(void)
     return WIFI_IDL_OPT_OK;
 }
 
+static bool CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
+{
+    int formatHiLink[] = {0, 0xE0, 0XFC, 0X80, 0, 0, 0, 0X01, 0};
+    int formatHiLinkOUI[] = {0, 0xE0, 0XFC, 0X40, 0, 0, 0, 0X01, 0};
+    if (bytes == NULL || len < HILINK_OUI_HEAD_LEN) {
+        return false;
+    }
+
+    for (int index = 0; index < HILINK_OUI_HEAD_LEN; index++) {
+        int element = bytes[index] & MASK_HILINK;
+        if (element != formatHiLink[index] && element != formatHiLinkOUI[index]) {
+            LOGI("hilink oui fiele mismatch.");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
+{
+    const struct HdiElem *elem;
+    bool num = false;
+
+    if (!start) {
+        return false;
+    }
+
+    HDI_CHECK_ELEMENT(elem, start, len) {
+        uint8_t id = elem->id, elen = elem->datalen;
+        const uint8_t *pos = elem->data;
+        if (id == HDI_EID_VENDOR_SPECIFIC) {
+            num |= CheckHiLinkOUISection(pos, elen);
+        }
+    }
+
+    return num;
+}
+
 int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
     const struct HdfWifiScanResults *scanResults, const char* ifName)
 {
@@ -441,10 +483,13 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
         GetScanResultInfoElem(&g_hdiWifiScanResults[g_hdiWifiScanResultsCount],
             (const uint8_t*)scanResult->ie, scanResult->ieLen);
         g_hdiWifiScanResults[g_hdiWifiScanResultsCount].timestamp = scanResult->tsf;
-        LOGD("%{public}s: bssid:%{private}s, ssid:%{private}s",
+        g_hdiWifiScanResults[g_hdiWifiScanResultsCount].isHiLinkNetwork = RouterSupportHiLinkByWifiInfo(
+            (const uint8_t*)scanResult->ie, scanResult->ieLen);
+        LOGD("%{public}s: bssid:%{private}s, ssid:%{private}s isHiLinkNetwork = %{public}d",
             __func__,
             g_hdiWifiScanResults[g_hdiWifiScanResultsCount].bssid,
-            g_hdiWifiScanResults[g_hdiWifiScanResultsCount].ssid);
+            g_hdiWifiScanResults[g_hdiWifiScanResultsCount].ssid,
+            g_hdiWifiScanResults[g_hdiWifiScanResultsCount].isHiLinkNetwork);
         g_hdiWifiScanResultsCount++;
     }
     LOGI("%{public}s: the number of scan results is %{public}d", __func__, g_hdiWifiScanResultsCount);

@@ -21,14 +21,14 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int WIFI_COUNTRY_CODE_POLICE_DEF_LEN = 5;
-constexpr const char* WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY = "persist.wifi_country_code.dynamic_update";
+constexpr const char* WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY = "persist.wifi.country_code.dynamic_update";
 constexpr const char* DEFAULT_WIFI_COUNTRY_CODE_ZZ = "ZZ";  // for tablets only, priority greater than HK
 constexpr const char* DEFAULT_WIFI_COUNTRY_CODE = "HK";
 constexpr const char* DEFAULT_RO_RUN_MODE = "normal";
 constexpr const char* FACTORY_RO_RUN_MODE = "factory";
-constexpr const char* FACTORY_WIFI_COUNTRY_CODE = "const.wifi_country_code.factory";
-constexpr const char* WIFI_COUNTRY_CODE_RUN_MODE = "const.wifi_country_code.runmode";
-constexpr const char* WIFI_COUNTRY_CODE_CONFIG = "const.wifi_country_code.conf";
+constexpr const char* FACTORY_WIFI_COUNTRY_CODE = "const.wifi.country_code.factory";
+constexpr const char* WIFI_COUNTRY_CODE_RUN_MODE = "const.wifi.country_code.runmode";
+constexpr const char* WIFI_COUNTRY_CODE_CONFIG = "const.wifi.country_code.conf";
 constexpr const char* WIFI_COUNTRY_CODE_CONFIG_DEFAULT = "0";
 constexpr const char* DEFAULT_REGION_KEY = "const.global.region";
 constexpr const char* DEFAULT_REGION = "CN";

@@ -982,6 +982,13 @@ static int SetCountryCode(const char *code, int id)
     return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
+static int TerminateAp(int id)
+{
+    char buf[BUFSIZE_REQUEST_SMALL] = {0};
+    g_hostapdHalDevInfo[id].hostapdHalDev->execDisable = 1;
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "TERMINATE", buf, sizeof(buf));
+}
+
 static int InitHostapdHal(int id)
 {
     if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
@@ -1022,6 +1029,7 @@ WifiHostapdHalDevice *GetWifiHostapdDev(int id)
     g_hostapdHalDevInfo[id].hostapdHalDev->reloadApConfigInfo = ReloadApConfigInfo;
     g_hostapdHalDevInfo[id].hostapdHalDev->disConnectedDev = DisConnectedDev;
     g_hostapdHalDevInfo[id].hostapdHalDev->setCountryCode = SetCountryCode;
+    g_hostapdHalDevInfo[id].hostapdHalDev->terminateAp = TerminateAp;
 
     if (InitHostapdHal(id) != 0) {
         LOGE("InitHostapdHal return failed!!");

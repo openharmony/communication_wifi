@@ -20,11 +20,6 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
-  "../common/handler.cpp",
-  "../common/internal_message.cpp",
-  "../common/message_queue.cpp",
-  "../common/state.cpp",
-  "../common/state_machine.cpp",
   "scan_interface.cpp",
   "scan_monitor.cpp",
   "scan_service.cpp",
@@ -32,10 +27,10 @@ local_base_sources = [
 ]
 
 local_base_include_dirs = [
+  "$WIFI_ROOT_DIR/base/state_machine/include",
+  "$WIFI_ROOT_DIR/base/cRPC/include",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-  "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
-  "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
@@ -66,6 +61,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_service_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
@@ -102,6 +98,7 @@ if (defined(ohos_lite)) {
     include_dirs = local_base_include_dirs
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",

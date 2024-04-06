@@ -594,7 +594,10 @@ HWTEST_F(WifiSettingsTest, MergeWifiCloneConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("MergeWifiCloneConfigTest enter");
     std::string cloneConfig = "wifitest";
-    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneConfig);
+    auto mergeCalback = [ = , &cloneConfig]() -> void {
+        WIFI_LOGI("MergeWifiCloneConfigTest callback");
+    };
+    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneConfig, mergeCalback);
 }
 
 HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)

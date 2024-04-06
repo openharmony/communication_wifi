@@ -39,7 +39,6 @@
 #include "parameter.h"
 #endif
 
-
 namespace OHOS {
 namespace Wifi {
 const std::string DEFAULT_IFACENAME = "wlan0";
@@ -302,7 +301,7 @@ void WifiSettings::MergeSoftapConfig()
     mSavedHotspotConfig.SaveConfig();
 }
 
-void WifiSettings::MergeWifiCloneConfig(const std::string &cloneData)
+void WifiSettings::MergeWifiCloneConfig(std::string &cloneData, MergeCallbackFunc mergeCallback)
 {
     LOGI("MergeWifiCloneConfig enter");
     std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
@@ -317,16 +316,28 @@ void WifiSettings::MergeWifiCloneConfig(const std::string &cloneData)
         return;
     }
     std::vector<WifiDeviceConfig> cloneConfigs = xmlParser->GetNetworks();
-
-    ConfigsDeduplicateAndSave(cloneConfigs);
+    std::thread th([ = , &cloneConfigs]() {
+            ConfigsDeduplicateAndSave(cloneConfigs);
+            LOGI("MergeWifiCloneConfig ConfigsDeduplicateAndSave end call callback");
+            mergeCallback();
+        }
+    );
+    th.join();
 }
 
-void WifiSettings::ConfigsDeduplicateAndSave(const std::vector<WifiDeviceConfig> &newConfigs)
+void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs)
 {
     if (newConfigs.size() == 0) {
         LOGE("NewConfigs is empty!");
         return;
     }
+
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    for (auto &config : newConfigs) {
+        EncryptionDeviceConfig(config);
+    }
+#endif
+
     mSavedDeviceConfig.LoadConfig();
     std::vector<WifiDeviceConfig> localConfigs;
     mSavedDeviceConfig.GetValue(localConfigs);
@@ -336,7 +347,7 @@ void WifiSettings::ConfigsDeduplicateAndSave(const std::vector<WifiDeviceConfig>
         std::string configKey = localConfig.ssid + localConfig.keyMgmt;
         tmp.insert(configKey);
     }
-    for (const auto &config : newConfigs) {
+    for (auto &config : newConfigs) {
         std::string configKey = config.ssid + config.keyMgmt;
         auto iter = tmp.find(configKey);
         if (iter == tmp.end()) {
@@ -556,6 +567,149 @@ int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
     return 0;
 }
 
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+bool WifiSettings::IsDecryptionEdDeviceConfig(const WifiDeviceConfig &config) const
+{
+    
+    int keyIndex = (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) ? 0 : config.wepTxKeyIndex;
+    if (!config.preSharedKey.empty() || !config.wepKeys[keyIndex].empty() || !config.wifiEapConfig.password.empty()) {
+        return true;
+    }
+
+    return false;
+}
+
+int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
+{
+    if (IsDecryptionEdDeviceConfig(config)) {
+        LOGI("DecryptionDeviceConfig IsDecryptionEdDeviceConfig true");
+        return 0;
+    }
+    LOGI("ohc_enc DecryptionDeviceConfig start");
+    WifiEncryptionInfo mWifiEncryptionInfo;
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
+    EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);
+    std::string decry = "";
+    if (WifiDecryption(mWifiEncryptionInfo, *encry, decry) == HKS_SUCCESS) {
+        config.preSharedKey = decry;
+    } else {
+        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
+            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+        config.preSharedKey = "";
+    }
+    delete encry;
+
+    if (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) {
+        config.wepTxKeyIndex = 0;
+    }
+    EncryptedData *encryWep = new EncryptedData(config.encryWepKeys[config.wepTxKeyIndex], config.IVWep);
+    std::string decryWep = "";
+    if (WifiDecryption(mWifiEncryptionInfo, *encryWep, decryWep) == HKS_SUCCESS) {
+        config.wepKeys[config.wepTxKeyIndex] = decryWep;
+    } else {
+        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
+            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+        config.wepKeys[config.wepTxKeyIndex] = "";
+    }
+    delete encryWep;
+
+    EncryptedData *encryEap = new EncryptedData(config.wifiEapConfig.encryptedData, config.wifiEapConfig.IV);
+    std::string decryEap = "";
+    if (WifiDecryption(mWifiEncryptionInfo, *encryEap, decryEap) == HKS_SUCCESS) {
+        config.wifiEapConfig.password = decryEap;
+    } else {
+        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
+            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+        config.wifiEapConfig.password = "";
+    }
+    delete encryEap;
+    LOGE("ohc_enc DecryptionDeviceConfig end");
+    return 0;
+}
+
+bool WifiSettings::IsEncryptionEdDeviceConfig(const WifiDeviceConfig config) const
+{
+    if (!config.encryptedData.empty() && !config.IV.empty()) {
+        return true;
+    }
+    if (!config.wifiEapConfig.eap.empty()) {
+        if (!config.wifiEapConfig.encryptedData.empty() && !config.wifiEapConfig.IV.empty()) {
+            return true;
+        }
+    }
+
+    int wepTxKeyIndex = config.wepTxKeyIndex;
+    if (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) {
+        wepTxKeyIndex = 0;
+    }
+    if (!config.encryWepKeys[wepTxKeyIndex].empty() && !config.IVWep.empty()) {
+        return true;
+    }
+    return false;
+}
+#endif
+
+bool WifiSettings::EncryptionDeviceConfig(WifiDeviceConfig &config) const
+{
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    if (config.version == 1) {
+        return true;
+    }
+    WifiEncryptionInfo mWifiEncryptionInfo;
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
+
+    config.encryptedData = "";
+    config.IV = "";
+    if (!config.preSharedKey.empty()) {
+        EncryptedData encry;
+        if (WifiEncryption(mWifiEncryptionInfo, config.preSharedKey, encry) == HKS_SUCCESS) {
+            config.encryptedData = encry.encryptedPassword;
+            config.IV = encry.IV;
+        } else {
+            LOGE("EncryptionDeviceConfig WifiEncryption preSharedKey failed");
+            WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
+                SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+            return false;
+        }
+    }
+
+    if (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) {
+        config.wepTxKeyIndex = 0;
+    }
+    config.encryWepKeys[config.wepTxKeyIndex] = "";
+    config.IVWep = "";
+    if (!config.wepKeys[config.wepTxKeyIndex].empty()) {
+        EncryptedData encryWep;
+        if (WifiEncryption(mWifiEncryptionInfo, config.wepKeys[config.wepTxKeyIndex], encryWep) == HKS_SUCCESS) {
+            config.encryWepKeys[config.wepTxKeyIndex] = encryWep.encryptedPassword;
+            config.IVWep = encryWep.IV;
+        } else {
+            LOGE("EncryptionDeviceConfig WifiEncryption wepKeys failed");
+            WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
+                SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+            return false;
+        }
+    }
+
+    config.wifiEapConfig.encryptedData = "";
+    config.wifiEapConfig.IV = "";
+    if (!config.wifiEapConfig.eap.empty()) {
+        EncryptedData encryEap;
+        if (WifiEncryption(mWifiEncryptionInfo, config.wifiEapConfig.password, encryEap) == HKS_SUCCESS) {
+            config.wifiEapConfig.encryptedData = encryEap.encryptedPassword;
+            config.wifiEapConfig.IV = encryEap.IV;
+        } else {
+            LOGE("EncryptionDeviceConfig WifiEncryption eap failed");
+            WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
+                SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+            return false;
+        }
+    }
+    config.version = 1;
+#endif
+    return true;
+}
+
 int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 {
     std::unique_lock<std::mutex> lock(mConfigMutex);
@@ -625,6 +779,9 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId) {
             config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            DecryptionDeviceConfig(config);
+#endif
             return 0;
         }
     }

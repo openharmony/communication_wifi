@@ -387,6 +387,8 @@ public:
     std::string identity;                   /* Identity information */
     std::string anonymousIdentity;          /* Anonymous identity information */
     std::string password;                   /* EAP mode password */
+    std::string encryptedData;              /* EAP mode password encryptedData */
+    std::string IV;                         /* EAP mode password encrypted IV */
 
     std::string caCertPath;                 /* CA certificate path */
     std::string caCertAlias;                /* CA certificate alias */
@@ -511,12 +513,16 @@ struct WifiDeviceConfig {
     bool isEphemeral;
     /* WPA-PSK mode pre shared key */
     std::string preSharedKey;
+    std::string encryptedData;
+    std::string IV;
     /* Encryption Mode */
     std::string keyMgmt;
     /* WEP mode key, max size: 4 */
     std::string wepKeys[WEPKEYS_SIZE];
     /* use WEP key index */
     int wepTxKeyIndex;
+    std::string encryWepKeys[WEPKEYS_SIZE];
+    std::string IVWep;
     /* network priority */
     int priority;
     /* is hidden network */
@@ -542,6 +548,7 @@ struct WifiDeviceConfig {
     std::string ancoCallProcessName;
     std::string internetSelfCureHistory;
     int isReassocSelfCureWithFactoryMacAddress;
+    int version;
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -572,6 +579,7 @@ struct WifiDeviceConfig {
         ancoCallProcessName = "";
         internetSelfCureHistory = "";
         isReassocSelfCureWithFactoryMacAddress = 0;
+        version = -1;
     }
 };
 

@@ -35,7 +35,7 @@ private:
 
 private:
     unsigned int m_arbitrationCond = 0x00;
-    bool m_isRxListenOn = false;\
+    bool m_isRxListenOn = false;
     std::mutex m_condMutex;
 };
 } // namespace Wifi

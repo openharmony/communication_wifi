@@ -156,8 +156,10 @@ static void DealFdReadEvent(RpcServer *server, Context *client, unsigned int mas
     DealReadMessage(server, client);
     int ret = ContextReadNet(client);
     if ((ret == SOCK_ERR) || ((ret == SOCK_CLOSE) && (mask & EXCP_EVENT))) {
+        LOGE("ContextReadNet failed: %{public}d", ret);
         DelFdEvent(server->loop, client->fd, READ_EVENT | WRIT_EVENT);
     } else if (ret == SOCK_CLOSE) {
+        LOGE("Socket close.");
         DelFdEvent(server->loop, client->fd, READ_EVENT);
     } else if (ret > 0) {
         int haveMsg;
@@ -177,9 +179,11 @@ static void DealFdWriteEvent(RpcServer *server, Context *client)
     if (client->wBegin != client->wEnd) {
         int tmp = ContextWriteNet(client);
         if (tmp < 0) {
+            LOGE("ContextWriteNet failed: %{public}d", tmp);
             DelFdEvent(server->loop, client->fd, READ_EVENT | WRIT_EVENT);
         }
     } else {
+        LOGE("Del write event.");
         DelFdEvent(server->loop, client->fd, WRIT_EVENT);
     }
     return;

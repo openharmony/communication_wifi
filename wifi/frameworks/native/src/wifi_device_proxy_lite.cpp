@@ -53,7 +53,12 @@ static void ReadIpAddress(IpcIo *reply, WifiIpAddress &address)
 static void Parse5GChannels(IpcIo *reply, std::vector<int> &result)
 {
     int retSize = 0;
+    constexpr int MAX_5G_CHANNELS = 256;
     (void)ReadInt32(reply, &retSize);
+    if (retSize > MAX_5G_CHANNELS) {
+        WIFI_LOGE("Parse5GChannels fail, size error: %{public}d", retSize);
+        return;
+    }
     for (int i = 0; i < retSize; ++i) {
         int channel = 0;
         (void)ReadInt32(reply, &channel);

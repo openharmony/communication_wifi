@@ -108,8 +108,9 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt);
 
 void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason);
 
-void WriteWifiEncryptionFailHiSysEvent(int event, const std::string &ssid,
+void WriteWifiEncryptionFailHiSysEvent(int event, const std::string &maskSsid,
     const std::string &keyMgmt, int encryptedModule);
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

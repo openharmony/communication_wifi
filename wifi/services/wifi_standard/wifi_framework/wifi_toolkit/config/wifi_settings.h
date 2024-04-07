@@ -1564,12 +1564,12 @@ public:
     int DecryptionDeviceConfig(WifiDeviceConfig &config);
 
     /**
-     * @Description Check WifiDeviceConfig is DecryptionedOrNot
+     * @Description Check WifiDeviceConfig is deciphered
      *
      * @param config - wifiDeviceConfig
-     * @return bool - true: Decryptioned
+     * @return bool - true: deciphered
      */
-    bool IsDecryptionEdDeviceConfig(const WifiDeviceConfig &config) const;
+    bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;
 #endif
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**

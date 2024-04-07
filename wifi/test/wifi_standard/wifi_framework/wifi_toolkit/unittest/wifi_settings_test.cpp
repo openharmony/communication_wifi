@@ -40,7 +40,6 @@ constexpr int SCORE = 0;
 constexpr int STATE = 0;
 constexpr int UID = 0;
 constexpr int ZERO = 0;
-constexpr int WIFI_OPT_SUCCESS = 0;
 constexpr int WIFI_OPT_RETURN = -1;
 constexpr int MIN_RSSI_2DOT_4GHZ = -80;
 constexpr int MIN_RSSI_5GZ = -77;

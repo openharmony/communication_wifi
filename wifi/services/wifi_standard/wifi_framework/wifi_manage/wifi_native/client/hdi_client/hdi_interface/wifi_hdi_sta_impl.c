@@ -398,7 +398,6 @@ static bool CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
     for (int index = 0; index < HILINK_OUI_HEAD_LEN; index++) {
         int element = bytes[index] & MASK_HILINK;
         if (element != formatHiLink[index] && element != formatHiLinkOUI[index]) {
-            LOGI("hilink oui fiele mismatch.");
             return false;
         }
     }

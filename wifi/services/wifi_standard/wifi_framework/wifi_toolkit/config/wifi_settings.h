@@ -25,6 +25,7 @@
 #include "wifi_common_def.h"
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
+#include "wifi_event_handler.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
 
@@ -387,6 +388,11 @@ public:
      * @return int - 0 success; -1 read config file failed
      */
     int ReloadDeviceConfig();
+
+    /**
+     * @Description Encryption WifiDeviceConfig for old data
+     */
+    void EncryptionWifiDeviceConfigOnBoot();
 
     /**
      * @Description Synchronizing saved the wifi WifiP2pGroupInfo config into config file
@@ -1557,8 +1563,12 @@ public:
      */
     int DecryptionDeviceConfig(WifiDeviceConfig &config);
 
-    bool IsEncryptionEdDeviceConfig(const WifiDeviceConfig config) const;
-
+    /**
+     * @Description Check WifiDeviceConfig is DecryptionedOrNot
+     *
+     * @param config - wifiDeviceConfig
+     * @return bool - true: Decryptioned
+     */
     bool IsDecryptionEdDeviceConfig(const WifiDeviceConfig &config) const;
 #endif
 #ifdef SUPPORT_RANDOM_MAC_ADDR

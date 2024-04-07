@@ -1756,6 +1756,7 @@ private:
     std::mutex mSoftapToggledMutex;
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
+    std::atomic_flag mEncryptionOnBootFalg = ATOMIC_FLAG_INIT;
 
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig; /* Persistence device config */
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
@@ -1774,6 +1775,8 @@ private:
     std::atomic_uint64_t mThreadStartTime { 0 };
     std::map<std::string, std::vector<std::string>> mFilterMap;
     std::vector<std::string> mAbnormalAppList;
+
+    std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -573,7 +573,7 @@ int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
 }
 
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-bool WifiSettings::IsDecryptionEdDeviceConfig(const WifiDeviceConfig &config) const
+bool WifiSettings::IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const
 {
     
     int keyIndex = (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) ? 0 : config.wepTxKeyIndex;
@@ -586,11 +586,11 @@ bool WifiSettings::IsDecryptionEdDeviceConfig(const WifiDeviceConfig &config) co
 
 int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
 {
-    if (IsDecryptionEdDeviceConfig(config)) {
-        LOGI("DecryptionDeviceConfig IsDecryptionEdDeviceConfig true");
+    if (IsWifiDeviceConfigDeciphered(config)) {
+        LOGI("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
         return 0;
     }
-    LOGI("ohc_enc DecryptionDeviceConfig start");
+    LOGI("DecryptionDeviceConfig start");
     WifiEncryptionInfo mWifiEncryptionInfo;
     mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);

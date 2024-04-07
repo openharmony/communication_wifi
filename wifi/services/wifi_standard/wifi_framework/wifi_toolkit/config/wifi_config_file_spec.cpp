@@ -694,7 +694,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
         ss << "    " <<"IV=" << encry.IV << std::endl;
     } else {
         WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
-                SsidAnonymize(item.GetSsid()), "WPA2_PSK", SOFTAP_MOUDLE_EVENT);
+            SsidAnonymize(item.GetSsid()), "WPA2_PSK", SOFTAP_MOUDLE_EVENT);
         ss << "    " <<"preSharedKey=" << item.GetPreSharedKey() << std::endl;
     }
 #else

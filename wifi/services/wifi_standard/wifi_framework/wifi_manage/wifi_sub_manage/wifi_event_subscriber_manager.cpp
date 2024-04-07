@@ -343,8 +343,6 @@ void WifiEventSubscriberManager::DealCloneDataChangeEvent()
     }
 
     auto mergeCalback = [ = , &cloneData]() -> void {
-        // Clone finished, clear settingsdata clonedata.
-        cloneData.clear();
         WIFI_LOGI("DealCloneDataChangeEvent MergeWifiCloneConfig callback.");
         SetCloneDataByDatashare(cloneData);
     };

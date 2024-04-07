@@ -2029,6 +2029,8 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
                 WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
                 return false;
             }
+            pStaStateMachine->linkedInfo.bssid = bssid;
+            WifiSettings::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
             /* BSSID change is not received during roaming, only set BSSID */
             if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid) != WIFI_IDL_OPT_OK) {
                 WIFI_LOGE("SetBssid return fail.");

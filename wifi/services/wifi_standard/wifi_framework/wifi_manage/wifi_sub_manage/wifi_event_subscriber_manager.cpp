@@ -341,10 +341,9 @@ void WifiEventSubscriberManager::DealCloneDataChangeEvent()
     if (cloneData.empty()) {
         return;
     }
-
-    auto mergeCalback = [ = , &cloneData]() -> void {
+    auto mergeCalback = [ = ]() -> void {
         WIFI_LOGI("DealCloneDataChangeEvent MergeWifiCloneConfig callback.");
-        SetCloneDataByDatashare(cloneData);
+        SetCloneDataByDatashare("");
     };
     WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData, mergeCalback);
 }

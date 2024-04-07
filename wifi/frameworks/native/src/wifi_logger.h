@@ -57,23 +57,23 @@ const unsigned int LOG_ID_WIFI_DHCP = LOG_ID_WIFI | 0x05;
 
 #else
 
-struct TestLogLable {
+struct LogLable {
     uint32_t dominId;
     const char* tag;
 };
 
 #define DEFINE_WIFILOG_LABEL(name) \
-    static constexpr OHOS::Wifi::TestLogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI, name};
+    static constexpr OHOS::Wifi::LogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI, name};
 #define DEFINE_WIFILOG_HOTSPOT_LABEL(name) \
-    static constexpr OHOS::Wifi::TestLogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_HOTSPOT, name};
+    static constexpr OHOS::Wifi::LogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_HOTSPOT, name};
 #define DEFINE_WIFILOG_SCAN_LABEL(name) \
-    static constexpr OHOS::Wifi::TestLogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_SCAN, name};
+    static constexpr OHOS::Wifi::LogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_SCAN, name};
 #define DEFINE_WIFILOG_P2P_LABEL(name) \
-    static constexpr OHOS::Wifi::TestLogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_P2P, name};
+    static constexpr OHOS::Wifi::LogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_P2P, name};
 #define DEFINE_WIFILOG_AWARE_LABEL(name) \
-    static constexpr OHOS::Wifi::TestLogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_AWARE, name};
+    static constexpr OHOS::Wifi::LogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_AWARE, name};
 #define DEFINE_WIFILOG_DHCP_LABEL(name) \
-    static constexpr OHOS::Wifi::TestLogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_DHCP, name};
+    static constexpr OHOS::Wifi::LogLable WIFI_LOG_LABEL = {OHOS::Wifi::LOG_ID_WIFI_DHCP, name};
 
 #define WIFI_LOGF(...) HILOG_IMPL(LOG_CORE, LOG_FATAL, WIFI_LOG_LABEL.dominId, WIFI_LOG_LABEL.tag, __VA_ARGS__)
 #define WIFI_LOGE(...) HILOG_IMPL(LOG_CORE, LOG_ERROR, WIFI_LOG_LABEL.dominId, WIFI_LOG_LABEL.tag, __VA_ARGS__)

@@ -217,6 +217,9 @@ int WifiSettings::Init()
     MergeWifiConfig();
     MergeSoftapConfig();
 #endif
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    SetUpHks();
+#endif
     InitWifiConfig();
     ReloadDeviceConfig();
     InitHotspotConfig();
@@ -229,9 +232,6 @@ int WifiSettings::Init()
     ReloadPortalconf();
     InitPackageFilterConfig();
     ClearLocalHid2dInfo();
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-    SetUpHks();
-#endif
     IncreaseNumRebootsSinceLastUse();
     return 0;
 }
@@ -307,22 +307,27 @@ void WifiSettings::MergeWifiCloneConfig(std::string &cloneData, MergeCallbackFun
     std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
     bool ret = xmlParser->LoadConfigurationMemory(cloneData.c_str());
     if (!ret) {
+        mergeCallback();
         LOGE("MergeWifiCloneConfig load fail");
         return;
     }
     ret = xmlParser->Parse();
     if (!ret) {
+        mergeCallback();
         LOGE("MergeWifiCloneConfig Parse fail");
         return;
     }
     std::vector<WifiDeviceConfig> cloneConfigs = xmlParser->GetNetworks();
-    std::thread th([ = , &cloneConfigs]() {
-            ConfigsDeduplicateAndSave(cloneConfigs);
-            LOGI("MergeWifiCloneConfig ConfigsDeduplicateAndSave end call callback");
-            mergeCallback();
-        }
-    );
-    th.join();
+    if (cloneConfigs.empty()) {
+        mergeCallback();
+        return;
+    }
+    mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
+    mWifiEncryptionThread->PostAsyncTask([this, &cloneConfigs, &mergeCallback]() {
+        ConfigsDeduplicateAndSave(cloneConfigs);
+        LOGI("MergeWifiCloneConfig ConfigsDeduplicateAndSave end");
+        mergeCallback();
+    });
 }
 
 void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs)
@@ -623,29 +628,8 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
-    LOGE("ohc_enc DecryptionDeviceConfig end");
+    LOGI("DecryptionDeviceConfig end");
     return 0;
-}
-
-bool WifiSettings::IsEncryptionEdDeviceConfig(const WifiDeviceConfig config) const
-{
-    if (!config.encryptedData.empty() && !config.IV.empty()) {
-        return true;
-    }
-    if (!config.wifiEapConfig.eap.empty()) {
-        if (!config.wifiEapConfig.encryptedData.empty() && !config.wifiEapConfig.IV.empty()) {
-            return true;
-        }
-    }
-
-    int wepTxKeyIndex = config.wepTxKeyIndex;
-    if (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) {
-        wepTxKeyIndex = 0;
-    }
-    if (!config.encryWepKeys[wepTxKeyIndex].empty() && !config.IVWep.empty()) {
-        return true;
-    }
-    return false;
 }
 #endif
 
@@ -1112,6 +1096,33 @@ int WifiSettings::SyncDeviceConfig()
 #endif
 }
 
+void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
+{
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    if (mEncryptionOnBootFalg.test_and_set()) {
+        return;
+    }
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    mSavedDeviceConfig.LoadConfig();
+    std::vector<WifiDeviceConfig> tmp;
+    mSavedDeviceConfig.GetValue(tmp);
+    int count = 0;
+
+    for (std::size_t i = 0; i < tmp.size(); ++i) {
+        WifiDeviceConfig &item = tmp[i];
+        if (item.version == -1 && EncryptionDeviceConfig(item)) {
+            count ++;
+        }
+    }
+    if (count > 0) {
+        mSavedDeviceConfig.SetValue(tmp);
+        mSavedDeviceConfig.SaveConfig();
+        ReloadDeviceConfig();
+    }
+    LOGI("EncryptionWifiDeviceConfigOnBoot end count:%{public}d", count);
+#endif
+}
+
 int WifiSettings::ReloadDeviceConfig()
 {
 #ifndef CONFIG_NO_CONFIG_WRITE
@@ -1127,26 +1138,16 @@ int WifiSettings::ReloadDeviceConfig()
     std::unique_lock<std::mutex> lock(mConfigMutex);
     mNetworkId = 0;
     mWifiDeviceConfig.clear();
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-    int count = 0;
-#endif
     for (std::size_t i = 0; i < tmp.size(); ++i) {
         WifiDeviceConfig &item = tmp[i];
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-        if (item.version == -1 && EncryptionDeviceConfig(item)) {
-            count ++;
-            item.version = 1;
-        }
-#endif
         item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-    if (count > 0) {
-        mSavedDeviceConfig.SetValue(tmp);
-        mSavedDeviceConfig.SaveConfig();
-    }
-#endif
+    mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
+    mWifiEncryptionThread->PostAsyncTask([this]() {
+        EncryptionWifiDeviceConfigOnBoot();
+        LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot end.");
+    });
     return 0;
 #else
     std::unique_lock<std::mutex> lock(mConfigMutex);

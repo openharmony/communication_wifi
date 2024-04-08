@@ -557,7 +557,6 @@ if (defined(ohos_lite)) {
     }
 
     if (wifi_feature_with_app_frozen) {
-      external_deps += [ "efficiency_manager:suspend_manager_client" ]
       defines += [ "FEATURE_APP_FROZEN" ]
     }
 

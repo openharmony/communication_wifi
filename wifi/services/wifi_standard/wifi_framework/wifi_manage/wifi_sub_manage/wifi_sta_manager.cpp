@@ -343,5 +343,6 @@ void WifiStaManager::DealRssiChanged(int rssi, int instId)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -662,26 +662,20 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
     int screenStateNew = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON)
         ? MODE_STATE_OPEN : MODE_STATE_CLOSE;
     WifiSettings::GetInstance().SetScreenState(screenStateNew);
+    if (screenStateNew == screenState) {
+        return;
+    }
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
-        if (pService == nullptr) {
-            WIFI_LOGE("sta service is NOT start!");
-            return;
-        }
-
-        IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
-        if (pScanService == nullptr) {
-            WIFI_LOGE("scan service is NOT start!");
-            return;
-        }
-        if (screenStateNew != screenState) {
-            if (pScanService->OnScreenStateChanged(screenStateNew) != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("OnScreenStateChanged failed");
-            }
+        if (pService != nullptr) {
             pService->OnScreenStateChanged(screenStateNew);
 #ifdef FEATURE_HPF_SUPPORT
             WifiManager::GetInstance().InstallPacketFilterProgram(screenStateNew, i);
 #endif
+        }
+        IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
+        if (pScanService != nullptr) {
+            pScanService->OnScreenStateChanged(screenStateNew);
         }
     }
 }

@@ -1062,6 +1062,8 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
     info.isAncoConnected = reply.ReadBool();
+    info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
+    info.isHiLinkNetwork = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)

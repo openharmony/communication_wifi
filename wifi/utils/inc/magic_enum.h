@@ -1,5 +1,17 @@
-#ifndef MAGIC_ENUM_HPP
-#define MAGIC_ENUM_HPP
+/*
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <array>
 #include <exception>
@@ -23,7 +35,7 @@ namespace magic_enum {
 
 const int MAGIC_ENUM_RANGE_MAX = 1024;
 template <typename E, E V>
-constexpr std::string_view get_enum_value_name()
+constexpr std::string_view GetEnumValueName()
 {
     std::string_view name{PRETTY_FUNCTION_NAME, sizeof(PRETTY_FUNCTION_NAME) - ENUM_OFFSET};
     for (std::size_t i = name.size(); i > 0; --i) {
@@ -41,61 +53,61 @@ constexpr std::string_view get_enum_value_name()
 }
 
 template <typename E, E V>
-constexpr bool is_valid()
+constexpr bool IsValid()
 {
-    return get_enum_value_name<E, V>().size() != 0;
+    return GetEnumValueName<E, V>().size() != 0;
 }
 
 template <int... Is>
-constexpr auto make_integer_list_wrapper(std::integer_sequence<int, Is...>)
+constexpr auto MakeIntegerListWrapper(std::integer_sequence<int, Is...>)
 {
-    constexpr int half_size = sizeof...(Is) / 2;
-    return std::integer_sequence<int, (Is - half_size)...>();
+    constexpr int halfSize = sizeof...(Is) / 2;
+    return std::integer_sequence<int, (Is - halfSize)...>();
 }
 
-constexpr auto test_integer_sequence_v =
-    make_integer_list_wrapper(std::make_integer_sequence<int, MAGIC_ENUM_RANGE_MAX>());
+constexpr auto TEST_INTEGER_SEQUENCE_V =
+    MakeIntegerListWrapper(std::make_integer_sequence<int, MAGIC_ENUM_RANGE_MAX>());
 
 template <typename E, int... Is>
-constexpr size_t get_enum_size(std::integer_sequence<int, Is...>)
+constexpr size_t GetEnumSize(std::integer_sequence<int, Is...>)
 {
-    constexpr std::array<bool, sizeof...(Is)> valid{is_valid<E, static_cast<E>(Is)>()...};
-    constexpr std::size_t count = [](decltype((valid)) valid_) constexpr noexcept->std::size_t
+    constexpr std::array<bool, sizeof...(Is)> valid{IsValid<E, static_cast<E>(Is)>()...};
+    constexpr std::size_t count = [](decltype((valid)) validValue) constexpr noexcept->std::size_t
     {
-        auto count_ = std::size_t{0};
-        for (std::size_t i_ = 0; i_ < valid_.size(); ++i_) {
-            if (valid_[i_]) {
-                ++count_;
+        auto nSize = std::size_t{0};
+        for (std::size_t index = 0; index < validValue.size(); ++index) {
+            if (validValue[index]) {
+                ++nSize;
             }
         }
-        return count_;
+        return nSize;
     }
     (valid);
     return count;
 }
 
 template <typename E>
-constexpr std::size_t enum_size_v = get_enum_size<E>(test_integer_sequence_v);
+constexpr std::size_t ENUM_SIZE_V = GetEnumSize<E>(TEST_INTEGER_SEQUENCE_V);
 
 template <typename E, int... Is>
-constexpr auto get_all_valid_values(std::integer_sequence<int, Is...>)
+constexpr auto GetAllValidValues(std::integer_sequence<int, Is...>)
 {
-    constexpr std::array<bool, sizeof...(Is)> valid{is_valid<E, static_cast<E>(Is)>()...};
-    constexpr std::array<int, sizeof...(Is)> integer_value{Is...};
-    std::array<int, enum_size_v<E>> values{};
+    constexpr std::array<bool, sizeof...(Is)> valid{IsValid<E, static_cast<E>(Is)>()...};
+    constexpr std::array<int, sizeof...(Is)> integerValue{Is...};
+    std::array<int, ENUM_SIZE_V<E>> values{};
     for (std::size_t i = 0, v = 0; i < sizeof...(Is); ++i) {
         if (valid[i]) {
-            values[v++] = integer_value[i];
+            values[v++] = integerValue[i];
         }
     }
     return values;
 }
 
 template <typename E, int... Is>
-constexpr auto get_all_valid_names(std::integer_sequence<int, Is...>)
+constexpr auto GetAllValidNames(std::integer_sequence<int, Is...>)
 {
-    constexpr std::array<std::string_view, sizeof...(Is)> names{get_enum_value_name<E, static_cast<E>(Is)>()...};
-    std::array<std::string_view, enum_size_v<E>> valid_names{};
+    constexpr std::array<std::string_view, sizeof...(Is)> names{GetEnumValueName<E, static_cast<E>(Is)>()...};
+    std::array<std::string_view, ENUM_SIZE_V<E>> valid_names{};
     for (std::size_t i = 0, v = 0; i < names.size(); ++i) {
         if (names[i].size() != 0) {
             valid_names[v++] = names[i];
@@ -105,52 +117,36 @@ constexpr auto get_all_valid_names(std::integer_sequence<int, Is...>)
 }
 
 template <typename E>
-constexpr auto enum_names_v = get_all_valid_names<E>(test_integer_sequence_v);
+constexpr auto ENUM_NAMES_V = GetAllValidNames<E>(TEST_INTEGER_SEQUENCE_V);
 
 template <typename E>
-constexpr auto enum_values_v = get_all_valid_values<E>(test_integer_sequence_v);
+constexpr auto ENUM_VALUES_V = GetAllValidValues<E>(TEST_INTEGER_SEQUENCE_V);
 
 template <typename E>
-constexpr E string2enum(const std::string_view str)
+constexpr std::string_view Enum2string(E V)
 {
-    constexpr auto valid_names = enum_names_v<E>;
-    constexpr auto valid_values = enum_values_v<E>;
-    constexpr auto enum_size = enum_size_v<E>;
-    for (size_t i = 0; i < enum_size; ++i) {
-        if (str == valid_names[i]) {
-            return static_cast<E>(valid_values[i]);
-        }
-    }
-    return E{};
-}
-
-template <typename E>
-constexpr std::string_view enum2string(E V)
-{
-    constexpr auto valid_names = enum_names_v<E>;
-    constexpr auto valid_values = enum_values_v<E>;
-    constexpr auto enum_size = enum_size_v<E>;
-    for (size_t i = 0; i < enum_size; ++i) {
-        if (static_cast<int>(V) == valid_values[i]) {
-            return valid_names[i];
+    constexpr auto validNames = ENUM_NAMES_V<E>;
+    constexpr auto validValues = ENUM_VALUES_V<E>;
+    constexpr auto enumSize = ENUM_SIZE_V<E>;
+    for (size_t i = 0; i < enumSize; ++i) {
+        if (static_cast<int>(V) == validValues[i]) {
+            return validNames[i];
         }
     }
     return "";
 }
 
 template <typename E>
-constexpr auto enum_name(E value)
+constexpr auto Enum2Name(E value)
 {
     int num = static_cast<int>(value);
     if (num > MAGIC_ENUM_RANGE_MAX / 2 || num < -(MAGIC_ENUM_RANGE_MAX / 2)) { // 2: maxnum
         return std::to_string(static_cast<int>(value));
     } else {
-        return std::string(enum2string<E>(value));
+        return std::string(Enum2string<E>(value));
     }
 }
 
 } // namespace magic_enum
 } // namespace Wifi
 } // namespace OHOS
-
-#endif // MAGIC_ENUM_HPP

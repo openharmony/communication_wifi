@@ -14,7 +14,7 @@
  */
 
 #include "wifi_sta_manager.h"
-#include "magic_enum.hpp"
+#include "magic_enum.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"

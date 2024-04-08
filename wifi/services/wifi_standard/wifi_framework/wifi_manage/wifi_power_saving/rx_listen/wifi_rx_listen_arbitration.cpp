@@ -46,6 +46,7 @@ RxListenArbitration &RxListenArbitration::GetInstance()
 
 void RxListenArbitration::OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData)
 {
+    std::unique_lock<std::mutex> lock(m_condMutex);
     if (appStateData.state == static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND) &&
         appStateData.isFocused) {
         WIFI_LOGD("%{public}s enter rx_listen arbitration, app name: %{public}s", __FUNCTION__,

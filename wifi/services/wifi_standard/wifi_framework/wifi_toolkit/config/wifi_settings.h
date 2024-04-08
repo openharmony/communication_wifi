@@ -1722,6 +1722,7 @@ private:
     std::mutex mWifiToggledMutex;
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;
+    std::mutex mSyncWifiConfigMutex;
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
 

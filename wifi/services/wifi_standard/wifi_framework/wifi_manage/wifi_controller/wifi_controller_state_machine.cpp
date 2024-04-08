@@ -471,6 +471,7 @@ void WifiControllerMachine::StopSoftapManager(int id)
 void WifiControllerMachine::StopAllSoftapManagers()
 {
     if (!HasAnySoftApManager()) {
+        WIFI_LOGE("Not found AnySoftApManager.");
         return;
     }
     std::unique_lock<std::mutex> lock(softapManagerMutex);

@@ -1642,6 +1642,7 @@ private:
     void InitScanControlIntervalList();
     void InitScanControlInfo();
     void GetLinkedChannelWidth(int instId = 0);
+    void UpdateLinkedInfo(int instId = 0);
 #ifndef OHOS_ARCH_LITE
     void MergeSoftapConfig();
     void MergeWifiConfig();

@@ -131,12 +131,6 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pGetIpState);
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
-    std::string ifname = IF_NAME + std::to_string(m_instId);
-    if (currentTpType == IPTYPE_IPV4) {
-        StopDhcpClient(ifname.c_str(), false);
-    } else {
-        StopDhcpClient(ifname.c_str(), true);
-    }
     ParsePointer(pDhcpResultNotify);
 }
 
@@ -3192,8 +3186,7 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
 {
     std::string ifname = IF_NAME + std::to_string(pStaStateMachine->GetInstanceId());
     if (iptype == 1) {
-        StopDhcpClient(ifname.c_str(), true);
-        LOGI("TryToCloseDhcpClient iptype ipv6 return, StopDhcpClient ipv6");
+        LOGI("TryToCloseDhcpClient iptype ipv6 return");
         return;
     }
 
@@ -3211,9 +3204,7 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
         pStaStateMachine->DealSetStaConnectFailedCount(0, true);
     }
     pStaStateMachine->getIpSucNum++;
-
-    StopDhcpClient(ifname.c_str(), false);
-    LOGI("TryToCloseDhcpClient, stop dhcp ipv4 client, getIpSucNum=%{public}d", pStaStateMachine->getIpSucNum);
+    LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d", pStaStateMachine->getIpSucNum);
 }
 
 void StaStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname, const char *reason)

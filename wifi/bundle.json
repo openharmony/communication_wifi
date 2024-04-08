@@ -87,7 +87,6 @@
                 "dhcp",
                 "drivers_interface_wlan",
                 "drivers_interface_wpa",
-                "efficiency_manager",
                 "eventhandler",
                 "ffrt",
                 "hdf_core",
@@ -141,6 +140,13 @@
                         "header_files": [ ]
                     },
                     "name" : "//foundation/communication/wifi/wifi/base:wifi_base"
+                },
+                {
+                    "header" : {
+                        "header_base": "//foundation/communication/wifi/wifi/utils/inc",
+                        "header_files": [ ]
+                    },
+                    "name" : "//foundation/communication/wifi/wifi/utils:wifi_utils"
                 }
             ],
             "test": [

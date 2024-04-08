@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef MAGIC_ENUM_H
+#define MAGIC_ENUM_H
 
 #include <array>
 #include <exception>
@@ -150,3 +152,5 @@ constexpr auto Enum2Name(E value)
 } // namespace magic_enum
 } // namespace Wifi
 } // namespace OHOS
+
+#endif

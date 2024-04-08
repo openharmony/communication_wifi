@@ -275,7 +275,7 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     WIFI_LOGI("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
-        magic_enum::enum_name(state).c_str());
+        magic_enum::Enum2Name(state).c_str());
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
     if (isReport) {

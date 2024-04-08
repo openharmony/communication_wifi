@@ -953,10 +953,10 @@ void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, const 
         }
     }
     if (!WifiCommonEventHelper::PublishConnStateChangedEvent(state, eventData)) {
-        WIFI_LOGE("failed to publish connection state changed event!");
+        WIFI_LOGE("failed to publish connection state changed event,%{public}s!", eventData.c_str());
         return;
     }
-    WIFI_LOGD("publish connection state changed event.");
+    WIFI_LOGI("publish connection state changed event,%{public}s.", eventData.c_str());
 }
 
 void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state)

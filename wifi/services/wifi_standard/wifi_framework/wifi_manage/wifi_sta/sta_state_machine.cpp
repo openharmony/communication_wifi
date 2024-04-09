@@ -3628,6 +3628,27 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(DhcpResult *dest, Dhcp
         LOGE("SaveDhcpResultExt strOptRandIpv6Addr strcpy_s failed!");
         return;
     }
+    if (strcpy_s(dest->strOptLocalAddr1, DHCP_MAX_FILE_BYTES, source->strOptLocalAddr1) != EOK) {
+        LOGE("SaveDhcpResultExt strOptLocalAddr1 strcpy_s failed!");
+        return;
+    }
+    if (strcpy_s(dest->strOptLocalAddr2, DHCP_MAX_FILE_BYTES, source->strOptLocalAddr2) != EOK) {
+        LOGE("SaveDhcpResultExt strOptLocalAddr2 strcpy_s failed!");
+        return;
+    }
+    if (source->dnsList.dnsNumber > 0) {
+        dest->dnsList.dnsNumber = 0;
+        for (uint32_t i = 0; i < source->dnsList.dnsNumber; i++) {
+            if (memcpy_s(dest->dnsList.dnsAddr[i], DHCP_LEASE_DATA_MAX_LEN, source->dnsList.dnsAddr[i],
+                DHCP_LEASE_DATA_MAX_LEN -1) != EOK) {
+                LOGE("SaveDhcpResultExt memcpy_s failed! i:%{public}d", i);
+            } else {
+                dest->dnsList.dnsNumber++;
+            }
+        }
+        LOGI("SaveDhcpResultExt destDnsNumber:%{public}d sourceDnsNumber:%{public}d", dest->dnsList.dnsNumber,
+            source->dnsList.dnsNumber);
+    }
     LOGI("SaveDhcpResultExt ok, ipType:%{public}d", dest->iptype);
 }
 
@@ -3754,6 +3775,29 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
     return;
 }
 
+void StaStateMachine::DhcpResultNotify::TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
+{
+    if (result == nullptr) {
+        LOGE("TryToSaveIpV4ResultExt result nullptr.");
+        return;
+    }
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
+    ipInfo.gateway = IpTools::ConvertIpv4Address(result->strOptRouter1);
+    ipInfo.netmask = IpTools::ConvertIpv4Address(result->strOptSubnet);
+    ipInfo.primaryDns = IpTools::ConvertIpv4Address(result->strOptDns1);
+    ipInfo.secondDns = IpTools::ConvertIpv4Address(result->strOptDns2);
+    ipInfo.serverIp = IpTools::ConvertIpv4Address(result->strOptServerId);
+    ipInfo.leaseDuration = result->uOptLeasetime;
+    if (result->dnsList.dnsNumber > 0) {
+        ipInfo.dnsAddr.clear();
+        for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
+            unsigned int ipv4Address = IpTools::ConvertIpv4Address(result->dnsList.dnsAddr[i]);
+            ipInfo.dnsAddr.push_back(ipv4Address);
+        }
+    }
+    WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+}
+
 void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
 {
     if (result == nullptr) {
@@ -3764,15 +3808,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
     if (!((IpTools::ConvertIpv4Address(result->strOptClientId) == ipInfo.ipAddress) &&
         (IpTools::ConvertIpv4Address(result->strOptRouter1) == ipInfo.gateway))) {
         if (result->iptype == 0) {  /* 0-ipv4,1-ipv6 */
-            ipInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
-            ipInfo.gateway = IpTools::ConvertIpv4Address(result->strOptRouter1);
-            ipInfo.netmask = IpTools::ConvertIpv4Address(result->strOptSubnet);
-            ipInfo.primaryDns = IpTools::ConvertIpv4Address(result->strOptDns1);
-            ipInfo.secondDns = IpTools::ConvertIpv4Address(result->strOptDns2);
-            ipInfo.serverIp = IpTools::ConvertIpv4Address(result->strOptServerId);
-            ipInfo.leaseDuration = result->uOptLeasetime;
-            WifiSettings::GetInstance().SaveIpInfo(ipInfo);
-
+            TryToSaveIpV4ResultExt(ipInfo, ipv6Info, result);
             pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
             /* If not phone hotspot, set .isDataRestricted = 0. */
             std::string strVendor = result->strOptVendor;
@@ -3805,6 +3841,8 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
 #ifdef OHOS_ARCH_LITE
         IfConfig::GetInstance().SetIfDnsAndRoute(result, result->iptype, pStaStateMachine->GetInstanceId());
 #endif
+    } else {
+        LOGI("TryToSaveIpV4Result not UpdateNetLinkInfo");
     }
 }
 
@@ -3814,15 +3852,28 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         LOGE("TryToSaveIpV6Result resultis nullptr.");
         return;
     }
-    if (result->iptype == 1 &&  /* 0-ipv4,1-ipv6 */
-        (ipv6Info.globalIpV6Address != result->strOptClientId || ipv6Info.gateway != result->strOptRouter1)) {
+    
+    if ((ipv6Info.globalIpV6Address != result->strOptClientId) ||
+        (ipv6Info.randGlobalIpV6Address != result->strOptRandIpv6Addr) ||
+        (ipv6Info.uniqueLocalAddress1 != result->strOptLocalAddr1) ||
+        (ipv6Info.uniqueLocalAddress2 != result->strOptLocalAddr2) ||
+        (ipv6Info.gateway != result->strOptRouter1)) {
         ipv6Info.linkIpV6Address = result->strOptLinkIpv6Addr;
         ipv6Info.globalIpV6Address = result->strOptClientId;
         ipv6Info.randGlobalIpV6Address = result->strOptRandIpv6Addr;
         ipv6Info.gateway = result->strOptRouter1;
         ipv6Info.netmask = result->strOptSubnet;
-        ipv6Info.primaryDns = result->strOptRouter1;
-        ipv6Info.secondDns = result->strOptRouter2;
+        ipv6Info.primaryDns = result->strOptDns1;
+        ipv6Info.secondDns = result->strOptDns2;
+        ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
+        ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
+        if (result->dnsList.dnsNumber > 0) {
+            ipv6Info.dnsAddr.clear();
+            for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
+                ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
+            }
+            LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}u", ipv6Info.dnsAddr.size());
+        }
         WifiSettings::GetInstance().SaveIpV6Info(ipv6Info, pStaStateMachine->GetInstanceId());
         WIFI_LOGI("SaveIpV6 addr=%{private}s, linkaddr=%{private}s, randaddr=%{private}s, gateway=%{private}s, "
             "mask=%{private}s, dns=%{private}s, dns2=%{private}s",
@@ -3835,6 +3886,8 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
             pStaStateMachine->GetInstanceId());
 #endif
+    } else {
+        LOGI("TryToSaveIpV6Result not UpdateNetLinkInfo");
     }
 }
 

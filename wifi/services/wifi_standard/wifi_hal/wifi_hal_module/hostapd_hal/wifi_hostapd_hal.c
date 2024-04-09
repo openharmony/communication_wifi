@@ -984,6 +984,11 @@ static int SetCountryCode(const char *code, int id)
 
 static int TerminateAp(int id)
 {
+    if (id < 0 || id >= AP_MAX_INSTANCE) {
+        LOGE("Invalid id: %{public}d!", id);
+        return -1;
+    }
+    
     char buf[BUFSIZE_REQUEST_SMALL] = {0};
     g_hostapdHalDevInfo[id].hostapdHalDev->execDisable = 1;
     return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "TERMINATE", buf, sizeof(buf));

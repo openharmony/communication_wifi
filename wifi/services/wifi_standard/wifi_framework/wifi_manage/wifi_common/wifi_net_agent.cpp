@@ -257,6 +257,36 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
         netIpv6Addr->prefixlen_ = 0;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
     }
+    LOGD("SetNetLinkIPInfo randGlobalIpV6Address:%{public}s", wifiIpV6Info.randGlobalIpV6Address.c_str());
+    if (!wifiIpV6Info.randGlobalIpV6Address.empty()) {
+        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr->address_ = wifiIpV6Info.randGlobalIpV6Address;
+        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
+        netIpv6Addr->prefixlen_ = 0;
+        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+    }
+    LOGD("SetNetLinkIPInfo uniqueLocalAddress1:%{public}s", wifiIpV6Info.uniqueLocalAddress1.c_str());
+    if (!wifiIpV6Info.uniqueLocalAddress1.empty()) {
+        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress1;
+        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
+        netIpv6Addr->prefixlen_ = 0;
+        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+    }
+    LOGD("SetNetLinkIPInfo uniqueLocalAddress2:%{public}s", wifiIpV6Info.uniqueLocalAddress2.c_str());
+    if (!wifiIpV6Info.uniqueLocalAddress2.empty()) {
+        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress2;
+        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
+        netIpv6Addr->prefixlen_ = 0;
+        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+    }
 }
 
 void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
@@ -265,19 +295,23 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     dns->type_ = NetManagerStandard::INetAddr::IPV4;
     dns->family_ = NetManagerStandard::INetAddr::IPV4;
-    dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
-    netLinkInfo->dnsList_.push_back(*dns);
-    dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
-    netLinkInfo->dnsList_.push_back(*dns);
-    LOGD("SetNetLinkDnsInfo %{public}s", wifiIpV6Info.primaryDns.c_str());
-    if (!wifiIpV6Info.primaryDns.empty()) {
-        sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        ipv6dns->type_ = NetManagerStandard::INetAddr::IPV6;
-        ipv6dns->family_ = NetManagerStandard::INetAddr::IPV6;
-        ipv6dns->address_ = wifiIpV6Info.primaryDns;
-        netLinkInfo->dnsList_.push_back(*ipv6dns);
-        ipv6dns->address_ = wifiIpV6Info.secondDns;
-        netLinkInfo->dnsList_.push_back(*ipv6dns);
+    LOGI("SetNetLinkDnsInfo ipv4 dns size:%{public}u", wifiIpInfo.dnsAddr.size());
+    if (wifiIpInfo.dnsAddr.size() > 0) {
+        for (uint32_t i = 0; i < wifiIpInfo.dnsAddr.size(); i++) {
+            dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.dnsAddr[i]);
+            netLinkInfo->dnsList_.push_back(*dns);
+        }
+    }
+
+    sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    ipv6dns->type_ = NetManagerStandard::INetAddr::IPV6;
+    ipv6dns->family_ = NetManagerStandard::INetAddr::IPV6;
+    LOGI("SetNetLinkDnsInfo ipv6 dns size:%{public}u", wifiIpV6Info.dnsAddr.size());
+    if (wifiIpV6Info.dnsAddr.size() > 0) {
+        for (uint32_t i = 0; i < wifiIpV6Info.dnsAddr.size(); i++) {
+            ipv6dns->address_ = wifiIpV6Info.dnsAddr[i];
+            netLinkInfo->dnsList_.push_back(*ipv6dns);
+        }
     }
 }
 

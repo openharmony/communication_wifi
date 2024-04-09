@@ -57,7 +57,7 @@ struct p2pSetting {
             this.deviceAddress = strInput;
             //判断合法性
             if ( strInput.length >= 1 ) {
-              AppStorage.setOrCreate('deviceAddress' , strInput);
+              AppStorage.setOrCreate('deviceAddress' , this.deviceAddress);
             }
           })
           .width(ConfigData.WH_80_100)
@@ -76,10 +76,10 @@ struct p2pSetting {
             TextInput({ text : this.netId.toString() , placeholder : "-2" })
               .fontSize("15vp")
               .onChange((strInput: string) => {
-                this.netId = Number(strInput);
+                this.netId = parseInt(strInput);
                 //判断合法性
                 if ( strInput.length >= 1 ) {
-                  AppStorage.setOrCreate('netId' , strInput);
+                  AppStorage.setOrCreate('netId' , this.netId);
                 }
               })
               .width(ConfigData.WH_80_100)
@@ -97,7 +97,7 @@ struct p2pSetting {
               .onChange((strInput: string) => {
                 this.passphrase = strInput;
                 if ( strInput.length >= 1 ) {
-                  AppStorage.setOrCreate('passphrase' , strInput);
+                  AppStorage.setOrCreate('passphrase' , this.passphrase);
                 }
               })
               .width(ConfigData.WH_80_100)
@@ -115,7 +115,7 @@ struct p2pSetting {
               .onChange((strInput: string) => {
                 this.groupName = strInput;
                 if ( strInput.length >= 1 ) {
-                  AppStorage.setOrCreate('groupName' , strInput);
+                  AppStorage.setOrCreate('groupName' , this.groupName);
                 }
               })
               .width(ConfigData.WH_80_100)
@@ -133,7 +133,7 @@ struct p2pSetting {
               .onChange((strInput: string) => {
                 this.goBand = Number(strInput);
                 if ( strInput.length >= 1 ) {
-                  AppStorage.setOrCreate('goBand' , strInput);
+                  AppStorage.setOrCreate('goBand' , this.goBand);
                 }
               })
               .width(ConfigData.WH_80_100)

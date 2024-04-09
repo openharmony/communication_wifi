@@ -130,7 +130,6 @@ struct webLatencyTest {
   build() {
     Column() {
       Stack({ alignContent : Alignment.TopStart }) {
-        // TestImageDisplay( { testItem : this.testItem } )
         PageTitle({ testItem : this.testItem })
       }
 

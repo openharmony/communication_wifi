@@ -41,6 +41,9 @@ constexpr int P2P_SUPPLICANT_CONNECTED = 1;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(void)
 {
+    WifiEventCallback callback;
+    callback.onConnectChanged = [](int param1, int param2, const std::string &param3) {};
+    ReqRegisterStaEventCallback(callback);
     return HdiWpaStaStart();
 }
 

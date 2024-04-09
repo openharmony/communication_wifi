@@ -27,22 +27,13 @@ export struct P2pView {
   private p2p!: wifi.WifiP2pDevice
   private securityString: Resource = $r('app.string.useful')
   private p2pConnectState: number = 0
-  private p2pLinkedDeviceName: string = ""
+  @StorageLink("p2pLinkedDeviceName") p2pLinkedDeviceName: string = ""
   @State isLock: boolean = true
 
   aboutToAppear() {
     console.log(TAG , `aboutToAppear ${ JSON.stringify(this.p2p) }`)
     testOnP2pConnectionChange()
-
-    testGetCurrentGroupCallback((error , message) => {
-      if ( error ) {
-        // 错误处理
-        console.error(error.message);
-      } else if ( message ) {
-        // 成功处理
-        console.log(message);
-      }
-    });
+    testGetCurrentGroupCallback();
 
     this.p2pConnectState = AppStorage.get("p2pConnectState") ! //非空断言操作符
     this.p2pLinkedDeviceName = AppStorage.get("p2pLinkedDeviceName") ! //非空断言操作符
@@ -64,12 +55,14 @@ export struct P2pView {
           }
         }
         if ( this.p2pConnectState == 1 && this.p2pLinkedDeviceName == this.p2p.deviceName ) {
-          Text(this.securityString = $r('app.string.p2pConnected'))
+          // Text(this.securityString = $r('app.string.p2pConnected'))
+          Text($r('app.string.p2pConnected'))
             .fontSize(18)
             .fontColor(Color.Gray)
             .width(ConfigData.WH_100_100)
         } else {
-          Text(this.securityString)
+          Text($r('app.string.useful'))
+            // Text(this.securityString)
             .fontSize(18)
             .fontColor(Color.Gray)
             .width(ConfigData.WH_100_100)

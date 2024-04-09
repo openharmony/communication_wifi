@@ -15,7 +15,6 @@
 import { Browser } from '../entryability/model/bowser';
 import { WebTab } from './webTitleBar';
 import ConfigData from '../Utils/ConfigData'
-import Logger from '../entryability/model/Logger';
 
 const TAG: string = '[PhoneLayout]';
 const BUTTON_WIDTH: number = 22;

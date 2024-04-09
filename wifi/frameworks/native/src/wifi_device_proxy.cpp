@@ -1554,7 +1554,7 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
-    constexpr int MAX_CHANNEL_SIZE = 256;
+    constexpr int MAX_CHANNEL_SIZE = 36;
     MessageOption option;
     MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {

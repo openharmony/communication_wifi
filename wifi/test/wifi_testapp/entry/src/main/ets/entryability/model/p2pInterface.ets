@@ -16,13 +16,24 @@
 import prompt from '@system.prompt';
 import router from '@ohos.router';
 import wifi from '@ohos.wifi';
-import ConfigData from "../../utils/ConfigData"
-import LogData from "../../utils/LogData"
-import MessageData from "../../utils/MessageData"
+import ConfigData from '../../utils/ConfigData'
+import LogData from '../../utils/LogData'
+import MessageData from '../../utils/MessageData'
 import { BusinessError } from '@ohos.base';
+import wifiManager from '@ohos.wifiManager';
 
 const PAGE_URI_P2P_FOUND_MODE = 'pages/subManualApiTest/subP2pTest/p2pFound';
 const TAG = "[p2pInterface]"
+
+interface p2pDevice {
+  "deviceName": string,
+  "deviceAddress": string,
+  "deviceAddressType": number,
+  "primaryDeviceType": string,
+  "devStatus": number,
+  "groupCapability": number
+}
+
 type Callback = (error: BusinessError | null , message?: string) => void;
 /**
  * p2p Test Page Of Wifi test
@@ -52,33 +63,30 @@ export function testGetP2pLinkedInfoPromise(): string {
   }
 }
 
-export function testGetP2pLinkedInfoCallback(): Promise<string> {
-  return new Promise((resolve , reject) => {
-    try {
-      let message = (MessageData.testGetP2pLinkedInfoCallback)
-      console.log(TAG , LogData.testGetP2pLinkedInfoCallback_StartLog);
-      wifi.getP2pLinkedInfo((err , WifiP2pLinkedInfo) => {
-        if ( err ) {
-          console.error("getP2pLinkedInfoCallback error");
-          console.error('failed to get getP2pLinkedInfo: ' + JSON.stringify(err));
-          reject(`Failed to getP2pLinkedInfo: ${ JSON.stringify(err) }`);
-        } else {
-          console.log(TAG , LogData.getP2pLinkedInfoCallback_successfulLog);
-          console.log(TAG , "getP2pLinkedInfoCallback: " + JSON.stringify(WifiP2pLinkedInfo));
-          message = "getP2pLinkedInfoCallback: " + JSON.stringify(WifiP2pLinkedInfo);
-          AppStorage.setOrCreate("p2pLinkMessage" , message);
-          console.log(TAG , LogData.testGetP2pLinkedInfoCallback_EndLog);
-          prompt.showToast({ message : message });
-          resolve(message);
-        }
-      });
-    } catch( error ) {
-      console.log(TAG , `Failed to testGetP2pLinkedInfoCallback. message: ${ error.message }, code: ${ error.code }`);
-      let message = `Failed to testGetP2pLinkedInfoCallback. message: ${ error.message }, code: ${ error.code }`;
-      prompt.showToast({ message : message });
-      reject(message);
-    }
-  });
+export function testGetP2pLinkedInfoCallback(): string {
+  try {
+    let message = (MessageData.testGetP2pLinkedInfoCallback)
+    console.log(TAG , LogData.testGetP2pLinkedInfoCallback_StartLog);
+    wifi.getP2pLinkedInfo((err , WifiP2pLinkedInfo) => {
+      if ( err ) {
+        console.error("getP2pLinkedInfoCallback error");
+        console.error('failed to get getP2pLinkedInfo: ' + JSON.stringify(err));
+      } else {
+        console.log(TAG , LogData.getP2pLinkedInfoCallback_successfulLog);
+        console.log(TAG , "getP2pLinkedInfoCallback: " + JSON.stringify(WifiP2pLinkedInfo));
+        message = "getP2pLinkedInfoCallback: " + JSON.stringify(WifiP2pLinkedInfo);
+        AppStorage.setOrCreate("p2pLinkMessage" , message);
+        console.log(TAG , LogData.testGetP2pLinkedInfoCallback_EndLog);
+        prompt.showToast({ message : message });
+      }
+    });
+    return message
+  } catch( error ) {
+    console.log(TAG , `Failed to testGetP2pLinkedInfoCallback. message: ${ error.message }, code: ${ error.code }`);
+    let message = `Failed to testGetP2pLinkedInfoCallback. message: ${ error.message }, code: ${ error.code }`;
+    prompt.showToast({ message : message });
+    return message
+  }
 }
 
 export function testGetCurrentGroupPromise(): string {
@@ -105,17 +113,23 @@ export function testGetCurrentGroupPromise(): string {
   }
 }
 
-export function testGetCurrentGroupCallback(callback: (error: Error | null , message?: string) => void): void {
+export function testGetCurrentGroupCallback(): string {
   try {
     let message = MessageData.testGetCurrentGroupCallback;
     console.log(TAG , LogData.testGetCurrentGroupCallback_StartLog);
-    wifi.getCurrentGroup((err , wifiP2pGroupInfo) => {
+    wifi.getCurrentGroup((err , wifiP2pGroupInfo: wifi.WifiP2pGroupInfo) => {
       if ( err ) {
         console.error("testCurrentGroupCallback 异常");
         console.error('failed to get current group: ' + JSON.stringify(err));
-        callback(new Error(`Failed to get current group: ${ JSON.stringify(err) }`));
+        prompt.showToast({ message : 'failed to get current group: ' + JSON.stringify(err) });
       } else {
-        let p2pLinkedDeviceName = wifiP2pGroupInfo.ownerInfo.deviceName;
+        console.log(TAG , "wifiP2pGroupInfo:" + JSON.stringify(wifiP2pGroupInfo))
+        let p2pLinkedDeviceName =''
+        if ( wifiP2pGroupInfo.ownerInfo ) {
+          p2pLinkedDeviceName = wifiP2pGroupInfo.ownerInfo.deviceName
+        } else {
+          p2pLinkedDeviceName = '未连接'
+        }
         console.log(TAG , LogData.getCurrentGroupCallback_successfulLog);
         console.log(TAG , "p2pLinkedDeviceName: " + JSON.stringify(p2pLinkedDeviceName));
         console.log(TAG , "getCurrentGroupCallback: " + JSON.stringify(wifiP2pGroupInfo));
@@ -124,14 +138,14 @@ export function testGetCurrentGroupCallback(callback: (error: Error | null , mes
         AppStorage.SetOrCreate("p2pLinkedDeviceName" , p2pLinkedDeviceName);
         console.log(TAG , LogData.testGetCurrentGroupCallback_EndLog);
         prompt.showToast({ message : message });
-        callback(null , message);
       }
     });
+    return message
   } catch( error ) {
     console.log(TAG , `Failed to testGetCurrentGroupCallback. message: ${ error.message }, code: ${ error.code }`);
     let message = `Failed to testGetCurrentGroupCallback. message: ${ error.message }, code: ${ error.code }`;
     prompt.showToast({ message : message });
-    callback(error);
+    return error
   }
 }
 
@@ -159,11 +173,10 @@ export function testGetP2pPeerDevicesPromise() {
   }
 }
 
-export function testGetP2pPeerDevicesCallback(callback: Callback): void {
+export function testGetP2pPeerDevicesCallback(): string {
   try {
     let message = MessageData.testGetP2pPeerDevicesCallback;
     console.log(TAG , LogData.testGetP2pPeerDevicesCallback_StartLog);
-
     wifi.getP2pPeerDevices((err: BusinessError , WifiP2pDevice) => {
       if ( err ) {
         console.error("getP2pPeerDevicesCallback 异常");
@@ -171,13 +184,11 @@ export function testGetP2pPeerDevicesCallback(callback: Callback): void {
         console.error(message);
         prompt.showToast({ message : message });
         console.log(TAG , LogData.testGetP2pPeerDevicesCallback_EndLog);
-        callback(err); // 调用传入的回调函数
       } else {
         console.log(TAG , LogData.getP2pPeerDevicesCallback_successfulLog);
         message = "getP2pPeerDevicesCallback: " + JSON.stringify(WifiP2pDevice);
         console.log(message);
         AppStorage.setOrCreate("p2pPeerDeviceMessages" , message);
-
         let len = Object.keys(WifiP2pDevice).length;
         for ( let i = 0 ; i < len ; ++ i ) {
           if ( WifiP2pDevice[ i ].deviceName === "MyTestDevice" ) {
@@ -193,15 +204,15 @@ export function testGetP2pPeerDevicesCallback(callback: Callback): void {
           }
         }
         console.log(TAG , LogData.testGetP2pPeerDevicesCallback_EndLog);
-        callback(null , message); // 使用回调返回成功的消息
+        prompt.showToast({ message : message });
       }
     });
-    // 提示信息将在函数调用时显示，而不是在异步操作完成时
-    prompt.showToast({ message : message });
+    return message
   } catch( error ) {
     console.log(TAG , `Failed to testGetP2pPeerDevicesCallback. message: ${ error.message }, code: ${ error.code }`)
     let message = `Failed to testGetP2pPeerDevicesCallback. message: ${ error.message }, code: ${ error.code }`
     prompt.showToast({ message : message })
+    return message
   }
 }
 
@@ -224,11 +235,12 @@ export function testCreateGroup(): string {
     AppStorage.setOrCreate("wifiP2pConfig" , wifiP2pConfig)
     let ret = wifi.createGroup(wifiP2pConfig as wifi.WifiP2PConfig)
     message = "createGroup: " + ret
+    console.log(TAG , JSON.stringify(wifiP2pConfig) + ",ret:" + ret)
     console.log(TAG , LogData.testCreateGroup_EndLog);
     return message
   } catch( error ) {
-    console.log(TAG , `Failed to testCreateGroup. message: ${ error.message }, code: ${ error.code }`)
-    let message = `Failed to testCreateGroup. message: ${ error.message }, code: ${ error.code }`
+    console.log(TAG , `Failed to testCreateGroup. message: ${ error }`)
+    let message = `Failed to testCreateGroup. message: ${ error }`
     prompt.showToast({ message : message })
     return message
   }
@@ -339,10 +351,11 @@ export function testDeletePersistentGroup(): string {
   }
 }
 
-export function testSetDeviceName(deviceName: string): string {
+export function testSetDeviceName(): string {
   try {
     let message = (MessageData.testSetDeviceName)
     console.log(TAG , LogData.testSetDeviceName_StartLog);
+    let deviceName: string = AppStorage.get('deviceName') !
     let ret = wifi.setDeviceName(deviceName)
     message = "设置：" + ret + ",设备名称为：" + deviceName;
     console.log(TAG , "设置：" + ret + ",设备名称为：" + deviceName);
@@ -471,37 +484,13 @@ export function testOnP2pDeviceChange(): string {
     } else {
       wifi.on("p2pDeviceChange" , (data) => {
         let p2pDeviceStatusMessage = ""
-        let deviceName = data.deviceName
-        let deviceAddress = data.deviceAddress
-        let primaryDeviceType = data.primaryDeviceType
-        let deviceStatus = data.deviceStatus
-        let groupCapabilitys = data.groupCapabilitys
-        switch ( deviceStatus ) {
-          case 0:
-            p2pDeviceStatusMessage = "CONNECTED"
-            break;
-          case 1:
-            p2pDeviceStatusMessage = "INVITED"
-            break;
-          case 2:
-            p2pDeviceStatusMessage = "FAILED"
-            break;
-          case 3:
-            p2pDeviceStatusMessage = "AVAILABLE"
-            break;
-          case 4:
-            p2pDeviceStatusMessage = "UNAVAILABLE"
-            break;
-          default:
-            p2pDeviceStatusMessage = '未知状态';
-            break;
-        }
         console.log(TAG , "info:" + JSON.stringify(data))
-        message = "deviceName: " + deviceName + "\n" +
-        "deviceAddress: " + deviceAddress + "\n" +
-        "primaryDeviceType: " + primaryDeviceType + "\n" +
-        "deviceStatus: " + p2pDeviceStatusMessage + "\n" +
-        "groupCapabilitys: " + groupCapabilitys + "\n"
+        message = JSON.stringify(data)
+        // message = "deviceName: " + deviceName + "\n" +
+        // "deviceAddress: " + deviceAddress + "\n" +
+        // "primaryDeviceType: " + primaryDeviceType + "\n" +
+        // "deviceStatus: " + p2pDeviceStatusMessage + "\n" +
+        // "groupCapabilitys: " + groupCapabilitys + "\n"
         AppStorage.setOrCreate("p2pDeviceMessage" , message)
         prompt.showToast({ message : message })
         console.log(TAG , LogData.testOnP2pDeviceChange_EndLog)

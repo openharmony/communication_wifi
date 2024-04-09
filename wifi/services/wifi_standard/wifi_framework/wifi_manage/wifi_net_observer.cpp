@@ -119,6 +119,7 @@ sptr<NetHandle> NetStateObserver::GetWifiNetworkHandle()
  
 int32_t NetStateObserver::StartWifiDetection()
 {
+    WIFI_LOGI("StartWifiDetection start");
     sptr<NetHandle> netHandle = GetWifiNetworkHandle();
     if (netHandle == nullptr) {
         WIFI_LOGE("StartWifiDetection failed!");

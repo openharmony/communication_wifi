@@ -177,9 +177,9 @@ enum class  ScanInterfaceCode {
     WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO = 0x101D,     /* set scan control policy */
     WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK = 0x101E,    /* register scan callback */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
-    WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY = 0x101F,        /*set scan only*/
-    WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY = 0x1020,        /*get scan only*/
-    WIFI_SVR_CMD_START_PNO_SCAN = 0x1021,            /*start pno scan*/
+    WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY = 0x1200,        /*set scan only*/
+    WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY = 0x1201,        /*get scan only*/
+    WIFI_SVR_CMD_START_PNO_SCAN = 0x1202,            /*start pno scan*/
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_SCAN_STATE_CHANGE = 0x3300,    /* SCAN state change event */

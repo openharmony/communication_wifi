@@ -986,7 +986,7 @@ private:
     int getIpFailNum;
     bool enableSignalPoll;
     bool isRoam;
-    int netNoWorkNum;
+    int64_t lastTimestamp;
     bool portalFlag;
     bool networkStatusHistoryInserted;
     WifiLinkedInfo linkedInfo;

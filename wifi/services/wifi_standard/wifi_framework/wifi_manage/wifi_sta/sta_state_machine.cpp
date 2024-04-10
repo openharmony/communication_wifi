@@ -93,7 +93,7 @@ StaStateMachine::StaStateMachine(int instId)
       getIpFailNum(0),
       enableSignalPoll(true),
       isRoam(false),
-      netNoWorkNum(0),
+      lastTimestamp(0),
       portalFlag(false),
       networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr),
@@ -2514,14 +2514,25 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         return;
     }
     mPortalUrl = portalUrl;
+    /* Obtains the current time, accurate to milliseconds. */
+    struct timespec curTime = {0, 0};
+    if (clock_gettime(CLOCK_BOOTTIME, &curTime) != 0) {
+        WIFI_LOGE("HandleNetCheckResult clock_gettime failed.");
+        return;
+    }
+    int64_t nowTime = static_cast<int64_t>(curTime.tv_sec) * PORTAL_MILLSECOND +
+        curTime.tv_nsec / (PORTAL_MILLSECOND * PORTAL_MILLSECOND);
+
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
         /* Save connection information to WifiSettings. */
         WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
-        StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET);
-        netNoWorkNum = 0;
+        if (nowTime - lastTimestamp > PORTAL_CHECK_TIME * PORTAL_MILLSECOND) {
+            StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
+            lastTimestamp = nowTime;
+        }
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
@@ -2531,19 +2542,17 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
             portalFlag = true;
         }
         WriteIsInternetHiSysEvent(NETWORK);
-        StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL);
-        netNoWorkNum = 0;
+        if (nowTime - lastTimestamp > PORTAL_CHECK_TIME * PORTAL_MILLSECOND) {
+            StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
+            lastTimestamp = nowTime;
+        }
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
-        int delay = 1 << netNoWorkNum;
-        delay = delay > PORTAL_CHECK_TIME ? PORTAL_CHECK_TIME : delay;
-        netNoWorkNum++;
-        StartTimer(static_cast<int>(CMD_START_NETCHECK), delay * PORTAL_MILLSECOND);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET);
     }
 }
@@ -2570,6 +2579,7 @@ void StaStateMachine::LinkedState::GoInState()
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
         pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);
+        pStaStateMachine->lastTimestamp = 0;
     }
 #endif
     return;
@@ -3206,7 +3216,6 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
         pStaStateMachine->InvokeOnStaConnChanged(
             OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
         /* Delay to wait for the network adapter information to take effect. */
-        pStaStateMachine->netNoWorkNum = 0;
         pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
         pStaStateMachine->DealSetStaConnectFailedCount(0, true);
     }

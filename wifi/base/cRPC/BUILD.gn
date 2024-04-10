@@ -76,7 +76,12 @@ if (defined(ohos_lite)) {
 
   ohos_static_library("crpc_server") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     sources = crpc_server_sources
 
     include_dirs = [ "include" ]
@@ -92,7 +97,12 @@ if (defined(ohos_lite)) {
 
   ohos_static_library("crpc_client") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     sources = crpc_client_sources
     include_dirs = [
       "include",
@@ -110,7 +120,12 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("crpc_client_updater") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     install_enable = true
     sources = [ "./src/client_updater.c" ]
     include_dirs = [ "include" ]

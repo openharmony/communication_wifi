@@ -296,6 +296,10 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode CloseScanOnly() const;
+    /* *
+     * @Description Init chipset info.
+     */
+    virtual void InitChipsetInfo();
 
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;
@@ -358,6 +362,7 @@ private:
     int lastNetworkQuality;
     int chipsetCategory;
     int chipsetFeatrureCapability;
+    bool isChipsetInfoObtained;
     /**
      * @Description Obtains the frequency of a specified band.
      *

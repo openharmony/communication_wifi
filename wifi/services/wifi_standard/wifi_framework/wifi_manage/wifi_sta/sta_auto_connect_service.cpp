@@ -126,6 +126,7 @@ bool StaAutoConnectService::EnableOrDisableBssid(std::string bssid, bool enable,
 
 bool StaAutoConnectService::AddOrDelBlockedBssids(std::string bssid, bool enable, int reason)
 {
+    std::lock_guard<std::mutex> lock(m_blockBssidMapMutex);
     WIFI_LOGI("Enter AddOrDelBlockedBssids.\n");
     if (enable) {
         if (blockedBssidMap.count(bssid) != 0) {
@@ -160,6 +161,7 @@ bool StaAutoConnectService::AddOrDelBlockedBssids(std::string bssid, bool enable
 
 void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBssids)
 {
+    std::lock_guard<std::mutex> lock(m_blockBssidMapMutex);
     for (auto iter = blockedBssidMap.begin(); iter != blockedBssidMap.end(); ++iter) {
         blockedBssids.push_back(iter->first);
     }
@@ -169,6 +171,7 @@ void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBs
 
 void StaAutoConnectService::ClearAllBlockedBssids()
 {
+    std::lock_guard<std::mutex> lock(m_blockBssidMapMutex);
     WIFI_LOGI("Enter ClearAllBlockedBssids.\n");
     blockedBssidMap.clear();
     return;
@@ -176,6 +179,7 @@ void StaAutoConnectService::ClearAllBlockedBssids()
 
 void StaAutoConnectService::ClearOvertimeBlockedBssid()
 {
+    std::lock_guard<std::mutex> lock(m_blockBssidMapMutex);
     WIFI_LOGI("Enter ClearOvertimeBlockedBssid.\n");
     if (blockedBssidMap.empty()) {
         WIFI_LOGI("blockedBssidMap is empty !\n");

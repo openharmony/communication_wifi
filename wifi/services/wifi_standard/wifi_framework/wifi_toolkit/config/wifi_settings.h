@@ -1642,6 +1642,7 @@ private:
     void InitScanControlIntervalList();
     void InitScanControlInfo();
     void GetLinkedChannelWidth(int instId = 0);
+    void UpdateLinkedInfo(int instId = 0);
 #ifndef OHOS_ARCH_LITE
     void MergeSoftapConfig();
     void MergeWifiConfig();
@@ -1722,6 +1723,7 @@ private:
     std::mutex mWifiToggledMutex;
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;
+    std::mutex mSyncWifiConfigMutex;
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
 

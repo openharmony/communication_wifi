@@ -58,7 +58,8 @@ ScanService::ScanService(int instId)
       m_instId(instId),
       lastNetworkQuality(0),
       chipsetCategory(static_cast<int>(WifiCategory::DEFAULT)),
-      chipsetFeatrureCapability(0)
+      chipsetFeatrureCapability(0),
+      isChipsetInfoObtained(false)
 {}
 
 ScanService::~ScanService()
@@ -116,13 +117,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_IDL_OPT_OK)) {
         WIFI_LOGE("GetSupportFrequencies failed.\n");
     }
-    if (WifiStaHalInterface::GetInstance().GetChipsetCategory(chipsetCategory) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("GetChipsetCategory failed.\n");
-    }
-    if (WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(chipsetFeatrureCapability)
-        != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("GetChipsetWifiFeatrureCapability failed.\n");
-    }
+    InitChipsetInfo();
 
     ChannelsTable chanTbs;
     (void)WifiSettings::GetInstance().GetValidChannels(chanTbs);
@@ -735,6 +730,8 @@ bool ScanService::StoreFullScanInfo(
             WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 storedIter->bssid, "");
         #endif
+            WIFI_LOGI("ScanInfo add new ssid=%{public}s bssid=%{public}s.\n",
+                SsidAnonymize(storedIter->ssid).c_str(), MacAnonymize(storedIter->bssid).c_str());
         }
         if (mEnhanceService != nullptr) {
             storedIter->supportedWifiCategory = mEnhanceService->GetWifiCategory(storedIter->infoElems,
@@ -2627,6 +2624,7 @@ ErrCode ScanService::StartWpa()
     if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
         return WIFI_OPT_FAILED;
     }
+    InitChipsetInfo();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -2710,6 +2708,22 @@ void ScanService::SystemScanDisconnectedPolicy(int &interval, int &count)
                 interval = SYSTEM_SCAN_INTERVAL_160_SECOND;
             }
         }
+    }
+}
+
+void ScanService::InitChipsetInfo()
+{
+    WIFI_LOGI("Enter ScanService::InitChipsetInfo");
+    if (isChipsetInfoObtained) {
+        return;
+    }
+    if (WifiStaHalInterface::GetInstance().GetChipsetCategory(chipsetCategory) != WIFI_IDL_OPT_OK
+        || WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(chipsetFeatrureCapability)
+        != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("GetChipsetCategory or GetChipsetWifiFeatrureCapability failed.\n");
+        isChipsetInfoObtained = false;
+    } else {
+        isChipsetInfoObtained = true;
     }
 }
 

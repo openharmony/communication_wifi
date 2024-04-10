@@ -32,6 +32,8 @@ extern "C" {
 #define WIFI_AP_PASSWORD_LENGTH 64
 #define WIFI_INTERFACE_NAME_SIZE 32
 #define WIFI_PIN_CODE_LENGTH 8
+#define WIFI_MAX_TLVS_LENGTH 4096
+#define WIFI_MAX_CHIP_IDS 4096
 
 /* IWifiIface */
 /*

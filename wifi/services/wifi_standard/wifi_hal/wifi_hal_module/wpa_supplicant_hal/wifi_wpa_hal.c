@@ -697,7 +697,7 @@ static void WpaCallBackFuncTwo(const char *p)
     } else if (strncmp(p, WPS_EVENT_TIMEOUT, strlen(WPS_EVENT_TIMEOUT)) == 0) {
         WifiHalCbNotifyWpsTimeOut(1);
     } else if (strncmp(p, WPA_EVENT_AUTH_REJECT, strlen(WPA_EVENT_AUTH_REJECT)) == 0) { /* connection full */
-        Parse_Auth_Reject
+        Parse_Auth_Reject(p);
     } else if (strncmp(p, WPA_EVENT_ASSOC_REJECT, strlen(WPA_EVENT_ASSOC_REJECT)) == 0) {
         Parse_Assoc_Reject(p);
     } else if (strncmp(p, WPA_EVENT_ASSOCIATING, strlen(WPA_EVENT_ASSOCIATING)) == 0) {

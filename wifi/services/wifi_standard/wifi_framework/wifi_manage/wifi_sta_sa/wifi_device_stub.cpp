@@ -743,6 +743,8 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32((int)wifiInfo.maxSupportedTxLinkSpeed);
         reply.WriteInt32((int)wifiInfo.channelWidth);
         reply.WriteBool(wifiInfo.isAncoConnected);
+        reply.WriteInt32((int)wifiInfo.supportedWifiCategory);
+        reply.WriteBool(wifiInfo.isHiLinkNetwork);
     }
 
     return;

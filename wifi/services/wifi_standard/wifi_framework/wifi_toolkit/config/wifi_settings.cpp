@@ -23,6 +23,7 @@
 #include <chrono>
 #include "define.h"
 #include "wifi_cert_utils.h"
+#include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
@@ -493,6 +494,8 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
             WifiSettings::GetInstance().RemoveMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 iter->bssid);
         #endif
+            LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
+                SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
             iter = mWifiScanInfoList.erase(iter);
             continue;
         }
@@ -1041,9 +1044,7 @@ int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info, int instId)
     std::unique_lock<std::mutex> lock(mInfoMutex);
     auto iter = mWifiLinkedInfo.find(instId);
     if (iter != mWifiLinkedInfo.end()) {
-        if (iter->second.channelWidth == WifiChannelWidth::WIDTH_INVALID) {
-            GetLinkedChannelWidth(instId);
-        }
+        UpdateLinkedInfo(instId);
         info = iter->second;
     }
     return 0;
@@ -1830,6 +1831,21 @@ void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannel
     }
 }
 
+void WifiSettings::UpdateLinkedInfo(int instId)
+{
+    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
+        if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
+            if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
+                mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
+            }
+            mWifiLinkedInfo[instId].supportedWifiCategory = iter->supportedWifiCategory;
+            mWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
+            return;
+        }
+    }
+    LOGD("WifiSettings UpdateLinkedInfo failed.");
+}
+
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers, int instId)
 {
     if (disableOthers) {
@@ -1867,6 +1883,7 @@ time_t WifiSettings::GetUserLastSelectedNetworkTimeVal(int instId)
 
 int WifiSettings::SyncWifiConfig()
 {
+    std::unique_lock<std::mutex> lock(mSyncWifiConfigMutex);
     std::vector<WifiConfig> tmp;
     for (auto &item : mWifiConfig) {
         tmp.push_back(item.second);

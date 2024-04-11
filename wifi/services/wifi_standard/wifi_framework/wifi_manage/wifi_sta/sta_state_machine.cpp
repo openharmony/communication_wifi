@@ -1525,6 +1525,8 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     if (bssid.empty()) {
         LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid);
+        deviceConfig.userSelectBssid = "";
+        WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
     } else {
         LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid);

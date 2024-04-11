@@ -1037,7 +1037,7 @@ WifiHostapdHalDevice *GetWifiHostapdDev(int id)
     g_hostapdHalDevInfo[id].hostapdHalDev->terminateAp = TerminateAp;
 
     if (InitHostapdHal(id) != 0) {
-        LOGE("InitHostapdHal return failed!!");
+        LOGE("InitHostapdHal return failed!!!");
         free(g_hostapdHalDevInfo[id].hostapdHalDev);
         g_hostapdHalDevInfo[id].hostapdHalDev = NULL;
         return NULL;

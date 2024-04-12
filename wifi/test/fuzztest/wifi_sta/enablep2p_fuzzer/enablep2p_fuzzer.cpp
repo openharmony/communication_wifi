@@ -66,7 +66,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
     OHOS::Wifi::DoSomethingInterestingWithMyAPIS(data, size);
-    sleep(5);
+    sleep(2);
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }

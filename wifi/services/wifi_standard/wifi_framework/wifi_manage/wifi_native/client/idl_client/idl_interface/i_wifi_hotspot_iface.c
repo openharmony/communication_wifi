@@ -47,7 +47,7 @@ IWifiApEventCallback *GetWifiApEventCallback(int id)
     return &g_wifiApEventCallback[id];
 }
 
-WifiErrorNo StartSoftAp(int id, char *ifaceName)
+WifiErrorNo StartSoftAp(int id, const char *ifaceName)
 {
     RpcClient *client = GetApRpcClient();
     LockRpcClient(client);

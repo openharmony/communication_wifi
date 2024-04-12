@@ -35,7 +35,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartP2p(void) const;
+    WifiErrorNo StartP2p(const std::string &ifaceName = "p2p0") const;
 
     /**
      * @Description Close p2p

@@ -755,7 +755,7 @@ HWTEST_F(WifiIdlClientTest, ReqGetConnectSignalInfoTest2, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, StartApTest, TestSize.Level1)
 {
     int id = 1;
-    mClient.StartAp(id);
+    mClient.StartAp(id, "wlan0");
 }
 
 HWTEST_F(WifiIdlClientTest, StopApTest, TestSize.Level1)
@@ -763,7 +763,7 @@ HWTEST_F(WifiIdlClientTest, StopApTest, TestSize.Level1)
     int id = 1;
     mClient.StopAp(id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.StartAp(id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.StartAp(id, "wlan0") == WIFI_IDL_OPT_FAILED);
     EXPECT_TRUE(mClient.StopAp(id) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }

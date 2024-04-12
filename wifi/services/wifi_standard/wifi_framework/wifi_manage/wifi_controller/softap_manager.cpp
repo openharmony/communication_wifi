@@ -58,5 +58,15 @@ SoftapManagerMachine *SoftApManager::GetSoftapMachine()
     return pSoftapManagerMachine;
 }
 
+void SoftApManager::SetRole(Role role)
+{
+    curRole = role;
+}
+
+SoftApManager::Role SoftApManager::GetRole()
+{
+    return curRole;
+}
+
 } // namespace Wifi
 } // namespace OHOS

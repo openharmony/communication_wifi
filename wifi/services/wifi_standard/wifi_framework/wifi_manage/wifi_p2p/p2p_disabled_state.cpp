@@ -49,12 +49,13 @@ bool P2pDisabledState::ExecuteStateMsg(InternalMessage *msg)
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::CMD_P2P_ENABLE: {
             /* WifiP2PHalInterface::createP2pInterface */
-            p2pStateMachine.p2pIface = P2P_INTERFACE;
+            p2pStateMachine.p2pIface = WifiSettings::GetInstance().GetP2pIfaceName();
             p2pStateMachine.RegisterEventHandler();
             p2pStateMachine.p2pMonitor.MonitorBegins(p2pStateMachine.p2pIface);
             p2pStateMachine.StartTimer(
                 static_cast<int>(P2P_STATE_MACHINE_CMD::ENABLE_P2P_TIMED_OUT), ENABLE_P2P_TIMED_OUT__INTERVAL);
-            if (WifiP2PHalInterface::GetInstance().StartP2p() == WifiErrorNo::WIFI_IDL_OPT_OK) {
+            if (WifiP2PHalInterface::GetInstance().StartP2p(WifiSettings::GetInstance().GetP2pIfaceName())
+                == WifiErrorNo::WIFI_IDL_OPT_OK) {
                 SetVendorFeatures();
                 p2pStateMachine.SwitchState(&p2pStateMachine.p2pEnablingState);
             } else {

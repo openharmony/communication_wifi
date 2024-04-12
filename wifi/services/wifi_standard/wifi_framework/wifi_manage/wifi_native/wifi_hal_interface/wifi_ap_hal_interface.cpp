@@ -51,7 +51,7 @@ WifiApHalInterface &WifiApHalInterface::GetInstance(void)
     return inst;
 }
 
-WifiErrorNo WifiApHalInterface::StartAp(int id, std::string ifaceName)
+WifiErrorNo WifiApHalInterface::StartAp(int id, const std::string &ifaceName)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);

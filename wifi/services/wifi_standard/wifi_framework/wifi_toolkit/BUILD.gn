@@ -126,6 +126,10 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_SCAN_CONTROL" ]
     }
 
+    if (wifi_feature_with_hdi_chip_supported) {
+      defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "c_utils:utils",

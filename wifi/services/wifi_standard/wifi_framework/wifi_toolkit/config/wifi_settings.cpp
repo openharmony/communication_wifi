@@ -42,8 +42,6 @@
 
 namespace OHOS {
 namespace Wifi {
-const std::string DEFAULT_IFACENAME = "wlan0";
-
 WifiSettings &WifiSettings::GetInstance()
 {
     static WifiSettings gWifiSettings;
@@ -57,7 +55,13 @@ WifiSettings::WifiSettings()
       mWifiStoping(false),
       mSoftapToggled(false),
       mIsSupportCoex(false),
-      mApIfaceName(DEFAULT_IFACENAME),
+      mStaIfaceName("wlan0"),
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+      mP2pIfaceName("p2p0"),
+#else
+      mP2pIfaceName("p2p-dev-wlan0"),
+#endif
+      mApIfaceName("wlan0"),
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
       mP2pConnectState(0),
@@ -475,13 +479,39 @@ bool WifiSettings::GetCoexSupport() const
     return mIsSupportCoex;
 }
 
+void WifiSettings::SetStaIfaceName(const std::string &ifaceName)
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    mStaIfaceName = ifaceName;
+}
+
+std::string WifiSettings::GetStaIfaceName()
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    return mStaIfaceName;
+}
+
+void WifiSettings::SetP2pIfaceName(const std::string &ifaceName)
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    mP2pIfaceName = ifaceName;
+}
+
+std::string WifiSettings::GetP2pIfaceName()
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    return mP2pIfaceName;
+}
+
 void WifiSettings::SetApIfaceName(const std::string &ifaceName)
 {
+    std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
     mApIfaceName = ifaceName;
 }
 
-std::string WifiSettings::GetApIfaceName() const
+std::string WifiSettings::GetApIfaceName()
 {
+    std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
     return mApIfaceName;
 }
 

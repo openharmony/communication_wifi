@@ -1495,18 +1495,7 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
 
 ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string & bssid)
 {
-    WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
-        LOGE("GetDeviceConfig failed!");
-        return WIFI_OPT_FAILED;
-    }
-    if (config.isReassocSelfCureWithFactoryMacAddress == SELF_CURE_FAC_MAC_REASSOC) {
-        config.wifiPrivacySetting = WifiPrivacyConfig::DEVICEMAC;
-    } else if (config.isReassocSelfCureWithFactoryMacAddress == SELF_CURE_RAND_MAC_REASSOC) {
-        config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
-    }
-    WifiSettings::GetInstance().AddDeviceConfig(config);
-    WifiSettings::GetInstance().SyncDeviceConfig();
+    ConfigRandMacSelfCure(networkId);
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId, bssid);
     WifiDeviceConfig deviceConfig;
@@ -1522,11 +1511,12 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     }
     ConvertDeviceCfg(deviceConfig);
     if (bssid.empty()) {
+        // user select connect
         LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid);
         deviceConfig.userSelectBssid = "";
-        WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
     } else {
+        // auto connect
         LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid);
     }
@@ -1540,6 +1530,8 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);
         return WIFI_OPT_FAILED;
     }
+    WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
+    WifiSettings::GetInstance().SyncDeviceConfig();
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
@@ -2751,6 +2743,22 @@ bool StaStateMachine::CanArpReachable()
         }
     }
     return false;
+}
+
+void StaStateMachine::ConfigRandMacSelfCure(const int networkId)
+{
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("GetDeviceConfig failed!");
+        return WIFI_OPT_FAILED;
+    }
+    if (config.isReassocSelfCureWithFactoryMacAddress == SELF_CURE_FAC_MAC_REASSOC) {
+        config.wifiPrivacySetting = WifiPrivacyConfig::DEVICEMAC;
+    } else if (config.isReassocSelfCureWithFactoryMacAddress == SELF_CURE_RAND_MAC_REASSOC) {
+        config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+    }
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    WifiSettings::GetInstance().SyncDeviceConfig();
 }
 
 void StaStateMachine::ConnectToNetworkProcess(std::string bssid)

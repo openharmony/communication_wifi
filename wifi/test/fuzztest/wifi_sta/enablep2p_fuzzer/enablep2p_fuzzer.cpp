@@ -29,8 +29,6 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr size_t U32_AT_SIZE_ZERO = 4;
-constexpr size_t MAP_P2P_NUMS = 41;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 sptr<WifiP2pStub> pWifiP2pStub = WifiP2pServiceImpl::GetInstance();
 
@@ -43,7 +41,7 @@ void DoSomethingInterestingWithMyAPIS(const uint8_t* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    pWifiP2pStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE),
+    pWifiP2pStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE),
         datas, reply, option);
 }
 
@@ -64,7 +62,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
+    if (data == nullptr) {
         return 0;
     }
     OHOS::Wifi::DoSomethingInterestingWithMyAPIS(data, size);

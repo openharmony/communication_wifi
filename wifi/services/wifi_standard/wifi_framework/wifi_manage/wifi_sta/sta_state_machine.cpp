@@ -1495,7 +1495,10 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
 
 ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string & bssid)
 {
-    ConfigRandMacSelfCure(networkId);
+    if (ConfigRandMacSelfCure(networkId) != WIFI_OPT_SUCCESS) {
+        LOGE("ConfigRandMacSelfCure failed!");
+        return WIFI_OPT_FAILED;
+    }
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId, bssid);
     WifiDeviceConfig deviceConfig;
@@ -2745,7 +2748,7 @@ bool StaStateMachine::CanArpReachable()
     return false;
 }
 
-void StaStateMachine::ConfigRandMacSelfCure(const int networkId)
+ErrCode StaStateMachine::ConfigRandMacSelfCure(const int networkId)
 {
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
@@ -2759,6 +2762,7 @@ void StaStateMachine::ConfigRandMacSelfCure(const int networkId)
     }
     WifiSettings::GetInstance().AddDeviceConfig(config);
     WifiSettings::GetInstance().SyncDeviceConfig();
+    return WIFI_OPT_SUCCESS;
 }
 
 void StaStateMachine::ConnectToNetworkProcess(std::string bssid)

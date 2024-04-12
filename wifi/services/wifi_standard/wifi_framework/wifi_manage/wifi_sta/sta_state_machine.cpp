@@ -1507,7 +1507,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     }
     WifiSettings::GetInstance().AddDeviceConfig(config);
     WifiSettings::GetInstance().SyncDeviceConfig();
-
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId, bssid);
     WifiDeviceConfig deviceConfig;

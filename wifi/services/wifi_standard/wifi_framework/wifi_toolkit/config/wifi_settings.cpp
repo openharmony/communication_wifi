@@ -174,7 +174,7 @@ void WifiSettings::InitPackageFilterConfig()
     if (mPackageFilterConfig.LoadConfig() >= 0) {
         std::vector<PackageFilterConf> tmp;
         mPackageFilterConfig.GetValue(tmp);
-        for (int i = 0; i < tmp.size(); i++) {
+        for (unsigned int i = 0; i < tmp.size(); i++) {
             mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
         }
     }
@@ -451,7 +451,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
         results.push_back(*iter);
         ++iter;
     }
-    LOGI("WifiSettings::GetScanInfoList size = %{public}u", results.size());
+    LOGI("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
     return 0;
 }
 

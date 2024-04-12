@@ -637,7 +637,7 @@ static int WpaP2pCallBackFunc(char *p)
     }
     return 0;
 }
-static void Parse_Auth_Reject(const char *p)
+static void ParseAuthReject(const char *p)
 {
     char *connectionStatus = strstr(p, "status_code=");
     if (connectionStatus != NULL) {
@@ -647,17 +647,17 @@ static void Parse_Auth_Reject(const char *p)
             WifiHalCbNotifyWrongKey(1);
         } else if (status == CONNECTION_FULL_STATUS) {
             WifiHalCbNotifyConnectionFull(status);
-        } else if (status == CONNECTION_REJECT_STATUS
-                || status == WLAN_STATUS_AUTH_TIMEOUT
-                || status == MAC_AUTH_RSP2_TIMEOUT
-                || status == MAC_AUTH_RSP4_TIMEOUT
-                || status == MAC_ASSOC_RSP_TIMEOUT) {
+        } else if (status == CONNECTION_REJECT_STATUS ||
+            status == WLAN_STATUS_AUTH_TIMEOUT ||
+            status == MAC_AUTH_RSP2_TIMEOUT ||
+            status == MAC_AUTH_RSP4_TIMEOUT ||
+            status == MAC_ASSOC_RSP_TIMEOUT) {
             WifiHalCbNotifyConnectionReject(status);
         }
     }
 }
 
-static void Parse_Assoc_Reject(const char *p)
+static void ParseAssocReject(const char *p)
 {
     char *connectionStatus = strstr(p, "status_code=");
     if (connectionStatus != NULL) {
@@ -665,12 +665,12 @@ static void Parse_Assoc_Reject(const char *p)
         int status = atoi(connectionStatus);
         if (status == CONNECTION_FULL_STATUS) {
             WifiHalCbNotifyConnectionFull(status);
-        } else if (status == CONNECTION_REJECT_STATUS
-                || status == WLAN_STATUS_AUTH_TIMEOUT
-                || status == MAC_AUTH_RSP2_TIMEOUT
-                || status == MAC_AUTH_RSP4_TIMEOUT
-                || status == MAC_ASSOC_RSP_TIMEOUT
-                || status == CONNECTION_PWD_WRONG_STATUS) {
+        } else if (status == CONNECTION_REJECT_STATUS ||
+            status == WLAN_STATUS_AUTH_TIMEOUT ||
+            status == MAC_AUTH_RSP2_TIMEOUT ||
+            status == MAC_AUTH_RSP4_TIMEOUT ||
+            status == MAC_ASSOC_RSP_TIMEOUT ||
+            status == CONNECTION_PWD_WRONG_STATUS) {
             WifiHalCbNotifyConnectionReject(status);
         }
     }
@@ -697,9 +697,9 @@ static void WpaCallBackFuncTwo(const char *p)
     } else if (strncmp(p, WPS_EVENT_TIMEOUT, strlen(WPS_EVENT_TIMEOUT)) == 0) {
         WifiHalCbNotifyWpsTimeOut(1);
     } else if (strncmp(p, WPA_EVENT_AUTH_REJECT, strlen(WPA_EVENT_AUTH_REJECT)) == 0) { /* connection full */
-        Parse_Auth_Reject(p);
+        ParseAuthReject(p);
     } else if (strncmp(p, WPA_EVENT_ASSOC_REJECT, strlen(WPA_EVENT_ASSOC_REJECT)) == 0) {
-        Parse_Assoc_Reject(p);
+        ParseAssocReject(p);
     } else if (strncmp(p, WPA_EVENT_ASSOCIATING, strlen(WPA_EVENT_ASSOCIATING)) == 0) {
         char *pBssid = strstr(p, WPA_EVENT_ASSOCIATING);
         if (pBssid == NULL) {

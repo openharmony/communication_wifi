@@ -1024,6 +1024,7 @@ private:
     WifiDeviceConfig getCurrentWifiDeviceConfig();
     void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
     bool CanArpReachable();
+    void ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     int32_t StaStartAbility(OHOS::AAFwk::Want& want);
 #endif

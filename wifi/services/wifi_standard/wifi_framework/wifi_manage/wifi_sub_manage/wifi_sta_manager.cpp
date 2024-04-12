@@ -203,8 +203,6 @@ void WifiStaManager::DealStaOpenRes(OperateResState state, int instId)
         WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
     }
 #endif
-    WifiManager::GetInstance().AutoStartEnhanceService();
-    WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(instId);
     return;
 }
 
@@ -231,10 +229,6 @@ void WifiStaManager::DealStaCloseRes(OperateResState state, int instId)
         ForceStopWifi(instId);
         cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    }
-    if (WifiOprMidState::RUNNING != WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId)) {
-        WIFI_LOGI("DealStaCloseRes: wifi scan only state is not running,to CheckAndStopScanService!");
-        WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(instId);
     }
 
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE, instId);

@@ -81,6 +81,14 @@ WifiErrorNo HdiWpaStart();
 WifiErrorNo HdiWpaStop();
 
 /**
+ * @Description check wpa hdi already stopped.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo IsHdiWpaStopped();
+
+
+/**
  * @Description Add interface.
  *
  * @return WifiErrorNo - operation result
@@ -93,6 +101,11 @@ WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName);
  * @return WifiErrorNo - operation result
  */
 WifiErrorNo HdiRemoveWpaIface(const char *ifName);
+
+WifiErrorNo SetHdiStaIfaceName(const char *ifaceName);
+const char *GetHdiStaIfaceName();
+WifiErrorNo SetHdiP2pIfaceName(const char *ifaceName);
+const char *GetHdiP2pIfaceName();
 
 /**
  * @Description Create the WiFi object.
@@ -115,14 +128,12 @@ WifiErrorNo CopyUserFile(const char *srcFilePath, const char* destFilePath);
  */
 WifiErrorNo CopyConfigFile(const char* configName);
 
-void HdiWpaResetGlobalObj();
-
 /**
  * @Description Create a ap channel between the HAL and the driver.
  *
  * @return WifiErrorNo - operation result
  */
-WifiErrorNo HdiApStart(int id, char *ifaceName);
+WifiErrorNo HdiApStart(int id, const char *ifaceName);
 
 /**
  * @Description Stop the created ap channel.
@@ -132,13 +143,21 @@ WifiErrorNo HdiApStart(int id, char *ifaceName);
 WifiErrorNo HdiApStop(int id);
 
 /**
+ * @Description check wpa hdi ap already stopped.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo IsHdiApStopped();
+
+/**
  * @Description Create the Ap object.
  *
  * @return WifiErrorNo - operation result
  */
 struct IHostapdInterface* GetApInterface();
-void InitCfg(char *ifaceName);
-char *GetApIfaceName();
+
+WifiErrorNo SetHdiApIfaceName(const char *ifaceName);
+const char *GetHdiApIfaceName();
 
 void SetExecDisable(int execDisable);
 int GetExecDisable();

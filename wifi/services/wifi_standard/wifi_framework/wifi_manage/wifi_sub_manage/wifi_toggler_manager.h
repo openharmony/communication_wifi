@@ -46,6 +46,7 @@ private:
     void DealConcreateStartFailure(int id = 0);
     void DealSoftapStop(int id = 0);
     void DealSoftapStartFailure(int id = 0);
+    void DealClientRemoved(int id = 0);
 
 private:
     ConcreteModeCallback mConcreteModeCb;

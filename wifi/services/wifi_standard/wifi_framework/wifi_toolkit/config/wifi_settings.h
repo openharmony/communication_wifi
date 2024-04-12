@@ -136,8 +136,12 @@ public:
     bool GetWifiStopState() const;
     void SetCoexSupport(bool isSupport);
     bool GetCoexSupport() const;
+    void SetStaIfaceName(const std::string &ifaceName);
+    std::string GetStaIfaceName();
+    void SetP2pIfaceName(const std::string &ifaceName);
+    std::string GetP2pIfaceName();
     void SetApIfaceName(const std::string &ifaceName);
-    std::string GetApIfaceName() const;
+    std::string GetApIfaceName();
 
     /**
      * @Description Has STA service running
@@ -1658,6 +1662,8 @@ private:
     bool mWifiStoping;
     bool mSoftapToggled;
     bool mIsSupportCoex;
+    std::string mStaIfaceName;
+    std::string mP2pIfaceName;
     std::string mApIfaceName;
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;

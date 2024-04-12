@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-WifiErrorNo HdiWpaStaStart();
+WifiErrorNo HdiWpaStaStart(const char *ifaceName);
 
 WifiErrorNo HdiWpaStaStop();
 

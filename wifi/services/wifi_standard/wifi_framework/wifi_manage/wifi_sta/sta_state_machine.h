@@ -119,7 +119,6 @@ typedef enum EnumDhcpReturnCode {
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
-const std::string IF_NAME = "wlan";
 
 class StaStateMachine : public StateMachine {
     FRIEND_GTEST(StaStateMachine);

@@ -106,7 +106,7 @@ enum class OperateResState {
     CLOSE_SCAN_ONLY_FAILED,                 /* close scan only failed */
 };
 
-/* is wps connected to a network */
+/* is wps connected to a network  */
 enum class IsWpsConnected {
     WPS_CONNECTED = 0,
     WPS_INVALID = -1,

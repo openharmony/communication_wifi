@@ -21,6 +21,7 @@
 #include "external_wifi_filter_builder_manager.h"
 #include "wifi_filter_impl.h"
 #include "wifi_logger.h"
+#include "parameters.h"
 
 using namespace std;
 
@@ -41,6 +42,9 @@ AutoConnectIntegrator::AutoConnectIntegrator() : CompositeNetworkSelector(
     auto filters = make_shared<AndWifiFilter>();
     filters->AddFilter(make_shared<HiddenWifiFilter>());
     filters->AddFilter(make_shared<SignalStrengthWifiFilter>());
+    if (OHOS::system::GetParameter("ohos.boot.advsecmode.state", "0") != "0") {
+        filters->AddFilter(make_shared<WeakAlgorithmWifiFilter>());
+    }
     SetWifiFilter(filters);
     AddSubNetworkSelector(make_shared<SavedNetworkTracker>());
     auto comparator = make_shared<WifiScorerComparator>(m_networkSelectorName);

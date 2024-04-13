@@ -148,6 +148,7 @@ ohos_unittest("wifi_sta_unittest") {
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "netstack:http_client",

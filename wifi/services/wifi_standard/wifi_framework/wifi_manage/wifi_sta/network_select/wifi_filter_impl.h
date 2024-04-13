@@ -122,5 +122,14 @@ public:
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
+
+
+class WeakAlgorithmWifiFilter final : public SimpleWifiFilter {
+public:
+    WeakAlgorithmWifiFilter();
+    ~WeakAlgorithmWifiFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
 }
 #endif //OHOS_WIFI_WIFI_FILTER_H

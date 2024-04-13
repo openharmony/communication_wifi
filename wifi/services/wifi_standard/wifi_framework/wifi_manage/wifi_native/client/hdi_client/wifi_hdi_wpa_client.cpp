@@ -1233,6 +1233,12 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &confi
         return WIFI_IDL_OPT_FAILED;
     }
     info.frequency = config.GetFrequency();
+    if (config.GetDhcoMode() == DhcoMode::CONNECT_AP_DHCP ||
+        config.GetDhcoMode() == DhcoMode::CONNECT_AP_NODHCP) {
+        info.isLegacyGo = 1;
+    } else {
+        info.isLegacyGo = 0;
+    }
     WifiErrorNo ret = HdiP2pHid2dConnect(&info);
     return ret;
 }

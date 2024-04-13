@@ -449,6 +449,7 @@ IP2pService *WifiServiceManager::GetP2pServiceInst()
 
 IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
 {
+#ifndef
     WIFI_LOGD("WifiServiceManager::GetEnhanceServiceInst");
     std::unique_lock<std::mutex> lock(mEnhanceMutex);
     if (mEnhanceServiceHandle.handle == nullptr) {
@@ -459,6 +460,9 @@ IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
         mEnhanceServiceHandle.pService = mEnhanceServiceHandle.create();
     }
     return mEnhanceServiceHandle.pService;
+#else
+    return nullptr;
+#endif
 }
 
 #ifdef FEATURE_SELF_CURE_SUPPORT

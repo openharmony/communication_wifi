@@ -41,6 +41,10 @@ ohos_fuzztest("WifiHotSpotStubFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
+  if (is_asan) {
+    defines += [ "DTFUZZ_TEST" ]
+  }
+
   sources = [
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
     "wifihotspotstub_fuzzer.cpp",

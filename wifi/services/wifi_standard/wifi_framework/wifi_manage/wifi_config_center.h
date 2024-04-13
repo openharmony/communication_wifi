@@ -471,7 +471,7 @@ public:
      *
      * @param state - 1 open; 2 close
      */
-    void SetAirplaneModeState(const int &state);
+    bool SetAirplaneModeState(const int &state);
 
     /**
      * @Description Get current airplane mode state

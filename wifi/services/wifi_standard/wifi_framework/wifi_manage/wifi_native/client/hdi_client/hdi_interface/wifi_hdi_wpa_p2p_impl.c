@@ -935,7 +935,7 @@ WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
     wpsParam.bssidLen = strlen(info->bssid);
     wpsParam.passphrase = (uint8_t *)info->passphrase;
     wpsParam.passphraseLen = strlen(info->passphrase) + 1;
-    wpsParam.frequency = info->frequency;
+    wpsParam.frequency = (info->frequency << 16) | (info->isLegacyGo);
     int32_t result = wpaObj->P2pHid2dConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pHid2dConnect: P2pHid2dConnect failed result:%{public}d", result);

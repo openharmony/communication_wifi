@@ -449,7 +449,7 @@ IP2pService *WifiServiceManager::GetP2pServiceInst()
 
 IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
 {
-#ifndef
+#ifndef DTFUZZ_TEST
     WIFI_LOGD("WifiServiceManager::GetEnhanceServiceInst");
     std::unique_lock<std::mutex> lock(mEnhanceMutex);
     if (mEnhanceServiceHandle.handle == nullptr) {

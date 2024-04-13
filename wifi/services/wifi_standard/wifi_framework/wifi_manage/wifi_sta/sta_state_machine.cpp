@@ -1518,6 +1518,8 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid);
         deviceConfig.userSelectBssid = "";
+        WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
+        WifiSettings::GetInstance().SyncDeviceConfig();
     } else {
         // auto connect
         LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
@@ -1533,8 +1535,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);
         return WIFI_OPT_FAILED;
     }
-    WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
-    WifiSettings::GetInstance().SyncDeviceConfig();
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),

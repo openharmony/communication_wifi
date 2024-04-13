@@ -17,9 +17,9 @@ import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("WifiP2pStubFuzzTest") {
+ohos_fuzztest("EnableP2pFuzzTest") {
   module_out_path = fuzz_test_output_path
-  fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifip2pstub_fuzzer"
+  fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/enablep2p_fuzzer"
 
   include_dirs = [
     "$WIFI_ROOT_DIR/interfaces/inner_api",
@@ -44,7 +44,7 @@ ohos_fuzztest("WifiP2pStubFuzzTest") {
 
   sources = [
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
-    "wifip2pstub_fuzzer.cpp",
+    "enablep2p_fuzzer.cpp",
   ]
 
   deps = [

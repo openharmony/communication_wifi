@@ -38,7 +38,14 @@ ohos_fuzztest("WifiDeviceStubFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "wifidevicestub_fuzzer.cpp" ]
+  sources = [
+    "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
+    "wifidevicestub_fuzzer.cpp",
+  ]
+
+  if (is_asan) {
+    defines += [ "DTFUZZ_TEST" ]
+  }
 
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",

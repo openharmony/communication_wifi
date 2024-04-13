@@ -30,6 +30,7 @@ group("fuzztest") {
     "connecttodevice_fuzzer:ConnectToDeviceFuzzTest",
     "disablewifi_fuzzer:DisableWifiFuzzTest",
     "disconnect_fuzzer:DisconnectFuzzTest",
+    "enablep2p_fuzzer:EnableP2pFuzzTest",
     "enablewifi_fuzzer:EnableWifiFuzzTest",
     "isconnected_fuzzer:IsConnectedFuzzTest",
     "reassociate_fuzzer:ReAssociateFuzzTest",

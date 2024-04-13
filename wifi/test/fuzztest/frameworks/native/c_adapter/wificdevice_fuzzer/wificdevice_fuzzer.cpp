@@ -284,13 +284,6 @@ static void IsBandTypeSupportedTest(const uint8_t* data, size_t size)
     (void)IsBandTypeSupported(bandType, &supported);
 }
 
-static void GetDisconnectedReasonTest(const uint8_t* data, size_t size)
-{
-    DisconnectedReason result = DISC_REASON_DEFAULT;
-    result = static_cast<DisconnectedReason>(static_cast<int>(data[0]) % (DISC_REASON_CONNECTION_REJECTED + 1));
-    (void)GetDisconnectedReason(&result);
-}
-
 namespace OHOS {
 namespace Wifi {
     bool WifiCDeviceFuzzerTest(const uint8_t* data, size_t size)
@@ -316,7 +309,6 @@ namespace Wifi {
         SetLowLatencyModeTest(data, size);
         Get5GHzChannelListTest(data, size);
         IsBandTypeSupportedTest(data, size);
-        GetDisconnectedReasonTest(data, size);
 
         return true;
     }

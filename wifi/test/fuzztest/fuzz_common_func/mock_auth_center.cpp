@@ -97,5 +97,10 @@ int WifiAuthCenter::VerifyManageWifiHotspotExtPermission(const int &pid, const i
 {
     return PERMISSION_GRANTED;
 }
+
+int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid)
+{
+    return PERMISSION_GRANTED;
+}
 } // namespace Wifi
 } // namespace OHOS

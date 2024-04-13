@@ -424,15 +424,11 @@ bool WifiControllerMachine::ShouldEnableWifi()
         return false;
     }
 #endif
-    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
-        !WifiSettings::GetInstance().GetWifiToggledState()) {
-        WIFI_LOGI("Disable wifi when airplane mode open.");
-        return false;
-    }
-    if (WifiSettings::GetInstance().GetWifiToggledState() || IsScanOnlyEnable()) {
-        WIFI_LOGI("Should to start Wifi or scanonly");
+    if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsScanOnlyEnable) {
+        WIFI_LOGI("Should start wifi or scanonly.");
         return true;
     }
+
     WIFI_LOGI("no need to start Wifi or scanonly");
     return false;
 }
@@ -452,7 +448,7 @@ ConcreteManagerRole WifiControllerMachine::GetWifiRole()
 
 bool WifiControllerMachine::IsWifiEnable()
 {
-    return WifiSettings::GetInstance().GetWifiToggledState();
+    return WifiSettings::GetInstance().IsWifiToggledEnable();
 }
 
 bool WifiControllerMachine::IsScanOnlyEnable()
@@ -599,9 +595,6 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
     ConcreteManagerRole presentRole;
     if (!(pWifiControllerMachine->ShouldEnableWifi())) {
         pWifiControllerMachine->StopAllConcreteManagers();
-        if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-            WifiConfigCenter::GetInstance().SetOpenWifiWhenAirplaneMode(false);
-        }
         return;
     }
     if (pWifiControllerMachine->ConcreteIdExist(msg->GetParam2())) {
@@ -764,8 +757,8 @@ void WifiControllerMachine::HandleConcreteStop(int id)
             return;
         }
 #endif
-        if (airplanstate != MODE_STATE_OPEN && !WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning()) {
-            if (ShouldEnableWifi()) {
+        if (!WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning()) {
+            if (WifiSettings::GetInstance().IsWifiToggledEnable()) {
                 ConcreteManagerRole presentRole = GetWifiRole();
                 MakeConcreteManager(presentRole, 0);
                 return;
@@ -773,12 +766,10 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
     } else {
 #endif
-        if (airplanstate != MODE_STATE_OPEN) {
-            if (ShouldEnableWifi()) {
-                ConcreteManagerRole presentRole = GetWifiRole();
-                MakeConcreteManager(presentRole, 0);
-                return;
-            }
+        if (WifiSettings::GetInstance().IsWifiToggledEnable()) {
+            ConcreteManagerRole presentRole = GetWifiRole();
+            MakeConcreteManager(presentRole, 0);
+            return;
         }
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
     }
@@ -791,7 +782,6 @@ void WifiControllerMachine::HandleConcreteStop(int id)
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::HandleSoftapStop(int id)
 {
-    int airplanstate;
     ConcreteManagerRole role;
     SoftApManager *softap = GetSoftApManager(id);
     if (softap->GetRole() == SoftApManager::Role::ROLE_HAS_REMOVED) {
@@ -811,9 +801,7 @@ void WifiControllerMachine::HandleSoftapStop(int id)
     if (HasAnyManager()) {
         return;
     }
-    airplanstate = WifiConfigCenter::GetInstance().GetAirplaneModeState();
-    if (ShouldEnableWifi() && airplanstate != MODE_STATE_OPEN &&
-        !WifiSettings::GetInstance().GetWifiStopState()) {
+    if (ShouldEnableWifi() && !WifiSettings::GetInstance().GetWifiStopState()) {
         role = GetWifiRole();
         if (role == ConcreteManagerRole::ROLE_UNKNOW) {
             WIFI_LOGE("Get unknow wifi role in HandleSoftapStop.");

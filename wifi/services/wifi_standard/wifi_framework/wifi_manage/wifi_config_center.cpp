@@ -402,9 +402,9 @@ int WifiConfigCenter::GetScreenState() const
     return WifiSettings::GetInstance().GetScreenState();
 }
 
-void WifiConfigCenter::SetAirplaneModeState(const int &state)
+bool WifiConfigCenter::SetAirplaneModeState(const int &state)
 {
-    WifiSettings::GetInstance().SetAirplaneModeState(state);
+    return WifiSettings::GetInstance().SetAirplaneModeState(state);
 }
 
 int WifiConfigCenter::GetAirplaneModeState() const

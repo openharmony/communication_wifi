@@ -128,6 +128,9 @@ public:
      */
     int SetWifiState(int state, int instId = 0);
 
+    void PersistWifiState(int state);
+    int GetPersistWifiState();
+    bool IsWifiToggledEnable();
     void SetWifiToggledState(bool state);
     bool GetWifiToggledState() const;
     void SetSoftapToggledState(bool state);
@@ -932,6 +935,20 @@ public:
     int SetOperatorWifiType(int type, int instId = 0);
 
     /**
+     * @Description Get last airplane mode
+     *
+     * @return type - enum aiprlane mode
+     */
+    int GetLastAirplaneMode(int instId = 0);
+
+    /**
+     * @Description Set last airplane mode
+     *
+     * @return type - 0 success
+     */
+    int SetLastAirplaneMode(int mode, int instId = 0);
+
+    /**
      * @Description Get the config whether can open sta when airplane mode opened
      *
      * @return true - can open
@@ -1075,8 +1092,9 @@ public:
      * @Description Set the Airplane Mode State
      *
      * @param state - 1 open; 2 close
+     * @return bool - true airplane mode toggled, false airplane mode not toggled
      */
-    void SetAirplaneModeState(const int &state);
+    bool SetAirplaneModeState(const int &state);
 
     /**
      * @Description Get the Airplane Mode State
@@ -1711,6 +1729,7 @@ private:
     std::string mUpperIfName;
     Hid2dUpperScene mUpperScene;
     P2pBusinessType mP2pBusinessType;
+    int mPersistWifiState;
 
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "wifip2pstub_fuzzer.h"
+#include "enablep2p_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 
 #include <cstddef>

@@ -110,7 +110,7 @@ ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
 
 ErrCode StaInterface::ReConnect()
 {
-    LOGD("Enter StaInterface::ReConnect.\n");
+    LOGD("Enter StaInterface::ReConnect.");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->ReConnect() != WIFI_OPT_SUCCESS) {

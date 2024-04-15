@@ -27,10 +27,6 @@ WifiBaseHalInterface::WifiBaseHalInterface()
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     mHdiWpaClient = nullptr;
 #endif
-
-#ifdef HDI_INTERFACE_SUPPORT
-    mHdiClient = nullptr;
-#endif
 }
 
 WifiBaseHalInterface::~WifiBaseHalInterface()
@@ -43,13 +39,6 @@ WifiBaseHalInterface::~WifiBaseHalInterface()
     if (mHdiWpaClient != nullptr) {
         delete mHdiWpaClient;
         mHdiWpaClient = nullptr;
-    }
-#endif
-
-#ifdef HDI_INTERFACE_SUPPORT
-    if (mHdiClient != nullptr) {
-        delete mHdiClient;
-        mHdiClient = nullptr;
     }
 #endif
 }
@@ -88,22 +77,6 @@ bool WifiBaseHalInterface::InitHdiWpaClient(void)
     if (mHdiWpaClient == nullptr) {
         LOGE("Failed to create hdi wpa client");
         return false;
-    }
-#endif
-    return true;
-}
-
-bool WifiBaseHalInterface::InitHdiClient(void)
-{
-#ifdef HDI_INTERFACE_SUPPORT
-    if (mHdiClient == nullptr) {
-        mHdiClient = new (std::nothrow) WifiHdiClient;
-        if (mHdiClient == nullptr) {
-            LOGE("failed to create hdi wifi client");
-            return false;
-        } else {
-            LOGI("success to create wifi hdi client");
-        }
     }
 #endif
     return true;

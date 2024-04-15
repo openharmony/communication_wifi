@@ -209,30 +209,6 @@ ErrCode ScanInterface::SetEnhanceService(IEnhanceService *enhanceService)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanInterface::StartWifiHdi()
-{
-    WIFI_LOGI("Enter ScanInterface::StartWifiHdi.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    if (pScanService->StartWifiHdi() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("StartWifiHdi failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ScanInterface::CloseWifiHdi()
-{
-    WIFI_LOGI("Enter ScanInterface::CloseWifiHdi.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    if (pScanService->CloseWifiHdi() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("CloseWifiHdi failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode ScanInterface::SetNetworkInterfaceUpDown(bool upDown)
 {
     LOGI("Enter ScanInterface::SetNetworkInterfaceUpDown.\n");

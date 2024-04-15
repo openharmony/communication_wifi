@@ -28,6 +28,7 @@
 #define LOG_TAG "WifiIdlP2pIface"
 
 #define P2P_EVENT_MAX_NUM 32
+#define INFO_NUM_MAX 4096
 
 static IWifiEventP2pCallback g_wifiP2pEventCallback = {0};
 void SetWifiP2pEventCallback(IWifiEventP2pCallback callback)
@@ -425,7 +426,7 @@ WifiErrorNo P2pListNetworks(P2pNetworkList *infoList)
         int infoNum = 0;
         ReadInt(context, &infoNum);
         infoList->infoNum = infoNum;
-        if (infoNum <= 0) {
+        if (infoNum <= 0 || infoNum > INFO_NUM_MAX) {
             break;
         }
         infoList->infos = (P2pNetworkInfo *)calloc(infoNum, sizeof(P2pNetworkInfo));

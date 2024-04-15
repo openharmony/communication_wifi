@@ -923,7 +923,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
     }
 
     WIFI_LOGI("Begin call Scan.\n");
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(scanParam);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(WifiSettings::GetInstance().GetStaIfaceName(), scanParam);
     if ((ret != WIFI_IDL_OPT_OK) && (ret != WIFI_IDL_OPT_SCAN_BUSY)) {
         WIFI_LOGE("GetInstance().scan failed.");
         return false;
@@ -1378,7 +1378,8 @@ bool ScanStateMachine::StartPnoScanHardware()
         runningPnoScanConfig.savedNetworkSsid.begin(), runningPnoScanConfig.savedNetworkSsid.end());
     pnoScanParam.scanFreqs.assign(runningPnoScanConfig.freqs.begin(), runningPnoScanConfig.freqs.end());
     WIFI_LOGI("pnoScanParam.scanInterval is %{public}d.\n", pnoScanParam.scanInterval);
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(pnoScanParam);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(
+        WifiSettings::GetInstance().GetStaIfaceName(), pnoScanParam);
     if ((ret != WIFI_IDL_OPT_OK) && (ret != WIFI_IDL_OPT_SCAN_BUSY)) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().StartPnoScan failed.");
         PnoScanFailedProcess();
@@ -1400,7 +1401,8 @@ void ScanStateMachine::StopPnoScanHardware()
     }
 
     /* Invoke the IDL interface to stop PNO scanning */
-    if (WifiStaHalInterface::GetInstance().StopPnoScan() != WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().StopPnoScan(
+        WifiSettings::GetInstance().GetStaIfaceName()) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().StopPnoScan failed.");
     }
 
@@ -1608,7 +1610,8 @@ bool ScanStateMachine::GetScanInfos(std::vector<InterScanInfo> &scanInfos)
     WIFI_LOGI("Enter GetScanInfos.\n");
 
     WIFI_LOGI("Begin: QueryScanInfos.");
-    if (WifiStaHalInterface::GetInstance().QueryScanInfos(scanInfos) != WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().QueryScanInfos(
+        WifiSettings::GetInstance().GetStaIfaceName(), scanInfos) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().GetScanInfos failed.");
         return false;
     }

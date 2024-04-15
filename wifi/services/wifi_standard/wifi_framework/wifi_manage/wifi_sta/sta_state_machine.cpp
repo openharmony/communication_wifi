@@ -923,7 +923,8 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         return;
     }
     WifiWpaSignalInfo signalInfo;
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(linkedInfo.bssid, signalInfo);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(
+        WifiSettings::GetInstance().GetStaIfaceName(), linkedInfo.bssid, signalInfo);
     if (ret != WIFI_IDL_OPT_OK) {
         LOGE("GetConnectSignalInfo return fail: %{public}d.", ret);
         return;
@@ -1838,7 +1839,8 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
         __func__, MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
         if (lastMac != currentMac) {
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(currentMac) != WIFI_IDL_OPT_OK) {
+            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
+                WifiSettings::GetInstance().GetStaIfaceName(), currentMac) != WIFI_IDL_OPT_OK) {
                 LOGE("set Mac [%{public}s] failed.", MacAnonymize(currentMac).c_str());
                 return false;
             }

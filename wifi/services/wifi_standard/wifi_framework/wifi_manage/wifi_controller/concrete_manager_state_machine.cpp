@@ -604,26 +604,6 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, instId);
     WifiManager::GetInstance().AutoStartEnhanceService();
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(instId);
-    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
-    if (pService == nullptr) {
-        WIFI_LOGE("[AutoStartScanOnly] scan service is null.");
-        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
-        return WIFI_OPT_FAILED;
-    }
-#ifndef HDI_CHIP_INTERFACE_SUPPORT
-    ErrCode ret = pService->SetNetworkInterfaceUpDown(true);
-    if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
-        WIFI_LOGE("iface up failed.");
-        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
-        return WIFI_OPT_FAILED;
-    }
-#endif
-    ErrCode res = pService->StartWifiHdi();
-    if (res != static_cast<int>(WIFI_OPT_SUCCESS)) {
-        WIFI_LOGE("Start WifiHdi failed.");
-        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
-        return WIFI_OPT_FAILED;
-    }
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, instId);
     return WIFI_OPT_SUCCESS;
 }
@@ -652,12 +632,7 @@ ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId)
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
     }
-    ErrCode ret = pService->CloseWifiHdi();
-    if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
-        WIFI_LOGE("Stop WifiHdi failed!");
-        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
-        return WIFI_OPT_FAILED;
-    }
+    pService->SetNetworkInterfaceUpDown(false);
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(instId);
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
     return WIFI_OPT_SUCCESS;
@@ -671,12 +646,6 @@ void ConcreteMangerMachine::HandleStaStop()
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
         }
-        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(mid);
-        if (pService == nullptr) {
-            WIFI_LOGE("HandleStaStop stop wlan failed scan service is null");
-            return ReportClose();
-        }
-        pService->SetNetworkInterfaceUpDown(false);
         return ReportClose();
     }
     if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX)) {

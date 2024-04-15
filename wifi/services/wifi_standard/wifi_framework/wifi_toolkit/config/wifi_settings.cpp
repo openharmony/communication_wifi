@@ -1991,7 +1991,7 @@ int WifiSettings::GetLastAirplaneMode(int instId)
 int WifiSettings::SetLastAirplaneMode(int mode, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    mWifiConfig[instId].lastAirplaneMode = type;
+    mWifiConfig[instId].lastAirplaneMode = mode;
     SyncWifiConfig();
     return 0;
 }

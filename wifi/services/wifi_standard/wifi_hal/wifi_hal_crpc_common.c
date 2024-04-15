@@ -24,6 +24,8 @@
 #include "wifi_common_hal.h"
 #include "wifi_hal_chba_interface.h"
 
+#define RPC_REGISTER_MAX_NUM 2
+
 int RpcRegisterEventCallback(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
@@ -31,6 +33,9 @@ int RpcRegisterEventCallback(RpcServer *server, Context *context)
     }
     int num = 0;
     if (ReadInt(context, &num) < 0) {
+        return HAL_FAILURE;
+    }
+    if (num < 0 || num > RPC_REGISTER_MAX_NUM) {
         return HAL_FAILURE;
     }
     int *events = ReadIntArray(context, num);
@@ -55,6 +60,9 @@ int RpcUnRegisterEventCallback(RpcServer *server, Context *context)
     }
     int num = 0;
     if (ReadInt(context, &num) < 0) {
+        return HAL_FAILURE;
+    }
+    if (num < 0 || num > RPC_REGISTER_MAX_NUM) {
         return HAL_FAILURE;
     }
     int *events = ReadIntArray(context, num);

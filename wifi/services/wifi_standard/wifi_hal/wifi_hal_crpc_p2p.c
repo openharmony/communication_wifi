@@ -19,6 +19,9 @@
 #include "wifi_hal_p2p_interface.h"
 #include "wifi_hal_define.h"
 
+#define WIFI_IDL_GET_MAX_BANDS 32
+#define GROUP_CONFIG_END_POS 9
+
 int RpcP2pStart(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
@@ -842,7 +845,7 @@ int RpcP2pGetFrequencies(RpcServer *server, Context *context)
     }
     int band = 0;
     int maxSize = 0;
-    if (ReadInt(context, &band) < 0 || ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
+    if (ReadInt(context, &band) < 0 || ReadInt(context, &maxSize) < 0 || maxSize <= 0 || maxSize > WIFI_IDL_GET_MAX_BANDS) {
         return HAL_FAILURE;
     }
     int *frequencies = (int *)calloc(maxSize, sizeof(int));
@@ -871,7 +874,7 @@ int RpcP2pSetGroupConfig(RpcServer *server, Context *context)
     }
     int networkId = 0;
     int size = 0;
-    if (ReadInt(context, &networkId) < 0 || ReadInt(context, &size) < 0 || size <= 0) {
+    if (ReadInt(context, &networkId) < 0 || ReadInt(context, &size) < 0 || size <= 0 || size > GROUP_CONFIG_END_POS) {
         return HAL_FAILURE;
     }
     P2pGroupConfig *confs = (P2pGroupConfig *)calloc(size, sizeof(P2pGroupConfig));
@@ -905,7 +908,7 @@ int RpcP2pGetGroupConfig(RpcServer *server, Context *context)
     }
     int networkId = 0;
     int size = 0;
-    if (ReadInt(context, &networkId) < 0 || ReadInt(context, &size) < 0 || size <= 0) {
+    if (ReadInt(context, &networkId) < 0 || ReadInt(context, &size) < 0 || size <= 0 || size > GROUP_CONFIG_END_POS) {
         return HAL_FAILURE;
     }
     P2pGroupConfig *confs = (P2pGroupConfig *)calloc(size, sizeof(P2pGroupConfig));

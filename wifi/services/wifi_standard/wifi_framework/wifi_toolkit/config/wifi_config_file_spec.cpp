@@ -843,7 +843,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
     item.staLastState = false;
-    item.lastAirplaneMode = AIRPLANEMODE_MODE_CLOSE;
+    item.lastAirplaneMode = AIRPLANE_MODE_CLOSE;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
     item.scoretacticsScoreSlope = SCORE_SLOPE;
     item.scoretacticsInitScore = INIT_SCORE;

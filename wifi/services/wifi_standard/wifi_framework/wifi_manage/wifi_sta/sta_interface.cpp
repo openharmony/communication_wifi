@@ -417,5 +417,24 @@ ErrCode StaInterface::HandleForegroundAppChangedAction(const std::string &bundle
     pStaService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::EnableHiLinkHandshake(const std::string &bssid)
+{
+    WIFI_LOGI("Enter StaInterface::EnableHiLinkHandshake");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->EnableHiLinkHandshake(bssid);
+ 
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
+{
+    WIFI_LOGI("Enter StaInterface::DeliverStaIfaceData");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->DeliverStaIfaceData(currentMac);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

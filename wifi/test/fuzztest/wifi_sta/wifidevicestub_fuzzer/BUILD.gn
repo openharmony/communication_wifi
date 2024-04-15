@@ -44,7 +44,7 @@ ohos_fuzztest("WifiDeviceStubFuzzTest") {
   ]
 
   if (is_asan) {
-    defines += [ "DTFUZZ_TEST" ]
+    defines = [ "DTFUZZ_TEST" ]
   }
 
   deps = [

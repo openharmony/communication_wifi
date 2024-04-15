@@ -42,7 +42,7 @@ ohos_fuzztest("WifiHotSpotStubFuzzTest") {
   ]
 
   if (is_asan) {
-    defines += [ "DTFUZZ_TEST" ]
+    defines = [ "DTFUZZ_TEST" ]
   }
 
   sources = [

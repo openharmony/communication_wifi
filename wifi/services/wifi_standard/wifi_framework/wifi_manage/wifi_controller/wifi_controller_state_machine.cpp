@@ -421,7 +421,7 @@ bool WifiControllerMachine::ShouldEnableWifi()
         return false;
     }
 #endif
-    if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsScanOnlyEnable) {
+    if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsScanOnlyEnable()) {
         WIFI_LOGI("Should start wifi or scanonly.");
         return true;
     }

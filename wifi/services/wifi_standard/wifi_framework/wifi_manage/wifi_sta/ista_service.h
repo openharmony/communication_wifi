@@ -309,6 +309,20 @@ public:
      */
     virtual ErrCode HandleForegroundAppChangedAction(const std::string &bundleName,
                                                         int uid, int pid, const int state) = 0;
+
+    /**
+     * @Description enable hilink
+     *
+	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableHiLinkHandshake(const std::string &bssid) = 0;
+ 
+    /**
+     * @Description deliver mac
+     *
+	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DeliverStaIfaceData(const std::string &currentMac) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

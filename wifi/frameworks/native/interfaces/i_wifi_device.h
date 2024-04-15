@@ -457,6 +457,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
+
+    /**
+     * @Description hilink connect
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) = 0;
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

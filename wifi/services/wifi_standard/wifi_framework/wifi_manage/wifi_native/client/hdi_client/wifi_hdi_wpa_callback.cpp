@@ -131,6 +131,38 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
     return 0;
 }
 
+int32_t OnEventStaNotify(struct IWpaCallback *self, const char* notifyParam, const char *ifName)
+{
+    LOGI("OnEventStaNotify: callback enter!");
+ 
+    if (strcmp(ifName, "wlan0") != 0) {
+        return 1;
+    }
+    if (notifyParam == NULL) {
+        LOGE("OnEventStaNotify: invalid parameter!");
+        return 1;
+    }
+    constexpr int HILINK_NUM = 0X01;
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    int num = std::stoi(notifyParam);
+    switch (num) {
+        case HILINK_NUM: {
+            char *bssid = strchr((char *)notifyParam, ':');
+            if (bssid != NULL) {
+                return 1;
+            }
+            bssid++;
+            if (cbk.OnEventStaNotify) {
+                cbk.OnEventStaNotify(bssid);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    return 0;
+}
+
 int32_t OnEventWpsOverlap(struct IWpaCallback *self, const char *ifName)
 {
     LOGI("OnEventWpsOverlap: callback enter!");

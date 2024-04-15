@@ -30,6 +30,8 @@
 
 namespace OHOS {
 namespace Wifi {
+#define MAX_IFACENAME_LEN 6
+#define MAX_CMD_BUFFER_SIZE 1024
 constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
 const int BUFFER_SIZE = 4096;
@@ -336,6 +338,7 @@ WifiErrorNo WifiHdiWpaClient::ReqRegisterStaEventCallback(const WifiEventCallbac
         cWifiHdiWpaCallback.OnEventWpsOverlap = OnEventWpsOverlap;
         cWifiHdiWpaCallback.OnEventWpsTimeout = OnEventWpsTimeout;
         cWifiHdiWpaCallback.OnEventScanResult = OnEventScanResult;
+        cWifiHdiWpaCallback.OnEventStaNotify = OnEventStaNotify;
     }
 
     return RegisterHdiWpaStaEventCallback(&cWifiHdiWpaCallback);
@@ -427,6 +430,22 @@ static WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCo
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetSuspendMode(bool mode) const
 {
     return HdiWpaStaSetSuspendMode(mode);
+}
+
+WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const std::string &cmd)
+{
+    char ifNameBuf[MAX_IFACENAME_LEN];
+    if (strncpy_s(ifNameBuf, sizeof(ifNameBuf), ifName.c_str(), ifName.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+ 
+    char cmdBuf[MAX_CMD_BUFFER_SIZE];
+    if (strncpy_s(cmdBuf, sizeof(cmdBuf), cmd.c_str(), cmd.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return HdiWpaStaSetShellCmd(ifNameBuf, cmdBuf);
 }
 
 int WifiHdiWpaClient::PushDeviceConfigString(

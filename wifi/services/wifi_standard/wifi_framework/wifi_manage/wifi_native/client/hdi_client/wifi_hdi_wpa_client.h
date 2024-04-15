@@ -309,6 +309,15 @@ public:
     WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
     static WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
 
+    /**
+     * @Description Send SIM/AKA/AKA' authentication to wpa
+     *
+     * @param ifName: Interface name
+     * @param cmd: Request message content
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqWpaShellCmd(const std::string &ifName, const std::string &cmd);
+
     /* ************************ softAp Interface ************************** */
     /**
      * @Description Start Ap.

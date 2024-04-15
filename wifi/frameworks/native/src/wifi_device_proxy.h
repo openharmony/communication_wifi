@@ -461,6 +461,13 @@ public:
      * @return WifiErrorNo
      */
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
+	
+    /**
+     * @Description hilink connect
+     *
+     * @return ErrCode - hilink connect result
+     */
+    ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

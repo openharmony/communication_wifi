@@ -89,6 +89,10 @@ WifiScanServiceImpl::~WifiScanServiceImpl()
 ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 {
     WIFI_LOGI("WifiScanServiceImpl::SetScanControlInfo");
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetScanControlInfo:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetScanControlInfo:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

@@ -156,7 +156,7 @@ ErrCode WifiDeviceServiceImpl::IsHeldWifiProtectRef(
     return WIFI_OPT_SUCCESS;
 #else
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("IsHeldWifiProtectRef:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     isHoldProtect = WifiProtectManager::GetInstance().IsHeldWifiProtect(protectName);
@@ -171,8 +171,12 @@ ErrCode WifiDeviceServiceImpl::GetWifiProtectRef(const WifiProtectMode &protectM
     /* refer to WifiProtectManager::GetInstance().GetWifiProtect, DO NOT support now! */
     return WIFI_OPT_SUCCESS;
 #else
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetWifiProtectRef:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("GetWifiProtectRef:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!WifiProtectManager::GetInstance().GetWifiProtect(protectMode, protectName)) {
@@ -190,8 +194,12 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
     /* refer to WifiProtectManager::GetInstance().PutWifiProtect, DO NOT support now! */
     return WIFI_OPT_SUCCESS;
 #else
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("PutWifiProtectRef:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("PutWifiProtectRef:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!WifiProtectManager::GetInstance().PutWifiProtect(protectName)) {

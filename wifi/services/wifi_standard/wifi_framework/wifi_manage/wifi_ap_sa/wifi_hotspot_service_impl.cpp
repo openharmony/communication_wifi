@@ -103,8 +103,8 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
 ErrCode WifiHotspotServiceImpl::GetHotspotState(int &state)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetHotspotState:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetHotspotState:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -506,8 +506,8 @@ ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
 ErrCode WifiHotspotServiceImpl::GetValidBands(std::vector<BandType> &bands)
 {
      WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetValidBands:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetValidBands:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -521,8 +521,8 @@ ErrCode WifiHotspotServiceImpl::GetValidChannels(BandType band, std::vector<int3
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s band %{public}d",
         m_id, __func__, static_cast<int>(band));
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetValidChannels:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetValidChannels:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 

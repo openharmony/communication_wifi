@@ -171,10 +171,6 @@ ErrCode WifiDeviceServiceImpl::GetWifiProtectRef(const WifiProtectMode &protectM
     /* refer to WifiProtectManager::GetInstance().GetWifiProtect, DO NOT support now! */
     return WIFI_OPT_SUCCESS;
 #else
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetWifiProtectRef:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetWifiProtectRef:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -194,10 +190,6 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
     /* refer to WifiProtectManager::GetInstance().PutWifiProtect, DO NOT support now! */
     return WIFI_OPT_SUCCESS;
 #else
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("PutWifiProtectRef:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("PutWifiProtectRef:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

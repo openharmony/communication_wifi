@@ -19,8 +19,6 @@
 #include "wifi_hal_chip_interface.h"
 #include "wifi_hal_define.h"
 
-#define WIFI_IDL_INTERFACE_SUPPORT_COMBINATIONS 32
-
 int RpcGetWifiChip(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
@@ -239,7 +237,7 @@ int RpcGetSupportedComboModes(RpcServer *server, Context *context)
         return HAL_FAILURE;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0 || maxSize <= 0 || maxSize > WIFI_IDL_INTERFACE_SUPPORT_COMBINATIONS) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
         return HAL_FAILURE;
     }
     int *modes = (int *)calloc(maxSize, sizeof(int));

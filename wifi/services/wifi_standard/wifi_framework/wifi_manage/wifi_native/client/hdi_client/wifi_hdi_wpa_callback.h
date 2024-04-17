@@ -18,11 +18,11 @@
 #define OHOS_WIFI_HDI_WPA_CALLBACK_H
 
 #include "wifi_hdi_wpa_proxy.h"
+typedef unsigned char u8;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 int32_t OnEventDisconnected(struct IWpaCallback *self,
     const struct HdiWpaDisconnectParam *disconectParam, const char* ifName);
 int32_t OnEventConnected(struct IWpaCallback *self,
@@ -72,6 +72,9 @@ int32_t OnEventStaConnectState(struct IWpaCallback *self,
     const struct HdiP2pStaConnectStateParam *staConnectStateParam, const char* ifName);
 int32_t OnEventIfaceCreated(struct IWpaCallback *self,
     const struct HdiP2pIfaceCreatedParam *ifaceCreatedParam, const char* ifName);
+
+void StrSafeCopy(char *dst, unsigned len, const char *src);
+size_t printf_decode(u8 *buf, size_t maxlen, const char *str);
 #ifdef __cplusplus
 }
 #endif

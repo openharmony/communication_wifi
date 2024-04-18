@@ -77,7 +77,6 @@ if (defined(ohos_lite)) {
 
   config("wifi_sdk_header") {
     include_dirs = [
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       "$WIFI_ROOT_DIR/interfaces",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
@@ -108,7 +107,12 @@ if (defined(ohos_lite)) {
 
   ohos_source_set("wifi_device_proxy_impl") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_device_impl.cpp",
@@ -135,7 +139,12 @@ if (defined(ohos_lite)) {
 
   ohos_source_set("wifi_hotspot_proxy_impl") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_hotspot_impl.cpp",
@@ -162,7 +171,12 @@ if (defined(ohos_lite)) {
 
   ohos_source_set("wifi_scan_proxy_impl") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_scan_impl.cpp",
@@ -195,7 +209,6 @@ if (defined(ohos_lite)) {
       boundary_sanitize = true
       cfi_cross_dso = true
       debug = false
-      blocklist = "../wifi_frameworks_sdk_block.txt"
     }
     part_name = "wifi"
     sources = [
@@ -228,7 +241,6 @@ if (defined(ohos_lite)) {
       boundary_sanitize = true
       cfi_cross_dso = true
       debug = false
-      blocklist = "../wifi_frameworks_sdk_block.txt"
     }
     install_enable = true
     sources = [

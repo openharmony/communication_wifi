@@ -800,15 +800,19 @@ void HalDeviceManager::DispatchIfaceDestoryCallback(std::string &removeIfaceName
             if (mIWifiStaIfaces.find(removeIfaceName) != mIWifiStaIfaces.end()) {
                 mIWifiStaIfaces.erase(removeIfaceName);
             }
-            WifiP2PHalInterface::GetInstance().StopP2p();
-            WifiStaHalInterface::GetInstance().StopWifi();
-            WifiStaHalInterface::GetInstance().StopWifiHdi();
+            if (isCallback) {
+                WifiP2PHalInterface::GetInstance().StopP2p();
+                WifiStaHalInterface::GetInstance().StopWifi();
+                WifiStaHalInterface::GetInstance().StopWifiHdi();
+            }
             break;
         case IfaceType::AP :
             if (mIWifiApIfaces.find(removeIfaceName) != mIWifiApIfaces.end()) {
                 mIWifiApIfaces.erase(removeIfaceName);
             }
-            WifiApHalInterface::GetInstance().StopAp();
+            if (isCallback) {
+                WifiApHalInterface::GetInstance().StopAp();
+            }
             break;
         case IfaceType::P2P :
             if (mIWifiP2pIfaces.find(removeIfaceName) != mIWifiP2pIfaces.end()) {

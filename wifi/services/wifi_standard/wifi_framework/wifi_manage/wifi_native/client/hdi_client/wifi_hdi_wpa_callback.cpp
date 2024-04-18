@@ -53,9 +53,6 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     const struct HdiWpaConnectParam *connectParam, const char* ifName)
 {
     LOGI("OnEventConnected: callback enter!");
-    if (strcmp(ifName, "wlan0") != 0) {
-        return 1;
-    }
     if (connectParam == NULL) {
         LOGE("OnEventConnected: invalid parameter!");
         return 1;
@@ -94,9 +91,6 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
     const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
 {
     LOGI("OnEventStateChanged: callback enter!");
-    if (strcmp(ifName, "wlan0") != 0) {
-        return 1;
-    }
     if (statechangedParam == NULL) {
         LOGE("OnEventStateChanged: invalid parameter!");
         return 1;
@@ -261,9 +255,6 @@ int32_t OnEventP2pStateChanged(struct IWpaCallback *self,
     const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
 {
     LOGI("OnEventP2pStateChanged ifName=%{public}s", ifName);
-    if (strcmp(ifName, "p2p0") != 0) {
-        return 1;
-    }
     if (statechangedParam == NULL) {
         LOGE("OnEventStateChanged: invalid parameter!");
         return 1;
@@ -443,17 +434,20 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         return 1;
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    char tempSsid[WIFI_SSID_LENGTH] = {0};
     if (cbk.onGroupStarted) {
         OHOS::Wifi::IdlP2pGroupInfo cbInfo;
         cbInfo.isGo = groupStartedParam->isGo;
         cbInfo.isPersistent = groupStartedParam->isPersistent;
         cbInfo.frequency = groupStartedParam->frequency;
         cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
-        cbInfo.ssid = (char *)(groupStartedParam->ssid);
+        StrSafeCopy(tempSsid, sizeof(tempSsid), tempSsid);
+        printf_decode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
+        cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
-        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{public}s",
-            cbInfo.groupName.c_str(), groupStartedParam->ssid);
+        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s",
+            cbInfo.groupName.c_str(), cbInfo.ssid.c_str());
 
         char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
         ConvertMacArr2String(groupStartedParam->goDeviceAddress,
@@ -611,5 +605,23 @@ int32_t OnEventIfaceCreated(struct IWpaCallback *self,
         cbk.onP2pIfaceCreated(ifName, ifaceCreatedParam->isGo);
     }
     return 0;
+}
+
+void StrSafeCopy(char *dst, unsigned len, const char *src)
+{
+    if (dst == NULL) {
+        return;
+    }
+    if (src == NULL) {
+        dst[0] = '\0';
+        return;
+    }
+    unsigned i = 0;
+    while (i + 1 < len && src[i] != '\0') {
+        dst[i] = src[i];
+        ++i;
+    }
+    dst[i] = '\0';
+    return;
 }
 #endif

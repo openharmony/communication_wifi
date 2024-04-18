@@ -81,6 +81,7 @@ typedef struct StWifiHostapdHalDevice {
     int (*reloadApConfigInfo)(int id);
     int (*disConnectedDev)(const char *mac, int id);
     int (*setCountryCode)(const char *code, int id);
+    int (*terminateAp)(int id);
 } WifiHostapdHalDevice;
 
 typedef struct StWifiHostapdHalDeviceInfo {

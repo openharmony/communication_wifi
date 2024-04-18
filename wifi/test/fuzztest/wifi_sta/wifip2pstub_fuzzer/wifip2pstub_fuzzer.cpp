@@ -18,7 +18,7 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#include <unistd.h>
 #include "wifi_p2p_stub.h"
 #include "message_parcel.h"
 #include "securec.h"
@@ -49,7 +49,8 @@ void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    uint32_t code = U32_AT(data) % MAP_P2P_NUMS + static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE);
+    uint32_t code = U32_AT(data) % MAP_P2P_NUMS + static_cast<uint32_t>
+    (P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_DEVICES);
     LOGI("wifip2pstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
@@ -69,6 +70,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    sleep(1);
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }

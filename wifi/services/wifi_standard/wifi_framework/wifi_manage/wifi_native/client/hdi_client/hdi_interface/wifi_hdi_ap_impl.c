@@ -27,10 +27,6 @@
 #ifndef CHECK_AP_HDI_PROXY_AND_RETURN
 #define CHECK_AP_HDI_PROXY_AND_RETURN(isRemoteDied) \
 if (isRemoteDied) { \
-    if (HdiStop() != WIFI_IDL_OPT_OK) { \
-        LOGE("failed to stop ap hdi"); \
-        return WIFI_IDL_OPT_FAILED; \
-    } \
     if (StartHdiWifi() != WIFI_IDL_OPT_OK) { \
         LOGE("failed to start ap hdi"); \
         return WIFI_IDL_OPT_FAILED; \

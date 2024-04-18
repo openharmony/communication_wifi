@@ -20,11 +20,14 @@
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#include "wifi_country_code_manager.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 
 namespace OHOS {
 namespace Wifi {
+#define COUNTRY_CODE_JAPAN_L "jp"
+#define COUNTRY_CODE_JAPAN_C "JP"
 WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pGroupManager &setGroupMgr, WifiP2pServiceManager &setSvrMgr)
     : p2pStateMachine(p2pStateMachine),
@@ -361,7 +364,12 @@ int WifiP2pService::GetSharedLinkCount(void)
 int WifiP2pService::GetP2pRecommendChannel(void)
 {
     WIFI_LOGI("GetP2pRecommendChannel");
-
+    const int COMMON_USING_2G_CHANNEL = 6;
+    std::string countryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
+    if (countryCode == COUNTRY_CODE_JAPAN_C || countryCode == COUNTRY_CODE_JAPAN_L) {
+        return COMMON_USING_2G_CHANNEL;
+    }
     int channel = 0; // 0 is invalid channel
     int COMMON_USING_5G_CHANNEL = 149;
     WifiLinkedInfo linkedInfo;
@@ -387,7 +395,6 @@ int WifiP2pService::GetP2pRecommendChannel(void)
         vec5GChannels = channels[BandType::BAND_5GHZ];
     }
 
-    const int COMMON_USING_2G_CHANNEL = 6;
     if (!vec5GChannels.empty()) {
         auto it = std::find(vec5GChannels.begin(), vec5GChannels.end(), COMMON_USING_5G_CHANNEL);
         if (it != vec5GChannels.end()) {

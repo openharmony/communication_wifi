@@ -48,4 +48,8 @@ declare_args() {
   wifi_feature_with_scan_control = true
   wifi_feature_network_selection = false
   wifi_feature_p2p_random_mac_addr = true
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.hdf_drivers_interface_wlan)) {
+    wifi_feature_with_hdi_chip_supported = true
+  }
 }

@@ -89,7 +89,10 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     ]
 
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "init:libbegetutil",
+    ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [

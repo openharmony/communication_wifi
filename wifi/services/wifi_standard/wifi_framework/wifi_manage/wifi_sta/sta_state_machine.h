@@ -127,7 +127,6 @@ typedef enum EnumDhcpReturnCode {
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
-const std::string IF_NAME = "wlan";
 
 class StaStateMachine : public StateMachine {
     FRIEND_GTEST(StaStateMachine);
@@ -1118,7 +1117,7 @@ private:
     int getIpFailNum;
     bool enableSignalPoll;
     bool isRoam;
-    int netNoWorkNum;
+    int64_t lastTimestamp;
     bool portalFlag;
     bool networkStatusHistoryInserted;
     WifiLinkedInfo linkedInfo;
@@ -1156,6 +1155,7 @@ private:
     WifiDeviceConfig getCurrentWifiDeviceConfig();
     void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
     bool CanArpReachable();
+    ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     int32_t StaStartAbility(OHOS::AAFwk::Want& want);
 #endif

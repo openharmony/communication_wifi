@@ -27,6 +27,7 @@
 
 #define MAX_FEATURE_NUMBER 16
 #define MAX_OBJ_REFERENCE_COUNT 2
+#define MAX_IFACENAME_LEN 16
 const char *HDI_SERVICE_NAME = "wlan_interface_service"; // Move the define to HDF module
 
 static pthread_mutex_t g_mutex;
@@ -34,6 +35,8 @@ static unsigned int g_wlanRefCount = 0;
 static struct IWlanInterface *g_wlanObj = NULL;
 static struct HdfFeatureInfo* g_featureArray[MAX_FEATURE_NUMBER] = {NULL};
 static bool g_isRemoteDied = false;
+static pthread_mutex_t g_wlanIfaceNameMutex = PTHREAD_MUTEX_INITIALIZER;
+static char g_wlanIfaceName[MAX_IFACENAME_LEN] = {0};
 
 static WifiErrorNo ReleaseFeatureInner(const int32_t wlanType)
 {
@@ -231,6 +234,19 @@ WifiErrorNo HdiStop()
     return (ret == HDF_SUCCESS) ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
 }
 
+WifiErrorNo IsHdiStopped()
+{
+    pthread_mutex_lock(&g_mutex);
+    if (g_wlanObj == NULL && g_wlanRefCount == 0) {
+        LOGI("Hdi already stopped");
+        pthread_mutex_unlock(&g_mutex);
+        return WIFI_IDL_OPT_OK;
+    }
+
+    pthread_mutex_unlock(&g_mutex);
+    return WIFI_IDL_OPT_FAILED;
+}
+
 struct IWlanInterface* GetWlanInterface()
 {
     struct IWlanInterface *wlanObj = NULL;
@@ -286,18 +302,53 @@ WifiErrorNo CheckHdiNormalStart(const int32_t wlanType)
     WifiHdiProxy proxy = GetHdiProxy(wlanType);
     if (proxy.wlanObj == NULL || proxy.feature == NULL) {
         LOGE("CheckHdiNormalStart: Hdi proxy is null, hdi abnormal start!");
-        ret = HdiStop();
+        ret = IsHdiStopped();
         if (ret != WIFI_IDL_OPT_OK) {
-            LOGE("CheckHdiNormalStart: HdiStop failed!");
-            return ret;
-        }
-        ret = StartHdiWifi();
-        if (ret != WIFI_IDL_OPT_OK) {
-            LOGE("CheckHdiNormalStart: StartHdiWifi failed!");
-            return ret;
+            ret = HdiStop();
+            if (ret != WIFI_IDL_OPT_OK) {
+                LOGE("CheckHdiNormalStart: HdiStop failed!");
+                return ret;
+            }
+            ret = StartHdiWifi();
+            if (ret != WIFI_IDL_OPT_OK) {
+                LOGE("CheckHdiNormalStart: StartHdiWifi failed!");
+                return ret;
+            }
         }
     }
     LOGI("CheckHdiNormalStart: hdi normal start!");
     return ret;
+}
+
+WifiErrorNo SetWifiHdiStaIfaceName(const char *ifaceName)
+{
+    pthread_mutex_lock(&g_wlanIfaceNameMutex);
+    if (ifaceName == NULL) {
+        pthread_mutex_unlock(&g_wlanIfaceNameMutex);
+        return WIFI_IDL_OPT_INVALID_PARAM;
+    }
+
+    if (memset_s(g_wlanIfaceName, MAX_IFACENAME_LEN, 0, MAX_IFACENAME_LEN) != EOK) {
+        pthread_mutex_unlock(&g_wlanIfaceNameMutex);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    if (strcpy_s(g_wlanIfaceName, MAX_IFACENAME_LEN, ifaceName) != EOK) {
+        pthread_mutex_unlock(&g_wlanIfaceNameMutex);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("SetWifiHdiStaIfaceName, g_wlanIfaceName:%{public}s", g_wlanIfaceName);
+    pthread_mutex_unlock(&g_wlanIfaceNameMutex);
+    return WIFI_IDL_OPT_OK;
+}
+
+const char *GetWifiHdiStaIfaceName()
+{
+    const char *ifaceName = NULL;
+    pthread_mutex_lock(&g_wlanIfaceNameMutex);
+    ifaceName = g_wlanIfaceName;
+    pthread_mutex_unlock(&g_wlanIfaceNameMutex);
+    return ifaceName;
 }
 #endif

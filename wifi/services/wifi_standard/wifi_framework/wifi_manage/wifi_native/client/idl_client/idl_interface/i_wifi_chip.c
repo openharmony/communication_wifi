@@ -202,6 +202,9 @@ WifiErrorNo GetSupportedComboModes(int32_t *modes, int32_t *size)
         LOGE("server GetSupportedComboModes deal failed!");
     } else {
         ReadInt(context, size);
+        if (*size > WIFI_MAX_CHIP_IDS) {
+            LOGE("GetSupportedComboModes fail, size error: %{public}d", *size);
+        }
         for (int i = 0; i < *size; ++i) {
             ReadInt(context, modes + i);
         }

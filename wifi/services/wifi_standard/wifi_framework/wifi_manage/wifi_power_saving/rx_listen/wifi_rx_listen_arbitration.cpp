@@ -17,6 +17,7 @@
 #include "wifi_logger.h"
 #include "wifi_cmd_client.h"
 #include "wifi_app_parser.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -46,6 +47,7 @@ RxListenArbitration &RxListenArbitration::GetInstance()
 
 void RxListenArbitration::OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData)
 {
+    std::unique_lock<std::mutex> lock(m_condMutex);
     if (appStateData.state == static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND) &&
         appStateData.isFocused) {
         WIFI_LOGD("%{public}s enter rx_listen arbitration, app name: %{public}s", __FUNCTION__,
@@ -64,7 +66,7 @@ void RxListenArbitration::OnForegroundAppChanged(const AppExecFwk::AppStateData 
 void RxListenArbitration::CheckRxListenSwitch()
 {
     std::string param;
-    std::string ifName = "wlan0";
+    std::string ifName = WifiSettings::GetInstance().GetStaIfaceName();
     if ((m_arbitrationCond == 0) && !m_isRxListenOn) {
         param = ENABLE_RX_LISTEN;
         if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH,

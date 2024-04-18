@@ -1111,7 +1111,7 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
 
 bool P2pStateMachine::IsInterfaceReuse() const
 {
-    return P2P_INTERFACE == "wlan0";
+    return !(WifiSettings::GetInstance().GetP2pIfaceName().compare("wlan0"));
 }
 
 void P2pStateMachine::UpdateGroupInfoToWpa() const

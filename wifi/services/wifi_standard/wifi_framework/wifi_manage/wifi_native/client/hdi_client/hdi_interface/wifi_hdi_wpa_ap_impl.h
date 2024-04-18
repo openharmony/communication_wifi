@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-WifiErrorNo HdiStartAp(char *ifaceName, int id);
+WifiErrorNo HdiStartAp(const char *ifaceName, int id);
 WifiErrorNo HdiStopAp(int id);
 WifiErrorNo HdiRegisterApEventCallback(struct IHostapdCallback *callback);
 WifiErrorNo HdiReloadApConfigInfo(int id);

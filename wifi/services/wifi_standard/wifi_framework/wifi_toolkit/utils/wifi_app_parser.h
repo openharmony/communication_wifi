@@ -69,6 +69,7 @@ private:
     std::vector<BlackListAppInfo> m_blackAppVec {};
     std::vector<ChariotAppInfo> m_chariotAppVec {};
     std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVec {};
+    
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -32,7 +32,6 @@ namespace OHOS {
 namespace Wifi {
 #define MAX_IFACENAME_LEN 6
 #define MAX_CMD_BUFFER_SIZE 1024
-
 constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
 const int BUFFER_SIZE = 4096;
@@ -446,7 +445,7 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const st
         LOGE("%{public}s: failed to copy", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-
+ 
     char cmdBuf[MAX_CMD_BUFFER_SIZE];
     if (strncpy_s(cmdBuf, sizeof(cmdBuf), cmd.c_str(), cmd.length()) != EOK) {
         LOGE("%{public}s: failed to copy", __func__);

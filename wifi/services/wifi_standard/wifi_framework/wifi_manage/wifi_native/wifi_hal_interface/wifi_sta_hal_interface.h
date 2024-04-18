@@ -373,7 +373,17 @@ public:
      * @param chipsetFeatrureCapability - chipset featrure capability
      */
     WifiErrorNo GetChipsetWifiFeatrureCapability(int& chipsetFeatrureCapability);
-    
+
+    /**
+     * @Description Send SIM/AKA/AKA' authentication to wpa
+     *
+     * @param ifName: Interface name
+     * @param cmd: Request message content
+     * @return WifiErrorNo
+     */
+
+    WifiErrorNo ShellCmd(const std::string &ifName, const std::string &cmd);
+
     /**
      * @Description Open Wifi hdi.
      *

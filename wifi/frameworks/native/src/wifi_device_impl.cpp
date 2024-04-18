@@ -529,5 +529,12 @@ ErrCode WifiDeviceImpl::LimitSpeed(const int controlId, const int limitMode)
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->LimitSpeed(controlId, limitMode);
 }
+
+ErrCode WifiDeviceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
+}
 }  // namespace Wifi
 }  // namespace OHOS

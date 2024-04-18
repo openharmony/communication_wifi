@@ -109,6 +109,13 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
     }
 }
 
+void StaMonitor::OnWpaHilinkCallBack(const std::string &bssid)
+{
+    WIFI_LOGI("OnWpaHilinkCallBack() enter");
+    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS, bssid);
+    return;
+}
+
 void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::string &bssid)
 {
     WIFI_LOGI("OnBssidChangedCallBack() reason:%{public}s,bssid=%{public}s",

@@ -1872,5 +1872,45 @@ ErrCode WifiDeviceProxy::LimitSpeed(const int controlId, const int limitMode)
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiDeviceProxy::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`, remote service is died.", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageParcel data, reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error, func:%{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    data.WriteInt32(0);
+    data.WriteBool(uiFlag);
+    data.WriteString(bssid);
+    WriteDeviceConfig(deviceConfig, data);
+ 
+    //Wirte device config
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("EnableHiLinkHandshake(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), error);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

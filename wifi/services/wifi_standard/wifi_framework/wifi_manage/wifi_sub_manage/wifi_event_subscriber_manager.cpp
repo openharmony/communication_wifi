@@ -341,11 +341,11 @@ void WifiEventSubscriberManager::DealCloneDataChangeEvent()
     if (cloneData.empty()) {
         return;
     }
-
-    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData);
-    // Clone finished, clear settingsdata clonedata.
-    cloneData.clear();
-    SetCloneDataByDatashare(cloneData);
+    auto mergeCalback = [ = ]() -> void {
+        WIFI_LOGI("DealCloneDataChangeEvent MergeWifiCloneConfig callback.");
+        SetCloneDataByDatashare("");
+    };
+    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData, mergeCalback);
 }
 
 void WifiEventSubscriberManager::CheckAndStartStaByDatashare()

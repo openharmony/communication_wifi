@@ -693,6 +693,9 @@ void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEven
             /* open airplane mode */
             if (WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN)) {
                 WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(1);
+            } else {
+                WifiSettings::GetInstance().SetSoftapToggledState(false);
+                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0);
             }
         } else {
             /* close airplane mode */

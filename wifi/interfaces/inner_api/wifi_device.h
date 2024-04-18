@@ -457,6 +457,13 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
+
+    /**
+     * @Description hilink connect
+     *
+     * @return ErrCode - hilink connect result
+     */
+    virtual ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

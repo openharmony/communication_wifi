@@ -29,7 +29,7 @@ struct WifiEventCallback {
     std::function<void(int)> onWpsTimeOut;
     std::function<void(int)> onWpaConnectionFull;
     std::function<void(int)> onWpaConnectionReject;
-    std::function<void(const std::string &)> OnEventStaNotify;
+    std::function<void(const std::string &)> onEventStaNotify;
 };
 }  // namespace Wifi
 }  // namespace OHOS

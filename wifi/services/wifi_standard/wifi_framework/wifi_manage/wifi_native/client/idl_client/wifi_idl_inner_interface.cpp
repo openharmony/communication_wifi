@@ -113,6 +113,17 @@ void OnWpaConnectionReject(int status)
     }
 }
 
+void OnWpaEventStaNotify(const char *notifyParam)
+{
+    if (notifyParam == nullptr) {
+        return;
+    }
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (cbk.onEventStaNotify) {
+        cbk.onEventStaNotify(notifyParam);
+    }
+}
+
 void OnWpsOverlap(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();

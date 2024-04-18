@@ -631,6 +631,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->OnEventIfaceCreated = NULL;
     g_hdiWpaStaCallbackObj->GetVersion = NULL;
     g_hdiWpaStaCallbackObj->AsObject = NULL;
+    g_hdiWpaStaCallbackObj->OnEventStaNotify = callback->OnEventStaNotify;
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaStaEventCallback3 success.");
@@ -872,13 +873,12 @@ WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, 
 
 WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd)
 {
-    LOGI("HdiWpaStaSetShellCmd enter, ifName:%{public}s, cmd:%{public}s", ifName, cmd);
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaSetShellCmd: wpaObj is NULL");
         return WIFI_IDL_OPT_FAILED;
     }
-
+ 
     int32_t result = wpaObj->StaShellCmd(wpaObj, ifName, cmd);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaSetShellCmd: failed to StaShellCmd, result:%{public}d", result);

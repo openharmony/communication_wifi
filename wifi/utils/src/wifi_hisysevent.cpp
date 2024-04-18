@@ -221,5 +221,16 @@ void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason)
     root["FAIL_REASON"] = failReason;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFISCANCONTROL_TRIGGER_API_FAIL", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteWifiEncryptionFailHiSysEvent(int event, const std::string& maskSsid, const std::string &keyMgmt, int encryptedModule)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ENCRY_OR_DECRY_EVENT"] = event;
+    root["SSID"] = maskSsid;
+    root["ENCRYKEYMANAGEMENT"] = keyMgmt;
+    root["ENCRYEVENTMODULE"] = encryptedModule;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFIENCRY_OR_DECRY_FAIL", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

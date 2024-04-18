@@ -50,6 +50,9 @@ constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 
+bool g_hiLinkActive = false;
+constexpr int HILINK_CMD_MAX_LEN = 1024;
+
 #ifdef OHOS_ARCH_LITE
 std::mutex WifiDeviceServiceImpl::g_instanceLock;
 std::shared_ptr<WifiDeviceServiceImpl> WifiDeviceServiceImpl::g_instance = nullptr;
@@ -1465,6 +1468,103 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     WifiSettings::GetInstance().ClearHotspotConfig();
     WifiSettings::GetInstance().SyncHotspotConfig();
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset ok!");
+    return WIFI_OPT_SUCCESS;
+}
+
+bool ComparedHinlinkKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt)
+{
+    if (deviceKeymgmt == "WPA-PSK") {
+        return scanInfoKeymgmt.find("PSK") != std::string::npos;
+    } else if (deviceKeymgmt == "WPA-EAP") {
+        return scanInfoKeymgmt.find("EAP") != std::string::npos;
+    } else if (deviceKeymgmt == "SAE") {
+        return scanInfoKeymgmt.find("SAE") != std::string::npos;
+    } else if (deviceKeymgmt == "NONE") {
+        return (scanInfoKeymgmt.find("PSK") == std::string::npos) &&
+               (scanInfoKeymgmt.find("EAP") == std::string::npos) && (scanInfoKeymgmt.find("SAE") == std::string::npos);
+    } else {
+        return false;
+    }
+}
+ 
+ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
+{
+    WIFI_LOGE("EnableHiLinkHandshake enter");
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableHiLinkHandshake: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableHiLinkHandshake:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableHiLinkHandshake:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    char cmd[HILINK_CMD_MAX_LEN] = {0};
+    if (!uiFlag) {
+        if (sprintf_s(cmd, sizeof(cmd), "ENABLE=%d BSSID=%s", uiFlag, bssid.c_str()) < 0) {
+            WIFI_LOGE("uiFlag false copy enable and bssid error!");
+            return WIFI_OPT_FAILED;
+        }
+        g_hiLinkActive = uiFlag;
+        pService->EnableHiLinkHandshake(cmd);
+        return WIFI_OPT_SUCCESS;
+    }
+    if (!g_hiLinkActive) {
+        if (sprintf_s(cmd, sizeof(cmd), "ENABLE=%d BSSID=%s", uiFlag, bssid.c_str()) < 0) {
+            WIFI_LOGE("g_hiLinkActive copy enable and bssid error!");
+            return WIFI_OPT_FAILED;
+        }
+        pService->EnableHiLinkHandshake(cmd);
+    }
+    std::string currentMac;
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
+        WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
+    } else {
+        WifiStoreRandomMac randomMacInfo;
+        std::vector<WifiScanInfo> scanInfoList;
+        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
+        for (auto scanInfo : scanInfoList) {
+            if ((deviceConfig.ssid == scanInfo.ssid) &&
+                (ComparedHinlinkKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
+                randomMacInfo.ssid = scanInfo.ssid;
+                randomMacInfo.keyMgmt = deviceConfig.keyMgmt;
+                randomMacInfo.preSharedKey = deviceConfig.preSharedKey;
+                randomMacInfo.peerBssid = scanInfo.bssid;
+                break;
+            }
+        }
+        if (randomMacInfo.ssid.empty()) {
+            LOGE("EnableHiLinkHandshake scanInfo has no target wifi!");
+            return WIFI_OPT_FAILED;
+        }
+ 
+        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+        if (randomMacInfo.randomMac.empty()) {
+            WIFI_LOGE("EnableHiLinkHandshake random mac empty");
+            return WIFI_OPT_FAILED;
+        }
+        currentMac = randomMacInfo.randomMac;
+    }
+    g_hiLinkActive = uiFlag;
+    WIFI_LOGI("currentMac = %{public}s", MacAnonymize(currentMac).c_str());
+
+    (void)memset_s(cmd, sizeof(cmd), 0x0, sizeof(cmd));
+    if (sprintf_s(cmd, sizeof(cmd), "HILINK_MAC=%s", currentMac.c_str()) < 0) {
+        WIFI_LOGE("g_hiLinkActive copy mac error!");
+        return WIFI_OPT_FAILED;
+    }
+    pService->DeliverStaIfaceData(cmd);
+ 
+    WIFI_LOGI("WifiDeviceServiceImpl EnableHiLinkHandshake ok!");
     return WIFI_OPT_SUCCESS;
 }
 

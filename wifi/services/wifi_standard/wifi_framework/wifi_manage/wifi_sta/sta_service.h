@@ -317,6 +317,21 @@ public:
      */
     virtual ErrCode HandleForegroundAppChangedAction(const std::string &bundleName,
                                                         int uid, int pid, const int state);
+
+    /**
+     * @Description enable hilink
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableHiLinkHandshake(const std::string &bssid);
+ 
+    /**
+     * @Description deliver mac
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DeliverStaIfaceData(const std::string &currentMac);
+
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;

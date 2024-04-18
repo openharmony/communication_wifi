@@ -735,5 +735,21 @@ ErrCode StaService::HandleForegroundAppChangedAction(const std::string &bundleNa
     return WIFI_OPT_SUCCESS;
 }
 #endif
+
+ErrCode StaService::EnableHiLinkHandshake(const std::string &bssid)
+{
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_ENABLE_HILINK, bssid);
+ 
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
+{
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_DELIVER_MAC, currentMac);
+ 
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -160,6 +160,9 @@ public:
     ErrCode FactoryReset() override;
 
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
+
+    ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

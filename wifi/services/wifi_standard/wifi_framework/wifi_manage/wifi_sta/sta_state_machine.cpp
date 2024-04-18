@@ -814,6 +814,9 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[CMD_START_RENEWAL_TIMEOUT] = &StaStateMachine::DealRenewalTimeout;
     staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = &StaStateMachine::DealScreenStateChangedEvent;
     staSmHandleFuncMap[CMD_AP_ROAMING_TIMEOUT_CHECK] = &StaStateMachine::DealApRoamingStateTimeout;
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_ENABLE_HILINK] = &StaStateMachine::DealHiLinkDataToWpa;
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_DELIVER_MAC] = &StaStateMachine::DealHiLinkDataToWpa;
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS] = &StaStateMachine::DealHiLinkDataToWpa;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -2634,6 +2637,47 @@ void StaStateMachine::DealApRoamingStateTimeout(InternalMessage *msg)
     LOGI("DealApRoamingStateTimeout StopTimer aproaming timer");
     StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
     DisConnectProcess();
+}
+
+void StaStateMachine::DealHiLinkDataToWpa(InternalMessage *msg)
+{
+    if (msg == nullptr) {
+        LOGE("DealHiLinkDataToWpa InternalMessage msg is null.");
+        return;
+    }
+    WIFI_LOGI("DealHiLinkDataToWpa=%{public}d received.\n", msg->GetMessageName());
+    switch (msg->GetMessageName()) {
+        case WIFI_SVR_COM_STA_ENABLE_HILINK: {
+            std::string cmd;
+            msg->GetMessageObj(cmd);
+            LOGI("DealEnableHiLinkHandshake start shell cmd");
+            WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd);
+            break;
+        }
+        case WIFI_SVR_COM_STA_HILINK_DELIVER_MAC: {
+            std::string mac;
+            msg->GetMessageObj(mac);
+            LOGI("DealHiLinkDataToWpa start shell cmd");
+            WifiStaHalInterface::GetInstance().ShellCmd("wlan0", mac);
+            break;
+        }
+        case WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS: {
+            std::string bssid;
+            msg->GetMessageObj(bssid);
+            LOGI("DealHiLinkDataToWpa start ClearDeviceConfig");
+            WifiStaHalInterface::GetInstance().ClearDeviceConfig();
+ 
+            LOGI("DealHiLinkDataToWpa start startWpsPbc");
+            WifiIdlWpsConfig config;
+            config.anyFlag = 0;
+            config.multiAp = 0;
+            config.bssid = bssid;
+            WifiStaHalInterface::GetInstance().StartWpsPbcMode(config);
+            break;
+        }
+        default:
+            return;
+    }
 }
 
 /* --------------------------- state machine Roaming State ------------------------------ */

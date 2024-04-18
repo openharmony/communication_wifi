@@ -765,5 +765,36 @@ HWTEST_F(WifiSettingsTest, RemoveWifiP2pSupplicantGroupInfoTets, TestSize.Level1
 {
     WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();
 }
+
+HWTEST_F(WifiSettingsTest, EncryptionWifiDeviceConfigOnBootTest, TestSize.Level1)
+{
+    WIFI_LOGI("EncryptionWifiDeviceConfigOnBootTest enter");
+    WifiSettings::GetInstance().EncryptionWifiDeviceConfigOnBoot();
+}
+
+HWTEST_F(WifiSettingsTest, EncryptionDeviceConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("EncryptionDeviceConfigTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().EncryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, DecryptionDeviceConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("DecryptionDeviceConfigTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().DecryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, IsWifiDeviceConfigDecipheredTest, TestSize.Level1)
+{
+    WIFI_LOGI("IsWifiDeviceConfigDecipheredTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config);
+}
+
 }  // namespace Wifi
 }  // namespace OHO

@@ -523,6 +523,7 @@ public:
     void RenewDhcp();
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
+    void DealHiLinkDataToWpa(InternalMessage *msg);
 private:
     /**
      * @Description  Destruct state.

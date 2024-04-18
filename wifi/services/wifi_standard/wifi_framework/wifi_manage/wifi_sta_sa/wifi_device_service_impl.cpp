@@ -159,7 +159,7 @@ ErrCode WifiDeviceServiceImpl::IsHeldWifiProtectRef(
     return WIFI_OPT_SUCCESS;
 #else
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("IsHeldWifiProtectRef:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     isHoldProtect = WifiProtectManager::GetInstance().IsHeldWifiProtect(protectName);
@@ -175,7 +175,7 @@ ErrCode WifiDeviceServiceImpl::GetWifiProtectRef(const WifiProtectMode &protectM
     return WIFI_OPT_SUCCESS;
 #else
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("GetWifiProtectRef:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!WifiProtectManager::GetInstance().GetWifiProtect(protectMode, protectName)) {
@@ -194,7 +194,7 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
     return WIFI_OPT_SUCCESS;
 #else
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("PutWifiProtectRef:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!WifiProtectManager::GetInstance().PutWifiProtect(protectName)) {

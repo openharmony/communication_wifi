@@ -83,7 +83,7 @@ WifiErrorNo WifiHdiWpaClient::GetStaCapabilities(unsigned int &capabilities)
 WifiErrorNo WifiHdiWpaClient::GetStaDeviceMacAddress(std::string &mac)
 {
     char macAddr[WIFI_IDL_BSSID_LENGTH + 1] = {0};
-    int macAddrLen = WIFI_IDL_BSSID_LENGTH;
+    int macAddrLen = WIFI_IDL_BSSID_LENGTH + 1;
     WifiErrorNo err = HdiWpaStaGetDeviceMacAddress(macAddr, macAddrLen);
     if (err == WIFI_IDL_OPT_OK) {
         mac = std::string(macAddr);

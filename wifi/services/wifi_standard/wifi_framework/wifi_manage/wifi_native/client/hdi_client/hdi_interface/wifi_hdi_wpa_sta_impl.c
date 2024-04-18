@@ -26,6 +26,8 @@
 #define COLUMN_INDEX_FOUR 4
 #define COLUMN_INDEX_FIVE 5
 #define REPLY_BUF_LENGTH (4096 * 10)
+#define ETH_ADDR_LEN 6
+#define WIFI_IDL_BSSID_LENGTH 17
 
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
@@ -305,6 +307,24 @@ WifiErrorNo HdiWpaStaDisconnect()
     return WIFI_IDL_OPT_OK;
 }
 
+int ConvertMacToStr(char *mac, int macSize, char *macStr, int strLen)
+{
+    if (mac == NULL || macStr == NULL || macSize < ETH_ADDR_LEN || strLen <= WIFI_IDL_BSSID_LENGTH) {
+        return -1;
+    }
+    const int posZero = 0;
+    const int posOne = 1;
+    const int posTwo = 2;
+    const int posThree = 3;
+    const int posFour = 4;
+    const int posFive = 5;
+    if (snprintf_s(macStr, strLen, strLen - 1, "%02x:%02x:%02x:%02x:%02x:%02x", mac[posZero], mac[posOne], mac[posTwo],
+        mac[posThree], mac[posFour], mac[posFive]) < 0) {
+        return -1;
+    }
+    return 0;
+}
+
 WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen)
 {
     LOGI("HdiWpaStaGetDeviceMacAddress enter");
@@ -336,8 +356,8 @@ WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen)
         return WIFI_IDL_OPT_BUFFER_TOO_LITTLE;
     }
 
-    if (strncpy_s(macAddr, macAddrLen, (const char *)status.address, status.addressLen) != EOK) {
-        LOGE("HdiWpaStaGetDeviceMacAddress: strncpy_s failed!");
+    if (ConvertMacToStr((char *)status.address, status.addressLen, macAddr, macAddrLen) != EOK) {
+        LOGE("HdiWpaStaGetDeviceMacAddress: convertMacToStr failed!");
         return WIFI_IDL_OPT_FAILED;
     }
 

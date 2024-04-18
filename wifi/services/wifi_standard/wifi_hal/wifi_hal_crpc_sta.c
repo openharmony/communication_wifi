@@ -19,6 +19,11 @@
 #include "wifi_hal_sta_interface.h"
 #include "wifi_hal_define.h"
 
+#define NETWORK_MAX_SIZE 32
+#define WIFI_IDL_GET_MAX_SCAN_INFO 256
+#define WIFI_IDL_GET_MAX_BANDS 32
+#define WIFI_IDL_GET_MAX_NETWORK_LIST 128
+
 int RpcStart(RpcServer *server, Context *context)
 {
     if (server == NULL || context == NULL) {
@@ -106,7 +111,7 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
         return HAL_FAILURE;
     }
     ScanInfo *results = NULL;
-    if (maxSize > 0) {
+    if (maxSize > 0 || maxSize < WIFI_IDL_GET_MAX_SCAN_INFO) {
         results = (ScanInfo *)calloc(maxSize, sizeof(ScanInfo));
     }
     if (results == NULL) {
@@ -343,7 +348,8 @@ int RpcGetFrequencies(RpcServer *server, Context *context)
     }
     int band = 0;
     int maxSize = 0;
-    if (ReadInt(context, &band) < 0 || ReadInt(context, &maxSize) < 0 || maxSize <= 0) {
+    if (ReadInt(context, &band) < 0 || ReadInt(context, &maxSize) < 0 || maxSize <= 0
+        || maxSize > WIFI_IDL_GET_MAX_BANDS) {
         return HAL_FAILURE;
     }
     int *frequencies = (int *)calloc(maxSize, sizeof(int));
@@ -610,7 +616,7 @@ int RpcSetNetwork(RpcServer *server, Context *context)
     if (ReadInt(context, &size) < 0) {
         return HAL_FAILURE;
     }
-    if (size <= 0) {
+    if (size <= 0 || size > NETWORK_MAX_SIZE) {
         return HAL_FAILURE;
     }
 
@@ -880,7 +886,7 @@ int RpcGetNetworkList(RpcServer *server, Context *context)
     if (ReadInt(context, &maxSize) < 0) {
         return HAL_FAILURE;
     }
-    if (maxSize <= 0) {
+    if (maxSize <= 0 || maxSize > WIFI_IDL_GET_MAX_NETWORK_LIST) {
         return HAL_FAILURE;
     }
 

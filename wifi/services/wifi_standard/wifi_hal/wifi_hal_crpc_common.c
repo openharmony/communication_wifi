@@ -24,7 +24,7 @@
 #include "wifi_common_hal.h"
 #include "wifi_hal_chba_interface.h"
 
-#define RPC_REGISTER_MAX_NUM 2
+#define RPC_REGISTER_MAX_NUM 256
 
 int RpcRegisterEventCallback(RpcServer *server, Context *context)
 {

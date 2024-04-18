@@ -212,5 +212,7 @@ AppType AppParser::GetAppTypeAsInt(const xmlNodePtr &innode)
     WIFI_LOGD("%{public}s not find targName:%{public}s in appTypeMap", __FUNCTION__, tagName.c_str());
     return AppType::OTHER_APP;
 }
+
+
 } // namespace Wifi
 } // namespace OHOS

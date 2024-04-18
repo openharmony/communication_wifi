@@ -44,7 +44,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWifi(void);
+    WifiErrorNo StartWifi(const std::string &ifaceName);
 
     /**
      * @Description Close Wifi.
@@ -324,7 +324,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartAp(int id, std::string ifaceName);
+    WifiErrorNo StartAp(int id, const std::string &ifaceName);
 
     /**
      * @Description Close Ap.
@@ -395,7 +395,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqP2pStart();
+    WifiErrorNo ReqP2pStart(const std::string &ifaceName);
 
     /**
      * @Description P2P stop

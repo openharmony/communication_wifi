@@ -64,7 +64,8 @@
             "wifi_feature_with_hdi_wpa_supported",
             "wifi_feature_with_rx_listen_supported",
             "wifi_feature_with_scan_control",
-            "wifi_feature_network_selection"
+            "wifi_feature_network_selection",
+            "wifi_feature_with_hdi_chip_supported"
         ],
         "adapted_system_type": [
             "small",
@@ -88,7 +89,6 @@
                 "dhcp",
                 "drivers_interface_wlan",
                 "drivers_interface_wpa",
-                "efficiency_manager",
                 "eventhandler",
                 "ffrt",
                 "hdf_core",
@@ -143,6 +143,13 @@
                         "header_files": [ ]
                     },
                     "name" : "//foundation/communication/wifi/wifi/base:wifi_base"
+                },
+                {
+                    "header" : {
+                        "header_base": "//foundation/communication/wifi/wifi/utils/inc",
+                        "header_files": [ ]
+                    },
+                    "name" : "//foundation/communication/wifi/wifi/utils:wifi_utils"
                 }
             ],
             "test": [

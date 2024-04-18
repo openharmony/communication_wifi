@@ -23,6 +23,7 @@
 #include <chrono>
 #include "define.h"
 #include "wifi_cert_utils.h"
+#include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
@@ -41,8 +42,6 @@
 
 namespace OHOS {
 namespace Wifi {
-const std::string DEFAULT_IFACENAME = "wlan0";
-
 WifiSettings &WifiSettings::GetInstance()
 {
     static WifiSettings gWifiSettings;
@@ -56,7 +55,13 @@ WifiSettings::WifiSettings()
       mWifiStoping(false),
       mSoftapToggled(false),
       mIsSupportCoex(false),
-      mApIfaceName(DEFAULT_IFACENAME),
+      mStaIfaceName("wlan0"),
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+      mP2pIfaceName("p2p0"),
+#else
+      mP2pIfaceName("p2p-dev-wlan0"),
+#endif
+      mApIfaceName("wlan0"),
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
       mP2pConnectState(0),
@@ -474,13 +479,39 @@ bool WifiSettings::GetCoexSupport() const
     return mIsSupportCoex;
 }
 
+void WifiSettings::SetStaIfaceName(const std::string &ifaceName)
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    mStaIfaceName = ifaceName;
+}
+
+std::string WifiSettings::GetStaIfaceName()
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    return mStaIfaceName;
+}
+
+void WifiSettings::SetP2pIfaceName(const std::string &ifaceName)
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    mP2pIfaceName = ifaceName;
+}
+
+std::string WifiSettings::GetP2pIfaceName()
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    return mP2pIfaceName;
+}
+
 void WifiSettings::SetApIfaceName(const std::string &ifaceName)
 {
+    std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
     mApIfaceName = ifaceName;
 }
 
-std::string WifiSettings::GetApIfaceName() const
+std::string WifiSettings::GetApIfaceName()
 {
+    std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
     return mApIfaceName;
 }
 
@@ -493,6 +524,8 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
             WifiSettings::GetInstance().RemoveMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 iter->bssid);
         #endif
+            LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
+                SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
             iter = mWifiScanInfoList.erase(iter);
             continue;
         }
@@ -1041,9 +1074,7 @@ int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info, int instId)
     std::unique_lock<std::mutex> lock(mInfoMutex);
     auto iter = mWifiLinkedInfo.find(instId);
     if (iter != mWifiLinkedInfo.end()) {
-        if (iter->second.channelWidth == WifiChannelWidth::WIDTH_INVALID) {
-            GetLinkedChannelWidth(instId);
-        }
+        UpdateLinkedInfo(instId);
         info = iter->second;
     }
     return 0;
@@ -1114,7 +1145,6 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     bool isConnected = false;
-
     for (auto &ele : mWifiStoreRandomMac) {
         if ((randomMacInfo.ssid == ele.ssid) && (randomMacInfo.keyMgmt == ele.keyMgmt)) {
             ele.peerBssid = randomMacInfo.peerBssid;
@@ -1122,13 +1152,15 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
             isConnected = true;
             break;
         } else if (CompareMac(randomMacInfo.peerBssid, ele.peerBssid) && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
-                   (randomMacInfo.keyMgmt == "NONE")) {
-            isConnected = false;
-        } else if (CompareMac(randomMacInfo.peerBssid, ele.peerBssid) && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
-                   (randomMacInfo.keyMgmt != "NONE")) {
+                   (randomMacInfo.keyMgmt == KEY_MGMT_WPA_PSK)) {
             ele.ssid = randomMacInfo.ssid;
             randomMacInfo.randomMac = ele.randomMac;
             isConnected = true;
+            break;
+        } else if (randomMacInfo.peerBssid == ele.peerBssid && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
+                   (randomMacInfo.keyMgmt != KEY_MGMT_WPA_PSK)) {
+            isConnected = true;
+            break;
         } else {
             isConnected = false;
         }
@@ -1147,7 +1179,14 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto &item : mWifiStoreRandomMac) {
-        if (CompareMac(item.peerBssid, randomMacInfo.peerBssid) && item.ssid == randomMacInfo.ssid) {
+        if (item.ssid != randomMacInfo.ssid || randomMacInfo.keyMgmt != item.keyMgmt) {
+            continue;
+        }
+        if (randomMacInfo.keyMgmt == KEY_MGMT_WPA_PSK && CompareMac(item.peerBssid, randomMacInfo.peerBssid)) {
+            randomMacInfo.randomMac = item.randomMac;
+            return true;
+        }
+        if (item.peerBssid == randomMacInfo.peerBssid) {
             randomMacInfo.randomMac = item.randomMac;
             return true;
         }
@@ -1822,6 +1861,21 @@ void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannel
     }
 }
 
+void WifiSettings::UpdateLinkedInfo(int instId)
+{
+    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
+        if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
+            if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
+                mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
+            }
+            mWifiLinkedInfo[instId].supportedWifiCategory = iter->supportedWifiCategory;
+            mWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
+            return;
+        }
+    }
+    LOGD("WifiSettings UpdateLinkedInfo failed.");
+}
+
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers, int instId)
 {
     if (disableOthers) {
@@ -1859,6 +1913,7 @@ time_t WifiSettings::GetUserLastSelectedNetworkTimeVal(int instId)
 
 int WifiSettings::SyncWifiConfig()
 {
+    std::unique_lock<std::mutex> lock(mSyncWifiConfigMutex);
     std::vector<WifiConfig> tmp;
     for (auto &item : mWifiConfig) {
         tmp.push_back(item.second);

@@ -256,7 +256,7 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
 int64_t GetElapsedMicrosecondsSinceBoot()
 {
     struct timespec times = {0, 0};
-    clock_gettime(CLOCK_MONOTONIC, &times);
+    clock_gettime(CLOCK_BOOTTIME, &times);
     return static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICROSECOND + times.tv_nsec / MICROSECOND_TO_NANOSECOND;
 }
 

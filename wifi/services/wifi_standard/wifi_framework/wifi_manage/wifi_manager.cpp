@@ -125,7 +125,9 @@ int WifiManager::Init()
             WIFI_LOGI("Auto start scan only!");
             wifiTogglerManager->ScanOnlyToggled(1);
         }
+#ifndef DTFUZZ_TEST
         AutoStartEnhanceService();
+#endif
         wifiScanManager->CheckAndStartScanService();
     }
     InitPidfile();

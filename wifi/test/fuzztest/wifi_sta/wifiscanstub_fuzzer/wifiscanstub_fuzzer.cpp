@@ -18,7 +18,7 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#include <unistd.h>
 #include "wifi_scan_stub.h"
 #include "wifi_scan_mgr_stub.h"
 #include "message_parcel.h"
@@ -86,6 +86,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    sleep(1);
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::Wifi::DoSomethingInterestingWithMyAPIEx(data, size);
     return 0;

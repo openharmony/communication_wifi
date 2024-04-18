@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Wifi {
-#define DEFAULT_IFACENAME "wlan0"
 class WifiApHalInterface : public WifiBaseHalInterface {
 public:
     /**
@@ -39,7 +38,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    virtual WifiErrorNo StartAp(int id = 0, std::string ifaceName = DEFAULT_IFACENAME);
+    virtual WifiErrorNo StartAp(int id = 0, const std::string &ifaceName = "wlan0");
 
     /**
      * @Description Close Ap.

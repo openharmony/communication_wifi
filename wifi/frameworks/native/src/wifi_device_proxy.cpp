@@ -1062,6 +1062,8 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
     info.isAncoConnected = reply.ReadBool();
+    info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
+    info.isHiLinkNetwork = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
@@ -1554,6 +1556,7 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
+    constexpr int MAX_CHANNEL_SIZE = 36;
     MessageOption option;
     MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -1578,6 +1581,10 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
         return ErrCode(ret);
     }
     int retSize = reply.ReadInt32();
+    if (retSize > MAX_CHANNEL_SIZE) {
+        WIFI_LOGE("Get5GHzChannelList fail, size error: %{public}d", retSize);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < retSize; ++i) {
         result.emplace_back(reply.ReadInt32());
     }

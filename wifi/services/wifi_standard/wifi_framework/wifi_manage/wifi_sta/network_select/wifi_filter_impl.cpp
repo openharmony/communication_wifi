@@ -275,4 +275,33 @@ bool NoInternetWifiFilter::Filter(NetworkCandidate &networkCandidate)
     return wifiDeviceConfig.noInternetAccess
         && !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory);
 }
+
+
+WeakAlgorithmWifiFilter::WeakAlgorithmWifiFilter() : SimpleWifiFilter("noWeakAlgorithm") {}
+
+WeakAlgorithmWifiFilter::~WeakAlgorithmWifiFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool WeakAlgorithmWifiFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    auto &scanInfo = networkCandidate.interScanInfo;
+    if (scanInfo.securityType == WifiSecurity::WEP) {
+        WIFI_LOGD("WeakAlgorithm: WEP AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
+        return false;
+    } else if (scanInfo.securityType == WifiSecurity::OPEN) {
+        WIFI_LOGD("WeakAlgorithm: OPEN AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
+        return false;
+    } else if (scanInfo.securityType == WifiSecurity::PSK
+        && scanInfo.capabilities.find("TKIP") != std::string::npos) {
+        WIFI_LOGD("WeakAlgorithm: WPA AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
+        return false;
+    }
+    return true;
+}
 }

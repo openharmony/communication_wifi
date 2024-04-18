@@ -136,8 +136,12 @@ public:
     bool GetWifiStopState() const;
     void SetCoexSupport(bool isSupport);
     bool GetCoexSupport() const;
+    void SetStaIfaceName(const std::string &ifaceName);
+    std::string GetStaIfaceName();
+    void SetP2pIfaceName(const std::string &ifaceName);
+    std::string GetP2pIfaceName();
     void SetApIfaceName(const std::string &ifaceName);
-    std::string GetApIfaceName() const;
+    std::string GetApIfaceName();
 
     /**
      * @Description Has STA service running
@@ -1642,6 +1646,7 @@ private:
     void InitScanControlIntervalList();
     void InitScanControlInfo();
     void GetLinkedChannelWidth(int instId = 0);
+    void UpdateLinkedInfo(int instId = 0);
 #ifndef OHOS_ARCH_LITE
     void MergeSoftapConfig();
     void MergeWifiConfig();
@@ -1657,6 +1662,8 @@ private:
     bool mWifiStoping;
     bool mSoftapToggled;
     bool mIsSupportCoex;
+    std::string mStaIfaceName;
+    std::string mP2pIfaceName;
     std::string mApIfaceName;
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
@@ -1722,6 +1729,7 @@ private:
     std::mutex mWifiToggledMutex;
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;
+    std::mutex mSyncWifiConfigMutex;
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
 

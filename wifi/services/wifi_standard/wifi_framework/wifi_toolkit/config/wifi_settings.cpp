@@ -440,19 +440,18 @@ int WifiSettings::ClearScanInfoList()
 void WifiSettings::SetWifiToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mWifiToggledMutex);
-    if (state && GetAirplaneModeState() == MODE_STATE_OPEN) {
-        SetOpenWifiWhenAirplaneMode(true);
-    } else {
-        SetOpenWifiWhenAirplaneMode(false);
-    }
 
     if (state) {
         if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+            SetOpenWifiWhenAirplaneMode(true);
             PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
         } else {
             PersistWifiState(WIFI_STATE_ENABLED);
         }
     } else {
+        if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+            SetOpenWifiWhenAirplaneMode(false);
+        }
         PersistWifiState(WIFI_STATE_DISABLED);
     }
 }

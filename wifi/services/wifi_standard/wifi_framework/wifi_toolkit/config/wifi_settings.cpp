@@ -2077,14 +2077,10 @@ bool WifiSettings::SetAirplaneModeState(const int &state)
     mAirplaneModeState = state;
     SetLastAirplaneMode(state);
     if (GetOpenWifiWhenAirplaneMode()) {
-        if (state == MODE_STATE_OPEN) {
-            if (mPersistWifiState == WIFI_STATE_ENABLED) {
-                PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
-            }
-        } else {
-            if (mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {
-                PersistWifiState(WIFI_STATE_ENABLED);
-            }
+        if (state == MODE_STATE_OPEN && mPersistWifiState == WIFI_STATE_ENABLED) {
+            PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
+        } else if (state == MODE_STATE_CLOSE && mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {
+            PersistWifiState(WIFI_STATE_ENABLED);
         }
         if (mPersistWifiState == WIFI_STATE_DISABLED || mPersistWifiState ==  WIFI_STATE_DISABLED_AIRPLANEMODE_ON) {
             return true;
@@ -2096,7 +2092,8 @@ bool WifiSettings::SetAirplaneModeState(const int &state)
             PersistWifiState(WIFI_STATE_DISABLED_AIRPLANEMODE_ON);
         }
     } else {
-        if (mPersistWifiState == WIFI_STATE_DISABLED_AIRPLANEMODE_ON || mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {
+        if (mPersistWifiState == WIFI_STATE_DISABLED_AIRPLANEMODE_ON
+            || mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {
             PersistWifiState(WIFI_STATE_ENABLED);
         }
     }

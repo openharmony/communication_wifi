@@ -141,7 +141,10 @@ static int MyWpaCtrlPending(struct wpa_ctrl *ctrl)
     pfd.events = POLLIN;
     int ret = poll(&pfd, 1, 100); /* 100 ms */
     if (ret < 0) {
-        LOGE("poll failed!");
+        LOGE("poll failed! errno = %{public}d", errno);
+        if (errno == EINTR) {
+            return 0;
+        }
         return -1;
     } else if (ret == 0) {
         return 0;

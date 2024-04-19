@@ -108,9 +108,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/inc",
     ]
 
-    deps = [ 
-      "$WIFI_ROOT_DIR/utils:wifi_utils",
-    ]
+    deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
 
     defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",

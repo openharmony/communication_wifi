@@ -114,22 +114,22 @@ constexpr int EAP_SIM_NUM = 0X02;
 
 void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
 {
-    WIFI_LOGI("OnEventStaNotifyCallBack() notifyParam=%{public}s", notifyParam.c_str());
+    WIFI_LOGI("OnWpaStaNotifyCallBack() notifyParam=%{public}s", notifyParam.c_str());
     if (notifyParam.empty()) {
-        WIFI_LOGI("OnEventStaNotifyCallBack() notifyParam is empty");
+        WIFI_LOGI("OnWpaStaNotifyCallBack() notifyParam is empty");
         return;
     }
 
     std::string::size_type begPos = 0;
-    if ((begPos = notifyParam.find(":") )== std::string::npos) {
-        WIFI_LOGI("OnEventStaNotifyCallBack() notifyParam not find :");
+    if ((begPos = notifyParam.find(":")) == std::string::npos) {
+        WIFI_LOGI("OnWpaStaNotifyCallBack() notifyParam not find :");
         return;
     }
     std::string type = notifyParam.substr(0, begPos);
     int num = stoi(type);
     std::string data = notifyParam.substr(begPos + 1);
     if (data.empty()) {
-        WIFI_LOGI("OnEventStaNotifyCallBack() data is empty");
+        WIFI_LOGI("OnWpaStaNotifyCallBack() data is empty");
         return;
     }
     switch (num) {
@@ -140,6 +140,7 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
             OnWpaEapSimAuthCallBack(data);
             break;
         default:
+            WIFI_LOGI("OnWpaStaNotifyCallBack() undefine event:%{public}d", num);
             break;
     }
 }

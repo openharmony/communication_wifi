@@ -677,7 +677,7 @@ WifiErrorNo WifiIdlClient::ReqRegisterStaEventCallback(const WifiEventCallback &
         cEventCallback.onWpsTimeOut = OnWpsTimeOut;
         cEventCallback.onWpsConnectionFull = OnWpaConnectionFull;
         cEventCallback.onWpsConnectionReject = OnWpaConnectionReject;
-        cEventCallback.onWpaEventStaNotify = OnWpaEventStaNotify;
+        cEventCallback.onEventStaNotify = OnWpaStaNotifyCallBack;
     }
     return RegisterStaEventCallback(cEventCallback);
 }

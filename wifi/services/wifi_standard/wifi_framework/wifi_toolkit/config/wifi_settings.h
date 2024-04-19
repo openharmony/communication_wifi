@@ -1676,7 +1676,6 @@ private:
     int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
-    bool mWifiToggled;
     bool mWifiStoping;
     bool mSoftapToggled;
     bool mIsSupportCoex;

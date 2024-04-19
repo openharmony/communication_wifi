@@ -30,11 +30,10 @@ public:
     virtual void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0) = 0;
 };
 
-class WifiManager : public MockWifiManager {
+class WifiScanManager : public MockWifiManager {
 public:
-    WifiManager();
-    ~WifiManager() = default;
-    static WifiManager &GetInstance();
+    WifiScanManager();
+    ~WifiScanManager() = default;
     IScanSerivceCallbacks GetScanCallback();
 
     MOCK_METHOD1(DealScanOpenRes, void(int));

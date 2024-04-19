@@ -53,11 +53,13 @@ public:
     {
         pStaService = std::make_unique<StaService>();
         pStaService->pStaStateMachine = new MockStaStateMachine();
+        pWifiStaManager.reset(new WifiStaManager());
         pStaService->pStaAutoConnectService = new MockStaAutoConnectService(pStaService->pStaStateMachine);
     }
     virtual void TearDown()
     {
         pStaService.reset();
+        pWifiStaManager.reset();
     }
 
     void StaServiceInitStaServiceSuccess();
@@ -113,6 +115,7 @@ public:
     void DeregisterFilterBuilder();
 public:
     std::unique_ptr<StaService> pStaService;
+    std::unique_ptr<WifiStaManager> pWifiStaManager;
 };
 
 void StaServiceTest::StaServiceInitStaServiceSuccess()
@@ -139,7 +142,7 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
     std::vector<StaServiceCallback> callbacks;
-    callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
+    callbacks.push_back(pWifiStaManager->GetStaCallback());
     EXPECT_TRUE(pStaService->InitStaService(callbacks) == WIFI_OPT_SUCCESS);
 }
 
@@ -483,14 +486,14 @@ void StaServiceTest::StaServiceAutoConnectServiceSuccess()
 void StaServiceTest::StaServiceRegisterStaServiceCallbackSuccess()
 {
     std::vector<StaServiceCallback> callbacks;
-    callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
+    callbacks.push_back(pWifiStaManager->GetStaCallback());
     pStaService->RegisterStaServiceCallback(callbacks);
 }
 
 void StaServiceTest::StaServiceRegisterStaServiceCallbackFail()
 {
     std::vector<StaServiceCallback> callbacks;
-    callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
+    callbacks.push_back(pWifiStaManager->GetStaCallback());
     pStaService->RegisterStaServiceCallback(callbacks);
 }
 

@@ -31,11 +31,10 @@ public:
     virtual void DealRssiChanged(int rssi, int instId = 0) = 0;
 };
 
-class WifiManager : public MockWifiManager {
+class WifiStaManager : public MockWifiManager {
 public:
-    WifiManager();
-    ~WifiManager() = default;
-    static WifiManager &GetInstance();
+    WifiStaManager();
+    ~WifiStaManager() = default;
     StaServiceCallback GetStaCallback();
     MOCK_METHOD2(DealStaOpenRes, void(OperateResState state, int));
     MOCK_METHOD2(DealStaCloseRes, void(OperateResState state, int));

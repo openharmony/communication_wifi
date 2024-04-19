@@ -16,30 +16,24 @@
 
 namespace OHOS {
 namespace Wifi {
-WifiManager &WifiManager::GetInstance()
-{
-    static WifiManager gWifiManager;
-    return gWifiManager;
-}
-
-WifiManager::WifiManager()
+WifiScanManager::WifiScanManager()
 {
     InitScanCallback();
 }
 
-IScanSerivceCallbacks WifiManager::GetScanCallback(void)
+IScanSerivceCallbacks WifiScanManager::GetScanCallback(void)
 {
     return mScanCallback;
 }
 
-void WifiManager::InitScanCallback(void)
+void WifiScanManager::InitScanCallback(void)
 {
     using namespace std::placeholders;
-    mScanCallback.OnScanStartEvent = std::bind(&WifiManager::DealScanOpenRes, this, _1);
-    mScanCallback.OnScanStopEvent = std::bind(&WifiManager::DealScanCloseRes, this, _1);
-    mScanCallback.OnScanFinishEvent = std::bind(&WifiManager::DealScanFinished, this, _1, _2);
-    mScanCallback.OnScanInfoEvent = std::bind(&WifiManager::DealScanInfoNotify, this, _1, _2);
-    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManager::DealStoreScanInfoEvent, this, _1, _2);
+    mScanCallback.OnScanStartEvent = std::bind(&WifiScanManager::DealScanOpenRes, this, _1);
+    mScanCallback.OnScanStopEvent = std::bind(&WifiScanManager::DealScanCloseRes, this, _1);
+    mScanCallback.OnScanFinishEvent = std::bind(&WifiScanManager::DealScanFinished, this, _1, _2);
+    mScanCallback.OnScanInfoEvent = std::bind(&WifiScanManager::DealScanInfoNotify, this, _1, _2);
+    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiScanManager::DealStoreScanInfoEvent, this, _1, _2);
     return;
 }
 } // namespace Wifi

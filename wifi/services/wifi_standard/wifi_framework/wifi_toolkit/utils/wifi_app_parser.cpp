@@ -101,12 +101,11 @@ bool AppParser::IsHighTempLimitSpeedApp(const std::string &bundleName) const
 {
     if (mIshighTempLimitSpeedReadCloudPush) {
         return std::any_of(m_highTempLimitSpeedAppVecCloudPush.begin(), m_highTempLimitSpeedAppVecCloudPush.end(),
-        [bundleName](const HighTempLimitSpeedAppInfo &app) { return app.packageName == bundleName; });
+            [bundleName](const HighTempLimitSpeedAppInfo &app) { return app.packageName == bundleName; });
     } else {
         return std::any_of(m_highTempLimitSpeedAppVec.begin(), m_highTempLimitSpeedAppVec.end(),
             [bundleName](const HighTempLimitSpeedAppInfo &app) { return app.packageName == bundleName; });
     }
-    return false;
 }
 
 bool AppParser::InitAppParser(const char *appXmlFilePath)
@@ -280,7 +279,7 @@ bool AppParser::IsReadCloudConfig()
     std::string strCloud = GetCloudPushFileVersion(GetCloudPushVersionFilePath().c_str());
     bool isReadCloudConfig = (strCloud > strLocal) || (strCloud.empty() && strLocal.empty());
     WIFI_LOGI("%{public}s out,IsReadCloudConfig:%{public}d,strLocal=%{public}s,strCloud =%{public}s !", __FUNCTION__,
-        isReadCloudConfig,strLocal.c_str(), strCloud.c_str());
+        isReadCloudConfig, strLocal.c_str(), strCloud.c_str());
     mIshighTempLimitSpeedReadCloudPush = isReadCloudConfig;
     return isReadCloudConfig;
 }
@@ -303,6 +302,7 @@ std::string AppParser::GetCloudPushFileVersion(const char *appVersionFilePath)
     while (getline(ifs, strTemp)) {
         if (nLineCount > VERSION_FILE_MAX_LINE) {
             WIFI_LOGE("%{public}s %{public}s Failed to parse local version data!", __FUNCTION__, appVersionFilePath);
+            break;
         }
         nLineCount++;
         int nPos = strTemp.find(VERSION_FILE_KEY_WORD);
@@ -354,7 +354,7 @@ std::string AppParser::GetLocalFileVersion(const char *appXmlVersionFilePath)
             break;
         }
         strFileVersion = GetStringValue(pNode);
-    } while(0);
+    } while (0);
 
     if (xmlObj != nullptr) {
         xmlFreeDoc(xmlObj);

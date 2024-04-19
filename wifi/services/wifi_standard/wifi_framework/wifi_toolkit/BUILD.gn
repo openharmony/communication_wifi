@@ -110,7 +110,6 @@ if (defined(ohos_lite)) {
 
     deps = [ 
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/jsoncpp:jsoncpp",
     ]
 
     defines = [
@@ -142,6 +141,7 @@ if (defined(ohos_lite)) {
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "ipc:ipc_single",
+      "jsoncpp:jsoncpp",
       "libxml2:libxml2",
     ]
 

@@ -134,7 +134,6 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
 int32_t OnEventStaNotify(struct IWpaCallback *self, const char* notifyParam, const char *ifName)
 {
     LOGI("OnEventStaNotify: callback enter!");
- 
     if (strcmp(ifName, "wlan0") != 0) {
         return 1;
     }
@@ -142,23 +141,9 @@ int32_t OnEventStaNotify(struct IWpaCallback *self, const char* notifyParam, con
         LOGE("OnEventStaNotify: invalid parameter!");
         return 1;
     }
-    constexpr int HILINK_NUM = 0X01;
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    int num = std::stoi(notifyParam);
-    switch (num) {
-        case HILINK_NUM: {
-            char *bssid = strchr((char *)notifyParam, ':');
-            if (bssid != NULL) {
-                return 1;
-            }
-            bssid++;
-            if (cbk.OnEventStaNotify) {
-                cbk.OnEventStaNotify(bssid);
-            }
-            break;
-        }
-        default:
-            break;
+    if (cbk.onEventStaNotify) {
+        cbk.onEventStaNotify(notifyParam);
     }
     return 0;
 }
@@ -196,20 +181,6 @@ int32_t OnEventScanResult(struct IWpaCallback *self,
         OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onScanNotify) {
         cbk.onScanNotify(SINGLE_SCAN_OVER_OK);
-    }
-    return 0;
-}
-
-int32_t OnEventStaNotify(struct IWpaCallback *self, const char *notifyParam, const char* ifName)
-{
-    LOGI("OnEventStaNotify: callback enter!");
-    if (notifyParam == NULL) {
-        LOGE("OnEventStaNotify: invalid parameter!");
-        return 1;
-    }
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    if (cbk.OnEventStaNotify) {
-        cbk.OnEventStaNotify(notifyParam);
     }
     return 0;
 }

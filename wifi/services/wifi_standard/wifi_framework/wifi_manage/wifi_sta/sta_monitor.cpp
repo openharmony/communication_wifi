@@ -45,7 +45,7 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
         std::bind(&StaMonitor::onWpaConnectionFullCallBack, this, _1),
         std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1),
-        std::bind(&StaMonitor::OnEventStaNotifyCallBack, this, _1)
+        std::bind(&StaMonitor::OnWpaStaNotifyCallBack, this, _1)
     };
 
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
@@ -101,8 +101,43 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
             break;
         }
         case WPA_CB_ASSOCIATING:
-        case WPA_CB_ASSOCIATED: 
+        case WPA_CB_ASSOCIATED:
             pStaStateMachine->OnNetworkAssocEvent(status, bssid, pStaStateMachine);
+            break;
+        default:
+            break;
+    }
+}
+
+constexpr int HILINK_NUM = 0X01;
+constexpr int EAP_SIM_NUM = 0X02;
+
+void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
+{
+    WIFI_LOGI("OnEventStaNotifyCallBack() notifyParam=%{public}s", notifyParam.c_str());
+    if (notifyParam.empty()) {
+        WIFI_LOGI("OnEventStaNotifyCallBack() notifyParam is empty");
+        return;
+    }
+
+    std::string::size_type begPos = 0;
+    if ((begPos = notifyParam.find(":") )== std::string::npos) {
+        WIFI_LOGI("OnEventStaNotifyCallBack() notifyParam not find :");
+        return;
+    }
+    std::string type = notifyParam.substr(0, begPos);
+    int num = stoi(type);
+    std::string data = notifyParam.substr(begPos + 1);
+    if (data.empty()) {
+        WIFI_LOGI("OnEventStaNotifyCallBack() data is empty");
+        return;
+    }
+    switch (num) {
+        case HILINK_NUM:
+            OnWpaHilinkCallBack(data);
+            break;
+        case EAP_SIM_NUM:
+            OnWpaEapSimAuthCallBack(data);
             break;
         default:
             break;
@@ -211,9 +246,9 @@ void StaMonitor::OnWpsTimeOutCallBack(int status)
 /* SIM authentication data format: [GSM-AUTH][:][Rand1][:][Rand2] or [GSM-AUTH][:][Rand1][:][Rand2][:][Rand3]
    AKA/AKA authentication data format: [UMTS-AUTH][:][rand][:][autn]
 */
-void StaMonitor::OnEventStaNotifyCallBack(const std::string &notifyParam)
+void StaMonitor::OnWpaEapSimAuthCallBack(const std::string &notifyParam)
 {
-    WIFI_LOGD("OnEventStaNotifyCallBack, notifyParam:%{private}s", notifyParam.c_str());
+    WIFI_LOGD("OnWpaEapSimAuthCallBack, notifyParam:%{private}s", notifyParam.c_str());
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;

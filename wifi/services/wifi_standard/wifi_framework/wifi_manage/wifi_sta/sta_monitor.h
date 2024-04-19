@@ -124,7 +124,14 @@ public:
      *
      * @param notifyParam - authentication information [in]
      */
-    void OnEventStaNotifyCallBack(const std::string &notifyParam);
+    void OnWpaEapSimAuthCallBack(const std::string &notifyParam);
+
+    /**
+     * @Description : Callback of the STA event.
+     *
+     * @param notifyParam - authentication information [in]
+     */
+    void OnWpaStaNotifyCallBack(const std::string &notifyParam);
 
 private:
     StaStateMachine *pStaStateMachine;

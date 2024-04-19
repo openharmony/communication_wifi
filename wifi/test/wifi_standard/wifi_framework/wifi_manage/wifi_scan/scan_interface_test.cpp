@@ -42,15 +42,18 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), ClearScanInfoList()).Times(AtLeast(0));
         pScanInterface = std::make_unique<ScanInterface>();
         pScanInterface->pScanService = new MockScanService();
-        pScanInterface->mScanSerivceCallbacks = WifiManager::GetInstance().GetScanCallback();
+        pWifiScanManager.reset(new WifiScanManager());
+        pScanInterface->mScanSerivceCallbacks = pWifiScanManager->GetScanCallback();
     }
     void TearDown() override
     {
         pScanInterface.reset();
+        pWifiScanManager.reset();
     }
 
 public:
     std::unique_ptr<ScanInterface> pScanInterface;
+    std::unique_ptr<WifiScanManager> pWifiScanManager;
 };
 
 extern "C" IScanService *Create(void);

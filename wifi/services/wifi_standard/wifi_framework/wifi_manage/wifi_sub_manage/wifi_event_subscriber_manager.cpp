@@ -263,7 +263,7 @@ void WifiEventSubscriberManager::GetAirplaneModeByDatashare()
 
     WIFI_LOGD("GetAirplaneModeByDatashare, airplaneMode:%{public}s", airplaneMode.c_str());
     if (airplaneMode.compare("1") == 0) {
-        WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
+        WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_OPEN);
     }
     return;
 }
@@ -359,7 +359,7 @@ void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
         WifiSettings::GetInstance().SetWifiToggledState(true);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     } else if (lastStaState == openWifiInAirplanemode) {
-        WifiConfigCenter::GetInstance().SetOpenWifiWhenAirplaneMode(true);
+        WifiConfigCenter::GetInstance().SetWifiFlagOnAirplaneMode(true);
         WifiSettings::GetInstance().SetWifiToggledState(true);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     } else if (lastStaState == closeWifiByAirplanemodeOpen) {
@@ -691,12 +691,17 @@ void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEven
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_AIRPLANE_MODE_CHANGED) {
         if (code == 1) {
             /* open airplane mode */
-            WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_OPEN);
-            WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(1);
+            if (WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_OPEN)) {
+                WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(1);
+            } else {
+                WifiSettings::GetInstance().SetSoftapToggledState(false);
+                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0);
+            }
         } else {
             /* close airplane mode */
-            WifiConfigCenter::GetInstance().SetAirplaneModeState(MODE_STATE_CLOSE);
-            WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(0);
+            if (WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_CLOSE)) {
+                WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(0);
+            }
         }
     }
 }

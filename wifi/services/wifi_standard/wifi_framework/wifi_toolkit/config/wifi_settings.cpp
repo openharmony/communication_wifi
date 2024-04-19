@@ -51,7 +51,6 @@ WifiSettings &WifiSettings::GetInstance()
 WifiSettings::WifiSettings()
     : mNetworkId(0),
       mWifiStaCapabilities(0),
-      mWifiToggled(false),
       mWifiStoping(false),
       mSoftapToggled(false),
       mIsSupportCoex(false),
@@ -238,6 +237,8 @@ int WifiSettings::Init()
     InitPackageFilterConfig();
     ClearLocalHid2dInfo();
     IncreaseNumRebootsSinceLastUse();
+    mPersistWifiState = GetPersistWifiState();
+    mAirplaneModeState.store(GetLastAirplaneMode());
     return 0;
 }
 
@@ -456,12 +457,41 @@ int WifiSettings::ClearScanInfoList()
 void WifiSettings::SetWifiToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mWifiToggledMutex);
-    mWifiToggled = state;
+
+    if (state) {
+        if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+            SetWifiFlagOnAirplaneMode(true);
+            PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
+        } else {
+            PersistWifiState(WIFI_STATE_ENABLED);
+        }
+    } else {
+        if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+            SetWifiFlagOnAirplaneMode(false);
+        }
+        PersistWifiState(WIFI_STATE_DISABLED);
+    }
 }
 
-bool WifiSettings::GetWifiToggledState() const
+void WifiSettings::PersistWifiState(int state)
 {
-    return mWifiToggled;
+    mPersistWifiState = state;
+    SetOperatorWifiType(state);
+    LOGI("persist wifi state is %{public}d", state);
+}
+
+int WifiSettings::GetPersistWifiState()
+{
+    return GetOperatorWifiType();
+}
+
+bool WifiSettings::IsWifiToggledEnable()
+{
+    if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+        return mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE;
+    } else {
+        return mPersistWifiState != WIFI_STATE_DISABLED;
+    }
 }
 
 void WifiSettings::SetSoftapToggledState(bool state)
@@ -2126,6 +2156,24 @@ int WifiSettings::SetOperatorWifiType(int type, int instId)
     return 0;
 }
 
+int WifiSettings::GetLastAirplaneMode(int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.lastAirplaneMode;
+    }
+    return mWifiConfig[0].lastAirplaneMode;
+}
+
+int WifiSettings::SetLastAirplaneMode(int mode, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig[instId].lastAirplaneMode = mode;
+    SyncWifiConfig();
+    return 0;
+}
+
 bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
@@ -2136,7 +2184,7 @@ bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
     return mWifiConfig[0].canOpenStaWhenAirplane;
 }
 
-int WifiSettings::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
+int WifiSettings::SetWifiFlagOnAirplaneMode(bool ifOpen, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].openWifiWhenAirplane = ifOpen;
@@ -2144,7 +2192,7 @@ int WifiSettings::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
     return 0;
 }
 
-bool WifiSettings::GetOpenWifiWhenAirplaneMode(int instId)
+bool WifiSettings::GetWifiFlagOnAirplaneMode(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);
@@ -2210,9 +2258,32 @@ int WifiSettings::GetScreenState() const
     return mScreenState;
 }
 
-void WifiSettings::SetAirplaneModeState(const int &state)
+bool WifiSettings::SetWifiStateOnAirplaneChanged(const int &state)
 {
     mAirplaneModeState = state;
+    SetLastAirplaneMode(state);
+    if (GetWifiFlagOnAirplaneMode()) {
+        if (state == MODE_STATE_OPEN && mPersistWifiState == WIFI_STATE_ENABLED) {
+            PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
+        } else if (state == MODE_STATE_CLOSE && mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {
+            PersistWifiState(WIFI_STATE_ENABLED);
+        }
+        if (mPersistWifiState == WIFI_STATE_DISABLED || mPersistWifiState ==  WIFI_STATE_DISABLED_AIRPLANEMODE_ON) {
+            return true;
+        }
+        return false;
+    }
+    if (state == MODE_STATE_OPEN) {
+        if (mPersistWifiState == WIFI_STATE_ENABLED) {
+            PersistWifiState(WIFI_STATE_DISABLED_AIRPLANEMODE_ON);
+        }
+    } else {
+        if (mPersistWifiState == WIFI_STATE_DISABLED_AIRPLANEMODE_ON
+            || mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {
+            PersistWifiState(WIFI_STATE_ENABLED);
+        }
+    }
+    return true;
 }
 
 int WifiSettings::GetAirplaneModeState() const

@@ -50,6 +50,8 @@ constexpr int RSSI_LEVEL_1_5G = -85;
 constexpr int RSSI_LEVEL_2_5G = -79;
 constexpr int RSSI_LEVEL_3_5G = -72;
 constexpr int RSSI_LEVEL_4_5G = -65;
+constexpr int AIRPLANE_MODE_OPEN = 1;
+constexpr int AIRPLANE_MODE_CLOSE = 2;
 
 enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, UNKNOWN };
 
@@ -183,12 +185,10 @@ enum class DhcpIpType { /* dhcp IP type: ipv4 ipv6 mix */
 };
 
 enum class OperatorWifiType {
-    USER_OPEN_WIFI_IN_NO_AIRPLANEMODE,      /* User open Wifi in non-airplane mode */
-    USER_CLOSE_WIFI_IN_NO_AIRPLANEMODE,     /* User clsoe Wifi in non-airplane mode */
-    USER_OPEN_WIFI_IN_AIRPLANEMODE,         /* User open Wifi in airplane mode */
-    USER_CLOSE_WIFI_IN_AIRPLANEMODE,        /* User close Wifi in airplane mode */
-    OPEN_WIFI_DUE_TO_AIRPLANEMODE_CLOSED,   /* Open Wifi due to airplane mode closed */
-    CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED,  /* Close Wifi due to airplane mode opened */
+    WIFI_DISABLED,
+    WIFI_ENABLED,
+    WIFI_ENABLED_AIRPLANEMODE_OVERRIDE,
+    WIFI_DISABLED_AIRPLANEMODE_ON,
     INITIAL_TYPE,                            /* initial type */
 };
 
@@ -213,6 +213,7 @@ struct WifiConfig {
      * set false;
      */
     bool staLastState;
+    int lastAirplaneMode;
     int savedDeviceAppraisalPriority;
     int scoretacticsScoreSlope;
     int scoretacticsInitScore;
@@ -255,6 +256,7 @@ struct WifiConfig {
         canOpenStaWhenAirplane = true;
         openWifiWhenAirplane = false;
         staLastState = false;
+        lastAirplaneMode = AIRPLANE_MODE_CLOSE;
         savedDeviceAppraisalPriority = PRIORITY_1;
         scoretacticsScoreSlope = SCORE_SLOPE;
         scoretacticsInitScore = INIT_SCORE;

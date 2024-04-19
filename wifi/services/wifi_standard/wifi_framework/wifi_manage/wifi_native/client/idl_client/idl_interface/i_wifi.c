@@ -80,6 +80,7 @@ WifiErrorNo GetWifiChipIds(uint8_t *ids, int32_t *size)
         ReadInt(context, size);
         if (*size > WIFI_MAX_CHIP_IDS) {
             LOGE("GetWifiChipIds fail, size error: %{public}d", *size);
+            return WIFI_IDL_OPT_FAILED;
         }
         for (int i = 0; i < *size; ++i) {
             ReadInt(context, (int *)(ids + i));

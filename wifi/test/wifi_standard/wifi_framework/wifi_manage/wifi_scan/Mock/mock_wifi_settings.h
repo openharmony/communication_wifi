@@ -53,6 +53,7 @@ public:
     virtual int SetP2pBusinessType(const P2pBusinessType &type) = 0;
     virtual int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene) = 0;
     virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
+    virtual int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -85,6 +86,7 @@ public:
     MOCK_METHOD1(SetP2pBusinessType, int(const P2pBusinessType &type));
     MOCK_METHOD2(GetHid2dUpperScene, int(std::string& ifName, Hid2dUpperScene &scene));
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
+    MOCK_METHOD2(SetHid2dUpperScene, int(const std::string& ifName, const Hid2dUpperScene &scene));
 };
 }  // namespace Wifi
 }  // namespace OHOS

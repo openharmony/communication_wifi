@@ -155,6 +155,12 @@ ohos_unittest("wifi_sta_unittest") {
     "samgr:samgr_proxy",
     "time_service:time_client",
   ]
+
+  if (wifi_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+    defines += [ "WIFI_FFRT_ENABLE" ]
+  }
+
   defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   part_name = "wifi"
   subsystem_name = "communication"

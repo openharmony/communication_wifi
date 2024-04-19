@@ -34,7 +34,7 @@ typedef struct IWifiEventCallback {
     void (*onWpsTimeOut)(int status);
     void (*onWpsConnectionFull)(int status);
     void (*onWpsConnectionReject)(int status);
-    void (*onWpaEventStaNotify)(const char *bssid);
+    void (*onEventStaNotify)(const char *bssid);
 } IWifiEventCallback;
 
 #ifdef __cplusplus

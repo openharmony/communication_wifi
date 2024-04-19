@@ -111,7 +111,7 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
         return HAL_FAILURE;
     }
     ScanInfo *results = NULL;
-    if (maxSize > 0 || maxSize < WIFI_IDL_GET_MAX_SCAN_INFO) {
+    if (maxSize > 0 && maxSize <= WIFI_IDL_GET_MAX_SCAN_INFO) {
         results = (ScanInfo *)calloc(maxSize, sizeof(ScanInfo));
     }
     if (results == NULL) {

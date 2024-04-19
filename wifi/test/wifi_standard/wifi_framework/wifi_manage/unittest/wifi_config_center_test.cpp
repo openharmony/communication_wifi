@@ -357,7 +357,7 @@ HWTEST_F(WifiConfigCenterTest, SetGetScreenState_SUCCESS, TestSize.Level1)
 HWTEST_F(WifiConfigCenterTest, SetGetAirplaneModeState_SUCCESS, TestSize.Level1)
 {
     int mode = 1;
-    WifiConfigCenter::GetInstance().SetAirplaneModeState(mode);
+    WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(mode);
     EXPECT_EQ(mode, WifiConfigCenter::GetInstance().GetAirplaneModeState());
 }
 

@@ -443,14 +443,14 @@ void WifiSettings::SetWifiToggledState(bool state)
 
     if (state) {
         if (GetAirplaneModeState() == MODE_STATE_OPEN) {
-            SetOpenWifiWhenAirplaneMode(true);
+            SetWifiFlagOnAirplaneMode(true);
             PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
         } else {
             PersistWifiState(WIFI_STATE_ENABLED);
         }
     } else {
         if (GetAirplaneModeState() == MODE_STATE_OPEN) {
-            SetOpenWifiWhenAirplaneMode(false);
+            SetWifiFlagOnAirplaneMode(false);
         }
         PersistWifiState(WIFI_STATE_DISABLED);
     }
@@ -1998,7 +1998,7 @@ bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
     return mWifiConfig[0].canOpenStaWhenAirplane;
 }
 
-int WifiSettings::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
+int WifiSettings::SetWifiFlagOnAirplaneMode(bool ifOpen, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].openWifiWhenAirplane = ifOpen;
@@ -2006,7 +2006,7 @@ int WifiSettings::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
     return 0;
 }
 
-bool WifiSettings::GetOpenWifiWhenAirplaneMode(int instId)
+bool WifiSettings::GetWifiFlagOnAirplaneMode(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);
@@ -2072,11 +2072,11 @@ int WifiSettings::GetScreenState() const
     return mScreenState;
 }
 
-bool WifiSettings::SetAirplaneModeState(const int &state)
+bool WifiSettings::SetWifiStateOnAirplaneChanged(const int &state)
 {
     mAirplaneModeState = state;
     SetLastAirplaneMode(state);
-    if (GetOpenWifiWhenAirplaneMode()) {
+    if (GetWifiFlagOnAirplaneMode()) {
         if (state == MODE_STATE_OPEN && mPersistWifiState == WIFI_STATE_ENABLED) {
             PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
         } else if (state == MODE_STATE_CLOSE && mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {

@@ -31,7 +31,7 @@ HWTEST_F(WifiManagerServiceTest, StaOpenResTest, TestSize.Level1)
     sleep(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
     sleep(1);
-    WifiSettings::GetInstance().SetAirplaneModeState(1);
+    WifiSettings::GetInstance().SetWifiStateOnAirplaneChanged(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
     sleep(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED);
@@ -47,7 +47,7 @@ HWTEST_F(WifiManagerServiceTest, StaCloseResTest, TestSize.Level1)
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
-    WifiSettings::GetInstance().SetAirplaneModeState(1);
+    WifiSettings::GetInstance().SetWifiStateOnAirplaneChanged(1);
     WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::RUNNING);
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
     sleep(2);

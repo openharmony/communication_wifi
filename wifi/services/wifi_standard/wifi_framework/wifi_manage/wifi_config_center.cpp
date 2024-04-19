@@ -350,14 +350,14 @@ bool WifiConfigCenter::GetCanOpenStaWhenAirplaneMode(int instId)
     return WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(instId);
 }
 
-int WifiConfigCenter::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
+int WifiConfigCenter::SetWifiFlagOnAirplaneMode(bool ifOpen, int instId)
 {
-    return WifiSettings::GetInstance().SetOpenWifiWhenAirplaneMode(ifOpen, instId);
+    return WifiSettings::GetInstance().SetWifiFlagOnAirplaneMode(ifOpen, instId);
 }
 
-bool WifiConfigCenter::GetOpenWifiWhenAirplaneMode(int instId)
+bool WifiConfigCenter::GetWifiFlagOnAirplaneMode(int instId)
 {
-    return WifiSettings::GetInstance().GetOpenWifiWhenAirplaneMode(instId);
+    return WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode(instId);
 }
 
 bool WifiConfigCenter::GetWifiStateWhenAirplaneMode()
@@ -402,9 +402,9 @@ int WifiConfigCenter::GetScreenState() const
     return WifiSettings::GetInstance().GetScreenState();
 }
 
-bool WifiConfigCenter::SetAirplaneModeState(const int &state)
+bool WifiConfigCenter::SetWifiStateOnAirplaneChanged(const int &state)
 {
-    return WifiSettings::GetInstance().SetAirplaneModeState(state);
+    return WifiSettings::GetInstance().SetWifiStateOnAirplaneChanged(state);
 }
 
 int WifiConfigCenter::GetAirplaneModeState() const

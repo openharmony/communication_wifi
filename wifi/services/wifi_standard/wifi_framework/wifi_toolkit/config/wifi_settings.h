@@ -962,7 +962,7 @@ public:
      * @return true - open
      * @return false - can't open
      */
-    bool GetOpenWifiWhenAirplaneMode(int instId = 0);
+    bool GetWifiFlagOnAirplaneMode(int instId = 0);
 
     /**
      * @Description Set the config whether open wifi when airplane mode opened
@@ -970,7 +970,7 @@ public:
      * @param ifOpen - user want to open wifi
      * @return int - 0 success
      */
-    int SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId = 0);
+    int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0);
 
     /**
      * @Description Get the STA service last running state
@@ -1094,7 +1094,7 @@ public:
      * @param state - 1 open; 2 close
      * @return bool - true airplane mode toggled, false airplane mode not toggled
      */
-    bool SetAirplaneModeState(const int &state);
+    bool SetWifiStateOnAirplaneChanged(const int &state);
 
     /**
      * @Description Get the Airplane Mode State

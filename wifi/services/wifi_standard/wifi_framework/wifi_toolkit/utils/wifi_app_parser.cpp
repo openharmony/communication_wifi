@@ -104,7 +104,7 @@ bool AppParser::IsHighTempLimitSpeedApp(const std::string &bundleName) const
         [bundleName](const HighTempLimitSpeedAppInfo &app) { return app.packageName == bundleName; });
     } else {
         return std::any_of(m_highTempLimitSpeedAppVec.begin(), m_highTempLimitSpeedAppVec.end(),
-        [bundleName](const HighTempLimitSpeedAppInfo &app) { return app.packageName == bundleName; });
+            [bundleName](const HighTempLimitSpeedAppInfo &app) { return app.packageName == bundleName; });
     }
     return false;
 }
@@ -176,7 +176,8 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
                 break;
         }
     }
-    WIFI_LOGI("%{public}s out,m_highTempLimitSpeedAppVec count:%{public}lu!", __FUNCTION__, m_highTempLimitSpeedAppVec.size());
+    WIFI_LOGI("%{public}s out,m_highTempLimitSpeedAppVec count:%{public}lu!",
+        __FUNCTION__, m_highTempLimitSpeedAppVec.size());
 }
 
 LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
@@ -279,9 +280,9 @@ bool AppParser::IsReadCloudConfig()
     std::string strCloud = GetCloudPushFileVersion(GetCloudPushVersionFilePath().c_str());
     bool isReadCloudConfig = (strCloud > strLocal) || (strCloud.empty() && strLocal.empty());
     WIFI_LOGI("%{public}s out,IsReadCloudConfig:%{public}d,strLocal=%{public}s,strCloud =%{public}s !", __FUNCTION__,
-        isReadCloudConfig,strLocal.c_str() ,strCloud.c_str());
+        isReadCloudConfig,strLocal.c_str(), strCloud.c_str());
     mIshighTempLimitSpeedReadCloudPush = isReadCloudConfig;
-	return isReadCloudConfig;
+    return isReadCloudConfig;
 }
 
 std::string AppParser::GetCloudPushFileVersion(const char *appVersionFilePath)
@@ -306,11 +307,12 @@ std::string AppParser::GetCloudPushFileVersion(const char *appVersionFilePath)
         nLineCount++;
         int nPos = strTemp.find(VERSION_FILE_KEY_WORD);
         if (nPos != -1) {
-            strFileVersion = strTemp.substr(nPos + strlen(VERSION_FILE_KEY_WORD), strTemp.length() - nPos - strlen(VERSION_FILE_KEY_WORD));
+            strFileVersion = strTemp.substr(nPos + strlen(VERSION_FILE_KEY_WORD),
+                strTemp.length() - nPos - strlen(VERSION_FILE_KEY_WORD));
             break;
         }
     }
-   ifs.close();
+    ifs.close();
     return strFileVersion;
 }
 
@@ -326,7 +328,7 @@ std::string AppParser::GetLocalFileVersion(const char *appXmlVersionFilePath)
         WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlVersionFilePath);
         return strFileVersion;
     }
-    xmlDoc * xmlObj = xmlReadFile(appXmlVersionFilePath, nullptr, XML_PARSE_NOBLANKS);
+    xmlDoc *xmlObj = xmlReadFile(appXmlVersionFilePath, nullptr, XML_PARSE_NOBLANKS);
     if (xmlObj == nullptr) {
         WIFI_LOGE("%{public}s xmlReadFile failed", __FUNCTION__);
         return strFileVersion;
@@ -352,7 +354,7 @@ std::string AppParser::GetLocalFileVersion(const char *appXmlVersionFilePath)
             break;
         }
         strFileVersion = GetStringValue(pNode);
-    }while(0);
+    } while(0);
 
     if (xmlObj != nullptr) {
         xmlFreeDoc(xmlObj);

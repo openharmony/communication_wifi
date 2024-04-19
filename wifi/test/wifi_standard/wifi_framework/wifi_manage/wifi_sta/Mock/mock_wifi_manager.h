@@ -34,7 +34,7 @@ public:
 class WifiStaManager : public MockWifiManager {
 public:
     WifiStaManager();
-    ~WifiStaManager() = default;
+    ~WifiStaManager() override;
     StaServiceCallback GetStaCallback();
     MOCK_METHOD2(DealStaOpenRes, void(OperateResState state, int));
     MOCK_METHOD2(DealStaCloseRes, void(OperateResState state, int));

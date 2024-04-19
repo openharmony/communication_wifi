@@ -33,7 +33,7 @@ public:
 class WifiScanManager : public MockWifiManager {
 public:
     WifiScanManager();
-    ~WifiScanManager() = default;
+    ~WifiScanManager() override;
     IScanSerivceCallbacks GetScanCallback();
 
     MOCK_METHOD1(DealScanOpenRes, void(int));

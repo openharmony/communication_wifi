@@ -592,7 +592,6 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, instId);
         return WIFI_OPT_SUCCESS;
     }
-
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(ConcreteMangerMachine::IfaceDestoryCallback, std::placeholders::_1, std::placeholders::_2),
@@ -602,7 +601,6 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
     }
     WifiSettings::GetInstance().SetStaIfaceName(ifaceName);
 #endif
-
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, instId);
     WifiManager::GetInstance().AutoStartEnhanceService();
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(instId);
@@ -612,14 +610,16 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
     }
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
     ErrCode ret = pService->SetNetworkInterfaceUpDown(true);
     if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
         WIFI_LOGE("iface up failed.");
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
     }
-    ret = pService->StartWifiHdi();
-    if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
+#endif
+    ErrCode res = pService->StartWifiHdi();
+    if (res != static_cast<int>(WIFI_OPT_SUCCESS)) {
         WIFI_LOGE("Start WifiHdi failed.");
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;

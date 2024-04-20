@@ -540,7 +540,12 @@ void StaStateMachine::StartWifiProcess()
         if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false) != WIFI_IDL_OPT_OK) {
             WIFI_LOGI("The automatic Wpa connection is disabled failed.");
         }
-
+        int screenState = WifiSettings::GetInstance().GetScreenState();
+        WIFI_LOGI("set suspend mode to chip when wifi started, screenState: %{public}d", screenState);
+        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
+            != WIFI_IDL_OPT_OK) {
+            WIFI_LOGE("%{public}s WpaSetSuspendMode failed!", __FUNCTION__);
+        }
         /* callback the InterfaceService that wifi is enabled successfully. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), m_instId);
         InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);

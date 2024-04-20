@@ -175,8 +175,8 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
                 break;
         }
     }
-    WIFI_LOGI("%{public}s out,m_highTempLimitSpeedAppVec count:%{public}lu!",
-        __FUNCTION__, m_highTempLimitSpeedAppVec.size());
+    WIFI_LOGI("%{public}s out,m_highTempLimitSpeedAppVec count:%{public}d!",
+        __FUNCTION__, (int)m_highTempLimitSpeedAppVec.size());
 }
 
 LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)

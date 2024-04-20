@@ -114,7 +114,7 @@ constexpr int EAP_SIM_NUM = 0X02;
 
 void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
 {
-    WIFI_LOGI("OnWpaStaNotifyCallBack() notifyParam=%{public}s", notifyParam.c_str());
+    WIFI_LOGI("OnWpaStaNotifyCallBack() enter, notifyParam=%{private}s", notifyParam.c_str());
     if (notifyParam.empty()) {
         WIFI_LOGI("OnWpaStaNotifyCallBack() notifyParam is empty");
         return;

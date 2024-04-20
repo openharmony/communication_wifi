@@ -20,6 +20,7 @@
 #include "wifi_hdi_util.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_p2p_hal_interface.h"
+#include "wifi_hdi_common.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
@@ -53,9 +54,6 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     const struct HdiWpaConnectParam *connectParam, const char* ifName)
 {
     LOGI("OnEventConnected: callback enter!");
-    if (strcmp(ifName, "wlan0") != 0) {
-        return 1;
-    }
     if (connectParam == NULL) {
         LOGE("OnEventConnected: invalid parameter!");
         return 1;
@@ -94,9 +92,6 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
     const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
 {
     LOGI("OnEventStateChanged: callback enter!");
-    if (strcmp(ifName, "wlan0") != 0) {
-        return 1;
-    }
     if (statechangedParam == NULL) {
         LOGE("OnEventStateChanged: invalid parameter!");
         return 1;
@@ -133,6 +128,38 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onWpaConnectionReject) {
         cbk.onWpaConnectionReject(associateRejectParam->statusCode);
+    }
+    return 0;
+}
+
+int32_t OnEventStaNotify(struct IWpaCallback *self, const char* notifyParam, const char *ifName)
+{
+    LOGI("OnEventStaNotify: callback enter!");
+ 
+    if (strcmp(ifName, "wlan0") != 0) {
+        return 1;
+    }
+    if (notifyParam == NULL) {
+        LOGE("OnEventStaNotify: invalid parameter!");
+        return 1;
+    }
+    constexpr int HILINK_NUM = 0X01;
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    int num = std::stoi(notifyParam);
+    switch (num) {
+        case HILINK_NUM: {
+            char *bssid = strchr((char *)notifyParam, ':');
+            if (bssid != NULL) {
+                return 1;
+            }
+            bssid++;
+            if (cbk.OnEventStaNotify) {
+                cbk.OnEventStaNotify(bssid);
+            }
+            break;
+        }
+        default:
+            break;
     }
     return 0;
 }
@@ -247,9 +274,6 @@ int32_t OnEventP2pStateChanged(struct IWpaCallback *self,
     const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
 {
     LOGI("OnEventP2pStateChanged ifName=%{public}s", ifName);
-    if (strcmp(ifName, "p2p0") != 0) {
-        return 1;
-    }
     if (statechangedParam == NULL) {
         LOGE("OnEventStateChanged: invalid parameter!");
         return 1;
@@ -429,17 +453,20 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         return 1;
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    char tempSsid[WIFI_SSID_LENGTH] = {0};
     if (cbk.onGroupStarted) {
         OHOS::Wifi::IdlP2pGroupInfo cbInfo;
         cbInfo.isGo = groupStartedParam->isGo;
         cbInfo.isPersistent = groupStartedParam->isPersistent;
         cbInfo.frequency = groupStartedParam->frequency;
         cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
-        cbInfo.ssid = (char *)(groupStartedParam->ssid);
+        StrSafeCopy(tempSsid, sizeof(tempSsid), (char *)groupStartedParam->ssid);
+        printf_decode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
+        cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
-        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{public}s",
-            cbInfo.groupName.c_str(), groupStartedParam->ssid);
+        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s",
+            cbInfo.groupName.c_str(), cbInfo.ssid.c_str());
 
         char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
         ConvertMacArr2String(groupStartedParam->goDeviceAddress,
@@ -598,4 +625,5 @@ int32_t OnEventIfaceCreated(struct IWpaCallback *self,
     }
     return 0;
 }
+
 #endif

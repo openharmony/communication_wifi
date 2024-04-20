@@ -30,6 +30,8 @@
 
 namespace OHOS {
 namespace Wifi {
+#define MAX_IFACENAME_LEN 6
+#define MAX_CMD_BUFFER_SIZE 1024
 constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
 const int BUFFER_SIZE = 4096;
@@ -39,9 +41,12 @@ constexpr int WIFI_MAX_SCAN_COUNT = 256;
 constexpr int P2P_SUPPLICANT_DISCONNECTED = 0;
 constexpr int P2P_SUPPLICANT_CONNECTED = 1;
 
-WifiErrorNo WifiHdiWpaClient::StartWifi(void)
+WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName)
 {
-    return HdiWpaStaStart();
+    WifiEventCallback callback;
+    callback.onConnectChanged = [](int param1, int param2, const std::string &param3) {};
+    ReqRegisterStaEventCallback(callback);
+    return HdiWpaStaStart(ifaceName.c_str());
 }
 
 WifiErrorNo WifiHdiWpaClient::StopWifi(void)
@@ -78,7 +83,7 @@ WifiErrorNo WifiHdiWpaClient::GetStaCapabilities(unsigned int &capabilities)
 WifiErrorNo WifiHdiWpaClient::GetStaDeviceMacAddress(std::string &mac)
 {
     char macAddr[WIFI_IDL_BSSID_LENGTH + 1] = {0};
-    int macAddrLen = WIFI_IDL_BSSID_LENGTH;
+    int macAddrLen = WIFI_IDL_BSSID_LENGTH + 1;
     WifiErrorNo err = HdiWpaStaGetDeviceMacAddress(macAddr, macAddrLen);
     if (err == WIFI_IDL_OPT_OK) {
         mac = std::string(macAddr);
@@ -333,6 +338,7 @@ WifiErrorNo WifiHdiWpaClient::ReqRegisterStaEventCallback(const WifiEventCallbac
         cWifiHdiWpaCallback.OnEventWpsOverlap = OnEventWpsOverlap;
         cWifiHdiWpaCallback.OnEventWpsTimeout = OnEventWpsTimeout;
         cWifiHdiWpaCallback.OnEventScanResult = OnEventScanResult;
+        cWifiHdiWpaCallback.OnEventStaNotify = OnEventStaNotify;
     }
 
     return RegisterHdiWpaStaEventCallback(&cWifiHdiWpaCallback);
@@ -424,6 +430,22 @@ static WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCo
 WifiErrorNo WifiHdiWpaClient::ReqWpaSetSuspendMode(bool mode) const
 {
     return HdiWpaStaSetSuspendMode(mode);
+}
+
+WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const std::string &cmd)
+{
+    char ifNameBuf[MAX_IFACENAME_LEN];
+    if (strncpy_s(ifNameBuf, sizeof(ifNameBuf), ifName.c_str(), ifName.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+ 
+    char cmdBuf[MAX_CMD_BUFFER_SIZE];
+    if (strncpy_s(cmdBuf, sizeof(cmdBuf), cmd.c_str(), cmd.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return HdiWpaStaSetShellCmd(ifNameBuf, cmdBuf);
 }
 
 int WifiHdiWpaClient::PushDeviceConfigString(
@@ -556,12 +578,9 @@ static WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &con
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo WifiHdiWpaClient::StartAp(int id, std::string ifaceName)
+WifiErrorNo WifiHdiWpaClient::StartAp(int id, const std::string &ifaceName)
 {
-    char ifName[ifaceName.size() + 1];
-    ifaceName.copy(ifName, ifaceName.size() + 1);
-    ifName[ifaceName.size()] = '\0';
-    return HdiStartAp(ifName, id);
+    return HdiStartAp(ifaceName.c_str(), id);
 }
 
 WifiErrorNo WifiHdiWpaClient::StopAp(int id)
@@ -669,9 +688,9 @@ WifiErrorNo WifiHdiWpaClient::ReqDisconnectStaByMac(const std::string &mac, int 
     return HdiDisassociateSta(mac.c_str(), id);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqP2pStart()
+WifiErrorNo WifiHdiWpaClient::ReqP2pStart(const std::string &ifaceName)
 {
-    WifiErrorNo ret = HdiWpaP2pStart();
+    WifiErrorNo ret = HdiWpaP2pStart(ifaceName.c_str());
     if (ret == WIFI_IDL_OPT_OK) {
         OnEventP2pStateChanged(P2P_SUPPLICANT_CONNECTED);
     }
@@ -1233,6 +1252,12 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &confi
         return WIFI_IDL_OPT_FAILED;
     }
     info.frequency = config.GetFrequency();
+    if (config.GetDhcoMode() == DhcoMode::CONNECT_AP_DHCP ||
+        config.GetDhcoMode() == DhcoMode::CONNECT_AP_NODHCP) {
+        info.isLegacyGo = 1;
+    } else {
+        info.isLegacyGo = 0;
+    }
     WifiErrorNo ret = HdiP2pHid2dConnect(&info);
     return ret;
 }

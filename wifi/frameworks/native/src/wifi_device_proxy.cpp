@@ -1062,6 +1062,8 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
     info.isAncoConnected = reply.ReadBool();
+    info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
+    info.isHiLinkNetwork = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
@@ -1554,6 +1556,7 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
+    constexpr int MAX_CHANNEL_SIZE = 36;
     MessageOption option;
     MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -1578,6 +1581,10 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
         return ErrCode(ret);
     }
     int retSize = reply.ReadInt32();
+    if (retSize > MAX_CHANNEL_SIZE) {
+        WIFI_LOGE("Get5GHzChannelList fail, size error: %{public}d", retSize);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < retSize; ++i) {
         result.emplace_back(reply.ReadInt32());
     }
@@ -1861,6 +1868,46 @@ ErrCode WifiDeviceProxy::LimitSpeed(const int controlId, const int limitMode)
     int ret = reply.ReadInt32();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("LimitSpeed Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`, remote service is died.", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageParcel data, reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error, func:%{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    data.WriteInt32(0);
+    data.WriteBool(uiFlag);
+    data.WriteString(bssid);
+    WriteDeviceConfig(deviceConfig, data);
+ 
+    //Wirte device config
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("EnableHiLinkHandshake(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), error);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Reply Read failed, ret:%{public}d", ret);
         return ErrCode(ret);
     }
     return WIFI_OPT_SUCCESS;

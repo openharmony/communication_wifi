@@ -24,6 +24,9 @@
 #include "wifi_common_util.h"
 #include "app_network_speed_limit_service.h"
 #endif
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+#include "hal_device_manage.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -31,6 +34,7 @@ DEFINE_WIFILOG_LABEL("ConcreteMangerMachine");
 int ConcreteMangerMachine::mTargetRole{static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW)};
 using TimeOutCallback = std::function<void()>;
 int ConcreteMangerMachine::mid{0};
+std::string ConcreteMangerMachine::ifaceName{""};
 
 ConcreteMangerMachine::ConcreteMangerMachine()
     : StateMachine("ConcreteMangerMachine"), pDefaultState(nullptr), pIdleState(nullptr), pConnectState(nullptr),
@@ -48,6 +52,13 @@ ConcreteMangerMachine::~ConcreteMangerMachine()
     ParsePointer(pMixState);
     WIFI_LOGE("set wifi stoping state is false");
     WifiSettings::GetInstance().SetWifiStopState(false);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!ifaceName.empty()) {
+        DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
+        ifaceName.clear();
+        WifiSettings::GetInstance().SetStaIfaceName("");
+    }
+#endif
 }
 
 /* --------------------------Initialization functions--------------------------*/
@@ -205,6 +216,12 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *m
 {
     mTargetRole = msg->GetParam1();
     mid = msg->GetParam2();
+    ErrCode res = AutoStartScanOnly(mid);
+    if (res != WIFI_OPT_SUCCESS) {
+        WifiSettings::GetInstance().SetWifiStopState(true);
+        pConcreteMangerMachine->mcb.onStartFailure(mid);
+        return;
+    }
     if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX) ||
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
         ErrCode ret = AutoStartStaService(mid);
@@ -215,12 +232,6 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *m
         }
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
-        ErrCode ret = AutoStartScanOnly(mid);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WifiSettings::GetInstance().SetWifiStopState(true);
-            pConcreteMangerMachine->mcb.onStartFailure(mid);
-            return;
-        }
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
     } else {
         WIFI_LOGE("idlestate start role is error");
@@ -268,12 +279,7 @@ bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessage *msg)
 
 void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
 {
-    ErrCode ret = AutoStartScanOnly(mid);
-    if (ret != WIFI_OPT_SUCCESS) {
-        pConcreteMangerMachine->mcb.onStartFailure(mid);
-        return;
-    }
-    ret = AutoStopStaService(mid);
+    ErrCode ret = AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
     }
@@ -282,11 +288,6 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
 
 void ConcreteMangerMachine::ConnectState::SwitchMixInConnectState()
 {
-    ErrCode ret = AutoStartScanOnly(mid);
-    if (ret != WIFI_OPT_SUCCESS) {
-        pConcreteMangerMachine->mcb.onStartFailure(mid);
-        return;
-    }
     pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pMixState);
 }
 
@@ -335,10 +336,6 @@ void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
     if (ret != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
-    }
-    ret = AutoStopScanOnly(mid);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
     }
     pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
@@ -394,10 +391,6 @@ bool ConcreteMangerMachine::MixState::ExecuteStateMsg(InternalMessage *msg)
 
 void ConcreteMangerMachine::MixState::SwitchConnectInMixState()
 {
-    ErrCode ret = AutoStopScanOnly(mid);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("stop scanonly failed ret = %{public}d", ret);
-    }
     pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
@@ -460,6 +453,16 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
     if (staState == WifiOprMidState::RUNNING) {
         return WIFI_OPT_SUCCESS;
     }
+
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+        std::bind(ConcreteMangerMachine::IfaceDestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        ifaceName)) {
+        WIFI_LOGE("AutoStartStaService, create iface failed!");
+        return WIFI_OPT_FAILED;
+    }
+    WifiSettings::GetInstance().SetStaIfaceName(ifaceName);
+#endif
 
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING, instId)) {
         WIFI_LOGE("AutoStartStaService, set wifi mid state opening failed!");
@@ -589,8 +592,17 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, instId);
         return WIFI_OPT_SUCCESS;
     }
-
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+        std::bind(ConcreteMangerMachine::IfaceDestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        ifaceName)) {
+        WIFI_LOGE("AutoStartScanOnly, create iface failed!");
+        return WIFI_OPT_FAILED;
+    }
+    WifiSettings::GetInstance().SetStaIfaceName(ifaceName);
+#endif
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, instId);
+    WifiManager::GetInstance().AutoStartEnhanceService();
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(instId);
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
     if (pService == nullptr) {
@@ -598,9 +610,17 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
     }
-    ErrCode ret = pService->StartWpa();
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
+    ErrCode ret = pService->SetNetworkInterfaceUpDown(true);
     if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
-        WIFI_LOGE("Start Wpa failed.");
+        WIFI_LOGE("iface up failed.");
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
+        return WIFI_OPT_FAILED;
+    }
+#endif
+    ErrCode res = pService->StartWifiHdi();
+    if (res != static_cast<int>(WIFI_OPT_SUCCESS)) {
+        WIFI_LOGE("Start WifiHdi failed.");
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
     }
@@ -632,9 +652,9 @@ ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId)
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
     }
-    ErrCode ret = pService->CloseWpa();
+    ErrCode ret = pService->CloseWifiHdi();
     if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
-        WIFI_LOGE("Stop Wpa failed!");
+        WIFI_LOGE("Stop WifiHdi failed!");
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
         return WIFI_OPT_FAILED;
     }
@@ -651,8 +671,13 @@ void ConcreteMangerMachine::HandleStaStop()
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
         }
-        mcb.onStopped(mid);
-        return;
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(mid);
+        if (pService == nullptr) {
+            WIFI_LOGE("HandleStaStop stop wlan failed scan service is null");
+            return ReportClose();
+        }
+        pService->SetNetworkInterfaceUpDown(false);
+        return ReportClose();
     }
     if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX)) {
         ErrCode ret = AutoStartStaService(mid);
@@ -661,14 +686,14 @@ void ConcreteMangerMachine::HandleStaStop()
             return;
         }
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
-        ErrCode ret = AutoStartScanOnly(mid);
-        if (ret != WIFI_OPT_SUCCESS) {
-            mcb.onStartFailure(mid);
-            return;
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(mid);
+        if (pService == nullptr) {
+            WIFI_LOGE("HandleStaStop scan service is null");
+            return ReportClose();
         }
+        pService->SetNetworkInterfaceUpDown(true);
         SwitchState(pScanonlyState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
-        AutoStopScanOnly(mid);
         ErrCode ret = AutoStartStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             mcb.onStartFailure(mid);
@@ -681,9 +706,21 @@ void ConcreteMangerMachine::HandleStaStop()
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
         }
-        mcb.onStopped(mid);
-        return;
+        return ReportClose();
     }
+}
+
+void ConcreteMangerMachine::ReportClose()
+{
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!ifaceName.empty()) {
+        mcb.onStopped(mid);
+    } else {
+        mcb.onRemoved(mid);
+    }
+#else
+    mcb.onStopped(mid);
+#endif
 }
 
 void ConcreteMangerMachine::HandleStaStart()
@@ -691,10 +728,6 @@ void ConcreteMangerMachine::HandleStaStart()
     ErrCode ret;
 
     if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX)) {
-        ret = AutoStartScanOnly(mid);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Start sta failed ret = %{public}d", ret);
-        }
         SwitchState(pMixState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
         ret = AutoStopStaService(mid);
@@ -702,10 +735,6 @@ void ConcreteMangerMachine::HandleStaStart()
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
         }
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
-        ret = AutoStopScanOnly(mid);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
-        }
         SwitchState(pConnectState);
     } else {
         WIFI_LOGE("Now targetrole is unknow.");
@@ -744,6 +773,20 @@ void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessage *msg)
         auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
         ins->HandleStaClose(mid);
     }
+}
+
+void ConcreteMangerMachine::IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType)
+{
+    WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
+        destoryIfaceName.c_str(), createIfaceType);
+    if (destoryIfaceName == ifaceName) {
+        ifaceName.clear();
+        WifiSettings::GetInstance().SetStaIfaceName("");
+    }
+
+    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    ins->SendMessage(CMD_STA_REMOVED, createIfaceType, mid);
+    return;
 }
 
 } // namespace Wifi

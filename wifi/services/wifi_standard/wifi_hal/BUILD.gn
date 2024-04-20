@@ -95,7 +95,12 @@ if (defined(ohos_lite)) {
 } else {
   ohos_executable("wifi_hal_service") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     install_enable = true
     sources = local_base_sources
 
@@ -144,7 +149,12 @@ if (defined(ohos_lite)) {
 
   ohos_executable("wifi_hal_service_updater") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true
+      boundary_sanitize = true
+      cfi_cross_dso = true
+      debug = false
+    }
     install_enable = true
     sources = local_base_sources
 

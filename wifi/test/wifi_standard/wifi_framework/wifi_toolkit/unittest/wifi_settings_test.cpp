@@ -40,7 +40,6 @@ constexpr int SCORE = 0;
 constexpr int STATE = 0;
 constexpr int UID = 0;
 constexpr int ZERO = 0;
-constexpr int WIFI_OPT_SUCCESS = 0;
 constexpr int WIFI_OPT_RETURN = -1;
 constexpr int MIN_RSSI_2DOT_4GHZ = -80;
 constexpr int MIN_RSSI_5GZ = -77;
@@ -594,7 +593,10 @@ HWTEST_F(WifiSettingsTest, MergeWifiCloneConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("MergeWifiCloneConfigTest enter");
     std::string cloneConfig = "wifitest";
-    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneConfig);
+    auto mergeCalback = [ = ]() -> void {
+        WIFI_LOGI("MergeWifiCloneConfigTest callback");
+    };
+    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneConfig, mergeCalback);
 }
 
 HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)
@@ -763,5 +765,36 @@ HWTEST_F(WifiSettingsTest, RemoveWifiP2pSupplicantGroupInfoTets, TestSize.Level1
 {
     WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();
 }
+
+HWTEST_F(WifiSettingsTest, EncryptionWifiDeviceConfigOnBootTest, TestSize.Level1)
+{
+    WIFI_LOGI("EncryptionWifiDeviceConfigOnBootTest enter");
+    WifiSettings::GetInstance().EncryptionWifiDeviceConfigOnBoot();
+}
+
+HWTEST_F(WifiSettingsTest, EncryptionDeviceConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("EncryptionDeviceConfigTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().EncryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, DecryptionDeviceConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("DecryptionDeviceConfigTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().DecryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, IsWifiDeviceConfigDecipheredTest, TestSize.Level1)
+{
+    WIFI_LOGI("IsWifiDeviceConfigDecipheredTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config);
+}
+
 }  // namespace Wifi
 }  // namespace OHO

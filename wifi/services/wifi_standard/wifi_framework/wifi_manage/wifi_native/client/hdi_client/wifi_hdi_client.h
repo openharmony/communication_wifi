@@ -42,7 +42,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWifi();
+    WifiErrorNo StartWifi(const std::string &ifaceName);
 
     /**
      * @Description Turn off WiFi.
@@ -186,6 +186,13 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo SetConnectMacAddr(const std::string &mac, const int portType);
+
+    /**
+     * @Description Req updown network interface.
+     *
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqUpDownNetworkInterface(const std::string &ifaceName, bool upDown);
 private:
     char **ConVectorToCArrayString(const std::vector<std::string> &vec) const;
     WifiErrorNo ConvertPnoScanParam(const WifiPnoScanParam &param, PnoScanSettings *pSettings) const;

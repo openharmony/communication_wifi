@@ -110,7 +110,7 @@ ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
 
 ErrCode StaInterface::ReConnect()
 {
-    LOGD("Enter StaInterface::ReConnect.\n");
+    LOGD("Enter StaInterface::ReConnect.");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->ReConnect() != WIFI_OPT_SUCCESS) {
@@ -415,6 +415,25 @@ ErrCode StaInterface::HandleForegroundAppChangedAction(const std::string &bundle
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::EnableHiLinkHandshake(const std::string &bssid)
+{
+    WIFI_LOGI("Enter StaInterface::EnableHiLinkHandshake");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->EnableHiLinkHandshake(bssid);
+ 
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
+{
+    WIFI_LOGI("Enter StaInterface::DeliverStaIfaceData");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->DeliverStaIfaceData(currentMac);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

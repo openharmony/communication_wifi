@@ -44,7 +44,8 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
         std::bind(&StaMonitor::onWpaConnectionFullCallBack, this, _1),
-        std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1)
+        std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpaHilinkCallBack, this, _1)
     };
 
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
@@ -106,6 +107,13 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
         default:
             break;
     }
+}
+
+void StaMonitor::OnWpaHilinkCallBack(const std::string &bssid)
+{
+    WIFI_LOGI("OnWpaHilinkCallBack() enter");
+    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS, bssid);
+    return;
 }
 
 void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::string &bssid)

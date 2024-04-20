@@ -20,9 +20,6 @@
 #include "wifi_common_util.h"
 #include "wifi_auth_center.h"
 #include "wifi_permission_utils.h"
-#ifdef FEATURE_APP_FROZEN
-#include "suspend_manager_client.h"
-#endif
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 #include "wifi_p2p_msg.h"
 #include "wifi_common_msg.h"
@@ -953,10 +950,10 @@ void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, const 
         }
     }
     if (!WifiCommonEventHelper::PublishConnStateChangedEvent(state, eventData)) {
-        WIFI_LOGE("failed to publish connection state changed event!");
+        WIFI_LOGE("failed to publish connection state changed event,%{public}s!", eventData.c_str());
         return;
     }
-    WIFI_LOGD("publish connection state changed event.");
+    WIFI_LOGI("publish connection state changed event,%{public}s.", eventData.c_str());
 }
 
 void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state)

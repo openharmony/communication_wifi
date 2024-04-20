@@ -208,6 +208,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.callProcessName = value;
     } else if (key == "ancoCallProcessName") {
         item.ancoCallProcessName = value;
+    } else if (key == "version") {
+        item.version = std::stoi(value);
     } else {
         return SetWifiDeviceConfigExternal(item, key, value);
     }
@@ -218,38 +220,21 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
 static int SetWifiDeviceConfigEncrypt(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     if (key == "encryptedData") {
-        item.preSharedKey = value;
+        item.preSharedKey = "";
+        item.encryptedData = value;
     } else if (key == "IV") {
-        EncryptedData *encry = new EncryptedData(item.preSharedKey, value);
-        std::string decry = "";
-        if (WifiDecryption(mWifiEncryptionInfo, *encry, decry) == HKS_SUCCESS) {
-            item.preSharedKey = decry;
-        } else {
-            item.preSharedKey = "";
-            errorKeyValue++;
-        }
-        delete encry;
+        item.IV = value;
     } else if (key.compare(0, strlen("encryWepKeys"), "encryWepKeys") == 0) {
         int pos = std::stoi(key.substr(strlen("encryWepKeys") + 1));
         if (pos >= 0 && pos < WEPKEYS_SIZE) {
-            item.wepKeys[pos] = value;
+            item.encryWepKeys[pos] = value;
         }
     } else if (key == "IVWep") {
         if (item.wepTxKeyIndex < 0 || item.wepTxKeyIndex >= WEPKEYS_SIZE) {
             item.wepTxKeyIndex = 0;
         }
-        EncryptedData *encryWep = new EncryptedData(item.wepKeys[item.wepTxKeyIndex], value);
-        std::string decryWep = "";
-        if (WifiDecryption(mWifiEncryptionInfo, *encryWep, decryWep) == HKS_SUCCESS) {
-            item.wepKeys[item.wepTxKeyIndex] = decryWep;
-        } else {
-            item.wepKeys[item.wepTxKeyIndex] = "";
-            errorKeyValue++;
-        }
-        delete encryWep;
+        item.IVWep = value;
     } else {
         return -1;
     }
@@ -334,20 +319,10 @@ static int SetWifiDeviceConfigIp(WifiDeviceConfig &item, const std::string &key,
 static int SetWifiDeviceConfigEncryptEap(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     if (key == "wifiEapConfig.encryptedData") {
-        item.wifiEapConfig.password = value;
+        item.wifiEapConfig.encryptedData = value;
     } else if (key == "wifiEapConfig.IV") {
-        EncryptedData *encry = new EncryptedData(item.wifiEapConfig.password, value);
-        std::string decry = "";
-        if (WifiDecryption(mWifiEncryptionInfo, *encry, decry) == HKS_SUCCESS) {
-            item.wifiEapConfig.password = decry;
-        } else {
-            item.wifiEapConfig.password = "";
-            errorKeyValue ++;
-        }
-        delete encry;
+        item.wifiEapConfig.IV = value;
     } else {
         return -1;
     }
@@ -445,27 +420,17 @@ std::string GetTClassName<WifiDeviceConfig>()
 static std::string OutPutEncryptionDeviceConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
-    WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
-    EncryptedData encry;
-    if (WifiEncryption(mWifiEncryptionInfo, item.preSharedKey, encry) == HKS_SUCCESS) {
-        ss << "    " <<"encryptedData=" << encry.encryptedPassword << std::endl;
-        ss << "    " <<"IV=" << encry.IV << std::endl;
+    if (item.version == 1) {
+        ss << "    " << "encryptedData=" << item.encryptedData << std::endl;
+        ss << "    " << "IV=" << item.IV << std::endl;
+        ss << "    " << "wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
+        for (int i = 0; i < WEPKEYS_SIZE; ++i) {
+            ss << "    " << "encryWepKeys_" << i << "=" << item.encryWepKeys[i] << std::endl;
+        }
+        ss << "    " << "IVWep=" << item.IVWep << std::endl;
     } else {
         ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
-    }
-    ss << "    " <<"wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
-    if (item.wepTxKeyIndex < 0 || item.wepTxKeyIndex >= WEPKEYS_SIZE) {
-        item.wepTxKeyIndex = 0;
-    }
-    EncryptedData encryWep;
-    if (WifiEncryption(mWifiEncryptionInfo, item.wepKeys[item.wepTxKeyIndex], encryWep) == HKS_SUCCESS) {
-        item.wepKeys[item.wepTxKeyIndex] = encryWep.encryptedPassword;
-        for (int i = 0; i < WEPKEYS_SIZE; ++i) {
-            ss << "    " <<"encryWepKeys_" << i << "=" << item.wepKeys[i] << std::endl;
-        }
-        ss << "    " <<"IVWep=" << encryWep.IV << std::endl;
-    } else {
+        ss << "    " <<"wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
         for (int i = 0; i < WEPKEYS_SIZE; ++i) {
             ss << "    " <<"wepKeys_" << i << "=" << item.wepKeys[i] << std::endl;
         }
@@ -478,6 +443,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfig>" << std::endl;
+    ss << "    " <<"version=" << item.version << std::endl;
     ss << "    " <<"instanceId=" << item.instanceId << std::endl;
     ss << "    " <<"uid=" << item.uid << std::endl;
     ss << "    " <<"status=" << item.status << std::endl;
@@ -565,12 +531,13 @@ static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item)
     ss << "    " <<"wifiEapConfig.eap=" << item.wifiEapConfig.eap << std::endl;
     ss << "    " <<"wifiEapConfig.identity=" << item.wifiEapConfig.identity << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    WifiEncryptionInfo mWifiEncryptionInfo;
-    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
-    EncryptedData encry;
-    if (WifiEncryption(mWifiEncryptionInfo, item.wifiEapConfig.password, encry) == HKS_SUCCESS) {
-        ss << "    " <<"wifiEapConfig.encryptedData=" << encry.encryptedPassword << std::endl;
-        ss << "    " <<"wifiEapConfig.IV=" << encry.IV << std::endl;
+    if (item.version == 1) {
+        if (!item.wifiEapConfig.encryptedData.empty() && !item.wifiEapConfig.IV.empty()) {
+            ss << "    " <<"wifiEapConfig.encryptedData=" << item.wifiEapConfig.encryptedData << std::endl;
+            ss << "    " <<"wifiEapConfig.IV=" << item.wifiEapConfig.IV << std::endl;
+        } else {
+            ss << "    " <<"wifiEapConfig.password=" << item.wifiEapConfig.password << std::endl;
+        }
     } else {
         ss << "    " <<"wifiEapConfig.password=" << item.wifiEapConfig.password << std::endl;
     }
@@ -648,6 +615,8 @@ static int SetWifiHotspotConfigEncrypt(HotspotConfig &item, const std::string &k
         if (WifiDecryption(mWifiEncryptionInfo, *encry, decry) == HKS_SUCCESS) {
             item.SetPreSharedKey(decry);
         } else {
+            WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
+                SsidAnonymize(item.GetSsid()), "WPA2_PSK", SOFTAP_MOUDLE_EVENT);
             item.SetPreSharedKey("");
             errorKeyValue++;
         }
@@ -724,6 +693,8 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
         ss << "    " <<"encryptedData=" << encry.encryptedPassword << std::endl;
         ss << "    " <<"IV=" << encry.IV << std::endl;
     } else {
+        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
+            SsidAnonymize(item.GetSsid()), "WPA2_PSK", SOFTAP_MOUDLE_EVENT);
         ss << "    " <<"preSharedKey=" << item.GetPreSharedKey() << std::endl;
     }
 #else
@@ -843,6 +814,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
     item.staLastState = false;
+    item.lastAirplaneMode = AIRPLANE_MODE_CLOSE;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
     item.scoretacticsScoreSlope = SCORE_SLOPE;
     item.scoretacticsInitScore = INIT_SCORE;
@@ -891,6 +863,8 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
         item.openWifiWhenAirplane = (std::stoi(value) != 0);
     } else if (key == "staLastState") {
         item.staLastState = (std::stoi(value) != 0);
+    } else if (key == "lastAirplaneMode") {
+        item.lastAirplaneMode = std::stoi(value);
     } else if (key == "savedDeviceAppraisalPriority") {
         item.savedDeviceAppraisalPriority = std::stoi(value);
     } else if (key == "scoretacticsScoreSlope") {
@@ -1004,6 +978,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"canOpenStaWhenAirplane=" << item.canOpenStaWhenAirplane << std::endl;
     ss << "    " <<"openWifiWhenAirplane=" << item.openWifiWhenAirplane << std::endl;
     ss << "    " <<"staLastState=" << item.staLastState << std::endl;
+    ss << "    " <<"lastAirplaneMode=" << item.lastAirplaneMode << std::endl;
     ss << "    " <<"savedDeviceAppraisalPriority=" << item.savedDeviceAppraisalPriority << std::endl;
     ss << "    " <<"scoretacticsScoreSlope=" << item.scoretacticsScoreSlope << std::endl;
     ss << "    " <<"scoretacticsInitScore=" << item.scoretacticsInitScore << std::endl;

@@ -78,6 +78,10 @@ WifiErrorNo GetWifiChipIds(uint8_t *ids, int32_t *size)
         LOGE("server GetWifiChipIds deal failed!");
     } else {
         ReadInt(context, size);
+        if (*size > WIFI_MAX_CHIP_IDS) {
+            LOGE("GetWifiChipIds fail, size error: %{public}d", *size);
+            return WIFI_IDL_OPT_FAILED;
+        }
         for (int i = 0; i < *size; ++i) {
             ReadInt(context, (int *)(ids + i));
         }
@@ -150,7 +154,7 @@ static void IdlCbkAddRemoveIface(Context *context, int event)
     }
     char *iface = NULL;
     int len = ReadStr(context, iface, 0);
-    if (len < 0) {
+    if (len < 0 || len > WIFI_INTERFACE_NAME_SIZE) {
         return;
     }
     iface = (char *)calloc(len + 1, sizeof(char));
@@ -187,7 +191,7 @@ static void IdlCbkStaJoinLeave(Context *context)
         return;
     }
     int len = ReadStr(context, reason, 0);
-    if (len < 0) {
+    if (len < 0 || len > WIFI_REASON_LENGTH) {
         return;
     }
     reason = (char *)calloc(len + 1, sizeof(char));
@@ -621,7 +625,7 @@ static void IdlCbP2pServDiscRespEvent(Context *context)
         return;
     }
     unsigned char *tlvs = NULL;
-    if (tlvsLength > 0) {
+    if (tlvsLength > 0 && tlvsLength < WIFI_MAX_TLVS_LENGTH) {
         tlvs = (unsigned char *)calloc(tlvsLength + 1, sizeof(unsigned char));
         if (tlvs == NULL) {
             return;
@@ -690,7 +694,7 @@ static void IdlCbP2pServDiscReqEvent(Context *context)
         ReadInt(context, &info.tlvsLength) < 0) {
         return;
     }
-    if (info.tlvsLength > 0) {
+    if (info.tlvsLength > 0 && info.tlvsLength < WIFI_MAX_TLVS_LENGTH) {
         info.tlvs = (unsigned char *)calloc(info.tlvsLength + 1, sizeof(unsigned char));
         if (info.tlvs == NULL) {
             return;

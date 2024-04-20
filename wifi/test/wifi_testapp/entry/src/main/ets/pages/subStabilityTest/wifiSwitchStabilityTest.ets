@@ -21,9 +21,21 @@ import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
-
+import fs from '@ohos.file.fs';
 interface myParams extends Object {
   testItem: TestData
+}
+
+/**
+ * Custom button style.
+ */
+@Extend(Button) function operateButtonStyle(color: Resource) {
+  .width($r('app.float.button_width'))
+  .height($r('app.float.button_height'))
+  .fontSize($r('app.float.font_16'))
+  .fontWeight(500)
+  .fontColor(color)
+  .backgroundColor($r('app.color.button_background'))
 }
 
 /**
@@ -54,6 +66,26 @@ struct WiFiSwitchStabilityTest {
   @State stateMessage: string = ""
   @State stateMessageLog: string = ""
   @State switchLoopState: Boolean = true
+  @State fileData: string = "";
+  @State filePath: string = ""
+  private file!: fs.File
+  @StorageLink("pathDir") pathDir: string = ""
+
+  async openLogFile() {
+    let time: number = new Date().getTime()
+    let currentTime: string = timestampToDate(time)
+    console.log(TAG , "当前时间: " + currentTime)
+    this.filePath = this.pathDir + ("/" + currentTime + ".txt");
+    console.log(TAG , "沙箱路径为: " + this.filePath)
+    this.file = fs.openSync(this.filePath , fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+    AppStorage.setOrCreate("fsFile" , this.file)
+    AppStorage.setOrCreate("openWifiNumber" , this.openWifiNumber)
+    console.log(TAG , "数据文件的沙箱路径为: " + this.filePath)
+    console.log(TAG , "file fd: " + this.file.fd);
+  }
+
+  aboutToAppear() {
+  }
 
   build() {
     Column() {
@@ -152,6 +184,7 @@ struct WiFiSwitchStabilityTest {
             .padding({ right : "10vp" })
             .onClick(async(event: ClickEvent) => {
               console.log(TAG , "start WiFiSwitch test-------------")
+              await this.openLogFile()
               await this.forLoop()
             })
 
@@ -165,6 +198,8 @@ struct WiFiSwitchStabilityTest {
               console.log(TAG , "准备测试停止 -------------")
               this.stateMessageLog = ""
               this.openWifiNumber = 0
+              AppStorage.setOrCreate("openWifiNumber" , this.openWifiNumber)
+              fs.closeSync(this.file);
             })
         }
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_25_100).backgroundColor($r("app.color.lead"))
@@ -241,7 +276,6 @@ struct WiFiSwitchStabilityTest {
           console.log(TAG , "wifi当前未使能，正常开始测试------")
         }
         await sleep(3)
-
         funcMessage = wifi.enableWifi()
         // 打时间戳
         this.open_StartTime = new Date().getTime()
@@ -296,16 +330,20 @@ struct WiFiSwitchStabilityTest {
   }
 }
 
-/**
- * Custom button style.
- */
-@Extend(Button) function operateButtonStyle(color: Resource) {
-  .width($r('app.float.button_width'))
-  .height($r('app.float.button_height'))
-  .fontSize($r('app.float.font_16'))
-  .fontWeight(500)
-  .fontColor(color)
-  .backgroundColor($r('app.color.button_background'))
+export function timestampToDate(timestamp: number): string {
+  const date = new Date(timestamp);
+  let year = date.getFullYear();
+  let month: string | number = date.getMonth() + 1;
+  month = month >= 10 ? month : ('0' + month);
+  let day: string | number = date.getDate();
+  day = day >= 10 ? day : ('0' + day);
+  let hours: string | number = date.getHours();
+  hours = hours >= 10 ? hours : ('0' + hours);
+  let minutes: string | number = date.getMinutes();
+  minutes = minutes >= 10 ? minutes : ('0' + minutes);
+  let seconds: string | number = date.getSeconds();
+  seconds = seconds >= 10 ? seconds : ('0' + seconds);
+  return `${ year }${ month }${ day }_${ hours }${ minutes }${ seconds }`;
 }
 
 async function sleep(time: number): Promise<void> {

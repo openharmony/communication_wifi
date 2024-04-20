@@ -44,7 +44,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWifi(void);
+    WifiErrorNo StartWifi(const std::string &ifaceName);
 
     /**
      * @Description Close Wifi.
@@ -309,13 +309,22 @@ public:
     WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
     static WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
 
+    /**
+     * @Description Send SIM/AKA/AKA' authentication to wpa
+     *
+     * @param ifName: Interface name
+     * @param cmd: Request message content
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqWpaShellCmd(const std::string &ifName, const std::string &cmd);
+
     /* ************************ softAp Interface ************************** */
     /**
      * @Description Start Ap.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartAp(int id, std::string ifaceName);
+    WifiErrorNo StartAp(int id, const std::string &ifaceName);
 
     /**
      * @Description Close Ap.
@@ -386,7 +395,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqP2pStart();
+    WifiErrorNo ReqP2pStart(const std::string &ifaceName);
 
     /**
      * @Description P2P stop

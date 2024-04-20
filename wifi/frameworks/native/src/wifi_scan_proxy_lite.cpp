@@ -41,7 +41,7 @@ static ErrCode ParseScanInfos(IpcIo *reply, std::vector<WifiScanInfo> &infos)
         return WIFI_OPT_FAILED;
     }
 
-    unsigned int readLen;
+    size_t readLen;
     for (int i = 0; i < tmpsize; ++i) {
         WifiScanInfo info;
         info.bssid = (char *)ReadString(reply, &readLen);

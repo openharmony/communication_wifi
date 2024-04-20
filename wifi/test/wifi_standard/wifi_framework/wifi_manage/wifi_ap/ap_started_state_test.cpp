@@ -191,7 +191,7 @@ HWTEST_F(ApStartedState_test, GoInState_SUCCESS,TestSize.Level1)
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(*pMockApNatManager, EnableInterfaceNat(Eq(true), StrEq(IN_INTERFACE), StrEq(OUT_INTERFACE)))
+    EXPECT_CALL(*pMockApNatManager, EnableInterfaceNat(Eq(true), StrEq("wlan0"), StrEq("wlan0")))
         .WillRepeatedly(Return(true));
     EXPECT_CALL(*pMockApMonitor, StartMonitor()).WillRepeatedly(Return());
     EXPECT_CALL(WifiSettings::GetInstance(), GetBlockList(Eq(results), 0))

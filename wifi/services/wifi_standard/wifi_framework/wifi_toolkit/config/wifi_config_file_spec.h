@@ -21,6 +21,8 @@
 #include <vector>
 #include "wifi_internal_msg.h"
 #include "wifi_p2p_msg.h"
+#include "wifi_hisysevent.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {

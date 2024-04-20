@@ -36,10 +36,6 @@ void HdiDeathCallbackCheck(HdiPortType portType, bool isRemoteDied)
         switch (portType) {
             case HDI_PORT_TYPE_STATION:
                 HdiReleaseLocalResources();
-                if (HdiStop() != WIFI_IDL_OPT_OK) {
-                    LOGE("failed to stop sta hdi");
-                    return;
-                }
                 if (StartHdiWifi() != WIFI_IDL_OPT_OK) {
                     LOGE("[STA] Start hdi failed!");
                     return;
@@ -734,6 +730,24 @@ int CheckMacIsValid(const char *macStr)
     }
     return 0;
 }
+
+void StrSafeCopy(char *dst, unsigned len, const char *src)
+{
+    if (dst == NULL) {
+        return;
+    }
+    if (src == NULL) {
+        dst[0] = '\0';
+        return;
+    }
+    unsigned i = 0;
+    while (i + 1 < len && src[i] != '\0') {
+        dst[i] = src[i];
+        ++i;
+    }
+    dst[i] = '\0';
+    return;
+}
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
 static const uint32_t MAC_ADDR_INDEX_0 = 0;
 static const uint32_t MAC_ADDR_INDEX_1 = 1;
@@ -742,37 +756,6 @@ static const uint32_t MAC_ADDR_INDEX_3 = 3;
 static const uint32_t MAC_ADDR_INDEX_4 = 4;
 static const uint32_t MAC_ADDR_INDEX_5 = 5;
 static const uint32_t MAC_ADDR_INDEX_SIZE = 6;
-
-uint8_t FillIfrName(char *ifrName, int ifrNameLen, int portType)
-{
-    if (ifrName == NULL) {
-        LOGE("%{public}s: ifrName is null", __func__);
-        return WIFI_IDL_OPT_INVALID_PARAM;
-    }
-    if (ifrNameLen > IFNAMSIZ) {
-        LOGE("%{public}s: invalid length:%{public}d", __func__, ifrNameLen);
-        return WIFI_IDL_OPT_INVALID_PARAM;
-    }
-    switch (portType) {
-        case HDI_PORT_TYPE_STATION:
-        case HDI_PORT_TYPE_AP:
-            if (strcpy_s(ifrName, ifrNameLen, "wlan0") != EOK) {
-                LOGE("%{public}s: failed to copy the wlan0", __func__);
-                return WIFI_IDL_OPT_FAILED;
-            }
-            break;
-        case HDI_PORT_TYPE_P2P_DEVICE:
-            if (strcpy_s(ifrName, ifrNameLen, "p2p0") != EOK) {
-                LOGE("%{public}s: failed to copy the p2p0", __func__);
-                return WIFI_IDL_OPT_FAILED;
-            }
-            break;
-        default:
-            LOGE("%{public}s: invalid type:%{public}d", __func__, portType);
-            return WIFI_IDL_OPT_INVALID_PARAM;
-    }
-    return WIFI_IDL_OPT_OK;
-}
 
 int32_t GetFeatureType(int portType)
 {
@@ -792,7 +775,7 @@ int32_t GetFeatureType(int portType)
     }
 }
 
-void UpDownLink(int flag, int type, char *iface)
+void UpDownLink(int flag, int type, const char *iface)
 {
     struct ifreq ifr;
     int32_t ret = 0;

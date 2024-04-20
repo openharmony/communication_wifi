@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-WifiErrorNo HdiWpaStaStart();
+WifiErrorNo HdiWpaStaStart(const char *ifaceName);
 
 WifiErrorNo HdiWpaStaStop();
 
@@ -75,6 +75,9 @@ WifiErrorNo HdiWpaStaGetCountryCode(char *countryCode, uint32_t size);
 WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32_t *size);
 
 WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen);
+
+WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd);
+int ConvertMacToStr(char *mac, int macSize, char *macStr, int strLen);
 
 #ifdef __cplusplus
 }

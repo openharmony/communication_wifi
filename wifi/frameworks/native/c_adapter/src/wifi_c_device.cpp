@@ -562,4 +562,11 @@ NO_SANITIZE("cfi") WifiErrorCode FactoryReset()
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->FactoryReset());
 }
+
+NO_SANITIZE("cfi") WifiErrorCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid,
+    OHOS::Wifi::WifiDeviceConfig &deviceConfig)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiDevicePtr->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig));
+}
 #endif

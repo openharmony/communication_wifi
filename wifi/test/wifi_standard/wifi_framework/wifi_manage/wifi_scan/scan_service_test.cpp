@@ -1938,25 +1938,25 @@ public:
     void StartWpaSuccessTest()
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
-        EXPECT_TRUE(pScanService->StartWpa() == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(pScanService->StartWifiHdi() == WIFI_OPT_SUCCESS);
     }
 
     void StartWpaFailTest()
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi = false;
-        EXPECT_TRUE(pScanService->StartWpa() == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pScanService->StartWifiHdi() == WIFI_OPT_FAILED);
     }
 
     void CloseWpaSuccessTest()
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi = false;
-        EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pScanService->CloseWifiHdi() == WIFI_OPT_FAILED);
     }
 
     void CloseWpaFailTest()
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi = false;
-        EXPECT_TRUE(pScanService->CloseWpa() == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pScanService->CloseWifiHdi() == WIFI_OPT_FAILED);
     }
 
     void SetScanTrustModeTest()

@@ -671,6 +671,7 @@ WifiErrorNo WifiIdlClient::ReqRegisterStaEventCallback(const WifiEventCallback &
         cEventCallback.onWpsTimeOut = OnWpsTimeOut;
         cEventCallback.onWpsConnectionFull = OnWpaConnectionFull;
         cEventCallback.onWpsConnectionReject = OnWpaConnectionReject;
+        cEventCallback.onWpaEventStaNotify = OnWpaEventStaNotify;
     }
     return RegisterStaEventCallback(cEventCallback);
 }
@@ -846,13 +847,10 @@ WifiErrorNo WifiIdlClient::ReqSetDpiMarkRule(int uid, int protocol, int enable) 
     return WIFI_IDL_OPT_NOT_SUPPORT;
 }
 
-WifiErrorNo WifiIdlClient::StartAp(int id, std::string ifaceName)
+WifiErrorNo WifiIdlClient::StartAp(int id, const std::string &ifaceName)
 {
     CHECK_CLIENT_NOT_NULL;
-    char ifName[ifaceName.size() + 1];
-    ifaceName.copy(ifName, ifaceName.size() + 1);
-    ifName[ifaceName.size()] = '\0';
-    return StartSoftAp(id, ifName);
+    return StartSoftAp(id, ifaceName.c_str());
 }
 
 WifiErrorNo WifiIdlClient::StopAp(int id)

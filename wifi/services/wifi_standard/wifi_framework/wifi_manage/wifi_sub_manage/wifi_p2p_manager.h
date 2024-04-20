@@ -50,11 +50,13 @@ private:
     void DealConfigChanged(CfgType type, char* data, int dataLen);
     void DealP2pGcJoinGroup(const GcInfo &info);
     void DealP2pGcLeaveGroup(const GcInfo &info);
+    void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
 
 private:
     IP2pServiceCallbacks mP2pCallback;
     uint32_t unloadP2PSaTimerId{0};
     std::mutex unloadP2PSaTimerMutex;
+    std::string ifaceName{""};
 };
 
 }  // namespace Wifi

@@ -108,11 +108,11 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
     if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
         WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
         wifiCountryCode = externalCode;
-        StrToUpper(wifiCountryCode);
     } else if (m_wifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
         WIFI_LOGE("calculate wifi country code failed");
         return WIFI_OPT_FAILED;
     }
+    StrToUpper(wifiCountryCode);
     WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
     UpdateWifiCountryCodeCache(wifiCountryCode);
     m_wifiCountryCode = wifiCountryCode;

@@ -992,6 +992,8 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "rxLinkSpeed", static_cast<int>(linkedInfo.rxLinkSpeed), result);
     SetValueInt32(env, "linkSpeed", static_cast<int>(linkedInfo.txLinkSpeed), result);
     SetValueInt32(env, "channelWidth", static_cast<int>(linkedInfo.channelWidth), result);
+    SetValueInt32(env, "supportedWifiCategory", static_cast<int>(linkedInfo.supportedWifiCategory), result);
+    SetValueBool(env, "isHiLinkNetwork", linkedInfo.isHiLinkNetwork, result);
 }
 
 /* This interface has not been fully implemented */
@@ -1541,6 +1543,31 @@ NO_SANITIZE("cfi") napi_value FactoryReset(napi_env env, napi_callback_info info
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->FactoryReset();
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
+NO_SANITIZE("cfi") napi_value EnableHiLinkHandshake(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 3;
+    napi_value argv[3];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+ 
+    bool uiFlag = false;
+    napi_get_value_bool(env, argv[0], &uiFlag);
+    std::string bssid;
+    JsObjectToString(env, argv[1], "bssid", NAPI_MAX_STR_LENT, bssid);
+    WifiDeviceConfig deviceConfig;
+    napi_value napiRet = JsObjToDeviceConfig(env, argv[2], deviceConfig);
+    napi_typeof(env, napiRet, &valueType);
+    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+ 
+    ErrCode ret = wifiDevicePtr->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 }  // namespace Wifi

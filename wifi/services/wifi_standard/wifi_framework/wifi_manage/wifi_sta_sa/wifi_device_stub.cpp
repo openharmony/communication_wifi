@@ -86,6 +86,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnFactoryReset;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED)] =
         &WifiDeviceStub::OnLimitSpeed;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT)] =
+        &WifiDeviceStub::OnEnableHiLinkHandshake;
     return;
 }
 
@@ -743,6 +745,8 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32((int)wifiInfo.maxSupportedTxLinkSpeed);
         reply.WriteInt32((int)wifiInfo.channelWidth);
         reply.WriteBool(wifiInfo.isAncoConnected);
+        reply.WriteInt32((int)wifiInfo.supportedWifiCategory);
+        reply.WriteBool(wifiInfo.isHiLinkNetwork);
     }
 
     return;
@@ -1055,6 +1059,19 @@ void WifiDeviceStub::OnLimitSpeed(uint32_t code, MessageParcel &data, MessagePar
     int controlId = data.ReadInt32();
     int limitMode = data.ReadInt32();
     ErrCode ret = LimitSpeed(controlId, limitMode);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__,  code, data.GetRawDataSize());
+    bool uiFlag = data.ReadBool();
+    std::string bssid = data.ReadString();
+    WifiDeviceConfig deviceConfig;
+    ReadWifiDeviceConfig(data, deviceConfig);
+    ErrCode ret = EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

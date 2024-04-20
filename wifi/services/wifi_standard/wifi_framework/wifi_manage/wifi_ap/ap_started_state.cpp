@@ -38,7 +38,7 @@
 #include "wifi_cmd_client.h"
 #ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
-#define SET_DUAL_ANTENNAS 60
+#define SET_DUAL_ANTENNAS 45
 #endif
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 

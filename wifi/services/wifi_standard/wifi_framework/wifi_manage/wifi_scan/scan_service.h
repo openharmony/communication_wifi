@@ -263,39 +263,34 @@ public:
      */
     virtual void SetEnhanceService(IEnhanceService* enhanceService);
     /**
-     * @Description  StartWpa
+     * @Description  StartWifiHdi
      *
-     * @Output: Return operating results to Interface Service after start wpa
+     * @Output: Return operating results to Interface Service after start wifi hdi
                successfully.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode StartWpa();
+    virtual ErrCode StartWifiHdi();
     /**
-     * @Description  CloseWpa
+     * @Description  CloseWifiHdi
      *
-     * @Output: Return operating results to Interface Service after close wpa
+     * @Output: Return operating results to Interface Service after close wifi hdi
                successfully.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode CloseWpa();
+    virtual ErrCode CloseWifiHdi();
     /**
-     * @Description  OpenScanOnly
+     * @Description Init chipset info.
+     */
+    virtual void InitChipsetInfo();
+    /**
+     * @Description  SetNetworkInterfaceUpDown
      *
-     * @Output: Return operating results to Interface Service after enable wifi scan only
+     * @Output: Return operating results to Interface Service after set iface up dwon
                successfully through callback function instead of returning
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode OpenScanOnly() const;
-    /**
-     * @Description  CloseScanOnly
-     *
-     * @Output: Return operating results to Interface Service after close wifi scan only
-               successfully through callback function instead of returning
-               result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode CloseScanOnly() const;
+    virtual ErrCode SetNetworkInterfaceUpDown(bool upDown);
 
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;
@@ -358,6 +353,7 @@ private:
     int lastNetworkQuality;
     int chipsetCategory;
     int chipsetFeatrureCapability;
+    bool isChipsetInfoObtained;
     /**
      * @Description Obtains the frequency of a specified band.
      *

@@ -54,6 +54,8 @@ public:
     int VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid);
 
     int VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid);
+
+    int VerifyGetWifiConfigPermission(const int &pid, const int &uid);
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -29,6 +29,7 @@
 #include "ip_tools.h"
 #include "ipv4_address.h"
 #include "ipv6_address.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -38,7 +39,6 @@ const int RECEIVE_BUFFER_LEN = 64;
 const int MAX_COMMAND_ARG = 32;
 #ifdef OHOS_ARCH_LITE
 const std::string SYSTEM_COMMAND_NDC = "/system/bin/ndc";
-const std::string IFNAME = "wlan";
 const int IPV6_SUFFIX_LEN = 3;
 const int MAX_IFNAME_LEN = 13;
 #endif
@@ -311,8 +311,8 @@ int IfConfig::SetIfDnsAndRoute(const DhcpResult *dhcpResult, int ipType, int ins
         dhcpResult->strOptRouter1,
         dhcpResult->strOptDns1,
         dhcpResult->strOptDns2);
-    SetNetDns(IFNAME + std::to_string(instId), dhcpResult->strOptDns1, dhcpResult->strOptDns2);
-    AddIfRoute(IFNAME + std::to_string(instId), dhcpResult->strOptClientId, dhcpResult->strOptSubnet,
+    SetNetDns(WifiSettings::GetInstance().GetStaIfaceName(), dhcpResult->strOptDns1, dhcpResult->strOptDns2);
+    AddIfRoute(WifiSettings::GetInstance().GetStaIfaceName(), dhcpResult->strOptClientId, dhcpResult->strOptSubnet,
         dhcpResult->strOptRouter1, ipType);
     LOGI("set dns and route finished!");
     return 0;

@@ -141,7 +141,10 @@ static int MyWpaCtrlPending(struct wpa_ctrl *ctrl)
     pfd.events = POLLIN;
     int ret = poll(&pfd, 1, 100); /* 100 ms */
     if (ret < 0) {
-        LOGE("poll failed!");
+        LOGE("poll failed! errno = %{public}d", errno);
+        if (errno == EINTR) {
+            return 0;
+        }
         return -1;
     } else if (ret == 0) {
         return 0;
@@ -982,6 +985,18 @@ static int SetCountryCode(const char *code, int id)
     return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, cmd, buf, sizeof(buf));
 }
 
+static int TerminateAp(int id)
+{
+    if (id < 0 || id >= AP_MAX_INSTANCE) {
+        LOGE("Invalid id: %{public}d!", id);
+        return -1;
+    }
+    
+    char buf[BUFSIZE_REQUEST_SMALL] = {0};
+    g_hostapdHalDevInfo[id].hostapdHalDev->execDisable = 1;
+    return WpaCtrlCommand(g_hostapdHalDevInfo[id].hostapdHalDev->ctrlConn, "TERMINATE", buf, sizeof(buf));
+}
+
 static int InitHostapdHal(int id)
 {
     if (g_hostapdHalDevInfo[id].hostapdHalDev == NULL) {
@@ -1022,6 +1037,7 @@ WifiHostapdHalDevice *GetWifiHostapdDev(int id)
     g_hostapdHalDevInfo[id].hostapdHalDev->reloadApConfigInfo = ReloadApConfigInfo;
     g_hostapdHalDevInfo[id].hostapdHalDev->disConnectedDev = DisConnectedDev;
     g_hostapdHalDevInfo[id].hostapdHalDev->setCountryCode = SetCountryCode;
+    g_hostapdHalDevInfo[id].hostapdHalDev->terminateAp = TerminateAp;
 
     if (InitHostapdHal(id) != 0) {
         LOGE("InitHostapdHal return failed!!");

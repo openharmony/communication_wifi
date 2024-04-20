@@ -20,6 +20,14 @@
 
 #define AP_ERR_CODE 3
 #define AP_STA_PSK_MISMATCH_CNT 1
+
+#define ENCRYPTION_EVENT 0
+#define DECRYPTION_EVENT 1
+#define NONE_ENCRYTION_UTIL 2
+
+#define SOFTAP_MOUDLE_EVENT 0
+#define STA_MOUDLE_EVENT 1
+
 namespace OHOS {
 namespace Wifi {
 enum class WifiOperType {
@@ -99,6 +107,10 @@ void WriteIsInternetHiSysEvent(int isInternet);
 void WriteSoftApConnectFailHiSysEvent(int errorCnt);
 
 void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason);
+
+void WriteWifiEncryptionFailHiSysEvent(int event, const std::string &maskSsid,
+    const std::string &keyMgmt, int encryptedModule);
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

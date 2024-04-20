@@ -20,6 +20,7 @@
 #include "wifi_hal_define.h"
 
 #define IFACENAME_LEN 6
+#define WIFI_IDL_GET_MAX_BANDS 32
 
 int RpcStartSoftAp(RpcServer *server, Context *context)
 {
@@ -227,7 +228,7 @@ int RpcGetValidFrequenciesForBand(RpcServer *server, Context *context)
         ReadInt(context, &id) < 0 || id < 0) {
         return HAL_FAILURE;
     }
-    if (size <= 0) {
+    if (size <= 0 || size > WIFI_IDL_GET_MAX_BANDS) {
         return HAL_FAILURE;
     }
     int *frequencies = (int *)calloc(size, sizeof(int));

@@ -39,7 +39,6 @@ export struct TestListItem {
             .width(60)
         }
         .backgroundColor($r("app.color.white"))
-
         .width(ConfigData.WH_30_100)
 
         Text(this.testItem.name)

@@ -400,10 +400,13 @@ static void DealP2pChannelSwitch(const char *buf)
     if (buf == NULL) {
         return;
     }
+    if (strstr(buf, "dfs=") != NULL) {
+        LOGE("return ap channel switch!");
+        return;
+    }
     const char *freqPos = strstr(buf, "freq=");
-    const char *dfsPos = strstr(buf, "dfs=");
-    if (freqPos == NULL || dfsPos == NULL) {
-        LOGE("freqPos or dfsPos is null!");
+    if (freqPos == NULL) {
+        LOGE("freqPos is null!");
         return;
     }
     int freq = atoi(freqPos + strlen("freq="));
@@ -634,6 +637,44 @@ static int WpaP2pCallBackFunc(char *p)
     }
     return 0;
 }
+static void ParseAuthReject(const char *p)
+{
+    char *connectionStatus = strstr(p, "status_code=");
+    if (connectionStatus != NULL) {
+        connectionStatus += strlen("status_code=");
+        int status = atoi(connectionStatus);
+        if (status == CONNECTION_PWD_WRONG_STATUS) {
+            WifiHalCbNotifyWrongKey(1);
+        } else if (status == CONNECTION_FULL_STATUS) {
+            WifiHalCbNotifyConnectionFull(status);
+        } else if (status == CONNECTION_REJECT_STATUS ||
+            status == WLAN_STATUS_AUTH_TIMEOUT ||
+            status == MAC_AUTH_RSP2_TIMEOUT ||
+            status == MAC_AUTH_RSP4_TIMEOUT ||
+            status == MAC_ASSOC_RSP_TIMEOUT) {
+            WifiHalCbNotifyConnectionReject(status);
+        }
+    }
+}
+
+static void ParseAssocReject(const char *p)
+{
+    char *connectionStatus = strstr(p, "status_code=");
+    if (connectionStatus != NULL) {
+        connectionStatus += strlen("status_code=");
+        int status = atoi(connectionStatus);
+        if (status == CONNECTION_FULL_STATUS) {
+            WifiHalCbNotifyConnectionFull(status);
+        } else if (status == CONNECTION_REJECT_STATUS ||
+            status == WLAN_STATUS_AUTH_TIMEOUT ||
+            status == MAC_AUTH_RSP2_TIMEOUT ||
+            status == MAC_AUTH_RSP4_TIMEOUT ||
+            status == MAC_ASSOC_RSP_TIMEOUT ||
+            status == CONNECTION_PWD_WRONG_STATUS) {
+            WifiHalCbNotifyConnectionReject(status);
+        }
+    }
+}
 
 static void WpaCallBackFuncTwo(const char *p)
 {
@@ -655,24 +696,10 @@ static void WpaCallBackFuncTwo(const char *p)
         WifiHalCbNotifyWpsOverlap(1);
     } else if (strncmp(p, WPS_EVENT_TIMEOUT, strlen(WPS_EVENT_TIMEOUT)) == 0) {
         WifiHalCbNotifyWpsTimeOut(1);
-    } else if (strncmp(p, WPA_EVENT_AUTH_REJECT, strlen(WPA_EVENT_AUTH_REJECT)) == 0 ||
-        strncmp(p, WPA_EVENT_ASSOC_REJECT, strlen(WPA_EVENT_ASSOC_REJECT)) == 0) { /* connection full */
-        char *connectionStatus = strstr(p, "status_code=");
-        if (connectionStatus != NULL) {
-            connectionStatus += strlen("status_code=");
-            int status = atoi(connectionStatus);
-            if (status == CONNECTION_PWD_WRONG_STATUS) {
-                WifiHalCbNotifyWrongKey(1);
-            } else if (status == CONNECTION_FULL_STATUS) {
-                WifiHalCbNotifyConnectionFull(status);
-            } else if (status == CONNECTION_REJECT_STATUS
-                       || status == WLAN_STATUS_AUTH_TIMEOUT
-                       || status == MAC_AUTH_RSP2_TIMEOUT
-                       || status == MAC_AUTH_RSP4_TIMEOUT
-                       || status == MAC_ASSOC_RSP_TIMEOUT) {
-                WifiHalCbNotifyConnectionReject(status);
-            }
-        }
+    } else if (strncmp(p, WPA_EVENT_AUTH_REJECT, strlen(WPA_EVENT_AUTH_REJECT)) == 0) { /* connection full */
+        ParseAuthReject(p);
+    } else if (strncmp(p, WPA_EVENT_ASSOC_REJECT, strlen(WPA_EVENT_ASSOC_REJECT)) == 0) {
+        ParseAssocReject(p);
     } else if (strncmp(p, WPA_EVENT_ASSOCIATING, strlen(WPA_EVENT_ASSOCIATING)) == 0) {
         char *pBssid = strstr(p, WPA_EVENT_ASSOCIATING);
         if (pBssid == NULL) {
@@ -769,7 +796,10 @@ static int MyWpaCtrlPending(struct wpa_ctrl *ctrl)
     pfd.events = POLLIN;
     int ret = poll(&pfd, 1, 100); /* 100 ms */
     if (ret < 0) {
-        LOGE("poll failed!");
+        LOGE("poll failed! errno = %{public}d", errno);
+        if (errno == EINTR) {
+            return 0;
+        }
         return -1;
     }
     if (ret == 0) {

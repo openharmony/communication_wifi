@@ -25,6 +25,9 @@
 #include "wifi_common_def.h"
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
+#include "wifi_event_handler.h"
+#include "wifi_hisysevent.h"
+#include "wifi_common_util.h"
 
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int RANDOM_PASSWD_LEN = 8;
@@ -128,6 +131,9 @@ public:
      */
     int SetWifiState(int state, int instId = 0);
 
+    void PersistWifiState(int state);
+    int GetPersistWifiState();
+    bool IsWifiToggledEnable();
     void SetWifiToggledState(bool state);
     bool GetWifiToggledState() const;
     void SetSoftapToggledState(bool state);
@@ -136,8 +142,12 @@ public:
     bool GetWifiStopState() const;
     void SetCoexSupport(bool isSupport);
     bool GetCoexSupport() const;
+    void SetStaIfaceName(const std::string &ifaceName);
+    std::string GetStaIfaceName();
+    void SetP2pIfaceName(const std::string &ifaceName);
+    std::string GetP2pIfaceName();
     void SetApIfaceName(const std::string &ifaceName);
-    std::string GetApIfaceName() const;
+    std::string GetApIfaceName();
 
     /**
      * @Description Has STA service running
@@ -385,6 +395,11 @@ public:
      * @return int - 0 success; -1 read config file failed
      */
     int ReloadDeviceConfig();
+
+    /**
+     * @Description Encryption WifiDeviceConfig for old data
+     */
+    void EncryptionWifiDeviceConfigOnBoot();
 
     /**
      * @Description Synchronizing saved the wifi WifiP2pGroupInfo config into config file
@@ -928,6 +943,20 @@ public:
     int SetOperatorWifiType(int type, int instId = 0);
 
     /**
+     * @Description Get last airplane mode
+     *
+     * @return type - enum aiprlane mode
+     */
+    int GetLastAirplaneMode(int instId = 0);
+
+    /**
+     * @Description Set last airplane mode
+     *
+     * @return type - 0 success
+     */
+    int SetLastAirplaneMode(int mode, int instId = 0);
+
+    /**
      * @Description Get the config whether can open sta when airplane mode opened
      *
      * @return true - can open
@@ -941,7 +970,7 @@ public:
      * @return true - open
      * @return false - can't open
      */
-    bool GetOpenWifiWhenAirplaneMode(int instId);
+    bool GetWifiFlagOnAirplaneMode(int instId = 0);
 
     /**
      * @Description Set the config whether open wifi when airplane mode opened
@@ -949,7 +978,7 @@ public:
      * @param ifOpen - user want to open wifi
      * @return int - 0 success
      */
-    int SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId);
+    int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0);
 
     /**
      * @Description Get the STA service last running state
@@ -1071,8 +1100,9 @@ public:
      * @Description Set the Airplane Mode State
      *
      * @param state - 1 open; 2 close
+     * @return bool - true airplane mode toggled, false airplane mode not toggled
      */
-    void SetAirplaneModeState(const int &state);
+    bool SetWifiStateOnAirplaneChanged(const int &state);
 
     /**
      * @Description Get the Airplane Mode State
@@ -1540,6 +1570,29 @@ public:
      * @return void
      */
     void ClearHotspotConfig();
+    /**
+     * @Description Encryption wifi device config
+     *
+     * @param config - Encryption wifiDeviceConfig
+     */
+    bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+
+    /**
+     * @Description Decryption wifi device config
+     *
+     * @param config - Decryption wifiDeviceConfig
+     */
+    int DecryptionDeviceConfig(WifiDeviceConfig &config);
+
+    /**
+     * @Description Check WifiDeviceConfig is deciphered
+     *
+     * @param config - wifiDeviceConfig
+     * @return bool - true: deciphered
+     */
+    bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;
+#endif
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
      * @Description generate a MAC address
@@ -1621,12 +1674,13 @@ public:
     int GetNextNetworkId();
 
 #ifndef OHOS_ARCH_LITE
+    using MergeCallbackFunc = std::function<void(void)>;
     /**
      * @Description Merge Localconfigs with cloneConfigs
      *
      * @param cloneData - wifi xml config
      */
-    void MergeWifiCloneConfig(const std::string &cloneData);
+    void MergeWifiCloneConfig(std::string &cloneData, MergeCallbackFunc mergeCalback);
 #endif
 
 private:
@@ -1642,10 +1696,11 @@ private:
     void InitScanControlIntervalList();
     void InitScanControlInfo();
     void GetLinkedChannelWidth(int instId = 0);
+    void UpdateLinkedInfo(int instId = 0);
 #ifndef OHOS_ARCH_LITE
     void MergeSoftapConfig();
     void MergeWifiConfig();
-    void ConfigsDeduplicateAndSave(const std::vector<WifiDeviceConfig> &newConfigs);
+    void ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs);
 #endif
     void InitPackageFilterConfig();
 
@@ -1653,10 +1708,11 @@ private:
     int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
-    bool mWifiToggled;
     bool mWifiStoping;
     bool mSoftapToggled;
     bool mIsSupportCoex;
+    std::string mStaIfaceName;
+    std::string mP2pIfaceName;
     std::string mApIfaceName;
     std::vector<WifiScanInfo> mWifiScanInfoList;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
@@ -1704,6 +1760,7 @@ private:
     std::string mUpperIfName;
     Hid2dUpperScene mUpperScene;
     P2pBusinessType mP2pBusinessType;
+    int mPersistWifiState;
 
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;
@@ -1722,8 +1779,10 @@ private:
     std::mutex mWifiToggledMutex;
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;
+    std::mutex mSyncWifiConfigMutex;
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
+    std::atomic_flag mEncryptionOnBootFalg = ATOMIC_FLAG_INIT;
 
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig; /* Persistence device config */
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
@@ -1742,6 +1801,8 @@ private:
     std::atomic_uint64_t mThreadStartTime { 0 };
     std::map<std::string, std::vector<std::string>> mFilterMap;
     std::vector<std::string> mAbnormalAppList;
+
+    std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

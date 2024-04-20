@@ -30,9 +30,9 @@
 namespace OHOS {
 namespace Wifi {
 /* ************************ Sta Interface ************************** */
-WifiErrorNo WifiHdiClient::StartWifi()
+WifiErrorNo WifiHdiClient::StartWifi(const std::string &ifaceName)
 {
-    return HdiWifiStart();
+    return HdiWifiStart(ifaceName.c_str());
 }
 
 WifiErrorNo WifiHdiClient::StopWifi()
@@ -267,6 +267,10 @@ WifiErrorNo WifiHdiClient::StartAp(int id)
 
 WifiErrorNo WifiHdiClient::StopAp(int id)
 {
+    if (IsHdiStopped() == WIFI_IDL_OPT_OK) {
+        LOGE("%{public}s: HdiAp already stopped", __func__);
+        return WIFI_IDL_OPT_OK;
+    }
     return HdiStop();
 }
 
@@ -310,10 +314,17 @@ WifiErrorNo WifiHdiClient::SetConnectMacAddr(const std::string &mac, const int p
     if (CheckMacIsValid((const char *)mac.c_str()) != 0) {
         return WIFI_IDL_OPT_INPUT_MAC_INVALID;
     }
-    HdiSetAssocMacAddr((unsigned char *)mac.c_str(), mac.length(), portType);
+    return HdiSetAssocMacAddr((unsigned char *)mac.c_str(), mac.length(), portType);
 #else
     return WIFI_IDL_OPT_OK;
 #endif
+}
+
+WifiErrorNo WifiHdiClient::ReqUpDownNetworkInterface(const std::string &ifaceName, bool upDown)
+{
+    LOGI("%{public}s: ifaceName:%{public}s, upDown:%{public}d", __func__, ifaceName.c_str(), upDown);
+    UpDownLink(static_cast<int>(upDown), 0, ifaceName.c_str());
+    return WIFI_IDL_OPT_OK;
 }
 
 char **WifiHdiClient::ConVectorToCArrayString(const std::vector<std::string> &vec) const

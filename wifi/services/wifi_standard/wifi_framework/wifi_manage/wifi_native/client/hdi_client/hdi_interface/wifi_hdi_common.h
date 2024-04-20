@@ -115,6 +115,7 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     const uint8_t *ie, size_t ieLen);
 int8_t IsValidHexCharAndConvert(char c);
 int CheckMacIsValid(const char *macStr);
+void StrSafeCopy(char *dst, unsigned len, const char *src);
 
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
 int32_t GetFeatureType(int portType);

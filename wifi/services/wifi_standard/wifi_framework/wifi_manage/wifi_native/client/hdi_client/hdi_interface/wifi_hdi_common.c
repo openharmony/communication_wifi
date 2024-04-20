@@ -730,6 +730,24 @@ int CheckMacIsValid(const char *macStr)
     }
     return 0;
 }
+
+void StrSafeCopy(char *dst, unsigned len, const char *src)
+{
+    if (dst == NULL) {
+        return;
+    }
+    if (src == NULL) {
+        dst[0] = '\0';
+        return;
+    }
+    unsigned i = 0;
+    while (i + 1 < len && src[i] != '\0') {
+        dst[i] = src[i];
+        ++i;
+    }
+    dst[i] = '\0';
+    return;
+}
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
 static const uint32_t MAC_ADDR_INDEX_0 = 0;
 static const uint32_t MAC_ADDR_INDEX_1 = 1;

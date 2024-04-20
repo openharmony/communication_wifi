@@ -66,6 +66,8 @@ namespace Wifi {
 #define WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT 0x301A
 #define WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT 0x301B
 #define WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT 0x301C
+#define WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT 0x301D
+#define WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT 0x301E
 
 #define WPA_BLOCK_LIST_CLEAR_EVENT 0x4001
 #define WIFI_SVR_CMD_UPDATE_COUNTRY_CODE 0x4002
@@ -80,6 +82,10 @@ namespace Wifi {
 #define NETWORK_SELECTED_BY_AUTO 0
 #define NETWORK_SELECTED_BY_USER 1
 #define NETWORK_SELECTED_BY_RETRY 2
+
+#define WIFI_SIM_GSM_AUTH_MIN_PARAM_COUNT 3
+#define WIFI_SIM_GSM_AUTH_MAX_PARAM_COUNT 4
+#define WIFI_SIM_UMTS_AUTH_PARAM_COUNT 3
 
 const int NETWORK_24G_BAND = 1;
 const int NETWORK_5G_BAND = 2;
@@ -102,6 +108,14 @@ typedef enum EnumNetWorkState {
     NETWORK_IS_WORKING,
     NETWORK_IS_PORTAL,
 }SystemNetWorkState;
+
+typedef enum EnumStaNetState {
+    NETWORK_STATE_UNKNOWN,
+    NETWORK_STATE_WORKING,
+    NETWORK_CHECK_PORTAL,
+    NETWORK_STATE_NOINTERNET,
+    NETWORK_STATE_BUTT,
+} StaNetState;
 
 using ArpStateHandler = std::function<void(StaArpState arpState)>;
 using DnsStateHandler = std::function<void(StaDnsState dnsState)>;

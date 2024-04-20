@@ -113,7 +113,7 @@ void OnWpaConnectionReject(int status)
     }
 }
 
-void OnWpaEventStaNotify(const char *notifyParam)
+void OnWpaStaNotifyCallBack(const char *notifyParam)
 {
     if (notifyParam == nullptr) {
         return;

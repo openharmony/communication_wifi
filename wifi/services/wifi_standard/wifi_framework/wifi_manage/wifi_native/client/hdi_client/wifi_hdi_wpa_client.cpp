@@ -217,8 +217,8 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
         num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
     }
     EapMethod eapMethod = WifiEapConfig::Str2EapMethod(config.eapConfig.eap);
-    LOGI("%{public}s, eap:%{public}s, eapMethod:%{public}d, num:%{public}d",
-        __func__, config.eapConfig.eap.c_str(), eapMethod, num);
+    LOGI("%{public}s, eap:%{public}s, eapMethod:%{public}d, identity:%{private}s, num:%{public}d",
+        __func__, config.eapConfig.eap.c_str(), eapMethod, config.eapConfig.identity.c_str(), num);
     switch (eapMethod) {
         case EapMethod::EAP_PEAP:
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
@@ -254,6 +254,12 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.eapConfig.password);
+            break;
+        case EapMethod::EAP_SIM:
+        case EapMethod::EAP_AKA:
+        case EapMethod::EAP_AKA_PRIME:
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
             break;
         default:
             LOGE("%{public}s, invalid eapMethod:%{public}d", __func__, eapMethod);
@@ -781,6 +787,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
         cWifiHdiWpaCallback.OnEventServDiscResp = OnEventServDiscResp;
         cWifiHdiWpaCallback.OnEventStaConnectState = OnEventStaConnectState;
         cWifiHdiWpaCallback.OnEventIfaceCreated = OnEventIfaceCreated;
+        cWifiHdiWpaCallback.OnEventStaNotify = OnEventStaNotify;
     }
 
     return RegisterHdiWpaP2pEventCallback(&cWifiHdiWpaCallback);

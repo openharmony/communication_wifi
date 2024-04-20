@@ -587,6 +587,12 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.eapConfig.password);
             break;
+        case EapMethod::EAP_SIM:
+        case EapMethod::EAP_AKA:
+        case EapMethod::EAP_AKA_PRIME:
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
+            break;
         default:
             LOGE("%{public}s, invalid eapMethod:%{public}d", __func__, eapMethod);
             break;
@@ -671,7 +677,7 @@ WifiErrorNo WifiIdlClient::ReqRegisterStaEventCallback(const WifiEventCallback &
         cEventCallback.onWpsTimeOut = OnWpsTimeOut;
         cEventCallback.onWpsConnectionFull = OnWpaConnectionFull;
         cEventCallback.onWpsConnectionReject = OnWpaConnectionReject;
-        cEventCallback.onWpaEventStaNotify = OnWpaEventStaNotify;
+        cEventCallback.onEventStaNotify = OnWpaStaNotifyCallBack;
     }
     return RegisterStaEventCallback(cEventCallback);
 }

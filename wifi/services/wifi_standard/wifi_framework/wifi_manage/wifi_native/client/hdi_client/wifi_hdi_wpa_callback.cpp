@@ -20,6 +20,7 @@
 #include "wifi_hdi_util.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_p2p_hal_interface.h"
+#include "wifi_hdi_common.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
@@ -459,7 +460,7 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         cbInfo.isPersistent = groupStartedParam->isPersistent;
         cbInfo.frequency = groupStartedParam->frequency;
         cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
-        StrSafeCopy(tempSsid, sizeof(tempSsid), tempSsid);
+        StrSafeCopy(tempSsid, sizeof(tempSsid), (char *)groupStartedParam->ssid);
         printf_decode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
         cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
@@ -625,21 +626,4 @@ int32_t OnEventIfaceCreated(struct IWpaCallback *self,
     return 0;
 }
 
-void StrSafeCopy(char *dst, unsigned len, const char *src)
-{
-    if (dst == NULL) {
-        return;
-    }
-    if (src == NULL) {
-        dst[0] = '\0';
-        return;
-    }
-    unsigned i = 0;
-    while (i + 1 < len && src[i] != '\0') {
-        dst[i] = src[i];
-        ++i;
-    }
-    dst[i] = '\0';
-    return;
-}
 #endif

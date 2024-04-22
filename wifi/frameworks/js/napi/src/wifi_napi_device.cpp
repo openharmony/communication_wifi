@@ -931,9 +931,9 @@ static void IpInfoToJsObj(const napi_env& env, IpInfo& ipInfo, napi_value& resul
 static void IpV6InfoToJsObj(const napi_env& env, IpV6Info& ipInfo, napi_value& result)
 {
     napi_create_object(env, &result);
-    SetValueUtf8String(env, "linkIpV6Address", ipInfo.linkIpV6Address, result);
-    SetValueUtf8String(env, "globalIpV6Address", ipInfo.globalIpV6Address, result);
-    SetValueUtf8String(env, "randGlobalIpV6Address", ipInfo.randGlobalIpV6Address, result);
+    SetValueUtf8String(env, "linkIpv6Address", ipInfo.linkIpV6Address, result);
+    SetValueUtf8String(env, "globalIpv6Address", ipInfo.globalIpV6Address, result);
+    SetValueUtf8String(env, "randGlobalIpv6Address", ipInfo.randGlobalIpV6Address, result);
     SetValueUtf8String(env, "gateway", ipInfo.gateway, result);
     SetValueUtf8String(env, "netmask", ipInfo.netmask, result);
     SetValueUtf8String(env, "primaryDNS", ipInfo.primaryDns, result);

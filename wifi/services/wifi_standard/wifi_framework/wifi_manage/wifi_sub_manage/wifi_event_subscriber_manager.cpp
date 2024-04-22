@@ -336,16 +336,17 @@ void WifiEventSubscriberManager::SetCloneDataByDatashare(const std::string &clon
 void WifiEventSubscriberManager::DealCloneDataChangeEvent()
 {
     WIFI_LOGI("DealCloneDataChangeEvent enter");
-    std::string cloneData;
-    GetCloneDataByDatashare(cloneData);
-    if (cloneData.empty()) {
-        return;
-    }
-    auto mergeCalback = [ = ]() -> void {
-        WIFI_LOGI("DealCloneDataChangeEvent MergeWifiCloneConfig callback.");
+    mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
+    mWifiEncryptionThread->PostAsyncTask([this]() {
+        std::string cloneData;
+        GetCloneDataByDatashare(cloneData);
+        if (cloneData.empty()) {
+            return;
+        }
+        WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData);
+        cloneData.clear();
         SetCloneDataByDatashare("");
-    };
-    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData, mergeCalback);
+    });
 }
 
 void WifiEventSubscriberManager::CheckAndStartStaByDatashare()

@@ -145,6 +145,7 @@ if (defined(ohos_lite)) {
       "i18n:intl_util",
       "image_framework:image_native",
       "ipc:ipc_single",
+      "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "relational_store:native_rdb",
     ]

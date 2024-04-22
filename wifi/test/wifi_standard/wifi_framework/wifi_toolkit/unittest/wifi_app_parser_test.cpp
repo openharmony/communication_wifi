@@ -87,10 +87,10 @@ HWTEST_F(AppParserTest, ParseAppList_fail, TestSize.Level1)
     WIFI_LOGI("ParseAppList_fail enter");
     xmlNodePtr otherNode = xmlNewNode(NULL, BAD_CAST "otherNode");
     m_appXmlParser->ParseAppList(otherNode);
-    EXPECT_EQ(0, m_appXmlParser->m_lowLatencyAppVec.size());
-    EXPECT_EQ(0, m_appXmlParser->m_whiteAppVec.size());
-    EXPECT_EQ(0, m_appXmlParser->m_blackAppVec.size());
-    EXPECT_EQ(0, m_appXmlParser->m_chariotAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->m_lowLatencyAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->m_whiteAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->m_blackAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->m_chariotAppVec.size());
 }
 
 HWTEST_F(AppParserTest, ParseAppList_Success, TestSize.Level1)

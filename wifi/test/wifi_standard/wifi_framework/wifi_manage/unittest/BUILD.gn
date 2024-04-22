@@ -212,6 +212,11 @@ ohos_unittest("manager_unittest") {
   # Do not modify the permission configuration of the unit test
   defines += [ "PERMISSION_ALWAYS_GRANT" ]
 
+  if (wifi_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+    defines += [ "WIFI_FFRT_ENABLE" ]
+  }
+
   part_name = "wifi"
   subsystem_name = "communication"
   testonly = true

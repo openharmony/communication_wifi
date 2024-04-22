@@ -1674,13 +1674,12 @@ public:
     int GetNextNetworkId();
 
 #ifndef OHOS_ARCH_LITE
-    using MergeCallbackFunc = std::function<void(void)>;
     /**
      * @Description Merge Localconfigs with cloneConfigs
      *
      * @param cloneData - wifi xml config
      */
-    void MergeWifiCloneConfig(std::string &cloneData, MergeCallbackFunc mergeCalback);
+    void MergeWifiCloneConfig(std::string &cloneData);
 #endif
 
 private:
@@ -1773,6 +1772,7 @@ private:
     std::mutex mStaMutex;
     std::mutex mApMutex;
     std::mutex mConfigMutex;
+    std::mutex mConfigOnBootMutex;
     std::mutex mInfoMutex;
     std::mutex mP2pMutex;
     std::mutex mWifiConfigMutex;

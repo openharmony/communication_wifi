@@ -233,7 +233,7 @@ void WifiProtectManager::UpdateWifiClientConnected(bool isConnected)
 
 #ifndef OHOS_ARCH_LITE
     if (ChangeWifiPowerMode()) {
-        LOGE("Failed to update wifi power mode for connect state change");
+        LOGD("Failed to update wifi power mode for connect state change");
     }
 #endif
 }

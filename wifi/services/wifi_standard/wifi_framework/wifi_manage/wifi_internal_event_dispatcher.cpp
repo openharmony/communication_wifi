@@ -638,7 +638,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
             if (callback == nullptr) {
                 continue;
             }
-            WIFI_LOGI("InvokeScanCallbacks, msg.msgCode: %{public}d, instId: %{public}d", msg.msgCode, msg.id);
+            WIFI_LOGD("InvokeScanCallbacks, msg.msgCode: %{public}d, instId: %{public}d", msg.msgCode, msg.id);
             auto remote = itr->first;
             bool isFrozen = false;
 #ifdef FEATURE_APP_FROZEN
@@ -649,7 +649,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
                 %{public}d", uid, pid, isFrozen);
 #endif
             if (mScanCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
-                WIFI_LOGI("Not registered callback event! msg.msgCode: %{public}d,"
+                WIFI_LOGD("Not registered callback event! msg.msgCode: %{public}d,"
                     "instId: %{public}d", msg.msgCode, msg.id);
                 continue;
             }

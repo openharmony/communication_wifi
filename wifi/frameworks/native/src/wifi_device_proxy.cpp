@@ -46,13 +46,13 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
             return;
         }
         remote_ = impl;
-        WIFI_LOGI("AddDeathRecipient success! ");
+        WIFI_LOGD("AddDeathRecipient success! ");
     }
 }
 
 WifiDeviceProxy::~WifiDeviceProxy()
 {
-    WIFI_LOGI("enter ~WifiDeviceProxy!");
+    WIFI_LOGD("enter ~WifiDeviceProxy!");
     RemoveDeathRecipient();
 }
 

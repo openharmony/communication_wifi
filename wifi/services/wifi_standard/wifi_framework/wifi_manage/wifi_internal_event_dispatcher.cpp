@@ -638,14 +638,14 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
             if (callback == nullptr) {
                 continue;
             }
-            WIFI_LOGI("InvokeScanCallbacks, msg.msgCode: %{public}d, instId: %{public}d", msg.msgCode, msg.id);
+            WIFI_LOGD("InvokeScanCallbacks, msg.msgCode: %{public}d, instId: %{public}d", msg.msgCode, msg.id);
             auto remote = itr->first;
             bool isFrozen = false;
 #ifdef FEATURE_APP_FROZEN
             int uid = mScanCallBackInfo[msg.id][remote].callingUid;
             int pid = mScanCallBackInfo[msg.id][remote].callingPid;
             isFrozen = IsAppFrozen(pid);
-            WIFI_LOGI("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
+            WIFI_LOGD("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
                 %{public}d", uid, pid, isFrozen);
 #endif
             if (mScanCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {

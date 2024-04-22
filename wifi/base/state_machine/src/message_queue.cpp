@@ -105,7 +105,6 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
 
 bool MessageQueue::DeleteMessageFromQueue(int messageName)
 {
-    LOGI("DeleteMessageFromQueue");
     std::unique_lock<std::mutex> lck(mMtxQueue);
     InternalMessage *pTop = pMessageQueue;
     if (pTop == nullptr) {

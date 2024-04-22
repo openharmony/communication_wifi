@@ -45,6 +45,10 @@ ApStateMachine::~ApStateMachine()
     StopDhcpServer();
     StopHandlerThread();
 #endif
+    {
+        std::unique_lock<std::shared_mutex> lock(m_callbackMutex);
+        m_callbacks.clear();
+    }
 }
 
 void ApStateMachine::Init()
@@ -69,6 +73,7 @@ void ApStateMachine::OnApStateChange(ApState state)
 
     if (state == ApState::AP_STATE_IDLE || state == ApState::AP_STATE_STARTED || state == ApState::AP_STATE_STARTING ||
             state == ApState::AP_STATE_CLOSING) {
+        std::shared_lock<std::shared_mutex> lock(m_callbackMutex);
         for (const auto &callBackItem : m_callbacks) {
             if (callBackItem.second.OnApStateChangedEvent != nullptr) {
                 callBackItem.second.OnApStateChangedEvent(state, m_id);
@@ -81,12 +86,14 @@ void ApStateMachine::OnApStateChange(ApState state)
 ErrCode ApStateMachine::RegisterApServiceCallbacks(const IApServiceCallbacks &callback)
 {
     WIFI_LOGI("RegisterApServiceCallbacks, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    std::unique_lock<std::shared_mutex> lock(m_callbackMutex);
     m_callbacks.insert_or_assign(callback.callbackModuleName, callback);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 void ApStateMachine::BroadCastStationChange(const StationInfo &staInfo, ApStatemachineEvent act)
 {
+    std::shared_lock<std::shared_mutex> lock(m_callbackMutex);
     switch (act) {
         case ApStatemachineEvent::CMD_STATION_JOIN:
             for (const auto &callBackItem : m_callbacks) {

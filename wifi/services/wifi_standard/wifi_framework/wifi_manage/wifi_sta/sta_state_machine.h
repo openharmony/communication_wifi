@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
+#include <shared_mutex>
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
@@ -1099,6 +1100,7 @@ private:
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
+    std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;

@@ -336,6 +336,13 @@ struct PackageFilterConf {
     std::string filterName;
     std::vector<std::string> packageList;
 };
+
+struct SoftApRandomMac {
+    std::string ssid;
+    KeyMgmt keyMgmt;
+    std::string randomMac;
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

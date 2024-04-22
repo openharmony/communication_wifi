@@ -176,6 +176,11 @@ bool WifiAppStateAware::IsForegroundApp(int32_t uid)
     return foregroundAppUid_ == uid;
 }
 
+bool WifiAppStateAware::IsForegroundApp(const std::string &bundleName)
+{
+    return bundleName == foregroundAppBundleName_;
+}
+
 std::string WifiAppStateAware::GetRunningProcessNameByPid(const int uid, const int pid)
 {
     if (!Connect()) {

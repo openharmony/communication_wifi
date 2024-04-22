@@ -40,8 +40,10 @@
 #include "iservice_registry.h"
 #include "message_parcel.h"
 #include "system_ability_definition.h"
+#include "wifi_app_state_aware.h"
 #include "wifi_net_observer.h"
 #include "wifi_system_timer.h"
+#include "wifi_notification_util.h"
 #endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST
@@ -61,6 +63,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PORTAL_ACTION "ohos.want.action.viewData"
 #define PORTAL_ENTITY "entity.browser.hbct"
 #define BROWSER_BUNDLE "com.huawei.hmos.browser"
+#define SETTINGS_BUNDLE "com.huawei.hmos.settings"
 #define PORTAL_CHECK_TIME (10 * 60)
 #define PORTAL_MILLSECOND  1000
 #define WPA3_BLACKMAP_MAX_NUM 20
@@ -126,7 +129,7 @@ StaStateMachine::StaStateMachine(int instId)
       enableSignalPoll(true),
       isRoam(false),
       lastTimestamp(0),
-      portalFlag(false),
+      portalFlag(true),
       networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr),
       pRootState(nullptr),
@@ -3014,6 +3017,29 @@ int32_t StaStateMachine::StaStartAbility(OHOS::AAFwk::Want& want)
     }
     return reply.ReadInt32();
 }
+
+void StaStateMachine::ShowPortalNitification()
+{
+    WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
+    bool hasInternetEver =
+        NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
+    if (hasInternetEver) {
+        WifiBannerNotification::GetInstance().PublishWifiNotification(
+            WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
+            WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+    } else {
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(SETTINGS_BUNDLE)) {
+            WifiBannerNotification::GetInstance().PublishWifiNotification(
+                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
+                WifiNotificationStatus::WIFI_PORTAL_CONNECTED);
+            portalFlag = false;
+        } else {
+            WifiBannerNotification::GetInstance().PublishWifiNotification(
+                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
+                WifiNotificationStatus::WIFI_PORTAL_FOUND);
+        }
+    }
+}
 #endif
 
 void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std::string url)
@@ -3049,9 +3075,18 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
             StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_CHECK_TIME * PORTAL_MILLSECOND);
             lastTimestamp = nowTime;
         }
+#ifndef OHOS_ARCH_LITE
+        WifiBannerNotification::GetInstance().CancelWifiNotification(
+            WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+#endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
+#ifndef OHOS_ARCH_LITE
+        if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
+            ShowPortalNitification();
+        }
+#endif
         if (portalFlag == false) {
             WriteIsInternetHiSysEvent(NO_NETWORK);
             HandlePortalNetworkPorcess();

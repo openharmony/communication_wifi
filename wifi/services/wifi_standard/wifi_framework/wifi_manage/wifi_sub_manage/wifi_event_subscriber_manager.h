@@ -37,6 +37,7 @@ public:
     void OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
     bool lastSleepState = false;
 };
 

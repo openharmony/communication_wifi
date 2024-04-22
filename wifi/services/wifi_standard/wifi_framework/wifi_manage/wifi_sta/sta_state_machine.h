@@ -1159,6 +1159,7 @@ private:
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     int32_t StaStartAbility(OHOS::AAFwk::Want& want);
+    void ShowPortalNitification();
 #endif
 };
 }  // namespace Wifi

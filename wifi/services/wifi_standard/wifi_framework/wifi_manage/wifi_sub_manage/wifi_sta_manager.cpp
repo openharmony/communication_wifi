@@ -28,6 +28,7 @@
 #else
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
+#include "wifi_notification_util.h"
 #endif
 
 DEFINE_WIFILOG_LABEL("WifiStaManager");
@@ -308,6 +309,10 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
 #ifndef OHOS_ARCH_LITE
     bool isConnected = (info.connState == CONNECTED) ? true : false;
     WifiProtectManager::GetInstance().UpdateWifiClientConnected(isConnected);
+    if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        WifiBannerNotification::GetInstance().CancelWifiNotification(
+            WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+    }
 #endif
     return;
 }

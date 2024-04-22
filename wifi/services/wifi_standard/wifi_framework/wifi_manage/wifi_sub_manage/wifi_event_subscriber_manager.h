@@ -23,6 +23,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_system_ability_listerner.h"
 #include "common_event_manager.h"
+#include "wifi_event_handler.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -102,6 +103,7 @@ private:
     bool isPowerStateListenerSubscribered = false;
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;
+    std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
 };
 
 }  // namespace Wifi

@@ -82,8 +82,10 @@ ScanService::~ScanService()
 bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks)
 {
     WIFI_LOGI("Enter ScanService::InitScanService.\n");
-
-    mScanSerivceCallbacks = scanSerivceCallbacks;
+    {
+        std::unique_lock<std::shared_mutex> lock(mScanCallbackMutex);
+        mScanSerivceCallbacks = scanSerivceCallbacks;
+    }
     pScanStateMachine = new (std::nothrow) ScanStateMachine(m_instId);
     if (pScanStateMachine == nullptr) {
         WIFI_LOGE("Alloc pScanStateMachine failed.\n");
@@ -186,12 +188,12 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
             scanStartedFlag = true;
             /* Pno scan maybe has started, stop it first. */
             pScanStateMachine->SendMessage(CMD_STOP_PNO_SCAN);
-            mScanSerivceCallbacks.OnScanStartEvent(m_instId);
+            ReportScanStartEvent();
             SystemScanProcess(true);
             break;
         }
         case SCAN_FINISHED_STATUS: {
-            mScanSerivceCallbacks.OnScanStopEvent(m_instId);
+            ReportScanStopEvent();
             break;
         }
         case COMMON_SCAN_SUCCESS: {
@@ -576,7 +578,7 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
         }
 
         /* Notification of the end of scanning. */
-        mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL), m_instId);
+        ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL));
         scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_FAIL);
 
         scanConfigMap.erase(*reqIter);
@@ -610,7 +612,7 @@ void ScanService::HandleCommonScanInfo(
 
                 if (StoreFullScanInfo(configIter->second, scanInfoList)) {
                     fullScanStored = true;
-                    mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), m_instId);
+                    ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
                     scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
                 } else {
                     WIFI_LOGE("StoreFullScanInfo failed.\n");
@@ -620,7 +622,7 @@ void ScanService::HandleCommonScanInfo(
                 if (!StoreUserScanInfo(configIter->second, scanInfoList)) {
                     WIFI_LOGE("StoreUserScanInfo failed.\n");
                 }
-                mScanSerivceCallbacks.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), m_instId);
+                ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
                 scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
             }
 
@@ -791,10 +793,28 @@ bool ScanService::StoreUserScanInfo(const StoreScanConfig &scanConfig, std::vect
     return true;
 }
 
+void ScanService::ReportScanStartEvent()
+{
+    std::shared_lock<std::shared_mutex> lock(mScanCallbackMutex);
+    mScanSerivceCallbacks.OnScanStartEvent(m_instId);
+}
+
+void ScanService::ReportScanStopEvent()
+{
+    std::shared_lock<std::shared_mutex> lock(mScanCallbackMutex);
+    mScanSerivceCallbacks.OnScanStopEvent(m_instId);
+}
+
+void ScanService::ReportScanFinishEvent(int event)
+{
+    std::shared_lock<std::shared_mutex> lock(mScanCallbackMutex);
+    mScanSerivceCallbacks.OnScanFinishEvent(event, m_instId);
+}
+
 void ScanService::ReportScanInfos(std::vector<InterScanInfo> &interScanList)
 {
     WIFI_LOGI("Enter ScanService::ReportScanInfos.\n");
-
+    std::shared_lock<std::shared_mutex> lock(mScanCallbackMutex);
     mScanSerivceCallbacks.OnScanInfoEvent(interScanList, m_instId);
     return;
 }
@@ -802,7 +822,7 @@ void ScanService::ReportScanInfos(std::vector<InterScanInfo> &interScanList)
 void ScanService::ReportStoreScanInfos(std::vector<InterScanInfo> &interScanList)
 {
     WIFI_LOGI("Enter ScanService::ReportStoreScanInfos.\n");
-
+    std::shared_lock<std::shared_mutex> lock(mScanCallbackMutex);
     mScanSerivceCallbacks.OnStoreScanInfoEvent(interScanList, m_instId);
     return;
 }
@@ -1632,7 +1652,7 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
         rlt = AllowScanByType(type);
         WIFI_LOGW("appPackageName empty, apply scan polices rlt: %{public}d.", static_cast<int>(rlt));
         if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
-            mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup, m_instId);
+            ReportScanFinishEvent(scanResultBackup);
         }
         return rlt;
     }
@@ -1653,7 +1673,7 @@ ErrCode ScanService::ApplyScanPolices(ScanType type)
     if (rlt != WIFI_OPT_SUCCESS) {
         if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
             WIFI_LOGE("trust list policy, but moving freeze ctrl failed.");
-            mScanSerivceCallbacks.OnScanFinishEvent(scanResultBackup, m_instId);
+            ReportScanFinishEvent(scanResultBackup);
         }
         return rlt;
     }

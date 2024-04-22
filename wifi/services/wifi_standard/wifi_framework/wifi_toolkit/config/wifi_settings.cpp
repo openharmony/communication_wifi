@@ -307,33 +307,25 @@ void WifiSettings::MergeSoftapConfig()
     mSavedHotspotConfig.SaveConfig();
 }
 
-void WifiSettings::MergeWifiCloneConfig(std::string &cloneData, MergeCallbackFunc mergeCallback)
+void WifiSettings::MergeWifiCloneConfig(std::string &cloneData)
 {
     LOGI("MergeWifiCloneConfig enter");
     std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
     bool ret = xmlParser->LoadConfigurationMemory(cloneData.c_str());
     if (!ret) {
-        mergeCallback();
         LOGE("MergeWifiCloneConfig load fail");
         return;
     }
     ret = xmlParser->Parse();
     if (!ret) {
-        mergeCallback();
         LOGE("MergeWifiCloneConfig Parse fail");
         return;
     }
     std::vector<WifiDeviceConfig> cloneConfigs = xmlParser->GetNetworks();
     if (cloneConfigs.empty()) {
-        mergeCallback();
         return;
     }
-    mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
-    mWifiEncryptionThread->PostAsyncTask([this, &cloneConfigs, &mergeCallback]() {
-        ConfigsDeduplicateAndSave(cloneConfigs);
-        LOGI("MergeWifiCloneConfig ConfigsDeduplicateAndSave end");
-        mergeCallback();
-    });
+    ConfigsDeduplicateAndSave(cloneConfigs);
 }
 
 void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs)
@@ -1165,7 +1157,7 @@ void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
     if (mEncryptionOnBootFalg.test_and_set()) {
         return;
     }
-    std::unique_lock<std::mutex> lock(mConfigMutex);
+    std::unique_lock<std::mutex> lock(mConfigOnBootMutex);
     mSavedDeviceConfig.LoadConfig();
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);

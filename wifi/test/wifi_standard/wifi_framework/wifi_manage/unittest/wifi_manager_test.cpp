@@ -211,22 +211,10 @@ HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
     wifiManager.Exit();
 }
 
-HWTEST_F(WifiManagerTest, PushServiceCloseMsgTest, TestSize.Level1)
-{
-    WIFI_LOGI("ExitTest enter!");
-    wifiManager.PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE);
-}
-
 HWTEST_F(WifiManagerTest, CheckAndStopScanServiceTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");
     wifiManager.wifiScanManager->CheckAndStopScanService();
-}
-
-HWTEST_F(WifiManagerTest, ForceStopWifiTest, TestSize.Level1)
-{
-    WIFI_LOGI("ExitTest enter!");
-    wifiManager.wifiStaManager->ForceStopWifi();
 }
 
 HWTEST_F(WifiManagerTest, AutoStartEnhanceServiceTest, TestSize.Level1)

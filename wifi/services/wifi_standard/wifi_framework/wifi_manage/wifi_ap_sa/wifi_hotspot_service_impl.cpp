@@ -193,11 +193,10 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         }
     }
 
-    if (!IsApServiceRunning()) {
+    if (!IsApServiceRunning() ||
+        WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(config, m_id) == false) {
         WifiConfigCenter::GetInstance().SetHotspotConfig(config, m_id);
         WifiSettings::GetInstance().SyncHotspotConfig();
-    } else {
-        WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(config, m_id);
     }
     return WIFI_OPT_SUCCESS;
 }

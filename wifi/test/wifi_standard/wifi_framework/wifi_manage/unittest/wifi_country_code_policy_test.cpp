@@ -94,7 +94,6 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByMccTest, TestSize.Level1
 HWTEST_F(WifiCountryCodePolicyTest, HandleScanResultActionTest, TestSize.Level1)
 {
     WIFI_LOGI("HandleScanResultActionTest enter");
-    WifiSettings::GetInstance().mWifiScanInfoList.clear();
     std::vector<WifiScanInfo> list;
 
     // Add simulated scan results
@@ -146,9 +145,6 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultFailTest, 
 {
     WIFI_LOGI("StatisticCountryCodeFromScanResultFailTest enter");
     std::vector<WifiScanInfo> list;
-    WifiSettings::GetInstance().mWifiScanInfoList.clear();
-    WifiSettings::GetInstance().mWifiLinkedInfo.clear();
-
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
 }
@@ -156,7 +152,6 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultFailTest, 
 HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultSuccessTest, TestSize.Level1)
 {
     WIFI_LOGI("StatisticCountryCodeFromScanResultSuccessTest enter");
-    WifiSettings::GetInstance().mWifiScanInfoList.clear();
     std::vector<WifiScanInfo> wifiScanInfoList;
 
     // Add simulated scan results
@@ -245,9 +240,6 @@ HWTEST_F(WifiCountryCodePolicyTest, ParseCountryCodeElementTest, TestSize.Level1
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPTest, TestSize.Level1)
 {
     WIFI_LOGI("GetWifiCountryCodeByAPTest enter");
-    WifiSettings::GetInstance().mWifiScanInfoList.clear();
-    WifiSettings::GetInstance().mWifiLinkedInfo.clear();
-
     // Add simulated scan results
     std::vector<WifiScanInfo> wifiScanInfoList;
     WifiScanInfo info1;

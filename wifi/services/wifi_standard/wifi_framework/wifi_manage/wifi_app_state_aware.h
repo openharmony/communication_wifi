@@ -42,6 +42,7 @@ public:
         const int state, const int mInstId = 0);
     void GetForegroundApp();
     bool IsForegroundApp(int32_t uid);
+    bool IsForegroundApp(const std::string &bundleName);
     std::string GetRunningProcessNameByPid(const int uid, const int pid);
 
 private:

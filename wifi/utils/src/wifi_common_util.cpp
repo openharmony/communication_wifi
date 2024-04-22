@@ -282,7 +282,6 @@ std::string GetBundleName()
     AppExecFwk::BundleInfo bundleInfo;
     auto ret = bundleInstance->GetBundleInfoForSelf(0, bundleInfo);
     if (ret != OHOS::ERR_OK) {
-        WIFI_LOGE("GetBundleInfoForSelf failed! ret[%{public}d]", ret);
         return "";
     }
 

@@ -1025,7 +1025,7 @@ NO_SANITIZE("cfi") napi_value GetLinkedInfo(napi_env env, napi_callback_info inf
         LinkedInfoAsyncContext *context = static_cast<LinkedInfoAsyncContext *>(data);
         napi_create_object(context->env, &context->result);
         LinkedInfoToJs(context->env, context->linkedInfo, context->result);
-        WIFI_LOGI("Push get linkedInfo result to client");
+        WIFI_LOGD("Push get linkedInfo result to client");
     };
 
     size_t nonCallbackArgNum = 0;

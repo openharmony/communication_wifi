@@ -33,7 +33,7 @@ WifiDeviceCallBackStub::~WifiDeviceCallBackStub()
 int WifiDeviceCallBackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGI("OnRemoteRequest, code:%{public}u!", code);
+    WIFI_LOGD("OnRemoteRequest, code:%{public}u!", code);
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("Sta callback stub token verification error: %{public}d", code);

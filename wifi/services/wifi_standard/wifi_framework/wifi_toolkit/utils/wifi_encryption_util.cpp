@@ -33,6 +33,7 @@ struct HksParam g_genParam[] = {
     { .tag = HKS_TAG_IS_KEY_ALIAS, .boolParam = true },
     { .tag = HKS_TAG_KEY_GENERATE_TYPE, .uint32Param = HKS_KEY_GENERATE_TYPE_DEFAULT },
     { .tag = HKS_TAG_BLOCK_MODE, .uint32Param = HKS_MODE_GCM },
+    { .tag = HKS_TAG_AUTH_STORAGE_LEVEL, .uint32Param = HKS_AUTH_STORAGE_LEVEL_DE },
     { .tag = HKS_TAG_ASSOCIATED_DATA, .blob = { .size = AAD_SIZE, .data = (uint8_t *)AAD } },
 };
 

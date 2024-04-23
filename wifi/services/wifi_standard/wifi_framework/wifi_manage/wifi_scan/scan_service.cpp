@@ -1538,7 +1538,6 @@ ErrCode ScanService::AllowPnoScan()
 
 ErrCode ScanService::AllowScanByType(ScanType scanType)
 {
-
     ErrCode allScanResult = WIFI_OPT_SUCCESS;
     switch (scanType) {
         case ScanType::SCAN_TYPE_EXTERN:

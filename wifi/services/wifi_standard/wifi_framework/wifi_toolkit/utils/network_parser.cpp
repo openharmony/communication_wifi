@@ -35,7 +35,7 @@ constexpr auto XML_TAG_HIDDEN_SSID = "HiddenSSID";
 constexpr auto XML_TAG_ALLOWED_KEY_MGMT = "AllowedKeyMgmt";
 constexpr auto XML_TAG_RANDOMIZED_MAC_ADDRESS = "RandomizedMacAddress";
 constexpr auto XML_TAG_MAC_RANDOMIZATION_SETTING = "MacRandomizationSetting";
-constexpr auto XML_TAG_STATUS = "Status";
+constexpr auto XML_TAG_STATUS = "SelectionStatus";
 constexpr auto XML_TAG_IP_ASSIGNMENT = "IpAssignment";
 constexpr auto XML_TAG_LINK_ADDRESS = "LinkAddress";
 constexpr auto XML_TAG_LINK_PREFIX_LENGTH = "LinkPrefixLength";
@@ -338,9 +338,6 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
             case WifiConfigType::RANDOMIZEDMACADDRESS:
                 wifiConfig.macAddress = GetStringValue(node);
                 break;
-            case WifiConfigType::STATUS:
-                ParseStatus(node, wifiConfig);
-                break;
             case WifiConfigType::WEPKEYINDEX:
                 wifiConfig.wepTxKeyIndex = GetPrimValue<int>(node, PrimType::INT);
                 break;
@@ -353,6 +350,26 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
         }
     }
     return wifiConfig;
+}
+
+void NetworkXmlParser::ParseNetworkStatus(xmlNodePtr innode, WifiDeviceConfig& wifiConfig)
+{
+    WifiDeviceConfig wifiConfig;
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseWifiConfig node null");
+        return wifiConfig;
+    }
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
+        switch (GetConfigNameAsInt(node)) {
+            case WifiConfigType::STATUS: {
+                ParseStatus(node, wifiConfig)
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
 }
 
 void NetworkXmlParser::ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig)
@@ -375,8 +392,8 @@ void NetworkXmlParser::ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDevice
         WIFI_LOGE("ParseStatus node null");
         return;
     }
-    int status = GetPrimValue<int>(node, PrimType::INT);
-    if (status == 1) { // 1 means DISABLED else enable
+    std::string status = GetStringValue(node);
+    if (status.compare("NETWORK_SELECTION_ENABLED")) {
         wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
     } else {
         wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
@@ -395,6 +412,10 @@ WifiDeviceConfig NetworkXmlParser::ParseNetwork(xmlNodePtr innode)
         switch (GetNodeNameAsInt(node)) {
             case NetworkSection::WIFI_CONFIGURATION: {
                 wifiConfig = ParseWifiConfig(node);
+                break;
+            }
+            case NetworkSection::NETWORK_STATUS: {
+                ParseNetworkStatus(node, wifiConfig);
                 break;
             }
             case NetworkSection::IP_CONFIGURATION: {

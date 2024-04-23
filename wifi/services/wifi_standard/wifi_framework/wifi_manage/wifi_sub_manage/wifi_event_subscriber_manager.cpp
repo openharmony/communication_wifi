@@ -336,8 +336,8 @@ void WifiEventSubscriberManager::SetCloneDataByDatashare(const std::string &clon
 void WifiEventSubscriberManager::DealCloneDataChangeEvent()
 {
     WIFI_LOGI("DealCloneDataChangeEvent enter");
-    mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
-    mWifiEncryptionThread->PostAsyncTask([this]() {
+    mWifiEventSubsThread = std::make_unique<WifiEventHandler>("WifiEventSubsThread");
+    mWifiEventSubsThread->PostAsyncTask([this]() {
         std::string cloneData;
         GetCloneDataByDatashare(cloneData);
         if (cloneData.empty()) {

@@ -103,7 +103,7 @@ private:
     bool isPowerStateListenerSubscribered = false;
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;
-    std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
+    std::unique_ptr<WifiEventHandler> mWifiEventSubsThread = nullptr;
 };
 
 }  // namespace Wifi

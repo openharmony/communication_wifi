@@ -1200,7 +1200,7 @@ int WifiSettings::ReloadDeviceConfig()
         mWifiEncryptionThread->PostAsyncTask([this]() {
             LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot start.");
             EncryptionWifiDeviceConfigOnBoot();
-        });    
+        });
     }
     return 0;
 #else

@@ -361,7 +361,7 @@ void NetworkXmlParser::ParseNetworkStatus(xmlNodePtr innode, WifiDeviceConfig& w
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetConfigNameAsInt(node)) {
             case WifiConfigType::STATUS: {
-                ParseStatus(node, wifiConfig)
+                ParseStatus(node, wifiConfig);
                 break;
             }
             default: {

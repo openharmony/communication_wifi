@@ -1154,9 +1154,6 @@ int WifiSettings::SyncDeviceConfig()
 void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
 {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    if (mEncryptionOnBootFalg.test_and_set()) {
-        return;
-    }
     std::unique_lock<std::mutex> lock(mConfigOnBootMutex);
     mSavedDeviceConfig.LoadConfig();
     std::vector<WifiDeviceConfig> tmp;
@@ -1198,11 +1195,13 @@ int WifiSettings::ReloadDeviceConfig()
         item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
-    mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
-    mWifiEncryptionThread->PostAsyncTask([this]() {
-        EncryptionWifiDeviceConfigOnBoot();
-        LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot end.");
-    });
+    if (!mEncryptionOnBootFalg.test_and_set()) {
+        mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
+        mWifiEncryptionThread->PostAsyncTask([this]() {
+            LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot start.");
+            EncryptionWifiDeviceConfigOnBoot();
+        });    
+    }
     return 0;
 #else
     std::unique_lock<std::mutex> lock(mConfigMutex);

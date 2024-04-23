@@ -1035,7 +1035,7 @@ void ScanService::HandleStaStatusChanged(int status)
 
 void ScanService::HandleNetworkQualityChanged(int status)
 {
-    WIFI_LOGD("Enter HandleNetworkQualityChanged, change to status: %{public}d.", status);
+    WIFI_LOGI("Enter HandleNetworkQualityChanged, change to status: %{public}d.", status);
     if (lastNetworkQuality == status) {
         return;
     }
@@ -1139,7 +1139,7 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
 
 void ScanService::StopSystemScan()
 {
-    WIFI_LOGD("Enter StopSystemScan.");
+    WIFI_LOGI("Enter StopSystemScan.");
     if (pScanStateMachine == nullptr) {
         WIFI_LOGE("pScanStateMachine is null.\n");
         return;
@@ -1538,7 +1538,6 @@ ErrCode ScanService::AllowPnoScan()
 
 ErrCode ScanService::AllowScanByType(ScanType scanType)
 {
-    LOGD("Enter AllowScanByType, scanType: %{public}d.", scanType);
 
     ErrCode allScanResult = WIFI_OPT_SUCCESS;
     switch (scanType) {
@@ -1556,7 +1555,7 @@ ErrCode ScanService::AllowScanByType(ScanType scanType)
             break;
     }
 
-    WIFI_LOGD("AllowScanByType, allScanResult:%{public}d.", static_cast<int>(allScanResult));
+    WIFI_LOGI("AllowScanByType, scanType:%{public}d, allScanResult:%{public}d", scanType, static_cast<int>(allScanResult));
     return allScanResult;
 }
 

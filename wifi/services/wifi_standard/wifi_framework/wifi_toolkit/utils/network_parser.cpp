@@ -356,7 +356,7 @@ void NetworkXmlParser::ParseNetworkStatus(xmlNodePtr innode, WifiDeviceConfig& w
 {
     if (innode == nullptr) {
         WIFI_LOGE("ParseWifiConfig node null");
-        return wifiConfig;
+        return;
     }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetConfigNameAsInt(node)) {

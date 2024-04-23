@@ -354,7 +354,6 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
 
 void NetworkXmlParser::ParseNetworkStatus(xmlNodePtr innode, WifiDeviceConfig& wifiConfig)
 {
-    WifiDeviceConfig wifiConfig;
     if (innode == nullptr) {
         WIFI_LOGE("ParseWifiConfig node null");
         return wifiConfig;

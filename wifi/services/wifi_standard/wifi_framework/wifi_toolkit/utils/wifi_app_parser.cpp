@@ -241,11 +241,11 @@ bool AppParser::ReadPackageCloudFilterConfig()
     }
     std::stringstream buffer;
     buffer << ifs.rdbuf();
-    std::string json_string = buffer.str();
+    std::string jsonString = buffer.str();
     Json::Value root;
     Json::Reader reader;
     ifs.close();
-    bool success = reader.parse(json_string, root);
+    bool success = reader.parse(jsonString, root);
     if (!success) {
         WIFI_LOGE("%{public}s Failed to parse JSON data!", __FUNCTION__);
         return false;

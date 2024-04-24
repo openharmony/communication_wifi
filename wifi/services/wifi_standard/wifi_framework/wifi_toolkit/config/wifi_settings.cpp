@@ -265,7 +265,7 @@ void WifiSettings::MergeWifiConfig()
         LOGE("MergeWifiConfig Parse fail");
         return;
     }
-    std::vector<WifiDeviceConfig> wifideviceConfig =  xmlParser->GetNetworks();
+    std::vector<WifiDeviceConfig> wifideviceConfig = xmlParser->GetNetworks();
     if (wifideviceConfig.size() == 0) {
         LOGE("MergeWifiConfig wifideviceConfig empty");
         return;

@@ -965,6 +965,13 @@ private:
      */
     ErrCode SetExternalSim(const std::string ifName, const std::string &eap, int value) const;
 
+    /**
+     * @Description : should sta connect use factory mac address.
+     *
+     * @param networkId - networkId.
+     */
+    bool ShouldUseFactoryMac(int networkId);
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.
@@ -1145,6 +1152,8 @@ private:
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
     std::string mPortalUrl;
+    int mLastConnectNetId;      /* last request connect netword id */
+    int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
     /**
      * @Description Replace empty dns
      */

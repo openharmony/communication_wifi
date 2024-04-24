@@ -61,11 +61,11 @@ WifiAppStateAware &WifiAppStateAware::GetInstance()
     return gWifiAppStateAware;
 }
 
-ErrCode WifiAppStateAware::InitAppStateAware()
+ErrCode WifiAppStateAware::InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks)
 {
+    mWifiAppStateAwareCallbacks = wifiAppStateAwareCallbacks;
     return WIFI_OPT_SUCCESS;
 }
-
 bool WifiAppStateAware::Connect()
 {
     if (appMgrProxy_ != nullptr) {
@@ -146,10 +146,7 @@ void WifiAppStateAware::OnForegroundAppChanged(const std::string &bundleName, in
     WifiProtectManager::GetInstance().OnAppForegroudChanged(bundleName, state);
 #ifndef OHOS_ARCH_LITE
     AppNetworkSpeedLimitService::GetInstance().HandleForegroundAppChangedAction(bundleName, uid, pid, state);
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(mInstId);
-    if (pService != nullptr) {
-        pService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
-    }
+    mWifiAppStateAwareCallbacks.OnForegroundAppChanged(bundleName, uid, pid, state, mInstId);
 #endif
 }
 

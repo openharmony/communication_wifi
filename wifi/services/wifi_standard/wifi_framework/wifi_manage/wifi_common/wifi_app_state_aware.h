@@ -27,6 +27,10 @@
 namespace OHOS {
 namespace Wifi {
 
+struct WifiAppStateAwareCallbacks {
+    std::function<void(const std::string &bundleName, int uid, int pid,
+        const int state, const int mInstId)> OnForegroundAppChanged;
+};
 class AppStateObserver;
 
 class WifiAppStateAware {
@@ -34,7 +38,7 @@ public:
     explicit WifiAppStateAware(int instId = 0);
     ~WifiAppStateAware();
     static WifiAppStateAware &GetInstance();
-    ErrCode InitAppStateAware();
+    ErrCode InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks);
     bool Connect();
     void RegisterAppStateObserver();
     void UnSubscribeAppState();
@@ -52,6 +56,7 @@ private:
     std::unique_ptr<WifiEventHandler> appChangeEventHandler = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy_ {nullptr};
     sptr<AppStateObserver> mAppStateObserver {nullptr};
+    WifiAppStateAwareCallbacks mWifiAppStateAwareCallbacks;
 };
 
 class AppStateObserver : public AppExecFwk::ApplicationStateObserverStub {

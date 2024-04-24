@@ -28,7 +28,6 @@
 #include "dhcpd_interface.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_ap_nat_manager.h"
-#include "wifi_chip_capability.h"
 #include "wifi_settings.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
@@ -94,7 +93,6 @@ void ApStartedState::GoInState()
     }
     UpdatePowerMode();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
-    ChipCapability::GetInstance().InitializeChipCapability();
 #ifdef HAS_BATTERY_MANAGER_PART
     if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
         HotspotConfig hotspotConfig;

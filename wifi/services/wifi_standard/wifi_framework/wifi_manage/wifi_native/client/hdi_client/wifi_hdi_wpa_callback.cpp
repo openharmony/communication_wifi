@@ -109,8 +109,22 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
     const struct HdiWpaTempDisabledParam *tempDisabledParam, const char *ifName)
 {
     LOGI("OnEventTempDisabled: callback enter!");
+    
+    if (tempDisabledParam == NULL) {
+        LOGE("OnEventTempDisabled tempDisabledParam is NULL");
+        return 1;
+    }
+    std::string ssid = "";
+    if (tempDisabledParam->ssid != NULL && tempDisabledParam->ssidLen > 0) {
+        ssid = std::string(tempDisabledParam->ssid, tempDisabledParam->ssid + tempDisabledParam->ssidLen);
+    }
+    std::string reason = "";
+    if (tempDisabledParam->reason != NULL && tempDisabledParam->reasonLen > 0) {
+        reason = std::string(tempDisabledParam->reason, tempDisabledParam->reason + tempDisabledParam->reasonLen);
+    }
+    LOGI("OnEventTempDisabled ssid:%{private}s reason:%{public}s", ssid.c_str(), reason.c_str());
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    if (cbk.onWpaSsidWrongKey) {
+    if (cbk.onWpaSsidWrongKey && (reason == "WRONG_KEY" || reason == "AUTH_FAILED")) {
         cbk.onWpaSsidWrongKey(1);
     }
     return 0;

@@ -869,6 +869,7 @@ NO_SANITIZE("cfi") napi_value Disconnect(napi_env env, napi_callback_info info)
 
 NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info info)
 {
+    WIFI_LOGI("GetSignalLevel napi start...");
     size_t argc = 2;
     const int PARAMS_NUM = 2;
     napi_value argv[2];
@@ -890,6 +891,7 @@ NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info in
     int band = 0;
     napi_get_value_int32(env, argv[0], &rssi);
     napi_get_value_int32(env, argv[1], &band);
+    WIFI_LOGI("GetSignalLevel device start...");
     ErrCode ret = wifiDevicePtr->GetSignalLevel(rssi, band, level);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi signal level fail: %{public}d", ret);
@@ -897,6 +899,7 @@ NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info in
     }
     napi_value result;
     napi_create_uint32(env, level, &result);
+    WIFI_LOGI("GetSignalLevel napi end...");
     return result;
 }
 

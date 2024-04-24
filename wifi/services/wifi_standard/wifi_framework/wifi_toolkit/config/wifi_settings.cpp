@@ -1785,6 +1785,7 @@ int WifiSettings::GetScanGenieState() const
 
 int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
 {
+    LOGI("GetSignalLevel wifi settings start...");
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     int level = 0;
     auto iter = mWifiConfig.find(instId);
@@ -1827,6 +1828,7 @@ int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
             }
         } while (0);
     }
+    LOGI("GetSignalLevel wifi settings end...");
     return level;
 }
 

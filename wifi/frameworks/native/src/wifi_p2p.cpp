@@ -24,7 +24,7 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbili
 {
     std::shared_ptr<WifiP2pImpl> impl = std::make_shared<WifiP2pImpl>();
     if (impl && impl->Init(systemAbilityId)) {
-        WIFI_LOGI("init p2p successfully!");
+        WIFI_LOGD("init p2p successfully!");
         return impl;
     }
 

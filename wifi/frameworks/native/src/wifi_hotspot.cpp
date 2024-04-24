@@ -31,7 +31,7 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiHotspot> WifiHotspot::GetInstance(int sys
 
     std::shared_ptr<WifiHotspotImpl> hotspot = std::make_shared<WifiHotspotImpl>();
     if (hotspot && hotspot->Init(systemAbilityId, id)) {
-        WIFI_LOGI("ap obj id:%{public}d succeeded, sa id:%{public}d", id, systemAbilityId);
+        WIFI_LOGD("ap obj id:%{public}d succeeded, sa id:%{public}d", id, systemAbilityId);
         return hotspot;
     }
 

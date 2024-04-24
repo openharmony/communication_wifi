@@ -110,6 +110,7 @@ private:
     WifiConfigType GetConfigNameAsInt(xmlNodePtr node);
     NetworkSection GetNodeNameAsInt(xmlNodePtr node);
     WifiDeviceConfig ParseWifiConfig(xmlNodePtr innode);
+    void ParseNetworkStatus(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
     WifiIpConfig ParseIpConfig(xmlNodePtr innode);
     ConfigureProxyMethod GetProxyMethod(xmlNodePtr innode);
     WifiProxyConfig ParseProxyConfig(xmlNodePtr innode);

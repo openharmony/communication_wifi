@@ -32,7 +32,7 @@ WifiScanCallbackStub::~WifiScanCallbackStub()
 int WifiScanCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGD("WifiScanCallbackStub::OnRemoteRequest code:%{public}u!", code);
+    WIFI_LOGD("OnRemoteRequest code:%{public}u!", code);
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("Scan callback stub token verification error: %{public}d", code);
@@ -41,13 +41,13 @@ int WifiScanCallbackStub::OnRemoteRequest(
 
     int exception = data.ReadInt32();
     if (exception) {
-        WIFI_LOGE("WifiScanCallbackStub::OnRemoteRequest exception! %{public}d!", exception);
+        WIFI_LOGE("OnRemoteRequest exception! %{public}d!", exception);
         return WIFI_OPT_FAILED;
     }
     int ret = -1;
     switch (code) {
         case static_cast<uint32_t>(ScanInterfaceCode::WIFI_CBK_CMD_SCAN_STATE_CHANGE): {
-            WIFI_LOGD("WifiScanCallbackStub::OnRemoteRequest code:%{public}u line:%{public}d!", code, __LINE__);
+            WIFI_LOGD("OnRemoteRequest code:%{public}u line:%{public}d!", code, __LINE__);
             ret = RemoteOnWifiScanStateChanged(code, data, reply);
             break;
         }
@@ -74,13 +74,13 @@ bool WifiScanCallbackStub::IsRemoteDied() const
 
 void WifiScanCallbackStub::SetRemoteDied(bool val)
 {
-    WIFI_LOGI("WifiScanCallbackStub::SetRemoteDied,state:%{public}d", val);
+    WIFI_LOGI("SetRemoteDied,state:%{public}d", val);
     mRemoteDied = val;
 }
 
 void WifiScanCallbackStub::OnWifiScanStateChanged(int state)
 {
-    WIFI_LOGI("WifiScanCallbackStub::OnWifiScanStateChanged,state:%{public}d", state);
+    WIFI_LOGD("OnWifiScanStateChanged,state:%{public}d", state);
 
     if (userCallback_) {
         userCallback_->OnWifiScanStateChanged(state);

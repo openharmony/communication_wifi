@@ -975,6 +975,7 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     LOGD("SignalPoll GetWifiStandard:%{public}d, bssid:%{public}s rxmax:%{public}d txmax:%{public}d.",
          linkedInfo.wifiStandard, MacAnonymize(linkedInfo.bssid).c_str(), linkedInfo.maxSupportedRxLinkSpeed,
          linkedInfo.maxSupportedTxLinkSpeed);
+    WriteLinkInfoHiSysEvent(lastSignalLevel, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
 
@@ -1068,6 +1069,13 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
             WIFI_LOGI("This network is connecting and does not need to be reconnected.\n");
             return;
         }
+    }
+
+    std::string connectType = config.lastConnectTime <= 0 ? "FIRST_CONNECT" :
+        connTriggerMode == NETWORK_SELECTED_BY_AUTO ? "AUTO_CONNECT" :
+        connTriggerMode == NETWORK_SELECTED_BY_USER ? "SELECT_CONNECT" : "";
+    if (!connectType.empty()) {
+        WirteConnectTypeHiSysEvent(connectType);
     }
 
     /* Save connection information. */
@@ -1344,7 +1352,7 @@ void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
-
+    WirteConnectTypeHiSysEvent("REASSOC");
     if (WifiStaHalInterface::GetInstance().Reassociate() == WIFI_IDL_OPT_OK) {
         /* Callback result to InterfaceService */
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
@@ -3084,6 +3092,8 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
         /* Save connection information to WifiSettings. */
         WriteIsInternetHiSysEvent(NETWORK);
+        WritePortalStateHiSysEvent(portalFlag ? HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED
+                                              : HISYS_EVENT_PROTAL_STATE_NOT_PORTAL);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET);
@@ -3105,6 +3115,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
         if (portalFlag == false) {
             WriteIsInternetHiSysEvent(NO_NETWORK);
+            WritePortalStateHiSysEvent(HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED);
             HandlePortalNetworkPorcess();
             portalFlag = true;
         }
@@ -3360,13 +3371,16 @@ bool StaStateMachine::CanArpReachable()
         WIFI_LOGI("gateway is empty");
         return false;
     }
+    uint64_t arpRtt = 0;
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
     for (int i = 0; i < DEFAULT_NUM_ARP_PINGS; i++) {
-        if (arpChecker.DoArpCheck(MAX_ARP_CHECK_TIME, true)) {
+        if (arpChecker.DoArpCheck(MAX_ARP_CHECK_TIME, true, arpRtt)) {
+            WriteArpInfoHiSysEvent(arpRtt, 0);
             return true;
         }
     }
+    WriteArpInfoHiSysEvent(arpRtt, 1);
     return false;
 }
 

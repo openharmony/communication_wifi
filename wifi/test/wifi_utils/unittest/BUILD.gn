@@ -27,6 +27,7 @@ ohos_unittest("utils_unittest") {
     "$WIFI_ROOT_DIR/utils/src/wifi_event_handler.cpp",
     "wifi_common_util_test.cpp",
     "wifi_event_handler_test.cpp",
+    "wifi_hisysevent_test.cpp",
   ]
 
   include_dirs = [
@@ -43,6 +44,7 @@ ohos_unittest("utils_unittest") {
   ]
 
   deps = [
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

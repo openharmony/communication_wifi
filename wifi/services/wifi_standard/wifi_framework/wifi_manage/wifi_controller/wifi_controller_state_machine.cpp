@@ -530,12 +530,14 @@ void WifiControllerMachine::RemoveConcreteManager(int id)
     if (!HasAnyConcreteManager()) {
         return;
     }
-    std::unique_lock<std::mutex> lock(concreteManagerMutex);
-    for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
-        if ((*iter)->mid == id) {
-            concreteManager = *iter;
-            concreteManagers.erase(iter);
-            break;
+    {
+        std::unique_lock<std::mutex> lock(concreteManagerMutex);
+        for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
+            if ((*iter)->mid == id) {
+                concreteManager = *iter;
+                concreteManagers.erase(iter);
+                break;
+            }
         }
     }
     if (concreteManager != nullptr) {

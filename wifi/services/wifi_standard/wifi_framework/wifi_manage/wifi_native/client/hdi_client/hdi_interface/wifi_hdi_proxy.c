@@ -210,8 +210,8 @@ WifiErrorNo HdiStop()
     pthread_mutex_lock(&g_mutex);
     if (g_wlanObj == NULL || g_wlanRefCount == 0) {
         pthread_mutex_unlock(&g_mutex);
-        LOGE("%{public}s: invalid parameter", __func__);
-        return WIFI_IDL_OPT_FAILED;
+        LOGE("%{public}s: parameter null, no need to stop.", __func__);
+        return WIFI_IDL_OPT_OK;
     }
 
     const unsigned int ONE_REF_COUNT = 1;

@@ -1101,7 +1101,7 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
         return;
     }
     if (targetNetworkId == mLastConnectNetId) {
-        mConnectFailedCnt ++;
+        mConnectFailedCnt++;
     }
     WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
     linkedInfo.retryedConnCount++;
@@ -1230,7 +1230,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     IfConfig::GetInstance().FlushIpAddr(WifiSettings::GetInstance().GetStaIfaceName(), IPTYPE_IPV4);
 #endif
     if (targetNetworkId == mLastConnectNetId) {
-        mConnectFailedCnt ++;
+        mConnectFailedCnt++;
     }
     /* Initialize connection information. */
     std::string ssid = linkedInfo.ssid;
@@ -1295,7 +1295,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
 bool StaStateMachine::DealReconnectSavedNetwork()
 {
     if (targetNetworkId == mLastConnectNetId) {
-        mConnectFailedCnt ++;
+        mConnectFailedCnt++;
     }
     linkedInfo.retryedConnCount++;
     if (linkedInfo.retryedConnCount < MAX_RETRY_COUNT) {
@@ -1810,7 +1810,7 @@ bool StaStateMachine::ShouldUseFactoryMac(int networkId)
         mConnectFailedCnt = 0;
     }
     if (mConnectFailedCnt >= STA_CONNECT_RANDOMMAC_MAX_FAILED_COUNT) {
-        return true;        
+        return true;
     }
     return false;
 }

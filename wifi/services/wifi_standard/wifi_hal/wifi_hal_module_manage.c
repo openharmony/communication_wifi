@@ -160,7 +160,7 @@ int StartModuleInternal(const char *moduleName, const char *startCmd, pid_t *pPr
 static int StopModuleInternalKillProcess(pid_t processId)
 {
     LOGI("Stop module kill process: %{public}d", processId);
-    if (kill(processId, SIGKILL) == -1) {
+    if (kill(processId, SIGTERM) == -1) {
         if (ESRCH == errno) {
             LOGI("kill [%{public}d] success, pid no exist", processId);
             return HAL_SUCCESS;

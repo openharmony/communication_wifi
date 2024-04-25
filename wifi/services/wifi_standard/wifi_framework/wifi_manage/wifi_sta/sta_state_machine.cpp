@@ -53,7 +53,7 @@ namespace Wifi {
 namespace {
 constexpr int DEFAULT_INVAL_VALUE = -1;
 const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
-constexpr std::string WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
+constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"

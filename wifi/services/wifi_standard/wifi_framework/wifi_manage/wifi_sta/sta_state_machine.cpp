@@ -53,6 +53,7 @@ namespace Wifi {
 namespace {
 constexpr int DEFAULT_INVAL_VALUE = -1;
 const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
+constexpr std::string WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
@@ -77,6 +78,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define WPA_DEFAULT_NETWORKID 0
 #define SELF_CURE_FAC_MAC_REASSOC 2
 #define SELF_CURE_RAND_MAC_REASSOC 3
+#define USER_CONNECT "1"
+#define AUTO_CONNECT "0"
 
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
@@ -995,7 +998,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
         OnConnectFailed(networkId);
         return;
     }
-
+    SetConnectMethod(connTriggerMode);
     /* Sets network status. */
     WifiSettings::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
@@ -1099,6 +1102,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
         WIFI_LOGE("wpsState is INVALID\n");
         return;
     }
+    SetConnectMethod(NETWORK_SELECTED_BY_UNKNOWN);
     std::string bssid;
     msg->GetMessageObj(bssid);
     if (CheckRoamingBssidIsSame(bssid)) {
@@ -1164,7 +1168,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         LOGE("msg is null.\n");
         return;
     }
-
+    SetConnectMethod(NETWORK_SELECTED_BY_UNKNOWN);
     DealSetStaConnectFailedCount(1, false);
     if (msg->GetMessageName() != WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT &&
         DealReconnectSavedNetwork()) {
@@ -3431,6 +3435,23 @@ void StaStateMachine::RenewDhcp()
 int StaStateMachine::GetInstanceId()
 {
     return m_instId;
+}
+
+void StaStateMachine::SetConnectMethod(int connectMethod)
+{
+    std::string isConnectFromUser="";
+    if (connectMethod == NETWORK_SELECTED_BY_RETRY) {
+        isConnectFromUser = AUTO_CONNECT;
+    } else if (connectMethod == NETWORK_SELECTED_BY_AUTO) {
+        isConnectFromUser = AUTO_CONNECT;
+    } else if (connectMethod == NETWORK_SELECTED_BY_USER) {
+        isConnectFromUser = USER_CONNECT;
+    }
+    int ret = SetParamValue(WIFI_IS_CONNECT_FROM_USER, isConnectFromUser.c_str());
+    std::string retStr = (ret == 0) ? "success" : ("fail,ret="+std::to_string(ret));
+    WIFI_LOGI("SetConnectMethod %{public}s,connectMethod:%{public}d",retStr.c_str(), connectMethod);
+    return;
+
 }
 } // namespace Wifi
 } // namespace OHOS

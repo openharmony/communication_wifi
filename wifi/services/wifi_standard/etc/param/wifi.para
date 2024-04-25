@@ -15,3 +15,4 @@ const.wifi.country_code.conf=1
 const.wifi.country_code.runmode=normal
 const.wifi.country_code.factory=HK
 persist.wifi.country_code.dynamic_update=CN
+persist.wifi.is_connect_from_user=

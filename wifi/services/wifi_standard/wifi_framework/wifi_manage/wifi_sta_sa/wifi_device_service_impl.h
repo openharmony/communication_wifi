@@ -174,6 +174,7 @@ private:
     bool IsWifiBrokerProcess(int uid);
     ErrCode CheckRemoveCandidateConfig(void);
     void SetWifiConnectedMode(void);
+    ErrCode HilinkGetMacAddress(WifiDeviceConfig &deviceConfig, std::string &currentMac);
 #ifndef OHOS_ARCH_LITE
     bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
 #endif

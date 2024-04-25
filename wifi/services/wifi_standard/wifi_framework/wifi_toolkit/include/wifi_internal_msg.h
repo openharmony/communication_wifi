@@ -106,6 +106,7 @@ enum class OperateResState {
     CLOSE_SCAN_ONLY_CLOSING,                /* close scan only closing */
     CLOSE_SCAN_ONLY_SUCCEED,                /* close scan only succeed */
     CLOSE_SCAN_ONLY_FAILED,                 /* close scan only failed */
+    SPECIAL_CONNECTED,                  /* special connected */
 };
 
 /* is wps connected to a network  */

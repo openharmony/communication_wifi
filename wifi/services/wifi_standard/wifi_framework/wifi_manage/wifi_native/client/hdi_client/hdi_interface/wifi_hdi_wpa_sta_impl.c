@@ -886,4 +886,21 @@ WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd)
     LOGI("HdiWpaStaSetShellCmd success.");
     return WIFI_IDL_OPT_OK;
 }
+
+WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t pskLen)
+{
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("GetPskPassphrase: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->GetPskPassphrase(wpaObj, ifName, psk, pskLen);
+    if (result != HDF_SUCCESS) {
+        LOGE("GetPskPassphrase: failed to StaShellCmd, result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    LOGI("GetPskPassphrase success.");
+    return WIFI_IDL_OPT_OK;
+}
 #endif

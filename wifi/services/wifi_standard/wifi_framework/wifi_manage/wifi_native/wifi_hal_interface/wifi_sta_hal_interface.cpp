@@ -516,6 +516,19 @@ WifiErrorNo WifiStaHalInterface::ShellCmd(const std::string &ifName, const std::
 #endif
 }
 
+WifiErrorNo WifiStaHalInterface::GetPskPassphrase(const std::string &ifName, std::string &psk)
+{
+    if (ifName.length() <= 0) {
+        return WIFI_IDL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqWpaGetPskPassphrase(ifName, psk);
+#else
+    return WIFI_IDL_OPT_FAILED;
+#endif
+}
+
 WifiErrorNo WifiStaHalInterface::GetChipsetCategory(int& chipsetCategory)
 {
 #ifdef HDI_INTERFACE_SUPPORT

@@ -145,7 +145,9 @@ StaStateMachine::StaStateMachine(int instId)
       pGetIpState(nullptr),
       pLinkedState(nullptr),
       pApRoamingState(nullptr),
-      m_instId(instId)
+      m_instId(instId),
+      mLastConnectNetId(INVALID_NETWORK_ID),
+      mConnectFailedCnt(0)
 {
 }
 
@@ -1098,6 +1100,9 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
         WIFI_LOGE("Currently connected and do not process timeout.\n");
         return;
     }
+    if (targetNetworkId == mLastConnectNetId) {
+        mConnectFailedCnt ++;
+    }
     WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
     linkedInfo.retryedConnCount++;
     DealSetStaConnectFailedCount(1, false);
@@ -1170,6 +1175,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true) != WIFI_IDL_OPT_OK) {
         LOGE("DealConnectionEvent WpaSetPowerMode() failed!");
     }
+    mConnectFailedCnt = 0;
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);
     WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
@@ -1223,6 +1229,9 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #ifdef OHOS_ARCH_LITE
     IfConfig::GetInstance().FlushIpAddr(WifiSettings::GetInstance().GetStaIfaceName(), IPTYPE_IPV4);
 #endif
+    if (targetNetworkId == mLastConnectNetId) {
+        mConnectFailedCnt ++;
+    }
     /* Initialize connection information. */
     std::string ssid = linkedInfo.ssid;
     InitWifiLinkedInfo();
@@ -1285,6 +1294,9 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
 
 bool StaStateMachine::DealReconnectSavedNetwork()
 {
+    if (targetNetworkId == mLastConnectNetId) {
+        mConnectFailedCnt ++;
+    }
     linkedInfo.retryedConnCount++;
     if (linkedInfo.retryedConnCount < MAX_RETRY_COUNT) {
         SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
@@ -1789,6 +1801,20 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
     }
 }
 
+static constexpr int STA_CONNECT_RANDOMMAC_MAX_FAILED_COUNT = 2;
+
+bool StaStateMachine::ShouldUseFactoryMac(int networkId)
+{
+    if (mLastConnectNetId != networkId) {
+        mLastConnectNetId = networkId;
+        mConnectFailedCnt = 0;
+    }
+    if (mConnectFailedCnt >= STA_CONNECT_RANDOMMAC_MAX_FAILED_COUNT) {
+        return true;        
+    }
+    return false;
+}
+
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
     LOGD("enter SetRandomMac.");
@@ -1800,7 +1826,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     }
     std::string lastMac;
     std::string currentMac;
-    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(networkId)) {
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
         WifiStoreRandomMac randomMacInfo;

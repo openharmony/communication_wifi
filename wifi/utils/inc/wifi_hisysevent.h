@@ -41,6 +41,9 @@ enum class WifiConnectionType {
 };
 
 const int HISYS_EVENT_DEFAULT_VALUE = -1;
+const int HISYS_EVENT_PROTAL_STATE_NOT_PORTAL = 0;
+const int HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED = 0;
+const int HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED = 1;
 
 const std::string HISYS_STA_POWER_STATE_CHANGE = "wifiStateChange";
 const std::string HISYS_STA_CONN_STATE_CHANGE = "wifiConnectionChange";
@@ -110,6 +113,14 @@ void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason);
 
 void WriteWifiEncryptionFailHiSysEvent(int event, const std::string &maskSsid,
     const std::string &keyMgmt, int encryptedModule);
+
+void WritePortalStateHiSysEvent(int portalState);
+
+void WriteArpInfoHiSysEvent(uint64_t arpRtt, int arpFailedCount);
+
+void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed);
+
+void WirteConnectTypeHiSysEvent(std::string connectType);
 
 }  // namespace Wifi
 }  // namespace OHOS

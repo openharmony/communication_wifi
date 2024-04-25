@@ -20,6 +20,7 @@
 #include "mac_address.h"
 #include "wifi_sta_hal_interface.h"
 #include "network_status_history_manager.h"
+#include "wifi_hisysevent.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1192,12 +1193,15 @@ bool SelfCureStateMachine::CanArpReachable()
         return false;
     }
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
+    uint64_t arpRtt = 0;
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
     for (int i = 0; i < DEFAULT_SLOW_NUM_ARP_PINGS; i++) {
-        if (arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true)) {
+        if (arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true, arpRtt)) {
+            WriteArpInfoHiSysEvent(arpRtt, 0);
             return true;
         }
     }
+    WriteArpInfoHiSysEvent(arpRtt, 1);
     return false;
 }
 

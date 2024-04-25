@@ -45,6 +45,7 @@ public:
     void Start(std::string& ifname, std::string& hwAddr, std::string& ipAddr, std::string& gateway);
     void Stop();
     bool DoArpCheck(int timeoutMillis, bool isFillSenderIp);
+    bool DoArpCheck(int timeoutMillis, bool isFillSenderIp, uint64_t &timeCost);
 private:
     RawSocket rawSocket_;
     bool socketCreated;

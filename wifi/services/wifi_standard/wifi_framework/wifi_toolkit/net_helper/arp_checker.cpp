@@ -79,6 +79,11 @@ void ArpChecker::Stop()
 
 bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp)
 {
+    uint64_t timeCost;
+    return DoArpCheck(timeoutMillis, isFillSenderIp, timeCost);
+}
+bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp, uint64_t &timeCost)
+{
     LOGI("Enter DoArpCheck");
     if (!socketCreated) {
         LOGE("ArpChecker DoArpCheck failed, socket not created");
@@ -114,6 +119,7 @@ bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp)
         return false;
     }
 
+    timeCost = 0;
     int readLen = 0;
     uint64_t elapsed = 0;
     int leftMillis = timeoutMillis;
@@ -130,6 +136,8 @@ bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp)
                 ntohs(respPacket->ar_op) == ARPOP_REPLY &&
                 memcmp(respPacket->ar_sha, localMacAddr, ETH_ALEN) != 0 &&
                 memcmp(respPacket->ar_spa, &gatewayIpAddr, IPV4_ALEN) == 0) {
+                std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
+                timeCost = std::chrono::duration_cast<std::chrono::milliseconds>(current - startTime).count();
                 LOGE("doArp() return true");
                 return true;
             }

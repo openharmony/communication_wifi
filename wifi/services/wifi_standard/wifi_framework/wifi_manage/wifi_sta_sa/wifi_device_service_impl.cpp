@@ -291,7 +291,7 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
     WIFI_LOGD("InitWifiBrokerProcessInfo,networkId=%{public}d, ProcessName=[%{public}s],"
         "ancoCallProcessName =[%{public}s],bssid = [%{public}s],ssid=[%{public}s]",
         config.networkId, config.callProcessName.c_str(), config.ancoCallProcessName.c_str(),
-        config.bssid.c_str(), config.ssid.c_str());
+        MacAnonymize(config.bssid).c_str(), SsidAnonymize(config.ssid).c_str());
     if (config.networkId == WIFI_BROKER_NETWORK_ID && config.ancoCallProcessName == BROKER_PROCESS_PROTECT_FLAG &&
         config.bssid.empty() && config.ssid.empty() && config.callProcessName == ANCO_SERVICE_BROKER) {
         SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);

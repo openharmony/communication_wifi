@@ -1027,6 +1027,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     int32_t StaStartAbility(OHOS::AAFwk::Want& want);
 #endif
+    void SetConnectMethod(int connectMethod);
 };
 }  // namespace Wifi
 }  // namespace OHOS

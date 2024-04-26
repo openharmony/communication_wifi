@@ -21,15 +21,12 @@
 #include "wifi_sta_hal_interface.h"
 #include "network_status_history_manager.h"
 #include "wifi_hisysevent.h"
-#include "wifi_app_state_aware.h"
 
 namespace OHOS {
 namespace Wifi {
 const std::string CLASS_NAME = "WifiSelfCure";
 
 DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
-
-const std::string SETTINGS_PAGE = "com.huawei.hmos.settings";
 
 SelfCureStateMachine::SelfCureStateMachine(int instId)
     : StateMachine("SelfCureStateMachine"),
@@ -106,7 +103,7 @@ ErrCode SelfCureStateMachine::Initialize()
 /* --------------------------- state machine default state ------------------------------ */
 SelfCureStateMachine::DefaultState::DefaultState(SelfCureStateMachine *selfCureStateMachine)
     : State("DefaultState"),
-    pSelfCureStateMachine(selfCureStateMachine)
+      pSelfCureStateMachine(selfCureStateMachine)
 {
     WIFI_LOGD("DefaultState construct success\n.");
 }
@@ -2006,13 +2003,5 @@ bool SelfCureStateMachine::IfMultiGateway()
     return false;
 }
 
-bool SelfCureStateMachine::IsSettingsPage()
-{
-    if (WifiAppStateAware::GetInstance().GetForegroundApp() == SETTINGS_PAGE) {
-        WIFI_LOGI("settings page, do not allow reset self cure");
-        return true;
-    }
-    return false;
-}
 } // namespace Wifi
 } // namespace OHOS

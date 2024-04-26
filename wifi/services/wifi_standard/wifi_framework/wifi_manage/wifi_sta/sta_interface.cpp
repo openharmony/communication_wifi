@@ -413,7 +413,7 @@ ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStat
     WIFI_LOGI("Enter StaInterface::HandleForegroundAppChangedAction");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    pStaService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    pStaService->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
 

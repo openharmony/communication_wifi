@@ -132,7 +132,8 @@ void WifiAppStateAware::UnSubscribeAppState()
 
 void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId)
 {
-    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND)) {
+    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND) &&
+        appStateData.isFocused) {
         foregroundAppBundleName_ = appStateData.bundleName;
         foregroundAppUid_ = appStateData.uid;
     } else if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_BACKGROUND) &&
@@ -142,12 +143,12 @@ void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &a
     } else {
         WIFI_LOGI("state = %{pubilc}d, not handle.", appStateData.state);
     }
-    WifiProtectManager::GetInstance().OnAppForegroudChanged(appStateData.bundleName, appStateData.state);
+    if (appStateData.isFocused) {
+        WifiProtectManager::GetInstance().OnAppForegroudChanged(appStateData.bundleName, appStateData.state);
+    }
 #ifndef OHOS_ARCH_LITE
-    AppNetworkSpeedLimitService::GetInstance().HandleForegroundAppChangedAction(appStateData.bundleName,
-    appStateData.uid, appStateData.pid, appStateData.state);
-    mWifiAppStateAwareCallbacks.OnForegroundAppChanged(appStateData.bundleName, appStateData.uid, appStateData.pid,
-    appStateData.state, mInstId);
+    AppNetworkSpeedLimitService::GetInstance().HandleForegroundAppChangedAction(appStateData);
+    mWifiAppStateAwareCallbacks.OnForegroundAppChanged(appStateData, mInstId);
 #endif
 }
 

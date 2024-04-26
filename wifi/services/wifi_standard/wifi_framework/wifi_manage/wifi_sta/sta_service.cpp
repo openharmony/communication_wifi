@@ -848,7 +848,7 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
         WIFI_LOGE("pStaAppAcceleration is null");
         return WIFI_OPT_FAILED;
     }
-    pStaAppAcceleration->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    pStaAppAcceleration->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
 #endif

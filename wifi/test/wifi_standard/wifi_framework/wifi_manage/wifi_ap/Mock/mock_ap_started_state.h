@@ -18,7 +18,6 @@
 
 #include <gmock/gmock.h>
 #include "ap_started_state.h"
-#include "wifi_chip_capability.h"
 #include "wifi_msg.h"
 
 namespace OHOS {

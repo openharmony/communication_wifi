@@ -1102,7 +1102,6 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
         WIFI_LOGE("wpsState is INVALID\n");
         return;
     }
-    SetConnectMethod(NETWORK_SELECTED_BY_UNKNOWN);
     std::string bssid;
     msg->GetMessageObj(bssid);
     if (CheckRoamingBssidIsSame(bssid)) {
@@ -1168,7 +1167,6 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         LOGE("msg is null.\n");
         return;
     }
-    SetConnectMethod(NETWORK_SELECTED_BY_UNKNOWN);
     DealSetStaConnectFailedCount(1, false);
     if (msg->GetMessageName() != WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT &&
         DealReconnectSavedNetwork()) {
@@ -1900,6 +1898,9 @@ StaStateMachine::SeparatedState::~SeparatedState()
 
 void StaStateMachine::SeparatedState::GoInState()
 {
+    if (pStaStateMachine != nullptr) {
+        pStaStateMachine->SetConnectMethod(NETWORK_SELECTED_BY_UNKNOWN);
+    }
     WIFI_LOGI("SeparatedState GoInState function.");
     return;
 }

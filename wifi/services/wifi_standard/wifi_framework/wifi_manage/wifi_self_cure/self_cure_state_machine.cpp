@@ -1831,8 +1831,8 @@ bool SelfCureStateMachine::SelfCureAcceptable(WifiSelfCureHistoryInfo &historyIn
         default:
             break;
     }
-    WIFI_LOGD("SelfCureAcceptable, requestCureLevel = %{public}d, ifAcceptable = %{public}d",
-              requestCureLevel, ifAcceptable);
+    WIFI_LOGD("SelfCureAcceptable, requestCureLevel = %{public}d, currentMs = %{public}lld, ifAcceptable = %{public}d",
+              requestCureLevel, currentMs, ifAcceptable);
     return ifAcceptable;
 }
 

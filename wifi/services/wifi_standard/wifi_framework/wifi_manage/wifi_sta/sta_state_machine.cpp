@@ -3439,19 +3439,25 @@ int StaStateMachine::GetInstanceId()
 
 void StaStateMachine::SetConnectMethod(int connectMethod)
 {
-    std::string isConnectFromUser="";
-    if (connectMethod == NETWORK_SELECTED_BY_RETRY) {
-        isConnectFromUser = AUTO_CONNECT;
-    } else if (connectMethod == NETWORK_SELECTED_BY_AUTO) {
-        isConnectFromUser = AUTO_CONNECT;
-    } else if (connectMethod == NETWORK_SELECTED_BY_USER) {
-        isConnectFromUser = USER_CONNECT;
+    std::string isConnectFromUser = "-1";
+    switch (connectMethod) {
+        case NETWORK_SELECTED_BY_AUTO:
+            isConnectFromUser = AUTO_CONNECT;
+            break;
+        case NETWORK_SELECTED_BY_USER:
+            isConnectFromUser = USER_CONNECT;
+            break;
+        case NETWORK_SELECTED_BY_RETRY:
+            break;
+        default:
+            break;
+
     }
     int ret = SetParamValue(WIFI_IS_CONNECT_FROM_USER, isConnectFromUser.c_str());
     std::string retStr = (ret == 0) ? "success" : ("fail,ret="+std::to_string(ret));
-    WIFI_LOGI("SetConnectMethod %{public}s,connectMethod:%{public}d",retStr.c_str(), connectMethod);
+    WIFI_LOGI("SetConnectMethod %{public}s,connectMethod:%{public}d",
+        retStr.c_str(), connectMethod);
     return;
-
 }
 } // namespace Wifi
 } // namespace OHOS

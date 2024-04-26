@@ -208,7 +208,7 @@ WifiErrorNo HdiStop()
 {
     LOGI("%{public}s: begin to stop hdi service", __func__);
     pthread_mutex_lock(&g_mutex);
-    if (g_wlanObj == NULL || g_wlanRefCount == 0) {
+    if (g_wlanObj == NULL) {
         pthread_mutex_unlock(&g_mutex);
         LOGE("%{public}s: parameter null, no need to stop.", __func__);
         return WIFI_IDL_OPT_OK;

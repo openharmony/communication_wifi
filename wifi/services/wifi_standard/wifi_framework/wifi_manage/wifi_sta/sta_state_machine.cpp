@@ -22,7 +22,6 @@
 #include "log_helper.h"
 #include "mac_address.h"
 #include "sta_monitor.h"
-#include "wifi_chip_capability.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
 #include "wifi_protect_manager.h"
@@ -632,9 +631,6 @@ void StaStateMachine::StartWifiProcess()
         InitLastWifiLinkedInfo();
         WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
         WifiSettings::GetInstance().ReloadDeviceConfig();
-#ifndef OHOS_ARCH_LITE
-        ChipCapability::GetInstance().InitializeChipCapability();
-#endif
         /* The current state of StaStateMachine transfers to SeparatedState after
          * enable supplicant.
          */

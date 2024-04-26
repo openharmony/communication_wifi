@@ -25,7 +25,6 @@
 #include "iservice_registry.h"
 #include "app_mgr_constants.h"
 #include "define.h"
-#include "wifi_rx_listen_arbitration.h"
 #endif
 #include "wifi_settings.h"
 

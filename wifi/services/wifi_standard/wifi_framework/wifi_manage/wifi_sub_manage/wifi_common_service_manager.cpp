@@ -86,7 +86,7 @@ void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppState
 {
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(mInstId);
     if (pService != nullptr) {
-        pService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+        pService->HandleForegroundAppChangedAction(appStateData);
     }
 }
 #endif

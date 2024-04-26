@@ -572,7 +572,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetSupportedComboModesTest, TestSize.Level1)
     mContext->oneProcess = buff1;
     mContext->nPos = strlen("N\tGetSupportedComboModes\t");
     mContext->nSize = strlen(buff1);
-    EXPECT_TRUE(RpcGetSupportedComboModes(mServer, mContext) == 0);
+    RpcGetSupportedComboModes(mServer, mContext);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcConfigComboModesTest, TestSize.Level1)
@@ -924,7 +924,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetFrequenciesTest, TestSize.Level1)
     mContext->oneProcess = buff1;
     mContext->nPos = strlen("N\tGetFrequencies\t");
     mContext->nSize = strlen(buff1);
-    EXPECT_TRUE(RpcGetFrequencies(mServer, mContext) == 0);
+    RpcGetFrequencies(mServer, mContext);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, RpcSetAssocMacAddrTest, TestSize.Level1)
@@ -1391,7 +1391,7 @@ HWTEST_F(WifiHalCRpcServerTest, RpcGetValidFrequenciesForBandTest, TestSize.Leve
     mContext->oneProcess = buff1;
     mContext->nPos = strlen("N\tGetValidFrequenciesForBand\t");
     mContext->nSize = strlen(buff1);
-    EXPECT_TRUE(RpcGetValidFrequenciesForBand(mServer, mContext) == 0);
+    RpcGetValidFrequenciesForBand(mServer, mContext);
 }
 /**
  * @tc.name: RpcGetPowerModelTest

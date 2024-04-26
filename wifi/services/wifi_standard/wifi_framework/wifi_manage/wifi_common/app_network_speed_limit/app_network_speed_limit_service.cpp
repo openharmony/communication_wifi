@@ -87,8 +87,7 @@ void AppNetworkSpeedLimitService::HandleWifiConnectStateChanged(const bool isWif
     }
 }
 
-void AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const std::string &bundleName, int uid, int pid,
-    const int state)
+void AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
     if (state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND)) {
         if (m_isWifiConnected && m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
@@ -145,7 +144,8 @@ ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningP
     }
     if (getFgAppFlag) {
         for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
+            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND &&
+                iter->isFocused) {
                 appList.push_back(*iter);
             }
         }

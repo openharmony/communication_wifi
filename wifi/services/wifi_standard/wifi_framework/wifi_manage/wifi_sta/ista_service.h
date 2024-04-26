@@ -307,8 +307,7 @@ public:
      * @param state app state.
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode HandleForegroundAppChangedAction(const std::string &bundleName,
-                                                        int uid, int pid, const int state) = 0;
+    virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) = 0;
 
     /**
      * @Description enable hilink

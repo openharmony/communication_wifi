@@ -3451,7 +3451,6 @@ void StaStateMachine::SetConnectMethod(int connectMethod)
             break;
         default:
             break;
-
     }
     int ret = SetParamValue(WIFI_IS_CONNECT_FROM_USER, isConnectFromUser.c_str());
     std::string retStr = (ret == 0) ? "success" : ("fail,ret="+std::to_string(ret));

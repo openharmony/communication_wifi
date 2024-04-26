@@ -1163,6 +1163,7 @@ private:
     int32_t StaStartAbility(OHOS::AAFwk::Want& want);
     void ShowPortalNitification();
 #endif
+    void SetConnectMethod(int connectMethod);
 };
 }  // namespace Wifi
 }  // namespace OHOS

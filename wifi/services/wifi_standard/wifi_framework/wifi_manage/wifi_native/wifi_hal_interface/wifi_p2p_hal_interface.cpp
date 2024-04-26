@@ -532,8 +532,13 @@ WifiErrorNo WifiP2PHalInterface::GetP2pPeer(const std::string &deviceAddress, Wi
 
 WifiErrorNo WifiP2PHalInterface::GetChba0Freq(int &chba0Freq) const
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    LOGE("call WifiP2PHalInterface::%{public}s!", __func__);
+    return WIFI_IDL_OPT_FAILED;
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqP2pGetChba0Freq(chba0Freq);
+#endif
 }
 
 WifiErrorNo WifiP2PHalInterface::P2pGetSupportFrequenciesByBand(int band, std::vector<int> &frequencies) const

@@ -437,6 +437,10 @@ ErrCode ConcreteMangerMachine::StartSelfCureService(int instId)
         return WIFI_OPT_FAILED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
+        return WIFI_OPT_FAILED;
+    }
     errCode = pService->RegisterStaServiceCallback(pSelfCureService->GetStaCallback());
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("SelfCure register sta service callback failed!");

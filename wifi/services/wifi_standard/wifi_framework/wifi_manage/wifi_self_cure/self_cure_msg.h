@@ -26,55 +26,55 @@ struct WifiSelfCureHistoryInfo {
     int dnsSelfCureFailedCnt;
 
     /* record last dns failed milliseconds */
-    long lastDnsSelfCureFailedTs;
+    uint64_t lastDnsSelfCureFailedTs;
 
     /* record renew dhcp failed count */
     int renewDhcpSelfCureFailedCnt;
 
     /* record last renew dhcp failed milliseconds */
-    long lastRenewDhcpSelfCureFailedTs;
+    uint64_t lastRenewDhcpSelfCureFailedTs;
 
     /* record static ip failed count */
     int staticIpSelfCureFailedCnt;
 
     /* record last static ip failed milliseconds */
-    long lastStaticIpSelfCureFailedTs;
+    uint64_t lastStaticIpSelfCureFailedTs;
 
     /* record reassoc failed count */
     int reassocSelfCureFailedCnt;
 
     /* record last reassoc failed milliseconds */
-    long lastReassocSelfCureFailedTs;
+    uint64_t lastReassocSelfCureFailedTs;
 
     /* record rand mac selfcure fail cnt */
     int randMacSelfCureFailedCnt;
 
     /* record rand mac selfcure fail time */
-    long lastRandMacSelfCureFailedCntTs;
+    uint64_t lastRandMacSelfCureFailedCntTs;
 
     /* record reset failed count */
     int resetSelfCureFailedCnt;
 
     /* record last reset failed milliseconds */
-    long lastResetSelfCureFailedTs;
+    uint64_t lastResetSelfCureFailedTs;
 
     /* record reassoc connect failed count */
     int reassocSelfCureConnectFailedCnt;
 
     /* record last reassoc connect failed milliseconds */
-    long lastReassocSelfCureConnectFailedTs;
+    uint64_t lastReassocSelfCureConnectFailedTs;
 
     /* record rand mac selfcure connect fail cnt */
     int randMacSelfCureConnectFailedCnt;
 
     /* record rand mac selfcure connect fail time */
-    long lastRandMacSelfCureConnectFailedCntTs;
+    uint64_t lastRandMacSelfCureConnectFailedCntTs;
 
     /* record reset connect failed count */
     int resetSelfCureConnectFailedCnt;
 
     /* record last reset connect failed milliseconds */
-    long lastResetSelfCureConnectFailedTs;
+    uint64_t lastResetSelfCureConnectFailedTs;
     WifiSelfCureHistoryInfo()
     {
         dnsSelfCureFailedCnt = 0;

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef HDI_INTERFACE_SUPPORT
+
 #ifndef OHOS_WIFI_HDI_COMMON_H
 #define OHOS_WIFI_HDI_COMMON_H
 
@@ -113,17 +113,14 @@ const char* HdiSSid2Txt(const uint8_t *ssid, size_t ssidLen);
 
 char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     const uint8_t *ie, size_t ieLen);
+
 int8_t IsValidHexCharAndConvert(char c);
+
 int CheckMacIsValid(const char *macStr);
+
 void StrSafeCopy(char *dst, unsigned len, const char *src);
 
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-int32_t GetFeatureType(int portType);
-void UpDownLink(int flag, int type, const char *iface);
-WifiErrorNo HdiSetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType);
-#endif
 #ifdef __cplusplus
 }
-#endif
 #endif
 #endif

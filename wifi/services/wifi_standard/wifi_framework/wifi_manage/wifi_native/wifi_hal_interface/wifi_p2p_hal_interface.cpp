@@ -39,11 +39,6 @@ WifiP2PHalInterface &WifiP2PHalInterface::GetInstance(void)
                 initFlag = 1;
             }
 #endif
-#ifdef HDI_INTERFACE_SUPPORT
-            if (inst.InitHdiClient()) {
-                initFlag = 1;
-            }
-#endif
         }
     }
     return inst;
@@ -601,15 +596,5 @@ WifiErrorNo WifiP2PHalInterface::Hid2dConnect(const Hid2dConnectConfig &config) 
 #endif
 }
 
-WifiErrorNo WifiP2PHalInterface::SetConnectMacAddr(const std::string &mac, const int portType)
-{
-#ifdef HDI_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
-    return mHdiClient->SetConnectMacAddr(mac, portType);
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->SetConnectMacAddr(mac, portType);
-#endif
-}
 }  // namespace Wifi
 }  // namespace OHOS

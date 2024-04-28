@@ -965,6 +965,14 @@ private:
      */
     ErrCode SetExternalSim(const std::string ifName, const std::string &eap, int value) const;
 
+    /**
+     * @Description : Check Current DisConnect event is should retry.
+     *
+     * @param eventName - eventName.
+     * @Return true: need retry.
+     */
+    bool IsStaDisConnectReasonShouldRetryEvent(int eventName);
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.

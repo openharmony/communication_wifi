@@ -89,7 +89,6 @@ if (defined(ohos_lite)) {
     ]
 
     external_deps = [
-      "ability_runtime:app_manager",
       "bounds_checking_function:libsec_shared",
       "init:libbegetutil",
     ]

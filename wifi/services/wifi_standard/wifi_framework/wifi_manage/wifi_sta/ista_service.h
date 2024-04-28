@@ -17,6 +17,7 @@
 #define OHOS_WIFI_STA_SERVICE_H
 
 #include "wifi_errcode.h"
+#include "app_state_data.h"
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
 #include "network_selection.h"

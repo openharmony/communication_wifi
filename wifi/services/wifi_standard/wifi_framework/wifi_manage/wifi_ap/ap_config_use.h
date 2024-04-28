@@ -100,7 +100,7 @@ private:
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
 
     int GetBestChannelFor2G() const;
-    int GetBestChannelFor5G() const;
+    int GetBestChannelFor5G(HotspotConfig &apConfig) const;
     std::vector<int> GetChannelFromDrvOrXmlByBand(const BandType &bandType) const;
     void FilterIndoorChannel(std::vector<int> &channels) const;
     void Filter165Channel(std::vector<int> &channels) const;

@@ -631,6 +631,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->GetVersion = NULL;
     g_hdiWpaStaCallbackObj->AsObject = NULL;
     g_hdiWpaStaCallbackObj->OnEventStaNotify = callback->OnEventStaNotify;
+    g_hdiWpaStaCallbackObj->OnEventVendorCb = NULL;
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaStaEventCallback3 success.");

@@ -19,7 +19,6 @@
 #include "wifi_log.h"
 #include "wifi_idl_define.h"
 #include "i_wifi_struct.h"
-#include "decode_util.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiCallback"

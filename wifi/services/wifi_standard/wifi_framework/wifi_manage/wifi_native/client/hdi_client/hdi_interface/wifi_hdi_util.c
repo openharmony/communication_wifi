@@ -17,7 +17,6 @@
 #include "wifi_hdi_util.h"
 #include "wifi_common_def.h"
 #include "wifi_log.h"
-#include "decode_util.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiUtil"

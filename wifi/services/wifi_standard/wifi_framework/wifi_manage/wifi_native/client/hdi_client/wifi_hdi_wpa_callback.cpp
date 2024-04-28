@@ -21,7 +21,6 @@
 #include "wifi_ap_hal_interface.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_hdi_common.h"
-#include "decode_util.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;

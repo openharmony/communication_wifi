@@ -47,7 +47,6 @@ ohos_static_library("wifi_self_cure") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
   ]
 
   sources = [
@@ -65,6 +64,7 @@ ohos_static_library("wifi_self_cure") {
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",

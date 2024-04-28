@@ -21,6 +21,7 @@
 #include "wifi_ap_hal_interface.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_hdi_common.h"
+#include "decode_util.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
@@ -446,7 +447,7 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         cbInfo.frequency = groupStartedParam->frequency;
         cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
         StrSafeCopy(tempSsid, sizeof(tempSsid), (char *)groupStartedParam->ssid);
-        printf_decode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
+        PrintfDecode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
         cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);

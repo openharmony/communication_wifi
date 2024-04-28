@@ -179,6 +179,18 @@ void WifiHotspotStub::OnGetHotspotConfig(
     return;
 }
 
+bool WifiHotspotStub::CheckHotspot160MParam(BandType band, int bandwidth, int channel)
+{
+    if ((band != BandType::BAND_5GHZ && bandwidth == AP_BANDWIDTH_160) ||
+        (bandwidth != AP_BANDWIDTH_160 && bandwidth != AP_BANDWIDTH_DEFAULT) ||
+        (band == BandType::BAND_5GHZ && bandwidth == AP_BANDWIDTH_160 &&
+        ((channel < AP_BANDWIDTH_5G_160M_SET_BEGIN) || (channel > AP_BANDWIDTH_5G_160M_SET_END)))) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -187,12 +199,20 @@ void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, Mess
     const char *ssidRead = data.ReadCString();
     config.SetSecurityType(static_cast<KeyMgmt>(data.ReadInt32()));
     config.SetBand(static_cast<BandType>(data.ReadInt32()));
-    config.SetChannel(data.ReadInt32());
+    int dataRead = data.ReadInt32();
+    int channel = dataRead & 0x000000FF;
+    int bandwidth = (dataRead & 0x00FF0000) >> 16;
+
+    BandType band = config.GetBand();
+    config.SetBandWidth(bandwidth);
+    config.SetChannel(channel);
+    WIFI_LOGD("run %{public}s channel %{public}d bandwidth %{public}d band %{public}d",
+        __func__, config.GetChannel(), config.GetBandWidth(), config.GetBand());
     const char *preSharedKeyRead = data.ReadCString();
     config.SetMaxConn(data.ReadInt32());
     config.SetIpAddress(data.ReadString());
     config.SetLeaseTime(data.ReadInt32());
-    if (ssidRead == nullptr || preSharedKeyRead == nullptr) {
+    if (ssidRead == nullptr || preSharedKeyRead == nullptr || !CheckHotspot160MParam(band, bandwidth, channel)) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
         config.SetSsid(ssidRead);

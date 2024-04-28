@@ -72,6 +72,8 @@ void StaAppAcceleration::HandleScreenStatusChanged(int screenState)
         WIFI_LOGI("mode not handle.\n");
     }
 }
+
+#ifndef OHOS_ARCH_LITE
 void StaAppAcceleration::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
     if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND)
@@ -85,6 +87,7 @@ void StaAppAcceleration::HandleForegroundAppChangedAction(const AppExecFwk::AppS
     }
     return;
 }
+#endif
 
 void StaAppAcceleration::SetPmMode(int mode)
 {

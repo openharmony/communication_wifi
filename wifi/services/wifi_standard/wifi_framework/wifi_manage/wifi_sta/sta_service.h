@@ -316,8 +316,9 @@ public:
      * @param state app state.
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
+#ifndef OHOS_ARCH_LITE
     virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
-
+#endif
     /**
      * @Description enable hilink
      *

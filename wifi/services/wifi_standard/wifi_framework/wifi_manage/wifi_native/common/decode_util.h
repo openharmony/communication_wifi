@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,20 @@
  * limitations under the License.
  */
 
-#ifdef HDI_INTERFACE_SUPPORT
-#include "wifi_hdi_callback.h"
-#include "wifi_supplicant_hal_interface.h"
-#include "wifi_log.h"
-#include "wifi_idl_define.h"
-#include "i_wifi_struct.h"
-#include "decode_util.h"
+#ifndef OHOS_DECODE_UTIL_H
+#define OHOS_DECODE_UTIL_H
 
-#undef LOG_TAG
-#define LOG_TAG "WifiHdiCallback"
+#include <cstddef>
 
-void OnEventScanNotify(int status)
-{
-    const OHOS::Wifi::SupplicantEventCallback &cbk =
-        OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().GetCallbackInst();
-    if (cbk.onScanNotify) {
-        cbk.onScanNotify(status);
-    }
+typedef unsigned char u8;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str);
+
+#ifdef __cplusplus
 }
-
+#endif
 #endif

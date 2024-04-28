@@ -1261,8 +1261,8 @@ bool StaStateMachine::IsDisConnectReasonShouldStopTimer(int reason)
 
 bool StaStateMachine::IsStaDisConnectReasonShouldRetryEvent(int eventName)
 {
-    return eventName == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT
-        || eventName == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT;
+    return eventName == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT ||
+        eventName == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT;
 }
 
 void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)

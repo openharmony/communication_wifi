@@ -887,6 +887,7 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_REPORT_DISCONNECT_REASON_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
     staSmHandleFuncMap[CMD_START_NETCHECK] = &StaStateMachine::DealNetworkCheck;
     staSmHandleFuncMap[CMD_START_GET_DHCP_IP_TIMEOUT] = &StaStateMachine::DealGetDhcpIpTimeout;
     staSmHandleFuncMap[CMD_START_RENEWAL_TIMEOUT] = &StaStateMachine::DealRenewalTimeout;
@@ -1251,6 +1252,19 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     return;
 }
 
+static constexpr int DIS_REASON_DISASSOC_STA_HAS_LEFT = 8;
+
+bool StaStateMachine::IsDisConnectReasonShouldStopTimer(int reason)
+{
+    return reason == DIS_REASON_DISASSOC_STA_HAS_LEFT;
+}
+
+bool StaStateMachine::IsStaDisConnectReasonShouldRetryEvent(int eventName)
+{
+    return eventName == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT
+        || eventName == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT;
+}
+
 void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
 {
     LOGW("enter DealWpaLinkFailEvent.\n");
@@ -1259,33 +1273,48 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         return;
     }
     DealSetStaConnectFailedCount(1, false);
-    if (msg->GetMessageName() != WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT &&
-        DealReconnectSavedNetwork()) {
+    int eventName = msg->GetMessageName();
+    if (IsStaDisConnectReasonShouldRetryEvent(eventName) && DealReconnectSavedNetwork()) {
         return;
     }
-    
-    StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+    bool shouldStopTimer = true;
+    if (eventName == WIFI_SVR_CMD_STA_REPORT_DISCONNECT_REASON_EVENT) {
+        std::string bssid = msg->GetStringFromMessage();
+        int reason = msg->GetIntFromMessage();
+        WIFI_LOGI("DealWpaLinkFailEvent reason:%{public}d, bssid:%{public}s", reason, MacAnonymize(bssid).c_str());
+        shouldStopTimer = IsDisConnectReasonShouldStopTimer(reason);
+    }
+    if (shouldStopTimer) {
+        StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+    }
     std::string ssid = linkedInfo.ssid;
     InitWifiLinkedInfo();
     linkedInfo.ssid = ssid;
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT) {
-        SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
-        SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
-        InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
-        InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
-    } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT) {
-        WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
-        SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_FULL);
-        SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
-        InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL, linkedInfo);
-        InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
-    } else if (msg->GetMessageName() == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT) {
-        WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
-        SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_REJECTED);
-        SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
-        InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
-        InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+    switch (eventName) {
+        case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
+            SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
+            SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
+            InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
+            InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+            break;
+        case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
+            WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
+            SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_FULL);
+            SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
+            InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL, linkedInfo);
+            InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+            break;
+        case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
+            WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
+            SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_REJECTED);
+            SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
+            InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
+            InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+            break;
+        default:
+            LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);
+            break;
     }
     linkedInfo.ssid = "";
 }

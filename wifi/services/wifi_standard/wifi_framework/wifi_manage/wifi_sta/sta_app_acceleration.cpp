@@ -95,7 +95,8 @@ void StaAppAcceleration::SetPmMode(int mode)
 
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode(linkedInfo.frequency, mode);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode(
+        WifiSettings::GetInstance().GetStaIfaceName(), linkedInfo.frequency, mode);
     if (ret != 0) {
         WIFI_LOGE("SetPmMode failed, ret = %{public}d.", ret);
         return;
@@ -132,7 +133,8 @@ void StaAppAcceleration::SetGameBoostMode(int enable, int uid, int type, int lim
 void StaAppAcceleration::HighPriorityTransmit(int uid, int protocol, int enable)
 {
     WIFI_LOGI("Enter HighPriorityTransmit.\n");
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetDpiMarkRule(uid, protocol, enable);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetDpiMarkRule(
+        WifiSettings::GetInstance().GetStaIfaceName(), uid, protocol, enable);
     if (ret != 0) {
         WIFI_LOGE("HighPriorityTransmit failed, ret = %{public}d.", ret);
         return;

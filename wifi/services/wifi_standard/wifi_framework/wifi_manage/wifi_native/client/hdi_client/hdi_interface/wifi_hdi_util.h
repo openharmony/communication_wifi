@@ -17,7 +17,8 @@
 #define OHOS_WIFI_HDI_UTIL_H
 
 #include "wifi_hdi_struct.h"
-#include "v1_2/wlan_types.h"
+#include "wifi_common_def.h"
+#include "wifi_hdi_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +27,7 @@ extern "C" {
 int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems,
     int show);
 
-int GetScanResultText(const struct HdfWifiScanResultExt *scanResults,
+int GetScanResultText(const struct WifiScanResultExt *scanResults,
     struct HdiElems *elems, char* buff, int buffLen);
 
 int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length);
@@ -50,6 +51,9 @@ int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *dest
  * @param len - ie length
  */
 void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len);
+
+bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len);
+
 #ifdef __cplusplus
 }
 #endif

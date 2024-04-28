@@ -29,6 +29,7 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_msg.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface/wifi_hdi_common.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface/wifi_hdi_util.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface/i_wifi.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface/i_wifi_chip.c",
@@ -78,6 +79,7 @@ ohos_unittest("idl_client_unittest") {
     "//commonlibrary/c_utils/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
   ]
 
   defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
@@ -88,6 +90,7 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
+    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
   ]
 
   ldflags = [

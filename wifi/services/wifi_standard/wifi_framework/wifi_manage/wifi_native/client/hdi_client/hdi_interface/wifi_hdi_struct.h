@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef HDI_INTERFACE_SUPPORT
+
 #ifndef OHOS_WIFI_HDI_STRUCT_H
 #define OHOS_WIFI_HDI_STRUCT_H
 
@@ -316,8 +316,26 @@ struct HdiParseAttr {
     uint8_t multiApExt;
 };
 
+struct WifiScanResultExt {
+    uint32_t flags;
+    uint8_t* bssid;
+    uint32_t bssidLen;
+    uint16_t caps;
+    uint32_t freq;
+    uint16_t beaconInt;
+    int32_t qual;
+    int32_t level;
+    uint32_t age;
+    uint64_t tsf;
+    uint8_t* variable;
+    uint32_t variableLen;
+    uint8_t* ie;
+    uint32_t ieLen;
+    uint8_t* beaconIe;
+    uint32_t beaconIeLen;
+};
+
 #ifdef __cplusplus
 }
-#endif
 #endif
 #endif

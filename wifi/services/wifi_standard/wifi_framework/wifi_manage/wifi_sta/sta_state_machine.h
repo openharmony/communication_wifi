@@ -973,6 +973,13 @@ private:
      */
     bool IsStaDisConnectReasonShouldRetryEvent(int eventName);
 
+    /**
+     * @Description : Check wpa report DisConnect reason is should stoptimer.
+     *
+     * @param reason - reason.
+     * @Return true: need stop timer.
+     */
+    bool IsDisConnectReasonShouldStopTimer(int reason);
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.

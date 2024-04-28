@@ -28,8 +28,7 @@ namespace OHOS {
 namespace Wifi {
 
 struct WifiAppStateAwareCallbacks {
-    std::function<void(const std::string &bundleName, int uid, int pid,
-        const int state, const int mInstId)> OnForegroundAppChanged;
+    std::function<void(const AppExecFwk::AppStateData &appStateData, const int mInstId)> OnForegroundAppChanged;
 };
 class AppStateObserver;
 

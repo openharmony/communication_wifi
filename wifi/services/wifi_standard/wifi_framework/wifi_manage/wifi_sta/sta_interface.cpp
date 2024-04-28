@@ -408,6 +408,7 @@ ErrCode StaInterface::RenewDhcp()
     return WIFI_OPT_SUCCESS;
 }
 
+#ifndef OHOS_ARCH_LITE
 ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
     WIFI_LOGI("Enter StaInterface::HandleForegroundAppChangedAction");
@@ -416,6 +417,7 @@ ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStat
     pStaService->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
+#endif
 
 ErrCode StaInterface::EnableHiLinkHandshake(const std::string &bssid)
 {

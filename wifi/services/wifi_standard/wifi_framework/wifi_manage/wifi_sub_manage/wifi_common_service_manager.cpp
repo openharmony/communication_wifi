@@ -61,7 +61,7 @@ InitStatus WifiCommonServiceManager::Init()
     }
     using namespace std::placeholders;
     mWifiAppStateAwareCallbacks.OnForegroundAppChanged =
-        std::bind(&WifiCommonServiceManager::OnForegroundAppChanged, this, _1, _2, _3, _4, _5);
+        std::bind(&WifiCommonServiceManager::OnForegroundAppChanged, this, _1, _2);
     if (WifiAppStateAware::GetInstance().InitAppStateAware(mWifiAppStateAwareCallbacks) < 0) {
         WIFI_LOGE("WifiAppStateAware Init failed!");
     }

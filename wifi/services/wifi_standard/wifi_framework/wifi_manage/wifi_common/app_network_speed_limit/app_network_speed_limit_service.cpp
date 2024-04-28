@@ -89,7 +89,8 @@ void AppNetworkSpeedLimitService::HandleWifiConnectStateChanged(const bool isWif
 
 void AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
-    if (state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND)) {
+    if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) &&
+        appStateData.isFocused) {
         if (m_isWifiConnected && m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
             WIFI_LOGI("%{public}s high temp speed limit is running, update background app list", __FUNCTION__);
             LimitSpeed(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP]);

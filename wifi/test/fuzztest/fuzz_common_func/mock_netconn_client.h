@@ -22,8 +22,8 @@
 #include "net_conn_client.h"
 
 namespace OHOS {
-using namespace NetManagerStandard;
-namespace Wifi {
+using namespace ;
+namespace NetManagerStandard {
 class NetConnClient {
 public:
     static NetConnClient &GetInstance();

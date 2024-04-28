@@ -94,7 +94,6 @@ idl_client_sources = [
   "client/idl_client/idl_interface/i_wifi_supplicant_iface.c",
   "client/idl_client/wifi_idl_client.cpp",
   "client/idl_client/wifi_idl_inner_interface.cpp",
-  "common/decode_util.cpp",
   "hal_device_manage/hal_device_manage.cpp",
   "wifi_hal_interface/wifi_ap_hal_interface.cpp",
   "wifi_hal_interface/wifi_base_hal_interface.cpp",

@@ -59,6 +59,10 @@ void SelfCureService::RegisterSelfCureServiceCallback(const std::vector<SelfCure
 void SelfCureService::HandleRssiLevelChanged(int rssi)
 {
     WIFI_LOGI("HandleRssiLevelChanged, %{public}d.\n", rssi);
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("pSelfCureStateMachine is null.\n");
+        return;
+    }
     InternalMessage *msg = pSelfCureStateMachine->CreateMessage();
     if (msg == nullptr) {
         WIFI_LOGE("msg is null.\n");
@@ -78,14 +82,19 @@ void SelfCureService::HandleP2pConnChanged(const WifiP2pLinkedInfo &info)
 void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
     WIFI_LOGD("self cure wifi connection state change, state = %{public}d", state);
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("pSelfCureStateMachine is null.\n");
+        return;
+    }
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD, info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD, info);
-    } else if (state == OperateResState::CONNECT_ASSOCIATED) {
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, info);
     } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
+        pSelfCureStateMachine->SetHttpMonitorStatus(false);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, info);
+    } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
+        pSelfCureStateMachine->SetHttpMonitorStatus(true);
     }
 }
 } //namespace Wifi

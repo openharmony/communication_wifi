@@ -143,9 +143,7 @@ void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &a
     } else {
         WIFI_LOGI("state = %{pubilc}d, not handle.", appStateData.state);
     }
-    if (appStateData.isFocused) {
-        WifiProtectManager::GetInstance().OnAppForegroudChanged(appStateData.bundleName, appStateData.state);
-    }
+    WifiProtectManager::GetInstance().OnAppForegroudChanged(appStateData.bundleName, appStateData.state);
 #ifndef OHOS_ARCH_LITE
     AppNetworkSpeedLimitService::GetInstance().HandleForegroundAppChangedAction(appStateData);
     mWifiAppStateAwareCallbacks.OnForegroundAppChanged(appStateData, mInstId);

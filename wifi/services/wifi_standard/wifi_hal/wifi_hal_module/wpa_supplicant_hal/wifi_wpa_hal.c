@@ -761,6 +761,7 @@ static void WpaCallBackFunc(const char *p)
                 return;
             }
         }
+        WifiHalCbNotifyDisConnectReason(reasonCode, pBssid);
         WifiHalCbNotifyConnectChanged(WPA_CB_DISCONNECTED, reasonCode, pBssid);
     /* bssid changed event */
     } else if (strncmp(p, WPA_EVENT_BSSID_CHANGED, strlen(WPA_EVENT_BSSID_CHANGED)) == 0) {

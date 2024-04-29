@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-#ifndef MOCK_NET_CONN_MANAGER_H
-#define MOCK_NET_CONN_MANAGER_H
-
 #include "mock_netconn_client.h"
 #include "wifi_log.h"
 

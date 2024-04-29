@@ -19,6 +19,8 @@
 #include "wifi_hdi_define.h"
 #include "wifi_hdi_struct.h"
 
+typedef unsigned char u8;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -102,6 +104,8 @@ static inline uint16_t HdiGetBe16(const uint8_t *a)
 {
     return (a[HDI_POS_FIRST] << HDI_MOVE_EIGHT) | a[HDI_POS_ZERO];
 }
+
+size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str);
 
 int HdiTxtPrintf(char *str, size_t size, const char *format, ...);
 

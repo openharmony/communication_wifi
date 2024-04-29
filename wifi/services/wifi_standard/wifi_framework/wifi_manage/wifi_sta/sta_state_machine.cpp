@@ -38,6 +38,7 @@
 #include "iremote_proxy.h"
 #include "iservice_registry.h"
 #include "message_parcel.h"
+#include "securec.h"
 #include "system_ability_definition.h"
 #include "wifi_app_state_aware.h"
 #include "wifi_net_observer.h"
@@ -2762,6 +2763,12 @@ void StaStateMachine::GetIpState::GoInState()
         int dhcpRet;
         std::string ifname = WifiSettings::GetInstance().GetStaIfaceName();
         pStaStateMachine->currentTpType = static_cast<int>(WifiSettings::GetInstance().GetDhcpIpType());
+
+        RouterConfig config;
+        if (strncpy_s(config.bssid, sizeof(config.bssid),
+            pStaStateMachine->linkedInfo.bssid.c_str(), pStaStateMachine->linkedInfo.bssid.size()) == EOK) {
+            SetConfiguration(ifname.c_str(), config);
+        }
         if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
             dhcpRet = StartDhcpClient(ifname.c_str(), false);
         } else {

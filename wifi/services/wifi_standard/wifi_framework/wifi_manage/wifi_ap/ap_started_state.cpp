@@ -356,6 +356,7 @@ void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessage &msg)
     m_hotspotConfig.SetSecurityType(securityType);
     m_hotspotConfig.SetBand(static_cast<BandType>(msg.GetIntFromMessage()));
     m_hotspotConfig.SetChannel(msg.GetIntFromMessage());
+    m_hotspotConfig.SetBandWidth(msg.GetIntFromMessage());
     m_hotspotConfig.SetMaxConn(msg.GetIntFromMessage());
     m_hotspotConfig.SetIpAddress(msg.GetStringFromMessage());
     m_hotspotConfig.SetLeaseTime(msg.GetIntFromMessage());

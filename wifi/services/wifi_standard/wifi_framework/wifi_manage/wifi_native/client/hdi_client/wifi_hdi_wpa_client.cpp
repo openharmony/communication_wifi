@@ -621,7 +621,9 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiSetApBand(static_cast<int>(config.GetBand()), id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (HdiSetApChannel(config.GetChannel(), id) != WIFI_IDL_OPT_OK) {
+    int channel = config.GetChannel() | (config.GetBandWidth << 16);
+    LOGI("WifiHdiWpaClient::%{public}s enter, channel=%{public}d", _func_, channel);
+    if (HdiSetApChannel(channel, id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     if (HdiSetApMaxConn(config.GetMaxConn(), id) != WIFI_IDL_OPT_OK) {

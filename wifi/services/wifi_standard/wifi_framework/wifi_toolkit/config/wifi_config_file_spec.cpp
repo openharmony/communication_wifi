@@ -210,6 +210,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.ancoCallProcessName = value;
     } else if (key == "version") {
         item.version = std::stoi(value);
+    } else if (key == "randomizedMacSuccessEver") {
+        item.randomizedMacSuccessEver = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else {
         return SetWifiDeviceConfigExternal(item, key, value);
     }
@@ -477,6 +479,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 #endif
     ss << "    " <<"callProcessName=" << item.callProcessName << std::endl;
     ss << "    " <<"ancoCallProcessName=" << item.ancoCallProcessName << std::endl;
+    ss << "    " <<"randomizedMacSuccessEver=" << item.randomizedMacSuccessEver << std::endl;
     ss << "    " <<"</WifiDeviceConfig>" << std::endl;
     return ss.str();
 }

@@ -228,9 +228,9 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
         }
         return true;
     } else {
-        WIFI_LOGE("EAP:%{public}s unsupported!", config.wifiEapConfig.eap.c_str());
+        WIFI_LOGW("EAP:%{public}s unsupported!", config.wifiEapConfig.eap.c_str());
     }
-    return false;
+    return true;
 }
 
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
@@ -291,7 +291,7 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
     WIFI_LOGD("InitWifiBrokerProcessInfo,networkId=%{public}d, ProcessName=[%{public}s],"
         "ancoCallProcessName =[%{public}s],bssid = [%{public}s],ssid=[%{public}s]",
         config.networkId, config.callProcessName.c_str(), config.ancoCallProcessName.c_str(),
-        config.bssid.c_str(), config.ssid.c_str());
+        MacAnonymize(config.bssid).c_str(), SsidAnonymize(config.ssid).c_str());
     if (config.networkId == WIFI_BROKER_NETWORK_ID && config.ancoCallProcessName == BROKER_PROCESS_PROTECT_FLAG &&
         config.bssid.empty() && config.ssid.empty() && config.callProcessName == ANCO_SERVICE_BROKER) {
         SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);
@@ -1147,12 +1147,14 @@ ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> 
 
 ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, int &level)
 {
+    WIFI_LOGI("GetSignalLevel device impl start...");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSignalLevel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     level = WifiConfigCenter::GetInstance().GetSignalLevel(rssi, band, m_instId);
+    WIFI_LOGI("GetSignalLevel device impl end...");
     return WIFI_OPT_SUCCESS;
 }
 

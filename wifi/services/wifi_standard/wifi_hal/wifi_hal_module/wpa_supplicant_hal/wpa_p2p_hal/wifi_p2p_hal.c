@@ -1181,6 +1181,10 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetChba0Freq(WifiWpaP2pInterface *thi
         LOGE("retbuf is null");
         return P2P_SUP_ERRCODE_FAILED;
     }
+    if (retbuf == NULL) {
+        LOGE("retbuf is null, return P2P_SUP_ERRCODE_FAILED");
+        return P2P_SUP_ERRCODE_FAILED;
+    }
     char *freq = strstr(retbuf, "freq=");
     if (freq != NULL) {
         freq += strlen("freq=");

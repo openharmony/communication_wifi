@@ -55,7 +55,7 @@ void OnWpsOverlap(int status);
 void OnWpsTimeOut(int status);
 void OnWpaConnectionFull(int status);
 void OnWpaConnectionReject(int status);
-void OnWpaEventStaNotify(const char *bssid);
+void OnWpaStaNotifyCallBack(const char *notifyParam);
 
 /**
  * @Description Get the Supplicant Rpc Client object.

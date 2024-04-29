@@ -26,6 +26,7 @@
 #include "wifi_location_mode_observer.h"
 #include "wifi_common_util.h"
 #include "wifi_settings.h"
+#include "wifi_notification_util.h"
 #ifdef HAS_POWERMGR_PART
 #include "wifi_power_state_listener.h"
 #include "suspend/sleep_priority.h"
@@ -79,7 +80,8 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED, &
     CesEventSubscriber::OnReceiveThermalEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
-    CesEventSubscriber::OnReceiveStandbyEvent}
+    CesEventSubscriber::OnReceiveStandbyEvent},
+    {WIFI_EVENT_TAP_NOTIFICATION, &CesEventSubscriber::OnReceiveNotificationEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -336,16 +338,17 @@ void WifiEventSubscriberManager::SetCloneDataByDatashare(const std::string &clon
 void WifiEventSubscriberManager::DealCloneDataChangeEvent()
 {
     WIFI_LOGI("DealCloneDataChangeEvent enter");
-    std::string cloneData;
-    GetCloneDataByDatashare(cloneData);
-    if (cloneData.empty()) {
-        return;
-    }
-    auto mergeCalback = [ = ]() -> void {
-        WIFI_LOGI("DealCloneDataChangeEvent MergeWifiCloneConfig callback.");
+    mWifiEventSubsThread = std::make_unique<WifiEventHandler>("WifiEventSubsThread");
+    mWifiEventSubsThread->PostAsyncTask([this]() {
+        std::string cloneData;
+        GetCloneDataByDatashare(cloneData);
+        if (cloneData.empty()) {
+            return;
+        }
+        WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData);
+        cloneData.clear();
         SetCloneDataByDatashare("");
-    };
-    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData, mergeCalback);
+    });
 }
 
 void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
@@ -814,6 +817,18 @@ void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEvent
         WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
     } else {
         WifiSettings::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
+    }
+}
+
+void CesEventSubscriber::OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    WIFI_LOGI("OnReceiveNotificationEvent action[%{public}s]", action.c_str());
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+        if (pService != nullptr) {
+            pService->StartPortalCertification();
+        }
     }
 }
 }  // namespace Wifi

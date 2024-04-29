@@ -46,7 +46,7 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
             return;
         }
         remote_ = impl;
-        WIFI_LOGI("AddDeathRecipient success! ");
+        WIFI_LOGD("AddDeathRecipient success! ");
     }
 }
 
@@ -1363,6 +1363,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
 
 ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &level)
 {
+    WIFI_LOGI("GetSignalLevel proxy start...");
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -1393,6 +1394,7 @@ ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &l
     }
 
     level = reply.ReadInt32();
+    WIFI_LOGI("GetSignalLevel proxy end...");
     return WIFI_OPT_SUCCESS;
 }
 

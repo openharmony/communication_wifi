@@ -19,6 +19,8 @@
 #ifndef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
+#include "core_service_client.h"
+#include "cellular_data_client.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_settings.h"
@@ -37,6 +39,23 @@ namespace Wifi {
 
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
+
+#define EAP_AUTH_IMSI_MCC_POS 0
+#define EAP_AUTH_MAX_MCC_LEN  3
+#define EAP_AUTH_IMSI_MNC_POS 3
+#define EAP_AUTH_MIN_MNC_LEN  2
+#define EAP_AUTH_MAX_MNC_LEN  3
+#define EAP_AUTH_MIN_PLMN_LEN  5
+#define EAP_AUTH_MAX_PLMN_LEN  6
+#define EAP_AUTH_MAX_IMSI_LENGTH 15
+
+#define EAP_AKA_PERMANENT_PREFIX "0"
+#define EAP_SIM_PERMANENT_PREFIX "1"
+#define EAP_AKA_PRIME_PERMANENT_PREFIX "6"
+
+#define EAP_AUTH_WLAN_MNC "@wlan.mnc"
+#define EAP_AUTH_WLAN_MCC ".mcc"
+#define EAP_AUTH_PERMANENT_SUFFIX ".3gppnetwork.org"
 
 StaService::StaService(int instId)
     : pStaStateMachine(nullptr),
@@ -276,6 +295,103 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
+std::string StaService::ConvertString(const std::u16string &wideText) const
+{
+    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(wideText);
+}
+
+#ifndef OHOS_ARCH_LITE
+int32_t StaService::GetDataSlotId() const
+{
+    auto slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
+    if ((slotId < 0) || (slotId >= simCount)) {
+        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotId, simCount);
+        return -1;
+    }
+    LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
+    return slotId;
+}
+
+std::string StaService::GetImsi(int32_t slotId) const
+{
+    std::u16string imsi;
+    int32_t errCode = CoreServiceClient::GetInstance().GetIMSI(slotId, imsi);
+    if (errCode != 0) {
+        LOGE("failed to get imsi, errCode: %{public}d", errCode);
+        return "";
+    }
+    return ConvertString(imsi);
+}
+
+std::string StaService::GetPlmn(int32_t slotId) const
+{
+    std::u16string plmn;
+    int32_t errCode = CoreServiceClient::GetInstance().GetSimOperatorNumeric(slotId, plmn);
+    if (errCode != 0) {
+        LOGE("failed to get plmn, errCode: %{public}d", errCode);
+        return "";
+    }
+    return ConvertString(plmn);
+}
+#endif
+
+std::string StaService::GetMcc(const std::string &imsi) const
+{
+    return imsi.substr(EAP_AUTH_IMSI_MCC_POS, EAP_AUTH_MAX_MCC_LEN);
+}
+
+std::string StaService::GetMnc(const std::string &imsi, const int mncLen) const
+{
+    return imsi.substr(EAP_AUTH_IMSI_MNC_POS, mncLen);
+}
+
+void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const
+{
+    std::string eapMethod = config.wifiEapConfig.eap;
+
+    LOGI("Enter StaService::UpdateEapConfig, eapMethod:%{public}s", eapMethod.c_str());
+    std::string prefix;
+    if (eapMethod == EAP_METHOD_SIM) {
+        prefix = EAP_SIM_PERMANENT_PREFIX;
+    } else if (eapMethod == EAP_METHOD_AKA) {
+        prefix = EAP_AKA_PERMANENT_PREFIX;
+    } else if (eapMethod == EAP_METHOD_AKA_PRIME) {
+        prefix = EAP_AKA_PRIME_PERMANENT_PREFIX;
+    } else {
+        return;
+    }
+
+    int32_t slotId = GetDataSlotId();
+    if (slotId == -1) {
+        return;
+    }
+
+    std::string imsi = GetImsi(slotId);
+    if (imsi.empty() || imsi.length() > EAP_AUTH_MAX_IMSI_LENGTH) {
+        LOGE("invalid imsi, length: %{public}zu", imsi.length());
+        return;
+    }
+
+    std::string mnc;
+    std::string plmn = GetPlmn(slotId);
+    LOGI("imsi: %{private}s, plmn: %{public}s", imsi.c_str(), plmn.c_str());
+    if (plmn.length() == EAP_AUTH_MIN_PLMN_LEN) {
+        mnc = "0" + GetMnc(imsi, EAP_AUTH_MIN_MNC_LEN);
+    } else if (plmn.length() == EAP_AUTH_MAX_PLMN_LEN) {
+        mnc = GetMnc(imsi, EAP_AUTH_MAX_MNC_LEN);
+    } else {
+        LOGE("invalid plmn, length: %{public}zu", plmn.length());
+        return;
+    }
+
+    // identity: prefix + imsi + "@wlan.mnc" + mnc + ".mcc" + mcc + ".3gppnetwork.org"
+    std::string identity = prefix + imsi + EAP_AUTH_WLAN_MNC + mnc +
+        EAP_AUTH_WLAN_MCC + GetMcc(imsi) + EAP_AUTH_PERMANENT_SUFFIX;
+    LOGI("StaService::UpdateEapConfig, identity: %{public}s", identity.c_str());
+    wifiEapConfig.identity = identity;
+}
+
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
     LOGI("Enter AddDeviceConfig, bssid=%{public}s\n", MacAnonymize(config.bssid).c_str());
@@ -321,11 +437,13 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         if (ret == 0) {
             tempDeviceConfig.wifiEapConfig.clientCert = uri;
             tempDeviceConfig.wifiEapConfig.privateKey = uri;
-            LOGE("install cert: %{public}s", tempDeviceConfig.wifiEapConfig.clientCert.c_str());
+            LOGI("success to install cert: %{public}s", tempDeviceConfig.wifiEapConfig.clientCert.c_str());
         } else {
-            LOGE("install cert: %{public}d, alias: %{public}s", ret, alias.c_str());
+            LOGE("failed to install cert: %{public}d, alias: %{public}s", ret, alias.c_str());
         }
     }
+
+    UpdateEapConfig(config, tempDeviceConfig.wifiEapConfig);
 
     /* Add the new network to WifiSettings. */
     if (WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
@@ -724,14 +842,13 @@ ErrCode StaService::RenewDhcp()
 }
 
 #ifndef OHOS_ARCH_LITE
-ErrCode StaService::HandleForegroundAppChangedAction(const std::string &bundleName,
-    int uid, int pid, const int state)
+ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
     if (pStaAppAcceleration == nullptr) {
         WIFI_LOGE("pStaAppAcceleration is null");
         return WIFI_OPT_FAILED;
     }
-    pStaAppAcceleration->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    pStaAppAcceleration->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
 #endif

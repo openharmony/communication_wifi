@@ -199,6 +199,10 @@ WifiErrorNo StartHdiWifi()
     }
     LOGI("%{public}s: success to get HdfRemoteService", __func__);
     struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
+    if (recipient == NULL) {
+        LOGE("%{public}s: OsalMemCalloc is failed", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
     recipient->OnRemoteDied = ProxyOnRemoteDied;
     HdfRemoteServiceAddDeathRecipient(remote, recipient);
     return WIFI_IDL_OPT_OK;
@@ -208,10 +212,10 @@ WifiErrorNo HdiStop()
 {
     LOGI("%{public}s: begin to stop hdi service", __func__);
     pthread_mutex_lock(&g_mutex);
-    if (g_wlanObj == NULL || g_wlanRefCount == 0) {
+    if (g_wlanObj == NULL) {
         pthread_mutex_unlock(&g_mutex);
-        LOGE("%{public}s: invalid parameter", __func__);
-        return WIFI_IDL_OPT_FAILED;
+        LOGE("%{public}s: parameter null, no need to stop.", __func__);
+        return WIFI_IDL_OPT_OK;
     }
 
     const unsigned int ONE_REF_COUNT = 1;

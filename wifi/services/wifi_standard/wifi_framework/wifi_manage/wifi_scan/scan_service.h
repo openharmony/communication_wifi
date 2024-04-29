@@ -263,22 +263,6 @@ public:
      */
     virtual void SetEnhanceService(IEnhanceService* enhanceService);
     /**
-     * @Description  StartWifiHdi
-     *
-     * @Output: Return operating results to Interface Service after start wifi hdi
-               successfully.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode StartWifiHdi();
-    /**
-     * @Description  CloseWifiHdi
-     *
-     * @Output: Return operating results to Interface Service after close wifi hdi
-               successfully.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode CloseWifiHdi();
-    /**
      * @Description Init chipset info.
      */
     virtual void InitChipsetInfo();
@@ -297,6 +281,7 @@ private:
     using ScanInfoHandlerMap = std::map<std::string, ScanInfoHandler>;
     using PnoScanInfoHandlerMap = std::map<std::string, PnoScanInfoHandler>;
 
+    std::shared_mutex mScanCallbackMutex;
     IScanSerivceCallbacks mScanSerivceCallbacks;
     ScanStateMachine *pScanStateMachine;             /* Scanning state machine pointer */
     ScanMonitor *pScanMonitor;                       /* Scanning Monitor Pointer */
@@ -396,6 +381,10 @@ private:
      * @return success: true, failed: false
      */
     bool StoreUserScanInfo(const StoreScanConfig &scanConfig, std::vector<InterScanInfo> &scanInfoList);
+
+    void ReportScanStartEvent();
+    void ReportScanStopEvent();
+    void ReportScanFinishEvent(int event);
     /**
      * @Description Sends the scanning result to the interface service,
      *              which then sends the scanning result to the connection

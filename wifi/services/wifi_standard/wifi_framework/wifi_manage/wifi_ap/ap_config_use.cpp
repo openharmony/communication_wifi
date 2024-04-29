@@ -50,7 +50,7 @@ void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig) const
             bestChannel = GetBestChannelFor2G();
             break;
         case BandType::BAND_5GHZ:
-            bestChannel = GetBestChannelFor5G();
+            bestChannel = GetBestChannelFor5G(apConfig);
             break;
         default:
             // BAND_6GHZ, BAND_60GHZ do nothing
@@ -81,11 +81,15 @@ int ApConfigUse::GetBestChannelFor2G() const
     return channels[GetRandomInt(0, channels.size() - 1)];
 }
 
-int ApConfigUse::GetBestChannelFor5G() const
+int ApConfigUse::GetBestChannelFor5G(HotspotConfig &apConfig) const
 {
     std::vector<int> channels = GetChannelFromDrvOrXmlByBand(BandType::BAND_5GHZ);
     FilterIndoorChannel(channels);
     Filter165Channel(channels);
+    if (apConfig.GetBandWidth() == AP_BANDWIDTH_160) {
+        WIFI_LOGI("GetBestChannelFor5G Bandwidth is 160M");
+        return AP_BANDWIDTH_5G_160M_DEFAULT;
+    }
     if (channels.empty()) {
         WIFI_LOGI("GetBestChannelFor5G is empty");
         return AP_CHANNEL_INVALID;
@@ -109,7 +113,8 @@ std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandT
         return preferredChannels;
     }
     std::vector<int> freqs;
-    WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(bandType), freqs);
+    WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand(
+        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(bandType), freqs);
     if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(bandType, freqs);
         WIFI_LOGI("get freqs from drv fail, use default, bandType=%{public}d, size=%{public}d",

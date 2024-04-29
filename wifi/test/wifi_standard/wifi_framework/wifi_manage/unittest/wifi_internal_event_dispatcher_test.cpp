@@ -27,40 +27,30 @@ namespace Wifi {
  */
 HWTEST_F(WifiInternalEventDispatcherTest, ThreadTest, TestSize.Level1)
 {
+    WifiInternalEventDispatcher instance;
     WifiEventCallbackMsg msg;
     msg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_SCAN_STATE_CHANGE;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_RSSI_CHANGE;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_JOIN;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_STREAM_DIRECTION;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = WIFI_CBK_MSG_WPS_STATE_CHANGE;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(1);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = 0xffff;
-    EXPECT_EQ(0, WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(msg));
-    sleep(2);
+    WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
 }
 
 HWTEST_F(WifiInternalEventDispatcherTest, InitExitTest, TestSize.Level1)

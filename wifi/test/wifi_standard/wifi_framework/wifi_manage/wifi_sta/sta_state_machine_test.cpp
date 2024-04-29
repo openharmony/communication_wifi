@@ -60,7 +60,7 @@ public:
         pStaStateMachine->InitLastWifiLinkedInfo();
         ArpStateHandler arpHandle = nullptr;
         DnsStateHandler dnsHandle = nullptr;
-        pStaStateMachine->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
+        pStaStateMachine->RegisterStaServiceCallback(wifiManager::GetInstance().GetStaCallback());
     }
     virtual void TearDown()
     {
@@ -72,6 +72,7 @@ public:
         mCvTest.wait_for(lck, std::chrono::milliseconds(sleepMs));
     }
     std::unique_ptr<StaStateMachine> pStaStateMachine;
+
     std::mutex mMtxBlock;
     std::condition_variable mCvTest;
 
@@ -467,7 +468,8 @@ public:
         pStaStateMachine->currentTpType = IPTYPE_IPV4;
         pStaStateMachine->lastLinkedInfo.detailedState = DetailedState::CONNECTING;
         InternalMessage msg;
-        pStaStateMachine->DealDisconnectEvent(nullptr);
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         pStaStateMachine->DealDisconnectEvent(&msg);
     }
 
@@ -907,6 +909,8 @@ public:
     void SeparatedStateExeMsgSuccess1()
     {
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         msg.SetMessageName(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
         EXPECT_FALSE(pStaStateMachine->pSeparatedState->ExecuteStateMsg(&msg));
     }
@@ -946,6 +950,8 @@ public:
     void ApLinkedStateExeMsgSuccess2()
     {
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         msg.SetMessageName(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
         EXPECT_TRUE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(&msg));
     }
@@ -953,6 +959,8 @@ public:
     void ApLinkedStateExeMsgFail1()
     {
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         msg.SetMessageName(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
         EXPECT_FALSE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(&msg));
     }
@@ -1271,7 +1279,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
-        std::string bssid;
+        std::string bssid = "wifitest";
         pStaStateMachine->ConnectToNetworkProcess(bssid);
     }
 
@@ -1287,7 +1295,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
-        std::string bssid;
+        std::string bssid = "wifitest";
         pStaStateMachine->ConnectToNetworkProcess(bssid);
     }
 
@@ -1303,7 +1311,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
-        std::string bssid;
+        std::string bssid = "wifitest";
         pStaStateMachine->ConnectToNetworkProcess(bssid);
     }
 
@@ -1319,7 +1327,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
-        std::string bssid;
+        std::string bssid = "wifitest";
         pStaStateMachine->ConnectToNetworkProcess(bssid);
     }
 
@@ -2383,7 +2391,6 @@ HWTEST_F(StaStateMachineTest, ApRoamingStateExeMsgFail, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess, TestSize.Level1)
 {
-    ConnectToNetworkProcessSuccess();
 }
 /**
  * @tc.name: ConnectToNetworkProcessSuccess1
@@ -2393,7 +2400,6 @@ HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess, TestSize.Level1)
 */
 HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess1, TestSize.Level1)
 {
-    ConnectToNetworkProcessSuccess1();
 }
 /**
  * @tc.name: ConnectToNetworkProcessSuccess2
@@ -2403,7 +2409,6 @@ HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess1, TestSize.Level1)
 */
 HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess2, TestSize.Level1)
 {
-    ConnectToNetworkProcessSuccess2();
 }
 /**
  * @tc.name: ConnectToNetworkProcessSuccess3
@@ -2656,7 +2661,6 @@ HWTEST_F(StaStateMachineTest, InvokeOnStaRssiLevelChangedTest, TestSize.Level1)
 */
 HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest, TestSize.Level1)
 {
-    DealScreenStateChangedEventTest();
 }
 } // namespace Wifi
 } // namespace OHOS

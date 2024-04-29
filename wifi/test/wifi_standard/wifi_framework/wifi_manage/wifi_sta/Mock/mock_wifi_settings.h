@@ -82,6 +82,7 @@ public:
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
     virtual void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0) = 0;
     virtual void GetPortalUri(WifiPortalConf &urlInfo) = 0;
+    virtual int GetScreenState() const = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -146,6 +147,7 @@ public:
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
     MOCK_METHOD2(SaveDisconnectedReason, void(DisconnectedReason discReason, int));
     MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
+    MOCK_CONST_METHOD0(GetScreenState, int());
 };
 }  // namespace OHOS
 }  // namespace Wifi

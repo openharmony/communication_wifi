@@ -84,16 +84,28 @@ StaServiceCallback SelfCureInterface::GetStaCallback()
 
 void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+    }
     pSelfCureService->HandleStaConnChanged(state, info);
 }
 
 void SelfCureInterface::DealRssiLevelChanged(int rssi, int instId)
 {
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+    }
     pSelfCureService->HandleRssiLevelChanged(rssi);
 }
 
 void SelfCureInterface::DealP2pConnChanged(const WifiP2pLinkedInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+    }
     pSelfCureService->HandleP2pConnChanged(info);
 }
 

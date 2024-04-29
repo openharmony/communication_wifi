@@ -232,5 +232,42 @@ void WriteWifiEncryptionFailHiSysEvent(int event, const std::string& maskSsid, c
     root["ENCRYEVENTMODULE"] = encryptedModule;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFIENCRY_OR_DECRY_FAIL", "EVENT_VALUE", writer.write(root));
 }
+
+void WritePortalStateHiSysEvent(int portalState)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["PORTAL_STATE"] = portalState;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_PORTAL_STATE", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteArpInfoHiSysEvent(uint64_t arpRtt, int arpFailedCount)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ARP_RTT"] = arpRtt;
+    root["ARP_FAILED_COUNT"] = arpFailedCount;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_ARP_DETECTION_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["LEVEL"] = signalLevel;
+    root["BAND"] = band;
+    root["RSSI"] = rssi;
+    root["LINKSPEED"] = linkSpeed;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_LINK_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WirteConnectTypeHiSysEvent(std::string connectType)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["CONNECT_TYPE"] = connectType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_CONNECT_TYPE", "EVENT_VALUE", writer.write(root));
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

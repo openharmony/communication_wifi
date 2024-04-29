@@ -17,6 +17,7 @@
 
 #include "state_machine.h"
 #include <vector>
+#include <shared_mutex>
 #include "dhcpd_interface.h"
 #include "i_ap_service.h"
 #include "ap_root_state.h"
@@ -116,6 +117,7 @@ private:
 
 private:
     std::string m_iface;
+    std::shared_mutex m_callbackMutex;
     std::map<std::string, IApServiceCallbacks> m_callbacks;
     /* STA Manager */
     ApStationsManager &m_ApStationsManager;

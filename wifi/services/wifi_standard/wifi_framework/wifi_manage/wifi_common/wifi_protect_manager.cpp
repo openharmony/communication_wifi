@@ -25,7 +25,6 @@
 #include "iservice_registry.h"
 #include "app_mgr_constants.h"
 #include "define.h"
-#include "wifi_rx_listen_arbitration.h"
 #endif
 #include "wifi_settings.h"
 
@@ -233,7 +232,7 @@ void WifiProtectManager::UpdateWifiClientConnected(bool isConnected)
 
 #ifndef OHOS_ARCH_LITE
     if (ChangeWifiPowerMode()) {
-        LOGE("Failed to update wifi power mode for connect state change");
+        LOGD("Failed to update wifi power mode for connect state change");
     }
 #endif
 }

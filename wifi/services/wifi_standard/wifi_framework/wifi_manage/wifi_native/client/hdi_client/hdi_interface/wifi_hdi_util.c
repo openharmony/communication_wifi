@@ -17,7 +17,6 @@
 #include "wifi_hdi_util.h"
 #include "wifi_common_def.h"
 #include "wifi_log.h"
-#include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiUtil"
@@ -1223,7 +1222,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             start = length;
             break;
 #else
@@ -1232,7 +1231,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             GetInfoElems(length, end, srcBuf, pcmd);
             start = length;
             break;

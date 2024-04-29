@@ -446,7 +446,7 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         cbInfo.frequency = groupStartedParam->frequency;
         cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
         StrSafeCopy(tempSsid, sizeof(tempSsid), (char *)groupStartedParam->ssid);
-        printf_decode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
+        PrintfDecode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
         cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);

@@ -389,6 +389,7 @@ public:
         void DealDhcpResultFailed();
         static void SetStaStateMachine(StaStateMachine *staStateMachine);
         static void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        static void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToCloseDhcpClient(int iptype);
         static void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);

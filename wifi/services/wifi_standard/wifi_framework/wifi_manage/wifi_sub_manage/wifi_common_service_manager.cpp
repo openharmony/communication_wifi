@@ -61,7 +61,7 @@ InitStatus WifiCommonServiceManager::Init()
     }
     using namespace std::placeholders;
     mWifiAppStateAwareCallbacks.OnForegroundAppChanged =
-        std::bind(&WifiCommonServiceManager::OnForegroundAppChanged, this, _1, _2, _3, _4, _5);
+        std::bind(&WifiCommonServiceManager::OnForegroundAppChanged, this, _1, _2);
     if (WifiAppStateAware::GetInstance().InitAppStateAware(mWifiAppStateAwareCallbacks) < 0) {
         WIFI_LOGE("WifiAppStateAware Init failed!");
     }
@@ -82,12 +82,11 @@ InitStatus WifiCommonServiceManager::Init()
     return INIT_OK;
 }
 #ifndef OHOS_ARCH_LITE
-void WifiCommonServiceManager::OnForegroundAppChanged(const std::string &bundleName, int uid, int pid,
-    const int state, const int mInstId)
+void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId)
 {
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(mInstId);
     if (pService != nullptr) {
-        pService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+        pService->HandleForegroundAppChangedAction(appStateData);
     }
 }
 #endif

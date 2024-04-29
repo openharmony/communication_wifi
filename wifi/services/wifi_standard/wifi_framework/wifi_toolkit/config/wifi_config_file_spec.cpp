@@ -1384,7 +1384,7 @@ template <> std::string OutTClassString<SoftApRandomMac>(SoftApRandomMac &item)
     ss << "    " <<"ssid=" << item.ssid << std::endl;
     ss << "    " <<"keyMgmt=" << static_cast<int>(item.keyMgmt) << std::endl;
     ss << "    " <<"randomMac=" << item.randomMac << std::endl;
-    ss << "    " <<"<SoftApRandomMac>" << std::endl;
+    ss << "    " <<"</SoftApRandomMac>" << std::endl;
     return ss.str();
 }
 

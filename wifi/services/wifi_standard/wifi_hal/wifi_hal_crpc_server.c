@@ -491,6 +491,16 @@ static void DealConnectionChangedCbk(int event, Context *context)
     return;
 }
 
+static void DealDisConnectReasonChangedCbk(int event, Context *context)
+{
+    WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
+    if (cbmsg != NULL) {
+        WriteInt(context, cbmsg->msg.connMsg.status);
+        WriteStr(context, cbmsg->msg.connMsg.bssid);
+    }
+    return;
+}
+
 static void DealBssidChangedCbk(int event, Context *context)
 {
     WifiHalEventCallbackMsg *cbmsg = FrontCallbackMsg(event);
@@ -534,6 +544,9 @@ static void DealStaApCallback(int event, Context *context)
             break;
         case WIFI_CONNECT_CHANGED_NOTIFY_EVENT:
             DealConnectionChangedCbk(event, context);
+            break;
+        case WIFI_STA_DISCONNECT_REASON_EVENT:
+            DealDisConnectReasonChangedCbk(event, context);
             break;
         case WIFI_BSSID_CHANGED_NOTIFY_EVENT:
             DealBssidChangedCbk(event, context);

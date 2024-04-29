@@ -81,6 +81,24 @@ void WifiHalCbNotifyConnectChanged(int status, int networkId, const char *pos)
     return;
 }
 
+void WifiHalCbNotifyDisConnectReason(int reason, const char *bssid)
+{
+    if (bssid == NULL) {
+        LOGI("Get connect state changed, pos is NULL");
+        return;
+    }
+    LOGI("Get disconnect state changed, reason: %{public}d", reason);
+    WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    if (pCbkMsg == NULL) {
+        LOGE("create callback message failed!");
+        return;
+    }
+    pCbkMsg->msg.connMsg.status = reason;
+    StrSafeCopy(pCbkMsg->msg.connMsg.bssid, WIFI_MAC_LENGTH + 1, bssid);
+    EmitEventCallbackMsg(pCbkMsg, WIFI_STA_DISCONNECT_REASON_EVENT);
+    return;
+}
+
 void WifiHalCbNotifyBssidChanged(const char *reasonPos, const char *bssidPos)
 {
     char reason[WIFI_REASON_LENGTH] = {0};

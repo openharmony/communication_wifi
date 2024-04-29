@@ -952,6 +952,17 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     return 0;
 }
 
+int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.randomizedMacSuccessEver = true;
+    return 0;
+}
+
 int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config)
 {
     std::vector<WifiDeviceConfig> configs;

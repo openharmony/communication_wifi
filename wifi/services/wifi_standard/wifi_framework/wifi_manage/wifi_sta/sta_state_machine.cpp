@@ -606,7 +606,10 @@ void StaStateMachine::StartWifiProcess()
         if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false) != WIFI_IDL_OPT_OK) {
             WIFI_LOGI("The automatic Wpa connection is disabled failed.");
         }
-        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(true) != WIFI_IDL_OPT_OK) {
+        int screenState = WifiSettings::GetInstance().GetScreenState();
+        WIFI_LOGI("set suspend mode to chip when wifi started, screenState: %{public}d", screenState);
+        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
+            != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("%{public}s WpaSetSuspendMode failed!", __FUNCTION__);
         }
 
@@ -1207,7 +1210,6 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
 #endif
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     StopTimer(static_cast<int>(CMD_START_NETCHECK));
-    StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     WIFI_LOGI("StopTimer CMD_START_RENEWAL_TIMEOUT DealDisconnectEvent");
 #ifndef OHOS_ARCH_LITE
     StaStateMachine::DhcpResultNotify::StopRenewTimeout();

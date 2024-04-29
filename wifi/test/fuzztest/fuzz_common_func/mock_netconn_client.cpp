@@ -22,12 +22,7 @@ namespace Wifi {
 NetConnClient &NetConnClient::GetInstance()
 {
     static NetConnClient gNetConnClient;
-    return gNetConnClient;s
-}
-int32_t NetConnClient::RegisterNetSupplier(NetBearType bearerType, const std::string &ident, const std::set<NetCap> &netCaps,
-                                uint32_t &supplierId);RegisterNetSupplier(const int &pid, const int &uid)
-{
-    return NETMANAGER;
+    return gNetConnClient;
 }
 
 int32_t NetConnClient::UnregisterNetSupplier(uint32_t supplierId)

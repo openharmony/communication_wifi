@@ -27,9 +27,6 @@ class NetConnClient {
 public:
     static NetConnClient &GetInstance();
 
-    int32_t RegisterNetSupplier(NetBearType bearerType, const std::string &ident, const std::set<NetCap> &netCaps,
-                                uint32_t &supplierId);
-
     int32_t UnregisterNetSupplier(uint32_t supplierId);
 
     int32_t RegisterNetSupplierCallback(uint32_t supplierId, const sptr<NetSupplierCallbackBase> &callback);

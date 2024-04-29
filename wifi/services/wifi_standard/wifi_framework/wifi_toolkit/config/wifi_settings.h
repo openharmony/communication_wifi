@@ -1665,6 +1665,15 @@ public:
      * @return std::string - an empty string indicates failure
      */
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
+
+    /**
+     * @Description Set WifiDeviceConfig by randomizedMacSuccess
+     *
+     * @param networkId - networkId[in]
+     * @return int - when 0 means success, other means some fails happened,
+     *               Input state invalid or not find the wifi device config
+     */
+    int SetDeviceRandomizedMacSuccessEver(int networkId);
 #endif
     /**
      * @Description Get next networkId

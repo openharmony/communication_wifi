@@ -189,11 +189,8 @@ int WifiSettings::SetApRandomMac(const SoftApRandomMac &randomMac, int id)
     mApRandomMac[id] =  randomMac;
 
     std::vector<SoftApRandomMac> tmp;
-    for (int i = 0; i < AP_INSTANCE_MAX_NUM; i++) {
-        auto iter = mApRandomMac.find(i);
-        if (iter != mApRandomMac.end()) {
-            tmp.push_back(iter->second);
-        }
+    for (auto iter : mApRandomMac) {
+        tmp.push_back(iter.second);
     }
 
     mSavedApRandomMac.SetValue(tmp);

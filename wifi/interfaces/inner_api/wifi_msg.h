@@ -557,6 +557,7 @@ struct WifiDeviceConfig {
     std::string internetSelfCureHistory;
     int isReassocSelfCureWithFactoryMacAddress;
     int version;
+    bool randomizedMacSuccessEver;
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -588,6 +589,7 @@ struct WifiDeviceConfig {
         internetSelfCureHistory = "";
         isReassocSelfCureWithFactoryMacAddress = 0;
         version = -1;
+        randomizedMacSuccessEver = false;
     }
 };
 

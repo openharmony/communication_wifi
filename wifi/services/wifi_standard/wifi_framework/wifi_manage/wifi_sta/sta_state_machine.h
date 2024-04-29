@@ -970,7 +970,15 @@ private:
      *
      * @param networkId - networkId.
      */
-    bool ShouldUseFactoryMac(int networkId);
+    bool ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig);
+
+    /**
+     * @Description : Check Current Connect is used randomized mac or not.
+     *
+     * @param networkId - networkId.
+     * @Return true: used randomized mac address.
+     */
+    bool CurrentIsRandomizedMac();
 
 #ifndef OHOS_ARCH_LITE
     /**

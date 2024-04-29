@@ -46,7 +46,6 @@ ohos_unittest("wifi_sta_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_saved_device_appraisal.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_state_machine.cpp",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_common/Mock/mock_chip_capability.cpp",
     "Mock/mock_dhcp_service.cpp",
     "Mock/mock_if_config.cpp",
     "Mock/mock_mac_address.cpp",
@@ -80,16 +79,15 @@ ohos_unittest("wifi_sta_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/app_network_speed_limit",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_common/Mock",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
@@ -146,6 +144,8 @@ ohos_unittest("wifi_sta_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "cellular_data:tel_cellular_data_api",
+    "core_service:tel_core_service_api",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -155,6 +155,12 @@ ohos_unittest("wifi_sta_unittest") {
     "samgr:samgr_proxy",
     "time_service:time_client",
   ]
+
+  if (wifi_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+    defines += [ "WIFI_FFRT_ENABLE" ]
+  }
+
   defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   part_name = "wifi"
   subsystem_name = "communication"

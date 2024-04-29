@@ -35,7 +35,7 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
     const struct HdiWpaTempDisabledParam *tempDisabledParam, const char *ifName);
 int32_t OnEventAssociateReject(struct IWpaCallback *self,
     const struct HdiWpaAssociateRejectParam *associateRejectParam, const char *ifName);
-int32_t OnEventStaNotify(struct IWpaCallback *self, const char *hilinkParam, const char *ifName);
+int32_t OnEventStaNotify(struct IWpaCallback *self, const char *notifyParam, const char *ifName);
 int32_t OnEventWpsOverlap(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventWpsTimeout(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventScanResult(struct IWpaCallback *self,
@@ -74,7 +74,6 @@ int32_t OnEventStaConnectState(struct IWpaCallback *self,
 int32_t OnEventIfaceCreated(struct IWpaCallback *self,
     const struct HdiP2pIfaceCreatedParam *ifaceCreatedParam, const char* ifName);
 
-void StrSafeCopy(char *dst, unsigned len, const char *src);
 size_t printf_decode(u8 *buf, size_t maxlen, const char *str);
 #ifdef __cplusplus
 }

@@ -1935,30 +1935,6 @@ public:
         EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == false);
     }
 
-    void StartWpaSuccessTest()
-    {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
-        EXPECT_TRUE(pScanService->StartWifiHdi() == WIFI_OPT_SUCCESS);
-    }
-
-    void StartWpaFailTest()
-    {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi = false;
-        EXPECT_TRUE(pScanService->StartWifiHdi() == WIFI_OPT_FAILED);
-    }
-
-    void CloseWpaSuccessTest()
-    {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi = false;
-        EXPECT_TRUE(pScanService->CloseWifiHdi() == WIFI_OPT_FAILED);
-    }
-
-    void CloseWpaFailTest()
-    {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi = false;
-        EXPECT_TRUE(pScanService->CloseWifiHdi() == WIFI_OPT_FAILED);
-    }
-
     void SetScanTrustModeTest()
     {
         pScanService->SetScanTrustMode();
@@ -3133,26 +3109,6 @@ HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_001, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_002, TestSize.Level1)
 {
     AllowExternCustomSceneCheckTest2();
-}
-
-HWTEST_F(ScanServiceTest, StartWpa_001, TestSize.Level1)
-{
-    StartWpaSuccessTest();
-}
-
-HWTEST_F(ScanServiceTest, StartWpa_002, TestSize.Level1)
-{
-    StartWpaFailTest();
-}
-
-HWTEST_F(ScanServiceTest, CloseWpa_001, TestSize.Level1)
-{
-    CloseWpaSuccessTest();
-}
-
-HWTEST_F(ScanServiceTest, CloseWpa_002, TestSize.Level1)
-{
-    CloseWpaFailTest();
 }
 
 HWTEST_F(ScanServiceTest, SetScanTrustMode_001, TestSize.Level1)

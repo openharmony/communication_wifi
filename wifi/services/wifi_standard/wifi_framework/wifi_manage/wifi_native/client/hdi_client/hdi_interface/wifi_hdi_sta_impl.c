@@ -33,9 +33,6 @@
 #define WIFI_IDL_GET_MAX_SCAN_INFO 256 /* Maximum number of scan infos obtained at a time */
 #define WIFI_HDI_STOP_SLEEP_MS 300000
 
-#define HILINK_OUI_HEAD_LEN 9
-#define MASK_HILINK 0xFF
-
 #ifndef CHECK_STA_HDI_WIFI_PROXY_AND_RETURN
 #define CHECK_STA_HDI_WIFI_PROXY_AND_RETURN(isRemoteDied) \
 if (isRemoteDied) { \
@@ -389,44 +386,6 @@ WifiErrorNo HdiWifiStopPnoScan(void)
     return WIFI_IDL_OPT_OK;
 }
 
-static bool CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
-{
-    int formatHiLink[] = {0, 0xE0, 0XFC, 0X80, 0, 0, 0, 0X01, 0};
-    int formatHiLinkOUI[] = {0, 0xE0, 0XFC, 0X40, 0, 0, 0, 0X01, 0};
-    if (bytes == NULL || len < HILINK_OUI_HEAD_LEN) {
-        return false;
-    }
-
-    for (int index = 0; index < HILINK_OUI_HEAD_LEN; index++) {
-        int element = bytes[index] & MASK_HILINK;
-        if (element != formatHiLink[index] && element != formatHiLinkOUI[index]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-static bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
-{
-    const struct HdiElem *elem;
-    bool num = false;
-
-    if (!start) {
-        return false;
-    }
-
-    HDI_CHECK_ELEMENT(elem, start, len) {
-        uint8_t id = elem->id, elen = elem->datalen;
-        const uint8_t *pos = elem->data;
-        if (id == HDI_EID_VENDOR_SPECIFIC) {
-            num |= CheckHiLinkOUISection(pos, elen);
-        }
-    }
-
-    return num;
-}
-
 int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
     const struct HdfWifiScanResults *scanResults, const char* ifName)
 {
@@ -458,7 +417,7 @@ int32_t HdiWifiScanResultsCallback(struct IWlanCallback *self, uint32_t event,
     char bssid[HDI_BSSID_LENGTH] = {0};
     int buffLen = WIFI_MAX_BUFFER_LENGTH;
     for (size_t i = 0; i < scanResults->resLen && i < WIFI_IDL_GET_MAX_SCAN_INFO; i++) {
-        struct HdfWifiScanResultExt *scanResult = &scanResults->res[i];
+        struct WifiScanResultExt *scanResult = (struct WifiScanResultExt *)&scanResults->res[i];
         struct HdiElems elems;
         Get80211ElemsFromIE((const uint8_t*)scanResult->ie, scanResult->ieLen, &elems, 1);
         if (elems.ssidLen == 0) {

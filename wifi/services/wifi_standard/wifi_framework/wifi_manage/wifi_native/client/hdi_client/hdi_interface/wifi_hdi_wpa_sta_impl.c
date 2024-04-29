@@ -607,7 +607,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->OnEventAssociateReject = callback->OnEventAssociateReject;
     g_hdiWpaStaCallbackObj->OnEventWpsOverlap = callback->OnEventWpsOverlap;
     g_hdiWpaStaCallbackObj->OnEventWpsTimeout = callback->OnEventWpsTimeout;
-#ifdef HDI_INTERFACE_SUPPORT
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     g_hdiWpaStaCallbackObj->OnEventScanResult = NULL;
 #else
     g_hdiWpaStaCallbackObj->OnEventScanResult = callback->OnEventScanResult;
@@ -631,6 +631,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->GetVersion = NULL;
     g_hdiWpaStaCallbackObj->AsObject = NULL;
     g_hdiWpaStaCallbackObj->OnEventStaNotify = callback->OnEventStaNotify;
+    g_hdiWpaStaCallbackObj->OnEventVendorCb = NULL;
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaStaEventCallback3 success.");

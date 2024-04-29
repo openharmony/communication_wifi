@@ -65,7 +65,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
         WIFI_LOGE("IsHotspotDualBandSupported:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsHotspotDualBandSupported:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -193,11 +193,10 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         }
     }
 
-    if (!IsApServiceRunning()) {
+    if (!IsApServiceRunning() ||
+        WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(config, m_id) == false) {
         WifiConfigCenter::GetInstance().SetHotspotConfig(config, m_id);
         WifiSettings::GetInstance().SyncHotspotConfig();
-    } else {
-        WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(config, m_id);
     }
     return WIFI_OPT_SUCCESS;
 }

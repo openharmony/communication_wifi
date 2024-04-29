@@ -310,7 +310,7 @@ void WifiSettings::MergeWifiConfig()
         LOGE("MergeWifiConfig Parse fail");
         return;
     }
-    std::vector<WifiDeviceConfig> wifideviceConfig =  xmlParser->GetNetworks();
+    std::vector<WifiDeviceConfig> wifideviceConfig = xmlParser->GetNetworks();
     if (wifideviceConfig.size() == 0) {
         LOGE("MergeWifiConfig wifideviceConfig empty");
         return;
@@ -352,33 +352,25 @@ void WifiSettings::MergeSoftapConfig()
     mSavedHotspotConfig.SaveConfig();
 }
 
-void WifiSettings::MergeWifiCloneConfig(std::string &cloneData, MergeCallbackFunc mergeCallback)
+void WifiSettings::MergeWifiCloneConfig(std::string &cloneData)
 {
     LOGI("MergeWifiCloneConfig enter");
     std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
     bool ret = xmlParser->LoadConfigurationMemory(cloneData.c_str());
     if (!ret) {
-        mergeCallback();
         LOGE("MergeWifiCloneConfig load fail");
         return;
     }
     ret = xmlParser->Parse();
     if (!ret) {
-        mergeCallback();
         LOGE("MergeWifiCloneConfig Parse fail");
         return;
     }
     std::vector<WifiDeviceConfig> cloneConfigs = xmlParser->GetNetworks();
     if (cloneConfigs.empty()) {
-        mergeCallback();
         return;
     }
-    mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
-    mWifiEncryptionThread->PostAsyncTask([this, &cloneConfigs, &mergeCallback]() {
-        ConfigsDeduplicateAndSave(cloneConfigs);
-        LOGI("MergeWifiCloneConfig ConfigsDeduplicateAndSave end");
-        mergeCallback();
-    });
+    ConfigsDeduplicateAndSave(cloneConfigs);
 }
 
 void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs)
@@ -1207,10 +1199,7 @@ int WifiSettings::SyncDeviceConfig()
 void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
 {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    if (mEncryptionOnBootFalg.test_and_set()) {
-        return;
-    }
-    std::unique_lock<std::mutex> lock(mConfigMutex);
+    std::unique_lock<std::mutex> lock(mConfigOnBootMutex);
     mSavedDeviceConfig.LoadConfig();
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
@@ -1251,11 +1240,13 @@ int WifiSettings::ReloadDeviceConfig()
         item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
-    mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
-    mWifiEncryptionThread->PostAsyncTask([this]() {
-        EncryptionWifiDeviceConfigOnBoot();
-        LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot end.");
-    });
+    if (!mEncryptionOnBootFalg.test_and_set()) {
+        mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
+        mWifiEncryptionThread->PostAsyncTask([this]() {
+            LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot start.");
+            EncryptionWifiDeviceConfigOnBoot();
+        });
+    }
     return 0;
 #else
     std::unique_lock<std::mutex> lock(mConfigMutex);
@@ -1839,6 +1830,7 @@ int WifiSettings::GetScanGenieState() const
 
 int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
 {
+    LOGI("GetSignalLevel wifi settings start...");
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     int level = 0;
     auto iter = mWifiConfig.find(instId);
@@ -1881,6 +1873,7 @@ int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
             }
         } while (0);
     }
+    LOGI("GetSignalLevel wifi settings end...");
     return level;
 }
 
@@ -1899,6 +1892,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetBand(BandType::BAND_2GHZ);
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
+    cfg.SetBandWidth(AP_BANDWIDTH_DEFAULT);
 #ifdef INIT_LIB_ENABLE
     cfg.SetSsid(ssid);
 #else
@@ -1922,6 +1916,7 @@ void WifiSettings::ClearHotspotConfig()
     config.SetBand(BandType::BAND_2GHZ);
     config.SetChannel(AP_CHANNEL_DEFAULT);
     config.SetMaxConn(GetApMaxConnNum());
+    config.SetBandWidth(AP_BANDWIDTH_DEFAULT);
 #ifdef INIT_LIB_ENABLE
     config.SetSsid(ssid);
 #else

@@ -35,6 +35,9 @@ namespace Wifi {
 #define WIFI_INVALID_UID (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
+#define WIFI_INVALID_SIM_ID (0)
+#define WIFI_EAP_OPEN_EXTERNAL_SIM 1
+#define WIFI_EAP_CLOSE_EXTERNAL_SIM 0
 #define WIFI_PASSWORD_LEN 128
 #define MAX_PID_LIST_SIZE 128
 
@@ -44,6 +47,7 @@ const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
 const std::string KEY_MGMT_EAP = "WPA-EAP";
 
+const std::string EAP_METHOD_NONE = "NONE";
 const std::string EAP_METHOD_PEAP = "PEAP";
 const std::string EAP_METHOD_TLS = "TLS";
 const std::string EAP_METHOD_TTLS = "TTLS";
@@ -641,6 +645,7 @@ struct IpInfo {
     unsigned int secondDns;          /* backup dns */
     unsigned int serverIp; /* DHCP server's address */
     unsigned int leaseDuration;
+    std::vector<unsigned int> dnsAddr;
 
     IpInfo()
     {
@@ -651,6 +656,7 @@ struct IpInfo {
         secondDns = 0;
         serverIp = 0;
         leaseDuration = 0;
+        dnsAddr.clear();
     }
 };
 
@@ -663,7 +669,10 @@ struct IpV6Info {
     std::string netmask;
     std::string primaryDns;
     std::string secondDns;
-
+    std::string uniqueLocalAddress1;
+    std::string uniqueLocalAddress2;
+    std::vector<std::string> dnsAddr;
+    
     IpV6Info()
     {
         linkIpV6Address = "";
@@ -673,9 +682,27 @@ struct IpV6Info {
         netmask = "";
         primaryDns = "";
         secondDns = "";
+        uniqueLocalAddress1 = "";
+        uniqueLocalAddress2 = "";
+        dnsAddr.clear();
     }
 };
 
+// SIM authentication
+struct EapSimGsmAuthParam {
+    std::vector<std::string> rands;
+};
+
+// AKA/AKA' authentication
+struct EapSimUmtsAuthParam {
+    std::string rand;
+    std::string autn;
+    EapSimUmtsAuthParam()
+    {
+        rand = "";
+        autn = "";
+    }
+};
 typedef enum {
     BG_LIMIT_CONTROL_ID_GAME = 1,
     BG_LIMIT_CONTROL_ID_STREAM,

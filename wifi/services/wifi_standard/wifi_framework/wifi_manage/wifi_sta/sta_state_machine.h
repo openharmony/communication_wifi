@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
+#include <shared_mutex>
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
@@ -35,10 +36,18 @@
 #include "want.h"
 #include "wifi_net_agent.h"
 #include "wifi_net_observer.h"
+#include "sim_state_type.h"
+#include "core_service_client.h"
+#include "cellular_data_client.h"
+#include "core_manager_inner.h"
+#include "telephony_errors.h"
 #endif
 
 namespace OHOS {
 namespace Wifi {
+#ifndef OHOS_ARCH_LITE
+using namespace OHOS::Telephony;
+#endif
 constexpr int STA_CONNECT_MODE = 1;
 constexpr int STA_SCAN_ONLY_MODE = 2;
 constexpr int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
@@ -380,6 +389,7 @@ public:
         void DealDhcpResultFailed();
         static void SetStaStateMachine(StaStateMachine *staStateMachine);
         static void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        static void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToCloseDhcpClient(int iptype);
         static void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
@@ -946,8 +956,132 @@ private:
      * @param msg - Message body received by the state machine[in]
      */
     void DealScreenStateChangedEvent(InternalMessage *msg);
-	
+
+    /**
+     * @Description set external sim
+     *
+     * @param ifName - port name(in)
+     * @param eap - eap method(in)
+     * @Return success: 0  fail: others
+     */
+    ErrCode SetExternalSim(const std::string ifName, const std::string &eap, int value) const;
+
 #ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Get slot id.
+     * @Return int32_t - 0:success, other value:failed
+     */
+    int32_t GetDataSlotId();
+
+    /**
+     * @Description Get card type.
+     * @param cardType - card type
+     * @Return int32_t - 0:success, other value:failed
+     */
+    int32_t GetCardType(CardType &cardType);
+
+    /**
+     * @Description Get default slot id.
+     * @param slotId - slot id
+     * @Return int32_t - 0 success, other value:failed
+     */
+    int32_t GetDefaultId(int32_t slotId);
+
+    /**
+     * @Description Get card state.
+     * @param slotId - slot id
+     * @Return int32_t - card state
+     */
+    int32_t GetSimCardState(int32_t slotId);
+
+    /**
+     * @Description verify simId.
+     * @param simId - sim id
+     * @Return int32_t - true: success, false: failed
+     */
+    bool IsValidSimId(int32_t simId);
+
+    /**
+     * @Description Check whether the SIM card is a multi-SIM card.
+     * @Return int32_t - true: success, false: failed
+     */
+    bool IsMultiSimEnabled();
+
+    /**
+     * @Description sim authenticate
+     * @param nonce - sim id
+     * @Return int32_t - 0:success, other value:failed
+     */
+    std::string SimAkaAuth(const std::string &nonce, AuthType authType);
+
+    /**
+     * @Description Get SIM card authentication information.
+     * @param param - authentication information
+     * @Return int32_t - 0:success, other value:failed
+     */
+    std::string GetGsmAuthResponseWithLength(EapSimGsmAuthParam param);
+
+    /**
+     * @Description Get SIM card authentication information.
+     * @param param - authentication information
+     * @Return int32_t - 0:success, other value:failed
+     */
+    std::string GetGsmAuthResponseWithoutLength(EapSimGsmAuthParam param);
+
+    /**
+     * @Description sim authentication notify events
+     *
+     * @param msg: authentication data
+     */
+    void DealWpaEapSimAuthEvent(InternalMessage *msg);
+
+    /**
+     * @Description aka/aka' authentication Pre-process
+     *
+     */
+    bool PreWpaEapUmtsAuthEvent();
+
+    /**
+     * @Description fill aka/aka' authentication request message
+     *
+     * @param param: authentication data
+     */
+    std::vector<uint8_t> FillUmtsAuthReq(EapSimUmtsAuthParam &param);
+
+    /**
+     * @Description fill aka/aka' authentication request message
+     *
+     * @param nonce: authentication data
+     */
+    std::string ParseAndFillUmtsAuthParam(std::vector<uint8_t> &nonce);
+
+    /**
+     * @Description Get aka/aka' card authentication information
+     *
+     * @param param: authentication data
+     */
+    std::string GetUmtsAuthResponse(EapSimUmtsAuthParam &param);
+
+    /**
+     * @Description aka/aka' authentication notify events
+     *
+     * @param msg: authentication data
+     */
+    void DealWpaEapUmtsAuthEvent(InternalMessage *msg);
+
+    /**
+     * @Description Get the SIM card ID.
+     *
+     */
+    int32_t GetSimId();
+
+    /**
+     * @Description Set the SIM card ID.
+     *
+     * @param id - Sim card id
+     */
+    void SetSimId(int32_t simId);
+
     /**
      * @Description Subscribe system ability changed.
      */
@@ -967,6 +1101,7 @@ private:
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
+    std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
@@ -1027,7 +1162,9 @@ private:
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     int32_t StaStartAbility(OHOS::AAFwk::Want& want);
+    void ShowPortalNitification();
 #endif
+    void SetConnectMethod(int connectMethod);
 };
 }  // namespace Wifi
 }  // namespace OHOS

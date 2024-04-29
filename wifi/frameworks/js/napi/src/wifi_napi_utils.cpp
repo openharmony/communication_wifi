@@ -287,6 +287,35 @@ napi_status SetValueBool(const napi_env& env, const char* fieldStr, const bool b
     return status;
 }
 
+napi_status SetValueU8Vector(const napi_env& env, const char* fieldStr,
+    const std::vector<uint8_t> value, napi_value& result)
+{
+    napi_value array;
+    napi_status status = napi_create_array_with_length(env, value.size(), &array);
+    if (status != napi_ok) {
+        WIFI_LOGE("failed to create array! field: %{public}s", fieldStr);
+        return status;
+    }
+    std::vector<uint8_t> vec = value;
+    for (auto i = 0; i < vec.size(); ++i) {
+        napi_value value;
+        napi_status status = napi_create_int32(env, vec[i], &value);
+        if (status != napi_ok) {
+            WIFI_LOGE("failed to create int32!");
+            return status;
+        }
+        status = napi_set_element(env, array, i, value);
+        if (status != napi_ok) {
+            WIFI_LOGE("failed to set element, status: %{public}d", status);
+            return status;
+        }
+    }
+    if (napi_set_named_property(env, result, fieldStr, array) != napi_ok) {
+        WIFI_LOGE("failed to set %{public}s named property!", fieldStr);
+    }
+    return status;
+}
+
 static napi_value InitAsyncCallBackEnv(const napi_env& env, AsyncContext *asyncContext,
     const size_t argc, const napi_value *argv, const size_t nonCallbackArgNum)
 {

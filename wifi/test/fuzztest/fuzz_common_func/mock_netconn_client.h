@@ -13,17 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef MOCK_NET_CONN_MANAGER_H
-#define MOCK_NET_CONN_MANAGER_H
+#ifndef OHOS_MOCK_NET_CONN_MANAGER_H
+#define OHOS_MOCK_NET_CONN_MANAGER_H
 
 #define NETMANAGER (0)
-
 #include "net_all_capabilities.h"
 #include "net_conn_client.h"
 
 namespace OHOS {
-using namespace ;
-namespace NetManagerStandard {
+using namespace NetManagerStandard;
+namespace Wifi {
 class NetConnClient {
 public:
     static NetConnClient &GetInstance();

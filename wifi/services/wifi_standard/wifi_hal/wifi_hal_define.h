@@ -128,6 +128,7 @@ typedef enum WifiHalEvent {
     AP_STA_PSK_MISMATH_EVENT,            /* AP STA possible PSK mismatch event */
     P2P_CONNECT_FAILED,                  /* P2P connect failed */
     P2P_CHANNEL_SWITCH,                  /* P2P Channel switch*/
+    WIFI_STA_DISCONNECT_REASON_EVENT,    /* sta disconnect reason report */
     WIFI_HAL_MAX_EVENT,
 } WifiHalEvent;
 

@@ -610,6 +610,7 @@ static int WpaP2pCallBackFunc(char *p)
         LOGI("recv notify message is NULL");
         return -1;
     }
+    LOGD("wpa p2p callback p :%{private}s!", p);
     if (strncmp(p, P2P_EVENT_PROV_DISC_PBC_REQ, strlen(P2P_EVENT_PROV_DISC_PBC_REQ)) == 0) {
         DealProvDiscPbcReqEvent(p, strlen(p));
     } else if (strncmp(p, P2P_EVENT_PROV_DISC_PBC_RESP, strlen(P2P_EVENT_PROV_DISC_PBC_RESP)) == 0) {

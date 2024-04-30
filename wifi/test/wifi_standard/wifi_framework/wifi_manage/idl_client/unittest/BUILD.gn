@@ -79,7 +79,6 @@ ohos_unittest("idl_client_unittest") {
     "//commonlibrary/c_utils/base/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
   ]
 
   defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
@@ -90,7 +89,6 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
   ]
 
   ldflags = [

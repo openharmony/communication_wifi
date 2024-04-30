@@ -389,6 +389,7 @@ public:
         void DealDhcpResultFailed();
         static void SetStaStateMachine(StaStateMachine *staStateMachine);
         static void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        static void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToCloseDhcpClient(int iptype);
         static void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
@@ -980,6 +981,22 @@ private:
      * @Return true: need stop timer.
      */
     bool IsDisConnectReasonShouldStopTimer(int reason);
+
+    /**
+     * @Description : should sta connect use factory mac address.
+     *
+     * @param networkId - networkId.
+     */
+    bool ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig);
+
+    /**
+     * @Description : Check Current Connect is used randomized mac or not.
+     *
+     * @param networkId - networkId.
+     * @Return true: used randomized mac address.
+     */
+    bool CurrentIsRandomizedMac();
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.
@@ -1160,6 +1177,8 @@ private:
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
     std::string mPortalUrl;
+    int mLastConnectNetId;      /* last request connect netword id */
+    int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
     /**
      * @Description Replace empty dns
      */

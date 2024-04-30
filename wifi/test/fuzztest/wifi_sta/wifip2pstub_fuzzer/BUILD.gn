@@ -45,6 +45,7 @@ ohos_fuzztest("WifiP2pStubFuzzTest") {
 
   sources = [
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
+    "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_netconn_client.cpp",
     "wifip2pstub_fuzzer.cpp",
   ]
 
@@ -60,6 +61,8 @@ ohos_fuzztest("WifiP2pStubFuzzTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_base:net_native_manager_if",
   ]
 
   part_name = "wifi"

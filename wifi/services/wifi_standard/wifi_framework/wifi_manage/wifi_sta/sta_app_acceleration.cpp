@@ -72,19 +72,22 @@ void StaAppAcceleration::HandleScreenStatusChanged(int screenState)
         WIFI_LOGI("mode not handle.\n");
     }
 }
-void StaAppAcceleration::HandleForegroundAppChangedAction(const std::string &bundleName,
-    int uid, int pid, const int state)
+
+#ifndef OHOS_ARCH_LITE
+void StaAppAcceleration::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
-    if (state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND)) {
-        if (AppParser::GetInstance().IsLowLatencyApp(bundleName)) {
+    if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND)
+        && appStateData.isFocused) {
+        if (AppParser::GetInstance().IsLowLatencyApp(appStateData.bundleName)) {
             WIFI_LOGI("target app on the foreground.");
-            StartGameBoost(uid);
+            StartGameBoost(appStateData.uid);
         } else {
-            StopGameBoost(uid);
+            StopGameBoost(appStateData.uid);
         }
     }
     return;
 }
+#endif
 
 void StaAppAcceleration::SetPmMode(int mode)
 {

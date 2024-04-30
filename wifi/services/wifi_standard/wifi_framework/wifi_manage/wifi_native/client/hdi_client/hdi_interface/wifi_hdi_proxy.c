@@ -199,6 +199,10 @@ WifiErrorNo StartHdiWifi()
     }
     LOGI("%{public}s: success to get HdfRemoteService", __func__);
     struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
+    if (recipient == NULL) {
+        LOGE("%{public}s: OsalMemCalloc is failed", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
     recipient->OnRemoteDied = ProxyOnRemoteDied;
     HdfRemoteServiceAddDeathRecipient(remote, recipient);
     return WIFI_IDL_OPT_OK;

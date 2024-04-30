@@ -69,6 +69,7 @@ ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
     msg->AddIntMessageBody(static_cast<int>(cfg.GetSecurityType()));
     msg->AddIntMessageBody(static_cast<int>(cfg.GetBand()));
     msg->AddIntMessageBody(cfg.GetChannel());
+    msg->AddIntMessageBody(cfg.GetBandWidth());
     msg->AddIntMessageBody(cfg.GetMaxConn());
     msg->AddStringMessageBody(cfg.GetIpAddress());
     msg->AddIntMessageBody(cfg.GetLeaseTime());

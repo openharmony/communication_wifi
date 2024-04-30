@@ -147,7 +147,9 @@ StaStateMachine::StaStateMachine(int instId)
       pGetIpState(nullptr),
       pLinkedState(nullptr),
       pApRoamingState(nullptr),
-      m_instId(instId)
+      m_instId(instId),
+      mLastConnectNetId(INVALID_NETWORK_ID),
+      mConnectFailedCnt(0)
 {
 }
 
@@ -1107,6 +1109,9 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
         WIFI_LOGE("Currently connected and do not process timeout.\n");
         return;
     }
+    if (targetNetworkId == mLastConnectNetId) {
+        mConnectFailedCnt++;
+    }
     WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
     linkedInfo.retryedConnCount++;
     DealSetStaConnectFailedCount(1, false);
@@ -1138,6 +1143,20 @@ bool StaStateMachine::CheckRoamingBssidIsSame(std::string bssid)
     return false;
 }
 
+bool StaStateMachine::CurrentIsRandomizedMac()
+{
+    std::string curMacAddress = "";
+    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(curMacAddress)) != WIFI_IDL_OPT_OK) {
+        LOGE("CurrentIsRandomizedMac GetStaDeviceMacAddress failed!");
+        return false;
+    }
+    std::string realMacAddress = "";
+    WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
+    WIFI_LOGI("CurrentIsRandomizedMac curMacAddress:%{public}s realMacAddress:%{public}s",
+        MacAnonymize(curMacAddress).c_str(), MacAnonymize(realMacAddress).c_str());
+    return curMacAddress != realMacAddress;
+}
+
 void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 {
     if (msg == nullptr) {
@@ -1150,6 +1169,9 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
         return;
     }
     WIFI_LOGI("enter DealConnectionEvent");
+    if (CurrentIsRandomizedMac()) {
+        WifiSettings::GetInstance().SetDeviceRandomizedMacSuccessEver(targetNetworkId);
+    }
     WifiSettings::GetInstance().SetDeviceAfterConnect(targetNetworkId);
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     WifiSettings::GetInstance().SyncDeviceConfig();
@@ -1179,6 +1201,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true) != WIFI_IDL_OPT_OK) {
         LOGE("DealConnectionEvent WpaSetPowerMode() failed!");
     }
+    mConnectFailedCnt = 0;
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);
     WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
@@ -1321,6 +1344,9 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
 
 bool StaStateMachine::DealReconnectSavedNetwork()
 {
+    if (targetNetworkId == mLastConnectNetId) {
+        mConnectFailedCnt++;
+    }
     linkedInfo.retryedConnCount++;
     if (linkedInfo.retryedConnCount < MAX_RETRY_COUNT) {
         SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
@@ -1825,6 +1851,25 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
     }
 }
 
+static constexpr int STA_CONNECT_RANDOMMAC_MAX_FAILED_COUNT = 2;
+
+bool StaStateMachine::ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig)
+{
+    if (deviceConfig.keyMgmt == KEY_MGMT_NONE) {
+        return false;
+    }
+    if (mLastConnectNetId != deviceConfig.networkId) {
+        mLastConnectNetId = deviceConfig.networkId;
+        mConnectFailedCnt = 0;
+    }
+    WIFI_LOGI("ShouldUseFactoryMac mLastConnectNetId:%{public}d networkId:%{public}d mConnectFailedCnt:%{public}d",
+        mLastConnectNetId, deviceConfig.networkId, mConnectFailedCnt);
+    if (mConnectFailedCnt >= STA_CONNECT_RANDOMMAC_MAX_FAILED_COUNT && !deviceConfig.randomizedMacSuccessEver) {
+        return true;
+    }
+    return false;
+}
+
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
     LOGD("enter SetRandomMac.");
@@ -1836,7 +1881,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     }
     std::string lastMac;
     std::string currentMac;
-    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
         WifiStoreRandomMac randomMacInfo;
@@ -3659,6 +3704,27 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(DhcpResult *dest, Dhcp
         LOGE("SaveDhcpResultExt strOptRandIpv6Addr strcpy_s failed!");
         return;
     }
+    if (strcpy_s(dest->strOptLocalAddr1, DHCP_MAX_FILE_BYTES, source->strOptLocalAddr1) != EOK) {
+        LOGE("SaveDhcpResultExt strOptLocalAddr1 strcpy_s failed!");
+        return;
+    }
+    if (strcpy_s(dest->strOptLocalAddr2, DHCP_MAX_FILE_BYTES, source->strOptLocalAddr2) != EOK) {
+        LOGE("SaveDhcpResultExt strOptLocalAddr2 strcpy_s failed!");
+        return;
+    }
+    if (source->dnsList.dnsNumber > 0) {
+        dest->dnsList.dnsNumber = 0;
+        for (uint32_t i = 0; i < source->dnsList.dnsNumber; i++) {
+            if (memcpy_s(dest->dnsList.dnsAddr[i], DHCP_LEASE_DATA_MAX_LEN, source->dnsList.dnsAddr[i],
+                DHCP_LEASE_DATA_MAX_LEN -1) != EOK) {
+                LOGE("SaveDhcpResultExt memcpy_s failed! i:%{public}d", i);
+            } else {
+                dest->dnsList.dnsNumber++;
+            }
+        }
+        LOGI("SaveDhcpResultExt destDnsNumber:%{public}d sourceDnsNumber:%{public}d", dest->dnsList.dnsNumber,
+            source->dnsList.dnsNumber);
+    }
     LOGI("SaveDhcpResultExt ok, ipType:%{public}d", dest->iptype);
 }
 
@@ -3731,6 +3797,7 @@ static void RenewTimeOutCallback(void)
 void StaStateMachine::DhcpResultNotify::StartRenewTimeout(int64_t interval)
 {
     WIFI_LOGE("DhcpResultNotify::StartRenewTimeout.");
+    StaStateMachine::DhcpResultNotify::StopRenewTimeout();
     std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, false, false);
     wifiSysTimer->SetCallbackInfo(RenewTimeOutCallback);
     renewTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
@@ -3785,6 +3852,29 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
     return;
 }
 
+void StaStateMachine::DhcpResultNotify::TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
+{
+    if (result == nullptr) {
+        LOGE("TryToSaveIpV4ResultExt result nullptr.");
+        return;
+    }
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
+    ipInfo.gateway = IpTools::ConvertIpv4Address(result->strOptRouter1);
+    ipInfo.netmask = IpTools::ConvertIpv4Address(result->strOptSubnet);
+    ipInfo.primaryDns = IpTools::ConvertIpv4Address(result->strOptDns1);
+    ipInfo.secondDns = IpTools::ConvertIpv4Address(result->strOptDns2);
+    ipInfo.serverIp = IpTools::ConvertIpv4Address(result->strOptServerId);
+    ipInfo.leaseDuration = result->uOptLeasetime;
+    if (result->dnsList.dnsNumber > 0) {
+        ipInfo.dnsAddr.clear();
+        for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
+            unsigned int ipv4Address = IpTools::ConvertIpv4Address(result->dnsList.dnsAddr[i]);
+            ipInfo.dnsAddr.push_back(ipv4Address);
+        }
+    }
+    WifiSettings::GetInstance().SaveIpInfo(ipInfo);
+}
+
 void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
 {
     if (result == nullptr) {
@@ -3795,15 +3885,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
     if (!((IpTools::ConvertIpv4Address(result->strOptClientId) == ipInfo.ipAddress) &&
         (IpTools::ConvertIpv4Address(result->strOptRouter1) == ipInfo.gateway))) {
         if (result->iptype == 0) {  /* 0-ipv4,1-ipv6 */
-            ipInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
-            ipInfo.gateway = IpTools::ConvertIpv4Address(result->strOptRouter1);
-            ipInfo.netmask = IpTools::ConvertIpv4Address(result->strOptSubnet);
-            ipInfo.primaryDns = IpTools::ConvertIpv4Address(result->strOptDns1);
-            ipInfo.secondDns = IpTools::ConvertIpv4Address(result->strOptDns2);
-            ipInfo.serverIp = IpTools::ConvertIpv4Address(result->strOptServerId);
-            ipInfo.leaseDuration = result->uOptLeasetime;
-            WifiSettings::GetInstance().SaveIpInfo(ipInfo);
-
+            TryToSaveIpV4ResultExt(ipInfo, ipv6Info, result);
             pStaStateMachine->linkedInfo.ipAddress = IpTools::ConvertIpv4Address(result->strOptClientId);
             /* If not phone hotspot, set .isDataRestricted = 0. */
             std::string strVendor = result->strOptVendor;
@@ -3836,6 +3918,8 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
 #ifdef OHOS_ARCH_LITE
         IfConfig::GetInstance().SetIfDnsAndRoute(result, result->iptype, pStaStateMachine->GetInstanceId());
 #endif
+    } else {
+        LOGI("TryToSaveIpV4Result not UpdateNetLinkInfo");
     }
 }
 
@@ -3845,15 +3929,28 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         LOGE("TryToSaveIpV6Result resultis nullptr.");
         return;
     }
-    if (result->iptype == 1 &&  /* 0-ipv4,1-ipv6 */
-        (ipv6Info.globalIpV6Address != result->strOptClientId || ipv6Info.gateway != result->strOptRouter1)) {
+    
+    if ((ipv6Info.globalIpV6Address != result->strOptClientId) ||
+        (ipv6Info.randGlobalIpV6Address != result->strOptRandIpv6Addr) ||
+        (ipv6Info.uniqueLocalAddress1 != result->strOptLocalAddr1) ||
+        (ipv6Info.uniqueLocalAddress2 != result->strOptLocalAddr2) ||
+        (ipv6Info.gateway != result->strOptRouter1)) {
         ipv6Info.linkIpV6Address = result->strOptLinkIpv6Addr;
         ipv6Info.globalIpV6Address = result->strOptClientId;
         ipv6Info.randGlobalIpV6Address = result->strOptRandIpv6Addr;
         ipv6Info.gateway = result->strOptRouter1;
         ipv6Info.netmask = result->strOptSubnet;
-        ipv6Info.primaryDns = result->strOptRouter1;
-        ipv6Info.secondDns = result->strOptRouter2;
+        ipv6Info.primaryDns = result->strOptDns1;
+        ipv6Info.secondDns = result->strOptDns2;
+        ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
+        ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
+        if (result->dnsList.dnsNumber > 0) {
+            ipv6Info.dnsAddr.clear();
+            for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
+                ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
+            }
+            LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}u", ipv6Info.dnsAddr.size());
+        }
         WifiSettings::GetInstance().SaveIpV6Info(ipv6Info, pStaStateMachine->GetInstanceId());
         WIFI_LOGI("SaveIpV6 addr=%{private}s, linkaddr=%{private}s, randaddr=%{private}s, gateway=%{private}s, "
             "mask=%{private}s, dns=%{private}s, dns2=%{private}s",
@@ -3866,6 +3963,8 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
             pStaStateMachine->GetInstanceId());
 #endif
+    } else {
+        LOGI("TryToSaveIpV6Result not UpdateNetLinkInfo");
     }
 }
 

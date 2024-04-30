@@ -54,8 +54,10 @@ public:
      *
      */
     void Exit();
-    void OnForegroundAppChanged(const std::string &bundleName, int uid, int pid,
-        const int state, const int mInstId = 0);
+
+#ifndef OHOS_ARCH_LITE
+    void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);
+#endif
 
 private:
     WifiCommonServiceManager();

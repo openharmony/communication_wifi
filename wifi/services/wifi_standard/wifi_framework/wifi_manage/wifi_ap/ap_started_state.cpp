@@ -424,8 +424,6 @@ bool ApStartedState::SetRandomMac(const HotspotConfig spotConfig, bool setSavedM
     WifiSettings::GetInstance().GetApRandomMac(mac, m_id);
     std::string ssid = spotConfig.GetSsid();
     KeyMgmt securityType = spotConfig.GetSecurityType();
-    WIFI_LOGD("[ssid:%{private}s, securityType:%{public}d] ==> [ssid:%{private}s, securityType:%{public}d]",
-        mac.ssid.c_str(), mac.keyMgmt, ssid.c_str(), securityType);
 
     bool ifNeedUpdateMac = false;
     if ((mac.randomMac == "") || (mac.ssid != ssid || mac.keyMgmt != securityType)) {
@@ -434,7 +432,9 @@ bool ApStartedState::SetRandomMac(const HotspotConfig spotConfig, bool setSavedM
             WIFI_LOGE("macAddress is invalid");
             return false;
         }
-        WIFI_LOGI("Update macAddress");
+        WIFI_LOGI("ssid, keyMgmt, %{private}s, %{public}d ==> %{private}s, %{public}d, randomMac ==> %{private}s",
+            SsidAnonymize(mac.ssid).c_str(), mac.keyMgmt, SsidAnonymize(ssid).c_str(), securityType,
+            MacAnonymize(mac.randomMac).c_str());
         mac.ssid = ssid;
         mac.keyMgmt = securityType;
         ifNeedUpdateMac = true;

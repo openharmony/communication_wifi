@@ -28,42 +28,349 @@
 #include "wifi_device_service_impl.h"
 #include "wifi_device_mgr_service_impl.h"
 #include "wifi_log.h"
+#include <mutex>
+#include "wifi_config_center.h"
+#include "wifi_settings.h"
+#include "wifi_common_def.h"
 
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
-constexpr size_t MAP_DEVICE_NUMS = 100;
+static bool g_isInsted = false;
+static std::mutex g_instanceLock;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiDeviceService";
-const std::u16string FORMMGR_INTERFACE_TOKEN_EX = u"ohos.wifi.IWifiDeviceMgr";
-sptr<WifiDeviceMgrStub> pWifiDeviceMgrStub = WifiDeviceMgrServiceImpl::GetInstance();
-std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
+static sptr<WifiDeviceMgrServiceImpl> pWifiDeviceMgrServiceImpl = nullptr;
+static sptr<WifiDeviceServiceImpl> pWifiDeviceServiceImpl = nullptr;
 
-bool DoSomethingInterestingWithMyAPIEx(const uint8_t* data, size_t size)
+bool Init ()
 {
-    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_MGR_GET_DEVICE_SERVICE);
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_EX);
-    datas.WriteInt32(0);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceMgrStub->OnRemoteRequest(code, datas, reply, option);
+    if (!g_isInsted) {
+        pWifiDeviceMgrServiceImpl = WifiDeviceMgrServiceImpl::GetInstance();
+        if(!pWifiDeviceMgrServiceImpl) {
+            LOGE("Init failed pWifiDeviceMgrServiceImpl is nullptr!");
+            return false;
+        }
+        pWifiDeviceMgrServiceImpl->OnStart();
+        sptr<IRemoteObject> remote = pWifiDeviceMgrServiceImpl->GetWifiRemote(0);
+        if (!remote) {
+            LOGE("Init failed remote is nullptr!");
+            return false;
+        }
+        pWifiDeviceServiceImpl = iface_cast<WifiDeviceServiceImpl>(remote);
+        if (!pWifiDeviceServiceImpl) {
+            LOGE("Init failed pWifiDeviceServiceImpl is nullptr!");
+            return false;
+        }
+        if (WifiConfigCenter::GetInstance().GetWifiMidState(0) != WifiOprMidState::RUNNING) {
+            LOGE("Init setmidstate!");
+            WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING, 0);
+        }
+        g_isInsted = true;
+    }
     return true;
 }
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool OnRemoteRequest(uint32_t code, MessageParcel &data)
 {
-    uint32_t code = U32_AT(data) % MAP_DEVICE_NUMS + static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI);
-    LOGI("wifidevicestub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size); // code[0x1001,0x1031]
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
+    std::unique_lock<std::mutex> autoLock(g_instanceLock);
+    if (!g_isInsted) {
+        if (!init()) {
+            LOGE("OnRemoteRequest Init failed!");
+            return false;
+        }
+    }
     MessageParcel reply;
     MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(code, datas, reply, option);
-    return true;
+    pWifiDeviceServiceImpl->OnRemoteRequest(code, data, reply, option);
+}
+
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnGetWifiProtectRef(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_PROTECT), datas);
+}
+
+bool OnPutWifiProtectRef(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_PUT_WIFI_PROTECT), datas);
+}
+
+bool OnIsHeldWifiProtectRef(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT), datas);
+}
+
+bool OnAddDeviceConfig(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ADD_DEVICE_CONFIG), datas);
+}
+
+bool OnUpdateDeviceConfig(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG), datas);
+}
+
+bool OnRemoveDevice(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG), datas);
+}
+
+bool OnRemoveAllDevice(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG), datas);
+}
+
+bool OnGetDeviceConfigs(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIGS), datas);
+}
+
+bool OnEnableDeviceConfig(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_DEVICE), datas);
+}
+
+bool OnDisableDeviceConfig(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
+}
+
+bool OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
 }
 
 /* Fuzzer entry point */

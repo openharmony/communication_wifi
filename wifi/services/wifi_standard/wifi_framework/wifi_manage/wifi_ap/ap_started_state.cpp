@@ -428,21 +428,21 @@ bool ApStartedState::SetRandomMac(const HotspotConfig spotConfig, bool setSavedM
         mac.ssid.c_str(), mac.keyMgmt, ssid.c_str(), securityType);
 
     bool ifNeedUpdateMac = false;
-    if ((mac.randomMac == "") || (mac.ssid != curApConfig.GetSsid() || mac.keyMgmt != securityType)) {
+    if ((mac.randomMac == "") || (mac.ssid != ssid || mac.keyMgmt != securityType)) {
         WifiSettings::GetInstance().GenerateRandomMacAddress(mac.randomMac);
         if (!MacAddress::IsValidMac(mac.randomMac.c_str())) {
             WIFI_LOGE("macAddress is invalid");
             return false;
         }
         WIFI_LOGI("Update macAddress");
-        mac.ssid = curApConfig.GetSsid();
-        mac.keyMgmt = curApConfig.GetSecurityType();
+        mac.ssid = ssid;
+        mac.keyMgmt = securityType;
         ifNeedUpdateMac = true;
     }
     if (ifNeedUpdateMac || setSavedMac) {
         WifiSettings::GetInstance().SetApRandomMac(mac, m_id);
         if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
-            WifiSettings::GetInstance().GetApIfaceName(), macAddress) != WIFI_IDL_OPT_OK) {
+            WifiSettings::GetInstance().GetApIfaceName(), mac.randomMac) != WIFI_IDL_OPT_OK) {
             WIFI_LOGE("failed to set ap MAC address:%{private}s", mac.randomMac.c_str());
         }
     }

@@ -1142,10 +1142,11 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
         }
     });
     std::stringstream removeConfig;
-    for (int i = 0; i < numExcessNetworks, i++) {
+    int maxIndex = numExcessNetworks > MAX_CONFIGS_NUM ? MAX_CONFIGS_NUM : numExcessNetworks;
+    for (int i = 0; i < maxIndex; i++) {
         removeConfig << SsidAnonymize(configs[i].ssid) << ",";
     }
-    LOGI("saved config size greater than %{public}d, total=%{public}ld, remove ssid=%{public}s",
+    LOGI("saved config size greater than %{public}d, total=%{public}ld, remove ssid(print up to 1000)=%{public}s",
         maxNumConfigs, configs.size(), removeConfig.str().c_str());
     configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
     return 0;

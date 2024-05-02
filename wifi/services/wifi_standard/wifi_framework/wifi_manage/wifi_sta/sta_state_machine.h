@@ -967,6 +967,22 @@ private:
     ErrCode SetExternalSim(const std::string ifName, const std::string &eap, int value) const;
 
     /**
+     * @Description : Check Current DisConnect event is should retry.
+     *
+     * @param eventName - eventName.
+     * @Return true: need retry.
+     */
+    bool IsStaDisConnectReasonShouldRetryEvent(int eventName);
+
+    /**
+     * @Description : Check wpa report DisConnect reason is should stoptimer.
+     *
+     * @param reason - reason.
+     * @Return true: need stop timer.
+     */
+    bool IsDisConnectReasonShouldStopTimer(int reason);
+
+    /**
      * @Description : should sta connect use factory mac address.
      *
      * @param networkId - networkId.

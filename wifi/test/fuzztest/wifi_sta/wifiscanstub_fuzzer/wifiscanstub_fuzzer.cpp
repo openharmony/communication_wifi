@@ -42,11 +42,11 @@ static std::mutex g_instanceLock;
 static sptr<WifiScanMgrServiceImpl> pWifiScanMgrServiceImpl = nullptr;
 static sptr<WifiScanServiceImpl> pWifiScanServiceImpl = nullptr;
 
-bool Init ()
+bool Init()
 {
     if (!g_isInsted) {
         pWifiScanMgrServiceImpl = WifiScanMgrServiceImpl::GetInstance();
-        if(!pWifiScanMgrServiceImpl) {
+        if (!pWifiScanMgrServiceImpl) {
             LOGE("Init failed pWifiScanMgrServiceImpl is nullptr!");
             return false;
         }

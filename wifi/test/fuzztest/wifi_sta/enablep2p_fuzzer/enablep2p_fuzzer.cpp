@@ -32,6 +32,9 @@
 #include "wifi_hotspot_service_impl.h"
 #include "wifi_scan_service_impl.h"
 #include "wifi_log.h"
+#include "wifi_config_center.h"
+#include "wifi_settings.h"
+#include "wifi_common_def.h"
 
 namespace OHOS {
 namespace Wifi {

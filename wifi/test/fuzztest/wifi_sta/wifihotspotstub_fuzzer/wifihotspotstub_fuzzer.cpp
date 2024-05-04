@@ -313,8 +313,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetHotspotConfigFuzzTest(data, size);
     OHOS::Wifi::OnSetApConfigWifiFuzzTest(data, size);
     OHOS::Wifi::OnGetStationListFuzzTest(data, size);
-    // OHOS::Wifi::OnEnableWifiApFuzzTest(data, size);
-    // OHOS::Wifi::OnDisableWifiApFuzzTest(data, size);
     OHOS::Wifi::OnAddBlockListFuzzTest(data, size);
     OHOS::Wifi::OnDelBlockListFuzzTest(data, size);
     OHOS::Wifi::OnGetBlockListsFuzzTest(data, size);

@@ -555,7 +555,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-
     OHOS::Wifi::OnDiscoverDevicesFuzzTest(data, size);
     OHOS::Wifi::OnStopDiscoverDevicesFuzzTest(data, size);
     OHOS::Wifi::OnDiscoverServicesFuzzTest(data, size);
@@ -596,7 +595,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnHid2dSetPeerWifiCfgInfoFuzzTest(data, size);
     OHOS::Wifi::OnQueryP2pLocalDeviceFuzzTest(data, size);
     OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest(data, size);
-
     return 0;
 }
 }

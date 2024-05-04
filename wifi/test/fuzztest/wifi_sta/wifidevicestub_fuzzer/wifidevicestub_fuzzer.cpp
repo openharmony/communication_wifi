@@ -578,6 +578,30 @@ void OnGetChangeDeviceConfigFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE), datas);
 }
 
+void OnLimitSpeedFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED), datas);
+}
+
+void OnEnableHiLinkHandshakeFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), datas);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -624,9 +648,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnEnableAutoJoinFuzzTest(data, size);
     OHOS::Wifi::OnStartPortalCertificationFuzzTest(data, size);
     OHOS::Wifi::OnGetChangeDeviceConfigFuzzTest(data, size);
-    // OHOS::Wifi::OnFactoryResetFuzzTest(data, size);
-    // OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
-    // OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
+    OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
+    OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
     return 0;
 }
 }

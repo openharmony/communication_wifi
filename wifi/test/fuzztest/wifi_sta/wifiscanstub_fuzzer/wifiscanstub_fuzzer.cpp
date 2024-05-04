@@ -74,107 +74,95 @@ bool OnRemoteRequest(uint32_t code, MessageParcel &data)
 {
     std::unique_lock<std::mutex> autoLock(g_instanceLock);
     if (!g_isInsted) {
-        if (!init()) {
+        if (!Init()) {
             LOGE("OnRemoteRequest Init failed!");
             return false;
         }
     }
     MessageParcel reply;
     MessageOption option;
-    pWifiScanServiceImpl->OnRemoteRequest(code, data, reply, option);
+    int32_t ret = pWifiScanServiceImpl->OnRemoteRequest(code, data, reply, option);
+    return ret;
 }
 
-bool DoSomethingInterestingWithMyAPIEx(const uint8_t* data, size_t size)
-{
-    uint32_t code = static_cast<uint32_t>(ScanInterfaceCode::WIFI_MGR_GET_SCAN_SERVICE);
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_EX);
-    datas.WriteInt32(0);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiScanMgrStub->OnRemoteRequest(code, datas, reply, option);
-    return true;
-}
-
-bool OnSetScanControlInfoFuzzTest(const uint8_t* data, size_t size)
+void OnSetScanControlInfoFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO), datas);
 }
 
-bool OnScanByParamsFuzzTest(const uint8_t* data, size_t size)
+void OnScanByParamsFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN), datas);
 }
 
-bool OnIsWifiClosedScanFuzzTest(const uint8_t* data, size_t size)
+void OnIsWifiClosedScanFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE), datas);
 }
 
-bool OnGetScanInfoListFuzzTest(const uint8_t* data, size_t size)
+void OnGetScanInfoListFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST), datas);
 }
 
-bool OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
+void OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK), datas);
 }
 
-bool OnStartWifiPnoScanFuzzTest(const uint8_t* data, size_t size)
+void OnStartWifiPnoScanFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), datas);
 }
 
-bool OnScanFuzzTest(const uint8_t* data, size_t size)
+void OnScanFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);

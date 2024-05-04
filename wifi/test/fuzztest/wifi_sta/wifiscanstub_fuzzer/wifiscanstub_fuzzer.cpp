@@ -57,7 +57,7 @@ bool Init()
             return false;
         }
         pWifiScanServiceImpl = iface_cast<WifiScanServiceImpl>(remote);
-        if (!pWifiDeviceServiceImpl) {
+        if (!pWifiScanServiceImpl) {
             LOGE("Init failed pWifiScanServiceImpl is nullptr!");
             return false;
         }

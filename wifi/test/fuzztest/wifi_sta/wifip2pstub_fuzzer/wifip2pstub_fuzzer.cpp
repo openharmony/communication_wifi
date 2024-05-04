@@ -26,6 +26,9 @@
 #include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_p2p_service_impl.h"
 #include "wifi_log.h"
+#include "wifi_config_center.h"
+#include "wifi_settings.h"
+#include "wifi_common_def.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -200,18 +203,6 @@ void OnRemoveGroupFuzzTest(const uint8_t* data, size_t size)
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP), datas);
-}
-
-void OnRemoveGroupClientFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT), datas);
 }
 
 void OnDeleteGroupFuzzTest(const uint8_t* data, size_t size)
@@ -566,7 +557,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnStopP2pListenFuzzTest(data, size);
     OHOS::Wifi::OnCreateGroupFuzzTest(data, size);
     OHOS::Wifi::OnRemoveGroupFuzzTest(data, size);
-    OHOS::Wifi::OnRemoveGroupClientFuzzTest(data, size);
     OHOS::Wifi::OnDeleteGroupFuzzTest(data, size);
     OHOS::Wifi::OnP2pConnectFuzzTest(data, size);
     OHOS::Wifi::OnP2pCancelConnectFuzzTest(data, size);

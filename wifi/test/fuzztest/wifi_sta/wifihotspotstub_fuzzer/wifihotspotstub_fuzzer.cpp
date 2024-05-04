@@ -26,42 +26,276 @@
 #include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_hotspot_service_impl.h"
 #include "wifi_log.h"
+#include <mutex>
+#include "wifi_config_center.h"
+#include "wifi_settings.h"
+#include "wifi_common_def.h"
 
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
-constexpr size_t MAP_HOTSPOT_NUMS = 22;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiHotspotService";
-std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotspotServiceImpl>();
+static bool g_isInsted = false;
+static std::mutex g_instanceLock;
+static sptr<WifiHotspotMgrServiceImpl> pWifiHotspotMgrServiceImpl = nullptr;
+static sptr<WifiHotspotServiceImpl> pWifiHotspotServiceImpl = nullptr;
 
-void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
+bool Init ()
 {
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiHotspotStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
-        datas, reply, option);
+    if (!g_isInsted) {
+        pWifiHotspotMgrServiceImpl = WifiHotspotMgrServiceImpl::GetInstance();
+        if(!pWifiHotspotMgrServiceImpl) {
+            LOGE("Init failed pWifiHotspotMgrServiceImpl is nullptr!");
+            return false;
+        }
+        pWifiHotspotMgrServiceImpl->OnStart();
+        sptr<IRemoteObject> remote = pWifiHotspotMgrServiceImpl->GetWifiRemote(0);
+        if (!remote) {
+            LOGE("Init failed remote is nullptr!");
+            return false;
+        }
+        pWifiHotspotServiceImpl = iface_cast<WifiHotspotServiceImpl>(remote);
+        if (!pWifiDeviceServiceImpl) {
+            LOGE("Init failed pWifiHotspotServiceImpl is nullptr!");
+            return false;
+        }
+        if (WifiConfigCenter::GetInstance().GetApMidState(0) != WifiOprMidState::RUNNING) {
+            LOGE("Init setmidstate!");
+            WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::RUNNING, 0);
+        }
+        g_isInsted = true;
+    }
+    return true;
 }
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool OnRemoteRequest(uint32_t code, MessageParcel &data)
 {
-    uint32_t code = U32_AT(data) % MAP_HOTSPOT_NUMS +
-        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP);
-    LOGI("wifihotspotstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size);
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
+    std::unique_lock<std::mutex> autoLock(g_instanceLock);
+    if (!g_isInsted) {
+        if (!init()) {
+            LOGE("OnRemoteRequest Init failed!");
+            return false;
+        }
+    }
     MessageParcel reply;
     MessageOption option;
-    pWifiHotspotStub->OnRemoteRequest(code, datas, reply, option);
-    OnGetSupportedFeaturesTest(data, size);
-    return true;
+    pWifiHotspotServiceImpl->OnRemoteRequest(code, data, reply, option);
+}
+
+bool OnIsHotspotActiveFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE), datas);
+}
+
+bool OnGetApStateWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GETAPSTATE_WIFI), datas);
+}
+
+bool OnGetHotspotConfigFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_CONFIG), datas);
+}
+
+bool OnSetApConfigWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETAPCONFIG_WIFI), datas);
+}
+
+bool OnGetStationListFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_STATION_LIST), datas);
+}
+
+bool OnAddBlockListFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ADD_BLOCK_LIST), datas);
+}
+
+bool OnDelBlockListFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DEL_BLOCK_LIST), datas);
+}
+
+bool OnGetBlockListsFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_BLOCK_LISTS), datas);
+}
+
+bool OnGetValidBandsFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_BANDS), datas);
+}
+
+bool OnDisassociateStaFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISCONNECT_STA), datas);
+}
+
+bool OnGetValidChannelsFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_CHANNELS), datas);
+}
+
+bool OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK), datas);
+}
+
+bool OnGetSupportedPowerModelFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL), datas);
+}
+
+bool OnGetPowerModelFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_POWER_MODEL), datas);
+}
+
+bool OnSetPowerModelFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SET_POWER_MODEL), datas);
+}
+
+bool OnIsHotspotDualBandSupportedFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED), datas);
+}
+
+bool OnSetApIdleTimeoutFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP), datas);
+}
+
+bool OnGetApIfaceNameFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        rerurn false;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_IFACE_NAME), datas);
 }
 
 /* Fuzzer entry point */
@@ -70,8 +304,27 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-    sleep(1);
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
+
+    OHOS::Wifi::OnIsHotspotActiveFuzzTest(data, size);
+    OHOS::Wifi::OnGetApStateWifiFuzzTest(data, size);
+    OHOS::Wifi::OnGetHotspotConfigFuzzTest(data, size);
+    OHOS::Wifi::OnSetApConfigWifiFuzzTest(data, size);
+    OHOS::Wifi::OnGetStationListFuzzTest(data, size);
+    // OHOS::Wifi::OnEnableWifiApFuzzTest(data, size);
+    // OHOS::Wifi::OnDisableWifiApFuzzTest(data, size);
+    OHOS::Wifi::OnAddBlockListFuzzTest(data, size);
+    OHOS::Wifi::OnDelBlockListFuzzTest(data, size);
+    OHOS::Wifi::OnGetBlockListsFuzzTest(data, size);
+    OHOS::Wifi::OnDisassociateStaFuzzTest(data, size);
+    OHOS::Wifi::OnGetValidBandsFuzzTest(data, size);
+    OHOS::Wifi::OnGetValidChannelsFuzzTest(data, size);
+    OHOS::Wifi::OnRegisterCallBackFuzzTest(data, size);
+    OHOS::Wifi::OnGetSupportedPowerModelFuzzTest(data, size);
+    OHOS::Wifi::OnGetPowerModelFuzzTest(data, size);
+    OHOS::Wifi::OnSetPowerModelFuzzTest(data, size);
+    OHOS::Wifi::OnIsHotspotDualBandSupportedFuzzTest(data, size);
+    OHOS::Wifi::OnSetApIdleTimeoutFuzzTest(data, size);
+    OHOS::Wifi::OnGetApIfaceNameFuzzTest(data, size);
     return 0;
 }
 }

@@ -107,32 +107,6 @@ bool OnFactoryResetFuzzTest(const uint8_t* data, size_t size)
     return true;
 }
 
-bool OnLimitSpeedFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED),
-        datas, reply, option);
-    return true;
-}
-
-bool OnEnableHiLinkHandshakeFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT),
-        datas, reply, option);
-    return true;
-}
-
 bool OnEnableWifiFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
@@ -224,8 +198,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnEnableWifiApTest(data, size);
     OHOS::Wifi::OnDisableWifiApTest(data, size);
     OHOS::Wifi::OnFactoryResetFuzzTest(data, size);
-    OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
-    OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
     OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
     OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
     OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);

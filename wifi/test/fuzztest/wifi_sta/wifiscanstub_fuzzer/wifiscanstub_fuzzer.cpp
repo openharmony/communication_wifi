@@ -182,8 +182,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnIsWifiClosedScanFuzzTest(data, size);
     OHOS::Wifi::OnGetScanInfoListFuzzTest(data, size);
     OHOS::Wifi::OnRegisterCallBackFuzzTest(data, size);
-    // OHOS::Wifi::OnSetScanOnlyAvailableFuzzTest(data, size);
-    // OHOS::Wifi::OnGetScanOnlyAvailableFuzzTest(data, size);
     OHOS::Wifi::OnStartWifiPnoScanFuzzTest(data, size);
     return 0;
 }

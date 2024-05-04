@@ -42,11 +42,11 @@ const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiDeviceService";
 static sptr<WifiDeviceMgrServiceImpl> pWifiDeviceMgrServiceImpl = nullptr;
 static sptr<WifiDeviceServiceImpl> pWifiDeviceServiceImpl = nullptr;
 
-bool Init ()
+bool Init()
 {
     if (!g_isInsted) {
         pWifiDeviceMgrServiceImpl = WifiDeviceMgrServiceImpl::GetInstance();
-        if(!pWifiDeviceMgrServiceImpl) {
+        if (!pWifiDeviceMgrServiceImpl) {
             LOGE("Init failed pWifiDeviceMgrServiceImpl is nullptr!");
             return false;
         }

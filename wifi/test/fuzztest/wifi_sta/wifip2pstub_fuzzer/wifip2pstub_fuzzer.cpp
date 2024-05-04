@@ -35,7 +35,7 @@ static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 static sptr<WifiP2pServiceImpl> pWifiP2pServiceImpl = nullptr;
 
-bool Init ()
+bool Init()
 {
     if (!g_isInsted) {
         pWifiP2pServiceImpl = WifiP2pServiceImpl::GetInstance();

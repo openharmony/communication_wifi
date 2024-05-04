@@ -42,11 +42,11 @@ static std::mutex g_instanceLock;
 static sptr<WifiHotspotMgrServiceImpl> pWifiHotspotMgrServiceImpl = nullptr;
 static sptr<WifiHotspotServiceImpl> pWifiHotspotServiceImpl = nullptr;
 
-bool Init ()
+bool Init()
 {
     if (!g_isInsted) {
         pWifiHotspotMgrServiceImpl = WifiHotspotMgrServiceImpl::GetInstance();
-        if(!pWifiHotspotMgrServiceImpl) {
+        if (!pWifiHotspotMgrServiceImpl) {
             LOGE("Init failed pWifiHotspotMgrServiceImpl is nullptr!");
             return false;
         }

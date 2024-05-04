@@ -56,22 +56,23 @@ bool OnRemoteRequest(uint32_t code, MessageParcel &data)
 {
     std::unique_lock<std::mutex> autoLock(g_instanceLock);
     if (!g_isInsted) {
-        if (!init()) {
+        if (!Init()) {
             LOGE("OnRemoteRequest Init failed!");
             return false;
         }
     }
     MessageParcel reply;
     MessageOption option;
-    pWifiP2pServiceImpl->OnRemoteRequest(code, data, reply, option);
+    int32_t ret = pWifiP2pServiceImpl->OnRemoteRequest(code, data, reply, option);
+    return ret;
 }
 
-bool OnDiscoverDevicesFuzzTest(const uint8_t* data, size_t size)
+void OnDiscoverDevicesFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
@@ -79,12 +80,12 @@ bool OnDiscoverDevicesFuzzTest(const uint8_t* data, size_t size)
 }
 
 
-bool OnStopDiscoverDevicesFuzzTest(const uint8_t* data, size_t size)
+void OnStopDiscoverDevicesFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
@@ -92,12 +93,12 @@ bool OnStopDiscoverDevicesFuzzTest(const uint8_t* data, size_t size)
 }
 
 
-bool OnDiscoverServicesFuzzTest(const uint8_t* data, size_t size)
+void OnDiscoverServicesFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
@@ -105,312 +106,312 @@ bool OnDiscoverServicesFuzzTest(const uint8_t* data, size_t size)
 }
 
 
-bool OnStopDiscoverServicesFuzzTest(const uint8_t* data, size_t size)
+void OnStopDiscoverServicesFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES), datas);
 }
 
-bool OnRequestServiceFuzzTest(const uint8_t* data, size_t size)
+void OnRequestServiceFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REQUEST_SERVICES), datas);
 }
 
-bool OnPutLocalP2pServiceFuzzTest(const uint8_t* data, size_t size)
+void OnPutLocalP2pServiceFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES), datas);
 }
 
-bool OnDeleteLocalP2pServiceFuzzTest(const uint8_t* data, size_t size)
+void OnDeleteLocalP2pServiceFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES), datas);
 }
 
-bool OnStartP2pListenFuzzTest(const uint8_t* data, size_t size)
+void OnStartP2pListenFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_START_LISTEN), datas);
 }
 
-bool OnStopP2pListenFuzzTest(const uint8_t* data, size_t size)
+void OnStopP2pListenFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_LISTEN), datas);
 }
 
-bool OnCreateGroupFuzzTest(const uint8_t* data, size_t size)
+void OnCreateGroupFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CREATE_GROUP), datas);
 }
 
-bool OnRemoveGroupFuzzTest(const uint8_t* data, size_t size)
+void OnRemoveGroupFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP), datas);
 }
 
-bool OnRemoveGroupClientFuzzTest(const uint8_t* data, size_t size)
+void OnRemoveGroupClientFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT), datas);
 }
 
-bool OnDeleteGroupFuzzTest(const uint8_t* data, size_t size)
+void OnDeleteGroupFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_GROUP), datas);
 }
 
-bool OnP2pConnectFuzzTest(const uint8_t* data, size_t size)
+void OnP2pConnectFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CONNECT), datas);
 }
 
-bool OnP2pCancelConnectFuzzTest(const uint8_t* data, size_t size)
+void OnP2pCancelConnectFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CANCEL_CONNECT), datas);
 }
 
-bool OnQueryP2pLinkedInfoFuzzTest(const uint8_t* data, size_t size)
+void OnQueryP2pLinkedInfoFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_INFO), datas);
 }
 
-bool OnGetCurrentGroupFuzzTest(const uint8_t* data, size_t size)
+void OnGetCurrentGroupFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP), datas);
 }
 
-bool OnGetP2pEnableStatusFuzzTest(const uint8_t* data, size_t size)
+void OnGetP2pEnableStatusFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS), datas);
 }
 
-bool OnGetP2pDiscoverStatusFuzzTest(const uint8_t* data, size_t size)
+void OnGetP2pDiscoverStatusFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS), datas);
 }
 
-bool OnGetP2pConnectedStatusFuzzTest(const uint8_t* data, size_t size)
+void OnGetP2pConnectedStatusFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS), datas);
 }
 
-bool OnQueryP2pDevicesFuzzTest(const uint8_t* data, size_t size)
+void OnQueryP2pDevicesFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_DEVICES), datas);
 }
 
-bool OnQueryP2pGroupsFuzzTest(const uint8_t* data, size_t size)
+void OnQueryP2pGroupsFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_GROUPS), datas);
 }
 
-bool OnQueryP2pServicesFuzzTest(const uint8_t* data, size_t size)
+void OnQueryP2pServicesFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_SERVICES), datas);
 }
 
-bool OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
+void OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REGISTER_CALLBACK), datas);
 }
 
-bool OnSetP2pDeviceNameFuzzTest(const uint8_t* data, size_t size)
+void OnSetP2pDeviceNameFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_DEVICE_NAME), datas);
 }
 
-bool OnSetP2pWfdInfoFuzzTest(const uint8_t* data, size_t size)
+void OnSetP2pWfdInfoFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_WFD_INFO), datas);
 }
 
-bool OnHid2dRequestGcIpFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dRequestGcIpFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_APPLY_IP), datas);
 }
 
-bool OnHid2dSharedlinkIncreaseFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dSharedlinkIncreaseFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE), datas);
 }
 
-bool OnHid2dSharedlinkDecreaseFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dSharedlinkDecreaseFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
@@ -418,130 +419,130 @@ bool OnHid2dSharedlinkDecreaseFuzzTest(const uint8_t* data, size_t size)
 }
 
 
-bool OnHid2dCreateGroupFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dCreateGroupFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP), datas);
 }
 
-bool OnHid2dRemoveGcGroupFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dRemoveGcGroupFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP), datas);
 }
-bool OnHid2dConnectFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dConnectFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONNECT), datas);
 }
 
-bool OnHid2dConfigIPAddrFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dConfigIPAddrFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP), datas);
 }
 
-bool OnHid2dReleaseIPAddrFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dReleaseIPAddrFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP), datas);
 }
 
-bool OnHid2dGetRecommendChannelFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dGetRecommendChannelFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL), datas);
 }
 
-bool OnHid2dGetChannelListFor5GFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dGetChannelListFor5GFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNEL_LIST), datas);
 }
 
-bool OnHid2dGetSelfWifiCfgInfoFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dGetSelfWifiCfgInfoFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_SELF_WIFI_CFG), datas);
 }
 
-bool OnHid2dSetPeerWifiCfgInfoFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dSetPeerWifiCfgInfoFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_PEER_WIFI_CFG), datas);
 }
-bool OnQueryP2pLocalDeviceFuzzTest(const uint8_t* data, size_t size)
+void OnQueryP2pLocalDeviceFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE), datas);
 }
 
-bool OnHid2dSetUpperSceneFuzzTest(const uint8_t* data, size_t size)
+void OnHid2dSetUpperSceneFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
-        rerurn false;
+        return;
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);

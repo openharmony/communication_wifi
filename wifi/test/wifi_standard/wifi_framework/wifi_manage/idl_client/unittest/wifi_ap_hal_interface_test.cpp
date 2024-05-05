@@ -115,14 +115,14 @@ HWTEST_F(WifiApHalInterfaceTest, DisconnectStaByMacTest, TestSize.Level1)
 HWTEST_F(WifiApHalInterfaceTest, GetFrequenciesByBandTest, TestSize.Level1)
 {
     std::vector<int> freq;
-    WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand(1, freq);
+    WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand("wlan0", 1, freq);
     EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, SetWifiCountryCodeTest, TestSize.Level1)
 {
     std::string code = "CN";
-    WifiErrorNo ret = WifiApHalInterface::GetInstance().SetWifiCountryCode(code);
+    WifiErrorNo ret = WifiApHalInterface::GetInstance().SetWifiCountryCode("wlan0", code);
     EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
 }
 

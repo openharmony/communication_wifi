@@ -952,6 +952,17 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     return 0;
 }
 
+int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.randomizedMacSuccessEver = true;
+    return 0;
+}
+
 int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config)
 {
     std::vector<WifiDeviceConfig> configs;
@@ -1847,6 +1858,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetBand(BandType::BAND_2GHZ);
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
+    cfg.SetBandWidth(AP_BANDWIDTH_DEFAULT);
 #ifdef INIT_LIB_ENABLE
     cfg.SetSsid(ssid);
 #else
@@ -1870,6 +1882,7 @@ void WifiSettings::ClearHotspotConfig()
     config.SetBand(BandType::BAND_2GHZ);
     config.SetChannel(AP_CHANNEL_DEFAULT);
     config.SetMaxConn(GetApMaxConnNum());
+    config.SetBandWidth(AP_BANDWIDTH_DEFAULT);
 #ifdef INIT_LIB_ENABLE
     config.SetSsid(ssid);
 #else

@@ -30,6 +30,7 @@ struct WifiEventCallback {
     std::function<void(int)> onWpaConnectionFull;
     std::function<void(int)> onWpaConnectionReject;
     std::function<void(const std::string &)> onEventStaNotify;
+    std::function<void(int, const std::string &)> onReportDisConnectReason;
 };
 }  // namespace Wifi
 }  // namespace OHOS

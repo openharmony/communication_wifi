@@ -295,13 +295,10 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     dns->type_ = NetManagerStandard::INetAddr::IPV4;
     dns->family_ = NetManagerStandard::INetAddr::IPV4;
-    LOGI("SetNetLinkDnsInfo ipv4 dns size:%{public}u", wifiIpInfo.dnsAddr.size());
-    if (wifiIpInfo.dnsAddr.size() > 0) {
-        for (uint32_t i = 0; i < wifiIpInfo.dnsAddr.size(); i++) {
-            dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.dnsAddr[i]);
-            netLinkInfo->dnsList_.push_back(*dns);
-        }
-    }
+    dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+    netLinkInfo->dnsList_.push_back(*dns);
+    dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+    netLinkInfo->dnsList_.push_back(*dns);
 
     sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     ipv6dns->type_ = NetManagerStandard::INetAddr::IPV6;

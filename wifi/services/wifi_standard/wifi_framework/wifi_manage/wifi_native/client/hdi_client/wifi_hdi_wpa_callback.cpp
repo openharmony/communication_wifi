@@ -469,8 +469,8 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
-        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s",
-            cbInfo.groupName.c_str(), cbInfo.ssid.c_str());
+        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s" len:%{public}lu:,
+            cbInfo.groupName.c_str(), cbInfo.ssid.c_str(), strlen(cbInfo.ssid.c_str()));
 
         char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
         ConvertMacArr2String(groupStartedParam->goDeviceAddress,

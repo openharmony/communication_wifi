@@ -362,6 +362,15 @@ public:
     WifiErrorNo ShellCmd(const std::string &ifName, const std::string &cmd);
 
     /**
+     * @Description get psk pass phrase
+     *
+     * @param ifName: Interface name
+     * @param psk: psk
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetPskPassphrase(const std::string &ifName, std::string &psk);
+
+    /**
      * @Description set background limit speed uid&pid list
      *
      * @param chipsetCategory - chipset category

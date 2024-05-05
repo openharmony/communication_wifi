@@ -78,6 +78,8 @@ WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, 
 
 WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd);
 
+WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t pskLen);
+
 int ConvertMacToStr(char *mac, int macSize, char *macStr, int strLen);
 
 #ifdef __cplusplus

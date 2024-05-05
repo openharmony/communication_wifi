@@ -118,6 +118,9 @@ enum ConnState {
     /** The Wi-Fi connection has been torn down. */
     DISCONNECTED,
 
+    /** The Wi-Fi special connection. */
+    SPECIAL_CONNECT,
+
     /** Failed to set up the Wi-Fi connection. */
     UNKNOWN
 };

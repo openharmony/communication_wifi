@@ -234,7 +234,7 @@ public:
     }
 
     void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {
-        WIFI_LOGI("OnWifiConnectionChanged event: %{public}d [4:CONNECTED, 6:DISCONNECTED]", state);
+        WIFI_LOGI("OnWifiConnectionChanged event: %{public}d [4:CONNECTED, 6:DISCONNECTED, 7:SPECIAL_CONNECT]", state);
         if (m_connectStateConvertMap.find(state) == m_connectStateConvertMap.end()) {
             WIFI_LOGW("not find connect state.");
             return;
@@ -281,6 +281,7 @@ private:
     enum class JsLayerConnectStatus {
         DISCONNECTED = 0,
         CONNECTED = 1,
+        SPECIAL_CONNECT = 2,
     };
 
     enum class JsLayerStreamDirection {
@@ -300,6 +301,7 @@ private:
     std::map<int, int> m_connectStateConvertMap = {
         { static_cast<int>(ConnState::CONNECTED), static_cast<int>(JsLayerConnectStatus::CONNECTED) },
         { static_cast<int>(ConnState::DISCONNECTED), static_cast<int>(JsLayerConnectStatus::DISCONNECTED) },
+        { static_cast<int>(ConnState::SPECIAL_CONNECT), static_cast<int>(JsLayerConnectStatus::SPECIAL_CONNECT) },
     };
 
     std::map<int, int> m_streamDirectionConvertMap = {

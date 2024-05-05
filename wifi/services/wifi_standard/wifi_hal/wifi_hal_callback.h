@@ -36,6 +36,13 @@ void WifiHalCbNotifyScanEnd(int status);
  */
 void WifiHalCbNotifyConnectChanged(int status, int networkId, const char *pos);
 /**
+ * @Description Wi-Fi Hal callback notification of the disconnect reason.
+ *
+ * @param reason
+ * @param bssid
+ */
+void WifiHalCbNotifyDisConnectReason(int reason, const char *bssid);
+/**
  * @Description Wi-Fi Hal module notifies the WPA module of the status change.
  *
  * @param status

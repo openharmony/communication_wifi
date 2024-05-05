@@ -31,9 +31,9 @@ public:
     StaServiceCallback GetStaCallback() const;
     ErrCode InitAppAcceleration();
     void HandleScreenStatusChanged(int screenState);
-    void HandleForegroundAppChangedAction(const std::string &bundleName,
-        const int uid, const int pid, const int state);
-
+#ifndef OHOS_ARCH_LITE
+    void HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
+#endif
 private:
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     void SetPmMode(int mode);

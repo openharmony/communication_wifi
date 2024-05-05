@@ -37,7 +37,7 @@ public:
     /**
      * @Description  self cure service initialization function.
      *
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode InitSelfCureService() = 0;
 

@@ -69,6 +69,7 @@ ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
     msg->AddIntMessageBody(static_cast<int>(cfg.GetSecurityType()));
     msg->AddIntMessageBody(static_cast<int>(cfg.GetBand()));
     msg->AddIntMessageBody(cfg.GetChannel());
+    msg->AddIntMessageBody(cfg.GetBandWidth());
     msg->AddIntMessageBody(cfg.GetMaxConn());
     msg->AddStringMessageBody(cfg.GetIpAddress());
     msg->AddIntMessageBody(cfg.GetLeaseTime());
@@ -173,10 +174,12 @@ ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
     }
 
     /* Get freqs from hal */
-    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(
+        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 2.4G channel", __func__);
     }
-    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(
+        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 5G channel", __func__);
     }
     if (allowed2GFreq.size() > 0) {
@@ -214,10 +217,12 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
     /* get freqs from hal service */
     std::vector<int32_t> allowed5GFreq, allowed2GFreq;
     std::vector<int32_t> allowed5GChan, allowed2GChan;
-    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(
+        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 2.4G channel", __func__);
     }
-    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
+    if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(
+        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 5G channel", __func__);
     }
     if (allowed2GFreq.size() == 0) {
@@ -272,7 +277,8 @@ ErrCode ApService::SetPowerModel(const PowerModel& model)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     LOGI("Enter ApService::SetPowerModel, model=[%d]", static_cast<int>(model));
-    if (WifiApHalInterface::GetInstance().SetPowerModel(static_cast<int>(model), m_id) != WIFI_IDL_OPT_OK) {
+    if (WifiApHalInterface::GetInstance().SetPowerModel(
+        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(model)) != WIFI_IDL_OPT_OK) {
         LOGE("SetPowerModel() failed!");
         return WIFI_OPT_FAILED;
     }

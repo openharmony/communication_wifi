@@ -13,14 +13,10 @@
  * limitations under the License.
  */
 
-#ifdef HDI_INTERFACE_SUPPORT
-
 #include "securec.h"
 #include "wifi_hdi_util.h"
-#include "wifi_hdi_common.h"
 #include "wifi_common_def.h"
 #include "wifi_log.h"
-#include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiUtil"
@@ -39,6 +35,10 @@
 #define REPLY_BUF_LENGTH (4096 * 10)
 #define REPLY_BUF_SMALL_LENGTH 64
 #define CMD_FREQ_MAX_LEN 8
+#define MAC_UINT_SIZE 6
+#define MAC_STRING_SIZE 17
+#define HILINK_OUI_HEAD_LEN 9
+#define MASK_HILINK 0xFF
 
 const unsigned int HT_OPER_EID = 61;
 const unsigned int VHT_OPER_EID = 192;
@@ -68,9 +68,6 @@ const unsigned int CHAN_WIDTH_40MHZ = 1;
 const unsigned int CHAN_WIDTH_80MHZ = 2;
 const unsigned int CHAN_WIDTH_160MHZ = 3;
 const unsigned int CHAN_WIDTH_80MHZ_MHZ = 4;
-
-#define MAC_UINT_SIZE 6
-#define MAC_STRING_SIZE 17
 
 #ifndef OHOS_ARCH_LITE
 static int ConvertChanToFreqMhz(int channel, int band)
@@ -995,7 +992,7 @@ done:
 }
 
 /* Format one result on one text line into a buffer. */
-int GetScanResultText(const struct HdfWifiScanResultExt *scanResult,
+int GetScanResultText(const struct WifiScanResultExt *scanResult,
     struct HdiElems *elems, char* buf, int bufLen)
 {
     char *pos, *end;
@@ -1225,7 +1222,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             start = length;
             break;
 #else
@@ -1234,7 +1231,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             GetInfoElems(length, end, srcBuf, pcmd);
             start = length;
             break;
@@ -1309,4 +1306,41 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
     scanInfo->infoElems = infoElemsTemp;
     scanInfo->ieSize = ieIndex;
 }
-#endif
+
+static bool CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
+{
+    int formatHiLink[] = {0, 0xE0, 0XFC, 0X80, 0, 0, 0, 0X01, 0};
+    int formatHiLinkOUI[] = {0, 0xE0, 0XFC, 0X40, 0, 0, 0, 0X01, 0};
+    if (bytes == NULL || len < HILINK_OUI_HEAD_LEN) {
+        return false;
+    }
+
+    for (int index = 0; index < HILINK_OUI_HEAD_LEN; index++) {
+        int element = bytes[index] & MASK_HILINK;
+        if (element != formatHiLink[index] && element != formatHiLinkOUI[index]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
+{
+    const struct HdiElem *elem;
+    bool num = false;
+
+    if (!start) {
+        return false;
+    }
+
+    HDI_CHECK_ELEMENT(elem, start, len) {
+        uint8_t id = elem->id, elen = elem->datalen;
+        const uint8_t *pos = elem->data;
+        if (id == HDI_EID_VENDOR_SPECIFIC) {
+            num |= CheckHiLinkOUISection(pos, elen);
+        }
+    }
+
+    return num;
+}

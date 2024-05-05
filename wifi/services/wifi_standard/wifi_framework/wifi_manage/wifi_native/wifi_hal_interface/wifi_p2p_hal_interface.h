@@ -453,15 +453,6 @@ public:
      */
     WifiErrorNo Hid2dConnect(const Hid2dConnectConfig &config) const;
 
-    /**
-     * @Description Set the MAC address of the P2P
-     *
-     * @param mac
-     * @param portType
-     * @return WifiErrorNo
-     */
-    WifiErrorNo SetConnectMacAddr(const std::string &mac, const int portType);
-
 private:
     P2pHalCallback mP2pCallback;
 };

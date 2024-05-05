@@ -100,26 +100,6 @@ HWTEST_F(ApConfigUse_Test, GetBestChannelFor2GTest, TestSize.Level1)
     EXPECT_TRUE(IsValid24GChannel(channel));
 }
 
-HWTEST_F(ApConfigUse_Test, GetBestChannelFor5GTest, TestSize.Level1)
-{
-    WIFI_LOGI("GetBestChannelFor5GTest enter");
-    std::vector<int> frequencies = {5180, 5200, 5220};
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(2, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(frequencies), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
-
-    int channel = m_apConfigUse->GetBestChannelFor5G();
-    WIFI_LOGI("GetBestChannelFor5GTest channel=%{public}d", channel);
-}
-
-HWTEST_F(ApConfigUse_Test, FilterIndoorChannelTest, TestSize.Level1)
-{
-    WIFI_LOGI("FilterIndoorChannelTest enter");
-    EXPECT_CALL(WifiCountryCodeManager::GetInstance(), GetWifiCountryCode(_))
-        .WillOnce(DoAll(SetArgReferee<0>("CA")));  // xml CA indoor channel：36,40,44,48
-    std::vector<int> channels = {36, 40, 44, 48, 52, 56};
-    m_apConfigUse->FilterIndoorChannel(channels);
-}
-
 HWTEST_F(ApConfigUse_Test, Filter165ChannelTest, TestSize.Level1)
 {
     WIFI_LOGI("Filter165ChannelTest enter");

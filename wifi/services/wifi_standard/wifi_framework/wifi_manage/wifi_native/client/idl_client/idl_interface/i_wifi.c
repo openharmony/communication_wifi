@@ -246,6 +246,21 @@ static void IdlCbkConnectChanged(Context *context)
     return;
 }
 
+static void IdlCbkDisConnectReasonNotify(Context *context)
+{
+    int reason = 0;
+    char bssid[WIFI_BSSID_LENGTH] = {0};
+    if (ReadInt(context, &reason) < 0 ||
+        ReadStr(context, bssid, sizeof(bssid)) != 0) {
+        return;
+    }
+    IWifiEventCallback *callback = GetWifiEventCallback();
+    if (callback != NULL && callback->onDisConnectReasonNotify != NULL) {
+        callback->onDisConnectReasonNotify(reason, bssid);
+    }
+    return;
+}
+
 static void IdlCbkBssidChanged(Context *context)
 {
     char reason[WIFI_REASON_LENGTH] = {0};
@@ -327,6 +342,9 @@ static int IdlDealStaApEvent(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_CONNECT_CHANGED:
             IdlCbkConnectChanged(context);
+            break;
+        case WIFI_IDL_CBK_CMD_STA_DISCONNECT_REASON_EVENT:
+            IdlCbkDisConnectReasonNotify(context);
             break;
         case WIFI_IDL_CBK_CMD_BSSID_CHANGED:
             IdlCbkBssidChanged(context);

@@ -235,6 +235,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
     g_hdiWpaP2pCallbackObj->OnEventIfaceCreated = callback->OnEventIfaceCreated;
     g_hdiWpaP2pCallbackObj->GetVersion = NULL;
     g_hdiWpaP2pCallbackObj->AsObject = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventVendorCb = NULL;
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaP2pEventCallback success.");

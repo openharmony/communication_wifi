@@ -108,7 +108,7 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo SetConnectMacAddr(const std::string &mac);
+    WifiErrorNo SetConnectMacAddr(const std::string &ifaceName, const std::string &mac);
 
     /**
      * @Description Sets the MAC address for Wi-Fi scanning.
@@ -157,7 +157,7 @@ public:
      * @param scanParam
      * @return WifiErrorNo
      */
-    WifiErrorNo Scan(const WifiScanParam &scanParam);
+    WifiErrorNo Scan(const std::string &ifaceName, const WifiScanParam &scanParam);
 
     /**
      * @Description Obtain the scanning result.
@@ -165,7 +165,7 @@ public:
      * @param scanResults
      * @return WifiErrorNo
      */
-    WifiErrorNo QueryScanInfos(std::vector<InterScanInfo> &scanInfos);
+    WifiErrorNo QueryScanInfos(const std::string &ifaceName, std::vector<InterScanInfo> &scanInfos);
 
     /**
      * @Description Initiate PNO scanning.
@@ -173,14 +173,14 @@ public:
      * @param scanParam
      * @return WifiErrorNo
      */
-    WifiErrorNo StartPnoScan(const WifiPnoScanParam &scanParam);
+    WifiErrorNo StartPnoScan(const std::string &ifaceName, const WifiPnoScanParam &scanParam);
 
     /**
      * @Description Stop PNO Scanning.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StopPnoScan(void);
+    WifiErrorNo StopPnoScan(const std::string &ifaceName);
 
     /**
      * @Description Deleting a Network.
@@ -332,7 +332,8 @@ public:
      * @param info - signal info
      * @return WifiErrorNo
      */
-    WifiErrorNo GetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info);
+    WifiErrorNo GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,
+        WifiWpaSignalInfo &info);
 
     /**
      * @Description set power save mode
@@ -340,7 +341,7 @@ public:
      * @param frequency - connected ap frequency
      * @param mode - power save mode
      */
-    WifiErrorNo SetPmMode(int frequency, int mode);
+    WifiErrorNo SetPmMode(const std::string &ifaceName, int frequency, int mode);
 
     /**
      * @Description set data packet identification mark rule
@@ -349,7 +350,7 @@ public:
      * @param protocol - target protocol type
      * @param enable - enable/disable dpi mark
      */
-    WifiErrorNo SetDpiMarkRule(int uid, int protocol, int enable);
+    WifiErrorNo SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable);
 
     /**
      * @Description Send SIM/AKA/AKA' authentication to wpa
@@ -374,28 +375,14 @@ public:
      *
      * @param chipsetCategory - chipset category
      */
-    WifiErrorNo GetChipsetCategory(int& chipsetCategory);
+    WifiErrorNo GetChipsetCategory(const std::string &ifaceName, int& chipsetCategory);
 
     /**
      * @Description set background limit speed uid&pid list
      *
      * @param chipsetFeatrureCapability - chipset featrure capability
      */
-    WifiErrorNo GetChipsetWifiFeatrureCapability(int& chipsetFeatrureCapability);
-
-    /**
-     * @Description Open Wifi hdi.
-     *
-     * @return WifiErrorNo
-     */
-    WifiErrorNo StartWifiHdi(const std::string &ifaceName = "wlan0");
-
-    /**
-     * @Description Close Wifi hdi.
-     *
-     * @return WifiErrorNo
-     */
-    WifiErrorNo StopWifiHdi(void);
+    WifiErrorNo GetChipsetWifiFeatrureCapability(const std::string &ifaceName, int& chipsetFeatrureCapability);
 
     /**
      * @Description Set network interface updown.

@@ -842,14 +842,13 @@ ErrCode StaService::RenewDhcp()
 }
 
 #ifndef OHOS_ARCH_LITE
-ErrCode StaService::HandleForegroundAppChangedAction(const std::string &bundleName,
-    int uid, int pid, const int state)
+ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
     if (pStaAppAcceleration == nullptr) {
         WIFI_LOGE("pStaAppAcceleration is null");
         return WIFI_OPT_FAILED;
     }
-    pStaAppAcceleration->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    pStaAppAcceleration->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
 #endif

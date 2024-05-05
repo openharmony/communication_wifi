@@ -176,12 +176,6 @@ static void DealGroupStartInfo(char *buf)
             StrSafeCopy(conf.psk, sizeof(conf.psk), retMsg.value);
         } else if (strncmp(retMsg.key, "ssid", strlen("ssid")) == 0 ||
                    strncmp(retMsg.key, "passphrase", strlen("passphrase")) == 0) {
-            unsigned len = strlen(retMsg.value);
-            if (len == SSID_EMPTY_LENGTH || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\"')) {
-                token = strtok_r(NULL, "\"", &savedPtr);
-                retMsg.value[len++] = ' ';
-                StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, token);
-            }
             TrimQuotationMark(retMsg.value, '\"');
             if (strncmp(retMsg.key, "ssid", strlen("ssid")) == 0) {
                 StrSafeCopy(conf.ssid, sizeof(conf.ssid), retMsg.value);

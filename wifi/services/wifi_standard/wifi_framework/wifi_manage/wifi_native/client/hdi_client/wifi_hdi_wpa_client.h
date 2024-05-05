@@ -318,6 +318,15 @@ public:
      */
     WifiErrorNo ReqWpaShellCmd(const std::string &ifName, const std::string &cmd);
 
+    /**
+     * @Description get psk pass phrase
+     *
+     * @param ifName: Interface name
+     * @param psk: psk
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqWpaGetPskPassphrase(const std::string &ifName, std::string &psk);
+
     /* ************************ softAp Interface ************************** */
     /**
      * @Description Start Ap.

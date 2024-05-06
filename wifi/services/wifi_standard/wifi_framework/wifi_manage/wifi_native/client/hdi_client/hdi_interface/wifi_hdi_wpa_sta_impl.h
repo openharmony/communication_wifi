@@ -32,6 +32,8 @@ WifiErrorNo HdiWpaStaConnect(int networkId);
 
 WifiErrorNo HdiWpaStaReconnect();
 
+WifiErrorNo HdiWpaStaReassociate();
+
 WifiErrorNo HdiWpaStaDisconnect();
 
 WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen);

@@ -67,7 +67,7 @@ WifiErrorNo WifiHdiWpaClient::ReqReconnect(void)
 
 WifiErrorNo WifiHdiWpaClient::ReqReassociate(void)
 {
-    return WIFI_IDL_OPT_NOT_SUPPORT;
+    return HdiWpaStaReassociate();
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqDisconnect(void)

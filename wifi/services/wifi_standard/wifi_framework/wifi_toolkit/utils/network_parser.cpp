@@ -15,6 +15,7 @@
 
 #include "network_parser.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -437,15 +438,18 @@ void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
         return;
     }
     xmlNodePtr networkNodeList = GotoNetworkList(innode);
+    int xmlSavedNetworkCount = 0;
     for (xmlNodePtr node = networkNodeList->children; node != nullptr; node = node->next) {
         if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_SECTION_HEADER_NETWORK)) == 0) {
+            xmlSavedNetworkCount++;
             WifiDeviceConfig wifiDeviceConfig = ParseNetwork(node);
             if (IsWifiConfigValid(wifiDeviceConfig)) {
                 wifiConfigs.push_back(wifiDeviceConfig);
             }
         }
     }
-    WIFI_LOGI("ParseNetworkList size[%{public}lu]", (unsigned long) wifiConfigs.size());
+    WIFI_LOGI("ParseNetwork size=%{public}lu, xml config total size=%{public}d",
+        (unsigned long) wifiConfigs.size(), xmlSavedNetworkCount);
 }
 
 void NetworkXmlParser::ParseMacMap()
@@ -514,6 +518,8 @@ bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)
         || wifiConfig.keyMgmt == OHOS::Wifi::KEY_MGMT_WEP || wifiConfig.keyMgmt == OHOS::Wifi::KEY_MGMT_WPA_PSK) {
         return true;
     }
+    WIFI_LOGE("invalid wifiConfig: ssid=%{public}s, keyMgmt=%{public}s",
+        SsidAnonymize(wifiConfig.ssid).c_str(), wifiConfig.keyMgmt.c_str());
     return false;
 }
 

@@ -140,9 +140,11 @@ void WifiSettings::InitHotspotConfig()
                 mHotspotConfig[i] = tmp[i];
             }
         } else {
+            LOGI("load hotspot config success, but tmp.size() = 0, use default config");
             InitDefaultHotspotConfig();
         }
     } else {
+        LOGI("load hotspot config fail, use default config");
         InitDefaultHotspotConfig();
     }
     /* init block list info */
@@ -1126,7 +1128,6 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     if (numExcessNetworks <= 0) {
         return 1;
     }
-    LOGI("Remove %d configs", numExcessNetworks);
     sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
         if (a.status != b.status) {
             return (a.status == 0) < (b.status == 0);
@@ -1140,6 +1141,13 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
             return a.networkId < b.networkId;
         }
     });
+    std::stringstream removeConfig;
+    int maxIndex = numExcessNetworks > MAX_CONFIGS_NUM ? MAX_CONFIGS_NUM : numExcessNetworks;
+    for (int i = 0; i < maxIndex; i++) {
+        removeConfig << SsidAnonymize(configs[i].ssid) << ",";
+    }
+    LOGI("saved config size greater than %{public}d, remove ssid(print up to 1000)=%{public}s",
+        maxNumConfigs, removeConfig.str().c_str());
     configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
     return 0;
 }

@@ -564,3 +564,17 @@ NO_SANITIZE("cfi") WifiErrorCode UnregisterCfgChangCallback(void)
     EventManager::GetInstance().RemoveP2PCallbackEvent(EVENT_P2P_CONFIG_CHANGE);
     return WIFI_SUCCESS;
 }
+
+NO_SANITIZE("cfi") WifiErrorCode DiscoverPeers(int32_t channelid)
+{
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiP2pPtr->DiscoverPeers(channelid));
+    return WIFI_SUCCESS;
+}
+
+NO_SANITIZE("cfi") WifiErrorCode DisableRandomMac(int setmode)
+{
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiP2pPtr->DisableRandomMac(setmode));
+    return WIFI_SUCCESS;
+}

@@ -152,6 +152,9 @@ enum class  P2PInterfaceCode {
     WIFI_SVR_CMD_SET_PEER_WIFI_CFG = 0x2026,    /* set peer wifi configuration */
     WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE = 0x2027, /* query the information about the local device */
     WIFI_SVR_CMD_SET_UPPER_SCENE = 0x2028,    /* set the scene of upper layer */
+    WIFI_SVR_CMD_P2P_DISCOVER_PEERS = 0x2029,
+    WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC = 0x2030,
+
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
     WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT = 0x3000,
     /* 以下CALL BACK类code，不需要进行权限校验 */

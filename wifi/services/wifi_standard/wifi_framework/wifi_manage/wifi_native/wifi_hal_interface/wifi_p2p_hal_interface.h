@@ -462,6 +462,16 @@ public:
      */
     WifiErrorNo SetConnectMacAddr(const std::string &mac, const int portType);
 
+    /**
+     * @Description Set the MAC address of the P2P
+     *
+     * @param cmdType
+     * @param dataType
+     * @param carryData
+     * @return WifiErrorNo
+     */
+    WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const;
+
 private:
     P2pHalCallback mP2pCallback;
 };

@@ -408,6 +408,19 @@ public:
      */
     bool IsRemoteDied(void) override;
 
+    /**
+     * @Description Discover p2p device
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Disable random mac
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode DisableRandomMac(int setmode) override;
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);

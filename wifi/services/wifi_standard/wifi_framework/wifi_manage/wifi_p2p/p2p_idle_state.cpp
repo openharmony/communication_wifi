@@ -80,6 +80,8 @@ void P2pIdleState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE, &P2pIdleState::ProcessRemoveDevice));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT, &P2pIdleState::RetryConnect));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISABLE_RANDOM_MAC, &P2pIdleState::ProcessCmdDisableRandomMac));
 }
 
 bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
@@ -449,6 +451,13 @@ bool P2pIdleState::ExecuteStateMsg(InternalMessage *msg)
     } else {
         return NOT_EXECUTED;
     }
+}
+
+bool P2pIdleState::ProcessCmdDisableRandomMac(InternalMessage &msg) const
+{
+    const int setmode = msg.GetParam1();
+    p2pStateMachine.HandlerDisableRandomMac(setmode);
+    return EXECUTED;
 }
 }  // namespace Wifi
 }  // namespace OHOS

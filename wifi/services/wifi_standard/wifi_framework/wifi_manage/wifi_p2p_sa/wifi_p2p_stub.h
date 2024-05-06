@@ -95,6 +95,8 @@ private:
     void WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroupInfo &info);
     void ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &config);
     void OnQueryP2pLocalDevice(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnDiscoverPeers(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnDisableRandomMac(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
 private:
     HandleFuncMap handleFuncMap;

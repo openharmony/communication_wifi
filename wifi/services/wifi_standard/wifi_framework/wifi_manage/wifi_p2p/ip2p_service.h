@@ -323,6 +323,20 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode MonitorCfgChange(void) = 0;
+
+    /**
+     * @Description Remove a P2P Group.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DiscoverPeers(int32_t channelid) = 0;
+
+    /**
+     * @Description Remove a P2P Group.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DisableRandomMac(int setmode) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -290,7 +290,6 @@ WifiErrorNo HdiWpaStaReconnect()
 
 WifiErrorNo HdiWpaStaReassociate()
 {
-    LOGI("HdiWpaStaReassociate enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaReassociate: wpaObj is NULL");
@@ -303,7 +302,6 @@ WifiErrorNo HdiWpaStaReassociate()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    LOGI("HdiWpaStaReassociate success.");
     return WIFI_IDL_OPT_OK;
 }
 

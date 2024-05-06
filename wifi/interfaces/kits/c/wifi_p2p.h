@@ -16,6 +16,7 @@
 #ifndef OHOS_C_P2P_H
 #define OHOS_C_P2P_H
 
+#include<stdint.h>
 #include "wifi_error_code.h"
 #include "wifi_p2p_config.h"
 
@@ -207,6 +208,19 @@ WifiErrorCode RegisterP2pConnectionChangedCallback(const P2pConnectionChangedCal
  */
 WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersChangedCallback callback);
 
+/**
+ * @Description Remove a P2P Group.
+ *
+ * @return WifiErrorCode - operation result
+ */
+WifiErrorCode DiscoverPeers(int32_t channelid);
+
+/**
+ * @Description Remove a P2P Group.
+ *
+ * @return WifiErrorCode - operation result
+ */
+WifiErrorCode DisableRandomMac(int setmode);
 #ifdef __cplusplus
 }
 #endif

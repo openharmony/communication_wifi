@@ -1117,4 +1117,23 @@ WifiErrorNo HdiP2pSaveConfig()
     LOGI("HdiP2pSaveConfig success.");
     return WIFI_IDL_OPT_OK;
 }
+
+WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData)
+{
+    LOGI("HdiDeliverP2pData enter");
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiDeliverP2pData: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, "p2p0", cmdType, dataType, carryData);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiDeliverP2pData: send failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiDeliverP2pData success.");
+    return WIFI_IDL_OPT_OK;
+}
 #endif

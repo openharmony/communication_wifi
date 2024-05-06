@@ -1269,6 +1269,10 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &confi
     return ret;
 }
 
+WifiErrorNo WifiHdiWpaClient::DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const
+{
+    return HdiDeliverP2pData(cmdType, dataType, carryData.c_str());
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

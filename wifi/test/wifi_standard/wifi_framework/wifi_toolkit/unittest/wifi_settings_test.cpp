@@ -341,7 +341,6 @@ HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
     bool state = WifiSettings::GetInstance().IsModulePreLoad("wifitest");
     EXPECT_FALSE(state);
     WifiSettings::GetInstance().IsModulePreLoad("StaService");
-    WIFI_LOGE("IsModulePreLoadTest result(%{public}d)", result);
     WifiSettings::GetInstance().IsModulePreLoad("ScanService");
     WifiSettings::GetInstance().IsModulePreLoad("ApService");
     WifiSettings::GetInstance().IsModulePreLoad("P2pService");

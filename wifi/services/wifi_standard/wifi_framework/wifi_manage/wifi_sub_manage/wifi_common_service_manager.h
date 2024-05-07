@@ -63,7 +63,6 @@ private:
     WifiCommonServiceManager();
 private:
 #ifndef OHOS_ARCH_LITE
-    std::unique_ptr<WifiEventSubscriberManager> wifiEventSubscriberManager = nullptr;
     WifiAppStateAwareCallbacks mWifiAppStateAwareCallbacks;
 #endif
 };

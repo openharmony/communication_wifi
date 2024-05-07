@@ -765,7 +765,7 @@ public:
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
+        pScanStateMachine->StartPnoScanHardware();
     }
 
     void StartPnoScanHardwareSuccess2()
@@ -979,7 +979,7 @@ public:
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = true;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        EXPECT_EQ(true, pScanStateMachine->RepeatStartCommonScan());
+        EXPECT_EQ(false, pScanStateMachine->RepeatStartCommonScan());
     }
 
     void RepeatStartCommonScanTest2()

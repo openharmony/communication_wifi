@@ -151,7 +151,7 @@ public:
     MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
     MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_METHOD0(GetStaIfaceName, std::string());
-    MOCK_METHOD1(GetStaIfaceName, int(int networkId));
+    MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
 
 };
 }  // namespace OHOS

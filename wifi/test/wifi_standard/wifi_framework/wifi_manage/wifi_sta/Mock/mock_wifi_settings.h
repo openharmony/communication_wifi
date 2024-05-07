@@ -84,6 +84,7 @@ public:
     virtual void GetPortalUri(WifiPortalConf &urlInfo) = 0;
     virtual int GetScreenState() const = 0;
     virtual std::string GetStaIfaceName() = 0;
+    virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -150,6 +151,8 @@ public:
     MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
     MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_METHOD0(GetStaIfaceName, std::string());
+    MOCK_METHOD1(GetStaIfaceName, int(int networkId));
+
 };
 }  // namespace OHOS
 }  // namespace Wifi

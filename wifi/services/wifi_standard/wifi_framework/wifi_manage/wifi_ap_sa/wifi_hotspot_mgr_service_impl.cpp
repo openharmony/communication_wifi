@@ -83,10 +83,15 @@ void WifiHotspotMgrServiceImpl::OnStart()
     (void)signal(SIGUSR2, SigHandler);
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start ap service!");
+    if (WifiManager::GetInstance().Init() < 0) {
+        WIFI_LOGE("WifiManager init failed!");
+        return;
+    }
     WifiManager::GetInstance().AddSupportedFeatures(WifiFeatures::WIFI_FEATURE_MOBILE_HOTSPOT);
-    // Get airplane mode by datashare
-    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
-    WifiManager::GetInstance().GetWifiHotspotManager()->StartUnloadApSaTimer();
+    auto &pWifiHotspotManager = WifiManager::GetInstance().GetWifiHotspotManager();
+    if (pWifiHotspotManager) {
+        pWifiHotspotManager->StartUnloadApSaTimer();
+    }
 }
 
 void WifiHotspotMgrServiceImpl::OnStop()

@@ -37,16 +37,6 @@ DEFINE_WIFILOG_LABEL("WifiManager");
 WifiManager &WifiManager::GetInstance()
 {
     static WifiManager gWifiManager;
-    static std::mutex gInitMutex;
-    if (gWifiManager.GetInitStatus() == INIT_UNKNOWN) {
-        std::unique_lock<std::mutex> lock(gInitMutex);
-        if (gWifiManager.GetInitStatus() == INIT_UNKNOWN) {
-            if (gWifiManager.Init() != 0) {
-                WIFI_LOGE("Failed to `WifiManager::Init` !");
-            }
-        }
-    }
-
     return gWifiManager;
 }
 
@@ -60,6 +50,11 @@ WifiManager::~WifiManager()
 
 int WifiManager::Init()
 {
+    std::unique_lock<std::mutex> lock(initStatusMutex);
+    if (mInitStatus == INIT_OK) {
+        WIFI_LOGI("WifiManager already init!");
+        return 0;
+    }
     mInitStatus = WifiCommonServiceManager::GetInstance().Init();
     if (mInitStatus != INIT_OK) {
         WIFI_LOGE("WifiCommonServiceManager Init failed!");
@@ -85,12 +80,14 @@ int WifiManager::Init()
 #ifdef FEATURE_P2P_SUPPORT
     wifiP2pManager = std::make_unique<WifiP2pManager>();
 #endif
-    mInitStatus = INIT_OK;
+
     if (WifiServiceManager::GetInstance().CheckPreLoadService() < 0) {
         WIFI_LOGE("WifiServiceManager check preload feature service failed!");
         WifiManager::GetInstance().Exit();
         return -1;
     }
+    mInitStatus = INIT_OK;
+
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread");
         WifiSettings::GetInstance().SetWifiToggledState(true);
@@ -310,11 +307,6 @@ void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
     WIFI_LOGE("%{public}s InstallFilterProgram success", __FUNCTION__);
 }
 #endif
-
-InitStatus WifiManager::GetInitStatus()
-{
-    return mInitStatus;
-}
 
 void WifiManager::CheckAndStartSta()
 {

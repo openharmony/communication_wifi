@@ -50,7 +50,8 @@ public:
     virtual const IWifiApMonitorEventCallback &GetApCallbackInst(int id = 0) const = 0;
     virtual WifiErrorNo GetPowerModel(int& model, int id = 0) const = 0;
     virtual WifiErrorNo SetPowerModel(const int& model, int id = 0) const = 0;
-    virtual WifiErrorNo GetFrequenciesByBand(const std::string &ifaceName, int band, std::vector<int> &frequencies) = 0;
+    virtual WifiErrorNo GetFrequenciesByBand(const std::string &ifaceName,
+    int band, std::vector<int> &frequencies) = 0;
 };
 
 class WifiApHalInterface : public MockWifiApHalInterface {
@@ -69,7 +70,8 @@ public:
     MOCK_CONST_METHOD1(GetApCallbackInst, IWifiApMonitorEventCallback &(int id));
     MOCK_CONST_METHOD2(GetPowerModel, WifiErrorNo(int& model, int id));
     MOCK_CONST_METHOD2(SetPowerModel, WifiErrorNo(const int& model, int id));
-    MOCK_METHOD3(GetFrequenciesByBand, WifiErrorNo(const std::string &ifaceName, int band, std::vector<int> &frequencies));
+    MOCK_METHOD3(GetFrequenciesByBand, WifiErrorNo(const std::string &ifaceName,
+    int band, std::vector<int> &frequencies));
 };
 } // namespace Wifi
 } // namespace OHOS

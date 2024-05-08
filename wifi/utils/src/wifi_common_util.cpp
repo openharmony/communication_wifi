@@ -470,7 +470,8 @@ void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t
     WIFI_LOGI("%{public}s byteLen:%{public}d, hexStrLen:%{public}d", __func__, bytesLen, hexstrLen);
     uint8_t hexstrIndex = 0;
     for (uint8_t i = 0; i < bytesLen; i++) {
-        if (snprintf(hexstr + hexstrIndex, hexstrLen - hexstrIndex, "%02x", byte[i]) <= 0) {
+        if (snprintf_s(hexstr + hexstrIndex, hexstrLen - hexstrIndex, hexstrLen - hexstrIndex - 1,
+            "%02x", byte[i]) <= 0) {
             WIFI_LOGI("%{public}s: failed to snprintf", __func__);
         }
         hexstrIndex += 2; // offset

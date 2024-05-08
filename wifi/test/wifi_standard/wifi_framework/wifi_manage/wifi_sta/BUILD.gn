@@ -162,7 +162,10 @@ ohos_unittest("wifi_sta_unittest") {
     defines += [ "WIFI_FFRT_ENABLE" ]
   }
 
-  defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+  defines += [
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    "private=public",
+  ]
   part_name = "wifi"
   subsystem_name = "communication"
 }

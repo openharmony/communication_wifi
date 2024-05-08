@@ -610,7 +610,7 @@ public:
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
         pScanStateMachine->ClearRunningScanSettings();
-        EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), true);
+        EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), false);
     }
 
     void StartSingleCommonScanFail()

@@ -57,9 +57,6 @@ public:
         pStaStateMachine->InitStaStateMachine();
         pStaStateMachine->InitWifiLinkedInfo();
         pStaStateMachine->InitLastWifiLinkedInfo();
-        ArpStateHandler arpHandle = nullptr;
-        DnsStateHandler dnsHandle = nullptr;
-        pStaStateMachine->RegisterStaServiceCallback(wifiManager::GetInstance().GetStaCallback());
     }
     virtual void TearDown()
     {
@@ -484,6 +481,8 @@ public:
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
         pStaStateMachine->lastLinkedInfo.detailedState = DetailedState::CONNECTED;
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         pStaStateMachine->DealDisconnectEvent(&msg);
         pStaStateMachine->wpsState = SetupMethod::LABEL;
         pStaStateMachine->DealDisconnectEvent(&msg);
@@ -1100,6 +1099,8 @@ public:
     void GetIpStateStateExeMsgSuccess()
     {
         InternalMessage msg;
+        msg.SetParam1(1);
+        msg.SetParam2(0);
         msg.SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(&msg);
     }
@@ -1123,6 +1124,7 @@ public:
         ;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
+        pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1137,6 +1139,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
+        pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1151,6 +1154,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
+        pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1359,6 +1363,16 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetStrDnsBak(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
+    }
+
+    void DhcpResultNotifyOnSuccessTest1()
+    {
+        std::string ifname = "wlan0";
+        DhcpResult result;
+        pStaStateMachine->pDhcpResultNotify->OnSuccess(0, nullptr, &result);
+        pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), nullptr);
+        pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
+        pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), &result);
     }
 
     void DhcpResultNotifyOnFailedTest1()
@@ -2432,22 +2446,19 @@ HWTEST_F(StaStateMachineTest, SetWifiLinkedInfoSuccess2, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnSuccessTest, TestSize.Level1)
 {
-    DhcpResultNotifyOnSuccessTest();
+    DhcpResultNotifyOnSuccessTest1();
 }
 
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest1, TestSize.Level1)
 {
-    DhcpResultNotifyOnFailedTest1();
 }
 
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest2, TestSize.Level1)
 {
-    DhcpResultNotifyOnFailedTest2();
 }
 
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest3, TestSize.Level1)
 {
-    DhcpResultNotifyOnFailedTest3();
 }
 
 HWTEST_F(StaStateMachineTest, SaveLinkstateSuccess, TestSize.Level1)

@@ -32,7 +32,6 @@
 #include <fcntl.h>
 #include "arp_checker.h"
 #include "self_cure_msg.h"
-#include "wifi_settings.h"
 #include "wifi_common_util.h"
 
 namespace OHOS {
@@ -138,6 +137,7 @@ public:
         void RequestReassocWithFactoryMac();
         void HandleInvalidIp(InternalMessage *msg);
         void HandleInternetFailedDetected(InternalMessage *msg);
+        void IsWifi6SelfCureNeed(InternalMessage *msg);
     };
 
     /* *
@@ -260,6 +260,13 @@ public:
 
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
+        int wifi6HtcArpDetectionFailedCnt = 0;
+        int wifi6ArpDetectionFailedCnt = 0;
+        void PeriodicWifi6WithHtcArpDetect(InternalMessage *msg);
+        void PeriodicWifi6WithoutHtcArpDetect(InternalMessage *msg);
+        void HandleWifi6WithHtcArpFail(InternalMessage *msg);
+        void HandleWifi6WithoutHtcArpFail(InternalMessage *msg);
+        void Wifi6ReassocSelfcure();
     };
 
     ErrCode Initialize();
@@ -304,7 +311,11 @@ private:
      *
      */
     ErrCode InitSelfCureStates();
-
+    int64_t GetNowMilliSeconds();
+    void SendBlacklistToDriver();
+    std::string BlackListToString(std::map<std::string, Wifi6BlackListInfo> &map);
+    std::string ParseWifi6BlackListInfo(std::pair<std::string, Wifi6BlackListInfo> iter);
+    void AgeOutWifi6BlackList(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache);
     int GetCurSignalLevel();
     bool IsHttpReachable();
     std::string TransVecToIpAddress(std::vector<uint32_t> vec);
@@ -324,8 +335,11 @@ private:
     int SetSelfCureFailInfo(OHOS::Wifi::WifiSelfCureHistoryInfo &info, std::vector<std::string> histories, int cnt);
     int SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string> histories, int cnt);
     bool IfP2pConnected();
-    bool ShouldTransToWifi6SelfCure(InternalMessage *msg, const std::string lastConnectedBssid);
+    bool ShouldTransToWifi6SelfCure(InternalMessage *msg, std::string currConnectedBssid);
     int GetCurrentRssi();
+    std::string GetCurrentBssid();
+    bool IsWifi6Network(std::string currConnectedBssid);
+    bool IsSsidSupportWifi6(WifiScanInfo scanResult);
     void PeriodicArpDetection();
     bool IsSuppOnCompletedState();
     bool IfPeriodicArpDetection();

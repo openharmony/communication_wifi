@@ -30,6 +30,7 @@ ohos_unittest("wifi_sta_unittest") {
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure/self_cure_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/external_wifi_filter_builder_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selection_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selection_utils.cpp",
@@ -58,6 +59,7 @@ ohos_unittest("wifi_sta_unittest") {
     "Mock/mock_wifi_supplicant_hal_interface.cpp",
     "global_test.cpp",
     "network_selection_test.cpp",
+    "self_cure_state_machine_test.cpp",
     "sta_auto_connect_service_test.cpp",
     "sta_interface_test.cpp",
     "sta_monitor_test.cpp",
@@ -90,6 +92,7 @@ ohos_unittest("wifi_sta_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select",
     "$WIFI_ROOT_DIR/base/cRPC/include",

@@ -440,6 +440,10 @@ public:
         WIFI_LOGI("received OnP2pGcLease event");
     }
 
+    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override
+    {
+        WIFI_LOGI("received OnP2pPrivatePeersChanged event");
+    }
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }

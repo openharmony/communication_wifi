@@ -638,7 +638,7 @@ bool P2pEnabledState::ProcessCmdDiscoverPeers(InternalMessage &msg) const
     if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("call ProcessCmdDiscoverPeers failed, ErrorCode: %{public}d", static_cast<int>(retCode));
         WifiP2PHalInterface::GetInstance().P2pStopFind();
-        return EXECUTED;
+        return NOT_EXECUTED;
     } else {
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverPeers, ErrCode::WIFI_OPT_SUCCESS);
         p2pStateMachine.BroadcastP2pDiscoveryChanged(true);

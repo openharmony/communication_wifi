@@ -421,6 +421,21 @@ void WifiP2pCEventCallback::OnP2pPeersChanged(const std::vector<OHOS::Wifi::Wifi
     }
 }
 
+void WifiP2pCEventCallback::OnP2pPrivatePeersChanged(const std::string &priWfdInfo)
+{
+    WIFI_LOGI("%{public}s, received p2p Private Peer changed event", __func__);
+    auto &eventHandler = EventManager::GetInstance().GetWifiP2pCEventHandler();
+    if (eventHandler) {
+        eventHandler->PostSyncTask([=]() {
+            char* wfdInfo  = const_cast<char*>(priWfdInfo.c_str());
+            std::unique_lock<std::mutex> lock(p2pCallbackMutex);
+            if (privatepeerChangeCb) {
+                privatepeerChangeCb(wfdInfo);
+            }
+        });
+    }
+}
+
 void WifiP2pCEventCallback::OnP2pServicesChanged(const std::vector<OHOS::Wifi::WifiP2pServiceInfo> &srvInfo)
 {
     WIFI_LOGI("%{public}s, received p2p services changed event", __func__);
@@ -544,6 +559,19 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersC
     return WIFI_SUCCESS;
 }
 
+NO_SANITIZE("cfi") WifiErrorCode RegisterP2pPrivatePeersChangedCallback(const P2pPrivatePeersChangedCallback callback)
+{
+    CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    EventManager::GetInstance().Init();
+    sptrCallback->privatepeerChangeCb = callback;
+    std::vector<std::string> event = {EVENT_P2P_PRIVATE_PEER_DEVICE_CHANGE};
+    wifiP2pPtr->RegisterCallBack(sptrCallback, event);
+    EventManager::GetInstance().SetP2PCallbackEvent(sptrCallback, EVENT_P2P_PRIVATE_PEER_DEVICE_CHANGE);
+    return WIFI_SUCCESS;
+}
+
 NO_SANITIZE("cfi") WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCallback callback)
 {
     CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
@@ -569,12 +597,10 @@ NO_SANITIZE("cfi") WifiErrorCode DiscoverPeers(int32_t channelid)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->DiscoverPeers(channelid));
-    return WIFI_SUCCESS;
 }
 
 NO_SANITIZE("cfi") WifiErrorCode DisableRandomMac(int setmode)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->DisableRandomMac(setmode));
-    return WIFI_SUCCESS;
 }

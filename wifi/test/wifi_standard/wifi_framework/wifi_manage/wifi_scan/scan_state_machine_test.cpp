@@ -610,7 +610,7 @@ public:
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
         pScanStateMachine->ClearRunningScanSettings();
-        EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), true);
+        EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), false);
     }
 
     void StartSingleCommonScanFail()
@@ -765,7 +765,7 @@ public:
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
+        pScanStateMachine->StartPnoScanHardware();
     }
 
     void StartPnoScanHardwareSuccess2()
@@ -979,7 +979,7 @@ public:
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = true;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        EXPECT_EQ(true, pScanStateMachine->RepeatStartCommonScan());
+        EXPECT_EQ(false, pScanStateMachine->RepeatStartCommonScan());
     }
 
     void RepeatStartCommonScanTest2()

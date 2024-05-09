@@ -21,6 +21,7 @@
 #include "wifi_logger.h"
 #include "wifi_settings.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_p2p_hal_interface.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 

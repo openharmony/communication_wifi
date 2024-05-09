@@ -17,6 +17,9 @@
 #define OHOS_WIFI_STA_SERVICE_H
 
 #include "wifi_errcode.h"
+#ifndef OHOS_ARCH_LITE
+#include "app_state_data.h"
+#endif
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
 #include "network_selection.h"
@@ -307,15 +310,15 @@ public:
      * @param state app state.
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode HandleForegroundAppChangedAction(const std::string &bundleName,
-                                                        int uid, int pid, const int state) = 0;
-
+#ifndef OHOS_ARCH_LITE
+    virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) = 0;
+#endif
     /**
      * @Description enable hilink
      *
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableHiLinkHandshake(const std::string &bssid) = 0;
+    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid) = 0;
  
     /**
      * @Description deliver mac

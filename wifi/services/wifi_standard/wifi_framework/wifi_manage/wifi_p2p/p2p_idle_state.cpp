@@ -279,8 +279,7 @@ bool P2pIdleState::ProcessCmdCreateGroup(InternalMessage &msg) const
 
 bool P2pIdleState::ProcessCmdRemoveGroup(InternalMessage &msg) const
 {
-    p2pStateMachine.DelayMessage(&msg);
-    p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
+    WIFI_LOGI("p2p ildeState no processing remove group! CMD: %{public}d", msg.GetMessageName());
     return EXECUTED;
 }
 

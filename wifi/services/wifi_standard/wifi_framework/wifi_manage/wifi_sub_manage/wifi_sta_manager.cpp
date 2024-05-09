@@ -286,7 +286,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         state == OperateResState::DISCONNECT_DISCONNECTING || state == OperateResState::DISCONNECT_DISCONNECTED ||
         state == OperateResState::CONNECT_OBTAINING_IP || state == OperateResState::CONNECT_ASSOCIATING ||
         state == OperateResState::CONNECT_ASSOCIATED || state == OperateResState::CONNECT_NETWORK_ENABLED ||
-        state == OperateResState::CONNECT_NETWORK_DISABLED) {
+        state == OperateResState::CONNECT_NETWORK_DISABLED || state == OperateResState::SPECIAL_CONNECTED) {
         if (WifiConfigCenter::GetInstance().GetScanMidState(instId) == WifiOprMidState::RUNNING) {
             IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
             if (pService != nullptr) {

@@ -408,22 +408,23 @@ ErrCode StaInterface::RenewDhcp()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::HandleForegroundAppChangedAction(const std::string &bundleName,
-    int uid, int pid, const int state)
+#ifndef OHOS_ARCH_LITE
+ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
     WIFI_LOGI("Enter StaInterface::HandleForegroundAppChangedAction");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    pStaService->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    pStaService->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
+#endif
 
-ErrCode StaInterface::EnableHiLinkHandshake(const std::string &bssid)
+ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
 {
     WIFI_LOGI("Enter StaInterface::EnableHiLinkHandshake");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    pStaService->EnableHiLinkHandshake(bssid);
+    pStaService->EnableHiLinkHandshake(config, bssid);
  
     return WIFI_OPT_SUCCESS;
 }

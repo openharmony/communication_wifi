@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef HDI_INTERFACE_SUPPORT
+
 #ifndef OHOS_HDI_DEFINE_H
 #define OHOS_HDI_DEFINE_H
 
@@ -274,6 +274,7 @@ extern "C" {
 #define WIFI_CAPABILITY_DEFAULT 0
 #define CMD_GET_FEATURE_CAPAB 101
 #define CMD_GET_WIFI_CATEGORY 127
+#define HDI_SCAN_RESULTS_MAX_LEN 1024
 
 typedef long os_time_t;
 
@@ -311,6 +312,5 @@ typedef enum {
 } FeatureType;
 #ifdef __cplusplus
 }
-#endif
 #endif
 #endif

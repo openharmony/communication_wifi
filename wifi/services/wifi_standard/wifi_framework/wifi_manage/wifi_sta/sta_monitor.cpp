@@ -45,7 +45,8 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
         std::bind(&StaMonitor::onWpaConnectionFullCallBack, this, _1),
         std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1),
-        std::bind(&StaMonitor::OnWpaStaNotifyCallBack, this, _1)
+        std::bind(&StaMonitor::OnWpaStaNotifyCallBack, this, _1),
+        std::bind(&StaMonitor::OnReportDisConnectReasonCallBack, this, _1, _2),
     };
 
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
@@ -74,6 +75,26 @@ void StaMonitor::SetStateMachine(StaStateMachine *paraStaStateMachine)
     }
     pStaStateMachine = paraStaStateMachine;
     return;
+}
+
+void StaMonitor::OnReportDisConnectReasonCallBack(int reason, const std::string &bssid)
+{
+    WIFI_LOGI("OnReportDisConnectReasonCallBack() reason=%{public}d, bssid=%{public}s",
+        reason, MacAnonymize(bssid).c_str());
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("OnReportDisConnectReasonCallBack pStaStateMachine is nullptr");
+        return;
+    }
+
+    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    if (msg == nullptr) {
+        WIFI_LOGE("OnReportDisConnectReasonCallBack CreateMessage failed");
+        return;
+    }
+    msg->SetMessageName(static_cast<int>(WIFI_SVR_CMD_STA_REPORT_DISCONNECT_REASON_EVENT));
+    msg->AddStringMessageBody(bssid);
+    msg->AddIntMessageBody(reason);
+    pStaStateMachine->SendMessage(msg);
 }
 
 void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::string &bssid)

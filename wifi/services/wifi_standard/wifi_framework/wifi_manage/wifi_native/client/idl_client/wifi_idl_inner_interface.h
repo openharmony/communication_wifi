@@ -56,6 +56,7 @@ void OnWpsTimeOut(int status);
 void OnWpaConnectionFull(int status);
 void OnWpaConnectionReject(int status);
 void OnWpaStaNotifyCallBack(const char *notifyParam);
+void OnDisConnectReasonCallback(int, const char *bssid);
 
 /**
  * @Description Get the Supplicant Rpc Client object.

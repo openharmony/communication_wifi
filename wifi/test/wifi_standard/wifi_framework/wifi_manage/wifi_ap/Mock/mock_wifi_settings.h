@@ -65,6 +65,7 @@ public:
     virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
     virtual WifiP2pGroupInfo GetCurrentP2pGroupInfo() = 0;
     virtual int GetIpInfo(IpInfo &info, int instId = 0) = 0;
+    virtual std::string GetApIfaceName() = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -100,6 +101,7 @@ public:
     MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &linkedInfo));
     MOCK_METHOD0(GetCurrentP2pGroupInfo, WifiP2pGroupInfo());
     MOCK_METHOD2(GetIpInfo, int(IpInfo &info, int));
+    MOCK_METHOD0(GetApIfaceName, std::string());
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

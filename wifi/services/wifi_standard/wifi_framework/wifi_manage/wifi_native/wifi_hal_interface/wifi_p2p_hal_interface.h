@@ -456,15 +456,6 @@ public:
     /**
      * @Description Set the MAC address of the P2P
      *
-     * @param mac
-     * @param portType
-     * @return WifiErrorNo
-     */
-    WifiErrorNo SetConnectMacAddr(const std::string &mac, const int portType);
-
-    /**
-     * @Description Set the MAC address of the P2P
-     *
      * @param cmdType
      * @param dataType
      * @param carryData

@@ -32,8 +32,7 @@ public:
     ~AppNetworkSpeedLimitService();
     static AppNetworkSpeedLimitService &GetInstance();
     StaServiceCallback GetStaCallback() const;
-    void HandleForegroundAppChangedAction(const std::string &bundleName,
-        const int uid, const int pid, const int state);
+    void HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
     void LimitSpeed(const int controlId, const int level);
 
 private:

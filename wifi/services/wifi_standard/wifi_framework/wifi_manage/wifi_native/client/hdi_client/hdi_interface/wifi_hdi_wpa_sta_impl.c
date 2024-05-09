@@ -288,6 +288,23 @@ WifiErrorNo HdiWpaStaReconnect()
     return WIFI_IDL_OPT_OK;
 }
 
+WifiErrorNo HdiWpaStaReassociate()
+{
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaStaReassociate: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->Reassociate(wpaObj, GetHdiStaIfaceName());
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaStaReassociate: Reassociate failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    return WIFI_IDL_OPT_OK;
+}
+
 WifiErrorNo HdiWpaStaDisconnect()
 {
     LOGI("HdiWpaStaDisconnect enter");
@@ -607,7 +624,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->OnEventAssociateReject = callback->OnEventAssociateReject;
     g_hdiWpaStaCallbackObj->OnEventWpsOverlap = callback->OnEventWpsOverlap;
     g_hdiWpaStaCallbackObj->OnEventWpsTimeout = callback->OnEventWpsTimeout;
-#ifdef HDI_INTERFACE_SUPPORT
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     g_hdiWpaStaCallbackObj->OnEventScanResult = NULL;
 #else
     g_hdiWpaStaCallbackObj->OnEventScanResult = callback->OnEventScanResult;
@@ -631,6 +648,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->GetVersion = NULL;
     g_hdiWpaStaCallbackObj->AsObject = NULL;
     g_hdiWpaStaCallbackObj->OnEventStaNotify = callback->OnEventStaNotify;
+    g_hdiWpaStaCallbackObj->OnEventVendorCb = NULL;
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaStaEventCallback3 success.");
@@ -884,6 +902,23 @@ WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd)
         return WIFI_IDL_OPT_FAILED;
     }
     LOGI("HdiWpaStaSetShellCmd success.");
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t pskLen)
+{
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("GetPskPassphrase: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->GetPskPassphrase(wpaObj, ifName, psk, pskLen);
+    if (result != HDF_SUCCESS) {
+        LOGE("GetPskPassphrase: failed to StaShellCmd, result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    LOGI("GetPskPassphrase success.");
     return WIFI_IDL_OPT_OK;
 }
 #endif

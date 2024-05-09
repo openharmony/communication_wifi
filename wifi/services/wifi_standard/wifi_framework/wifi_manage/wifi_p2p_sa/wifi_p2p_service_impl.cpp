@@ -74,10 +74,15 @@ void WifiP2pServiceImpl::OnStart()
     }
     mState = ServiceRunningState::STATE_RUNNING;
     WIFI_LOGI("Start p2p service!");
+    if (WifiManager::GetInstance().Init() < 0) {
+        WIFI_LOGE("WifiManager init failed!");
+        return;
+    }
     WifiManager::GetInstance().AddSupportedFeatures(WifiFeatures::WIFI_FEATURE_P2P);
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    if (p2pState == WifiOprMidState::CLOSED) {
-        WifiManager::GetInstance().GetWifiP2pManager()->StartUnloadP2PSaTimer();
+    auto &pWifiP2pManager = WifiManager::GetInstance().GetWifiP2pManager();
+    if (p2pState == WifiOprMidState::CLOSED && pWifiP2pManager) {
+        pWifiP2pManager->StartUnloadP2PSaTimer();
     }
 }
 

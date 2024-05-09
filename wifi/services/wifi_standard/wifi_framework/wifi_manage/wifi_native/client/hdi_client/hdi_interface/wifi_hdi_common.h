@@ -12,12 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef HDI_INTERFACE_SUPPORT
+
 #ifndef OHOS_WIFI_HDI_COMMON_H
 #define OHOS_WIFI_HDI_COMMON_H
 
 #include "wifi_hdi_define.h"
 #include "wifi_hdi_struct.h"
+
+typedef unsigned char u8;
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,6 +105,8 @@ static inline uint16_t HdiGetBe16(const uint8_t *a)
     return (a[HDI_POS_FIRST] << HDI_MOVE_EIGHT) | a[HDI_POS_ZERO];
 }
 
+size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str);
+
 int HdiTxtPrintf(char *str, size_t size, const char *format, ...);
 
 const uint8_t* HdiBssGetIeExt(const uint8_t *ies, size_t len, uint8_t ext);
@@ -113,17 +117,14 @@ const char* HdiSSid2Txt(const uint8_t *ssid, size_t ssidLen);
 
 char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     const uint8_t *ie, size_t ieLen);
+
 int8_t IsValidHexCharAndConvert(char c);
+
 int CheckMacIsValid(const char *macStr);
+
 void StrSafeCopy(char *dst, unsigned len, const char *src);
 
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-int32_t GetFeatureType(int portType);
-void UpDownLink(int flag, int type, const char *iface);
-WifiErrorNo HdiSetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType);
-#endif
 #ifdef __cplusplus
 }
-#endif
 #endif
 #endif

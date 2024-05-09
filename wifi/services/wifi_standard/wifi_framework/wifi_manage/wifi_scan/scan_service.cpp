@@ -2636,27 +2636,6 @@ bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId
     return bFind;
 }
 
-ErrCode ScanService::StartWifiHdi()
-{
-    WIFI_LOGI("Enter StartWifiHdi.\n");
-    int res = WifiStaHalInterface::GetInstance().StartWifiHdi(WifiSettings::GetInstance().GetStaIfaceName());
-    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
-        return WIFI_OPT_FAILED;
-    }
-    InitChipsetInfo();
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ScanService::CloseWifiHdi()
-{
-    WIFI_LOGI("Enter CloseWifiHdi.\n");
-    int res = WifiStaHalInterface::GetInstance().StopWifiHdi();
-    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode ScanService::SetNetworkInterfaceUpDown(bool upDown)
 {
     WIFI_LOGI("Enter SetNetworkInterfaceUpDown.\n");
@@ -2735,11 +2714,12 @@ void ScanService::InitChipsetInfo()
     if (isChipsetInfoObtained) {
         return;
     }
-    if (WifiStaHalInterface::GetInstance().GetChipsetCategory(chipsetCategory) != WIFI_IDL_OPT_OK
-        || WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(chipsetFeatrureCapability)
-        != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("GetChipsetCategory or GetChipsetWifiFeatrureCapability failed.\n");
-        isChipsetInfoObtained = false;
+    if (WifiStaHalInterface::GetInstance().GetChipsetCategory(
+        WifiSettings::GetInstance().GetStaIfaceName(), chipsetCategory) != WIFI_IDL_OPT_OK
+        || WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(
+            WifiSettings::GetInstance().GetStaIfaceName(), chipsetFeatrureCapability) != WIFI_IDL_OPT_OK) {
+                WIFI_LOGE("GetChipsetCategory or GetChipsetWifiFeatrureCapability failed.\n");
+                isChipsetInfoObtained = false;
     } else {
         isChipsetInfoObtained = true;
     }

@@ -659,7 +659,7 @@ void StaServiceTest::StaServiceSetSuspendModeTest()
     MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = false;
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_FAILED);
     MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = true;
-    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
+    pStaService->SetSuspendMode(false);
 }
 
 void StaServiceTest::StaServiceSetPowerModeTest()

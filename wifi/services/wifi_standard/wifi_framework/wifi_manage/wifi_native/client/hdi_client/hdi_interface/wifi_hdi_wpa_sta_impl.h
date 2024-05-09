@@ -32,6 +32,8 @@ WifiErrorNo HdiWpaStaConnect(int networkId);
 
 WifiErrorNo HdiWpaStaReconnect();
 
+WifiErrorNo HdiWpaStaReassociate();
+
 WifiErrorNo HdiWpaStaDisconnect();
 
 WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen);
@@ -77,6 +79,8 @@ WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32
 WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen);
 
 WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd);
+
+WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t pskLen);
 
 int ConvertMacToStr(char *mac, int macSize, char *macStr, int strLen);
 

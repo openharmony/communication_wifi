@@ -137,22 +137,6 @@ public:
      */
     virtual ErrCode SetEnhanceService(IEnhanceService *enhanceService) = 0;
     /**
-     * @Description  StartWifiHdi
-     *
-     * @Output: Return operating results to Interface Service after start wifi hdi
-               successfully.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode StartWifiHdi() = 0;
-    /**
-     * @Description  CloseWifiHdi
-     *
-     * @Output: Return operating results to Interface Service after close wifi hdi
-               successfully.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode CloseWifiHdi() = 0;
-    /**
      * @Description  SetNetworkInterfaceUpDown
      *
      * @Output: Return operating results to Interface Service after set iface up dwon

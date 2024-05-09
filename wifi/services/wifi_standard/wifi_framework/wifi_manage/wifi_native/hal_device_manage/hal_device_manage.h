@@ -32,12 +32,18 @@ namespace OHOS {
 namespace Wifi {
 using OHOS::HDI::Wlan::Chip::V1_0::IChipController;
 using OHOS::HDI::Wlan::Chip::V1_0::IChipControllerCallback;
+using OHOS::HDI::Wlan::Chip::V1_0::IConcreteChip;
+using OHOS::HDI::Wlan::Chip::V1_0::IConcreteChipCallback;
+using OHOS::HDI::Wlan::Chip::V1_0::IChipIface;
+using OHOS::HDI::Wlan::Chip::V1_0::IChipIfaceCallback;
 using OHOS::HDI::Wlan::Chip::V1_0::ErrorCode;
 using OHOS::HDI::Wlan::Chip::V1_0::IfaceType;
-using OHOS::HDI::Wlan::Chip::V1_0::IConcreteChip;
-using OHOS::HDI::Wlan::Chip::V1_0::IChipIface;
-using OHOS::HDI::Wlan::Chip::V1_0::UsableMode;
 using OHOS::HDI::Wlan::Chip::V1_0::ComboIface;
+using OHOS::HDI::Wlan::Chip::V1_0::UsableMode;
+using OHOS::HDI::Wlan::Chip::V1_0::ScanParams;
+using OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo;
+using OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams;
+using OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult;
 using IfaceDestoryCallback = std::function<void(std::string&, int)>;
 
 constexpr IfaceType IFACE_TYPE_DEFAULT = (IfaceType)255;
@@ -147,6 +153,14 @@ public:
     virtual int32_t OnVendorHalRestart(ErrorCode code) override { return 0; }
 };
 
+class ChipIfaceCallback : public IChipIfaceCallback {
+public:
+    ChipIfaceCallback() = default;
+    virtual ~ChipIfaceCallback() = default;
+
+    virtual int32_t OnScanResultsCallback(uint32_t event) override;
+};
+
 class HalDeviceManager {
     DECLARE_DELAYED_SINGLETON(HalDeviceManager)
 
@@ -167,6 +181,7 @@ public:
      */
     void StopChipHdi();
 
+    /* ************************ Iface Manager Interface ************************** */
     /**
      * @Description create sta iface
      *
@@ -200,7 +215,7 @@ public:
      * @param ifaceName: [in] iface name
      * @return bool
      */
-    bool RemoveStaIface(std::string &ifaceName);
+    bool RemoveStaIface(const std::string &ifaceName);
 
     /**
      * @Description remove ap iface
@@ -208,7 +223,7 @@ public:
      * @param ifaceName: [in] iface name
      * @return bool
      */
-    bool RemoveApIface(std::string &ifaceName);
+    bool RemoveApIface(const std::string &ifaceName);
 
     /**
      * @Description remove p2p iface
@@ -216,7 +231,152 @@ public:
      * @param ifaceName: [in] iface name
      * @return bool
      */
-    bool RemoveP2pIface(std::string &ifaceName);
+    bool RemoveP2pIface(const std::string &ifaceName);
+
+    /* ************************ Sta Interface ************************** */
+    /**
+     * @Description start scan.
+     *
+     * @param ifaceName: [in] iface name
+     * @param scanParams: [in] scan params
+     * @return bool
+     */
+    bool Scan(const std::string &ifaceName, const ScanParams &scanParams);
+
+    /**
+     * @Description start pno scan.
+     *
+     * @param ifaceName: [in] iface name
+     * @param scanParams: [in] scan params
+     * @return bool
+     */
+    bool StartPnoScan(const std::string &ifaceName, const PnoScanParams &scanParams);
+
+    /**
+     * @Description stop pno scan.
+     *
+     * @param ifaceName: [in] iface name
+     * @return bool
+     */
+    bool StopPnoScan(const std::string &ifaceName);
+
+    /**
+     * @Description get scan infos.
+     *
+     * @param ifaceName: [in] iface name
+     * @param scanResultsInfo: [out] scan results info
+     * @return bool
+     */
+    bool GetScanInfos(const std::string &ifaceName, std::vector<ScanResultsInfo> &scanResultsInfo);
+
+    /**
+     * @Description Obtain connection signaling information.
+     *
+     * @param ifaceName: [in] iface name
+     * @param signalPollResult: [out] signal poll result
+     * @return bool
+     */
+    bool GetConnectSignalInfo(const std::string &ifaceName, SignalPollResult &signalPollResult);
+
+    /**
+     * @Description set power save mode
+     *
+     * @param ifaceName: [in] iface name
+     * @param mode: [in] power save mode
+     * @return bool
+     */
+    bool SetPmMode(const std::string &ifaceName, int mode);
+
+    /**
+     * @Description set data packet identification mark rule
+     *
+     * @param ifaceName: [in] iface name
+     * @return bool
+     */
+    bool SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable);
+
+    /**
+     * @Description set sta mac address.
+     *
+     * @param ifaceName: [in] iface name
+     * @param mac: [in] mac address
+     * @return bool
+     */
+    bool SetStaMacAddress(const std::string &ifaceName, const std::string &mac);
+
+    /**
+     * @Description set network updown.
+     *
+     * @param ifaceName: [in] iface name
+     * @param upDown: [in] up or down
+     * @return bool
+     */
+    bool SetNetworkUpDown(const std::string &ifaceName, bool upDown);
+
+    /**
+     * @Description get chipset category
+     *
+     * @param ifaceName: [in] iface name
+     * @param chipsetCategory: [out] chipset category
+     * @return bool
+     */
+    bool GetChipsetCategory(const std::string &ifaceName, int &chipsetCategory);
+
+    /**
+     * @Description get chipset feature capability
+     *
+     * @param ifaceName: [in] iface name
+     * @param chipsetFeatrureCapability: [out] chipset feature capability
+     * @return bool
+     */
+    bool GetChipsetWifiFeatrureCapability(const std::string &ifaceName, int &chipsetFeatrureCapability);
+
+    /* ************************ Ap Interface ************************** */
+    /**
+     * @Description Obtains the hotspot frequency supported by a specified frequency band.
+     *
+     * @param ifaceName: [in] iface name
+     * @param band: [in] frequency band
+     * @param frequencies: [in] frequency
+     * @return bool
+     */
+    bool GetFrequenciesByBand(const std::string &ifaceName, int32_t band, std::vector<int> &frequencies);
+
+    /**
+     * @Description set the power mode.
+     *
+     * @param ifaceName: [in] iface name
+     * @param model: [in] power mode
+     * @return bool
+     */
+    bool SetPowerModel(const std::string &ifaceName, int model);
+
+    /**
+     * @Description get the power mode.
+     *
+     * @param ifaceName: [in] iface name
+     * @param model: [in] power mode
+     * @return bool
+     */
+    bool GetPowerModel(const std::string &ifaceName, int &model);
+
+    /**
+     * @Description Sets the Wi-Fi country code.
+     *
+     * @param ifaceName: [in] iface name
+     * @param code: [in] country code
+     * @return bool
+     */
+    bool SetWifiCountryCode(const std::string &ifaceName, const std::string &code);
+
+    /**
+     * @Description set ap mac address.
+     *
+     * @param ifaceName: [in] iface name
+     * @param mac: [in] mac address
+     * @return bool
+     */
+    bool SetApMacAddress(const std::string &ifaceName, const std::string &mac);
 
 private:
     void ResetHalDeviceManagerInfo();
@@ -250,7 +410,7 @@ private:
         std::string &ifaceName, sptr<IChipIface> &iface);
     void DispatchIfaceDestoryCallback(std::string &removeIfaceName, IfaceType removeIfaceType, bool isCallback,
         IfaceType createIfaceType);
-    bool GetChip(std::string &removeIfaceName, IfaceType removeIfaceType, sptr<IConcreteChip> &chip);
+    bool GetChip(const std::string &removeIfaceName, IfaceType removeIfaceType, sptr<IConcreteChip> &chip);
     bool RemoveIface(sptr<IChipIface> &iface, bool isCallback, IfaceType createIfaceType);
 
     // death recipient
@@ -264,6 +424,7 @@ private:
     std::map<std::string, sptr<IChipIface>> mIWifiP2pIfaces;
     sptr<IChipController> g_IWifi{nullptr};
     sptr<ChipControllerCallback> g_chipControllerCallback{nullptr};
+    sptr<ChipIfaceCallback> g_chipIfaceCallback{nullptr};
     static std::atomic_bool g_chipHdiServiceDied;
     static std::mutex mMutex;
 };

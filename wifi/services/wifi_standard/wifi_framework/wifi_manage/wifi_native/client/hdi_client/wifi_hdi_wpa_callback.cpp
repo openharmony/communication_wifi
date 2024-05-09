@@ -21,6 +21,7 @@
 #include "wifi_ap_hal_interface.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_hdi_common.h"
+#include "wifi_common_util.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
@@ -43,6 +44,9 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
     ConvertMacArr2String(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (cbk.onReportDisConnectReason) {
+        cbk.onReportDisConnectReason(disconectParam->reasonCode, szBssid);
+    }
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, szBssid);
     }
@@ -109,8 +113,23 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
     const struct HdiWpaTempDisabledParam *tempDisabledParam, const char *ifName)
 {
     LOGI("OnEventTempDisabled: callback enter!");
+    
+    if (tempDisabledParam == NULL) {
+        LOGE("OnEventTempDisabled tempDisabledParam is NULL");
+        return 1;
+    }
+    std::string ssid = "";
+    if (tempDisabledParam->ssid != NULL && tempDisabledParam->ssidLen > 0) {
+        ssid = std::string(tempDisabledParam->ssid, tempDisabledParam->ssid + tempDisabledParam->ssidLen);
+    }
+    std::string reason = "";
+    if (tempDisabledParam->reason != NULL && tempDisabledParam->reasonLen > 0) {
+        reason = std::string(tempDisabledParam->reason, tempDisabledParam->reason + tempDisabledParam->reasonLen);
+    }
+    LOGI("OnEventTempDisabled ssid:%{public}s reason:%{public}s",
+        OHOS::Wifi::SsidAnonymize(ssid).c_str(), reason.c_str());
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    if (cbk.onWpaSsidWrongKey) {
+    if (cbk.onWpaSsidWrongKey && (reason == "WRONG_KEY" || reason == "AUTH_FAILED")) {
         cbk.onWpaSsidWrongKey(1);
     }
     return 0;
@@ -443,12 +462,12 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         cbInfo.frequency = groupStartedParam->frequency;
         cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
         StrSafeCopy(tempSsid, sizeof(tempSsid), (char *)groupStartedParam->ssid);
-        printf_decode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
+        PrintfDecode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
         cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
-        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s",
-            cbInfo.groupName.c_str(), cbInfo.ssid.c_str());
+        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s" len:%{public}lu:,
+            cbInfo.groupName.c_str(), cbInfo.ssid.c_str(), strlen(cbInfo.ssid.c_str()));
 
         char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
         ConvertMacArr2String(groupStartedParam->goDeviceAddress,

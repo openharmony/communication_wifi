@@ -148,10 +148,5 @@ bool WifiCommonEventHelper::PublishP2pGroupStateChangedEvent(const int &code, co
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED, code, data);
 }
-
-bool WifiCommonEventHelper::PublishP2pPrivatePeersChangedEvent(const int &code, const std::string &data)
-{
-    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_P2P_PRIVATE_PEERS_CHANGED, code, data);
-}
 }  // namespace Wifi
 }  // namespace OHOS

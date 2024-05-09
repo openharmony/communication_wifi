@@ -182,7 +182,7 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const
     return mHdiWpaClient->ReqSetPowerSave(mode);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->ReqWpaSetPowerMode(mode);
+    return mIdlClient->ReqWpaSetPowerMode(!mode);
 #endif
 }
 }  // namespace Wifi

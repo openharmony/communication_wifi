@@ -65,6 +65,7 @@ ohos_unittest("wifi_sta_unittest") {
     "sta_monitor_test.cpp",
     "sta_saved_device_appraisal_test.cpp",
     "sta_service_test.cpp",
+    "sta_state_machine_test.cpp",
   ]
 
   include_dirs = [
@@ -164,7 +165,10 @@ ohos_unittest("wifi_sta_unittest") {
     defines += [ "WIFI_FFRT_ENABLE" ]
   }
 
-  defines += [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+  defines += [
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    "private=public",
+  ]
   part_name = "wifi"
   subsystem_name = "communication"
 }

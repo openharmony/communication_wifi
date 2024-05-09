@@ -140,9 +140,11 @@ void WifiSettings::InitHotspotConfig()
                 mHotspotConfig[i] = tmp[i];
             }
         } else {
+            LOGI("load hotspot config success, but tmp.size() = 0, use default config");
             InitDefaultHotspotConfig();
         }
     } else {
+        LOGI("load hotspot config fail, use default config");
         InitDefaultHotspotConfig();
     }
     /* init block list info */
@@ -154,7 +156,48 @@ void WifiSettings::InitHotspotConfig()
             mBlockListInfo.emplace(item.bssid, item);
         }
     }
+
+    /* init softap random mac info */
+    if (mSavedApRandomMac.LoadConfig() >= 0) {
+        std::vector<SoftApRandomMac> tmp;
+        mSavedApRandomMac.GetValue(tmp);
+        if (tmp.size() > 0) {
+            for (std::size_t i = 0; i < tmp.size(); i++) {
+                mApRandomMac[i] = tmp[i];
+            }
+        }
+    }
     return;
+}
+
+int WifiSettings::GetApRandomMac(SoftApRandomMac &randomMac, int id)
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    auto iter = mApRandomMac.find(id);
+    if (iter != mApRandomMac.end()) {
+        randomMac = iter->second;
+    }
+    return 0;
+}
+
+int WifiSettings::SetApRandomMac(const SoftApRandomMac &randomMac, int id)
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    if (id > AP_INSTANCE_MAX_NUM) {
+        LOGE("Id is larger than AP_INSTANCE_MAX_NUM");
+        return -1;
+    }
+
+    mApRandomMac[id] =  randomMac;
+
+    std::vector<SoftApRandomMac> tmp;
+    for (auto iter : mApRandomMac) {
+        tmp.push_back(iter.second);
+    }
+
+    mSavedApRandomMac.SetValue(tmp);
+    mSavedApRandomMac.SaveConfig();
+    return 0;
 }
 
 void WifiSettings::InitP2pVendorConfig()
@@ -217,6 +260,7 @@ int WifiSettings::Init()
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
     mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
+    mSavedApRandomMac.SetConfigFilePath(WIFI_SOFTAP_RANDOM_MAC_FILE_PATH);
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -1155,7 +1199,6 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     if (numExcessNetworks <= 0) {
         return 1;
     }
-    LOGI("Remove %d configs", numExcessNetworks);
     sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
         if (a.status != b.status) {
             return (a.status == 0) < (b.status == 0);
@@ -1169,6 +1212,13 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
             return a.networkId < b.networkId;
         }
     });
+    std::stringstream removeConfig;
+    int maxIndex = numExcessNetworks > MAX_CONFIGS_NUM ? MAX_CONFIGS_NUM : numExcessNetworks;
+    for (int i = 0; i < maxIndex; i++) {
+        removeConfig << SsidAnonymize(configs[i].ssid) << ",";
+    }
+    LOGI("saved config size greater than %{public}d, remove ssid(print up to 1000)=%{public}s",
+        maxNumConfigs, removeConfig.str().c_str());
     configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
     return 0;
 }

@@ -382,7 +382,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
         return;
     }
     if (pSelfCureStateMachine->ShouldTransToWifi6SelfCure(msg, lastConnectedBssid)) {
-        WIFI_LOGI("%(public}s: TransToWifi6SelfCure",__FUNCTION__);
+        WIFI_LOGI("%{public}s: TransToWifi6SelfCure", __FUNCTION__);
         return;
     }
     if (pSelfCureStateMachine->IsNeedWifiReassocUseDeviceMac()) {

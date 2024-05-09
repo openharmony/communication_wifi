@@ -288,6 +288,23 @@ WifiErrorNo HdiWpaStaReconnect()
     return WIFI_IDL_OPT_OK;
 }
 
+WifiErrorNo HdiWpaStaReassociate()
+{
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiWpaStaReassociate: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->Reassociate(wpaObj, GetHdiStaIfaceName());
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiWpaStaReassociate: Reassociate failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    return WIFI_IDL_OPT_OK;
+}
+
 WifiErrorNo HdiWpaStaDisconnect()
 {
     LOGI("HdiWpaStaDisconnect enter");

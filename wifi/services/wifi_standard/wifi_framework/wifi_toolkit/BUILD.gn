@@ -63,6 +63,7 @@ if (defined(ohos_lite)) {
       "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$DHCP_ROOT_DIR/interfaces/kits/c",
+      "$DHCP_ROOT_DIR/services",
     ]
 
     deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
@@ -139,6 +140,7 @@ if (defined(ohos_lite)) {
       "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
       "dhcp:dhcp_sdk",
+      "dhcp:dhcp_utils",
       "distributed_notification_service:ans_innerkits",
       "eventhandler:libeventhandler",
       "hilog:libhilog",

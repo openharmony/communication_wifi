@@ -28,6 +28,7 @@
 #include "wifi_service_manager.h"
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
+#include "wifi_common_service_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -36,16 +37,6 @@ DEFINE_WIFILOG_LABEL("WifiManager");
 WifiManager &WifiManager::GetInstance()
 {
     static WifiManager gWifiManager;
-    static std::mutex gInitMutex;
-    if (gWifiManager.GetInitStatus() == INIT_UNKNOWN) {
-        std::unique_lock<std::mutex> lock(gInitMutex);
-        if (gWifiManager.GetInitStatus() == INIT_UNKNOWN) {
-            if (gWifiManager.Init() != 0) {
-                WIFI_LOGE("Failed to `WifiManager::Init` !");
-            }
-        }
-    }
-
     return gWifiManager;
 }
 
@@ -59,37 +50,23 @@ WifiManager::~WifiManager()
 
 int WifiManager::Init()
 {
-#ifndef OHOS_ARCH_LITE
-    if (WifiCountryCodeManager::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiCountryCodeManager Init failed!");
-        mInitStatus = WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED;
+    std::unique_lock<std::mutex> lock(initStatusMutex);
+    if (mInitStatus == INIT_OK) {
+        WIFI_LOGI("WifiManager already init!");
+        return 0;
+    }
+    mInitStatus = WifiCommonServiceManager::GetInstance().Init();
+    if (mInitStatus != INIT_OK) {
+        WIFI_LOGE("WifiCommonServiceManager Init failed!");
         return -1;
     }
 
-    if (WifiAppStateAware::GetInstance().InitAppStateAware() < 0) {
-        WIFI_LOGE("WifiAppStateAware Init failed!");
-    }
-#endif
-    if (WifiConfigCenter::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiConfigCenter Init failed!");
-        mInitStatus = CONFIG_CENTER_INIT_FAILED;
-        return -1;
-    }
-    if (WifiAuthCenter::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiAuthCenter Init failed!");
-        mInitStatus = AUTH_CENTER_INIT_FAILED;
-        return -1;
-    }
     if (WifiServiceManager::GetInstance().Init() < 0) {
         WIFI_LOGE("WifiServiceManager Init failed!");
         mInitStatus = SERVICE_MANAGER_INIT_FAILED;
         return -1;
     }
-    if (WifiInternalEventDispatcher::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiInternalEventDispatcher Init failed!");
-        mInitStatus = EVENT_BROADCAST_INIT_FAILED;
-        return -1;
-    }
+
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
@@ -103,12 +80,14 @@ int WifiManager::Init()
 #ifdef FEATURE_P2P_SUPPORT
     wifiP2pManager = std::make_unique<WifiP2pManager>();
 #endif
-    mInitStatus = INIT_OK;
+
     if (WifiServiceManager::GetInstance().CheckPreLoadService() < 0) {
         WIFI_LOGE("WifiServiceManager check preload feature service failed!");
         WifiManager::GetInstance().Exit();
         return -1;
     }
+    mInitStatus = INIT_OK;
+
     if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread");
         WifiSettings::GetInstance().SetWifiToggledState(true);
@@ -138,7 +117,6 @@ void WifiManager::Exit()
 {
     WIFI_LOGI("[WifiManager] Exit.");
     WifiServiceManager::GetInstance().UninstallAllService();
-    WifiInternalEventDispatcher::GetInstance().Exit();
     PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
     if (mCloseServiceThread) {
         mCloseServiceThread.reset();
@@ -329,11 +307,6 @@ void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
     WIFI_LOGE("%{public}s InstallFilterProgram success", __FUNCTION__);
 }
 #endif
-
-InitStatus WifiManager::GetInitStatus()
-{
-    return mInitStatus;
-}
 
 void WifiManager::CheckAndStartSta()
 {

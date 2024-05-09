@@ -72,19 +72,22 @@ void StaAppAcceleration::HandleScreenStatusChanged(int screenState)
         WIFI_LOGI("mode not handle.\n");
     }
 }
-void StaAppAcceleration::HandleForegroundAppChangedAction(const std::string &bundleName,
-    int uid, int pid, const int state)
+
+#ifndef OHOS_ARCH_LITE
+void StaAppAcceleration::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
-    if (state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND)) {
-        if (AppParser::GetInstance().IsLowLatencyApp(bundleName)) {
+    if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND)
+        && appStateData.isFocused) {
+        if (AppParser::GetInstance().IsLowLatencyApp(appStateData.bundleName)) {
             WIFI_LOGI("target app on the foreground.");
-            StartGameBoost(uid);
+            StartGameBoost(appStateData.uid);
         } else {
-            StopGameBoost(uid);
+            StopGameBoost(appStateData.uid);
         }
     }
     return;
 }
+#endif
 
 void StaAppAcceleration::SetPmMode(int mode)
 {
@@ -95,7 +98,8 @@ void StaAppAcceleration::SetPmMode(int mode)
 
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode(linkedInfo.frequency, mode);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode(
+        WifiSettings::GetInstance().GetStaIfaceName(), linkedInfo.frequency, mode);
     if (ret != 0) {
         WIFI_LOGE("SetPmMode failed, ret = %{public}d.", ret);
         return;
@@ -132,7 +136,8 @@ void StaAppAcceleration::SetGameBoostMode(int enable, int uid, int type, int lim
 void StaAppAcceleration::HighPriorityTransmit(int uid, int protocol, int enable)
 {
     WIFI_LOGI("Enter HighPriorityTransmit.\n");
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetDpiMarkRule(uid, protocol, enable);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetDpiMarkRule(
+        WifiSettings::GetInstance().GetStaIfaceName(), uid, protocol, enable);
     if (ret != 0) {
         WIFI_LOGE("HighPriorityTransmit failed, ret = %{public}d.", ret);
         return;

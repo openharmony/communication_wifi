@@ -196,7 +196,7 @@ int WifiConfigFileImpl<T>::LoadConfig()
     }
     std::ifstream fs(mFileName.c_str());
     if (!fs.is_open()) {
-        LOGD("Loading config file: %{public}s, fs.is_open() failed!", mFileName.c_str());
+        LOGE("Loading config file: %{public}s, fs.is_open() failed!", mFileName.c_str());
         return -1;
     }
     mValues.clear();

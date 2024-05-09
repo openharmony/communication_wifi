@@ -304,18 +304,18 @@ public:
      * @param state app state.
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode HandleForegroundAppChangedAction(const std::string &bundleName,
-                                                        int uid, int pid, const int state) override;
-
+#ifndef OHOS_ARCH_LITE
+    virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) override;
+#endif
 	/**
-     * @Description renew dhcp.
+     * @Description EnableHiLinkHandshake.
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableHiLinkHandshake(const std::string &bssid) override;
+    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid) override;
  
 	/**
-     * @Description renew dhcp.
+     * @Description DeliverStaIfaceData.
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */

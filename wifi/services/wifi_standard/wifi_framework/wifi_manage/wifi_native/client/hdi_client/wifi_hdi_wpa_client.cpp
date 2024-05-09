@@ -32,6 +32,7 @@ namespace OHOS {
 namespace Wifi {
 #define MAX_IFACENAME_LEN 6
 #define MAX_CMD_BUFFER_SIZE 1024
+#define MAX_PASSWORD_LEN 32
 constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
 const int BUFFER_SIZE = 4096;
@@ -66,7 +67,7 @@ WifiErrorNo WifiHdiWpaClient::ReqReconnect(void)
 
 WifiErrorNo WifiHdiWpaClient::ReqReassociate(void)
 {
-    return WIFI_IDL_OPT_NOT_SUPPORT;
+    return HdiWpaStaReassociate();
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqDisconnect(void)
@@ -454,6 +455,24 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const st
     return HdiWpaStaSetShellCmd(ifNameBuf, cmdBuf);
 }
 
+WifiErrorNo WifiHdiWpaClient::ReqWpaGetPskPassphrase(const std::string &ifName, std::string &psk)
+{
+    char ifNameBuf[MAX_IFACENAME_LEN];
+    char tmpPsk[MAX_CMD_BUFFER_SIZE] = {0};
+    uint32_t pskLen = MAX_PASSWORD_LEN;
+    if (strncpy_s(ifNameBuf, sizeof(ifNameBuf), ifName.c_str(), ifName.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    if (HdiWpaStaGetPskPassphrase(ifNameBuf, tmpPsk, pskLen) != WIFI_IDL_OPT_OK) {
+        LOGE("%{public}s: GetPskPassphrase failed", __func__);
+        return WIFI_IDL_OPT_FAILED;
+    }
+    psk = tmpPsk;
+    return WIFI_IDL_OPT_OK;
+}
+
 int WifiHdiWpaClient::PushDeviceConfigString(
     SetNetworkConfig *pConfig, DeviceConfigType type, const std::string &msg, bool checkEmpty) const
 {
@@ -621,7 +640,9 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiSetApBand(static_cast<int>(config.GetBand()), id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (HdiSetApChannel(config.GetChannel(), id) != WIFI_IDL_OPT_OK) {
+    int channel = config.GetChannel() | (config.GetBandWidth << 16);
+    LOGI("WifiHdiWpaClient::%{public}s enter, channel=%{public}d", _func_, channel);
+    if (HdiSetApChannel(channel, id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     if (HdiSetApMaxConn(config.GetMaxConn(), id) != WIFI_IDL_OPT_OK) {

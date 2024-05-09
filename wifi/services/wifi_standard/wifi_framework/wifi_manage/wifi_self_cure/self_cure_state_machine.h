@@ -45,6 +45,7 @@ constexpr int VEC_POS_2 = 2;
 constexpr int VEC_POS_3 = 3;
 constexpr int TRY_TIMES = 3;
 constexpr int STATIC_IP_ADDR = 156;
+constexpr int IP_ADDR_LIMIT = 255;
 constexpr int GET_NEXT_IP_MAC_CNT = 10;
 constexpr int IP_ADDR_SIZE = 4;
 constexpr int NET_MASK_LENGTH = 24;
@@ -93,7 +94,6 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
-
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
     };
@@ -199,7 +199,7 @@ public:
         bool hasInternetRecently = false;
         bool portalUnthenEver = false;
         bool userSetStaticIpConfig = false;
-        long lastHasInetTimeMillis = 0;
+        uint64_t lastHasInetTimeMillis = 0;
         bool delayedReassocSelfCure = false;
         bool delayedRandMacReassocSelfCure = false;
         bool delayedResetSelfCure = false;
@@ -223,6 +223,7 @@ public:
         void HandleRssiChangedEvent(InternalMessage *msg);
         void HandleP2pDisconnected(InternalMessage *msg);
         void HandlePeriodicArpDetecte(InternalMessage *msg);
+        void HandleArpFailedDetected(InternalMessage *msg);
         void SelectSelfCureByFailedReason(int internetFailedType);
         int SelectBestSelfCureSolution(int internetFailedType);
         void SelfCureWifiLink(int requestCureLevel);
@@ -262,6 +263,7 @@ public:
     };
 
     ErrCode Initialize();
+    void SetHttpMonitorStatus(bool isHttpReachable);
 
 private:
 
@@ -305,8 +307,8 @@ private:
 
     int GetCurSignalLevel();
     bool IsHttpReachable();
-    std::string TransVecToIpAddress(std::vector<int> vec);
-    std::vector<int> TransIpAddressToVec(std::string addr);
+    std::string TransVecToIpAddress(std::vector<uint32_t> vec);
+    std::vector<uint32_t> TransIpAddressToVec(std::string addr);
     int GetLegalIpConfiguration(IpInfo &dhcpResults);
     bool CanArpReachable();
     bool DoSlowArpTest(std::string testIpAddr);
@@ -323,6 +325,7 @@ private:
     int SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string> histories, int cnt);
     bool IfP2pConnected();
     bool ShouldTransToWifi6SelfCure(InternalMessage *msg, const std::string lastConnectedBssid);
+    int GetCurrentRssi();
     void PeriodicArpDetection();
     bool IsSuppOnCompletedState();
     bool IfPeriodicArpDetection();
@@ -349,6 +352,7 @@ private:
                                                  bool success);
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     bool IfMultiGateway();
+    bool IsSettingsPage();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;
@@ -362,12 +366,11 @@ private:
     Wifi6SelfCureState *pWifi6SelfCureState;
 
     int m_instId;
-    bool mIsHttpRedirected = false;
+    bool mIsHttpReachable = false;
     int useWithRandMacAddress = 0;
-    ArpChecker arpChecker;
-    std::atomic<bool> selfCureOnGoing;
-    std::atomic<bool> p2pConnected;
-    std::atomic<bool> hmlConnected;
+    std::atomic<bool> selfCureOnGoing = false;
+    std::atomic<bool> p2pConnected = false;
+    std::atomic<bool> notAllowSelfcure = false;
     int arpDetectionFailedCnt = 0;
     int selfCureReason = -1;
     int noTcpRxCounter = 0;
@@ -380,7 +383,7 @@ private:
     bool isWifi6ArpSuccess = false;
     bool hasTestWifi6Reassoc = false;
     bool isReassocSelfCureWithRealMacAddress = false;
-    clock_t connectedTimeMills = 0;
+    uint64_t connectedTimeMills = 0;
     std::mutex dhcpFailedBssidLock;
     std::vector<std::string> dhcpFailedBssids;
     std::vector<std::string> dhcpFailedConfigKeys;

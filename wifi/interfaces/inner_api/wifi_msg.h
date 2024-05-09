@@ -118,6 +118,9 @@ enum ConnState {
     /** The Wi-Fi connection has been torn down. */
     DISCONNECTED,
 
+    /** The Wi-Fi special connection. */
+    SPECIAL_CONNECT,
+
     /** Failed to set up the Wi-Fi connection. */
     UNKNOWN
 };
@@ -557,6 +560,7 @@ struct WifiDeviceConfig {
     std::string internetSelfCureHistory;
     int isReassocSelfCureWithFactoryMacAddress;
     int version;
+    bool randomizedMacSuccessEver;
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -588,6 +592,7 @@ struct WifiDeviceConfig {
         internetSelfCureHistory = "";
         isReassocSelfCureWithFactoryMacAddress = 0;
         version = -1;
+        randomizedMacSuccessEver = false;
     }
 };
 
@@ -645,6 +650,7 @@ struct IpInfo {
     unsigned int secondDns;          /* backup dns */
     unsigned int serverIp; /* DHCP server's address */
     unsigned int leaseDuration;
+    std::vector<unsigned int> dnsAddr;
 
     IpInfo()
     {
@@ -655,6 +661,7 @@ struct IpInfo {
         secondDns = 0;
         serverIp = 0;
         leaseDuration = 0;
+        dnsAddr.clear();
     }
 };
 
@@ -667,7 +674,10 @@ struct IpV6Info {
     std::string netmask;
     std::string primaryDns;
     std::string secondDns;
-
+    std::string uniqueLocalAddress1;
+    std::string uniqueLocalAddress2;
+    std::vector<std::string> dnsAddr;
+    
     IpV6Info()
     {
         linkIpV6Address = "";
@@ -677,6 +687,9 @@ struct IpV6Info {
         netmask = "";
         primaryDns = "";
         secondDns = "";
+        uniqueLocalAddress1 = "";
+        uniqueLocalAddress2 = "";
+        dnsAddr.clear();
     }
 };
 

@@ -126,6 +126,9 @@ ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport)
         case OperateResState::CONNECT_CONNECTING:
             isReport = true;
             return ConnState::CONNECTING;
+        case OperateResState::SPECIAL_CONNECTED:
+            isReport = true;
+            return ConnState::SPECIAL_CONNECT;
         case OperateResState::CONNECT_AP_CONNECTED:
             isReport = true;
             return ConnState::CONNECTED;
@@ -158,11 +161,7 @@ ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport)
             isReport = true;
             return ConnState::OBTAINING_IPADDR;
         case OperateResState::CONNECT_OBTAINING_IP_FAILED:
-            isReport = false;
-            return ConnState::UNKNOWN;
         case OperateResState::CONNECT_ASSOCIATING:
-            isReport = false;
-            return ConnState::UNKNOWN;
         case OperateResState::CONNECT_ASSOCIATED:
             isReport = false;
             return ConnState::UNKNOWN;

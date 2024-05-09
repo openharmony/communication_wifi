@@ -842,22 +842,30 @@ ErrCode StaService::RenewDhcp()
 }
 
 #ifndef OHOS_ARCH_LITE
-ErrCode StaService::HandleForegroundAppChangedAction(const std::string &bundleName,
-    int uid, int pid, const int state)
+ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
     if (pStaAppAcceleration == nullptr) {
         WIFI_LOGE("pStaAppAcceleration is null");
         return WIFI_OPT_FAILED;
     }
-    pStaAppAcceleration->HandleForegroundAppChangedAction(bundleName, uid, pid, state);
+    pStaAppAcceleration->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
 #endif
 
-ErrCode StaService::EnableHiLinkHandshake(const std::string &bssid)
+ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
 {
+    int netWorkId = INVALID_NETWORK_ID;
+    if (bssid.find("ENABLE=1") != INVALID_NETWORK_ID) {
+        netWorkId = AddDeviceConfig(config);
+        if (netWorkId == INVALID_NETWORK_ID) {
+            WIFI_LOGE("EnableHiLinkHandshake, AddDeviceConfig failed!");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    WIFI_LOGI("EnableHiLinkHandshake, netWorkId: %{public}d", netWorkId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_ENABLE_HILINK, bssid);
+    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_ENABLE_HILINK, netWorkId, 0, bssid);
  
     return WIFI_OPT_SUCCESS;
 }

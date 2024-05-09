@@ -1488,10 +1488,55 @@ bool ComparedHinlinkKeymgmt(const std::string scanInfoKeymgmt, const std::string
         return false;
     }
 }
- 
+
+ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfig, std::string &currentMac)
+{
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
+        WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
+    } else {
+        WifiStoreRandomMac randomMacInfo;
+        std::vector<WifiScanInfo> scanInfoList;
+        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
+        for (auto scanInfo : scanInfoList) {
+            if ((deviceConfig.ssid == scanInfo.ssid) &&
+                (ComparedHinlinkKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
+                randomMacInfo.ssid = scanInfo.ssid;
+                randomMacInfo.keyMgmt = deviceConfig.keyMgmt;
+                randomMacInfo.preSharedKey = deviceConfig.preSharedKey;
+                randomMacInfo.peerBssid = scanInfo.bssid;
+                break;
+            }
+        }
+        if (randomMacInfo.ssid.empty()) {
+            LOGE("EnableHiLinkHandshake scanInfo has no target wifi!");
+            return WIFI_OPT_FAILED;
+        }
+
+        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+        if (randomMacInfo.randomMac.empty()) {
+            /* Sets the MAC address of WifiSettings. */
+            std::string macAddress;
+            WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+            randomMacInfo.randomMac = macAddress;
+            LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                MacAnonymize(randomMacInfo.peerBssid).c_str());
+            WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        } else {
+            LOGI("%{public}s: randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                MacAnonymize(randomMacInfo.peerBssid).c_str());
+        }
+        currentMac = randomMacInfo.randomMac;
+    }
+    WIFI_LOGI("EnableHiLinkHandshake mac address get success, mac = %{public}s", MacAnonymize(currentMac).c_str());
+
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
 {
-    WIFI_LOGE("EnableHiLinkHandshake enter");
+    WIFI_LOGI("EnableHiLinkHandshake enter");
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("EnableHiLinkHandshake: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -1517,7 +1562,7 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
             return WIFI_OPT_FAILED;
         }
         g_hiLinkActive = uiFlag;
-        pService->EnableHiLinkHandshake(cmd);
+        pService->EnableHiLinkHandshake(deviceConfig, cmd);
         return WIFI_OPT_SUCCESS;
     }
     if (!g_hiLinkActive) {
@@ -1525,39 +1570,14 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
             WIFI_LOGE("g_hiLinkActive copy enable and bssid error!");
             return WIFI_OPT_FAILED;
         }
-        pService->EnableHiLinkHandshake(cmd);
+        pService->EnableHiLinkHandshake(deviceConfig, cmd);
     }
+
     std::string currentMac;
-    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
-        WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
-    } else {
-        WifiStoreRandomMac randomMacInfo;
-        std::vector<WifiScanInfo> scanInfoList;
-        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
-        for (auto scanInfo : scanInfoList) {
-            if ((deviceConfig.ssid == scanInfo.ssid) &&
-                (ComparedHinlinkKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
-                randomMacInfo.ssid = scanInfo.ssid;
-                randomMacInfo.keyMgmt = deviceConfig.keyMgmt;
-                randomMacInfo.preSharedKey = deviceConfig.preSharedKey;
-                randomMacInfo.peerBssid = scanInfo.bssid;
-                break;
-            }
-        }
-        if (randomMacInfo.ssid.empty()) {
-            LOGE("EnableHiLinkHandshake scanInfo has no target wifi!");
-            return WIFI_OPT_FAILED;
-        }
- 
-        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-        if (randomMacInfo.randomMac.empty()) {
-            WIFI_LOGE("EnableHiLinkHandshake random mac empty");
-            return WIFI_OPT_FAILED;
-        }
-        currentMac = randomMacInfo.randomMac;
+    if (HilinkGetMacAddress(deviceConfig, currentMac) != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_FAILED;
     }
     g_hiLinkActive = uiFlag;
-    WIFI_LOGI("currentMac = %{public}s", MacAnonymize(currentMac).c_str());
 
     (void)memset_s(cmd, sizeof(cmd), 0x0, sizeof(cmd));
     if (sprintf_s(cmd, sizeof(cmd), "HILINK_MAC=%s", currentMac.c_str()) < 0) {
@@ -1565,7 +1585,7 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
         return WIFI_OPT_FAILED;
     }
     pService->DeliverStaIfaceData(cmd);
- 
+
     WIFI_LOGI("WifiDeviceServiceImpl EnableHiLinkHandshake ok!");
     return WIFI_OPT_SUCCESS;
 }

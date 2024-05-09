@@ -176,12 +176,6 @@ static void DealGroupStartInfo(char *buf)
             StrSafeCopy(conf.psk, sizeof(conf.psk), retMsg.value);
         } else if (strncmp(retMsg.key, "ssid", strlen("ssid")) == 0 ||
                    strncmp(retMsg.key, "passphrase", strlen("passphrase")) == 0) {
-            unsigned len = strlen(retMsg.value);
-            if (len == SSID_EMPTY_LENGTH || (len < sizeof(retMsg.value) - 1 && retMsg.value[len - 1] != '\"')) {
-                token = strtok_r(NULL, "\"", &savedPtr);
-                retMsg.value[len++] = ' ';
-                StrSafeCopy(retMsg.value + len, sizeof(retMsg.value) - len, token);
-            }
             TrimQuotationMark(retMsg.value, '\"');
             if (strncmp(retMsg.key, "ssid", strlen("ssid")) == 0) {
                 StrSafeCopy(conf.ssid, sizeof(conf.ssid), retMsg.value);
@@ -610,6 +604,7 @@ static int WpaP2pCallBackFunc(char *p)
         LOGI("recv notify message is NULL");
         return -1;
     }
+    LOGD("wpa p2p callback p :%{private}s!", p);
     if (strncmp(p, P2P_EVENT_PROV_DISC_PBC_REQ, strlen(P2P_EVENT_PROV_DISC_PBC_REQ)) == 0) {
         DealProvDiscPbcReqEvent(p, strlen(p));
     } else if (strncmp(p, P2P_EVENT_PROV_DISC_PBC_RESP, strlen(P2P_EVENT_PROV_DISC_PBC_RESP)) == 0) {
@@ -761,6 +756,7 @@ static void WpaCallBackFunc(const char *p)
                 return;
             }
         }
+        WifiHalCbNotifyDisConnectReason(reasonCode, pBssid);
         WifiHalCbNotifyConnectChanged(WPA_CB_DISCONNECTED, reasonCode, pBssid);
     /* bssid changed event */
     } else if (strncmp(p, WPA_EVENT_BSSID_CHANGED, strlen(WPA_EVENT_BSSID_CHANGED)) == 0) {

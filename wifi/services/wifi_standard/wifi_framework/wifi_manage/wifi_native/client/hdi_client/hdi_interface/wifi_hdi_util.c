@@ -388,6 +388,10 @@ static void RecordIeNeedParse(unsigned int id, ScanInfoElem* ie, struct NeedPars
 
 static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
 {
+    if (pcmd == NULL) {
+        LOGE("%{public}s, pcmd is NULL", __func__);
+        return;
+    }
     int len;
     int start = end + 1;
     int last = end + 1;
@@ -760,6 +764,10 @@ int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems
     }
 
     HDI_CHECK_ELEMENT(elem, start, len) {
+        if (elem == NULL) {
+            LOGE("%{public}s, elem is NULL", __func__);
+            return false;
+        }
         uint8_t id = elem->id, elen = elem->datalen;
         const uint8_t *pos = elem->data;
 

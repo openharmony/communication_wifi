@@ -170,18 +170,18 @@ public:
         pSelfCureStateMachine->GetNowMilliSeconds();
     }
 
-    void SendBlacklistToDriverTest()
+    void SendBlaListToDriverTest()
     {
-        LOGI("Enter SendBlacklistToDriverTest");
+        LOGI("Enter SendBlaListToDriverTest");
         std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache = {};
         EXPECT_CALL(WifiSettings::GetInstance(), GetWifi6BlackListCache(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(wifi6BlackListCache), Return(0)));
-        pSelfCureStateMachine->SendBlacklistToDriver();
+        pSelfCureStateMachine->SendBlaListToDriver();
     }
 
-    void SendBlacklistToDriverTest2()
+    void SendBlaListToDriverTest2()
     {
-        LOGI("Enter SendBlacklistToDriverTest2");
+        LOGI("Enter SendBlaListToDriverTest2");
         std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
         std::string currentBssid = CURR_BSSID;
         Wifi6BlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
@@ -189,7 +189,7 @@ public:
 
         EXPECT_CALL(WifiSettings::GetInstance(), GetWifi6BlackListCache(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(wifi6BlackListCache), Return(0)));
-        pSelfCureStateMachine->SendBlacklistToDriver();
+        pSelfCureStateMachine->SendBlaListToDriver();
     }
 
     void BlackListToStringTest()
@@ -223,15 +223,15 @@ public:
         pSelfCureStateMachine->ParseWifi6BlackListInfo(iter);
     }
 
-    void AgeOutWifi6BlackListTest()
+    void AgeOutWifi6BlackTest()
     {
-        LOGI("Enter AgeOutWifi6BlackListTest");
+        LOGI("Enter AgeOutWifi6BlackTest");
         std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
         std::string currentBssid = CURR_BSSID;
         Wifi6BlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
         wifi6BlackListCache.emplace(std::make_pair(currentBssid, wifi6BlackListInfo));
         EXPECT_CALL(WifiSettings::GetInstance(), RemoveWifi6BlackListCache(_)).Times(AtLeast(0));
-        pSelfCureStateMachine->AgeOutWifi6BlackList(wifi6BlackListCache);
+        pSelfCureStateMachine->AgeOutWifi6Black(wifi6BlackListCache);
     }
 
     void ShouldTransToWifi6SelfCureTest()
@@ -266,7 +266,6 @@ public:
     {
         LOGI("Enter IsWifi6NetworkTest");
         std::string currConnectedBssid = "";
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         EXPECT_FALSE(pSelfCureStateMachine->IsWifi6Network(currConnectedBssid));
     }
 
@@ -274,24 +273,22 @@ public:
     {
         LOGI("Enter IsWifi6NetworkTest2");
         std::string currConnectedBssid = CURR_BSSID;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        WifiLinkedInfo wifiLinkedInfo;
+        wifiLinkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
         EXPECT_FALSE(pSelfCureStateMachine->IsWifi6Network(currConnectedBssid));
     }
 
-    void IsSsidSupportWifi6Test()
+    void IsWifi6NetworkTest3()
     {
-        LOGI("Enter IsSsidSupportWifi6Test");
-        WifiScanInfo scanResult;
-        scanResult.supportedWifiCategory = WifiCategory::DEFAULT;
-        EXPECT_FALSE(pSelfCureStateMachine->IsSsidSupportWifi6(scanResult));
-    }
-
-    void IsSsidSupportWifi6Test2()
-    {
-        LOGI("Enter IsSsidSupportWifi6Test2");
-        WifiScanInfo scanResult;
-        scanResult.supportedWifiCategory = WifiCategory::WIFI6;
-        EXPECT_TRUE(pSelfCureStateMachine->IsSsidSupportWifi6(scanResult));
+        LOGI("Enter IsWifi6NetworkTest3");
+        std::string currConnectedBssid = CURR_BSSID;
+        WifiLinkedInfo wifiLinkedInfo;
+        wifiLinkedInfo.supportedWifiCategory = WifiCategory::WIFI6;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+        EXPECT_TRUE(pSelfCureStateMachine->IsWifi6Network(currConnectedBssid));
     }
 };
 
@@ -355,14 +352,14 @@ HWTEST_F(SelfCureStateMachineTest, GetNowMilliSecondsTest, TestSize.Level1)
     GetNowMilliSecondsTest();
 }
 
-HWTEST_F(SelfCureStateMachineTest, SendBlacklistToDriverTest, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, SendBlaListToDriverTest, TestSize.Level1)
 {
-    SendBlacklistToDriverTest();
+    SendBlaListToDriverTest();
 }
 
-HWTEST_F(SelfCureStateMachineTest, SendBlacklistToDriverTest2, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, SendBlaListToDriverTest2, TestSize.Level1)
 {
-    SendBlacklistToDriverTest2();
+    SendBlaListToDriverTest2();
 }
 
 HWTEST_F(SelfCureStateMachineTest, BlackListToStringTest, TestSize.Level1)
@@ -380,9 +377,9 @@ HWTEST_F(SelfCureStateMachineTest, ParseWifi6BlackListInfoTest, TestSize.Level1)
     ParseWifi6BlackListInfoTest();
 }
 
-HWTEST_F(SelfCureStateMachineTest, AgeOutWifi6BlackListTest, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, AgeOutWifi6BlackTest, TestSize.Level1)
 {
-    AgeOutWifi6BlackListTest();
+    AgeOutWifi6BlackTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi6SelfCureTest, TestSize.Level1)
@@ -410,14 +407,9 @@ HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest2, TestSize.Level1)
     IsWifi6NetworkTest2();
 }
 
-HWTEST_F(SelfCureStateMachineTest, IsSsidSupportWifi6Test, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest3, TestSize.Level1)
 {
-    IsSsidSupportWifi6Test();
-}
-
-HWTEST_F(SelfCureStateMachineTest, IsSsidSupportWifi6Test2, TestSize.Level1)
-{
-    IsSsidSupportWifi6Test2();
+    IsWifi6NetworkTest3();
 }
 
 } // namespace Wifi

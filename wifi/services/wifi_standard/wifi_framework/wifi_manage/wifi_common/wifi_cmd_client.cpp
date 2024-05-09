@@ -30,15 +30,15 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCmdClient");
 
 static const int MAX_PRIV_CMD_SIZE = 4096;
-static const int MSS_BLACKLIST_MAX_PARAMSIZE = 129;
-static const int MSS_BLACKLIST_BUFSIZE = 192;
+static const int MSS_BLA_LIST_MAX_PARAMSIZE = 129;
+static const int MSS_BLA_LIST_BUFSIZE = 192;
 static const int TINY_BUFF_SIZE = 64;
 
 static const auto RX_LISTEN_ON = "Y";
 static const auto RX_LISTEN_OFF = "N";
 static const auto CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
 static const auto CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
-static const auto CMD_SET_AX_BLACKLIST = "SET_AX_BLACKLIST";
+static const auto CMD_SET_AX_BLA_LIST = "SET_AX_BLACKLIST";
 static const auto CMD_SET_AX_CLOSE_HTC = "SET_AX_CLOSE_HTC";
 
 #define MSS_SOFTAP_MAX_IFNAMESIZE 5
@@ -60,8 +60,8 @@ int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, con
         ret = SetRxListen(ifName, param);
     } else if (commandId == CMD_SET_SOFTAP_2G_MSS) {
         ret = Set2gSoftapMss(ifName, param);
-    } else if (commandId == CMD_AX_BLACKLIST) {
-        ret = SetAxBlacklist(ifName, param);
+    } else if (commandId == CMD_AX_BLA_LIST) {
+        ret = SetAxBlaList(ifName, param);
     } else if (commandId == CMD_AX_SELFCURE) {
         ret = AxSelfcure(ifName, param);
     } else {
@@ -90,8 +90,8 @@ int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
         return ret;
     }
     privCmd.buf = buf;
-    if (strncmp(cmdParm.c_str(), CMD_SET_AX_BLACKLIST, strlen(CMD_SET_AX_BLACKLIST)) == 0) {
-        WIFI_LOGE("%{public}s send wifi6 blacklist", __FUNCTION__);
+    if (strncmp(cmdParm.c_str(), CMD_SET_AX_BLA_LIST, strlen(CMD_SET_AX_BLA_LIST)) == 0) {
+        WIFI_LOGI("%{public}s send wifi6 bla list", __FUNCTION__);
         privCmd.size = static_cast<int>(cmdParm.size());
     } else {
         privCmd.size = sizeof(buf);
@@ -145,15 +145,15 @@ int WifiCmdClient::Set2gSoftapMss(const std::string &ifName, const std::string &
     return SendCommandToDriverByInterfaceName(ifName, param);
 }
 
-int WifiCmdClient::SetAxBlacklist(const std::string &ifName, const std::string &param) const
+int WifiCmdClient::SetAxBlaList(const std::string &ifName, const std::string &param) const
 {
     WIFI_LOGD("%{public}s enter", __FUNCTION__);
-    if (param.size() > MSS_BLACKLIST_MAX_PARAMSIZE ||
-        param.size() + strlen(CMD_SET_AX_BLACKLIST) > MSS_BLACKLIST_BUFSIZE) {
+    if (param.size() > MSS_BLA_LIST_MAX_PARAMSIZE ||
+        param.size() + strlen(CMD_SET_AX_BLA_LIST) > MSS_BLA_LIST_BUFSIZE) {
         WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
         return -1;
     }
-    std::string cmdParm = CMD_SET_AX_BLACKLIST;
+    std::string cmdParm = CMD_SET_AX_BLA_LIST;
     cmdParm.append(" ");
     cmdParm.append(param);
     return SendCommandToDriverByInterfaceName(ifName, cmdParm);

@@ -86,8 +86,9 @@ public:
         const Wifi6BlackListInfo wifi6BlackListInfo) = 0;
     virtual void RemoveWifi6BlackListCache(const std::string bssid) = 0;
     virtual int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const = 0;
-    virtual int GetScreenState() const = 0;
     virtual std::string GetStaIfaceName() = 0;
+    virtual int GetScreenState() const = 0;
+    virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -156,8 +157,9 @@ public:
         const Wifi6BlackListInfo wifi6BlackListInfo));
     MOCK_METHOD1(RemoveWifi6BlackListCache, void(const std::string bssid));
     MOCK_CONST_METHOD1(GetWifi6BlackListCache, int(std::map<std::string, Wifi6BlackListInfo> &blackListCache));
-    MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_METHOD0(GetStaIfaceName, std::string());
+    MOCK_CONST_METHOD0(GetScreenState, int());
+    MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
 };
 }  // namespace OHOS
 }  // namespace Wifi

@@ -124,13 +124,13 @@ public:
 
 private:
     WifiManager();
-    InitStatus GetInitStatus();
     void DealCloseServiceMsg();
     void CheckAndStartSta();
     void AutoStartServiceThread();
     void InitPidfile(void);
 
 private:
+    std::mutex initStatusMutex;
     InitStatus mInitStatus;
     long mSupportedFeatures;
     std::unique_ptr<WifiEventHandler> mCloseServiceThread = nullptr;

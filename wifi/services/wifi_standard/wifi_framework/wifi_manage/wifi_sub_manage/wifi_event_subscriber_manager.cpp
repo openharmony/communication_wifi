@@ -106,6 +106,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     GetMdmProp();
     GetChipProp();
     RegisterMdmPropListener();
+    GetAirplaneModeByDatashare();
 }
 
 WifiEventSubscriberManager::~WifiEventSubscriberManager()

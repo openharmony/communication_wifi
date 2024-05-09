@@ -312,10 +312,10 @@ private:
      */
     ErrCode InitSelfCureStates();
     int64_t GetNowMilliSeconds();
-    void SendBlacklistToDriver();
+    void SendBlaListToDriver();
     std::string BlackListToString(std::map<std::string, Wifi6BlackListInfo> &map);
     std::string ParseWifi6BlackListInfo(std::pair<std::string, Wifi6BlackListInfo> iter);
-    void AgeOutWifi6BlackList(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache);
+    void AgeOutWifi6Black(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache);
     int GetCurSignalLevel();
     bool IsHttpReachable();
     std::string TransVecToIpAddress(std::vector<uint32_t> vec);
@@ -339,7 +339,6 @@ private:
     int GetCurrentRssi();
     std::string GetCurrentBssid();
     bool IsWifi6Network(std::string currConnectedBssid);
-    bool IsSsidSupportWifi6(WifiScanInfo scanResult);
     void PeriodicArpDetection();
     bool IsSuppOnCompletedState();
     bool IfPeriodicArpDetection();

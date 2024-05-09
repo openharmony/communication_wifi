@@ -508,7 +508,7 @@ void WifiSettings::RemoveWifi6BlackListCache(const std::string bssid)
     if (wifi6BlackListCache.find(bssid) != wifi6BlackListCache.end()) {
         wifi6BlackListCache.erase(bssid);
     } else {
-        LOGE("%{public}s: don't exist wifi blacklist, bssid: %{public}s", __func__, MacAnonymize(bssid).c_str());
+        LOGE("%{public}s: don't exist wifi bla list, bssid: %{public}s", __func__, MacAnonymize(bssid).c_str());
         return;
     }
 }

@@ -34,7 +34,7 @@ DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 const int WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
 const int WIFI6_SINGLE_MAC_LEN = 6;
 const int HEXADECIMAL = 16;
-const int WIFI6_MAX_BLACKLIST_NUM = 16;
+const int WIFI6_MAX_BLA_LIST_NUM = 16;
 
 SelfCureStateMachine::SelfCureStateMachine(int instId)
     : StateMachine("SelfCureStateMachine"),
@@ -1250,8 +1250,8 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(Interna
     std::string currentBssid = pSelfCureStateMachine->GetCurrentBssid();
 
     WifiSettings::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
-    WIFI_LOGI("add %{public}s to HTC blacklist", MacAnonymize(currentBssid).c_str());
-    pSelfCureStateMachine->SendBlacklistToDriver();
+    WIFI_LOGI("add %{public}s to HTC bla list", MacAnonymize(currentBssid).c_str());
+    pSelfCureStateMachine->SendBlaListToDriver();
     std::string param = "1";
     std::string ifName = "wlan0";
     if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, EVENT_AX_CLOSE_HTC, param) != 0) {
@@ -1274,8 +1274,8 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(Inte
 
     WifiSettings::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
 
-    WIFI_LOGI("add %{public}s to wifi6 blacklist", MacAnonymize(currentBssid).c_str());
-    pSelfCureStateMachine->SendBlacklistToDriver();
+    WIFI_LOGI("add %{public}s to wifi6 bla list", MacAnonymize(currentBssid).c_str());
+    pSelfCureStateMachine->SendBlaListToDriver();
     Wifi6ReassocSelfcure();
 }
 
@@ -1295,18 +1295,18 @@ int64_t SelfCureStateMachine::GetNowMilliSeconds()
     return std::chrono::duration_cast<std::chrono::milliseconds>(epoch).count();
 }
 
-void SelfCureStateMachine::SendBlacklistToDriver()
+void SelfCureStateMachine::SendBlaListToDriver()
 {
     std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
     WifiSettings::GetInstance().GetWifi6BlackListCache(wifi6BlackListCache);
     if (wifi6BlackListCache.empty()) {
         return;
     }
-    AgeOutWifi6BlackList(wifi6BlackListCache);
+    AgeOutWifi6Black(wifi6BlackListCache);
     std::string param = BlackListToString(wifi6BlackListCache);
     std::string ifName = "wlan0";
-    if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, EVENT_AX_BLACKLIST, param) != 0) {
-        WIFI_LOGE("%{public}s set AxBlacklist fail", __FUNCTION__);
+    if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, EVENT_AX_BLA_LIST, param) != 0) {
+        WIFI_LOGE("%{public}s set AxBlaList fail", __FUNCTION__);
         return;
     }
 }
@@ -1317,7 +1317,7 @@ std::string SelfCureStateMachine::BlackListToString(std::map<std::string, Wifi6B
     if (map.empty()) {
         return param;
     }
-    int idx = map.size() >= WIFI6_MAX_BLACKLIST_NUM ? WIFI6_MAX_BLACKLIST_NUM : map.size();
+    int idx = map.size() >= WIFI6_MAX_BLA_LIST_NUM ? WIFI6_MAX_BLA_LIST_NUM : map.size();
     param.push_back(idx);
     for (auto iter : map) {
         std::string singleParam = ParseWifi6BlackListInfo(iter);
@@ -1325,7 +1325,7 @@ std::string SelfCureStateMachine::BlackListToString(std::map<std::string, Wifi6B
             continue;
         }
         param.append(singleParam);
-        if (param.size() >= WIFI6_MAX_BLACKLIST_NUM * WIFI6_SINGLE_ITEM_BYTE_LEN + 1) {
+        if (param.size() >= WIFI6_MAX_BLA_LIST_NUM * WIFI6_SINGLE_ITEM_BYTE_LEN + 1) {
             break;
         }
     }
@@ -1352,14 +1352,14 @@ std::string SelfCureStateMachine::ParseWifi6BlackListInfo(std::pair<std::string,
     return singleParam;
 }
 
-void SelfCureStateMachine::AgeOutWifi6BlackList(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache)
+void SelfCureStateMachine::AgeOutWifi6Black(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache)
 {
     for (auto iter = wifi6BlackListCache.begin(); iter != wifi6BlackListCache.end(); ++iter) {
-        if (GetNowMilliSeconds() - iter->second.updateTime >= WIFI6_BLACKLIST_TIME_EXPIRED) {
+        if (GetNowMilliSeconds() - iter->second.updateTime >= WIFI6_BLA_LIST_TIME_EXPIRED) {
             WifiSettings::GetInstance().RemoveWifi6BlackListCache(iter->first);
         }
     }
-    if (wifi6BlackListCache.size() >= WIFI6_MAX_BLACKLIST_NUM) {
+    if (wifi6BlackListCache.size() >= WIFI6_MAX_BLA_LIST_NUM) {
         int64_t earliestTime = std::numeric_limits<int64_t>::max();
         std::string delBssid;
         for (auto iter = wifi6BlackListCache.begin(); iter != wifi6BlackListCache.end(); ++iter) {
@@ -1877,28 +1877,17 @@ std::string SelfCureStateMachine::GetCurrentBssid()
 
 bool SelfCureStateMachine::IsWifi6Network(std::string currConnectedBssid)
 {
-    std::vector<WifiScanInfo> scanResults;
-    WifiSettings::GetInstance().GetScanInfoList(scanResults);
-    if (scanResults.empty() || currConnectedBssid.empty()) {
-        WIFI_LOGE("scanResults or currConnectedBssid is empty");
+    if (currConnectedBssid.empty()) {
+        WIFI_LOGE("currConnectedBssid is empty");
         return false;
     }
-    for (WifiScanInfo scanResult : scanResults) {
-        if (scanResult.bssid.empty()) {
-            continue;
-        }
-        if (strcasecmp(scanResult.bssid.c_str(), currConnectedBssid.c_str()) == 0 && IsSsidSupportWifi6(scanResult)) {
-            WIFI_LOGI("current network is wifi6 network");
-            return true;
-        }
+    WifiLinkedInfo wifiLinkedInfo;
+    if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
+        WIFI_LOGE("Get current link info failed!");
     }
-    return false;
-}
-
-bool SelfCureStateMachine::IsSsidSupportWifi6(WifiScanInfo scanResult)
-{
-    if (scanResult.supportedWifiCategory == WifiCategory::WIFI6
-        || scanResult.supportedWifiCategory == WifiCategory::WIFI6_PLUS) {
+    if (wifiLinkedInfo.supportedWifiCategory == WifiCategory::WIFI6 ||
+        wifiLinkedInfo.supportedWifiCategory == WifiCategory::WIFI6_PLUS) {
+        WIFI_LOGI("current network is wifi6 network");
         return true;
     }
     return false;

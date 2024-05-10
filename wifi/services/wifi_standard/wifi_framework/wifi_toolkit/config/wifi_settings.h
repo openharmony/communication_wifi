@@ -137,6 +137,10 @@ public:
     bool IsWifiToggledEnable();
     void SetWifiToggledState(bool state);
     bool GetWifiToggledState() const;
+    void InsertWifi6BlackListCache(const std::string currentBssid,
+        const Wifi6BlackListInfo wifi6BlackListInfo);
+    void RemoveWifi6BlackListCache(const std::string bssid);
+    int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const;
     void SetSoftapToggledState(bool state);
     bool GetSoftapToggledState() const;
     void SetWifiStopState(bool state);
@@ -1804,6 +1808,7 @@ private:
     std::mutex mP2pMutex;
     std::mutex mWifiConfigMutex;
     std::mutex mWifiToggledMutex;
+    std::mutex mWifiSelfcureMutex;
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;
     std::mutex mSyncWifiConfigMutex;
@@ -1828,6 +1833,7 @@ private:
     std::atomic_bool mThreadStatusFlag_ { false };
     std::atomic_uint64_t mThreadStartTime { 0 };
     std::map<std::string, std::vector<std::string>> mFilterMap;
+    std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
     std::vector<std::string> mAbnormalAppList;
 
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;

@@ -53,6 +53,12 @@ static void UnloadStaSaTimerCallback()
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 }
 
+static void RsmcTimerCallback()
+{
+    WifiConfigCenter::GetInstance().SetSatelliteState(false);
+    WifiManager::GetInstance().GetWifiStaManager()->StopRsmcTimer();
+}
+
 void WifiStaManager::StopUnloadStaSaTimer(void)
 {
     WIFI_LOGI("StopUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
@@ -349,6 +355,33 @@ void WifiStaManager::DealRssiChanged(int rssi, int instId)
     cbMsg.msgData = rssi;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiStaManager::StopRsmcTimer(void)
+{
+    WIFI_LOGI("StopRsmcTimer! rsmcTimerId:%{public}u", rsmcTimerId);
+    std::unique_lock<std::mutex> lock(rsmcTimerMutex);
+    if (rsmcTimerId == 0) {
+        return;
+    }
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(rsmcTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(rsmcTimerId);
+    rsmcTimerId = 0;
+    return;
+}
+
+void WifiStaManager::StartRsmcTimer(void)
+{
+    WIFI_LOGI("StartRsmcTimer!");
+    std::unique_lock<std::mutex> lock(rsmcTimerMutex);
+    std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+    wifiSysTimer->SetCallbackInfo(RsmcTimerCallback);
+    unloadStaSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
+    MiscServices::TimeServiceClient::GetInstance()->StartTimer(rsmcTimerId,
+        currentTime + TIMEOUT_STOP_RSMC);
+    WIFI_LOGI("StartRsmcTimer success! rsmcTimerId:%{public}u", rsmcTimerId);
     return;
 }
 }  // namespace Wifi

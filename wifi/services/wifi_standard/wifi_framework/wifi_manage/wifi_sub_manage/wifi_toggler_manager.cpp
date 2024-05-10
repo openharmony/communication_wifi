@@ -26,6 +26,11 @@ DEFINE_WIFILOG_LABEL("WifiTogglerManager")
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int32_t WIFI_MODE_RSMC_START = 3009;
+constexpr int32_t WIFI_MODE_RSMC_STOP = 3009;
+constexpr int32_t WIFI_MODE_RSMC_CHECK = 3009;
+
 WifiTogglerManager::WifiTogglerManager()
 {
     WIFI_LOGI("create WifiTogglerManager");
@@ -154,5 +159,23 @@ void WifiTogglerManager::DealClientRemoved(int id)
     }
 }
 
+ErrCode WifiTogglerManager::SatelliteToggled(int state)
+{
+    if (state == WIFI_MODE_RSMC_START) {
+        WIFI_LOGI("Satellite state start.");
+        WifiConfigCenter::GetInstance().SetRsmcState(true);
+        WifiManager::GetInstance().GetWifiStaManager()->StartRsmcTimer();
+    } else if (state == WIFI_MODE_RSMC_STOP) {
+        WIFI_LOGI("Satellite state stop.");
+        WifiConfigCenter::GetInstance().SetRsmcState(false);
+        WifiManager::GetInstance().GetWifiStaManager()->StopRsmcTimer();
+    } else if (state == WIFI_MODE_RSMC_CHECK) {
+        WIFI_LOGI("Satellite state check.");
+        pWifiControllerMachine->CheckSatelliteState();
+    } else {
+        WIFI_LOGI("unknow state, not handle.");
+    }
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

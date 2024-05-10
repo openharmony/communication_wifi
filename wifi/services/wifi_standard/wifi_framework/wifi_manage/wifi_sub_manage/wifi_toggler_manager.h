@@ -38,6 +38,7 @@ public:
     ErrCode AirplaneToggled(int isOpen);
     bool HasAnyApRuning();
     std::unique_ptr<WifiControllerMachine>& GetControllerMachine();
+    ErrCode SatelliteToggled(int state);
 
 private:
     void InitConcreteCallback(void);

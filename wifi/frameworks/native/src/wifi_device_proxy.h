@@ -468,6 +468,13 @@ public:
      * @return ErrCode - hilink connect result
      */
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
+    /**
+     * @Description set satellite state
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetSatelliteState(const int state) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

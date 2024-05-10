@@ -94,6 +94,7 @@ public:
     void HandleSoftapStop(int id);
     void StartSoftapCloseTimer();
     void StopSoftapCloseTimer();
+    void CheckSatelliteState();
 #endif
 
 private:
@@ -139,6 +140,7 @@ private:
     void HandleAirplaneClose();
     static bool IsWifiEnable();
     static bool IsScanOnlyEnable();
+    bool IsInterfaceUp(std::string &iface);
 
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
     int mApidStopWifi;

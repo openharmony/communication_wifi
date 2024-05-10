@@ -3218,6 +3218,17 @@ void WifiSettings::ClearMacAddrPairs(WifiMacAddrInfoType type)
     }
     return;
 }
+
+void WifiSettings::SetSatelliteState(bool state)
+{
+    LOGI("%{public}s state:%{public}d", __func__, state);
+    mSatelliteState = state;
+}
+
+bool WifiSettings::GetSatelliteState()
+{
+    return mSatelliteState;
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

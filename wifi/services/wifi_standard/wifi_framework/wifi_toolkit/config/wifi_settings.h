@@ -149,6 +149,8 @@ public:
     std::string GetP2pIfaceName();
     void SetApIfaceName(const std::string &ifaceName);
     std::string GetApIfaceName();
+    void SetSatelliteState(bool state);
+    bool GetSatelliteState();
 
     /**
      * @Description Has STA service running
@@ -1787,6 +1789,7 @@ private:
     Hid2dUpperScene mUpperScene;
     P2pBusinessType mP2pBusinessType;
     int mPersistWifiState;
+    bool mSatelliteState;
 
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;

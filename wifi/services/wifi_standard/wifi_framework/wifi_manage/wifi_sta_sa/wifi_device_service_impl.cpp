@@ -1241,6 +1241,10 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
         WIFI_LOGI("current power saving mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
+    if (WifiConfigCenter::GetInstance().GetSatelliteState()) {
+        WIFI_LOGI("current satellite mode and can not use sta, open failed!");
+        return WIFI_OPT_FORBID_AIRPLANE;
+    }
     /**
      * Check the interval between the last STA shutdown and the current STA
      * startup.
@@ -1746,6 +1750,31 @@ ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTa
         return WIFI_OPT_STA_NOT_OPENED;
     }
     return pService->DeregisterFilterBuilder(filterTag, builderName);
+}
+
+ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
+{
+    WIFI_LOGI("Enter SetSatelliteState");
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetSatelliteState:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableWifi:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    return WifiManager::GetInstance().GetWifiTogglerManager()->SatelliteToggled(state);
 }
 #endif
 }  // namespace Wifi

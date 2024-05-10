@@ -536,5 +536,13 @@ ErrCode WifiDeviceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, W
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
 }
+
+ErrCode WifiDeviceImpl::SetSatelliteState(const int state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetSatelliteState(state);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

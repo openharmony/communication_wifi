@@ -163,6 +163,8 @@ public:
 
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 
+    ErrCode SetSatelliteState(const int state) override;
+
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

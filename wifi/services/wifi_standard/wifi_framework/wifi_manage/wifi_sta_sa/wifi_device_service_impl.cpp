@@ -1756,19 +1756,18 @@ ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
 {
     WIFI_LOGI("Enter SetSatelliteState");
 
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetSatelliteState:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("EnableWifi:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetSatelliteState:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED");
+        return WIFI_OPT_PERMISSION_DENIED;
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("EnableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("EnableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

@@ -16,8 +16,10 @@
 #include "self_cure_state_machine.h"
 #include <vector>
 #include <string>
+#include "wifi_cmd_client.h"
 #include "wifi_logger.h"
 #include "mac_address.h"
+#include "event_runner.h"
 #include "wifi_sta_hal_interface.h"
 #include "network_status_history_manager.h"
 #include "wifi_hisysevent.h"
@@ -31,6 +33,11 @@ const std::string CLASS_NAME = "WifiSelfCure";
 DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 std::vector<std::string> sChinaPublicDnses;
 std::vector<std::string> sOverseaPublicDnses;
+
+const int WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
+const int WIFI6_SINGLE_MAC_LEN = 6;
+const int HEXADECIMAL = 16;
+const int WIFI6_MAX_BLA_LIST_NUM = 16;
 
 SelfCureStateMachine::SelfCureStateMachine(int instId)
     : StateMachine("SelfCureStateMachine"),
@@ -117,7 +124,7 @@ SelfCureStateMachine::DefaultState::~DefaultState() {}
 
 void SelfCureStateMachine::DefaultState::GoInState()
 {
-    pSelfCureStateMachine->GetCurSignalLevel();
+    pSelfCureStateMachine->selfCureOnGoing = false;
     WIFI_LOGI("DefaultState GoInState function.");
 }
 
@@ -374,8 +381,12 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessage *msg)
 {
     WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
-    if (mobileHotspot) {
+    if (mobileHotspot && !pSelfCureStateMachine->IsWifi6Network(lastConnectedBssid)) {
         WIFI_LOGI("don't support selfcure, do nothing, mobileHotspot = %{public}d", mobileHotspot);
+        return;
+    }
+    if (pSelfCureStateMachine->ShouldTransToWifi6SelfCure(msg, lastConnectedBssid)) {
+        WIFI_LOGI("%{public}s: TransToWifi6SelfCure", __FUNCTION__);
         return;
     }
     if (pSelfCureStateMachine->IsNeedWifiReassocUseDeviceMac()) {
@@ -1218,13 +1229,15 @@ SelfCureStateMachine::Wifi6SelfCureState::~Wifi6SelfCureState() {}
 
 void SelfCureStateMachine::Wifi6SelfCureState::GoInState()
 {
-    pSelfCureStateMachine->GetCurSignalLevel();
-    WIFI_LOGD("Wifi6SelfCureState GoInState function.");
+    WIFI_LOGI("Wifi6SelfCureState GoInState function.");
+    wifi6HtcArpDetectionFailedCnt = 0;
+    wifi6ArpDetectionFailedCnt = 0;
+    return;
 }
 
 void SelfCureStateMachine::Wifi6SelfCureState::GoOutState()
 {
-    WIFI_LOGD("Wifi6SelfCureState GoOutState function.");
+    WIFI_LOGI("Wifi6SelfCureState GoOutState function.");
     return;
 }
 
@@ -1237,15 +1250,226 @@ bool SelfCureStateMachine::Wifi6SelfCureState::ExecuteStateMsg(InternalMessage *
     WIFI_LOGI("Wifi6SelfCureState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case 0: {
+        case WIFI_CURE_CMD_WIFI6_SELFCURE:
             ret = EXECUTED;
+            pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI6_WITH_HTC_PERIODIC_ARP_DETECTED);
             break;
-        }
+        case WIFI_CURE_CMD_WIFI6_BACKOFF_SELFCURE:
+            ret = EXECUTED;
+            pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_PERIODIC_ARP_DETECTED);
+            break;
+        case WIFI_CURE_CMD_WIFI6_WITH_HTC_PERIODIC_ARP_DETECTED:
+            ret = EXECUTED;
+            PeriodicWifi6WithHtcArpDetect(msg);
+            break;
+        case WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_PERIODIC_ARP_DETECTED:
+            ret = EXECUTED;
+            PeriodicWifi6WithoutHtcArpDetect(msg);
+            break;
+        case WIFI_CURE_CMD_WIFI6_WITH_HTC_ARP_FAILED_DETECTED:
+            ret = EXECUTED;
+            HandleWifi6WithHtcArpFail(msg);
+            break;
+        case WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_ARP_FAILED_DETECTED:
+            ret = EXECUTED;
+            HandleWifi6WithoutHtcArpFail(msg);
+            break;
         default:
-            WIFI_LOGI("Wifi6SelfCureState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
+            WIFI_LOGD("Wifi6SelfCureState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;
+}
+
+void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithHtcArpDetect(InternalMessage *msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
+        return;
+    }
+    if (!pSelfCureStateMachine->CanArpReachable()) {
+        wifi6HtcArpDetectionFailedCnt++;
+        WIFI_LOGI("wifi6 with htc arp detection failed, times : %{public}d", wifi6HtcArpDetectionFailedCnt);
+        if (wifi6HtcArpDetectionFailedCnt == ARP_DETECTED_FAILED_COUNT) {
+            pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI6_WITH_HTC_ARP_FAILED_DETECTED);
+            return;
+        } else if (wifi6HtcArpDetectionFailedCnt > 0 && wifi6HtcArpDetectionFailedCnt < ARP_DETECTED_FAILED_COUNT) {
+            pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_WIFI6_WITH_HTC_PERIODIC_ARP_DETECTED,
+                WIFI6_HTC_ARP_DETECTED_MS);
+            return;
+        }
+    } else {
+        WIFI_LOGI("wifi6 with htc arp detect success");
+        wifi6HtcArpDetectionFailedCnt = 0;
+        pSelfCureStateMachine->isWifi6ArpSuccess = true;
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, SELF_CURE_DELAYED_MS);
+        pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
+        return;
+    }
+}
+
+void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithoutHtcArpDetect(InternalMessage *msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
+        return;
+    }
+    if (!pSelfCureStateMachine->CanArpReachable()) {
+        wifi6ArpDetectionFailedCnt++;
+        WIFI_LOGI("wifi6 without htc arp detection failed, times : %{public}d", wifi6ArpDetectionFailedCnt);
+        if (wifi6ArpDetectionFailedCnt == ARP_DETECTED_FAILED_COUNT) {
+            pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_ARP_FAILED_DETECTED);
+            return;
+        } else if (wifi6ArpDetectionFailedCnt > 0 && wifi6ArpDetectionFailedCnt < ARP_DETECTED_FAILED_COUNT) {
+            pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_PERIODIC_ARP_DETECTED,
+                WIFI6_HTC_ARP_DETECTED_MS);
+            return;
+        }
+    } else {
+        WIFI_LOGI("wifi6 without htc arp detect success");
+        wifi6ArpDetectionFailedCnt = 0;
+        pSelfCureStateMachine->isWifi6ArpSuccess = true;
+        if (!pSelfCureStateMachine->IsHttpReachable()) {
+            pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, SELF_CURE_DELAYED_MS);
+        } else {
+            pSelfCureStateMachine->selfCureOnGoing = false;
+        }
+        pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
+        return;
+    }
+}
+
+void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(InternalMessage *msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
+        return;
+    }
+    pSelfCureStateMachine->isWifi6ArpSuccess = false;
+    Wifi6BlackListInfo wifi6BlackListInfo(ACTION_TYPE_HTC, pSelfCureStateMachine->GetNowMilliSeconds());
+    std::string currentBssid = pSelfCureStateMachine->GetCurrentBssid();
+
+    WifiSettings::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
+    WIFI_LOGI("add %{public}s to HTC bla list", MacAnonymize(currentBssid).c_str());
+    pSelfCureStateMachine->SendBlaListToDriver();
+    std::string param = "1";
+    std::string ifName = "wlan0";
+    if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, EVENT_AX_CLOSE_HTC, param) != 0) {
+        WIFI_LOGE("%{public}s Ax Selfcure fail", __FUNCTION__);
+        return;
+    }
+    pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_PERIODIC_ARP_DETECTED);
+}
+
+void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(InternalMessage *msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
+        return;
+    }
+    WIFI_LOGI("wifi6 without htc arp detect failed");
+    std::string currentBssid = pSelfCureStateMachine->GetCurrentBssid();
+    pSelfCureStateMachine->isWifi6ArpSuccess = false;
+    Wifi6BlackListInfo wifi6BlackListInfo(ACTION_TYPE_WIFI6, pSelfCureStateMachine->GetNowMilliSeconds());
+
+    WifiSettings::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
+
+    WIFI_LOGI("add %{public}s to wifi6 bla list", MacAnonymize(currentBssid).c_str());
+    pSelfCureStateMachine->SendBlaListToDriver();
+    Wifi6ReassocSelfcure();
+}
+
+void SelfCureStateMachine::Wifi6SelfCureState::Wifi6ReassocSelfcure()
+{
+    WIFI_LOGI("begin to self cure for wifi6 reassoc");
+    pSelfCureStateMachine->hasTestWifi6Reassoc = true;
+    pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE,
+        WIFI_CURE_INTERNET_FAILED_TYPE_TCP, SELF_CURE_DELAYED_MS);
+    pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pInternetSelfCureState);
+}
+
+int64_t SelfCureStateMachine::GetNowMilliSeconds()
+{
+    auto nowSys = AppExecFwk::InnerEvent::Clock::now();
+    auto epoch = nowSys.time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(epoch).count();
+}
+
+void SelfCureStateMachine::SendBlaListToDriver()
+{
+    std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+    WifiSettings::GetInstance().GetWifi6BlackListCache(wifi6BlackListCache);
+    if (wifi6BlackListCache.empty()) {
+        return;
+    }
+    AgeOutWifi6Black(wifi6BlackListCache);
+    std::string param = BlackListToString(wifi6BlackListCache);
+    std::string ifName = "wlan0";
+    if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, EVENT_AX_BLA_LIST, param) != 0) {
+        WIFI_LOGE("%{public}s set AxBlaList fail", __FUNCTION__);
+        return;
+    }
+}
+
+std::string SelfCureStateMachine::BlackListToString(std::map<std::string, Wifi6BlackListInfo> &map)
+{
+    std::string param;
+    if (map.empty()) {
+        return param;
+    }
+    int idx = map.size() >= WIFI6_MAX_BLA_LIST_NUM ? WIFI6_MAX_BLA_LIST_NUM : map.size();
+    param.push_back(idx);
+    for (auto iter : map) {
+        std::string singleParam = ParseWifi6BlackListInfo(iter);
+        if (singleParam.size() != WIFI6_SINGLE_ITEM_BYTE_LEN) {
+            continue;
+        }
+        param.append(singleParam);
+        if (param.size() >= WIFI6_MAX_BLA_LIST_NUM * WIFI6_SINGLE_ITEM_BYTE_LEN + 1) {
+            break;
+        }
+    }
+    return param;
+}
+
+std::string SelfCureStateMachine::ParseWifi6BlackListInfo(std::pair<std::string, Wifi6BlackListInfo> iter)
+{
+    std::string singleParam;
+    std::string currBssid = iter.first;
+    WIFI_LOGI("currBssid %{public}s", MacAnonymize(currBssid).c_str());
+    for (int i = 0; i < WIFI6_SINGLE_MAC_LEN; i++) {
+        std::string::size_type npos = currBssid.find(":");
+        if (npos != std::string::npos) {
+            std::string value = currBssid.substr(0, npos);
+            singleParam.push_back(static_cast<uint8_t>(std::stoi(value, nullptr, HEXADECIMAL)));
+            currBssid = currBssid.substr(npos + 1);
+        } else {
+            singleParam.push_back(static_cast<uint8_t>(std::stoi(currBssid, nullptr, HEXADECIMAL)));
+        }
+    }
+    singleParam.push_back(static_cast<uint8_t>(iter.second.actionType));
+    singleParam.push_back(0);
+    return singleParam;
+}
+
+void SelfCureStateMachine::AgeOutWifi6Black(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache)
+{
+    for (auto iter = wifi6BlackListCache.begin(); iter != wifi6BlackListCache.end(); ++iter) {
+        if (GetNowMilliSeconds() - iter->second.updateTime >= WIFI6_BLA_LIST_TIME_EXPIRED) {
+            WifiSettings::GetInstance().RemoveWifi6BlackListCache(iter->first);
+        }
+    }
+    if (wifi6BlackListCache.size() >= WIFI6_MAX_BLA_LIST_NUM) {
+        int64_t earliestTime = std::numeric_limits<int64_t>::max();
+        std::string delBssid;
+        for (auto iter = wifi6BlackListCache.begin(); iter != wifi6BlackListCache.end(); ++iter) {
+            if (iter->second.updateTime < earliestTime) {
+                delBssid = iter->first;
+                earliestTime = iter->second.updateTime;
+            }
+        }
+        WifiSettings::GetInstance().RemoveWifi6BlackListCache(delBssid);
+    }
 }
 
 void SelfCureStateMachine::SetHttpMonitorStatus(bool isHttpReachable)
@@ -1706,8 +1930,31 @@ void SelfCureStateMachine::PeriodicArpDetection()
     MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
 }
 
-bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessage *msg, const std::string lastConnectedBssid)
+bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessage *msg, std::string currConnectedBssid)
 {
+    WIFI_LOGI("enter ShouldTransToWifi6SelfCure");
+    if (currConnectedBssid.empty()) {
+        return false;
+    }
+    if (!IsWifi6Network(currConnectedBssid) || isWifi6ArpSuccess || GetCurrentRssi() < MIN_VAL_LEVEL_3) {
+        return false;
+    }
+    std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+    WifiSettings::GetInstance().GetWifi6BlackListCache(wifi6BlackListCache);
+    if (wifi6BlackListCache.find(currConnectedBssid) == wifi6BlackListCache.end()) {
+        MessageExecutedLater(WIFI_CURE_CMD_WIFI6_SELFCURE, SELF_CURE_DELAYED_MS);
+        SwitchState(pWifi6SelfCureState);
+        return true;
+    } else {
+        auto iter = wifi6BlackListCache.find(currConnectedBssid);
+        if (iter->second.actionType == 0) {
+            MessageExecutedLater(WIFI_CURE_CMD_WIFI6_BACKOFF_SELFCURE, SELF_CURE_DELAYED_MS);
+            SwitchState(pWifi6SelfCureState);
+            return true;
+        } else {
+            WIFI_LOGD("don't need to do wifi6 selfcure");
+        }
+    }
     return false;
 }
 
@@ -1719,6 +1966,31 @@ int SelfCureStateMachine::GetCurrentRssi()
     }
     int currentRssi = wifiLinkedInfo.rssi;
     return currentRssi;
+}
+
+std::string SelfCureStateMachine::GetCurrentBssid()
+{
+    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    std::string currentBssid = config.bssid;
+    return currentBssid;
+}
+
+bool SelfCureStateMachine::IsWifi6Network(std::string currConnectedBssid)
+{
+    if (currConnectedBssid.empty()) {
+        WIFI_LOGE("currConnectedBssid is empty");
+        return false;
+    }
+    WifiLinkedInfo wifiLinkedInfo;
+    if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
+        WIFI_LOGE("Get current link info failed!");
+    }
+    if (wifiLinkedInfo.supportedWifiCategory == WifiCategory::WIFI6 ||
+        wifiLinkedInfo.supportedWifiCategory == WifiCategory::WIFI6_PLUS) {
+        WIFI_LOGI("current network is wifi6 network");
+        return true;
+    }
+    return false;
 }
 
 bool SelfCureStateMachine::IfP2pConnected()

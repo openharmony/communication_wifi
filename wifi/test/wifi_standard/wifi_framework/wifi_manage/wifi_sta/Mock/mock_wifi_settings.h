@@ -82,8 +82,12 @@ public:
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
     virtual void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0) = 0;
     virtual void GetPortalUri(WifiPortalConf &urlInfo) = 0;
-    virtual int GetScreenState() const = 0;
+    virtual void InsertWifi6BlackListCache(const std::string currentBssid,
+        const Wifi6BlackListInfo wifi6BlackListInfo) = 0;
+    virtual void RemoveWifi6BlackListCache(const std::string bssid) = 0;
+    virtual int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const = 0;
     virtual std::string GetStaIfaceName() = 0;
+    virtual int GetScreenState() const = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
 };
 
@@ -149,8 +153,12 @@ public:
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
     MOCK_METHOD2(SaveDisconnectedReason, void(DisconnectedReason discReason, int));
     MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
-    MOCK_CONST_METHOD0(GetScreenState, int());
+    MOCK_METHOD2(InsertWifi6BlackListCache, void(const std::string currentBssid,
+        const Wifi6BlackListInfo wifi6BlackListInfo));
+    MOCK_METHOD1(RemoveWifi6BlackListCache, void(const std::string bssid));
+    MOCK_CONST_METHOD1(GetWifi6BlackListCache, int(std::map<std::string, Wifi6BlackListInfo> &blackListCache));
     MOCK_METHOD0(GetStaIfaceName, std::string());
+    MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
 };
 }  // namespace OHOS

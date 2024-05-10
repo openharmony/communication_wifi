@@ -490,6 +490,35 @@ int WifiSettings::ClearScanInfoList()
     return 0;
 }
 
+void WifiSettings::InsertWifi6BlackListCache(const std::string currentBssid,
+    const Wifi6BlackListInfo wifi6BlackListInfo)
+{
+    std::unique_lock<std::mutex> lock(mWifiSelfcureMutex);
+    auto iter = wifi6BlackListCache.find(currentBssid);
+    if (iter != wifi6BlackListCache.end()) {
+        iter->second = wifi6BlackListInfo;
+    } else {
+        wifi6BlackListCache.emplace(std::make_pair(currentBssid, wifi6BlackListInfo));
+    }
+}
+
+void WifiSettings::RemoveWifi6BlackListCache(const std::string bssid)
+{
+    std::unique_lock<std::mutex> lock(mWifiSelfcureMutex);
+    if (wifi6BlackListCache.find(bssid) != wifi6BlackListCache.end()) {
+        wifi6BlackListCache.erase(bssid);
+    } else {
+        LOGE("%{public}s: don't exist wifi bla list, bssid: %{public}s", __func__, MacAnonymize(bssid).c_str());
+        return;
+    }
+}
+
+int WifiSettings::GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const
+{
+    blackListCache = wifi6BlackListCache;
+    return 0;
+}
+
 void WifiSettings::SetWifiToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mWifiToggledMutex);

@@ -28,8 +28,8 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int32_t WIFI_MODE_RSMC_START = 3009;
-constexpr int32_t WIFI_MODE_RSMC_STOP = 3009;
-constexpr int32_t WIFI_MODE_RSMC_CHECK = 3009;
+constexpr int32_t WIFI_MODE_RSMC_STOP = 3010;
+constexpr int32_t WIFI_MODE_RSMC_CHECK = 3011;
 
 WifiTogglerManager::WifiTogglerManager()
 {

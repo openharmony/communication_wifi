@@ -23,6 +23,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "network_status_history_manager.h"
 #include "wifi_hisysevent.h"
+#include "wifi_settings.h"
 #include "wifi_net_agent.h"
 #include "paramter.h"
 

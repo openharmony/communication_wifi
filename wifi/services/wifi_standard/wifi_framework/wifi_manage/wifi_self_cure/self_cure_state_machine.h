@@ -371,7 +371,7 @@ private:
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     bool IfMultiGateway();
     bool IsSettingsPage();
-    void initDnsServer();
+    void InitDnsServer();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;

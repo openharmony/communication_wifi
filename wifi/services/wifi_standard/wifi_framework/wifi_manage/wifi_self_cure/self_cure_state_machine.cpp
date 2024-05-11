@@ -50,7 +50,7 @@ SelfCureStateMachine::SelfCureStateMachine(int instId)
       pWifi6SelfCureState(nullptr),
       m_instId(instId)
 {
-    initDnsServer();
+    InitDnsServer();
 }
 
 SelfCureStateMachine::~SelfCureStateMachine()
@@ -793,7 +793,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
     }
 }
 
-void SelfCureStateMachine::InternetSelfCureState::initDnsServer()
+void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
 {
     std::vector<std::string> strPublicIpAddr;
     char DnsIpAddr[128];

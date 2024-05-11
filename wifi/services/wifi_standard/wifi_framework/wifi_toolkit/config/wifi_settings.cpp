@@ -430,9 +430,9 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
         backupConfigs.push_back(backupConfig);
     }
 
-    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfg;
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
     wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
-    wifiBackupConfig.SetValue(cloneConfigs);
+    wifiBackupConfig.SetValue(backupConfigs);
     wifiBackupConfig.SaveConfig();
 
     fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH, O_RDONLY));
@@ -440,7 +440,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
         LOGE("OnBackup open fail.");
         return -1;
     }
-    LOGE("OnBackup end. Backup count: %{public}d, fd: %{public}d.", backupCount, fd.Get());
+    LOGE("OnBackup end. Backup count: %{public}d, fd: %{public}d.", static_cast<int>(backupConfigs.size()), fd.Get());
     return 0;
 }
 
@@ -464,14 +464,14 @@ int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
     }
     close(destFd);
 
-    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfg;
-    wifiBackupConfg.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
-    wifiBackupConfg.LoadConfig();
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.LoadConfig();
     std::vector<WifiBackupConfig> backupConfigs;
-    wifiBackupConfg.GetValue(backupConfigs);
+    wifiBackupConfig.GetValue(backupConfigs);
 
     std::vector<WifiDeviceConfig> deviceConfigs;
-    for (auto &backupCfg : backupConfigs) {
+    for (const auto &backupCfg : backupConfigs) {
         WifiDeviceConfig config;
         ConvertBackupCfgToDeviceCfg(backupCfg, config);
         deviceConfigs.push_back(config);

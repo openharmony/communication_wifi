@@ -40,7 +40,7 @@ struct WifiBackupConfig {
     WifiIpConfig wifiIpConfig;
     WifiProxyConfig wifiProxyconfig;
     WifiPrivacyConfig wifiPrivacySetting;
-    WifiDeviceConfig()
+    WifiBackupConfig()
     {
         instanceId = 0;
         uid = WIFI_INVALID_UID;
@@ -62,3 +62,4 @@ void ConvertDeviceCfgToBackupCfg(const WifiDeviceConfig &config, WifiBackupConfi
 
 }  // namespace Wifi
 }  // namespace OHOS
+#endif  // OHOS_WIFI_BACKUP_CONFIG_H

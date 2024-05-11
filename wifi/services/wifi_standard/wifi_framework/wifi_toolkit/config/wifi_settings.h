@@ -22,6 +22,9 @@
 #include <memory>
 #include <mutex>
 #include <algorithm>
+#ifndef OHOS_ARCH_LITE
+#include "unique_fd.h"
+#endif
 #include "wifi_common_def.h"
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"

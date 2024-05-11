@@ -554,7 +554,7 @@ static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item)
     return ss.str();
 }
 
-static std::string OutPutwifiProxyconfig(wifiProxyconfig &item)
+static std::string OutPutWifiProxyConfig(WifiProxyConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigProxy>" << std::endl;

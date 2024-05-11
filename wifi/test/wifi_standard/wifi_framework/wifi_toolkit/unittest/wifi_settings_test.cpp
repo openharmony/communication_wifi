@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <cstddef>
 #include <cstdint>
+#include <fcntl.h>
 #include "securec.h"
 #include "wifi_settings.h"
 #include "wifi_logger.h"
@@ -43,6 +44,7 @@ constexpr int ZERO = 0;
 constexpr int WIFI_OPT_RETURN = -1;
 constexpr int MIN_RSSI_2DOT_4GHZ = -80;
 constexpr int MIN_RSSI_5GZ = -77;
+constexpr char BACKUP_CONFIG_FILE_PATH_TEST[] = CONFIG_ROOR_DIR"/backup_config_test.conf";
 class WifiSettingsTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -608,6 +610,48 @@ HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)
     std::vector<WifiDeviceConfig> configs;
     configs.push_back(config);
     WifiSettings::GetInstance().ConfigsDeduplicateAndSave(configs);
+}
+
+HWTEST_F(WifiSettingsTest, OnBackupTest, TestSize.Level1)
+{
+    WIFI_LOGI("OnBackupTest enter");
+    UniqueFd fd(-1);
+    WifiSettings::GetInstance().OnBackup(fd, "");
+    EXPECT_TRUE(fd.Get() > 0);
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveBackupFile();
+}
+
+HWTEST_F(WifiSettingsTest, OnRestoreTest1, TestSize.Level1)
+{
+    WIFI_LOGI("OnRestoreTest1 enter");
+    UniqueFd fd(-1);
+    WifiSettings::GetInstance().OnRestore(fd, "");
+    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), false);
+    close(fd.Release());
+}
+
+HWTEST_F(WifiSettingsTest, OnRestoreTest2, TestSize.Level1)
+{
+    WIFI_LOGI("OnRestoreTest2 enter");
+    std::vector<WifiBackupConfig> configs;
+    WifiBackupConfig config;
+    config.ssid = "onrestretest";
+    config.keyMgmt = "WPA-PSK";
+    config.preSharedKey = "12345678";
+    configs.push_back(config);
+
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH_TEST);
+    wifiBackupConfig.SetValue(configs);
+    wifiBackupConfig.SaveConfig();
+
+    UniqueFd fd(open(BACKUP_CONFIG_FILE_PATH_TEST, O_RDONLY));
+    WifiSettings::GetInstance().OnRestore(fd, "");
+    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), true);
+    close(fd.Release());
+    remove(BACKUP_CONFIG_FILE_PATH_TEST);
+    WifiSettings::GetInstance().RemoveCloneFile();
 }
 
 HWTEST_F(WifiSettingsTest, RemoveMacAddrPairInfoTest, TestSize.Level1)

@@ -136,6 +136,47 @@ template <>
 std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item);
 
 /**
+ * @Description Clear and init WifiBackupConfig
+ *
+ * @tparam
+ * @param item - WifiBackupConfig item
+ */
+template <>
+void ClearTClass<WifiBackupConfig>(WifiBackupConfig &item);
+
+/**
+ * @Description Set WifiBackupConfig item data
+ *
+ * @tparam
+ * @param item - WifiBackupConfig &item
+ * @param key - WifiBackupConfig struct member name
+ * @param value - the WifiBackupConfig item member value
+ * @return int - parse error: 0 Success, >0 parse failed
+ */
+template <>
+int SetTClassKeyValue<WifiBackupConfig>(WifiBackupConfig &item, const std::string &key, const std::string &value);
+
+/**
+ * @Description Output WifiBackupConfig class name
+ *
+ * @tparam
+ * @param item - WifiBackupConfig &item
+ * @return std::string - Class name
+ */
+template <>
+std::string GetTClassName<WifiBackupConfig>();
+
+/**
+ * @Description Output the WifiBackupConfig item, format: item's member = the member value
+ *
+ * @tparam
+ * @param item - WifiBackupConfig &item
+ * @return std::string - output total member=value string about the WifiBackupConfig item
+ */
+template <>
+std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item);
+
+/**
  * @Description Clear and init HotspotConfig
  *
  * @tparam

@@ -797,7 +797,8 @@ void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
 {
     std::vector<std::string> strPublicIpAddr;
     char DnsIpAddr[128];
-    GetParamter("const.wifi.dnscure_ipcfg", "10.8.2.1;10.8.2.2|8.8.8.8;208.67.222.222;180.76.76.76;223.5.5.5", DnsIpAddr,128);
+    GetParamter("const.wifi.dnscure_ipcfg", 
+    "10.8.2.1;10.8.2.2|8.8.8.8;208.67.222.222;180.76.76.76;223.5.5.5", DnsIpAddr, 128);
     char PublicDnsIpAddr[31];
     std::copy(DnsIpAddr + 17, std::end(DnsIpAddr), PublicDnsIpAddr);
     std::string temp = "";
@@ -866,7 +867,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
     testedSelfCureLevel.push_back(WIFI_CURE_RESET_LEVEL_LOW_1_DNS);
     std::vector<std::string> servers;
     std::vector<std::string> domains;
-    if(pSelfCureStateMachine->internetUnknown) {
+    if (pSelfCureStateMachine->internetUnknown) {
         IpInfo ipInfo;
         IpV6Info ipV6Info;
         WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);

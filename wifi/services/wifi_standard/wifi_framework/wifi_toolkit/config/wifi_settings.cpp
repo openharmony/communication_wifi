@@ -32,9 +32,11 @@
 #include "wifi_encryption_util.h"
 #endif
 #ifndef OHOS_ARCH_LITE
+#include <sys/sendfile.h>
 #include "wifi_country_code_define.h"
 #include "network_parser.h"
 #include "softap_parser.h"
+#include "wifi_backup_config.h"
 #endif
 #ifdef INIT_LIB_ENABLE
 #include "parameter.h"
@@ -406,6 +408,83 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
     mSavedDeviceConfig.SetValue(localConfigs);
     mSavedDeviceConfig.SaveConfig();
     ReloadDeviceConfig();
+}
+
+int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
+{
+    LOGI("OnBackup enter.");
+    mSavedDeviceConfig.LoadConfig();
+    std::vector<WifiDeviceConfig> localConfigs;
+    mSavedDeviceConfig.GetValue(localConfigs);
+
+    std::vector<WifiBackupConfig> backupConfigs;
+    for (auto &config : localConfigs) {
+        if (config.wifiEapConfig.eap.length() == 0 || config.isPasspoint == true) {
+            continue;
+        }
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        DecryptionDeviceConfig(config);
+#endif
+        WifiBackupConfig backupConfig;
+        ConvertDeviceCfgToBackupCfg(config, backupConfig);
+        backupConfigs.push_back(backupConfig);
+    }
+
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfg;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.SetValue(cloneConfigs);
+    wifiBackupConfig.SaveConfig();
+
+    fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH, O_RDONLY));
+    if (fd.Get() < 0) {
+        LOGE("OnBackup open fail.");
+        return -1;
+    }
+    LOGE("OnBackup end. Backup count: %{public}d, fd: %{public}d.", backupCount, fd.Get());
+    return 0;
+}
+
+int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
+{
+    LOGI("OnRestore enter.");
+    struct stat statBuf;
+    if (fstat(fd.Get(), &statBuf) < 0) {
+        LOGE("OnRestore fstat fd fail.");
+        return -1;
+    }
+    int destFd = open(BACKUP_CONFIG_FILE_PATH, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (destFd < 0) {
+        LOGE("OnRestore open file fail.");
+        return -1;
+    }
+    if (sendfile(destFd, fd.Get(), nullptr, statBuf.st_size) < 0) {
+        LOGE("OnRestore fd sendfile(size: %{public}d) to destFd fail.", static_cast<int>(statBuf.st_size));
+        close(destFd);
+        return -1;
+    }
+    close(destFd);
+
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfg;
+    wifiBackupConfg.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfg.LoadConfig();
+    std::vector<WifiBackupConfig> backupConfigs;
+    wifiBackupConfg.GetValue(backupConfigs);
+
+    std::vector<WifiDeviceConfig> deviceConfigs;
+    for (auto &backupCfg : backupConfigs) {
+        WifiDeviceConfig config;
+        ConvertBackupCfgToDeviceCfg(backupCfg, config);
+        deviceConfigs.push_back(config);
+    }
+
+    LOGI("OnRestore end. Restore count: %{public}d", static_cast<int>(deviceConfigs.size()));
+    ConfigsDeduplicateAndSave(deviceConfigs);
+    return 0;
+}
+
+void WifiSettings::RemoveBackupFile()
+{
+    remove(BACKUP_CONFIG_FILE_PATH);
 }
 #endif
 

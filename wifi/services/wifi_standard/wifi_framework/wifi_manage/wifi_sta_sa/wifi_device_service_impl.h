@@ -42,6 +42,8 @@ public:
     static std::shared_ptr<WifiDeviceServiceImpl> GetInstance();
     void OnStart();
     void OnStop();
+    static ErrCode OnBackup(MessageParcel& data, MessageParcel& reply);
+    static ErrCode OnRestore(MessageParcel& data, MessageParcel& reply);
 #else
     explicit WifiDeviceServiceImpl(int instId);
     static void StartWatchdog(void);

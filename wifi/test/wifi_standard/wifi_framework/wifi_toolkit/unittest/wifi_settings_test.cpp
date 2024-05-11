@@ -651,7 +651,7 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest2, TestSize.Level1)
     EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), true);
     close(fd.Release());
     remove(BACKUP_CONFIG_FILE_PATH_TEST);
-    WifiSettings::GetInstance().RemoveCloneFile();
+    WifiSettings::GetInstance().RemoveBackupFile();
 }
 
 HWTEST_F(WifiSettingsTest, RemoveMacAddrPairInfoTest, TestSize.Level1)

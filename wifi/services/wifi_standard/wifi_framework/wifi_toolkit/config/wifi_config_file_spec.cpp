@@ -585,7 +585,7 @@ std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << OutPutWifiDeviceConfig(item) << OutPutWifiIpConfig(item.wifiIpConfig)
-       << OutPutWifiDeviceConfigEap(item) << OutPutWifiProxyConfig(item.wifiProxyConfig)
+       << OutPutWifiDeviceConfigEap(item) << OutPutWifiProxyConfig(item.wifiProxyconfig)
        << OutPutWifiDeviceConfigPrivacy(item);
     return ss.str();
 }
@@ -1496,7 +1496,6 @@ static void ClearWifiBackupConfig(WifiBackupConfig &item)
     item.noInternetAccess = false;
     item.preSharedKey.clear();
     item.wepTxKeyIndex = 0;
-    item.keyMgmt.clear();
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         item.wepKeys[i].clear();
     }
@@ -1515,7 +1514,7 @@ static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, c
         item.instanceId = std::stoi(value);
     } else if (key == "uid") {
         item.uid = std::stoi(value);
-    }else if (key == "status") {
+    } else if (key == "status") {
         item.status = std::stoi(value);
     } else if (key == "bssid") {
         item.bssid = value;
@@ -1556,7 +1555,7 @@ static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, c
             item.wepKeys[pos] = value;
         }
     } else {
-        LOGE("Invalid config key value");
+        LOGE("Invalid config key value.");
     }
     return 0;
 }
@@ -1607,17 +1606,17 @@ static std::string OutPutWifiBackupConfigPrivacy(WifiBackupConfig &item)
     return ss.str();
 }
 
-template<>
+template <>
 void ClearTClass<WifiBackupConfig>(WifiBackupConfig &item)
 {
-    ClearWifiDeviceConfig(item);
+    ClearWifiBackupConfig(item);
     ClearWifiIpConfig(item.wifiIpConfig);
     ClearWifiProxyConfig(item.wifiProxyconfig);
-    ClearWifiDeviceConfigPrivacy(item);
+    ClearWifiBackupConfigPrivacy(item);
     return;
 }
 
-template<>
+template <>
 int SetTClassKeyValue<WifiBackupConfig>(WifiBackupConfig &item, const std::string &key, const std::string &value)
 {
     if (key.compare(0, strlen("wifiIpConfig"), "wifiIpConfig") == 0) {
@@ -1632,18 +1631,18 @@ int SetTClassKeyValue<WifiBackupConfig>(WifiBackupConfig &item, const std::strin
     return 0;
 }
 
-template<>
+template <>
 std::string GetTClassName<WifiBackupConfig>()
 {
     return "WifiBackupConfig";
 }
 
-template<>
+template <>
 std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item)
 {
     std::ostringstream ss;
     ss << OutPutWifiBackupConfig(item) << OutPutWifiIpConfig(item.wifiIpConfig)
-       << OutPutWifiProxyConfig(item.wifiProxyConfig) << OutPutWifiBackupConfigPrivacy(item);
+       << OutPutWifiProxyConfig(item.wifiProxyconfig) << OutPutWifiBackupConfigPrivacy(item);
     return ss.str();
 }
 

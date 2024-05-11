@@ -1716,7 +1716,7 @@ public:
      * @Description Backup config file
      *
      * @param fd - File Descriptor
-     * @param backupInfo - Backup Info
+     * @param backupInfo - Backup info
      * @return int - 0: success
      */
     int OnBackup(UniqueFd &fd, const std::string &backupInfo);
@@ -1725,7 +1725,7 @@ public:
      * @Description Restore config file
      *
      * @param fd - File Descriptor
-     * @param restoreInfo - Restore Info
+     * @param restoreInfo - Restore info
      * @return int - 0: success
      */
     int OnRestore(UniqueFd &fd, const std::string &restoreInfo);

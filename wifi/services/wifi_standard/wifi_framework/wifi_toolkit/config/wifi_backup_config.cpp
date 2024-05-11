@@ -17,25 +17,6 @@
 
 namespace OHOS {
 namespace Wifi {
-        int instanceId;
-    int uid;
-    int status;
-    std::string bssid;
-    std::string userSelectBssid;
-    std::string ssid;
-    int priority;
-    bool hiddenSSID;
-    std::string keyMgmt;
-    unsigned int networkStatusHistory;
-    bool isPortal;
-    time_t lastHasInternetTime;
-    bool noInternetAccess;
-    std::string preSharedKey;
-    int wepTxKeyIndex;
-    std::string wepKeys[WEPKEYS_SIZE];
-    WifiIpConfig wifiIpConfig;
-    WifiProxyConfig wifiProxyconfig;
-    WifiPrivacyConfig wifiPrivacySetting;
 void ConvertBackupCfgToDeviceCfg(const WifiBackupConfig &backupCfg, WifiDeviceConfig &config)
 {
     config.instanceId = backupCfg.instanceId;

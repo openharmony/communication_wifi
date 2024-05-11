@@ -23,6 +23,7 @@
 #include "wifi_p2p_msg.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
+#include "wifi_backup_config.h"
 
 namespace OHOS {
 namespace Wifi {

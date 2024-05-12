@@ -561,7 +561,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
 
 ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bssid) const
 {
-    LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, bssid.c_str());
+    LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
         LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
@@ -575,7 +575,8 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
         } else {
-            LOGI("%{public}s roam to target bssid", __FUNCTION__);
+            LOGI("%{public}s current linedBssid: %{public}s, roam to targetBssid: %{public}s",
+                __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
             pStaStateMachine->StartRoamToNetwork(bssid);
         }
     } else {

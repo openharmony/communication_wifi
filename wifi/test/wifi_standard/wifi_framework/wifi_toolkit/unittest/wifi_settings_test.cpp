@@ -617,7 +617,7 @@ HWTEST_F(WifiSettingsTest, OnBackupTest, TestSize.Level1)
     WIFI_LOGI("OnBackupTest enter");
     UniqueFd fd(-1);
     WifiSettings::GetInstance().OnBackup(fd, "");
-    EXPECT_TRUE(fd.Get() > 0);
+    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), true);
     close(fd.Release());
     WifiSettings::GetInstance().RemoveBackupFile();
 }

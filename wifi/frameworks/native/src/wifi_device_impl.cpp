@@ -257,6 +257,13 @@ ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     return client_->ConnectToDevice(config);
 }
 
+ErrCode WifiDeviceImpl::StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->StartRoamToNetwork(networkId, bssid, isCandidate);
+}
+
 ErrCode WifiDeviceImpl::IsConnected(bool &isConnected)
 {
     std::lock_guard<std::mutex> lock(mutex_);

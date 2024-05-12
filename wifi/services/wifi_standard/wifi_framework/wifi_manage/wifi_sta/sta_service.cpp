@@ -559,6 +559,36 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bssid) const
+{
+    LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, bssid.c_str());
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if (networkId == linkedInfo.networkId) {
+        if (bssid == linkedInfo.bssid) {
+            LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+        } else {
+            LOGI("%{public}s roam to target bssid", __FUNCTION__);
+            pStaStateMachine->StartRoamToNetwork(bssid);
+        }
+    } else {
+        LOGI("%{public}s switch to target network", __FUNCTION__);
+        auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+        message->SetParam1(networkId);
+        message->SetParam2(NETWORK_SELECTED_BY_USER);
+        message->AddStringMessageBody(bssid);
+        pStaStateMachine->SendMessage(message);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::ReAssociate() const
 {
     WIFI_LOGI("Enter ReAssociate.\n");

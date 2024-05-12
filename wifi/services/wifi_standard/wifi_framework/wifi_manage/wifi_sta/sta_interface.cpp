@@ -108,6 +108,18 @@ ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::StartRoamToNetwork(const int networkId, const std::string bssid)
+{
+    LOGD("Enter StaInterface::StartRoamToNetwork");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->StartRoamToNetwork(networkId, bssid) != WIFI_OPT_SUCCESS) {
+        LOGI("StartRoamToNetwork failed");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::ReConnect()
 {
     LOGD("Enter StaInterface::ReConnect.");

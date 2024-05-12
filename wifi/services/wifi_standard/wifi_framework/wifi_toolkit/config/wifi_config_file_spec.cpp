@@ -1479,6 +1479,7 @@ int SetNoInternetAccess(WifiDeviceConfig &item, const std::string &value)
     return 0;
 }
 
+#ifndef OHOS_ARCH_LITE
 static void ClearWifiBackupConfig(WifiBackupConfig &item)
 {
     item.instanceId = 0;
@@ -1508,7 +1509,7 @@ static void ClearWifiBackupConfigPrivacy(WifiBackupConfig &item)
     return;
 }
 
-static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, const std::string &value)
+static int SetWifiBackupConfigFirst(WifiBackupConfig &item, const std::string &key, const std::string &value)
 {
     if (key == "instanceId") {
         item.instanceId = std::stoi(value);
@@ -1528,8 +1529,6 @@ static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, c
         if (HexStringToVec(value, vec) == 0) {
             std::string strSsid(vec.begin(), vec.end());
             item.ssid = strSsid;
-        } else {
-            return -1;
         }
     } else if (key == "priority") {
         item.priority = std::stoi(value);
@@ -1537,7 +1536,18 @@ static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, c
         item.hiddenSSID = std::stoi(value);
     } else if (key == "keyMgmt") {
         item.keyMgmt = value;
-    } else if (key == "networkStatusHistory") {
+    } else {
+        return -1;
+    }
+    return 0;
+}
+
+static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, const std::string &value)
+{
+    if (SetWifiBackupConfigFirst(item, key, value) == 0) {
+        return 0;
+    }
+    if (key == "networkStatusHistory") {
         item.networkStatusHistory = std::stoi(value);
     } else if (key == "isPortal") {
         item.isPortal = std::stoi(value);
@@ -1645,6 +1655,6 @@ std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item)
        << OutPutWifiProxyConfig(item.wifiProxyconfig) << OutPutWifiBackupConfigPrivacy(item);
     return ss.str();
 }
-
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

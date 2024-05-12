@@ -23,7 +23,9 @@
 #include "wifi_p2p_msg.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
+#ifndef OHOS_ARCH_LITE
 #include "wifi_backup_config.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -136,6 +138,7 @@ std::string GetTClassName<WifiDeviceConfig>();
 template <>
 std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item);
 
+#ifndef OHOS_ARCH_LITE
 /**
  * @Description Clear and init WifiBackupConfig
  *
@@ -176,6 +179,7 @@ std::string GetTClassName<WifiBackupConfig>();
  */
 template <>
 std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item);
+#endif
 
 /**
  * @Description Clear and init HotspotConfig

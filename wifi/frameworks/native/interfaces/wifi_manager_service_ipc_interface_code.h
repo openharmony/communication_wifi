@@ -66,6 +66,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_ENABLE_AUTO_JOIN = 0x103A,          /* enable auto join */
     WIFI_SVR_CMD_LIMIT_SPEED = 0x103B,               /* limit app speed */
     WIFI_SVR_CMD_IS_HILINK_CONNECT = 0x103C,          /* hilink connect */
+    WIFI_SVR_CMD_START_ROAM_TO_NETWORK = 0x103D,     /* roam to target bssid */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */

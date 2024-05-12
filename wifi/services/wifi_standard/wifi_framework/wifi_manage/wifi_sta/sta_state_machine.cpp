@@ -1608,6 +1608,7 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
 
     WIFI_LOGI("enter DealStartRoamCmd\n");
     std::string bssid = msg->GetStringFromMessage();
+    targetRoamBssid = bssid;
     /* GetDeviceConfig from Configuration center. */
     WifiDeviceConfig network;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, network);

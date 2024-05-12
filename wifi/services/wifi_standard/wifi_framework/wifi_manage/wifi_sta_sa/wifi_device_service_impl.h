@@ -78,6 +78,8 @@ public:
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 
+    ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
+
     ErrCode IsConnected(bool &isConnected) override;
 
     ErrCode ReConnect() override;

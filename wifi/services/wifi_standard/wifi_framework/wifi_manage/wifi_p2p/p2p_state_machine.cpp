@@ -373,8 +373,7 @@ ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
     if (!isFound) {
         WIFI_LOGE("current connected device not found the Gc");
         return ErrCode::WIFI_OPT_FAILED;
-    } 
-    }
+	}
     auto iter = std::find(curClientList.begin(), curClientList.end(), device.GetDeviceAddress().c_str());
     if (iter != curClientList.end()) {
         curClientList.erase(iter);

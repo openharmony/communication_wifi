@@ -183,9 +183,9 @@ int CopyConfigFile(const char* configName)
     LOGI("buf = %s",buf);
     if ((access(buf, F_OK) != -1)) {
         LOGI("Configure file %{public}s is exist.", buf);
-        const char CFG_NAME_PREFIX[] = "hostapd";
+        const char hostapdCfgNamePrefix[] = "hostapd";
         int isEmpty = IsFileEmpty(buf);
-        if (strncmp(configName, CFG_NAME_PREFIX, strlen(CFG_NAME_PREFIX)) == 0) {
+        if (strncmp(configName, hostapdCfgNamePrefix, strlen(hostapdCfgNamePrefix)) == 0) {
             LOGI("Configure file[%{public}s] belongs to hostapd.", configName);
         } else if (!isEmpty) {
             LOGI("Configure file[%{public}s] is exist.", buf);

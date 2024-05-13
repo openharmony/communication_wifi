@@ -180,6 +180,27 @@ int CopyConfigFile(const char* configName)
         LOGE("snprintf_s dest dir failed.");
         return HAL_FAILURE;
     }
+    LOGI("buf = %s",buf);
+    if ((access(buf, F_OK) != -1)) {
+        LOGI("Configure file %{public}s is exist.", buf);
+        const char CFG_NAME_PREFIX[] = "hostapd";
+        int isEmpty = IsFileEmpty(buf);
+        if (strncmp(configName, CFG_NAME_PREFIX, strlen(CFG_NAME_PREFIX)) == 0) {
+            LOGI("Configure file[%{public}s] belongs to hostapd.", configName);
+        } else if (!isEmpty) {
+            LOGI("Configure file[%{public}s] is exist.", buf);
+        }
+
+        LOGI("Configure file %{public}s is empty, isEmpty = %d.", buf, isEmpty);
+        char cmd[BUFF_SIZE] = {0};
+        if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
+            "rm %s", buf) < 0) {
+            LOGE("snprintf_s rm cmd failed.");
+            return HAL_FAILURE;
+        }
+        LOGW("rm Configure file %{public}s", buf);
+        ExcuteCmd(cmd);
+    }
     char path[PATH_NUM][BUFF_SIZE] = {"/system/etc/wifi/", "/vendor/etc/wifi/"};
     for (int i = 0; i != PATH_NUM; ++i) {
         if (strcat_s(path[i], sizeof(path[i]), configName) != EOK) {
@@ -210,4 +231,20 @@ int CopyConfigFile(const char* configName)
     }
     LOGD("success to copy file %{public}s", configName);
     return HAL_SUCCESS;
+}
+
+int IsFileEmpty(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        LOGE("fail to open file %s", filename);
+        return -1;
+    }
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    if (size <= 20) {
+        fclose(file);
+        return 1;
+    }
+    fclose(file);
+    return 0;
 }

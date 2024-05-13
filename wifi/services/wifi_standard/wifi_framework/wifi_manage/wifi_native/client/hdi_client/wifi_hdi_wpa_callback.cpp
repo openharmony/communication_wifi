@@ -24,6 +24,7 @@
 #include "wifi_common_util.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
+constexpr int WIFI_HDI_REASON_LENGTH = 32;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
 constexpr int PD_STATUS_CODE_ENTER_PIN = 1;
 constexpr int PD_STATUS_CODE_PBC_REQ = 2;
@@ -77,16 +78,26 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
     const struct HdiWpaBssidChangedParam *bssidChangedParam, const char* ifName)
 {
     LOGI("OnEventBssidChanged: callback enter!");
-    if (bssidChangedParam == NULL) {
+    if (bssidChangedParam == nullptr || bssidChangedParam->reason == nullptr) {
         LOGE("OnEventBssidChanged: invalid parameter!");
         return 1;
     }
-    uint32_t bssidLen = bssidChangedParam->bssidLen;
+
+    char reason[WIFI_HDI_REASON_LENGTH] = {0};
+    if (strcpy_s(reason, sizeof(reason), (const char *)bssidChangedParam->reason) != EOK) {
+        LOGE("OnEventBssidChanged: failed to copy reason!");
+        return 1;
+    }
+
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacArr2String(bssidChangedParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    if (ConvertMacArr2String(bssidChangedParam->bssid, bssidChangedParam->bssidLen, szBssid, sizeof(szBssid)) != 0) {
+        LOGE("OnEventBssidChanged: failed to convert mac!");
+        return 1;
+    }
+
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onBssidChanged) {
-        cbk.onBssidChanged((const char *)bssidChangedParam->reason, szBssid);
+        cbk.onBssidChanged(reason, szBssid);
     }
     LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
     return 0;

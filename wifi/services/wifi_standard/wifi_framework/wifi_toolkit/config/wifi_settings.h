@@ -22,6 +22,9 @@
 #include <memory>
 #include <mutex>
 #include <algorithm>
+#ifndef OHOS_ARCH_LITE
+#include "unique_fd.h"
+#endif
 #include "wifi_common_def.h"
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
@@ -54,6 +57,7 @@ constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
 
 constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
+constexpr char BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/backup_config.conf";
 constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
 constexpr char BLOCK_LIST_FILE_PATH[] = CONFIG_ROOR_DIR"/block_list.conf";
 constexpr char WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/wifi_config.conf";
@@ -1710,6 +1714,29 @@ public:
      * @param cloneData - wifi xml config
      */
     void MergeWifiCloneConfig(std::string &cloneData);
+
+    /**
+     * @Description Backup config file
+     *
+     * @param fd - File Descriptor
+     * @param backupInfo - Backup info
+     * @return int - 0: success
+     */
+    int OnBackup(UniqueFd &fd, const std::string &backupInfo);
+
+    /**
+     * @Description Restore config file
+     *
+     * @param fd - File Descriptor
+     * @param restoreInfo - Restore info
+     * @return int - 0: success
+     */
+    int OnRestore(UniqueFd &fd, const std::string &restoreInfo);
+
+    /**
+     * @Description Remove backup config file
+     */
+    void RemoveBackupFile();
 #endif
 
 private:

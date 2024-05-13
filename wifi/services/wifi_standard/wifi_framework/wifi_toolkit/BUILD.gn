@@ -96,6 +96,7 @@ if (defined(ohos_lite)) {
     install_enable = true
     sources = local_base_sources
     sources += [
+      "config/wifi_backup_config.cpp",
       "utils/network_parser.cpp",
       "utils/softap_parser.cpp",
       "utils/wifi_app_parser.cpp",

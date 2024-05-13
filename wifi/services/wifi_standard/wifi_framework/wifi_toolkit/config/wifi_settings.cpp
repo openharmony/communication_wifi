@@ -419,7 +419,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 
     std::vector<WifiBackupConfig> backupConfigs;
     for (auto &config : localConfigs) {
-        if (config.keyMgmt != KEY_MGMT_NONE) {
+        if (config.wifiEapConfig.eap.length() != 0 || config.isPasspoint == true) {
             continue;
         }
 #ifdef FEATURE_ENCRYPTION_SUPPORT

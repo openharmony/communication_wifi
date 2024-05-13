@@ -29,6 +29,7 @@ namespace OHOS {
 namespace Wifi {
 #define COUNTRY_CODE_JAPAN_L "jp"
 #define COUNTRY_CODE_JAPAN_C "JP"
+#define SOFT_BUS_UID 1024
 WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pGroupManager &setGroupMgr, WifiP2pServiceManager &setSvrMgr)
     : p2pStateMachine(p2pStateMachine),
@@ -344,22 +345,42 @@ ErrCode WifiP2pService::Hid2dRequestGcIp(const std::string& gcMac, std::string& 
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiP2pService::IncreaseSharedLink(void)
+void WifiP2pService::IncreaseSharedLink(int callingUid)
 {
-    WIFI_LOGI("IncreaseSharedLink");
-    SharedLinkManager::IncreaseSharedLink();
+    WIFI_LOGI("Uid %{public}d increaseSharedLink", callingUid);
+    SharedLinkManager::IncreaseSharedLink(callingUid);
 }
 
-void WifiP2pService::DecreaseSharedLink(void)
+void WifiP2pService::DecreaseSharedLink(int callingUid)
 {
-    WIFI_LOGI("DecreaseSharedLink");
-    SharedLinkManager::DecreaseSharedLink();
+    WIFI_LOGI("Uid %{public}d decreaseSharedLink", callingUid);
+    SharedLinkManager::DecreaseSharedLink(callingUid);
 }
 
 int WifiP2pService::GetSharedLinkCount(void)
 {
     WIFI_LOGI("GetSharedLinkCount");
     return SharedLinkManager::GetSharedLinkCount();
+}
+
+ErrCode WifiP2pService::HandleBusinessSAException(int systemAbilityId)
+{
+    WIFI_LOGI("HandleBusinessSAException");
+    if (SharedLinkManager::GetSharedLinkCount() == 0) {
+        return WIFI_OPT_SUCCESS;
+    }
+    int callingUid = -1;
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        callingUid = SOFT_BUS_UID;
+    } else {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    SharedLinkManager::DecreaseSharedLink(callingUid);
+    if (SharedLinkManager::GetSharedLinkCount() == 0) {
+        RemoveGroup();
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 int WifiP2pService::GetP2pRecommendChannel(void)

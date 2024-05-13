@@ -138,7 +138,8 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
 #endif
     /* add its if not found . be careful of the return value */
     LOGI("UpdateDeviceSupplicantInf deviceAddr: %{private}s, groupAddr: %{private}s, deviceName: %{private}s",
-        updateDevice.GetDeviceAddress().c_str(), updateDevice.GetGroupAddress().c_str(), updateDevice.GetDeviceName().c_str());
+        updateDevice.GetDeviceAddress().c_str(), updateDevice.GetGroupAddress().c_str(),
+        updateDevice.GetDeviceName().c_str());
     p2pDevices.push_back(updateDevice);
     return true;
 }

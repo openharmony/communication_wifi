@@ -334,6 +334,31 @@ void P2pStateMachine::SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwne
     groupManager.SaveP2pInfo(p2pInfo);
 }
 
+bool P2pStateMachine::IsMatchClientDevice(std::vector<GcInfo> &gcInfos, WifiP2pDevice &device, GcInfo &gcInfo)
+{
+    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList;
+    if (deviceManager.GetDevicesList(deviceList) <= 0) {
+        WIFI_LOGE("deviceList.size <= 0 ");
+        return false;
+    }
+
+    bool isFound = false;
+    for (auto iterClientAddress : curClientList) {
+        for (auto iterDevice : deviceList) {
+            if (iterDevice.GetDeviceAddress() == iterClientAddress) {
+                device = iterDevice;
+                gcInfo = MatchDevInGcInfos(device.GetDeviceAddress(), device.GetGroupAddress(), gcInfos);
+                isFound = !(gcInfo.ip.empty());
+                break;
+            }
+        }
+        if (isFound) {
+            break;
+        }
+    }
+    return isFound;
+}
+
 ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
 {
     std::lock_guard<std::mutex> lock(m_gcJoinmutex);
@@ -342,49 +367,30 @@ ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
         WIFI_LOGE("this device is not Group owner");
         return ErrCode::WIFI_OPT_FAILED;
     }
-    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList;
-    if (deviceManager.GetDevicesList(deviceList) <= 0) {
-        WIFI_LOGE("deviceList.size <=0 ");
-        return WIFI_OPT_FAILED;
-    }
-    WifiP2pDevice curDev;
-    GcInfo curGc;
-    bool isFound = false;
-    for (auto iterClientList : curClientList) {
-        for (auto iterDeviceList : deviceList) {
-            if (iterDeviceList.GetDeviceAddress() == iterClientList) {
-                curDev = iterDeviceList;
-                auto p2pDeviceMac = curDev.GetDeviceAddress();
-                auto p2pGroupMac = curDev.GetGroupAddress();
-                curGc = MatchDevInGcInfos(p2pDeviceMac, p2pGroupMac, gcInfos);
-                isFound = !(curGc.ip.empty());
-                break;
-            }
-        }
-        if (isFound) {
-            break;
-        }
-    }
+    WifiP2pDevice device;
+    GcInfo gcInfo;
+    bool isFound = IsMatchClientDevice(gcInfos, device, gcInfo);
     if (!isFound) {
         WIFI_LOGE("current connected device not found the Gc");
         return ErrCode::WIFI_OPT_FAILED;
     } 
-    auto iter = std::find(curClientList.begin(), curClientList.end(), curDev.GetDeviceAddress().c_str());
+    }
+    auto iter = std::find(curClientList.begin(), curClientList.end(), device.GetDeviceAddress().c_str());
     if (iter != curClientList.end()) {
         curClientList.erase(iter);
     }
 
     WifiP2pLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
-    std::string gcDeviceAddr = curDev.GetDeviceAddress();
-    std::string gcHostName = curDev.GetDeviceName();
-    linkedInfo.AddClientInfoList(gcDeviceAddr, curGc.ip, gcHostName);
+    std::string gcDeviceAddr = device.GetDeviceAddress();
+    std::string gcHostName = device.GetDeviceName();
+    linkedInfo.AddClientInfoList(gcDeviceAddr, gcInfo.ip, gcHostName);
     if (WifiSettings::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
         groupManager.SaveP2pInfo(linkedInfo);
         GcInfo joinGc;
-        joinGc.ip = curGc.ip;
-        joinGc.host = curDev.GetDeviceName();
-        joinGc.mac = curDev.GetDeviceAddress();
+        joinGc.ip = gcInfo.ip;
+        joinGc.host = device.GetDeviceName();
+        joinGc.mac = device.GetDeviceAddress();
         BroadcastP2pGcJoinGroup(joinGc);
     }
     return ErrCode::WIFI_OPT_FAILED;

@@ -224,14 +224,15 @@ HWTEST_F(WifiP2pServiceTest, SetUpperScene, TestSize.Level1)
 HWTEST_F(WifiP2pServiceTest, HiD2dSharedLinkTest, TestSize.Level1)
 {
     int count = pWifiP2pService->GetSharedLinkCount();
-    pWifiP2pService->IncreaseSharedLink();
+    int callingUid = 0;
+    pWifiP2pService->IncreaseSharedLink(callingUid);
     EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
-    pWifiP2pService->IncreaseSharedLink();
+    pWifiP2pService->IncreaseSharedLink(callingUid);
     EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 2);
 
-    pWifiP2pService->DecreaseSharedLink();
+    pWifiP2pService->DecreaseSharedLink(callingUid);
     EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
-    pWifiP2pService->DecreaseSharedLink();
+    pWifiP2pService->DecreaseSharedLink(callingUid);
     EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count);
 }
 }  // namespace Wifi

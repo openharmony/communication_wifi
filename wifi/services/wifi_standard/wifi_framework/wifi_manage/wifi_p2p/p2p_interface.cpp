@@ -234,19 +234,24 @@ ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ip
     return p2pService.Hid2dRequestGcIp(gcMac, ipAddr);
 }
 
-void P2pInterface::IncreaseSharedLink(void)
+void P2pInterface::IncreaseSharedLink(int callingUid)
 {
-    p2pService.IncreaseSharedLink();
+    p2pService.IncreaseSharedLink(callingUid);
 }
 
-void P2pInterface::DecreaseSharedLink(void)
+void P2pInterface::DecreaseSharedLink(int callingUid)
 {
-    p2pService.DecreaseSharedLink();
+    p2pService.DecreaseSharedLink(callingUid);
 }
 
 int P2pInterface::GetSharedLinkCount(void)
 {
     return p2pService.GetSharedLinkCount();
+}
+
+ErrCode P2pInterface::HandleBusinessSAException(int systemAbilityId)
+{
+    return p2pService.HandleBusinessSAException(systemAbilityId);
 }
 
 int P2pInterface::GetP2pRecommendChannel(void)

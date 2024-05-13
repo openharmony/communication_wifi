@@ -141,6 +141,10 @@ public:
         const Wifi6BlackListInfo wifi6BlackListInfo);
     void RemoveWifi6BlackListCache(const std::string bssid);
     int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const;
+    void SetWifiSelfcureReset(const bool isReset);
+    bool GetWifiSelfcureReset() const;
+    void SetLastNetworkId(const int networkId);
+    int GetLastNetworkId() const;
     void SetSoftapToggledState(bool state);
     bool GetSoftapToggledState() const;
     void SetWifiStopState(bool state);
@@ -1737,6 +1741,8 @@ private:
     int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
+    bool mWifiSelfcureReset;
+    int mLastNetworkId;
     bool mWifiStoping;
     bool mSoftapToggled;
     bool mIsSupportCoex;
@@ -1808,6 +1814,7 @@ private:
     std::mutex mP2pMutex;
     std::mutex mWifiConfigMutex;
     std::mutex mWifiToggledMutex;
+    std::mutex mWifiSelfcureResetMutex;
     std::mutex mWifiSelfcureMutex;
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;

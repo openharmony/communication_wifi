@@ -519,6 +519,29 @@ int WifiSettings::GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInf
     return 0;
 }
 
+void WifiSettings::SetWifiSelfcureReset(const bool isReset)
+{
+    std::unique_lock<std::mutex> lock(mWifiSelfcureResetMutex);
+    mWifiSelfcureReset = isReset;
+}
+
+bool WifiSettings::GetWifiSelfcureReset() const
+{
+    LOGD("selfcure reset state is %{public}d", mWifiSelfcureReset);
+    return mWifiSelfcureReset;
+}
+
+void WifiSettings::SetLastNetworkId(const int networkId)
+{
+    std::unique_lock<std::mutex> lock(mWifiSelfcureMutex);
+    mLastNetworkId = networkId;
+}
+
+int WifiSettings::GetLastNetworkId() const
+{
+    return mLastNetworkId;
+}
+
 void WifiSettings::SetWifiToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mWifiToggledMutex);

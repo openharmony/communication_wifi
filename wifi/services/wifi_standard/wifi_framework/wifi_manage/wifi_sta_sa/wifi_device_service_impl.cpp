@@ -110,6 +110,8 @@ WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 
 ErrCode WifiDeviceServiceImpl::EnableWifi()
 {
+    WIFI_LOGI("EnableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
     ErrCode errCode = CheckCanEnableWifi();
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
@@ -124,6 +126,8 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
 {
+    WIFI_LOGI("DisableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("DisableWifi: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;

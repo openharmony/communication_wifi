@@ -1028,6 +1028,7 @@ void WifiInternalEventDispatcher::ResetAllFrozenApp()
 
 bool WifiInternalEventDispatcher::IsAppFrozen(int pid)
 {
+    std::unique_lock<std::mutex> lock(mPidFrozenMutex);
     auto it = frozenPidList.find(pid);
     if (it != frozenPidList.end()) {
         return true;

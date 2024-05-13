@@ -100,7 +100,6 @@ if (defined(ohos_lite)) {
       "utils/softap_parser.cpp",
       "utils/wifi_app_parser.cpp",
       "utils/wifi_cert_utils.cpp",
-      "utils/wifi_notification_util.cpp",
       "utils/xml_parser.cpp",
     ]
 
@@ -134,22 +133,16 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
-      "ability_base:zuri",
-      "ability_runtime:wantagent_innerkits",
       "c_utils:utils",
       "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
       "dhcp:dhcp_sdk",
       "dhcp:dhcp_utils",
-      "distributed_notification_service:ans_innerkits",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
-      "i18n:intl_util",
-      "image_framework:image_native",
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
       "libxml2:libxml2",
-      "relational_store:native_rdb",
     ]
 
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {

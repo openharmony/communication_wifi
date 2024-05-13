@@ -440,7 +440,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
         LOGE("OnBackup open fail.");
         return -1;
     }
-    LOGE("OnBackup end. Backup count: %{public}d, fd: %{public}d.", static_cast<int>(backupConfigs.size()), fd.Get());
+    LOGI("OnBackup end. Backup count: %{public}d, fd: %{public}d.", static_cast<int>(backupConfigs.size()), fd.Get());
     return 0;
 }
 

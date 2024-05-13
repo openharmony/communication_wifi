@@ -391,6 +391,7 @@ ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
         joinGc.host = device.GetDeviceName();
         joinGc.mac = device.GetDeviceAddress();
         BroadcastP2pGcJoinGroup(joinGc);
+        return ErrCode::WIFI_OPT_SUCCESS;
     }
     return ErrCode::WIFI_OPT_FAILED;
 }

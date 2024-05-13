@@ -598,6 +598,7 @@ void WifiP2pProxy::ReadWifiP2pDeviceData(MessageParcel &reply, WifiP2pDevice &de
     device.SetWpsConfigMethod(reply.ReadInt32());
     device.SetDeviceCapabilitys(reply.ReadInt32());
     device.SetGroupCapabilitys(reply.ReadInt32());
+    device.SetGroupAddress(reply.ReadString());
 }
 
 void WifiP2pProxy::WriteWifiP2pGroupData(MessageParcel &data, const WifiP2pGroupInfo &info) const

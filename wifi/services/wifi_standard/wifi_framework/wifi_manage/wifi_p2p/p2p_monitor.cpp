@@ -326,6 +326,7 @@ void P2pMonitor::WpaEventDeviceFound(const IdlP2pDeviceFound &deviceInfo) const
         WIFI_LOGE("Missing device name!");
         return;
     }
+    device.SetGroupAddress(deviceInfo.srcAddress);
     device.SetDeviceAddress(deviceInfo.p2pDeviceAddress);
     device.SetPrimaryDeviceType(deviceInfo.primaryDeviceType);
     device.SetDeviceCapabilitys(deviceInfo.deviceCapabilities);

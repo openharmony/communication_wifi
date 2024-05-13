@@ -873,15 +873,15 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
                 WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d",
                     __func__, pid, uid, tokenId);
             #ifdef SUPPORT_RANDOM_MAC_ADDR
+                std::vector<WifiP2pDevice> deviceVec = msg.device;
                 if ((pid != 0) && (uid != 0)) {
-                    std::vector<WifiP2pDevice> deviceVec = msg.device;
                     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
                         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
                             __func__, pid, uid);
                         updateP2pDeviceMacAddress(deviceVec);
                     }
-                    callback->OnP2pPeersChanged(deviceVec);
                 }
+                callback->OnP2pPeersChanged(deviceVec);
             #else
                 callback->OnP2pPeersChanged(msg.device);
             #endif

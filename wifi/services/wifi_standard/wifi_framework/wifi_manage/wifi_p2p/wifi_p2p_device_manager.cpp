@@ -125,6 +125,7 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
             it->SetWpsConfigMethod(device.GetWpsConfigMethod());
             it->SetDeviceCapabilitys(device.GetDeviceCapabilitys());
             it->SetGroupCapabilitys(device.GetGroupCapabilitys());
+            it->SetGroupAddress(device.GetGroupAddress());
             return true;
         }
     }
@@ -136,6 +137,8 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
         device.GetDeviceAddress(), "");
 #endif
     /* add its if not found . be careful of the return value */
+    LOGI("UpdateDeviceSupplicantInf deviceAddr: %{private}s, groupAddr: %{private}s, deviceName: %{private}s",
+        updateDevice.GetDeviceAddress().c_str(), updateDevice.GetGroupAddress().c_str(), updateDevice.GetDeviceName().c_str());
     p2pDevices.push_back(updateDevice);
     return true;
 }

@@ -269,11 +269,8 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
             dhcpFunc();
             WifiP2pGroupInfo invalidGroup;
             groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, invalidGroup);
-            p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
-            p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_FAILED);
         } else {
-            p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
             WIFI_LOGI("The P2P group is successfully removed.");
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
             ret = WifiP2PHalInterface::GetInstance().P2pFlush();
@@ -283,7 +280,6 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
         }
     } else {
         WIFI_LOGE("Error:No group can be removed.");
-        p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     }
     return EXECUTED;

@@ -577,6 +577,7 @@ void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevi
     reply.WriteInt32(device.GetWpsConfigMethod());
     reply.WriteInt32(device.GetDeviceCapabilitys());
     reply.WriteInt32(device.GetGroupCapabilitys());
+    reply.WriteString(device.GetGroupAddress());
 }
 
 bool WifiP2pStub::ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &info)

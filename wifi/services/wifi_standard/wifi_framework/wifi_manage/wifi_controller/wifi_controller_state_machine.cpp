@@ -21,9 +21,11 @@
 #include "wifi_msg.h"
 #include "wifi_system_timer.h"
 #include "wifi_hisysevent.h"
+#ifndef OHOS_ARCH_LITE
 #include "iservice_registry.h"
 #include "netsys_native_service_proxy.h"
 #include "system_ability_definition.h"
+#endif
 #ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
 #endif
@@ -36,7 +38,6 @@ namespace Wifi {
 
 constexpr const char *IFACE_LINK_UP = "up";
 constexpr const char *IFACE_RUNNING = "running";
-std::string RSMC_CHECK_WHITE_LIST[] = {"wlan0", "wlan1", "wlan2", "p2p0", "chba0"};
 
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
@@ -856,9 +857,11 @@ void WifiControllerMachine::StopSoftapCloseTimer()
     stopSoftapTimerId_ = 0;
 }
 
+#ifdef OHOS_ARCH_LITE
 void WifiControllerMachine::CheckSatelliteState()
 {
     WIFI_LOGI("Enter CheckSatelliteState");
+    std::string RSMC_CHECK_WHITE_LIST[] = {"wlan0", "wlan1", "wlan2", "p2p0", "chba0"};
     bool isUp = false;
     for (auto nif : RSMC_CHECK_WHITE_LIST) {
         if (IsInterfaceUp(nif)) {
@@ -903,6 +906,7 @@ bool WifiControllerMachine::IsInterfaceUp(std::string &iface)
     }
     return false;
 }
+#endif
 #endif
 
 } // namespace Wifi

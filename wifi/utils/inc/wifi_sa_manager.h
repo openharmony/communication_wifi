@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr uint32_t TIMEOUT_UNLOAD_WIFI_SA = 5 * 60 * 1000;
-constexpr uint32_t TIMEOUT_STOP_RSMC = 2 * 60 * 1000;
+constexpr uint32_t TIMEOUT_STOP_SATELLITE = 2 * 60 * 1000;
 
 class WifiSaLoadCallback : public SystemAbilityLoadCallbackStub {
 public:

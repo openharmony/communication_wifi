@@ -53,10 +53,10 @@ static void UnloadStaSaTimerCallback()
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 }
 
-static void RsmcTimerCallback()
+static void SatelliteTimerCallback()
 {
     WifiConfigCenter::GetInstance().SetSatelliteState(false);
-    WifiManager::GetInstance().GetWifiStaManager()->StopRsmcTimer();
+    WifiManager::GetInstance().GetWifiStaManager()->StopSatelliteTimer();
 }
 
 void WifiStaManager::StopUnloadStaSaTimer(void)
@@ -358,30 +358,30 @@ void WifiStaManager::DealRssiChanged(int rssi, int instId)
     return;
 }
 
-void WifiStaManager::StopRsmcTimer(void)
+void WifiStaManager::StopSatelliteTimer(void)
 {
-    WIFI_LOGI("StopRsmcTimer! rsmcTimerId:%{public}u", rsmcTimerId);
-    std::unique_lock<std::mutex> lock(rsmcTimerMutex);
-    if (rsmcTimerId == 0) {
+    WIFI_LOGI("StopSatelliteTimer! satelliteTimerId:%{public}u", satelliteTimerId);
+    std::unique_lock<std::mutex> lock(satelliteTimerMutex);
+    if (satelliteTimerId == 0) {
         return;
     }
-    MiscServices::TimeServiceClient::GetInstance()->StopTimer(rsmcTimerId);
-    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(rsmcTimerId);
-    rsmcTimerId = 0;
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(satelliteTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(satelliteTimerId);
+    satelliteTimerId = 0;
     return;
 }
 
-void WifiStaManager::StartRsmcTimer(void)
+void WifiStaManager::StartSatelliteTimer(void)
 {
-    WIFI_LOGI("StartRsmcTimer!");
-    std::unique_lock<std::mutex> lock(rsmcTimerMutex);
+    WIFI_LOGI("StartSatelliteTimer!");
+    std::unique_lock<std::mutex> lock(satelliteTimerMutex);
     std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
-    wifiSysTimer->SetCallbackInfo(RsmcTimerCallback);
-    unloadStaSaTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+    wifiSysTimer->SetCallbackInfo(SatelliteTimerCallback);
+    satelliteTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
     int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
-    MiscServices::TimeServiceClient::GetInstance()->StartTimer(rsmcTimerId,
-        currentTime + TIMEOUT_STOP_RSMC);
-    WIFI_LOGI("StartRsmcTimer success! rsmcTimerId:%{public}u", rsmcTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->StartTimer(satelliteTimerId,
+        currentTime + TIMEOUT_STOP_SATELLITE);
+    WIFI_LOGI("StartSatelliteTimer success! satelliteTimerId:%{public}u", satelliteTimerId);
     return;
 }
 }  // namespace Wifi

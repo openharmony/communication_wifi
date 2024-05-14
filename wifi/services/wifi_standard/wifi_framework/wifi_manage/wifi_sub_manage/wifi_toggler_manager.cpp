@@ -163,12 +163,12 @@ ErrCode WifiTogglerManager::SatelliteToggled(int state)
 {
     if (state == WIFI_MODE_RSMC_START) {
         WIFI_LOGI("Satellite state start.");
-        WifiConfigCenter::GetInstance().SetRsmcState(true);
-        WifiManager::GetInstance().GetWifiStaManager()->StartRsmcTimer();
+        WifiConfigCenter::GetInstance().SetSatelliteState(true);
+        WifiManager::GetInstance().GetWifiStaManager()->StartSatelliteTimer();
     } else if (state == WIFI_MODE_RSMC_STOP) {
         WIFI_LOGI("Satellite state stop.");
-        WifiConfigCenter::GetInstance().SetRsmcState(false);
-        WifiManager::GetInstance().GetWifiStaManager()->StopRsmcTimer();
+        WifiConfigCenter::GetInstance().SetSatelliteState(false);
+        WifiManager::GetInstance().GetWifiStaManager()->StopSatelliteTimer();
     } else if (state == WIFI_MODE_RSMC_CHECK) {
         WIFI_LOGI("Satellite state check.");
         pWifiControllerMachine->CheckSatelliteState();

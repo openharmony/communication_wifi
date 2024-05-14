@@ -1251,6 +1251,12 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
         WIFI_LOGI("current power saving mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
+        WIFI_LOGI("current satellite mode and can not use sta, open failed!");
+        return WIFI_OPT_FORBID_AIRPLANE;
+    }
+#endif
     /**
      * Check the interval between the last STA shutdown and the current STA
      * startup.
@@ -1756,6 +1762,26 @@ ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTa
         return WIFI_OPT_STA_NOT_OPENED;
     }
     return pService->DeregisterFilterBuilder(filterTag, builderName);
+}
+
+ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
+{
+    WIFI_LOGI("Enter SetSatelliteState");
+
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("SetSatelliteState:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetSatelliteState:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetSatelliteState:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    return WifiManager::GetInstance().GetWifiTogglerManager()->SatelliteToggled(state);
 }
 
 ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& reply)

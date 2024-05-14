@@ -33,6 +33,8 @@ public:
     void StopUnloadStaSaTimer(void);
     void StartUnloadStaSaTimer(void);
     void CloseStaService(int instId = 0);
+    void StartSatelliteTimer(void);
+    void StopSatelliteTimer(void);
 
 private:
     void InitStaCallback(void);
@@ -49,6 +51,9 @@ private:
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
     int mLastWifiOpenState = -1;
+    uint32_t satelliteTimerId;
+    std::mutex satelliteTimerMutex;
+
 };
 
 }  // namespace Wifi

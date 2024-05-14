@@ -1241,7 +1241,7 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
         WIFI_LOGI("current power saving mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
-    if (WifiConfigCenter::GetInstance().GetSatelliteState()) {
+    if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
         WIFI_LOGI("current satellite mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
     }
@@ -1759,10 +1759,6 @@ ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("SetSatelliteState:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
-    }
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetSatelliteState:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED");
-        return WIFI_OPT_PERMISSION_DENIED;
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetSatelliteState:VerifySetWifiInfoPermission PERMISSION_DENIED!");

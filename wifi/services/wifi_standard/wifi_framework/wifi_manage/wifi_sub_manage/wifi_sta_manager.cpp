@@ -55,7 +55,8 @@ static void UnloadStaSaTimerCallback()
 
 static void SatelliteTimerCallback()
 {
-    WifiConfigCenter::GetInstance().SetSatelliteState(false);
+    WIFI_LOGI("It's time for satellite timer.");
+    WifiManager::GetInstance().GetWifiTogglerManager()->SetSatelliteStartState(false);
     WifiManager::GetInstance().GetWifiStaManager()->StopSatelliteTimer();
 }
 
@@ -374,7 +375,6 @@ void WifiStaManager::StopSatelliteTimer(void)
 
 void WifiStaManager::StartSatelliteTimer(void)
 {
-    WIFI_LOGI("StartSatelliteTimer!");
     std::unique_lock<std::mutex> lock(satelliteTimerMutex);
     std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
     wifiSysTimer->SetCallbackInfo(SatelliteTimerCallback);

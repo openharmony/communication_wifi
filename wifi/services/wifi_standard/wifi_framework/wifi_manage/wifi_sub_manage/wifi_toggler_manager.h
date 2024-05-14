@@ -40,6 +40,8 @@ public:
     std::unique_ptr<WifiControllerMachine>& GetControllerMachine();
 #ifndef OHOS_ARCH_LITE
     ErrCode SatelliteToggled(int state);
+    void SetSatelliteStartState(bool state);
+    bool IsSatelliteStateStart();
 #endif
 
 private:
@@ -50,6 +52,8 @@ private:
     void DealSoftapStop(int id = 0);
     void DealSoftapStartFailure(int id = 0);
     void DealClientRemoved(int id = 0);
+    void CheckSatelliteState()
+    bool IsInterfaceUp(std::string &iface);
 
 private:
     ConcreteModeCallback mConcreteModeCb;

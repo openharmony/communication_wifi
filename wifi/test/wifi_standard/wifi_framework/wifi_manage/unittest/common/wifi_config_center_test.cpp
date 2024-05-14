@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "wifi_config_center_test.h"
 #include "wifi_global_func.h"
 #include "wifi_internal_msg.h"

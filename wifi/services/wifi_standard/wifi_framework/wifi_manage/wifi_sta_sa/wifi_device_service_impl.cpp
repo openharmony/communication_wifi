@@ -48,6 +48,8 @@ namespace Wifi {
 
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
+constexpr const char *EXTENSION_SUCCESS = "wifi extension success";
+constexpr const char *EXTENSION_FAIL = "wifi extension fail";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 
 bool g_hiLinkActive = false;
@@ -110,6 +112,10 @@ WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 
 ErrCode WifiDeviceServiceImpl::EnableWifi()
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("EnableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     ErrCode errCode = CheckCanEnableWifi();
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
@@ -124,6 +130,10 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("DisableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("DisableWifi: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -1772,6 +1782,46 @@ ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->SatelliteToggled(state);
+}
+
+ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& reply)
+{
+    UniqueFd fd(-1);
+    std::string replyCode = EXTENSION_SUCCESS;
+    int ret = WifiSettings::GetInstance().OnBackup(fd, "");
+    if (ret < 0) {
+        WIFI_LOGE("OnBackup fail: backup data fail!");
+        replyCode = EXTENSION_FAIL;
+    }
+    if (reply.WriteFileDescriptor(fd) == false || reply.WriteString(replyCode) == false) {
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveBackupFile();
+        WIFI_LOGE("OnBackup fail: reply write fail!");
+        return WIFI_OPT_FAILED;
+    }
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveBackupFile();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& reply)
+{
+    UniqueFd fd(data.ReadFileDescriptor());
+    std::string replyCode = EXTENSION_SUCCESS;
+    int ret = WifiSettings::GetInstance().OnRestore(fd, "");
+    if (ret < 0) {
+        WIFI_LOGE("OnRestore fail: restore data fail!");
+        replyCode = EXTENSION_FAIL;
+    }
+    if (reply.WriteString(replyCode) == false) {
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveBackupFile();
+        WIFI_LOGE("OnRestore fail: reply write fail!");
+        return WIFI_OPT_FAILED;
+    }
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveBackupFile();
+    return WIFI_OPT_SUCCESS;
 }
 #endif
 }  // namespace Wifi

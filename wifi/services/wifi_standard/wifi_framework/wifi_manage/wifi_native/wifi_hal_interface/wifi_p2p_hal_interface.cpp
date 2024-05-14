@@ -596,5 +596,15 @@ WifiErrorNo WifiP2PHalInterface::Hid2dConnect(const Hid2dConnectConfig &config) 
 #endif
 }
 
+WifiErrorNo WifiP2PHalInterface::DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->DeliverP2pData(cmdType, dataType, carryData.c_str());
+#else
+    LOGE("DeliverP2pData enter Ipc");
+    return WIFI_IDL_OPT_FAILED;
+#endif
+}
 }  // namespace Wifi
 }  // namespace OHOS

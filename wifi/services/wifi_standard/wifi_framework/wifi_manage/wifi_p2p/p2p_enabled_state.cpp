@@ -23,6 +23,14 @@
 
 DEFINE_WIFILOG_P2P_LABEL("P2pEnabledState");
 
+const int CHANNEL_INDEX_OF_DISCOVER = 16;
+const int TIMEOUT_MASK_OF_DISCOVER = 0x00FF;
+const int DISCOVER_TIMEOUT_S = 120;
+// miracast
+const int CMD_TYPE_SET = 2;
+const int DATA_TYPE_SET_LISTEN_MODE = 4;
+const std::string ONEHOP_LISTEN_MODE = "1";
+
 namespace OHOS {
 namespace Wifi {
 P2pEnabledState::P2pEnabledState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
@@ -74,6 +82,8 @@ void P2pEnabledState::Init()
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND, &P2pEnabledState::ProcessDeviceFoundEvt));
     mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PRI_DEVICE_FOUND, &P2pEnabledState::ProcessPriDeviceFoundEvt));
+    mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST, &P2pEnabledState::ProcessDeviceLostEvt));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_FIND_STOPPED, &P2pEnabledState::ProcessFindStoppedEvt));
@@ -103,6 +113,8 @@ void P2pEnabledState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &P2pEnabledState::ProcessCmdCancelConnect));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED, &P2pEnabledState::ProcessCmdConnectFailed));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_PEERS, &P2pEnabledState::ProcessCmdDiscoverPeers));
 }
 bool P2pEnabledState::ProcessCmdDisable(InternalMessage &msg) const
 {
@@ -192,6 +204,17 @@ bool P2pEnabledState::ProcessDeviceFoundEvt(InternalMessage &msg) const
         device.GetDeviceAddress().c_str(), device.GetDeviceAddressType());
     deviceManager.UpdateDeviceSupplicantInf(device);
     p2pStateMachine.BroadcastP2pPeersChanged();
+    return EXECUTED;
+}
+bool P2pEnabledState::ProcessPriDeviceFoundEvt(InternalMessage &msg) const
+{
+    WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_PRI_DEVICE_FOUND");
+    std::string PrivateInfo;
+    if (!msg.GetMessageObj(PrivateInfo)) {
+        WIFI_LOGE("Failed to obtain device information.");
+        return EXECUTED;
+    }
+    p2pStateMachine.BroadcastP2pPrivatePeersChanged(PrivateInfo);
     return EXECUTED;
 }
 bool P2pEnabledState::ProcessDeviceLostEvt(InternalMessage &msg) const
@@ -594,6 +617,32 @@ bool P2pEnabledState::ProcessCmdConnectFailed(InternalMessage &msg) const
     if (msg.GetParam1() == connectFailed || msg.GetParam1() == connectTimeout) {
         WIFI_LOGD("P2P ProcessCmdConnectFailed: filed reason = %{public}d", msg.GetParam1());
         p2pStateMachine.RemoveGroupByDevice(device);
+    }
+    return EXECUTED;
+}
+
+static int AddScanChannelInTimeout(int channelid, int timeout)
+{
+    int ret = (channelid << CHANNEL_INDEX_OF_DISCOVER) + (timeout & TIMEOUT_MASK_OF_DISCOVER);
+    return ret;
+}
+
+bool P2pEnabledState::ProcessCmdDiscoverPeers(InternalMessage &msg) const
+{
+    WIFI_LOGI("P2P ProcessCmdDiscoverPeers recv CMD: %{public}d", msg.GetMessageName());
+    const int channelid = msg.GetParam1();
+    WifiP2PHalInterface::GetInstance().DeliverP2pData(CMD_TYPE_SET, DATA_TYPE_SET_LISTEN_MODE, ONEHOP_LISTEN_MODE);
+    p2pStateMachine.CancelSupplicantSrvDiscReq();
+    int ret = AddScanChannelInTimeout(channelid, DISCOVER_TIMEOUT_S);
+    int retCode = WifiP2PHalInterface::GetInstance().P2pFind(ret);
+    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("call ProcessCmdDiscoverPeers failed, ErrorCode: %{public}d", static_cast<int>(retCode));
+        WifiP2PHalInterface::GetInstance().P2pStopFind();
+        return NOT_EXECUTED;
+    } else {
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverPeers, ErrCode::WIFI_OPT_SUCCESS);
+        p2pStateMachine.BroadcastP2pDiscoveryChanged(true);
+        return EXECUTED;
     }
     return EXECUTED;
 }

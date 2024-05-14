@@ -52,7 +52,7 @@ private:
     void DealSoftapStop(int id = 0);
     void DealSoftapStartFailure(int id = 0);
     void DealClientRemoved(int id = 0);
-    void CheckSatelliteState()
+    void CheckSatelliteState();
     bool IsInterfaceUp(std::string &iface);
 
 private:

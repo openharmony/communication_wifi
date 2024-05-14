@@ -50,8 +50,8 @@ constexpr int ASSOCIATING_SCAN_CONTROL_INTERVAL = 2;
 constexpr int ASSOCIATED_SCAN_CONTROL_INTERVAL = 5;
 constexpr int OBTAINING_IP_SCAN_CONTROL_INTERVAL = 5;
 constexpr int OBTAINING_IP_SCAN_CONTROL_TIMES = 1;
-/* Obtain the scanning result that is valid within 180s. */
-constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
+/* Obtain the scanning result that is valid within 30s. */
+constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;

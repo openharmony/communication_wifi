@@ -252,7 +252,7 @@ void WifiStaManager::DealStaCloseRes(OperateResState state, int instId)
 void WifiStaManager::ResetSelfcureOpenWifi(int instId)
 {
     if (!WifiSettings::GetInstance().GetWifiSelfcureReset()) {
-        return;            
+        return;
     }
     WIFI_LOGI("reset selfcure wifi off->open!");
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);

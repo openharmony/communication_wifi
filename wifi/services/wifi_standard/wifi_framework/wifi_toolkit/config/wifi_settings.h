@@ -1741,8 +1741,8 @@ private:
     int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
-    bool mWifiSelfcureReset;
-    int mLastNetworkId;
+    std::atomic<bool> mWifiSelfcureReset;
+    std::atomic<int> mLastNetworkId;
     bool mWifiStoping;
     bool mSoftapToggled;
     bool mIsSupportCoex;
@@ -1814,7 +1814,6 @@ private:
     std::mutex mP2pMutex;
     std::mutex mWifiConfigMutex;
     std::mutex mWifiToggledMutex;
-    std::mutex mWifiSelfcureResetMutex;
     std::mutex mWifiSelfcureMutex;
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;

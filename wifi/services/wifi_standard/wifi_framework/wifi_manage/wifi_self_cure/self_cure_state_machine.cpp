@@ -119,7 +119,7 @@ SelfCureStateMachine::DefaultState::DefaultState(SelfCureStateMachine *selfCureS
     : State("DefaultState"),
       pSelfCureStateMachine(selfCureStateMachine)
 {
-    WIFI_LOGD("DefaultState construct success\n.");
+    WIFI_LOGD("DefaultState construct success.");
 }
 
 SelfCureStateMachine::DefaultState::~DefaultState() {}
@@ -161,7 +161,7 @@ SelfCureStateMachine::ConnectedMonitorState::ConnectedMonitorState(SelfCureState
       pSelfCureStateMachine(selfCureStateMachine)
 {
     InitSelfCureCmsHandleMap();
-    WIFI_LOGD("ConnectedMonitorState construct success\n.");
+    WIFI_LOGD("ConnectedMonitorState construct success.");
 }
 
 SelfCureStateMachine::ConnectedMonitorState::~ConnectedMonitorState() {}
@@ -427,7 +427,7 @@ SelfCureStateMachine::DisconnectedMonitorState::DisconnectedMonitorState(SelfCur
     : State("DisconnectedMonitorState"),
       pSelfCureStateMachine(selfCureStateMachine)
 {
-    WIFI_LOGD("DisconnectedMonitorState construct success\n.");
+    WIFI_LOGD("DisconnectedMonitorState construct success.");
 }
 
 SelfCureStateMachine::DisconnectedMonitorState::~DisconnectedMonitorState() {}
@@ -511,7 +511,7 @@ SelfCureStateMachine::ConnectionSelfCureState::ConnectionSelfCureState(SelfCureS
     : State("ConnectionSelfCureState"),
       pSelfCureStateMachine(selfCureStateMachine)
 {
-    WIFI_LOGD("ConnectionSelfCureState construct success\n.");
+    WIFI_LOGD("ConnectionSelfCureState construct success.");
 }
 
 SelfCureStateMachine::ConnectionSelfCureState::~ConnectionSelfCureState() {}
@@ -554,7 +554,7 @@ SelfCureStateMachine::InternetSelfCureState::InternetSelfCureState(SelfCureState
       pSelfCureStateMachine(selfCureStateMachine)
 {
     InitSelfCureIssHandleMap();
-    WIFI_LOGD("InternetSelfCureState construct success\n.");
+    WIFI_LOGD("InternetSelfCureState construct success.");
 }
 
 SelfCureStateMachine::InternetSelfCureState::~InternetSelfCureState() {}
@@ -941,6 +941,10 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
     WifiSettings::GetInstance().SetWifiToggledState(false);
+    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+        WIFI_LOGI("GetWifiTogglerManager is nullptr");
+        return;
+    }
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 0);
 }
 
@@ -1193,7 +1197,7 @@ SelfCureStateMachine::Wifi6SelfCureState::Wifi6SelfCureState(SelfCureStateMachin
     : State("Wifi6SelfCureState"),
       pSelfCureStateMachine(selfCureStateMachine)
 {
-    WIFI_LOGD("Wifi6SelfCureState construct success\n.");
+    WIFI_LOGD("Wifi6SelfCureState construct success.");
 }
 
 SelfCureStateMachine::Wifi6SelfCureState::~Wifi6SelfCureState() {}

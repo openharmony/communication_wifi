@@ -1787,7 +1787,6 @@ private:
     Hid2dUpperScene mUpperScene;
     P2pBusinessType mP2pBusinessType;
     int mPersistWifiState;
-    bool mSatelliteState;
 
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;

@@ -1208,6 +1208,7 @@ void ScanService::DisconnectedTimerScan()
         WIFI_LOGE("pScanStateMachine is null.\n");
         return;
     }
+    pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);
     return;
 }
@@ -1226,6 +1227,7 @@ void ScanService::HandleDisconnectedScanTimeout()
     if (Scan(false) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed.");
     }
+    pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);
 
     return;

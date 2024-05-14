@@ -53,7 +53,6 @@ private:
     int mLastWifiOpenState = -1;
     uint32_t satelliteTimerId;
     std::mutex satelliteTimerMutex;
-
 };
 
 }  // namespace Wifi

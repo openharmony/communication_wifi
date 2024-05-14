@@ -36,7 +36,7 @@
 namespace OHOS {
 namespace Wifi {
 
-#ifdef OHOS_ARCH_LITE
+#ifndef OHOS_ARCH_LITE
 constexpr const char *IFACE_LINK_UP = "up";
 constexpr const char *IFACE_RUNNING = "running";
 #endif

@@ -635,20 +635,6 @@ public:
     
     bool GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config);
 
-    /**
-     * @Description set satellite state
-     *
-     * @param state - true:satellite on false:satellite off
-     */
-    void SetSatelliteState(bool state);
-
-    /**
-     * @Description set satellite state
-     *
-     * @return true - satellite on
-     * @return false - satellite off
-     */
-    bool GetSatelliteState();
 private:
     std::mutex mStaMutex;
     std::mutex mScanMutex;

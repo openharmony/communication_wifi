@@ -540,15 +540,5 @@ bool WifiConfigCenter::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConf
     config = mLastRemoveDeviceConfig.second;
     return true;
 }
-
-void WifiConfigCenter::SetSatelliteState(bool state)
-{
-    WifiSettings::GetInstance().SetSatelliteState(state);
-}
-
-bool WifiConfigCenter::GetSatelliteState()
-{
-    return WifiSettings::GetInstance().GetSatelliteState();
-}
 }  // namespace Wifi
 }  // namespace OHOS

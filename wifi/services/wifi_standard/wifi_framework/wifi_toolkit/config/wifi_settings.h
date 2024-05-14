@@ -149,8 +149,6 @@ public:
     std::string GetP2pIfaceName();
     void SetApIfaceName(const std::string &ifaceName);
     std::string GetApIfaceName();
-    void SetSatelliteState(bool state);
-    bool GetSatelliteState();
 
     /**
      * @Description Has STA service running

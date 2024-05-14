@@ -857,10 +857,7 @@ void WifiControllerMachine::ShutdownWifi()
     StopAllSoftapManagers();
 #endif
     StopAllConcreteManagers();
-
 }
 #endif
-#endif
-
 } // namespace Wifi
 } // namespace OHOS

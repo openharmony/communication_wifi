@@ -71,6 +71,10 @@ void WifiP2pStub::InitHandleMapEx()
         &WifiP2pStub::OnQueryP2pLocalDevice;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE)] =
         &WifiP2pStub::OnHid2dSetUpperScene;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_PEERS)] =
+        &WifiP2pStub::OnDiscoverPeers;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC)] =
+        &WifiP2pStub::OnDisableRandomMac;
     return;
 }
 
@@ -488,6 +492,25 @@ void WifiP2pStub::OnQueryP2pServices(uint32_t code, MessageParcel &data, Message
     return;
 }
 
+void WifiP2pStub::OnDiscoverPeers(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int channelid = data.ReadInt32();
+    ErrCode ret = DiscoverPeers(channelid);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiP2pStub::OnDisableRandomMac(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int setmode = data.ReadInt32();
+    ErrCode ret = DisableRandomMac(setmode);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
 bool WifiP2pStub::ReadWifiP2pServiceInfo(MessageParcel &data, WifiP2pServiceInfo &info)
 {
     const char *readStr = nullptr;

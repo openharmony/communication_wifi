@@ -802,6 +802,14 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetPowerMode(bool mode) const;
+    /**
+     * @Description Send power mode to wpa
+     *
+     * @param mode: true for power, false for resume
+     * @return WifiErrorNo
+     */
+    WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const;
+
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

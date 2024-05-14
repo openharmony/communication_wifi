@@ -83,6 +83,11 @@ public:
         WIFI_LOGI("OnP2pPeersChanged Mock");
     }
 
+    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override
+    {
+        WIFI_LOGI("OnP2pPrivatePeersChanged Mock");
+    }
+
     void OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo>& srvInfo) override
     {
         WIFI_LOGI("OnP2pServicesChanged Mock");

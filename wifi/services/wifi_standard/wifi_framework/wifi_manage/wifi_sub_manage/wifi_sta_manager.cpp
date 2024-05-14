@@ -358,6 +358,7 @@ void WifiStaManager::DealRssiChanged(int rssi, int instId)
     return;
 }
 
+#ifndef OHOS_ARCH_LITE
 void WifiStaManager::StopSatelliteTimer(void)
 {
     WIFI_LOGI("StopSatelliteTimer! satelliteTimerId:%{public}u", satelliteTimerId);
@@ -384,5 +385,6 @@ void WifiStaManager::StartSatelliteTimer(void)
     WIFI_LOGI("StartSatelliteTimer success! satelliteTimerId:%{public}u", satelliteTimerId);
     return;
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

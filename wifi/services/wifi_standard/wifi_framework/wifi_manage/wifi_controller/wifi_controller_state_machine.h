@@ -95,7 +95,7 @@ public:
     void StartSoftapCloseTimer();
     void StopSoftapCloseTimer();
 #endif
-#ifdef OHOS_ARCH_LITE
+#ifndef OHOS_ARCH_LITE
     void CheckSatelliteState();
 #endif
 

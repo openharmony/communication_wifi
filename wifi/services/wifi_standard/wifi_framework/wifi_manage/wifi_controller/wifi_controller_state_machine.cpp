@@ -859,7 +859,7 @@ void WifiControllerMachine::StopSoftapCloseTimer()
     stopSoftapTimerId_ = 0;
 }
 
-#ifdef OHOS_ARCH_LITE
+#ifndef OHOS_ARCH_LITE
 void WifiControllerMachine::CheckSatelliteState()
 {
     WIFI_LOGI("Enter CheckSatelliteState");

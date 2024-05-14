@@ -848,6 +848,7 @@ void WifiControllerMachine::StopSoftapCloseTimer()
     MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(stopSoftapTimerId_);
     stopSoftapTimerId_ = 0;
 }
+#endif
 
 void WifiControllerMachine::ShutdownWifi()
 {
@@ -858,6 +859,5 @@ void WifiControllerMachine::ShutdownWifi()
 #endif
     StopAllConcreteManagers();
 }
-#endif
 } // namespace Wifi
 } // namespace OHOS

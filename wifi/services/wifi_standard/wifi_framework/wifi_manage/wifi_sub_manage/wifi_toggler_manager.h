@@ -38,7 +38,9 @@ public:
     ErrCode AirplaneToggled(int isOpen);
     bool HasAnyApRuning();
     std::unique_ptr<WifiControllerMachine>& GetControllerMachine();
+#ifndef OHOS_ARCH_LITE
     ErrCode SatelliteToggled(int state);
+#endif
 
 private:
     void InitConcreteCallback(void);

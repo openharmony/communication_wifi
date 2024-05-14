@@ -159,6 +159,7 @@ void WifiTogglerManager::DealClientRemoved(int id)
     }
 }
 
+#ifndef OHOS_ARCH_LITE
 ErrCode WifiTogglerManager::SatelliteToggled(int state)
 {
     if (state == WIFI_MODE_RSMC_START) {
@@ -177,5 +178,6 @@ ErrCode WifiTogglerManager::SatelliteToggled(int state)
     }
     return WIFI_OPT_SUCCESS;
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

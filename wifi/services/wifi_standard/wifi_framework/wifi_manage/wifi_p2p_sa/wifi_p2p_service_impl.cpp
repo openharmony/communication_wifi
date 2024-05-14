@@ -412,7 +412,8 @@ ErrCode WifiP2pServiceImpl::StopP2pListen()
 
 ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("CreateGroup, network name is [%{public}s]", config.GetGroupName().c_str());
+    int callingUid = GetCallingUid();
+    WIFI_LOGI("Uid %{public}d createGroup, network name is [%{public}s]", callingUid, config.GetGroupName().c_str());
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -438,6 +439,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
+    pService->IncreaseSharedLink(callingUid);
     return pService->CreateGroup(config);
 }
 
@@ -1050,7 +1052,8 @@ ErrCode WifiP2pServiceImpl::Hid2dRequestGcIp(const std::string& gcMac, std::stri
 
 ErrCode WifiP2pServiceImpl::Hid2dSharedlinkIncrease()
 {
-    WIFI_LOGI("Hid2dSharedlinkIncrease");
+    int callingUid = GetCallingUid();
+    WIFI_LOGI("Uid %{public}d Hid2dSharedlinkIncrease", callingUid);
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("Hid2dSharedlinkIncrease:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1070,13 +1073,14 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkIncrease()
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_FAILED;
     }
-    pService->IncreaseSharedLink();
+    pService->IncreaseSharedLink(callingUid);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
 {
-    WIFI_LOGI("Hid2dSharedlinkDecrease");
+    int callingUid = GetCallingUid();
+    WIFI_LOGI("Uid %{public}d Hid2dSharedlinkDecrease", callingUid);
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("Hid2dSharedlinkDecrease:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1090,9 +1094,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    if (pService->GetSharedLinkCount() > 0) {
-        pService->DecreaseSharedLink();
-    }
+    pService->DecreaseSharedLink(callingUid);
     if (pService->GetSharedLinkCount() == 0) {
         WIFI_LOGI("Shared link count == 0, remove group!");
         RemoveGroup();
@@ -1102,7 +1104,8 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
 
 ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
 {
-    WIFI_LOGI("Hid2dCreateGroup");
+    int callingUid = GetCallingUid();
+    WIFI_LOGI("Uid %{public}d Hid2dCreateGroup", callingUid);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1119,6 +1122,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiSettings::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
+    pService->IncreaseSharedLink(callingUid);
     return pService->Hid2dCreateGroup(frequency, type);
 }
 
@@ -1334,6 +1338,56 @@ int32_t WifiP2pServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& 
         return ERR_OK;
     }
     return ERR_OK;
+}
+
+ErrCode WifiP2pServiceImpl::DiscoverPeers(int32_t channelid)
+{
+    WIFI_LOGE("DiscoverPeers");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DiscoverPeers:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DiscoverPeers:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->DiscoverPeers(channelid);
+}
+
+ErrCode WifiP2pServiceImpl::DisableRandomMac(int setmode)
+{
+    WIFI_LOGE("DisableRandomMac");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DisableRandomMac:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DisableRandomMac:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->DisableRandomMac(setmode);
 }
 
 bool WifiP2pServiceImpl::IsRemoteDied(void)

@@ -693,6 +693,18 @@ struct IpV6Info {
     }
 };
 
+struct Wifi6BlackListInfo {
+    /* 0:HTC, 1:WIFI6, -1:invalid */
+    int actionType = -1;
+    int64_t updateTime = 0;
+
+    Wifi6BlackListInfo(int type, int64_t time)
+    {
+        this->actionType = type;
+        this->updateTime = time;
+    }
+};
+
 // SIM authentication
 struct EapSimGsmAuthParam {
     std::vector<std::string> rands;

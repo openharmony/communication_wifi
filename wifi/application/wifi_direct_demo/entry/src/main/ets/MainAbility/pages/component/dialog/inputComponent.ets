@@ -29,14 +29,6 @@ export default struct InputComponent {
   controller: CustomDialogController;
   eventConnect: (value: string) => void;
 
-//  checkCharacter(str: string): boolean{
-//    let pattern = new RegExp("[`+-\\~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]");
-//    if (pattern.test(str)) {
-//      return true;
-//    }
-//    return false;
-//  }
-
   build() {
     Column() {
       Text(this.title)
@@ -67,13 +59,6 @@ export default struct InputComponent {
           this.inputValue = value;
         })
         .height(60)
-      //      Divider()
-      //        .color('#bcbcbc')
-      //        .height(1)
-      //        .margin({
-      //          left: 15,
-      //          right: 15
-      //        })
 
       Row() {
         Button(this.cancelVal, { type: ButtonType.Capsule, stateEffect: true })

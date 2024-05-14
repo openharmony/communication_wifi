@@ -119,7 +119,6 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_IDL_OPT_OK)) {
         WIFI_LOGE("GetSupportFrequencies failed.\n");
     }
-    InitChipsetInfo();
 
     ChannelsTable chanTbs;
     (void)WifiSettings::GetInstance().GetValidChannels(chanTbs);
@@ -592,6 +591,9 @@ void ScanService::HandleCommonScanInfo(
 {
     WIFI_LOGI("Enter HandleCommonScanInfo, requestIndexList size: %{public}d.",
         static_cast<int>(requestIndexList.size()));
+    if (!isChipsetInfoObtained) {
+        InitChipsetInfo();
+    }
     bool fullScanStored = false;
     {
         std::unique_lock<std::mutex> lock(scanConfigMapMutex);
@@ -963,7 +965,7 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
     for (; iter != scanInfoList.end(); ++iter) {
         if ((iter->timestamp / SECOND_TO_MILLI_SECOND) > pnoScanStartTime) {
             filterScanInfo.push_back(*iter);
-            WIFI_LOGD("InterScanInfo bssid:%{private}s, ssid:%{public}s, capabilities:%{public}s,"
+            WIFI_LOGD("InterScanInfo bssid:%{public}s, ssid:%{public}s, capabilities:%{public}s,"
                 "frequency:%{public}d, rssi:%{public}d, timestamp:%" PRId64 ".\n",
                 MacAnonymize(iter->bssid).c_str(), SsidAnonymize(iter->ssid).c_str(), iter->capabilities.c_str(),
                 iter->frequency, iter->rssi, iter->timestamp);
@@ -1208,6 +1210,7 @@ void ScanService::DisconnectedTimerScan()
         WIFI_LOGE("pScanStateMachine is null.\n");
         return;
     }
+    pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);
     return;
 }
@@ -1226,6 +1229,7 @@ void ScanService::HandleDisconnectedScanTimeout()
     if (Scan(false) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed.");
     }
+    pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);
 
     return;
@@ -2711,9 +2715,6 @@ void ScanService::SystemScanDisconnectedPolicy(int &interval, int &count)
 void ScanService::InitChipsetInfo()
 {
     WIFI_LOGI("Enter InitChipsetInfo");
-    if (isChipsetInfoObtained) {
-        return;
-    }
     if (WifiStaHalInterface::GetInstance().GetChipsetCategory(
         WifiSettings::GetInstance().GetStaIfaceName(), chipsetCategory) != WIFI_IDL_OPT_OK
         || WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(

@@ -377,6 +377,20 @@ public:
     virtual ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) = 0;
 
     /**
+     * @Description Discover p2p device
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode DiscoverPeers(int32_t channelid) = 0;
+
+    /**
+     * @Description Disable random mac
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    virtual ErrCode DisableRandomMac(int setmode) = 0;
+
+    /**
      * @Description Check whether service is died.
      *
      * @return bool - true: service is died, false: service is not died.

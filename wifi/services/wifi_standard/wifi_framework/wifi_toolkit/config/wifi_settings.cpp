@@ -32,9 +32,11 @@
 #include "wifi_encryption_util.h"
 #endif
 #ifndef OHOS_ARCH_LITE
+#include <sys/sendfile.h>
 #include "wifi_country_code_define.h"
 #include "network_parser.h"
 #include "softap_parser.h"
+#include "wifi_backup_config.h"
 #endif
 #ifdef INIT_LIB_ENABLE
 #include "parameter.h"
@@ -407,6 +409,83 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
     mSavedDeviceConfig.SaveConfig();
     ReloadDeviceConfig();
 }
+
+int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
+{
+    LOGI("OnBackup enter.");
+    mSavedDeviceConfig.LoadConfig();
+    std::vector<WifiDeviceConfig> localConfigs;
+    mSavedDeviceConfig.GetValue(localConfigs);
+
+    std::vector<WifiBackupConfig> backupConfigs;
+    for (auto &config : localConfigs) {
+        if (config.wifiEapConfig.eap.length() != 0 || config.isPasspoint == true) {
+            continue;
+        }
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        DecryptionDeviceConfig(config);
+#endif
+        WifiBackupConfig backupConfig;
+        ConvertDeviceCfgToBackupCfg(config, backupConfig);
+        backupConfigs.push_back(backupConfig);
+    }
+
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.SetValue(backupConfigs);
+    wifiBackupConfig.SaveConfig();
+
+    fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH, O_RDONLY));
+    if (fd.Get() < 0) {
+        LOGE("OnBackup open fail.");
+        return -1;
+    }
+    LOGI("OnBackup end. Backup count: %{public}d, fd: %{public}d.", static_cast<int>(backupConfigs.size()), fd.Get());
+    return 0;
+}
+
+int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
+{
+    LOGI("OnRestore enter.");
+    struct stat statBuf;
+    if (fstat(fd.Get(), &statBuf) < 0) {
+        LOGE("OnRestore fstat fd fail.");
+        return -1;
+    }
+    int destFd = open(BACKUP_CONFIG_FILE_PATH, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (destFd < 0) {
+        LOGE("OnRestore open file fail.");
+        return -1;
+    }
+    if (sendfile(destFd, fd.Get(), nullptr, statBuf.st_size) < 0) {
+        LOGE("OnRestore fd sendfile(size: %{public}d) to destFd fail.", static_cast<int>(statBuf.st_size));
+        close(destFd);
+        return -1;
+    }
+    close(destFd);
+
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.LoadConfig();
+    std::vector<WifiBackupConfig> backupConfigs;
+    wifiBackupConfig.GetValue(backupConfigs);
+
+    std::vector<WifiDeviceConfig> deviceConfigs;
+    for (const auto &backupCfg : backupConfigs) {
+        WifiDeviceConfig config;
+        ConvertBackupCfgToDeviceCfg(backupCfg, config);
+        deviceConfigs.push_back(config);
+    }
+
+    LOGI("OnRestore end. Restore count: %{public}d", static_cast<int>(deviceConfigs.size()));
+    ConfigsDeduplicateAndSave(deviceConfigs);
+    return 0;
+}
+
+void WifiSettings::RemoveBackupFile()
+{
+    remove(BACKUP_CONFIG_FILE_PATH);
+}
 #endif
 
 int WifiSettings::GetWifiStaCapabilities() const
@@ -487,6 +566,35 @@ int WifiSettings::ClearScanInfoList()
     WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO);
 #endif
     mWifiScanInfoList.clear();
+    return 0;
+}
+
+void WifiSettings::InsertWifi6BlackListCache(const std::string currentBssid,
+    const Wifi6BlackListInfo wifi6BlackListInfo)
+{
+    std::unique_lock<std::mutex> lock(mWifiSelfcureMutex);
+    auto iter = wifi6BlackListCache.find(currentBssid);
+    if (iter != wifi6BlackListCache.end()) {
+        iter->second = wifi6BlackListInfo;
+    } else {
+        wifi6BlackListCache.emplace(std::make_pair(currentBssid, wifi6BlackListInfo));
+    }
+}
+
+void WifiSettings::RemoveWifi6BlackListCache(const std::string bssid)
+{
+    std::unique_lock<std::mutex> lock(mWifiSelfcureMutex);
+    if (wifi6BlackListCache.find(bssid) != wifi6BlackListCache.end()) {
+        wifi6BlackListCache.erase(bssid);
+    } else {
+        LOGE("%{public}s: don't exist wifi bla list, bssid: %{public}s", __func__, MacAnonymize(bssid).c_str());
+        return;
+    }
+}
+
+int WifiSettings::GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const
+{
+    blackListCache = wifi6BlackListCache;
     return 0;
 }
 
@@ -601,8 +709,10 @@ std::string WifiSettings::GetApIfaceName()
 int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
+    int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ) {
-        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
+        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES
+            || iter->timestamp < currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
         #ifdef SUPPORT_RANDOM_MAC_ADDR
             WifiSettings::GetInstance().RemoveMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 iter->bssid);

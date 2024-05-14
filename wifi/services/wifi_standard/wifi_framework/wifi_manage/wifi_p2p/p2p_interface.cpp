@@ -268,5 +268,15 @@ ErrCode P2pInterface::MonitorCfgChange(void)
 {
     return p2pService.MonitorCfgChange();
 }
+
+ErrCode P2pInterface::DiscoverPeers(int32_t channelid)
+{
+    return p2pService.DiscoverPeers(channelid);
+}
+
+ErrCode P2pInterface::DisableRandomMac(int setmode)
+{
+    return p2pService.DisableRandomMac(setmode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

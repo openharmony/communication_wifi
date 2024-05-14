@@ -356,7 +356,10 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode MonitorCfgChange(void)  override;
+ 
+    virtual ErrCode DiscoverPeers(int32_t channelid) override;
 
+    virtual ErrCode DisableRandomMac(int setmode) override;
 private:
     WifiP2pGroupManager groupManager;    /* group manager */
     WifiP2pDeviceManager deviceMgr;  /* device manager */

@@ -318,6 +318,19 @@ public:
      */
     virtual ErrCode MonitorCfgChange(void) override;
 
+    /**
+     * @Description Discover p2p device
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Disable random mac
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode DisableRandomMac(int setmode) override;
 private:
     /**
      * @Description - P2P state machine deregistration event callback.

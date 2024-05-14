@@ -391,6 +391,20 @@ public:
      */
     bool IsRemoteDied(void);
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    ErrCode DisableRandomMac(int setmode) override;
+
 private:
     bool GetWifiP2pProxy();
     int systemAbilityId_;

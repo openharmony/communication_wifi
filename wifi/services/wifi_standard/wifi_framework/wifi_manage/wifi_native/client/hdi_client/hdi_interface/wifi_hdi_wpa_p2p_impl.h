@@ -115,6 +115,8 @@ WifiErrorNo HdiP2pListNetworks(struct HdiP2pNetworkList *infoList);
 
 WifiErrorNo HdiP2pSaveConfig();
 
+WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData);
+
 #ifdef __cplusplus
 }
 #endif

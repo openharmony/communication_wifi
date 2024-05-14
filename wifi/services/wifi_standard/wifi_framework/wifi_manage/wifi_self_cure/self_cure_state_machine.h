@@ -385,7 +385,7 @@ private:
     int useWithRandMacAddress = 0;
     std::atomic<bool> selfCureOnGoing = false;
     std::atomic<bool> p2pConnected = false;
-    std::atomic<bool> notAllowSelfcure = false;
+    std::atomic<bool> notAllowSelfcure = true;
     int arpDetectionFailedCnt = 0;
     int selfCureReason = -1;
     int noTcpRxCounter = 0;

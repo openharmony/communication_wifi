@@ -45,6 +45,8 @@ public:
 #else
     explicit WifiDeviceServiceImpl(int instId);
     static void StartWatchdog(void);
+    static ErrCode OnBackup(MessageParcel& data, MessageParcel& reply);
+    static ErrCode OnRestore(MessageParcel& data, MessageParcel& reply);
 #endif
     virtual ~WifiDeviceServiceImpl();
 
@@ -164,6 +166,8 @@ public:
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
+    ErrCode SetSatelliteState(const int state) override;
 
 private:
     bool Init();

@@ -474,6 +474,13 @@ public:
      * @return ErrCode - hilink connect result
      */
     virtual ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) = 0;
+
+    /**
+     * @Description set satellite state
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetSatelliteState(const int state) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

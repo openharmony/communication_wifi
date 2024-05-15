@@ -390,5 +390,19 @@ bool WifiP2pImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();
 }
+
+ErrCode WifiP2pImpl::DiscoverPeers(int32_t channelid)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->DiscoverPeers(channelid);
+}
+
+ErrCode WifiP2pImpl::DisableRandomMac(int setmode)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->DisableRandomMac(setmode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -33,13 +33,7 @@
 #include "wifi_hisysevent.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
-#include "ability_manager_ipc_interface_code.h"
-#include "iremote_broker.h"
-#include "iremote_proxy.h"
-#include "iservice_registry.h"
-#include "message_parcel.h"
 #include "securec.h"
-#include "system_ability_definition.h"
 #include "wifi_app_state_aware.h"
 #include "wifi_net_observer.h"
 #include "wifi_system_timer.h"
@@ -53,8 +47,6 @@
 namespace OHOS {
 namespace Wifi {
 namespace {
-constexpr int DEFAULT_INVAL_VALUE = -1;
-const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
@@ -3091,7 +3083,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     want.SetBundle(BROWSER_BUNDLE);
     want.SetParam("netId", netId);
     WIFI_LOGI("wifi netId is %{public}d", netId);
-    OHOS::ErrCode err = StaStartAbility(want);
+    OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
     if (err != ERR_OK) {
         WIFI_LOGI("StartAbility is failed %{public}d", err);
         WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
@@ -3105,68 +3097,23 @@ void StaStateMachine::SetPortalBrowserFlag(bool flag)
 }
 
 #ifndef OHOS_ARCH_LITE
-int32_t StaStateMachine::StaStartAbility(OHOS::AAFwk::Want& want)
-{
-    sptr<ISystemAbilityManager> systemAbilityManager =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        WIFI_LOGE("systemAbilityManager is nullptr");
-        return -1;
-    }
-    sptr<IRemoteObject> remote = systemAbilityManager->GetSystemAbility(ABILITY_MGR_SERVICE_ID);
-    if (remote == nullptr) {
-        WIFI_LOGE("remote is nullptr");
-        return -1;
-    }
-
-    int error;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
- 
-    if (!data.WriteInterfaceToken(ABILITY_MGR_DESCRIPTOR)) {
-        return -1;
-    }
-    if (!data.WriteParcelable(&want)) {
-        WIFI_LOGE("want write failed.");
-        return -1;
-    }
- 
-    if (!data.WriteInt32(DEFAULT_INVAL_VALUE)) {
-        WIFI_LOGE("userId write failed.");
-        return -1;
-    }
- 
-    if (!data.WriteInt32(DEFAULT_INVAL_VALUE)) {
-        WIFI_LOGE("requestCode write failed.");
-        return -1;
-    }
-    uint32_t task =  static_cast<uint32_t>(AAFwk::AbilityManagerInterfaceCode::START_ABILITY);
-    error = remote->SendRequest(task, data, reply, option);
-    if (error != NO_ERROR) {
-        WIFI_LOGE("Send request error: %{public}d", error);
-        return error;
-    }
-    return reply.ReadInt32();
-}
-
 void StaStateMachine::ShowPortalNitification()
 {
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     bool hasInternetEver =
         NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
     if (hasInternetEver) {
-        WifiBannerNotification::GetInstance().PublishWifiNotification(
+        WifiNotificationUtil::GetInstance().PublishWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
             WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
     } else {
         if (WifiAppStateAware::GetInstance().IsForegroundApp(SETTINGS_BUNDLE)) {
-            WifiBannerNotification::GetInstance().PublishWifiNotification(
+            WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_CONNECTED);
             portalFlag = false;
         } else {
-            WifiBannerNotification::GetInstance().PublishWifiNotification(
+            WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_FOUND);
         }
@@ -3210,7 +3157,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
             lastTimestamp = nowTime;
         }
 #ifndef OHOS_ARCH_LITE
-        WifiBannerNotification::GetInstance().CancelWifiNotification(
+        WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
 #endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {

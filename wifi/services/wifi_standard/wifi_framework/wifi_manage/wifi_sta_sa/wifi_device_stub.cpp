@@ -88,6 +88,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnLimitSpeed;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT)] =
         &WifiDeviceStub::OnEnableHiLinkHandshake;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE)] =
+        &WifiDeviceStub::OnSetSatelliteState;
     return;
 }
 
@@ -1085,6 +1087,16 @@ void WifiDeviceStub::OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data,
     WifiDeviceConfig deviceConfig;
     ReadWifiDeviceConfig(data, deviceConfig);
     ErrCode ret = EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int state = data.ReadInt32();
+    ErrCode ret = SetSatelliteState(state);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

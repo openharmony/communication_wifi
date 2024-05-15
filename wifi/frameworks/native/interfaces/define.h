@@ -46,6 +46,7 @@
 #define WIFI_CBK_MSG_CFG_CHANGE 0x4009
 #define WIFI_CBK_MSG_P2P_GC_JOIN_GROUP 0x4010
 #define WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP 0x4011
+#define WIFI_CBK_MSG_PRIVATE_PEER_CHANGE 0x4012
 #define WIFI_CBK_MSG_MAX_INVALID_P2P 0x4FFF /* P2P invalid value */
 
 /* -----------Callback event name define-------------- */
@@ -71,7 +72,8 @@
 #define EVENT_P2P_ACTION_RESULT "p2pActionResult"
 #define EVENT_P2P_CONFIG_CHANGE "p2pConfigChange"
 #define EVENT_P2P_GC_JOIN_GROUP "p2pGcJoinGroup"
-#define EVENT_P2P_GC_LEAVE_GROUP "p2pGcLeaveGroup" /* P2P */
+#define EVENT_P2P_GC_LEAVE_GROUP "p2pGcLeaveGroup"
+#define EVENT_P2P_PRIVATE_PEER_DEVICE_CHANGE "p2pPrivatePeerDeviceChange" /* P2P */
 
 /* -----------Feature service name-------------- */
 #define WIFI_SERVICE_STA "StaService"     /* STA */

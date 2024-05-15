@@ -46,7 +46,10 @@ WifiServiceManager::~WifiServiceManager()
 int WifiServiceManager::Init()
 {
 #ifdef FEATURE_P2P_SUPPORT
-    mP2pServiceHandle.Clear();
+    {
+        std::unique_lock<std::mutex> lock(mP2pMutex);
+        mP2pServiceHandle.Clear();
+    }
 #endif
 #ifdef FEATURE_AP_SUPPORT
     mApServiceHandle.Clear();
@@ -56,7 +59,11 @@ int WifiServiceManager::Init()
 #endif
     mStaServiceHandle.Clear();
     mScanServiceHandle.Clear();
-    mEnhanceServiceHandle.Clear();
+    {
+        std::unique_lock<std::mutex> lock(mEnhanceMutex);
+        mEnhanceServiceHandle.Clear();
+    }
+    
 #ifdef OHOS_ARCH_LITE
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.so"));
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.so"));

@@ -232,22 +232,26 @@ void WifiManager::AutoStartEnhanceService(void)
 
 std::unique_ptr<WifiStaManager>& WifiManager::GetWifiStaManager()
 {
+    std::unique_lock<std::mutex> lock(initStatusMutex);
     return wifiStaManager;
 }
 
 std::unique_ptr<WifiScanManager>& WifiManager::GetWifiScanManager()
 {
+    std::unique_lock<std::mutex> lock(initStatusMutex);
     return wifiScanManager;
 }
 
 std::unique_ptr<WifiTogglerManager>& WifiManager::GetWifiTogglerManager()
 {
+    std::unique_lock<std::mutex> lock(initStatusMutex);
     return wifiTogglerManager;
 }
 
 #ifdef FEATURE_AP_SUPPORT
 std::unique_ptr<WifiHotspotManager>& WifiManager::GetWifiHotspotManager()
 {
+    std::unique_lock<std::mutex> lock(initStatusMutex);
     return wifiHotspotManager;
 }
 #endif
@@ -262,6 +266,7 @@ std::unique_ptr<WifiP2pManager>& WifiManager::GetWifiP2pManager()
 #ifndef OHOS_ARCH_LITE
 std::unique_ptr<WifiEventSubscriberManager>& WifiManager::GetWifiEventSubscriberManager()
 {
+    std::unique_lock<std::mutex> lock(initStatusMutex);
     return wifiEventSubscriberManager;
 }
 #endif

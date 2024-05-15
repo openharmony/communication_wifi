@@ -179,6 +179,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
         return false;
     }
     WIFI_LOGE("EnableState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+    std::unique_lock<std::mutex> lock(wifiControllerMachineMutex);
     switch (msg->GetMessageName()) {
         case CMD_WIFI_TOGGLED:
         case CMD_SCAN_ALWAYS_MODE_CHANGED:
@@ -590,6 +591,7 @@ void WifiControllerMachine::SwitchRole(ConcreteManagerRole role)
 
 void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessage *msg)
 {
+    std::unique_lock<std::mutex> lock(wifiControllerMachineMutex);
     ConcreteManagerRole presentRole;
     if (!(pWifiControllerMachine->ShouldEnableWifi())) {
         pWifiControllerMachine->StopAllConcreteManagers();
@@ -629,6 +631,7 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(InternalMessage *msg)
 {
+    std::unique_lock<std::mutex> lock(wifiControllerMachineMutex);
     int id = msg->GetParam2();
     WIFI_LOGE("handleSoftapToggleChangeInEnabledState");
     if (msg->GetParam1() == 1) {
@@ -670,6 +673,7 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
 void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 {
     WIFI_LOGE("HandleStaStartFailure");
+    std::unique_lock<std::mutex> lock(wifiControllerMachineMutex);
     pWifiControllerMachine->RemoveConcreteManager(id);
     mWifiStartFailCount++;
     if (pWifiControllerMachine->ShouldEnableWifi() && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {

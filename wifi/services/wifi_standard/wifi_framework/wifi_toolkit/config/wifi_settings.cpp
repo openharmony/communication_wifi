@@ -2103,6 +2103,7 @@ void WifiSettings::InitSettingsNum()
 
 void WifiSettings::InitScanControlForbidList(void)
 {
+    std::unique_lock<std::mutex> lock(mInfoMutex);
     /* Disable external scanning during scanning. */
     ScanForbidMode forbidMode;
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
@@ -2161,6 +2162,7 @@ void WifiSettings::InitScanControlForbidList(void)
 
 void WifiSettings::InitScanControlIntervalList(void)
 {
+    std::unique_lock<std::mutex> lock(mInfoMutex);
     /* Foreground app: 4 times in 2 minutes for a single application */
     ScanIntervalMode scanIntervalMode;
     scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_ORIGIN;

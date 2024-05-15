@@ -50,13 +50,14 @@ private:
 
 private:
     StaServiceCallback m_staCallback;
-    bool m_isWifiConnected {false};
+    std::atomic<bool> m_isWifiConnected = false;
     std::map<int, int> m_bgLimitRecordMap;
     int m_currentLimitMode;
     std::unordered_set<int> m_bgUidSet;
     std::unordered_set<int> m_bgPidSet;
     std::unordered_set<int> m_fgUidSet;
     std::mutex m_mutex;
+    std::mutex m_ReadWritemutex;
 };
 
 } // namespace Wifi

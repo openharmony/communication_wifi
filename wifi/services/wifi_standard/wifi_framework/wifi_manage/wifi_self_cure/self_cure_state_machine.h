@@ -242,6 +242,9 @@ public:
         void HandleRssiChanged();
         void HandleDelayedResetSelfCure();
         void SelfCureForDns();
+        std::string GetCountry();
+        std::string GetLanguage();
+        std::string GetOversea();
         bool useOperatorOverSea(std::vector<std::string>& publicDnsServers);
         void getPublicDnsServers(std::vector<std::string>& curDnses, std::vector<std::string>& replacedDnses);
         void getReplacedDnsServers(std::vector<std::string>& dnsServers);

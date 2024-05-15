@@ -122,7 +122,6 @@ ohos_unittest("wifi_sta_unittest") {
     "-Wl,--wrap=RegisterDhcpClientCallBack",
     "-Wl,--wrap=StartDhcpClient",
     "-Wl,--wrap=StopDhcpClient",
-    "-Wl,--wrap=RenewDhcpClient",
     "-Wl,--wrap=RegisterDhcpServerCallBack",
     "-Wl,--wrap=StartDhcpServer",
     "-Wl,--wrap=StopDhcpServer",

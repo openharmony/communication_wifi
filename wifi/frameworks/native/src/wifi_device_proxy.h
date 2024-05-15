@@ -470,6 +470,21 @@ public:
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 
     /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableSemiWifi() override;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetWifiDetailState(WifiDetailState &state) override;
+
+    /**
      * @Description set satellite state
      *
      * @return ErrCode - operation result

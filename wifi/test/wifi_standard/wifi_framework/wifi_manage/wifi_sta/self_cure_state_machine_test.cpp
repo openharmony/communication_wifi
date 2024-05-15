@@ -123,7 +123,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
         EXPECT_TRUE(pSelfCureStateMachine->pWifi6SelfCureState->ExecuteStateMsg(&msg));
     }
@@ -137,7 +137,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
         EXPECT_TRUE(pSelfCureStateMachine->pWifi6SelfCureState->ExecuteStateMsg(&msg));
     }
@@ -161,6 +161,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), InsertWifi6BlackListCache(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), RemoveWifi6BlackListCache(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetWifi6BlackListCache(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_TRUE(pSelfCureStateMachine->pWifi6SelfCureState->ExecuteStateMsg(&msg));
     }
 
@@ -258,7 +259,7 @@ public:
         LOGI("Enter GetCurrentBssidTest");
         std::string currConnectedBssid = "";
         EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         pSelfCureStateMachine->GetCurrentBssid();
     }
 
@@ -289,6 +290,130 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
         EXPECT_TRUE(pSelfCureStateMachine->IsWifi6Network(currConnectedBssid));
+    }
+
+    void DisconnectedExeMsgSuccess0()
+    {
+        LOGI("Enter DisconnectedExeMsgSuccess0");
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiSelfcureReset()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetLastNetworkId()).Times(AtLeast(0));
+        EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(&msg));
+    }
+
+    void HandleResetConnectNetworkTest()
+    {
+        LOGI("Enter HandleResetConnectNetworkTest");
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiSelfcureReset()).Times(AtLeast(0)).WillOnce(Return(false));
+        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(&msg);
+    }
+
+    void HandleResetConnectNetworkTest2()
+    {
+        LOGI("Enter HandleResetConnectNetworkTest2");
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
+        EXPECT_CALL(WifiSettings::GetInstance(), GetWifiSelfcureReset()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetLastNetworkId()).Times(AtLeast(0));
+        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(&msg);
+    }
+
+    void HandleResetConnectNetworkTest3()
+    {
+        LOGI("Enter HandleResetConnectNetworkTest3");
+        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(nullptr);
+    }
+
+    void SelfCureForResetTest()
+    {
+        LOGI("Enter SelfCureForResetTest");
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+        pSelfCureStateMachine->internetUnknown = true;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+    }
+
+    void SelfCureForResetTest2()
+    {
+        LOGI("Enter SelfCureForResetTest2");
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+        pSelfCureStateMachine->internetUnknown = false;
+        pSelfCureStateMachine->pInternetSelfCureState->hasInternetRecently = false;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+    }
+
+    void SelfCureForResetTest3()
+    {
+        LOGI("Enter SelfCureForResetTest3");
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+        pSelfCureStateMachine->internetUnknown = false;
+        pSelfCureStateMachine->pInternetSelfCureState->hasInternetRecently = true;
+        pSelfCureStateMachine->pInternetSelfCureState->currentRssi = MIN_VAL_LEVEL_2_5G;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+    }
+
+    void SelfCureForResetTest4()
+    {
+        LOGI("Enter SelfCureForResetTest4");
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+        pSelfCureStateMachine->internetUnknown = false;
+        pSelfCureStateMachine->pInternetSelfCureState->hasInternetRecently = true;
+        pSelfCureStateMachine->pInternetSelfCureState->currentRssi = MIN_VAL_LEVEL_4;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(0));
+        WifiP2pLinkedInfo linkedInfo;
+        linkedInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+        EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+    }
+
+    void SelfCureForResetTest5()
+    {
+        LOGI("Enter SelfCureForResetTest5");
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+        pSelfCureStateMachine->internetUnknown = false;
+        pSelfCureStateMachine->pInternetSelfCureState->hasInternetRecently = true;
+        pSelfCureStateMachine->pInternetSelfCureState->currentRssi = MIN_VAL_LEVEL_4;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(0));
+        WifiP2pLinkedInfo linkedInfo;
+        linkedInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+        EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        pSelfCureStateMachine->notAllowSelfcure = true;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+    }
+
+    void SelfCureForResetTest6()
+    {
+        LOGI("Enter SelfCureForResetTest6");
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+        pSelfCureStateMachine->internetUnknown = false;
+        pSelfCureStateMachine->pInternetSelfCureState->hasInternetRecently = true;
+        pSelfCureStateMachine->pInternetSelfCureState->currentRssi = MIN_VAL_LEVEL_4;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(0));
+        WifiP2pLinkedInfo linkedInfo;
+        linkedInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+        EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        pSelfCureStateMachine->notAllowSelfcure = false;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetLastNetworkId(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiSelfcureReset(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiToggledState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+    }
+
+    void IsSettingsPageTest()
+    {
+        LOGI("Enter IsSettingsPageTest");
+        pSelfCureStateMachine->IsSettingsPage();
     }
 };
 
@@ -410,6 +535,61 @@ HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest2, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest3, TestSize.Level1)
 {
     IsWifi6NetworkTest3();
+}
+
+HWTEST_F(SelfCureStateMachineTest, DisconnectedExeMsgSuccess0, TestSize.Level1)
+{
+    DisconnectedExeMsgSuccess0();
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleResetConnectNetworkTest, TestSize.Level1)
+{
+    HandleResetConnectNetworkTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleResetConnectNetworkTest2, TestSize.Level1)
+{
+    HandleResetConnectNetworkTest2();
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleResetConnectNetworkTest3, TestSize.Level1)
+{
+    HandleResetConnectNetworkTest3();
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest, TestSize.Level1)
+{
+    SelfCureForResetTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest2, TestSize.Level1)
+{
+    SelfCureForResetTest2();
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest3, TestSize.Level1)
+{
+    SelfCureForResetTest3();
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest4, TestSize.Level1)
+{
+    SelfCureForResetTest4();
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest5, TestSize.Level1)
+{
+    SelfCureForResetTest5();
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest6, TestSize.Level1)
+{
+    SelfCureForResetTest6();
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsSettingsPageTest, TestSize.Level1)
+{
+    IsSettingsPageTest();
 }
 
 } // namespace Wifi

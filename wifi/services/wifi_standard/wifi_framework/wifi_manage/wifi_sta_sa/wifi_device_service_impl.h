@@ -165,6 +165,10 @@ public:
 
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 
+    ErrCode EnableSemiWifi() override;
+
+    ErrCode GetWifiDetailState(WifiDetailState &state) override;
+
     ErrCode SetSatelliteState(const int state) override;
 
 private:

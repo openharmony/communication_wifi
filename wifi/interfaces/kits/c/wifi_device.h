@@ -42,6 +42,7 @@
 #include "wifi_error_code.h"
 #include "wifi_linked_info.h"
 #include "wifi_device_config.h"
+#include "wifi_state.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -316,6 +317,24 @@ WifiErrorCode RegisterWifiEvent(WifiEvent *event);
  * @since 7
  */
 WifiErrorCode UnRegisterWifiEvent(WifiEvent *event);
+
+/**
+ * @brief Enable semi-Wifi.
+ *
+ * @return Returns {@link WIFI_SUCCESS} if the station mode is semi enabled; returns an error code defined in
+ * {@link WifiErrorCode} otherwise.
+ * @since 7
+ */
+WifiErrorCode EnableSemiWifi(void);
+
+/**
+ * @brief Obtains the wifi detail state
+ *
+ * @return Returns {@link WIFI_SUCCESS} if get detail state successfully; returns an error code defined in
+ * {@link WifiErrorCode} otherwise.
+ * @since 7
+ */
+WifiErrorCode GetWifiDetailState(WifiDetailState *state);
 #ifdef __cplusplus
 }
 #endif

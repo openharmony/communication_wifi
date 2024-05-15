@@ -62,6 +62,14 @@ public:
     void OnP2pPeersChanged(const std::vector<WifiP2pDevice> &device) override;
 
     /**
+     * @Description If the discover P2P device information is updated, all the
+     *        latest WifiP2P devices are reported.
+     *
+     * @param priWfdInfo - std::string &priWfdInfo object
+     */
+    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override;
+
+    /**
      * @Description This event is triggered when the discovered services are updated.
      *
      * @param srvInfo - std::vector<WifiP2pServiceInfo> object
@@ -133,6 +141,7 @@ private:
     void RemoteOnConfigChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void RemoteOnP2pPrivatePeersChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     HandleFuncMap handleFuncMap;

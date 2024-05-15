@@ -95,6 +95,7 @@ public:
     void StartSoftapCloseTimer();
     void StopSoftapCloseTimer();
 #endif
+    void ShutdownWifi();
 
 private:
     template <typename T>

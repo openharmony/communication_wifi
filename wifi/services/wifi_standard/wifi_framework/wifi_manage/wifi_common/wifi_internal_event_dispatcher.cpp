@@ -908,6 +908,9 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
         case WIFI_CBK_MSG_CFG_CHANGE:
             SendConfigChangeEvent(callback, msg.cfgInfo);
             break;
+        case WIFI_CBK_MSG_PRIVATE_PEER_CHANGE:
+            callback->OnP2pPrivatePeersChanged(msg.privateWfdInfo);
+            break;
         default:
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
             break;
@@ -1028,6 +1031,7 @@ void WifiInternalEventDispatcher::ResetAllFrozenApp()
 
 bool WifiInternalEventDispatcher::IsAppFrozen(int pid)
 {
+    std::unique_lock<std::mutex> lock(mPidFrozenMutex);
     auto it = frozenPidList.find(pid);
     if (it != frozenPidList.end()) {
         return true;

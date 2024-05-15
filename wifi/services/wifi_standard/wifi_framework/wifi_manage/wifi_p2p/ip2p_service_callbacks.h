@@ -54,6 +54,7 @@ struct IP2pServiceCallbacks {
     std::function<void(const std::string &, const std::map<std::string, std::string> &, const WifiP2pDevice &)>
         OnP2pDnsSdTxtRecordAvailable;
     std::function<void(const std::vector<std::string> &, const WifiP2pDevice &)> OnP2pUpnpServiceAvailable;
+    std::function<void(const std::string &)> OnP2pPrivatePeersChangedEvent;
 };
 }  // namespace Wifi
 }  // namespace OHOS

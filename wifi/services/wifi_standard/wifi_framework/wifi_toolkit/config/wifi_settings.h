@@ -22,6 +22,9 @@
 #include <memory>
 #include <mutex>
 #include <algorithm>
+#ifndef OHOS_ARCH_LITE
+#include "unique_fd.h"
+#endif
 #include "wifi_common_def.h"
 #include "wifi_common_msg.h"
 #include "wifi_config_file_impl.h"
@@ -47,13 +50,14 @@ constexpr int ASSOCIATING_SCAN_CONTROL_INTERVAL = 2;
 constexpr int ASSOCIATED_SCAN_CONTROL_INTERVAL = 5;
 constexpr int OBTAINING_IP_SCAN_CONTROL_INTERVAL = 5;
 constexpr int OBTAINING_IP_SCAN_CONTROL_TIMES = 1;
-/* Obtain the scanning result that is valid within 180s. */
-constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 180;
+/* Obtain the scanning result that is valid within 30s. */
+constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
 
 constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
+constexpr char BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/backup_config.conf";
 constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
 constexpr char BLOCK_LIST_FILE_PATH[] = CONFIG_ROOR_DIR"/block_list.conf";
 constexpr char WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/wifi_config.conf";
@@ -141,6 +145,10 @@ public:
         const Wifi6BlackListInfo wifi6BlackListInfo);
     void RemoveWifi6BlackListCache(const std::string bssid);
     int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const;
+    void SetWifiSelfcureReset(const bool isReset);
+    bool GetWifiSelfcureReset() const;
+    void SetLastNetworkId(const int networkId);
+    int GetLastNetworkId() const;
     void SetSoftapToggledState(bool state);
     bool GetSoftapToggledState() const;
     void SetWifiStopState(bool state);
@@ -1710,6 +1718,29 @@ public:
      * @param cloneData - wifi xml config
      */
     void MergeWifiCloneConfig(std::string &cloneData);
+
+    /**
+     * @Description Backup config file
+     *
+     * @param fd - File Descriptor
+     * @param backupInfo - Backup info
+     * @return int - 0: success
+     */
+    int OnBackup(UniqueFd &fd, const std::string &backupInfo);
+
+    /**
+     * @Description Restore config file
+     *
+     * @param fd - File Descriptor
+     * @param restoreInfo - Restore info
+     * @return int - 0: success
+     */
+    int OnRestore(UniqueFd &fd, const std::string &restoreInfo);
+
+    /**
+     * @Description Remove backup config file
+     */
+    void RemoveBackupFile();
 #endif
 
 private:
@@ -1737,6 +1768,8 @@ private:
     int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
+    std::atomic<bool> mWifiSelfcureReset;
+    std::atomic<int> mLastNetworkId;
     bool mWifiStoping;
     bool mSoftapToggled;
     bool mIsSupportCoex;

@@ -86,7 +86,7 @@ private:
     void RegisterMovementCallBack();
     void UnRegisterMovementCallBack();
 #endif
-
+    void HandlP2pBusinessChange(int systemAbilityId, bool add);
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};

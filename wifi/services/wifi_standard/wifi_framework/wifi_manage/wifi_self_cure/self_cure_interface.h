@@ -70,6 +70,13 @@ public:
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
 
     /**
+     * @Description deal sta open result
+     *
+     * @param state - OperateResState
+     */
+    void DealStaOpenRes(OperateResState state, int instId = 0);
+
+    /**
      * @Description rssi level changed
      *
      * @param rssi

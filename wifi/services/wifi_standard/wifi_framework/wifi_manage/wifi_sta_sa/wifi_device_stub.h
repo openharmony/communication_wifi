@@ -86,6 +86,7 @@ private:
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);

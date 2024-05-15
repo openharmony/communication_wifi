@@ -796,13 +796,10 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
 void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
 {
     std::vector<std::string> strPublicIpAddr;
-    char DnsIpAddr[128];
-    GetParamter("const.wifi.dnscure_ipcfg", 
-    "10.8.2.1;10.8.2.2|8.8.8.8;208.67.222.222;180.76.76.76;223.5.5.5", DnsIpAddr, 128);
-    char PublicDnsIpAddr[31];
-    std::copy(DnsIpAddr + 17, std::end(DnsIpAddr), PublicDnsIpAddr);
+    char DnsIpAddr[32];
+    GetParamValue("const.wifi.dnscure_ipcfg", "", DnsIpAddr, 128);
     std::string temp = "";
-    for (int i = 0; i < sizeof(PublicDnsIpAddr); i++) {
+    for (int i = 0; i < sizeof(PublicDnsIpAddr) - 1; i++) {
         if (PublicDnsIpAddr[i] == ';') {
             strPublicIpAddr.push_back(temp);
             temp = "";
@@ -822,9 +819,33 @@ void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
     sOverseaPublicDnses[1] = strPublicIpAddr[3];
 }
 
+std::string SelfCureStateMachine::InternetSelfCureState::GetCountry()
+{
+    return GetParameter("const.cust.region", "");
+}
+
+std::string SelfCureStateMachine::InternetSelfCureState::GetLanguage()
+{
+    return GetParameter("persist。global。language", "");
+}
+
+std::string SelfCureStateMachine::InternetSelfCureState::GetOversea()
+{
+    std::string language = GetLanguage();
+    std::string country = GetCountry();
+    if (language == "zh-Hans" && (country == "cn" || country == "CN")) {
+        return "internal";
+    }
+    return "oversea";
+}
+
 bool SelfCureStateMachine::InternetSelfCureState::useOperatorOverSea()
 {
-    return true;
+    std::string oversea = GetOversea();
+    if ((oversea == "oversea")) {
+        return true;
+    }
+    return false;
 }
 
 void SelfCureStateMachine::InternetSelfCureState::getPublicDnsServers(std::vector<std::string>& publicDnsServers)
@@ -841,12 +862,11 @@ void SelfCureStateMachine::InternetSelfCureState::getReplacedDnsServers(
 {
     if (curDnses.empty()) {
         return;
-    } else {
-        std::vector<std::string> publicServer;
-        replaceDnses = curDnses;
-        getPublicDnsServers(publicServer);
-        replaceDnses[1] = publicServer[0];
     }
+    std::vector<std::string> publicServer;
+    replaceDnses = curDnses;
+    getPublicDnsServers(publicServer);
+    replaceDnses[1] = publicServer[0];
 }
 
 void SelfCureStateMachine::InternetSelfCureState::requestUpdateDnsServers(std::vector<std::string>& dnsServers)
@@ -865,14 +885,12 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
 {
     pSelfCureStateMachine->selfCureOnGoing = true;
     testedSelfCureLevel.push_back(WIFI_CURE_RESET_LEVEL_LOW_1_DNS);
-    std::vector<std::string> servers;
-    std::vector<std::string> domains;
     if (pSelfCureStateMachine->internetUnknown) {
         IpInfo ipInfo;
         IpV6Info ipV6Info;
         WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
         WifiSettings::GetInstance().GetIpv6Info(IpV6Info, 0);
-        if (servers.size() != 0) {
+        if (ipInfo.primaryDns != 0 && ipInfo.secondDns != 0) {
             std::vector<std::string> replacedDnsServers;
             getReplacedDnsServers(servers, replacedDnsServers);
             requestUpdateDnsServers(replacedDnsServers);

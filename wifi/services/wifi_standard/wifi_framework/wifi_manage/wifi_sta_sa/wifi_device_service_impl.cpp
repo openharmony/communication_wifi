@@ -848,7 +848,7 @@ ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std
     }
     if (networkId < 0 || CheckMacIsValid(bssid) != 0) {
         WIFI_LOGE("%{public}s: invalid param, networkId: %{public}d, bssid:%{public}s",
-            __FUNCTION__, networkId, MacAnonymize(bssid));
+            __FUNCTION__, networkId, MacAnonymize(bssid).c_str());
         return WIFI_OPT_INVALID_PARAM;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);

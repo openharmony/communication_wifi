@@ -598,6 +598,16 @@ struct WifiDeviceConfig {
 
 enum class WifiState { DISABLING = 0, DISABLED = 1, ENABLING = 2, ENABLED = 3, UNKNOWN = 4 };
 
+enum class WifiDetailState {
+    STATE_UNKNOWN = -1,
+    STATE_INACTIVE = 0,
+    STATE_ACTIVATED = 1,
+    STATE_ACTIVATING = 2,
+    STATE_DEACTIVATING = 3,
+    STATE_SEMI_ACTIVATING = 4,
+    STATE_SEMI_ACTIVE = 5
+};
+
 /* wps state */
 enum class WpsStartState {
     START_PBC_SUCCEED = 0,

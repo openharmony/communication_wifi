@@ -32,7 +32,8 @@ namespace OHOS {
 namespace Wifi {
 enum class WifiOperType {
     ENABLE,
-    DISABLE
+    DISABLE,
+    SEMI_ENABLE
 };
 
 enum class WifiConnectionType {

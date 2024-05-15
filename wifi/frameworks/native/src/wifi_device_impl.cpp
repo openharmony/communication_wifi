@@ -544,5 +544,19 @@ ErrCode WifiDeviceImpl::SetSatelliteState(const int state)
     return client_->SetSatelliteState(state);
 }
 
+ErrCode WifiDeviceImpl::EnableSemiWifi()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->EnableSemiWifi();
+}
+
+ErrCode WifiDeviceImpl::GetWifiDetailState(WifiDetailState &state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetWifiDetailState(state);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

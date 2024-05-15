@@ -118,6 +118,7 @@ ohos_unittest("toolkit_unittest") {
   external_deps = [
     "c_utils:utils",
     "dhcp:dhcp_sdk",
+    "dhcp:dhcp_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
     "jsoncpp:jsoncpp",

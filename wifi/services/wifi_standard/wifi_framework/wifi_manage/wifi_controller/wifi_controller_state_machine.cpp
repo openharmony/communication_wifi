@@ -30,6 +30,7 @@
 
 namespace OHOS {
 namespace Wifi {
+
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
 int WifiControllerMachine::mSoftapStartFailCount{0};
@@ -849,5 +850,14 @@ void WifiControllerMachine::StopSoftapCloseTimer()
 }
 #endif
 
+void WifiControllerMachine::ShutdownWifi()
+{
+    WIFI_LOGI("shutdownWifi.");
+#ifdef FEATURE_AP_SUPPORT
+    WifiSettings::GetInstance().SetSoftapToggledState(false);
+    StopAllSoftapManagers();
+#endif
+    StopAllConcreteManagers();
+}
 } // namespace Wifi
 } // namespace OHOS

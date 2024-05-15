@@ -304,6 +304,10 @@ private:
      */
     virtual void BroadcastP2pPeersChanged() const;
     /**
+     * @Description - Peers private update detected by broadcast.
+     */
+    virtual void BroadcastP2pPrivatePeersChanged(std::string &PrivateInfo) const;
+    /**
      * @Description - Broadcast the scanned service information update.
      */
     virtual void BroadcastP2pServicesChanged() const;
@@ -387,6 +391,8 @@ private:
      * @return true: success   false: fail
      */
     virtual bool StopDhcpServer();
+
+    virtual bool HandlerDisableRandomMac(int setmode) const;
 private:
     virtual void NotifyUserInvitationSentMessage(const std::string &pin, const std::string &peerAddress) const;
     virtual void NotifyUserProvDiscShowPinRequestMessage(const std::string &pin, const std::string &peerAddress);

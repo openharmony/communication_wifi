@@ -308,14 +308,16 @@ public:
     /**
      * @Description Increase the reference count of the hid2d service.
      *
+     * @param callingUid - the UID of caller
      */
-    virtual void IncreaseSharedLink(void) override;
+    virtual void IncreaseSharedLink(int callingUid) override;
 
     /**
      * @Description Decrease the reference count of the hid2d service.
      *
+     * @param callingUid - the UID of caller
      */
-    virtual void DecreaseSharedLink(void) override;
+    virtual void DecreaseSharedLink(int callingUid) override;
 
     /**
      * @Description Get the reference count of the hid2d service.
@@ -323,6 +325,14 @@ public:
      * @return int - reference count
      */
     virtual int GetSharedLinkCount(void) override;
+
+    /**
+     * @Description Handle the exception of upper-layer business.
+     *
+     * @param systemAbilityId - systemAbilityId of upper-layer business.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode HandleBusinessSAException(int systemAbilityId) override;
 
     /**
      * @Description - Get P2P recommended channel.
@@ -346,7 +356,10 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode MonitorCfgChange(void)  override;
+ 
+    virtual ErrCode DiscoverPeers(int32_t channelid) override;
 
+    virtual ErrCode DisableRandomMac(int setmode) override;
 private:
     WifiP2pGroupManager groupManager;    /* group manager */
     WifiP2pDeviceManager deviceMgr;  /* device manager */

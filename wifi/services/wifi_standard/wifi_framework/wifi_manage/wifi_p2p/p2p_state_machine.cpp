@@ -36,6 +36,11 @@
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
+//miracast
+const int CMD_TYPE_SET = 2;
+const int DATA_TYPE_P2P_BUSINESS = 1;
+const std::string CARRY_DATA_MIRACAST = "1";
+
 namespace OHOS {
 namespace Wifi {
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
@@ -432,6 +437,16 @@ void P2pStateMachine::BroadcastP2pPeersChanged() const
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pPeersChangedEvent != nullptr) {
             callBackItem.second.OnP2pPeersChangedEvent(peers);
+        }
+    }
+}
+
+void P2pStateMachine::BroadcastP2pPrivatePeersChanged(std::string &PrivateInfo) const
+{
+    std::unique_lock<std::mutex> lock(cbMapMutex);
+    for (const auto &callBackItem : p2pServiceCallbacks) {
+        if (callBackItem.second.OnP2pPrivatePeersChangedEvent != nullptr) {
+            callBackItem.second.OnP2pPrivatePeersChangedEvent(PrivateInfo);
         }
     }
 }
@@ -1204,5 +1219,13 @@ void P2pStateMachine::ClearGroup() const
     }
     freeifaddrs(ifaddr);
 }
+
+bool P2pStateMachine::HandlerDisableRandomMac(int setmode) const
+{
+    WifiP2PHalInterface::GetInstance().SetRandomMacAddr(setmode);
+    WifiP2PHalInterface::GetInstance().DeliverP2pData(CMD_TYPE_SET, DATA_TYPE_P2P_BUSINESS, CARRY_DATA_MIRACAST);
+    return EXECUTED;
+}
+
 } // namespace Wifi
 } // namespace OHOS

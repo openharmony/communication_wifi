@@ -885,7 +885,7 @@ std::string SelfCureStateMachine::InternetSelfCureState::GetOversea()
     return "oversea";
 }
 
-bool SelfCureStateMachine::InternetSelfCureState::useOperatorOverSea()
+bool SelfCureStateMachine::InternetSelfCureState::UseOperatorOverSea()
 {
     std::string oversea = GetOversea();
     if ((oversea == "oversea")) {
@@ -894,16 +894,16 @@ bool SelfCureStateMachine::InternetSelfCureState::useOperatorOverSea()
     return false;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::getPublicDnsServers(std::vector<std::string>& publicDnsServers)
+void SelfCureStateMachine::InternetSelfCureState::GetPublicDnsServers(std::vector<std::string>& publicDnsServers)
 {
-    if (!useOperatorOverSea() && chinaPublicDnses[0].empty()) {
+    if (!UseOperatorOverSea() && chinaPublicDnses[0].empty()) {
         publicDnsServers = chinaPublicDnses;
     } else {
         publicDnsServers = overseaPublicDnses;
     }
 }
 
-void SelfCureStateMachine::InternetSelfCureState::getReplacedDnsServers(
+void SelfCureStateMachine::InternetSelfCureState::GetReplacedDnsServers(
     std::vector<std::string>& curDnses, std::vector<std::string>& replaceDnses)
 {
     if (curDnses.empty()) {
@@ -911,11 +911,11 @@ void SelfCureStateMachine::InternetSelfCureState::getReplacedDnsServers(
     }
     std::vector<std::string> publicServer;
     replaceDnses = curDnses;
-    getPublicDnsServers(publicServer);
+    GetPublicDnsServers(publicServer);
     replaceDnses[1] = publicServer[0];
 }
 
-void SelfCureStateMachine::InternetSelfCureState::requestUpdateDnsServers(std::vector<std::string>& dnsServers)
+void SelfCureStateMachine::InternetSelfCureState::UpdateDnsServers(std::vector<std::string>& dnsServers)
 {
     IpInfo ipInfo;
     IpV6Info ipV6Info;
@@ -939,17 +939,17 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
         std::vector<std::string> servers = {ipInfo.primaryDns, ipInfo.secondDns};
         if (ipInfo.primaryDns != 0 && ipInfo.secondDns != 0) {
             std::vector<std::string> replacedDnsServers;
-            getReplacedDnsServers(servers, replacedDnsServers);
-            requestUpdateDnsServers(replacedDnsServers);
+            GetReplacedDnsServers(servers, replacedDnsServers);
+            UpdateDnsServers(replacedDnsServers);
         } else {
             std::vector<std::string> publicDnsServers;
-            getPublicDnsServers(publicDnsServers);
-            requestUpdateDnsServers(publicDnsServers);
+            GetPublicDnsServers(publicDnsServers);
+            UpdateDnsServers(publicDnsServers);
         }
     } else {
         std::vector<std::string> publicDnsServers;
-        getPublicDnsServers(publicDnsServers);
-        requestUpdateDnsServers(publicDnsServers);
+        GetPublicDnsServers(publicDnsServers);
+        UpdateDnsServers(publicDnsServers);
     }
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, DNS_UPDATE_CONFIRM_DELAYED_MS);
 }

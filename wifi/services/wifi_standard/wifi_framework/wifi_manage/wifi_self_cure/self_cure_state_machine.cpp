@@ -27,14 +27,17 @@
 #include "wifi_settings.h"
 #include "wifi_net_agent.h"
 #include "paramter.h"
-
+ 
 namespace OHOS {
 namespace Wifi {
 const std::string CLASS_NAME = "WifiSelfCure";
+const std::string LANGUAGE_CHINESE = "zh-Hans";
+const std::string COUNTRY_CHINA_CAPITAL = "CN";
+const std::string COUNTRY_CHINA_LOWERCASE = "cn";
 
 DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
-std::vector<std::string> sChinaPublicDnses;
-std::vector<std::string> sOverseaPublicDnses;
+std::vector<std::string> chinaPublicDnses;
+std::vector<std::string> overseaPublicDnses;
 
 const int CONNECT_NETWORK_RETRY = 1;
 const int WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
@@ -841,24 +844,24 @@ void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
     char DnsIpAddr[32];
     GetParamValue("const.wifi.dnscure_ipcfg", "", DnsIpAddr, 128);
     std::string temp = "";
-    for (int i = 0; i < sizeof(PublicDnsIpAddr) - 1; i++) {
-        if (PublicDnsIpAddr[i] == ';') {
+    for (int i = 0; i < sizeof(DnsIpAddr) - 1; i++) {
+        if (DnsIpAddr[i] == ';') {
             strPublicIpAddr.push_back(temp);
             temp = "";
             continue;
-        } else if (i == sizeof(PublicDnsIpAddr) - 1) {
-            temp = temp + PublicDnsIpAddr[i];
+        } else if (i == sizeof(DnsIpAddr) - 1) {
+            temp = temp + DnsIpAddr[i];
             strPublicIpAddr.push_back(temp);
             continue;
         } else {
-            temp = temp + PublicDnsIpAddr[i];
+            temp = temp + DnsIpAddr[i];
         }
     }
-    sChinaPublicDnses[0] = strPublicIpAddr[0];
-    sChinaPublicDnses[1] = strPublicIpAddr[1];
+    chinaPublicDnses[0] = strPublicIpAddr[0];
+    chinaPublicDnses[1] = strPublicIpAddr[1];
 
-    sOverseaPublicDnses[0] = strPublicIpAddr[2];
-    sOverseaPublicDnses[1] = strPublicIpAddr[3];
+    overseaPublicDnses[0] = strPublicIpAddr[2];
+    overseaPublicDnses[1] = strPublicIpAddr[3];
 }
 
 std::string SelfCureStateMachine::InternetSelfCureState::GetCountry()
@@ -868,14 +871,14 @@ std::string SelfCureStateMachine::InternetSelfCureState::GetCountry()
 
 std::string SelfCureStateMachine::InternetSelfCureState::GetLanguage()
 {
-    return GetParameter("persist。global。language", "");
+    return GetParameter("persist.global.language", "");
 }
 
 std::string SelfCureStateMachine::InternetSelfCureState::GetOversea()
 {
     std::string language = GetLanguage();
     std::string country = GetCountry();
-    if (language == "zh-Hans" && (country == "cn" || country == "CN")) {
+    if (language == LANGUAGE_CHINESE && (country == COUNTRY_CHINA_CAPITAL || country == COUNTRY_CHINA_LOWERCASE)) {
         return "internal";
     }
     return "oversea";
@@ -892,10 +895,10 @@ bool SelfCureStateMachine::InternetSelfCureState::useOperatorOverSea()
 
 void SelfCureStateMachine::InternetSelfCureState::getPublicDnsServers(std::vector<std::string>& publicDnsServers)
 {
-    if (!useOperatorOverSea() && sChinaPublicDnses[0].empty()) {
-        publicDnsServers = sChinaPublicDnses;
+    if (!useOperatorOverSea() && chinaPublicDnses[0].empty()) {
+        publicDnsServers = chinaPublicDnses;
     } else {
-        publicDnsServers = sOverseaPublicDnses;
+        publicDnsServers = overseaPublicDnses;
     }
 }
 
@@ -932,6 +935,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
         IpV6Info ipV6Info;
         WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
         WifiSettings::GetInstance().GetIpv6Info(IpV6Info, 0);
+        std::vector<std::string> servers = {ipInfo.primaryDns, ipInfo.secondDns};
         if (ipInfo.primaryDns != 0 && ipInfo.secondDns != 0) {
             std::vector<std::string> replacedDnsServers;
             getReplacedDnsServers(servers, replacedDnsServers);

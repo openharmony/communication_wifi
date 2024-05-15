@@ -607,9 +607,6 @@ void WifiDeviceStub::OnStartRoamToNetwork(uint32_t code, MessageParcel &data, Me
     ErrCode ret = StartRoamToNetwork(networkId, bssid, isCandidate);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-    if (ret == WIFI_OPT_SUCCESS) {
-        reply.WriteBool(isConnected);
-    }
     return;
 }
 

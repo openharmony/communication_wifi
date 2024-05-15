@@ -75,7 +75,7 @@ public:
      * @param bssid - target bssid
      * @return ErrCode - operation result
      */
-    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid)
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) = 0;
 
     /**
      * @Description  Disconnect to the network

@@ -315,11 +315,8 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
         cbInfo.configMethods = deviceInfoParam->configMethods;
         cbInfo.deviceCapabilities = deviceInfoParam->deviceCapabilities;
         cbInfo.groupCapabilities = deviceInfoParam->groupCapabilities;
-        const int wfdLength = 14; /* wfd info type: 0x000000000000 */
-        const int wfdStartPos = 2; /* skip 0x */
-        if (deviceInfoParam->wfdLength >= wfdLength && strlen((char *)(deviceInfoParam->wfdDeviceInfo)) >= wfdLength) {
-            OHOS::Wifi::HexStringToVec((char *)(deviceInfoParam->wfdDeviceInfo) + wfdStartPos, cbInfo.wfdDeviceInfo);
-        }
+        cbInfo.wfdDeviceInfo.insert(cbInfo.wfdDeviceInfo.begin(), deviceInfoParam->wfdDeviceInfo,
+            deviceInfoParam->wfdDeviceInfo + deviceInfoParam->wfdLength);
         cbk.onDeviceFound(cbInfo);
         LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{public}s",
             p2pDeviceAddress, deviceInfoParam->deviceName);

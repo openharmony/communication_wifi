@@ -53,6 +53,13 @@ static void UnloadStaSaTimerCallback()
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 }
 
+static void SatelliteTimerCallback()
+{
+    WIFI_LOGI("It's time for satellite timer.");
+    WifiManager::GetInstance().GetWifiTogglerManager()->SetSatelliteStartState(false);
+    WifiManager::GetInstance().GetWifiStaManager()->StopSatelliteTimer();
+}
+
 void WifiStaManager::StopUnloadStaSaTimer(void)
 {
     WIFI_LOGI("StopUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
@@ -310,7 +317,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     bool isConnected = (info.connState == CONNECTED) ? true : false;
     WifiProtectManager::GetInstance().UpdateWifiClientConnected(isConnected);
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
-        WifiBannerNotification::GetInstance().CancelWifiNotification(
+        WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
     }
 #endif
@@ -351,5 +358,33 @@ void WifiStaManager::DealRssiChanged(int rssi, int instId)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+
+#ifndef OHOS_ARCH_LITE
+void WifiStaManager::StopSatelliteTimer(void)
+{
+    WIFI_LOGI("StopSatelliteTimer! satelliteTimerId:%{public}u", satelliteTimerId);
+    std::unique_lock<std::mutex> lock(satelliteTimerMutex);
+    if (satelliteTimerId == 0) {
+        return;
+    }
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(satelliteTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(satelliteTimerId);
+    satelliteTimerId = 0;
+    return;
+}
+
+void WifiStaManager::StartSatelliteTimer(void)
+{
+    std::unique_lock<std::mutex> lock(satelliteTimerMutex);
+    std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+    wifiSysTimer->SetCallbackInfo(SatelliteTimerCallback);
+    satelliteTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
+    MiscServices::TimeServiceClient::GetInstance()->StartTimer(satelliteTimerId,
+        currentTime + TIMEOUT_STOP_SATELLITE);
+    WIFI_LOGI("StartSatelliteTimer success! satelliteTimerId:%{public}u", satelliteTimerId);
+    return;
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

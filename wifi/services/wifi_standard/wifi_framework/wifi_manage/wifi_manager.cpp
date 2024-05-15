@@ -116,6 +116,8 @@ int WifiManager::Init()
 void WifiManager::Exit()
 {
     WIFI_LOGI("[WifiManager] Exit.");
+    std::unique_lock<std::mutex> lock(initStatusMutex);
+    mInitStatus = INIT_UNKNOWN;
     WifiServiceManager::GetInstance().UninstallAllService();
     PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
     if (mCloseServiceThread) {

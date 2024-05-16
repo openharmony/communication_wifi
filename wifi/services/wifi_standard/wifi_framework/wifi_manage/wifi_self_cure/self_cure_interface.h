@@ -52,7 +52,7 @@ public:
      *
      * @return StaServiceCallback - sta callback
      */
-    virtual StaServiceCallback GetStaCallback() override;
+    virtual StaServiceCallback GetStaCallback() const override;
 
     /**
     * @Description  init callback function.

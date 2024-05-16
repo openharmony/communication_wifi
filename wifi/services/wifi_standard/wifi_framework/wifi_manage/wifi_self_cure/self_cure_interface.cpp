@@ -77,7 +77,7 @@ ErrCode SelfCureInterface::InitCallback()
     return WIFI_OPT_SUCCESS;
 }
 
-StaServiceCallback SelfCureInterface::GetStaCallback()
+StaServiceCallback SelfCureInterface::GetStaCallback() const
 {
     WIFI_LOGD("self cure GetStaCallback");
     return mStaCallback;

@@ -57,7 +57,7 @@ private:
     std::unordered_set<int> m_bgPidSet;
     std::unordered_set<int> m_fgUidSet;
     std::mutex m_mutex;
-    std::mutex m_ReadWritemutex;
+    std::mutex m_readWritemutex;
 };
 
 } // namespace Wifi

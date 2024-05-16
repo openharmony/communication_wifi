@@ -1228,6 +1228,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     LOGI("Enter DealDisconnectEvent.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
+        return;
     }
     if (wpsState != SetupMethod::INVALID) {
         WIFI_LOGE("wpsState is INVALID\n");

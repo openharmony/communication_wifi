@@ -425,6 +425,7 @@ private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);
     bool IsP2pServiceRunning();
+    bool IsCallingAllowed();
     static void SaBasicDump(std::string& result);
 
 private:

@@ -29,7 +29,7 @@ WifiPowerStateListener &WifiPowerStateListener::GetInstance()
 
 WifiPowerStateListener::WifiPowerStateListener()
 {
-    bWifiStateBeforeSleep[0] = false;
+    bWifiStateBeforeSleep[0] = WIFI_STATE_CLOSED;
 }
 
 void WifiPowerStateListener::OnSyncSleep(bool onForceSleep)
@@ -67,9 +67,13 @@ void WifiPowerStateListener::DealPowerEnterSleepEvent()
 
     for (int idx = 0; idx < STA_INSTANCE_MAX_NUM; idx++) {
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(idx);
-        if (staState == WifiOprMidState::RUNNING) {
-            bWifiStateBeforeSleep[idx] = true;
+        WifiDetailState staDetailState = WifiConfigCenter::GetInstance().GetWifiDetailState(idx);
+        if (staState == WifiOprMidState::RUNNING || staDetailState == WifiDetailState::STATE_SEMI_ACTIVE) {
+            bWifiStateBeforeSleep[idx] = (staState == WifiOprMidState::RUNNING) ?
+                WIFI_STATE_OPENED : WIFI_STATE_SEMI_ACTIVE;
             WifiSettings::GetInstance().SetWifiToggledState(false);
+            WifiSettings::GetInstance().SetWifiAllowSemiActive(false);
+            WifiSettings::GetInstance().SetSemiWifiEnable(false);
             WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, idx);
         }
     }
@@ -83,7 +87,7 @@ void WifiPowerStateListener::DealPowerExitSleepEvent()
 
     /* Re-opening is required only if it was previously turned on and then turned off when entering enforce sleep. */
     for (int idx = 0; idx < STA_INSTANCE_MAX_NUM; idx++) {
-        if (bWifiStateBeforeSleep[idx]) {
+        if (bWifiStateBeforeSleep[idx] == WIFI_STATE_OPENED) {
             WifiSettings::GetInstance().SetWifiToggledState(true);
             ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, idx);
             if (ret != WIFI_OPT_SUCCESS) {
@@ -91,8 +95,12 @@ void WifiPowerStateListener::DealPowerExitSleepEvent()
             } else {
                 WIFI_LOGI("DealPowerExitSleepEvent, auto start wifi success!");
             }
-            bWifiStateBeforeSleep[idx] = false;
+        } else if (bWifiStateBeforeSleep[idx] == WIFI_STATE_SEMI_ACTIVE) {
+            WifiSettings::GetInstance().SetWifiToggledState(false);
+            WifiSettings::GetInstance().SetSemiWifiEnable(true);
+            WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, idx);
         }
+        bWifiStateBeforeSleep[idx] = WIFI_STATE_CLOSED;
     }
     return;
 }

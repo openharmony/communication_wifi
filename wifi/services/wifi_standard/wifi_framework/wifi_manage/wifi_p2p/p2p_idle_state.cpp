@@ -305,11 +305,12 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
         p2pStateMachine.UpdateGroupManager();
         group.SetNetworkId(groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         WIFI_LOGI("the group network id is %{public}d set id is %{public}d",
-            group.GetNetworkId(),
-            p2pStateMachine.groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
+            group.GetNetworkId(), groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         p2pStateMachine.UpdatePersistentGroups();
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
+    group.SetCreatorUid(WifiSettings::GetInstance().GetP2pCreatorUid());
+    WifiSettings::GetInstance().SaveP2pCreatorUid(-1);
     p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     if (!p2pStateMachine.groupManager.GetCurrentGroup().IsGroupOwner()) {
         p2pStateMachine.StartDhcpClientInterface();

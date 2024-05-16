@@ -49,6 +49,7 @@ public:
 
     void OnSystemAbilityChanged(int systemAbilityId, bool add) override;
     void GetAirplaneModeByDatashare();
+    void GetWifiAllowSemiActiveByDatashare();
     bool GetLocationModeByDatashare();
     void DealLocationModeChangeEvent();
     void DealCloneDataChangeEvent();

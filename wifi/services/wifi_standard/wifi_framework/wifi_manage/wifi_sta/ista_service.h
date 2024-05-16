@@ -48,6 +48,15 @@ public:
      */
     virtual ErrCode DisableWifi() = 0;
     /**
+     * @Description  Enable semi-wifi
+     *
+     * @Output: Return operating results to Interface Service after enable semi-wifi
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableSemiWifi() = 0;
+    /**
      * @Description  Connect to a new network
      *
      * @param config - the configuration of network which is going to connect.(in)

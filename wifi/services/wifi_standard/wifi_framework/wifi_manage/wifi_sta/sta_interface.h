@@ -48,6 +48,15 @@ public:
      */
     virtual ErrCode DisableWifi() override;
     /**
+     * @Description  Enable semi-wifi
+     *
+     * @Output: Return operating results to Interface Service after enable semi-wifi
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableSemiWifi() override;
+    /**
      * @Description  Connect to a new network
      *
      * @param config - the configuration of network which is going to connect.(in)
@@ -321,6 +330,7 @@ public:
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &bssid) override;
 private:
+    bool InitStaServiceLocked();
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;
     std::mutex mutex;

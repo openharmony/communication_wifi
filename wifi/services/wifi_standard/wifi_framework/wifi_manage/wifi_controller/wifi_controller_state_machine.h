@@ -65,7 +65,6 @@ public:
         void HandleSoftapToggleChangeInEnabledState(InternalMessage *msg);
         void HandleApRemoved(InternalMessage *msg);
 #endif
-        mutable std::mutex wifiControllerMachineMutex;
         WifiControllerMachine *pWifiControllerMachine;
     };
 

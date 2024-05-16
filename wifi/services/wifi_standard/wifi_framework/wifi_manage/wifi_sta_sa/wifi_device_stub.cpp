@@ -121,7 +121,8 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnDisableDeviceConfig;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = &WifiDeviceStub::OnConnectTo;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = &WifiDeviceStub::OnConnect2To;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK)] = &WifiDeviceStub::OnConnect2To;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK)] =
+        &WifiDeviceStub::OnStartRoamToNetwork;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = &WifiDeviceStub::OnReConnect;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE)] = &WifiDeviceStub::OnReAssociate;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISCONNECT)] = &WifiDeviceStub::OnDisconnect;

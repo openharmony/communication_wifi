@@ -275,13 +275,18 @@ void WifiControllerMachine::HandleAirplaneOpen()
     WifiSettings::GetInstance().SetSoftapToggledState(false);
     StopAllSoftapManagers();
 #endif
-    if (!WifiConfigCenter::GetInstance().GetWifiFlagOnAirplaneMode()) {
+    if (!WifiConfigCenter::GetInstance().GetWifiFlagOnAirplaneMode() ||
+        WifiConfigCenter::GetInstance().GetWifiDetailState() == WifiDetailState::STATE_SEMI_ACTIVE) {
         StopAllConcreteManagers();
     }
 }
 
 void WifiControllerMachine::HandleAirplaneClose()
 {
+    WIFI_LOGI("HandleAirplaneClose in");
+#ifndef OHOS_ARCH_LITE
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetWifiAllowSemiActiveByDatashare();
+#endif
     if (!ShouldEnableWifi() || WifiSettings::GetInstance().GetWifiStopState()) {
         return;
     }
@@ -422,7 +427,7 @@ bool WifiControllerMachine::ShouldEnableWifi()
         return false;
     }
 #endif
-    if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsScanOnlyEnable()) {
+    if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsSemiWifiEnable() || IsScanOnlyEnable()) {
         WIFI_LOGI("Should start wifi or scanonly.");
         return true;
     }
@@ -437,6 +442,10 @@ ConcreteManagerRole WifiControllerMachine::GetWifiRole()
         return ConcreteManagerRole::ROLE_CLIENT_MIX;
     } else if (IsWifiEnable()) {
         return ConcreteManagerRole::ROLE_CLIENT_STA;
+    } else if (IsSemiWifiEnable() && IsScanOnlyEnable()) {
+        return ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE;
+    } else if (IsSemiWifiEnable()) {
+        return ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE;
     } else if (IsScanOnlyEnable()) {
         return ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY;
     } else {
@@ -447,6 +456,11 @@ ConcreteManagerRole WifiControllerMachine::GetWifiRole()
 bool WifiControllerMachine::IsWifiEnable()
 {
     return WifiSettings::GetInstance().IsWifiToggledEnable();
+}
+
+bool WifiControllerMachine::IsSemiWifiEnable()
+{
+    return WifiSettings::GetInstance().IsSemiWifiEnable();
 }
 
 bool WifiControllerMachine::IsScanOnlyEnable()
@@ -723,6 +737,16 @@ void WifiControllerMachine::HandleStaStart(int id)
     }
 }
 
+void WifiControllerMachine::HandleStaSemiActive(int id)
+{
+    mWifiStartFailCount = 0;
+    this->StopTimer(CMD_OPEN_WIFI_RETRY);
+    std::unique_lock<std::mutex> lock(concreteManagerMutex);
+    for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
+        (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STA_SEMI_ACTIVE);
+    }
+}
+
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleApStart(int id)
 {
@@ -756,7 +780,7 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
 #endif
         if (!WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning()) {
-            if (WifiSettings::GetInstance().IsWifiToggledEnable()) {
+            if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsWifiEnable()) {
                 ConcreteManagerRole presentRole = GetWifiRole();
                 MakeConcreteManager(presentRole, 0);
                 return;
@@ -764,7 +788,7 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
     } else {
 #endif
-        if (WifiSettings::GetInstance().IsWifiToggledEnable()) {
+        if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsWifiEnable()) {
             ConcreteManagerRole presentRole = GetWifiRole();
             MakeConcreteManager(presentRole, 0);
             return;

@@ -88,9 +88,14 @@ int WifiManager::Init()
     }
     mInitStatus = INIT_OK;
 
-    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
-        WIFI_LOGI("AutoStartServiceThread");
-        WifiSettings::GetInstance().SetWifiToggledState(true);
+    int lastState = WifiConfigCenter::GetInstance().GetStaLastRunState();
+    if (lastState != WIFI_STATE_CLOSED) { /* Automatic startup upon startup */
+        WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
+        if (lastState == WIFI_STATE_SEMI_ACTIVE) {
+            WifiSettings::GetInstance().SetSemiWifiEnable(true);
+        } else {
+            WifiSettings::GetInstance().SetWifiToggledState(true);
+        }
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();

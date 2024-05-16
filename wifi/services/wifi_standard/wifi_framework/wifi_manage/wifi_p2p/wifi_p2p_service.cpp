@@ -15,6 +15,7 @@
 
 #include "wifi_p2p_service.h"
 #include "abstract_ui.h"
+#include "ipc_skeleton.h"
 #include "p2p_define.h"
 #include "wifi_common_util.h"
 #include "wifi_errcode.h"
@@ -125,6 +126,7 @@ ErrCode WifiP2pService::StopP2pListen()
 
 ErrCode WifiP2pService::CreateGroup(const WifiP2pConfig &config)
 {
+    WifiSettings::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     WIFI_LOGI("CreateGroup name: %{private}s, address:%{private}s, addressType:%{public}d",
         config.GetGroupName().c_str(), config.GetDeviceAddress().c_str(), config.GetDeviceAddressType());
     WifiP2pConfigInternal configInternal(config);
@@ -162,6 +164,7 @@ ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 {
     WIFI_LOGI("P2pConnect");
+    WifiSettings::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     WifiP2pConfigInternal configInternal(config);
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
@@ -296,6 +299,7 @@ void WifiP2pService::ClearAllP2pServiceCallbacks()
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
 {
     WIFI_LOGI("Create hid2d group");
+    WifiSettings::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     const std::any info = std::pair<int, FreqType>(frequency, type);
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP), info);
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -304,7 +308,7 @@ ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
 ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
 {
     WIFI_LOGI("Hid2dConnect");
-
+    WifiSettings::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     DHCPTYPE dhcpType = DHCPTYPE::DHCP_LEGACEGO;
     if (config.GetDhcpMode() == DhcpMode::CONNECT_GO_NODHCP ||
         config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {

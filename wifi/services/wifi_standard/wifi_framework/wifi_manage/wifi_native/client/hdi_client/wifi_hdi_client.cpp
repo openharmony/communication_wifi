@@ -112,7 +112,9 @@ WifiErrorNo WifiHdiClient::ReqRegisterSupplicantEventCallback(const SupplicantEv
 
 WifiErrorNo WifiHdiClient::ReqUnRegisterSupplicantEventCallback()
 {
-    HdiUnRegisterStaCallbackEvent();
+    ISupplicantEventCallback cEventCallback;
+    cEventCallback.onScanNotify = nullptr;
+    HdiSetSupplicantEventCallback(cEventCallback);
     return WIFI_IDL_OPT_OK;
 }
 

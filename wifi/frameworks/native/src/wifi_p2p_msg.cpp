@@ -461,6 +461,16 @@ void WifiP2pGroupInfo::ClearClientDevices()
     clientDevices.clear();
 }
 
+void WifiP2pGroupInfo::SetCreatorUid(int uid)
+{
+    creatorUid = uid;
+}
+
+int WifiP2pGroupInfo::GetCreatorUid()
+{
+    return creatorUid;
+}
+
 void WpsInfo::SetWpsMethod(WpsMethod wpsMethod)
 {
     mWpsMethod = wpsMethod;

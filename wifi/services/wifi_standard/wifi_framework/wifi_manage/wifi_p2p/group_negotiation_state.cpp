@@ -19,6 +19,7 @@
 #include "wifi_logger.h"
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupNegotiationState");
 
@@ -79,6 +80,8 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         return EXECUTED;
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
+    group.SetCreatorUid(WifiSettings::GetInstance().GetP2pCreatorUid());
+    WifiSettings::GetInstance().SaveP2pCreatorUid(-1);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
 
     if (groupManager.GetCurrentGroup().IsGroupOwner() &&

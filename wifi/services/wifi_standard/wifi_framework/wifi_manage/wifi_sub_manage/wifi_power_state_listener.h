@@ -33,7 +33,7 @@ public:
 private:
     void DealPowerEnterSleepEvent();
     void DealPowerExitSleepEvent();
-    std::map <int, bool> bWifiStateBeforeSleep;
+    std::map <int, int> bWifiStateBeforeSleep;
 };
 
 } // namespace Wifi

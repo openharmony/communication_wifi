@@ -107,6 +107,9 @@ enum class OperateResState {
     CLOSE_SCAN_ONLY_SUCCEED,                /* close scan only succeed */
     CLOSE_SCAN_ONLY_FAILED,                 /* close scan only failed */
     SPECIAL_CONNECTED,                  /* special connected */
+    ENABLE_SEMI_WIFI_OPENING,               /* enable semi wifi opening */
+    ENABLE_SEMI_WIFI_SUCCEED,               /* enable semi wifi succeed */
+    ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
 };
 
 /* is wps connected to a network  */
@@ -211,10 +214,10 @@ struct WifiConfig {
      * last sta service state, when service started, power
      * saving off, airplane mode off we use this saved state to
      * discuss whether need restore sta service. when open sta
-     * service, set true; when user call DisableWifi succeed,
-     * set false;
+     * service, set 1; when user call DisableWifi succeed,
+     * set 0; when sta is semi active, set 2;
      */
-    bool staLastState;
+    int staLastState;
     int lastAirplaneMode;
     int savedDeviceAppraisalPriority;
     int scoretacticsScoreSlope;
@@ -257,7 +260,7 @@ struct WifiConfig {
         staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
         canOpenStaWhenAirplane = true;
         openWifiWhenAirplane = false;
-        staLastState = false;
+        staLastState = 0;
         lastAirplaneMode = AIRPLANE_MODE_CLOSE;
         savedDeviceAppraisalPriority = PRIORITY_1;
         scoretacticsScoreSlope = SCORE_SLOPE;

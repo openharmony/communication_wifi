@@ -386,7 +386,6 @@ int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject>
         std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
         auto iter = mHotspotCallbacks.find(id);
         if (iter != mHotspotCallbacks.end()) {
-            std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
             auto item = iter->second.find(remote);
             if (item != iter->second.end()) {
                 iter->second.erase(item);

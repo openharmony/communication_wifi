@@ -189,7 +189,6 @@ void MessageQueue::StopQueueLoop()
     LOGI("Start stop queue loop.");
     mNeedQuit = true;
     if (mIsBlocked) {
-        std::unique_lock<std::mutex> lck(mMtxBlock);
         mIsBlocked = false;
     }
     mCvQueue.notify_one();

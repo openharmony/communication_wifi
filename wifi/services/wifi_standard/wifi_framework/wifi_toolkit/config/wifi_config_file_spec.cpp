@@ -48,6 +48,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.numAssociation = 0;
     item.networkStatusHistory = 0;
     item.isPortal = false;
+    item.portalAuthTime = -1;
     item.lastHasInternetTime = -1;
     item.noInternetAccess = false;
     item.callProcessName.clear();
@@ -212,6 +213,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.version = std::stoi(value);
     } else if (key == "randomizedMacSuccessEver") {
         item.randomizedMacSuccessEver = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "portalAuthTime") {
+        item.portalAuthTime = std::stol(value);
     } else {
         return SetWifiDeviceConfigExternal(item, key, value);
     }
@@ -463,6 +466,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"numAssociation=" << item.numAssociation << std::endl;
     ss << "    " <<"networkStatusHistory=" << item.networkStatusHistory << std::endl;
     ss << "    " <<"isPortal=" << item.isPortal << std::endl;
+    ss << "    " <<"portalAuthTime=" << item.portalAuthTime << std::endl;
     ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
     ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
     ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;

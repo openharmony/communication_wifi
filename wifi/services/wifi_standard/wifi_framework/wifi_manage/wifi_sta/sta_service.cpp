@@ -766,7 +766,7 @@ void StaService::HandleScreenStatusChanged(int screenState)
         return;
     }
     if (screenState == MODE_STATE_OPEN) {
-        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
+        pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }

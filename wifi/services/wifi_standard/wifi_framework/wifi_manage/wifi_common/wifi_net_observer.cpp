@@ -28,10 +28,6 @@ namespace OHOS {
 namespace Wifi {
 using namespace NetManagerStandard;
 
-#define NETWORK 1
-#define NO_NETWORK 0
-#define ARP_OPT 0
-
 NetStateObserver::NetStateObserver(): m_callback(nullptr)
 {
     WIFI_LOGD("construct NetStateObserver");
@@ -81,13 +77,10 @@ int32_t NetStateObserver::OnNetDetectionResultChanged(
             break;
         }
         case NetManagerStandard::NET_DETECTION_FAIL: {
-            WriteWifiAccessIntFailedHiSysEvent(ARP_OPT, StaArpState::ARP_STATE_UNREACHABLE);
-            WriteIsInternetHiSysEvent(NO_NETWORK);
             m_callback(SystemNetWorkState::NETWORK_NOTWORKING, "");
             break;
         }
         case NetManagerStandard::NET_DETECTION_SUCCESS: {
-            WriteIsInternetHiSysEvent(NETWORK);
             m_callback(SystemNetWorkState::NETWORK_IS_WORKING, "");
             break;
         }

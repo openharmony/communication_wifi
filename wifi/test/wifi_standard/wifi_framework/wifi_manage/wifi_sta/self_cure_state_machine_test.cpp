@@ -38,6 +38,9 @@ namespace OHOS {
 namespace Wifi {
 static const int64_t TIME_MILLS = 1615153293123;
 static const std::string CURR_BSSID = "11:22:33:ef:ac:0e";
+static const std::string GATEWAY = "192.168.0.1";
+static const std::string CURRENT_ADDR = "192.168.0.100";
+static const std::vector<std::string> TESTED_ADDR = {"192.168.0.101", "192.168.0.102", "192.168.0.103"};
 
 class SelfCureStateMachineTest : public testing::Test {
 public:
@@ -1374,6 +1377,1151 @@ HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest6, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, IsSettingsPageTest, TestSize.Level1)
 {
     IsSettingsPageTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest1, TestSize.Level1)
+{
+    IpInfo dhcpResults;
+    int result = pSelfCureStateMachine->GetLegalIpConfiguration(dhcpResults);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest2, TestSize.Level1)
+{
+    IpInfo dhcpResults;
+    dhcpResults.gateway = 19216801;
+    dhcpResults.ipAddress = 19216801;
+    int result = pSelfCureStateMachine->GetLegalIpConfiguration(dhcpResults);
+    EXPECT_EQ(result, 0);
+    EXPECT_EQ(dhcpResults.ipAddress, 192168156);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest3, TestSize.Level1)
+{
+    IpInfo dhcpResults;
+    dhcpResults.gateway = 19216801;
+    dhcpResults.ipAddress = 19216801;
+    int result = pSelfCureStateMachine->GetLegalIpConfiguration(dhcpResults);
+    EXPECT_EQ(result, 0);
+    EXPECT_EQ(dhcpResults.ipAddress, 192168156);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest4, TestSize.Level1)
+{
+    IpInfo dhcpResults;
+    dhcpResults.gateway = 19216801;
+    dhcpResults.ipAddress = 19216801;
+    int result = pSelfCureStateMachine->GetLegalIpConfiguration(dhcpResults);
+    EXPECT_EQ(result, 0);
+    EXPECT_EQ(dhcpResults.ipAddress, 192168156);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest5, TestSize.Level1)
+{
+    IpInfo dhcpResults;
+    dhcpResults.gateway = 19216801;
+    dhcpResults.ipAddress = 19216801;
+    int result = pSelfCureStateMachine->GetLegalIpConfiguration(dhcpResults);
+    EXPECT_EQ(result, 0);
+    EXPECT_EQ(dhcpResults.ipAddress, 192168156);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenGatewayAndCurrentAddrAreEmpty_ReturnEmptyString, TestSize.Level1) {
+    std::string gateway = "";
+    std::string currentAddr = "";
+    std::vector<std::string> testedAddr = {};
+
+    std::string nextIpAddr = pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr);
+
+    EXPECT_EQ(nextIpAddr, "");
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenGatewayIsEmpty_ReturnEmptyString, TestSize.Level1) {
+    std::string gateway = "";
+    std::string currentAddr = CURRENT_ADDR;
+    std::vector<std::string> testedAddr = TESTED_ADDR;
+
+    std::string nextIpAddr = pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr);
+
+    EXPECT_EQ(nextIpAddr, "");
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenCurrentAddrIsEmpty_ReturnEmptyString, TestSize.Level1) {
+    std::string gateway = GATEWAY;
+    std::string currentAddr = "";
+    std::vector<std::string> testedAddr = TESTED_ADDR;
+
+    std::string nextIpAddr = pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr);
+
+    EXPECT_EQ(nextIpAddr, "");
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenTestedAddrIsEmpty_ReturnEmptyString, TestSize.Level1) {
+    std::string gateway = GATEWAY;
+    std::string currentAddr = CURRENT_ADDR;
+    std::vector<std::string> testedAddr = {};
+
+    std::string nextIpAddr = pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr);
+
+    EXPECT_EQ(nextIpAddr, "");
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenGatewayAndCurrentAddrAreValid_ReturnNextIpAddr, TestSize.Level1) {
+    std::string gateway = GATEWAY;
+    std::string currentAddr = CURRENT_ADDR;
+    std::vector<std::string> testedAddr = TESTED_ADDR;
+
+    std::string nextIpAddr = pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr);
+
+    EXPECT_EQ(nextIpAddr, "192.168.0.104");
+}
+
+HWTEST(SelfCureStateMachineTest, IsIpAddressInvalidTest1, TestSize.Level1)
+{
+    IpInfo dhcpInfo;
+    dhcpInfo.ipAddress = 0;
+    dhcpInfo.netmask = 0;
+    dhcpInfo.gateway = 0;
+    EXPECT_FALSE(pSelfCureStateMachine->IsIpAddressInvalid(dhcpInfo));
+}
+
+HWTEST(SelfCureStateMachineTest, IsIpAddressInvalidTest2, TestSize.Level1)
+{
+    IpInfo dhcpInfo;
+    dhcpInfo.ipAddress = 0x0100007F; // 127.0.0.1
+    dhcpInfo.netmask = 0x00FFFFFF; // 255.255.255.0
+    dhcpInfo.gateway = 0x0100007F; // 127.0.0.1
+    EXPECT_FALSE(pSelfCureStateMachine->IsIpAddressInvalid(dhcpInfo));
+}
+
+HWTEST(SelfCureStateMachineTest, IsIpAddressInvalidTest3, TestSize.Level1)
+{
+    IpInfo dhcpInfo;
+    dhcpInfo.ipAddress = 0x0100007F; // 127.0.0.1
+    dhcpInfo.netmask = 0x00FFFFFF; // 255.255.255.0
+    dhcpInfo.gateway = 0x01000001; // 127.0.0.1
+    EXPECT_TRUE(pSelfCureStateMachine->IsIpAddressInvalid(dhcpInfo));
+}
+
+HWTEST(SelfCureStateMachineTest, IsIpAddressInvalidTest4, TestSize.Level1)
+{
+    IpInfo dhcpInfo;
+    dhcpInfo.ipAddress = 0x0100007F; // 127.0.0.1
+    dhcpInfo.netmask = 0x00FFFFFF; // 255.255.255.0
+    dhcpInfo.gateway = 0x010000FF; // 127.0.0.255
+    EXPECT_TRUE(pSelfCureStateMachine->IsIpAddressInvalid(dhcpInfo));
+}
+
+HWTEST(SelfCureStateMachineTest, IsSameEncryptTypeTest, TestSize.Level1)
+{
+    // Test case 1: deviceKeymgmt = "WPA-PSK", scanInfoKeymgmt = "WPA-PSK"
+    std::string deviceKeymgmt = "WPA-PSK";
+    std::string scanInfoKeymgmt = "WPA-PSK";
+    bool result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    // Test case 2: deviceKeymgmt = "WPA-PSK", scanInfoKeymgmt = "WPA2-PSK"
+    deviceKeymgmt = "WPA-PSK";
+    scanInfoKeymgmt = "WPA2-PSK";
+    result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+
+    // Test case 3: deviceKeymgmt = "WPA-EAP", scanInfoKeymgmt = "WPA-EAP"
+    deviceKeymgmt = "WPA-EAP";
+    scanInfoKeymgmt = "WPA-EAP";
+    result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    // Test case 4: deviceKeymgmt = "WPA-EAP", scanInfoKeymgmt = "WPA2-EAP"
+    deviceKeymgmt = "WPA-EAP";
+    scanInfoKeymgmt = "WPA2-EAP";
+    result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+
+    // Test case 5: deviceKeymgmt = "SAE", scanInfoKeymgmt = "SAE"
+    deviceKeymgmt = "SAE";
+    scanInfoKeymgmt = "SAE";
+    result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    // Test case 6: deviceKeymgmt = "SAE", scanInfoKeymgmt = "WPA2-PSK"
+    deviceKeymgmt = "SAE";
+    scanInfoKeymgmt = "WPA2-PSK";
+    result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+
+    // Test case 7: deviceKeymgmt = "NONE", scanInfoKeymgmt = "NONE"
+    deviceKeymgmt = "NONE";
+    scanInfoKeymgmt = "NONE";
+    result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    // Test case 8: deviceKeymgmt = "NONE", scanInfoKeymgmt = "WPA-PSK"
+    deviceKeymgmt = "NONE";
+    scanInfoKeymgmt = "WPA-PSK";
+    result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+
+    // Test case 9: deviceKeymgmt = "Invalid", scanInfoKeymgmt = "WPA-PSK"
+    deviceKeymgmt = "Invalid";
+    scanInfoKeymgmt = "WPA-PSK";
+    result = pSelfCureStateMachine->IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetBssidCounterTest1, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = {
+        { "ssid1", "capabilities1" },
+        { "ssid2", "capabilities2" },
+        { "ssid1", "capabilities1" },
+        { "ssid3", "capabilities3" }
+    };
+
+    int counter = pSelfCureStateMachine->GetBssidCounter(scanResults);
+
+    EXPECT_EQ(counter, 2);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetBssidCounterTest2, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = {
+        { "ssid1", "capabilities1" },
+        { "ssid2", "capabilities2" },
+        { "ssid3", "capabilities3" }
+    };
+
+    int counter = pSelfCureStateMachine->GetBssidCounter(scanResults);
+
+    EXPECT_EQ(counter, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetBssidCounterTest3, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = {};
+
+    int counter = pSelfCureStateMachine->GetBssidCounter(scanResults);
+
+    EXPECT_EQ(counter, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsNeedWifiReassocUseDeviceMac_Test1, TestSize.Level1)
+{
+    // Test case 1: GetSelfCureHistoryInfo returns an empty string
+    std::string selfCureHistory = "";
+    pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistory);
+
+    EXPECT_FALSE(pSelfCureStateMachine->IsNeedWifiReassocUseDeviceMac());
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsNeedWifiReassocUseDeviceMac_Test2, TestSize.Level1)
+{
+    // Test case 2: GetSelfCureHistoryInfo returns a non-empty string
+    std::string selfCureHistory = "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
+    selfCureStateMachine.SetSelfCureHistoryInfo(selfCureHistory);
+
+    EXPECT_FALSE(pSelfCureStateMachine->IsNeedWifiReassocUseDeviceMac());
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsNeedWifiReassocUseDeviceMac_Test3, TestSize.Level1)
+{
+    // Test case 3: GetSelfCureHistoryInfo returns a non-empty string and CanArpReachable returns true
+    std::string selfCureHistory = "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
+    pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistory);
+
+    EXPECT_TRUE(pSelfCureStateMachine->IsNeedWifiReassocUseDeviceMac());
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest)
+{
+    WifiSelfCureHistoryInfo info;
+    std::vector<std::string> histories = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"};
+    int cnt = 18;
+
+    int result = pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt);
+
+    EXPECT_EQ(result, 0);
+    EXPECT_EQ(info.dnsSelfCureFailedCnt, 1);
+    EXPECT_EQ(info.lastDnsSelfCureFailedTs, 2);
+    EXPECT_EQ(info.renewDhcpSelfCureFailedCnt, 3);
+    EXPECT_EQ(info.lastRenewDhcpSelfCureFailedTs, 4);
+    EXPECT_EQ(info.staticIpSelfCureFailedCnt, 5);
+    EXPECT_EQ(info.lastStaticIpSelfCureFailedTs, 6);
+    EXPECT_EQ(info.reassocSelfCureFailedCnt, 7);
+    EXPECT_EQ(info.lastReassocSelfCureFailedTs, 8);
+    EXPECT_EQ(info.randMacSelfCureFailedCnt, 9);
+    EXPECT_EQ(info.lastRandMacSelfCureFailedCntTs, 10);
+    EXPECT_EQ(info.resetSelfCureFailedCnt, 11);
+    EXPECT_EQ(info.lastResetSelfCureFailedTs, 12);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoEmptyHistoriesTest)
+{
+    WifiSelfCureHistoryInfo info;
+    std::vector<std::string> histories;
+    int cnt = 0;
+
+    int result = pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt);
+
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoInvalidHistoriesSizeTest)
+{
+    WifiSelfCureHistoryInfo info;
+    std::vector<std::string> histories = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"};
+    int cnt = 17;
+
+    int result = pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt);
+
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureConnectFailInfoTest)
+{
+    WifiSelfCureHistoryInfo info;
+    std::vector<std::string> histories = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+    int cnt = 0;
+
+    int result = pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt);
+
+    EXPECT_EQ(result, 0);
+    EXPECT_EQ(info.reassocSelfCureConnectFailedCnt, 0);
+    EXPECT_EQ(info.lastReassocSelfCureConnectFailedTs, 0);
+    EXPECT_EQ(info.randMacSelfCureConnectFailedCnt, 0);
+    EXPECT_EQ(info.lastRandMacSelfCureConnectFailedCntTs, 0);
+    EXPECT_EQ(info.resetSelfCureConnectFailedCnt, 0);
+    EXPECT_EQ(info.lastResetSelfCureConnectFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureConnectFailInfoInvalidHistoriesTest)
+{
+    WifiSelfCureHistoryInfo info;
+    std::vector<std::string> histories = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+    int cnt = 1;
+
+    int result = pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt);
+
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureConnectFailInfoInvalidCntTest)
+{
+    WifiSelfCureHistoryInfo info;
+    std::vector<std::string> histories = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+    int cnt = 2;
+
+    int result = pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt);
+
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, PeriodicArpDetection_WhenMsgIsNullptr_ReturnsFalse)
+{
+    InternalMessage* msg = nullptr;
+    bool result = pSelfCureStateMachine->PeriodicArpDetection(msg);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, PeriodicArpDetection_WhenArpNotReachableAndFailedCountIsLessThanThreshold_ExecutesLater)
+{
+    InternalMessage msg;
+    msg.SetMessageName(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
+    pSelfCureStateMachine->CanArpReachable = []() { return false; };
+    pSelfCureStateMachine->arpDetectionFailedCnt = 2;
+    pSelfCureStateMachine->MessageExecutedLater = [](int, int) {};
+    pSelfCureStateMachine->PeriodicArpDetection(&msg);
+}
+
+HWTEST_F(SelfCureStateMachineTest, PeriodicArpDetection_WhenArpNotReachableAndFailedCountIsEqualToThreshold_SendsArpFailedDetected)
+{
+    InternalMessage msg;
+    msg.SetMessageName(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
+    pSelfCureStateMachine->CanArpReachable = []() { return false; };
+    pSelfCureStateMachine->arpDetectionFailedCnt = 3;
+    pSelfCureStateMachine->SendMessage = [](int) {};
+    pSelfCureStateMachine->PeriodicArpDetection(&msg);
+}
+
+HWTEST_F(SelfCureStateMachineTest, PeriodicArpDetection_WhenArpReachable_ResetsFailedCount)
+{
+    SelfCureStateMachine selfCureStateMachine;
+    InternalMessage msg;
+    msg.SetMessageName(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
+    selfCureStateMachine.CanArpReachable = []() { return true; };
+    selfCureStateMachine.arpDetectionFailedCnt = 2;
+    selfCureStateMachine.MessageExecutedLater = [](int, int) {};
+    selfCureStateMachine.PeriodicArpDetection(&msg);
+    EXPECT_EQ(selfCureStateMachine.arpDetectionFailedCnt, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, PeriodicArpDetection_WhenArpReachable_ExecutesLater)
+{
+    InternalMessage msg;
+    msg.SetMessageName(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
+    pSelfCureStateMachine->CanArpReachable = []() { return true; };
+    pSelfCureStateMachine->arpDetectionFailedCnt = 0;
+    pSelfCureStateMachine->MessageExecutedLater = [](int, int) {};
+    pSelfCureStateMachine->PeriodicArpDetection(&msg);
+}
+
+HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi6SelfCure_WhenCurrConnectedBssidIsEmpty_ReturnsFalse, TestSize.Level1)
+{
+    std::string currConnectedBssid = "";
+    bool result = pSelfCureStateMachine->ShouldTransToWifi6SelfCure(nullptr, currConnectedBssid);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi6SelfCure_WhenNotWifi6Network_ReturnsFalse, TestSize.Level1)
+{
+    std::string currConnectedBssid = "11:22:33:ef:ac:0e";
+    pSelfCureStateMachine->isWifi6ArpSuccess = false;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLastNetworkId()).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetWifi6BlackListCache(_)).Times(testing::AtLeast(0));
+    bool result = pSelfCureStateMachine->ShouldTransToWifi6SelfCure(nullptr, currConnectedBssid);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi6SelfCure_WhenWifi6NetworkAndNotInBlackList_ReturnsTrue, TestSize.Level1)
+{
+    std::string currConnectedBssid = "11:22:33:ef:ac:0e";
+    pSelfCureStateMachine->isWifi6ArpSuccess = false;
+    std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLastNetworkId()).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetWifi6BlackListCache(_))
+        .WillOnce(testing::DoAll(testing::SetArgReferee<0>(wifi6BlackListCache), testing::Return(0)));
+
+    bool result = pSelfCureStateMachine->ShouldTransToWifi6SelfCure(nullptr, currConnectedBssid);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi6SelfCure_WhenWifi6NetworkAndInBlackListWithActionTypeZero_ReturnsTrue, TestSize.Level1)
+{
+    std::string currConnectedBssid = "11:22:33:ef:ac:0e";
+    pSelfCureStateMachine->isWifi6ArpSuccess = false;
+    std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+    wifi6BlackListCache[currConnectedBssid] = {0};
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLastNetworkId()).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetWifi6BlackListCache(_))
+        .WillOnce(testing::DoAll(testing::SetArgReferee<0>(wifi6BlackListCache), testing::Return(0)));
+    bool result = pSelfCureStateMachine->ShouldTransToWifi6SelfCure(nullptr, currConnectedBssid);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi6SelfCure_WhenWifi6NetworkAndInBlackListWithActionTypeNonZero_ReturnsFalse, TestSize.Level1)
+{
+    // Arrange
+    std::string currConnectedBssid = "11:22:33:ef:ac:0e";
+    pSelfCureStateMachine->isWifi6ArpSuccess = false;
+    std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+    wifi6BlackListCache[currConnectedBssid] = {1};
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLastNetworkId()).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(testing::AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetWifi6BlackListCache(_))
+        .WillOnce(testing::DoAll(testing::SetArgReferee<0>(wifi6BlackListCache), testing::Return(0)));
+    bool result = pSelfCureStateMachine->ShouldTransToWifi6SelfCure(nullptr, currConnectedBssid);
+    EXPECT_FALSE(result);
+}
+
+HWTEST(SelfCureStateMachineTest, IfP2pConnectedTest, TestSize.Level1)
+{
+    bool expectedResult = false;
+    // Test when P2P is not connected
+    WifiP2pLinkedInfo linkedInfo;
+    linkedInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+    EXPECT_EQ(expectedResult, pSelfCureStateMachine->IfP2pConnected(linkedInfo));
+    // Test when P2P is connected
+    linkedInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+    expectedResult = true;
+    EXPECT_EQ(expectedResult, pSelfCureStateMachine->IfP2pConnected(linkedInfo));
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetIpAssignmentTest, TestSize.Level1)
+{
+    AssignIpMethod ipAssignment;
+    int result = pSelfCureStateMachine->GetIpAssignment(ipAssignment);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetNetworkStatusHistoryTest, TestSize.Level1)
+{
+    WifiDeviceConfig config;
+    config.networkStatusHistory = 12345;
+    uint32_t networkStatusHistory = pSelfCureStateMachine->GetNetworkStatusHistory();
+    EXPECT_EQ(networkStatusHistory, 12345);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureHistoryInfoTest, TestSize.Level1)
+{
+    std::string selfCureHistory = "1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18";
+    int result = pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistory);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureHistoryInfoEmptyTest, TestSize.Level1)
+{
+    std::string selfCureHistory = "";
+    int result = pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistory);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetSelfCureHistoryInfoZeroTest, TestSize.Level1)
+{
+    std::string selfCureHistory = "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
+    int result = pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistory);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetIsReassocWithFactoryMacAddress_Test1, TestSize.Level1)
+{
+    int isReassocWithFactoryMacAddress = 1;
+    int result = pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(isReassocWithFactoryMacAddress);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetIsReassocWithFactoryMacAddress_Test2, TestSize.Level1)
+{
+    int isReassocWithFactoryMacAddress = 0;
+    int result = pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(isReassocWithFactoryMacAddress);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetIsReassocWithFactoryMacAddress_Test3, TestSize.Level1)
+{
+    int isReassocWithFactoryMacAddress = -1;
+    int result = pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(isReassocWithFactoryMacAddress);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetCurrentWifiDeviceConfigTest, TestSize.Level1)
+{
+    pSelfCureStateMachine->GetCurrentWifiDeviceConfig();
+}
+
+HWTEST_F(SelfCureStateMachineTest, AllowSelfCure_WhenRequestCureLevelIsMiddleReassocAndHistoryInfoIsEmpty_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    uint64_t currentMs = 0;
+
+    bool result = AllowSelfCure(historyInfo, requestCureLevel);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, AllowSelfCure_WhenRequestCureLevelIsMiddleReassocAndConnectFailedCntIsZero_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.reassocSelfCureConnectFailedCnt = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    uint64_t currentMs = 0;
+
+    bool result = AllowSelfCure(historyInfo, requestCureLevel);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, AllowSelfCure_WhenRequestCureLevelIsMiddleReassocAndConnectFailedCntIsOneAndTimeElapsed_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.reassocSelfCureConnectFailedCnt = 1;
+    historyInfo.lastReassocSelfCureConnectFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    uint64_t currentMs = 1000;
+
+    bool result = AllowSelfCure(historyInfo, requestCureLevel);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, AllowSelfCure_WhenRequestCureLevelIsMiddleReassocAndConnectFailedCntIsOneAndTimeNotElapsed_ReturnsFalse)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.reassocSelfCureConnectFailedCnt = 1;
+    historyInfo.lastReassocSelfCureConnectFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    uint64_t currentMs = 500;
+
+    bool result = AllowSelfCure(historyInfo, requestCureLevel);
+
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, AllowSelfCure_WhenRequestCureLevelIsHighResetAndHistoryInfoIsEmpty_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = 0;
+
+    bool result = AllowSelfCure(historyInfo, requestCureLevel);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, AllowSelfCure_WhenRequestCureLevelIsHighResetAndConnectFailedCntIsZero_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureConnectFailedCnt = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = 0;
+
+    bool result = AllowSelfCure(historyInfo, requestCureLevel);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, AllowSelfCure_WhenRequestCureLevelIsHighResetAndConnectFailedCntIsOneAndTimeElapsed_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureConnectFailedCnt = 1;
+    historyInfo.lastResetSelfCureConnectFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = 1000;
+
+    bool result = AllowSelfCure(historyInfo, requestCureLevel);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, AllowSelfCure_WhenRequestCureLevelIsHighResetAndConnectFailedCntIsOneAndTimeNotElapsed_ReturnsFalse)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureConnectFailedCnt = 1;
+    historyInfo.lastResetSelfCureConnectFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = 500;
+
+    bool result = AllowSelfCure(historyInfo, requestCureLevel);
+
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealDnsTest_WhenDnsSelfCureFailedCntIsZero_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 0;
+    uint64_t currentMs = 0;
+
+    bool result = DealDns(historyInfo, 1, currentMs);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealDnsTest_WhenDnsSelfCureFailedCntIsOneAndTimeElapsed_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 1;
+    historyInfo.lastDnsSelfCureFailedTs = 0;
+    uint64_t currentMs = 1000;
+
+    bool result = DealDns(historyInfo, 1, currentMs);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealDnsTest_WhenDnsSelfCureFailedCntIsOneAndTimeNotElapsed_ReturnsFalse)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 1;
+    historyInfo.lastDnsSelfCureFailedTs = 0;
+    uint64_t currentMs = 500;
+
+    bool result = DealDns(historyInfo, 1, currentMs);
+
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealDnsTest_WhenDnsSelfCureFailedCntIsTwoAndTimeElapsed_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 2;
+    historyInfo.lastDnsSelfCureFailedTs = 0;
+    uint64_t currentMs = 2000;
+
+    bool result = DealDns(historyInfo, 1, currentMs);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealDnsTest_WhenDnsSelfCureFailedCntIsTwoAndTimeNotElapsed_ReturnsFalse)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 2;
+    historyInfo.lastDnsSelfCureFailedTs = 0;
+    uint64_t currentMs = 1500;
+
+    bool result = DealDns(historyInfo, 1, currentMs);
+
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealDnsTest_WhenDnsSelfCureFailedCntIsThreeAndTimeElapsed_ReturnsTrue)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 3;
+    historyInfo.lastDnsSelfCureFailedTs = 0;
+    uint64_t currentMs = 3000;
+
+    bool result = DealDns(historyInfo, 1, currentMs);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealDnsTest_WhenDnsSelfCureFailedCntIsThreeAndTimeNotElapsed_ReturnsFalse)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 3;
+    historyInfo.lastDnsSelfCureFailedTs = 0;
+    uint64_t currentMs = 2500;
+
+    bool result = DealDns(historyInfo, 1, currentMs);
+
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealRenewDhcpTest)
+{
+    // Test setup
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = 1;
+    uint64_t currentMs = 1615153293123;
+
+    // Test execution
+    bool result = pSelfCureStateMachine->DealRenewDhcp(historyInfo, requestCureLevel, currentMs);
+
+    // Test verification
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealStaticIpTest)
+{
+    // Test case 1: historyInfo.staticIpSelfCureFailedCnt = 0, currentMs - historyInfo.lastStaticIpSelfCureFailedTs > DELAYED_DAYS_LOW
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.staticIpSelfCureFailedCnt = 0;
+    historyInfo.lastStaticIpSelfCureFailedTs = pSelfCureStateMachine->GetNowMilliSeconds() - DELAYED_DAYS_LOW - 1;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = pSelfCureStateMachine->GetNowMilliSeconds();
+    EXPECT_TRUE(DealStaticIp(historyInfo, requestCureLevel, currentMs));
+
+    // Test case 2: historyInfo.staticIpSelfCureFailedCnt = SELF_CURE_FAILED_FIVE_CNT, currentMs - historyInfo.lastStaticIpSelfCureFailedTs > DELAYED_DAYS_MID
+    historyInfo.staticIpSelfCureFailedCnt = SELF_CURE_FAILED_FIVE_CNT;
+    historyInfo.lastStaticIpSelfCureFailedTs = pSelfCureStateMachine->GetNowMilliSeconds() - DELAYED_DAYS_MID - 1;
+    EXPECT_TRUE(DealStaticIp(historyInfo, requestCureLevel, currentMs));
+
+    // Test case 3: historyInfo.staticIpSelfCureFailedCnt = SELF_CURE_FAILED_SIX_CNT, currentMs - historyInfo.lastStaticIpSelfCureFailedTs > DELAYED_DAYS_HIGH
+    historyInfo.staticIpSelfCureFailedCnt = SELF_CURE_FAILED_SIX_CNT;
+    historyInfo.lastStaticIpSelfCureFailedTs = GetNowMilliSeconds() - DELAYED_DAYS_HIGH - 1;
+    EXPECT_TRUE(DealStaticIp(historyInfo, requestCureLevel, currentMs));
+
+    // Test case 4: historyInfo.staticIpSelfCureFailedCnt = SELF_CURE_FAILED_SEVEN_CNT, currentMs - historyInfo.lastStaticIpSelfCureFailedTs > DELAYED_DAYS_HIGH
+    historyInfo.staticIpSelfCureFailedCnt = SELF_CURE_FAILED_SEVEN_CNT;
+    historyInfo.lastStaticIpSelfCureFailedTs = GetNowMilliSeconds() - DELAYED_DAYS_HIGH - 1;
+    EXPECT_TRUE(DealStaticIp(historyInfo, requestCureLevel, currentMs));
+
+    // Test case 5: historyInfo.staticIpSelfCureFailedCnt = SELF_CURE_FAILED_SEVEN_CNT, currentMs - historyInfo.lastStaticIpSelfCureFailedTs <= DELAYED_DAYS_HIGH
+    historyInfo.lastStaticIpSelfCureFailedTs = GetNowMilliSeconds();
+    EXPECT_FALSE(DealStaticIp(historyInfo, requestCureLevel, currentMs));
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealMiddleReassocTest)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    uint64_t currentMs = 123456789;
+
+    // Test case 1: historyInfo.reassocSelfCureFailedCnt is 0
+    historyInfo.reassocSelfCureFailedCnt = 0;
+    historyInfo.lastReassocSelfCureFailedTs = 0;
+    bool result1 = pSelfCureStateMachine->DealMiddleReassoc(historyInfo, requestCureLevel, currentMs);
+    EXPECT_TRUE(result1);
+
+    // Test case 2: historyInfo.reassocSelfCureFailedCnt is 1 and currentMs - historyInfo.lastReassocSelfCureFailedTs > DELAYED_DAYS_LOW
+    historyInfo.reassocSelfCureFailedCnt = 1;
+    historyInfo.lastReassocSelfCureFailedTs = currentMs - DELAYED_DAYS_LOW - 1;
+    bool result2 = pSelfCureStateMachine->DealMiddleReassoc(historyInfo, requestCureLevel, currentMs);
+    EXPECT_TRUE(result2);
+
+    // Test case 3: historyInfo.reassocSelfCureFailedCnt is 2 and currentMs - historyInfo.lastReassocSelfCureFailedTs > DELAYED_DAYS_MID
+    historyInfo.reassocSelfCureFailedCnt = 2;
+    historyInfo.lastReassocSelfCureFailedTs = currentMs - DELAYED_DAYS_MID - 1;
+    bool result3 = pSelfCureStateMachine->DealMiddleReassoc(historyInfo, requestCureLevel, currentMs);
+    EXPECT_TRUE(result3);
+
+    // Test case 4: historyInfo.reassocSelfCureFailedCnt is 3 and currentMs - historyInfo.lastReassocSelfCureFailedTs > DELAYED_DAYS_HIGH
+    historyInfo.reassocSelfCureFailedCnt = 3;
+    historyInfo.lastReassocSelfCureFailedTs = currentMs - DELAYED_DAYS_HIGH - 1;
+    bool result4 = pSelfCureStateMachine->DealMiddleReassoc(historyInfo, requestCureLevel, currentMs);
+    EXPECT_TRUE(result4);
+
+    // Test case 5: historyInfo.reassocSelfCureFailedCnt is 3 and currentMs - historyInfo.lastReassocSelfCureFailedTs <= DELAYED_DAYS_HIGH
+    historyInfo.reassocSelfCureFailedCnt = 3;
+    historyInfo.lastReassocSelfCureFailedTs = currentMs - DELAYED_DAYS_HIGH + 1;
+    bool result5 = pSelfCureStateMachine->DealMiddleReassoc(historyInfo, requestCureLevel, currentMs);
+    EXPECT_FALSE(result5);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealHighResetTest1, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureFailedCnt = 0;
+    historyInfo.lastResetSelfCureFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = 0;
+
+    bool result = DealHighReset(historyInfo, requestCureLevel, currentMs);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealHighResetTest2, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureFailedCnt = SELF_CURE_FAILED_ONE_CNT;
+    historyInfo.lastResetSelfCureFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = DELAYED_DAYS_LOW + 1;
+
+    bool result = DealHighReset(historyInfo, requestCureLevel, currentMs);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealHighResetTest3, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureFailedCnt = SELF_CURE_FAILED_TWO_CNT;
+    historyInfo.lastResetSelfCureFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = DELAYED_DAYS_MID + 1;
+
+    bool result = DealHighReset(historyInfo, requestCureLevel, currentMs);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealHighResetTest4, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureFailedCnt = SELF_CURE_FAILED_THREE_CNT;
+    historyInfo.lastResetSelfCureFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = DELAYED_DAYS_HIGH + 1;
+
+    bool result = DealHighReset(historyInfo, requestCureLevel, currentMs);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, DealHighResetTest5, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureFailedCnt = SELF_CURE_FAILED_FOUR_CNT;
+    historyInfo.lastResetSelfCureFailedTs = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    uint64_t currentMs = DELAYED_DAYS_HIGH + 1;
+
+    bool result = DealHighReset(historyInfo, requestCureLevel, currentMs);
+
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_Dns_ReturnsTrue) {
+    // Arrange
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
+
+    // Act
+    bool result = pSelfCureStateMachine->SelfCureAcceptable(historyInfo, requestCureLevel);
+
+    // Assert
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_RenewDhcp_ReturnsTrue) {
+    // Arrange
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.renewDhcpSelfCureFailedCnt = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_2_RENEW_DHCP;
+
+    // Act
+    bool result = pSelfCureStateMachine->SelfCureAcceptable(historyInfo, requestCureLevel);
+
+    // Assert
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_StaticIp_ReturnsTrue) {
+    // Arrange
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.staticIpSelfCureFailedCnt = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP;
+
+    // Act
+    bool result = pSelfCureStateMachine->SelfCureAcceptable(historyInfo, requestCureLevel);
+
+    // Assert
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_MiddleReassoc_ReturnsTrue) {
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.reassocSelfCureFailedCnt = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    bool result = pSelfCureStateMachine->SelfCureAcceptable(historyInfo, requestCureLevel);
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_RandMacReassoc_ReturnsTrue) {
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.randMacSelfCureFailedCnt = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+    bool result = pSelfCureStateMachine->SelfCureAcceptable(historyInfo, requestCureLevel);
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_HighReset_ReturnsTrue) {
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.resetSelfCureFailedCnt = 0;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    bool result = pSelfCureStateMachine->SelfCureAcceptable(historyInfo, requestCureLevel);
+
+    // Assert
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleNetworkConnectedTest, TestSize.Level1)
+{
+    pSelfCureStateMachine->HandleNetworkConnected();
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetCurrentGatewayTest, TestSize.Level1)
+{
+    std::string expectedGateway = "192.168.0.1";
+    IpInfo ipInfo;
+    ipInfo.gateway = "192.168.0.1";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+    std::string actualGateway = pSelfCureStateMachine->GetCurrentGateway();
+
+    ASSERT_EQ(actualGateway, expectedGateway);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Success_Reassoc, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    bool success = true;
+    pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(historyInfo, requestCureLevel, success);
+    ASSERT_EQ(historyInfo.reassocSelfCureConnectFailedCnt, 0);
+    ASSERT_EQ(historyInfo.lastReassocSelfCureConnectFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Failure_Reassoc, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    bool success = false;
+    pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(historyInfo, requestCureLevel, success);
+    ASSERT_EQ(historyInfo.reassocSelfCureConnectFailedCnt, 1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Success_RandMacReassoc, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+    bool success = true;
+    pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(historyInfo, requestCureLevel, success);
+    ASSERT_EQ(historyInfo.randMacSelfCureConnectFailedCnt, 0);
+    ASSERT_EQ(historyInfo.lastRandMacSelfCureConnectFailedCntTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Failure_RandMacReassoc, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+    bool success = false;
+    pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(historyInfo, requestCureLevel, success);
+    ASSERT_EQ(historyInfo.randMacSelfCureConnectFailedCnt, 1);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Success_Reset, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    bool success = true;
+    pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(historyInfo, requestCureLevel, success);
+    ASSERT_EQ(historyInfo.resetSelfCureConnectFailedCnt, 0);
+    ASSERT_EQ(historyInfo.lastResetSelfCureConnectFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Failure_Reset, TestSize.Level1)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    bool success = false;
+    pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(historyInfo, requestCureLevel, success);
+    ASSERT_EQ(historyInfo.resetSelfCureConnectFailedCnt, 1);
+}
+
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureHistoryInfo_Success_DnsSelfCureFailedCntZero)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 1;
+    historyInfo.lastDnsSelfCureFailedTs = 1234567890;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
+    bool success = true;
+    pSelfCureStateMachine->UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
+    EXPECT_EQ(historyInfo.dnsSelfCureFailedCnt, 0);
+    EXPECT_EQ(historyInfo.lastDnsSelfCureFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureHistoryInfo_Failure_DnsSelfCureFailedCntIncremented)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    historyInfo.dnsSelfCureFailedCnt = 1;
+    historyInfo.lastDnsSelfCureFailedTs = 1234567890;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
+    bool success = false;
+    pSelfCureStateMachine->UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
+    EXPECT_EQ(historyInfo.dnsSelfCureFailedCnt, 2);
+    EXPECT_NE(historyInfo.lastDnsSelfCureFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_SuccessfulReassoc)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    bool success = true;
+
+    pSelfCureStateMachine->UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+
+    EXPECT_EQ(historyInfo.reassocSelfCureFailedCnt, 0);
+    EXPECT_EQ(historyInfo.lastReassocSelfCureFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedReassoc)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+    bool success = false;
+
+    pSelfCureStateMachine->UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+
+    EXPECT_EQ(historyInfo.reassocSelfCureFailedCnt, 1);
+    EXPECT_NE(historyInfo.lastReassocSelfCureFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_SuccessfulRandMacReassoc)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+    bool success = true;
+
+    pSelfCureStateMachine->UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+
+    EXPECT_EQ(historyInfo.randMacSelfCureFailedCnt, 0);
+    EXPECT_EQ(historyInfo.lastRandMacSelfCureFailedCntTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedRandMacReassoc)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+    bool success = false;
+
+    pSelfCureStateMachine->UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+
+    EXPECT_EQ(historyInfo.randMacSelfCureFailedCnt, 1);
+    EXPECT_NE(historyInfo.lastRandMacSelfCureFailedCntTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_SuccessfulHighReset)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    bool success = true;
+
+    pSelfCureStateMachine->UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+
+    EXPECT_EQ(historyInfo.resetSelfCureFailedCnt, 0);
+    EXPECT_EQ(historyInfo.lastResetSelfCureFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedHighReset)
+{
+    WifiSelfCureHistoryInfo historyInfo;
+    int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+    bool success = false;
+
+    pSelfCureStateMachine->UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+
+    EXPECT_EQ(historyInfo.resetSelfCureFailedCnt, 1);
+    EXPECT_NE(historyInfo.lastResetSelfCureFailedTs, 0);
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleP2pConnChanged_P2pConnectedState_SetP2pConnectedFlag)
+{
+    WifiP2pLinkedInfo info;
+    info.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+    pSelfCureStateMachine->HandleP2pConnChanged(info);
+    EXPECT_TRUE(pSelfCureStateMachine->p2pConnected);
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleP2pConnChanged_P2pDisconnectedState_ClearP2pConnectedFlag)
+{
+    WifiP2pLinkedInfo info;
+    info.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+    pSelfCureStateMachine->HandleP2pConnChanged(info);
+    EXPECT_FALSE(pSelfCureStateMachine->p2pConnected);
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleP2pConnChanged_CurrentStateIsInternetSelfCureState_SendP2pDisconnectedEvent)
+{
+    pSelfCureStateMachine->SetCurStateName("InternetSelfCureState");
+    WifiP2pLinkedInfo info;
+    info.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+
+    pSelfCureStateMachine->HandleP2pConnChanged(info);
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleP2pConnChanged_CurrentStateIsNotInternetSelfCureState_NoEventSent)
+{
+    pSelfCureStateMachine->SetCurStateName("SomeOtherState");
+    WifiP2pLinkedInfo info;
+    info.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+    pSelfCureStateMachine->HandleP2pConnChanged(info);
+}
+
+
+HWTEST_F(SelfCureStateMachineTest, IfMultiGateway_Test, TestSize.Level1)
+{
+    pSelfCureStateMachine->IfMultiGateway();
+}
+
+HWTEST_F(SelfCureStateMachineTest, TestIsSettingsPage_ReturnsFalseWhenNotSettingsPage) {
+    std::string app = "com.example.app";
+    bool result = pSelfCureStateMachine->IsSettingsPage(app);
+    ASSERT_FALSE(result);
+}
+
+HWTEST_F(SelfCureStateMachineTest, TestIsSettingsPage_ReturnsTrueWhenSettingsPage) {
+    std::string app = SETTINGS_PAGE;
+    bool result = pSelfCureStateMachine->IsSettingsPage(app);
+
+    ASSERT_TRUE(result);
 }
 
 } // namespace Wifi

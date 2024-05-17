@@ -228,7 +228,7 @@ public:
 
 private:
     bool GetWifiHotspotProxy();
-    int systemAbilityId_;
+    std::atomic<int> systemAbilityId_;
     std::mutex mutex_;
     int instId;
     sptr<IWifiHotspot> client_;

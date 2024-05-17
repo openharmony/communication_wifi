@@ -97,7 +97,7 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
         deviceMgr = new (std::nothrow) WifiDeviceMgrProxy(object);
     }
     if (deviceMgr == nullptr) {
-        WIFI_LOGE("wifi device init failed, %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi device init failed, %{public}d", systemAbilityId_.load());
         return false;
     }
 
@@ -112,7 +112,7 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
         client_ = new (std::nothrow) WifiDeviceProxy(service);
     }
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi device instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_);
+        WIFI_LOGE("wifi device instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_.load());
         return false;
     }
     return true;

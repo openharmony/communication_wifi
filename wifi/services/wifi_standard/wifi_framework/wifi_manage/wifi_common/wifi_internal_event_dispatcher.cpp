@@ -383,9 +383,9 @@ ErrCode WifiInternalEventDispatcher::AddHotspotCallback(
 int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject> &remote, int id)
 {
     if (remote != nullptr) {
+        std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
         auto iter = mHotspotCallbacks.find(id);
         if (iter != mHotspotCallbacks.end()) {
-            std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
             auto item = iter->second.find(remote);
             if (item != iter->second.end()) {
                 iter->second.erase(item);
@@ -416,9 +416,9 @@ sptr<IWifiHotspotCallback> WifiInternalEventDispatcher::GetSingleHotspotCallback
 bool WifiInternalEventDispatcher::HasHotspotRemote(const sptr<IRemoteObject> &remote, int id)
 {
     if (remote != nullptr) {
+        std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
         auto iter = mHotspotCallbacks.find(id);
         if (iter != mHotspotCallbacks.end()) {
-            std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
             if (iter->second.find(remote) != iter->second.end()) {
                 return true;
             }

@@ -139,6 +139,7 @@ bool WifiProtectManager::InitWifiProtect(
     const WifiProtectType &protectType,
     const std::string &protectName)
 {
+    std::unique_lock<std::mutex> lock(mMutex);
     std::shared_ptr<WifiProtect> pProtect = std::make_shared<WifiProtect>(protectType,
         WifiProtectMode::WIFI_PROTECT_FULL, protectName);
     mWifiProtects.push_back(pProtect);

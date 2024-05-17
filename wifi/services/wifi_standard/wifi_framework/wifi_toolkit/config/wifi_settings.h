@@ -1687,6 +1687,15 @@ public:
      * @return std::string - an empty string indicates failure
      */
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
+
+    /**
+     * @Description Fuzzy Bssid.
+     *
+     * @param bssid - MAC address type[in]
+     * @return std::string - the fuzzy bssid.
+     */
+    std::string FuzzyBssid(const std::string bssid);
+
 #endif
 
     /**

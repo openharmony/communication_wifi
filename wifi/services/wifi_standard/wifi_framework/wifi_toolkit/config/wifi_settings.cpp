@@ -223,6 +223,7 @@ void WifiSettings::InitPackageFilterConfig()
     if (mPackageFilterConfig.LoadConfig() >= 0) {
         std::vector<PackageFilterConf> tmp;
         mPackageFilterConfig.GetValue(tmp);
+        std::unique_lock<std::mutex> lock(mInfoMutex);
         for (int i = 0; i < tmp.size(); i++) {
             mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
         }
@@ -249,7 +250,6 @@ int WifiSettings::ReloadPortalconf()
 int WifiSettings::Init()
 {
     InitSettingsNum();
-
     /* read ini config */
     mSavedDeviceConfig.SetConfigFilePath(DEVICE_CONFIG_FILE_PATH);
     mSavedHotspotConfig.SetConfigFilePath(HOTSPOT_CONFIG_FILE_PATH);
@@ -318,6 +318,7 @@ void WifiSettings::MergeWifiConfig()
     }
     mSavedDeviceConfig.SetValue(wifideviceConfig);
     mSavedDeviceConfig.SaveConfig();
+    std::unique_lock<std::mutex> lock(mStaMutex);
     std::vector<WifiStoreRandomMac> wifiStoreRandomMac = xmlParser->GetRandomMacmap();
     mSavedWifiStoreRandomMac.SetValue(wifiStoreRandomMac);
     mSavedWifiStoreRandomMac.SaveConfig();
@@ -1513,10 +1514,10 @@ int WifiSettings::GetMacAddress(std::string &macAddress, int instId)
 
 int WifiSettings::ReloadStaRandomMac()
 {
+    std::unique_lock<std::mutex> lock(mStaMutex);
     if (mSavedWifiStoreRandomMac.LoadConfig()) {
         return -1;
     }
-    std::unique_lock<std::mutex> lock(mStaMutex);
     mWifiStoreRandomMac.clear();
     mSavedWifiStoreRandomMac.GetValue(mWifiStoreRandomMac);
     return 0;
@@ -2103,6 +2104,7 @@ void WifiSettings::InitSettingsNum()
 
 void WifiSettings::InitScanControlForbidList(void)
 {
+    std::unique_lock<std::mutex> lock(mInfoMutex);
     /* Disable external scanning during scanning. */
     ScanForbidMode forbidMode;
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
@@ -2161,6 +2163,7 @@ void WifiSettings::InitScanControlForbidList(void)
 
 void WifiSettings::InitScanControlIntervalList(void)
 {
+    std::unique_lock<std::mutex> lock(mInfoMutex);
     /* Foreground app: 4 times in 2 minutes for a single application */
     ScanIntervalMode scanIntervalMode;
     scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_ORIGIN;
@@ -2243,6 +2246,7 @@ void WifiSettings::InitScanControlInfo()
 
 void WifiSettings::GetLinkedChannelWidth(int instId)
 {
+    std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
         if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
             mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;

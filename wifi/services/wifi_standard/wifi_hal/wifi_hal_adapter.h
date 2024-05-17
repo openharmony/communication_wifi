@@ -42,7 +42,6 @@ void ReleaseWifiHalVendorInterface(void);
 int ExcuteCmd(const char *szCmd);
 int FileIsExisted(const char* file);
 int CopyConfigFile(const char* configName);
-int IsFileEmpty(const char* filename);
 #ifdef __cplusplus
 }
 #endif

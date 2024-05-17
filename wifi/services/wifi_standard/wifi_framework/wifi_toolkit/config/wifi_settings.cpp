@@ -2269,7 +2269,6 @@ void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannel
 
 void WifiSettings::UpdateLinkedInfo(int instId)
 {
-    std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
         if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
             if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {

@@ -56,7 +56,7 @@ int WifiServiceManager::Init()
 #endif
     mStaServiceHandle.Clear();
     mScanServiceHandle.Clear();
-    mEnhanceServiceHandle.Clear(); 
+    mEnhanceServiceHandle.Clear();
 #ifdef OHOS_ARCH_LITE
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.so"));
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.so"));

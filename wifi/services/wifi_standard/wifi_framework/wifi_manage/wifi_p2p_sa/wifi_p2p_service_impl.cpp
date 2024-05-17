@@ -419,11 +419,12 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
     }
     int passLen = config.GetPassphrase().length();
     if ((!config.GetPassphrase().empty()) &&
-              (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN)) {
+        (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN)) {
         WIFI_LOGE("CreateGroup:VerifyPassphrase length failed!");
         return WIFI_OPT_INVALID_PARAM;
     }
-    if (CheckMacIsValid(config.GetDeviceAddress()) != 0) {
+    if ((!config.GetDeviceAddress().empty()) &&
+        (CheckMacIsValid(config.GetDeviceAddress()) != 0)) {
         WIFI_LOGE("CreateGroup:VerifyDeviceAddress failed!");
         return WIFI_OPT_INVALID_PARAM;
     }

@@ -1887,6 +1887,11 @@ bool StaStateMachine::ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig)
     return false;
 }
 
+static bool isPskEncryption(const std::string keyMgmt)
+{
+    return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
+}
+
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
     LOGD("enter SetRandomMac.");
@@ -1908,23 +1913,24 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             LOGE("scanInfo has no target wifi and bssid is empty!");
             return false;
         }
-
-        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-        if (randomMacInfo.randomMac.empty()) {
-            /* Sets the MAC address of WifiSettings. */
+        if (deviceConfig.macAddress.empty()) {
             std::string macAddress;
-            WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
-            randomMacInfo.randomMac = macAddress;
-            LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
-                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
-                MacAnonymize(randomMacInfo.peerBssid).c_str());
+            WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+            if (!randomMacInfo.randomMac.empty()) {
+                currentMac = randomMacInfo.randomMac;
+            } else {
+                WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+                randomMacInfo.randomMac = macAddress;
+                currentMac = randomMacInfo.randomMac;
+                WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+            }
+        } else if (isPskEncryption(deviceConfig.keyMgmt)) {
+            randomMacInfo.randomMac = deviceConfig.macAddress;
+            currentMac = randomMacInfo.randomMac;
             WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
         } else {
-            LOGI("%{public}s: randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
-                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
-                MacAnonymize(randomMacInfo.peerBssid).c_str());
+            currentMac = deviceConfig.macAddress;
         }
-        currentMac = randomMacInfo.randomMac;
     }
 
     if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac)) != WIFI_IDL_OPT_OK) {

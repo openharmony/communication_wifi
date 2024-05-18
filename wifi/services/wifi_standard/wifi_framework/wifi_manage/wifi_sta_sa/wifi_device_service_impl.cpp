@@ -856,7 +856,7 @@ ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std
         WIFI_LOGE("%{public}s: sta service is not running!", __FUNCTION__);
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    if (networkId < 0 || CheckMacIsValid(bssid) != 0) {
+    if (networkId < 0 || (!bssid.empty() && CheckMacIsValid(bssid) != 0)) {
         WIFI_LOGE("%{public}s: invalid param, networkId: %{public}d, bssid:%{public}s",
             __FUNCTION__, networkId, MacAnonymize(bssid).c_str());
         return WIFI_OPT_INVALID_PARAM;

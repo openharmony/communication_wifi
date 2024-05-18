@@ -575,7 +575,7 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
         } else {
-            LOGI("%{public}s current linedBssid: %{public}s, roam to targetBssid: %{public}s",
+            LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
                 __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
             pStaStateMachine->StartRoamToNetwork(bssid);
         }

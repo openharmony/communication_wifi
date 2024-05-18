@@ -71,12 +71,13 @@ ErrCode SelfCureInterface::InitCallback()
     using namespace std::placeholders;
     WIFI_LOGD("Enter SelfCureInterface::InitCallback");
     mStaCallback.callbackModuleName = "SelfCureService";
+    mStaCallback.OnStaOpenRes = std::bind(&SelfCureInterface::DealStaOpenRes, this, _1, _2);
     mStaCallback.OnStaConnChanged = std::bind(&SelfCureInterface::DealStaConnChanged, this, _1, _2, _3);
     mStaCallback.OnStaRssiLevelChanged = std::bind(&SelfCureInterface::DealRssiLevelChanged, this, _1, _2);
     return WIFI_OPT_SUCCESS;
 }
 
-StaServiceCallback SelfCureInterface::GetStaCallback()
+StaServiceCallback SelfCureInterface::GetStaCallback() const
 {
     WIFI_LOGD("self cure GetStaCallback");
     return mStaCallback;
@@ -87,8 +88,19 @@ void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLink
     std::lock_guard<std::mutex> lock(mutex);
     if (pSelfCureService == nullptr) {
         WIFI_LOGI("pSelfCureService is null");
+        return;
     }
     pSelfCureService->HandleStaConnChanged(state, info);
+}
+
+void SelfCureInterface::DealStaOpenRes(OperateResState state, int instId)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return;
+    }
+    pSelfCureService->HandleStaOpenRes(state);
 }
 
 void SelfCureInterface::DealRssiLevelChanged(int rssi, int instId)
@@ -96,6 +108,7 @@ void SelfCureInterface::DealRssiLevelChanged(int rssi, int instId)
     std::lock_guard<std::mutex> lock(mutex);
     if (pSelfCureService == nullptr) {
         WIFI_LOGI("pSelfCureService is null");
+        return;
     }
     pSelfCureService->HandleRssiLevelChanged(rssi);
 }
@@ -105,6 +118,7 @@ void SelfCureInterface::DealP2pConnChanged(const WifiP2pLinkedInfo &info)
     std::lock_guard<std::mutex> lock(mutex);
     if (pSelfCureService == nullptr) {
         WIFI_LOGI("pSelfCureService is null");
+        return;
     }
     pSelfCureService->HandleP2pConnChanged(info);
 }

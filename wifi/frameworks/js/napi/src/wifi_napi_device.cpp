@@ -1621,5 +1621,29 @@ NO_SANITIZE("cfi") napi_value EnableHiLinkHandshake(napi_env env, napi_callback_
     ErrCode ret = wifiDevicePtr->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
+
+NO_SANITIZE("cfi") napi_value EnableSemiWifi(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    ErrCode ret = wifiDevicePtr->EnableSemiWifi();
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
+NO_SANITIZE("cfi") napi_value GetWifiDetailState(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    WifiDetailState state = WifiDetailState::STATE_UNKNOWN;
+    ErrCode ret = wifiDevicePtr->GetWifiDetailState(state);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetWifiDetailState failed:%{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value value;
+    napi_create_int32(env, static_cast<int>(state), &value);
+    return value;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

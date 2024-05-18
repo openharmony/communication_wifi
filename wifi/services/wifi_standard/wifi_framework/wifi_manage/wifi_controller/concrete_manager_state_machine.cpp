@@ -483,17 +483,17 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
+        errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Register sta service callback failed!");
+            break;
+        }
 #ifdef FEATURE_SELF_CURE_SUPPORT
         if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("StartSelfCureService failed!");
             break;
         }
 #endif
-        errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register sta service callback failed!");
-            break;
-        }
 #ifndef OHOS_ARCH_LITE
         errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {

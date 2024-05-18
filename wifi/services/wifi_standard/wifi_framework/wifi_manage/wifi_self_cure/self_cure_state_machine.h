@@ -153,6 +153,7 @@ public:
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
+        void HandleResetConnectNetwork(InternalMessage *msg);
         SelfCureStateMachine *pSelfCureStateMachine;
         bool setStaticIpConfig = false;
     };
@@ -229,6 +230,7 @@ public:
         void SelfCureWifiLink(int requestCureLevel);
         bool SelectedSelfCureAcceptable();
         void SelfCureForRandMacReassoc();
+        void SelfCureForReset(int requestCureLevel);
         void HandleIpConfigCompleted();
         void HandleIpConfigCompletedAfterRenewDhcp();
         void HandleInternetRecoveryConfirm();
@@ -383,10 +385,11 @@ private:
     int useWithRandMacAddress = 0;
     std::atomic<bool> selfCureOnGoing = false;
     std::atomic<bool> p2pConnected = false;
-    std::atomic<bool> notAllowSelfcure = false;
+    std::atomic<bool> notAllowSelfcure = true;
     int arpDetectionFailedCnt = 0;
     int selfCureReason = -1;
     int noTcpRxCounter = 0;
+    int connectNetworkRetryCnt = 0;
     bool internetUnknown = false;
     std::map<std::string, IpInfo> dhcpOfferPackets;
     std::vector<std::string> dhcpResultsTestDone;

@@ -159,5 +159,44 @@ HWTEST_F(AppParserTest, IsChariotApp_False, TestSize.Level1)
     EXPECT_FALSE(m_appXmlParser->IsChariotApp(appName));
 }
 
+HWTEST_F(AppParserTest, ReadPackageCloudFilterConfig, TestSize.Level1)
+{
+    WIFI_LOGI("IsChariotApp_False enter");
+    std::string appName = "other";
+    EXPECT_FALSE(m_appXmlParser->ReadPackageCloudFilterConfig());
+}
+ 
+HWTEST_F(AppParserTest, IsReadCloudConfig, TestSize.Level1)
+{
+    WIFI_LOGI("IsReadCloudConfig enter");
+    m_appXmlParser->IsReadCloudConfig();
+}
+ 
+HWTEST_F(AppParserTest, GetCloudPushFileVersion, TestSize.Level1)
+{
+    WIFI_LOGI("GetLocalFileVersion enter");
+    std::string strCloud = m_appXmlParser->GetCloudPushVersionFilePath();
+    m_appXmlParser->GetCloudPushFileVersion(strCloud.c_str());
+}
+ 
+HWTEST_F(AppParserTest, GetLocalFileVersion, TestSize.Level1)
+{
+    WIFI_LOGI("GetLocalFileVersion enter");
+    std::string WIFI_MONITOR_APP_FILE_PATH = "/system/etc/wifi/wifi_monitor_apps.xml";
+    m_appXmlParser->GetLocalFileVersion(WIFI_MONITOR_APP_FILE_PATH);
+}
+ 
+HWTEST_F(AppParserTest, GetCloudPushVersionFilePath, TestSize.Level1)
+{
+    WIFI_LOGI("GetCloudPushVersionFilePath enter");
+    m_appXmlParser->GetCloudPushVersionFilePath();
+}
+ 
+HWTEST_F(AppParserTest, GetCloudPushJsonFilePath, TestSize.Level1)
+{
+    WIFI_LOGI("GetCloudPushJsonFilePath enter");
+    m_appXmlParser->GetCloudPushJsonFilePath();
+}
+
 } // namespace Wifi
 } // namespace OHOS

@@ -2687,7 +2687,6 @@ void StaStateMachine::DisConnectProcess()
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
-        mPortalUrl = "";
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
@@ -3163,9 +3162,13 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
+        portalFlag = true;
 #ifndef OHOS_ARCH_LITE
         if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
             ShowPortalNitification();
+            if (WifiAppStateAware::GetInstance().IsForegroundApp(SETTINGS_BUNDLE)) {
+                portalFlag = false;
+            }
         }
 #endif
         if (portalFlag == false) {
@@ -3272,6 +3275,12 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
             }
             WIFI_LOGI("netdetection, netstate:%{public}d url:%{public}s\n", netstate, url.c_str());
             pStaStateMachine->HandleNetCheckResult(netstate, url);
+            break;
+        }
+        case WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            WIFI_LOGI("LinkedState, recv StartPortalCertification!");
+            pStaStateMachine->HandlePortalNetworkPorcess();
             break;
         }
         default:

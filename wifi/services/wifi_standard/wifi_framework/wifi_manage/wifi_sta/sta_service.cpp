@@ -827,7 +827,8 @@ ErrCode StaService::StartPortalCertification()
         WIFI_LOGE("pStaStateMachine is null!");
         return WIFI_OPT_FAILED;
     }
-    pStaStateMachine->HandlePortalNetworkPorcess();
+    WIFI_LOGI("StartPortalCertification send message!");
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT);
     return WIFI_OPT_SUCCESS;
 }
 

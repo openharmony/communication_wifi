@@ -1595,45 +1595,22 @@ void StaStateMachine::DealCancelWpsCmd(InternalMessage *msg)
 void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
 {
     if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is null", __FUNCTION__);
         return;
     }
-
-    WIFI_LOGI("enter DealStartRoamCmd\n");
     std::string bssid = msg->GetStringFromMessage();
     targetRoamBssid = bssid;
-    /* GetDeviceConfig from Configuration center. */
-    WifiDeviceConfig network;
-    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, network);
-
-    /* Setting the network. */
-    WifiIdlDeviceConfig idlConfig;
-    idlConfig.networkId = linkedInfo.networkId;
-    idlConfig.ssid = linkedInfo.ssid;
-    idlConfig.bssid = bssid;
-    idlConfig.psk = network.preSharedKey;
-    idlConfig.keyMgmt = network.keyMgmt;
-    idlConfig.priority = network.priority;
-    idlConfig.scanSsid = network.hiddenSSID ? 1 : 0;
-    FillEapCfg(network, idlConfig);
-    if (WifiStaHalInterface::GetInstance().SetDeviceConfig(linkedInfo.networkId, idlConfig) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("DealStartRoamCmd SetDeviceConfig() failed!");
+    WIFI_LOGI("%{public}s target bssid:{public}s", MacAnonymize(linkedInfo.bssid).c_str());
+    if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, targetRoamBssid)
+        != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("%{public}s set roam target bssid fail", __FUNCTION__);
         return;
     }
-    WIFI_LOGD("DealStartRoamCmd  SetDeviceConfig() succeed!");
-
-    /* Save to Configuration center. */
-    network.bssid = bssid;
-    WifiSettings::GetInstance().AddDeviceConfig(network);
-    WifiSettings::GetInstance().SyncDeviceConfig();
-
-    /* Save linkedinfo */
-    linkedInfo.bssid = bssid;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-
     if (WifiStaHalInterface::GetInstance().Reassociate() != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("START_ROAM-ReAssociate() failed!");
+        WIFI_LOGE("%{public}s START_ROAM-ReAssociate() failed!", __FUNCTION__);
+        return;
     }
-    WIFI_LOGI("START_ROAM-ReAssociate() succeeded!");
+    WIFI_LOGI("%{public}s START_ROAM-ReAssociate() succeeded!", __FUNCTION__);
     /* Start roaming */
     SwitchState(pApRoamingState);
 }

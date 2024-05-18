@@ -158,5 +158,6 @@ HWTEST_F(AppParserTest, IsChariotApp_False, TestSize.Level1)
     std::string appName = "other";
     EXPECT_FALSE(m_appXmlParser->IsChariotApp(appName));
 }
+
 } // namespace Wifi
 } // namespace OHOS

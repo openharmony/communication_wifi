@@ -155,6 +155,29 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
 
+ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("EnableSemiWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableSemiWifi: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableSemiWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableSemiWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
 {
     /* refer to WifiProtectManager::GetInstance().InitWifiProtect, DO NOT support now! */
@@ -1158,6 +1181,25 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
     WIFI_LOGI("GetCountryCode: country code is %{public}s", countryCode.c_str());
 #endif
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::GetWifiDetailState(WifiDetailState &state)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetWifiDetailState: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetWifiDetailState:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetWifiDetailState:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    state = WifiDetailState::STATE_UNKNOWN;
+    WIFI_LOGI("GetWifiDetailState: state is %{public}d", static_cast<int>(state));
     return WIFI_OPT_SUCCESS;
 }
 

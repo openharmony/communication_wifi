@@ -863,6 +863,10 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 
 ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) 
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     if (isCandidate) {
         WIFI_LOGE("%{public}s: don't support roam to candidate network", __FUNCTION__);
         return WIFI_OPT_NOT_SUPPORTED;
@@ -1682,6 +1686,10 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     WIFI_LOGI("Enter LimitSpeed.");
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);

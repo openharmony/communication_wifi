@@ -56,6 +56,7 @@ public:
     bool IsMdmForbidden(void);
 
 private:
+    void DelayedAccessDataShare();
     void InitSubscribeListener();
     bool IsDataMgrServiceActive();
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
@@ -90,7 +91,7 @@ private:
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
-    uint32_t migrateTimerId{0};
+    uint32_t accessDatashareTimerId{0};
     std::mutex cesEventMutex;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;

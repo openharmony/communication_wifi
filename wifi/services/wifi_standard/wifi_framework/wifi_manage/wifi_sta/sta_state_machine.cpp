@@ -545,6 +545,17 @@ ErrCode StaStateMachine::SetExternalSim(const std::string ifName, const std::str
     return WIFI_OPT_SUCCESS;
 }
 
+void StaStateMachine::FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const
+{
+    if (idlConfig.keyMgmt.find("WPA-EAP-SUITE-B-192") != std::string::npos) {
+        idlConfig.allowedProtocols = 0x02; // RSN
+        idlConfig.allowedPairwiseCiphers = 0x20; // GCMP-256
+        idlConfig.allowedGroupCiphers = 0x20; // GCMP-256
+        idlConfig.isRequirePmf = true;
+        idlConfig.allowedGroupMgmtCiphers = 0x4; // BIP-GMAC-256
+    }
+}
+
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
     LOGI("Enter ConvertDeviceCfg.\n");
@@ -556,6 +567,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     idlConfig.priority = config.priority;
     idlConfig.scanSsid = config.hiddenSSID ? 1 : 0;
     FillEapCfg(config, idlConfig);
+    FillSuiteB192Cfg(idlConfig);
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
     if (strcmp(config.keyMgmt.c_str(), "WEP") == 0) {
         /* for wep */

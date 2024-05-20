@@ -305,6 +305,11 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
         num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_CIPHERS, config.allowedGroupCiphers,
                                          groupCipherStr, sizeof(groupCipherStr)/sizeof(groupCipherStr[0]));
     }
+    if (config.allowedGroupMgmtCiphers > 0) {
+        std::string groupMgmtCipherStr[] = {"AES-128-CMAC ", "BIP-GMAC-128 ", "BIP-GMAC-256 ", "BIP-CMAC-256 "};
+        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_MGMT_CIPHERS, config.allowedGroupMgmtCiphers,
+                                         groupMgmtCipherStr, sizeof(groupMgmtCipherStr)/sizeof(groupMgmtCipherStr[0]));
+    }
     if (num == 0) {
         return WIFI_IDL_OPT_OK;
     }

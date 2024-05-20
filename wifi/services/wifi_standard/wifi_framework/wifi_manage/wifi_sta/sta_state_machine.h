@@ -1219,6 +1219,7 @@ private:
     void ShowPortalNitification();
 #endif
     void SetConnectMethod(int connectMethod);
+    void FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

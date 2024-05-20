@@ -114,6 +114,9 @@ struct InterScanInfo {
             case WifiSecurity::WEP:
                 mgmt = "WEP";
                 break;
+            case WifiSecurity::EAP_SUITE_B:
+                mgmt = "WPA-EAP-SUITE-B-192";
+                break;
             default:
                 mgmt = "NONE";
                 break;

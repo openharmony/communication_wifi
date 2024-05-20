@@ -459,6 +459,13 @@ public:
     virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
 
     /**
+     * @Description SetLowTxPower
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
+
+    /**
      * @Description hilink connect
      *
      * @return ErrCode - operation result

@@ -94,6 +94,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnGetWifiDetailState;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE)] =
         &WifiDeviceStub::OnSetSatelliteState;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER)] =
+        &WifiDeviceStub::OnSetLowTxPower;
     return;
 }
 
@@ -1113,6 +1115,22 @@ void WifiDeviceStub::OnGetWifiDetailState(uint32_t code, MessageParcel &data, Me
         reply.WriteInt32(static_cast<int>(state));
     }
 
+    return;
+}
+
+void WifiDeviceStub::OnSetLowTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiLowPowerParam wifiLowPowerParam;
+    wifiLowPowerParam.ifName = data.ReadString();
+    wifiLowPowerParam.scene = data.ReadInt32();
+    wifiLowPowerParam.rssiThreshold = data.ReadInt32();
+    wifiLowPowerParam.peerMacaddr = data.ReadString();
+    wifiLowPowerParam.powerParam = data.ReadString();
+    wifiLowPowerParam.powerParamLen = data.ReadInt32();
+    ErrCode ret = SetLowTxPower(wifiLowPowerParam);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 

@@ -1909,6 +1909,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     std::string lastMac;
     std::string currentMac;
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
+        LOGI("%{public}s randommac, use factory mac to connect", __func__);
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
         WifiStoreRandomMac randomMacInfo;
@@ -1918,15 +1919,21 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             LOGE("scanInfo has no target wifi and bssid is empty!");
             return false;
         }
+        LOGI("%{public}s randommac, ssid:%{public}s keyMgmt:%{public}s macAddress:%{public}s",
+            __func__, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
+            MacAnonymize(deviceConfig.macAddress).c_str());
         if (deviceConfig.macAddress.empty()) {
-            std::string macAddress;
             WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
             if (!randomMacInfo.randomMac.empty()) {
                 currentMac = randomMacInfo.randomMac;
             } else {
+                std::string macAddress;
                 WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
                 randomMacInfo.randomMac = macAddress;
                 currentMac = randomMacInfo.randomMac;
+                LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                    __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                    MacAnonymize(randomMacInfo.peerBssid).c_str());
                 WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
             }
         } else if (isPskEncryption(deviceConfig.keyMgmt)) {
@@ -1939,11 +1946,11 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     }
 
     if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac)) != WIFI_IDL_OPT_OK) {
-        LOGE("GetStaDeviceMacAddress failed!");
+        LOGE("%{public}s randommac, GetStaDeviceMacAddress failed!", __func__);
         return false;
     }
 
-    LOGI("%{public}s, currentMac:%{public}s, lastMac:%{public}s",
+    LOGI("%{public}s, randommac, use random mac to connect, currentMac:%{public}s, lastMac:%{public}s",
         __func__, MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
         if (lastMac != currentMac) {
@@ -1958,7 +1965,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
     } else {
-        LOGE("Check MacAddress error.");
+        LOGE("%{public}s randommac, Check MacAddress error.", __func__);
         return false;
     }
 #endif

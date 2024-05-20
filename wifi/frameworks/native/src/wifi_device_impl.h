@@ -517,7 +517,7 @@ public:
     virtual ErrCode SetSatelliteState(const int state) override;
 private:
     bool GetWifiDeviceProxy();
-    int systemAbilityId_;
+    std::atomic<int> systemAbilityId_;
     int instId_;
     std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE

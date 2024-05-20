@@ -547,6 +547,7 @@ struct WifiDeviceConfig {
     int connFailedCount;
     unsigned int networkStatusHistory;
     bool isPortal;
+    time_t portalAuthTime;
     time_t lastHasInternetTime;
     bool noInternetAccess;
     /* save select mac address */
@@ -585,6 +586,7 @@ struct WifiDeviceConfig {
         connFailedCount = 0;
         networkStatusHistory = 0;
         isPortal = false;
+        portalAuthTime = -1;
         lastHasInternetTime = -1;
         noInternetAccess = false;
         callProcessName = "";

@@ -163,6 +163,8 @@ public:
 
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 
+    ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
+
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 
     ErrCode EnableSemiWifi() override;

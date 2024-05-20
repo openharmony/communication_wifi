@@ -102,6 +102,24 @@
 #define DEVICE_IPV6_MAX_LEN 128
 
 /**
+ * @brief Indicates the maximum length of ifName.
+ *
+ */
+#define WIFI_IF_NAME_MAX_LEN 16
+
+/**
+ * @brief Indicates the maximum length of peer mac address.
+ *
+ */
+#define WIFI_PEER_MAC_ADDR_MAX_LEN 18
+
+/**
+ * @brief Indicates the maximum length of low tx power param.
+ *
+ */
+#define WIFI_LOW_TX_POWER_PARAM_MAX_LEN 40
+
+/**
  * @brief Enumerates Wi-Fi security types.
  *
  * @since 7
@@ -266,6 +284,16 @@ typedef struct {
     char primaryDns[DEVICE_IPV6_MAX_LEN];
     char secondDns[DEVICE_IPV6_MAX_LEN];
 } IpV6Info;
+
+/* Wifi Low Tx Power Param */
+typedef struct {
+    char ifName[WIFI_IF_NAME_MAX_LEN];
+    int scene;
+    int rssiThreshold;
+    char peerMacaddr[WIFI_PEER_MAC_ADDR_MAX_LEN];
+    char powerParam[WIFI_LOW_TX_POWER_PARAM_MAX_LEN];
+    int powerParamLen;
+} WifiLowPowerParam;
 
 #endif // WIFI_LITE_WIFI_DEVICE_CONFIG_H
 /** @} */

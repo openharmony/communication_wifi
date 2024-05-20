@@ -743,7 +743,7 @@ WifiErrorNo HdiP2pInvite(const char *peerBssid, const char *goBssid, const char 
 
 WifiErrorNo HdiP2pReinvoke(int networkId, const char *bssid)
 {
-    LOGI("HdiP2pReinvoke enter networkId=%{public}d, bssid=%{public}s", networkId, bssid);
+    LOGI("HdiP2pReinvoke enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pReinvoke: wpaObj is NULL");

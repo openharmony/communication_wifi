@@ -53,6 +53,8 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.noInternetAccess = false;
     item.callProcessName.clear();
     item.ancoCallProcessName.clear();
+    item.randomizedMacSuccessEver = false;
+    item.macAddress.clear();
     item.internetSelfCureHistory.clear();
     item.isReassocSelfCureWithFactoryMacAddress = 0;
     return;

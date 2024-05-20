@@ -407,7 +407,7 @@ public:
 
 private:
     bool GetWifiP2pProxy();
-    int systemAbilityId_;
+    std::atomic<int> systemAbilityId_;
     sptr<IWifiP2p> client_;
     std::mutex mutex_;
 };

@@ -817,7 +817,7 @@ template<>
 void ClearTClass<WifiConfig>(WifiConfig &item)
 {
     item.scanAlwaysSwitch = false;
-    item.staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+    item.staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
     item.staLastState = false;

@@ -51,8 +51,6 @@ public:
 
 private:
     bool Init();
-    friend void SigHandler(int sig);
-    friend bool IsProcessNeedToRestart();
     static sptr<WifiHotspotMgrServiceImpl> g_instance;
     std::map<int, sptr<IRemoteObject>> mWifiService;
     static std::mutex g_instanceLock;

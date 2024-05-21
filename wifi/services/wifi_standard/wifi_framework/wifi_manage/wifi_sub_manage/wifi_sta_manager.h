@@ -33,6 +33,8 @@ public:
     void StopUnloadStaSaTimer(void);
     void StartUnloadStaSaTimer(void);
     void CloseStaService(int instId = 0);
+    void StartSatelliteTimer(void);
+    void StopSatelliteTimer(void);
 
 private:
     void InitStaCallback(void);
@@ -43,12 +45,15 @@ private:
     void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
     void DealStreamChanged(StreamDirection direction, int instId = 0);
     void DealRssiChanged(int rssi, int instId = 0);
+    void ResetSelfcureOpenWifi(int instId = 0);
     void PublishWifiOperateStateHiSysEvent(OperateResState state);
 private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
     int mLastWifiOpenState = -1;
+    uint32_t satelliteTimerId;
+    std::mutex satelliteTimerMutex;
 };
 
 }  // namespace Wifi

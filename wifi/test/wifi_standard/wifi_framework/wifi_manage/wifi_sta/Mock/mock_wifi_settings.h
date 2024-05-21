@@ -87,6 +87,12 @@ public:
     virtual void RemoveWifi6BlackListCache(const std::string bssid) = 0;
     virtual int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const = 0;
     virtual std::string GetStaIfaceName() = 0;
+    virtual void SetWifiSelfcureReset(const bool isReset) = 0;
+    virtual bool GetWifiSelfcureReset() const = 0;
+    virtual void SetLastNetworkId(const int networkId) = 0;
+    virtual int GetLastNetworkId() const = 0;
+    virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
+    virtual void SetWifiToggledState(bool state) = 0;
     virtual int GetScreenState() const = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
 };
@@ -158,6 +164,12 @@ public:
     MOCK_METHOD1(RemoveWifi6BlackListCache, void(const std::string bssid));
     MOCK_CONST_METHOD1(GetWifi6BlackListCache, int(std::map<std::string, Wifi6BlackListInfo> &blackListCache));
     MOCK_METHOD0(GetStaIfaceName, std::string());
+    MOCK_METHOD1(SetWifiSelfcureReset, void(const bool isReset));
+    MOCK_CONST_METHOD0(GetWifiSelfcureReset, bool());
+    MOCK_METHOD1(SetLastNetworkId, void(const int networkId));
+    MOCK_CONST_METHOD0(GetLastNetworkId, int());
+    MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &linkedInfo));
+    MOCK_METHOD1(SetWifiToggledState, void(bool state));
     MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
 };

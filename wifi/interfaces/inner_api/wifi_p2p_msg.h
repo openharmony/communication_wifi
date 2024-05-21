@@ -63,6 +63,7 @@ enum class P2pActionCallback : unsigned char {
     CreateHid2dGroup,
     Hid2dConnect,
     RemoveGroupClient,
+    DiscoverPeers,
     UNKNOWN
 };
 

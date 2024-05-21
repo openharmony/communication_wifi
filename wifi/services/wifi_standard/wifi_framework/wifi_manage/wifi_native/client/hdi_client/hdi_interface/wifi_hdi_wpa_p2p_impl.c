@@ -16,6 +16,7 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
+#include "stub_collector.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaP2pImpl"
@@ -91,7 +92,7 @@ static WifiErrorNo UnRegisterP2pEventCallback()
             LOGE("UnRegisterP2pEventCallback: UnregisterEventCallback failed result:%{public}d", result);
             return WIFI_IDL_OPT_FAILED;
         }
-
+        StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaP2pCallbackObj);
         free(g_hdiWpaP2pCallbackObj);
         g_hdiWpaP2pCallbackObj = NULL;
     }
@@ -743,7 +744,7 @@ WifiErrorNo HdiP2pInvite(const char *peerBssid, const char *goBssid, const char 
 
 WifiErrorNo HdiP2pReinvoke(int networkId, const char *bssid)
 {
-    LOGI("HdiP2pReinvoke enter networkId=%{public}d, bssid=%{public}s", networkId, bssid);
+    LOGI("HdiP2pReinvoke enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pReinvoke: wpaObj is NULL");
@@ -1116,6 +1117,25 @@ WifiErrorNo HdiP2pSaveConfig()
     }
 
     LOGI("HdiP2pSaveConfig success.");
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData)
+{
+    LOGI("HdiDeliverP2pData enter");
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiDeliverP2pData: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, "p2p0", cmdType, dataType, carryData);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiDeliverP2pData: send failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiDeliverP2pData success.");
     return WIFI_IDL_OPT_OK;
 }
 #endif

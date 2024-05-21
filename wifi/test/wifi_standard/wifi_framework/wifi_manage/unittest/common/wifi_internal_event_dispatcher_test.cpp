@@ -177,7 +177,8 @@ HWTEST_F(WifiInternalEventDispatcherTest, AddP2pCallbackFail, TestSize.Level1)
 {
     sptr<IRemoteObject> remote;
     sptr<IWifiP2pCallback> callback;
-    EXPECT_EQ(3, WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback, 123, EVENT_P2P_STATE_CHANGE, 0));
+    EXPECT_EQ(3, WifiInternalEventDispatcher::GetInstance()
+        .AddP2pCallback(remote, callback, 123, EVENT_P2P_STATE_CHANGE, 0));
 }
 
 HWTEST_F(WifiInternalEventDispatcherTest, RemoveP2pCallbackFail, TestSize.Level1)

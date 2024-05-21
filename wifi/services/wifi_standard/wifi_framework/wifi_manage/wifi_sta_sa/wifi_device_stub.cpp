@@ -88,6 +88,12 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnLimitSpeed;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT)] =
         &WifiDeviceStub::OnEnableHiLinkHandshake;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI)] =
+        &WifiDeviceStub::OnEnableSemiWifi;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE)] =
+        &WifiDeviceStub::OnGetWifiDetailState;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE)] =
+        &WifiDeviceStub::OnSetSatelliteState;
     return;
 }
 
@@ -1076,5 +1082,39 @@ void WifiDeviceStub::OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data,
     reply.WriteInt32(ret);
     return;
 }
+
+void WifiDeviceStub::OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int state = data.ReadInt32();
+    ErrCode ret = SetSatelliteState(state);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = EnableSemiWifi();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnGetWifiDetailState(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiDetailState state = WifiDetailState::STATE_UNKNOWN;
+    ErrCode ret = GetWifiDetailState(state);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(static_cast<int>(state));
+    }
+
+    return;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

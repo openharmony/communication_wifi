@@ -375,6 +375,9 @@ public:
      */
     ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) override;
 
+    ErrCode DiscoverPeers(int32_t channelid) override;
+
+    ErrCode DisableRandomMac(int setmode) override;
     /**
     * @Description Handle remote object died event.
     * @param remoteObject remote object.

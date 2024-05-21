@@ -7,7 +7,8 @@
                 "run-on-create":false,
                 "auto-restart":true,
                 "distributed":false,
-                "dump-level":1
+                "dump-level":1,
+                "extension":["backup", "restore"]
             }
         ]
 }

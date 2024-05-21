@@ -21,11 +21,26 @@
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
+#ifndef OHOS_ARCH_LITE
+#include "iservice_registry.h"
+#include "netsys_native_service_proxy.h"
+#include "system_ability_definition.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("WifiTogglerManager")
 
 namespace OHOS {
 namespace Wifi {
+
+#ifndef OHOS_ARCH_LITE
+bool mIsSatelliteStart = false;
+constexpr int32_t WIFI_MODE_RSMC_START = 3009;
+constexpr int32_t WIFI_MODE_RSMC_STOP = 3010;
+constexpr int32_t WIFI_MODE_RSMC_CHECK = 3011;
+constexpr const char *IFACE_LINK_UP = "up";
+constexpr const char *IFACE_RUNNING = "running";
+#endif
+
 WifiTogglerManager::WifiTogglerManager()
 {
     WIFI_LOGI("create WifiTogglerManager");
@@ -154,5 +169,80 @@ void WifiTogglerManager::DealClientRemoved(int id)
     }
 }
 
+#ifndef OHOS_ARCH_LITE
+ErrCode WifiTogglerManager::SatelliteToggled(int state)
+{
+    if (state == WIFI_MODE_RSMC_START) {
+        WIFI_LOGI("Satellite state start.");
+        SetSatelliteStartState(true);
+        WifiManager::GetInstance().GetWifiStaManager()->StartSatelliteTimer();
+    } else if (state == WIFI_MODE_RSMC_STOP) {
+        WIFI_LOGI("Satellite state stop.");
+        SetSatelliteStartState(false);
+        WifiManager::GetInstance().GetWifiStaManager()->StopSatelliteTimer();
+    } else if (state == WIFI_MODE_RSMC_CHECK) {
+        WIFI_LOGI("Satellite state check.");
+        CheckSatelliteState();
+    } else {
+        WIFI_LOGI("unknow state, not handle.");
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+void WifiTogglerManager::SetSatelliteStartState(bool state)
+{
+    mIsSatelliteStart = state;
+}
+
+void WifiTogglerManager::CheckSatelliteState()
+{
+    WIFI_LOGI("Enter CheckSatelliteState");
+    std::string RSMC_CHECK_WHITE_LIST[] = {"wlan0", "wlan1", "wlan2", "p2p0", "chba0"};
+    bool isUp = false;
+    for (auto nif : RSMC_CHECK_WHITE_LIST) {
+        if (IsInterfaceUp(nif)) {
+            isUp = true;
+        }
+    }
+    if (isUp) {
+        pWifiControllerMachine->ShutdownWifi();
+    }
+}
+
+bool WifiTogglerManager::IsInterfaceUp(std::string &iface)
+{
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOGE("GetSystemAbilityManager failed!");
+        return false;
+    }
+    auto remote = samgr->GetSystemAbility(COMM_NETSYS_NATIVE_SYS_ABILITY_ID);
+    if (remote == nullptr) {
+        LOGE("GetSystemAbility failed!");
+        return false;
+    }
+    OHOS::sptr<OHOS::NetsysNative::INetsysService> netsysService = iface_cast<NetsysNative::INetsysService>(remote);
+    if (netsysService == nullptr) {
+        LOGE("NetdService is nullptr!");
+        return false;
+    }
+    OHOS::nmd::InterfaceConfigurationParcel config;
+    config.ifName = iface;
+    if (netsysService->GetInterfaceConfig(config) != ERR_NONE) {
+        WIFI_LOGE("ret is not ERR_NONE, return false.");
+        return false;
+    }
+    if (std::find(config.flags.begin(), config.flags.end(), IFACE_LINK_UP) != config.flags.end() ||
+        std::find(config.flags.begin(), config.flags.end(), IFACE_RUNNING) != config.flags.end()) {
+        return true;
+    }
+    return false;
+}
+
+bool WifiTogglerManager::IsSatelliteStateStart()
+{
+    return mIsSatelliteStart;
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

@@ -68,6 +68,8 @@ napi_value GetWifiProtect(napi_env env, napi_callback_info info);
 napi_value PutWifiProtect(napi_env env, napi_callback_info info);
 napi_value FactoryReset(napi_env env, napi_callback_info info);
 napi_value EnableHiLinkHandshake(napi_env env, napi_callback_info info);
+napi_value EnableSemiWifi(napi_env env, napi_callback_info info);
+napi_value GetWifiDetailState(napi_env env, napi_callback_info info);
 
 class ScanInfoAsyncContext : public AsyncContext {
 public:

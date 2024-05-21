@@ -27,8 +27,8 @@ std::list<std::string> IpPool::ipList;
 std::map<std::string, std::string> IpPool::mapGcMacToAllocIp;
 const std::string PATTERN_IP = "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 std::shared_mutex g_ipPoolMutex;
-
-std::atomic_int SharedLinkManager::sharedLinkCount(0);
+static std::mutex g_sharedLinkMutex;
+std::map<int, int> SharedLinkManager::sharedLinkCountMap;
 
 bool IpPool::InitIpPool(const std::string& serverIp)
 {
@@ -105,31 +105,53 @@ bool IpPool::IsValidIp(const std::string& ip)
     return std::regex_match(ip, std::regex(PATTERN_IP));
 }
 
-void SharedLinkManager::IncreaseSharedLink()
+void SharedLinkManager::IncreaseSharedLink(int callingUid)
 {
-    WIFI_LOGI("Increase shared link %{public}d -> %{public}d", sharedLinkCount.load(), sharedLinkCount.load() + 1);
-    ++sharedLinkCount;
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    sharedLinkCountMap[callingUid]++;
+    WIFI_LOGI("CallingUid %{public}d increase shared link to %{public}d", callingUid,
+        sharedLinkCountMap[callingUid]);
 }
 
-void SharedLinkManager::DecreaseSharedLink()
+void SharedLinkManager::DecreaseSharedLink(int callingUid)
 {
-    if (sharedLinkCount == 0) {
-        WIFI_LOGE("Decrease error for sharedLinkCount == 0!");
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    if (sharedLinkCountMap.find(callingUid) == sharedLinkCountMap.end()) {
+        WIFI_LOGE("CallingUid %{public}d decrease error for not found!", callingUid);
         return;
     }
-    WIFI_LOGI("Decrease shared link %{public}d -> %{public}d", sharedLinkCount.load(), sharedLinkCount.load() - 1);
-    --sharedLinkCount;
+    if (sharedLinkCountMap[callingUid] == 0) {
+        WIFI_LOGE("CallingUid %{public}d decrease error for sharedLinkCount == 0!", callingUid);
+        return;
+    }
+    sharedLinkCountMap[callingUid]--;
+    WIFI_LOGI("CallingUid %{public}d increase shared link to %{public}d", callingUid,
+        sharedLinkCountMap[callingUid]);
 }
 
 void SharedLinkManager::SetSharedLinkCount(int count)
 {
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
     WIFI_LOGI("Set sharedLinkCount: %{public}d", count);
-    sharedLinkCount = count;
+    if (count == 0) {
+        sharedLinkCountMap.clear();
+    } else if (count == 1) {
+        if (!sharedLinkCountMap.empty()) {
+            return;
+        }
+        int callingUid = 0;
+        sharedLinkCountMap[callingUid] = count;
+    }
 }
 
 int SharedLinkManager::GetSharedLinkCount()
 {
-    WIFI_LOGI("Get sharedLinkCount: %{public}d", sharedLinkCount.load());
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    int sharedLinkCount = 0;
+    for (auto iter : sharedLinkCountMap) {
+        sharedLinkCount += iter.second;
+    }
+    WIFI_LOGI("Get sharedLinkCount: %{public}d", sharedLinkCount);
     return sharedLinkCount;
 }
 }  // namespace Wifi

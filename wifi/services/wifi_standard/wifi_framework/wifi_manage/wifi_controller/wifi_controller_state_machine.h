@@ -95,6 +95,7 @@ public:
     void StartSoftapCloseTimer();
     void StopSoftapCloseTimer();
 #endif
+    void ShutdownWifi();
 
 private:
     template <typename T>
@@ -141,7 +142,7 @@ private:
     static bool IsScanOnlyEnable();
 
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
-    int mApidStopWifi;
+    std::atomic<int> mApidStopWifi;
 #endif
     EnableState *pEnableState;
     DisableState *pDisableState;

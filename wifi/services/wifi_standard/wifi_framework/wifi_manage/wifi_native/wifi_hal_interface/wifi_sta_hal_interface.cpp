@@ -272,7 +272,7 @@ static void ConvertsScanInfo(InterScanInfo &interScanInfo, ScanInfo &scanInfo)
 static void ConvertScanResultsInfo(WifiScanResultExt &wifiScanResultExt, ScanResultsInfo &scanResultsInfo)
 {
     wifiScanResultExt.flags = scanResultsInfo.flags;
-    wifiScanResultExt.bssid = (uint8_t *)scanResultsInfo.bssid.c_str();
+    wifiScanResultExt.bssid = scanResultsInfo.bssid.data();
     wifiScanResultExt.bssidLen = scanResultsInfo.bssid.size();
     wifiScanResultExt.caps = scanResultsInfo.caps;
     wifiScanResultExt.freq = scanResultsInfo.freq;

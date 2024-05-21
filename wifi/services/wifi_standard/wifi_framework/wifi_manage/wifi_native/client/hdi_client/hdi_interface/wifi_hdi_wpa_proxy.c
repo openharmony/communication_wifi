@@ -257,8 +257,10 @@ WifiErrorNo HdiWpaStart()
     }
     g_wpaObj = IWpaInterfaceGetInstance(HDI_WPA_SERVICE_NAME, false);
     if (g_wpaObj == NULL) {
-        g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
-        g_devMgr = NULL;
+        if (g_devMgr != NULL) {
+            g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
+            g_devMgr = NULL;
+        }
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s WpaInterfaceGetInstance failed", __func__);
         return WIFI_IDL_OPT_FAILED;
@@ -269,8 +271,10 @@ WifiErrorNo HdiWpaStart()
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);
         IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
         g_wpaObj = NULL;
-        g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
-        g_devMgr = NULL;
+        if (g_devMgr != NULL) {
+            g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
+            g_devMgr = NULL;
+        }
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_IDL_OPT_FAILED;
     }
@@ -299,8 +303,10 @@ WifiErrorNo HdiWpaStop()
     IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
     g_wpaStartSucceed = false;
     g_wpaObj = NULL;
-    g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
-    g_devMgr = NULL;
+    if (g_devMgr != NULL) {
+        g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
+        g_devMgr = NULL;
+    }
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("HdiWpaStart stop success!");
     return WIFI_IDL_OPT_OK;
@@ -598,7 +604,7 @@ static WifiErrorNo GetApInstance()
         return WIFI_IDL_OPT_FAILED;
     }
     g_apObj = IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, false);
-    if (g_apObj == NULL) {
+    if (g_apObj == NULL && g_apDevMgr != NULL) {
         g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
         g_apDevMgr = NULL;
         LOGE("%{public}s HostapdInterfaceGetInstance failed", __func__);
@@ -614,8 +620,10 @@ static WifiErrorNo StartApHdi(int id, const char *ifaceName)
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);
         IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, false);
         g_apObj = NULL;
-        g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
-        g_apDevMgr = NULL;
+        if (g_apDevMgr != NULL) {
+            g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
+            g_apDevMgr = NULL;
+        }
         return WIFI_IDL_OPT_FAILED;
     }
     return WIFI_IDL_OPT_OK;
@@ -673,8 +681,10 @@ WifiErrorNo HdiApStop(int id)
     }
     IHostapdInterfaceReleaseInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
     g_apObj = NULL;
-    g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
-    g_apDevMgr = NULL;
+    if (g_apDevMgr != NULL) {
+        g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
+        g_apDevMgr = NULL;
+    }
     g_apIsRunning = false;
     pthread_mutex_unlock(&g_apObjMutex);
     LOGI("HdiApStop stop success");

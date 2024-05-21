@@ -823,7 +823,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
     WIFI_LOGI("SelfCureWifiLink, requestCureLevel = %{public}d, currentRssi = %{public}d",
               requestCureLevel, currentRssi);
     if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS) {
-        WIFI_LOGI("SelfCureForDns");
         SelfCureForDns();
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_2_RENEW_DHCP) {
         SelfCureForRenewDhcp(requestCureLevel);
@@ -866,29 +865,9 @@ void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
     }
 }
 
-std::string SelfCureStateMachine::InternetSelfCureState::GetCountry()
-{
-    return GetParameter("const.cust.region", "");
-}
-
-std::string SelfCureStateMachine::InternetSelfCureState::GetLanguage()
-{
-    return GetParameter("persist.global.language", "");
-}
-
-std::string SelfCureStateMachine::InternetSelfCureState::GetOversea()
-{
-    std::string language = GetLanguage();
-    std::string country = GetCountry();
-    if (language == LANGUAGE_CHINESE && (country == COUNTRY_CHINA_CAPITAL || country == COUNTRY_CHINA_LOWERCASE)) {
-        return "internal";
-    }
-    return "oversea";
-}
-
 bool SelfCureStateMachine::InternetSelfCureState::UseOperatorOverSea()
 {
-    std::string oversea = GetOversea();
+    std::string oversea = WifiSettings::GetOversea();
     if ((oversea == "oversea")) {
         return true;
     }
@@ -930,6 +909,7 @@ void SelfCureStateMachine::InternetSelfCureState::UpdateDnsServers(std::vector<s
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
 {
+    WIFI_LOGI("begin to SelfCureForDns");
     pSelfCureStateMachine->selfCureOnGoing = true;
     testedSelfCureLevel.push_back(WIFI_CURE_RESET_LEVEL_LOW_1_DNS);
     if (pSelfCureStateMachine->internetUnknown) {

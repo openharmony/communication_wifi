@@ -48,6 +48,8 @@ namespace Wifi {
 
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
+constexpr const char *EXTENSION_SUCCESS = "wifi extension success";
+constexpr const char *EXTENSION_FAIL = "wifi extension fail";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 
 bool g_hiLinkActive = false;
@@ -110,6 +112,10 @@ WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 
 ErrCode WifiDeviceServiceImpl::EnableWifi()
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("EnableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     ErrCode errCode = CheckCanEnableWifi();
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
@@ -124,6 +130,10 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("DisableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     if (!WifiAuthCenter::IsSystemAppByToken()) {
         WIFI_LOGE("DisableWifi: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -143,6 +153,29 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
+}
+
+ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("EnableSemiWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableSemiWifi: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableSemiWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableSemiWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
@@ -1120,6 +1153,25 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::GetWifiDetailState(WifiDetailState &state)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetWifiDetailState: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetWifiDetailState:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetWifiDetailState:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    state = WifiDetailState::STATE_UNKNOWN;
+    WIFI_LOGI("GetWifiDetailState: state is %{public}d", static_cast<int>(state));
+    return WIFI_OPT_SUCCESS;
+}
+
 #ifdef OHOS_ARCH_LITE
 ErrCode WifiDeviceServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
     const std::vector<std::string> &event)
@@ -1241,6 +1293,12 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
         WIFI_LOGI("current power saving mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
+        WIFI_LOGI("current satellite mode and can not use sta, open failed!");
+        return WIFI_OPT_FORBID_AIRPLANE;
+    }
+#endif
     /**
      * Check the interval between the last STA shutdown and the current STA
      * startup.
@@ -1746,6 +1804,66 @@ ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTa
         return WIFI_OPT_STA_NOT_OPENED;
     }
     return pService->DeregisterFilterBuilder(filterTag, builderName);
+}
+
+ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
+{
+    WIFI_LOGI("Enter SetSatelliteState");
+
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("SetSatelliteState:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetSatelliteState:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetSatelliteState:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    return WifiManager::GetInstance().GetWifiTogglerManager()->SatelliteToggled(state);
+}
+
+ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& reply)
+{
+    UniqueFd fd(-1);
+    std::string replyCode = EXTENSION_SUCCESS;
+    int ret = WifiSettings::GetInstance().OnBackup(fd, "");
+    if (ret < 0) {
+        WIFI_LOGE("OnBackup fail: backup data fail!");
+        replyCode = EXTENSION_FAIL;
+    }
+    if (reply.WriteFileDescriptor(fd) == false || reply.WriteString(replyCode) == false) {
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveBackupFile();
+        WIFI_LOGE("OnBackup fail: reply write fail!");
+        return WIFI_OPT_FAILED;
+    }
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveBackupFile();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& reply)
+{
+    UniqueFd fd(data.ReadFileDescriptor());
+    std::string replyCode = EXTENSION_SUCCESS;
+    int ret = WifiSettings::GetInstance().OnRestore(fd, "");
+    if (ret < 0) {
+        WIFI_LOGE("OnRestore fail: restore data fail!");
+        replyCode = EXTENSION_FAIL;
+    }
+    if (reply.WriteString(replyCode) == false) {
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveBackupFile();
+        WIFI_LOGE("OnRestore fail: reply write fail!");
+        return WIFI_OPT_FAILED;
+    }
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveBackupFile();
+    return WIFI_OPT_SUCCESS;
 }
 #endif
 }  // namespace Wifi

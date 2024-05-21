@@ -51,6 +51,7 @@ private:
     void DealP2pGcJoinGroup(const GcInfo &info);
     void DealP2pGcLeaveGroup(const GcInfo &info);
     void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
+    void DealP2pPrivatePeersChanged(const std::string &PrivateInfo);
 
 private:
     IP2pServiceCallbacks mP2pCallback;

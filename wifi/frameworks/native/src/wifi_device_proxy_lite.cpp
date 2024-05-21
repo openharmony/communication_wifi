@@ -1663,5 +1663,73 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
 
     return ErrCode(owner.retCode);
 }
+
+ErrCode WifiDeviceProxy::EnableSemiWifi()
+{
+    if (remoteDied_ || remote_ == nullptr) {
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+            __func__, remoteDied_, remote_ == nullptr);
+        return WIFI_OPT_FAILED;
+    }
+
+    IpcIo req;
+    char data[IPC_DATA_SIZE_SMALL];
+    struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
+
+    IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&req, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    (void)WriteInt32(&req, 0);
+    owner.funcId = static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI), &req,
+        &owner, IpcCallback);
+    if (error != EC_SUCCESS) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI), error);
+        return WIFI_OPT_FAILED;
+    }
+
+    if (owner.exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(owner.retCode);
+}
+
+ErrCode WifiDeviceProxy::GetWifiDetailState(WifiDetailState &state)
+{
+    if (remoteDied_ || remote_ == nullptr) {
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+            __func__, remoteDied_, remote_ == nullptr);
+        return WIFI_OPT_FAILED;
+    }
+
+    IpcIo req;
+    char data[IPC_DATA_SIZE_SMALL];
+    struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
+
+    IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&req, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    (void)WriteInt32(&req, 0);
+    owner.variable = &state;
+    owner.funcId = static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE),
+        &req, &owner, IpcCallback);
+    if (error != EC_SUCCESS) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), error);
+        return WIFI_OPT_FAILED;
+    }
+
+    if (owner.exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(owner.retCode);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -464,6 +464,28 @@ public:
      * @return ErrCode - hilink connect result
      */
     virtual ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) = 0;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableSemiWifi() = 0;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiDetailState(WifiDetailState &state) = 0;
+
+    /**
+     * @Description set satellite state
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetSatelliteState(const int state) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

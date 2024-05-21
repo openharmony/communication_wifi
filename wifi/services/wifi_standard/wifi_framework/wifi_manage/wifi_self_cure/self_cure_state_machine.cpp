@@ -32,9 +32,8 @@
 namespace OHOS {
 namespace Wifi {
 const std::string CLASS_NAME = "WifiSelfCure";
-const std::string LANGUAGE_CHINESE = "zh-Hans";
-const std::string COUNTRY_CHINA_CAPITAL = "CN";
-const std::string COUNTRY_CHINA_LOWERCASE = "cn";
+const int PUBLIC_DNS_SERVERS_SIZE = 31;
+const int DEFAULT_PARAM_SIZE = 128;
 
 DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 std::vector<std::string> chinaPublicDnses;
@@ -842,10 +841,10 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
 void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
 {
     std::vector<std::string> strPublicIpAddr;
-    char DnsIpAddr[32];
-    GetParamValue("const.wifi.dnscure_ipcfg", "", DnsIpAddr, 128);
+    char DnsIpAddr[PUBLIC_DNS_SERVERS_SIZE];
+    GetParamValue("const.wifi.dnscure_ipcfg", "", DnsIpAddr, DEFAULT_PARAM_SIZE);
     std::string temp = "";
-    for (int i = 0; i < sizeof(DnsIpAddr) - 1; i++) {
+    for (int i = 0; i < sizeof(DnsIpAddr); i++) {
         if (DnsIpAddr[i] == ';') {
             strPublicIpAddr.push_back(temp);
             temp = "";
@@ -858,11 +857,13 @@ void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
             temp = temp + DnsIpAddr[i];
         }
     }
-    chinaPublicDnses[0] = strPublicIpAddr[0];
-    chinaPublicDnses[1] = strPublicIpAddr[1];
-
-    overseaPublicDnses[0] = strPublicIpAddr[2];
-    overseaPublicDnses[1] = strPublicIpAddr[3];
+    for (int i = 0; i < overseaPublicDnses.size(); i++) {
+        overseaPublicDnses[i] = strPublicIpAddr[i];
+    }
+    strPublicIpAddr.erase(strPublicIpAddr.begin, strPublicIpAddr.begin + 2);
+    for (int i = 0; i < chinaPublicDnses.size(); i++) {
+        chinaPublicDnses[i] = strPublicIpAddr[i];
+    }
 }
 
 std::string SelfCureStateMachine::InternetSelfCureState::GetCountry()

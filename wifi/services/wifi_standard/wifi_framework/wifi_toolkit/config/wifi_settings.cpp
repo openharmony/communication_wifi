@@ -44,6 +44,11 @@
 
 namespace OHOS {
 namespace Wifi {
+
+const std::string LANGUAGE_CHINESE = "zh-Hans";
+const std::string COUNTRY_CHINA_CAPITAL = "CN";
+const std::string COUNTRY_CHINA_LOWERCASE = "cn";
+
 WifiSettings &WifiSettings::GetInstance()
 {
     static WifiSettings gWifiSettings;
@@ -3057,6 +3062,26 @@ void WifiSettings::GenerateRandomMacAddress(std::string &randomMacAddr)
     }
     randomMacAddr = strMac;
     LOGD("%{public}s: randomMacAddr: %{private}s", __func__, randomMacAddr.c_str());
+}
+
+std::string WifiSettings::GetCountry()
+{
+    return GetParameter("const.cust.region", "");
+}
+
+std::string WifiSettings::GetLanguage()
+{
+    return GetParameter("persist.global.language", "");
+}
+
+std::string WifiSettings::GetOversea()
+{
+    std::string language = GetLanguage();
+    std::string country = GetCountry();
+    if (language == LANGUAGE_CHINESE && (country == COUNTRY_CHINA_CAPITAL || country == COUNTRY_CHINA_LOWERCASE)) {
+        return "internal";
+    }
+    return "oversea";
 }
 
 #ifdef SUPPORT_RANDOM_MAC_ADDR

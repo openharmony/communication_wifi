@@ -1210,6 +1210,9 @@ void ScanService::DisconnectedTimerScan()
         WIFI_LOGE("pScanStateMachine is null.\n");
         return;
     }
+    if (WifiSettings::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
+        return;
+    }
     pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
     pScanStateMachine->StartTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER), DISCONNECTED_SCAN_INTERVAL);
     return;
@@ -1219,6 +1222,9 @@ void ScanService::HandleDisconnectedScanTimeout()
 {
     WIFI_LOGI("Enter HandleDisconnectedScanTimeout.\n");
 
+    if (WifiSettings::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
+        return;
+    }
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
         return;
     }
@@ -1280,6 +1286,10 @@ ErrCode ScanService::AllowExternScan()
     ScanMode scanMode = WifiSettings::GetInstance().GetAppRunningState();
     WIFI_LOGI("AllowExternScan, staScene is %{public}d, scanMode is %{public}d", staScene, (int)scanMode);
 
+    if (WifiSettings::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
+        WIFI_LOGW("extern scan not allow when wifi disable");
+        return WIFI_OPT_FAILED;
+    }
     if (!AllowExternScanByPowerIdelState()) {
         WIFI_LOGW("extern scan not allow by power idel state");
         return WIFI_OPT_FAILED;
@@ -1415,6 +1425,10 @@ ErrCode ScanService::AllowSystemTimerScan()
 {
     WIFI_LOGI("Enter AllowSystemTimerScan.\n");
 
+    if (WifiSettings::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
+        WIFI_LOGW("system timer scan not allow when wifi disable");
+        return WIFI_OPT_FAILED;
+    }
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
         staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
         WIFI_LOGW("system timer scan not allowed for staStatus: %{public}d.", staStatus);
@@ -1486,6 +1500,10 @@ ErrCode ScanService::AllowPnoScan()
 {
     WIFI_LOGD("Enter AllowPnoScan.\n");
 
+    if (WifiSettings::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
+        WIFI_LOGW("pnoScan not allow when wifi disable");
+        return WIFI_OPT_FAILED;
+    }
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
         WIFI_LOGE("NOT allow PNO scan for staStatus: %{public}d", staStatus);
         return WIFI_OPT_FAILED;

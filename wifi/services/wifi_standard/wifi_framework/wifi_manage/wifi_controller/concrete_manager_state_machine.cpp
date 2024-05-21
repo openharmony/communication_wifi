@@ -570,13 +570,6 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
         return ret;
     }
 
-#ifdef HAS_POWERMGR_PART
-    if (WifiConfigCenter::GetInstance().GetPowerSleepState() == MODE_STATE_OPEN) {
-        WIFI_LOGI("AutoStopStaService, do not set staLastState to false for forcesleep!");
-        return WIFI_OPT_SUCCESS;
-    }
-#endif
-
     WifiConfigCenter::GetInstance().SetStaLastRunState(false);
     return WIFI_OPT_SUCCESS;
 }

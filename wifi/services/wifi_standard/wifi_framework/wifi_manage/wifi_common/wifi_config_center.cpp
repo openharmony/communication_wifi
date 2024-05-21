@@ -412,16 +412,6 @@ int WifiConfigCenter::GetAirplaneModeState() const
     return WifiSettings::GetInstance().GetAirplaneModeState();
 }
 
-void WifiConfigCenter::SetPowerSleepState(const int &state)
-{
-    WifiSettings::GetInstance().SetPowerSleepState(state);
-}
-
-int WifiConfigCenter::GetPowerSleepState() const
-{
-    return WifiSettings::GetInstance().GetPowerSleepState();
-}
-
 void WifiConfigCenter::SetAppRunningState(ScanMode appRunMode)
 {
     WifiSettings::GetInstance().SetAppRunningState(appRunMode);

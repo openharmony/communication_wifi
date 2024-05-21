@@ -193,18 +193,6 @@ HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->UnRegisterLocationEvent();
 }
 
-HWTEST_F(WifiManagerTest, RegisterPowerStateListenerTest, TestSize.Level1)
-{
-    WIFI_LOGI("RegisterPowerStateListenerTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterPowerStateListener();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterPowerStateListenerTest, TestSize.Level1)
-{
-    WIFI_LOGI("UnRegisterPowerStateListenerTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterPowerStateListener();
-}
-
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");

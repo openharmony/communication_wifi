@@ -3236,6 +3236,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
             const int httpOpt = 1;
             WriteWifiAccessIntFailedHiSysEvent(httpOpt, StaDnsState::DNS_STATE_UNREACHABLE);
         }
+        mIsWifiInternetCHRFlag = true;
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);

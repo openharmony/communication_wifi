@@ -1564,7 +1564,7 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
     }
     
     for (auto &ele : mWifiStoreRandomMac) {
-        if (isPskEncryption(randomMacInfo.keyMgmt)) {
+        if (isPskEncryption(ele.keyMgmt)) {
             if (ele.randomMac != randomMacInfo.randomMac) {
                 continue;
             }
@@ -1609,7 +1609,7 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
     }
 
     for (auto &item : mWifiStoreRandomMac) {
-        if (isPskEncryption(randomMacInfo.keyMgmt)) {
+        if (isPskEncryption(item.keyMgmt)) {
             std::vector<std::string> fuzzyBssids = item.fuzzyBssids;
             if (std::find(fuzzyBssids.begin(), fuzzyBssids.end(), fuzzyBssid) != fuzzyBssids.end()) {
                 LOGI("GetStaRandomMac fuzzyBssids contains fuzzyBssid:%{public}s",

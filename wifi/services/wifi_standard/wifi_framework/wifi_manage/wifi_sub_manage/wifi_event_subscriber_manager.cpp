@@ -790,16 +790,18 @@ void CesEventSubscriber::OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEv
 {
     std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("Receive ForceSleep Event: %{public}s", action.c_str());
+#ifdef FEATURE_HPF_SUPPORT
     if (action == COMMON_EVENT_POWER_MANAGER_STATE_CHANGED) {
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
             if (eventData.GetCode() == 0x30) { // STATE_ENTER_FORCESLEEP
                 WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
             }
             if (eventData.GetCode() == 0x31) {
-                WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
+                WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_EXIT_FORCESLEEP, i);
             }
         }
     }
+#endif
 }
 #endif
 

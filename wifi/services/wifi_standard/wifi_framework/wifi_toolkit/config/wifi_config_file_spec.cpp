@@ -48,6 +48,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.numAssociation = 0;
     item.networkStatusHistory = 0;
     item.isPortal = false;
+    item.portalAuthTime = -1;
     item.lastHasInternetTime = -1;
     item.noInternetAccess = false;
     item.callProcessName.clear();
@@ -57,25 +58,25 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     return;
 }
 
-static void ClearWifiDeviceConfigIp(WifiDeviceConfig &item)
+static void ClearWifiIpConfig(WifiIpConfig &item)
 {
-    item.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
-    item.wifiIpConfig.staticIpAddress.ipAddress.address.family = 0;
-    item.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4 = 0;
-    item.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv6.clear();
-    item.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = 0;
-    item.wifiIpConfig.staticIpAddress.ipAddress.flags = 0;
-    item.wifiIpConfig.staticIpAddress.ipAddress.scope = 0;
-    item.wifiIpConfig.staticIpAddress.gateway.family = 0;
-    item.wifiIpConfig.staticIpAddress.gateway.addressIpv4 = 0;
-    item.wifiIpConfig.staticIpAddress.gateway.addressIpv6.clear();
-    item.wifiIpConfig.staticIpAddress.dnsServer1.family = 0;
-    item.wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4 = 0;
-    item.wifiIpConfig.staticIpAddress.dnsServer1.addressIpv6.clear();
-    item.wifiIpConfig.staticIpAddress.dnsServer2.family = 0;
-    item.wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4 = 0;
-    item.wifiIpConfig.staticIpAddress.dnsServer2.addressIpv6.clear();
-    item.wifiIpConfig.staticIpAddress.domains.clear();
+    item.assignMethod = AssignIpMethod::DHCP;
+    item.staticIpAddress.ipAddress.address.family = 0;
+    item.staticIpAddress.ipAddress.address.addressIpv4 = 0;
+    item.staticIpAddress.ipAddress.address.addressIpv6.clear();
+    item.staticIpAddress.ipAddress.prefixLength = 0;
+    item.staticIpAddress.ipAddress.flags = 0;
+    item.staticIpAddress.ipAddress.scope = 0;
+    item.staticIpAddress.gateway.family = 0;
+    item.staticIpAddress.gateway.addressIpv4 = 0;
+    item.staticIpAddress.gateway.addressIpv6.clear();
+    item.staticIpAddress.dnsServer1.family = 0;
+    item.staticIpAddress.dnsServer1.addressIpv4 = 0;
+    item.staticIpAddress.dnsServer1.addressIpv6.clear();
+    item.staticIpAddress.dnsServer2.family = 0;
+    item.staticIpAddress.dnsServer2.addressIpv4 = 0;
+    item.staticIpAddress.dnsServer2.addressIpv6.clear();
+    item.staticIpAddress.domains.clear();
     return;
 }
 
@@ -94,13 +95,13 @@ static void ClearWifiDeviceConfigEap(WifiDeviceConfig &item)
     return;
 }
 
-static void ClearWifiDeviceConfigProxy(WifiDeviceConfig &item)
+static void ClearWifiProxyConfig(WifiProxyConfig &item)
 {
-    item.wifiProxyconfig.configureMethod = ConfigureProxyMethod::CLOSED;
-    item.wifiProxyconfig.autoProxyConfig.pacWebAddress.clear();
-    item.wifiProxyconfig.manualProxyConfig.serverHostName.clear();
-    item.wifiProxyconfig.manualProxyConfig.serverPort = 0;
-    item.wifiProxyconfig.manualProxyConfig.exclusionObjectList.clear();
+    item.configureMethod = ConfigureProxyMethod::CLOSED;
+    item.autoProxyConfig.pacWebAddress.clear();
+    item.manualProxyConfig.serverHostName.clear();
+    item.manualProxyConfig.serverPort = 0;
+    item.manualProxyConfig.exclusionObjectList.clear();
     return;
 }
 
@@ -114,9 +115,9 @@ template<>
 void ClearTClass<WifiDeviceConfig>(WifiDeviceConfig &item)
 {
     ClearWifiDeviceConfig(item);
-    ClearWifiDeviceConfigIp(item);
+    ClearWifiIpConfig(item.wifiIpConfig);
     ClearWifiDeviceConfigEap(item);
-    ClearWifiDeviceConfigProxy(item);
+    ClearWifiProxyConfig(item.wifiProxyconfig);
     ClearWifiDeviceConfigPrivacy(item);
     return;
 }
@@ -212,6 +213,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.version = std::stoi(value);
     } else if (key == "randomizedMacSuccessEver") {
         item.randomizedMacSuccessEver = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "portalAuthTime") {
+        item.portalAuthTime = std::stol(value);
     } else {
         return SetWifiDeviceConfigExternal(item, key, value);
     }
@@ -272,43 +275,43 @@ static int SetWifiDeviceConfig(WifiDeviceConfig &item, const std::string &key, c
     return errorKeyValue;
 }
 
-static int SetWifiDeviceConfigIp(WifiDeviceConfig &item, const std::string &key, const std::string &value)
+static int SetWifiIpConfig(WifiIpConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "wifiIpConfig.assignMethod") {
-        item.wifiIpConfig.assignMethod = AssignIpMethod(std::stoi(value));
+        item.assignMethod = AssignIpMethod(std::stoi(value));
     } else if (key == "wifiIpConfig.staticIpAddress.ipAddress.address.family") {
-        item.wifiIpConfig.staticIpAddress.ipAddress.address.family = std::stoi(value);
+        item.staticIpAddress.ipAddress.address.family = std::stoi(value);
     } else if (key == "wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4") {
-        item.wifiIpConfig.staticIpAddress.ipAddress.address.SetIpv4Address(value);
+        item.staticIpAddress.ipAddress.address.SetIpv4Address(value);
     } else if (key == "wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv6") {
-        item.wifiIpConfig.staticIpAddress.ipAddress.address.SetIpv6Address(value);
+        item.staticIpAddress.ipAddress.address.SetIpv6Address(value);
     } else if (key == "wifiIpConfig.staticIpAddress.ipAddress.prefixLength") {
-        item.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = std::stoi(value);
+        item.staticIpAddress.ipAddress.prefixLength = std::stoi(value);
     } else if (key == "wifiIpConfig.staticIpAddress.ipAddress.flags") {
-        item.wifiIpConfig.staticIpAddress.ipAddress.flags = std::stoi(value);
+        item.staticIpAddress.ipAddress.flags = std::stoi(value);
     } else if (key == "wifiIpConfig.staticIpAddress.ipAddress.scope") {
-        item.wifiIpConfig.staticIpAddress.ipAddress.scope = std::stoi(value);
+        item.staticIpAddress.ipAddress.scope = std::stoi(value);
     } else if (key == "wifiIpConfig.staticIpAddress.gateway.family") {
-        item.wifiIpConfig.staticIpAddress.gateway.family = std::stoi(value);
+        item.staticIpAddress.gateway.family = std::stoi(value);
     } else if (key == "wifiIpConfig.staticIpAddress.gateway.addressIpv4") {
-        item.wifiIpConfig.staticIpAddress.gateway.SetIpv4Address(value);
+        item.staticIpAddress.gateway.SetIpv4Address(value);
     } else if (key == "wifiIpConfig.staticIpAddress.gateway.addressIpv6") {
-        item.wifiIpConfig.staticIpAddress.gateway.SetIpv6Address(value);
+        item.staticIpAddress.gateway.SetIpv6Address(value);
     } else if (key == "wifiIpConfig.staticIpAddress.dnsServer1.family") {
-        item.wifiIpConfig.staticIpAddress.dnsServer1.family = std::stoi(value);
+        item.staticIpAddress.dnsServer1.family = std::stoi(value);
     } else if (key == "wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4") {
-        item.wifiIpConfig.staticIpAddress.dnsServer1.SetIpv4Address(value);
+        item.staticIpAddress.dnsServer1.SetIpv4Address(value);
     } else if (key == "wifiIpConfig.staticIpAddress.dnsServer1.addressIpv6") {
-        item.wifiIpConfig.staticIpAddress.dnsServer1.SetIpv6Address(value);
+        item.staticIpAddress.dnsServer1.SetIpv6Address(value);
     } else if (key == "wifiIpConfig.staticIpAddress.dnsServer2.family") {
-        item.wifiIpConfig.staticIpAddress.dnsServer2.family = std::stoi(value);
+        item.staticIpAddress.dnsServer2.family = std::stoi(value);
     } else if (key == "wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4") {
-        item.wifiIpConfig.staticIpAddress.dnsServer2.SetIpv4Address(value);
+        item.staticIpAddress.dnsServer2.SetIpv4Address(value);
     } else if (key == "wifiIpConfig.staticIpAddress.dnsServer2.addressIpv6") {
-        item.wifiIpConfig.staticIpAddress.dnsServer2.SetIpv6Address(value);
+        item.staticIpAddress.dnsServer2.SetIpv6Address(value);
     } else if (key == "wifiIpConfig.staticIpAddress.domains") {
-        item.wifiIpConfig.staticIpAddress.domains = value;
+        item.staticIpAddress.domains = value;
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -362,19 +365,19 @@ static int SetWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &key
     return errorKeyValue;
 }
 
-static int SetWifiDeviceConfigProxy(WifiDeviceConfig &item, const std::string &key, const std::string &value)
+static int SetWifiProxyConfig(WifiProxyConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
     if (key == "wifiProxyconfig.configureMethod") {
-        item.wifiProxyconfig.configureMethod = ConfigureProxyMethod(std::stoi(value));
+        item.configureMethod = ConfigureProxyMethod(std::stoi(value));
     } else if (key == "wifiProxyconfig.autoProxyConfig.pacWebAddress") {
-        item.wifiProxyconfig.autoProxyConfig.pacWebAddress = value;
+        item.autoProxyConfig.pacWebAddress = value;
     } else if (key == "wifiProxyconfig.ManualProxyConfig.serverHostName") {
-        item.wifiProxyconfig.manualProxyConfig.serverHostName = value;
+        item.manualProxyConfig.serverHostName = value;
     } else if (key == "wifiProxyconfig.ManualProxyConfig.serverPort") {
-        item.wifiProxyconfig.manualProxyConfig.serverPort = std::stoi(value);
+        item.manualProxyConfig.serverPort = std::stoi(value);
     } else if (key == "wifiProxyconfig.ManualProxyConfig.exclusionObjectList") {
-        item.wifiProxyconfig.manualProxyConfig.exclusionObjectList = value;
+        item.manualProxyConfig.exclusionObjectList = value;
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -399,11 +402,11 @@ int SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::strin
 {
     int errorKeyValue = 0;
     if (key.compare(0, strlen("wifiIpConfig"), "wifiIpConfig") == 0) {
-        errorKeyValue += SetWifiDeviceConfigIp(item, key, value);
+        errorKeyValue += SetWifiIpConfig(item.wifiIpConfig, key, value);
     } else if (key.compare(0, strlen("wifiEapConfig"), "wifiEapConfig") == 0) {
         errorKeyValue += SetWifiDeviceConfigEap(item, key, value);
     } else if (key.compare(0, strlen("wifiProxyconfig"), "wifiProxyconfig") == 0) {
-        errorKeyValue += SetWifiDeviceConfigProxy(item, key, value);
+        errorKeyValue += SetWifiProxyConfig(item.wifiProxyconfig, key, value);
     } else if (key.compare(0, strlen("wifiPrivacySetting"), "wifiPrivacySetting") == 0) {
         errorKeyValue += SetWifiDeviceconfigPrivacy(item, key, value);
     } else {
@@ -463,6 +466,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"numAssociation=" << item.numAssociation << std::endl;
     ss << "    " <<"networkStatusHistory=" << item.networkStatusHistory << std::endl;
     ss << "    " <<"isPortal=" << item.isPortal << std::endl;
+    ss << "    " <<"portalAuthTime=" << item.portalAuthTime << std::endl;
     ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
     ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
     ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;
@@ -484,42 +488,42 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     return ss.str();
 }
 
-static std::string OutPutWifiDeviceConfigIp(WifiDeviceConfig &item)
+static std::string OutPutWifiIpConfig(WifiIpConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigIp>" << std::endl;
-    ss << "    " <<"wifiIpConfig.assignMethod=" << (int)item.wifiIpConfig.assignMethod << std::endl;
+    ss << "    " <<"wifiIpConfig.assignMethod=" << (int)item.assignMethod << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.address.family="
-       << item.wifiIpConfig.staticIpAddress.ipAddress.address.family << std::endl;
+       << item.staticIpAddress.ipAddress.address.family << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4="
-       << item.wifiIpConfig.staticIpAddress.ipAddress.address.GetIpv4Address() << std::endl;
+       << item.staticIpAddress.ipAddress.address.GetIpv4Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv6="
-       << item.wifiIpConfig.staticIpAddress.ipAddress.address.GetIpv6Address() << std::endl;
+       << item.staticIpAddress.ipAddress.address.GetIpv6Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.prefixLength="
-       << item.wifiIpConfig.staticIpAddress.ipAddress.prefixLength << std::endl;
-    ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.flags=" << item.wifiIpConfig.staticIpAddress.ipAddress.flags
+       << item.staticIpAddress.ipAddress.prefixLength << std::endl;
+    ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.flags=" << item.staticIpAddress.ipAddress.flags
        << std::endl;
-    ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.scope=" << item.wifiIpConfig.staticIpAddress.ipAddress.scope
+    ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.scope=" << item.staticIpAddress.ipAddress.scope
        << std::endl;
-    ss << "    " <<"wifiIpConfig.staticIpAddress.gateway.family=" << item.wifiIpConfig.staticIpAddress.gateway.family
+    ss << "    " <<"wifiIpConfig.staticIpAddress.gateway.family=" << item.staticIpAddress.gateway.family
        << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.gateway.addressIpv4="
-       << item.wifiIpConfig.staticIpAddress.gateway.GetIpv4Address() << std::endl;
+       << item.staticIpAddress.gateway.GetIpv4Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.gateway.addressIpv6="
-       << item.wifiIpConfig.staticIpAddress.gateway.GetIpv6Address() << std::endl;
+       << item.staticIpAddress.gateway.GetIpv6Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer1.family="
-       << item.wifiIpConfig.staticIpAddress.dnsServer1.family << std::endl;
+       << item.staticIpAddress.dnsServer1.family << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4="
-       << item.wifiIpConfig.staticIpAddress.dnsServer1.GetIpv4Address() << std::endl;
+       << item.staticIpAddress.dnsServer1.GetIpv4Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer1.addressIpv6="
-       << item.wifiIpConfig.staticIpAddress.dnsServer1.GetIpv6Address() << std::endl;
+       << item.staticIpAddress.dnsServer1.GetIpv6Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer2.family="
-       << item.wifiIpConfig.staticIpAddress.dnsServer2.family << std::endl;
+       << item.staticIpAddress.dnsServer2.family << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4="
-       << item.wifiIpConfig.staticIpAddress.dnsServer2.GetIpv4Address() << std::endl;
+       << item.staticIpAddress.dnsServer2.GetIpv4Address() << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.dnsServer2.addressIpv6="
-       << item.wifiIpConfig.staticIpAddress.dnsServer2.GetIpv6Address() << std::endl;
-    ss << "    " <<"wifiIpConfig.staticIpAddress.domains=" << item.wifiIpConfig.staticIpAddress.domains << std::endl;
+       << item.staticIpAddress.dnsServer2.GetIpv6Address() << std::endl;
+    ss << "    " <<"wifiIpConfig.staticIpAddress.domains=" << item.staticIpAddress.domains << std::endl;
     ss << "    " <<"</WifiDeviceConfigIp>" << std::endl;
     return ss.str();
 }
@@ -554,19 +558,19 @@ static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item)
     return ss.str();
 }
 
-static std::string OutPutWifiDeviceConfigProxy(WifiDeviceConfig &item)
+static std::string OutPutWifiProxyConfig(WifiProxyConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigProxy>" << std::endl;
-    ss << "    " <<"wifiProxyconfig.configureMethod=" << (int)item.wifiProxyconfig.configureMethod << std::endl;
+    ss << "    " <<"wifiProxyconfig.configureMethod=" << (int)item.configureMethod << std::endl;
     ss << "    " <<"wifiProxyconfig.autoProxyConfig.pacWebAddress="
-       << item.wifiProxyconfig.autoProxyConfig.pacWebAddress << std::endl;
+       << item.autoProxyConfig.pacWebAddress << std::endl;
     ss << "    " <<"wifiProxyconfig.ManualProxyConfig.serverHostName="
-       << item.wifiProxyconfig.manualProxyConfig.serverHostName << std::endl;
+       << item.manualProxyConfig.serverHostName << std::endl;
     ss << "    " <<"wifiProxyconfig.ManualProxyConfig.serverPort="
-       << item.wifiProxyconfig.manualProxyConfig.serverPort << std::endl;
+       << item.manualProxyConfig.serverPort << std::endl;
     ss << "    " <<"wifiProxyconfig.ManualProxyConfig.exclusionObjectList="
-       << item.wifiProxyconfig.manualProxyConfig.exclusionObjectList << std::endl;
+       << item.manualProxyConfig.exclusionObjectList << std::endl;
     ss << "    " <<"</WifiDeviceConfigProxy>" << std::endl;
     return ss.str();
 }
@@ -584,8 +588,8 @@ template<>
 std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
-    ss << OutPutWifiDeviceConfig(item) << OutPutWifiDeviceConfigIp(item)
-       << OutPutWifiDeviceConfigEap(item) << OutPutWifiDeviceConfigProxy(item)
+    ss << OutPutWifiDeviceConfig(item) << OutPutWifiIpConfig(item.wifiIpConfig)
+       << OutPutWifiDeviceConfigEap(item) << OutPutWifiProxyConfig(item.wifiProxyconfig)
        << OutPutWifiDeviceConfigPrivacy(item);
     return ss.str();
 }
@@ -1479,5 +1483,182 @@ int SetNoInternetAccess(WifiDeviceConfig &item, const std::string &value)
     return 0;
 }
 
+#ifndef OHOS_ARCH_LITE
+static void ClearWifiBackupConfig(WifiBackupConfig &item)
+{
+    item.instanceId = 0;
+    item.uid = -1;
+    item.status = 0;
+    item.bssid.clear();
+    item.userSelectBssid.clear();
+    item.ssid.clear();
+    item.priority = 0;
+    item.hiddenSSID = false;
+    item.keyMgmt.clear();
+    item.networkStatusHistory = 0;
+    item.isPortal = false;
+    item.lastHasInternetTime = -1;
+    item.noInternetAccess = false;
+    item.preSharedKey.clear();
+    item.wepTxKeyIndex = 0;
+    for (int i = 0; i < WEPKEYS_SIZE; ++i) {
+        item.wepKeys[i].clear();
+    }
+    return;
+}
+
+static void ClearWifiBackupConfigPrivacy(WifiBackupConfig &item)
+{
+    item.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+    return;
+}
+
+static int SetWifiBackupConfigFirst(WifiBackupConfig &item, const std::string &key, const std::string &value)
+{
+    if (key == "instanceId") {
+        item.instanceId = std::stoi(value);
+    } else if (key == "uid") {
+        item.uid = std::stoi(value);
+    } else if (key == "status") {
+        item.status = std::stoi(value);
+    } else if (key == "bssid") {
+        item.bssid = value;
+    } else if (key == "userSelectBssid") {
+        item.userSelectBssid = value;
+    } else if (key == "ssid") {
+        item.ssid = value;
+    } else if (key == "HexSsid") {
+        std::vector<char> vec;
+        vec.clear();
+        if (HexStringToVec(value, vec) == 0) {
+            std::string strSsid(vec.begin(), vec.end());
+            item.ssid = strSsid;
+        }
+    } else if (key == "priority") {
+        item.priority = std::stoi(value);
+    } else if (key == "hiddenSSID") {
+        item.hiddenSSID = std::stoi(value);
+    } else if (key == "keyMgmt") {
+        item.keyMgmt = value;
+    } else {
+        return -1;
+    }
+    return 0;
+}
+
+static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, const std::string &value)
+{
+    if (SetWifiBackupConfigFirst(item, key, value) == 0) {
+        return 0;
+    }
+    if (key == "networkStatusHistory") {
+        item.networkStatusHistory = std::stoi(value);
+    } else if (key == "isPortal") {
+        item.isPortal = std::stoi(value);
+    } else if (key == "lastHasInternetTime") {
+        item.lastHasInternetTime = std::stol(value);
+    } else if (key == "noInternetAccess") {
+        item.noInternetAccess = std::stoi(value);
+    } else if (key == "preSharedKey") {
+        item.preSharedKey = value;
+    } else if (key == "wepTxKeyIndex") {
+        item.wepTxKeyIndex = std::stoi(value);
+    } else if (key.compare(0, strlen("wepKeys"), "wepKeys") == 0) {
+        int pos = std::stoi(key.substr(strlen("wepKeys") + 1));
+        if (pos >= 0 && pos < WEPKEYS_SIZE) {
+            item.wepKeys[pos] = value;
+        }
+    } else {
+        LOGE("Invalid config key value.");
+    }
+    return 0;
+}
+
+static int SetWifiBackupConfigPrivacy(WifiBackupConfig &item, const std::string &key, const std::string &value)
+{
+    if (key == "wifiPrivacySetting") {
+        item.wifiPrivacySetting = WifiPrivacyConfig(std::stoi(value));
+    } else {
+        LOGE("Invalid config key value");
+    }
+    return 0;
+}
+
+static std::string OutPutWifiBackupConfig(WifiBackupConfig &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"<WifiDeviceConfig>" << std::endl;
+    ss << "    " <<"instanceId=" << item.instanceId << std::endl;
+    ss << "    " <<"uid=" << item.uid << std::endl;
+    ss << "    " <<"status=" << item.status << std::endl;
+    ss << "    " <<"bssid=" << item.bssid << std::endl;
+    ss << "    " <<"userSelectBssid=" << item.userSelectBssid << std::endl;
+    ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
+    ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
+    ss << "    " <<"priority=" << item.priority << std::endl;
+    ss << "    " <<"hiddenSSID=" << (int)item.hiddenSSID << std::endl;
+    ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
+    ss << "    " <<"networkStatusHistory=" << item.networkStatusHistory << std::endl;
+    ss << "    " <<"isPortal=" << item.isPortal << std::endl;
+    ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
+    ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
+    ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
+    ss << "    " <<"wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
+    for (int i = 0; i < WEPKEYS_SIZE; ++i) {
+        ss << "    " <<"wepKeys_" << i << "=" << item.wepKeys[i] << std::endl;
+    }
+    ss << "    " <<"</WifiDeviceConfig>" << std::endl;
+    return ss.str();
+}
+
+static std::string OutPutWifiBackupConfigPrivacy(WifiBackupConfig &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"<WifiDeviceConfigPrivacy>" << std::endl;
+    ss << "    " <<"wifiPrivacySetting=" << (int)item.wifiPrivacySetting << std::endl;
+    ss << "    " <<"</WifiDeviceConfigPrivacy>" << std::endl;
+    return ss.str();
+}
+
+template <>
+void ClearTClass<WifiBackupConfig>(WifiBackupConfig &item)
+{
+    ClearWifiBackupConfig(item);
+    ClearWifiIpConfig(item.wifiIpConfig);
+    ClearWifiProxyConfig(item.wifiProxyconfig);
+    ClearWifiBackupConfigPrivacy(item);
+    return;
+}
+
+template <>
+int SetTClassKeyValue<WifiBackupConfig>(WifiBackupConfig &item, const std::string &key, const std::string &value)
+{
+    if (key.compare(0, strlen("wifiIpConfig"), "wifiIpConfig") == 0) {
+        SetWifiIpConfig(item.wifiIpConfig, key, value);
+    } else if (key.compare(0, strlen("wifiProxyconfig"), "wifiProxyconfig") == 0) {
+        SetWifiProxyConfig(item.wifiProxyconfig, key, value);
+    } else if (key.compare(0, strlen("wifiPrivacySetting"), "wifiPrivacySetting") == 0) {
+        SetWifiBackupConfigPrivacy(item, key, value);
+    } else {
+        SetWifiBackupConfig(item, key, value);
+    }
+    return 0;
+}
+
+template <>
+std::string GetTClassName<WifiBackupConfig>()
+{
+    return "WifiBackupConfig";
+}
+
+template <>
+std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item)
+{
+    std::ostringstream ss;
+    ss << OutPutWifiBackupConfig(item) << OutPutWifiIpConfig(item.wifiIpConfig)
+       << OutPutWifiProxyConfig(item.wifiProxyconfig) << OutPutWifiBackupConfigPrivacy(item);
+    return ss.str();
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

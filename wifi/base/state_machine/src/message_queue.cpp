@@ -95,7 +95,6 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
 
     LOGD("Add message needWakeup: %{public}d", static_cast<int>(mNeedWakeup));
     if (mNeedWakeup) {
-        std::unique_lock<std::mutex> lck(mMtxBlock);
         mIsBlocked = false;
     }
     /* Wake up the process. */
@@ -169,8 +168,9 @@ InternalMessage *MessageQueue::GetNextMessage()
             }
         }
 
-        std::unique_lock<std::mutex> lck(mMtxBlock); // mCvQueue lock
         if (mIsBlocked && (!mNeedQuit)) {
+            std::mutex mtxBlock;
+            std::unique_lock<std::mutex> lck(mtxBlock); // mCvQueue lock
             LOGD("mCvQueue wait_for: %{public}d", nextBlockTime);
             if (mCvQueue.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
                 LOGD("mCvQueue wake up, reason: cv_status::timeout: %{public}d", nextBlockTime);
@@ -189,7 +189,6 @@ void MessageQueue::StopQueueLoop()
     LOGI("Start stop queue loop.");
     mNeedQuit = true;
     if (mIsBlocked) {
-        std::unique_lock<std::mutex> lck(mMtxBlock);
         mIsBlocked = false;
     }
     mCvQueue.notify_one();

@@ -67,7 +67,7 @@ bool WifiP2pImpl::GetWifiP2pProxy()
     }
 
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi p2p init failed. %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi p2p init failed. %{public}d", systemAbilityId_.load());
         return false;
     }
     return true;
@@ -389,6 +389,20 @@ ErrCode WifiP2pImpl::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUp
 bool WifiP2pImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();
+}
+
+ErrCode WifiP2pImpl::DiscoverPeers(int32_t channelid)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->DiscoverPeers(channelid);
+}
+
+ErrCode WifiP2pImpl::DisableRandomMac(int setmode)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->DisableRandomMac(setmode);
 }
 }  // namespace Wifi
 }  // namespace OHOS

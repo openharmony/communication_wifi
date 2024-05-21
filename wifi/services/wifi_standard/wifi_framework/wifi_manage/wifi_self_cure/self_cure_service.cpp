@@ -97,5 +97,18 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         pSelfCureStateMachine->SetHttpMonitorStatus(true);
     }
 }
+
+void SelfCureService::HandleStaOpenRes(OperateResState state)
+{
+    WIFI_LOGD("self cure wifi open state change, state = %{public}d", state);
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("pSelfCureStateMachine is null.\n");
+        return;
+    }
+    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
+    }
+}
+
 } //namespace Wifi
 } //namespace OHOS

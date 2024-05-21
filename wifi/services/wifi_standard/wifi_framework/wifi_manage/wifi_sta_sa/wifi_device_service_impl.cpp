@@ -240,7 +240,7 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
 
 bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
 {
-    if (config.keyMgmt != KEY_MGMT_EAP || config.keyMgmt != KEY_MGMT_SUITE_B_192) {
+    if (config.keyMgmt != KEY_MGMT_EAP && config.keyMgmt != KEY_MGMT_SUITE_B_192) {
         WIFI_LOGE("CheckConfigEap: keyMgmt is not EAP!");
         return false;
     }

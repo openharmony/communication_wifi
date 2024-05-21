@@ -38,6 +38,7 @@ public:
     static sptr<WifiDeviceMgrServiceImpl> GetInstance();
     void OnStart() override;
     void OnStop() override;
+    int32_t OnExtension(const std::string& extension, MessageParcel& data, MessageParcel& reply) override;
     sptr<IRemoteObject> GetWifiRemote(int instId) override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     std::map<int, sptr<IRemoteObject>>& GetDeviceServiceMgr();

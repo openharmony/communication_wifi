@@ -103,6 +103,8 @@ public:
 
     void OnP2pPeersChanged(const std::vector<OHOS::Wifi::WifiP2pDevice> &devices) override;
 
+    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override;
+
     void OnP2pServicesChanged(const std::vector<OHOS::Wifi::WifiP2pServiceInfo> &srvInfo) override;
 
     void OnP2pConnectionChanged(const OHOS::Wifi::WifiP2pLinkedInfo &info) override;
@@ -126,6 +128,7 @@ public:
         groupChangeCb = nullptr;
         connectionChangeCb = nullptr;
         peersChangeCb = nullptr;
+        privatepeerChangeCb = nullptr;
         cfgChangeCallback = nullptr;
     }
 
@@ -137,6 +140,7 @@ public:
     P2pPersistentGroupsChangedCallback groupChangeCb;
     P2pConnectionChangedCallback connectionChangeCb;
     P2pPeersChangedCallback peersChangeCb;
+    P2pPrivatePeersChangedCallback privatepeerChangeCb;
     WifiCfgChangCallback cfgChangeCallback;
 
 private:

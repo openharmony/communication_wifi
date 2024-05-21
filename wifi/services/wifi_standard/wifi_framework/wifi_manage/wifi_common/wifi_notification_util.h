@@ -15,10 +15,14 @@
 
 #ifndef WIFI_NOTIFICATION_UTIL_H
 #define WIFI_NOTIFICATION_UTIL_H
+#include "want.h"
 #include <string>
 
 namespace OHOS {
 namespace Wifi {
+constexpr int DEFAULT_INVAL_VALUE = -1;
+const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
+const std::string WIFI_EVENT_TAP_NOTIFICATION = "ohos.event.notification.wifi.TAP_NOTIFICATION";
 enum WifiNotificationId {
     WIFI_PORTAL_NOTIFICATION_ID = 101000
 };
@@ -29,19 +33,24 @@ enum WifiNotificationStatus {
     WIFI_PORTAL_FOUND = 2
 };
 
-const std::string WIFI_EVENT_TAP_NOTIFICATION = "ohos.event.notification.wifi.TAP_NOTIFICATION";
+enum WifiNotificationOpetationType {
+    CANCEL = 0,
+    PUBLISH = 1
+};
 
-class WifiBannerNotification {
+class WifiNotificationUtil {
 public:
-    static WifiBannerNotification& GetInstance(void);
+    static WifiNotificationUtil& GetInstance(void);
 
     void PublishWifiNotification(WifiNotificationId notificationId, std::string& ssid, WifiNotificationStatus status);
 
     void CancelWifiNotification(WifiNotificationId notificationId);
 
+    int32_t StartAbility(OHOS::AAFwk::Want& want);
+
 private:
-    WifiBannerNotification();
-    ~WifiBannerNotification();
+    WifiNotificationUtil();
+    ~WifiNotificationUtil();
 };
 }
 }

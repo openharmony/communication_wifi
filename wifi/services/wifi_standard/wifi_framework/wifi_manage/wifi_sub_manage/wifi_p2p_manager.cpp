@@ -228,6 +228,7 @@ void WifiP2pManager::InitP2pCallback(void)
     mP2pCallback.OnConfigChangedEvent = std::bind(&WifiP2pManager::DealConfigChanged, this, _1, _2, _3);
     mP2pCallback.OnP2pGcJoinGroupEvent = std::bind(&WifiP2pManager::DealP2pGcJoinGroup, this, _1);
     mP2pCallback.OnP2pGcLeaveGroupEvent = std::bind(&WifiP2pManager::DealP2pGcLeaveGroup, this, _1);
+    mP2pCallback.OnP2pPrivatePeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPrivatePeersChanged, this, _1);
     return;
 }
 
@@ -271,6 +272,15 @@ void WifiP2pManager::DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeer
     cbMsg.device = vPeers;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     WifiCommonEventHelper::PublishP2pPeersStateChangedEvent(vPeers.size(), "OnP2pPeersChanged");
+    return;
+}
+
+void WifiP2pManager::DealP2pPrivatePeersChanged(const std::string &PrivateInfo)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_PRIVATE_PEER_CHANGE;
+    cbMsg.privateWfdInfo = PrivateInfo;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
 

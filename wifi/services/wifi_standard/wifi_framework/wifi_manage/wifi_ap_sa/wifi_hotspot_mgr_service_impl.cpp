@@ -49,30 +49,15 @@ WifiHotspotMgrServiceImpl::WifiHotspotMgrServiceImpl()
 WifiHotspotMgrServiceImpl::~WifiHotspotMgrServiceImpl()
 {}
 
-bool IsProcessNeedToRestart()
-{
-    sptr<WifiHotspotMgrServiceImpl> instancePtr = WifiHotspotMgrServiceImpl::GetInstance();
-    if (instancePtr == nullptr) {
-        return false;
-    }
-    for (auto it = instancePtr->mWifiService.begin(); it != instancePtr->mWifiService.end(); it++) {
-        int id = it->first;
-        if (WifiConfigCenter::GetInstance().GetApMidState(id) == WifiOprMidState::RUNNING) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void SigHandler(int sig)
-{
-    WIFI_LOGI("[Ap] Recv SIG: %{public}d\n", sig);
-}
-
 void WifiHotspotMgrServiceImpl::OnStart()
 {
+    WIFI_LOGI("Start ap service!");
     if (mState == ServiceRunningState::STATE_RUNNING) {
         WIFI_LOGW("Service has already started.");
+        return;
+    }
+    if (WifiManager::GetInstance().Init() < 0) {
+        WIFI_LOGE("WifiManager init failed!");
         return;
     }
     if (!Init()) {
@@ -80,13 +65,7 @@ void WifiHotspotMgrServiceImpl::OnStart()
         OnStop();
         return;
     }
-    (void)signal(SIGUSR2, SigHandler);
     mState = ServiceRunningState::STATE_RUNNING;
-    WIFI_LOGI("Start ap service!");
-    if (WifiManager::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiManager init failed!");
-        return;
-    }
     WifiManager::GetInstance().AddSupportedFeatures(WifiFeatures::WIFI_FEATURE_MOBILE_HOTSPOT);
     auto &pWifiHotspotManager = WifiManager::GetInstance().GetWifiHotspotManager();
     if (pWifiHotspotManager) {

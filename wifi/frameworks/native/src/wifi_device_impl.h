@@ -492,9 +492,32 @@ public:
      * @return ErrCode - hilink connect result
      */
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableSemiWifi() override;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetWifiDetailState(WifiDetailState &state) override;
+
+    /**
+     * @Description set satellite state
+     * @param state 3009:satellite start 3010:satellite stop 3011:satellite check
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetSatelliteState(const int state) override;
 private:
     bool GetWifiDeviceProxy();
-    int systemAbilityId_;
+    std::atomic<int> systemAbilityId_;
     int instId_;
     std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE

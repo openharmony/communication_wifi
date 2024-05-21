@@ -66,6 +66,7 @@ void AppNetworkSpeedLimitService::InitWifiLimitRecord()
 
 void AppNetworkSpeedLimitService::InitCellarLimitRecord()
 {
+    std::lock_guard<std::mutex> lock(m_readWritemutex);
     m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT] = BG_LIMIT_OFF;
 }
 
@@ -81,6 +82,7 @@ void AppNetworkSpeedLimitService::DealStaConnChanged(OperateResState state, cons
 void AppNetworkSpeedLimitService::HandleWifiConnectStateChanged(const bool isWifiConnected)
 {
     WIFI_LOGI("%{public}s, isWifiConnected=%{public}d", __FUNCTION__, isWifiConnected);
+    std::lock_guard<std::mutex> lock(m_readWritemutex);
     m_isWifiConnected = isWifiConnected;
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
         LimitSpeed(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP]);
@@ -91,6 +93,7 @@ void AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const AppExec
 {
     if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) &&
         appStateData.isFocused) {
+        std::lock_guard<std::mutex> lock(m_readWritemutex);
         if (m_isWifiConnected && m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
             WIFI_LOGI("%{public}s high temp speed limit is running, update background app list", __FUNCTION__);
             LimitSpeed(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP]);
@@ -228,7 +231,7 @@ void AppNetworkSpeedLimitService::LogSpeedLimitConfigs()
         recordsStr += ",";
     }
     WIFI_LOGI("%{public}s speed limit records= %{public}s, limitMode: %{public}d, m_isWifiConnected: %{public}d",
-        __FUNCTION__, recordsStr.c_str(), m_currentLimitMode, m_isWifiConnected);
+        __FUNCTION__, recordsStr.c_str(), m_currentLimitMode, m_isWifiConnected.load());
     WIFI_LOGI("%{public}s m_bgUidSet: %{public}s; m_bgPidSet: %{public}s; m_fgUidSet: %{public}s", __FUNCTION__,
         JoinVecToString(std::vector<int>(m_bgUidSet.begin(), m_bgUidSet.end()), ",").c_str(),
         JoinVecToString(std::vector<int>(m_bgPidSet.begin(), m_bgPidSet.end()), ",").c_str(),

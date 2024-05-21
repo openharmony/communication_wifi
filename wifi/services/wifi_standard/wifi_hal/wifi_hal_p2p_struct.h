@@ -33,7 +33,7 @@ typedef enum P2pSupplicantErrCode {
 
 #define WIFI_P2P_DEVICE_TYPE_LENGTH 64
 #define WIFI_P2P_DEVICE_NAME_LENGTH 128
-#define WIFI_P2P_WFD_DEVICE_INFO_LENGTH 32
+#define WIFI_P2P_WFD_DEVICE_INFO_LENGTH 128
 #define WIFI_P2P_PASSWORD_SIZE 128
 
 typedef struct P2pDeviceInfo {

@@ -1117,20 +1117,6 @@ public:
     int GetAirplaneModeState() const;
 
     /**
-     * @Description Set the Power Sleep State
-     *
-     * @param state - 1 open; 2 close
-     */
-    void SetPowerSleepState(const int &state);
-
-    /**
-     * @Description Get the Power Sleep State
-     *
-     * @return int - 1 open; 2 close
-     */
-    int GetPowerSleepState() const;
-
-    /**
      * @Description Set the App Running State
      *
      * @param appRunMode - app run mode

@@ -267,9 +267,9 @@ std::unique_ptr<WifiEventSubscriberManager>& WifiManager::GetWifiEventSubscriber
 #endif
 
 #ifdef FEATURE_HPF_SUPPORT
-void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
+void WifiManager::InstallPacketFilterProgram(int event, int instId)
 {
-    WIFI_LOGD("%{public}s enter screenState: %{public}d, instId: %{public}d", __FUNCTION__, screenState, instId);
+    WIFI_LOGD("%{public}s enter event: %{public}d, instId: %{public}d", __FUNCTION__, event, instId);
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGW("%{public}s pEnhanceService is nullptr", __FUNCTION__);
@@ -300,7 +300,7 @@ void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
         __FUNCTION__,
         OHOS::Wifi::MacAnonymize(ipAddrStr).c_str(), OHOS::Wifi::MacAnonymize(ipMaskStr).c_str(), netMaskLen);
     if (pEnhanceService->InstallFilterProgram(
-        ipInfo.ipAddress, netMaskLen, macAddr, WIFI_MAC_LEN, screenState) != WIFI_OPT_SUCCESS) {
+        ipInfo.ipAddress, netMaskLen, macAddr, WIFI_MAC_LEN, event) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("%{public}s InstallFilterProgram fail", __FUNCTION__);
         return;
     }

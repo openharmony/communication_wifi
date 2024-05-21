@@ -496,20 +496,6 @@ public:
     bool GetWifiFlagOnAirplaneMode(int instId = 0);
 
     /**
-     * @Description Set current power sleep state
-     *
-     * @param state - 1 open; 2 close
-     */
-    void SetPowerSleepState(const int &state);
-
-    /**
-     * @Description Get current power sleep state
-     *
-     * @return int - 1 open; 2 close
-     */
-    int GetPowerSleepState() const;
-
-    /**
      * @Description Set current app running mode
      *
      * @param appRunMode - app run mode

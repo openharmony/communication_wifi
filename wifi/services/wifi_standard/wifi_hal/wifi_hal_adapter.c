@@ -180,7 +180,7 @@ int CopyConfigFile(const char* configName)
         LOGE("snprintf_s dest dir failed.");
         return HAL_FAILURE;
     }
-    LOGI("buf = %s",buf);
+    LOGI("buf=%{public}s", buf);
     if ((access(buf, F_OK) != -1)) {
         LOGI("Configure file %{public}s is exist.", buf);
         char cmd[BUFF_SIZE] = {0};

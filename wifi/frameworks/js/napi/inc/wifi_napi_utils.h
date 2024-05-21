@@ -130,9 +130,9 @@ enum class SecTypeJs {
     SEC_TYPE_SAE = 4,
     /** EAP authentication. */
     SEC_TYPE_EAP = 5,
-#ifdef ENABLE_NAPI_WIFI_MANAGER
     /** SUITE_B_192 192 bit level. */
     SEC_TYPE_EAP_SUITE_B = 6,
+#ifdef ENABLE_NAPI_WIFI_MANAGER
     /** Opportunistic Wireless Encryption. */
     SEC_TYPE_OWE = 7,
     /** WAPI certificate to be specified. */

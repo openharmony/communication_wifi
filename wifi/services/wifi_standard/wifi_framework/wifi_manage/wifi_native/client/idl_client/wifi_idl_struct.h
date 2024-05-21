@@ -90,6 +90,7 @@ struct WifiIdlDeviceConfig {
     int allowedProtocols;
     int allowedPairwiseCiphers;
     int allowedGroupCiphers;
+    int allowedGroupMgmtCiphers;
     WifiIdlDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1)
     {}
 

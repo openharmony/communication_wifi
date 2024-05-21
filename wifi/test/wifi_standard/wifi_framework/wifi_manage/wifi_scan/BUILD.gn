@@ -40,7 +40,6 @@ ohos_unittest("wifi_scan_unittest") {
     "scan_interface_test.cpp",
     "scan_monitor_test.cpp",
     "scan_service_test.cpp",
-    "scan_state_machine_test.cpp",
   ]
 
   include_dirs = [

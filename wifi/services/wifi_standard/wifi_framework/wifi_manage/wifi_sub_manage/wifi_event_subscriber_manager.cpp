@@ -75,7 +75,7 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
 #ifdef HAS_POWERMGR_PART
-    {COMMMON_EVENT_POWER_MANAGER_STATE_CHANGED, &CesEventSubscriber::OnReceiveForceSleepEvent},
+    {COMMON_EVENT_POWER_MANAGER_STATE_CHANGED, &CesEventSubscriber::OnReceiveForceSleepEvent},
 #endif
     {WIFI_EVENT_TAP_NOTIFICATION, &CesEventSubscriber::OnReceiveNotificationEvent}
 };
@@ -759,14 +759,14 @@ void CesEventSubscriber::OnReceiveNotificationEvent(const OHOS::EventFwk::Common
 void CesEventSubscriber::OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
-    WIFI_LOGI("Receive ForceSleep Event: %{public}s",action.c_str());
-    if(action == COMMMON_EVENT_POWER_MANAGER_STATE_CHANGED){
+    WIFI_LOGI("Receive ForceSleep Event: %{public}s", action.c_str());
+    if (action == COMMON_EVENT_POWER_MANAGER_STATE_CHANGED) {
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
             if (eventData.GetCode() == 0x30) { // STATE_ENTER_FORCESLEEP
-                WifiManager::GetInstance.InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
+                WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
             }
             if (eventData.GetCode() == 0x31) {
-                WifiManager::GetInstance.InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
+                WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
             }
         }
     }

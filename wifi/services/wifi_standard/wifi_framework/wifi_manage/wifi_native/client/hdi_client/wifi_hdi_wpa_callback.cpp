@@ -24,6 +24,7 @@
 #include "wifi_common_util.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
+constexpr int WIFI_HDI_REASON_LENGTH = 32;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
 constexpr int PD_STATUS_CODE_ENTER_PIN = 1;
 constexpr int PD_STATUS_CODE_PBC_REQ = 2;
@@ -50,7 +51,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, szBssid);
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
 }
 
@@ -69,7 +70,7 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, szBssid);
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
 }
 
@@ -77,18 +78,28 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
     const struct HdiWpaBssidChangedParam *bssidChangedParam, const char* ifName)
 {
     LOGI("OnEventBssidChanged: callback enter!");
-    if (bssidChangedParam == NULL) {
+    if (bssidChangedParam == nullptr || bssidChangedParam->reason == nullptr) {
         LOGE("OnEventBssidChanged: invalid parameter!");
         return 1;
     }
-    uint32_t bssidLen = bssidChangedParam->bssidLen;
+
+    char reason[WIFI_HDI_REASON_LENGTH] = {0};
+    if (strcpy_s(reason, sizeof(reason), (const char *)bssidChangedParam->reason) != EOK) {
+        LOGE("OnEventBssidChanged: failed to copy reason!");
+        return 1;
+    }
+
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacArr2String(bssidChangedParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    if (ConvertMacArr2String(bssidChangedParam->bssid, bssidChangedParam->bssidLen, szBssid, sizeof(szBssid)) != 0) {
+        LOGE("OnEventBssidChanged: failed to convert mac!");
+        return 1;
+    }
+
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onBssidChanged) {
-        cbk.onBssidChanged((const char *)bssidChangedParam->reason, szBssid);
+        cbk.onBssidChanged(reason, szBssid);
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
 }
 
@@ -315,11 +326,8 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
         cbInfo.configMethods = deviceInfoParam->configMethods;
         cbInfo.deviceCapabilities = deviceInfoParam->deviceCapabilities;
         cbInfo.groupCapabilities = deviceInfoParam->groupCapabilities;
-        const int wfdLength = 14; /* wfd info type: 0x000000000000 */
-        const int wfdStartPos = 2; /* skip 0x */
-        if (deviceInfoParam->wfdLength >= wfdLength && strlen((char *)(deviceInfoParam->wfdDeviceInfo)) >= wfdLength) {
-            OHOS::Wifi::HexStringToVec((char *)(deviceInfoParam->wfdDeviceInfo) + wfdStartPos, cbInfo.wfdDeviceInfo);
-        }
+        cbInfo.wfdDeviceInfo.insert(cbInfo.wfdDeviceInfo.begin(), deviceInfoParam->wfdDeviceInfo,
+            deviceInfoParam->wfdDeviceInfo + deviceInfoParam->wfdLength);
         cbk.onDeviceFound(cbInfo);
         LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{public}s",
             p2pDeviceAddress, deviceInfoParam->deviceName);
@@ -470,7 +478,7 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
         LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s" len:%{public}lu:,
-            cbInfo.groupName.c_str(), cbInfo.ssid.c_str(), strlen(cbInfo.ssid.c_str()));
+            cbInfo.groupName.c_str(), OHOS::Wifi::SsidAnonymize(cbInfo.ssid).c_str(), strlen(cbInfo.ssid.c_str()));
 
         char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
         ConvertMacArr2String(groupStartedParam->goDeviceAddress,
@@ -499,11 +507,12 @@ int32_t OnEventGroupRemoved(struct IWpaCallback *self,
 int32_t OnEventProvisionDiscoveryCompleted(struct IWpaCallback *self,
     const struct HdiP2pProvisionDiscoveryCompletedParam *provisionDiscoveryCompletedParam, const char* ifName)
 {
-    LOGI("OnEventProvisionDiscoveryCompleted provDiscStatusCode=%{public}d",
-        provisionDiscoveryCompletedParam->provDiscStatusCode);
+    LOGI("OnEventProvisionDiscoveryCompleted enter");
     if (provisionDiscoveryCompletedParam == nullptr) {
         return 1;
     }
+    LOGI("OnEventProvisionDiscoveryCompleted provDiscStatusCode=%{public}d",
+        provisionDiscoveryCompletedParam->provDiscStatusCode);
     uint32_t addressLen = provisionDiscoveryCompletedParam->p2pDeviceAddressLen;
     char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
     ConvertMacArr2String(provisionDiscoveryCompletedParam->p2pDeviceAddress,

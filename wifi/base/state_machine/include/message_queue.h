@@ -71,16 +71,14 @@ public:
     void StopQueueLoop();
 
 private:
+    /* Thread lock of operation queue */
+    std::mutex mMtxQueue;
     /* Message Queuing */
     InternalMessage *pMessageQueue;
     /* No messages to be executed, blocking */
     std::atomic<bool> mIsBlocked;
     /* Exit Loop */
     std::atomic<bool> mNeedQuit;
-    /* Thread lock of operation queue */
-    std::mutex mMtxQueue;
-    /* Blocked thread lock */
-    std::mutex mMtxBlock;
     /* blocking condition variable */
     std::condition_variable mCvQueue;
 };

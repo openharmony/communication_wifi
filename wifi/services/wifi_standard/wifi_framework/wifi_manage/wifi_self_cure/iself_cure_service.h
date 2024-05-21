@@ -46,7 +46,7 @@ public:
      *
      * @return StaServiceCallback - sta callback
      */
-    virtual StaServiceCallback GetStaCallback();
+    virtual StaServiceCallback GetStaCallback() const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

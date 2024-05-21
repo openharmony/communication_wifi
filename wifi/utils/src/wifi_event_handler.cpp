@@ -106,6 +106,7 @@ class WifiEventHandler::WifiEventHandlerImpl {
 public:
     WifiEventHandlerImpl(const std::string &threadName)
     {
+        std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         if (eventQueue != nullptr) {
             WIFI_LOGI("WifiEventHandlerImpl already init.");
             return;
@@ -115,6 +116,7 @@ public:
     }
     ~WifiEventHandlerImpl()
     {
+        std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         WIFI_LOGI("WifiEventHandler: ~WifiEventHandler");
         if (eventQueue) {
             eventQueue = nullptr;

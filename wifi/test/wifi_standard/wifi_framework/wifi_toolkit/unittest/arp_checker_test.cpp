@@ -105,7 +105,6 @@ HWTEST_F(ArpCheckerTest, DoArp_FAIL2, TestSize.Level1)
     int timeoutMillis = 0;
     std::string targetIp = "192.168.3.66";
     bool isFillSenderIp = false;
-    pArpChecker->socketCreated = true;
     EXPECT_TRUE(pArpChecker->DoArpCheck(timeoutMillis, isFillSenderIp) == false);
 }
 

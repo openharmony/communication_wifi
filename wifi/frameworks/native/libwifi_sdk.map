@@ -62,6 +62,8 @@
         RegisterWifiEvent;
         UnRegisterWifiEvent;
         StartPortalCertification;
+        EnableSemiWifi;
+        GetWifiDetailState;
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";
             "OHOS::Wifi::WifiScan::GetInstance(int, int)";

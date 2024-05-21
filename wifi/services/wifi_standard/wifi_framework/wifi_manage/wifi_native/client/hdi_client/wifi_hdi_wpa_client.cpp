@@ -20,6 +20,7 @@
 #include "wifi_hdi_wpa_ap_impl.h"
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
+#include "wifi_common_util.h"
 #include <securec.h>
 #include <unistd.h>
 
@@ -132,7 +133,7 @@ WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInf
         tmp.isErpExist = results[i].isErpExist;
         tmp.maxRates = results[i].maxRates > results[i].extMaxRates ? results[i].maxRates : results[i].extMaxRates;
         LOGI("WifiHdiWpaClient::QueryScanInfos ssid = %{public}s, ssid = %{public}s",
-            results[i].ssid, results[i].bssid);
+            SsidAnonymize(results[i].ssid).c_str(), MacAnonymize(results[i].bssid).c_str());
         for (int j = 0; j < results[i].ieSize; ++j) {
             WifiInfoElem infoElemTmp;
             int infoElemSize = results[i].infoElems[j].size;
@@ -864,7 +865,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo>
         }
         mapGroups.insert(std::pair<int, WifiP2pGroupInfo>(infoList.infos[i].id, groupInfo));
         LOGI("ReqP2pListNetworks id=%{public}d ssid=%{public}s address=%{private}s",
-            infoList.infos[i].id, infoList.infos[i].ssid, address);
+            infoList.infos[i].id, SsidAnonymize(infoList.infos[i].ssid).c_str(), address);
     }
     free(infoList.infos);
     infoList.infos = nullptr;
@@ -1002,6 +1003,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pInvite(const WifiP2pGroupInfo &group, const 
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pReinvoke(int networkId, const std::string &deviceAddr) const
 {
+    LOGI("HdiP2pReinvoke networkId=%{public}d, bssid=%{public}s", networkId, MacAnonymize(deviceAddr).c_str());
     return HdiP2pReinvoke(networkId, deviceAddr.c_str());
 }
 
@@ -1290,6 +1292,10 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &confi
     return ret;
 }
 
+WifiErrorNo WifiHdiWpaClient::DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const
+{
+    return HdiDeliverP2pData(cmdType, dataType, carryData.c_str());
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -42,7 +42,7 @@ public:
     void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
-#ifdef HAS_POWER_MANAGER_PART
+#ifdef HAS_POWERMGR_PART
     void OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEventData &eventData);
 #endif
 private:
@@ -63,6 +63,7 @@ public:
     bool IsMdmForbidden(void);
 
 private:
+    void DelayedAccessDataShare();
     void InitSubscribeListener();
     bool IsDataMgrServiceActive();
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
@@ -88,11 +89,11 @@ private:
     void RegisterMovementCallBack();
     void UnRegisterMovementCallBack();
 #endif
-
+    void HandlP2pBusinessChange(int systemAbilityId, bool add);
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
-    uint32_t migrateTimerId{0};
+    uint32_t accessDatashareTimerId{0};
     std::mutex cesEventMutex;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;

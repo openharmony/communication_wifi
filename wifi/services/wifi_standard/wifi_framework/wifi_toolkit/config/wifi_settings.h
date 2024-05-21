@@ -1598,6 +1598,11 @@ public:
      *               Input state invalid or not find the wifi device config
      */
     int SetDeviceRandomizedMacSuccessEver(int networkId);
+
+    std::string GetCountry();
+    std::string GetLanguage();
+    std::string GetOversea();
+
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 
     /**

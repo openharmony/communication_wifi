@@ -38,7 +38,7 @@ HWTEST_F(WifiConfigFileTest, SaveValueCheck, TestSize.Level1)
     WifiConfig tmp;
     tmp.defaultWifiInterface = "abcd";
     tmp.scanAlwaysSwitch = true;
-    tmp.staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+    tmp.staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
     tmp.staLastState = true;
     tmp.savedDeviceAppraisalPriority = PRIORITY_1;
     tmp.scoretacticsScoreSlope = SCORE_SLOPE;

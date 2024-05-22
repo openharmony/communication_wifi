@@ -953,7 +953,7 @@ public:
         interScanInfo.capabilities = "WEP";
         scanInfos.push_back(interScanInfo);
         interScanInfo.frequency = FREQ_5_GHZ_VALUE;
-        interScanInfo.capabilities = "EAP_SUITE_B_192";
+        interScanInfo.capabilities = "EAP-SUITE-B-192";
         scanInfos.push_back(interScanInfo);
         interScanInfo.frequency = FREQ_5_GHZ_VALUE;
         interScanInfo.capabilities = "EAP";

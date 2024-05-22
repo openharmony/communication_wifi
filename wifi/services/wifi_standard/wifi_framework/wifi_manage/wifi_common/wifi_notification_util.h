@@ -15,14 +15,20 @@
 
 #ifndef WIFI_NOTIFICATION_UTIL_H
 #define WIFI_NOTIFICATION_UTIL_H
+#include "ability_connect_callback_stub.h"
+#include "ipc_skeleton.h"
 #include "want.h"
+#include "want_params_wrapper.h"
 #include <string>
 
 namespace OHOS {
 namespace Wifi {
 constexpr int DEFAULT_INVAL_VALUE = -1;
+constexpr int32_t SIGNAL_NUM = 3;
 const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
 const std::string WIFI_EVENT_TAP_NOTIFICATION = "ohos.event.notification.wifi.TAP_NOTIFICATION";
+const std::string WIFI_EVENT_DIALOG_ACCEPT = "ohos.event.wifi.DIALOG_ACCEPT";
+const std::string WIFI_EVENT_DIALOG_REJECT = "ohos.event.wifi.DIALOG_REJECT";
 enum WifiNotificationId {
     WIFI_PORTAL_NOTIFICATION_ID = 101000
 };
@@ -38,6 +44,11 @@ enum WifiNotificationOpetationType {
     PUBLISH = 1
 };
 
+enum WifiDialogType {
+    CDD = 0,
+    THREE_VAP = 1
+};
+
 class WifiNotificationUtil {
 public:
     static WifiNotificationUtil& GetInstance(void);
@@ -48,9 +59,30 @@ public:
 
     int32_t StartAbility(OHOS::AAFwk::Want& want);
 
+    void ShowDialog(WifiDialogType type);
+
 private:
     WifiNotificationUtil();
     ~WifiNotificationUtil();
+};
+
+class UIExtensionAbilityConnection : public AAFwk::AbilityConnectionStub {
+public:
+    UIExtensionAbilityConnection(
+        const std::string commandStr, const std::string bundleName, const std::string abilityName)
+        : commandStr_(commandStr), bundleName_(bundleName), abilityName_(abilityName)
+    {}
+
+    virtual ~UIExtensionAbilityConnection() = default;
+
+    void OnAbilityConnectDone(
+        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int32_t resultCode) override;
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int32_t resultCode) override;
+
+private:
+    std::string commandStr_;
+    std::string bundleName_;
+    std::string abilityName_;
 };
 }
 }

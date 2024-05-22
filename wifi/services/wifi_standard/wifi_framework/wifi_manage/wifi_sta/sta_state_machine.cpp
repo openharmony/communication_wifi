@@ -545,6 +545,17 @@ ErrCode StaStateMachine::SetExternalSim(const std::string ifName, const std::str
     return WIFI_OPT_SUCCESS;
 }
 
+void StaStateMachine::FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const
+{
+    if (idlConfig.keyMgmt.find("WPA-EAP-SUITE-B-192") != std::string::npos) {
+        idlConfig.allowedProtocols = 0x02; // RSN
+        idlConfig.allowedPairwiseCiphers = 0x20; // GCMP-256
+        idlConfig.allowedGroupCiphers = 0x20; // GCMP-256
+        idlConfig.isRequirePmf = true;
+        idlConfig.allowedGroupMgmtCiphers = 0x4; // BIP-GMAC-256
+    }
+}
+
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
     LOGI("Enter ConvertDeviceCfg.\n");
@@ -556,6 +567,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     idlConfig.priority = config.priority;
     idlConfig.scanSsid = config.hiddenSSID ? 1 : 0;
     FillEapCfg(config, idlConfig);
+    FillSuiteB192Cfg(idlConfig);
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
     if (strcmp(config.keyMgmt.c_str(), "WEP") == 0) {
         /* for wep */
@@ -1892,6 +1904,11 @@ bool StaStateMachine::ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig)
     return false;
 }
 
+static bool isPskEncryption(const std::string keyMgmt)
+{
+    return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
+}
+
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
     LOGD("enter SetRandomMac.");
@@ -1904,6 +1921,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     std::string lastMac;
     std::string currentMac;
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
+        LOGI("%{public}s randommac, use factory mac to connect", __func__);
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
         WifiStoreRandomMac randomMacInfo;
@@ -1913,31 +1931,38 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             LOGE("scanInfo has no target wifi and bssid is empty!");
             return false;
         }
-
-        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-        if (randomMacInfo.randomMac.empty()) {
-            /* Sets the MAC address of WifiSettings. */
-            std::string macAddress;
-            WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
-            randomMacInfo.randomMac = macAddress;
-            LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
-                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
-                MacAnonymize(randomMacInfo.peerBssid).c_str());
+        LOGI("%{public}s randommac, ssid:%{public}s keyMgmt:%{public}s macAddress:%{public}s",
+            __func__, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
+            MacAnonymize(deviceConfig.macAddress).c_str());
+        if (deviceConfig.macAddress.empty()) {
+            WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+            if (!randomMacInfo.randomMac.empty()) {
+                currentMac = randomMacInfo.randomMac;
+            } else {
+                std::string macAddress;
+                WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+                randomMacInfo.randomMac = macAddress;
+                currentMac = randomMacInfo.randomMac;
+                LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+                    __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+                    MacAnonymize(randomMacInfo.peerBssid).c_str());
+                WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+            }
+        } else if (isPskEncryption(deviceConfig.keyMgmt)) {
+            randomMacInfo.randomMac = deviceConfig.macAddress;
+            currentMac = randomMacInfo.randomMac;
             WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
         } else {
-            LOGI("%{public}s: randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
-                __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
-                MacAnonymize(randomMacInfo.peerBssid).c_str());
+            currentMac = deviceConfig.macAddress;
         }
-        currentMac = randomMacInfo.randomMac;
     }
 
     if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac)) != WIFI_IDL_OPT_OK) {
-        LOGE("GetStaDeviceMacAddress failed!");
+        LOGE("%{public}s randommac, GetStaDeviceMacAddress failed!", __func__);
         return false;
     }
 
-    LOGI("%{public}s, currentMac:%{public}s, lastMac:%{public}s",
+    LOGI("%{public}s, randommac, use random mac to connect, currentMac:%{public}s, lastMac:%{public}s",
         __func__, MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
         if (lastMac != currentMac) {
@@ -1952,7 +1977,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
     } else {
-        LOGE("Check MacAddress error.");
+        LOGE("%{public}s randommac, Check MacAddress error.", __func__);
         return false;
     }
 #endif
@@ -2694,7 +2719,6 @@ void StaStateMachine::DisConnectProcess()
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     if (WifiStaHalInterface::GetInstance().Disconnect() == WIFI_IDL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
-        mPortalUrl = "";
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
@@ -3241,6 +3265,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
+    portalFlag = true;
 }
 
 void StaStateMachine::HandleArpCheckResult(StaArpState arpState)
@@ -3325,6 +3350,12 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
             }
             WIFI_LOGI("netdetection, netstate:%{public}d url:%{public}s\n", netstate, url.c_str());
             pStaStateMachine->HandleNetCheckResult(netstate, url);
+            break;
+        }
+        case WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            WIFI_LOGI("LinkedState, recv StartPortalCertification!");
+            pStaStateMachine->HandlePortalNetworkPorcess();
             break;
         }
         default:

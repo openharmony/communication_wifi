@@ -30,6 +30,9 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+#ifdef DTFUZZ_TEST
+static WifiAppStateAware* gWifiAppStateAware = nullptr;
+#endif
 WifiAppStateAware::WifiAppStateAware(int instId)
 {
     GetForegroundApp();
@@ -53,12 +56,25 @@ WifiAppStateAware::~WifiAppStateAware()
     if (appMgrProxy_) {
         appMgrProxy_ = nullptr;
     }
+#ifdef DTFUZZ_TEST
+    if (gWifiAppStateAware != nullptr) {
+        delete gWifiAppStateAware;
+        gWifiAppStateAware = nullptr;
+    }
+#endif
 }
 
 WifiAppStateAware &WifiAppStateAware::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiAppStateAware gWifiAppStateAware;
     return gWifiAppStateAware;
+#else
+    if (gWifiAppStateAware == nullptr) {
+        gWifiAppStateAware = new (std::nothrow) WifiAppStateAware();
+    }
+    return *gWifiAppStateAware;
+#endif
 }
 
 ErrCode WifiAppStateAware::InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks)

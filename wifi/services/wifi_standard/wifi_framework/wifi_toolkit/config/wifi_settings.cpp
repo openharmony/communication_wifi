@@ -44,10 +44,20 @@
 
 namespace OHOS {
 namespace Wifi {
+#ifdef DTFUZZ_TEST
+static WifiSettings* gWifiSettings = nullptr;
+#endif
 WifiSettings &WifiSettings::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiSettings gWifiSettings;
     return gWifiSettings;
+#else
+    if (gWifiSettings == nullptr) {
+        gWifiSettings = new (std::nothrow) WifiSettings();
+    }
+    return *gWifiSettings;
+#endif
 }
 
 WifiSettings::WifiSettings()
@@ -106,6 +116,12 @@ WifiSettings::~WifiSettings()
     SyncP2pVendorConfig();
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     SyncWifiConfig();
+#ifdef DTFUZZ_TEST
+    if (gWifiSettings != nullptr) {
+        delete gWifiSettings;
+        gWifiSettings = nullptr;
+    }
+#endif
 }
 
 void WifiSettings::InitDefaultWifiConfig()

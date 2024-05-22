@@ -81,7 +81,9 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     CesEventSubscriber::OnReceiveThermalEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
-    {WIFI_EVENT_TAP_NOTIFICATION, &CesEventSubscriber::OnReceiveNotificationEvent}
+    {WIFI_EVENT_TAP_NOTIFICATION, &CesEventSubscriber::OnReceiveNotificationEvent},
+    {WIFI_EVENT_DIALOG_ACCEPT, &CesEventSubscriber::OnReceiveNotificationEvent},
+    {WIFI_EVENT_DIALOG_REJECT, &CesEventSubscriber::OnReceiveNotificationEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -853,13 +855,21 @@ void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEvent
 
 void CesEventSubscriber::OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    const auto &action = eventData.GetWant().GetAction();
+    std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("OnReceiveNotificationEvent action[%{public}s]", action.c_str());
-    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
-        if (pService != nullptr) {
-            pService->StartPortalCertification();
+    if (action == WIFI_EVENT_TAP_NOTIFICATION) {
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+            if (pService != nullptr) {
+                pService->StartPortalCertification();
+            }
         }
+    } else if (action == WIFI_EVENT_DIALOG_ACCEPT) {
+        int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
+        WIFI_LOGI("dialogType[%{public}d]", dialogType);
+    } else {
+        int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
+        WIFI_LOGI("dialogType[%{public}d]", dialogType);
     }
 }
 }  // namespace Wifi

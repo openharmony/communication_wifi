@@ -33,11 +33,20 @@ namespace OHOS {
 namespace Wifi {
 constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
 using namespace NetManagerStandard;
-
+#ifdef DTFUZZ_TEST
+static WifiNetAgent* gWifiNetAgent = nullptr;
+#endif
 WifiNetAgent &WifiNetAgent::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiNetAgent gWifiNetAgent;
     return gWifiNetAgent;
+#else
+    if (gWifiNetAgent == nullptr) {
+        gWifiNetAgent = new (std::nothrow) WifiNetAgent();
+    }
+    return *gWifiNetAgent;
+#endif
 }
 
 WifiNetAgent::WifiNetAgent()
@@ -49,6 +58,12 @@ WifiNetAgent::~WifiNetAgent()
     if (netAgentEventHandler) {
         netAgentEventHandler.reset();
     }
+#ifdef DTFUZZ_TEST
+    if (gWifiNetAgent != nullptr) {
+        delete gWifiNetAgent;
+        gWifiNetAgent = nullptr;
+    }
+#endif
 }
 
 bool WifiNetAgent::RegisterNetSupplier()
@@ -72,6 +87,7 @@ bool WifiNetAgent::RegisterNetSupplier()
 
 bool WifiNetAgent::RegisterNetSupplierCallback()
 {
+#ifndef DTFUZZ_TEST
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplierCallback.");
     sptr<NetConnCallback> pNetConnCallback = (std::make_unique<NetConnCallback>()).release();
@@ -86,15 +102,18 @@ bool WifiNetAgent::RegisterNetSupplierCallback()
         return true;
     }
     WIFI_LOGE("Register NetSupplierCallback failed [%{public}d]", result);
+#endif
     return false;
 }
 
 void WifiNetAgent::UnregisterNetSupplier()
 {
+#ifndef DTFUZZ_TEST
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UnregisterNetSupplier.");
     int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(supplierId);
     WIFI_LOGI("Unregister network result:%{public}d", result);
+#endif
 }
 
 void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)

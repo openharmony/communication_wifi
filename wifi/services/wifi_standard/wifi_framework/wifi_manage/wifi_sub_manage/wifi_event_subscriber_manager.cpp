@@ -118,6 +118,11 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
 #ifdef HAS_POWERMGR_PART
     UnRegisterPowerStateListener();
 #endif
+#ifdef DTFUZZ_TEST
+    if (mWifiEventSubsThread) {
+        mWifiEventSubsThread.reset();
+    }
+#endif
 }
 
 void WifiEventSubscriberManager::RegisterCesEvent()

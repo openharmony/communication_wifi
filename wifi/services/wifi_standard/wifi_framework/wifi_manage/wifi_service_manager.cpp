@@ -31,17 +31,35 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiServiceManager");
+
+#ifdef DTFUZZ_TEST
+static WifiServiceManager* gWifiServiceManager = nullptr;
+#endif
 WifiServiceManager &WifiServiceManager::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiServiceManager gWifiServiceManager;
     return gWifiServiceManager;
+#else
+    if (gWifiServiceManager == nullptr) {
+        gWifiServiceManager = new (std::nothrow) WifiServiceManager();
+    }
+    return *gWifiServiceManager;
+#endif
 }
 
 WifiServiceManager::WifiServiceManager()
 {}
 
 WifiServiceManager::~WifiServiceManager()
-{}
+{
+#ifdef DTFUZZ_TEST
+    if (gWifiServiceManager != nullptr) {
+        delete gWifiServiceManager;
+        gWifiServiceManager = nullptr;
+    }
+#endif
+}
 
 int WifiServiceManager::Init()
 {

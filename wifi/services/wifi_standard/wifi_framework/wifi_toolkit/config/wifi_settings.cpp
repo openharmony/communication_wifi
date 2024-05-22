@@ -3064,6 +3064,28 @@ void WifiSettings::GenerateRandomMacAddress(std::string &randomMacAddr)
     LOGD("%{public}s: randomMacAddr: %{private}s", __func__, randomMacAddr.c_str());
 }
 
+bool WifiSettings::IsValidParanValue(const char *value, uint32_t len)
+{
+    return (value != NULL) && (strlen(value) + 1 <= len);
+}
+
+std::string WifiSettings::GetParameter(const std::string &key, const std::string &def)
+{
+    uint_t size = 0;
+    int ret = SystemReadParam(key.c_str(), NULL, &size);
+    if (ret == 0) {
+        std::vector<char> value(size + 1);
+        ret = SystemReadParam(key.c_str(), value.data(), &size);
+        if (ret = 0) {
+            return std::string(value.data());
+        }
+    }
+    if (IsValidParanValue(def.c_str(), MAX_PARAM_VALUE_LEN)) {
+        return std::string(def);
+    }
+    return "";
+}
+
 std::string WifiSettings::GetCountry()
 {
     return GetParameter("const.cust.region", "");

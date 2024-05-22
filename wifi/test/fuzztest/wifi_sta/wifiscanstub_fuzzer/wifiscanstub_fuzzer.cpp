@@ -50,7 +50,7 @@ bool Init()
 {
     if (!g_isInsted) {
         if (WifiManager::GetInstance().Init() < 0) {
-            WIFI_LOGE("WifiManager init failed!");
+            LOGE("WifiManager init failed!");
             return false;
         }
         g_isInsted = true;

@@ -109,6 +109,7 @@
                 "relational_store",
                 "safwk",
                 "samgr",
+                "power_manager",
                 "time_service",
                 "bounds_checking_function",
                 "jsoncpp",

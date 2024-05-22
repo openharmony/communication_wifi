@@ -48,6 +48,7 @@ namespace Wifi {
 const std::string LANGUAGE_CHINESE = "zh-Hans";
 const std::string COUNTRY_CHINA_CAPITAL = "CN";
 const std::string COUNTRY_CHINA_LOWERCASE = "cn";
+constexpr int32_t MAX_PARAM_VALUE_LEN = 128;
 
 WifiSettings &WifiSettings::GetInstance()
 {

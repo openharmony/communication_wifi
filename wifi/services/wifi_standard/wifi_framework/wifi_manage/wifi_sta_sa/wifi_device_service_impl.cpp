@@ -240,7 +240,7 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
 
 bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
 {
-    if (config.keyMgmt != KEY_MGMT_EAP) {
+    if (config.keyMgmt != KEY_MGMT_EAP && config.keyMgmt != KEY_MGMT_SUITE_B_192) {
         WIFI_LOGE("CheckConfigEap: keyMgmt is not EAP!");
         return false;
     }
@@ -253,7 +253,8 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
             return false;
         }
         return true;
-    } else if ((config.wifiEapConfig.eap == EAP_METHOD_PEAP) || (config.wifiEapConfig.eap == EAP_METHOD_PWD)) {
+    } else if ((config.wifiEapConfig.eap == EAP_METHOD_PEAP) || (config.wifiEapConfig.eap == EAP_METHOD_PWD) ||
+        (config.wifiEapConfig.eap == EAP_METHOD_TTLS)) {
         if (config.wifiEapConfig.identity.empty() || config.wifiEapConfig.password.empty()) {
             WIFI_LOGE("CheckConfigEap: invalid parameter, the identity length is:%{public}zu",
                 config.wifiEapConfig.identity.length());
@@ -274,7 +275,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
     }
 
     WIFI_LOGI("CheckConfigPwd: keyMgmt = %{public}s!", config.keyMgmt.c_str());
-    if (config.keyMgmt == KEY_MGMT_EAP) {
+    if (config.keyMgmt == KEY_MGMT_EAP || config.keyMgmt == KEY_MGMT_SUITE_B_192) {
         return CheckConfigEap(config);
     }
 

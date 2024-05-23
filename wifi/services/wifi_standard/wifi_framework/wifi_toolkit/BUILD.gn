@@ -142,6 +142,7 @@ if (defined(ohos_lite)) {
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "init:libbegetutil",
+      "init:libinit_module_engine",
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
       "libxml2:libxml2",

@@ -72,7 +72,7 @@ ohos_static_library("wifi_self_cure") {
     "hilog:libhilog",
     "init:libbegetutil",
     "netmanager_base:net_conn_manager_if",
-    "netstack:http_client"
+    "netstack:http_client",
   ]
 
   defines = [ "FEATURE_SELF_CURE_SUPPORT" ]

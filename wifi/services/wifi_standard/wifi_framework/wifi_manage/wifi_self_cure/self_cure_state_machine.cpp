@@ -860,7 +860,7 @@ void SelfCureStateMachine::InitDnsServer()
     for (int i = 0; i < overseaPublicDnses.size(); i++) {
         overseaPublicDnses[i] = strPublicIpAddr[i];
     }
-    strPublicIpAddr.erase(strPublicIpAddr.begin, strPublicIpAddr.begin + 2);
+    strPublicIpAddr.erase(strPublicIpAddr.begin(), strPublicIpAddr.begin() + 2);
     for (int i = 0; i < chinaPublicDnses.size(); i++) {
         chinaPublicDnses[i] = strPublicIpAddr[i];
     }
@@ -868,7 +868,7 @@ void SelfCureStateMachine::InitDnsServer()
 
 bool SelfCureStateMachine::InternetSelfCureState::UseOperatorOverSea()
 {
-    std::string oversea = WifiSettings::GetOversea();
+    std::string oversea = WifiSettings::GetInstance().GetOversea();
     if ((oversea == "oversea")) {
         return true;
     }

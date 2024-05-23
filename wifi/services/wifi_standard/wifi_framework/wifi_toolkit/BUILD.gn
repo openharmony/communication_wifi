@@ -137,7 +137,6 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
-      "config_policy:configpolicy_util",
       "dhcp:dhcp_sdk",
       "dhcp:dhcp_utils",
       "eventhandler:libeventhandler",

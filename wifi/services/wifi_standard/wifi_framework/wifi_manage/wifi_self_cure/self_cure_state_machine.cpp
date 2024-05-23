@@ -860,7 +860,8 @@ void SelfCureStateMachine::InitDnsServer()
     for (int i = 0; i < overseaPublicDnses.size(); i++) {
         overseaPublicDnses[i] = strPublicIpAddr[i];
     }
-    strPublicIpAddr.erase(strPublicIpAddr.begin(), strPublicIpAddr.begin() + 2);
+    int spaceSize = chinaPublicDnses.size();
+    strPublicIpAddr.erase(strPublicIpAddr.begin(), strPublicIpAddr.begin() + spaceSize);
     for (int i = 0; i < chinaPublicDnses.size(); i++) {
         chinaPublicDnses[i] = strPublicIpAddr[i];
     }

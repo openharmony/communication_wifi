@@ -28,6 +28,7 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_net_agent.h"
 #include "parameter.h"
+#include "wifi_settings.h"
  
 namespace OHOS {
 namespace Wifi {
@@ -898,8 +899,10 @@ void SelfCureStateMachine::InternetSelfCureState::GetReplacedDnsServers(
 void SelfCureStateMachine::InternetSelfCureState::UpdateDnsServers(std::vector<std::string>& dnsServers)
 {
     IpInfo ipInfo;
+    IpV6Info ipV6Info;
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
+    WifiSettings::GetInstance().GetIpv6Info(ipV6Info, 0);
     ipInfo.primaryDns = IpTools::ConvertIpv4Address(dnsServers[0]);
     ipInfo.secondDns = IpTools::ConvertIpv4Address(dnsServers[1]);
     WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipV6Info, config.wifiProxyconfig, 0);

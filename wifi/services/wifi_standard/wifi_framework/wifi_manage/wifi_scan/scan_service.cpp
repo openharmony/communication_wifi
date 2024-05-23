@@ -589,8 +589,7 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
 void ScanService::HandleCommonScanInfo(
     std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList)
 {
-    WIFI_LOGI("Enter HandleCommonScanInfo, requestIndexList size: %{public}d.",
-        static_cast<int>(requestIndexList.size()));
+    WIFI_LOGI("HandleCommonScanInfo, requestIndexList size: %{public}d.", static_cast<int>(requestIndexList.size()));
     if (!isChipsetInfoObtained) {
         InitChipsetInfo();
     }

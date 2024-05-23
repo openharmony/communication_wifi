@@ -27,7 +27,8 @@
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
-#include "param_manager.h"
+#include "param/init_param.h"
+#include "securec.h"
 #include <random>
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"

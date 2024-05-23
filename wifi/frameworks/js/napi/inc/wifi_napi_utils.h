@@ -135,11 +135,11 @@ enum class SecTypeJs {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
     /** Opportunistic Wireless Encryption. */
     SEC_TYPE_OWE = 7,
+#endif
     /** WAPI certificate to be specified. */
     SEC_TYPE_WAPI_CERT = 8,
     /** WAPI pre-shared key to be specified. */
     SEC_TYPE_WAPI_PSK = 9,
-#endif
 };
 
 enum class AddressTypeJs {

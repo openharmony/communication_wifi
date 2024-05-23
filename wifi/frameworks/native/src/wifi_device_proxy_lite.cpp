@@ -144,7 +144,9 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
         (void)ReadInt32(reply, &privacyConfig);
         config.wifiPrivacySetting = WifiPrivacyConfig(privacyConfig);
         (void)ReadInt32(reply, &config.uid);
-
+        (void)ReadInt32(reply, &config.wifiWapiConfig.wapiPskType);
+        config.wifiWapiConfig.wapiAsCert = (char *)ReadString(reply, &readLen);
+        config.wifiWapiConfig.wapiUserCert = (char *)ReadString(reply, &readLen);
         result.emplace_back(config);
     }
 }
@@ -605,6 +607,9 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &r
     (void)WriteInt32(&req, config.wifiProxyconfig.manualProxyConfig.serverPort);
     (void)WriteString(&req, config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
     (void)WriteInt32(&req, (int)config.wifiPrivacySetting);
+    (void)WriteInt32(&req, (int)config.wifiWapiConfig.wapiPskType);
+    (void)WriteString(&req, config.wifiWapiConfig.wapiAsCert.c_str());
+    (void)WriteString(&req, config.wifiWapiConfig.wapiUserCert.c_str());
 }
 
 ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)

@@ -91,13 +91,13 @@ bool WifiAppStateAware::Connect()
 
 void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
 {
-    WIFI_LOGI("%{public}s enter, delayTime: %{public}ld", __func__, delayTime);
+    WIFI_LOGI("%{public}s enter, delayTime: %{public}lld", __func__, delayTime);
     if (appChangeEventHandler) {
         std::function<void()> RegisterAppStateObserverFunc =
             std::bind(&WifiAppStateAware::RegisterAppStateObserver, this);
         appChangeEventHandler->PostAsyncTask(RegisterAppStateObserverFunc, delayTime);
     } else {
-         WIFI_LOGE("%{public}s appChangeEventHandler is null", __func__);
+        WIFI_LOGE("%{public}s appChangeEventHandler is null", __func__);
     }
 }
 

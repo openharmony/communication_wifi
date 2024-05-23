@@ -46,12 +46,6 @@ static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 std::shared_ptr<WifiScanStub> pWifiScanServiceImpl = std::make_shared<WifiScanServiceImpl>();
 
-void MyExit(void)
-{
-    sleep(4);
-    printf("exiting")
-}
-
 bool Init()
 {
     if (!g_isInsted) {
@@ -59,7 +53,6 @@ bool Init()
             LOGE("WifiManager init failed!");
             return false;
         }
-        atexit(MyExit);
         g_isInsted = true;
     }
     return true;

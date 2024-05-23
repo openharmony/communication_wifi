@@ -840,7 +840,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
 
 void SelfCureStateMachine::InitDnsServer()
 {
-    static std::vector<std::string> strPublicIpAddr;
+    std::vector<std::string> strPublicIpAddr;
     char DnsIpAddr[PUBLIC_DNS_SERVERS_SIZE];
     GetParamValue("const.wifi.dnscure_ipcfg", "", DnsIpAddr, DEFAULT_PARAM_SIZE);
     std::string temp = "";

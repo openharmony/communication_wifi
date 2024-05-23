@@ -842,19 +842,19 @@ void SelfCureStateMachine::InitDnsServer()
 {
     std::vector<std::string> strPublicIpAddr;
     char dnsIpAddr[PUBLIC_DNS_SERVERS_SIZE];
-    GetParamValue("const.wifi.dnscure_ipcfg", "", DnsIpAddr, DEFAULT_PARAM_SIZE);
+    GetParamValue("const.wifi.dnscure_ipcfg", "", dnsIpAddr, DEFAULT_PARAM_SIZE);
     std::string temp = "";
-    for (int i = 0; i < sizeof(DnsIpAddr); i++) {
-        if (DnsIpAddr[i] == ';') {
+    for (int i = 0; i < sizeof(dnsIpAddr); i++) {
+        if (dnsIpAddr[i] == ';') {
             strPublicIpAddr.push_back(temp);
             temp = "";
             continue;
-        } else if (i == sizeof(DnsIpAddr) - 1) {
-            temp = temp + DnsIpAddr[i];
+        } else if (i == sizeof(dnsIpAddr) - 1) {
+            temp = temp + dnsIpAddr[i];
             strPublicIpAddr.push_back(temp);
             continue;
         } else {
-            temp = temp + DnsIpAddr[i];
+            temp = temp + dnsIpAddr[i];
         }
     }
     for (int i = 0; i < overseaPublicDnses.size(); i++) {

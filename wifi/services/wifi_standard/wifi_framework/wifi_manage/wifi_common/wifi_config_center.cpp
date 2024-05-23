@@ -50,14 +50,7 @@ WifiConfigCenter::WifiConfigCenter()
 }
 
 WifiConfigCenter::~WifiConfigCenter()
-{
-#ifdef DTFUZZ_TEST
-    if (gWifiConfigCenter != nullptr) {
-        delete gWifiConfigCenter;
-        gWifiConfigCenter = nullptr;
-    }
-#endif
-}
+{}
 
 int WifiConfigCenter::Init()
 {

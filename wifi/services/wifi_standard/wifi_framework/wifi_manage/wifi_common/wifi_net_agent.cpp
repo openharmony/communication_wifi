@@ -58,16 +58,11 @@ WifiNetAgent::~WifiNetAgent()
     if (netAgentEventHandler) {
         netAgentEventHandler.reset();
     }
-#ifdef DTFUZZ_TEST
-    if (gWifiNetAgent != nullptr) {
-        delete gWifiNetAgent;
-        gWifiNetAgent = nullptr;
-    }
-#endif
 }
 
 bool WifiNetAgent::RegisterNetSupplier()
 {
+#ifndef DTFUZZ_TEST
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplier.");
 
@@ -82,6 +77,7 @@ bool WifiNetAgent::RegisterNetSupplier()
         return true;
     }
     WIFI_LOGI("Register NetSupplier failed");
+#endif
     return false;
 }
 

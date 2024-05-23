@@ -37,12 +37,6 @@ WifiCountryCodeManager::~WifiCountryCodeManager()
 {
     std::lock_guard<std::mutex> lock(m_countryCodeMutex);
     m_codeChangeListeners.clear();
-#ifdef DTFUZZ_TEST
-    if (instance != nullptr) {
-        delete instance;
-        instance = nullptr;
-    }
-#endif
 }
 
 WifiCountryCodeManager &WifiCountryCodeManager::GetInstance()

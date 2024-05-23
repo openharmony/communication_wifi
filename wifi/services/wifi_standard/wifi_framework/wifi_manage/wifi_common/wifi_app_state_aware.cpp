@@ -56,12 +56,6 @@ WifiAppStateAware::~WifiAppStateAware()
     if (appMgrProxy_) {
         appMgrProxy_ = nullptr;
     }
-#ifdef DTFUZZ_TEST
-    if (gWifiAppStateAware != nullptr) {
-        delete gWifiAppStateAware;
-        gWifiAppStateAware = nullptr;
-    }
-#endif
 }
 
 WifiAppStateAware &WifiAppStateAware::GetInstance()

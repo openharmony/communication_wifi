@@ -123,14 +123,7 @@ WifiInternalEventDispatcher::WifiInternalEventDispatcher()
 {}
 
 WifiInternalEventDispatcher::~WifiInternalEventDispatcher()
-{
-#ifdef DTFUZZ_TEST
-    if (gWifiEventBroadcast != nullptr) {
-        delete gWifiEventBroadcast;
-        gWifiEventBroadcast = nullptr;
-    }
-#endif
-}
+{}
 
 int WifiInternalEventDispatcher::Init()
 {

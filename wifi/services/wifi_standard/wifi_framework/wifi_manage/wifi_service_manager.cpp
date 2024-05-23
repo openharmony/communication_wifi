@@ -52,14 +52,7 @@ WifiServiceManager::WifiServiceManager()
 {}
 
 WifiServiceManager::~WifiServiceManager()
-{
-#ifdef DTFUZZ_TEST
-    if (gWifiServiceManager != nullptr) {
-        delete gWifiServiceManager;
-        gWifiServiceManager = nullptr;
-    }
-#endif
-}
+{}
 
 int WifiServiceManager::Init()
 {

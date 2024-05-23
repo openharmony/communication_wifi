@@ -342,8 +342,8 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteString(config.ancoCallProcessName);
     data.WriteInt32(config.uid);
     data.WriteInt32(config.wifiWapiConfig.wapiPskType);
-    data.WriteString(config.wifiWapiConfig.wapiAsCert);
-    data.WriteString(config.wifiWapiConfig.wapiUserCert);
+    data.WriteString(config.wifiWapiConfig.wapiAsCertPath);
+    data.WriteString(config.wifiWapiConfig.wapiUserCertPath);
 }
 
 ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)
@@ -626,8 +626,8 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.callProcessName = reply.ReadString();
         config.ancoCallProcessName = reply.ReadString();
         config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
-        config.wifiWapiConfig.wapiAsCert = reply.ReadString();
-        config.wifiWapiConfig.wapiUserCert = reply.ReadString();
+        config.wifiWapiConfig.wapiAsCertPath = reply.ReadString();
+        config.wifiWapiConfig.wapiUserCertPath = reply.ReadString();
         result.emplace_back(config);
     }
 }
@@ -781,6 +781,43 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
         return WIFI_OPT_FAILED;
     }
     return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiDeviceProxy::StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to %{public}s,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(networkId);
+    data.WriteString(bssid);
+    data.WriteInt32(isCandidate);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("StartRoamToNetwork %{public}d failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("StartRoamToNetwork Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartRoamToNetwork Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)

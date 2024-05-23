@@ -198,14 +198,15 @@ WifiErrorNo WifiHdiWpaClient::ReqDisableNetwork(int networkId)
 
 void WifiHdiWpaClient::SetWapiConfig(const WifiIdlDeviceConfig &config, SetNetworkConfig *conf, int &num)
 {
-    LOGI("Enter SetWapiConfig, keyMgmt is %{public}s, pskType is %{public}d", config.keyMgmt.c_str(), config.wapiPskType);
+    LOGI("Enter SetWapiConfig, keyMgmt is %{public}s, pskType is %{public}d", config.keyMgmt.c_str(),
+        config.wapiPskType);
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
-    if (config.keyMgmt.find(KEY_MGMT_WAPI_PSK) != std::string::npos) {
+    if (config.keyMgmt == KEY_MGMT_WAPI_PSK) {
         num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_WAPI_PSK_TYPE, config.wapiPskType);
         num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WAPI_PSK, config.psk);
-    } else if (config.keyMgmt.find(KEY_MGMT_WAPI_CERT) != std::string::npos) {
-        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WAPI_USER_CERT, config.wapiUserCert);
-        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WAPI_CA_CERT, config.wapiAsCert);
+    } else if (config.keyMgmt == KEY_MGMT_WAPI_CERT) {
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WAPI_USER_CERT, config.wapiUserCertData);
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WAPI_CA_CERT, config.wapiAsCertData);
     }
 }
 
@@ -236,7 +237,7 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
         } else {
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
         }
-    } while(0);
+    } while (0);
     EapMethod eapMethod = WifiEapConfig::Str2EapMethod(config.eapConfig.eap);
     LOGI("%{public}s, eap:%{public}s, eapMethod:%{public}d, identity:%{private}s, num:%{public}d",
         __func__, config.eapConfig.eap.c_str(), eapMethod, config.eapConfig.identity.c_str(), num);

@@ -496,6 +496,25 @@ public:
 
 enum class WifiPrivacyConfig { RANDOMMAC, DEVICEMAC };
 
+class WifiWapiConfig {
+public:
+    int wapiPskType;
+    std::string wapiAsCertPath;
+    std::string wapiUserCertPath;
+    std::string wapiAsCertData;
+    std::string wapiUserCertData;
+    std::string encryptedUserCertData;
+    std::string IV;
+
+    WifiWapiConfig()
+    {
+        wapiPskType = -1;
+    }
+
+    ~WifiWapiConfig()
+    {}
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
@@ -760,24 +779,7 @@ typedef enum {
     BG_LIMIT_LEVEL_11,
 } BgLimitLevel;
 
-class WifiWapiConfig {
-public:
-    int wapiPskType;
-    std::string wapiAsCert;
-    std::string wapiUserCert;
-
-    WifiWapiConfig()
-    {
-        wapiPskType = -1;
-        wapiAsCert = "";
-        wapiUserCert = "";
-    }
-
-    ~WifiWapiConfig()
-    {}
-};
-
-enum calss WapiPskType{
+enum class WapiPskType {
     WAPI_PSK_ASCII = 0,
     WAPI_PSK_HEX = 1,
 };

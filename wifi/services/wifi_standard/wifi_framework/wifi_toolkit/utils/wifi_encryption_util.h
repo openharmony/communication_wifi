@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr uint32_t AES_COMMON_SIZE = 256;
+constexpr uint32_t AES_COMMON_SIZE = 2048 + 16;
 constexpr uint32_t AAD_SIZE = 16;
 constexpr uint32_t NONCE_SIZE = 16;
 

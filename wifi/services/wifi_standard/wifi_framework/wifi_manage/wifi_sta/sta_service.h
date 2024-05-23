@@ -79,6 +79,16 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode ConnectToNetwork(int networkId) const;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) const;
+
     /**
      * @Description  Disconnect to the network
      *
@@ -343,6 +353,7 @@ private:
     std::string GetMcc(const std::string &imsi) const;
     std::string GetMnc(const std::string &imsi, const int mncLen) const;
     void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;
+    void UpdateWapiConfig(const WifiDeviceConfig &config, WifiWapiConfig &wifiWapiConfig) const;
 private:
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {

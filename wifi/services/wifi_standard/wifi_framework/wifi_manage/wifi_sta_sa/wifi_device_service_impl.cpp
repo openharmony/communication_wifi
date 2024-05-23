@@ -270,7 +270,7 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
 bool WifiDeviceServiceImpl::CheckConfigWapi(const WifiDeviceConfig &config)
 {
     if (config.keyMgmt == KEY_MGMT_WAPI_PSK) {
-        if (config.wifiWapiConfig.wapiPskType < static_cast<int>(WapiPskType::WAPI_PSK_ASCII) || 
+        if (config.wifiWapiConfig.wapiPskType < static_cast<int>(WapiPskType::WAPI_PSK_ASCII) ||
             config.wifiWapiConfig.wapiPskType > static_cast<int>(WapiPskType::WAPI_PSK_HEX)) {
             WIFI_LOGE("CheckConfigWapi: with invalid wapiPskType!");
             return false;
@@ -278,7 +278,7 @@ bool WifiDeviceServiceImpl::CheckConfigWapi(const WifiDeviceConfig &config)
         return true;
     }
 
-    if (config.wifiWapiConfig.wapiAsCert.empty() || config.wifiWapiConfig.wapiUserCert.empty()) {
+    if (config.wifiWapiConfig.wapiAsCertPath.empty() || config.wifiWapiConfig.wapiUserCertPath.empty()) {
         WIFI_LOGE("CheckConfigWapi: with cert path empty!");
         return false;
     }
@@ -299,9 +299,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
     }
 
     if (config.keyMgmt == KEY_MGMT_WAPI_CERT || config.keyMgmt == KEY_MGMT_WAPI_PSK) {
-        if (!CheckConfigWapi(config)) {
-            return false;
-        }
+        return CheckConfigWapi(config);
     }
 
     if (config.keyMgmt == KEY_MGMT_NONE) {
@@ -885,6 +883,41 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     }
     SetWifiConnectedMode();
     return pService->ConnectToDevice(updateConfig);
+}
+
+ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate)
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
+    if (isCandidate) {
+        WIFI_LOGE("%{public}s: don't support roam to candidate network", __FUNCTION__);
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("%{public}s:NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s:VerifyWifiConnectionPermission PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsStaServiceRunning()) {
+        WIFI_LOGE("%{public}s: sta service is not running!", __FUNCTION__);
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    if (networkId < 0 || (!bssid.empty() && CheckMacIsValid(bssid) != 0)) {
+        WIFI_LOGE("%{public}s: invalid param, networkId: %{public}d, bssid:%{public}s",
+            __FUNCTION__, networkId, MacAnonymize(bssid).c_str());
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("%{public}s: pService is nullptr!", __FUNCTION__);
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->StartRoamToNetwork(networkId, bssid);
 }
 
 ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)
@@ -1677,6 +1710,10 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     WIFI_LOGI("Enter LimitSpeed.");
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);

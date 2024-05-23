@@ -392,6 +392,31 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
     wifiEapConfig.identity = identity;
 }
 
+void StaService::UpdateWapiConfig(const WifiDeviceConfig &config, WifiWapiConfig &wifiWapiConfig) const
+{
+    if (config.keyMgmt != KEY_MGMT_WAPI_CERT) {
+        return;
+    }
+
+    if (wifiWapiConfig.wapiAsCertPath.empty() || wifiWapiConfig.wapiUserCertPath.empty()) {
+        LOGE("UpdateWapiConfig, certPath is empty!");
+        return;
+    }
+
+    wifiWapiConfig.wapiAsCertData = File2String(wifiWapiConfig.wapiAsCertPath);
+    if (wifiWapiConfig.wapiAsCertData.empty()) {
+        LOGE("UpdateWapiConfig, wapiAsCertData is empty!");
+        return;
+    }
+
+    wifiWapiConfig.wapiUserCertData = File2String(wifiWapiConfig.wapiUserCertPath);
+    if (wifiWapiConfig.wapiUserCertData.empty()) {
+        LOGE("UpdateWapiConfig, wapiUserCertData is empty!");
+        return;
+    }
+    return;
+}
+
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
     LOGI("Enter AddDeviceConfig, bssid=%{public}s\n", MacAnonymize(config.bssid).c_str());
@@ -444,6 +469,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     }
 
     UpdateEapConfig(config, tempDeviceConfig.wifiEapConfig);
+    UpdateWapiConfig(config, tempDeviceConfig.wifiWapiConfig);
 
     /* Add the new network to WifiSettings. */
     if (WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
@@ -556,6 +582,37 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bssid) const
+{
+    LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if (networkId == linkedInfo.networkId) {
+        if (bssid == linkedInfo.bssid) {
+            LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+        } else {
+            LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
+                __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
+            pStaStateMachine->StartRoamToNetwork(bssid);
+        }
+    } else {
+        LOGI("%{public}s switch to target network", __FUNCTION__);
+        auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+        message->SetParam1(networkId);
+        message->SetParam2(NETWORK_SELECTED_BY_USER);
+        message->AddStringMessageBody(bssid);
+        pStaStateMachine->SendMessage(message);
+    }
     return WIFI_OPT_SUCCESS;
 }
 

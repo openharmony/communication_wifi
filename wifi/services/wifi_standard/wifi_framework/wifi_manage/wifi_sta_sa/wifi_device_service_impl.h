@@ -80,6 +80,8 @@ public:
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 
+    ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
+
     ErrCode IsConnected(bool &isConnected) override;
 
     ErrCode ReConnect() override;
@@ -178,7 +180,7 @@ private:
     bool IsScanServiceRunning();
     bool CheckConfigEap(const WifiDeviceConfig &config);
     bool CheckConfigPwd(const WifiDeviceConfig &config);
-    bool CheckConfigWapi(const WifiDeviceConfig &config)
+    bool CheckConfigWapi(const WifiDeviceConfig &config);
     ErrCode CheckCallingUid(int &uid);
     bool IsWifiBrokerProcess(int uid);
     ErrCode CheckRemoveCandidateConfig(void);

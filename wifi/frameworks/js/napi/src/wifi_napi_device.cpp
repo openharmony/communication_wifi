@@ -494,6 +494,24 @@ ErrCode ProcessProxyConfig(const napi_env& env, const napi_value& object, WifiDe
     return ret;
 }
 
+napi_value JsObjToWapiConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
+{
+    bool hasProperty = false;
+    NAPI_CALL(env, napi_has_named_property(env, object, "wapiConfig", &hasProperty));
+    if (!hasProperty) {
+        WIFI_LOGI("Js has no property: wapiConfig.");
+        return UndefinedNapiValue(env);
+    }
+
+    napi_value napiEap;
+    napi_get_named_property(env, object, "wapiConfig", &napiEap);
+    
+    JsObjectToInt(env, napiEap, "wapiPskType", devConfig.wifiWapiConfig.wapiPskType);
+    JsObjectToString(env, napiEap, "wapiAsCert", NAPI_MAX_STR_LENT, devConfig.wifiWapiConfig.wapiAsCertPath);
+    JsObjectToString(env, napiEap, "wapiUserCert", NAPI_MAX_STR_LENT, devConfig.wifiWapiConfig.wapiUserCertPath);
+    return CreateInt32(env);
+}
+
 static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
@@ -1289,6 +1307,20 @@ static void EapConfigToJs(const napi_env& env, const WifiEapConfig& wifiEapConfi
     SetValueInt32(env, "eapSubId", wifiEapConfig.eapSubId, cfgObj);
 }
 
+static void WapiConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDeviceConfig, napi_value& result)
+{
+    napi_value wapiCfgObj;
+    napi_create_object(env, &wapiCfgObj);
+    SetValueInt32(env, "wapiPskType", wifiDeviceConfig.wifiWapiConfig.wapiPskType, wapiCfgObj);
+    SetValueUtf8String(env, "wapiAsCert", wifiDeviceConfig.wifiWapiConfig.wapiAsCertPath.c_str(), wapiCfgObj);
+    SetValueUtf8String(env, "wapiUserCert", wifiDeviceConfig.wifiWapiConfig.wapiUserCertPath.c_str(), wapiCfgObj);
+
+    napi_status status = napi_set_named_property(env, result, "wapiConfig", wapiCfgObj);
+    if (status != napi_ok) {
+        WIFI_LOGE("%{public}s set wapi config failed!", __FUNCTION__);
+    }
+}
+
 static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceConfig>& vecDeviceConfigs,
     const int idx, napi_value& arrayResult)
 {
@@ -1336,38 +1368,6 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
         WIFI_LOGE("Wifi napi set element error: %{public}d", status);
-    }
-}
-
-napi_value JsObjToWapiConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
-{
-    bool hasProperty = false;
-    NAPI_CALL(env, napi_has_named_property(env, object, "wapiConfig", &hasProperty));
-    if (!hasProperty) {
-        WIFI_LOGI("Js has no property: wapiConfig.");
-        return UndefinedNapiValue(env);
-    }
-
-    napi_value napiEap;
-    napi_get_named_property(env, object, "wapiConfig", &napiEap);
-    
-    JsObjectToInt(env, napiEap, "wapiPskType", devConfig.wifiWapiConfig.wapiPskType);
-    JsObjectToString(env, napiEap, "wapiAsCert", NAPI_MAX_STR_LENT, devConfig.wifiWapiConfig.wapiAsCert);
-    JsObjectToString(env, napiEap, "wapiUserCert", NAPI_MAX_STR_LENT, devConfig.wifiWapiConfig.wapiUserCert);
-    return CreateInt32(env);
-}
-
-static void WapiConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDeviceConfig, napi_value& result)
-{
-    napi_value wapiCfgObj;
-    napi_create_object(env, &WapiCfgObj);
-    SetValueInt32(env, "wapiPskType", wifiDeviceConfig.wifiWapiConfig.wapiPskType, wapiCfgObj);
-    SetValueUtf8String(env, "wapiAsCert", wifiDeviceConfig.wifiWapiConfig.wapiAsCert.c_str(), wapiCfgObj);
-    SetValueUtf8String(env, "wapiUserCert", wifiDeviceConfig.wifiWapiConfig.wapiUserCert.c_str(), wapiCfgObj);
-
-    napi_status status = napi_set_named_property(env, result, "wapiConfig", wapiCfgObj);
-    if (status != napi_ok) {
-        WIFI_LOGE("%{public}s set wapi config failed!", __FUNCTION__);
     }
 }
 

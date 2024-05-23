@@ -125,6 +125,8 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnDisableDeviceConfig;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = &WifiDeviceStub::OnConnectTo;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = &WifiDeviceStub::OnConnect2To;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK)] =
+        &WifiDeviceStub::OnStartRoamToNetwork;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = &WifiDeviceStub::OnReConnect;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE)] = &WifiDeviceStub::OnReAssociate;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISCONNECT)] = &WifiDeviceStub::OnDisconnect;
@@ -402,8 +404,8 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.ancoCallProcessName = data.ReadString();
     config.uid = data.ReadInt32();
     config.wifiWapiConfig.wapiPskType = data.ReadInt32();
-    config.wifiWapiConfig.wapiAsCert = data.ReadString();
-    config.wifiWapiConfig.wapiUserCert = data.ReadString();
+    config.wifiWapiConfig.wapiAsCertPath = data.ReadString();
+    config.wifiWapiConfig.wapiUserCertPath = data.ReadString();
     return;
 }
 
@@ -487,8 +489,8 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteString(config.callProcessName);
     reply.WriteString(config.ancoCallProcessName);
     reply.WriteInt32(config.wifiWapiConfig.wapiPskType);
-    reply.WriteString(config.wifiWapiConfig.wapiAsCert);
-    reply.WriteString(config.wifiWapiConfig.wapiUserCert);
+    reply.WriteString(config.wifiWapiConfig.wapiAsCertPath);
+    reply.WriteString(config.wifiWapiConfig.wapiUserCertPath);
     return;
 }
 
@@ -606,6 +608,18 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, MessageParcel &data, MessagePar
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
+    return;
+}
+
+void WifiDeviceStub::OnStartRoamToNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int networkId = data.ReadInt32();
+    std::string bssid = data.ReadString();
+    bool isCandidate = data.ReadBool();
+    ErrCode ret = StartRoamToNetwork(networkId, bssid, isCandidate);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 

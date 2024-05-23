@@ -127,8 +127,8 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     (void)ReadInt32(req, &tmpInt);
     config.wifiPrivacySetting = WifiPrivacyConfig(tmpInt);
     (void)ReadInt32(req, &config.wifiWapiConfig.wapiPskType);
-    config.wifiWapiConfig.wapiAsCert = (char *)ReadString(req, &size);
-    config.wifiWapiConfig.wapiUserCert = (char *)ReadString(req, &size);
+    config.wifiWapiConfig.wapiAsCertPath = (char *)ReadString(req, &size);
+    config.wifiWapiConfig.wapiUserCertPath = (char *)ReadString(req, &size);
 }
 
 void WifiDeviceStub::WriteIpAddress(IpcIo *reply, const WifiIpAddress &address)
@@ -202,8 +202,8 @@ void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig 
     (void)WriteInt32(reply, (int)config.wifiPrivacySetting);
     (void)WriteInt32(reply, (int)config.uid);
     (void)WriteInt32(reply, (int)config.wifiWapiConfig.wapiPskType);
-    (void)WriteString(reply, config.wifiWapiConfig.wapiAsCert.c_str());
-    (void)WriteString(reply, config.wifiWapiConfig.wapiUserCert.c_str());
+    (void)WriteString(reply, config.wifiWapiConfig.wapiAsCertPath.c_str());
+    (void)WriteString(reply, config.wifiWapiConfig.wapiUserCertPath.c_str());
 }
 
 void WifiDeviceStub::OnEnableWifi(uint32_t code, IpcIo *req, IpcIo *reply)

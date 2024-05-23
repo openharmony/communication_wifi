@@ -486,6 +486,16 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetSatelliteState(const int state) = 0;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

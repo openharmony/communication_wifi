@@ -141,6 +141,7 @@ if (defined(ohos_lite)) {
       "dhcp:dhcp_utils",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
+      "init:libbegetutil",
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
       "libxml2:libxml2",

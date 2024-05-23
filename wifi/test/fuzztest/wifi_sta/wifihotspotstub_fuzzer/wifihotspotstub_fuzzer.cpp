@@ -342,6 +342,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    Init();
     OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
     OHOS::Wifi::OnEnableWifiApTest(data, size);
     OHOS::Wifi::OnIsHotspotActiveFuzzTest(data, size);

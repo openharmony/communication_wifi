@@ -818,7 +818,7 @@ int SelfCureStateMachine::InternetSelfCureState::SelectBestSelfCureSolution(int 
     return bestSelfCureLevel;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCureLevel)
+void SelfCureStateMachine::SelfCureWifiLink(int requestCureLevel)
 {
     WIFI_LOGI("SelfCureWifiLink, requestCureLevel = %{public}d, currentRssi = %{public}d",
               requestCureLevel, currentRssi);
@@ -839,7 +839,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
 
 void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
 {
-    std::vector<std::string> strPublicIpAddr;
+    static std::vector<std::string> strPublicIpAddr;
     char DnsIpAddr[PUBLIC_DNS_SERVERS_SIZE];
     GetParamValue("const.wifi.dnscure_ipcfg", "", DnsIpAddr, DEFAULT_PARAM_SIZE);
     std::string temp = "";
@@ -867,7 +867,7 @@ void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
 
 bool SelfCureStateMachine::InternetSelfCureState::UseOperatorOverSea()
 {
-    std::string oversea = WifiSettings::GetOversea();
+    std::string oversea = GetOversea();
     if ((oversea == "oversea")) {
         return true;
     }
@@ -898,12 +898,10 @@ void SelfCureStateMachine::InternetSelfCureState::GetReplacedDnsServers(
 void SelfCureStateMachine::InternetSelfCureState::UpdateDnsServers(std::vector<std::string>& dnsServers)
 {
     IpInfo ipInfo;
-    IpV6Info ipV6Info;
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
-    WifiSettings::GetInstance().GetIpv6Info(IpV6Info, 0);
     ipInfo.primaryDns = IpTools::ConvertIpv4Address(dnsServers[0]);
-    ipInfo.primaryDns = IpTools::ConvertIpv4Address(dnsServers[1]);
+    ipInfo.secondDns = IpTools::ConvertIpv4Address(dnsServers[1]);
     WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipV6Info, config.wifiProxyconfig, 0);
 }
 
@@ -914,10 +912,10 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
     testedSelfCureLevel.push_back(WIFI_CURE_RESET_LEVEL_LOW_1_DNS);
     if (pSelfCureStateMachine->internetUnknown) {
         IpInfo ipInfo;
-        IpV6Info ipV6Info;
         WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
-        WifiSettings::GetInstance().GetIpv6Info(IpV6Info, 0);
-        std::vector<std::string> servers = {ipInfo.primaryDns, ipInfo.secondDns};
+        std::string ipV4PrimaryDns = IpTools::ConvertIpv4Address(ipInfo.primaryDns);
+        std::string ipV4SecondDns = IpTools::ConvertIpv4Address(ipInfo.secondDns);
+        std::vector<std::string> servers = {ipV4PrimaryDns, ipV4SecondDns};
         if (ipInfo.primaryDns != 0 && ipInfo.secondDns != 0) {
             std::vector<std::string> replacedDnsServers;
             GetReplacedDnsServers(servers, replacedDnsServers);

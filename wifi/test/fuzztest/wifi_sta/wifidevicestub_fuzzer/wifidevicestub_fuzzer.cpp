@@ -614,6 +614,18 @@ void OnSetSatelliteStateFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE), datas);
 }
 
+void OnStartRoamToNetworkFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK), datas);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -663,6 +675,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
     OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
     OHOS::Wifi::OnSetSatelliteStateFuzzTest(data, size);
+    OHOS::Wifi::OnStartRoamToNetworkFuzzTest(data, size);
     return 0;
 }
 }

@@ -389,7 +389,7 @@ private:
     int arpDetectionFailedCnt = 0;
     int selfCureReason = -1;
     int noTcpRxCounter = 0;
-    int connectNetworkRetryCnt = 0;
+    uint32_t connectNetworkRetryCnt = 0;
     bool internetUnknown = false;
     std::map<std::string, IpInfo> dhcpOfferPackets;
     std::vector<std::string> dhcpResultsTestDone;

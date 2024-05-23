@@ -700,6 +700,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
     OHOS::Wifi::OnFactoryResetFuzzTest(data, size);
     OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    sleep(4);
     return 0;
 }
 }

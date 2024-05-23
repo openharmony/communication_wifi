@@ -868,7 +868,7 @@ void SelfCureStateMachine::InitDnsServer()
 
 bool SelfCureStateMachine::InternetSelfCureState::UseOperatorOverSea()
 {
-    std::string oversea = GetOversea();
+    std::string oversea = WifiSettings::GetOversea();
     if ((oversea == "oversea")) {
         return true;
     }

@@ -35,7 +35,7 @@ WifiAppStateAware::WifiAppStateAware(int instId)
 {
     GetForegroundApp();
     appChangeEventHandler = std::make_unique<WifiEventHandler>(WIFI_APP_STATE_AWARE_THREAD);
-    RegisterAppStateChangedCallback()
+    RegisterAppStateChangedCallback();
     WIFI_LOGI("Register app state observer successful.");
 }
 

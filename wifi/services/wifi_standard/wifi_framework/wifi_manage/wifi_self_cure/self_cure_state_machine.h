@@ -247,7 +247,7 @@ public:
         bool UseOperatorOverSea();
         void GetPublicDnsServers(std::vector<std::string>& dnsServers);
         void GetReplacedDnsServers(std::vector<std::string>& curDnses, std::vector<std::string>& replacedDnses);
-        void UpdateDnsServers();
+        void UpdateDnsServers(std::vector<std::string>& dnsServers);
         void SelfCureForRenewDhcp(int requestCureLevel);
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);

@@ -33,11 +33,11 @@ const std::string CLASS_NAME = "WifiSelfCure";
 
 DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 
-const int CONNECT_NETWORK_RETRY = 1;
-const int WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
-const int WIFI6_SINGLE_MAC_LEN = 6;
-const int HEXADECIMAL = 16;
-const int WIFI6_MAX_BLA_LIST_NUM = 16;
+const uint32_t CONNECT_NETWORK_RETRY = 1;
+const uint32_t WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
+const uint32_t WIFI6_SINGLE_MAC_LEN = 6;
+const uint32_t HEXADECIMAL = 16;
+const uint32_t WIFI6_MAX_BLA_LIST_NUM = 16;
 const int CMD_WIFI_CONNECT_TIMEOUT_SCREEN = 8 * 1000;
 const int CMD_WIFI_CONNECT_TIMEOUT = 16 * 1000;
 const std::string SETTINGS_PAGE = "com.huawei.hmos.settings";
@@ -56,7 +56,7 @@ SelfCureStateMachine::SelfCureStateMachine(int instId)
 
 SelfCureStateMachine::~SelfCureStateMachine()
 {
-    WIFI_LOGD("~SelfCureStateMachine");
+    WIFI_LOGI("~SelfCureStateMachine");
     StopHandlerThread();
     ParsePointer(pDefaultState);
     ParsePointer(pConnectedMonitorState);
@@ -78,7 +78,7 @@ void SelfCureStateMachine::BuildStateTree()
 
 ErrCode SelfCureStateMachine::InitSelfCureStates()
 {
-    WIFI_LOGD("Enter InitSelfCureStates\n");
+    WIFI_LOGI("Enter InitSelfCureStates\n");
     int tmpErrNumber;
     pDefaultState = new (std::nothrow)DefaultState(this);
     tmpErrNumber = JudgmentEmpty(pDefaultState);
@@ -604,7 +604,7 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
 
 void SelfCureStateMachine::InternetSelfCureState::GoOutState()
 {
-    WIFI_LOGD("InternetSelfCureState GoOutState function.");
+    WIFI_LOGI("InternetSelfCureState GoOutState function.");
     return;
 }
 
@@ -1392,7 +1392,7 @@ std::string SelfCureStateMachine::BlackListToString(std::map<std::string, Wifi6B
     if (map.empty()) {
         return param;
     }
-    int idx = map.size() >= WIFI6_MAX_BLA_LIST_NUM ? WIFI6_MAX_BLA_LIST_NUM : map.size();
+    uint32_t idx = map.size() >= WIFI6_MAX_BLA_LIST_NUM ? WIFI6_MAX_BLA_LIST_NUM : map.size();
     param.push_back(idx);
     for (auto iter : map) {
         std::string singleParam = ParseWifi6BlackListInfo(iter);
@@ -1412,7 +1412,7 @@ std::string SelfCureStateMachine::ParseWifi6BlackListInfo(std::pair<std::string,
     std::string singleParam;
     std::string currBssid = iter.first;
     WIFI_LOGI("currBssid %{public}s", MacAnonymize(currBssid).c_str());
-    for (int i = 0; i < WIFI6_SINGLE_MAC_LEN; i++) {
+    for (uint32_t i = 0; i < WIFI6_SINGLE_MAC_LEN; i++) {
         std::string::size_type npos = currBssid.find(":");
         if (npos != std::string::npos) {
             std::string value = currBssid.substr(0, npos);
@@ -1885,7 +1885,7 @@ void SelfCureStateMachine::PeriodicArpDetection()
 {
     StopTimer(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
     if (!IfPeriodicArpDetection()) {
-        WIFI_LOGI("PeriodicArpDetection, no need detection, just jump");
+        WIFI_LOGD("PeriodicArpDetection, no need detection, just jump");
         MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
         return;
     }
@@ -1899,7 +1899,7 @@ void SelfCureStateMachine::PeriodicArpDetection()
             return;
         }
     } else {
-        WIFI_LOGD("Periodic Arp Detection success");
+        WIFI_LOGI("Periodic Arp Detection success");
         arpDetectionFailedCnt = 0;
     }
     MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);

@@ -326,6 +326,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaGetPskPassphrase(const std::string &ifName, std::string &psk);
+    void SetWapiConfig(const WifiIdlDeviceConfig &config, SetNetworkConfig *conf, int &num);
 
     /* ************************ softAp Interface ************************** */
     /**

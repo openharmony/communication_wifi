@@ -556,6 +556,17 @@ void StaStateMachine::FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const
     }
 }
 
+void StaStateMachine::FillWapiCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const
+{
+    idlConfig.wapiPskType = config.wifiWapiConfig.wapiPskType;
+    idlConfig.wapiAsCert = config.wifiWapiConfig.wapiAsCert;
+    idlConfig.wapiUserCert = config.wifiWapiConfig.wapiUserCert;
+    idlConfig.allowedProtocols = 0x20; // WAPI
+    idlConfig.allowedPairwiseCiphers = 0x80; // SMS4
+    idlConfig.allowedGroupCiphers = 0x80; // SMS4
+    return;
+}
+
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
     LOGI("Enter ConvertDeviceCfg.\n");
@@ -569,6 +580,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     FillEapCfg(config, idlConfig);
     FillSuiteB192Cfg(idlConfig);
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
+    FillWapiCfg(config, idlConfig);
     if (strcmp(config.keyMgmt.c_str(), "WEP") == 0) {
         /* for wep */
         idlConfig.authAlgorithms = 0x02;
@@ -1632,6 +1644,7 @@ void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
     idlConfig.priority = network.priority;
     idlConfig.scanSsid = network.hiddenSSID ? 1 : 0;
     FillEapCfg(network, idlConfig);
+    FillWapiCfg(network, idlConfig);
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(linkedInfo.networkId, idlConfig) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("DealStartRoamCmd SetDeviceConfig() failed!");
         return;

@@ -341,6 +341,9 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteString(config.callProcessName);
     data.WriteString(config.ancoCallProcessName);
     data.WriteInt32(config.uid);
+    data.WriteInt32(config.wifiWapiConfig.wapiPskType);
+    data.WriteString(config.wifiWapiConfig.wapiAsCert);
+    data.WriteString(config.wifiWapiConfig.wapiUserCert);
 }
 
 ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)
@@ -622,6 +625,9 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.uid = reply.ReadInt32();
         config.callProcessName = reply.ReadString();
         config.ancoCallProcessName = reply.ReadString();
+        config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
+        config.wifiWapiConfig.wapiAsCert = reply.ReadString();
+        config.wifiWapiConfig.wapiUserCert = reply.ReadString();
         result.emplace_back(config);
     }
 }

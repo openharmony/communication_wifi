@@ -837,7 +837,7 @@ void SelfCureStateMachine::SelfCureWifiLink(int requestCureLevel)
     }
 }
 
-void SelfCureStateMachine::InternetSelfCureState::InitDnsServer()
+void SelfCureStateMachine::InitDnsServer()
 {
     static std::vector<std::string> strPublicIpAddr;
     char DnsIpAddr[PUBLIC_DNS_SERVERS_SIZE];

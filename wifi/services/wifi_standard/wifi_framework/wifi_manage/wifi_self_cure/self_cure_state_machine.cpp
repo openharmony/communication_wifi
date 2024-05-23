@@ -818,7 +818,7 @@ int SelfCureStateMachine::InternetSelfCureState::SelectBestSelfCureSolution(int 
     return bestSelfCureLevel;
 }
 
-void SelfCureStateMachine::SelfCureWifiLink(int requestCureLevel)
+void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCureLevel)
 {
     WIFI_LOGI("SelfCureWifiLink, requestCureLevel = %{public}d, currentRssi = %{public}d",
               requestCureLevel, currentRssi);

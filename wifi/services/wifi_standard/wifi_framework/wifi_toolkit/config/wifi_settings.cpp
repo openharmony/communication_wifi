@@ -116,12 +116,6 @@ WifiSettings::~WifiSettings()
     SyncP2pVendorConfig();
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     SyncWifiConfig();
-#ifdef DTFUZZ_TEST
-    if (gWifiSettings != nullptr) {
-        delete gWifiSettings;
-        gWifiSettings = nullptr;
-    }
-#endif
 }
 
 void WifiSettings::InitDefaultWifiConfig()

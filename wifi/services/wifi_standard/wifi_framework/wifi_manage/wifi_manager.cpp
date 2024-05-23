@@ -153,12 +153,6 @@ void WifiManager::Exit()
         wifiEventSubscriberManager.reset();
     }
 #endif
-#ifdef DTFUZZ_TEST
-    if (gWifiManager != nullptr) {
-        delete gWifiManager;
-        gWifiManager = nullptr;
-    }
-#endif
     return;
 }
 

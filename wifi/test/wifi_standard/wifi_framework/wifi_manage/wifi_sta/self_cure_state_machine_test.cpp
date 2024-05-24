@@ -1730,7 +1730,8 @@ HWTEST_F(SelfCureStateMachineTest, SetIsReassocWithFactoryMacAddress_Test3, Test
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentWifiDeviceConfigTest, TestSize.Level1)
 {
-    pSelfCureStateMachine->GetCurrentWifiDeviceConfig();
+    WifiDeviceConfig config;
+    pSelfCureStateMachine->GetCurrentWifiDeviceConfig(config);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_Dns_ReturnsTrue, TestSize.Level1)

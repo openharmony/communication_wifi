@@ -28,7 +28,7 @@
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
 #include "securec.h"
-#include "param/init_param.h"
+#include "init_param.h"
 #include <random>
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
@@ -46,7 +46,9 @@
 
 namespace OHOS {
 namespace Wifi {
-
+#ifdef DTFUZZ_TEST
+static WifiSettings* gWifiSettings = nullptr;
+#endif
 const std::string LANGUAGE_CHINESE = "zh-Hans";
 const std::string COUNTRY_CHINA_CAPITAL = "CN";
 const std::string COUNTRY_CHINA_LOWERCASE = "cn";

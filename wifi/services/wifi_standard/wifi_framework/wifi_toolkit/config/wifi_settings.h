@@ -71,7 +71,6 @@ constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.x
 constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
 constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
-constexpr char WIFI_SOFTAP_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/ap_randomMac.conf";
 
 namespace OHOS {
 namespace Wifi {
@@ -1699,21 +1698,6 @@ public:
 #endif
 
     /**
-     * @Description get softap random mac address
-     *
-     * @param randomMac - MAC address info[in]
-     * @return int - 0 success
-     */
-    int GetApRandomMac(SoftApRandomMac &randomMac, int id);
-    /**
-     * @Description set softap random mac address
-     *
-     * @param randomMac - MAC address info[in]
-     * @return int - 0 success
-     */
-    int SetApRandomMac(const SoftApRandomMac &randomMac, int id);
-
-    /**
      * @Description Get next networkId
      *
      * @return int - next network id
@@ -1799,7 +1783,6 @@ private:
     WifiPortalConf mPortalUri;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map <int, HotspotConfig> mHotspotConfig;
-    std::map <int, SoftApRandomMac> mApRandomMac;
     P2pVendorConfig mP2pVendorConfig;
     std::map<std::string, StationInfo> mConnectStationInfo;
     std::map<std::string, StationInfo> mBlockListInfo;
@@ -1860,7 +1843,6 @@ private:
 
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig; /* Persistence device config */
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
-    WifiConfigFileImpl<SoftApRandomMac> mSavedApRandomMac;
     WifiConfigFileImpl<StationInfo> mSavedBlockInfo;
     WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
     WifiConfigFileImpl<WifiP2pGroupInfo> mSavedWifiP2pGroupInfo;

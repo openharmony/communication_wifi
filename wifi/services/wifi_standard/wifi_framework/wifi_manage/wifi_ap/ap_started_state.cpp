@@ -466,7 +466,7 @@ void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg)
     WifiSettings::GetInstance().SetHotspotIdleTimeout(mTimeoutDelay);
 }
 
-bool ApStartedState::SetRandomMac() const
+void ApStartedState::SetRandomMac() const
 {
     std::string macAddress;
     WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);

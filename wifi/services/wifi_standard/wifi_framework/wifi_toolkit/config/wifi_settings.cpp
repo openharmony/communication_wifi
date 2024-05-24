@@ -742,8 +742,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     std::unique_lock<std::mutex> lock(mInfoMutex);
     int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ) {
-        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES
-            || iter->timestamp < currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
+        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
         #ifdef SUPPORT_RANDOM_MAC_ADDR
             WifiSettings::GetInstance().RemoveMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 iter->bssid);
@@ -753,8 +752,13 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
             iter = mWifiScanInfoList.erase(iter);
             continue;
         }
-        results.push_back(*iter);
+        if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
+            results.push_back(*iter);
+        }
         ++iter;
+    }
+    if (results.empty()) {
+        results.assign(mWifiScanInfoList.begin(), mWifiScanInfoList.end());
     }
     LOGI("WifiSettings::GetScanInfoList size = %{public}u", results.size());
     return 0;

@@ -28,7 +28,6 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_net_agent.h"
 #include "parameter.h"
-#include "wifi_settings.h"
  
 namespace OHOS {
 namespace Wifi {

@@ -51,7 +51,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, szBssid);
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
 }
 
@@ -70,7 +70,7 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, szBssid);
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
 }
 
@@ -99,7 +99,7 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
     if (cbk.onBssidChanged) {
         cbk.onBssidChanged(reason, szBssid);
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, szBssid);
+    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
 }
 
@@ -478,7 +478,7 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
         LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s" len:%{public}lu:,
-            cbInfo.groupName.c_str(), cbInfo.ssid.c_str(), strlen(cbInfo.ssid.c_str()));
+            cbInfo.groupName.c_str(), OHOS::Wifi::SsidAnonymize(cbInfo.ssid).c_str(), strlen(cbInfo.ssid.c_str()));
 
         char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
         ConvertMacArr2String(groupStartedParam->goDeviceAddress,
@@ -507,11 +507,12 @@ int32_t OnEventGroupRemoved(struct IWpaCallback *self,
 int32_t OnEventProvisionDiscoveryCompleted(struct IWpaCallback *self,
     const struct HdiP2pProvisionDiscoveryCompletedParam *provisionDiscoveryCompletedParam, const char* ifName)
 {
-    LOGI("OnEventProvisionDiscoveryCompleted provDiscStatusCode=%{public}d",
-        provisionDiscoveryCompletedParam->provDiscStatusCode);
+    LOGI("OnEventProvisionDiscoveryCompleted enter");
     if (provisionDiscoveryCompletedParam == nullptr) {
         return 1;
     }
+    LOGI("OnEventProvisionDiscoveryCompleted provDiscStatusCode=%{public}d",
+        provisionDiscoveryCompletedParam->provDiscStatusCode);
     uint32_t addressLen = provisionDiscoveryCompletedParam->p2pDeviceAddressLen;
     char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
     ConvertMacArr2String(provisionDiscoveryCompletedParam->p2pDeviceAddress,

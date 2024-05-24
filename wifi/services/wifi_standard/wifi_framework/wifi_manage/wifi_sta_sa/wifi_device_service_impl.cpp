@@ -155,6 +155,29 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
 
+ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("EnableSemiWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("EnableSemiWifi: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableSemiWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableSemiWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
 {
     /* refer to WifiProtectManager::GetInstance().InitWifiProtect, DO NOT support now! */
@@ -217,7 +240,7 @@ ErrCode WifiDeviceServiceImpl::PutWifiProtectRef(const std::string &protectName)
 
 bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
 {
-    if (config.keyMgmt != KEY_MGMT_EAP) {
+    if (config.keyMgmt != KEY_MGMT_EAP && config.keyMgmt != KEY_MGMT_SUITE_B_192) {
         WIFI_LOGE("CheckConfigEap: keyMgmt is not EAP!");
         return false;
     }
@@ -230,7 +253,8 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
             return false;
         }
         return true;
-    } else if ((config.wifiEapConfig.eap == EAP_METHOD_PEAP) || (config.wifiEapConfig.eap == EAP_METHOD_PWD)) {
+    } else if ((config.wifiEapConfig.eap == EAP_METHOD_PEAP) || (config.wifiEapConfig.eap == EAP_METHOD_PWD) ||
+        (config.wifiEapConfig.eap == EAP_METHOD_TTLS)) {
         if (config.wifiEapConfig.identity.empty() || config.wifiEapConfig.password.empty()) {
             WIFI_LOGE("CheckConfigEap: invalid parameter, the identity length is:%{public}zu",
                 config.wifiEapConfig.identity.length());
@@ -251,7 +275,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
     }
 
     WIFI_LOGI("CheckConfigPwd: keyMgmt = %{public}s!", config.keyMgmt.c_str());
-    if (config.keyMgmt == KEY_MGMT_EAP) {
+    if (config.keyMgmt == KEY_MGMT_EAP || config.keyMgmt == KEY_MGMT_SUITE_B_192) {
         return CheckConfigEap(config);
     }
 
@@ -838,6 +862,41 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
     return pService->ConnectToDevice(updateConfig);
 }
 
+ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate)
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
+    if (isCandidate) {
+        WIFI_LOGE("%{public}s: don't support roam to candidate network", __FUNCTION__);
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("%{public}s:NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s:VerifyWifiConnectionPermission PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsStaServiceRunning()) {
+        WIFI_LOGE("%{public}s: sta service is not running!", __FUNCTION__);
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    if (networkId < 0 || (!bssid.empty() && CheckMacIsValid(bssid) != 0)) {
+        WIFI_LOGE("%{public}s: invalid param, networkId: %{public}d, bssid:%{public}s",
+            __FUNCTION__, networkId, MacAnonymize(bssid).c_str());
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("%{public}s: pService is nullptr!", __FUNCTION__);
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->StartRoamToNetwork(networkId, bssid);
+}
+
 ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)
 {
     WifiLinkedInfo linkedInfo;
@@ -1127,6 +1186,25 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
     WIFI_LOGI("GetCountryCode: country code is %{public}s", countryCode.c_str());
 #endif
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::GetWifiDetailState(WifiDetailState &state)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetWifiDetailState: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetWifiDetailState:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetWifiDetailState:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    state = WifiDetailState::STATE_UNKNOWN;
+    WIFI_LOGI("GetWifiDetailState: state is %{public}d", static_cast<int>(state));
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1609,6 +1687,10 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     WIFI_LOGI("Enter LimitSpeed.");
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);

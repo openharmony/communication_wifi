@@ -19,6 +19,7 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_LABEL("StaMonitor");
 
@@ -199,6 +200,7 @@ void StaMonitor::OnWpaStateChangedCallBack(int status)
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
+    WriteWifiWpaStateHiSysEvent(status);
     /* Notification state machine wpa state changed event. */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT, status);
 }

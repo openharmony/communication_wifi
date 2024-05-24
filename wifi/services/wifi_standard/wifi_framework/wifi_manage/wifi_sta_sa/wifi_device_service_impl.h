@@ -80,6 +80,8 @@ public:
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 
+    ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
+
     ErrCode IsConnected(bool &isConnected) override;
 
     ErrCode ReConnect() override;
@@ -164,6 +166,10 @@ public:
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
+    ErrCode EnableSemiWifi() override;
+
+    ErrCode GetWifiDetailState(WifiDetailState &state) override;
 
     ErrCode SetSatelliteState(const int state) override;
 

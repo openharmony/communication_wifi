@@ -569,4 +569,19 @@ NO_SANITIZE("cfi") WifiErrorCode EnableHiLinkHandshake(bool uiFlag, std::string 
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig));
 }
+
+NO_SANITIZE("cfi") WifiErrorCode EnableSemiWifi()
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiDevicePtr->EnableSemiWifi());
+}
+
+NO_SANITIZE("cfi") WifiErrorCode GetWifiDetailState(WifiDetailState *state)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    OHOS::Wifi::WifiDetailState detailState;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetWifiDetailState(detailState);
+    *state = (WifiDetailState)detailState;
+    return GetCErrorCode(ret);
+}
 #endif

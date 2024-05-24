@@ -131,6 +131,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
@@ -163,6 +164,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
@@ -195,6 +197,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
@@ -227,6 +230,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",

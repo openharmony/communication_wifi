@@ -33,11 +33,20 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiManager");
-
+#ifdef DTFUZZ_TEST
+static WifiManager* gWifiManager = nullptr;
+#endif
 WifiManager &WifiManager::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiManager gWifiManager;
     return gWifiManager;
+#else
+    if (gWifiManager == nullptr) {
+        gWifiManager = new (std::nothrow) WifiManager();
+    }
+    return *gWifiManager;
+#endif
 }
 
 WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0)
@@ -96,26 +105,22 @@ int WifiManager::Init()
             AutoStartServiceThread();
         });
     } else {
-        /**
-         * The sta service automatically starts upon startup. After the sta
-         * service is started, the scanning is directly started.
-         */
         if (WifiSettings::GetInstance().GetScanOnlySwitchState()) {
             WIFI_LOGI("Auto start scan only!");
             wifiTogglerManager->ScanOnlyToggled(1);
         }
-#ifndef DTFUZZ_TEST
-        AutoStartEnhanceService();
-#endif
-        wifiScanManager->CheckAndStartScanService();
     }
+#ifndef DTFUZZ_TEST
     InitPidfile();
+#endif
     return 0;
 }
 
 void WifiManager::Exit()
 {
     WIFI_LOGI("[WifiManager] Exit.");
+    std::unique_lock<std::mutex> lock(initStatusMutex);
+    mInitStatus = INIT_UNKNOWN;
     WifiServiceManager::GetInstance().UninstallAllService();
     PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
     if (mCloseServiceThread) {

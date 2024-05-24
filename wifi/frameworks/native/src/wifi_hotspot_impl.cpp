@@ -71,7 +71,7 @@ bool WifiHotspotImpl::GetWifiHotspotProxy()
         hotspotMgr = new (std::nothrow) WifiHotspotMgrProxy(object);
     }
     if (hotspotMgr == nullptr) {
-        WIFI_LOGE("wifi hotspot init failed, %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi hotspot init failed, %{public}d", systemAbilityId_.load());
         return false;
     }
 
@@ -83,7 +83,7 @@ bool WifiHotspotImpl::GetWifiHotspotProxy()
 
     client_ = new (std::nothrow) WifiHotspotProxy(service);
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi device id init failed., %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi device id init failed., %{public}d", systemAbilityId_.load());
         return false;
     }
     return true;

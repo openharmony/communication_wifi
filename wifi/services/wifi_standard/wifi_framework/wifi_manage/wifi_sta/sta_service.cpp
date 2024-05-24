@@ -559,6 +559,37 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bssid) const
+{
+    LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if (networkId == linkedInfo.networkId) {
+        if (bssid == linkedInfo.bssid) {
+            LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+        } else {
+            LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
+                __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
+            pStaStateMachine->StartRoamToNetwork(bssid);
+        }
+    } else {
+        LOGI("%{public}s switch to target network", __FUNCTION__);
+        auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+        message->SetParam1(networkId);
+        message->SetParam2(NETWORK_SELECTED_BY_USER);
+        message->AddStringMessageBody(bssid);
+        pStaStateMachine->SendMessage(message);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::ReAssociate() const
 {
     WIFI_LOGI("Enter ReAssociate.\n");
@@ -766,7 +797,7 @@ void StaService::HandleScreenStatusChanged(int screenState)
         return;
     }
     if (screenState == MODE_STATE_OPEN) {
-        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
+        pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
@@ -827,7 +858,8 @@ ErrCode StaService::StartPortalCertification()
         WIFI_LOGE("pStaStateMachine is null!");
         return WIFI_OPT_FAILED;
     }
-    pStaStateMachine->HandlePortalNetworkPorcess();
+    WIFI_LOGI("StartPortalCertification send message!");
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT);
     return WIFI_OPT_SUCCESS;
 }
 

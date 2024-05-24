@@ -55,6 +55,7 @@ private:
     void OnDisableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnectTo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnect2To(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnStartRoamToNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReConnect(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReAssociate(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisconnect(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -87,6 +88,8 @@ private:
     void OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetWifiDetailState(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);

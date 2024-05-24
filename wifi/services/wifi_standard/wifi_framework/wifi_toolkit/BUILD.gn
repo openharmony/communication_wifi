@@ -121,6 +121,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
     }
 
+    if (is_asan) {
+      defines += [ "DTFUZZ_TEST" ]
+    }
+
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }

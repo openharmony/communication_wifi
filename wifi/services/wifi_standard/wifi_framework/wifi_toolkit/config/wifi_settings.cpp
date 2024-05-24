@@ -44,10 +44,20 @@
 
 namespace OHOS {
 namespace Wifi {
+#ifdef DTFUZZ_TEST
+static WifiSettings* gWifiSettings = nullptr;
+#endif
 WifiSettings &WifiSettings::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiSettings gWifiSettings;
     return gWifiSettings;
+#else
+    if (gWifiSettings == nullptr) {
+        gWifiSettings = new (std::nothrow) WifiSettings();
+    }
+    return *gWifiSettings;
+#endif
 }
 
 WifiSettings::WifiSettings()

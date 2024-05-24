@@ -352,7 +352,7 @@ private:
     int SetSelfCureHistoryInfo(const std::string selfCureHistory);
     int GetIsReassocWithFactoryMacAddress();
     int SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress);
-    ErrCode GetCurrentWifiDeviceConfig();
+    ErrCode GetCurrentWifiDeviceConfig(WifiDeviceConfig &config);
     bool SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel);
     void HandleNetworkConnected();
     bool UpdateConnSelfCureFailedHistory();

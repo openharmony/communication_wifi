@@ -1428,6 +1428,10 @@ std::string SelfCureStateMachine::ParseWifi6BlackListInfo(std::pair<std::string,
             singleParam.push_back(static_cast<uint8_t>(std::stoi(value, nullptr, HEXADECIMAL)));
             currBssid = currBssid.substr(npos + 1);
         } else {
+            if (currBssid.empty()) {
+                WIFI_LOGI("currBssid is empty");
+                break;
+            }
             singleParam.push_back(static_cast<uint8_t>(std::stoi(currBssid, nullptr, HEXADECIMAL)));
         }
     }
@@ -1956,7 +1960,7 @@ std::string SelfCureStateMachine::GetCurrentBssid()
 {
     WifiDeviceConfig config;
     if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Get current device config failed!");
+        WIFI_LOGE("Get current bssid failed!");
         return "";
     }
     std::string currentBssid = config.bssid;
@@ -2076,7 +2080,7 @@ int SelfCureStateMachine::SetIsReassocWithFactoryMacAddress(int isReassocWithFac
 {
     WifiDeviceConfig config;
     if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("GetIsReassocWithFactoryMacAddress failed!");
+        WIFI_LOGE("SetIsReassocWithFactoryMacAddress failed!");
         return -1;
     }
     config.isReassocSelfCureWithFactoryMacAddress = isReassocWithFactoryMacAddress;

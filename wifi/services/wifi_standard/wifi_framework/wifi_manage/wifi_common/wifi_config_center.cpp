@@ -21,10 +21,20 @@ DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 
 namespace OHOS {
 namespace Wifi {
+#ifdef DTFUZZ_TEST
+static WifiConfigCenter* gWifiConfigCenter = nullptr;
+#endif
 WifiConfigCenter &WifiConfigCenter::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiConfigCenter gWifiConfigCenter;
     return gWifiConfigCenter;
+#else
+    if (gWifiConfigCenter == nullptr) {
+        gWifiConfigCenter = new (std::nothrow) WifiConfigCenter();
+    }
+    return *gWifiConfigCenter;
+#endif
 }
 
 WifiConfigCenter::WifiConfigCenter()

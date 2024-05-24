@@ -1145,7 +1145,7 @@ void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanIn
             iter->securityType = WifiSecurity::WEP;
             continue;
         }
-        if (iter->capabilities.find("EAP_SUITE_B_192") != std::string::npos) {
+        if (iter->capabilities.find("EAP-SUITE-B-192") != std::string::npos) {
             iter->securityType = WifiSecurity::EAP_SUITE_B;
             continue;
         }

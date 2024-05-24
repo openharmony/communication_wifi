@@ -164,9 +164,9 @@ void P2pMonitor::Broadcast2SmDeviceFound(const std::string &iface, const WifiP2p
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND, 0, 0, anyDevice);
 }
 
-void P2pMonitor::Broadcast2SmPrivateDeviceFound(const std::string &iface, const std::string &PrivateInfo) const
+void P2pMonitor::Broadcast2SmPrivateDeviceFound(const std::string &iface, const std::string &privateInfo) const
 {
-    std::any anyDevice = PrivateInfo;
+    std::any anyDevice = privateInfo;
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_PRI_DEVICE_FOUND, 0, 0, anyDevice);
 }
 
@@ -355,8 +355,8 @@ void P2pMonitor::WpaEventDeviceFound(const IdlP2pDeviceFound &deviceInfo) const
         std::string p2pDeviceAddress = deviceInfo.p2pDeviceAddress;
         std::string wfdDeviceInfo(reinterpret_cast<const char*>(deviceInfo.wfdDeviceInfo.data()),
             deviceInfo.wfdDeviceInfo.size());
-        std::string PrivateInfo = p2pDeviceAddress + wfdDeviceInfo;
-        Broadcast2SmPrivateDeviceFound(selectIfacName, PrivateInfo);
+        std::string privateInfo = p2pDeviceAddress + wfdDeviceInfo;
+        Broadcast2SmPrivateDeviceFound(selectIfacName, privateInfo);
     }
     Broadcast2SmDeviceFound(selectIfacName, device);
 }

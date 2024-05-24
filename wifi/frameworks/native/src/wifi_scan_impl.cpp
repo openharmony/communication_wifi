@@ -98,7 +98,7 @@ bool WifiScanImpl::GetWifiScanProxy()
         scanMgr = new (std::nothrow) WifiScanMgrProxy(object);
     }
     if (scanMgr == nullptr) {
-        WIFI_LOGE("wifi scan init failed, %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi scan init failed, %{public}d", systemAbilityId_.load());
         WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
         return false;
     }
@@ -115,7 +115,7 @@ bool WifiScanImpl::GetWifiScanProxy()
         client_ = new (std::nothrow) WifiScanProxy(service);
     }
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi scan instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_);
+        WIFI_LOGE("wifi scan instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_.load());
         WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
         return false;
     }

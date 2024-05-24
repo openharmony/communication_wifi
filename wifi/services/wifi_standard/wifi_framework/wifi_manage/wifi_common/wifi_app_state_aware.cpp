@@ -30,17 +30,15 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+constexpr int64_t WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY = 3 * 1000;
+#ifdef DTFUZZ_TEST
+static WifiAppStateAware* gWifiAppStateAware = nullptr;
+#endif
 WifiAppStateAware::WifiAppStateAware(int instId)
 {
     GetForegroundApp();
     appChangeEventHandler = std::make_unique<WifiEventHandler>(WIFI_APP_STATE_AWARE_THREAD);
-    if (appChangeEventHandler) {
-        std::function<void()> RegisterAppStateObserverFunc =
-                            std::bind(&WifiAppStateAware::RegisterAppStateObserver, this);
-        appChangeEventHandler->PostSyncTask(RegisterAppStateObserverFunc);
-    } else {
-        WIFI_LOGE("Create event handler failed.");
-    }
+    RegisterAppStateChangedCallback();
     WIFI_LOGI("Register app state observer successful.");
 }
 
@@ -57,8 +55,15 @@ WifiAppStateAware::~WifiAppStateAware()
 
 WifiAppStateAware &WifiAppStateAware::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiAppStateAware gWifiAppStateAware;
     return gWifiAppStateAware;
+#else
+    if (gWifiAppStateAware == nullptr) {
+        gWifiAppStateAware = new (std::nothrow) WifiAppStateAware();
+    }
+    return *gWifiAppStateAware;
+#endif
 }
 
 ErrCode WifiAppStateAware::InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks)
@@ -94,6 +99,18 @@ bool WifiAppStateAware::Connect()
     return true;
 }
 
+void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
+{
+    WIFI_LOGI("%{public}s enter, delayTime: %{public}lld", __func__, delayTime);
+    if (appChangeEventHandler) {
+        std::function<void()> RegisterAppStateObserverFunc =
+            std::bind(&WifiAppStateAware::RegisterAppStateObserver, this);
+        appChangeEventHandler->PostAsyncTask(RegisterAppStateObserverFunc, delayTime);
+    } else {
+        WIFI_LOGE("%{public}s appChangeEventHandler is null", __func__);
+    }
+}
+
 void WifiAppStateAware::RegisterAppStateObserver()
 {
     WIFI_LOGI("%{public}s called", __func__);
@@ -102,12 +119,15 @@ void WifiAppStateAware::RegisterAppStateObserver()
         WIFI_LOGI("mAppStateObserver already registered");
     }
     if (!Connect()) {
+        WIFI_LOGI("%{public}s connect fail", __func__);
+        RegisterAppStateChangedCallback(WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY);
         return;
     }
     mAppStateObserver = sptr<AppStateObserver>(new (std::nothrow) AppStateObserver());
     int ret = appMgrProxy_->RegisterApplicationStateObserver(mAppStateObserver);
     if (ret != ERR_OK) {
         WIFI_LOGE("register application state observer fail, ret = %{public}d", ret);
+        RegisterAppStateChangedCallback(WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY);
         return;
     }
     WIFI_LOGI("register application state observer success.");

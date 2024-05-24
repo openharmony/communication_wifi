@@ -40,11 +40,11 @@ DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 std::vector<std::string> chinaPublicDnses;
 std::vector<std::string> overseaPublicDnses;
 
-const int CONNECT_NETWORK_RETRY = 1;
-const int WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
-const int WIFI6_SINGLE_MAC_LEN = 6;
-const int HEXADECIMAL = 16;
-const int WIFI6_MAX_BLA_LIST_NUM = 16;
+const uint32_t CONNECT_NETWORK_RETRY = 1;
+const uint32_t WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
+const uint32_t WIFI6_SINGLE_MAC_LEN = 6;
+const uint32_t HEXADECIMAL = 16;
+const uint32_t WIFI6_MAX_BLA_LIST_NUM = 16;
 const int CMD_WIFI_CONNECT_TIMEOUT_SCREEN = 8 * 1000;
 const int CMD_WIFI_CONNECT_TIMEOUT = 16 * 1000;
 const std::string SETTINGS_PAGE = "com.huawei.hmos.settings";
@@ -64,7 +64,7 @@ SelfCureStateMachine::SelfCureStateMachine(int instId)
 
 SelfCureStateMachine::~SelfCureStateMachine()
 {
-    WIFI_LOGD("~SelfCureStateMachine");
+    WIFI_LOGI("~SelfCureStateMachine");
     StopHandlerThread();
     ParsePointer(pDefaultState);
     ParsePointer(pConnectedMonitorState);
@@ -86,7 +86,7 @@ void SelfCureStateMachine::BuildStateTree()
 
 ErrCode SelfCureStateMachine::InitSelfCureStates()
 {
-    WIFI_LOGD("Enter InitSelfCureStates\n");
+    WIFI_LOGI("Enter InitSelfCureStates\n");
     int tmpErrNumber;
     pDefaultState = new (std::nothrow)DefaultState(this);
     tmpErrNumber = JudgmentEmpty(pDefaultState);
@@ -612,7 +612,7 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
 
 void SelfCureStateMachine::InternetSelfCureState::GoOutState()
 {
-    WIFI_LOGD("InternetSelfCureState GoOutState function.");
+    WIFI_LOGI("InternetSelfCureState GoOutState function.");
     return;
 }
 
@@ -1430,7 +1430,11 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(Interna
     pSelfCureStateMachine->isWifi6ArpSuccess = false;
     Wifi6BlackListInfo wifi6BlackListInfo(ACTION_TYPE_HTC, pSelfCureStateMachine->GetNowMilliSeconds());
     std::string currentBssid = pSelfCureStateMachine->GetCurrentBssid();
-
+    if (currentBssid.empty()) {
+        WIFI_LOGE("%{public}s currentBssid is empty", __FUNCTION__);
+        Wifi6ReassocSelfcure();
+        return;
+    }
     WifiSettings::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
     WIFI_LOGI("add %{public}s to HTC bla list", MacAnonymize(currentBssid).c_str());
     pSelfCureStateMachine->SendBlaListToDriver();
@@ -1451,6 +1455,11 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(Inte
     }
     WIFI_LOGI("wifi6 without htc arp detect failed");
     std::string currentBssid = pSelfCureStateMachine->GetCurrentBssid();
+    if (currentBssid.empty()) {
+        WIFI_LOGE("%{public}s currentBssid is empty", __FUNCTION__);
+        Wifi6ReassocSelfcure();
+        return;
+    }
     pSelfCureStateMachine->isWifi6ArpSuccess = false;
     Wifi6BlackListInfo wifi6BlackListInfo(ACTION_TYPE_WIFI6, pSelfCureStateMachine->GetNowMilliSeconds());
 
@@ -1499,7 +1508,7 @@ std::string SelfCureStateMachine::BlackListToString(std::map<std::string, Wifi6B
     if (map.empty()) {
         return param;
     }
-    int idx = map.size() >= WIFI6_MAX_BLA_LIST_NUM ? WIFI6_MAX_BLA_LIST_NUM : map.size();
+    uint32_t idx = map.size() >= WIFI6_MAX_BLA_LIST_NUM ? WIFI6_MAX_BLA_LIST_NUM : map.size();
     param.push_back(idx);
     for (auto iter : map) {
         std::string singleParam = ParseWifi6BlackListInfo(iter);
@@ -1519,13 +1528,17 @@ std::string SelfCureStateMachine::ParseWifi6BlackListInfo(std::pair<std::string,
     std::string singleParam;
     std::string currBssid = iter.first;
     WIFI_LOGI("currBssid %{public}s", MacAnonymize(currBssid).c_str());
-    for (int i = 0; i < WIFI6_SINGLE_MAC_LEN; i++) {
+    for (uint32_t i = 0; i < WIFI6_SINGLE_MAC_LEN; i++) {
         std::string::size_type npos = currBssid.find(":");
         if (npos != std::string::npos) {
             std::string value = currBssid.substr(0, npos);
             singleParam.push_back(static_cast<uint8_t>(std::stoi(value, nullptr, HEXADECIMAL)));
             currBssid = currBssid.substr(npos + 1);
         } else {
+            if (currBssid.empty()) {
+                WIFI_LOGI("currBssid is empty");
+                break;
+            }
             singleParam.push_back(static_cast<uint8_t>(std::stoi(currBssid, nullptr, HEXADECIMAL)));
         }
     }
@@ -1992,7 +2005,7 @@ void SelfCureStateMachine::PeriodicArpDetection()
 {
     StopTimer(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
     if (!IfPeriodicArpDetection()) {
-        WIFI_LOGI("PeriodicArpDetection, no need detection, just jump");
+        WIFI_LOGD("PeriodicArpDetection, no need detection, just jump");
         MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
         return;
     }
@@ -2006,7 +2019,7 @@ void SelfCureStateMachine::PeriodicArpDetection()
             return;
         }
     } else {
-        WIFI_LOGD("Periodic Arp Detection success");
+        WIFI_LOGI("Periodic Arp Detection success");
         arpDetectionFailedCnt = 0;
     }
     MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
@@ -2052,7 +2065,11 @@ int SelfCureStateMachine::GetCurrentRssi()
 
 std::string SelfCureStateMachine::GetCurrentBssid()
 {
-    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get current bssid failed!");
+        return "";
+    }
     std::string currentBssid = config.bssid;
     return currentBssid;
 }
@@ -2085,35 +2102,55 @@ bool SelfCureStateMachine::IfP2pConnected()
 
 std::string SelfCureStateMachine::GetAuthType()
 {
-    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetAuthType failed!");
+        return "";
+    }
     std::string keyMgmt = config.keyMgmt;
     return keyMgmt;
 }
 
 int SelfCureStateMachine::GetIpAssignment(AssignIpMethod &ipAssignment)
 {
-    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetIpAssignment failed!");
+        return -1;
+    }
     ipAssignment = config.wifiIpConfig.assignMethod;
     return 0;
 }
 
 time_t SelfCureStateMachine::GetLastHasInternetTime()
 {
-    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetLastHasInternetTime failed!");
+        return -1;
+    }
     time_t lastHasInternetTime = config.lastHasInternetTime;
     return lastHasInternetTime;
 }
 
 uint32_t SelfCureStateMachine::GetNetworkStatusHistory()
 {
-    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetNetworkStatusHistory failed!");
+        return 0;
+    }
     uint32_t networkStatusHistory = config.networkStatusHistory;
     return networkStatusHistory;
 }
 
 std::string SelfCureStateMachine::GetSelfCureHistoryInfo()
 {
-    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetSelfCureHistoryInfo failed!");
+        return "";
+    }
     std::string internetSelfCureHistory = config.internetSelfCureHistory;
     return internetSelfCureHistory;
 }
@@ -2124,40 +2161,53 @@ int SelfCureStateMachine::SetSelfCureHistoryInfo(const std::string selfCureHisto
         WIFI_LOGW("selfCureHistory is zero");
         return -1;
     }
-    WifiDeviceConfig wifiDeviceConfig = GetCurrentWifiDeviceConfig();
-    wifiDeviceConfig.internetSelfCureHistory = selfCureHistory;
-    WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetSelfCureHistoryInfo failed!");
+        return -1;
+    }
+    config.internetSelfCureHistory = selfCureHistory;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
     WifiSettings::GetInstance().SyncDeviceConfig();
     return 0;
 }
 
 int SelfCureStateMachine::GetIsReassocWithFactoryMacAddress()
 {
-    WifiDeviceConfig config = GetCurrentWifiDeviceConfig();
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetIsReassocWithFactoryMacAddress failed!");
+        return 0;
+    }
     int isReassocWithFactoryMacAddress = config.isReassocSelfCureWithFactoryMacAddress;
     return isReassocWithFactoryMacAddress;
 }
 
 int SelfCureStateMachine::SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress)
 {
-    WifiDeviceConfig wifiDeviceConfig = GetCurrentWifiDeviceConfig();
-    wifiDeviceConfig.isReassocSelfCureWithFactoryMacAddress = isReassocWithFactoryMacAddress;
-    WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetIsReassocWithFactoryMacAddress failed!");
+        return -1;
+    }
+    config.isReassocSelfCureWithFactoryMacAddress = isReassocWithFactoryMacAddress;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
     WifiSettings::GetInstance().SyncDeviceConfig();
     return 0;
 }
 
-WifiDeviceConfig SelfCureStateMachine::GetCurrentWifiDeviceConfig()
+ErrCode SelfCureStateMachine::GetCurrentWifiDeviceConfig(WifiDeviceConfig &config)
 {
     WifiLinkedInfo wifiLinkedInfo;
-    WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
         WIFI_LOGE("Get current link info failed!");
+        return WIFI_OPT_FAILED;
     }
     if (WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, config) != 0) {
         WIFI_LOGE("Get device config failed!");
+        return WIFI_OPT_FAILED;
     }
-    return config;
+    return WIFI_OPT_SUCCESS;
 }
 
 bool AllowSelfCure(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel)

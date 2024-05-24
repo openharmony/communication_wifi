@@ -67,7 +67,7 @@ bool WifiP2pImpl::GetWifiP2pProxy()
     }
 
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi p2p init failed. %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi p2p init failed. %{public}d", systemAbilityId_.load());
         return false;
     }
     return true;

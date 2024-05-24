@@ -641,6 +641,8 @@ HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest4, TestSize.Level1)
     mClient.SetDeviceConfig(networkId, config);
     config.allowedGroupCiphers = 1;
     mClient.SetDeviceConfig(networkId, config);
+    config.allowedGroupMgmtCiphers = 1;
+    mClient.SetDeviceConfig(networkId, config);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);

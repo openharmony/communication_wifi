@@ -179,6 +179,16 @@ public:
     virtual ErrCode ConnectToDevice(const WifiDeviceConfig &config) = 0;
 
     /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) = 0;
+
+    /**
      * @Description Check whether Wi-Fi is connected.
      *
      * @param isConnected - true / false
@@ -464,6 +474,21 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) = 0;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableSemiWifi() = 0;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiDetailState(WifiDetailState &state) = 0;
 
     /**
      * @Description set satellite state

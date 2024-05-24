@@ -36,14 +36,14 @@
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
-//miracast
-const int CMD_TYPE_SET = 2;
-const int DATA_TYPE_P2P_BUSINESS = 1;
-const std::string CARRY_DATA_MIRACAST = "1";
 
 namespace OHOS {
 namespace Wifi {
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
+//miracast
+const int CMD_TYPE_SET = 2;
+const int DATA_TYPE_P2P_BUSINESS = 1;
+const std::string CARRY_DATA_MIRACAST = "1";
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
 DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
@@ -441,12 +441,12 @@ void P2pStateMachine::BroadcastP2pPeersChanged() const
     }
 }
 
-void P2pStateMachine::BroadcastP2pPrivatePeersChanged(std::string &PrivateInfo) const
+void P2pStateMachine::BroadcastP2pPrivatePeersChanged(std::string &privateInfo) const
 {
     std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pPrivatePeersChangedEvent != nullptr) {
-            callBackItem.second.OnP2pPrivatePeersChangedEvent(PrivateInfo);
+            callBackItem.second.OnP2pPrivatePeersChangedEvent(privateInfo);
         }
     }
 }

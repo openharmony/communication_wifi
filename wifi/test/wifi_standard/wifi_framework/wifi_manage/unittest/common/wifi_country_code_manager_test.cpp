@@ -182,6 +182,23 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaCloseResTest, TestSize.Level1)
     sleep(2);
 }
 
+HWTEST_F(WifiCountryCodeManagerTest, DealStaConnChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealStaConnChangedTest enter");
+    StaServiceCallback cbk = WifiCountryCodeManager::GetInstance().GetStaCallback();
+    sleep(1);
+    ASSERT_TRUE(cbk.OnStaConnChanged != nullptr);
+    WifiLinkedInfo info;
+    cbk.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, info, 0);
+    sleep(1);
+    cbk.OnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
+    sleep(1);
+    cbk.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, info, 0);
+    sleep(1);
+    cbk.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
+    sleep(2);
+}
+
 HWTEST_F(WifiCountryCodeManagerTest, DealApStateChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealApStateChangedTest enter");

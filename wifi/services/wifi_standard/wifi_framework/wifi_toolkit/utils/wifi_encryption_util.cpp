@@ -147,7 +147,7 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     HksAddParams(decryParamSet, IVParam, sizeof(IVParam) / sizeof(HksParam));
     HksBuildParamSet(&decryParamSet);
 
-    int32_t ret = HksKeyExist(&authId, genParamSet);
+    int32_t ret = HksKeyExist(&authId, decryParamSet);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("wifi decryption key not exist");
         return ret;

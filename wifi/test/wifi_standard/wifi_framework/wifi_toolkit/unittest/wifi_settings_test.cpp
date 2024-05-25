@@ -20,6 +20,7 @@
 #include "securec.h"
 #include "wifi_settings.h"
 #include "wifi_logger.h"
+#include "init_param.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

@@ -673,10 +673,6 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     if (ret != HDF_SUCCESS) {
         LOGE("SetApMacAddress, call SetMacAddress failed! ret:%{public}d", ret);
     }
-    if (!SetNetworkUpDown(ifaceName, true)) {
-        LOGE("SetStaMacAddress, set network up fail");
-        return false;
-    }
 
     LOGI("SetApMacAddress success");
     return true;

@@ -48,6 +48,15 @@ public:
     virtual WifiErrorNo StopAp(int id = 0);
 
     /**
+     * @Description Enable SoftAP.
+     *
+     * @param id
+     * @return WifiErrorNo
+     */
+    WifiErrorNo EnableAp(int id = 0);
+
+
+    /**
      * @Description Setting SoftAP Configurations.
      *
      * @param config

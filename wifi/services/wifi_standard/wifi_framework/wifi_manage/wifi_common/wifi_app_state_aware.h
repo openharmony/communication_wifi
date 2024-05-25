@@ -43,6 +43,7 @@ public:
     void UnSubscribeAppState();
     void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);
     void GetForegroundApp();
+    ErrCode GetProcessRunningInfos(std::vector<RunningProcessInfo> &info);
     bool IsForegroundApp(int32_t uid);
     bool IsForegroundApp(const std::string &bundleName);
     std::string GetRunningProcessNameByPid(const int uid, const int pid);

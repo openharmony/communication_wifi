@@ -21,6 +21,7 @@
 #include "app_mgr_client.h"
 #include "wifi_global_func.h"
 #include "speed_limit_configs_writer.h"
+#include "wifi_app_state_aware.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -137,14 +138,9 @@ int AppNetworkSpeedLimitService::GetBgLimitMaxMode()
 
 ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningProcessInfo> &appList, bool getFgAppFlag)
 {
-    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-    appMgrClient->ConnectAppMgrService();
-    AppExecFwk::AppMgrResultCode ret;
     std::vector<AppExecFwk::RunningProcessInfo> infos;
-    ret = appMgrClient->GetProcessRunningInfosByUserId(infos, APP_INFO_USERID);
-    if (ret != AppExecFwk::AppMgrResultCode::RESULT_OK) {
+    if (WifiAppStateAware::GetInstance().GetProcessRunningInfos(infos) != WIFI_OPT_FAILED) {
         WIFI_LOGE("GetProcessRunningInfosByUserId failed.");
-        return WIFI_OPT_FAILED;
     }
     if (getFgAppFlag) {
         for (auto iter = infos.begin(); iter != infos.end(); ++iter) {

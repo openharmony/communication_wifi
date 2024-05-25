@@ -503,6 +503,7 @@ void P2pMonitor::WpaEventGroupStarted(const IdlP2pGroupInfo &groupInfo) const
 
     WifiP2pDevice owner;
     owner.SetDeviceAddress(groupInfo.goDeviceAddress);
+    owner.SetRandomDeviceAddress(groupInfo.goRandomAddress);
 
     group.SetOwner(owner);
     Broadcast2SmGroupStarted(selectIfacName, group);
@@ -627,6 +628,7 @@ void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress, con
     WifiP2pDevice device;
     device.SetDeviceAddress(p2pDeviceAddress);
     device.SetGroupAddress(p2pGroupAddress);
+    device.SetRandomDeviceAddress(p2pGroupAddress);
     Broadcast2SmApStaConnected(selectIfacName, device);
 }
 

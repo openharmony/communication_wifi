@@ -585,6 +585,7 @@ void WifiP2pProxy::ReadWifiP2pDeviceData(MessageParcel &reply, WifiP2pDevice &de
 {
     device.SetDeviceName(reply.ReadString());
     device.SetDeviceAddress(reply.ReadString());
+    device.SetRandomDeviceAddress(reply.ReadString());
     device.SetDeviceAddressType(reply.ReadInt32());
     device.SetPrimaryDeviceType(reply.ReadString());
     device.SetSecondaryDeviceType(reply.ReadString());

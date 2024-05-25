@@ -227,6 +227,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
     g_hdiWpaP2pCallbackObj->OnEventGroupFormationSuccess = callback->OnEventGroupFormationSuccess;
     g_hdiWpaP2pCallbackObj->OnEventGroupFormationFailure = callback->OnEventGroupFormationFailure;
     g_hdiWpaP2pCallbackObj->OnEventGroupStarted = callback->OnEventGroupStarted;
+    g_hdiWpaP2pCallbackObj->OnEventGroupInfoStarted = callback->OnEventGroupInfoStarted;
     g_hdiWpaP2pCallbackObj->OnEventGroupRemoved = callback->OnEventGroupRemoved;
     g_hdiWpaP2pCallbackObj->OnEventProvisionDiscoveryCompleted = callback->OnEventProvisionDiscoveryCompleted;
     g_hdiWpaP2pCallbackObj->OnEventFindStopped = callback->OnEventFindStopped;

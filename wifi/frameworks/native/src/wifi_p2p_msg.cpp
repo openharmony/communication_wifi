@@ -113,6 +113,16 @@ const std::string &WifiP2pDevice::GetDeviceAddress() const
     return mDeviceAddress;
 }
 
+void WifiP2pDevice::SetRandomDeviceAddress(const std::string &deviceAddress)
+{
+    mRandomDeviceAddress = deviceAddress;
+}
+ 
+const std::string &WifiP2pDevice::GetRandomDeviceAddress() const
+{
+    return mRandomDeviceAddress;
+}
+
 void WifiP2pDevice::SetGroupAddress(const std::string &groupAddress)
 {
     mGroupAddress = groupAddress;

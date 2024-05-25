@@ -277,6 +277,7 @@ typedef struct P2pGroupInfo {
     char psk[WIFI_P2P_TMP_MSG_LENGTH_128];
     char passphrase[WIFI_P2P_TMP_MSG_LENGTH_128];
     char goDeviceAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1];
+    char goRandomAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1];
 } P2pGroupInfo;
 
 typedef struct P2pInvitationInfo {

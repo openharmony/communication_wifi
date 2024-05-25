@@ -1951,16 +1951,16 @@ public:
     {
         pScanService->scanTrustMode = true;
         pScanService->scanTrustSceneIds.insert(-1);
-        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze() == true);
+        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == true);
     }
 
     void AllowScanByMovingFreezeTest2()
     {
-        pScanService->isAbsFreezeState = true;
+        pScanService->lastFreezeState = true;
         pScanService->isAbsFreezeScaned = false;
-        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze() == true);
+        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == true);
         pScanService->isAbsFreezeScaned = true;
-        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze() == false);
+        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
     }
 
     void AllowScanByHid2dStateTest()

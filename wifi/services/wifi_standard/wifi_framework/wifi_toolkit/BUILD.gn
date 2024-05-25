@@ -145,6 +145,7 @@ if (defined(ohos_lite)) {
       "dhcp:dhcp_utils",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
+      "hisysevent:libhisysevent",
       "init:libbegetutil",
       "init:libinit_module_engine",
       "ipc:ipc_single",

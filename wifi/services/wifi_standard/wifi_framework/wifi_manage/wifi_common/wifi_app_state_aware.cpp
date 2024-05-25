@@ -166,6 +166,18 @@ void WifiAppStateAware::GetForegroundApp()
     return;
 }
 
+ErrCode WifiAppStateAware::GetProcessRunningInfos(std::vector<RunningProcessInfo> &info) {
+    if (!Connect()) {
+        WIFI_LOGE("%{public}s connect failed", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    if (appMgrProxy_->GetProcessRunningInfoByUserId(info) != AppExecFwk::AppMgrResultCode::RESULT_OK) {
+        WIFI_LOGE("%{public}s GetProcessRunningInfoByUserId failed", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 bool WifiAppStateAware::IsForegroundApp(int32_t uid)
 {
     WIFI_LOGD("IsForegroundApp %{public}s %{public}d, try uid: %{public}d",

@@ -83,9 +83,7 @@ if (defined(ohos_lite)) {
       "-Wl,-E",
     ]
 
-    external_deps = [
-      "init:libbegetutil",
-    ]
+    external_deps = [ "init:libbegetutil" ]
   }
 } else {
   ohos_shared_library("wifi_toolkit") {

@@ -420,6 +420,16 @@ HWTEST_F(ApStartedState_test, SetConfig_003, TestSize.Level1)
     EXPECT_FALSE(pApStartedState->SetConfig(apcfg));
 }
 
+HWTEST_F(ApStartedState_test, SetConfig_004, TestSize.Level1)
+{
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), EnableAp(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_FALSE(pApStartedState->SetConfig(apcfg));
+}
+
 HWTEST_F(ApStartedState_test, SetConfigs_001, TestSize.Level1)
 {
     EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(_)).WillRepeatedly(Return(0));

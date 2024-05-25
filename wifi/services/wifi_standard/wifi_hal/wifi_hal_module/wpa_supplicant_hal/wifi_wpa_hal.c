@@ -170,6 +170,8 @@ static void DealGroupStartInfo(char *buf)
             conf.frequency = atoi(retMsg.value);
         } else if (strncmp(retMsg.key, "go_dev_addr", strlen("go_dev_addr")) == 0) {
             StrSafeCopy(conf.goDeviceAddress, sizeof(conf.goDeviceAddress), retMsg.value);
+        } else if (strncmp(retMsg.key, "go_random_addr", strlen("go_random_addr")) == 0) {
+            StrSafeCopy(conf.goRandomAddress, sizeof(conf.goRandomAddress), retMsg.value);
         } else if (strncmp(retMsg.key, "p2p-", strlen("p2p-")) == 0) {
             StrSafeCopy(conf.groupIfName, sizeof(conf.groupIfName), retMsg.key);
         } else if (strncmp(retMsg.key, "psk", strlen("psk")) == 0) {

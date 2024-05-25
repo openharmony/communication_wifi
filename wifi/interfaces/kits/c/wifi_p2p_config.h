@@ -87,6 +87,7 @@ typedef struct WifiP2pWfdInfo {
 typedef struct WifiP2pDevice {
     char deviceName[P2P_NAME_LENGTH]; /* the value range is 0 to 32 characters. */
     unsigned char devAddr[COMMON_MAC_LEN]; /* the device MAC address */
+    unsigned char randomDevAddr[COMMON_MAC_LEN]; /* the device MAC address */
     int bssidType; /* bssid type. */
     char primaryDeviceType[DEVICE_TYPE_LENGTH];
     char secondaryDeviceType[DEVICE_TYPE_LENGTH];

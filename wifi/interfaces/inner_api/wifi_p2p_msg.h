@@ -191,7 +191,9 @@ public:
     void SetNetworkName(const std::string &name);
     const std::string &GetNetworkName() const;
     void SetDeviceAddress(const std::string &deviceAddress);
+    void SetRandomDeviceAddress(const std::string &deviceAddress);
     const std::string &GetDeviceAddress() const;
+    const std::string &GetRandomDeviceAddress() const;
     void SetDeviceAddressType(int devAddressType);
     int GetDeviceAddressType() const;
     void SetPrimaryDeviceType(const std::string &setPrimaryDeviceType);
@@ -226,6 +228,7 @@ private:
     std::string networkName; /* oper_ssid of peer device */
     std::string mDeviceAddress; /* the device MAC address, the length is 17 characters. */
     std::string mGroupAddress; /* the group MAC address, the length is 17 characters. */
+    std::string mRandomDeviceAddress; /* the device random MAC address, the length is 17 characters. */
     int deviceAddressType; /* the device MAC address type */
     std::string primaryDeviceType;
     std::string secondaryDeviceType;

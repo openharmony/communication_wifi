@@ -490,6 +490,40 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
     return 0;
 }
 
+int32_t OnEventGroupInfoStarted(struct IWpaCallback *self,
+    const struct HdiP2pGroupInfoStartedParam *groupStartedParam, const char* ifName)
+{
+    LOGI("OnEventGroupInfoStarted");
+    if (groupStartedParam == nullptr) {
+        return 1;
+    }
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onGroupStarted) {
+        OHOS::Wifi::IdlP2pGroupInfo cbInfo;
+        cbInfo.isGo = groupStartedParam->isGo;
+        cbInfo.isPersistent = groupStartedParam->isPersistent;
+        cbInfo.frequency = groupStartedParam->frequency;
+        cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
+        cbInfo.ssid = (char *)(groupStartedParam->ssid);
+        cbInfo.psk = (char *)(groupStartedParam->psk);
+        cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
+ 
+        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address1[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        ConvertMacArr2String(groupStartedParam->goDeviceAddress,
+            groupStartedParam->goDeviceAddressLen, address, sizeof(address));
+        ConvertMacArr2String(groupStartedParam->goRandomDeviceAddress,
+            groupStartedParam->goRandomDeviceAddressLen, address1, sizeof(address1));
+        LOGI("OnEventGroupInfoStarted address=%{private}s len %{public}d address1=%{private}s ",
+            address, groupStartedParam->goRandomDeviceAddressLen, address1);
+        cbInfo.goDeviceAddress = address;
+        cbInfo.goRandomAddress = address1;
+ 
+        cbk.onGroupStarted(cbInfo);
+    }
+    return 0;
+}
+
 int32_t OnEventGroupRemoved(struct IWpaCallback *self,
     const struct HdiP2pGroupRemovedParam *groupRemovedParam, const char* ifName)
 {
@@ -610,16 +644,19 @@ int32_t OnEventStaConnectState(struct IWpaCallback *self,
         return 1;
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    char srcAddress[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
     char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
     ConvertMacArr2String(staConnectStateParam->p2pDeviceAddress,
         staConnectStateParam->p2pDeviceAddressLen, address, sizeof(address));
+    ConvertMacArr2String(staConnectStateParam->srcAddress,
+        staConnectStateParam->srcAddressLen, srcAddress, sizeof(srcAddress));
     if (staConnectStateParam->state == 1) {
         if (cbk.onStaAuthorized) {
-            cbk.onStaAuthorized(address);
+            cbk.onStaAuthorized(address, srcAddress);
         }
     } else {
         if (cbk.onStaDeauthorized) {
-            cbk.onStaDeauthorized(address);
+            cbk.onStaDeauthorized(address, srcAddress);
         }
     }
     return 0;

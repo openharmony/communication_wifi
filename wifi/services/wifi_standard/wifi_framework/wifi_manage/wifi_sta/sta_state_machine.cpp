@@ -357,9 +357,11 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
     switch (state) {
         case OperateResState::CONNECT_AP_CONNECTED:
             WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
+            WifiNetStatsManager::GetInstance().StartNetStats();
             break;
         case OperateResState::DISCONNECT_DISCONNECTED:
             WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
+            WifiNetStatsManager::GetInstance().StopNetStats();
             break;
         default:
             break;

@@ -186,29 +186,8 @@ WifiErrorNo HdiWpaP2pStop()
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
+static void InitHdiWpaP2pCallbackObj()
 {
-    LOGI("RegisterHdiWpaP2pEventCallback enter");
-    pthread_mutex_lock(&g_hdiCallbackMutex);
-    if (callback == NULL || callback->OnEventDeviceFound == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
-        LOGE("RegisterHdiWpaP2pEventCallback: invalid parameter!");
-        return WIFI_IDL_OPT_INVALID_PARAM;
-    }
-
-    if (g_hdiWpaP2pCallbackObj != NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
-        LOGI("RegisterHdiWpaP2pEventCallback: already register!");
-        return WIFI_IDL_OPT_OK;
-    }
-
-    g_hdiWpaP2pCallbackObj = (struct IWpaCallback *)malloc(sizeof(struct IWpaCallback));
-    if (g_hdiWpaP2pCallbackObj == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
-        LOGE("RegisterHdiWpaP2pEventCallback: IWpaCallback malloc failed!");
-        return WIFI_IDL_OPT_FAILED;
-    }
-
     g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
     g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
     g_hdiWpaP2pCallbackObj->OnEventBssidChanged = NULL;
@@ -238,7 +217,32 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
     g_hdiWpaP2pCallbackObj->GetVersion = NULL;
     g_hdiWpaP2pCallbackObj->AsObject = NULL;
     g_hdiWpaP2pCallbackObj->OnEventVendorCb = NULL;
+}
 
+WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
+{
+    LOGI("RegisterHdiWpaP2pEventCallback enter");
+    pthread_mutex_lock(&g_hdiCallbackMutex);
+    if (callback == NULL || callback->OnEventDeviceFound == NULL) {
+        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        LOGE("RegisterHdiWpaP2pEventCallback: invalid parameter!");
+        return WIFI_IDL_OPT_INVALID_PARAM;
+    }
+
+    if (g_hdiWpaP2pCallbackObj != NULL) {
+        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        LOGI("RegisterHdiWpaP2pEventCallback: already register!");
+        return WIFI_IDL_OPT_OK;
+    }
+
+    g_hdiWpaP2pCallbackObj = (struct IWpaCallback *)malloc(sizeof(struct IWpaCallback));
+    if (g_hdiWpaP2pCallbackObj == NULL) {
+        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        LOGE("RegisterHdiWpaP2pEventCallback: IWpaCallback malloc failed!");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    InitHdiWpaP2pCallbackObj();
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaP2pEventCallback success.");
     return WIFI_IDL_OPT_OK;

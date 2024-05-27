@@ -20,6 +20,7 @@
 #include "wifi_common_util.h"
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
+#include "wifi_event_callback.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pMonitor");
 
@@ -71,6 +72,7 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
         std::bind(&P2pMonitor::WpaEventP2pIfaceCreated, this, _1, _2),
         std::bind(&P2pMonitor::WpaEventP2pConnectFailed, this, _1, _2),
         std::bind(&P2pMonitor::WpaEventP2pChannelSwitch, this, _1),
+        std::bind(&P2pMonitor::WpaEventStaNotifyCallBack, this, _1),
     };
 
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
@@ -662,6 +664,38 @@ void P2pMonitor::WpaEventP2pChannelSwitch(int freq) const
     WifiP2pGroupInfo group;
     group.SetFrequency(freq);
     Broadcast2SmChSwitch(selectIfacName, group);
+}
+
+void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
+{
+    WIFI_LOGI("WpaEventStaNotifyCallBack callback, notifyParam:%{private}s", notifyParam.c_str());
+    if (notifyParam.empty()) {
+        WIFI_LOGE("WpaEventStaNotifyCallBack() notifyParam is empty");
+        return;
+    }
+    std::string::size_type begPos = 0;
+    if ((begPos = notifyParam.find(":")) == std::string::npos) {
+        WIFI_LOGI("WpaEventStaNotifyCallBack() notifyParam not find :");
+        return;
+    }
+    std::string type = notifyParam.substr(0, begPos);
+    int num = stoi(type);
+    switch (num) {
+        case static_cast<int>(WpaEventCallback::CSA_CHSWITCH_NUM): {
+            std::string::size_type freqPos = 0;
+            if ((freqPos = notifyParam.find("freq=")) == std::string::npos) {
+                WIFI_LOGE("csa channel switch notifyParam not find frequency!");
+                return;
+            }
+            std::string data = notifyParam.substr(freqPos + strlen("freq="));
+            int freq = stoi(data);
+            WpaEventP2pChannelSwitch(freq);
+            break;
+        }
+        default:
+            WIFI_LOGI("WpaEventStaNotifyCallBack() undefine event:%{public}d", num);
+            break;
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

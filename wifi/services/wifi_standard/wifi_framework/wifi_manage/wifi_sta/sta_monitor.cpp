@@ -20,6 +20,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
+#include "wifi_event_callback.h"
 
 DEFINE_WIFILOG_LABEL("StaMonitor");
 
@@ -131,9 +132,6 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
     }
 }
 
-constexpr int HILINK_NUM = 0X01;
-constexpr int EAP_SIM_NUM = 0X02;
-
 void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
 {
     WIFI_LOGI("OnWpaStaNotifyCallBack() enter, notifyParam=%{private}s", notifyParam.c_str());
@@ -155,10 +153,10 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         return;
     }
     switch (num) {
-        case HILINK_NUM:
+        case static_cast<int>(WpaEventCallback::HILINK_NUM):
             OnWpaHilinkCallBack(data);
             break;
-        case EAP_SIM_NUM:
+        case static_cast<int>(WpaEventCallback::EAP_SIM_NUM):
             OnWpaEapSimAuthCallBack(data);
             break;
         default:

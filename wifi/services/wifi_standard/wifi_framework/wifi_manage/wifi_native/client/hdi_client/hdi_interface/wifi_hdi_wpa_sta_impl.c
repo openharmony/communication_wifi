@@ -16,6 +16,7 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_sta_impl.h"
 #include "wifi_hdi_util.h"
+#include "stub_collector.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaStaImpl"
@@ -60,6 +61,7 @@ static WpaSsidField g_wpaSsidFields[] = {
     {DEVICE_CONFIG_SAE_PASSWD, "sae_password", QUOTATION_MARKS_FLAG_YES},
     {DEVICE_CONFIG_EAP_CA_CERT, "ca_cert", QUOTATION_MARKS_FLAG_YES},
     {DEVICE_CONFIG_EAP_CERT_PWD, "private_key_passwd", QUOTATION_MARKS_FLAG_YES},
+    {DEVICE_CONFIG_GROUP_MGMT_CIPHERS, "group_mgmt", QUOTATION_MARKS_FLAG_NO},
 };
 
 static WifiErrorNo RegisterEventCallback()
@@ -109,7 +111,7 @@ static WifiErrorNo UnRegisterEventCallback()
             LOGE("UnRegisterEventCallback: UnregisterEventCallback failed result:%{public}d", result);
             return WIFI_IDL_OPT_FAILED;
         }
-
+        StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaStaCallbackObj);
         free(g_hdiWpaStaCallbackObj);
         g_hdiWpaStaCallbackObj = NULL;
     }

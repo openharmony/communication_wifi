@@ -179,6 +179,16 @@ public:
     virtual ErrCode ConnectToDevice(const WifiDeviceConfig &config) = 0;
 
     /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) = 0;
+
+    /**
      * @Description Check whether Wi-Fi is connected.
      *
      * @param isConnected - true / false

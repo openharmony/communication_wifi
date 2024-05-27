@@ -802,7 +802,8 @@ void CesEventSubscriber::OnReceiveNotificationEvent(const OHOS::EventFwk::Common
 }
 
 #ifdef HAS_POWERMGR_PART
-void WifiEventSubscriberManager::RegisterPowermgrEvent(){
+void WifiEventSubscriberManager::RegisterPowermgrEvent()
+{
     std::unique_lock<std::mutex> lock(powermgrEventMutex);
     if (wifiPowermgrEventSubsciber_) {
         return;

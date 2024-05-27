@@ -190,7 +190,6 @@ enum class OperatorWifiType {
     WIFI_ENABLED,
     WIFI_ENABLED_AIRPLANEMODE_OVERRIDE,
     WIFI_DISABLED_AIRPLANEMODE_ON,
-    INITIAL_TYPE,                            /* initial type */
 };
 
 enum class StaApExclusionType {
@@ -253,7 +252,7 @@ struct WifiConfig {
     WifiConfig()
     {
         scanAlwaysSwitch = false;
-        staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+        staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
         canOpenStaWhenAirplane = true;
         openWifiWhenAirplane = false;
         staLastState = false;

@@ -51,7 +51,7 @@ void SelfCureService::RegisterSelfCureServiceCallback(const std::vector<SelfCure
 {
     WIFI_LOGI("Enter RegisterSelfCureServiceCallback.");
     if (pSelfCureStateMachine == nullptr) {
-        WIFI_LOGE("pSelfCureStateMachine is null.\n");
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;
     }
 }
@@ -60,7 +60,7 @@ void SelfCureService::HandleRssiLevelChanged(int rssi)
 {
     WIFI_LOGI("HandleRssiLevelChanged, %{public}d.\n", rssi);
     if (pSelfCureStateMachine == nullptr) {
-        WIFI_LOGE("pSelfCureStateMachine is null.\n");
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;
     }
     InternalMessage *msg = pSelfCureStateMachine->CreateMessage();
@@ -83,7 +83,7 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
 {
     WIFI_LOGD("self cure wifi connection state change, state = %{public}d", state);
     if (pSelfCureStateMachine == nullptr) {
-        WIFI_LOGE("pSelfCureStateMachine is null.\n");
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;
     }
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
@@ -102,7 +102,7 @@ void SelfCureService::HandleStaOpenRes(OperateResState state)
 {
     WIFI_LOGD("self cure wifi open state change, state = %{public}d", state);
     if (pSelfCureStateMachine == nullptr) {
-        WIFI_LOGE("pSelfCureStateMachine is null.\n");
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;
     }
     if (state == OperateResState::OPEN_WIFI_SUCCEED) {

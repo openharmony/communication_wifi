@@ -186,7 +186,7 @@ WifiErrorNo HdiWpaP2pStop()
     return WIFI_IDL_OPT_OK;
 }
 
-static void InitHdiWpaP2pCallbackObj()
+static void InitHdiWpaP2pCallbackObj(struct IWpaCallback *callback)
 {
     g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
     g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
@@ -242,7 +242,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    InitHdiWpaP2pCallbackObj();
+    InitHdiWpaP2pCallbackObj(callback);
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaP2pEventCallback success.");
     return WIFI_IDL_OPT_OK;

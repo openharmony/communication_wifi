@@ -35,6 +35,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_global_func.h"
 #include "wifi_cmd_client.h"
+#include "wifi_sta_hal_interface.h"
 #ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
 #define SET_DUAL_ANTENNAS 45
@@ -93,16 +94,6 @@ void ApStartedState::GoInState()
     }
     UpdatePowerMode();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
-#ifdef HAS_BATTERY_MANAGER_PART
-    if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
-        HotspotConfig hotspotConfig;
-        WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
-        if (hotspotConfig.GetBand() == BandType::BAND_2GHZ) {
-            std::string ifName = "wlan0";
-            WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_SOFTAP_2G_MSS, CMD_SET_SOFTAP_MIMOMODE);
-        }
-    }
-#endif
 }
 
 void ApStartedState::GoOutState()
@@ -225,6 +216,23 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         }
     }
 #endif
+
+    WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(
+        WifiSettings::GetInstance().GetApIfaceName(), true);
+#ifdef HAS_BATTERY_MANAGER_PART
+    if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
+        HotspotConfig hotspotConfig;
+        WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
+        if (hotspotConfig.GetBand() == BandType::BAND_2GHZ) {
+            std::string ifName = WifiSettings::GetInstance().GetApIfaceName();
+            WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_SOFTAP_2G_MSS, CMD_SET_SOFTAP_MIMOMODE);
+        }
+    }
+#endif
+    if (WifiApHalInterface::GetInstance().EnableAp(m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("Enableap failed.");
+        return false;
+    }
 
     if (apConfig.GetIpAddress().empty()) {
         WIFI_LOGI("IP is empty, set default ipaddr");

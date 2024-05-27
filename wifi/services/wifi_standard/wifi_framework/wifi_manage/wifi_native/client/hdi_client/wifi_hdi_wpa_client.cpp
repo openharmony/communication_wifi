@@ -669,6 +669,11 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiEnableAp(id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
+        return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::EnableAp(int id)
+{
     return WIFI_IDL_OPT_OK;
 }
 

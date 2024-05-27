@@ -52,7 +52,7 @@ private:
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
     int mLastWifiOpenState = -1;
-    uint32_t satelliteTimerId;
+    uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
 };
 

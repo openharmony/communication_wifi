@@ -37,21 +37,24 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     const struct HdiWpaDisconnectParam *disconectParam, const char* ifName)
 {
     LOGI("OnEventDisconnected: callback enter!");
-    if (disconectParam == NULL) {
+    if (disconectParam == NULL || disconectParam->bssidLen <= 0) {
         LOGE("OnEventDisconnected: invalid parameter!");
         return 1;
     }
     uint32_t bssidLen = disconectParam->bssidLen;
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacArr2String(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    if (ConvertMacArr2String(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid)) != 0) {
+        LOGE("%{public}s: failed to convert mac!", __func__);
+        return 1;
+    }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onReportDisConnectReason) {
-        cbk.onReportDisConnectReason(disconectParam->reasonCode, szBssid);
+        cbk.onReportDisConnectReason(disconectParam->reasonCode, std::string(szBssid));
     }
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, szBssid);
+        cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, std::string(szBssid));
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
+    LOGI("%{public}s callback out, bssid:%{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
 }
 
@@ -59,13 +62,16 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     const struct HdiWpaConnectParam *connectParam, const char* ifName)
 {
     LOGI("OnEventConnected: callback enter!");
-    if (connectParam == NULL) {
+    if (connectParam == NULL || connectParam->bssidLen <= 0) {
         LOGE("OnEventConnected: invalid parameter!");
         return 1;
     }
     uint32_t bssidLen = connectParam->bssidLen;
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-    ConvertMacArr2String(connectParam->bssid, bssidLen, szBssid, sizeof(szBssid));
+    if (ConvertMacArr2String(connectParam->bssid, bssidLen, szBssid, sizeof(szBssid)) != 0) {
+        LOGE("%{public}s: failed to convert mac!", __func__);
+        return 1;
+    }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, szBssid);
@@ -83,12 +89,12 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
         return 1;
     }
 
-    char reason[WIFI_HDI_REASON_LENGTH] = {0};
-    if (strcpy_s(reason, sizeof(reason), (const char *)bssidChangedParam->reason) != EOK) {
-        LOGE("OnEventBssidChanged: failed to copy reason!");
-        return 1;
+    std::string reason = "";
+    if (bssidChangedParam->reasonLen > 0 && bssidChangedParam->reasonLen < WIFI_HDI_REASON_LENGTH) {
+        reason = std::string(bssidChangedParam->reason, bssidChangedParam->reason + bssidChangedParam->reasonLen);
+    } else {
+        LOGE("OnEventBssidChanged: invalid reasonLen:%{public}u", bssidChangedParam->reasonLen);
     }
-
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
     if (ConvertMacArr2String(bssidChangedParam->bssid, bssidChangedParam->bssidLen, szBssid, sizeof(szBssid)) != 0) {
         LOGE("OnEventBssidChanged: failed to convert mac!");
@@ -99,7 +105,8 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
     if (cbk.onBssidChanged) {
         cbk.onBssidChanged(reason, szBssid);
     }
-    LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
+    LOGI("%{public}s callback out, bssid:%{public}s reason:%{public}s reasonLen:%{public}u",
+        __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str(), reason.c_str(), bssidChangedParam->reasonLen);
     return 0;
 }
 

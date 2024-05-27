@@ -55,7 +55,6 @@ public:
      */
     WifiErrorNo EnableAp(int id = 0);
 
-
     /**
      * @Description Setting SoftAP Configurations.
      *

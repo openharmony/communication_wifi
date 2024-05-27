@@ -42,12 +42,18 @@ public:
     void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
-#ifdef HAS_POWERMGR_PART
-    void OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEventData &eventData);
-#endif
 private:
     bool lastSleepState = false;
 };
+
+#ifdef HAS_POWERMGR_PART
+class PowermgrEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit PowermgrEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~PowermgrEventSubscriber();
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+#endif
 
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
@@ -78,6 +84,12 @@ private:
     void RegisterCloneEvent();
     void UnRegisterCloneEvent();
     void RegisterCesEvent();
+#ifdef HAS_POWERMGR_PART
+    void RegisterPowermgrEvent();
+    void UnRegisterPowermgrEvent();
+    std::shared_ptr<PowermgrEventSubscriber> wifiPowermgrEventSubsciber_ = nullptr;
+    std::mutex powermgrEventMutex;
+#endif
     void UnRegisterCesEvent();
     void RegisterLocationEvent();
     void UnRegisterLocationEvent();

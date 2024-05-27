@@ -208,7 +208,6 @@ ohos_unittest("manager_unittest") {
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.powermgr_power_manager)) {
-    external_deps += [ "power_manager:powermgr_client" ]
     defines += [ "HAS_POWERMGR_PART" ]
   }
 

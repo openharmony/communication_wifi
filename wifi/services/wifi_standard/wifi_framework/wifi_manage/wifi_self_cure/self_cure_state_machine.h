@@ -352,7 +352,7 @@ private:
     int SetSelfCureHistoryInfo(const std::string selfCureHistory);
     int GetIsReassocWithFactoryMacAddress();
     int SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress);
-    WifiDeviceConfig GetCurrentWifiDeviceConfig();
+    ErrCode GetCurrentWifiDeviceConfig(WifiDeviceConfig &config);
     bool SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel);
     void HandleNetworkConnected();
     bool UpdateConnSelfCureFailedHistory();
@@ -389,7 +389,7 @@ private:
     int arpDetectionFailedCnt = 0;
     int selfCureReason = -1;
     int noTcpRxCounter = 0;
-    int connectNetworkRetryCnt = 0;
+    uint32_t connectNetworkRetryCnt = 0;
     bool internetUnknown = false;
     std::map<std::string, IpInfo> dhcpOfferPackets;
     std::vector<std::string> dhcpResultsTestDone;

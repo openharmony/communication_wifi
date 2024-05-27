@@ -275,11 +275,11 @@ void WifiP2pManager::DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeer
     return;
 }
 
-void WifiP2pManager::DealP2pPrivatePeersChanged(const std::string &PrivateInfo)
+void WifiP2pManager::DealP2pPrivatePeersChanged(const std::string &privateInfo)
 {
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_PRIVATE_PEER_CHANGE;
-    cbMsg.privateWfdInfo = PrivateInfo;
+    cbMsg.privateWfdInfo = privateInfo;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }

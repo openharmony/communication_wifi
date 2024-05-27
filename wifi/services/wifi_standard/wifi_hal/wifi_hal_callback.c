@@ -482,7 +482,8 @@ void P2pHalCbGroupStarted(const P2pGroupInfo *info)
     if (info == NULL) {
         return;
     }
-    LOGI("P2p group started event groupIfName: %{public}s, ssid len: %{public}u", info->groupIfName, strlen(info->ssid));
+    LOGI("P2p group started event groupIfName: %{public}s, ssid len: %{public}zu", info->groupIfName,
+        strlen(info->ssid));
     WifiHalEventCallbackMsg *pCbkMsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
     if (pCbkMsg == NULL) {
         LOGE("create callback message failed!");

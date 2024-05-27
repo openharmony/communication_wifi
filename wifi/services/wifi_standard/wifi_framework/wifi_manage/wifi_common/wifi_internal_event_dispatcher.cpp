@@ -30,6 +30,9 @@ DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
 namespace OHOS {
 namespace Wifi {
+#ifdef DTFUZZ_TEST
+static WifiInternalEventDispatcher* gWifiEventBroadcast = nullptr;
+#endif
 std::set<std::int32_t> g_CallbackEventChkSysAppList = {
     WIFI_CBK_MSG_HOTSPOT_STATE_JOIN,
     WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE,
@@ -105,8 +108,15 @@ CallbackEventPermissionMap g_CallbackEventPermissionMap = {
 
 WifiInternalEventDispatcher &WifiInternalEventDispatcher::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiInternalEventDispatcher gWifiEventBroadcast;
     return gWifiEventBroadcast;
+#else
+    if (gWifiEventBroadcast == nullptr) {
+        gWifiEventBroadcast = new (std::nothrow) WifiInternalEventDispatcher();
+    }
+    return *gWifiEventBroadcast;
+#endif
 }
 
 WifiInternalEventDispatcher::WifiInternalEventDispatcher()
@@ -1011,7 +1021,7 @@ bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackE
 void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     std::unique_lock<std::mutex> lock(mPidFrozenMutex);
-    WIFI_LOGI("%{public}s, list size:%{public}u, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
+    WIFI_LOGI("%{public}s, list size:%{public}zu, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
     for (auto itr : pidList) {
         if (isFrozen) {
             frozenPidList.insert(itr);
@@ -1019,7 +1029,7 @@ void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFro
             frozenPidList.erase(itr);
         }
     }
-    WIFI_LOGI("%{public}s finish, size:%{public}u", __func__, frozenPidList.size());
+    WIFI_LOGI("%{public}s finish, size:%{public}zu", __func__, frozenPidList.size());
 }
 
 void WifiInternalEventDispatcher::ResetAllFrozenApp()

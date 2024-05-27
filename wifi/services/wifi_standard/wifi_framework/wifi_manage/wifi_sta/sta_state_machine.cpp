@@ -2622,8 +2622,6 @@ StaStateMachine::ApLinkedState::~ApLinkedState()
 void StaStateMachine::ApLinkedState::GoInState()
 {
     WIFI_LOGI("ApLinkedState GoInState function.");
-    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
-        static_cast<int>(WifiOperateState::STA_CONNECTED));
     return;
 }
 
@@ -3265,6 +3263,8 @@ StaStateMachine::LinkedState::~LinkedState()
 void StaStateMachine::LinkedState::GoInState()
 {
     WIFI_LOGI("LinkedState GoInState function.");
+    WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
+        static_cast<int>(WifiOperateState::STA_CONNECTED));
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
         pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);

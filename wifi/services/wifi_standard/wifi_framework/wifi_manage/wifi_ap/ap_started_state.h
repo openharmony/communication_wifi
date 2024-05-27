@@ -240,11 +240,13 @@ private:
 
     /**
      * @Description update MAC address.
-     * @param spotConfig - Current hotspot configuration
-     * @param setSavedMac - Set saved Mac address if no need update Mac address when open hotspot
+     * @param ssid - Network name
+     * @param securityType - Security type
      * @return true: Set successfully    false: Set failed
      */
-    bool SetRandomMac(const HotspotConfig spotConfig, bool setSavedMac) const;
+    bool UpdatMacAddress(const std::string ssid, KeyMgmt securityType);
+
+    void SetRandomMac() const;
 private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result
     HotspotConfig m_hotspotConfig;

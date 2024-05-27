@@ -1613,44 +1613,22 @@ void StaStateMachine::DealCancelWpsCmd(InternalMessage *msg)
 void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
 {
     if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is null", __FUNCTION__);
         return;
     }
-
-    WIFI_LOGI("enter DealStartRoamCmd\n");
     std::string bssid = msg->GetStringFromMessage();
-    /* GetDeviceConfig from Configuration center. */
-    WifiDeviceConfig network;
-    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, network);
-
-    /* Setting the network. */
-    WifiIdlDeviceConfig idlConfig;
-    idlConfig.networkId = linkedInfo.networkId;
-    idlConfig.ssid = linkedInfo.ssid;
-    idlConfig.bssid = bssid;
-    idlConfig.psk = network.preSharedKey;
-    idlConfig.keyMgmt = network.keyMgmt;
-    idlConfig.priority = network.priority;
-    idlConfig.scanSsid = network.hiddenSSID ? 1 : 0;
-    FillEapCfg(network, idlConfig);
-    if (WifiStaHalInterface::GetInstance().SetDeviceConfig(linkedInfo.networkId, idlConfig) != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("DealStartRoamCmd SetDeviceConfig() failed!");
+    targetRoamBssid = bssid;
+    WIFI_LOGI("%{public}s target bssid:{public}s", MacAnonymize(linkedInfo.bssid).c_str());
+    if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, targetRoamBssid)
+        != WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("%{public}s set roam target bssid fail", __FUNCTION__);
         return;
     }
-    WIFI_LOGD("DealStartRoamCmd  SetDeviceConfig() succeed!");
-
-    /* Save to Configuration center. */
-    network.bssid = bssid;
-    WifiSettings::GetInstance().AddDeviceConfig(network);
-    WifiSettings::GetInstance().SyncDeviceConfig();
-
-    /* Save linkedinfo */
-    linkedInfo.bssid = bssid;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-
     if (WifiStaHalInterface::GetInstance().Reassociate() != WIFI_IDL_OPT_OK) {
-        WIFI_LOGE("START_ROAM-ReAssociate() failed!");
+        WIFI_LOGE("%{public}s START_ROAM-ReAssociate() failed!", __FUNCTION__);
+        return;
     }
-    WIFI_LOGI("START_ROAM-ReAssociate() succeeded!");
+    WIFI_LOGI("%{public}s START_ROAM-ReAssociate() succeeded!", __FUNCTION__);
     /* Start roaming */
     SwitchState(pApRoamingState);
 }
@@ -4020,7 +3998,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
             for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
                 ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
             }
-            LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}u", ipv6Info.dnsAddr.size());
+            LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}zu", ipv6Info.dnsAddr.size());
         }
         WifiSettings::GetInstance().SaveIpV6Info(ipv6Info, pStaStateMachine->GetInstanceId());
         WIFI_LOGI("SaveIpV6 addr=%{private}s, linkaddr=%{private}s, randaddr=%{private}s, gateway=%{private}s, "

@@ -109,6 +109,11 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterCesEvent();
     UnRegisterCloneEvent();
     UnRegisterLocationEvent();
+#ifdef DTFUZZ_TEST
+    if (mWifiEventSubsThread) {
+        mWifiEventSubsThread.reset();
+    }
+#endif
 }
 
 void WifiEventSubscriberManager::RegisterCesEvent()

@@ -55,6 +55,7 @@ private:
     void OnDisableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnectTo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnect2To(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnStartRoamToNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReConnect(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReAssociate(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisconnect(uint32_t code, MessageParcel &data, MessageParcel &reply);

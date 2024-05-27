@@ -40,7 +40,7 @@ DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 namespace OHOS {
 namespace Wifi {
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
-constexpr uint32_t TIMEOUT_CHECK_LAST_STA_STATE_EVENT = 10 * 1000;
+constexpr uint32_t TIMEOUT_EVENT_DELAY_ACCESS_DATASHARE = 10 * 1000;
 constexpr uint32_t PROP_LEN = 26;
 constexpr uint32_t PROP_SUBCHIPTYPE_LEN = 10;
 constexpr uint32_t SUPPORT_COEXCHIP_LEN = 7;
@@ -81,21 +81,22 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     CesEventSubscriber::OnReceiveThermalEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
-    {WIFI_EVENT_TAP_NOTIFICATION, &CesEventSubscriber::OnReceiveNotificationEvent}
+    {WIFI_EVENT_TAP_NOTIFICATION, &CesEventSubscriber::OnReceiveNotificationEvent},
+    {WIFI_EVENT_DIALOG_ACCEPT, &CesEventSubscriber::OnReceiveNotificationEvent},
+    {WIFI_EVENT_DIALOG_REJECT, &CesEventSubscriber::OnReceiveNotificationEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
 {
     WIFI_LOGI("create WifiEventSubscriberManager");
-
-    RegisterCesEvent();
-
-    if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && migrateTimerId == 0) {
-        WifiTimer::TimerCallback timeoutCallback = std::bind(
-            &WifiEventSubscriberManager::CheckAndStartStaByDatashare, this);
-        WifiTimer::GetInstance()->Register(timeoutCallback, migrateTimerId, TIMEOUT_CHECK_LAST_STA_STATE_EVENT);
-        WIFI_LOGI("CheckAndStartStaByDatashare register success! migrateTimerId:%{public}u", migrateTimerId);
+    if (accessDatashareTimerId == 0) {
+        WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::DelayedAccessDataShare, this);
+        WifiTimer::GetInstance()->Register(
+            timeoutCallback, accessDatashareTimerId, TIMEOUT_EVENT_DELAY_ACCESS_DATASHARE);
+        WIFI_LOGI("DelayedAccessDataShare register success! accessDatashareTimerId:%{public}u", accessDatashareTimerId);
     }
+    
+    RegisterCesEvent();
 #ifdef HAS_POWERMGR_PART
     RegisterPowerStateListener();
 #endif
@@ -106,7 +107,6 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     GetMdmProp();
     GetChipProp();
     RegisterMdmPropListener();
-    GetAirplaneModeByDatashare();
 }
 
 WifiEventSubscriberManager::~WifiEventSubscriberManager()
@@ -117,6 +117,11 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterLocationEvent();
 #ifdef HAS_POWERMGR_PART
     UnRegisterPowerStateListener();
+#endif
+#ifdef DTFUZZ_TEST
+    if (mWifiEventSubsThread) {
+        mWifiEventSubsThread.reset();
+    }
 #endif
 }
 
@@ -278,11 +283,15 @@ void WifiEventSubscriberManager::GetAirplaneModeByDatashare()
     Uri uri(SETTINGS_DATASHARE_URL_AIRPLANE_MODE);
     int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_AIRPLANE_MODE, airplaneMode);
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("GetAirplaneModeByDatashare, Query airplaneMode fail!");
-        return;
+        WIFI_LOGE("GetAirplaneModeByDatashare, Query airplaneMode again!");
+        ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_AIRPLANE_MODE, airplaneMode, true);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("GetAirplaneModeByDatashare, Query airplaneMode fail!");
+            return;
+        }
     }
 
-    WIFI_LOGD("GetAirplaneModeByDatashare, airplaneMode:%{public}s", airplaneMode.c_str());
+    WIFI_LOGI("GetAirplaneModeByDatashare, airplaneMode:%{public}s", airplaneMode.c_str());
     if (airplaneMode.compare("1") == 0) {
         WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_OPEN);
     }
@@ -387,16 +396,25 @@ void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
     } else if (lastStaState == closeWifiByAirplanemodeOpen) {
         WifiSettings::GetInstance().SetWifiToggledState(true);
     }
-
-    if (migrateTimerId != 0) {
-        WifiTimer::GetInstance()->UnRegister(migrateTimerId);
-        migrateTimerId = 0;
-    }
 }
 
 bool WifiEventSubscriberManager::IsMdmForbidden()
 {
     return mIsMdmForbidden;
+}
+
+void WifiEventSubscriberManager::DelayedAccessDataShare()
+{
+    WIFI_LOGI("DelayedAccessDataShare enter!");
+    GetAirplaneModeByDatashare();
+    if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH)) {
+        CheckAndStartStaByDatashare();
+    }
+
+    if (accessDatashareTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(accessDatashareTimerId);
+        accessDatashareTimerId = 0;
+    }
 }
 
 void WifiEventSubscriberManager::InitSubscribeListener()
@@ -842,13 +860,21 @@ void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEvent
 
 void CesEventSubscriber::OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    const auto &action = eventData.GetWant().GetAction();
+    std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("OnReceiveNotificationEvent action[%{public}s]", action.c_str());
-    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
-        if (pService != nullptr) {
-            pService->StartPortalCertification();
+    if (action == WIFI_EVENT_TAP_NOTIFICATION) {
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+            if (pService != nullptr) {
+                pService->StartPortalCertification();
+            }
         }
+    } else if (action == WIFI_EVENT_DIALOG_ACCEPT) {
+        int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
+        WIFI_LOGI("dialogType[%{public}d]", dialogType);
+    } else {
+        int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
+        WIFI_LOGI("dialogType[%{public}d]", dialogType);
     }
 }
 }  // namespace Wifi

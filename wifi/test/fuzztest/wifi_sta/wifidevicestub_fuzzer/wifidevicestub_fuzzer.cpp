@@ -32,6 +32,7 @@
 #include "wifi_config_center.h"
 #include "wifi_settings.h"
 #include "wifi_common_def.h"
+#include "wifi_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -39,31 +40,14 @@ constexpr size_t U32_AT_SIZE_ZERO = 4;
 static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiDeviceService";
-static sptr<WifiDeviceMgrServiceImpl> pWifiDeviceMgrServiceImpl = nullptr;
-static sptr<WifiDeviceServiceImpl> pWifiDeviceServiceImpl = nullptr;
+std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 
 bool Init()
 {
     if (!g_isInsted) {
-        pWifiDeviceMgrServiceImpl = WifiDeviceMgrServiceImpl::GetInstance();
-        if (!pWifiDeviceMgrServiceImpl) {
-            LOGE("Init failed pWifiDeviceMgrServiceImpl is nullptr!");
+        if (WifiManager::GetInstance().Init() < 0) {
+            LOGE("WifiManager init failed!");
             return false;
-        }
-        pWifiDeviceMgrServiceImpl->OnStart();
-        sptr<IRemoteObject> remote = pWifiDeviceMgrServiceImpl->GetWifiRemote(0);
-        if (!remote) {
-            LOGE("Init failed remote is nullptr!");
-            return false;
-        }
-        pWifiDeviceServiceImpl = iface_cast<WifiDeviceServiceImpl>(remote);
-        if (!pWifiDeviceServiceImpl) {
-            LOGE("Init failed pWifiDeviceServiceImpl is nullptr!");
-            return false;
-        }
-        if (WifiConfigCenter::GetInstance().GetWifiMidState(0) != WifiOprMidState::RUNNING) {
-            LOGE("Init setmidstate!");
-            WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING, 0);
         }
         g_isInsted = true;
     }
@@ -81,8 +65,8 @@ bool OnRemoteRequest(uint32_t code, MessageParcel &data)
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = pWifiDeviceServiceImpl->OnRemoteRequest(code, data, reply, option);
-    return ret;
+    pWifiDeviceStub->OnRemoteRequest(code, data, reply, option);
+    return true;
 }
 
 
@@ -614,12 +598,62 @@ void OnSetSatelliteStateFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE), datas);
 }
 
+void OnFactoryResetFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET), datas);
+}
+
+void OnEnableWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI), datas);
+}
+
+void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI), datas);
+}
+
+void OnGetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
+
     OHOS::Wifi::OnInitWifiProtectFuzzTest(data, size);
     OHOS::Wifi::OnGetWifiProtectRefFuzzTest(data, size);
     OHOS::Wifi::OnPutWifiProtectRefFuzzTest(data, size);
@@ -663,6 +697,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
     OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
     OHOS::Wifi::OnSetSatelliteStateFuzzTest(data, size);
+    OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
+    OHOS::Wifi::OnFactoryResetFuzzTest(data, size);
+    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    sleep(4);
     return 0;
 }
 }

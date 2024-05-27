@@ -1041,7 +1041,7 @@ bool HalDeviceManager::CanIfaceComboSupportRequest(WifiChipInfo &wifiChipInfo, U
     }
 
     for (auto type : IFACE_TYPES_BY_PRIORITY) {
-        int tooManyInterfaces = wifiChipInfo.ifaces[type].size() - chipIfaceCombo[type];
+        int tooManyInterfaces = static_cast<int>(wifiChipInfo.ifaces[type].size()) - chipIfaceCombo[type];
         if (createIfaceType == type) {
             tooManyInterfaces += 1;
         }

@@ -295,16 +295,6 @@ static void ParseScanInfo(std::vector<ScanResultsInfo> &scanResultsInfo, std::ve
     for (auto &scanResult : scanResultsInfo) {
         struct HdiElems elems = {0};
         Get80211ElemsFromIE(scanResult.ie.data(), scanResult.ie.size(), &elems, 1);
-        if (elems.ssidLen == 0) {
-            char bssid[HDI_BSSID_LENGTH] = {0};
-            if (sprintf_s(bssid, sizeof(bssid), MACSTR, MAC2STR(scanResult.bssid.c_str())) < 0) {
-                LOGD("%{public}s: ssid empty.", __func__);
-                continue;
-            }
-            LOGD("%{public}s: ssid empty, bssid:%{private}s", __func__, bssid);
-            continue;
-        }
-
         WifiScanResultExt wifiScanResultExt = {0};
         ConvertScanResultsInfo(wifiScanResultExt, scanResult);
         char buff[HDI_SCAN_RESULTS_MAX_LEN] = {0};

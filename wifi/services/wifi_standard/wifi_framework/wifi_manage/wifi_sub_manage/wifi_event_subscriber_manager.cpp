@@ -74,9 +74,6 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     CesEventSubscriber::OnReceiveThermalEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
-#ifdef HAS_POWERMGR_PART
-    {COMMON_EVENT_POWER_MANAGER_STATE_CHANGED, &CesEventSubscriber::OnReceiveForceSleepEvent},
-#endif
     {WIFI_EVENT_TAP_NOTIFICATION, &CesEventSubscriber::OnReceiveNotificationEvent},
     {WIFI_EVENT_DIALOG_ACCEPT, &CesEventSubscriber::OnReceiveNotificationEvent},
     {WIFI_EVENT_DIALOG_REJECT, &CesEventSubscriber::OnReceiveNotificationEvent}
@@ -94,6 +91,9 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     }
     
     RegisterCesEvent();
+#ifdef HAS_POWERMGR_PART
+    RegisterPowermgrEvent();
+#endif
     if (IsDataMgrServiceActive()) {
         RegisterCloneEvent();
     }
@@ -109,6 +109,11 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterCesEvent();
     UnRegisterCloneEvent();
     UnRegisterLocationEvent();
+#ifdef DTFUZZ_TEST
+    if (mWifiEventSubsThread) {
+        mWifiEventSubsThread.reset();
+    }
+#endif
 }
 
 void WifiEventSubscriberManager::RegisterCesEvent()
@@ -797,24 +802,74 @@ void CesEventSubscriber::OnReceiveNotificationEvent(const OHOS::EventFwk::Common
 }
 
 #ifdef HAS_POWERMGR_PART
-void CesEventSubscriber::OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEventData &eventData)
+void WifiEventSubscriberManager::RegisterPowermgrEvent(){
+    std::unique_lock<std::mutex> lock(powermgrEventMutex);
+    if (wifiPowermgrEventSubsciber_) {
+        return;
+    }
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(COMMON_EVENT_POWER_MANAGER_STATE_CHANGED);
+    WIFI_LOGI("RegisterPowermgrEvent start");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfo.SetPermission("ohos.permission.SET_WIFI_CONFIG");
+    wifiPowermgrEventSubsciber_ = std::make_shared<PowermgrEventSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiPowermgrEventSubsciber_)) {
+        WIFI_LOGE("Powermgr SubscribeCommonEvent() failed");
+        wifiPowermgrEventSubsciber_ = nullptr;
+    } else {
+        WIFI_LOGI("RegisterCesEvent success");
+    }
+}
+
+void WifiEventSubscriberManager::UnRegisterPowermgrEvent()
+{
+    std::unique_lock<std::mutex> lock(powermgrEventMutex);
+    if (!wifiPowermgrEventSubsciber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(wifiPowermgrEventSubsciber_)) {
+        WIFI_LOGE("UnRegisterPowermgrEvent failed");
+    }
+    wifiPowermgrEventSubsciber_ = nullptr;
+    WIFI_LOGI("UnRegisterPowermgrEvent finished");
+}
+
+PowermgrEventSubscriber::PowermgrEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+    : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("PowermgrEventSubscriber enter");
+}
+
+PowermgrEventSubscriber::~PowermgrEventSubscriber()
+{
+    WIFI_LOGI("~PowermgrEventSubscriber enter");
+}
+
+void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("Receive ForceSleep Event: %{public}s", action.c_str());
 #ifdef FEATURE_HPF_SUPPORT
+    const int enterForceSleep = 0x30;
+    const int exitForceSleep = 0x31;
     if (action == COMMON_EVENT_POWER_MANAGER_STATE_CHANGED) {
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-            if (eventData.GetCode() == 0x30) { // STATE_ENTER_FORCESLEEP
+            if (eventData.GetCode() == enterForceSleep) { // STATE_ENTER_FORCESLEEP
+                WIFI_LOGI("Receive ForceSleep Event: %{public}d", enterForceSleep);
                 WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
             }
-            if (eventData.GetCode() == 0x31) {
+            if (eventData.GetCode() == exitForceSleep) {
+                WIFI_LOGI("Receive ForceSleep Event: %{public}d", exitForceSleep);
                 WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_EXIT_FORCESLEEP, i);
             }
         }
     }
 #endif
 }
+
 #endif
+
 
 }  // namespace Wifi
 }  // namespace OHOS

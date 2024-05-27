@@ -1377,47 +1377,6 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     return ss.str();
 }
 
-template <> void ClearTClass<SoftApRandomMac>(SoftApRandomMac &item)
-{
-    item.ssid.clear();
-    item.keyMgmt = KeyMgmt::NONE;
-    item.randomMac.clear();
-    return;
-}
-
-template <>
-int SetTClassKeyValue<SoftApRandomMac>(SoftApRandomMac &item, const std::string &key, const std::string &value)
-{
-    int errorKeyValue = 0;
-    if (key == "ssid") {
-        item.ssid = value;
-    } else if (key == "keyMgmt") {
-        item.keyMgmt = static_cast<KeyMgmt>(std::stoi(value));
-    } else if (key == "randomMac") {
-        item.randomMac = value;
-    } else {
-        LOGE("Invalid config key value");
-        errorKeyValue++;
-    }
-    return errorKeyValue;
-}
-
-template <> std::string GetTClassName<SoftApRandomMac>()
-{
-    return "SoftApRandomMac";
-}
-
-template <> std::string OutTClassString<SoftApRandomMac>(SoftApRandomMac &item)
-{
-    std::ostringstream ss;
-    ss << "    " <<"<SoftApRandomMac>" << std::endl;
-    ss << "    " <<"ssid=" << item.ssid << std::endl;
-    ss << "    " <<"keyMgmt=" << static_cast<int>(item.keyMgmt) << std::endl;
-    ss << "    " <<"randomMac=" << item.randomMac << std::endl;
-    ss << "    " <<"</SoftApRandomMac>" << std::endl;
-    return ss.str();
-}
-
 template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
 {
     item.portalHttpUrl.clear();

@@ -52,6 +52,7 @@ public:
     virtual WifiErrorNo SetPowerModel(const int& model, int id = 0) const = 0;
     virtual WifiErrorNo GetFrequenciesByBand(const std::string &ifaceName,
     int band, std::vector<int> &frequencies) = 0;
+    virtual WifiErrorNo EnableAp(int id = 0) = 0;
 };
 
 class WifiApHalInterface : public MockWifiApHalInterface {
@@ -72,6 +73,7 @@ public:
     MOCK_CONST_METHOD2(SetPowerModel, WifiErrorNo(const int& model, int id));
     MOCK_METHOD3(GetFrequenciesByBand, WifiErrorNo(const std::string &ifaceName,
     int band, std::vector<int> &frequencies));
+    MOCK_METHOD1(EnableAp, WifiErrorNo(int id));
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -669,6 +669,11 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiEnableAp(id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
+        return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::EnableAp(int id)
+{
     return WIFI_IDL_OPT_OK;
 }
 
@@ -869,8 +874,9 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo>
             groupInfo.SetIsPersistent(true);
         }
         mapGroups.insert(std::pair<int, WifiP2pGroupInfo>(infoList.infos[i].id, groupInfo));
+        std::string ssid(reinterpret_cast<const char*>(infoList.infos[i].ssid));
         LOGI("ReqP2pListNetworks id=%{public}d ssid=%{public}s address=%{private}s",
-            infoList.infos[i].id, SsidAnonymize(infoList.infos[i].ssid).c_str(), address);
+            infoList.infos[i].id, SsidAnonymize(ssid).c_str(), address);
     }
     free(infoList.infos);
     infoList.infos = nullptr;

@@ -133,6 +133,7 @@ private:
 #else
     /* task queue. */
     std::unique_ptr<WifiEventHandler> pMyTaskQueue;
+    std::vector<InternalMessage *> mMessageQueue;
 #endif
     std::string mThreadName = "";
 };

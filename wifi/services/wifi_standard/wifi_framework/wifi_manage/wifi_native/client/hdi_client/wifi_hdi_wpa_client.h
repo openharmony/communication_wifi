@@ -809,6 +809,14 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const;
+    
+    /**
+     * @Description Enable Softap.
+     *
+     * @param id
+     * @return WifiErrorNo
+     */
+    WifiErrorNo EnableAp(int id = 0);
 
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,

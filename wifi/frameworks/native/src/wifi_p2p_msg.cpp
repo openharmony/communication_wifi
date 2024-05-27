@@ -117,7 +117,7 @@ void WifiP2pDevice::SetRandomDeviceAddress(const std::string &deviceAddress)
 {
     mRandomDeviceAddress = deviceAddress;
 }
-
+ 
 const std::string &WifiP2pDevice::GetRandomDeviceAddress() const
 {
     return mRandomDeviceAddress;

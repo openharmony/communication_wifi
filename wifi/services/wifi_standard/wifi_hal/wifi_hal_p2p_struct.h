@@ -60,6 +60,7 @@ typedef struct P2pGroupInfo {
     char psk[WIFI_P2P_PASSWORD_SIZE];
     char passphrase[WIFI_P2P_PASSWORD_SIZE];
     char goDeviceAddress[WIFI_BSSID_LENGTH];
+    char goRandomDeviceAddress[WIFI_BSSID_LENGTH];
 } P2pGroupInfo;
 
 typedef struct P2pInvitationInfo {

@@ -1481,6 +1481,10 @@ bool SelfCureStateMachine::IsHttpReachable()
 
 std::vector<uint32_t> SelfCureStateMachine::TransIpAddressToVec(std::string addr)
 {
+    if (addr.empty()) {
+        WIFI_LOGE("addr is empty");
+        return {0, 0, 0, 0};
+    }
     size_t pos = 0;
     std::vector<uint32_t> currAddr;
     while ((pos = addr.find('.')) != std::string::npos) {

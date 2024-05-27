@@ -318,7 +318,7 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     ipv6dns->type_ = NetManagerStandard::INetAddr::IPV6;
     ipv6dns->family_ = NetManagerStandard::INetAddr::IPV6;
-    LOGI("SetNetLinkDnsInfo ipv6 dns size:%{public}u", wifiIpV6Info.dnsAddr.size());
+    LOGI("SetNetLinkDnsInfo ipv6 dns size:%{public}zu", wifiIpV6Info.dnsAddr.size());
     if (wifiIpV6Info.dnsAddr.size() > 0) {
         for (uint32_t i = 0; i < wifiIpV6Info.dnsAddr.size(); i++) {
             ipv6dns->address_ = wifiIpV6Info.dnsAddr[i];

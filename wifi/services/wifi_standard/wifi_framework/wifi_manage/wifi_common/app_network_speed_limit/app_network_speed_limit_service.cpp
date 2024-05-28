@@ -28,7 +28,6 @@ namespace Wifi {
 
 DEFINE_WIFILOG_LABEL("AppNetworkSpeedLimitService");
 const std::string APP_NETWORK_SPEED_LIMIT_CLASS_NAME = "AppNetworkSpeedLimitService";
-constexpr const int APP_INFO_USERID = 100;
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService()
 {
@@ -139,7 +138,7 @@ int AppNetworkSpeedLimitService::GetBgLimitMaxMode()
 ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningProcessInfo> &appList, bool getFgAppFlag)
 {
     std::vector<AppExecFwk::RunningProcessInfo> infos;
-    if (WifiAppStateAware::GetInstance().GetProcessRunningInfos(infos) != WIFI_OPT_FAILED) {
+    if (WifiAppStateAware::GetInstance().GetProcessRunningInfos(infos) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetProcessRunningInfosByUserId failed.");
         return WIFI_OPT_FAILED;
     }

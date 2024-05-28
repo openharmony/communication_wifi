@@ -20,6 +20,7 @@
 #include "wifi_hdi_wpa_ap_impl.h"
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
+#include "wifi_common_util.h"
 #include <securec.h>
 #include <unistd.h>
 
@@ -132,7 +133,7 @@ WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInf
         tmp.isErpExist = results[i].isErpExist;
         tmp.maxRates = results[i].maxRates > results[i].extMaxRates ? results[i].maxRates : results[i].extMaxRates;
         LOGI("WifiHdiWpaClient::QueryScanInfos ssid = %{public}s, ssid = %{public}s",
-            results[i].ssid, results[i].bssid);
+            SsidAnonymize(results[i].ssid).c_str(), MacAnonymize(results[i].bssid).c_str());
         for (int j = 0; j < results[i].ieSize; ++j) {
             WifiInfoElem infoElemTmp;
             int infoElemSize = results[i].infoElems[j].size;
@@ -304,6 +305,11 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
         std::string groupCipherStr[] = {"GTK_NOT_USED ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 "};
         num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_CIPHERS, config.allowedGroupCiphers,
                                          groupCipherStr, sizeof(groupCipherStr)/sizeof(groupCipherStr[0]));
+    }
+    if (config.allowedGroupMgmtCiphers > 0) {
+        std::string groupMgmtCipherStr[] = {"AES-128-CMAC ", "BIP-GMAC-128 ", "BIP-GMAC-256 ", "BIP-CMAC-256 "};
+        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_MGMT_CIPHERS, config.allowedGroupMgmtCiphers,
+                                         groupMgmtCipherStr, sizeof(groupMgmtCipherStr)/sizeof(groupMgmtCipherStr[0]));
     }
     if (num == 0) {
         return WIFI_IDL_OPT_OK;
@@ -663,6 +669,11 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiEnableAp(id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
+        return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::EnableAp(int id)
+{
     return WIFI_IDL_OPT_OK;
 }
 
@@ -863,8 +874,9 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo>
             groupInfo.SetIsPersistent(true);
         }
         mapGroups.insert(std::pair<int, WifiP2pGroupInfo>(infoList.infos[i].id, groupInfo));
+        std::string ssid(reinterpret_cast<const char*>(infoList.infos[i].ssid));
         LOGI("ReqP2pListNetworks id=%{public}d ssid=%{public}s address=%{private}s",
-            infoList.infos[i].id, infoList.infos[i].ssid, address);
+            infoList.infos[i].id, SsidAnonymize(ssid).c_str(), address);
     }
     free(infoList.infos);
     infoList.infos = nullptr;
@@ -1002,6 +1014,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pInvite(const WifiP2pGroupInfo &group, const 
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pReinvoke(int networkId, const std::string &deviceAddr) const
 {
+    LOGI("HdiP2pReinvoke networkId=%{public}d, bssid=%{public}s", networkId, MacAnonymize(deviceAddr).c_str());
     return HdiP2pReinvoke(networkId, deviceAddr.c_str());
 }
 

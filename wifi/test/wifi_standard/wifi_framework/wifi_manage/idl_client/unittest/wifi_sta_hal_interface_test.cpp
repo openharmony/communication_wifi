@@ -271,6 +271,9 @@ HWTEST_F(WifiStaHalInterfaceTest, SetDeviceConfigTest, TestSize.Level1)
     cfg.wepKeyIdx = 2;
     ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
     EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
+    cfg.allowedGroupMgmtCiphers = 4;
+    ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, GetDeviceConfigTest, TestSize.Level1)

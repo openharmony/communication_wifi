@@ -17,6 +17,7 @@
 #include "wifi_hdi_wpa_ap_impl.h"
 #include "wifi_hdi_util.h"
 #include <unistd.h>
+#include "stub_collector.h"
 
 #undef LOG_TAG
 #define LOG_TAG "wifiHdiWpaApImpl"
@@ -71,7 +72,7 @@ static WifiErrorNo UnRegisterApEventCallback()
             LOGE("UnRegisterEventCallback: UnRegisterEventCallback failed result:%{public}d", result);
             return WIFI_IDL_OPT_FAILED;
         }
-
+        StubCollectorRemoveObject(IHOSTAPDCALLBACK_INTERFACE_DESC, g_hdiApCallbackObj);
         free(g_hdiApCallbackObj);
         g_hdiApCallbackObj = NULL;
     }

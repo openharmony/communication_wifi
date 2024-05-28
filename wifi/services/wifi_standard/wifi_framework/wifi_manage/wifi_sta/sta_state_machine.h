@@ -125,6 +125,18 @@ typedef enum EnumDhcpReturnCode {
     DHCP_FAIL,
 } DhcpReturnCode;
 
+const int DETECT_TYPE_DEFAULT = 0;
+const int DETECT_TYPE_PERIODIC = 1;
+const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
+const int PORTAL_EXPERIED_DETECT_MAX_COUNT = 2;
+enum PortalState {
+    UNCHECKED = 0,
+    NOT_PORTAL,
+    UNAUTHED,
+    AUTHED,
+    EXPERIED
+};
+
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
@@ -518,6 +530,12 @@ public:
      *
      */
     void DealRenewalTimeout(InternalMessage *msg);
+
+    /**
+     * @Description : start detect timer.
+     * @param detectType - type of detect
+     */
+    void StartDetectTimer(int detectType);
 
     /**
      * @Description  start browser to login portal
@@ -1154,6 +1172,10 @@ private:
     bool isRoam;
     int64_t lastTimestamp;
     bool portalFlag;
+    int portalState;
+    int detectNum;
+    int portalExpiredDetectCount;
+    bool mIsWifiInternetCHRFlag;
     bool networkStatusHistoryInserted;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
@@ -1190,13 +1212,14 @@ private:
     void InvokeOnStaStreamChanged(StreamDirection direction);
     void InvokeOnStaRssiLevelChanged(int level);
     WifiDeviceConfig getCurrentWifiDeviceConfig();
-    void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
+    void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus, bool updatePortalAuthTime);
     bool CanArpReachable();
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
 #endif
     void SetConnectMethod(int connectMethod);
+    void FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

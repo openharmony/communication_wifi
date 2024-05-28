@@ -446,8 +446,8 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     UpdateEapConfig(config, tempDeviceConfig.wifiEapConfig);
 
     /* Add the new network to WifiSettings. */
-    if (WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
-        LOGE("AddDeviceConfig EncryptionDeviceConfig failed");
+    if (!WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
+        LOGI("AddDeviceConfig EncryptionDeviceConfig failed");
     }
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
@@ -797,7 +797,7 @@ void StaService::HandleScreenStatusChanged(int screenState)
         return;
     }
     if (screenState == MODE_STATE_OPEN) {
-        pStaStateMachine->StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
+        pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
@@ -858,7 +858,8 @@ ErrCode StaService::StartPortalCertification()
         WIFI_LOGE("pStaStateMachine is null!");
         return WIFI_OPT_FAILED;
     }
-    pStaStateMachine->HandlePortalNetworkPorcess();
+    WIFI_LOGI("StartPortalCertification send message!");
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT);
     return WIFI_OPT_SUCCESS;
 }
 

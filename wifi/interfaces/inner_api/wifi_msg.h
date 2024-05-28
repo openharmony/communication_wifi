@@ -46,6 +46,7 @@ const std::string KEY_MGMT_WEP = "WEP";
 const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
 const std::string KEY_MGMT_EAP = "WPA-EAP";
+const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
 
 const std::string EAP_METHOD_NONE = "NONE";
 const std::string EAP_METHOD_PEAP = "PEAP";
@@ -547,6 +548,7 @@ struct WifiDeviceConfig {
     int connFailedCount;
     unsigned int networkStatusHistory;
     bool isPortal;
+    time_t portalAuthTime;
     time_t lastHasInternetTime;
     bool noInternetAccess;
     /* save select mac address */
@@ -585,6 +587,7 @@ struct WifiDeviceConfig {
         connFailedCount = 0;
         networkStatusHistory = 0;
         isPortal = false;
+        portalAuthTime = -1;
         lastHasInternetTime = -1;
         noInternetAccess = false;
         callProcessName = "";

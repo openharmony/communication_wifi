@@ -769,7 +769,7 @@ void HalDeviceManager::GetP2pIfaceInfo(WifiChipInfo &wifiChipInfo)
 
     int32_t ret = wifiChipInfo.chip->GetP2pServiceIfNames(ifnames);
     if (ret == HDF_SUCCESS) {
-        for (int i = 0; i < ifnames.size(); ++i) {
+        for (uint32_t i = 0; i < ifnames.size(); ++i) {
             wifiIfaceInfo.Clear();
             ret = wifiChipInfo.chip->GetP2pService(ifnames[i], wifiIfaceInfo.iface);
             if (ret != HDF_SUCCESS) {
@@ -795,7 +795,7 @@ void HalDeviceManager::GetApIfaceInfo(WifiChipInfo &wifiChipInfo)
 
     int32_t ret = wifiChipInfo.chip->GetApServiceIfNames(ifnames);
     if (ret == HDF_SUCCESS) {
-        for (int i = 0; i < ifnames.size(); ++i) {
+        for (uint32_t i = 0; i < ifnames.size(); ++i) {
             wifiIfaceInfo.Clear();
             ret = wifiChipInfo.chip->GetApService(ifnames[i], wifiIfaceInfo.iface);
             if (ret != HDF_SUCCESS) {
@@ -821,7 +821,7 @@ void HalDeviceManager::GetStaIfaceInfo(WifiChipInfo &wifiChipInfo)
 
     int32_t ret = wifiChipInfo.chip->GetStaServiceIfNames(ifnames);
     if (ret == HDF_SUCCESS) {
-        for (int i = 0; i < ifnames.size(); ++i) {
+        for (uint32_t i = 0; i < ifnames.size(); ++i) {
             wifiIfaceInfo.Clear();
             ret = wifiChipInfo.chip->GetStaService(ifnames[i], wifiIfaceInfo.iface);
             if (ret != HDF_SUCCESS) {
@@ -897,7 +897,7 @@ bool HalDeviceManager::GetAllChipInfo(std::vector<WifiChipInfo> &wifiChipInfos)
         return false;
     }
 
-    for (int i = 0; i < chipIds.size(); ++i) {
+    for (uint32_t i = 0; i < chipIds.size(); ++i) {
         WifiChipInfo wifiChipInfo;
         if (GetChipInfo(chipIds[i], wifiChipInfo)) {
             wifiChipInfo.chipId = chipIds[i];
@@ -1069,19 +1069,19 @@ void HalDeviceManager::ExpandIfaceCombos(ComboIface &chipIfaceCombo,
 {
     int numOfCombos = 1;
     for (auto &limit : chipIfaceCombo.limits) {
-        for (int i = 0; i < limit.ifaceNum; ++i) {
+        for (uint32_t i = 0; i < limit.ifaceNum; ++i) {
             numOfCombos *= limit.types.size();
         }
     }
 
     expandedIfaceCombos.resize(numOfCombos);
-    for (int i = 0; i < expandedIfaceCombos.size(); ++i) {
+    for (uint32_t i = 0; i < expandedIfaceCombos.size(); ++i) {
         expandedIfaceCombos[i].resize(IFACE_TYPES_BY_PRIORITY.size(), 0);
     }
 
     int span = numOfCombos;
     for (auto &limit : chipIfaceCombo.limits) {
-        for (int i = 0; i < limit.ifaceNum; ++i) {
+        for (uint32_t i = 0; i < limit.ifaceNum; ++i) {
             span /= limit.types.size();
             for (int k = 0; k < numOfCombos; ++k) {
                 int ifaceType = limit.types.at((k / span) % limit.types.size());

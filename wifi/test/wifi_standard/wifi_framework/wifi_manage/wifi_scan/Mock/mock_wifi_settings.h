@@ -55,6 +55,12 @@ public:
     virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
     virtual int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene) = 0;
     virtual std::string GetStaIfaceName() = 0;
+    virtual int SetValidChannels(const ChannelsTable &channelsInfo) = 0;
+    virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
+    virtual int GetAbnormalApps(std::vector<std::string> &abnormalAppList) = 0;
+    virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
+    virtual int GetValidChannels(ChannelsTable &channelsInfo)  = 0;
+    virtual int GetWifiState(int instId = 0) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -89,7 +95,12 @@ public:
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
     MOCK_METHOD2(SetHid2dUpperScene, int(const std::string& ifName, const Hid2dUpperScene &scene));
     MOCK_METHOD0(GetStaIfaceName, std::string());
-    
+     MOCK_METHOD1(SetValidChannels, int(const ChannelsTable &channelsInfo));
+    MOCK_METHOD1(GetPackageFilterMap,  int(std::map<std::string, std::vector<std::string>> &filterMap));
+    MOCK_METHOD1(GetAbnormalApps,  int (std::vector<std::string> &abnormalAppList));
+    MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &linkedInfo));
+    MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
+    MOCK_METHOD1(GetWifiState, int(int));
 };
 }  // namespace Wifi
 }  // namespace OHOS

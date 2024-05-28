@@ -30,6 +30,7 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+constexpr const int  = 100;
 WifiAppStateAware::WifiAppStateAware(int instId)
 {
     GetForegroundApp();
@@ -166,12 +167,13 @@ void WifiAppStateAware::GetForegroundApp()
     return;
 }
 
-ErrCode WifiAppStateAware::GetProcessRunningInfos(std::vector<RunningProcessInfo> &info) {
+ErrCode WifiAppStateAware::GetProcessRunningInfos(std::vector<AppExecFwk::RunningProcessInfo> &info) {
     if (!Connect()) {
         WIFI_LOGE("%{public}s connect failed", __FUNCTION__);
         return WIFI_OPT_FAILED;
     }
-    if (appMgrProxy_->GetProcessRunningInfoByUserId(info) != AppExecFwk::AppMgrResultCode::RESULT_OK) {
+    if (appMgrProxy_->GetProcessRunningInfosByUserId(info, APP_INFO_USERID) 
+        != AppExecFwk::AppMgrResultCode::RESULT_OK) {
         WIFI_LOGE("%{public}s GetProcessRunningInfoByUserId failed", __FUNCTION__);
         return WIFI_OPT_FAILED;
     }

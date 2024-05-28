@@ -141,6 +141,7 @@ ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningP
     std::vector<AppExecFwk::RunningProcessInfo> infos;
     if (WifiAppStateAware::GetInstance().GetProcessRunningInfos(infos) != WIFI_OPT_FAILED) {
         WIFI_LOGE("GetProcessRunningInfosByUserId failed.");
+        return WIFI_OPT_FAILED;
     }
     if (getFgAppFlag) {
         for (auto iter = infos.begin(); iter != infos.end(); ++iter) {

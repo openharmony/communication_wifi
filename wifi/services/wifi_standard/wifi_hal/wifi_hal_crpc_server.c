@@ -648,7 +648,6 @@ static void DealP2pDeviceInfoCbk(int event, Context *context)
         }
         if (event == AP_STA_DISCONNECTED_EVENT || event == AP_STA_CONNECTED_EVENT) {
             WriteStr(context, cbmsg->msg.deviceInfo.p2pDeviceAddress);
-            WriteStr(context, cbmsg->msg.deviceInfo.p2pRandomDeviceAddress);
         }
     }
     return;

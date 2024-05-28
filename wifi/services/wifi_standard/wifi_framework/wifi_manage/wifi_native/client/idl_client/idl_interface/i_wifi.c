@@ -527,8 +527,7 @@ static void IdlCbP2pGroupStartedEvent(Context *context)
         ReadInt(context, &info.frequency) < 0 || ReadStr(context, info.groupName, sizeof(info.groupName)) != 0 ||
         ReadStr(context, info.ssid, sizeof(info.ssid)) != 0 || ReadStr(context, info.psk, sizeof(info.psk)) != 0 ||
         ReadStr(context, info.passphrase, sizeof(info.passphrase)) != 0 ||
-        ReadStr(context, info.goDeviceAddress, sizeof(info.goDeviceAddress)) != 0 ||
-        ReadStr(context, info.goRandomAddress, sizeof(info.goRandomAddress)) != 0) {
+        ReadStr(context, info.goDeviceAddress, sizeof(info.goDeviceAddress)) != 0) {
         return;
     }
     IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();

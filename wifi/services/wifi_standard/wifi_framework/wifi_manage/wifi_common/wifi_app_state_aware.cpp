@@ -30,7 +30,7 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
-constexpr const int  = 100;
+constexpr const int = 100;
 WifiAppStateAware::WifiAppStateAware(int instId)
 {
     GetForegroundApp();

@@ -217,7 +217,6 @@ struct IdlP2pGroupInfo {
     std::string psk;
     std::string passphrase;
     std::string goDeviceAddress;
-    std::string goRandomAddress;
 
     IdlP2pGroupInfo() : isGo(0), isPersistent(0), frequency(0)
     {}

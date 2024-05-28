@@ -304,7 +304,6 @@ void OnP2pGroupStarted(const P2pGroupInfo *group)
         cbInfo.psk = group->psk;
         cbInfo.passphrase = group->passphrase;
         cbInfo.goDeviceAddress = group->goDeviceAddress;
-        cbInfo.goRandomAddress = group->goRandomAddress;
         cbk.onGroupStarted(cbInfo);
     }
 }

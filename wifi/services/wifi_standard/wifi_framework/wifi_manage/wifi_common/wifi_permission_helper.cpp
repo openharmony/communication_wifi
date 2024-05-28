@@ -31,12 +31,10 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
 #ifdef OHOS_ARCH_LITE
     return PERMISSION_GRANTED;
 #else
-    /* Waive all permission checks for wifi_enhance */
-    const int uidWifiEnhance = 1010;
-    if (uid == uidWifiEnhance) {
-        return PERMISSION_GRANTED;
+    if (uid != static_cast<int>(getuid()) || pid != static_cast<int>(getuid())) {
+        return PERMISSION_DENIED;
     }
-
+    /* Waive all permission checks for wifi_enhance */
     Security::AccessToken::AccessTokenID callerToken = 0;
     if (tokenId == 0) {
         callerToken = IPCSkeleton::GetCallingTokenID();

@@ -137,8 +137,7 @@ int WifiPermissionUtils::VerifyGetWifiDirectDevicePermission()
 int WifiPermissionUtils::VerifyManageWifiHotspotPermission()
 {
     /* Exempt net_manager from this sys_core level permission check */
-    const int uidNetNamager = 1099;
-    if (IPCSkeleton::GetCallingUid() == uidNetNamager) {
+    if (IPCSkeleton::GetCallingUid() == static_cast<int>(getuid())) {
         return PERMISSION_GRANTED;
     }
     return WifiAuthCenter::GetInstance().VerifyManageWifiHotspotPermission(

@@ -125,6 +125,7 @@ private:
     std::string m_wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
     std::shared_ptr<WifiCountryCodePolicy> m_wifiCountryCodePolicy;
     std::mutex m_countryCodeMutex;
+    bool m_isFirstConnected = false;
 
     WifiCountryCodeManager() = default;
     void SendCountryCodeChangeCommonEvent(const std::string &wifiCountryCode);
@@ -132,10 +133,12 @@ private:
 #ifdef FEATURE_STA_SUPPORT
     static void DealStaOpenRes(OperateResState state, int instId = 0);
     static void DealStaCloseRes(OperateResState state, int instId = 0);
+    static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
 #endif
 #ifdef FEATURE_AP_SUPPORT
     static void DealApStateChanged(ApState state, int id = 0);
 #endif
+    bool IsAllowUpdateWifiCountryCode();
     ErrCode UpdateWifiCountryCodeCache(const std::string &wifiCountryCode);
     void NotifyWifiCountryCodeChangeListeners(const std::string &wifiCountryCode);
     ErrCode UnregisterWifiCountryCodeChangeListener(const std::string &moduleName);

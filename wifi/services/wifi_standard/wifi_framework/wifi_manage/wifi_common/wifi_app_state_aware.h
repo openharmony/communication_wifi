@@ -49,6 +49,7 @@ public:
     std::string GetRunningProcessNameByPid(const int uid, const int pid);
 
 private:
+    void RegisterAppStateChangedCallback(const int64_t delayTime = 0);
     std::mutex mutex_ {};
     std::string foregroundAppBundleName_;
     int32_t foregroundAppUid_;

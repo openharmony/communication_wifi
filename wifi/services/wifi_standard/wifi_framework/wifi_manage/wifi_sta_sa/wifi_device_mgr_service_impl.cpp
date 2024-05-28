@@ -54,8 +54,13 @@ WifiDeviceMgrServiceImpl::~WifiDeviceMgrServiceImpl()
 
 void WifiDeviceMgrServiceImpl::OnStart()
 {
+    WIFI_LOGI("Start sta service!");
     if (mState == ServiceRunningState::STATE_RUNNING) {
         WIFI_LOGW("Service has already started.");
+        return;
+    }
+    if (WifiManager::GetInstance().Init() < 0) {
+        WIFI_LOGE("WifiManager init failed!");
         return;
     }
     if (!Init()) {
@@ -64,11 +69,6 @@ void WifiDeviceMgrServiceImpl::OnStart()
         return;
     }
     mState = ServiceRunningState::STATE_RUNNING;
-    WIFI_LOGI("Start sta service!");
-    if (WifiManager::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiManager init failed!");
-        return;
-    }
     auto &pWifiStaManager = WifiManager::GetInstance().GetWifiStaManager();
     if (pWifiStaManager) {
         pWifiStaManager->StartUnloadStaSaTimer();

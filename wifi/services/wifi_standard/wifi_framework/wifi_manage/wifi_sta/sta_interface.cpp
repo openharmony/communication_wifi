@@ -212,6 +212,7 @@ int StaInterface::UpdateDeviceConfig(const WifiDeviceConfig &config)
 {
     LOGD("Enter StaInterface::UpdateDeviceConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->UpdateDeviceConfig(config);
 }
 

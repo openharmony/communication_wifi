@@ -48,10 +48,13 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.numAssociation = 0;
     item.networkStatusHistory = 0;
     item.isPortal = false;
+    item.portalAuthTime = -1;
     item.lastHasInternetTime = -1;
     item.noInternetAccess = false;
     item.callProcessName.clear();
     item.ancoCallProcessName.clear();
+    item.randomizedMacSuccessEver = false;
+    item.macAddress.clear();
     item.internetSelfCureHistory.clear();
     item.isReassocSelfCureWithFactoryMacAddress = 0;
     return;
@@ -212,6 +215,10 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.version = std::stoi(value);
     } else if (key == "randomizedMacSuccessEver") {
         item.randomizedMacSuccessEver = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "macAddress") {
+        item.macAddress = value;
+    } else if (key == "portalAuthTime") {
+        item.portalAuthTime = std::stol(value);
     } else {
         return SetWifiDeviceConfigExternal(item, key, value);
     }
@@ -463,6 +470,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"numAssociation=" << item.numAssociation << std::endl;
     ss << "    " <<"networkStatusHistory=" << item.networkStatusHistory << std::endl;
     ss << "    " <<"isPortal=" << item.isPortal << std::endl;
+    ss << "    " <<"portalAuthTime=" << item.portalAuthTime << std::endl;
     ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
     ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
     ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;
@@ -480,6 +488,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"callProcessName=" << item.callProcessName << std::endl;
     ss << "    " <<"ancoCallProcessName=" << item.ancoCallProcessName << std::endl;
     ss << "    " <<"randomizedMacSuccessEver=" << item.randomizedMacSuccessEver << std::endl;
+    ss << "    " << "macAddress=" << item.macAddress << std::endl;
     ss << "    " <<"</WifiDeviceConfig>" << std::endl;
     return ss.str();
 }
@@ -813,7 +822,7 @@ template<>
 void ClearTClass<WifiConfig>(WifiConfig &item)
 {
     item.scanAlwaysSwitch = false;
-    item.staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+    item.staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
     item.staLastState = false;
@@ -1325,6 +1334,8 @@ int SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::s
         item.peerBssid = value;
     } else if (key == "randomMac") {
         item.randomMac = value;
+    } else if (key == "fuzzyBssids") {
+        SplitString(value, "|", item.fuzzyBssids);
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -1337,6 +1348,21 @@ template <> std::string GetTClassName<WifiStoreRandomMac>()
     return "WifiStoreRandomMac";
 }
 
+static std::string OutWifiStoreRandomMacBssids(const std::vector<std::string> &bssids, const std::string prefix = "|")
+{
+    std::ostringstream ss;
+    size_t count = bssids.size();
+    for (size_t index = 0; index < count; index ++) {
+        if (index != count -1) {
+            ss << bssids[index] << prefix;
+        } else {
+            ss << bssids[index] << std::endl;
+        }
+    }
+
+    return ss.str();
+}
+
 template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item)
 {
     std::ostringstream ss;
@@ -1346,48 +1372,8 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
     ss << "    " <<"peerBssid=" << item.peerBssid << std::endl;
     ss << "    " <<"randomMac=" << item.randomMac << std::endl;
+    ss << "    " <<"fuzzyBssids=" << OutWifiStoreRandomMacBssids(item.fuzzyBssids) << std::endl;
     ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
-    return ss.str();
-}
-
-template <> void ClearTClass<SoftApRandomMac>(SoftApRandomMac &item)
-{
-    item.ssid.clear();
-    item.keyMgmt = KeyMgmt::NONE;
-    item.randomMac.clear();
-    return;
-}
-
-template <>
-int SetTClassKeyValue<SoftApRandomMac>(SoftApRandomMac &item, const std::string &key, const std::string &value)
-{
-    int errorKeyValue = 0;
-    if (key == "ssid") {
-        item.ssid = value;
-    } else if (key == "keyMgmt") {
-        item.keyMgmt = static_cast<KeyMgmt>(std::stoi(value));
-    } else if (key == "randomMac") {
-        item.randomMac = value;
-    } else {
-        LOGE("Invalid config key value");
-        errorKeyValue++;
-    }
-    return errorKeyValue;
-}
-
-template <> std::string GetTClassName<SoftApRandomMac>()
-{
-    return "SoftApRandomMac";
-}
-
-template <> std::string OutTClassString<SoftApRandomMac>(SoftApRandomMac &item)
-{
-    std::ostringstream ss;
-    ss << "    " <<"<SoftApRandomMac>" << std::endl;
-    ss << "    " <<"ssid=" << item.ssid << std::endl;
-    ss << "    " <<"keyMgmt=" << static_cast<int>(item.keyMgmt) << std::endl;
-    ss << "    " <<"randomMac=" << item.randomMac << std::endl;
-    ss << "    " <<"</SoftApRandomMac>" << std::endl;
     return ss.str();
 }
 

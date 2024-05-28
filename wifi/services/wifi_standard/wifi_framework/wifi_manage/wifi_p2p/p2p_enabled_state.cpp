@@ -23,6 +23,8 @@
 
 DEFINE_WIFILOG_P2P_LABEL("P2pEnabledState");
 
+namespace OHOS {
+namespace Wifi {
 const int CHANNEL_INDEX_OF_DISCOVER = 16;
 const int TIMEOUT_MASK_OF_DISCOVER = 0x00FF;
 const int DISCOVER_TIMEOUT_S = 120;
@@ -31,8 +33,6 @@ const int CMD_TYPE_SET = 2;
 const int DATA_TYPE_SET_LISTEN_MODE = 4;
 const std::string ONEHOP_LISTEN_MODE = "1";
 
-namespace OHOS {
-namespace Wifi {
 P2pEnabledState::P2pEnabledState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
     WifiP2pDeviceManager &deviceMgr)
     : State("P2pEnabledState"),
@@ -209,12 +209,12 @@ bool P2pEnabledState::ProcessDeviceFoundEvt(InternalMessage &msg) const
 bool P2pEnabledState::ProcessPriDeviceFoundEvt(InternalMessage &msg) const
 {
     WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_PRI_DEVICE_FOUND");
-    std::string PrivateInfo;
-    if (!msg.GetMessageObj(PrivateInfo)) {
+    std::string privateInfo;
+    if (!msg.GetMessageObj(privateInfo)) {
         WIFI_LOGE("Failed to obtain device information.");
         return EXECUTED;
     }
-    p2pStateMachine.BroadcastP2pPrivatePeersChanged(PrivateInfo);
+    p2pStateMachine.BroadcastP2pPrivatePeersChanged(privateInfo);
     return EXECUTED;
 }
 bool P2pEnabledState::ProcessDeviceLostEvt(InternalMessage &msg) const

@@ -51,7 +51,7 @@ ScanService::ScanService(int instId)
       staSceneForbidCount(0),
       customSceneForbidCount(0),
       scanTrustMode(false),
-      isAbsFreezeState(false),
+      lastFreezeState(false),
       isAbsFreezeScaned(false),
       scanResultBackup(-1),
       mEnhanceService(nullptr),
@@ -422,7 +422,6 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
         return false;
     }
 
-    std::unique_lock<std::mutex> lock(scanConfigMapMutex);
     if (pScanStateMachine == nullptr) {
         WIFI_LOGE("pScanStateMachine is null.\n");
         return false;
@@ -431,12 +430,14 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
     InternalMessage *interMessage =
         pScanStateMachine->CreateMessage(static_cast<int>(CMD_START_COMMON_SCAN), requestIndex);
     if (interMessage == nullptr) {
+        std::unique_lock<std::mutex> lock(scanConfigMapMutex);
         scanConfigMap.erase(requestIndex);
         WIFI_LOGE("CreateMessage failed.\n");
         return false;
     }
 
     if (!AddScanMessageBody(interMessage, interConfig)) {
+        std::unique_lock<std::mutex> lock(scanConfigMapMutex);
         scanConfigMap.erase(requestIndex);
         MessageManage::GetInstance().ReclaimMsg(interMessage);
         WIFI_LOGE("AddScanMessageBody failed.\n");
@@ -1056,26 +1057,17 @@ void ScanService::HandleNetworkQualityChanged(int status)
 void ScanService::HandleMovingFreezeChanged()
 {
     LOGI("Enter HandleMovingFreezeChanged.");
-    ScanMode appRunMode = WifiSettings::GetInstance().GetAppRunningState();
     int freezeState = WifiSettings::GetInstance().GetFreezeModeState();
-    int noChargerPlugModeState = WifiSettings::GetInstance().GetNoChargerPlugModeState();
-
-    bool movingFreeze = (appRunMode == ScanMode::APP_BACKGROUND_SCAN || appRunMode == ScanMode::SYS_BACKGROUND_SCAN) &&
-        (freezeState == MODE_STATE_OPEN) && (noChargerPlugModeState == MODE_STATE_OPEN);
-    bool movingFreezeBakup = IsMovingFreezeState();
-
-    SetMovingFreezeState(movingFreeze);
-    WIFI_LOGD("moving freeze changed: movingFreeze=%{public}d, movingFreezeBakup=%{public}d", movingFreeze,
-        movingFreezeBakup);
     /* Moving -> Freeze, set the scanned flag to false. */
-    if (!movingFreezeBakup && movingFreeze) {
+    if (!lastFreezeState && freezeState) {
         WIFI_LOGW("set movingFreeze scanned false.");
         SetMovingFreezeScaned(false);
     }
-    if (movingFreezeBakup == movingFreeze) {
+    if (lastFreezeState == freezeState) {
         WIFI_LOGD("AbsFreezeState not change, no need to restart system timer scan.");
         return;
     }
+    lastFreezeState = freezeState;
     SystemScanProcess(false);
 }
 
@@ -1348,7 +1340,7 @@ ErrCode ScanService::AllowExternScan()
         return WIFI_OPT_FAILED;
     }
 
-    if (!AllowScanByMovingFreeze()) {
+    if (!AllowScanByMovingFreeze(scanMode)) {
         WIFI_LOGW("extern scan not allow by moving freeze mode");
         return WIFI_OPT_MOVING_FREEZE_CTRL;
     }
@@ -1399,7 +1391,7 @@ ErrCode ScanService::AllowExternScan()
         WIFI_LOGW("extern scan not allow by interval mode");
         return WIFI_OPT_FAILED;
     }
-    if (!AllowScanByMovingFreeze()) {
+    if (!AllowScanByMovingFreeze(scanMode)) {
         WIFI_LOGW("extern scan not allow by moving freeze mode");
         return WIFI_OPT_MOVING_FREEZE_CTRL;
     }
@@ -1467,7 +1459,7 @@ ErrCode ScanService::AllowSystemTimerScan()
     SystemScanByInterval(staScene, systemScanIntervalMode.scanIntervalMode.interval,
         systemScanIntervalMode.scanIntervalMode.count);
 #else
-    if (!AllowScanByMovingFreeze()) {
+    if (!AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN)) {
         return WIFI_OPT_MOVING_FREEZE_CTRL;
     }
 
@@ -1525,7 +1517,7 @@ ErrCode ScanService::AllowPnoScan()
         WIFI_LOGD("pnoScan is not allowed for forbid map");
         return WIFI_OPT_FAILED;
     }
-    if (!AllowScanByMovingFreeze()) {
+    if (!AllowScanByMovingFreeze(ScanMode::PNO_SCAN)) {
         return WIFI_OPT_MOVING_FREEZE_CTRL;
     }
 
@@ -1620,16 +1612,17 @@ bool ScanService::IsInScanTrust(int sceneId) const
     return false;
 }
 
-void ScanService::SetMovingFreezeState(bool state)
+bool ScanService::IsMovingFreezeState(ScanMode appRunMode) const
 {
-    std::unique_lock<std::mutex> lock(scanControlInfoMutex);
-    isAbsFreezeState = state;
-}
-
-bool ScanService::IsMovingFreezeState() const
-{
-    std::unique_lock<std::mutex> lock(scanControlInfoMutex);
-    return isAbsFreezeState;
+    int freezeState = WifiSettings::GetInstance().GetFreezeModeState();
+    int noChargerPlugModeState = WifiSettings::GetInstance().GetNoChargerPlugModeState();
+    if (appRunMode == ScanMode::APP_BACKGROUND_SCAN || appRunMode == ScanMode::SYS_BACKGROUND_SCAN) {
+        return freezeState == MODE_STATE_OPEN && noChargerPlugModeState == MODE_STATE_OPEN;
+    } else if (appRunMode == ScanMode::SYSTEM_TIMER_SCAN || appRunMode == ScanMode::PNO_SCAN) {
+        return freezeState == MODE_STATE_OPEN;
+    } else {
+        return false;
+    }
 }
 
 void ScanService::SetMovingFreezeScaned(bool scanned)
@@ -2568,7 +2561,7 @@ bool ScanService::AllowScanByDisableScanCtrl()
     return !disableScanFlag;
 }
 
-bool ScanService::AllowScanByMovingFreeze()
+bool ScanService::AllowScanByMovingFreeze(ScanMode appRunMode)
 {
     LOGI("Enter AllowScanByMovingFreeze.\n");
 
@@ -2579,7 +2572,7 @@ bool ScanService::AllowScanByMovingFreeze()
         return true;
     }
 
-    if (!IsMovingFreezeState()) {
+    if (!IsMovingFreezeState(appRunMode)) {
         WIFI_LOGD("It's not in the movingfreeze mode, return true.");
         return true;
     }
@@ -2686,7 +2679,7 @@ void ScanService::SystemScanConnectedPolicy(int &interval)
         interval = SYSTEM_SCAN_INTERVAL_ONE_HOUR;
     } else {
         interval *= DOUBLE_SCAN_INTERVAL;
-        if (IsMovingFreezeState()) {
+        if (IsMovingFreezeState(ScanMode::SYSTEM_TIMER_SCAN)) {
             if (interval > SYSTEM_SCAN_INTERVAL_FIVE_MINUTE) {
                 interval = SYSTEM_SCAN_INTERVAL_FIVE_MINUTE;
             }
@@ -2708,7 +2701,7 @@ void ScanService::SystemScanDisconnectedPolicy(int &interval, int &count)
         } else if (count < SYSTEM_SCAN_COUNT_3_TIMES * DOUBLE_SCAN_INTERVAL) {
             interval = SYSTEM_SCAN_INTERVAL_30_SECOND;
         } else {
-            if (IsMovingFreezeState()) {
+            if (IsMovingFreezeState(ScanMode::SYSTEM_TIMER_SCAN)) {
                 interval = SYSTEM_SCAN_INTERVAL_FIVE_MINUTE;
             } else {
                 interval = SYSTEM_SCAN_INTERVAL_60_SECOND;
@@ -2717,7 +2710,7 @@ void ScanService::SystemScanDisconnectedPolicy(int &interval, int &count)
         count++;
     } else {
         interval *= DOUBLE_SCAN_INTERVAL;
-        if (IsMovingFreezeState()) {
+        if (IsMovingFreezeState(ScanMode::SYSTEM_TIMER_SCAN)) {
             if (interval > SYSTEM_SCAN_INTERVAL_FIVE_MINUTE) {
                 interval = SYSTEM_SCAN_INTERVAL_FIVE_MINUTE;
             }

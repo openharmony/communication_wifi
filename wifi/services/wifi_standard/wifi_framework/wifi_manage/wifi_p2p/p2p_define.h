@@ -160,6 +160,7 @@ enum class DHCPTYPE {
     NO_DHCP = 0,
     DHCP_P2P,
     DHCP_LEGACEGO,
+    DHCP_INVALID,
 };
 
 enum class P2P_ERROR_RES {

@@ -31,7 +31,7 @@ namespace OHOS {
 namespace Wifi {
 #define WIFI_COUNTRY_CODE_LEN 2
 #define WEPKEYS_SIZE 4
-#define INVALID_NETWORK_ID (-1)
+#define INVALID_NETWORK_ID (static_cast<unsigned int>(-1))
 #define WIFI_INVALID_UID (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1

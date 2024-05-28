@@ -21,6 +21,7 @@
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
 #include "wifi_common_util.h"
+#include "hdi_struct_toolkit.h"
 #include <securec.h>
 #include <unistd.h>
 
@@ -584,6 +585,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &ne
         }
         networkInfo.flag = flags;
         networkList.push_back(networkInfo);
+        FreeHdiWifiWpaNetworkInfo(&listNetwork[i]);
     }
     if (listNetwork != nullptr) {
         delete[] listNetwork;
@@ -878,8 +880,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo>
         LOGI("ReqP2pListNetworks id=%{public}d ssid=%{public}s address=%{private}s",
             infoList.infos[i].id, SsidAnonymize(ssid).c_str(), address);
     }
-    free(infoList.infos);
-    infoList.infos = nullptr;
+    FreeHdiP2pNetworkList(&infoList);
     return ret;
 }
 
@@ -1198,6 +1199,7 @@ WifiErrorNo WifiHdiWpaClient::ReqGetP2pPeer(const std::string &deviceAddress, Wi
         device.SetGroupCapabilitys(peerInfo.groupCapabilities);
         device.SetNetworkName((char *)peerInfo.operSsid);
     }
+    FreeHdiP2pDeviceInfo(&peerInfo);
     return ret;
 }
 

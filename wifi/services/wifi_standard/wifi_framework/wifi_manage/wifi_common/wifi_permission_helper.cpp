@@ -31,7 +31,7 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
 #ifdef OHOS_ARCH_LITE
     return PERMISSION_GRANTED;
 #else
-    if (uid != static_cast<int>(getuid()) || pid != static_cast<int>(getuid())) {
+    if (uid == static_cast<int>(getuid()) && pid == static_cast<int>(getpid())) {
         return PERMISSION_DENIED;
     }
     /* Waive all permission checks for wifi_enhance */

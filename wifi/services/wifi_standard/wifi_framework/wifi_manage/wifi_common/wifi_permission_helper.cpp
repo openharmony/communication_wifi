@@ -32,7 +32,7 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
     return PERMISSION_GRANTED;
 #else
     if (uid == static_cast<int>(getuid()) && pid == static_cast<int>(getpid())) {
-        return PERMISSION_DENIED;
+        return PERMISSION_GRANTED;
     }
     Security::AccessToken::AccessTokenID callerToken = 0;
     if (tokenId == 0) {

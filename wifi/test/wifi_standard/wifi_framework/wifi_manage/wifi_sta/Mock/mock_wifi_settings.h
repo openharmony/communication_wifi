@@ -95,6 +95,7 @@ public:
     virtual void SetWifiToggledState(bool state) = 0;
     virtual int GetScreenState() const = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
+
 };
 
 class WifiSettings : public MockWifiSettings {

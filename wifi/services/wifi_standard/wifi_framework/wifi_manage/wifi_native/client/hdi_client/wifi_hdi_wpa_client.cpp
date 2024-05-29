@@ -812,6 +812,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
         cWifiHdiWpaCallback.OnEventGroupFormationSuccess = OnEventGroupFormationSuccess;
         cWifiHdiWpaCallback.OnEventGroupFormationFailure = OnEventGroupFormationFailure;
         cWifiHdiWpaCallback.OnEventGroupStarted = OnEventGroupStarted;
+        cWifiHdiWpaCallback.OnEventGroupInfoStarted = OnEventGroupInfoStarted;
         cWifiHdiWpaCallback.OnEventGroupRemoved = OnEventGroupRemoved;
         cWifiHdiWpaCallback.OnEventProvisionDiscoveryCompleted = OnEventProvisionDiscoveryCompleted;
         cWifiHdiWpaCallback.OnEventFindStopped = OnEventFindStopped;

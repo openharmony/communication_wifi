@@ -123,11 +123,13 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
         WifiP2pDevice device = deviceManager.GetDevices(owner.GetDeviceAddress());
         if (device.IsValid()) {
+            device.SetRandomDeviceAddress(owner.GetRandomDeviceAddress());
             device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
             WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
             copy.SetOwner(device);
             groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
-
+            WIFI_LOGI("GetGcDeviceAddress %{private}s %{private}s", device.GetDeviceAddress().c_str(),
+                device.GetRandomDeviceAddress().c_str());
             deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
 
             p2pStateMachine.BroadcastP2pPeersChanged();

@@ -589,6 +589,7 @@ void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevi
 {
     reply.WriteString(device.GetDeviceName());
     reply.WriteString(device.GetDeviceAddress());
+    reply.WriteString(device.GetRandomDeviceAddress());
     reply.WriteInt32(device.GetDeviceAddressType());
     reply.WriteString(device.GetPrimaryDeviceType());
     reply.WriteString(device.GetSecondaryDeviceType());

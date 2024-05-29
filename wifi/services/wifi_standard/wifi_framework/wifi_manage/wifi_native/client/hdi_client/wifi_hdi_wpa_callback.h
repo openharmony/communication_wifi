@@ -60,6 +60,8 @@ int32_t OnEventGroupFormationSuccess(struct IWpaCallback *self, const char *ifNa
 int32_t OnEventGroupFormationFailure(struct IWpaCallback *self, const char *reason, const char *ifName);
 int32_t OnEventGroupStarted(struct IWpaCallback *self,
     const struct HdiP2pGroupStartedParam *groupStartedParam, const char* ifName);
+int32_t OnEventGroupInfoStarted(struct IWpaCallback *self,
+    const struct HdiP2pGroupInfoStartedParam *groupStartedParam, const char* ifName);
 int32_t OnEventGroupRemoved(struct IWpaCallback *self,
     const struct HdiP2pGroupRemovedParam *groupRemovedParam, const char* ifName);
 int32_t OnEventProvisionDiscoveryCompleted(struct IWpaCallback *self,

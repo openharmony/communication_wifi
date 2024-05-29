@@ -101,7 +101,7 @@ private:
      */
     virtual void Broadcast2SmDeviceFound(const std::string &iface, const WifiP2pDevice &device) const;
 
-    virtual void Broadcast2SmPrivateDeviceFound(const std::string &iface, const std::string &PrivateInfo) const;
+    virtual void Broadcast2SmPrivateDeviceFound(const std::string &iface, const std::string &privateInfo) const;
 
     /**
      * @Description Broadcast device lost event.

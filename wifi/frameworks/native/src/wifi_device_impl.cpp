@@ -565,5 +565,11 @@ ErrCode WifiDeviceImpl::GetWifiDetailState(WifiDetailState &state)
     return client_->GetWifiDetailState(state);
 }
 
+ErrCode WifiDeviceImpl::StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->StartRoamToNetwork(networkId, bssid, isCandidate);
+}
 }  // namespace Wifi
 }  // namespace OHOS

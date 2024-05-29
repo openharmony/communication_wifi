@@ -446,8 +446,8 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     UpdateEapConfig(config, tempDeviceConfig.wifiEapConfig);
 
     /* Add the new network to WifiSettings. */
-    if (WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
-        LOGE("AddDeviceConfig EncryptionDeviceConfig failed");
+    if (!WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
+        LOGI("AddDeviceConfig EncryptionDeviceConfig failed");
     }
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
@@ -556,6 +556,37 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bssid) const
+{
+    LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+
+    WifiLinkedInfo linkedInfo;
+    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if (networkId == linkedInfo.networkId) {
+        if (bssid == linkedInfo.bssid) {
+            LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+        } else {
+            LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
+                __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
+            pStaStateMachine->StartRoamToNetwork(bssid);
+        }
+    } else {
+        LOGI("%{public}s switch to target network", __FUNCTION__);
+        auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+        message->SetParam1(networkId);
+        message->SetParam2(NETWORK_SELECTED_BY_USER);
+        message->AddStringMessageBody(bssid);
+        pStaStateMachine->SendMessage(message);
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -827,7 +858,8 @@ ErrCode StaService::StartPortalCertification()
         WIFI_LOGE("pStaStateMachine is null!");
         return WIFI_OPT_FAILED;
     }
-    pStaStateMachine->HandlePortalNetworkPorcess();
+    WIFI_LOGI("StartPortalCertification send message!");
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -855,7 +887,7 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
 
 ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
 {
-    int netWorkId = INVALID_NETWORK_ID;
+    unsigned int netWorkId = INVALID_NETWORK_ID;
     if (bssid.find("ENABLE=1") != INVALID_NETWORK_ID) {
         netWorkId = AddDeviceConfig(config);
         if (netWorkId == INVALID_NETWORK_ID) {

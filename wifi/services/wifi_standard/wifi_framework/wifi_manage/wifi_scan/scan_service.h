@@ -330,7 +330,7 @@ private:
     };
     bool scanTrustMode;                              /* scan trustlist mode */
     std::unordered_set<int> scanTrustSceneIds;       /* scan scene ids */
-    bool isAbsFreezeState;                           /* absolute freeze state. */
+    bool lastFreezeState;                            /* last freeze state. */
     bool isAbsFreezeScaned;                          /* scanned in freeze state. */
     int scanResultBackup;                            /* scan result backup. */
     IEnhanceService *mEnhanceService;                /* EnhanceService handle */
@@ -522,17 +522,12 @@ private:
      */
     bool IsInScanTrust(int sceneId) const;
     /**
-     * @Description Set the moving freeze status by state.
-     *
-     * @param state - state value.
-     */
-    void SetMovingFreezeState(bool state);
-    /**
      * @Description Is it the moving freeze state?
      *
-    * @return true: success, false: failed
+     * @param appRunMode - current scan mode.
+     * @return true: success, false: failed
      */
-    bool IsMovingFreezeState() const;
+    bool IsMovingFreezeState(ScanMode appRunMode) const;
     /**
      * @Description Set the moving freeze state to scanned.
      *
@@ -852,9 +847,10 @@ private:
     /**
      * @Description Determines whether scanning is allowed in movingfreeze mode.
      *
+     * @param appRunMode scan mode
      * @return true: allow, false: not allowed.
      */
-    bool AllowScanByMovingFreeze();
+    bool AllowScanByMovingFreeze(ScanMode appRunMode);
     /**
      * @Description Determines whether scanning is allowed in hid2d state.
      *

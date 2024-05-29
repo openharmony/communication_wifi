@@ -31,7 +31,7 @@ namespace OHOS {
 namespace Wifi {
 #define WIFI_COUNTRY_CODE_LEN 2
 #define WEPKEYS_SIZE 4
-#define INVALID_NETWORK_ID (-1)
+#define INVALID_NETWORK_ID (static_cast<unsigned int>(-1))
 #define WIFI_INVALID_UID (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
@@ -46,6 +46,7 @@ const std::string KEY_MGMT_WEP = "WEP";
 const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
 const std::string KEY_MGMT_EAP = "WPA-EAP";
+const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
 
 const std::string EAP_METHOD_NONE = "NONE";
 const std::string EAP_METHOD_PEAP = "PEAP";

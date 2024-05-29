@@ -522,6 +522,16 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetSatelliteState(const int state) override;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

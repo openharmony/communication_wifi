@@ -34,7 +34,6 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
     if (uid == static_cast<int>(getuid()) && pid == static_cast<int>(getpid())) {
         return PERMISSION_DENIED;
     }
-    /* Waive all permission checks for wifi_enhance */
     Security::AccessToken::AccessTokenID callerToken = 0;
     if (tokenId == 0) {
         callerToken = IPCSkeleton::GetCallingTokenID();

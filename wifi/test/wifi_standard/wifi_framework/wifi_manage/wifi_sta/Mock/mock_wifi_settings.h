@@ -95,7 +95,35 @@ public:
     virtual void SetWifiToggledState(bool state) = 0;
     virtual int GetScreenState() const = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
-
+    virtual bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr, const std::string &randomAddr) = 0;
+    virtual void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth, int instId = 0) = 0;
+    virtual int GetNoChargerPlugModeState() const = 0  ;
+    virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
+    virtual int GetPowerIdelState()  const = 0 ;
+    virtual int GetGnssFixState() const = 0;
+    virtual int GetAbnormalApps(std::vector<std::string> &abnormalAppList) = 0;
+    virtual int GetScanGenieState() const = 0;
+    virtual int ClearScanInfoList() = 0;
+    virtual int SetValidChannels(const ChannelsTable &channelsInfo) = 0;
+    virtual int SaveScanInfoList(const std::vector<WifiScanInfo> &results) = 0;
+    virtual int GetMinRssi2Dot4Ghz(int instId = 0) = 0;
+    virtual int GetMinRssi5Ghz(int instId = 0) = 0;
+    virtual ScanMode GetAppRunningState() const = 0;
+    virtual int GetFreezeModeState() const = 0; 
+    virtual const std::string GetAppPackageName() const = 0;
+    virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
+    virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
+    virtual int GetThermalLevel() const = 0;
+    virtual int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene) = 0;
+    virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
+    virtual int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene) = 0;   
+    virtual int SetWifiDetailState(WifiDetailState state, int instId) = 0; 
+    virtual bool EncryptionDeviceConfig(WifiDeviceConfig &config) const = 0;
+    virtual bool GetRandomMac(WifiStoreRandomMac &randomMacInfo) = 0;
+    virtual void GenerateRandomMacAddress(std::string &randomMacAddr) = 0;
+    virtual void GenerateRandomMacAddress(std::string peerBssid, std::string &randomMacAddr) = 0;
+    virtual bool AddRandomMac(WifiStoreRandomMac &randomMacInfo) = 0;
+    virtual int AddWpsDeviceConfig(const WifiDeviceConfig &config) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -173,6 +201,35 @@ public:
     MOCK_METHOD1(SetWifiToggledState, void(bool state));
     MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
+    MOCK_METHOD1(SetValidChannels, int(const ChannelsTable &channelsInfo));
+    MOCK_METHOD1(GetPackageFilterMap,  int(std::map<std::string, std::vector<std::string>> &filterMap));
+    MOCK_METHOD1(GetAbnormalApps,  int (std::vector<std::string> &abnormalAppList));
+    MOCK_METHOD0(ClearScanInfoList, int());
+    MOCK_METHOD3(StoreWifiMacAddrPairInfo, bool(WifiMacAddrInfoType type, const std::string &realMacAddr, const std::string &randomAddr));
+    MOCK_METHOD3(UpdateLinkedChannelWidth, void(std::string bssid, WifiChannelWidth channelWidth, int instId));
+    MOCK_CONST_METHOD0(GetNoChargerPlugModeState, int());
+    MOCK_CONST_METHOD0(GetPowerIdelState, int());
+    MOCK_CONST_METHOD0(GetGnssFixState, int());
+    MOCK_METHOD1(SaveScanInfoList, int(const std::vector<WifiScanInfo> &results));
+    MOCK_METHOD1(GetMinRssi2Dot4Ghz, int(int));
+    MOCK_METHOD1(GetMinRssi5Ghz, int(int));
+    MOCK_CONST_METHOD0(GetAppRunningState, ScanMode());
+    MOCK_CONST_METHOD0(GetFreezeModeState, int());
+    MOCK_CONST_METHOD0(GetAppPackageName, const std::string());
+    MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
+    MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
+    MOCK_CONST_METHOD0(GetThermalLevel, int());
+    MOCK_METHOD2(GetHid2dUpperScene, int(std::string& ifName, Hid2dUpperScene &scene));
+    MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
+    MOCK_METHOD2(SetHid2dUpperScene, int(const std::string& ifName, const Hid2dUpperScene &scene));
+    MOCK_METHOD2(SetWifiDetailState, int(WifiDetailState state, int instId));
+    MOCK_CONST_METHOD1(EncryptionDeviceConfig, bool(WifiDeviceConfig &config));
+    MOCK_METHOD1(GetRandomMac, bool(WifiStoreRandomMac &randomMacInfo));
+    MOCK_METHOD1(GenerateRandomMacAddress, void(std::string &randomMacAddr));
+    MOCK_METHOD2(GenerateRandomMacAddress, void (std::string peerBssid, std::string &randomMacAddr));
+    MOCK_METHOD1(AddRandomMac, bool(WifiStoreRandomMac &randomMacInfo));
+    MOCK_METHOD1(AddWpsDeviceConfig, int(const WifiDeviceConfig &config));
+    MOCK_CONST_METHOD0(GetScanGenieState, int());
 };
 }  // namespace OHOS
 }  // namespace Wifi

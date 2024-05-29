@@ -69,7 +69,8 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_SET_SATELLITE_STATE = 0x103D,        /* set satellite state */
     WIFI_SVR_CMD_ENABLE_SEMI_WIFI = 0x103E,          /* enable semi-wifi */
     WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE = 0x103F,     /* get wifi detail state */
-    WIFI_SVR_CMD_SET_LOW_TX_POWER = 0x1040,          /* set low tx power */
+    WIFI_SVR_CMD_START_ROAM_TO_NETWORK = 0x1040,     /* roam to target bssid */
+    WIFI_SVR_CMD_SET_LOW_TX_POWER = 0x1041,          /* set low tx power */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */

@@ -14,6 +14,7 @@
  */
 
 #include "ability_manager_ipc_interface_code.h"
+#include "extension_manager_client.h"
 #include "iservice_registry.h"
 #include "message_parcel.h"
 #include "system_ability_definition.h"
@@ -104,6 +105,54 @@ int32_t WifiNotificationUtil::StartAbility(OHOS::AAFwk::Want& want)
         return error;
     }
     return reply.ReadInt32();
+}
+
+void WifiNotificationUtil::ShowDialog(WifiDialogType type)
+{
+    WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
+    AAFwk::Want want;
+    std::string bundleName = "com.ohos.sceneboard";
+    std::string abilityName = "com.ohos.sceneboard.systemdialog";
+    want.SetElementName(bundleName, abilityName);
+    nlohmann::json param;
+    param["ability.want.params.uiExtensionType"] = "sysDialog/common";
+    param["wifiDialogType"] = static_cast<int32_t>(type);
+    std::string cmdData = param.dump();
+    sptr<UIExtensionAbilityConnection> connection(
+        new (std::nothrow) UIExtensionAbilityConnection(cmdData, "com.ohos.locationdialog", "WifiUIExtAbility"));
+    if (connection == nullptr) {
+        WIFI_LOGE("connect UIExtensionAbilityConnection fail");
+        return;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto ret =
+        AAFwk::ExtensionManagerClient::GetInstance().ConnectServiceExtensionAbility(want, connection, nullptr, -1);
+    WIFI_LOGI("connect service extension ability result = %{public}d", ret);
+    IPCSkeleton::SetCallingIdentity(identity);
+}
+
+void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
+    const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
+{
+    WIFI_LOGI("on ability connected");
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInt32(SIGNAL_NUM);
+    data.WriteString16(u"bundleName");
+    data.WriteString16(Str8ToStr16(bundleName_));
+    data.WriteString16(u"abilityName");
+    data.WriteString16(Str8ToStr16(abilityName_));
+    data.WriteString16(u"parameters");
+    data.WriteString16(Str8ToStr16(commandStr_));
+
+    int32_t errCode = remoteObject->SendRequest(IAbilityConnection::ON_ABILITY_CONNECT_DONE, data, reply, option);
+    WIFI_LOGI("AbilityConnectionWrapperProxy::OnAbilityConnectDone result %{public}d", errCode);
+}
+
+void UIExtensionAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int32_t resultCode)
+{
+    WIFI_LOGI("on ability disconnected");
 }
 }
 }

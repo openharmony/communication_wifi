@@ -278,8 +278,6 @@ private:
     bool IsApServiceRunning();
     static void ConfigInfoDump(std::string& result);
     static void StationsInfoDump(std::string& result);
-    static void SigHandler(int sig);
-    static bool IsProcessNeedToRestart();
 
 private:
     bool mGetChannels = false;

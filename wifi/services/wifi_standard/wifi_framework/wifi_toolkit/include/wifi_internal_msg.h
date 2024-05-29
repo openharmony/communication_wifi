@@ -191,7 +191,6 @@ enum class OperatorWifiType {
     WIFI_ENABLED,
     WIFI_ENABLED_AIRPLANEMODE_OVERRIDE,
     WIFI_DISABLED_AIRPLANEMODE_ON,
-    INITIAL_TYPE,                            /* initial type */
 };
 
 enum class StaApExclusionType {
@@ -254,7 +253,7 @@ struct WifiConfig {
     WifiConfig()
     {
         scanAlwaysSwitch = false;
-        staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+        staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
         canOpenStaWhenAirplane = true;
         openWifiWhenAirplane = false;
         staLastState = false;
@@ -325,6 +324,7 @@ struct WifiStoreRandomMac {
     std::string peerBssid;
     std::string randomMac;
     std::string preSharedKey;
+    std::vector<std::string> fuzzyBssids;
 };
 
 struct WifiPortalConf {
@@ -338,13 +338,6 @@ struct PackageFilterConf {
     std::string filterName;
     std::vector<std::string> packageList;
 };
-
-struct SoftApRandomMac {
-    std::string ssid;
-    KeyMgmt keyMgmt;
-    std::string randomMac;
-};
-
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

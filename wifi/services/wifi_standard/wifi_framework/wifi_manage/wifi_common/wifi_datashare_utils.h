@@ -114,6 +114,8 @@ public:
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(bool onlySettingsData = false);
+    void ClearResources(std::shared_ptr<DataShare::DataShareHelper> operatrPtr,
+        std::shared_ptr<DataShare::DataShareResultSet> result);
 };
 
 class IWifiDataShareRemoteBroker : public IRemoteBroker {

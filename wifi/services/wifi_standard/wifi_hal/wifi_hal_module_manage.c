@@ -207,14 +207,15 @@ static int StopModuleInternalSendTerminate(void)
     return (ret == 0 ? HAL_SUCCESS : HAL_FAILURE);
 }
 
-static int StopModuleInternalSoftAp(void)
+static int StopModuleInternalSoftAp(void) __attribute__((no_sanitize("cfi")))
 {
-    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(0);
+    int id = 0;
+    WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);
     if (hostapdHalDevice == NULL) {
         LOGE("Get hostap dev interface failed!");
         return WIFI_HAL_FAILED;
     }
-    if (hostapdHalDevice->terminateAp(0) != 0) {
+    if (hostapdHalDevice->terminateAp(id) != 0) {
         LOGE("terminateAp failed!");
         return WIFI_HAL_FAILED;
     }

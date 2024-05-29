@@ -306,7 +306,7 @@ private:
     /**
      * @Description - Peers private update detected by broadcast.
      */
-    virtual void BroadcastP2pPrivatePeersChanged(std::string &PrivateInfo) const;
+    virtual void BroadcastP2pPrivatePeersChanged(std::string &privateInfo) const;
     /**
      * @Description - Broadcast the scanned service information update.
      */

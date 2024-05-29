@@ -1292,15 +1292,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
     /* Initialize connection information. */
     std::string ssid = linkedInfo.ssid;
     InitWifiLinkedInfo();
-    if (lastLinkedInfo.detailedState == DetailedState::CONNECTING) {
-        linkedInfo.networkId = lastLinkedInfo.networkId;
-        linkedInfo.ssid = lastLinkedInfo.ssid;
-        linkedInfo.connState = ConnState::CONNECTING;
-        linkedInfo.detailedState = DetailedState::CONNECTING;
-        WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    } else {
-        WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    }
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     linkedInfo.ssid = ssid;
     /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
@@ -1340,14 +1332,15 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         int reason = msg->GetIntFromMessage();
         WIFI_LOGI("DealWpaLinkFailEvent reason:%{public}d, bssid:%{public}s", reason, MacAnonymize(bssid).c_str());
         shouldStopTimer = IsDisConnectReasonShouldStopTimer(reason);
+    } else {
+        std::string ssid = linkedInfo.ssid;
+        InitWifiLinkedInfo();
+        linkedInfo.ssid = ssid;
+        WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     }
     if (shouldStopTimer) {
         StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     }
-    std::string ssid = linkedInfo.ssid;
-    InitWifiLinkedInfo();
-    linkedInfo.ssid = ssid;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     switch (eventName) {
         case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
             SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);

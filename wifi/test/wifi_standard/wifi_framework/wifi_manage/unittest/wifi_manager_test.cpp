@@ -51,6 +51,7 @@ public:
         wifiManager.wifiHotspotManager = std::make_unique<WifiHotspotManager>();
         wifiManager.wifiP2pManager = std::make_unique<WifiP2pManager>();
         wifiManager.wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
+        wifiManager.wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
     }
     virtual void TearDown()
     {
@@ -60,6 +61,7 @@ public:
         wifiManager.wifiHotspotManager = nullptr;
         wifiManager.wifiP2pManager = nullptr;
         wifiManager.wifiEventSubscriberManager = nullptr;
+        wifiManager.wifiMultiVapManager = nullptr;
     }
 public:
     WifiManager wifiManager;
@@ -221,6 +223,46 @@ HWTEST_F(WifiManagerTest, AutoStartEnhanceServiceTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");
     wifiManager.AutoStartEnhanceService();
+}
+
+HWTEST_F(WifiManagerTest, CheckCanConnectDeviceTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckCanConnectDevice();
+}
+
+HWTEST_F(WifiManagerTest, CheckCanUseP2pTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckCanUseP2p();
+}
+
+HWTEST_F(WifiManagerTest, CheckCanUseSoftApTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckCanUseSoftAp();
+}
+
+HWTEST_F(WifiManagerTest, CheckStaConnectedTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckStaConnected();
+}
+
+HWTEST_F(WifiManagerTest, CheckP2pConnectedTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckP2pConnected();
+}
+
+HWTEST_F(WifiManagerTest, CheckSoftApStartedTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckSoftApStarted();
+}
+
+HWTEST_F(WifiManagerTest, ForceStopSoftApTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->ForceStopSoftAp();
+}
+
+HWTEST_F(WifiManagerTest, ShowToastTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->ShowToast();
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -120,10 +120,6 @@ void WifiStaManager::CloseStaService(int instId)
         WIFI_LOGI("airplaneMode not close sta SA!");
         return;
     }
-    if (WifiConfigCenter::GetInstance().GetPowerSleepState() == MODE_STATE_OPEN) {
-        StopUnloadStaSaTimer();
-        return;
-    }
     StartUnloadStaSaTimer();
 #endif
     return;

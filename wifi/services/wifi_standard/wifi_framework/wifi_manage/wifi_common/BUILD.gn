@@ -236,12 +236,6 @@ if (defined(ohos_lite)) {
     }
 
     if (defined(global_parts_info) &&
-        defined(global_parts_info.powermgr_power_manager)) {
-      external_deps += [ "power_manager:powermgr_client" ]
-      defines += [ "HAS_POWERMGR_PART" ]
-    }
-
-    if (defined(global_parts_info) &&
         defined(global_parts_info.account_os_account)) {
       external_deps += [ "os_account:os_account_innerkits" ]
       defines += [ "HAS_ACCOUNT_PART" ]

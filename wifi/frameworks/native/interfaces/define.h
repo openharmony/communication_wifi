@@ -104,8 +104,12 @@
 #define MODE_STATE_NO_CHARGER_PLUG (6)
 
 #define MODE_STATE_DEFAULT (-1)
+/* Begin apf filter */
 #define MODE_STATE_OPEN (1)
 #define MODE_STATE_CLOSE (2)
+#define MODE_STATE_FORCESLEEP (3)
+#define MODE_STATE_EXIT_FORCESLEEP (4)
+/* End apf filter */
 #define WIFI_STATE_DISABLED (0)
 #define WIFI_STATE_ENABLED (1)
 #define WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE (2)

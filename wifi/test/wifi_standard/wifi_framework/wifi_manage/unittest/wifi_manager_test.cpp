@@ -181,6 +181,20 @@ HWTEST_F(WifiManagerTest, UnRegisterCesEventTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->UnRegisterCesEvent();
 }
 
+#ifdef HAS_POWERMGR_PART
+HWTEST_F(WifiManagerTest, RegisterPowermgrEventTestTest, TestSize.Level1)
+{
+    WIFI_LOGE("RegisterPowermgrEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->RegisterPowermgrEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterPowermgrEventTestTest, TestSize.Level1)
+{
+    WIFI_LOGE("UnRegisterPowermgrEventTestTest enter!");
+    wifiManager.wifiEventSubscriberManager->UnRegisterPowermgrEvent();
+}
+#endif
+
 HWTEST_F(WifiManagerTest, RegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGI("RegisterLocationEventTest enter!");
@@ -191,18 +205,6 @@ HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGI("UnRegisterLocationEventTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterLocationEvent();
-}
-
-HWTEST_F(WifiManagerTest, RegisterPowerStateListenerTest, TestSize.Level1)
-{
-    WIFI_LOGI("RegisterPowerStateListenerTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterPowerStateListener();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterPowerStateListenerTest, TestSize.Level1)
-{
-    WIFI_LOGI("UnRegisterPowerStateListenerTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterPowerStateListener();
 }
 
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)

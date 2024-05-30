@@ -842,12 +842,13 @@ void SelfCureStateMachine::InitDnsServer()
     char dnsIpAddr[PUBLIC_DNS_SERVERS_SIZE];
     GetParamValue("const.wifi.dnscure_ipcfg", "", dnsIpAddr, PUBLIC_DNS_SERVERS_SIZE);
     std::string temp = "";
-    for (int i = 0; i < sizeof(dnsIpAddr) - 1; i++) {
+    int publicDDnsSize = sizeof(dnsIpAddr) - 1;
+    for (int i = 0; i < publicDDnsSize; i++) {
         if (dnsIpAddr[i] == ';') {
             strPublicIpAddr.push_back(temp);
             temp = "";
             continue;
-        } else if (i == sizeof(dnsIpAddr) - 2) {
+        } else if (i == publicDDnsSize - 1) {
             temp = temp + dnsIpAddr[i];
             strPublicIpAddr.push_back(temp);
             continue;

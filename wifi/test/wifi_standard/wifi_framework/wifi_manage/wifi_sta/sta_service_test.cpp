@@ -138,6 +138,8 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
+     EXPECT_CALL(WifiSettings::GetInstance(), SetDefaultFrequenciesByCountryBand(_, _, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillOnce(Return(0)));
     std::vector<StaServiceCallback> callbacks;
     callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
     EXPECT_TRUE(pStaService->InitStaService(callbacks) == WIFI_OPT_SUCCESS);

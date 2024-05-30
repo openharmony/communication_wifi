@@ -32,8 +32,7 @@
 namespace OHOS {
 namespace Wifi {
 const std::string CLASS_NAME = "WifiSelfCure";
-const int PUBLIC_DNS_SERVERS_SIZE = 31;
-const int DEFAULT_PARAM_SIZE = 128;
+const int PUBLIC_DNS_SERVERS_SIZE = 32;
 
 DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 std::vector<std::string> chinaPublicDnses;
@@ -841,14 +840,14 @@ void SelfCureStateMachine::InitDnsServer()
 {
     std::vector<std::string> strPublicIpAddr;
     char dnsIpAddr[PUBLIC_DNS_SERVERS_SIZE];
-    GetParamValue("const.wifi.dnscure_ipcfg", "", dnsIpAddr, DEFAULT_PARAM_SIZE);
+    GetParamValue("const.wifi.dnscure_ipcfg", "", dnsIpAddr, PUBLIC_DNS_SERVERS_SIZE);
     std::string temp = "";
-    for (int i = 0; i < sizeof(dnsIpAddr); i++) {
+    for (int i = 0; i < sizeof(dnsIpAddr) - 1; i++) {
         if (dnsIpAddr[i] == ';') {
             strPublicIpAddr.push_back(temp);
             temp = "";
             continue;
-        } else if (i == sizeof(dnsIpAddr) - 1) {
+        } else if (i == sizeof(dnsIpAddr) - 2) {
             temp = temp + dnsIpAddr[i];
             strPublicIpAddr.push_back(temp);
             continue;

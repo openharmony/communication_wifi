@@ -172,16 +172,21 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
 int32_t OnEventStaNotify(struct IWpaCallback *self, const char* notifyParam, const char *ifName)
 {
     LOGI("OnEventStaNotify: callback enter!");
-    if (strcmp(ifName, "wlan0") != 0) {
-        return 1;
-    }
     if (notifyParam == NULL) {
         LOGE("OnEventStaNotify: invalid parameter!");
         return 1;
     }
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    if (cbk.onEventStaNotify) {
-        cbk.onEventStaNotify(notifyParam);
+
+    if (strcmp(ifName, "wlan0") == 0) {
+        const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+        if (cbk.onEventStaNotify) {
+            cbk.onEventStaNotify(notifyParam);
+        }
+    } else if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+        const OHOS::Wifi::P2pHalCallback &p2pCbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+        if (p2pCbk.onEventStaNotify) {
+            p2pCbk.onEventStaNotify(notifyParam);
+        }
     }
     return 0;
 }

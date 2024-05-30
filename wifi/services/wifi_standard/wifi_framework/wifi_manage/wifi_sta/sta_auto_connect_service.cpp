@@ -437,14 +437,16 @@ bool StaAutoConnectService::AllowAutoSelectDevice(OHOS::Wifi::WifiLinkedInfo &in
     if (info.connState == DISCONNECTED || info.connState == UNKNOWN) {
         return true;
     }
-    WIFI_LOGI("Current linkInfo is not in DISCONNECTED state, skip network selection.");
+    WIFI_LOGI("Current linkInfo state:[%{public}d %{public}s] is not in DISCONNECTED state, skip network selection.",
+        info.connState, magic_enum::Enum2Name(info.connState).c_str());
     return false;
 }
 
 bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
-    WIFI_LOGI("Allow auto select device, connState=%{public}d, detailedState=%{public}d\n",
-        info.connState, info.detailedState);
+    WIFI_LOGI("Allow auto select device, connState=%{public}d %{public}s, detailedState=%{public}d %{public}s\n",
+        info.connState, magic_enum::Enum2Name(info.connState).c_str(), info.detailedState,
+        magic_enum::Enum2Name(info.detailedState).c_str());
     if (scanInfos.empty()) {
         WIFI_LOGE("No network,skip network selection.\n");
         return false;

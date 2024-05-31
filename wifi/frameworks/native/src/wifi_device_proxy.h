@@ -149,6 +149,14 @@ public:
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     /**
+     * @Description set wifi tx power for sar
+     *
+     * @param power - txpower
+     * @return ErrCode - operation result
+     */
+    ErrCode SetTxPower(int power) override;
+
+    /**
      * @Description Enable device config, when set attemptEnable, disable other device config
      *
      * @param networkId - need enable device config's network id

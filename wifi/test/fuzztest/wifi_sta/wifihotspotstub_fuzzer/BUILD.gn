@@ -68,6 +68,7 @@ ohos_fuzztest("WifiHotSpotStubFuzzTest") {
     "FEATURE_AP_SUPPORT",
     "FEATURE_STA_SUPPORT",
     "FEATURE_P2P_SUPPORT",
+    "private=public",
   ]
 
   if (is_asan) {

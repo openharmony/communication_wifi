@@ -47,8 +47,8 @@ void MyExit()
 {
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
     WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
-    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadP2PSaTimer();
-    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
     WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
     WifiNetAgent::GetInstance().netAgentEventHandler.reset();
     WifiSettings::GetInstance().mWifiEncryptionThread.reset();

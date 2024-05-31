@@ -19,6 +19,7 @@
 #include "wifi_logger.h"
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupNegotiationState");
 
@@ -78,6 +79,10 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         WIFI_LOGE("Failed to obtain the group information.");
         return EXECUTED;
     }
+    WifiP2pLinkedInfo p2pInfo;
+    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    p2pInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+    WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
 
@@ -118,8 +123,11 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         }
 
         /* GC start DHCP Client. */
-        p2pStateMachine.StartDhcpClientInterface();
-
+        if (p2pStateMachine.GetIsNeedDhcp() == DHCPTYPE::NO_DHCP) {
+            p2pStateMachine.BroadcastP2pConnectionChanged();
+        } else {
+            p2pStateMachine.StartDhcpClientInterface();
+        }
         const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
         WifiP2pDevice device = deviceManager.GetDevices(owner.GetDeviceAddress());
         if (device.IsValid()) {
@@ -141,7 +149,6 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_IDL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
-    p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
 }

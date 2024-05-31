@@ -71,7 +71,12 @@ ohos_fuzztest("WifiDeviceStubFuzzTest") {
   if (is_asan) {
     defines = [ "DTFUZZ_TEST" ]
   }
-
+  defines += [
+    "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+    "FEATURE_AP_SUPPORT",
+    "FEATURE_STA_SUPPORT",
+    "FEATURE_P2P_SUPPORT",
+  ]
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",

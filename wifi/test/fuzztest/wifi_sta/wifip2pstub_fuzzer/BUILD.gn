@@ -65,7 +65,12 @@ ohos_fuzztest("WifiP2pStubFuzzTest") {
   if (is_asan) {
     defines = [ "DTFUZZ_TEST" ]
   }
-
+  defines += [
+    "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+    "FEATURE_AP_SUPPORT",
+    "FEATURE_STA_SUPPORT",
+    "FEATURE_P2P_SUPPORT",
+  ]
   sources = [
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_netconn_client.cpp",

@@ -352,6 +352,15 @@ public:
     bool SetPowerModel(const std::string &ifaceName, int model);
 
     /**
+     * @Description set wifi tx power for sar.
+     *
+     * @param ifaceName: [in] iface name
+     * @param power: [in] power
+     * @return bool
+     */
+    bool SetTxPower(const std::string &ifaceName, int power);
+
+    /**
      * @Description get the power mode.
      *
      * @param ifaceName: [in] iface name

@@ -136,6 +136,14 @@ public:
     virtual ErrCode RemoveAllDevice() = 0;
 
     /**
+     * @Description Set tx power for sar.
+     *
+     * @param power - tx power
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetTxPower(int power) = 0;
+
+    /**
      * @Description Get all the device configs
      *
      * @param result - Get result vector of WifiDeviceConfig

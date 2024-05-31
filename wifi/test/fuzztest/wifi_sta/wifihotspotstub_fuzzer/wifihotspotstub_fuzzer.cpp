@@ -377,7 +377,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnIsHotspotDualBandSupportedFuzzTest(data, size);
     OHOS::Wifi::OnSetApIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::OnGetApIfaceNameFuzzTest(data, size);
-    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    OHOS::Wifi::OnDisableWifiApTest(data, size);
     OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
     sleep(4);
     return 0;

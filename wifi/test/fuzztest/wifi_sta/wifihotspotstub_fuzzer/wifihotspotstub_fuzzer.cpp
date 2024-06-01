@@ -35,6 +35,8 @@
 #include "wifi_settings.h"
 #include "wifi_common_def.h"
 #include "wifi_manager.h"
+#include "wifi_net_agent.h"
+
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;

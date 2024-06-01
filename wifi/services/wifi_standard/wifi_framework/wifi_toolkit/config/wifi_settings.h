@@ -31,9 +31,6 @@
 #include "wifi_event_handler.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-#include "wifi_encryption_util.h"
-#endif
 
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int RANDOM_PASSWD_LEN = 8;
@@ -1617,9 +1614,6 @@ public:
      * @return bool - true: deciphered
      */
     bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;
-
-    bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
-    void DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**

@@ -47,9 +47,6 @@ const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
 const std::string KEY_MGMT_EAP = "WPA-EAP";
 const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
-const std::string KEY_MGMT_WAPI_CERT = "WAPI-CERT";
-const std::string KEY_MGMT_WAPI_PSK = "WAPI-PSK";
-const std::string KEY_MGMT_WAPI = "WAPI";
 
 const std::string EAP_METHOD_NONE = "NONE";
 const std::string EAP_METHOD_PEAP = "PEAP";
@@ -496,25 +493,6 @@ public:
 
 enum class WifiPrivacyConfig { RANDOMMAC, DEVICEMAC };
 
-class WifiWapiConfig {
-public:
-    int wapiPskType;
-    std::string wapiAsCertPath;
-    std::string wapiUserCertPath;
-    std::string wapiAsCertData;
-    std::string wapiUserCertData;
-    std::string encryptedUserCertData;
-    std::string IV;
-
-    WifiWapiConfig()
-    {
-        wapiPskType = -1;
-    }
-
-    ~WifiWapiConfig()
-    {}
-};
-
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
@@ -585,7 +563,6 @@ struct WifiDeviceConfig {
     int isReassocSelfCureWithFactoryMacAddress;
     int version;
     bool randomizedMacSuccessEver;
-    WifiWapiConfig wifiWapiConfig;
 
     WifiDeviceConfig()
     {
@@ -778,13 +755,6 @@ typedef enum {
     BG_LIMIT_LEVEL_10,
     BG_LIMIT_LEVEL_11,
 } BgLimitLevel;
-
-enum class WapiPskType {
-    WAPI_PSK_ASCII = 0,
-    WAPI_PSK_HEX = 1,
-};
-
-
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

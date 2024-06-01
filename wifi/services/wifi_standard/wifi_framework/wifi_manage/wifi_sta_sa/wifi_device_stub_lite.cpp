@@ -126,9 +126,6 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (char *)ReadString(req, &size);
     (void)ReadInt32(req, &tmpInt);
     config.wifiPrivacySetting = WifiPrivacyConfig(tmpInt);
-    (void)ReadInt32(req, &config.wifiWapiConfig.wapiPskType);
-    config.wifiWapiConfig.wapiAsCertPath = (char *)ReadString(req, &size);
-    config.wifiWapiConfig.wapiUserCertPath = (char *)ReadString(req, &size);
 }
 
 void WifiDeviceStub::WriteIpAddress(IpcIo *reply, const WifiIpAddress &address)
@@ -200,10 +197,6 @@ void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig 
     (void)WriteInt32(reply, config.wifiProxyconfig.manualProxyConfig.serverPort);
     (void)WriteString(reply, config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
     (void)WriteInt32(reply, (int)config.wifiPrivacySetting);
-    (void)WriteInt32(reply, (int)config.uid);
-    (void)WriteInt32(reply, (int)config.wifiWapiConfig.wapiPskType);
-    (void)WriteString(reply, config.wifiWapiConfig.wapiAsCertPath.c_str());
-    (void)WriteString(reply, config.wifiWapiConfig.wapiUserCertPath.c_str());
 }
 
 void WifiDeviceStub::OnEnableWifi(uint32_t code, IpcIo *req, IpcIo *reply)

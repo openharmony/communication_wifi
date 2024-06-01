@@ -361,6 +361,19 @@ public:
         EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->ReConnect() == WIFI_OPT_FAILED);
     }
+
+    void EnableHiLinkHandshakeSuceess()
+    {
+        WifiDeviceConfig config;
+        std::string bssid = "01:23:45:67:89:ab";
+        pStaInterface->EnableHiLinkHandshake(config, bssid);
+    }
+
+    void DeliverStaIfaceDataSuceess()
+    {
+        std::string mac = "01:23:45:67:89:ab";
+        pStaInterface->DeliverStaIfaceData(mac);
+    }
 };
 
 extern "C" IStaService *Create(void);
@@ -664,5 +677,14 @@ HWTEST_F(StaInterfaceTest, DeregisterFilterBuilderFail, TestSize.Level1)
                                                                       "testFilterBuilder"));
 }
 
+HWTEST_F(StaInterfaceTest, EnableHiLinkHandshakeSuccess, TestSize.Level1)
+{
+    EnableHiLinkHandshakeSuceess();
+}
+
+HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
+{
+    DeliverStaIfaceDataSuceess();
+}
 } // namespace Wifi
 } // namespace OHOS

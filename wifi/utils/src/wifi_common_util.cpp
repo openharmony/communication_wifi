@@ -14,7 +14,6 @@
  */
 
 #include "wifi_common_util.h"
-#include <fstream>
 #include <sstream>
 #include <iterator>
 #include <regex>
@@ -560,18 +559,5 @@ std::vector<std::string> getAuthInfo(const std::string &input, const std::string
     WIFI_LOGD("%{public}s size:%{public}zu", __func__, results.size());
     return results;
 }
-
-std::string File2String(const std::string &filePath)
-{
-    std::ifstream file(filePath);
-    if (!file.is_open()) {
-        WIFI_LOGE("Failed to open file: %{public}s", filePath.c_str());
-        return "";
-    }
-    std::string result((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    file.close();
-    return result;
-}
-
 }  // namespace Wifi
 }  // namespace OHOS

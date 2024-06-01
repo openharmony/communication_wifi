@@ -401,9 +401,6 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.callProcessName = data.ReadString();
     config.ancoCallProcessName = data.ReadString();
     config.uid = data.ReadInt32();
-    config.wifiWapiConfig.wapiPskType = data.ReadInt32();
-    config.wifiWapiConfig.wapiAsCertPath = data.ReadString();
-    config.wifiWapiConfig.wapiUserCertPath = data.ReadString();
     return;
 }
 
@@ -486,9 +483,6 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteInt32(config.uid);
     reply.WriteString(config.callProcessName);
     reply.WriteString(config.ancoCallProcessName);
-    reply.WriteInt32(config.wifiWapiConfig.wapiPskType);
-    reply.WriteString(config.wifiWapiConfig.wapiAsCertPath);
-    reply.WriteString(config.wifiWapiConfig.wapiUserCertPath);
     return;
 }
 

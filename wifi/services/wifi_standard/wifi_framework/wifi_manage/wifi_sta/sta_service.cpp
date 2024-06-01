@@ -392,31 +392,6 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
     wifiEapConfig.identity = identity;
 }
 
-void StaService::UpdateWapiConfig(const WifiDeviceConfig &config, WifiWapiConfig &wifiWapiConfig) const
-{
-    if (config.keyMgmt != KEY_MGMT_WAPI_CERT) {
-        return;
-    }
-
-    if (wifiWapiConfig.wapiAsCertPath.empty() || wifiWapiConfig.wapiUserCertPath.empty()) {
-        LOGE("UpdateWapiConfig, certPath is empty!");
-        return;
-    }
-
-    wifiWapiConfig.wapiAsCertData = File2String(wifiWapiConfig.wapiAsCertPath);
-    if (wifiWapiConfig.wapiAsCertData.empty()) {
-        LOGE("UpdateWapiConfig, wapiAsCertData is empty!");
-        return;
-    }
-
-    wifiWapiConfig.wapiUserCertData = File2String(wifiWapiConfig.wapiUserCertPath);
-    if (wifiWapiConfig.wapiUserCertData.empty()) {
-        LOGE("UpdateWapiConfig, wapiUserCertData is empty!");
-        return;
-    }
-    return;
-}
-
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
     LOGI("Enter AddDeviceConfig, bssid=%{public}s\n", MacAnonymize(config.bssid).c_str());
@@ -469,7 +444,6 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     }
 
     UpdateEapConfig(config, tempDeviceConfig.wifiEapConfig);
-    UpdateWapiConfig(config, tempDeviceConfig.wifiWapiConfig);
 
     /* Add the new network to WifiSettings. */
     if (!WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {

@@ -1220,7 +1220,6 @@ private:
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const;
-    void FillWapiCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

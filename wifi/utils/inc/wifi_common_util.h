@@ -265,7 +265,6 @@ void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t
 bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);
 std::string EncodeBase64(const std::vector<uint8_t> &input);
 std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter);
-std::string File2String(const std::string &filePath);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -81,16 +81,6 @@ idl_client_sources = [
   "client/hdi_client/wifi_hdi_client.cpp",
   "client/hdi_client/wifi_hdi_wpa_callback.cpp",
   "client/hdi_client/wifi_hdi_wpa_client.cpp",
-  "client/idl_client/idl_interface/i_wifi.c",
-  "client/idl_client/idl_interface/i_wifi_chip.c",
-  "client/idl_client/idl_interface/i_wifi_hotspot_iface.c",
-  "client/idl_client/idl_interface/i_wifi_iface.c",
-  "client/idl_client/idl_interface/i_wifi_p2p_iface.c",
-  "client/idl_client/idl_interface/i_wifi_public_func.c",
-  "client/idl_client/idl_interface/i_wifi_sta_iface.c",
-  "client/idl_client/idl_interface/i_wifi_supplicant_iface.c",
-  "client/idl_client/wifi_idl_client.cpp",
-  "client/idl_client/wifi_idl_inner_interface.cpp",
   "hal_device_manage/hal_device_manage.cpp",
   "wifi_hal_interface/wifi_ap_hal_interface.cpp",
   "wifi_hal_interface/wifi_base_hal_interface.cpp",
@@ -99,6 +89,21 @@ idl_client_sources = [
   "wifi_hal_interface/wifi_sta_hal_interface.cpp",
   "wifi_hal_interface/wifi_supplicant_hal_interface.cpp",
 ]
+
+if (!wifi_feature_with_hdi_wpa_supported) {
+  idl_client_sources += [
+    "client/idl_client/idl_interface/i_wifi.c",
+    "client/idl_client/idl_interface/i_wifi_chip.c",
+    "client/idl_client/idl_interface/i_wifi_hotspot_iface.c",
+    "client/idl_client/idl_interface/i_wifi_iface.c",
+    "client/idl_client/idl_interface/i_wifi_p2p_iface.c",
+    "client/idl_client/idl_interface/i_wifi_public_func.c",
+    "client/idl_client/idl_interface/i_wifi_sta_iface.c",
+    "client/idl_client/idl_interface/i_wifi_supplicant_iface.c",
+    "client/idl_client/wifi_idl_client.cpp",
+    "client/idl_client/wifi_idl_inner_interface.cpp",
+  ]
+}
 
 if (defined(ohos_lite)) {
   shared_library("wifi_native") {
@@ -110,10 +115,13 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     ]
+
+    if (!wifi_feature_with_hdi_wpa_supported) {
+      deps += [ "$WIFI_ROOT_DIR/base/cRPC:crpc_client" ]
+    }
 
     external_deps = [ "bounds_checking_function:libsec_shared" ]
 
@@ -182,10 +190,13 @@ if (defined(ohos_lite)) {
 
     deps = [
       ":wifi_utils",
-      "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
+
+    if (!wifi_feature_with_hdi_wpa_supported) {
+      deps += [ "$WIFI_ROOT_DIR/base/cRPC:crpc_client" ]
+    }
 
     external_deps = [
       "c_utils:utils",

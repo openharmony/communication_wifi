@@ -17,6 +17,7 @@
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 
 #include <gtest/gtest.h>
+#include "hal_device_manage.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -27,9 +28,13 @@ public:
     static void TearDownTestCase()
     {}
     virtual void SetUp()
-    {}
+    {
+        DelayedSingleton<HalDeviceManager>::GetInstance()->StartChipHdi();
+    }
     virtual void TearDown()
-    {}
+    {
+        DelayedSingleton<HalDeviceManager>::GetInstance()->StopChipHdi();
+    }
 
     static void DestoryCallback(std::string &destoryIfaceName, int createIfaceType);
 };

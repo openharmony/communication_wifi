@@ -55,9 +55,10 @@ public:
     bool InitHdiWpaClient(void);
 
 public:
-    WifiIdlClient *mIdlClient;
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     WifiHdiWpaClient *mHdiWpaClient;
+#else
+    WifiIdlClient *mIdlClient;
 #endif
 };
 }  // namespace Wifi

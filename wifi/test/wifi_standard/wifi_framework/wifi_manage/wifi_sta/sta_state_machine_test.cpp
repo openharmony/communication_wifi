@@ -1710,6 +1710,38 @@ public:
         msg.SetParam1(static_cast<int>(MODE_STATE_CLOSE));
         pStaStateMachine->DealScreenStateChangedEvent(&msg);
     }
+
+    void DealHiLinkDataToWpaFailTest()
+    {
+        pStaStateMachine->DealHiLinkDataToWpa(nullptr);
+    }
+
+    void DealHiLinkDataToWpaSuccessTest1()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_COM_STA_ENABLE_HILINK);
+        std::string cmd = "ENABLE=1 BSSID=01:23:45:67:89:a0";
+        msg.SetMessageObj(cmd);
+        pStaStateMachine->DealHiLinkDataToWpa(&msg);
+    }
+
+    void DealHiLinkDataToWpaSuccessTest2()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_COM_STA_HILINK_DELIVER_MAC);
+        std::string cmd = "HILINK_MAC=01:23:45:67:89:a0";
+        msg.SetMessageObj(cmd);
+        pStaStateMachine->DealHiLinkDataToWpa(&msg);
+    }
+
+    void DealHiLinkDataToWpaSuccessTest3()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_COM_STA_ENABLE_HILINK);
+        std::string bssid = "01:23:45:67:89:a0";
+        msg.SetMessageObj(bssid);
+        pStaStateMachine->DealHiLinkDataToWpa(&msg);
+    }
 };
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
@@ -2671,6 +2703,26 @@ HWTEST_F(StaStateMachineTest, InvokeOnStaRssiLevelChangedTest, TestSize.Level1)
 */
 HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest, TestSize.Level1)
 {
+}
+
+HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaFailTest, TestSize.Level1)
+{
+    DealHiLinkDataToWpaFailTest();
+}
+
+HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest1, TestSize.Level1)
+{
+    DealHiLinkDataToWpaSuccessTest1();
+}
+
+HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest2, TestSize.Level1)
+{
+    DealHiLinkDataToWpaSuccessTest2();
+}
+
+HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest3, TestSize.Level1)
+{
+    DealHiLinkDataToWpaSuccessTest3();
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -267,6 +267,25 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
     return true;
 }
 
+bool WifiDeviceServiceImpl::CheckConfigWapi(const WifiDeviceConfig &config)
+{
+    if (config.keyMgmt == KEY_MGMT_WAPI_PSK) {
+        if (config.wifiWapiConfig.wapiPskType < static_cast<int>(WapiPskType::WAPI_PSK_ASCII) ||
+            config.wifiWapiConfig.wapiPskType > static_cast<int>(WapiPskType::WAPI_PSK_HEX)) {
+            WIFI_LOGE("CheckConfigWapi: with invalid wapiPskType!");
+            return false;
+        }
+        return true;
+    }
+
+    if (config.wifiWapiConfig.wapiAsCertPath.empty() || config.wifiWapiConfig.wapiUserCertPath.empty()) {
+        WIFI_LOGE("CheckConfigWapi: with cert path empty!");
+        return false;
+    }
+
+    return true;
+}
+
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
     if ((config.ssid.length() <= 0) || (config.ssid.length() > DEVICE_NAME_LENGTH) || (config.keyMgmt.length()) <= 0) {
@@ -277,6 +296,10 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
     WIFI_LOGI("CheckConfigPwd: keyMgmt = %{public}s!", config.keyMgmt.c_str());
     if (config.keyMgmt == KEY_MGMT_EAP || config.keyMgmt == KEY_MGMT_SUITE_B_192) {
         return CheckConfigEap(config);
+    }
+
+    if (config.keyMgmt == KEY_MGMT_WAPI_CERT || config.keyMgmt == KEY_MGMT_WAPI_PSK) {
+        return CheckConfigWapi(config);
     }
 
     if (config.keyMgmt == KEY_MGMT_NONE) {

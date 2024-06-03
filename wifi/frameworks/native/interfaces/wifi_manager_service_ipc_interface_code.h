@@ -157,7 +157,8 @@ enum class  P2PInterfaceCode {
     WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE = 0x2027, /* query the information about the local device */
     WIFI_SVR_CMD_SET_UPPER_SCENE = 0x2028,    /* set the scene of upper layer */
     WIFI_SVR_CMD_P2P_DISCOVER_PEERS = 0x2029,
-    WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC = 0x2030,
+    WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC = 0x202A,
+    WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P = 0x202B,    /* check can use p2p */
 
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
     WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT = 0x3000,

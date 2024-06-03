@@ -1444,6 +1444,22 @@ ErrCode WifiP2pServiceImpl::DisableRandomMac(int setmode)
     return pService->DisableRandomMac(setmode);
 }
 
+ErrCode WifiP2pServiceImpl::CheckCanUseP2p()
+{
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("CheckCanUseP2p: VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiManager::GetInstance().GetWifiMultiVapManager() == nullptr) {
+        WIFI_LOGE("CheckCanUseP2p: WifiMultiVapManager is nullptr!");
+        return WIFI_OPT_FAILED;
+    }
+
+    return ((WifiManager::GetInstance().GetWifiMultiVapManager()->CheckCanUseP2p()) ? WIFI_OPT_SUCCESS
+        : WIFI_OPT_NOT_SUPPORTED);
+}
+
 bool WifiP2pServiceImpl::IsRemoteDied(void)
 {
     return false;

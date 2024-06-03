@@ -607,3 +607,9 @@ NO_SANITIZE("cfi") WifiErrorCode DisableRandomMac(int setmode)
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->DisableRandomMac(setmode));
 }
+
+NO_SANITIZE("cfi") WifiErrorCode CheckCanUseP2p()
+{
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiP2pPtr->CheckCanUseP2p());
+}

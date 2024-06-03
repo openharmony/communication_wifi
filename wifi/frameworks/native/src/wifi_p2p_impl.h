@@ -405,6 +405,13 @@ public:
      */
     ErrCode DisableRandomMac(int setmode) override;
 
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode CheckCanUseP2p() override;
+
 private:
     bool GetWifiP2pProxy();
     std::atomic<int> systemAbilityId_;

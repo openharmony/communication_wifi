@@ -79,6 +79,7 @@ int WifiManager::Init()
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
+    wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
 #endif
     wifiStaManager = std::make_unique<WifiStaManager>();
     wifiScanManager = std::make_unique<WifiScanManager>();
@@ -151,6 +152,9 @@ void WifiManager::Exit()
 #ifndef OHOS_ARCH_LITE
     if (wifiEventSubscriberManager) {
         wifiEventSubscriberManager.reset();
+    }
+    if (wifiMultiVapManager) {
+        wifiMultiVapManager.reset();
     }
 #endif
     return;
@@ -268,6 +272,11 @@ std::unique_ptr<WifiP2pManager>& WifiManager::GetWifiP2pManager()
 std::unique_ptr<WifiEventSubscriberManager>& WifiManager::GetWifiEventSubscriberManager()
 {
     return wifiEventSubscriberManager;
+}
+
+std::unique_ptr<WifiMultiVapManager>& WifiManager::GetWifiMultiVapManager()
+{
+    return wifiMultiVapManager;
 }
 #endif
 

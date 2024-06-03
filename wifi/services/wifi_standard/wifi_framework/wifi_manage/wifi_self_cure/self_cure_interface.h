@@ -55,6 +55,20 @@ public:
     virtual StaServiceCallback GetStaCallback() const override;
 
     /**
+     * @Description Notify Internet Failure Detected
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+    */
+    virtual ErrCode NotifyInternetFailureDetected(int forceNoHttpCheck) override;
+
+    /**
+     * @Description Is SelfCure On Going
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+    */
+    virtual ErrCode IsSelfCureOnGoing() override;
+
+    /**
     * @Description  init callback function.
     *
     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED

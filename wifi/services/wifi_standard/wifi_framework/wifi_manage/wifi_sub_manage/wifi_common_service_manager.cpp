@@ -66,6 +66,11 @@ InitStatus WifiCommonServiceManager::Init()
         WIFI_LOGE("WifiAppStateAware Init failed!");
     }
 #endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    mWifiNetLinkCallbacks.OnTcpReportMsgComplete =
+        std::bind(&WifiCommonServiceManager::OnTcpReportMsgComplete, this, _1, _2, _3);
+    WifiNetLink::GetInstance().InitWifiNetLink(mWifiNetLinkCallbacks);
+#endif
     if (WifiConfigCenter::GetInstance().Init() < 0) {
         WIFI_LOGE("WifiConfigCenter Init failed!");
         return CONFIG_CENTER_INIT_FAILED;
@@ -88,6 +93,14 @@ void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppState
     if (pService != nullptr) {
         pService->HandleForegroundAppChangedAction(appStateData);
     }
+}
+#endif
+
+#ifdef FEATURE_SELF_CURE_SUPPORT
+void WifiCommonServiceManager::OnTcpReportMsgComplete(const std::vector<int64_t> &elems, const int32_t cmd, const int32_t mInstId)
+{
+    WIFI_LOGI("enter %{public}s", __FUNCTION__);
+    IpQosMonitor::GetInstance().HandleTcpReportMsgComplete(elems, cmd);
 }
 #endif
 }  // namespace Wifi

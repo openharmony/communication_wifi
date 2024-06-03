@@ -330,6 +330,13 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &bssid) override;
+
+    /**
+     * @Description start http detect.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartHttpDetect() override;
 private:
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;

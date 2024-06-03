@@ -456,5 +456,14 @@ ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
     pStaService->DeliverStaIfaceData(currentMac);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::StartHttpDetect()
+{
+    WIFI_LOGI("Enter StaInterface::StartHttpDetect");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->StartHttpDetect();
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

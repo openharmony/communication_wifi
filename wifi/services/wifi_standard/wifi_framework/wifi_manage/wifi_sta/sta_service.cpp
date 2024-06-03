@@ -888,7 +888,7 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
 
 ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
 {
-    unsigned int netWorkId = INVALID_NETWORK_ID;
+    int netWorkId = INVALID_NETWORK_ID;
     if (bssid.find("ENABLE=1") != INVALID_NETWORK_ID) {
         netWorkId = AddDeviceConfig(config);
         if (netWorkId == INVALID_NETWORK_ID) {

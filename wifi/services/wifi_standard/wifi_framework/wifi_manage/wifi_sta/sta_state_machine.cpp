@@ -31,6 +31,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
+#include "block_connect_service.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
 #include "securec.h"
@@ -1056,12 +1057,14 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
         LOGE("msg is null.\n");
         return;
     }
-
     int networkId = msg->GetParam1();
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
     if (connTriggerMode != NETWORK_SELECTED_BY_RETRY) {
         linkedInfo.retryedConnCount = 0;
+    }
+    if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
+        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
     }
     WriteWifiConnectionInfoHiSysEvent(networkId);
     WifiDeviceConfig config;
@@ -1088,7 +1091,6 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     if (!connectType.empty()) {
         WirteConnectTypeHiSysEvent(connectType);
     }
-
     /* Save connection information. */
     SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
@@ -1319,6 +1321,12 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
         int reason = msg->GetIntFromMessage();
         WIFI_LOGI("DealWpaLinkFailEvent reason:%{public}d, bssid:%{public}s", reason, MacAnonymize(bssid).c_str());
         shouldStopTimer = IsDisConnectReasonShouldStopTimer(reason);
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
+            DisabledReason::DISABLED_DISASSOC_REASON, reason);
+        if (BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, reason)) {
+            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
+                DisabledReason::DISABLED_CONSECUTIVE_FAILURES);
+        }
     } else {
         std::string ssid = linkedInfo.ssid;
         InitWifiLinkedInfo();
@@ -1334,6 +1342,8 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
             SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
             InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
+                DisabledReason::DISABLED_BY_WRONG_PASSWORD);
             break;
         case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
             WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
@@ -1341,6 +1351,8 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
             SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
             InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL, linkedInfo);
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
+                DisabledReason::DISABLED_ASSOCIATION_REJECTION);
             break;
         case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
             WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
@@ -1348,6 +1360,8 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
             SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
             InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT, linkedInfo);
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
+                DisabledReason::DISABLED_ASSOCIATION_REJECTION);
             break;
         default:
             LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);

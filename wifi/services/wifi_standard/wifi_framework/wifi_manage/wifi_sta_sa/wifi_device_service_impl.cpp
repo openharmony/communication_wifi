@@ -632,6 +632,28 @@ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
     return pService->RemoveAllDevice();
 }
 
+ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("SetTxPower:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->SetTxPower(power);
+}
+
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     if (!isCandidate && !WifiAuthCenter::IsSystemAppByToken()) {

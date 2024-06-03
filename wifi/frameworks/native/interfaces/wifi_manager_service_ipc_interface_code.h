@@ -71,6 +71,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE = 0x103F,     /* get wifi detail state */
     WIFI_SVR_CMD_START_ROAM_TO_NETWORK = 0x1040,     /* roam to target bssid */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
+    WIFI_SVR_CMD_SET_TX_POWER = 0x1041,              /* set tx power */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

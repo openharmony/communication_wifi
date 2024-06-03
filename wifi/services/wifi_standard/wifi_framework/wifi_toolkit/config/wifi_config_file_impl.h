@@ -23,7 +23,7 @@
 #include "wifi_config_file_spec.h"
 #include "wifi_log.h"
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-wifi_encryption_util.h
+#include "wifi_encryption_util.h"
 #endif
 
 namespace OHOS {
@@ -112,11 +112,11 @@ public:
     int SetEncryptionInfo(const std::string &key, const std::string &iv);
 
     /**
-     * @Description UnSet the Encryption info: delete the key loaded in hks
+     * @Description Unset the Encryption info: delete the key loaded in hks
      *
      * @return int - 0 success
      */
-    int UnSetEncryptionInfo();
+    int UnsetEncryptionInfo();
 
     /**
      * @Description read decrypt and parses the ini config file
@@ -309,7 +309,7 @@ int WifiConfigFileImpl<T>::SetEncryptionInfo(const std::string &key, const std::
 }
 
 template<typename T>
-int WifiConfigFileImpl<T>::UnSetEncryptionInfo()
+int WifiConfigFileImpl<T>::UnsetEncryptionInfo()
 {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     DeleteKey(mEncryptionInfo);
@@ -330,7 +330,7 @@ int WifiConfigFileImpl<T>::LoadEncryptedConfig()
         return -1;
     }
 
-    std::string content(std::istreambuf_iterator<char>(fs), std::istreambuf_iterator<char>());
+    std::string content((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     mEncry.encryptedPassword = content;
     WifiLoopDecrypt(mEncryptionInfo, mEncry, content);
@@ -392,7 +392,7 @@ int WifiConfigFileImpl<T>::SaveEncryptedConfig()
 #endif
 
     int ret = fwrite(content.c_str(), 1, content.length(), fp);
-    if (ret != (int)content.length()) {
+    if (ret != static_cast<int>(content.length())) {
         LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());
     }
     (void)fflush(fp);

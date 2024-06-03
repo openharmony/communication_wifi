@@ -434,6 +434,26 @@ bool IsFreqDbac(int freqA, int freqB);
  * @return false - not dbac
  */
 bool IsChannelDbac(int channelA, int channelB);
+
+/**
+ * @Description Parse json string, find key by type, get value by key
+ *
+ * @param jsonString - json string
+ * @param type - key at group named type 
+ * @param key - key
+ * @param value - value
+ * @return true - parse json success
+ */
+bool ParseJson(const std::string &jsonString, const std::string &type, const std::string &key, std::string &value);
+
+/**
+ * @Description used for string(1,2,3,...,255) to hexstring
+ *
+ * @param inData - string(1,2,3,...,255)
+ * @param outData - hexstring
+ */
+void ConvertToHexString(const std::string &inData, std::string &outData)
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

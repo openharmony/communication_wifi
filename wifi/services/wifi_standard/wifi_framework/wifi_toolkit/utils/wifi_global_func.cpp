@@ -19,6 +19,7 @@
 #include <sstream>
 #include <random>
 #include "wifi_log.h"
+#include "json/json.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_define.h"
 #endif
@@ -525,6 +526,64 @@ bool IsChannelDbac(int channelA, int channelB)
         return true;
     }
     return false;
+}
+
+bool ParsejsonKey(const Json::value &jsonVaue, const std::string &key, std::string &value)
+{
+    if (jsonValue.isArray()) {
+        int nSize = static_cast<int>(jsonValue.size());
+        for (int i = 0; i < nSize; i++) {
+            if (!jsonValue[i].isMember(key)) {
+                LogW("ParsejsonKey JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
+                return false;
+            }
+            if (jsonValue[i][key].isString()) {
+                value = jsonValue[i][key].asString();
+                return true;
+            } else if (jsonValue[i][key].isInt()) {
+                value = std::to_string(jsonValue[i][key].asInt());
+                return true;
+            }
+            return false;
+        }
+    }
+    return false;
+}
+
+bool ParseJson(const std::string &jsonString, const std::string &type, const std::string &key, std::string &value)
+{
+    LogI("ParseJson enter.");
+    Json::Value root;
+    Json::Reader reader;
+    bool success = reader.parse(jsonString, root);
+    if (!success) {
+        LogE("ParseJson fail to parse json data.");
+        return false;
+    }
+    int nSize = static_cast<int>(root.size());
+    for (int i = 0; i < nSize; i++) {
+        if (!root[i].isMember(type)) {
+            LogW("ParsejsonKey JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
+            continue;
+        }
+        if (ParsejsonKey(root[i][type], key, value)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ConvertToHexString(const std::string &inData, std::string &outData)
+{
+    std::stringstream ss(inData);
+    std::string token;
+    constexpr int hexCharLen = 2;
+    std::stringstream temp;
+    for (getline(ss, token, ',')) {
+        int num = ConvertStringToInt(token);
+        temp << std::setfill('0') << std::setw(hexCharLen) << std::hex << num;
+    }
+    outData = temp.str();
 }
 }  // namespace Wifi
 }  // namespace OHOS

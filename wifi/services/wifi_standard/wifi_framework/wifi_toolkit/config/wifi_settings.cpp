@@ -385,9 +385,37 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
     ReloadDeviceConfig();
 }
 
+void WifiSettings::ParseBackupJson(const std::string &backupInfo, std::string &key, std::string &iv,
+    std::string &version)
+{
+    const std::string type = "detail";
+    const std::string encryptionSymkey = "encryption_symkey";
+    const std::string gcmParamsIv = "gcmParams_iv";
+    const std::string apiVersion = "api_version";
+    std::string keyStr;
+    std::string ivStr;
+
+    ParseJson(backupInfo, type, encryptionSymkey, keyStr);
+    ParseJson(backupInfo, type, gcmParamsIv, ivStr);
+    ParseJson(backupInfo, type, apiVersion, version);
+
+    ConvertToHexString(keyStr, key);
+    LOGI("ParseBackupJson key.size: %{public}d.", static_cast<int>(key.size()));
+    ConvertToHexString(ivStr, iv);
+    LOGI("ParseBackupJson iv.size: %{public}d.", static_cast<int>(iv.size()));
+}
+
 int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 {
     LOGI("OnBackup enter.");
+    std::string key;
+    std::string iv;
+    std::string version;
+    ParseBackupJson(backupInfo, key, iv, version);
+    if (key.size() == 0 || iv.size() == 0) {
+        LOGE("OnBackup key or iv is empty.");
+        return -1;
+    }
     mSavedDeviceConfig.LoadConfig();
     std::vector<WifiDeviceConfig> localConfigs;
     mSavedDeviceConfig.GetValue(localConfigs);
@@ -407,8 +435,10 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 
     WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
     wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.SetEncryptionInfo(key, iv);
     wifiBackupConfig.SetValue(backupConfigs);
-    wifiBackupConfig.SaveConfig();
+    wifiBackupConfig.SaveEncryptedConfig();
+    wifiBackupConfig.UnSetEncryptionInfo(key);
 
     fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH, O_RDONLY));
     if (fd.Get() < 0) {
@@ -422,6 +452,14 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
 {
     LOGI("OnRestore enter.");
+    std::string key;
+    std::string iv;
+    std::string version;
+    ParseBackupJson(restoreInfo, key, iv, version);
+    if (key.size() == 0 || iv.size() == 0) {
+        LOGE("OnRestore key or iv is empty.");
+        return -1;
+    }
     struct stat statBuf;
     if (fstat(fd.Get(), &statBuf) < 0) {
         LOGE("OnRestore fstat fd fail.");
@@ -441,9 +479,11 @@ int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
 
     WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
     wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
-    wifiBackupConfig.LoadConfig();
+    wifiBackupConfig.SetEncryptionInfo(key, iv);
+    wifiBackupConfig.LoadEncryptedConfig();
     std::vector<WifiBackupConfig> backupConfigs;
     wifiBackupConfig.GetValue(backupConfigs);
+    wifiBackupConfig.UnSetEncryptionInfo(key);
 
     std::vector<WifiDeviceConfig> deviceConfigs;
     for (const auto &backupCfg : backupConfigs) {

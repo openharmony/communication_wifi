@@ -26,6 +26,8 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_event_subscriber_manager.h"
 #endif
+#include "wifi_netlink.h"
+#include "ip_qos_monitor.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -59,11 +61,18 @@ public:
     void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);
 #endif
 
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    void OnTcpReportMsgComplete(const std::vector<int64_t> &elems, const int32_t cmd, const int32_t mInstId = 0);
+#endif
+
 private:
     WifiCommonServiceManager();
 private:
 #ifndef OHOS_ARCH_LITE
     WifiAppStateAwareCallbacks mWifiAppStateAwareCallbacks;
+#endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    WifiNetLinkCallbacks mWifiNetLinkCallbacks;
 #endif
 };
 } // namespace Wifi

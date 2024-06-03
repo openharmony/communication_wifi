@@ -137,7 +137,7 @@ public:
         void RequestReassocWithFactoryMac();
         void HandleInvalidIp(InternalMessage *msg);
         void HandleInternetFailedDetected(InternalMessage *msg);
-        void IsWifi6SelfCureNeed(InternalMessage *msg);
+        void HandleTcpQualityQuery(InternalMessage *msg);
     };
 
     /* *
@@ -225,11 +225,12 @@ public:
         void HandleP2pDisconnected(InternalMessage *msg);
         void HandlePeriodicArpDetecte(InternalMessage *msg);
         void HandleArpFailedDetected(InternalMessage *msg);
+        void HandleHttpReachableRecv(InternalMessage *msg);
         void SelectSelfCureByFailedReason(int internetFailedType);
         int SelectBestSelfCureSolution(int internetFailedType);
         void SelfCureWifiLink(int requestCureLevel);
         bool SelectedSelfCureAcceptable();
-        void SelfCureForRandMacReassoc();
+        void SelfCureForRandMacReassoc(int requestCureLevel);
         void SelfCureForReset(int requestCureLevel);
         void HandleIpConfigCompleted();
         void HandleIpConfigCompletedAfterRenewDhcp();
@@ -276,8 +277,25 @@ public:
         void Wifi6ReassocSelfcure();
     };
 
+    /* *
+     * @Description  Definition of NoInternetState class in SelfCureStateMachine.
+     *
+     */
+    class NoInternetState : public State {
+    public:
+        explicit NoInternetState(SelfCureStateMachine *selfCureStateMachine);
+        ~NoInternetState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
+
+    private:
+        SelfCureStateMachine *pSelfCureStateMachine;
+    };
+
     ErrCode Initialize();
     void SetHttpMonitorStatus(bool isHttpReachable);
+    bool IsSelfCureOnGoing();
 
 private:
 
@@ -385,6 +403,7 @@ private:
     ConnectionSelfCureState *pConnectionSelfCureState;
     InternetSelfCureState *pInternetSelfCureState;
     Wifi6SelfCureState *pWifi6SelfCureState;
+    NoInternetState *pNoInternetState;
 
     int m_instId;
     bool mIsHttpReachable = false;

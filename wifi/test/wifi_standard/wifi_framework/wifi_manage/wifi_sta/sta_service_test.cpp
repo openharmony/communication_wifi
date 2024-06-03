@@ -111,6 +111,7 @@ public:
     void DeregisterAutoJoinCondition();
     void RegisterFilterBuilder();
     void DeregisterFilterBuilder();
+    void StaServiceStartHttpDetectTestSucc();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -721,6 +722,11 @@ void StaServiceTest::DeregisterFilterBuilder()
                                                                      "testFilterBuilder"));
 }
 
+void StaServiceTest::StaServiceStartHttpDetectTestSucc()
+{
+    EXPECT_TRUE(pStaService->StartHttpDetect() == WIFI_OPT_SUCCESS);
+}
+
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
 }
@@ -973,6 +979,11 @@ HWTEST_F(StaServiceTest, RegisterFilterBuilder, TestSize.Level1)
 HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level1)
 {
     DeregisterFilterBuilder();
+}
+
+HWTEST_F(StaServiceTest, StaServiceStartHttpDetectTestSucc, TestSize.Level1)
+{
+    StaServiceStartHttpDetectTestSucc();
 }
 } // namespace Wifi
 } // namespace OHOS

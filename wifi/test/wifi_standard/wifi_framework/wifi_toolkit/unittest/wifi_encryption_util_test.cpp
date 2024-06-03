@@ -175,7 +175,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiLoopEncrypt_011, TestSize.Level1)
 
     // 1111111111111111111111111111111111111111111111111111111111111111 : 64 bit
     encryResult.IV = "1111111111111111111111111111111111111111111111111111111111111111";
-    EXPECT_TRUE(WifiLoopDecrypt(testEncryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopDecrypt(testEncryptionInfo, encryResult, decryptedData) != HKS_SUCCESS);
     EXPECT_TRUE(inputString.compare(decryptedData) != 0);
 
     // 0000000000000000000000000000000000000000000000000000000000000000 : 64 bit

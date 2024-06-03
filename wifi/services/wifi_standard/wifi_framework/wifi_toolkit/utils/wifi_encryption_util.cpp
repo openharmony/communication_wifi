@@ -184,15 +184,14 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
 int32_t UpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *paramSet,
     const struct HksBlob *inData, struct HksBlob *outData)
 {
-    uint32_t inDataSize = inData->size;
     uint32_t handledInDataSize = 0;
     uint32_t handledOutDataSize = 0;
     uint8_t *handledOutData = outData->data;
     struct HksBlob inDataSeg = *inData;
     struct HksBlob outDataSeg = { MAX_UPDATE_SIZE, nullptr };
-
-    while (handledInDataSize < inDataSize) {
-        uint32_t aesDataLen = std::min(MAX_UPDATE_SIZE, (inDataSize - handledInDataSize));
+    WIFI_LOGI("UpdateAndFinish inData.size: %{public}d.", static_cast<int>(inData->size));
+    while (handledInDataSize < inData->size) {
+        uint32_t aesDataLen = std::min(MAX_UPDATE_SIZE, (inData->size - handledInDataSize));
         inDataSeg.size = aesDataLen;
         outDataSeg.size = MAX_UPDATE_SIZE + AEAD_SIZE;
         outDataSeg.data = (uint8_t *)malloc(outDataSeg.size);
@@ -202,7 +201,7 @@ int32_t UpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *
         }
 
         int32_t hksResult = 0;
-        if (handledInDataSize + aesDataLen < inDataSize) {
+        if (handledInDataSize + aesDataLen < inData->size) {
             hksResult = HksUpdate(handle, paramSet, &inDataSeg, &outDataSeg);
         } else {
             hksResult = HksFinish(handle, paramSet, &inDataSeg, &outDataSeg);
@@ -232,6 +231,7 @@ int32_t UpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *
         outDataSeg.data = nullptr;
     }
     outData->size = handledOutDataSize;
+    WIFI_LOGI("UpdateAndFinish outData.size: %{public}d.", static_cast<int>(outData->size));
     return HKS_SUCCESS;
 }
 
@@ -344,6 +344,10 @@ int32_t DecryptParamSet(struct HksParamSet **decryParamSet, const WifiEncryption
     struct HksBlob decryptNonce = { nonceLength, nonce };
     uint32_t cipherLength = encryptedData.encryptedPassword.length();
     uint8_t *cipherBuf = reinterpret_cast<uint8_t*>(const_cast<char*>(encryptedData.encryptedPassword.c_str()));
+    if (cipherLength < AEAD_SIZE) {
+        WIFI_LOGE("DecryptParamSet cipherLength is too small.");
+        return HKS_FAILURE;
+    }
     struct HksBlob decryptAead = { AEAD_SIZE, cipherBuf + cipherLength - AEAD_SIZE };
     struct HksParam decryptParam[] = {
         { .tag = HKS_TAG_PURPOSE, .uint32Param = HKS_KEY_PURPOSE_DECRYPT },
@@ -449,7 +453,7 @@ int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const Encr
         free(plainBuf);
         return ret;
     }
-    std::string temp(outData.data, outData.data + outData.size - AEAD_SIZE);
+    std::string temp(outData.data, outData.data + outData.size);
     if (memset_s(outData.data, outData.size, 0, outData.size) != EOK) {
         WIFI_LOGE("WifiLoopDecrypt memset_s return error!");
         free(plainBuf);

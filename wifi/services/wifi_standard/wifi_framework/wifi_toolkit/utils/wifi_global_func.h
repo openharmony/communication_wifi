@@ -439,7 +439,7 @@ bool IsChannelDbac(int channelA, int channelB);
  * @Description Parse json string, find key by type, get value by key
  *
  * @param jsonString - json string
- * @param type - key at group named type 
+ * @param type - key at group named type
  * @param key - key
  * @param value - value
  * @return true - parse json success

@@ -61,7 +61,6 @@ constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
-constexpr int CMD_START_RENEWAL_TIMEOUT = 0X05;
 constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
@@ -104,6 +103,7 @@ constexpr int MAC_AUTH_RSP4_TIMEOUT = 5202;
 constexpr int MAC_ASSOC_RSP_TIMEOUT = 5203;
 constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
+constexpr int DHCP_LEASE_EXPIRED = 6;
 
 enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,
@@ -122,6 +122,7 @@ typedef enum EnumDhcpReturnCode {
     DHCP_RESULT,
     DHCP_JUMP,
     DHCP_RENEW_FAIL,
+    DHCP_IP_EXPIRED,
     DHCP_FAIL,
 } DhcpReturnCode;
 
@@ -367,25 +368,7 @@ public:
          *
          */
         void DealDhcpResult(int ipType);
-#ifndef OHOS_ARCH_LITE
-        /**
-         * @Description : start renew timeout timer
-         *
-         */
-        void StartRenewTimeout(int64_t interval);
 
-        /**
-         * @Description : stop renew timeout timer
-         *
-         */
-        static void StopRenewTimeout();
-
-        /**
-         * @Description : deal renew timeout
-         *
-         */
-        static void DealRenewTimeout();
-#endif
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
          *
@@ -410,9 +393,6 @@ public:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;
         static DhcpResult DhcpIpv6Result;
-#ifndef OHOS_ARCH_LITE
-        static uint64_t renewTimerId_;
-#endif
     };
 
 public:
@@ -519,18 +499,6 @@ public:
      */
     void OnNetManagerRestart(void);
 
-     /**
-     * @Description start dhcp renewal.
-     *
-     */
-    void StartDhcpRenewal();
-
-    /**
-     * @Description : Deal renewal timeout.
-     *
-     */
-    void DealRenewalTimeout(InternalMessage *msg);
-
     /**
      * @Description : start detect timer.
      * @param detectType - type of detect
@@ -544,11 +512,6 @@ public:
     void HandlePortalNetworkPorcess();
     
     void SetPortalBrowserFlag(bool flag);
-    /**
-     * @Description renew dhcp.
-     *
-     */
-    void RenewDhcp();
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
     void DealHiLinkDataToWpa(InternalMessage *msg);

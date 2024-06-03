@@ -303,13 +303,6 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode StartPortalCertification() = 0;
-	
-    /**
-     * @Description renew dhcp.
-     *
-	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode RenewDhcp() = 0;
 
     /**
      * @Description Handle foreground app changed action.

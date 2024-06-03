@@ -114,10 +114,9 @@ public:
     /**
      * @Description UnSet the Encryption info: delete the key loaded in hks
      *
-     * @param key - key
      * @return int - 0 success
      */
-    int UnSetEncryptionInfo(const std::string &key);
+    int UnSetEncryptionInfo();
 
     /**
      * @Description read decrypt and parses the ini config file
@@ -310,12 +309,10 @@ int WifiConfigFileImpl<T>::SetEncryptionInfo(const std::string &key, const std::
 }
 
 template<typename T>
-int WifiConfigFileImpl<T>::UnSetEncryptionInfo(const std::string &fileName)
+int WifiConfigFileImpl<T>::UnSetEncryptionInfo()
 {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    if (!key.empty()) {
-        DeleteKey(mEncryptionInfo);
-    }
+    DeleteKey(mEncryptionInfo);
 #endif
     return 0;
 }
@@ -339,7 +336,6 @@ int WifiConfigFileImpl<T>::LoadEncryptedConfig()
     WifiLoopDecrypt(mEncryptionInfo, mEncry, content);
 #endif
     std::stringstream strStream(content);
-
     mValues.clear();
     T item;
     std::string line;
@@ -359,6 +355,7 @@ int WifiConfigFileImpl<T>::LoadEncryptedConfig()
             mValues.push_back(item);
         }
     }
+    std::fill(content.begin(), content.end(), 0);
     fs.close();
     return 0;
 }
@@ -389,8 +386,8 @@ int WifiConfigFileImpl<T>::SaveEncryptedConfig()
     std::string content = ss.str();
 
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    mEncry.encryptedPassword = content;
     WifiLoopEncrypt(mEncryptionInfo, content, mEncry);
+    std::fill(content.begin(), content.end(), 0);
     content = mEncry.encryptedPassword;
 #endif
 

@@ -425,7 +425,7 @@ int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const Encr
     struct HksParamSet *decryParamSet = nullptr;
     int32_t ret = DecryptParamSet(&decryParamSet, wifiEncryptionInfo, encryptedData);
     if (ret != HKS_SUCCESS) {
-        WIFI_LOGE("WifiLoopEncrypt DecryptParamSet failed: %{public}d.", ret);
+        WIFI_LOGE("WifiLoopDecrypt DecryptParamSet failed: %{public}d.", ret);
         return ret;
     }
 

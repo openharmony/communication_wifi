@@ -1872,6 +1872,7 @@ ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& repl
     std::string replyCode = EXTENSION_SUCCESS;
     std::string backupInfo = data.ReadString();
     int ret = WifiSettings::GetInstance().OnBackup(fd, backupInfo);
+    std::fill(backupInfo.begin(), backupInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnBackup fail: backup data fail!");
         replyCode = EXTENSION_FAIL;
@@ -1893,6 +1894,7 @@ ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& rep
     std::string replyCode = EXTENSION_SUCCESS;
     std::string restoreInfo = data.ReadString();
     int ret = WifiSettings::GetInstance().OnRestore(fd, restoreInfo);
+    std::fill(restoreInfo.begin(), restoreInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnRestore fail: restore data fail!");
         replyCode = EXTENSION_FAIL;

@@ -528,13 +528,13 @@ bool IsChannelDbac(int channelA, int channelB)
     return false;
 }
 
-bool ParseJsonKey(const Json::value &jsonVaue, const std::string &key, std::string &value)
+bool ParseJsonKey(const Json::Value &jsonVaue, const std::string &key, std::string &value)
 {
     if (jsonValue.isArray()) {
         int nSize = static_cast<int>(jsonValue.size());
         for (int i = 0; i < nSize; i++) {
             if (!jsonValue[i].isMember(key)) {
-                LogW("ParseJsonKey JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
+                LOGW("ParseJsonKey JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
                 return false;
             }
             if (jsonValue[i][key].isString()) {
@@ -552,18 +552,18 @@ bool ParseJsonKey(const Json::value &jsonVaue, const std::string &key, std::stri
 
 bool ParseJson(const std::string &jsonString, const std::string &type, const std::string &key, std::string &value)
 {
-    LogI("ParseJson enter.");
+    LOGI("ParseJson enter.");
     Json::Value root;
     Json::Reader reader;
     bool success = reader.parse(jsonString, root);
     if (!success) {
-        LogE("ParseJson failed to parse json data.");
+        LOGE("ParseJson failed to parse json data.");
         return false;
     }
     int nSize = static_cast<int>(root.size());
     for (int i = 0; i < nSize; i++) {
         if (!root[i].isMember(type)) {
-            LogW("ParseJson JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
+            LOGW("ParseJson JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
             continue;
         }
         if (ParseJsonKey(root[i][type], key, value)) {

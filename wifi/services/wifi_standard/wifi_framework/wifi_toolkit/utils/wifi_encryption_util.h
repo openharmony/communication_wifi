@@ -86,7 +86,6 @@ int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksPar
 int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &inputString,
     EncryptedData &encryptedData);
 
-
 /**
  * @Description  Decrypt encryptedData using GCM-AES based on input encryptionInfo
  * @param wifiEncryptionInfo  - keyAlias info
@@ -121,7 +120,6 @@ int32_t DeleteKey(const WifiEncryptionInfo &wifiEncryptionInfo);
  */
 int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &inputString,
     EncryptedData &encryptedData);
-
 
 /**
  * @Description  Decrypt encryptedData using GCM-AES based on input encryptionInfo

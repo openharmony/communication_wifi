@@ -798,7 +798,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         LOGI("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
         return 0;
     }
-    LOGI("DecryptionDeviceConfig start");
+    LOGD("DecryptionDeviceConfig start");
     WifiEncryptionInfo mWifiEncryptionInfo;
     mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);
@@ -836,7 +836,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
-    LOGI("DecryptionDeviceConfig end");
+    LOGD("DecryptionDeviceConfig end");
     return 0;
 }
 #endif

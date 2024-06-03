@@ -96,7 +96,6 @@ int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::
  */
 int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const EncryptedData &encryptedData,
     std::string &decryptedData);
-}
 
 /**
  * @Description  Import GCM-AES key based on input encryptionInfo and default genParamSet

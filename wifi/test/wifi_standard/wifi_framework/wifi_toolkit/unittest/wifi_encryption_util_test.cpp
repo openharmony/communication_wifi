@@ -171,16 +171,16 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiLoopEncrypt_011, TestSize.Level1)
 
     std::string decryptedData;
     encryResult.IV = "";
-    EXPECT_TRUE(WifiLoopDecrypt(testDecryptionInfo, encryResult, decryptedData) != HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopDecrypt(testEncryptionInfo, encryResult, decryptedData) != HKS_SUCCESS);
 
     // 1111111111111111111111111111111111111111111111111111111111111111 : 64 bit
     encryResult.IV = "1111111111111111111111111111111111111111111111111111111111111111";
-    EXPECT_TRUE(WifiLoopDecrypt(testDecryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopDecrypt(testEncryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
     EXPECT_TRUE(inputString.compare(decryptedData) != 0);
 
     // 0000000000000000000000000000000000000000000000000000000000000000 : 64 bit
     encryResult.IV = "0000000000000000000000000000000000000000000000000000000000000000";
-    EXPECT_TRUE(WifiLoopDecrypt(testDecryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopDecrypt(testEncryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
     EXPECT_TRUE(inputString.compare(decryptedData) == 0);
     EXPECT_TRUE(DeleteKey(testEncryptionInfo) == HKS_SUCCESS);
 }
@@ -201,8 +201,8 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiLoopDecrypt_013, TestSize.Level1)
 {
     // 0001020304050607080910000102030405060708091000010203040506070809 : 64 bit
     std::string key = "0001020304050607080910000102030405060708091000010203040506070809";
-    WifiEncryptionInfo testEncryptionInfo;
-    testEncryptionInfo.SetFile("TestWifiLoopDecrypt013");
+    WifiEncryptionInfo testDecryptionInfo;
+    testDecryptionInfo.SetFile("TestWifiLoopDecrypt013");
     std::string decryptedData;
     EncryptedData encryResult;
     encryResult.encryptedPassword = "";

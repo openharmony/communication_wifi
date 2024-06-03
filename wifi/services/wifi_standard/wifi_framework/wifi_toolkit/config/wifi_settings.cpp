@@ -439,7 +439,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
     wifiBackupConfig.SetEncryptionInfo(key, iv);
     wifiBackupConfig.SetValue(backupConfigs);
     wifiBackupConfig.SaveEncryptedConfig();
-    wifiBackupConfig.UnSetEncryptionInfo();
+    wifiBackupConfig.UnsetEncryptionInfo();
     std::fill(key.begin(), key.end(), 0);
 
     fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH, O_RDONLY));
@@ -485,7 +485,7 @@ int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
     wifiBackupConfig.LoadEncryptedConfig();
     std::vector<WifiBackupConfig> backupConfigs;
     wifiBackupConfig.GetValue(backupConfigs);
-    wifiBackupConfig.UnSetEncryptionInfo();
+    wifiBackupConfig.UnsetEncryptionInfo();
     std::fill(key.begin(), key.end(), 0);
 
     std::vector<WifiDeviceConfig> deviceConfigs;

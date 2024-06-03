@@ -626,7 +626,6 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest1, TestSize.Level1)
 {
     WIFI_LOGI("OnRestoreTest1 enter");
     UniqueFd fd(-1);
-    WifiSettings::GetInstance().OnRestore(fd, "");
     EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, ""), -1);
     close(fd.Release());
 }

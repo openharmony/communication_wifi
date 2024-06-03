@@ -83,8 +83,9 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
         if (exception) {
             return WIFI_OPT_FAILED;
         }
-        return (this->*(iter->second))(code, data, reply, option);
+        (this->*(iter->second))(code, data, reply, option);
     }
+    return 0;
 }
 
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)

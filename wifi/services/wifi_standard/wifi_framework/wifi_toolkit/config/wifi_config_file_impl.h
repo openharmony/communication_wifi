@@ -121,7 +121,7 @@ public:
     /**
      * @Description read decrypt and parses the ini config file
      * need call SetConfigFilePath and SetEncryptionInfo first
-     * 
+     *
      * @return int - 0 Success; -1 file not exist
      */
     int LoadEncryptedConfig();

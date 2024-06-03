@@ -345,7 +345,7 @@ int32_t DecryptParamSet(struct HksParamSet **decryParamSet, const WifiEncryption
     uint32_t cipherLength = encryptedData.encryptedPassword.length();
     uint8_t *cipherBuf = reinterpret_cast<uint8_t*>(const_cast<char*>(encryptedData.encryptedPassword.c_str()));
     struct HksBlob decryptAead = { AEAD_SIZE, cipherBuf + cipherLength - AEAD_SIZE };
-    struct HksParam encryptParam[] = {
+    struct HksParam decryptParam[] = {
         { .tag = HKS_TAG_PURPOSE, .uint32Param = HKS_KEY_PURPOSE_DECRYPT },
         { .tag = HKS_TAG_NONCE, .blob = { .size = decryptNonce.size, .data = decryptNonce.data } },
         { .tag = HKS_TAG_AE_TAG, .blob = { .size = decryptAead.size, .data = decryptAead.data } },
@@ -353,7 +353,7 @@ int32_t DecryptParamSet(struct HksParamSet **decryParamSet, const WifiEncryption
 
     HksInitParamSet(decryParamSet);
     HksAddParams(*decryParamSet, g_genAes256Param, sizeof(g_genAes256Param) / sizeof(HksParam));
-    HksAddParams(*decryParamSet, encryptParam, sizeof(encryptParam) / sizeof(HksParam));
+    HksAddParams(*decryParamSet, decryptParam, sizeof(decryptParam) / sizeof(HksParam));
     HksBuildParamSet(decryParamSet);
 
     struct HksBlob authId = wifiEncryptionInfo.keyAlias;

@@ -528,7 +528,7 @@ bool IsChannelDbac(int channelA, int channelB)
     return false;
 }
 
-bool ParseJsonKey(const Json::Value &jsonVaue, const std::string &key, std::string &value)
+bool ParseJsonKey(const Json::Value &jsonValue, const std::string &key, std::string &value)
 {
     if (jsonValue.isArray()) {
         int nSize = static_cast<int>(jsonValue.size());
@@ -563,7 +563,7 @@ bool ParseJson(const std::string &jsonString, const std::string &type, const std
     int nSize = static_cast<int>(root.size());
     for (int i = 0; i < nSize; i++) {
         if (!root[i].isMember(type)) {
-            LOGW("ParseJson JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
+            LOGW("ParseJson JSON[%{public}d] has no member %{public}s.", nSize, type.c_str());
             continue;
         }
         if (ParseJsonKey(root[i][type], key, value)) {

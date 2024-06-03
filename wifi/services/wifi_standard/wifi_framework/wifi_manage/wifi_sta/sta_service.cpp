@@ -722,6 +722,17 @@ ErrCode StaService::SetPowerMode(bool mode) const
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::SetTxPower(int power) const
+{
+    LOGD("Enter SetTxPower, power=[%{public}d]!", power);
+    if (WifiStaHalInterface::GetInstance().SetTxPower(WifiSettings::GetInstance().GetStaIfaceName(), power)
+        != WIFI_IDL_OPT_OK) {
+        LOGE("SetTxPower() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 {
     WIFI_LOGI("Notify device config change: %{public}d\n", static_cast<int>(value));

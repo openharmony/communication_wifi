@@ -22,6 +22,9 @@
 #include <vector>
 #include "wifi_config_file_spec.h"
 #include "wifi_log.h"
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+wifi_encryption_util.h
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -76,14 +79,14 @@ public:
      *
      * @return int - 0 Success; >0 parse failed
      */
-    int ReadNetworkSection(T &item, std::ifstream &fs, std::string &line);
+    int ReadNetworkSection(T &item, std::istream &fs, std::string &line);
 
     /**
      * @Description read and parses the networks of ini config file, need call SetConfigFilePath first
      *
      * @return int - 0 Success; >0 parse failed
      */
-    int ReadNetwork(T &item, std::ifstream &fs, std::string &line);
+    int ReadNetwork(T &item, std::istream &fs, std::string &line);
 
     /**
      * @Description read and parses the ini config file, need call SetConfigFilePath first
@@ -98,6 +101,38 @@ public:
      * @return int - 0 Success; -1 Failed
      */
     int SaveConfig();
+
+    /**
+     * @Description Set the Encryption info
+     *
+     * @param key - key
+     * @param iv - iv
+     * @return int - 0 success
+     */
+    int SetEncryptionInfo(const std::string &key, const std::string &iv);
+
+    /**
+     * @Description UnSet the Encryption info: delete the key loaded in hks
+     *
+     * @param key - key
+     * @return int - 0 success
+     */
+    int UnSetEncryptionInfo(const std::string &key);
+
+    /**
+     * @Description read decrypt and parses the ini config file
+     * need call SetConfigFilePath and SetEncryptionInfo first
+     * 
+     * @return int - 0 Success; -1 file not exist
+     */
+    int LoadEncryptedConfig();
+
+    /**
+     * @Description Save encrypted config to file
+     *
+     * @return int - 0 Success; -1 Failed
+     */
+    int SaveEncryptedConfig();
 
     /**
      * @Description Get config values
@@ -125,6 +160,10 @@ public:
 private:
     std::string mFileName;
     std::vector<T> mValues;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    WifiEncryptionInfo mEncryptionInfo;
+    EncryptedData mEncry;
+#endif
 };
 
 template<typename T>
@@ -135,7 +174,7 @@ int WifiConfigFileImpl<T>::SetConfigFilePath(const std::string &fileName)
 }
 
 template<typename T>
-int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::string &line)
+int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::istream &fs, std::string &line)
 {
     int sectionError = 0;
     while (std::getline(fs, line)) {
@@ -165,7 +204,7 @@ int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::ifstream &fs, std::s
 }
 
 template<typename T>
-int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::ifstream &fs, std::string &line)
+int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::istream &fs, std::string &line)
 {
     int networkError = 0;
     while (std::getline(fs, line)) {
@@ -246,6 +285,115 @@ int WifiConfigFileImpl<T>::SaveConfig()
         ss << "}" << std::endl;
     }
     std::string content = ss.str();
+    int ret = fwrite(content.c_str(), 1, content.length(), fp);
+    if (ret != (int)content.length()) {
+        LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());
+    }
+    (void)fflush(fp);
+    (void)fsync(fileno(fp));
+    (void)fclose(fp);
+    mValues.clear(); /* clear values */
+    return 0;
+}
+
+template<typename T>
+int WifiConfigFileImpl<T>::SetEncryptionInfo(const std::string &key, const std::string &iv)
+{
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    mEncryptionInfo.SetFile(GetTClassName<T>());
+    if (!key.empty()) {
+        ImportKey(mEncryptionInfo, key);
+    }
+    mEncry.IV = iv;
+#endif
+    return 0;
+}
+
+template<typename T>
+int WifiConfigFileImpl<T>::UnSetEncryptionInfo(const std::string &fileName)
+{
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    if (!key.empty()) {
+        DeleteKey(mEncryptionInfo);
+    }
+#endif
+    return 0;
+}
+
+template<typename T>
+int WifiConfigFileImpl<T>::LoadEncryptedConfig()
+{
+    if (mFileName.empty()) {
+        LOGE("File name is empty.");
+        return -1;
+    }
+    std::ifstream fs(mFileName.c_str());
+    if (!fs.is_open()) {
+        LOGE("Loading config file: %{public}s, fs.is_open() failed!", mFileName.c_str());
+        return -1;
+    }
+
+    std::string content(std::istreambuf_iterator<char>(fs), std::istreambuf_iterator<char>());
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    mEncry.encryptedPassword = content;
+    WifiLoopDecrypt(mEncryptionInfo, mEncry, content);
+#endif
+    std::stringstream strStream(content);
+
+    mValues.clear();
+    T item;
+    std::string line;
+    int configError;
+    while (std::getline(strStream, line)) {
+        TrimString(line);
+        if (line.empty()) {
+            continue;
+        }
+        if (line[0] == '[' && line[line.length() - 1] == '{') {
+            ClearTClass(item); /* template function, needing specialization */
+            configError = ReadNetwork(item, strStream, line);
+            if (configError > 0) {
+                LOGE("Parse network failed.");
+                continue;
+            }
+            mValues.push_back(item);
+        }
+    }
+    fs.close();
+    return 0;
+}
+
+template<typename T>
+int WifiConfigFileImpl<T>::SaveEncryptedConfig()
+{
+    if (mFileName.empty()) {
+        LOGE("File name is empty.");
+        return -1;
+    }
+    FILE* fp = fopen(mFileName.c_str(), "w");
+    if (!fp) {
+        LOGE("Save config file: %{public}s, fopen() failed!", mFileName.c_str());
+        return -1;
+    }
+    std::ostringstream ss;
+    for (std::size_t i = 0; i < mValues.size(); ++i) {
+        T &item = mValues[i];
+        /*
+         * here use template function GetTClassName OutTClassString, needing
+         * specialization.
+         */
+        ss << "[" << GetTClassName<T>() << "_" << (i + 1) << "] {" << std::endl;
+        ss << OutTClassString(item) << std::endl;
+        ss << "}" << std::endl;
+    }
+    std::string content = ss.str();
+
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    mEncry.encryptedPassword = content;
+    WifiLoopEncrypt(mEncryptionInfo, content, mEncry);
+    content = mEncry.encryptedPassword;
+#endif
+
     int ret = fwrite(content.c_str(), 1, content.length(), fp);
     if (ret != (int)content.length()) {
         LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());

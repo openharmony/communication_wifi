@@ -155,19 +155,19 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiLoopEncrypt_011, TestSize.Level1)
 
     EncryptedData encryResult;
     std::string inputString = "";
-    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopEncrypt(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
 
     inputString = "12345678";
     // 000000000000000000000000000000000000000000000000000000000000000000 : 66 bit
     encryResult.IV = "000000000000000000000000000000000000000000000000000000000000000000";
-    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) != HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopEncrypt(testEncryptionInfo, inputString, encryResult) != HKS_SUCCESS);
 
     encryResult.IV = "";
-    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) != HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopEncrypt(testEncryptionInfo, inputString, encryResult) != HKS_SUCCESS);
 
     // 0000000000000000000000000000000000000000000000000000000000000000 : 64 bit
     encryResult.IV = "0000000000000000000000000000000000000000000000000000000000000000";
-    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopEncrypt(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
 
     std::string decryptedData;
     encryResult.IV = "";
@@ -194,7 +194,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiLoopEncrypt_012, TestSize.Level1)
 
     EncryptedData encryResult;
     std::string inputString = "12345678";
-    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) != HKS_SUCCESS);
+    EXPECT_TRUE(WifiLoopEncrypt(testEncryptionInfo, inputString, encryResult) != HKS_SUCCESS);
 }
 
 HWTEST_F(WifiEncryptionUtilFuncTest, WifiLoopDecrypt_013, TestSize.Level1)

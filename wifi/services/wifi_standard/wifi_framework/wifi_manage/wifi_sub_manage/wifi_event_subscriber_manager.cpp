@@ -272,6 +272,27 @@ void WifiEventSubscriberManager::GetAirplaneModeByDatashare()
     return;
 }
 
+void WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()
+{
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("GetWifiAllowSemiActiveByDatashare, datashareHelper is nullptr!");
+        return;
+    }
+
+    std::string isAllowed;
+    Uri uri(SETTINGS_DATASHARE_URI_WIFI_ALLOW_SEMI_ACTIVE);
+    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ALLOW_SEMI_ACTIVE, isAllowed);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetWifiAllowSemiActiveByDatashare, Query wifiAllowSemiActive fail!");
+        return;
+    }
+
+    WIFI_LOGI("GetWifiAllowSemiActiveByDatashare, isAllowed:%{public}s", isAllowed.c_str());
+    WifiSettings::GetInstance().SetWifiAllowSemiActive(isAllowed.compare("1") == 0);
+    return;
+}
+
 bool WifiEventSubscriberManager::GetLocationModeByDatashare()
 {
     auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();

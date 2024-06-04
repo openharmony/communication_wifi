@@ -245,12 +245,12 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason)
     if (wpaReason == static_cast<int>(DisconnectDetailReason::DEAUTH_STA_IS_LEFING) ||
         wpaReason == static_cast<int>(DisconnectDetailReason::DISASSOC_STA_HAS_LEFT)) {
         if (time_duration < FREQUENT_DISCONNECT_TIME_INTERVAL_MIN) {
-            WIFI_LOGD("isFrequentDisconnect case min %{public}s %{public}d  duration %{public}" PRId64"",
+            WIFI_LOGD("isFrequentDisconnect case min %{public}s %{public}d  duration %{public}" PRId64,
                 MacAnonymize(bssid).c_str(), wpaReason, time_duration);
             mLastConnectedApInfo.alreadyConnectedCount++;
         }
     } else if (time_duration < FREQUENT_DISCONNECT_TIME_INTERVAL_MID) {
-        WIFI_LOGD("isFrequentDisconnect case mid %{public}s %{public}d duration %{public}%" PRId64"",
+        WIFI_LOGD("isFrequentDisconnect case mid %{public}s %{public}d duration %{public}" PRId64,
             MacAnonymize(bssid).c_str(), wpaReason, time_duration);
         mLastConnectedApInfo.alreadyConnectedCount++;
     }

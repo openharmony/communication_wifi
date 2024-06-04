@@ -41,6 +41,7 @@ private:
     void ForceStopWifi(int instId = 0);
     void DealStaOpenRes(OperateResState state, int instId = 0);
     void DealStaCloseRes(OperateResState state, int instId = 0);
+    void DealStaSemiActiveRes(OperateResState state, int instId = 0);
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
     void DealStreamChanged(StreamDirection direction, int instId = 0);

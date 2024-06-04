@@ -53,7 +53,7 @@ int WifiDeviceMgrStub::OnRemoteRequest(
         WIFI_LOGE("not find function to deal, code %{public}u", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
-        return (this->*(iter->second))(code, data, reply, option);
+        (this->*(iter->second))(code, data, reply, option);
     }
     return 0;
 }

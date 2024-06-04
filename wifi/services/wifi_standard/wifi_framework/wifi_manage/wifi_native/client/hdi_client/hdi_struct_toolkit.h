@@ -58,7 +58,8 @@ static void FreeHdiP2pNetworkList(HdiP2pNetworkList *hdiP2pNetworkList)
     hdiP2pNetworkList = nullptr;
 }
 
-static void FreeHdiP2pDeviceInfo(HdiP2pDeviceInfo *hdiP2pDeviceInfo) {
+static void FreeHdiP2pDeviceInfo(HdiP2pDeviceInfo *hdiP2pDeviceInfo)
+{
     free(hdiP2pDeviceInfo->srcAddress);
     free(hdiP2pDeviceInfo->p2pDeviceAddress);
     free(hdiP2pDeviceInfo->primaryDeviceType);

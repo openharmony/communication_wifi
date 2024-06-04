@@ -105,7 +105,6 @@ HWTEST_F(WifiCommonUtilTest, Byte2HexStringTest, TestSize.Level1)
     std::vector<uint8_t> nonce(str.begin(), str.end());
     uint8_t autsLen = nonce.size();
     Byte2HexString(&nonce[offset], autsLen, autsBuf, sizeof(autsBuf));
-    std::cout << "" << std::endl;
     EXPECT_NE(autsBuf, "30303a35353a44443a66663a4d4d");
 }
 

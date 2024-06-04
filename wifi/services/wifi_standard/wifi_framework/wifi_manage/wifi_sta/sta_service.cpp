@@ -217,6 +217,24 @@ ErrCode StaService::DisableWifi() const
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::EnableSemiWifi()
+{
+    WIFI_LOGI("Enter EnableSemiWifi.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+#ifndef OHOS_ARCH_LITE
+    // notification of registration country code change
+    std::string moduleName = "StaService_" + std::to_string(m_instId);
+    m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
+    if (m_staObserver == nullptr) {
+        WIFI_LOGI("m_staObserver is null\n");
+        return WIFI_OPT_FAILED;
+    }
+    WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
+#endif
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_SEMI_WIFI, STA_CONNECT_MODE);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId) const
 {
     LOGI("Enter AddCandidateConfig.\n");

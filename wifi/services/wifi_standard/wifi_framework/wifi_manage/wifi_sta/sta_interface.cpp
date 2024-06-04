@@ -49,24 +49,14 @@ ErrCode StaInterface::EnableWifi()
 {
     WIFI_LOGI("Enter EnableWifi.\n");
     std::lock_guard<std::mutex> lock(mutex);
-    if(pStaService == nullptr) {
-        pStaService = new (std::nothrow) StaService(m_instId);
-        if (pStaService == nullptr) {
-            WIFI_LOGE("New StaService failed.\n");
-            return WIFI_OPT_FAILED;
-        }
-        if (pStaService->InitStaService(m_staCallback) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("InitStaService failed.\n");
-            delete pStaService;
-            pStaService = nullptr;
-            return WIFI_OPT_FAILED;
-        }
+    if (!InitStaServiceLocked()) {
+        return WIFI_OPT_FAILED;
     }
 
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->EnableWifi() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("EnableWifi failed.\n");
-        DisableWifi();
+        pStaService->DisableWifi();
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -79,6 +69,23 @@ ErrCode StaInterface::DisableWifi()
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->DisableWifi() != WIFI_OPT_SUCCESS) {
         LOGE("DisableWifi failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::EnableSemiWifi()
+{
+    LOGI("Enter StaInterface::EnableSemiWifi.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    if (!InitStaServiceLocked()) {
+        return WIFI_OPT_FAILED;
+    }
+
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->EnableSemiWifi() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("EnableSemiWifi failed.\n");
+        pStaService->DisableWifi();
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -458,6 +465,24 @@ ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->DeliverStaIfaceData(currentMac);
     return WIFI_OPT_SUCCESS;
+}
+
+bool StaInterface::InitStaServiceLocked()
+{
+    if (pStaService == nullptr) {
+        pStaService = new (std::nothrow) StaService(m_instId);
+        if (pStaService == nullptr) {
+            WIFI_LOGE("New StaService failed.\n");
+            return false;
+        }
+        if (pStaService->InitStaService(m_staCallback) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("InitStaService failed.\n");
+            delete pStaService;
+            pStaService = nullptr;
+            return false;
+        }
+    }
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

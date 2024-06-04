@@ -19,8 +19,8 @@
 #include <sstream>
 #include <random>
 #include "wifi_log.h"
-#include "json/json.h"
 #ifndef OHOS_ARCH_LITE
+#include "json/json.h"
 #include "wifi_country_code_define.h"
 #endif
 #ifdef INIT_LIB_ENABLE
@@ -528,6 +528,7 @@ bool IsChannelDbac(int channelA, int channelB)
     return false;
 }
 
+#ifndef OHOS_ARCH_LITE
 bool ParseJsonKey(const Json::Value &jsonValue, const std::string &key, std::string &value)
 {
     if (jsonValue.isArray()) {
@@ -585,5 +586,6 @@ void ConvertToHexString(const std::string &inData, std::string &outData)
     }
     outData = temp.str();
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

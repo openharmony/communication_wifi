@@ -435,6 +435,7 @@ bool IsFreqDbac(int freqA, int freqB);
  */
 bool IsChannelDbac(int channelA, int channelB);
 
+#ifndef OHOS_ARCH_LITE
 /**
  * @Description Parse json string, find key by type, get value by key
  *
@@ -453,7 +454,7 @@ bool ParseJson(const std::string &jsonString, const std::string &type, const std
  * @param outData - hexstring
  */
 void ConvertToHexString(const std::string &inData, std::string &outData);
-
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

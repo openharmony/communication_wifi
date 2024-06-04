@@ -666,6 +666,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest(data, size);
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    sleep(U32_AT_SIZE_ZERO);
     return 0;
 }
 }

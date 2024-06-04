@@ -52,7 +52,6 @@
             "wifi_feature_with_auth_disable",
             "wifi_feature_with_dhcp_disable",
             "wifi_feature_with_encryption",
-            "wifi_feature_with_wifi_hdi",
             "wifi_feature_with_ap_extension",
             "wifi_feature_with_app_frozen",
             "wifi_feature_non_seperate_p2p",

@@ -26,7 +26,6 @@ declare_args() {
   wifi_feature_with_auth_disable = false
   wifi_feature_with_dhcp_disable = false
   wifi_feature_with_encryption = true
-  wifi_feature_with_wifi_hdi = false
   wifi_feature_with_ap_extension = false
   wifi_feature_with_app_frozen = false
   wifi_feature_non_seperate_p2p = false

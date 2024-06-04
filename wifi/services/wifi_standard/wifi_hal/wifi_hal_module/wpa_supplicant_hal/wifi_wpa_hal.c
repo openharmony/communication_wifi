@@ -720,13 +720,9 @@ static void WpaCallBackFunc(const char *p)
         return;
     }
     if (strncmp(p, WPA_EVENT_SCAN_RESULTS, strlen(WPA_EVENT_SCAN_RESULTS)) == 0) {
-#ifndef HDI_INTERFACE_SUPPORT
         WifiHalCbNotifyScanEnd(STA_CB_SCAN_OVER_OK);
-#endif
     } else if (strncmp(p, WPA_EVENT_SCAN_FAILED, strlen(WPA_EVENT_SCAN_FAILED)) == 0) {
-#ifndef HDI_INTERFACE_SUPPORT
         WifiHalCbNotifyScanEnd(STA_CB_SCAN_FAILED);
-#endif
     } else if (strncmp(p, WPA_EVENT_CONNECTED, strlen(WPA_EVENT_CONNECTED)) == 0) { /* Connection notification */
         char *pid = strstr(p, "id=");
         char *pMacPos = strstr(p, "Connection to ");

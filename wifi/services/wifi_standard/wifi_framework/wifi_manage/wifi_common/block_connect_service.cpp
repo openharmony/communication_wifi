@@ -228,7 +228,7 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason)
     // Return true if frequent disconnects, false otherwise
     int64_t timestamp = GetElapsedMicrosecondsSinceBoot();
     int64_t time_duration = timestamp - mLastConnectedApInfo.lastDisconnectTimestamp;
-    WIFI_LOGD("ENTER isFrequentDisconnect %{public}lld  %{public}s", time_duration, MacAnonymize(bssid).c_str());
+    WIFI_LOGD("ENTER isFrequentDisconnect %{public}" PRId64"  %{public}s", time_duration, MacAnonymize(bssid).c_str());
     WIFI_LOGD("mLastConnectedApInfo alreadyConnectedCount %{public}d", mLastConnectedApInfo.alreadyConnectedCount);
     mLastConnectedApInfo.lastDisconnectTimestamp = timestamp;
     if (mLastConnectedApInfo.bssid != bssid) {
@@ -245,12 +245,12 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason)
     if (wpaReason == static_cast<int>(DisconnectDetailReason::DEAUTH_STA_IS_LEFING) ||
         wpaReason == static_cast<int>(DisconnectDetailReason::DISASSOC_STA_HAS_LEFT)) {
         if (time_duration < FREQUENT_DISCONNECT_TIME_INTERVAL_MIN) {
-            WIFI_LOGD("isFrequentDisconnect case min %{public}s %{public}d  duration %{public}lld",
+            WIFI_LOGD("isFrequentDisconnect case min %{public}s %{public}d  duration %{public}" PRId64"",
                 MacAnonymize(bssid).c_str(), wpaReason, time_duration);
             mLastConnectedApInfo.alreadyConnectedCount++;
         }
     } else if (time_duration < FREQUENT_DISCONNECT_TIME_INTERVAL_MID) {
-        WIFI_LOGD("isFrequentDisconnect case mid %{public}s %{public}d duration %{public}lld",
+        WIFI_LOGD("isFrequentDisconnect case mid %{public}s %{public}d duration %{public}%" PRId64"",
             MacAnonymize(bssid).c_str(), wpaReason, time_duration);
         mLastConnectedApInfo.alreadyConnectedCount++;
     }

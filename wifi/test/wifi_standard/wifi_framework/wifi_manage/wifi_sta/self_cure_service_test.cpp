@@ -77,6 +77,14 @@ public:
         WifiLinkedInfo info;
         pSelfCureService->HandleStaConnChanged(state, info);
     }
+
+    void HandleStaOpenResTest()
+    {
+        OperateResState state = OperateResState::OPEN_WIFI_SUCCEED;
+        pSelfCureService->HandleStaOpenRes(state);
+        state = OperateResState::CONNECT_AP_CONNECTED;
+        pSelfCureService->HandleStaOpenRes(state);
+    }
 };
 
 HWTEST_F(SelfCureServiceTest, InitSelfCureServiceTest, TestSize.Level1)
@@ -102,6 +110,11 @@ HWTEST_F(SelfCureServiceTest, HandleP2pConnChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest, TestSize.Level1)
 {
     HandleStaConnChangedTest();
+}
+
+HWTEST_F(SelfCureServiceTest, HandleStaOpenResTest, TestSize.Level1)
+{
+    HandleStaOpenResTest();
 }
 
 } // namespace Wifi

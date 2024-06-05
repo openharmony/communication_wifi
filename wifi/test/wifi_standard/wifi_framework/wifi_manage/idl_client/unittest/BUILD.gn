@@ -81,7 +81,11 @@ ohos_unittest("idl_client_unittest") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
 
-  defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+  defines = [
+    "private = public",
+    "protected = public",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+  ]
 
   deps = [
     "$WIFI_ROOT_DIR/base/cRPC:crpc_client",

@@ -132,7 +132,6 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
 {
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
     WifiP2pGroupInfo group;
-    WifiP2pDevice owner;
     msg.GetMessageObj(group);
     WIFI_LOGI("P2P_EVENT_GROUP_STARTED create group interface name : %{private}s, network name : %{private}s, owner "
               "address : %{private}s",
@@ -144,8 +143,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
         p2pStateMachine.UpdateGroupManager();
         group.SetNetworkId(groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         WIFI_LOGI("the group network id is %{public}d set id is %{public}d",
-            group.GetNetworkId(),
-            p2pStateMachine.groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
+            group.GetNetworkId(), groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         p2pStateMachine.UpdatePersistentGroups();
     } else {
         group.SetNetworkId(TEMPORARY_NET_ID);
@@ -166,6 +164,8 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
             group.SetOwner(dev);
         }
     }
+    group.SetCreatorUid(WifiSettings::GetInstance().GetP2pCreatorUid());
+    WifiSettings::GetInstance().SaveP2pCreatorUid(-1);
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
     p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
 

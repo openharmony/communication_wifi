@@ -424,13 +424,6 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureWifiLink(requestCureLevel);
     }
 
-    void SelfCureForRenewDhcpTest()
-    {
-        LOGI("Enter SelfCureForRenewDhcpTest");
-        int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_2_RENEW_DHCP;
-        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForRenewDhcp(requestCureLevel);
-    }
-
     void SelfCureForInvalidIpTest()
     {
         LOGI("Enter SelfCureForInvalidIpTest");
@@ -1194,10 +1187,6 @@ HWTEST_F(SelfCureStateMachineTest, SelectBestSelfCureSolutionTest, TestSize.Leve
 HWTEST_F(SelfCureStateMachineTest, SelfCureWifiLinkTest, TestSize.Level1)
 {
     SelfCureWifiLinkTest();
-}
-HWTEST_F(SelfCureStateMachineTest, SelfCureForRenewDhcpTest, TestSize.Level1)
-{
-    SelfCureForRenewDhcpTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, SelfCureForInvalidIpTest, TestSize.Level1)

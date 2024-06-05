@@ -556,6 +556,18 @@ void OnHid2dSetUpperSceneFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE), datas);
 }
 
+void OnCheckCanUseP2pFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P), datas);
+}
+
 void DoSomethingInterestingWithMyAPIS(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
@@ -611,6 +623,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     Init();
     OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
+    OHOS::Wifi::OnCheckCanUseP2pFuzzTest(data, size);
     OHOS::Wifi::DoSomethingInterestingWithMyAPIS(data, size);
     OHOS::Wifi::OnDiscoverDevicesFuzzTest(data, size);
     OHOS::Wifi::OnStopDiscoverDevicesFuzzTest(data, size);
@@ -653,6 +666,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest(data, size);
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    sleep(U32_AT_SIZE_ZERO);
     return 0;
 }
 }

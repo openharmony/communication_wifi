@@ -285,6 +285,8 @@ public:
     void ClearClientDevices();
     bool IsExplicitGroup(void) const;
     void SetExplicitGroup(bool isExplicit);
+    void SetCreatorUid(int uid);
+    int GetCreatorUid();
 
 private:
     WifiP2pDevice owner;
@@ -299,6 +301,7 @@ private:
     std::vector<WifiP2pDevice> clientDevices;
     std::string goIpAddress;
     bool explicitGroup;
+    int creatorUid = -1;
 };
 
 class WpsInfo {

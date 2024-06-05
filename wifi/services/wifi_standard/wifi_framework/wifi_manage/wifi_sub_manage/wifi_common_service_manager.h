@@ -27,7 +27,9 @@
 #include "wifi_event_subscriber_manager.h"
 #endif
 #include "wifi_netlink.h"
+#ifdef FEATURE_SELF_CURE_SUPPORT
 #include "ip_qos_monitor.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {

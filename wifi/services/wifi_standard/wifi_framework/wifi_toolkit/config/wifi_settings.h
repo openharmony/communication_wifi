@@ -31,9 +31,6 @@
 #include "wifi_event_handler.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-#include "wifi_encryption_util.h"
-#endif
 
 constexpr int RANDOM_STR_LEN = 6;
 constexpr int RANDOM_PASSWD_LEN = 8;
@@ -74,6 +71,10 @@ constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.x
 constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
 constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
+
+constexpr int WIFI_STATE_CLOSED = 0;
+constexpr int WIFI_STATE_OPENED = 1;
+constexpr int WIFI_STATE_SEMI_ACTIVE = 2;
 
 namespace OHOS {
 namespace Wifi {
@@ -138,9 +139,28 @@ public:
      */
     int SetWifiState(int state, int instId = 0);
 
+    /**
+     * @Description Get current STA service detail state
+     *
+     * @return WifiDetailState - the wifi detail state
+     */
+    WifiDetailState GetWifiDetailState(int instId = 0);
+
+    /**
+     * @Description Save STA service detail state
+     *
+     * @param state - the wifi detail state
+     * @return int - 0 success
+     */
+    int SetWifiDetailState(WifiDetailState state, int instId);
+
+    void SetWifiAllowSemiActive(bool isAllowed);
+    bool GetWifiAllowSemiActive() const;
     void PersistWifiState(int state);
     int GetPersistWifiState();
     bool IsWifiToggledEnable();
+    bool IsSemiWifiEnable();
+    void SetSemiWifiEnable(bool enable);
     void SetWifiToggledState(bool state);
     bool GetWifiToggledState() const;
     void InsertWifi6BlackListCache(const std::string currentBssid,
@@ -238,6 +258,21 @@ public:
      * @return int - 0 success
      */
     int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo);
+
+    /**
+     * @Description save the p2p group creator uid
+     *
+     * @param int - uid of p2p group creator
+     * @return int - 0 success
+     */
+    int SaveP2pCreatorUid(int uid);
+
+    /**
+     * @Description get the p2p group creator uid
+     *
+     * @return uid of creator
+     */
+    int GetP2pCreatorUid();
 
     /**
      * @Description Get the scan control policy info
@@ -1006,18 +1041,19 @@ public:
     /**
      * @Description Get the STA service last running state
      *
-     * @return true - running
-     * @return false - not running
+     * @return 2 - semi active
+     * @return 1 - running
+     * @return 0 - not running
      */
-    bool GetStaLastRunState(int instId = 0);
+    int GetStaLastRunState(int instId = 0);
 
     /**
      * @Description Set the STA service running state
      *
-     * @param bRun - running or not
+     * @param bRun - running/semi active/not running
      * @return int - 0 success
      */
-    int SetStaLastRunState(bool bRun, int instId = 0);
+    int SetStaLastRunState(int bRun, int instId = 0);
 
     /**
      * @Description Get the Dhcp Ip Type
@@ -1617,9 +1653,6 @@ public:
      * @return bool - true: deciphered
      */
     bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;
-
-    bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
-    void DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     /**
@@ -1760,6 +1793,9 @@ private:
     int mNetworkId;
     int mWifiStaCapabilities;            /* Sta capability */
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
+    std::map <int, WifiDetailState> mWifiDetailState;    /* Sta service detail state */
+    bool mWifiAllowSemiActive;
+    bool isSemiWifiEnable;
     std::atomic<bool> mWifiSelfcureReset;
     std::atomic<int> mLastNetworkId;
     bool mWifiStoping;
@@ -1815,6 +1851,7 @@ private:
     Hid2dUpperScene mUpperScene;
     P2pBusinessType mP2pBusinessType;
     int mPersistWifiState;
+    int mUid = -1;
 
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;
@@ -1836,6 +1873,7 @@ private:
     std::mutex mWifiStopMutex;
     std::mutex mSoftapToggledMutex;
     std::mutex mSyncWifiConfigMutex;
+    std::mutex mUidMutex;
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
     std::atomic_flag mEncryptionOnBootFalg = ATOMIC_FLAG_INIT;

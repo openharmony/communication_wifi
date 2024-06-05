@@ -17,6 +17,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
+#include "block_connect_service.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -86,6 +87,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     if (!AllowAutoSelectDevice(info) || !IsAllowAutoJoin()) {
         return;
     }
+    BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;

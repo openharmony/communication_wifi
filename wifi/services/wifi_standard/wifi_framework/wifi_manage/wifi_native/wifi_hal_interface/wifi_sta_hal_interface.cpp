@@ -204,14 +204,16 @@ WifiErrorNo WifiStaHalInterface::SendRequest(const WifiStaRequest &request)
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::SetTxPower(int power)
+WifiErrorNo WifiStaHalInterface::SetTxPower(const std::string &ifaceName, int power)
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(ifaceName, power)) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    return WIFI_IDL_OPT_OK;
+#else
     LOGE("call WifiStaHalInterface::%{public}s!", __func__);
     return WIFI_IDL_OPT_FAILED;
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->SetTxPower(power);
 #endif
 }
 

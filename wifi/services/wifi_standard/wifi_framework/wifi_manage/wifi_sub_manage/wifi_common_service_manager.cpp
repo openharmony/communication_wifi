@@ -29,6 +29,9 @@
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
 #include "wifi_service_manager.h"
+#ifdef FEATURE_SELF_CURE_SUPPORT
+#include "ip_qos_monitor.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -97,7 +100,8 @@ void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppState
 #endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
-void WifiCommonServiceManager::OnTcpReportMsgComplete(const std::vector<int64_t> &elems, const int32_t cmd, const int32_t mInstId)
+void WifiCommonServiceManager::OnTcpReportMsgComplete(const std::vector<int64_t> &elems, const int32_t cmd,
+    const int32_t mInstId)
 {
     WIFI_LOGI("enter %{public}s", __FUNCTION__);
     IpQosMonitor::GetInstance().HandleTcpReportMsgComplete(elems, cmd);

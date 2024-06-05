@@ -380,12 +380,12 @@ void WifiConfigCenter::SetWifiStateWhenAirplaneMode(bool bState)
     mWifiOpenedWhenAirplane = bState;
 }
 
-bool WifiConfigCenter::GetStaLastRunState(int instId)
+int WifiConfigCenter::GetStaLastRunState(int instId)
 {
     return WifiSettings::GetInstance().GetStaLastRunState(instId);
 }
 
-int WifiConfigCenter::SetStaLastRunState(bool bRun, int instId)
+int WifiConfigCenter::SetStaLastRunState(int bRun, int instId)
 {
     return WifiSettings::GetInstance().SetStaLastRunState(bRun, instId);
 }
@@ -514,6 +514,11 @@ void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state, int instId
     if (!ret.second) {
         mStaScanOnlyMidState[instId] = state;
     }
+}
+
+WifiDetailState WifiConfigCenter::GetWifiDetailState(int instId)
+{
+    return WifiSettings::GetInstance().GetWifiDetailState(instId);
 }
 
 int WifiConfigCenter::GetStaApExclusionType()

@@ -127,7 +127,6 @@ std::map<int32_t, NetStatsInfo> WifiNetStatsManager::ConvertNetStatsToMap(NetSta
 {
     std::map<int32_t, NetStatsInfo> netStatsMap;
     for (const auto &item : netStats) {
-        
         netStatsMap.emplace(item.uid_, item);
     }
     return netStatsMap;

@@ -26,7 +26,8 @@
 namespace OHOS {
 namespace Wifi {
 
-using NetStats = std::vector<NetStatsInfo>;
+using NetStats = std::vector<NetManagerStandard::NetStatsInfo>;
+using NetStatsInfo = NetManagerStandard::NetStatsInfo;
 
 class WifiNetStatsManager : public Singleton<WifiNetStatsManager> {
 public:
@@ -34,7 +35,7 @@ public:
     void StopNetStats();
 private:
     void PerformPollAndLog();   
-    ErrCode GetNetStatsDetail(NetStats netStats);
+    ErrCode GetNetStatsDetail(NetStats &netStats);
     NetStats GetIncrementalNetStats(NetStats curNetStats);
     NetStatsInfo GetTotalNetStatsInfo(NetStats netStats);
     void LogNetStatsTraffic(NetStats netStats);
@@ -47,7 +48,7 @@ private:
     std::map<int32_t, NetStatsInfo> m_lastStatsMap;
     bool m_hasLastStats {false};
     uint64_t m_netStatsTimerId {0};
-}
+};
 } // namespace Wifi
 } // namespace OHOS
 

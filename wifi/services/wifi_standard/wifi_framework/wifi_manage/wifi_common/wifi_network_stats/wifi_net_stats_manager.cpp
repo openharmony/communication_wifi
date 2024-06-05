@@ -77,11 +77,11 @@ void WifiNetStatsManager::PerformPollAndLog()
     LogNetStatsTraffic(incrementalNetStats);
 }
 
-ErrCode WifiNetStatsManager::GetNetStatsDetail(NetStats netStats)
+ErrCode WifiNetStatsManager::GetNetStatsDetail(NetStats &netStats)
 {
-    std::vector<NetStatsInfo> data;
+    NetStats data;
     int32_t ret = DelayedSingleton<NetManagerStandard::NetStatsClient>::GetInstance()->GetAllStatsInfo(data);
-    if (ret != EC_OK) {
+    if (ret != ERR_OK) {
         WIFI_LOGE("%{public}s, get network stats failed, ret: %{public}d", __FUNCTION__, ret);
         return WIFI_OPT_FAILED;
     }
@@ -120,7 +120,6 @@ NetStatsInfo WifiNetStatsManager::GetTotalNetStatsInfo(NetStats netStats)
     return totalNetStatsInfo;
 }
 
-
 std::map<int32_t, NetStatsInfo> WifiNetStatsManager::ConvertNetStatsToMap(NetStats netStats)
 {
     std::map<int32_t, NetStatsInfo> netStatsMap;
@@ -132,7 +131,7 @@ std::map<int32_t, NetStatsInfo> WifiNetStatsManager::ConvertNetStatsToMap(NetSta
 
 bool WifiNetStatsManager::ValidateNetStatsInfo(NetStatsInfo info)
 {
-    if (info.rxBytes_ <= 0 || info.txBytes_ <= 0 || info.rxPackets_ <= 0 || info.txPackets_ <= 0) {
+    if (info.rxBytes_ < 0 || info.txBytes_ < 0 || info.rxPackets_ < 0 || info.txPackets_ < 0) {
         return false;
     }
     return true;
@@ -172,11 +171,11 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
 {
     std::sort(netStats.begin(), netStats.end(), [] (NetStatsInfo v1, NetStatsInfo v2) {
         return v1.GetStats() > v2.GetStats();
-    })
+    });
     int maxCount = netStats.size() >= MAX_LOG_TRAFFIC ? MAX_LOG_TRAFFIC : static_cast<int>(netStats.size());
     NetStatsInfo totalNetStats = GetTotalNetStatsInfo(netStats);
     std::string allTrafficLog;
-    allTrafficLog += GetTrafficLog(GetBundleName(totalNetStats), totalNetStats);
+    allTrafficLog += GetTrafficLog(GetBundleName(totalNetStats.uid_), totalNetStats);
     for (int i = 0; i < maxCount; i++) {
         if (i != maxCount - 1) {
             allTrafficLog += GetTrafficLog(GetBundleName(netStats[i].uid_), netStats[i]);
@@ -184,7 +183,7 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
             allTrafficLog += GetTrafficLog(GetBundleName(netStats[i].uid_), netStats[i], false);
         }
     }
-    WIFI_LOGI("%{public}s: %{public}s", __FUNCTION__, allTrafficLog.c_str());
+    WIFI_LOGI("%{public}s %{public}s", __FUNCTION__, allTrafficLog.c_str());
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -2342,12 +2342,15 @@ void WifiSettings::UpdateLinkedInfo(int instId)
             if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
                 mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
             }
-            mWifiLinkedInfo[instId].supportedWifiCategory = iter->supportedWifiCategory;
             mWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
-            return;
+            break;
         }
     }
-    LOGD("WifiSettings UpdateLinkedInfo failed.");
+    auto iter = wifiCategoryRecord.find(mWifiLinkedInfo[instId].bssid);
+    if (iter != wifiCategoryRecord.end()) {
+        mWifiLinkedInfo[instId].supportedWifiCategory = iter->second;
+    }
+    LOGD("WifiSettings UpdateLinkedInfo.");
 }
 
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers, int instId)
@@ -3052,6 +3055,26 @@ int WifiSettings::SetStaApExclusionType(int type)
     mWifiConfig[0].staApExclusionType = type;
     SyncWifiConfig();
     return 0;
+}
+
+void WifiSettings::RecordWifiCategory(const std::string bssid, WifiCategory category)
+{
+    std::unique_lock<std::mutex> lock(mScanRecordMutex);
+    if (bssid.empty()) {
+        return;
+    }
+    auto iter = wifiCategoryRecord.find(bssid);
+    if (iter != wifiCategoryRecord.end()) {
+        iter->second = category;
+    } else {
+        wifiCategoryRecord.emplace(std::make_pair(bssid, category));
+    }
+}
+
+void WifiSettings::CleanWifiCategoryRecord()
+{
+    std::unique_lock<std::mutex> lock(mScanRecordMutex);
+    wifiCategoryRecord.clear();
 }
 
 long int WifiSettings::GetRandom()

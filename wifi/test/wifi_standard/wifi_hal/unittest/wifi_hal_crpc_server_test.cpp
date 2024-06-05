@@ -199,6 +199,19 @@ HWTEST_F(WifiHalCRpcServerTest, DealConnectionChangedCbkTest, TestSize.Level1)
     EXPECT_TRUE(EndCallbackTransact(mServer, WIFI_CONNECT_CHANGED_NOTIFY_EVENT) == 0);
 }
 
+HWTEST_F(WifiHalCRpcServerTest, DealDisConnectReasonChangedCbkTest, TestSize.Level1)
+{
+    WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));
+    cbmsg->msg.connMsg.status = 100;
+    char *src = nullptr;
+    StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), src);
+    StrSafeCopy(cbmsg->msg.connMsg.bssid, sizeof(cbmsg->msg.connMsg.bssid), "00:00:00:00:00:00");
+    EXPECT_TRUE(PushBackCallbackMsg(WIFI_STA_DISCONNECT_REASON_EVENT, cbmsg) == 0);
+    EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_STA_DISCONNECT_REASON_EVENT, mContext) == 0);
+    EXPECT_TRUE(StrcmpMathRight(mContext->szWrite, "C\t146\t100\t00:00:00:00:00:00\t$$$$$$") == 0);
+    EXPECT_TRUE(EndCallbackTransact(mServer, WIFI_STA_DISCONNECT_REASON_EVENT) == 0);
+}
+
 HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceFoundCbkTest, TestSize.Level1)
 {
     WifiHalEventCallbackMsg *cbmsg = (WifiHalEventCallbackMsg *)calloc(1, sizeof(WifiHalEventCallbackMsg));

@@ -35,12 +35,11 @@ public:
     void StopNetStats();
 private:
     void PerformPollAndLog();   
-    ErrCode GetNetStatsDetail(NetStats &netStats);
+    ErrCode GetWifiNetStatsDetail(NetStats &netStats);
     NetStats GetIncrementalNetStats(NetStats curNetStats);
     NetStatsInfo GetTotalNetStatsInfo(NetStats netStats);
     void LogNetStatsTraffic(NetStats netStats);
     std::map<int32_t, NetStatsInfo> ConvertNetStatsToMap(NetStats netStats);
-    bool ValidateNetStatsInfo(NetStatsInfo info);
     std::string GetTrafficLog(std::string bundleName, NetStatsInfo info, bool needEndStr = true);
     std::string GetBundleName(int32_t uid);
 private:

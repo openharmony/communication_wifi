@@ -35,7 +35,7 @@ const int64_t NET_STATS_DELAY_TIME = 2 * 1000;
 
 void WifiNetStatsManager::StartNetStats()
 {
-    WIFI_LOGD("%{public}s, enter", __FUNCTION__);
+    WIFI_LOGI("%{public}s, enter", __FUNCTION__);
     std::shared_ptr<WifiSysTimer> netStatsTimer =
         std::make_shared<WifiSysTimer>(true, NET_STATS_POLL_INTERVAL, true, false);
     std::function<void()> callback = std::bind(&WifiNetStatsManager::PerformPollAndLog, this);
@@ -43,11 +43,12 @@ void WifiNetStatsManager::StartNetStats()
     m_netStatsTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(netStatsTimer);
     int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
     MiscServices::TimeServiceClient::GetInstance()->StartTimer(m_netStatsTimerId, currentTime + NET_STATS_DELAY_TIME);
+    WIFI_LOGI("%{public}s, succuss", __FUNCTION__);
 }
 
 void WifiNetStatsManager::StopNetStats()
 {
-    WIFI_LOGD("%{public}s, enter", __FUNCTION__);
+    WIFI_LOGI("%{public}s, enter", __FUNCTION__);
     if (m_netStatsTimerId == 0) {
         WIFI_LOGE("%{public}s, m_netStatsTimerId is zero", __FUNCTION__);
     } else {
@@ -57,13 +58,14 @@ void WifiNetStatsManager::StopNetStats()
     }
     m_lastStatsMap.clear();
     m_hasLastStats = false;
+    WIFI_LOGI("%{public}s, succuss", __FUNCTION__);
 }
 
 void WifiNetStatsManager::PerformPollAndLog()
 {
     WIFI_LOGD("%{public}s, enter", __FUNCTION__);
     NetStats curNetStats;
-    if (GetNetStatsDetail(curNetStats) != WIFI_OPT_SUCCESS) {
+    if (GetWifiNetStatsDetail(curNetStats) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("%{public}s, get network stats failed", __FUNCTION__);
         return;
     }
@@ -74,10 +76,11 @@ void WifiNetStatsManager::PerformPollAndLog()
          return;
     }
     NetStats incrementalNetStats = GetIncrementalNetStats(curNetStats);
+    m_lastStatsMap = ConvertNetStatsToMap(curNetStats);
     LogNetStatsTraffic(incrementalNetStats);
 }
 
-ErrCode WifiNetStatsManager::GetNetStatsDetail(NetStats &netStats)
+ErrCode WifiNetStatsManager::GetWifiNetStatsDetail(NetStats &netStats)
 {
     NetStats data;
     int32_t ret = DelayedSingleton<NetManagerStandard::NetStatsClient>::GetInstance()->GetAllStatsInfo(data);
@@ -86,7 +89,7 @@ ErrCode WifiNetStatsManager::GetNetStatsDetail(NetStats &netStats)
         return WIFI_OPT_FAILED;
     }
     std::copy_if(data.begin(), data.end(), std::back_insert_iterator(netStats), [](NetStatsInfo info) {
-        return info.iface_ == "wlan0" && !info.HasNoData();
+        return info.iface_ == WLAN_0 && !info.HasNoData();
     });
     return WIFI_OPT_SUCCESS;
 }
@@ -101,9 +104,9 @@ NetStats WifiNetStatsManager::GetIncrementalNetStats(NetStats curNetStats)
             deltaInfo = curInfo;
         } else {
             deltaInfo = curInfo - indexIter->second;
-            if (!ValidateNetStatsInfo(deltaInfo)) {
-                continue;
-            }
+        }
+        if (deltaInfo.HasNoData()) {
+            continue;
         }
         incrementNetStats.push_back(deltaInfo);
     }
@@ -124,17 +127,10 @@ std::map<int32_t, NetStatsInfo> WifiNetStatsManager::ConvertNetStatsToMap(NetSta
 {
     std::map<int32_t, NetStatsInfo> netStatsMap;
     for (const auto &item : netStats) {
+        
         netStatsMap.emplace(item.uid_, item);
     }
     return netStatsMap;
-}
-
-bool WifiNetStatsManager::ValidateNetStatsInfo(NetStatsInfo info)
-{
-    if (info.rxBytes_ < 0 || info.txBytes_ < 0 || info.rxPackets_ < 0 || info.txPackets_ < 0) {
-        return false;
-    }
-    return true;
 }
 
 std::string WifiNetStatsManager::GetTrafficLog(std::string bundleName, NetStatsInfo info, bool needEndStr)

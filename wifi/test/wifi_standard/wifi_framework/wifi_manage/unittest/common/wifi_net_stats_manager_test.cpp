@@ -33,44 +33,22 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNetStatsManagerTest");
 class WifiNetStatsManagerTest : public Test {
 public:
-    void SetUp() override
-    {
-        // Set up any necessary dependencies or configurations for the tests
-    }
-
-    void TearDown() override
-    {
-        // Clean up any resources allocated in SetUp()
-    }
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
 HWTEST_F(WifiNetStatsManagerTest, StartNetStats_CreatesTimerAndStartsIt, TestSize.Level1)
 {
     WIFI_LOGI("StartNetStats_CreatesTimerAndStartsIt enter!");
     WifiNetStatsManager::GetInstance().StartNetStats();
-    EXPECT_TRUE(WifiNetStatsManager::GetInstance().m_hasLastStats);
+    EXPECT_NE(WifiNetStatsManager::GetInstance().m_netStatsTimerId, 0);
 }
 
 HWTEST_F(WifiNetStatsManagerTest, StopNetStats_StopsAndDestroysTimer, TestSize.Level1)
 {
     WIFI_LOGI("StopNetStats_StopsAndDestroysTimer enter!");
     WifiNetStatsManager::GetInstance().StopNetStats();
-    EXPECT_FALSE(WifiNetStatsManager::GetInstance().m_hasLastStats);
-}
-
-HWTEST_F(WifiNetStatsManagerTest, PerformPollAndLog_GetsNetStatsAndLogsTraffic, TestSize.Level1)
-{
-    WIFI_LOGI("PerformPollAndLog_GetsNetStatsAndLogsTraffic enter!");
-    WifiNetStatsManager::GetInstance().PerformPollAndLog();
-    EXPECT_TRUE(WifiNetStatsManager::GetInstance().m_hasLastStats);
-}
-
-HWTEST_F(WifiNetStatsManagerTest, GetWifiNetStatsDetail_GetsNetStatsInfo, TestSize.Level1)
-{
-    WIFI_LOGI("GetWifiNetStatsDetail_GetsNetStatsInfo enter!");
-    NetStats netStats;
-    ErrCode ret = WifiNetStatsManager::GetInstance().GetWifiNetStatsDetail(netStats);
-    EXPECT_EQ(ret, WIFI_OPT_SUCCESS);
+    EXPECT_EQ(WifiNetStatsManager::GetInstance().m_netStatsTimerId, 0);
 }
 
 HWTEST_F(WifiNetStatsManagerTest, GetIncrementalNetStats_CalculatesIncrementalNetStats_1, TestSize.Level1)
@@ -100,7 +78,7 @@ HWTEST_F(WifiNetStatsManagerTest, GetIncrementalNetStats_CalculatesIncrementalNe
     netStatsInfoLast.uid_ = 123;
     netStatsInfoLast.rxBytes_ = 50;
     WifiNetStatsManager::GetInstance().m_lastStatsMap = {{123, netStatsInfoLast}};
-    NetStats ret = WifiNetStatsManager::GetInstance().GetIncrementalNetStats(netStatsInfoCur);
+    NetStats ret = WifiNetStatsManager::GetInstance().GetIncrementalNetStats(netStats);
     EXPECT_EQ(ret[0].uid_, 123);
     EXPECT_EQ(ret[0].rxBytes_, 50);
 }

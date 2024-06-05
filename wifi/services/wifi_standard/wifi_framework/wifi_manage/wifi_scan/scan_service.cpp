@@ -686,9 +686,6 @@ bool ScanService::StoreFullScanInfo(
 
     std::vector<WifiScanInfo> storeInfoList;
     for (auto iter = scanInfoList.begin(); iter != scanInfoList.end(); ++iter) {
-        if (iter->ssid.empty()) {
-            continue;
-        }
         WifiScanInfo scanInfo;
         scanInfo.bssid = iter->bssid;
         scanInfo.bssidType = REAL_DEVICE_ADDRESS;
@@ -740,6 +737,7 @@ bool ScanService::StoreFullScanInfo(
         if (mEnhanceService != nullptr) {
             storedIter->supportedWifiCategory = mEnhanceService->GetWifiCategory(storedIter->infoElems,
                 chipsetCategory, chipsetFeatrureCapability);
+            WifiSettings::GetInstance().RecordWifiCategory(storedIter->bssid, storedIter->supportedWifiCategory);
             WIFI_LOGD("GetWifiCategory supportedWifiCategory=%{public}d.\n",
                 static_cast<int>(storedIter->supportedWifiCategory));
         }
@@ -969,6 +967,11 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
                 "frequency:%{public}d, rssi:%{public}d, timestamp:%" PRId64 ".\n",
                 MacAnonymize(iter->bssid).c_str(), SsidAnonymize(iter->ssid).c_str(), iter->capabilities.c_str(),
                 iter->frequency, iter->rssi, iter->timestamp);
+        }
+        if (mEnhanceService != nullptr) {
+            WifiCategory category = mEnhanceService->GetWifiCategory(iter->infoElems,
+                chipsetCategory, chipsetFeatrureCapability);
+            WifiSettings::GetInstance().RecordWifiCategory(iter->bssid, category);
         }
     }
 

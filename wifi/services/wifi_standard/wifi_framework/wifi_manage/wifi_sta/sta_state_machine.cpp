@@ -38,6 +38,7 @@
 #include "wifi_net_observer.h"
 #include "wifi_system_timer.h"
 #include "wifi_notification_util.h"
+#include "wifi_net_stats_manager.h"
 #endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST

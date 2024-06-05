@@ -152,7 +152,7 @@ if (defined(ohos_lite)) {
       "wifi_internal_event_dispatcher.cpp",
       "wifi_net_agent.cpp",
       "wifi_net_observer.cpp",
-      "wifi_network_stats/wifi_net_stats_manager.cpp"
+      "wifi_network_stats/wifi_net_stats_manager.cpp",
       "wifi_notification_util.cpp",
       "wifi_permission_helper.cpp",
       "wifi_permission_utils.cpp",

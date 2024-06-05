@@ -43,7 +43,6 @@ private:
     std::string GetTrafficLog(std::string bundleName, NetStatsInfo info, bool needEndStr = true);
     std::string GetBundleName(int32_t uid);
 private:
-    // NetStats m_lastStats;
     std::map<int32_t, NetStatsInfo> m_lastStatsMap;
     bool m_hasLastStats {false};
     uint64_t m_netStatsTimerId {0};

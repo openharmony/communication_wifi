@@ -81,6 +81,11 @@ public:
     void OnWpaConnectionFullCallBackFail();
     void OnWpaConnectionRejectCallBackSuccess();
     void OnWpaConnectionRejectCallBackFail();
+    void OnWpaHilinkCallBackSuccess();
+    void OnWpaStaNotifyCallBackSuccess();
+    void OnWpaStaNotifyCallBackFail();
+    void OnWpaStaNotifyCallBackFail1();
+    void OnWpaStaNotifyCallBackFail2();
 };
 
 void StaMonitorTest::InitStaMonitorSuccess()
@@ -297,6 +302,36 @@ void StaMonitorTest::OnWpaConnectionRejectCallBackFail()
     pStaMonitor->onWpaConnectionRejectCallBack(status);
 }
 
+void StaMonitorTest::OnWpaHilinkCallBackSuccess()
+{
+    std::string bssid = "01:23:45:67:89:AB";
+    pStaMonitor->OnWpaHilinkCallBack(bssid);
+}
+
+void StaMonitorTest::OnWpaStaNotifyCallBackSuccess()
+{
+    std::string notifyParam = "01:23:45:67:89:AB";
+    pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
+}
+
+void StaMonitorTest::OnWpaStaNotifyCallBackFail()
+{
+    std::string notifyParam;
+    pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
+}
+
+void StaMonitorTest::OnWpaStaNotifyCallBackFail1()
+{
+    std::string notifyParam = "01";
+    pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
+}
+
+void StaMonitorTest::OnWpaStaNotifyCallBackFail2()
+{
+    std::string notifyParam = "01:";
+    pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
+}
+
 HWTEST_F(StaMonitorTest, InitStaMonitorSuccess, TestSize.Level1)
 {
     InitStaMonitorSuccess();
@@ -425,6 +460,31 @@ HWTEST_F(StaMonitorTest, OnWpaConnectionRejectCallBackSuccess, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnWpaConnectionRejectCallBackFail, TestSize.Level1)
 {
     OnWpaConnectionRejectCallBackFail();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaHilinkCallBackSuccess, TestSize.Level1)
+{
+    OnWpaHilinkCallBackSuccess();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackSuccess, TestSize.Level1)
+{
+    OnWpaStaNotifyCallBackSuccess();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail, TestSize.Level1)
+{
+    OnWpaStaNotifyCallBackFail();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail1, TestSize.Level1)
+{
+    OnWpaStaNotifyCallBackFail1();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail2, TestSize.Level1)
+{
+    OnWpaStaNotifyCallBackFail2();
 }
 } // WIFI
 } // OHOS

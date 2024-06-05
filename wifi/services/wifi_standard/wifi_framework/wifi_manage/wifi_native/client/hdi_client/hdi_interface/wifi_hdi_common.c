@@ -800,32 +800,3 @@ void StrSafeCopy(char *dst, unsigned len, const char *src)
     dst[i] = '\0';
     return;
 }
-
-char* HdiGetWapiTxt(char *pos, char *end, const uint8_t *ie)
-{
-    if (ie[HDI_POS_FIRST] < HDI_CAP_WAPI_BIT_OFFSET - HDI_POS_SECOND) {
-        return pos;
-    }
-
-    char *start;
-    int ret;
-
-    ret = HdiTxtPrintf(pos, end - pos, "[WAPI-");
-    if (HdiCheckError(end - pos, ret)) {
-        return pos;
-    }
-    pos += ret;
-
-    start = pos;
-    uint8_t akm = ie[HDI_CAP_WAPI_BIT_OFFSET];
-    HDI_HANDLE_CIPHER_POS_INFO(akm & HDI_KEY_MGMT_WAPI_CERT_AKM, ret, pos, end, "+", "%sCERT");
-    HDI_HANDLE_CIPHER_POS_INFO(akm & HDI_KEY_MGMT_WAPI_PSK_AKM, ret, pos, end, "+", "%sPSK");
-
-    ret = HdiTxtPrintf(pos, end - pos, "]");
-    if (HdiCheckError(end - pos, ret)) {
-        return pos;
-    }
-    pos += ret;
-
-    return pos;
-}

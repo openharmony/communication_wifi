@@ -79,6 +79,7 @@ int WifiManager::Init()
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
+    wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
 #endif
     wifiStaManager = std::make_unique<WifiStaManager>();
     wifiScanManager = std::make_unique<WifiScanManager>();
@@ -97,9 +98,14 @@ int WifiManager::Init()
     }
     mInitStatus = INIT_OK;
 
-    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
-        WIFI_LOGI("AutoStartServiceThread");
-        WifiSettings::GetInstance().SetWifiToggledState(true);
+    int lastState = WifiConfigCenter::GetInstance().GetStaLastRunState();
+    if (lastState != WIFI_STATE_CLOSED) { /* Automatic startup upon startup */
+        WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
+        if (lastState == WIFI_STATE_SEMI_ACTIVE) {
+            WifiSettings::GetInstance().SetSemiWifiEnable(true);
+        } else {
+            WifiSettings::GetInstance().SetWifiToggledState(true);
+        }
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();
@@ -151,6 +157,9 @@ void WifiManager::Exit()
 #ifndef OHOS_ARCH_LITE
     if (wifiEventSubscriberManager) {
         wifiEventSubscriberManager.reset();
+    }
+    if (wifiMultiVapManager) {
+        wifiMultiVapManager.reset();
     }
 #endif
     return;
@@ -268,6 +277,11 @@ std::unique_ptr<WifiP2pManager>& WifiManager::GetWifiP2pManager()
 std::unique_ptr<WifiEventSubscriberManager>& WifiManager::GetWifiEventSubscriberManager()
 {
     return wifiEventSubscriberManager;
+}
+
+std::unique_ptr<WifiMultiVapManager>& WifiManager::GetWifiMultiVapManager()
+{
+    return wifiMultiVapManager;
 }
 #endif
 

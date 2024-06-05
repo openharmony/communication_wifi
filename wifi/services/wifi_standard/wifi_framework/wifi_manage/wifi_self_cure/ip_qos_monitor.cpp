@@ -20,12 +20,13 @@
 
 DEFINE_WIFILOG_LABEL("IpQosMonitor");
 
-static const int32_t MAX_INTERNET_FAILED_COUNTER = 2;
 static const int32_t MIN_DELTA_TCP_TX = 3;
 static const int32_t QOS_TCP_TX_PKTS = 6;
 static const int32_t QOS_TCP_RX_PKTS = 7;
 static const int32_t QOS_MSG_FROM = 9;
 static const int32_t MIN_PACKET_LEN = 7;
+static const int32_t CMD_START_MONITOR = 10;
+static const int32_t CMD_QUERY_PKTS = 15;
 
 namespace OHOS {
 namespace Wifi {
@@ -80,7 +81,7 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t currentRssi = linkedInfo.rssi;
     int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.frequency);
-    if ((mInternetFailedCounter >= MAX_INTERNET_FAILED_COUNTER) && (linkedInfo.connState == ConnState::CONNECTED)) {
+    if ((mInternetFailedCounter >= 1) && (linkedInfo.connState == ConnState::CONNECTED)) {
         ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
         if (pSelfCureService == nullptr) {
             WIFI_LOGE("%{public}s: pSelfCureService is null", __FUNCTION__);
@@ -126,17 +127,18 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
     if ((queryResp) && (packetsLength > MIN_PACKET_LEN)) {
         int64_t tcpTxPkts = elems[QOS_TCP_TX_PKTS];
         int64_t tcpRxPkts = elems[QOS_TCP_RX_PKTS];
-        WIFI_LOGI("tcpTxPkts = %{public}ld, tcpRxPkts = %{public}ld", tcpTxPkts, tcpRxPkts);
+        WIFI_LOGI("tcpTxPkts = %{public}" PRId64 ", tcpRxPkts = %{public}" PRId64, tcpTxPkts, tcpRxPkts);
         if ((mLastTcpTxCounter == 0) || (mLastTcpRxCounter == 0)) {
             mLastTcpTxCounter = tcpTxPkts;
             mLastTcpRxCounter = tcpRxPkts;
-            WIFI_LOGI("mLastTcpTxCounter = %{public}ld, mLastTcpRxCounter = %{public}ld",
+            WIFI_LOGI("mLastTcpTxCounter = %{public}" PRId64 ", mLastTcpRxCounter = %{public}" PRId64,
                 mLastTcpTxCounter, mLastTcpRxCounter);
             return true;
         }
         int64_t deltaTcpTxPkts = tcpTxPkts - mLastTcpTxCounter;
         int64_t deltaTcpRxPkts = tcpRxPkts - mLastTcpRxCounter;
-        WIFI_LOGI("deltaTcpTxPkts = %{public}ld, deltaTcpRxPkts = %{public}ld", deltaTcpTxPkts, deltaTcpRxPkts);
+        WIFI_LOGI("deltaTcpTxPkts = %{public}" PRId64 ", deltaTcpRxPkts = %{public}" PRId64,
+            deltaTcpTxPkts, deltaTcpRxPkts);
         mLastTcpTxCounter = tcpTxPkts;
         mLastTcpRxCounter = tcpRxPkts;
         if (deltaTcpRxPkts == 0) {

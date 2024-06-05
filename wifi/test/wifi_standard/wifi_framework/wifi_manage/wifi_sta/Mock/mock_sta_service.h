@@ -26,6 +26,7 @@ public:
     virtual ~MockWifiStaService() {}
     MOCK_METHOD1(InitStaService, ErrCode(const std::vector<StaServiceCallback> &callbacks));
     MOCK_METHOD0(EnableWifi, ErrCode());
+    MOCK_METHOD0(EnableSemiWifi, ErrCode());
     MOCK_CONST_METHOD0(DisableWifi, ErrCode());
     MOCK_CONST_METHOD1(ConnectToDevice, ErrCode(const WifiDeviceConfig &config));
     MOCK_CONST_METHOD1(ConnectToNetwork, ErrCode(int networkId));

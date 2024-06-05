@@ -61,7 +61,6 @@ constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
-constexpr int CMD_START_RENEWAL_TIMEOUT = 0X05;
 constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
@@ -104,6 +103,7 @@ constexpr int MAC_AUTH_RSP4_TIMEOUT = 5202;
 constexpr int MAC_ASSOC_RSP_TIMEOUT = 5203;
 constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
+constexpr int DHCP_LEASE_EXPIRED = 6;
 
 enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,
@@ -122,6 +122,7 @@ typedef enum EnumDhcpReturnCode {
     DHCP_RESULT,
     DHCP_JUMP,
     DHCP_RENEW_FAIL,
+    DHCP_IP_EXPIRED,
     DHCP_FAIL,
 } DhcpReturnCode;
 
@@ -338,6 +339,21 @@ public:
     private:
         StaStateMachine *pStaStateMachine;
     };
+    /**
+     * @Description : Definition of member function of SemiActiveState class in StaStateMachine.
+     *
+     */
+    class SemiActiveState : public State {
+    public:
+        explicit SemiActiveState(StaStateMachine *staStateMachine);
+        ~SemiActiveState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
+
+    private:
+        StaStateMachine *pStaStateMachine;
+    };
 
     class DhcpResultNotify {
     public:
@@ -367,25 +383,7 @@ public:
          *
          */
         void DealDhcpResult(int ipType);
-#ifndef OHOS_ARCH_LITE
-        /**
-         * @Description : start renew timeout timer
-         *
-         */
-        void StartRenewTimeout(int64_t interval);
 
-        /**
-         * @Description : stop renew timeout timer
-         *
-         */
-        static void StopRenewTimeout();
-
-        /**
-         * @Description : deal renew timeout
-         *
-         */
-        static void DealRenewTimeout();
-#endif
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
          *
@@ -410,9 +408,6 @@ public:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;
         static DhcpResult DhcpIpv6Result;
-#ifndef OHOS_ARCH_LITE
-        static uint64_t renewTimerId_;
-#endif
     };
 
 public:
@@ -519,18 +514,6 @@ public:
      */
     void OnNetManagerRestart(void);
 
-     /**
-     * @Description start dhcp renewal.
-     *
-     */
-    void StartDhcpRenewal();
-
-    /**
-     * @Description : Deal renewal timeout.
-     *
-     */
-    void DealRenewalTimeout(InternalMessage *msg);
-
     /**
      * @Description : start detect timer.
      * @param detectType - type of detect
@@ -544,11 +527,6 @@ public:
     void HandlePortalNetworkPorcess();
     
     void SetPortalBrowserFlag(bool flag);
-    /**
-     * @Description renew dhcp.
-     *
-     */
-    void RenewDhcp();
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
     void DealHiLinkDataToWpa(InternalMessage *msg);
@@ -636,6 +614,14 @@ private:
     void StartWifiProcess();
 
     /**
+     * @Description  Processing after a success response is returned after Wi-Fi
+     * is semi active successfully, such as setting the MAC address and
+     * saving the connection information.
+     *
+     */
+    void StartSemiWifiProcess();
+
+    /**
      * @Description  Update wifi status and save connection information.
      *
      * @param bssid - the mac address of wifi(in)
@@ -669,7 +655,16 @@ private:
      *
      */
     void StopWifiProcess();
-
+    /**
+     * @Description  switch semi from enable process.
+     *
+     */
+    void SwitchSemiFromEnableProcess();
+    /**
+     * @Description  switch enable from semi process.
+     *
+     */
+    void SwitchEnableFromSemiProcess();
     /**
      * @Description  Setting statemachine status during the process of enable or disable wifi.
      *
@@ -1195,6 +1190,7 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    SemiActiveState *pSemiActiveState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
@@ -1207,6 +1203,7 @@ private:
     void ReplaceEmptyDns(DhcpResult *result);
     void InvokeOnStaOpenRes(OperateResState state);
     void InvokeOnStaCloseRes(OperateResState state);
+    void InvokeOnStaSemiActiveRes(OperateResState state);
     void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
     void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);
@@ -1220,7 +1217,6 @@ private:
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const;
-    void FillWapiCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

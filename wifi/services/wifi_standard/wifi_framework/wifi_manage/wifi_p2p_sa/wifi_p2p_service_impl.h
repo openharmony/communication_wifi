@@ -421,10 +421,18 @@ public:
      * @return ErrCode - operate result
      */
     ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode CheckCanUseP2p() override;
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);
     bool IsP2pServiceRunning();
+    bool IsCallingAllowed();
     static void SaBasicDump(std::string& result);
 
 private:

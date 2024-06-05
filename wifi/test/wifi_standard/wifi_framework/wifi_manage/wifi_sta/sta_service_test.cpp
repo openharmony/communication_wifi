@@ -62,6 +62,7 @@ public:
 
     void StaServiceInitStaServiceSuccess();
     void StaServiceEnableWifiSuccess();
+    void StaServiceEnableSemiWifiSuccess();
     void StaServiceConnectToWifiDeviceConfigSuccess();
     void StaServiceConnectToWifiDeviceConfigFail1();
     void StaServiceConnectToWifiDeviceConfigFail2();
@@ -112,6 +113,9 @@ public:
     void RegisterFilterBuilder();
     void DeregisterFilterBuilder();
     void StaServiceStartHttpDetectTestSucc();
+    void EnableHiLinkHandshakeFailTest();
+    void EnableHiLinkHandshakeSuceessTest();
+    void DeliverStaIfaceDataSuccessTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -149,6 +153,12 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
 void StaServiceTest::StaServiceEnableWifiSuccess()
 {
     EXPECT_TRUE(pStaService->EnableWifi() == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->DisableWifi() == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceEnableSemiWifiSuccess()
+{
+    EXPECT_TRUE(pStaService->EnableSemiWifi() == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->DisableWifi() == WIFI_OPT_SUCCESS);
 }
 
@@ -727,6 +737,26 @@ void StaServiceTest::StaServiceStartHttpDetectTestSucc()
     EXPECT_TRUE(pStaService->StartHttpDetect() == WIFI_OPT_SUCCESS);
 }
 
+void StaServiceTest::EnableHiLinkHandshakeFailTest()
+{
+    WifiDeviceConfig config;
+    std::string cmd = "ENABLE=1 BSSID=01:23:45:67:89:AB";
+    pStaService->EnableHiLinkHandshake(config, cmd);
+}
+
+void StaServiceTest::EnableHiLinkHandshakeSuceessTest()
+{
+    WifiDeviceConfig config;
+    std::string cmd = "ENABLE=0 BSSID=01:23:45:67:89:AB";
+    pStaService->EnableHiLinkHandshake(config, cmd);
+}
+
+void StaServiceTest::DeliverStaIfaceDataSuccessTest()
+{
+    std::string mac = "01:23:45:67:89:AB";
+    pStaService->DeliverStaIfaceData(mac);
+}
+
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
 }
@@ -744,6 +774,11 @@ HWTEST_F(StaServiceTest, StaServiceSetPowerModeTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)
 {
     StaServiceEnableWifiSuccess();
+}
+
+HWTEST_F(StaServiceTest, StaServiceEnableSemiWifiSuccess, TestSize.Level1)
+{
+    StaServiceEnableSemiWifiSuccess();
 }
 
 HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigSuccess, TestSize.Level1)
@@ -984,6 +1019,21 @@ HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceStartHttpDetectTestSucc, TestSize.Level1)
 {
     StaServiceStartHttpDetectTestSucc();
+}
+
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level1)
+{
+    EnableHiLinkHandshakeSuceessTest();
+}
+
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level1)
+{
+    EnableHiLinkHandshakeFailTest();
+}
+
+HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level1)
+{
+    DeliverStaIfaceDataSuccessTest();
 }
 } // namespace Wifi
 } // namespace OHOS

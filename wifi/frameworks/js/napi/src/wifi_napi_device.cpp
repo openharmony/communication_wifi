@@ -99,12 +99,6 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
         case WifiSecurity::EAP_SUITE_B:
             jsSecurityType = SecTypeJs::SEC_TYPE_EAP_SUITE_B;
             break;
-        case WifiSecurity::WAPI_CERT:
-            jsSecurityType = SecTypeJs::SEC_TYPE_WAPI_CERT;
-            break;
-        case WifiSecurity::WAPI_PSK:
-            jsSecurityType = SecTypeJs::SEC_TYPE_WAPI_PSK;
-            break;
         default:
             jsSecurityType = SecTypeJs::SEC_TYPE_INVALID;
             break;
@@ -329,12 +323,6 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
         case SecTypeJs::SEC_TYPE_EAP_SUITE_B:
             keyMgmt = KEY_MGMT_SUITE_B_192;
             break;
-        case SecTypeJs::SEC_TYPE_WAPI_CERT:
-            keyMgmt = KEY_MGMT_WAPI_CERT;
-            break;
-        case SecTypeJs::SEC_TYPE_WAPI_PSK:
-            keyMgmt = KEY_MGMT_WAPI_PSK;
-            break;
         default:
             keyMgmt = KEY_MGMT_NONE;
             break;
@@ -494,24 +482,6 @@ ErrCode ProcessProxyConfig(const napi_env& env, const napi_value& object, WifiDe
     return ret;
 }
 
-napi_value JsObjToWapiConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
-{
-    bool hasProperty = false;
-    NAPI_CALL(env, napi_has_named_property(env, object, "wapiConfig", &hasProperty));
-    if (!hasProperty) {
-        WIFI_LOGI("Js has no property: wapiConfig.");
-        return UndefinedNapiValue(env);
-    }
-
-    napi_value napiEap;
-    napi_get_named_property(env, object, "wapiConfig", &napiEap);
-    
-    JsObjectToInt(env, napiEap, "wapiPskType", devConfig.wifiWapiConfig.wapiPskType);
-    JsObjectToString(env, napiEap, "wapiAsCert", NAPI_MAX_STR_LENT, devConfig.wifiWapiConfig.wapiAsCertPath);
-    JsObjectToString(env, napiEap, "wapiUserCert", NAPI_MAX_STR_LENT, devConfig.wifiWapiConfig.wapiUserCertPath);
-    return CreateInt32(env);
-}
-
 static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
@@ -554,9 +524,6 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     }
     if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP || SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP_SUITE_B) {
         return ProcessEapConfig(env, object, cppConfig);
-    }
-    if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_WAPI_CERT || SecTypeJs(type) == SecTypeJs::SEC_TYPE_WAPI_PSK) {
-        return JsObjToWapiConfig(env, object, cppConfig);
     }
     return CreateInt32(env);
 }
@@ -1307,20 +1274,6 @@ static void EapConfigToJs(const napi_env& env, const WifiEapConfig& wifiEapConfi
     SetValueInt32(env, "eapSubId", wifiEapConfig.eapSubId, cfgObj);
 }
 
-static void WapiConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDeviceConfig, napi_value& result)
-{
-    napi_value wapiCfgObj;
-    napi_create_object(env, &wapiCfgObj);
-    SetValueInt32(env, "wapiPskType", wifiDeviceConfig.wifiWapiConfig.wapiPskType, wapiCfgObj);
-    SetValueUtf8String(env, "wapiAsCert", wifiDeviceConfig.wifiWapiConfig.wapiAsCertPath.c_str(), wapiCfgObj);
-    SetValueUtf8String(env, "wapiUserCert", wifiDeviceConfig.wifiWapiConfig.wapiUserCertPath.c_str(), wapiCfgObj);
-
-    napi_status status = napi_set_named_property(env, result, "wapiConfig", wapiCfgObj);
-    if (status != napi_ok) {
-        WIFI_LOGE("%{public}s set wapi config failed!", __FUNCTION__);
-    }
-}
-
 static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceConfig>& vecDeviceConfigs,
     const int idx, napi_value& arrayResult)
 {
@@ -1362,8 +1315,6 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     if (status != napi_ok) {
         WIFI_LOGE("failed to set eapConfig!");
     }
-
-    WapiConfigToJs(env, vecDeviceConfigs[idx], result);
 
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {

@@ -26,6 +26,7 @@
         RegisterP2pPersistentGroupsChangedCallback;
         RegisterP2pConnectionChangedCallback;
         RegisterP2pPeersChangedCallback;
+        CheckCanUseP2p;
         EnableHotspot;
         DisableHotspot;
         SetHotspotConfig;

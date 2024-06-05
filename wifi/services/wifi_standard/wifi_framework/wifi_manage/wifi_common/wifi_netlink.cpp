@@ -18,16 +18,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <linux/fib_rules.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/uio.h>
 #include <unistd.h>
 #include "securec.h"
-#include "netlink_socket.h"
+#include <linux/netlink.h>
 #include "wifi_logger.h"
 
 namespace OHOS {
@@ -45,6 +38,39 @@ static const int32_t QOS_TCP_TX_PKTS = 6;
 static const int32_t QOS_TCP_RX_PKTS = 7;
 static const int32_t QOS_TCP_RETRANS_PKTS = 8;
 static const int32_t QOS_MSG_FROM = 9;
+
+enum WifiKnlMsgType {
+    NETLINK_WIFIPRO_START_MONITOR = 0,
+    NETLINK_WIFIPRO_GET_MSG,
+};
+
+enum CmdWord {
+    CMD_START_MONITOR = 10,
+    CMD_QUERY_PKTS = 15,
+    MSG_REPORT_IPQOS = 100,
+};
+
+struct WifiNlPacketMsg {
+    uint32_t msgFrom;
+    uint32_t rtt;
+    uint32_t rttPkts;
+    uint32_t rttWhen;
+    uint32_t congestion;
+    uint32_t congWhen;
+    uint32_t tcpQuality;
+    uint32_t tcpTxPkts;
+    uint32_t tcpRxPkts;
+    uint32_t tcpRetransPkts;
+};
+
+struct TagMsg2Knl {
+    struct nlmsghdr hdr;
+};
+
+struct PacketInfo {
+    struct nlmsghdr hdr;
+    struct WifiNlPacketMsg qos;
+};
 
 WifiNetLink &WifiNetLink::GetInstance()
 {

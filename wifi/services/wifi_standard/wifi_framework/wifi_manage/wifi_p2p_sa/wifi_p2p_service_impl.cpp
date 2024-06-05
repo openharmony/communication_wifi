@@ -199,6 +199,10 @@ ErrCode WifiP2pServiceImpl::DisableP2p(void)
             return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
         }
     }
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
     if (!WifiConfigCenter::GetInstance().SetP2pMidState(curState, WifiOprMidState::CLOSING)) {
         WIFI_LOGD("set p2p mid state opening failed! may be other activity has been operated");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
@@ -970,8 +974,21 @@ ErrCode WifiP2pServiceImpl::GetSupportedFeatures(long &features)
     return WIFI_OPT_SUCCESS;
 }
 
+bool WifiP2pServiceImpl::IsCallingAllowed()
+{
+    auto state = WifiConfigCenter::GetInstance().GetWifiDetailState();
+    if (state == WifiDetailState::STATE_SEMI_ACTIVE && !WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGW("curr wifi state is semiactive, only allow system app use p2p service");
+        return false;
+    }
+    return true;
+}
+
 bool WifiP2pServiceImpl::IsP2pServiceRunning()
 {
+    if (!IsCallingAllowed()) {
+        return false;
+    }
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetP2pMidState();
     if (curState != WifiOprMidState::RUNNING) {
         WIFI_LOGW("p2p service does not started!");
@@ -1442,6 +1459,22 @@ ErrCode WifiP2pServiceImpl::DisableRandomMac(int setmode)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->DisableRandomMac(setmode);
+}
+
+ErrCode WifiP2pServiceImpl::CheckCanUseP2p()
+{
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("CheckCanUseP2p: VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiManager::GetInstance().GetWifiMultiVapManager() == nullptr) {
+        WIFI_LOGE("CheckCanUseP2p: WifiMultiVapManager is nullptr!");
+        return WIFI_OPT_FAILED;
+    }
+
+    return ((WifiManager::GetInstance().GetWifiMultiVapManager()->CheckCanUseP2p()) ? WIFI_OPT_SUCCESS
+        : WIFI_OPT_NOT_SUPPORTED);
 }
 
 bool WifiP2pServiceImpl::IsRemoteDied(void)

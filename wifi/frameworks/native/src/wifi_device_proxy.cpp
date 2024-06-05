@@ -341,9 +341,6 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteString(config.callProcessName);
     data.WriteString(config.ancoCallProcessName);
     data.WriteInt32(config.uid);
-    data.WriteInt32(config.wifiWapiConfig.wapiPskType);
-    data.WriteString(config.wifiWapiConfig.wapiAsCertPath);
-    data.WriteString(config.wifiWapiConfig.wapiUserCertPath);
 }
 
 ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)
@@ -625,9 +622,6 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.uid = reply.ReadInt32();
         config.callProcessName = reply.ReadString();
         config.ancoCallProcessName = reply.ReadString();
-        config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
-        config.wifiWapiConfig.wapiAsCertPath = reply.ReadString();
-        config.wifiWapiConfig.wapiUserCertPath = reply.ReadString();
         result.emplace_back(config);
     }
 }
@@ -666,6 +660,35 @@ ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result,
 
     ParseDeviceConfigs(reply, result);
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::SetTxPower(int power)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("Failed to `%{public}s`, remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(power);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), data, reply,
+        option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
 }
 
 ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)

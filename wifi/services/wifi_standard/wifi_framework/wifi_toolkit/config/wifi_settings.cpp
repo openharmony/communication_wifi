@@ -30,6 +30,9 @@
 #include "securec.h"
 #include "init_param.h"
 #include <random>
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+#include "wifi_encryption_util.h"
+#endif
 #ifndef OHOS_ARCH_LITE
 #include <sys/sendfile.h>
 #include "wifi_country_code_define.h"
@@ -108,6 +111,8 @@ WifiSettings::WifiSettings()
     mLastDiscReason[0] = DisconnectedReason::DISC_REASON_DEFAULT;
     mThermalLevel = static_cast<int>(ThermalLevel::NORMAL);
     mValidChannels.clear();
+    mWifiDetailState[0] = WifiDetailState::STATE_INACTIVE;
+    isSemiWifiEnable = false;
 }
 
 WifiSettings::~WifiSettings()
@@ -489,6 +494,34 @@ int WifiSettings::SetWifiState(int state, int instId)
     return 0;
 }
 
+WifiDetailState WifiSettings::GetWifiDetailState(int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDetailState.find(instId);
+    if (iter != mWifiDetailState.end()) {
+        return iter->second;
+    }
+    mWifiDetailState[instId] = WifiDetailState::STATE_UNKNOWN;
+    return mWifiDetailState[instId];
+}
+
+int WifiSettings::SetWifiDetailState(WifiDetailState state, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiDetailState[instId] = state;
+    return 0;
+}
+
+bool WifiSettings::GetWifiAllowSemiActive() const
+{
+    return mWifiAllowSemiActive;
+}
+
+void WifiSettings::SetWifiAllowSemiActive(bool isAllowed)
+{
+    mWifiAllowSemiActive = isAllowed;
+}
+
 bool WifiSettings::HasWifiActive()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -630,6 +663,19 @@ bool WifiSettings::IsWifiToggledEnable()
     }
 }
 
+bool WifiSettings::IsSemiWifiEnable()
+{
+    if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+        return false;
+    }
+    return isSemiWifiEnable || GetWifiAllowSemiActive();
+}
+
+void WifiSettings::SetSemiWifiEnable(bool enable)
+{
+    isSemiWifiEnable = enable;
+}
+
 void WifiSettings::SetSoftapToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
@@ -721,7 +767,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     if (results.empty()) {
         results.assign(mWifiScanInfoList.begin(), mWifiScanInfoList.end());
     }
-    LOGI("WifiSettings::GetScanInfoList size = %{public}u", results.size());
+    LOGI("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
     return 0;
 }
 
@@ -770,6 +816,19 @@ int WifiSettings::SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo)
     return 0;
 }
 
+int WifiSettings::SaveP2pCreatorUid(int uid)
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    mUid = uid;
+    return 0;
+}
+
+int WifiSettings::GetP2pCreatorUid()
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    return mUid;
+}
+
 int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
@@ -787,20 +846,6 @@ bool WifiSettings::IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) 
     }
 
     return false;
-}
-
-void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const
-{
-    EncryptedData *encryWapi = new EncryptedData(config.wifiWapiConfig.encryptedUserCertData, config.wifiWapiConfig.IV);
-    std::string decryWapi = "";
-    if (WifiDecryption(wifiEncryptionInfo, *encryWapi, decryWapi) == HKS_SUCCESS) {
-        config.wifiWapiConfig.wapiUserCertData = decryWapi;
-    } else {
-        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
-            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
-        config.wifiWapiConfig.wapiUserCertData = "";
-    }
-    delete encryWapi;
 }
 
 int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
@@ -847,38 +892,9 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
-    DecryptionWapiConfig(mWifiEncryptionInfo, config);
     LOGI("DecryptionDeviceConfig end");
     return 0;
 }
-
-bool WifiSettings::EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const
-{
-    if (config.keyMgmt != KEY_MGMT_WAPI_CERT) {
-        return true;
-    }
-
-    if (config.wifiWapiConfig.wapiUserCertData.empty()) {
-        LOGE("EncryptionDeviceConfig wapiUserCertData empty");
-        return false;
-    }
-
-    config.wifiWapiConfig.encryptedUserCertData = "";
-    config.wifiWapiConfig.IV = "";
-
-    EncryptedData encryWapi;
-    if (WifiEncryption(wifiEncryptionInfo, config.wifiWapiConfig.wapiUserCertData, encryWapi) == HKS_SUCCESS) {
-        config.wifiWapiConfig.encryptedUserCertData = encryWapi.encryptedPassword;
-        config.wifiWapiConfig.IV = encryWapi.IV;
-    } else {
-        LOGE("EncryptionDeviceConfig WifiEncryption wapiUserCertData failed");
-        WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
-            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
-        return false;
-    }
-    return true;
-}
-
 #endif
 
 bool WifiSettings::EncryptionDeviceConfig(WifiDeviceConfig &config) const
@@ -936,9 +952,6 @@ bool WifiSettings::EncryptionDeviceConfig(WifiDeviceConfig &config) const
                 SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
             return false;
         }
-    }
-    if (!EncryptionWapiConfig(mWifiEncryptionInfo, config)) {
-        return false;
     }
     config.version = 1;
 #endif
@@ -2447,7 +2460,7 @@ bool WifiSettings::GetWifiFlagOnAirplaneMode(int instId)
     return mWifiConfig[0].openWifiWhenAirplane;
 }
 
-bool WifiSettings::GetStaLastRunState(int instId)
+int WifiSettings::GetStaLastRunState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);
@@ -2457,7 +2470,7 @@ bool WifiSettings::GetStaLastRunState(int instId)
     return mWifiConfig[0].staLastState;
 }
 
-int WifiSettings::SetStaLastRunState(bool bRun, int instId)
+int WifiSettings::SetStaLastRunState(int bRun, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].staLastState = bRun;

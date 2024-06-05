@@ -30,6 +30,7 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+constexpr const int APP_INFO_USERID = 100;
 constexpr int64_t WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY = 3 * 1000;
 #ifdef DTFUZZ_TEST
 static WifiAppStateAware* gWifiAppStateAware = nullptr;
@@ -184,6 +185,20 @@ void WifiAppStateAware::GetForegroundApp()
         return;
     }
     return;
+}
+
+ErrCode WifiAppStateAware::GetProcessRunningInfos(std::vector<AppExecFwk::RunningProcessInfo> &info)
+{
+    if (!Connect()) {
+        WIFI_LOGE("%{public}s connect failed", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    if (appMgrProxy_->GetProcessRunningInfosByUserId(info, APP_INFO_USERID)
+        != AppExecFwk::AppMgrResultCode::RESULT_OK) {
+        WIFI_LOGE("%{public}s GetProcessRunningInfoByUserId failed", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 bool WifiAppStateAware::IsForegroundApp(int32_t uid)

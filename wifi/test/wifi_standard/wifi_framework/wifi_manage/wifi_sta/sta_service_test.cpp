@@ -62,6 +62,7 @@ public:
 
     void StaServiceInitStaServiceSuccess();
     void StaServiceEnableWifiSuccess();
+    void StaServiceEnableSemiWifiSuccess();
     void StaServiceConnectToWifiDeviceConfigSuccess();
     void StaServiceConnectToWifiDeviceConfigFail1();
     void StaServiceConnectToWifiDeviceConfigFail2();
@@ -111,6 +112,9 @@ public:
     void DeregisterAutoJoinCondition();
     void RegisterFilterBuilder();
     void DeregisterFilterBuilder();
+    void EnableHiLinkHandshakeFailTest();
+    void EnableHiLinkHandshakeSuceessTest();
+    void DeliverStaIfaceDataSuccessTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -138,6 +142,8 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetDefaultFrequenciesByCountryBand(_, _, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillOnce(Return(0));
     std::vector<StaServiceCallback> callbacks;
     callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
     EXPECT_TRUE(pStaService->InitStaService(callbacks) == WIFI_OPT_SUCCESS);
@@ -146,6 +152,12 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
 void StaServiceTest::StaServiceEnableWifiSuccess()
 {
     EXPECT_TRUE(pStaService->EnableWifi() == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->DisableWifi() == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceEnableSemiWifiSuccess()
+{
+    EXPECT_TRUE(pStaService->EnableSemiWifi() == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->DisableWifi() == WIFI_OPT_SUCCESS);
 }
 
@@ -719,6 +731,26 @@ void StaServiceTest::DeregisterFilterBuilder()
                                                                      "testFilterBuilder"));
 }
 
+void StaServiceTest::EnableHiLinkHandshakeFailTest()
+{
+    WifiDeviceConfig config;
+    std::string cmd = "ENABLE=1 BSSID=01:23:45:67:89:AB";
+    pStaService->EnableHiLinkHandshake(config, cmd);
+}
+
+void StaServiceTest::EnableHiLinkHandshakeSuceessTest()
+{
+    WifiDeviceConfig config;
+    std::string cmd = "ENABLE=0 BSSID=01:23:45:67:89:AB";
+    pStaService->EnableHiLinkHandshake(config, cmd);
+}
+
+void StaServiceTest::DeliverStaIfaceDataSuccessTest()
+{
+    std::string mac = "01:23:45:67:89:AB";
+    pStaService->DeliverStaIfaceData(mac);
+}
+
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
 }
@@ -736,6 +768,11 @@ HWTEST_F(StaServiceTest, StaServiceSetPowerModeTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)
 {
     StaServiceEnableWifiSuccess();
+}
+
+HWTEST_F(StaServiceTest, StaServiceEnableSemiWifiSuccess, TestSize.Level1)
+{
+    StaServiceEnableSemiWifiSuccess();
 }
 
 HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigSuccess, TestSize.Level1)
@@ -971,6 +1008,21 @@ HWTEST_F(StaServiceTest, RegisterFilterBuilder, TestSize.Level1)
 HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level1)
 {
     DeregisterFilterBuilder();
+}
+
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level1)
+{
+    EnableHiLinkHandshakeSuceessTest();
+}
+
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level1)
+{
+    EnableHiLinkHandshakeFailTest();
+}
+
+HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level1)
+{
+    DeliverStaIfaceDataSuccessTest();
 }
 } // namespace Wifi
 } // namespace OHOS

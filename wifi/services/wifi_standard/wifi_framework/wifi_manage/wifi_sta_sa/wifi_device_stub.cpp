@@ -96,6 +96,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnSetSatelliteState;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER)] =
         &WifiDeviceStub::OnSetLowTxPower;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER)] =
+        &WifiDeviceStub::OnSetTxPower;
     return;
 }
 
@@ -165,8 +167,6 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
-        reply.WriteInt32(0);
-        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
         int exception = data.ReadInt32();
@@ -1143,6 +1143,16 @@ void WifiDeviceStub::OnSetLowTxPower(uint32_t code, MessageParcel &data, Message
     wifiLowPowerParam.powerParam = data.ReadString();
     wifiLowPowerParam.powerParamLen = data.ReadInt32();
     ErrCode ret = SetLowTxPower(wifiLowPowerParam);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int power = data.ReadInt32();
+    ErrCode ret = SetTxPower(power);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

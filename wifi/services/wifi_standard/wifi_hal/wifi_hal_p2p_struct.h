@@ -42,6 +42,7 @@ typedef struct P2pDeviceInfo {
     int groupCapabilities;
     unsigned int wfdLength;
     char srcAddress[WIFI_BSSID_LENGTH];
+    char p2pRandomDeviceAddress[WIFI_BSSID_LENGTH];
     char p2pDeviceAddress[WIFI_BSSID_LENGTH];
     char p2pGroupAddress[WIFI_BSSID_LENGTH];
     char primaryDeviceType[WIFI_P2P_DEVICE_TYPE_LENGTH];
@@ -59,6 +60,7 @@ typedef struct P2pGroupInfo {
     char psk[WIFI_P2P_PASSWORD_SIZE];
     char passphrase[WIFI_P2P_PASSWORD_SIZE];
     char goDeviceAddress[WIFI_BSSID_LENGTH];
+    char goRandomDeviceAddress[WIFI_BSSID_LENGTH];
 } P2pGroupInfo;
 
 typedef struct P2pInvitationInfo {

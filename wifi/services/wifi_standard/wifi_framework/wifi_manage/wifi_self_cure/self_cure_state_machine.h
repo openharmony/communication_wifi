@@ -243,7 +243,11 @@ public:
         void HandleSelfCureFailedForRandMacReassoc();
         void HandleRssiChanged();
         void HandleDelayedResetSelfCure();
-        void SelfCureForRenewDhcp(int requestCureLevel);
+        void SelfCureForDns();
+        bool UseOperatorOverSea();
+        void GetPublicDnsServers(std::vector<std::string>& dnsServers);
+        void GetReplacedDnsServers(std::vector<std::string>& curDnses, std::vector<std::string>& replacedDnses);
+        void UpdateDnsServers(std::vector<std::string>& dnsServers);
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);
     };
@@ -368,6 +372,7 @@ private:
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     bool IfMultiGateway();
     bool IsSettingsPage();
+    void InitDnsServer();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;

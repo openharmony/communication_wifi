@@ -222,6 +222,13 @@ ErrCode WifiDeviceImpl::RemoveAllDevice()
     return client_->RemoveAllDevice();
 }
 
+ErrCode WifiDeviceImpl::SetWifiTxPower(int power)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetTxPower(power);
+}
+
 ErrCode WifiDeviceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     std::lock_guard<std::mutex> lock(mutex_);

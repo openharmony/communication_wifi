@@ -825,7 +825,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
-    item.staLastState = false;
+    item.staLastState = 0;
     item.lastAirplaneMode = AIRPLANE_MODE_CLOSE;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
     item.scoretacticsScoreSlope = SCORE_SLOPE;
@@ -874,7 +874,7 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
     } else if (key == "openWifiWhenAirplane") {
         item.openWifiWhenAirplane = (std::stoi(value) != 0);
     } else if (key == "staLastState") {
-        item.staLastState = (std::stoi(value) != 0);
+        item.staLastState = std::stoi(value);
     } else if (key == "lastAirplaneMode") {
         item.lastAirplaneMode = std::stoi(value);
     } else if (key == "savedDeviceAppraisalPriority") {

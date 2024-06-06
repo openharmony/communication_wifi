@@ -51,6 +51,7 @@ public:
         wifiManager.wifiHotspotManager = std::make_unique<WifiHotspotManager>();
         wifiManager.wifiP2pManager = std::make_unique<WifiP2pManager>();
         wifiManager.wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
+        wifiManager.wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
     }
     virtual void TearDown()
     {
@@ -60,6 +61,7 @@ public:
         wifiManager.wifiHotspotManager = nullptr;
         wifiManager.wifiP2pManager = nullptr;
         wifiManager.wifiEventSubscriberManager = nullptr;
+        wifiManager.wifiMultiVapManager = nullptr;
     }
 public:
     WifiManager wifiManager;
@@ -181,6 +183,20 @@ HWTEST_F(WifiManagerTest, UnRegisterCesEventTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->UnRegisterCesEvent();
 }
 
+#ifdef HAS_POWERMGR_PART
+HWTEST_F(WifiManagerTest, RegisterPowermgrEventTestTest, TestSize.Level1)
+{
+    WIFI_LOGE("RegisterPowermgrEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->RegisterPowermgrEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterPowermgrEventTestTest, TestSize.Level1)
+{
+    WIFI_LOGE("UnRegisterPowermgrEventTestTest enter!");
+    wifiManager.wifiEventSubscriberManager->UnRegisterPowermgrEvent();
+}
+#endif
+
 HWTEST_F(WifiManagerTest, RegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGI("RegisterLocationEventTest enter!");
@@ -191,18 +207,6 @@ HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGI("UnRegisterLocationEventTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterLocationEvent();
-}
-
-HWTEST_F(WifiManagerTest, RegisterPowerStateListenerTest, TestSize.Level1)
-{
-    WIFI_LOGI("RegisterPowerStateListenerTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterPowerStateListener();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterPowerStateListenerTest, TestSize.Level1)
-{
-    WIFI_LOGI("UnRegisterPowerStateListenerTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterPowerStateListener();
 }
 
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
@@ -221,6 +225,46 @@ HWTEST_F(WifiManagerTest, AutoStartEnhanceServiceTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");
     wifiManager.AutoStartEnhanceService();
+}
+
+HWTEST_F(WifiManagerTest, CheckCanConnectDeviceTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckCanConnectDevice();
+}
+
+HWTEST_F(WifiManagerTest, CheckCanUseP2pTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckCanUseP2p();
+}
+
+HWTEST_F(WifiManagerTest, CheckCanUseSoftApTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckCanUseSoftAp();
+}
+
+HWTEST_F(WifiManagerTest, CheckStaConnectedTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckStaConnected();
+}
+
+HWTEST_F(WifiManagerTest, CheckP2pConnectedTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckP2pConnected();
+}
+
+HWTEST_F(WifiManagerTest, CheckSoftApStartedTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckSoftApStarted();
+}
+
+HWTEST_F(WifiManagerTest, ForceStopSoftApTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->ForceStopSoftAp();
+}
+
+HWTEST_F(WifiManagerTest, ShowToastTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->ShowToast();
 }
 }  // namespace Wifi
 }  // namespace OHOS

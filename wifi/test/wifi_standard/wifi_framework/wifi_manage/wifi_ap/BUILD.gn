@@ -91,7 +91,6 @@ ohos_unittest("WifiApServiceTest") {
     "-Wl,--wrap=RegisterDhcpClientCallBack",
     "-Wl,--wrap=StartDhcpClient",
     "-Wl,--wrap=StopDhcpClient",
-    "-Wl,--wrap=RenewDhcpClient",
     "-Wl,--wrap=RegisterDhcpServerCallBack",
     "-Wl,--wrap=StartDhcpServer",
     "-Wl,--wrap=StopDhcpServer",

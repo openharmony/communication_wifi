@@ -113,6 +113,16 @@ const std::string &WifiP2pDevice::GetDeviceAddress() const
     return mDeviceAddress;
 }
 
+void WifiP2pDevice::SetRandomDeviceAddress(const std::string &deviceAddress)
+{
+    mRandomDeviceAddress = deviceAddress;
+}
+ 
+const std::string &WifiP2pDevice::GetRandomDeviceAddress() const
+{
+    return mRandomDeviceAddress;
+}
+
 void WifiP2pDevice::SetGroupAddress(const std::string &groupAddress)
 {
     mGroupAddress = groupAddress;
@@ -459,6 +469,16 @@ void WifiP2pGroupInfo::SetClientDevices(const std::vector<WifiP2pDevice> &device
 void WifiP2pGroupInfo::ClearClientDevices()
 {
     clientDevices.clear();
+}
+
+void WifiP2pGroupInfo::SetCreatorUid(int uid)
+{
+    creatorUid = uid;
+}
+
+int WifiP2pGroupInfo::GetCreatorUid()
+{
+    return creatorUid;
 }
 
 void WpsInfo::SetWpsMethod(WpsMethod wpsMethod)

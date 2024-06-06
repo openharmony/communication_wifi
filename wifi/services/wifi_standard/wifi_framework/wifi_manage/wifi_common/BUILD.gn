@@ -25,6 +25,7 @@ if (defined(ohos_lite)) {
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_utils.cpp",
+      "block_connect_service.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
       "wifi_dumper.cpp",
@@ -142,6 +143,7 @@ if (defined(ohos_lite)) {
     sources = [
       "app_network_speed_limit/app_network_speed_limit_service.cpp",
       "app_network_speed_limit/speed_limit_configs_writer.cpp",
+      "block_connect_service.cpp",
       "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",
       "wifi_cmd_client.cpp",
@@ -233,12 +235,6 @@ if (defined(ohos_lite)) {
         defined(global_parts_info.msdp_movement)) {
       external_deps += [ "movement:movement_client" ]
       defines += [ "HAS_MOVEMENT_PART" ]
-    }
-
-    if (defined(global_parts_info) &&
-        defined(global_parts_info.powermgr_power_manager)) {
-      external_deps += [ "power_manager:powermgr_client" ]
-      defines += [ "HAS_POWERMGR_PART" ]
     }
 
     if (defined(global_parts_info) &&

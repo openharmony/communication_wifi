@@ -464,6 +464,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_event_subscriber_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_hotspot_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_location_mode_observer.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_multi_vap_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_p2p_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_scan_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
@@ -474,10 +475,6 @@ if (defined(ohos_lite)) {
     if (defined(global_parts_info) &&
         defined(global_parts_info.msdp_movement)) {
       sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_msdp_state_listener.cpp" ]
-    }
-    if (defined(global_parts_info) &&
-        defined(global_parts_info.powermgr_power_manager)) {
-      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_power_state_listener.cpp" ]
     }
 
     deps = [
@@ -562,7 +559,6 @@ if (defined(ohos_lite)) {
 
     if (defined(global_parts_info) &&
         defined(global_parts_info.powermgr_power_manager)) {
-      external_deps += [ "power_manager:powermgr_client" ]
       defines += [ "HAS_POWERMGR_PART" ]
     }
 

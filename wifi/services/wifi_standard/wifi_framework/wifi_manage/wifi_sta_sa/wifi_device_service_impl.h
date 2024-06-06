@@ -70,6 +70,8 @@ public:
 
     ErrCode RemoveAllDevice() override;
 
+    ErrCode SetTxPower(int power) override;
+
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;

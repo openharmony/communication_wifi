@@ -43,14 +43,14 @@ ErrCode WifiTimer::Register(const TimerCallback &callback, uint32_t &outTimerId,
         return WIFI_OPT_FAILED;
     }
     timerIdInit++;
+    outTimerId = timerIdInit;
     bool ret = timer_->PostAsyncTask(callback, std::to_string(timerIdInit), interval);
     if (!ret) {
         WIFI_LOGE("Register timer failed");
         timerIdInit--;
+        outTimerId = 0;
         return WIFI_OPT_FAILED;
     }
-
-    outTimerId = timerIdInit;
     return WIFI_OPT_SUCCESS;
 }
 

@@ -1035,6 +1035,7 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
         pos = HdiGetIeTxt(pos, end, mesh ? "RSN" : "WPA2",
                         ie2, HDI_POS_SECOND + ie2[1]);
     }
+
     rsnxe = HdiBssGetIe(scanResult->ie, scanResult->ieLen, HDI_EID_RSNX);
     if (HdiGetRsnCapab(rsnxe, HDI_RSNX_CAPAB_SAE_H2E)) {
         ret = HdiTxtPrintf(pos, end - pos, "[SAE-H2E]");

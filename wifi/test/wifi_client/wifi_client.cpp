@@ -322,6 +322,19 @@ static void HandleDisable(int argc, const char* argv[])
     }
 }
 
+static void HandleEnableSemiWifi(int argc, const char* argv[])
+{
+    Logd("enter command handler:%s", argv[CMD_IDX]);
+    if (ptrWifiDevice != nullptr) {
+        ErrCode ret = ptrWifiDevice->EnableSemiWifi();
+        if (ret == WIFI_OPT_SUCCESS) {
+            Logd("%s success", __func__);
+        } else {
+            Logd("%s failed", __func__);
+        }
+    }
+}
+
 static void HandleScan(int argc, const char* argv[])
 {
     Logd("enter command handler:%s", argv[CMD_IDX]);
@@ -543,6 +556,20 @@ static void HandleGetWifiState(int argc, const char* argv[])
     }
 }
 
+static void HandleGetWifiDetailState(int argc, const char* argv[])
+{
+    Logd("enter command handler:%s", argv[CMD_IDX]);
+    if (ptrWifiDevice != nullptr) {
+        WifiDetailState state;
+        ErrCode ret = ptrWifiDevice->GetWifiDetailState(state);
+        if (ret == WIFI_OPT_SUCCESS) {
+            Logd("%s success, wifi state:%d", __func__, state);
+        } else {
+            Logd("%s failed", __func__);
+        }
+    }
+}
+
 static void HandleGetCountry(int argc, const char* argv[])
 {
     Logd("enter command handler:%s", argv[CMD_IDX]);
@@ -734,6 +761,7 @@ static void HandleInteractive(int argc, const char* argv[])
 static const struct sta_cli_cmd g_sta_cli_cmds[] = {
     {"enable", HandleEnable, "enable"},
     {"disable", HandleDisable, "disable"},
+    {"enable_semi_wifi", HandleEnableSemiWifi, "enable_semi_wifi"},
     {"scan", HandleScan, "scan"},
     {"disconnect", HandleDisconnect, "disconnect nid=%d"},
     {"get_status", HandleGetStatus, "get_status"},
@@ -746,6 +774,7 @@ static const struct sta_cli_cmd g_sta_cli_cmds[] = {
     {"connect_network", HandleConnectNetwork, "connect_network nid=%d"},
     {"connect_device", HandleConnectDevice, "connect_device ssid=%s pwd=%s key_mgmt=open/wpa/wpa2"},
     {"get_wifi_state", HandleGetWifiState, "get_wifi_state"},
+    {"get_wifi_detail_state", HandleGetWifiDetailState, "get_wifi_detail_state"},
     {"set_country", HandleSetCountry, "set_country code=%s"},
     {"get_country", HandleGetCountry, "get_country"},
     {"get_signal_level", HandleGetSignalLevel, "get_signal_level rssi=%d band=2g/5g"},

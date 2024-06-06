@@ -21,6 +21,7 @@
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
 #include "wifi_common_util.h"
+#include "hdi_struct_toolkit.h"
 #include <securec.h>
 #include <unistd.h>
 
@@ -584,6 +585,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &ne
         }
         networkInfo.flag = flags;
         networkList.push_back(networkInfo);
+        FreeHdiWifiWpaNetworkInfo(&listNetwork[i]);
     }
     if (listNetwork != nullptr) {
         delete[] listNetwork;
@@ -666,14 +668,14 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiDisableAp(id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    if (HdiEnableAp(id) != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
-    }
-        return WIFI_IDL_OPT_OK;
+    return WIFI_IDL_OPT_OK;
 }
 
 WifiErrorNo WifiHdiWpaClient::EnableAp(int id)
 {
+    if (HdiEnableAp(id) != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
     return WIFI_IDL_OPT_OK;
 }
 
@@ -812,6 +814,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
         cWifiHdiWpaCallback.OnEventGroupFormationSuccess = OnEventGroupFormationSuccess;
         cWifiHdiWpaCallback.OnEventGroupFormationFailure = OnEventGroupFormationFailure;
         cWifiHdiWpaCallback.OnEventGroupStarted = OnEventGroupStarted;
+        cWifiHdiWpaCallback.OnEventGroupInfoStarted = OnEventGroupInfoStarted;
         cWifiHdiWpaCallback.OnEventGroupRemoved = OnEventGroupRemoved;
         cWifiHdiWpaCallback.OnEventProvisionDiscoveryCompleted = OnEventProvisionDiscoveryCompleted;
         cWifiHdiWpaCallback.OnEventFindStopped = OnEventFindStopped;
@@ -878,8 +881,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo>
         LOGI("ReqP2pListNetworks id=%{public}d ssid=%{public}s address=%{private}s",
             infoList.infos[i].id, SsidAnonymize(ssid).c_str(), address);
     }
-    free(infoList.infos);
-    infoList.infos = nullptr;
+    FreeHdiP2pNetworkList(&infoList);
     return ret;
 }
 
@@ -1198,6 +1200,7 @@ WifiErrorNo WifiHdiWpaClient::ReqGetP2pPeer(const std::string &deviceAddress, Wi
         device.SetGroupCapabilitys(peerInfo.groupCapabilities);
         device.SetNetworkName((char *)peerInfo.operSsid);
     }
+    FreeHdiP2pDeviceInfo(&peerInfo);
     return ret;
 }
 

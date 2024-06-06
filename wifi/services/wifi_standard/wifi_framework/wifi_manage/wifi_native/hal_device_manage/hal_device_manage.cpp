@@ -597,6 +597,32 @@ bool HalDeviceManager::SetPowerModel(const std::string &ifaceName, int model)
     return true;
 }
 
+bool HalDeviceManager::SetTxPower(const std::string &ifaceName, int power)
+{
+    if (!CheckReloadChipHdiService()) {
+        return false;
+    }
+    
+    std::lock_guard<std::mutex> lock(mMutex);
+    LOGD("SetTxPower, ifaceName:%{public}s, power:%{public}d", ifaceName.c_str(), power);
+    auto iter = mIWifiStaIfaces.find(ifaceName);
+    if (iter == mIWifiStaIfaces.end()) {
+        LOGE("SetTxPower, not find iface info");
+        return false;
+    }
+
+    sptr<IChipIface> &iface = iter->second;
+    CHECK_NULL_AND_RETURN(iface, false);
+    int32_t ret = iface->SetTxPower(power);
+    if (ret != HDF_SUCCESS) {
+        LOGE("SetTxPower, call SetTxPower failed! ret:%{public}d", ret);
+        return false;
+    }
+
+    LOGD("SetTxPower success");
+    return true;
+}
+
 bool HalDeviceManager::GetPowerModel(const std::string &ifaceName, int &model)
 {
     if (!CheckReloadChipHdiService()) {

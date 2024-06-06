@@ -80,6 +80,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
+    
+    /**
+     * @Description Check Chba conncted
+     *
+     * @return true: conncted, false: not conncted
+     */
+    virtual bool CheckChbaConncted() = 0;
+>>>>>>> master
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_chip_hal_interface.h"
 #include <mutex>
 #include "wifi_log.h"
@@ -122,3 +124,4 @@ WifiErrorNo WifiChipHalInterface::IsSupportIndoorChannel(bool &isSupport) const
 }
 }  // namespace Wifi
 }  // namespace OHOS
+#endif

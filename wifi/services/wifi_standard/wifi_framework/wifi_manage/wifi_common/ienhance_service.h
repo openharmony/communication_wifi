@@ -87,7 +87,6 @@ public:
      * @return true: conncted, false: not conncted
      */
     virtual bool CheckChbaConncted() = 0;
->>>>>>> master
 };
 }  // namespace Wifi
 }  // namespace OHOS

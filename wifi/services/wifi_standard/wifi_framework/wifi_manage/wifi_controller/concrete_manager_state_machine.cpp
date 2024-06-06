@@ -500,6 +500,14 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessage *ms
         case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
             SwitchScanOnlyInSemiActiveState();
             break;
+        case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
+            if (pConcreteMangerMachine->mTargetRole ==
+                static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
+                AutoStopScanOnly(mid, true);
+            } else {
+                AutoStartScanOnly(mid);
+            }
+            break;
         default:
             break;
     }
@@ -508,6 +516,7 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessage *ms
 
 void ConcreteMangerMachine::SemiActiveState::SwitchMixInSemiActiveState()
 {
+    AutoStartScanOnly(mid);
     ErrCode ret = pConcreteMangerMachine->SwitchEnableFromSemi();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("SemiActiveState SwitchEnableFromSemi failed");
@@ -519,6 +528,7 @@ void ConcreteMangerMachine::SemiActiveState::SwitchMixInSemiActiveState()
 
 void ConcreteMangerMachine::SemiActiveState::SwitchConnectInSemiActiveState()
 {
+    AutoStartScanOnly(mid);
     ErrCode ret = pConcreteMangerMachine->SwitchEnableFromSemi();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("SemiActiveState SwitchEnableFromSemi failed");
@@ -530,6 +540,7 @@ void ConcreteMangerMachine::SemiActiveState::SwitchConnectInSemiActiveState()
 
 void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
 {
+    AutoStartScanOnly(mid);
     ErrCode ret = AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
@@ -753,7 +764,7 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId)
+ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId, bool isSemiWifiEnable)
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId);
     WIFI_LOGI("AutoStopScanOnly, current wifi scan only state is %{public}d", static_cast<int>(curState));
@@ -772,12 +783,14 @@ ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId)
         return WIFI_OPT_FAILED;
     }
 
-    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
-    if (pService == nullptr) {
-        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
-        return WIFI_OPT_FAILED;
+    if (!isSemiWifiEnable) {
+        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
+        if (pService == nullptr) {
+            WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
+            return WIFI_OPT_FAILED;
+        }
+        pService->SetNetworkInterfaceUpDown(false);
     }
-    pService->SetNetworkInterfaceUpDown(false);
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(instId);
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
     return WIFI_OPT_SUCCESS;
@@ -787,7 +800,7 @@ void ConcreteMangerMachine::HandleStaStop()
 {
     if (WifiSettings::GetInstance().GetWifiStopState()) {
         WIFI_LOGE("Sta stoped remove manager.");
-        ErrCode ret = AutoStopScanOnly(mid);
+        ErrCode ret = AutoStopScanOnly(mid, false);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
         }
@@ -824,7 +837,7 @@ void ConcreteMangerMachine::HandleStaStop()
         SwitchState(pSemiActiveState);
     } else {
         WIFI_LOGE("Now targetrole is unknow, stop concrete.");
-        ErrCode ret = AutoStopScanOnly(mid);
+        ErrCode ret = AutoStopScanOnly(mid, false);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
         }
@@ -885,13 +898,17 @@ void ConcreteMangerMachine::HandleStaSemiActive()
             mcb.onStartFailure(mid);
             return;
         }
+        AutoStartScanOnly(mid);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
         ret = AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
         }
-    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
-        mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
+    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE)) {
+        AutoStartScanOnly(mid);
+        SwitchState(pSemiActiveState);
+    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
+        AutoStopScanOnly(mid, true);
         SwitchState(pSemiActiveState);
     } else {
         WIFI_LOGE("Now targetrole is unknow.");

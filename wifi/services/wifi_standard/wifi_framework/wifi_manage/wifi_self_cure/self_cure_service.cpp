@@ -58,7 +58,7 @@ void SelfCureService::RegisterSelfCureServiceCallback(const std::vector<SelfCure
 
 void SelfCureService::HandleRssiLevelChanged(int rssi)
 {
-    WIFI_LOGI("HandleRssiLevelChanged, %{public}d.\n", rssi);
+    WIFI_LOGD("HandleRssiLevelChanged, %{public}d.\n", rssi);
     if (pSelfCureStateMachine == nullptr) {
         WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;

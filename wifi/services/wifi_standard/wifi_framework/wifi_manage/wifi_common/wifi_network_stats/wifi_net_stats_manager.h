@@ -34,7 +34,7 @@ public:
     void StartNetStats();
     void StopNetStats();
 private:
-    void PerformPollAndLog();   
+    void PerformPollAndLog();
     ErrCode GetWifiNetStatsDetail(NetStats &netStats);
     NetStats GetIncrementalNetStats(NetStats curNetStats);
     NetStatsInfo GetTotalNetStatsInfo(NetStats netStats);

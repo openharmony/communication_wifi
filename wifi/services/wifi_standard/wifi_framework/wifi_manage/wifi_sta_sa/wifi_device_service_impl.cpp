@@ -1743,6 +1743,12 @@ ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMo
 
 ErrCode WifiDeviceServiceImpl::SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam)
 {
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d",
+        __FUNCTION__, GetCallingPid(), GetCallingUid());
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);

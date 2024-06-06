@@ -24,6 +24,10 @@
 #define HEX_TO_DEC_MOVING 4
 #define DEC_MAX_SCOPE 10
 #define WPA_CMD_RETURN_TIMEOUT (-2)
+#define POS_SECOND 2
+#define POS_FOURTH 4
+#define POS_EIGHT 8
+#define POS_TEN 10
 
 void GetStrKeyVal(char *src, const char *split, WpaKeyValue *out)
 {
@@ -171,4 +175,131 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
         return -1;
     }
     return 0;
+}
+
+static int Hex2num(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (c >= 'a' && c <= 'f') {
+        return c - 'a' + POS_TEN;
+    }
+    if (c >= 'A' && c <= 'F') {
+        return c - 'A' + POS_TEN;
+    }
+    return -1;
+}
+
+static int Hex2byte(const char *hex)
+{
+    int a = Hex2num(*hex++);
+    if (a < 0) {
+        return -1;
+    }
+    int b = Hex2num(*hex++);
+    if (b < 0) {
+        return -1;
+    }
+    return (a << POS_FOURTH) | b;
+}
+
+static void DealDigital(u8 *buf, const char **pos, size_t *len)
+{
+    int val;
+    switch (**pos) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+            val = **pos++ - '0';
+            if (**pos >= '0' && **pos <= '7') {
+                val = val * POS_EIGHT + (**pos++ - '0');
+            }
+            if (**pos >= '0' && **pos <= '7') {
+                val = val * POS_EIGHT + (**pos++ - '0');
+            }
+            buf[(*len)++] = val;
+            return;
+        default:
+            return;
+    }
+}
+
+static void DealSymbol(u8 *buf, const char **pos, size_t *len)
+{
+    int val;
+    switch (**pos) {
+        case '\\':
+            buf[(*len)++] = '\\';
+            (*pos)++;
+            return;
+        case '"':
+            buf[(*len)++] = '"';
+            (*pos)++;
+            return;
+        case 'n':
+            buf[(*len)++] = '\n';
+            (*pos)++;
+            return;
+        case 'r':
+            buf[(*len)++] = '\r';
+            (*pos)++;
+            return;
+        case 't':
+            buf[(*len)++] = '\t';
+            (*pos)++;
+            return;
+        case 'e':
+            buf[(*len)++] = '\033';
+            (*pos)++;
+            return;
+        case 'x':
+            (*pos)++;
+            val = Hex2byte(*pos);
+            if (val < 0) {
+                val = Hex2num(**pos);
+                if (val < 0) {
+                    return;
+                }
+                buf[(*len)++] = val;
+                (*pos)++;
+            } else {
+                buf[(*len)++] = val;
+                (*pos) += POS_SECOND;
+            }
+            return;
+        default:
+            DealDigital(buf, pos, len);
+            return;
+    }
+}
+
+size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str)
+{
+    const char *pos = str;
+    size_t len = 0;
+
+    while (*pos) {
+        if (len + 1 >= maxlen) {
+            break;
+        }
+        switch (*pos) {
+            case '\\':
+                pos++;
+                DealSymbol(buf, &pos, &len);
+                break;
+            default:
+                buf[len++] = *pos++;
+                break;
+        }
+    }
+    if (maxlen > len) {
+        buf[len] = '\0';
+    }
+    return len;
 }

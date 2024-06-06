@@ -845,7 +845,8 @@ int RpcP2pGetFrequencies(RpcServer *server, Context *context)
     }
     int band = 0;
     int maxSize = 0;
-    if (ReadInt(context, &band) < 0 || ReadInt(context, &maxSize) < 0 || maxSize <= 0 || maxSize > WIFI_IDL_GET_MAX_BANDS) {
+    if (ReadInt(context, &band) < 0 || ReadInt(context, &maxSize) < 0 || maxSize <= 0
+        || maxSize > WIFI_IDL_GET_MAX_BANDS) {
         return HAL_FAILURE;
     }
     int *frequencies = (int *)calloc(maxSize, sizeof(int));

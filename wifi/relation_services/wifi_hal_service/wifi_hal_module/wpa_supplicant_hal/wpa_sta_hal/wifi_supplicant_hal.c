@@ -21,7 +21,6 @@
 #include "securec.h"
 #include "wifi_log.h"
 #include "wifi_wpa_common.h"
-#include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
 #include "wifi_hal_common_func.h"
 
 #undef LOG_TAG
@@ -133,7 +132,7 @@ static int WpaCliCmdStatus(WifiWpaStaInterface *this, struct WpaHalCmdStatus *pc
             pcmd->freq = atoi(value);
         } else if (strcmp(key, "ssid") == 0) {
             StrSafeCopy(pcmd->ssid, sizeof(pcmd->ssid), value);
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
         } else if (strcmp(key, "id") == 0) {
             pcmd->id = atoi(value);
         } else if (strcmp(key, "key_mgmt") == 0) {
@@ -591,7 +590,7 @@ static void ListNetworkProcess(WifiNetworkInfo *pcmd, char *tmpBuf, int bufLeng)
             if (strcpy_s(pcmd->ssid, sizeof(pcmd->ssid), tmpBuf + start) != EOK) {
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
         } else if (i == COLUMN_INDEX_TWO) {
             if (strcpy_s(pcmd->bssid, sizeof(pcmd->bssid), tmpBuf + start) != EOK) {
                 break;
@@ -1225,7 +1224,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             start = length;
             break;
 #else
@@ -1234,7 +1233,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             GetInfoElems(length, end, srcBuf, pcmd);
             start = length;
             break;

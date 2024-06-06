@@ -35,7 +35,6 @@ const int64_t NET_STATS_DELAY_TIME = 2 * 1000;
 
 void WifiNetStatsManager::StartNetStats()
 {
-    #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("%{public}s, enter", __FUNCTION__);
     std::shared_ptr<WifiSysTimer> netStatsTimer =
         std::make_shared<WifiSysTimer>(true, NET_STATS_POLL_INTERVAL, true, false);
@@ -45,12 +44,10 @@ void WifiNetStatsManager::StartNetStats()
     int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
     MiscServices::TimeServiceClient::GetInstance()->StartTimer(m_netStatsTimerId, currentTime + NET_STATS_DELAY_TIME);
     WIFI_LOGI("%{public}s, succuss", __FUNCTION__);
-    #endif
 }
 
 void WifiNetStatsManager::StopNetStats()
 {
-    #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("%{public}s, enter", __FUNCTION__);
     if (m_netStatsTimerId == 0) {
         WIFI_LOGE("%{public}s, m_netStatsTimerId is zero", __FUNCTION__);
@@ -62,7 +59,6 @@ void WifiNetStatsManager::StopNetStats()
     m_lastStatsMap.clear();
     m_hasLastStats = false;
     WIFI_LOGI("%{public}s, succuss", __FUNCTION__);
-    #endif
 }
 
 void WifiNetStatsManager::PerformPollAndLog()

@@ -111,6 +111,8 @@ WifiSettings::WifiSettings()
     mLastDiscReason[0] = DisconnectedReason::DISC_REASON_DEFAULT;
     mThermalLevel = static_cast<int>(ThermalLevel::NORMAL);
     mValidChannels.clear();
+    mWifiDetailState[0] = WifiDetailState::STATE_INACTIVE;
+    isSemiWifiEnable = false;
 }
 
 WifiSettings::~WifiSettings()
@@ -492,6 +494,34 @@ int WifiSettings::SetWifiState(int state, int instId)
     return 0;
 }
 
+WifiDetailState WifiSettings::GetWifiDetailState(int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDetailState.find(instId);
+    if (iter != mWifiDetailState.end()) {
+        return iter->second;
+    }
+    mWifiDetailState[instId] = WifiDetailState::STATE_UNKNOWN;
+    return mWifiDetailState[instId];
+}
+
+int WifiSettings::SetWifiDetailState(WifiDetailState state, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiDetailState[instId] = state;
+    return 0;
+}
+
+bool WifiSettings::GetWifiAllowSemiActive() const
+{
+    return mWifiAllowSemiActive;
+}
+
+void WifiSettings::SetWifiAllowSemiActive(bool isAllowed)
+{
+    mWifiAllowSemiActive = isAllowed;
+}
+
 bool WifiSettings::HasWifiActive()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -633,6 +663,19 @@ bool WifiSettings::IsWifiToggledEnable()
     }
 }
 
+bool WifiSettings::IsSemiWifiEnable()
+{
+    if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+        return false;
+    }
+    return isSemiWifiEnable || GetWifiAllowSemiActive();
+}
+
+void WifiSettings::SetSemiWifiEnable(bool enable)
+{
+    isSemiWifiEnable = enable;
+}
+
 void WifiSettings::SetSoftapToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
@@ -771,6 +814,19 @@ int WifiSettings::SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo)
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mWifiP2pInfo = linkedInfo;
     return 0;
+}
+
+int WifiSettings::SaveP2pCreatorUid(int uid)
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    mUid = uid;
+    return 0;
+}
+
+int WifiSettings::GetP2pCreatorUid()
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    return mUid;
 }
 
 int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
@@ -2404,7 +2460,7 @@ bool WifiSettings::GetWifiFlagOnAirplaneMode(int instId)
     return mWifiConfig[0].openWifiWhenAirplane;
 }
 
-bool WifiSettings::GetStaLastRunState(int instId)
+int WifiSettings::GetStaLastRunState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);
@@ -2414,7 +2470,7 @@ bool WifiSettings::GetStaLastRunState(int instId)
     return mWifiConfig[0].staLastState;
 }
 
-int WifiSettings::SetStaLastRunState(bool bRun, int instId)
+int WifiSettings::SetStaLastRunState(int bRun, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].staLastState = bRun;

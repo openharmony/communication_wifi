@@ -86,6 +86,8 @@ public:
     void OnWpaStaNotifyCallBackFail();
     void OnWpaStaNotifyCallBackFail1();
     void OnWpaStaNotifyCallBackFail2();
+    void OnReportDisConnectReasonCallBackSuccess();
+    void OnReportDisConnectReasonCallBackFail();
 };
 
 void StaMonitorTest::InitStaMonitorSuccess()
@@ -332,6 +334,21 @@ void StaMonitorTest::OnWpaStaNotifyCallBackFail2()
     pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
 }
 
+void StaMonitorTest::OnReportDisConnectReasonCallBackSuccess()
+{
+    int reason = 1;
+    std::string bssid = "02:42:ac:11:00:04";
+    pStaMonitor->OnReportDisConnectReasonCallBack(reason, bssid);
+}
+
+void StaMonitorTest::OnReportDisConnectReasonCallBackFail()
+{
+    int reason = 1;
+    std::string bssid = "02:42:ac:11:00:04";
+    pStaMonitor->pStaStateMachine = nullptr;
+    pStaMonitor->OnReportDisConnectReasonCallBack(reason, bssid);
+}
+
 HWTEST_F(StaMonitorTest, InitStaMonitorSuccess, TestSize.Level1)
 {
     InitStaMonitorSuccess();
@@ -485,6 +502,16 @@ HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail1, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail2, TestSize.Level1)
 {
     OnWpaStaNotifyCallBackFail2();
+}
+
+HWTEST_F(StaMonitorTest, OnReportDisConnectReasonCallBackSuccess, TestSize.Level1)
+{
+    OnReportDisConnectReasonCallBackSuccess();
+}
+
+HWTEST_F(StaMonitorTest, OnReportDisConnectReasonCallBackFail, TestSize.Level1)
+{
+    OnReportDisConnectReasonCallBackFail();
 }
 } // WIFI
 } // OHOS

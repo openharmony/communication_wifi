@@ -79,6 +79,20 @@ public:
         pStaInterface->EnableWifi();
     }
 
+    void EnableSemiWifiSuccess()
+    {
+        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, EnableSemiWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->EnableSemiWifi() == WIFI_OPT_SUCCESS);
+    }
+
+    void EnableSemiWifiFail()
+    {
+        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, EnableSemiWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->EnableSemiWifi() == WIFI_OPT_FAILED);
+    }
+
     void DisableWifiSuceess()
     {
         EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
@@ -392,6 +406,16 @@ HWTEST_F(StaInterfaceTest, EnableWifiSuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, EnableWifiFail1, TestSize.Level1)
 {
     EnableWifiFail1();
+}
+
+HWTEST_F(StaInterfaceTest, EnableSemiWifiSuccess, TestSize.Level1)
+{
+    EnableSemiWifiSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, EnableSemiWifiFail, TestSize.Level1)
+{
+    EnableSemiWifiFail();
 }
 
 HWTEST_F(StaInterfaceTest, DisableWifiSuceess, TestSize.Level1)

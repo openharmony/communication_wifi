@@ -352,6 +352,29 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnConnectChangedTest, TestSize.Level1)
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
     OnConnectChanged(status, networkId, mac1);
 }
+
+/**
+ * @tc.name: OnDisConnectReasonCallbackTest
+ * @tc.desc: Sta OnDisConnectReasonCallbackTest
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiIdlInnerInterfaceTest, OnDisConnectReasonCallbackTest, TestSize.Level1)
+{
+    LOGI("OnDisConnectReasonCallbackTest enter");
+    int reason = 1;
+    char *mac = nullptr;
+    OnDisConnectReasonCallback(reason, mac);
+    char mac1[] = "00:00:AA:BB:CC:DD";
+    WifiEventCallback callback;
+    RegisterStaCallbackMock(&callback);
+    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
+    OnDisConnectReasonCallback(reason, mac1);
+    UnRegisterStaCallbackMock(&callback);
+    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
+    OnDisConnectReasonCallback(reason, mac1);
+}
+
 /**
  * @tc.name: OnBssidChangedTest
  * @tc.desc: OnBssidChangedTest

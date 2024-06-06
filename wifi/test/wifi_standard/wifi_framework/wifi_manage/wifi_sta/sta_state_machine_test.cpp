@@ -1742,7 +1742,87 @@ public:
         msg.SetMessageObj(bssid);
         pStaStateMachine->DealHiLinkDataToWpa(&msg);
     }
+
+    void IsStaDisConnectReasonShouldRetryEventSuccessTest()
+    {
+        int event = 0x3018;
+        EXPECT_TRUE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
+    }
+    
+    void IsStaDisConnectReasonShouldRetryEventFailedTest()
+    {
+        int event = 0;
+        EXPECT_FALSE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
+    }
+
+    void IsDisConnectReasonShouldStopTimerSuccessTest()
+    {
+        int event = 8;
+        EXPECT_TRUE(pStaStateMachine->IsDisConnectReasonShouldStopTimer(event));
+    }
+    
+    void IsDisConnectReasonShouldStopTimerFailedTest()
+    {
+        int event = 0;
+        EXPECT_FALSE(pStaStateMachine->IsDisConnectReasonShouldStopTimer(event));
+    }
+
+    void ShouldUseFactoryMacSuccess()
+    {
+        WifiDeviceConfig deviceConfig;
+        deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
+        deviceConfig.networkId = 1;
+        pStaStateMachine->mLastConnectNetId = 0;
+        pStaStateMachine->mConnectFailedCnt = 0;
+        EXPECT_FALSE(pStaStateMachine->ShouldUseFactoryMac(deviceConfig));
+        pStaStateMachine->mConnectFailedCnt++ ;
+        EXPECT_FALSE(pStaStateMachine->ShouldUseFactoryMac(deviceConfig));
+        pStaStateMachine->mConnectFailedCnt++ ;
+        EXPECT_TRUE(pStaStateMachine->ShouldUseFactoryMac(deviceConfig));
+    }
+
+    void ShouldUseFactoryMacFail()
+    {
+        WifiDeviceConfig deviceConfig;
+        deviceConfig.keyMgmt = KEY_MGMT_NONE;
+        EXPECT_FALSE(pStaStateMachine->ShouldUseFactoryMac(deviceConfig));
+        deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
+        deviceConfig.networkId = 1;
+        pStaStateMachine->mLastConnectNetId = 0;
+        pStaStateMachine->mConnectFailedCnt = 1;
+        EXPECT_FALSE(pStaStateMachine->ShouldUseFactoryMac(deviceConfig));
+    }
 };
+
+HWTEST_F(StaStateMachineTest, ShouldUseFactoryMacSuccess, TestSize.Level1)
+{
+    ShouldUseFactoryMacSuccess();
+}
+
+HWTEST_F(StaStateMachineTest, ShouldUseFactoryMacFail, TestSize.Level1)
+{
+    ShouldUseFactoryMacFail();
+}
+
+HWTEST_F(StaStateMachineTest, IsDisConnectReasonShouldStopTimerSuccessTest, TestSize.Level1)
+{
+    IsDisConnectReasonShouldStopTimerSuccessTest();
+}
+
+HWTEST_F(StaStateMachineTest, IsDisConnectReasonShouldStopTimerFailedTest, TestSize.Level1)
+{
+    IsDisConnectReasonShouldStopTimerFailedTest();
+}
+
+HWTEST_F(StaStateMachineTest, IsStaDisConnectReasonShouldRetryEventSuccessTest, TestSize.Level1)
+{
+    IsStaDisConnectReasonShouldRetryEventSuccessTest();
+}
+
+HWTEST_F(StaStateMachineTest, IsStaDisConnectReasonShouldRetryEventFailedTest, TestSize.Level1)
+{
+    IsStaDisConnectReasonShouldRetryEventFailedTest();
+}
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
 {

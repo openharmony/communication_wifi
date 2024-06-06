@@ -148,7 +148,7 @@ private:
     void BuildStateTree();
     ErrCode InitConcreteMangerStates();
 
-    static ErrCode AutoStopScanOnly(int instId);
+    static ErrCode AutoStopScanOnly(int instId, bool isSemiWifiEnable);
     static ErrCode AutoStartScanOnly(int instId);
     static ErrCode AutoStopStaService(int instId);
     static ErrCode AutoStartStaService(int instId, bool isSemiWifi);

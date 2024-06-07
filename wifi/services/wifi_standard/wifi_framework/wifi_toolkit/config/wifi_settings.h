@@ -1788,6 +1788,9 @@ private:
     void MergeSoftapConfig();
     void MergeWifiConfig();
     void ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs);
+    void ParseBackupJson(const std::string &backupInfo, std::string &key, std::string &iv, std::string &version);
+    void GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, const std::string &key,
+        const std::string &iv);
 #endif
     void InitPackageFilterConfig();
 

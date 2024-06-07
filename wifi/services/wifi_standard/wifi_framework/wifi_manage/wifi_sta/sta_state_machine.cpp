@@ -39,6 +39,7 @@
 #include "wifi_net_observer.h"
 #include "wifi_system_timer.h"
 #include "wifi_notification_util.h"
+#include "wifi_net_stats_manager.h"
 #endif // OHOS_ARCH_LITE
 
 #ifndef OHOS_WIFI_STA_TEST
@@ -372,9 +373,15 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
     switch (state) {
         case OperateResState::CONNECT_AP_CONNECTED:
             WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
+#ifndef OHOS_ARCH_LITE
+            WifiNetStatsManager::GetInstance().StartNetStats();
+#endif
             break;
         case OperateResState::DISCONNECT_DISCONNECTED:
             WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
+#ifndef OHOS_ARCH_LITE
+            WifiNetStatsManager::GetInstance().StopNetStats();
+#endif
             break;
         default:
             break;

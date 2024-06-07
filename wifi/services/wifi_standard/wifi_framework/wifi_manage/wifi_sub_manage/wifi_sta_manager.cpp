@@ -323,7 +323,7 @@ void WifiStaManager::DealStaSemiActiveRes(OperateResState state, int instId)
         DealStaCloseRes(state, instId);
         return;
     }
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, instId);
+    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::SEMI_ACTIVE, instId);
     WifiConfigCenter::GetInstance().SetWifiStaCloseTime(instId);
     WifiConfigCenter::GetInstance().SetStaLastRunState(WIFI_STATE_SEMI_ACTIVE);
     auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();

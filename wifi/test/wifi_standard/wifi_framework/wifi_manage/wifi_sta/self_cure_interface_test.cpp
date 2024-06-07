@@ -153,5 +153,16 @@ HWTEST_F(SelfCureInterfaceTest, DealStaOpenResTest, TestSize.Level1)
     DealStaOpenResTest();
 }
 
+HWTEST_F(SelfCureInterfaceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)
+{
+    int forceNoHttpCheck = 0;
+    pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck);
+}
+
+HWTEST_F(SelfCureInterfaceTest, IsSelfCureOnGoingTest, TestSize.Level1)
+{
+    pSelfCureInterface->IsSelfCureOnGoing();
+}
+
 } // namespace Wifi
 } // namespace OHOS

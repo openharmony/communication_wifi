@@ -472,7 +472,7 @@ void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t
     for (uint8_t i = 0; i < bytesLen; i++) {
         if (snprintf_s(hexstr + hexstrIndex, hexstrLen - hexstrIndex, hexstrLen - hexstrIndex - 1,
             "%02x", byte[i]) <= 0) {
-            WIFI_LOGI("%{public}s: failed to snprintf", __func__);
+            WIFI_LOGI("%{public}s: failed to snprintf_s", __func__);
         }
         hexstrIndex += 2; // offset
         if (hexstrIndex >= hexstrLen) {
@@ -515,6 +515,10 @@ std::string EncodeBase64(const std::vector<uint8_t> &input)
 {
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGD("%{public}s: size:%{public}zu", __func__, input.size());
+    if (input.empty()) {
+        WIFI_LOGE("%{public}s: wrong data length for string to encode.", __func__);
+        return "";
+    }
     BIO *b64 = BIO_new(BIO_f_base64());
     BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
     BIO *bio = BIO_new(BIO_s_mem());

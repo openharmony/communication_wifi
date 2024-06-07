@@ -46,7 +46,21 @@ public:
      *
      * @return StaServiceCallback - sta callback
      */
-    virtual StaServiceCallback GetStaCallback() const;
+    virtual StaServiceCallback GetStaCallback() const = 0;
+
+     /**
+     * @Description Notify Internet Failure Detected
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode NotifyInternetFailureDetected(int forceNoHttpCheck) = 0;
+
+     /**
+     * @Description Is SelfCure On Going
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode IsSelfCureOnGoing() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

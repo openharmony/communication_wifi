@@ -252,7 +252,7 @@ public:
 
     void OnStreamChanged(int direction) override
     {
-        WIFI_LOGI("OnStreamChanged event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
+        WIFI_LOGD("OnStreamChanged event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
             direction);
         if (m_streamDirectionConvertMap.find(direction) == m_streamDirectionConvertMap.end()) {
             WIFI_LOGW("not find stream state.");

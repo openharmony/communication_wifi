@@ -26,7 +26,6 @@ declare_args() {
   wifi_feature_with_sta_num = 1
   wifi_feature_with_auth_disable = false
   wifi_feature_with_dhcp_disable = false
-  wifi_feature_with_wifi_hdi = false
   wifi_feature_with_hpf_supported = false
   wifi_feature_with_hdi_wpa_supported = false
 }

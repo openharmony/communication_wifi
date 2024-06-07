@@ -58,7 +58,7 @@ void SelfCureService::RegisterSelfCureServiceCallback(const std::vector<SelfCure
 
 void SelfCureService::HandleRssiLevelChanged(int rssi)
 {
-    WIFI_LOGI("HandleRssiLevelChanged, %{public}d.\n", rssi);
+    WIFI_LOGD("HandleRssiLevelChanged, %{public}d.\n", rssi);
     if (pSelfCureStateMachine == nullptr) {
         WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;
@@ -92,9 +92,10 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD, info);
     } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
         pSelfCureStateMachine->SetHttpMonitorStatus(false);
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, info);
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, 1, info);
     } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
         pSelfCureStateMachine->SetHttpMonitorStatus(true);
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);
     }
 }
 
@@ -108,6 +109,25 @@ void SelfCureService::HandleStaOpenRes(OperateResState state)
     if (state == OperateResState::OPEN_WIFI_SUCCEED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
     }
+}
+
+void SelfCureService::NotifyInternetFailureDetected(int forceNoHttpCheck)
+{
+    WIFI_LOGI("Enter NotifyInternetFailureDetected.");
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return;
+    }
+    pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, forceNoHttpCheck);
+}
+
+bool SelfCureService::IsSelfCureOnGoing()
+{
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return false;
+    }
+    return pSelfCureStateMachine->IsSelfCureOnGoing();
 }
 
 } //namespace Wifi

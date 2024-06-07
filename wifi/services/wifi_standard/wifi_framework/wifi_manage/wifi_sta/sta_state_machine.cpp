@@ -876,6 +876,11 @@ void StaStateMachine::StopWifiProcess()
     }
 
     if (WifiStaHalInterface::GetInstance().StopWifi() == WIFI_IDL_OPT_OK) {
+        WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId);
+        if (scanState != WifiOprMidState::RUNNING) {
+            WIFI_LOGI("scan is not running, set sta iface:%{public}s down", ifname.c_str());
+            WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(ifname, false);
+        }
         /* Callback result to InterfaceService. */
         WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
         WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, m_instId);

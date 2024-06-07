@@ -465,7 +465,7 @@ bool WifiControllerMachine::IsSemiWifiEnable()
 
 bool WifiControllerMachine::IsScanOnlyEnable()
 {
-    if (WifiSettings::GetInstance().GetScanOnlySwitchState()) {
+    if (WifiSettings::GetInstance().CheckScanOnlyAvailable()) {
         WIFI_LOGI("scanonly available is true");
 #ifndef OHOS_ARCH_LITE
         if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetLocationModeByDatashare()) {

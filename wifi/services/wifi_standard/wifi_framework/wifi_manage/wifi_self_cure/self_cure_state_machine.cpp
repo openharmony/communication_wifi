@@ -197,7 +197,8 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     mobileHotspot = linkedInfo.isDataRestricted == 1 ? true : false;
     pSelfCureStateMachine->connectNetworkRetryCnt = 0;
     WifiSettings::GetInstance().SetWifiSelfcureReset(false);
-    lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.frequency);
+    lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
+        pSelfCureStateMachine->m_instId);
     if (!SetupSelfCureMonitor()) {
         WIFI_LOGI("ConnectedMonitorState, config is null when connected broadcast received, delay to setup again.");
         pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RESETUP_SELF_CURE_MONITOR,
@@ -1660,7 +1661,7 @@ int SelfCureStateMachine::GetCurSignalLevel()
 {
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-    int signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.frequency);
+    int signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
     WIFI_LOGD("GetCurSignalLevel, signalLevel : %{public}d", signalLevel);
     return signalLevel;
 }

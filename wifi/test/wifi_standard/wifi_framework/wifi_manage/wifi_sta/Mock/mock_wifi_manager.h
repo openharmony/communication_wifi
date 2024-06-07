@@ -29,6 +29,7 @@ public:
     virtual void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0) = 0;
     virtual void DealStreamChanged(StreamDirection state, int instId = 0) = 0;
     virtual void DealRssiChanged(int rssi, int instId = 0) = 0;
+    virtual void DealStaSemiActiveRes(OperateResState state, int instId) = 0;
 };
 
 class WifiManager : public MockWifiManager {
@@ -43,6 +44,7 @@ public:
     MOCK_METHOD3(DealWpsChanged, void(WpsStartState state, const int pinCode, int));
     MOCK_METHOD2(DealStreamChanged, void(StreamDirection state, int));
     MOCK_METHOD2(DealRssiChanged, void(int rssi, int));
+    MOCK_METHOD2(DealStaSemiActiveRes, void(OperateResState state, int instId));
 private:
     StaServiceCallback mStaCallback;
     void InitStaCallback(void);

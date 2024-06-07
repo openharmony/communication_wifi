@@ -181,7 +181,7 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     return ret;
 }
 
-int32_t UpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *paramSet,
+int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *paramSet,
     const struct HksBlob *inData, struct HksBlob *outData)
 {
     uint32_t handledInDataSize = 0;
@@ -189,14 +189,14 @@ int32_t UpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *
     uint8_t *handledOutData = outData->data;
     struct HksBlob inDataSeg = *inData;
     struct HksBlob outDataSeg = { MAX_UPDATE_SIZE, nullptr };
-    WIFI_LOGI("UpdateAndFinish inData.size: %{public}d.", static_cast<int>(inData->size));
+    WIFI_LOGI("HksUpdateAndFinish inData.size: %{public}d.", static_cast<int>(inData->size));
     while (handledInDataSize < inData->size) {
         uint32_t aesDataLen = std::min(MAX_UPDATE_SIZE, (inData->size - handledInDataSize));
         inDataSeg.size = aesDataLen;
         outDataSeg.size = MAX_UPDATE_SIZE + AEAD_SIZE;
         outDataSeg.data = (uint8_t *)malloc(outDataSeg.size);
         if (outDataSeg.data == nullptr) {
-            WIFI_LOGE("UpdateAndFinish malloc failed.");
+            WIFI_LOGE("HksUpdateAndFinish malloc failed.");
             return HKS_FAILURE;
         }
 
@@ -207,18 +207,18 @@ int32_t UpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *
             hksResult = HksFinish(handle, paramSet, &inDataSeg, &outDataSeg);
         }
         if (hksResult != HKS_SUCCESS) {
-            WIFI_LOGE("UpdateAndFinish do HksUpdate or HksFinish failed: %{public}d.", hksResult);
+            WIFI_LOGE("HksUpdateAndFinish do HksUpdate or HksFinish failed: %{public}d.", hksResult);
             free(outDataSeg.data);
             return HKS_FAILURE;
         }
 
         if (handledOutDataSize + outDataSeg.size > outData->size) {
-            WIFI_LOGE("UpdateAndFinish outData->size is too small.");
+            WIFI_LOGE("HksUpdateAndFinish outData->size is too small.");
             free(outDataSeg.data);
             return HKS_FAILURE;
         }
         if (memcpy_s(handledOutData, outDataSeg.size, outDataSeg.data, outDataSeg.size) != EOK) {
-            WIFI_LOGE("UpdateAndFinish memcpy_s failed.");
+            WIFI_LOGE("HksUpdateAndFinish memcpy_s failed.");
             free(outDataSeg.data);
             return HKS_FAILURE;
         }
@@ -231,7 +231,7 @@ int32_t UpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *
         outDataSeg.data = nullptr;
     }
     outData->size = handledOutDataSize;
-    WIFI_LOGI("UpdateAndFinish outData.size: %{public}d.", static_cast<int>(outData->size));
+    WIFI_LOGI("HksUpdateAndFinish outData.size: %{public}d.", static_cast<int>(outData->size));
     return HKS_SUCCESS;
 }
 
@@ -400,9 +400,9 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
         return HKS_FAILURE;
     }
     struct HksBlob outData = { inputString.length() + AEAD_SIZE, cipherBuf };
-    ret = UpdateAndFinish(&handleEncrypt, encryParamSet, &inData, &outData);
+    ret = HksUpdateAndFinish(&handleEncrypt, encryParamSet, &inData, &outData);
     if (ret != HKS_SUCCESS) {
-        WIFI_LOGE("WifiLoopEncrypt UpdateAndFinish failed: %{public}d.", ret);
+        WIFI_LOGE("WifiLoopEncrypt HksUpdateAndFinish failed: %{public}d.", ret);
         free(cipherBuf);
         return ret;
     }
@@ -447,9 +447,9 @@ int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const Encr
         return HKS_FAILURE;
     }
     struct HksBlob outData = { cipherLength, plainBuf };
-    ret = UpdateAndFinish(&handleDecrypt, decryParamSet, &inData, &outData);
+    ret = HksUpdateAndFinish(&handleDecrypt, decryParamSet, &inData, &outData);
     if (ret != HKS_SUCCESS) {
-        WIFI_LOGE("WifiLoopDecrypt UpdateAndFinish failed: %{public}d.", ret);
+        WIFI_LOGE("WifiLoopDecrypt HksUpdateAndFinish failed: %{public}d.", ret);
         free(plainBuf);
         return ret;
     }

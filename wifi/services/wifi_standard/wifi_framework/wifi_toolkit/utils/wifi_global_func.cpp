@@ -574,7 +574,7 @@ bool ParseJson(const std::string &jsonString, const std::string &type, const std
     return false;
 }
 
-void ConvertToHexString(const std::string &inData, std::string &outData)
+void ConvertDecStrToHexStr(const std::string &inData, std::string &outData)
 {
     std::stringstream ss(inData);
     std::string token;

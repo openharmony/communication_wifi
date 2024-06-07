@@ -399,10 +399,10 @@ void WifiSettings::ParseBackupJson(const std::string &backupInfo, std::string &k
     ParseJson(backupInfo, type, gcmParamsIv, ivStr);
     ParseJson(backupInfo, type, apiVersion, version);
 
-    ConvertToHexString(keyStr, key);
+    ConvertDecStrToHexStr(keyStr, key);
     std::fill(keyStr.begin(), keyStr.end(), 0);
     LOGI("ParseBackupJson key.size: %{public}d.", static_cast<int>(key.size()));
-    ConvertToHexString(ivStr, iv);
+    ConvertDecStrToHexStr(ivStr, iv);
     LOGI("ParseBackupJson iv.size: %{public}d.", static_cast<int>(iv.size()));
 }
 
@@ -433,12 +433,13 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
         ConvertDeviceCfgToBackupCfg(config, backupConfig);
         backupConfigs.push_back(backupConfig);
     }
+    std::vector<WifiDeviceConfig>().swap(localConfigs);
 
     WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
     wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
     wifiBackupConfig.SetEncryptionInfo(key, iv);
     wifiBackupConfig.SetValue(backupConfigs);
-    wifiBackupConfig.SaveEncryptedConfig();
+    wifiBackupConfig.SaveConfig();
     wifiBackupConfig.UnsetEncryptionInfo();
     std::fill(key.begin(), key.end(), 0);
 
@@ -449,6 +450,24 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
     }
     LOGI("OnBackup end. Backup count: %{public}d, fd: %{public}d.", static_cast<int>(backupConfigs.size()), fd.Get());
     return 0;
+}
+
+void WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, const std::string &key,
+    const std::string &key)
+{
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.SetEncryptionInfo(key, iv);
+    wifiBackupConfig.LoadConfig();
+    std::vector<WifiBackupConfig> backupConfigs;
+    wifiBackupConfig.GetValue(backupConfigs);
+    wifiBackupConfig.UnsetEncryptionInfo();
+
+    for (const auto &backupCfg : backupConfigs) {
+        WifiDeviceConfig config;
+        ConvertBackupCfgToDeviceCfg(backupCfg, config);
+        deviceConfigs.push_back(config);
+    }
 }
 
 int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
@@ -479,22 +498,9 @@ int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
     }
     close(destFd);
 
-    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
-    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
-    wifiBackupConfig.SetEncryptionInfo(key, iv);
-    wifiBackupConfig.LoadEncryptedConfig();
-    std::vector<WifiBackupConfig> backupConfigs;
-    wifiBackupConfig.GetValue(backupConfigs);
-    wifiBackupConfig.UnsetEncryptionInfo();
-    std::fill(key.begin(), key.end(), 0);
-
     std::vector<WifiDeviceConfig> deviceConfigs;
-    for (const auto &backupCfg : backupConfigs) {
-        WifiDeviceConfig config;
-        ConvertBackupCfgToDeviceCfg(backupCfg, config);
-        deviceConfigs.push_back(config);
-    }
-
+    GetConfigbyBackupFile(deviceConfigs, key, iv);
+    std::fill(key.begin(), key.end(), 0);
     LOGI("OnRestore end. Restore count: %{public}d", static_cast<int>(deviceConfigs.size()));
     ConfigsDeduplicateAndSave(deviceConfigs);
     return 0;

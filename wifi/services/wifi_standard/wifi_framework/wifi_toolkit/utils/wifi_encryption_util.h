@@ -113,6 +113,7 @@ int32_t DeleteKey(const WifiEncryptionInfo &wifiEncryptionInfo);
 
 /**
  * @Description  Encrypt inputString using GCM-AES based on input encryptionInfo
+ * Used for encryptedData is biger than 100k
  * @param wifiEncryptionInfo  - keyAlias info
  * @param inputString - plaint string that needs to be encrypted
  * @param encryptedData - encrypted result with encrypted string and IV value
@@ -123,6 +124,7 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
 
 /**
  * @Description  Decrypt encryptedData using GCM-AES based on input encryptionInfo
+ * Used for encryptedData is biger than 100k
  * @param wifiEncryptionInfo  - keyAlias info
  * @param encryptedData - encrypted result with encrypted string and IV value
  * @param decryptedData - string after decryption

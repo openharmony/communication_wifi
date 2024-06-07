@@ -15,7 +15,6 @@
 
 #include "wifi_p2p_hal.h"
 #include "wifi_wpa_common.h"
-#include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
 #include "wifi_log.h"
 #include "securec.h"
 #include "wifi_hal_callback.h"
@@ -837,7 +836,7 @@ static void GetHalNetworkInfos(char *buf, P2pNetworkInfo *info)
             if (strcpy_s(info->ssid, sizeof(info->ssid), buf + start) != EOK) {
                 break;
             }
-            printf_decode((u8 *)info->ssid, sizeof(info->ssid), info->ssid);
+            PrintfDecode((u8 *)info->ssid, sizeof(info->ssid), info->ssid);
         } else if (i == NETWORKS_LIST_TWO) {
             if (strcpy_s(info->bssid, sizeof(info->bssid), buf + start) != EOK) {
                 break;

@@ -52,6 +52,7 @@ public:
     MOCK_METHOD1(DeregisterAutoJoinCondition, ErrCode(const std::string&));
     MOCK_METHOD3(RegisterFilterBuilder, ErrCode(const FilterTag &, const std::string &, const FilterBuilder &));
     MOCK_METHOD2(DeregisterFilterBuilder, ErrCode(const FilterTag &, const std::string &));
+    MOCK_METHOD0(StartHttpDetect, ErrCode());
 };
 }  // namespace OHOS
 }  // namespace OHOS

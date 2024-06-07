@@ -17,7 +17,6 @@
 #include <poll.h>
 #include <unistd.h>
 #include "securec.h"
-#include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
 #include "wifi_common_def.h"
 #include "wifi_hal_callback.h"
 #include "wifi_hal_common_func.h"
@@ -179,7 +178,7 @@ static void DealGroupStartInfo(char *buf)
             TrimQuotationMark(retMsg.value, '\"');
             if (strncmp(retMsg.key, "ssid", strlen("ssid")) == 0) {
                 StrSafeCopy(conf.ssid, sizeof(conf.ssid), retMsg.value);
-                printf_decode((u8 *)conf.ssid, sizeof(conf.ssid), conf.ssid);
+                PrintfDecode((u8 *)conf.ssid, sizeof(conf.ssid), conf.ssid);
             } else {
                 StrSafeCopy(conf.passphrase, sizeof(conf.passphrase), retMsg.value);
             }
@@ -720,13 +719,9 @@ static void WpaCallBackFunc(const char *p)
         return;
     }
     if (strncmp(p, WPA_EVENT_SCAN_RESULTS, strlen(WPA_EVENT_SCAN_RESULTS)) == 0) {
-#ifndef HDI_INTERFACE_SUPPORT
         WifiHalCbNotifyScanEnd(STA_CB_SCAN_OVER_OK);
-#endif
     } else if (strncmp(p, WPA_EVENT_SCAN_FAILED, strlen(WPA_EVENT_SCAN_FAILED)) == 0) {
-#ifndef HDI_INTERFACE_SUPPORT
         WifiHalCbNotifyScanEnd(STA_CB_SCAN_FAILED);
-#endif
     } else if (strncmp(p, WPA_EVENT_CONNECTED, strlen(WPA_EVENT_CONNECTED)) == 0) { /* Connection notification */
         char *pid = strstr(p, "id=");
         char *pMacPos = strstr(p, "Connection to ");

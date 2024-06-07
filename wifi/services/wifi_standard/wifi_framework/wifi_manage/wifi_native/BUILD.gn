@@ -67,18 +67,12 @@ config("wifi_idl_cxx_config") {
 idl_client_sources = [
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_msg.cpp",
-  "client/hdi_client/hdi_interface/wifi_hdi_ap_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_common.c",
-  "client/hdi_client/hdi_interface/wifi_hdi_p2p_impl.c",
-  "client/hdi_client/hdi_interface/wifi_hdi_proxy.c",
-  "client/hdi_client/hdi_interface/wifi_hdi_sta_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_util.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_ap_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_p2p_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_proxy.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_sta_impl.c",
-  "client/hdi_client/wifi_hdi_callback.cpp",
-  "client/hdi_client/wifi_hdi_client.cpp",
   "client/hdi_client/wifi_hdi_wpa_callback.cpp",
   "client/hdi_client/wifi_hdi_wpa_client.cpp",
   "hal_device_manage/hal_device_manage.cpp",
@@ -214,11 +208,6 @@ if (defined(ohos_lite)) {
       defines += [ "HDI_WPA_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libwpa_proxy_1.1" ]
       external_deps += [ "drivers_interface_wlan:libhostapd_proxy_1.0" ]
-    }
-
-    if (wifi_feature_with_wifi_hdi) {
-      defines += [ "HDI_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.2" ]
     }
 
     if (wifi_feature_with_hdi_chip_supported) {

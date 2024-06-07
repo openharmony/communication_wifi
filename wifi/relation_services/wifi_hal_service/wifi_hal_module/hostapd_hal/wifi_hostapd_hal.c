@@ -26,7 +26,7 @@
 #include <linux/wireless.h>
 #endif
 #include "securec.h"
-#include "common/wpa_ctrl.h"
+#include "wpa_ctrl.h"
 #include "wifi_common_def.h"
 #include "wifi_hal_callback.h"
 #include "wifi_log.h"

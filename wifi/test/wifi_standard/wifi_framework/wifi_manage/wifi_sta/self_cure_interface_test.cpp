@@ -74,7 +74,7 @@ public:
         WifiLinkedInfo info;
         int instId = 0;
         pSelfCureInterface->DealStaConnChanged(state, info, instId);
-        pSelfcureService == nullptr;
+        pSelfCureInterface->pSelfCureService == nullptr;
         pSelfCureInterface->DealStaConnChanged(state, info, instId);
     }
 
@@ -83,7 +83,7 @@ public:
         int rssi = MIN_VAL_LEVEL_4;
         int instId = 0;
         pSelfCureInterface->DealRssiLevelChanged(rssi, instId);
-        pSelfcureService == nullptr;
+        pSelfCureInterface->pSelfCureService == nullptr;
         pSelfCureInterface->DealRssiLevelChanged(rssi, instId);
     }
 
@@ -91,7 +91,7 @@ public:
     {
         WifiP2pLinkedInfo info;
         pSelfCureInterface->DealP2pConnChanged(info);
-        pSelfcureService == nullptr;
+        pSelfCureInterface->pSelfCureService == nullptr;
         pSelfCureInterface->DealP2pConnChanged(info);
     }
 
@@ -99,7 +99,6 @@ public:
     {
         SelfCureServiceCallback callbacks;
         pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks);
-        SelfCureServiceCallback callbacks;
         callbacks.callbackModuleName = "test";
         pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks);
     }
@@ -107,9 +106,9 @@ public:
     void DealStaOpenResTest()
     {
         OperateResState state = OperateResState::OPEN_WIFI_SUCCEED;
-        pSelfCureInterface->DealStaOpenRes(state, instId);
-        pSelfcureService == nullptr;
-        pSelfCureInterface->DealStaOpenRes(state, instId);
+        pSelfCureInterface->DealStaOpenRes(state);
+        pSelfCureInterface->pSelfCureService == nullptr;
+        pSelfCureInterface->DealStaOpenRes(state);
     }
 };
 

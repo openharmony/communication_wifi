@@ -84,6 +84,8 @@ public:
         pSelfCureService->HandleStaOpenRes(state);
         state = OperateResState::CONNECT_AP_CONNECTED;
         pSelfCureService->HandleStaOpenRes(state);
+    }
+
     void HandleStaConnChangedTest2()
     {
         OperateResState state = OperateResState::DISCONNECT_DISCONNECTED;

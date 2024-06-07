@@ -453,7 +453,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 }
 
 void WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, const std::string &key,
-    const std::string &key)
+    const std::string &iv)
 {
     WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
     wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);

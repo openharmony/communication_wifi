@@ -106,9 +106,8 @@ public:
 
     /**
      * @Description read ini config file, need call SetConfigFilePath first
-     *
      */
-    void ReadFile(std::itream &fs);
+    void ReadFile(std::istream &fs);
 
     /**
      * @Description read and parses the ini config file, need call SetConfigFilePath first
@@ -121,7 +120,7 @@ public:
     /**
      * @Description Save config to file
      * need call SetEncryptionInfo first when save encrypted config file
-     * 
+     *
      * @return int - 0 Success; -1 Failed
      */
     int SaveConfig();
@@ -244,7 +243,7 @@ int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::istream &fs, std::string &l
 }
 
 template<typename T>
-void WifiConfigFileImpl<T>::ReadFile(std::itream &fs)
+void WifiConfigFileImpl<T>::ReadFile(std::istream &fs)
 {
     mValues.clear();
     T item;
@@ -325,9 +324,11 @@ int WifiConfigFileImpl<T>::SaveConfig()
         content = ss.str();
     }
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    WifiLoopEncrypt(mEncryptionInfo, content, mEncry);
-    std::fill(content.begin(), content.end(), 0);
-    content = mEncry.encryptedPassword;
+    if (mSetEncryption) {
+        WifiLoopEncrypt(mEncryptionInfo, content, mEncry);
+        std::fill(content.begin(), content.end(), 0);
+        content = mEncry.encryptedPassword;
+    }
 #endif
     int ret = fwrite(content.c_str(), 1, content.length(), fp);
     if (ret != (int)content.length()) {

@@ -17,7 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "common/wpa_ctrl.h"
+#include "wpa_ctrl.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +26,7 @@ extern "C" {
 #define WPA_MESSAGE_KEY_LENGTH 64
 #define WPA_MESSAGE_VALUE_LENGTH 256
 
+typedef unsigned char u8;
 typedef struct stWpaCtrl {
     struct wpa_ctrl *pSend;
     struct wpa_ctrl *pRecv;
@@ -44,6 +45,7 @@ int WpaCliCmd(const char *cmd, char *buf, size_t bufLen);
 void GetStrKeyVal(char *src, const char *split, WpaKeyValue *out);
 int Hex2Dec(const char *str);
 void TrimQuotationMark(char *str, char c);
+size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str);
 
 #ifdef __cplusplus
 }

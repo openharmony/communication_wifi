@@ -391,6 +391,13 @@ public:
     virtual ErrCode DisableRandomMac(int setmode) = 0;
 
     /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode CheckCanUseP2p() = 0;
+
+    /**
      * @Description Check whether service is died.
      *
      * @return bool - true: service is died, false: service is not died.

@@ -247,8 +247,12 @@ void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results
 void WifiScanManager::DealStaOpenRes(OperateResState state, int instId)
 {
     WIFI_LOGI("wifi open result, state=%{public}d, id=%{public}d", state, instId);
-    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
+    if (state == OperateResState::OPEN_WIFI_OPENING) {
+        WifiSettings::GetInstance().CleanWifiCategoryRecord();
+    } else if (state == OperateResState::OPEN_WIFI_SUCCEED) {
         CheckAndStartScanService(instId);
+    } else {
+        WIFI_LOGD("Unknown sta state");
     }
 }
 }  // namespace Wifi

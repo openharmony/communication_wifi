@@ -244,6 +244,7 @@ void WifiP2pGroupManager::RefreshCurrentGroupFromGroups()
 
 void WifiP2pGroupManager::SaveP2pInfo(const WifiP2pLinkedInfo &linkedInfo)
 {
+    std::unique_lock<std::mutex> lock(groupMutex);
     p2pConnInfo = linkedInfo;
 }
 
@@ -284,6 +285,7 @@ void WifiP2pGroupManager::UpdateGroupsNetwork(std::map<int, WifiP2pGroupInfo> wp
 
 void WifiP2pGroupManager::SetCurrentGroup(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
 {
+    std::unique_lock<std::mutex> lock(groupMutex);
     currentGroup = group;
     WifiSettings::GetInstance().SetCurrentP2pGroupInfo(group);
 #ifdef SUPPORT_RANDOM_MAC_ADDR

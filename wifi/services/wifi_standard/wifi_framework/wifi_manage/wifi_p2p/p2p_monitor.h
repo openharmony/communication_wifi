@@ -101,7 +101,7 @@ private:
      */
     virtual void Broadcast2SmDeviceFound(const std::string &iface, const WifiP2pDevice &device) const;
 
-    virtual void Broadcast2SmPrivateDeviceFound(const std::string &iface, const std::string &PrivateInfo) const;
+    virtual void Broadcast2SmPrivateDeviceFound(const std::string &iface, const std::string &privateInfo) const;
 
     /**
      * @Description Broadcast device lost event.
@@ -428,11 +428,17 @@ private:
      */
     void WpaEventP2pConnectFailed(const std::string &bssid, int reason) const;
 
-        /**
+    /**
      * @Description Register the callback function for p2p channel switch
      * @param freq - channel switch freq
      */
     void WpaEventP2pChannelSwitch(int freq) const;
+
+    /**
+     * @Description Register the callback function for p2p event notify
+     * @param freq - data param
+     */
+    void WpaEventStaNotifyCallBack(const std::string &notifyParam) const;
 private:
     /**
      * The current implementation cannot obtain abundant HAL instances like Andoird and cannot distinguish which

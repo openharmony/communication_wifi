@@ -27,6 +27,8 @@
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
+#include "securec.h"
+#include "init_param.h"
 #include <random>
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
@@ -44,10 +46,25 @@
 
 namespace OHOS {
 namespace Wifi {
+#ifdef DTFUZZ_TEST
+static WifiSettings* gWifiSettings = nullptr;
+#endif
+const std::string LANGUAGE_CHINESE = "zh-Hans";
+const std::string COUNTRY_CHINA_CAPITAL = "CN";
+const std::string COUNTRY_CHINA_LOWERCASE = "cn";
+constexpr int32_t MAX_PARAM_VALUE_LEN = 128;
+
 WifiSettings &WifiSettings::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiSettings gWifiSettings;
     return gWifiSettings;
+#else
+    if (gWifiSettings == nullptr) {
+        gWifiSettings = new (std::nothrow) WifiSettings();
+    }
+    return *gWifiSettings;
+#endif
 }
 
 WifiSettings::WifiSettings()
@@ -71,7 +88,6 @@ WifiSettings::WifiSettings()
       mScreenState(MODE_STATE_DEFAULT),
       mScanGenieState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
-      mPowerSleepState(MODE_STATE_CLOSE),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
@@ -95,6 +111,8 @@ WifiSettings::WifiSettings()
     mLastDiscReason[0] = DisconnectedReason::DISC_REASON_DEFAULT;
     mThermalLevel = static_cast<int>(ThermalLevel::NORMAL);
     mValidChannels.clear();
+    mWifiDetailState[0] = WifiDetailState::STATE_INACTIVE;
+    isSemiWifiEnable = false;
 }
 
 WifiSettings::~WifiSettings()
@@ -158,48 +176,7 @@ void WifiSettings::InitHotspotConfig()
             mBlockListInfo.emplace(item.bssid, item);
         }
     }
-
-    /* init softap random mac info */
-    if (mSavedApRandomMac.LoadConfig() >= 0) {
-        std::vector<SoftApRandomMac> tmp;
-        mSavedApRandomMac.GetValue(tmp);
-        if (tmp.size() > 0) {
-            for (std::size_t i = 0; i < tmp.size(); i++) {
-                mApRandomMac[i] = tmp[i];
-            }
-        }
-    }
     return;
-}
-
-int WifiSettings::GetApRandomMac(SoftApRandomMac &randomMac, int id)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    auto iter = mApRandomMac.find(id);
-    if (iter != mApRandomMac.end()) {
-        randomMac = iter->second;
-    }
-    return 0;
-}
-
-int WifiSettings::SetApRandomMac(const SoftApRandomMac &randomMac, int id)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    if (id > AP_INSTANCE_MAX_NUM) {
-        LOGE("Id is larger than AP_INSTANCE_MAX_NUM");
-        return -1;
-    }
-
-    mApRandomMac[id] =  randomMac;
-
-    std::vector<SoftApRandomMac> tmp;
-    for (auto iter : mApRandomMac) {
-        tmp.push_back(iter.second);
-    }
-
-    mSavedApRandomMac.SetValue(tmp);
-    mSavedApRandomMac.SaveConfig();
-    return 0;
 }
 
 void WifiSettings::InitP2pVendorConfig()
@@ -262,7 +239,6 @@ int WifiSettings::Init()
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
     mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
-    mSavedApRandomMac.SetConfigFilePath(WIFI_SOFTAP_RANDOM_MAC_FILE_PATH);
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -518,6 +494,34 @@ int WifiSettings::SetWifiState(int state, int instId)
     return 0;
 }
 
+WifiDetailState WifiSettings::GetWifiDetailState(int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDetailState.find(instId);
+    if (iter != mWifiDetailState.end()) {
+        return iter->second;
+    }
+    mWifiDetailState[instId] = WifiDetailState::STATE_UNKNOWN;
+    return mWifiDetailState[instId];
+}
+
+int WifiSettings::SetWifiDetailState(WifiDetailState state, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiDetailState[instId] = state;
+    return 0;
+}
+
+bool WifiSettings::GetWifiAllowSemiActive() const
+{
+    return mWifiAllowSemiActive;
+}
+
+void WifiSettings::SetWifiAllowSemiActive(bool isAllowed)
+{
+    mWifiAllowSemiActive = isAllowed;
+}
+
 bool WifiSettings::HasWifiActive()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -659,6 +663,19 @@ bool WifiSettings::IsWifiToggledEnable()
     }
 }
 
+bool WifiSettings::IsSemiWifiEnable()
+{
+    if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+        return false;
+    }
+    return isSemiWifiEnable || GetWifiAllowSemiActive();
+}
+
+void WifiSettings::SetSemiWifiEnable(bool enable)
+{
+    isSemiWifiEnable = enable;
+}
+
 void WifiSettings::SetSoftapToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
@@ -732,8 +749,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     std::unique_lock<std::mutex> lock(mInfoMutex);
     int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ) {
-        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES
-            || iter->timestamp < currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
+        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
         #ifdef SUPPORT_RANDOM_MAC_ADDR
             WifiSettings::GetInstance().RemoveMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 iter->bssid);
@@ -743,10 +759,15 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
             iter = mWifiScanInfoList.erase(iter);
             continue;
         }
-        results.push_back(*iter);
+        if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
+            results.push_back(*iter);
+        }
         ++iter;
     }
-    LOGI("WifiSettings::GetScanInfoList size = %{public}u", results.size());
+    if (results.empty()) {
+        results.assign(mWifiScanInfoList.begin(), mWifiScanInfoList.end());
+    }
+    LOGI("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
     return 0;
 }
 
@@ -795,6 +816,19 @@ int WifiSettings::SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo)
     return 0;
 }
 
+int WifiSettings::SaveP2pCreatorUid(int uid)
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    mUid = uid;
+    return 0;
+}
+
+int WifiSettings::GetP2pCreatorUid()
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    return mUid;
+}
+
 int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
@@ -820,7 +854,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         LOGI("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
         return 0;
     }
-    LOGI("DecryptionDeviceConfig start");
+    LOGD("DecryptionDeviceConfig start");
     WifiEncryptionInfo mWifiEncryptionInfo;
     mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);
@@ -858,7 +892,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
-    LOGI("DecryptionDeviceConfig end");
+    LOGD("DecryptionDeviceConfig end");
     return 0;
 }
 #endif
@@ -2308,12 +2342,15 @@ void WifiSettings::UpdateLinkedInfo(int instId)
             if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
                 mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
             }
-            mWifiLinkedInfo[instId].supportedWifiCategory = iter->supportedWifiCategory;
             mWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
-            return;
+            break;
         }
     }
-    LOGD("WifiSettings UpdateLinkedInfo failed.");
+    auto iter = wifiCategoryRecord.find(mWifiLinkedInfo[instId].bssid);
+    if (iter != wifiCategoryRecord.end()) {
+        mWifiLinkedInfo[instId].supportedWifiCategory = iter->second;
+    }
+    LOGD("WifiSettings UpdateLinkedInfo.");
 }
 
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers, int instId)
@@ -2426,7 +2463,7 @@ bool WifiSettings::GetWifiFlagOnAirplaneMode(int instId)
     return mWifiConfig[0].openWifiWhenAirplane;
 }
 
-bool WifiSettings::GetStaLastRunState(int instId)
+int WifiSettings::GetStaLastRunState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);
@@ -2436,7 +2473,7 @@ bool WifiSettings::GetStaLastRunState(int instId)
     return mWifiConfig[0].staLastState;
 }
 
-int WifiSettings::SetStaLastRunState(bool bRun, int instId)
+int WifiSettings::SetStaLastRunState(int bRun, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].staLastState = bRun;
@@ -2513,16 +2550,6 @@ bool WifiSettings::SetWifiStateOnAirplaneChanged(const int &state)
 int WifiSettings::GetAirplaneModeState() const
 {
     return mAirplaneModeState.load();
-}
-
-void WifiSettings::SetPowerSleepState(const int &state)
-{
-    mPowerSleepState = state;
-}
-
-int WifiSettings::GetPowerSleepState() const
-{
-    return mPowerSleepState.load();
 }
 
 void WifiSettings::SetAppRunningState(ScanMode appRunMode)
@@ -3030,6 +3057,26 @@ int WifiSettings::SetStaApExclusionType(int type)
     return 0;
 }
 
+void WifiSettings::RecordWifiCategory(const std::string bssid, WifiCategory category)
+{
+    std::unique_lock<std::mutex> lock(mScanRecordMutex);
+    if (bssid.empty()) {
+        return;
+    }
+    auto iter = wifiCategoryRecord.find(bssid);
+    if (iter != wifiCategoryRecord.end()) {
+        iter->second = category;
+    } else {
+        wifiCategoryRecord.emplace(std::make_pair(bssid, category));
+    }
+}
+
+void WifiSettings::CleanWifiCategoryRecord()
+{
+    std::unique_lock<std::mutex> lock(mScanRecordMutex);
+    wifiCategoryRecord.clear();
+}
+
 long int WifiSettings::GetRandom()
 {
     long random = 0;
@@ -3095,6 +3142,48 @@ void WifiSettings::GenerateRandomMacAddress(std::string &randomMacAddr)
     }
     randomMacAddr = strMac;
     LOGD("%{public}s: randomMacAddr: %{private}s", __func__, randomMacAddr.c_str());
+}
+
+bool WifiSettings::IsValidParanValue(const char *value, uint32_t len)
+{
+    return (value != NULL) && (strlen(value) + 1 <= len);
+}
+
+std::string WifiSettings::GetParameter(const std::string &key, const std::string &def)
+{
+    uint32_t size = 0;
+    int ret = SystemReadParam(key.c_str(), NULL, &size);
+    if (ret == 0) {
+        std::vector<char> value(size + 1);
+        ret = SystemReadParam(key.c_str(), value.data(), &size);
+        if (ret == 0) {
+            return std::string(value.data());
+        }
+    }
+    if (IsValidParanValue(def.c_str(), MAX_PARAM_VALUE_LEN)) {
+        return std::string(def);
+    }
+    return "";
+}
+
+std::string WifiSettings::GetCountry()
+{
+    return GetParameter("const.cust.region", "");
+}
+
+std::string WifiSettings::GetLanguage()
+{
+    return GetParameter("persist.global.language", "");
+}
+
+std::string WifiSettings::GetOversea()
+{
+    std::string language = GetLanguage();
+    std::string country = GetCountry();
+    if (language == LANGUAGE_CHINESE && (country == COUNTRY_CHINA_CAPITAL || country == COUNTRY_CHINA_LOWERCASE)) {
+        return "internal";
+    }
+    return "oversea";
 }
 
 #ifdef SUPPORT_RANDOM_MAC_ADDR

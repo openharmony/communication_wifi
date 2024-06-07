@@ -18,9 +18,11 @@ ohos_static_library("wifi_self_cure") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    cfi = true
-    boundary_sanitize = true
-    cfi_cross_dso = true
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
     debug = false
   }
   include_dirs = [
@@ -53,6 +55,7 @@ ohos_static_library("wifi_self_cure") {
 
   sources = [
     "../wifi_sta/network_status_history_manager.cpp",
+    "ip_qos_monitor.cpp",
     "self_cure_interface.cpp",
     "self_cure_service.cpp",
     "self_cure_state_machine.cpp",
@@ -70,6 +73,8 @@ ohos_static_library("wifi_self_cure") {
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "init:libbegetutil",
+    "netmanager_base:net_conn_manager_if",
     "netstack:http_client",
   ]
 

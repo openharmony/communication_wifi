@@ -94,6 +94,8 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnGetWifiDetailState;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE)] =
         &WifiDeviceStub::OnSetSatelliteState;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER)] =
+        &WifiDeviceStub::OnSetTxPower;
     return;
 }
 
@@ -163,8 +165,6 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
-        reply.WriteInt32(0);
-        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
         int exception = data.ReadInt32();
@@ -202,7 +202,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &rem
             static_cast<void*>(deathRecipient_), static_cast<void*>(iter->second));
         remoteObject->RemoveDeathRecipient(iter->second);
         remoteDeathMap.erase(iter);
-        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}u.", remoteDeathMap.size());
+        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}zu.", remoteDeathMap.size());
     }
 }
 
@@ -878,7 +878,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             if (iter == remoteDeathMap.end()) {
                 std::lock_guard<std::mutex> lock(mutex_);
                 remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
-                WIFI_LOGI("OnRegisterCallBack, AddDeathRecipient, remote: %{public}p, remoteDeathMap.size: %{public}d",
+                WIFI_LOGI("OnRegisterCallBack, AddDeathRecipient, remote: %{public}p, remoteDeathMap.size: %{public}zu",
                     static_cast<void*>(remote), remoteDeathMap.size());
                 if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                     WIFI_LOGI("AddDeathRecipient!");
@@ -1127,6 +1127,16 @@ void WifiDeviceStub::OnGetWifiDetailState(uint32_t code, MessageParcel &data, Me
         reply.WriteInt32(static_cast<int>(state));
     }
 
+    return;
+}
+
+void WifiDeviceStub::OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int power = data.ReadInt32();
+    ErrCode ret = SetTxPower(power);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 

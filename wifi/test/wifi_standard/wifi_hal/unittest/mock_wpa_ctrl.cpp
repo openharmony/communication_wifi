@@ -280,8 +280,3 @@ int wpa_ctrl_get_fd(struct wpa_ctrl *ctrl)
     }
     return -1;
 }
-
-size_t printf_decode(u8 *buf, size_t maxlen, const char *str)
-{
-    return 0;
-}

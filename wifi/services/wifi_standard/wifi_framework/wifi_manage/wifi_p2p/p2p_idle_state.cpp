@@ -36,6 +36,7 @@ void P2pIdleState::GoInState()
     p2pStateMachine.ClearGroup();
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
     p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE), P2P_REMOVE_DEVICE_TIMEOUT);
+    p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_INVALID);
     SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
 }
 
@@ -305,11 +306,12 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
         p2pStateMachine.UpdateGroupManager();
         group.SetNetworkId(groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         WIFI_LOGI("the group network id is %{public}d set id is %{public}d",
-            group.GetNetworkId(),
-            p2pStateMachine.groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
+            group.GetNetworkId(), groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         p2pStateMachine.UpdatePersistentGroups();
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
+    group.SetCreatorUid(WifiSettings::GetInstance().GetP2pCreatorUid());
+    WifiSettings::GetInstance().SaveP2pCreatorUid(-1);
     p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     if (!p2pStateMachine.groupManager.GetCurrentGroup().IsGroupOwner()) {
         p2pStateMachine.StartDhcpClientInterface();

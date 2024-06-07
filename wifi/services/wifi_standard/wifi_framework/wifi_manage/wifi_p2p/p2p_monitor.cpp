@@ -20,6 +20,7 @@
 #include "wifi_common_util.h"
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
+#include "wifi_event_callback.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pMonitor");
 
@@ -71,6 +72,7 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
         std::bind(&P2pMonitor::WpaEventP2pIfaceCreated, this, _1, _2),
         std::bind(&P2pMonitor::WpaEventP2pConnectFailed, this, _1, _2),
         std::bind(&P2pMonitor::WpaEventP2pChannelSwitch, this, _1),
+        std::bind(&P2pMonitor::WpaEventStaNotifyCallBack, this, _1),
     };
 
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
@@ -164,9 +166,9 @@ void P2pMonitor::Broadcast2SmDeviceFound(const std::string &iface, const WifiP2p
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND, 0, 0, anyDevice);
 }
 
-void P2pMonitor::Broadcast2SmPrivateDeviceFound(const std::string &iface, const std::string &PrivateInfo) const
+void P2pMonitor::Broadcast2SmPrivateDeviceFound(const std::string &iface, const std::string &privateInfo) const
 {
-    std::any anyDevice = PrivateInfo;
+    std::any anyDevice = privateInfo;
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_PRI_DEVICE_FOUND, 0, 0, anyDevice);
 }
 
@@ -355,8 +357,8 @@ void P2pMonitor::WpaEventDeviceFound(const IdlP2pDeviceFound &deviceInfo) const
         std::string p2pDeviceAddress = deviceInfo.p2pDeviceAddress;
         std::string wfdDeviceInfo(reinterpret_cast<const char*>(deviceInfo.wfdDeviceInfo.data()),
             deviceInfo.wfdDeviceInfo.size());
-        std::string PrivateInfo = p2pDeviceAddress + wfdDeviceInfo;
-        Broadcast2SmPrivateDeviceFound(selectIfacName, PrivateInfo);
+        std::string privateInfo = p2pDeviceAddress + wfdDeviceInfo;
+        Broadcast2SmPrivateDeviceFound(selectIfacName, privateInfo);
     }
     Broadcast2SmDeviceFound(selectIfacName, device);
 }
@@ -503,6 +505,7 @@ void P2pMonitor::WpaEventGroupStarted(const IdlP2pGroupInfo &groupInfo) const
 
     WifiP2pDevice owner;
     owner.SetDeviceAddress(groupInfo.goDeviceAddress);
+    owner.SetRandomDeviceAddress(groupInfo.goRandomAddress);
 
     group.SetOwner(owner);
     Broadcast2SmGroupStarted(selectIfacName, group);
@@ -627,6 +630,7 @@ void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress, con
     WifiP2pDevice device;
     device.SetDeviceAddress(p2pDeviceAddress);
     device.SetGroupAddress(p2pGroupAddress);
+    device.SetRandomDeviceAddress(p2pGroupAddress);
     Broadcast2SmApStaConnected(selectIfacName, device);
 }
 
@@ -662,6 +666,38 @@ void P2pMonitor::WpaEventP2pChannelSwitch(int freq) const
     WifiP2pGroupInfo group;
     group.SetFrequency(freq);
     Broadcast2SmChSwitch(selectIfacName, group);
+}
+
+void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
+{
+    WIFI_LOGI("WpaEventStaNotifyCallBack callback, notifyParam:%{private}s", notifyParam.c_str());
+    if (notifyParam.empty()) {
+        WIFI_LOGE("WpaEventStaNotifyCallBack() notifyParam is empty");
+        return;
+    }
+    std::string::size_type begPos = 0;
+    if ((begPos = notifyParam.find(":")) == std::string::npos) {
+        WIFI_LOGI("WpaEventStaNotifyCallBack() notifyParam not find :");
+        return;
+    }
+    std::string type = notifyParam.substr(0, begPos);
+    int num = stoi(type);
+    switch (num) {
+        case static_cast<int>(WpaEventCallback::CSA_CHSWITCH_NUM): {
+            std::string::size_type freqPos = 0;
+            if ((freqPos = notifyParam.find("freq=")) == std::string::npos) {
+                WIFI_LOGE("csa channel switch notifyParam not find frequency!");
+                return;
+            }
+            std::string data = notifyParam.substr(freqPos + strlen("freq="));
+            int freq = stoi(data);
+            WpaEventP2pChannelSwitch(freq);
+            break;
+        }
+        default:
+            WIFI_LOGI("WpaEventStaNotifyCallBack() undefine event:%{public}d", num);
+            break;
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

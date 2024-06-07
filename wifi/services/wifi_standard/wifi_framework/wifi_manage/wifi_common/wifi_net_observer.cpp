@@ -93,6 +93,7 @@ int32_t NetStateObserver::OnNetDetectionResultChanged(
 
 sptr<NetHandle> NetStateObserver::GetWifiNetworkHandle()
 {
+#ifndef DTFUZZ_TEST
     std::list<sptr<NetHandle>> netList;
     int32_t ret = NetConnClient::GetInstance().GetAllNets(netList);
     if (ret != NETMANAGER_SUCCESS) {
@@ -107,6 +108,7 @@ sptr<NetHandle> NetStateObserver::GetWifiNetworkHandle()
         }
     }
     WIFI_LOGE("GetWifiNetworkHandle not find wifi network");
+#endif
     return nullptr;
 }
  

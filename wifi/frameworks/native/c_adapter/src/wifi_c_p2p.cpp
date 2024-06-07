@@ -194,6 +194,9 @@ static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevic
         WIFI_LOGE("Mac str to array failed!");
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
+    if (OHOS::Wifi::MacStrToArray(cppDevice.GetRandomDeviceAddress(), p2pDevice->randomDevAddr) != EOK) {
+        WIFI_LOGI("randomDevAddr Mac str to array failed!");
+    }
     p2pDevice->bssidType = cppDevice.GetDeviceAddressType();
     if (memcpy_s(p2pDevice->primaryDeviceType, DEVICE_TYPE_LENGTH,
         cppDevice.GetPrimaryDeviceType().c_str(), cppDevice.GetPrimaryDeviceType().size() + 1) != EOK) {
@@ -603,4 +606,10 @@ NO_SANITIZE("cfi") WifiErrorCode DisableRandomMac(int setmode)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->DisableRandomMac(setmode));
+}
+
+NO_SANITIZE("cfi") WifiErrorCode CheckCanUseP2p()
+{
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiP2pPtr->CheckCanUseP2p());
 }

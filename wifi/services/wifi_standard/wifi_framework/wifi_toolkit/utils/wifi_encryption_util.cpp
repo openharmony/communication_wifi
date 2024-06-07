@@ -49,7 +49,7 @@ int32_t SetUpHks()
 int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksParamSet *genParamSet)
 {
     struct HksBlob authId = wifiEncryptionInfo.keyAlias;
-    int32_t keyExist = HksKeyExist(&authId, nullptr);
+    int32_t keyExist = HksKeyExist(&authId, genParamSet);
     if (keyExist == HKS_ERROR_NOT_EXIST) {
         int32_t ret = HksGenerateKey(&authId, genParamSet, nullptr);
         if (ret != HKS_SUCCESS) {
@@ -147,7 +147,7 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     HksAddParams(decryParamSet, IVParam, sizeof(IVParam) / sizeof(HksParam));
     HksBuildParamSet(&decryParamSet);
 
-    int32_t ret = HksKeyExist(&authId, nullptr);
+    int32_t ret = HksKeyExist(&authId, decryParamSet);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("wifi decryption key not exist");
         return ret;

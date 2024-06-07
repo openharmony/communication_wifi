@@ -123,6 +123,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
 
     if (m_instId == 0) {
         WifiSettings::GetInstance().SetWifiToggledState(true);
+        WifiSettings::GetInstance().SetSemiWifiEnable(false);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
@@ -150,6 +151,8 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
 
     if (m_instId == 0) {
         WifiSettings::GetInstance().SetWifiToggledState(false);
+        WifiSettings::GetInstance().SetWifiAllowSemiActive(false);
+        WifiSettings::GetInstance().SetSemiWifiEnable(false);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
@@ -174,8 +177,22 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
         WIFI_LOGE("EnableSemiWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
+        WIFI_LOGE("EnableSemiWifi: Mdm forbidden PERMISSION_DENIED!");
+        return WIFI_OPT_ENTERPRISE_DENIED;
+    }
+    if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
+        WIFI_LOGI("current satellite mode and can not use sta, open failed!");
+        return WIFI_OPT_FORBID_AIRPLANE;
+    }
+#endif
+    if (m_instId == 0) {
+        WifiSettings::GetInstance().SetWifiToggledState(false);
+        WifiSettings::GetInstance().SetSemiWifiEnable(true);
+    }
 
-    return WIFI_OPT_SUCCESS;
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
@@ -630,6 +647,28 @@ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
         return WIFI_OPT_STA_NOT_OPENED;
     }
     return pService->RemoveAllDevice();
+}
+
+ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
+{
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("SetTxPower:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->SetTxPower(power);
 }
 
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
@@ -1203,7 +1242,7 @@ ErrCode WifiDeviceServiceImpl::GetWifiDetailState(WifiDetailState &state)
         WIFI_LOGE("GetWifiDetailState:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    state = WifiDetailState::STATE_UNKNOWN;
+    state = WifiConfigCenter::GetInstance().GetWifiDetailState(m_instId);
     WIFI_LOGI("GetWifiDetailState: state is %{public}d", static_cast<int>(state));
     return WIFI_OPT_SUCCESS;
 }
@@ -1540,14 +1579,12 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot!");
-    if (IsStaServiceRunning()) {
-        WIFI_LOGI("WifiDeviceServiceImpl FactoryReset IsStaServiceRunning, m_instId:%{public}d", m_instId);
-        if (m_instId == 0) {
-            WifiSettings::GetInstance().SetWifiToggledState(false);
-        }
-        WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
+    WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
+    if (m_instId == 0) {
+        WifiSettings::GetInstance().SetWifiToggledState(false);
+        WifiSettings::GetInstance().SetSemiWifiEnable(true);
     }
+    WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);
     WIFI_LOGI("WifiDeviceServiceImpl curState:%{public}d", curState);
     if (curState == WifiOprMidState::RUNNING) {

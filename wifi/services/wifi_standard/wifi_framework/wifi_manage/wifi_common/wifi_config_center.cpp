@@ -21,10 +21,20 @@ DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 
 namespace OHOS {
 namespace Wifi {
+#ifdef DTFUZZ_TEST
+static WifiConfigCenter* gWifiConfigCenter = nullptr;
+#endif
 WifiConfigCenter &WifiConfigCenter::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiConfigCenter gWifiConfigCenter;
     return gWifiConfigCenter;
+#else
+    if (gWifiConfigCenter == nullptr) {
+        gWifiConfigCenter = new (std::nothrow) WifiConfigCenter();
+    }
+    return *gWifiConfigCenter;
+#endif
 }
 
 WifiConfigCenter::WifiConfigCenter()
@@ -370,12 +380,12 @@ void WifiConfigCenter::SetWifiStateWhenAirplaneMode(bool bState)
     mWifiOpenedWhenAirplane = bState;
 }
 
-bool WifiConfigCenter::GetStaLastRunState(int instId)
+int WifiConfigCenter::GetStaLastRunState(int instId)
 {
     return WifiSettings::GetInstance().GetStaLastRunState(instId);
 }
 
-int WifiConfigCenter::SetStaLastRunState(bool bRun, int instId)
+int WifiConfigCenter::SetStaLastRunState(int bRun, int instId)
 {
     return WifiSettings::GetInstance().SetStaLastRunState(bRun, instId);
 }
@@ -410,16 +420,6 @@ bool WifiConfigCenter::SetWifiStateOnAirplaneChanged(const int &state)
 int WifiConfigCenter::GetAirplaneModeState() const
 {
     return WifiSettings::GetInstance().GetAirplaneModeState();
-}
-
-void WifiConfigCenter::SetPowerSleepState(const int &state)
-{
-    WifiSettings::GetInstance().SetPowerSleepState(state);
-}
-
-int WifiConfigCenter::GetPowerSleepState() const
-{
-    return WifiSettings::GetInstance().GetPowerSleepState();
 }
 
 void WifiConfigCenter::SetAppRunningState(ScanMode appRunMode)
@@ -514,6 +514,11 @@ void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state, int instId
     if (!ret.second) {
         mStaScanOnlyMidState[instId] = state;
     }
+}
+
+WifiDetailState WifiConfigCenter::GetWifiDetailState(int instId)
+{
+    return WifiSettings::GetInstance().GetWifiDetailState(instId);
 }
 
 int WifiConfigCenter::GetStaApExclusionType()

@@ -355,13 +355,6 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
         LOGE("NewConfigs is empty!");
         return;
     }
-
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-    for (auto &config : newConfigs) {
-        EncryptionDeviceConfig(config);
-    }
-#endif
-
     mSavedDeviceConfig.LoadConfig();
     std::vector<WifiDeviceConfig> localConfigs;
     mSavedDeviceConfig.GetValue(localConfigs);
@@ -376,10 +369,13 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
         auto iter = tmp.find(configKey);
         if (iter == tmp.end()) {
             tmp.insert(configKey);
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            EncryptionDeviceConfig(config);
+#endif
             localConfigs.push_back(config);
         }
     }
-
+    std::vector<WifiDeviceConfig>().swap(newConfigs);
     mSavedDeviceConfig.SetValue(localConfigs);
     mSavedDeviceConfig.SaveConfig();
     ReloadDeviceConfig();
@@ -482,7 +478,7 @@ int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
         return -1;
     }
     struct stat statBuf;
-    if (fstat(fd.Get(), &statBuf) < 0) {
+    if (fd.Get() < 0 || fstat(fd.Get(), &statBuf) < 0) {
         LOGE("OnRestore fstat fd fail.");
         return -1;
     }

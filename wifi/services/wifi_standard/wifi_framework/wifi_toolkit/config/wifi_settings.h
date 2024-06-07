@@ -183,6 +183,8 @@ public:
     std::string GetP2pIfaceName();
     void SetApIfaceName(const std::string &ifaceName);
     std::string GetApIfaceName();
+    void RecordWifiCategory(const std::string bssid, WifiCategory category);
+    void CleanWifiCategoryRecord();
 
     /**
      * @Description Has STA service running
@@ -1874,6 +1876,7 @@ private:
     std::mutex mSoftapToggledMutex;
     std::mutex mSyncWifiConfigMutex;
     std::mutex mUidMutex;
+    std::mutex mScanRecordMutex;
 
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
     std::atomic_flag mEncryptionOnBootFalg = ATOMIC_FLAG_INIT;
@@ -1895,6 +1898,7 @@ private:
     std::atomic_uint64_t mThreadStartTime { 0 };
     std::map<std::string, std::vector<std::string>> mFilterMap;
     std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+    std::map<std::string, WifiCategory> wifiCategoryRecord;
     std::vector<std::string> mAbnormalAppList;
 
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;

@@ -71,7 +71,7 @@ public:
      * @return 1: DEFAULT, 2: WIFI6, 3: WIFI6_PLUS
      */
     virtual WifiCategory GetWifiCategory(
-        std::vector<WifiInfoElem> infoElems, int chipsetCategory, int chipsetFeatrureCapability);
+        std::vector<WifiInfoElem> infoElems, int chipsetCategory, int chipsetFeatrureCapability) = 0;
 
     /**
      * @Description set low tx power

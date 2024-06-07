@@ -45,6 +45,10 @@ constexpr const char *SETTINGS_DATASHARE_URI_WIFI_ON =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=wifi_on";
 constexpr const char *SETTINGS_DATASHARE_KEY_WIFI_ON = "wifi_on";
 #endif
+constexpr const char *SETTINGS_DATASHARE_URI_WIFI_ALLOW_SEMI_ACTIVE =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=";
+constexpr const char *SETTINGS_DATASHARE_KEY_WIFI_ALLOW_SEMI_ACTIVE =
+    "settings.collaboration.multi_device_collaboration_service_switch";
 }
 
 class WifiDataShareHelperUtils : DelayedSingleton<WifiDataShareHelperUtils> {
@@ -114,6 +118,8 @@ public:
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(bool onlySettingsData = false);
+    void ClearResources(std::shared_ptr<DataShare::DataShareHelper> operatrPtr,
+        std::shared_ptr<DataShare::DataShareResultSet> result);
 };
 
 class IWifiDataShareRemoteBroker : public IRemoteBroker {

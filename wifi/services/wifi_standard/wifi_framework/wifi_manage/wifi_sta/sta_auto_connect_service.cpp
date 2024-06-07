@@ -17,6 +17,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
+#include "block_connect_service.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -86,6 +87,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     if (!AllowAutoSelectDevice(info) || !IsAllowAutoJoin()) {
         return;
     }
+    BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
@@ -437,14 +439,16 @@ bool StaAutoConnectService::AllowAutoSelectDevice(OHOS::Wifi::WifiLinkedInfo &in
     if (info.connState == DISCONNECTED || info.connState == UNKNOWN) {
         return true;
     }
-    WIFI_LOGI("Current linkInfo is not in DISCONNECTED state, skip network selection.");
+    WIFI_LOGI("Current linkInfo state:[%{public}d %{public}s] is not in DISCONNECTED state, skip network selection.",
+        info.connState, magic_enum::Enum2Name(info.connState).c_str());
     return false;
 }
 
 bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInfo> &scanInfos, WifiLinkedInfo &info)
 {
-    WIFI_LOGI("Allow auto select device, connState=%{public}d, detailedState=%{public}d\n",
-        info.connState, info.detailedState);
+    WIFI_LOGI("Allow auto select device, connState=%{public}d %{public}s, detailedState=%{public}d %{public}s\n",
+        info.connState, magic_enum::Enum2Name(info.connState).c_str(), info.detailedState,
+        magic_enum::Enum2Name(info.detailedState).c_str());
     if (scanInfos.empty()) {
         WIFI_LOGE("No network,skip network selection.\n");
         return false;

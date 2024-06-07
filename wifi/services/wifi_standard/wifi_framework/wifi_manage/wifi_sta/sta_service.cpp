@@ -217,6 +217,24 @@ ErrCode StaService::DisableWifi() const
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::EnableSemiWifi()
+{
+    WIFI_LOGI("Enter EnableSemiWifi.\n");
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+#ifndef OHOS_ARCH_LITE
+    // notification of registration country code change
+    std::string moduleName = "StaService_" + std::to_string(m_instId);
+    m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
+    if (m_staObserver == nullptr) {
+        WIFI_LOGI("m_staObserver is null\n");
+        return WIFI_OPT_FAILED;
+    }
+    WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
+#endif
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_SEMI_WIFI, STA_CONNECT_MODE);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId) const
 {
     LOGI("Enter AddCandidateConfig.\n");
@@ -446,8 +464,8 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     UpdateEapConfig(config, tempDeviceConfig.wifiEapConfig);
 
     /* Add the new network to WifiSettings. */
-    if (WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
-        LOGE("AddDeviceConfig EncryptionDeviceConfig failed");
+    if (!WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
+        LOGI("AddDeviceConfig EncryptionDeviceConfig failed");
     }
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
@@ -722,6 +740,17 @@ ErrCode StaService::SetPowerMode(bool mode) const
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::SetTxPower(int power) const
+{
+    LOGD("Enter SetTxPower, power=[%{public}d]!", power);
+    if (WifiStaHalInterface::GetInstance().SetTxPower(WifiSettings::GetInstance().GetStaIfaceName(), power)
+        != WIFI_IDL_OPT_OK) {
+        LOGE("SetTxPower() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 {
     WIFI_LOGI("Notify device config change: %{public}d\n", static_cast<int>(value));
@@ -863,16 +892,6 @@ ErrCode StaService::StartPortalCertification()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::RenewDhcp()
-{
-    if (pStaStateMachine == nullptr) {
-        WIFI_LOGE("pStaStateMachine is null!");
-        return WIFI_OPT_FAILED;
-    }
-    pStaStateMachine->RenewDhcp();
-    return WIFI_OPT_SUCCESS;
-}
-
 #ifndef OHOS_ARCH_LITE
 ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
@@ -907,6 +926,16 @@ ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_DELIVER_MAC, currentMac);
  
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::StartHttpDetect()
+{
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
+    pStaStateMachine->SendMessage(CMD_START_NETCHECK);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

@@ -284,6 +284,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode DisableRandomMac(int setmode) = 0;
+
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode CheckCanUseP2p() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

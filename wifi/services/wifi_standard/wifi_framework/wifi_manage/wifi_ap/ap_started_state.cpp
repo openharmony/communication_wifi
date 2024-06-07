@@ -35,6 +35,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_global_func.h"
 #include "wifi_cmd_client.h"
+#include "wifi_sta_hal_interface.h"
 #ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
 #define SET_DUAL_ANTENNAS 45
@@ -67,9 +68,7 @@ void ApStartedState::GoInState()
     m_ApStateMachine.RegisterEventHandler();
     StartMonitor();
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
-    HotspotConfig curApConfig;
-    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, m_id);
-    SetRandomMac(curApConfig, true);
+    SetRandomMac();
 #endif
     if (StartAp() == false) {
         WIFI_LOGE("enter ApstartedState is failed.");
@@ -95,16 +94,6 @@ void ApStartedState::GoInState()
     }
     UpdatePowerMode();
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
-#ifdef HAS_BATTERY_MANAGER_PART
-    if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
-        HotspotConfig hotspotConfig;
-        WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
-        if (hotspotConfig.GetBand() == BandType::BAND_2GHZ) {
-            std::string ifName = "wlan0";
-            WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_SOFTAP_2G_MSS, CMD_SET_SOFTAP_MIMOMODE);
-        }
-    }
-#endif
 }
 
 void ApStartedState::GoOutState()
@@ -171,12 +160,77 @@ bool ApStartedState::ExecuteStateMsg(InternalMessage *msg)
     return EXECUTED;
 }
 
+bool ApStartedState::UpdatMacAddress(const std::string ssid, KeyMgmt securityType)
+{
+    HotspotConfig curApConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, m_id);
+
+    LOGD("%{public}s: [ssid:%{private}s, securityType:%{public}d] ==> [ssid:%{private}s, securityType:%{public}d]",
+        __func__, curApConfig.GetSsid().c_str(), curApConfig.GetSecurityType(),
+        ssid.c_str(), securityType);
+    if ((curApConfig.GetSsid() != ssid) ||
+        (curApConfig.GetSecurityType() != securityType)) {
+        std::string macAddress;
+        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+        if (MacAddress::IsValidMac(macAddress.c_str())) {
+            if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
+                WifiSettings::GetInstance().GetApIfaceName(), macAddress) != WIFI_IDL_OPT_OK) {
+                LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
+                return false;
+            }
+        } else {
+            LOGW("%{public}s: macAddress is invalid", __func__);
+        }
+    }
+    return true;
+}
+
 bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 {
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
     m_ApConfigUse.UpdateApChannelConfig(apConfig);
     if (WifiApHalInterface::GetInstance().SetSoftApConfig(apConfig, m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
         WIFI_LOGE("set hostapd config failed.");
+        return false;
+    }
+
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    HotspotConfig curApConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, m_id);
+
+    LOGD("%{public}s: [ssid:%{private}s, securityType:%{public}d] ==> [ssid:%{private}s, securityType:%{public}d]",
+        __func__, curApConfig.GetSsid().c_str(), curApConfig.GetSecurityType(),
+        apConfig.GetSsid().c_str(), apConfig.GetSecurityType());
+    if ((curApConfig.GetSsid() != apConfig.GetSsid()) ||
+        (curApConfig.GetSecurityType() != apConfig.GetSecurityType())) {
+        std::string macAddress;
+        WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+        if (MacAddress::IsValidMac(macAddress.c_str())) {
+            if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
+                WifiSettings::GetInstance().GetApIfaceName(), macAddress) != WIFI_IDL_OPT_OK) {
+                LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
+                return false;
+            }
+        } else {
+            LOGW("%{public}s: macAddress is invalid", __func__);
+        }
+    }
+#endif
+
+    WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(
+        WifiSettings::GetInstance().GetApIfaceName(), true);
+#ifdef HAS_BATTERY_MANAGER_PART
+    if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
+        HotspotConfig hotspotConfig;
+        WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
+        if (hotspotConfig.GetBand() == BandType::BAND_2GHZ) {
+            std::string ifName = WifiSettings::GetInstance().GetApIfaceName();
+            WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_SOFTAP_2G_MSS, CMD_SET_SOFTAP_MIMOMODE);
+        }
+    }
+#endif
+    if (WifiApHalInterface::GetInstance().EnableAp(m_id) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WIFI_LOGE("Enableap failed.");
         return false;
     }
 
@@ -300,18 +354,20 @@ void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg)
 void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessage &msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    m_hotspotConfig.SetSsid(msg.GetStringFromMessage());
+    std::string ssid = msg.GetStringFromMessage();
+    KeyMgmt securityType = static_cast<KeyMgmt>(msg.GetIntFromMessage());
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    UpdatMacAddress(ssid, securityType);
+#endif
+    m_hotspotConfig.SetSsid(ssid);
     m_hotspotConfig.SetPreSharedKey(msg.GetStringFromMessage());
-    m_hotspotConfig.SetSecurityType(static_cast<KeyMgmt>(msg.GetIntFromMessage()));
+    m_hotspotConfig.SetSecurityType(securityType);
     m_hotspotConfig.SetBand(static_cast<BandType>(msg.GetIntFromMessage()));
     m_hotspotConfig.SetChannel(msg.GetIntFromMessage());
     m_hotspotConfig.SetBandWidth(msg.GetIntFromMessage());
     m_hotspotConfig.SetMaxConn(msg.GetIntFromMessage());
     m_hotspotConfig.SetIpAddress(msg.GetStringFromMessage());
     m_hotspotConfig.SetLeaseTime(msg.GetIntFromMessage());
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-    SetRandomMac(m_hotspotConfig, false);
-#endif
     if (SetConfig(m_hotspotConfig)) {
         WIFI_LOGI("SetSoftApConfig success.");
     } else {
@@ -418,35 +474,18 @@ void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg)
     WifiSettings::GetInstance().SetHotspotIdleTimeout(mTimeoutDelay);
 }
 
-bool ApStartedState::SetRandomMac(const HotspotConfig spotConfig, bool setSavedMac) const
+void ApStartedState::SetRandomMac() const
 {
-    SoftApRandomMac mac = {};
-    WifiSettings::GetInstance().GetApRandomMac(mac, m_id);
-    std::string ssid = spotConfig.GetSsid();
-    KeyMgmt securityType = spotConfig.GetSecurityType();
-
-    bool ifNeedUpdateMac = false;
-    if ((mac.randomMac == "") || (mac.ssid != ssid || mac.keyMgmt != securityType)) {
-        WifiSettings::GetInstance().GenerateRandomMacAddress(mac.randomMac);
-        if (!MacAddress::IsValidMac(mac.randomMac.c_str())) {
-            WIFI_LOGE("macAddress is invalid");
-            return false;
-        }
-        WIFI_LOGI("ssid, keyMgmt, %{private}s, %{public}d ==> %{private}s, %{public}d, randomMac ==> %{private}s",
-            SsidAnonymize(mac.ssid).c_str(), mac.keyMgmt, SsidAnonymize(ssid).c_str(), securityType,
-            MacAnonymize(mac.randomMac).c_str());
-        mac.ssid = ssid;
-        mac.keyMgmt = securityType;
-        ifNeedUpdateMac = true;
-    }
-    if (ifNeedUpdateMac || setSavedMac) {
-        WifiSettings::GetInstance().SetApRandomMac(mac, m_id);
+    std::string macAddress;
+    WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+    if (MacAddress::IsValidMac(macAddress.c_str())) {
         if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
-            WifiSettings::GetInstance().GetApIfaceName(), mac.randomMac) != WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("failed to set ap MAC address:%{private}s", mac.randomMac.c_str());
+            WifiSettings::GetInstance().GetApIfaceName(), macAddress) != WIFI_IDL_OPT_OK) {
+            LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
         }
+    } else {
+        LOGE("%{public}s: macAddress is invalid", __func__);
     }
-    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -83,6 +83,29 @@ StaServiceCallback SelfCureInterface::GetStaCallback() const
     return mStaCallback;
 }
 
+ErrCode SelfCureInterface::NotifyInternetFailureDetected(int forceNoHttpCheck)
+{
+    WIFI_LOGI("Enter %{public}s", __FUNCTION__);
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return WIFI_OPT_FAILED;
+    }
+    pSelfCureService->NotifyInternetFailureDetected(forceNoHttpCheck);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode SelfCureInterface::IsSelfCureOnGoing()
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return WIFI_OPT_FAILED;
+    }
+    pSelfCureService->IsSelfCureOnGoing();
+    return WIFI_OPT_SUCCESS;
+}
+
 void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     std::lock_guard<std::mutex> lock(mutex);

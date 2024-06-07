@@ -46,6 +46,7 @@ const std::string &WifiP2pServiceManager::GetQueryId() const
 
 unsigned char WifiP2pServiceManager::GetTransId()
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     transId++;
     if (transId == 0) {
         transId++;
@@ -84,6 +85,7 @@ bool WifiP2pServiceManager::RemoveLocalService(const WifiP2pServiceInfo &p2pSvrI
 }
 void WifiP2pServiceManager::ClearLocalService()
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     localServicesInfo.clear();
 }
 const std::vector<WifiP2pServiceInfo> &WifiP2pServiceManager::GetLocalServiceList()
@@ -275,6 +277,7 @@ WifiP2pServiceResponseList WifiP2pServiceManager::ProcessServiceRequestList(cons
     responseList.SetDialogToken(reqList.GetDialogToken());
     const std::vector<WifiP2pServiceRequest> &list = reqList.GetServiceRequestList();
 
+    std::unique_lock<std::mutex> lock(serviceMutex);
     for (const auto &request : list) {
         bool isFind = false;
         WifiP2pServiceResponse response;
@@ -369,6 +372,7 @@ void WifiP2pServiceManager::ClearAllRequestRecord()
 
 bool WifiP2pServiceManager::UpdateServiceName(const std::string &devAddr, const WifiP2pServiceResponse &svrInfo)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     auto iter = deviceService.find(devAddr);
     if (iter == deviceService.end()) {
         WIFI_LOGE("Cannot find %{private}s, update service name failed!", devAddr.c_str());

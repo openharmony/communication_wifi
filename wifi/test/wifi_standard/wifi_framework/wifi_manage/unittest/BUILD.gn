@@ -32,6 +32,7 @@ ohos_unittest("manager_unittest") {
   sources = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/app_network_speed_limit_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/speed_limit_configs_writer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/block_connect_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_app_state_aware.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_auth_center.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_cmd_client.cpp",
@@ -44,6 +45,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_internal_event_dispatcher.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_net_agent.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_net_observer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_netlink.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_notification_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_utils.cpp",
@@ -61,14 +63,15 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_event_subscriber_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_hotspot_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_location_mode_observer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_multi_vap_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_p2p_manager.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_power_state_listener.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_scan_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_toggler_manager.cpp",
     "//foundation/systemabilitymgr/samgr/services/samgr/native/source/service_registry.cpp",
     "Mock/mock_wifi_app_parser.cpp",
     "common/app_network_speed_limit_service_test.cpp",
+    "common/block_connect_service_test.cpp",
     "common/speed_limit_configs_writer_test.cpp",
     "common/wifi_app_state_aware_test.cpp",
     "common/wifi_auth_center_test.cpp",
@@ -82,6 +85,7 @@ ohos_unittest("manager_unittest") {
     "common/wifi_net_agent_test.cpp",
     "common/wifi_net_observer_test.cpp",
     "common/wifi_net_stats_manager_test.cpp",
+    "common/wifi_netlink_test.cpp",
     "common/wifi_permission_helper_test.cpp",
     "common/wifi_permission_utils_test.cpp",
     "common/wifi_protect_manager_test.cpp",
@@ -213,7 +217,6 @@ ohos_unittest("manager_unittest") {
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.powermgr_power_manager)) {
-    external_deps += [ "power_manager:powermgr_client" ]
     defines += [ "HAS_POWERMGR_PART" ]
   }
 

@@ -53,13 +53,6 @@ DhcpErrorCode __wrap_StopDhcpClient(const char *ifname, bool bIpv6)
     return MockDhcpService::GetInstance().StopDhcpClient(ifname, bIpv6);
 }
 
-DhcpErrorCode __real_RenewDhcpClient(const char *ifname);
-DhcpErrorCode __wrap_RenewDhcpClient(const char *ifname)
-{
-    WIFI_LOGI("SUN MockDhcpService::RenewDhcpClient");
-    return MockDhcpService::GetInstance().RenewDhcpClient(ifname);
-}
-
 DhcpErrorCode __real_RegisterDhcpServerCallBack(const char *ifname, const ServerCallBack *event);
 DhcpErrorCode __wrap_RegisterDhcpServerCallBack(const char *ifname, const ServerCallBack *event)
 {

@@ -281,7 +281,10 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
     WifiP2pDevice memberPeer = deviceManager.GetDevices(device.GetDeviceAddress());
     if (memberPeer.IsValid()) {
         memberPeer.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
+        memberPeer.SetRandomDeviceAddress(device.GetRandomDeviceAddress());
         groupManager.UpdateCurrGroupClient(memberPeer);
+        WIFI_LOGI("ProcessConnectEvt memberPeer:%{private}s %{private}s", memberPeer.GetDeviceAddress().c_str(),
+            memberPeer.GetRandomDeviceAddress().c_str());
     } else {
         groupManager.UpdateCurrGroupClient(device);
     }

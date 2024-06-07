@@ -127,7 +127,7 @@ DisableWifiFilter::~DisableWifiFilter()
 
 bool DisableWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return networkCandidate.wifiDeviceConfig.status == static_cast<int>(WifiDeviceConfigStatus::ENABLED);
+    return networkCandidate.wifiDeviceConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
 }
 
 MatchedUserSelectBssidWifiFilter::MatchedUserSelectBssidWifiFilter() : SimpleWifiFilter("matchUserSelect") {}

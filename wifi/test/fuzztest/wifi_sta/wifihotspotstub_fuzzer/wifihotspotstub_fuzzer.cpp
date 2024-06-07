@@ -20,6 +20,8 @@
 #include <cstdint>
 #include <unistd.h>
 #include "wifi_hotspot_stub.h"
+#include "wifi_device_stub.h"
+#include "wifi_device_service_impl.h"
 #include "message_parcel.h"
 #include "securec.h"
 #include "define.h"
@@ -32,39 +34,40 @@
 #include "wifi_config_center.h"
 #include "wifi_settings.h"
 #include "wifi_common_def.h"
+#include "wifi_manager.h"
+#include "wifi_net_agent.h"
 
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiHotspotService";
+const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceService";
 static bool g_isInsted = false;
 static std::mutex g_instanceLock;
-static sptr<WifiHotspotMgrServiceImpl> pWifiHotspotMgrServiceImpl = nullptr;
-static sptr<WifiHotspotServiceImpl> pWifiHotspotServiceImpl = nullptr;
+std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
+std::shared_ptr<WifiHotspotStub> pWifiHotspotServiceImpl = std::make_shared<WifiHotspotServiceImpl>();
+void MyExit()
+{
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
+    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
+    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
+    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
+    WifiManager::GetInstance().Exit();
+    sleep(5);
+    printf("exiting\n");
+}
 
 bool Init()
 {
     if (!g_isInsted) {
-        pWifiHotspotMgrServiceImpl = WifiHotspotMgrServiceImpl::GetInstance();
-        if (!pWifiHotspotMgrServiceImpl) {
-            LOGE("Init failed pWifiHotspotMgrServiceImpl is nullptr!");
+        if (WifiManager::GetInstance().Init() < 0) {
+            LOGE("WifiManager init failed!");
             return false;
         }
-        pWifiHotspotMgrServiceImpl->OnStart();
-        sptr<IRemoteObject> remote = pWifiHotspotMgrServiceImpl->GetWifiRemote(0);
-        if (!remote) {
-            LOGE("Init failed remote is nullptr!");
-            return false;
-        }
-        pWifiHotspotServiceImpl = iface_cast<WifiHotspotServiceImpl>(remote);
-        if (!pWifiHotspotServiceImpl) {
-            LOGE("Init failed pWifiHotspotServiceImpl is nullptr!");
-            return false;
-        }
-        if (WifiConfigCenter::GetInstance().GetApMidState(0) != WifiOprMidState::RUNNING) {
-            LOGE("Init setmidstate!");
-            WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::RUNNING, 0);
-        }
+        atexit(MyExit);
         g_isInsted = true;
     }
     return true;
@@ -81,8 +84,8 @@ bool OnRemoteRequest(uint32_t code, MessageParcel &data)
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = pWifiHotspotServiceImpl->OnRemoteRequest(code, data, reply, option);
-    return ret;
+    pWifiHotspotServiceImpl->OnRemoteRequest(code, data, reply, option);
+    return true;
 }
 
 void OnIsHotspotActiveFuzzTest(const uint8_t* data, size_t size)
@@ -301,13 +304,63 @@ void OnGetApIfaceNameFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_IFACE_NAME), datas);
 }
 
+void OnEnableWifiApTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP), datas);
+}
+
+void OnDisableWifiApTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI_AP), datas);
+}
+
+void OnEnableWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI),
+        datas, reply, option);
+}
+
+void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI),
+        datas, reply, option);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-
+    Init();
+    OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
+    OHOS::Wifi::OnEnableWifiApTest(data, size);
     OHOS::Wifi::OnIsHotspotActiveFuzzTest(data, size);
     OHOS::Wifi::OnGetApStateWifiFuzzTest(data, size);
     OHOS::Wifi::OnGetHotspotConfigFuzzTest(data, size);
@@ -326,6 +379,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnIsHotspotDualBandSupportedFuzzTest(data, size);
     OHOS::Wifi::OnSetApIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::OnGetApIfaceNameFuzzTest(data, size);
+    OHOS::Wifi::OnDisableWifiApTest(data, size);
+    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    sleep(4);
     return 0;
 }
 }

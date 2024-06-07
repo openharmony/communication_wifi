@@ -82,15 +82,19 @@ if (defined(ohos_lite)) {
       "-fPIC",
       "-Wl,-E",
     ]
+
+    external_deps = [ "init:libbegetutil" ]
   }
 } else {
   ohos_shared_library("wifi_toolkit") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true
@@ -119,6 +123,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_encryption) {
       defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
+    }
+
+    if (is_asan) {
+      defines += [ "DTFUZZ_TEST" ]
     }
 
     if (wifi_feature_with_random_mac_addr) {

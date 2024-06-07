@@ -825,7 +825,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
-    item.staLastState = false;
+    item.staLastState = 0;
     item.lastAirplaneMode = AIRPLANE_MODE_CLOSE;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
     item.scoretacticsScoreSlope = SCORE_SLOPE;
@@ -874,7 +874,7 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
     } else if (key == "openWifiWhenAirplane") {
         item.openWifiWhenAirplane = (std::stoi(value) != 0);
     } else if (key == "staLastState") {
-        item.staLastState = (std::stoi(value) != 0);
+        item.staLastState = std::stoi(value);
     } else if (key == "lastAirplaneMode") {
         item.lastAirplaneMode = std::stoi(value);
     } else if (key == "savedDeviceAppraisalPriority") {
@@ -1374,47 +1374,6 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     ss << "    " <<"randomMac=" << item.randomMac << std::endl;
     ss << "    " <<"fuzzyBssids=" << OutWifiStoreRandomMacBssids(item.fuzzyBssids) << std::endl;
     ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
-    return ss.str();
-}
-
-template <> void ClearTClass<SoftApRandomMac>(SoftApRandomMac &item)
-{
-    item.ssid.clear();
-    item.keyMgmt = KeyMgmt::NONE;
-    item.randomMac.clear();
-    return;
-}
-
-template <>
-int SetTClassKeyValue<SoftApRandomMac>(SoftApRandomMac &item, const std::string &key, const std::string &value)
-{
-    int errorKeyValue = 0;
-    if (key == "ssid") {
-        item.ssid = value;
-    } else if (key == "keyMgmt") {
-        item.keyMgmt = static_cast<KeyMgmt>(std::stoi(value));
-    } else if (key == "randomMac") {
-        item.randomMac = value;
-    } else {
-        LOGE("Invalid config key value");
-        errorKeyValue++;
-    }
-    return errorKeyValue;
-}
-
-template <> std::string GetTClassName<SoftApRandomMac>()
-{
-    return "SoftApRandomMac";
-}
-
-template <> std::string OutTClassString<SoftApRandomMac>(SoftApRandomMac &item)
-{
-    std::ostringstream ss;
-    ss << "    " <<"<SoftApRandomMac>" << std::endl;
-    ss << "    " <<"ssid=" << item.ssid << std::endl;
-    ss << "    " <<"keyMgmt=" << static_cast<int>(item.keyMgmt) << std::endl;
-    ss << "    " <<"randomMac=" << item.randomMac << std::endl;
-    ss << "    " <<"</SoftApRandomMac>" << std::endl;
     return ss.str();
 }
 

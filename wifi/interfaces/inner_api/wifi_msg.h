@@ -171,8 +171,13 @@ enum class WifiOperateState {
 enum class DisconnectDetailReason {
     UNUSED = 0,
     UNSPECIFIED = 1,
+    PREV_AUTH_NOT_VALID = 2,
     DEAUTH_STA_IS_LEFING = 3,
-    DISASSOC_STA_HAS_LEFT = 8
+    DISASSOC_DUE_TO_INACTIVITY = 4,
+    DISASSOC_AP_BUSY = 5,
+    DISASSOC_STA_HAS_LEFT = 8,
+    DISASSOC_IEEE_802_1X_AUTH_FAILED = 23,
+    DISASSOC_LOW_ACK = 34
 };
 
 struct WifiLinkedInfo {
@@ -264,6 +269,7 @@ struct WpsConfig {
 enum class WifiDeviceConfigStatus {
     ENABLED, /* enable */
     DISABLED, /* disabled */
+    PERMEMANTLY_DISABLED, /* permanently disabled */
     UNKNOWN
 };
 
@@ -493,12 +499,49 @@ public:
 
 enum class WifiPrivacyConfig { RANDOMMAC, DEVICEMAC };
 
+enum class DisabledReason {
+    DISABLED_UNKNOWN_REASON = -1,
+    DISABLED_NONE = 0,
+    DISABLED_ASSOCIATION_REJECTION = 1,
+    DISABLED_AUTHENTICATION_FAILURE = 2,
+    DISABLED_DHCP_FAILURE = 3,
+    DISABLED_NO_INTERNET_TEMPORARY = 4,
+    DISABLED_AUTHENTICATION_NO_CREDENTIALS = 5,
+    DISABLED_NO_INTERNET_PERMANENT = 6,
+    DISABLED_BY_WIFI_MANAGER = 7,
+    DISABLED_BY_WRONG_PASSWORD = 8,
+    DISABLED_AUTHENTICATION_NO_SUBSCRIPTION = 9,
+    DISABLED_AUTHENTICATION_PRIVATE_EAP_ERROR = 10,
+    DISABLED_NETWORK_NOT_FOUND = 1,
+    DISABLED_CONSECUTIVE_FAILURES = 12,
+    DISABLED_BY_SYSTEM = 13,
+    DISABLED_EAP_AKA_FAILURE = 14,
+    DISABLED_DISASSOC_REASON = 15,
+    NETWORK_SELECTION_DISABLED_MAX = 16
+};
+
+struct NetworkSelectionStatus {
+    WifiDeviceConfigStatus status;
+    DisabledReason networkSelectionDisableReason;
+    int64_t networkDisableTimeStamp;
+    int networkDisableCount;
+    NetworkSelectionStatus()
+    {
+        status = WifiDeviceConfigStatus::ENABLED;
+        networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
+        networkDisableTimeStamp = -1;
+        networkDisableCount = 0;
+    }
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
     int networkId;
     /* 0: CURRENT, using 1: DISABLED 2: ENABLED */
     int status;
+    /*  network selection status*/
+    NetworkSelectionStatus networkSelectionStatus;
     /* mac address */
     std::string bssid;
     /* bssid type. */
@@ -563,6 +606,7 @@ struct WifiDeviceConfig {
     int isReassocSelfCureWithFactoryMacAddress;
     int version;
     bool randomizedMacSuccessEver;
+
     WifiDeviceConfig()
     {
         instanceId = 0;

@@ -404,5 +404,12 @@ ErrCode WifiP2pImpl::DisableRandomMac(int setmode)
     RETURN_IF_FAIL(GetWifiP2pProxy());
     return client_->DisableRandomMac(setmode);
 }
+
+ErrCode WifiP2pImpl::CheckCanUseP2p()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->CheckCanUseP2p();
+}
 }  // namespace Wifi
 }  // namespace OHOS

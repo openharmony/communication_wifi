@@ -170,7 +170,6 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->GetSharedLinkCount();
     pP2pInterface->DecreaseSharedLink(interval);
     pP2pInterface->IncreaseSharedLink(interval);
-    pP2pInterface->SetGroupUid(period);
 }
 
 /* Fuzzer entry point */

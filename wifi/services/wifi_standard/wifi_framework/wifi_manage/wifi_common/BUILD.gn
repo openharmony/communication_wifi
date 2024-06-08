@@ -214,7 +214,7 @@ if (defined(ohos_lite)) {
       "FEATURE_SELF_CURE_SUPPORT",
     ]
 
-    if (is_asan) {
+    if (is_asan || use_clang_coverage) {
       defines += [ "DTFUZZ_TEST" ]
     }
 

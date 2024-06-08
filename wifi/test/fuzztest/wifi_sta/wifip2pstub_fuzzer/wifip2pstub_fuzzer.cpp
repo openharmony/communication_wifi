@@ -556,18 +556,6 @@ void OnHid2dSetUpperSceneFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE), datas);
 }
 
-void OnCheckCanUseP2pFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P), datas);
-}
-
 void DoSomethingInterestingWithMyAPIS(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
@@ -615,6 +603,43 @@ void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
     pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI),
         datas, reply, option);
 }
+
+void OnDiscoverPeersFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_PEERS),
+        datas, reply, option);
+}
+
+void OnDisableRandomMacFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC),
+        datas, reply, option);
+}
+
+void OnCheckCanUseP2pFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P),
+        datas, reply, option);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -623,9 +648,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     Init();
     OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
-    OHOS::Wifi::OnCheckCanUseP2pFuzzTest(data, size);
     OHOS::Wifi::DoSomethingInterestingWithMyAPIS(data, size);
     OHOS::Wifi::OnDiscoverDevicesFuzzTest(data, size);
+    OHOS::Wifi::OnDiscoverPeersFuzzTest(data, size);
+    OHOS::Wifi::OnDisableRandomMacFuzzTest(data, size);
+    OHOS::Wifi::OnCheckCanUseP2pFuzzTest(data, size);
     OHOS::Wifi::OnStopDiscoverDevicesFuzzTest(data, size);
     OHOS::Wifi::OnDiscoverServicesFuzzTest(data, size);
     OHOS::Wifi::OnStopDiscoverServicesFuzzTest(data, size);

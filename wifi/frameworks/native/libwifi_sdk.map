@@ -58,6 +58,7 @@
         GetIpInfo;
         GetSignalLevel;
         SetLowLatencyMode;
+        SetLowTxPower;
         IsBandTypeSupported;
         Get5GHzChannelList;
         RegisterWifiEvent;

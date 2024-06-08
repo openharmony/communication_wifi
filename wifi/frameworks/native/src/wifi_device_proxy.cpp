@@ -2071,6 +2071,46 @@ ErrCode WifiDeviceProxy::LimitSpeed(const int controlId, const int limitMode)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to %{public}s,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteString(wifiLowPowerParam.ifName);
+    data.WriteInt32(wifiLowPowerParam.scene);
+    data.WriteInt32(wifiLowPowerParam.rssiThreshold);
+    data.WriteString(wifiLowPowerParam.peerMacaddr);
+    data.WriteString(wifiLowPowerParam.powerParam);
+    data.WriteInt32(wifiLowPowerParam.powerParamLen);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("SetLowTxPower(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("SetLowTxPower Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetLowTxPower Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceProxy::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
 {
     if (mRemoteDied) {

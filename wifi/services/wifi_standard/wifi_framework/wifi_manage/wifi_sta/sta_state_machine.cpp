@@ -1103,9 +1103,9 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         LOGE("GetConnectSignalInfo return fail: %{public}d.", ret);
         return;
     }
-    LOGI("SignalPoll, bssid:%{public}s, freq:%{public}d, rssi:%{public}d, noise:%{public}d, "
-        "chload:%{public}d, snr:%{public}d, ulDelay:%{public}d, txLinkSpeed:%{public}d, rxLinkSpeed:%{public}d, "
-        "txBytes:%{public}d, rxBytes:%{public}d, txFailed:%{public}d, txPackets:%{public}d, rxPackets:%{public}d.",
+    LOGI("SignalPoll,bssid:%{public}s,freq:%{public}d,rssi:%{public}d noise:%{public}d, "
+        "chload:%{public}d,snr:%{public}d,ulDelay:%{public}d,txLinkSpeed:%{public}d,rxLinkSpeed:%{public}d, "
+        "txBytes:%{public}d,rxBytes:%{public}d,txFailed:%{public}d,txPackets:%{public}d,rxPackets:%{public}d.\n",
         MacAnonymize(linkedInfo.bssid).c_str(), signalInfo.frequency, signalInfo.signal, signalInfo.noise,
         signalInfo.chload, signalInfo.snr, signalInfo.ulDelay, signalInfo.txrate, signalInfo.rxrate, signalInfo.txBytes,
         signalInfo.rxBytes, signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets);
@@ -1121,8 +1121,8 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
             linkedInfo.rssi = setRssi(signalInfo.signal);
         }
         int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
-        LOGI("SignalPoll, networkId:%{public}d, ssid:%{public}s, rssi:%{public}d, band:%{public}d, "
-            "connState:%{public}d, detailedState:%{public}d, currentSignal:%{public}d, lastSignal:%{public}d.\n",
+        LOGI("SignalPoll,networkId:%{public}d,ssid:%{public}s,rssi:%{public}d,band:%{public}d, "
+            "connState:%{public}d,detailedState:%{public}d,currentSignal:%{public}d,lastSignal:%{public}d.\n",
             linkedInfo.networkId, SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.rssi, linkedInfo.band,
             linkedInfo.connState, linkedInfo.detailedState, currentSignalLevel, lastSignalLevel);
         if (currentSignalLevel != lastSignalLevel) {

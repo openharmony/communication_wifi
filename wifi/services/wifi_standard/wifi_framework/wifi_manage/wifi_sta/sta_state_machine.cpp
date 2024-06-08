@@ -111,8 +111,6 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
-static bool g_isHilinkFlag = false;
-
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -1316,23 +1314,6 @@ bool StaStateMachine::CheckRoamingBssidIsSame(std::string bssid)
     return false;
 }
 
-static void HilinkSetPskToConfig(int networkId)
-{
-    WIFI_LOGI("enter HilinkSetPskToConfig networkId:%{public}d", networkId);
-    WifiDeviceConfig config;
-    WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
-    if (g_isHilinkFlag && config.preSharedKey.empty()) {
-        WifiStaHalInterface::GetInstance().GetPskPassphrase("wlan0", config.preSharedKey);
-        config.version = -1;
-        if (!WifiSettings::GetInstance().EncryptionDeviceConfig(config)) {
-            LOGE("HilinkSetPskToConfig EncryptionDeviceConfig failed");
-        }
-    }
-    WifiSettings::GetInstance().AddDeviceConfig(config);
-    WifiSettings::GetInstance().SyncDeviceConfig();
-    g_isHilinkFlag = false;
-}
-
 bool StaStateMachine::CurrentIsRandomizedMac()
 {
     std::string curMacAddress = "";
@@ -1347,6 +1328,29 @@ bool StaStateMachine::CurrentIsRandomizedMac()
     return curMacAddress != realMacAddress;
 }
 
+void StaStateMachine::HilinkSaveConfig(void)
+{
+    WIFI_LOGI("enter HilinkSaveConfig");
+    WifiDeviceConfig outConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(m_hilinkDeviceConfig.ssid, m_hilinkDeviceConfig.keyMgmt,
+        outConfig) == 0) {
+        m_hilinkDeviceConfig.networkId = outConfig.networkId;
+    } else {
+        m_hilinkDeviceConfig.networkId = WifiSettings::GetInstance().GetNextNetworkId();
+    }
+
+    targetNetworkId = m_hilinkDeviceConfig.networkId;
+
+    WifiStaHalInterface::GetInstance().GetPskPassphrase("wlan0", m_hilinkDeviceConfig.preSharedKey);
+    m_hilinkDeviceConfig.version = -1;
+    if (!WifiSettings::GetInstance().EncryptionDeviceConfig(m_hilinkDeviceConfig)) {
+        LOGE("HilinkSaveConfig EncryptionDeviceConfig failed");
+    }
+    WifiSettings::GetInstance().AddDeviceConfig(m_hilinkDeviceConfig);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    m_hilinkFlag = false;
+}
+
 void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
 {
     if (msg == nullptr) {
@@ -1358,6 +1362,9 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
         WIFI_LOGE("DealConnectionEvent inconsistent bssid in connecter");
         return;
     }
+    if (m_hilinkFlag) {
+        HilinkSaveConfig();
+    }
     WIFI_LOGI("enter DealConnectionEvent");
     if (CurrentIsRandomizedMac()) {
         WifiSettings::GetInstance().SetDeviceRandomizedMacSuccessEver(targetNetworkId);
@@ -1366,7 +1373,6 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
     WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
-    HilinkSetPskToConfig(targetNetworkId);
     SaveWifiConfigForUpdate(targetNetworkId);
 #endif
     /* Stop clearing the Wpa_blocklist. */
@@ -3523,14 +3529,12 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessage *msg)
     WIFI_LOGI("DealHiLinkDataToWpa=%{public}d received.\n", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case WIFI_SVR_COM_STA_ENABLE_HILINK: {
-            int networkId = msg->GetParam1();
-            if (networkId != INVALID_NETWORK_ID) {
-                targetNetworkId = networkId;
-            }
-            std::string cmd;
-            msg->GetMessageObj(cmd);
-            LOGI("DealEnableHiLinkHandshake start shell cmd = %{public}s networkId = %{public}d",
-                MacAnonymize(cmd).c_str(), networkId);
+            m_hilinkDeviceConfig.bssidType = msg->GetParam1();
+            m_hilinkDeviceConfig.ssid = msg->GetStringFromMessage();
+            m_hilinkDeviceConfig.bssid = msg->GetStringFromMessage();
+            m_hilinkDeviceConfig.keyMgmt = msg->GetStringFromMessage();
+            std::string cmd = msg->GetStringFromMessage();
+            LOGI("DealEnableHiLinkHandshake start shell cmd = %{public}s", MacAnonymize(cmd).c_str());
             WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd);
             break;
         }
@@ -3556,7 +3560,7 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessage *msg)
             config.multiAp = 0;
             config.bssid = bssid;
             WifiStaHalInterface::GetInstance().StartWpsPbcMode(config);
-            g_isHilinkFlag = true;
+            m_hilinkFlag = true;
             break;
         }
         default:

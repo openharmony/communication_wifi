@@ -25,6 +25,11 @@ DEFINE_WIFILOG_LABEL("WifiDeviceProxy");
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int MAX_SIZE = 256;
+constexpr int MAX_ASHMEM_SIZE = 300;
+int g_bigDataRecvLen = 0;
+
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
     sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());
 
@@ -537,7 +542,6 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
 
 void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address)
 {
-    constexpr int MAX_SIZE = 256;
     address.family = reply.ReadInt32();
     address.addressIpv4 = reply.ReadInt32();
     int size = reply.ReadInt32();
@@ -547,6 +551,21 @@ void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address
     }
     for (int i = 0; i < size; i++) {
         address.addressIpv6.push_back(reply.ReadInt8());
+    }
+    return;
+}
+
+void WifiDeviceProxy::BigDataReadIpAddress(WifiIpAddress &address, std::vector<std::string> &tokens)
+{
+    address.family = std::stoi(tokens[g_bigDataRecvLen++]);
+    address.addressIpv4 = std::stoi(tokens[g_bigDataRecvLen++]);
+    int size = std::stoi(tokens[g_bigDataRecvLen++]);
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Read IP address size error: %{public}d", size);
+        return;
+    }
+    for (int i = 0; i < size; i++) {
+        address.addressIpv6[i] = std::stoi(tokens[g_bigDataRecvLen++]);
     }
     return;
 }
@@ -574,14 +593,105 @@ void WifiDeviceProxy::ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEap
     wifiEapConfig.eapSubId = reply.ReadInt32();
 }
 
-void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
+void WifiDeviceProxy::BigDataReadEapConfig(WifiEapConfig &wifiEapConfig, std::vector<std::string> &tokens)
 {
-    constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
-    int retSize = reply.ReadInt32();
-    if (retSize > MAX_DEVICE_CONFIG_SIZE) {
-        WIFI_LOGE("Parse device config size error: %{public}d", retSize);
+    wifiEapConfig.eap = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.phase2Method = Phase2Method(std::stoi(tokens[g_bigDataRecvLen++]));
+    wifiEapConfig.identity = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.anonymousIdentity = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.password = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.caCertPath = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.caCertAlias = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.clientCert = tokens[g_bigDataRecvLen++];
+    if (strcpy_s(wifiEapConfig.certPassword, sizeof(wifiEapConfig.certPassword),
+        tokens[g_bigDataRecvLen++].c_str()) != EOK) {
+        WIFI_LOGE("%{public}s: failed to copy", __func__);
+    }
+    wifiEapConfig.privateKey = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.altSubjectMatch = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.domainSuffixMatch = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.realm = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.plmn = tokens[g_bigDataRecvLen++];
+    wifiEapConfig.eapSubId = std::stoi(tokens[g_bigDataRecvLen++]);
+}
+
+std::vector<std::string> splitString(std::string str, char delimiter)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    size_t pos = 0;
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+        token = str.substr(0, pos);
+        tokens.push_back(token);
+        str.erase(0, pos + 1);
+    }
+    tokens.push_back(str);
+    return tokens;
+}
+
+void WifiDeviceProxy::ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize,
+    long len)
+{
+    WIFI_LOGI("WifiDeviceProxy ParseBigConfig");
+    sptr<Ashmem> ashmem = reply.ReadAshmem();
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        WIFI_LOGE("ParseDeviceConfigs ReadAshmem error");
         return;
     }
+ 
+    std::string net = (char *)ashmem->ReadFromAshmem(len, 0);
+    std::vector<std::string> tokens = splitString(net, ';');
+    for (int m = 0; m < retSize; ++m) {
+        WifiDeviceConfig config;
+        config.networkId = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.status = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.bssid = tokens[g_bigDataRecvLen++];
+        config.bssidType = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.ssid = tokens[g_bigDataRecvLen++];
+        config.band = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.channel = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.frequency = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.level = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.isPasspoint = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.isEphemeral = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.preSharedKey = tokens[g_bigDataRecvLen++];
+        config.keyMgmt = tokens[g_bigDataRecvLen++];
+        for (int j = 0; j < WEPKEYS_SIZE; j++) {
+            config.wepKeys[j] = tokens[g_bigDataRecvLen++];
+        }
+        config.wepTxKeyIndex = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.priority = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.hiddenSSID = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.wifiIpConfig.assignMethod = AssignIpMethod(std::stoi(tokens[g_bigDataRecvLen++]));
+        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.ipAddress.address, tokens);
+        config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.wifiIpConfig.staticIpAddress.ipAddress.flags = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.wifiIpConfig.staticIpAddress.ipAddress.scope = std::stoi(tokens[g_bigDataRecvLen++]);
+        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.gateway, tokens);
+        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.dnsServer1, tokens);
+        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.dnsServer2, tokens);
+        config.wifiIpConfig.staticIpAddress.domains = tokens[g_bigDataRecvLen++];
+        BigDataReadEapConfig(config.wifiEapConfig, tokens);
+        config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(std::stoi(tokens[g_bigDataRecvLen++]));
+        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = tokens[g_bigDataRecvLen++];
+        config.wifiProxyconfig.manualProxyConfig.serverHostName = tokens[g_bigDataRecvLen++];
+        config.wifiProxyconfig.manualProxyConfig.serverPort = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = tokens[g_bigDataRecvLen++];
+        config.wifiPrivacySetting = WifiPrivacyConfig(std::stoi(tokens[g_bigDataRecvLen++]));
+        config.uid = std::stoi(tokens[g_bigDataRecvLen++]);
+        config.callProcessName =tokens[g_bigDataRecvLen++];
+        config.ancoCallProcessName = tokens[g_bigDataRecvLen++];
+        result.emplace_back(config);
+    }
+    g_bigDataRecvLen = 0;
+    ashmem->UnmapAshmem();
+    ashmem->CloseAshmem();
+ 
+    return;
+}
+ 
+void WifiDeviceProxy::ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize)
+{
     for (int i = 0; i < retSize; ++i) {
         WifiDeviceConfig config;
         config.networkId = reply.ReadInt32();
@@ -624,6 +734,26 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.ancoCallProcessName = reply.ReadString();
         result.emplace_back(config);
     }
+}
+
+void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
+{
+    WIFI_LOGI("ParseDeviceConfigs");
+    constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
+    int retSize = reply.ReadInt32();
+    if (retSize > MAX_DEVICE_CONFIG_SIZE || retSize == 0) {
+        WIFI_LOGE("Parse device config size error: %{public}d", retSize);
+        return;
+    }
+    if (retSize > MAX_ASHMEM_SIZE) {
+        long len = reply.ReadInt64();
+        ParseBigConfig(reply, result, retSize, len);
+        return;
+    }
+ 
+    ParseSmallConfig(reply, result, retSize);
+ 
+    return;
 }
 
 ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)

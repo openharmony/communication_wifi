@@ -1010,6 +1010,12 @@ private:
      */
     bool CurrentIsRandomizedMac();
 
+    /**
+     * @Description : Hilink Save Data To Device Config.
+     *
+     */
+    void HilinkSaveConfig(void);
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.
@@ -1147,6 +1153,8 @@ private:
     StaSmHandleFuncMap staSmHandleFuncMap;
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
+    bool m_hilinkFlag = false;
+    WifiDeviceConfig m_hilinkDeviceConfig;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;

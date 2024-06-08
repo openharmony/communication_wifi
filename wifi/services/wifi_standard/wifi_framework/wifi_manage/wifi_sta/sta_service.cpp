@@ -904,20 +904,18 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
 }
 #endif
 
-ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
+ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd)
 {
-    int netWorkId = INVALID_NETWORK_ID;
-    if (bssid.find("ENABLE=1") != INVALID_NETWORK_ID) {
-        netWorkId = AddDeviceConfig(config);
-        if (netWorkId == INVALID_NETWORK_ID) {
-            WIFI_LOGE("EnableHiLinkHandshake, AddDeviceConfig failed!");
-            return WIFI_OPT_FAILED;
-        }
-    }
-    WIFI_LOGI("EnableHiLinkHandshake, netWorkId: %{public}d", netWorkId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_ENABLE_HILINK, netWorkId, 0, bssid);
- 
+    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    msg->SetMessageName(WIFI_SVR_COM_STA_ENABLE_HILINK);
+    msg->SetParam1(config.bssidType);
+    msg->AddStringMessageBody(config.ssid);
+    msg->AddStringMessageBody(config.bssid);
+    msg->AddStringMessageBody(config.keyMgmt);
+    msg->AddStringMessageBody(cmd);
+    pStaStateMachine->SendMessage(msg);
+
     return WIFI_OPT_SUCCESS;
 }
  

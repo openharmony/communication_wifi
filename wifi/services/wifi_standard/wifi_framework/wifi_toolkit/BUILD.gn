@@ -125,7 +125,7 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
     }
 
-    if (is_asan) {
+    if (is_asan || use_clang_coverage) {
       defines += [ "DTFUZZ_TEST" ]
     }
 

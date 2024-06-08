@@ -32,6 +32,7 @@ ohos_fuzztest("WifiScanServerFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/",
@@ -54,7 +55,6 @@ ohos_fuzztest("WifiScanServerFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-
   defines = [
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
     "FEATURE_AP_SUPPORT",
@@ -62,11 +62,9 @@ ohos_fuzztest("WifiScanServerFuzzTest") {
     "FEATURE_P2P_SUPPORT",
     "private=public",
   ]
-
-   if (is_asan || use_clang_coverage) {
+  if (is_asan || use_clang_coverage) {
     defines += [ "DTFUZZ_TEST" ]
   }
-
   sources = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_monitor.cpp",

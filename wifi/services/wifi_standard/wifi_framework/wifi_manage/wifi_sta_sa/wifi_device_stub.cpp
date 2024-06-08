@@ -28,6 +28,9 @@ DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int MAX_ASHMEM_SIZE = 300;
+
 WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
 {
     WIFI_LOGI("enter WifiDeviceStub!");
@@ -445,6 +448,28 @@ void WifiDeviceStub::WriteEapConfig(MessageParcel &reply, const WifiEapConfig &w
     reply.WriteInt32(wifiEapConfig.eapSubId);
 }
 
+void WifiDeviceStub::BigDataWriteEapConfig(const WifiEapConfig &wifiEapConfig, std::stringstream &bigDataStream)
+{
+    bigDataStream << wifiEapConfig.eap << ";";
+    bigDataStream << static_cast<int>(wifiEapConfig.phase2Method) << ";";
+    bigDataStream << wifiEapConfig.identity << ";";
+    bigDataStream << wifiEapConfig.anonymousIdentity << ";";
+    bigDataStream << wifiEapConfig.password << ";";
+ 
+    bigDataStream << wifiEapConfig.caCertPath << ";";
+    bigDataStream << wifiEapConfig.caCertAlias << ";";
+ 
+    bigDataStream << wifiEapConfig.clientCert << ";";
+    bigDataStream << std::string(wifiEapConfig.certPassword) << ";";
+    bigDataStream << wifiEapConfig.privateKey << ";";
+ 
+    bigDataStream << wifiEapConfig.altSubjectMatch << ";";
+    bigDataStream << wifiEapConfig.domainSuffixMatch << ";";
+    bigDataStream << wifiEapConfig.realm << ";";
+    bigDataStream << wifiEapConfig.plmn << ";";
+    bigDataStream << wifiEapConfig.eapSubId << ";";
+}
+
 void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config)
 {
     reply.WriteInt32(config.networkId);
@@ -501,6 +526,19 @@ void WifiDeviceStub::WriteIpAddress(MessageParcel &reply, const WifiIpAddress &a
     return;
 }
 
+void WifiDeviceStub::BigDataWriteIpAddress(const WifiIpAddress &address, std::stringstream &bigDataStream)
+{
+    bigDataStream << address.family << ";";
+    bigDataStream << address.addressIpv4 << ";";
+    int size = address.addressIpv6.size();
+    bigDataStream << size << ";";
+    for (int i = 0; i < size; i++) {
+        bigDataStream << address.addressIpv6[i] << ";";
+    }
+ 
+    return;
+}
+
 void WifiDeviceStub::OnRemoveDevice(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -522,6 +560,82 @@ void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, MessageParcel &data, Messa
     return;
 }
 
+void WifiDeviceStub::SendBigConfig(int contentSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
+{
+    WIFI_LOGI("WifiDeviceStub SendBigConfig");
+    std::string name = "deviceconfigs";
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), contentSize * sizeof(WifiDeviceConfig));
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        reply.WriteInt32(WIFI_OPT_FAILED);
+        if (ashmem != nullptr) {
+            ashmem->UnmapAshmem();
+            ashmem->CloseAshmem();
+        }
+        return;
+    }
+    std::stringstream bigDataStream;
+    for (unsigned int i = 0; i < contentSize; ++i) {
+        bigDataStream << result[i].networkId << ";";
+        bigDataStream << result[i].status << ";";
+        bigDataStream << result[i].bssid << ";";
+        bigDataStream << result[i].bssidType << ";";
+        bigDataStream << result[i].ssid << ";";
+        bigDataStream << result[i].band << ";";
+        bigDataStream << result[i].channel << ";";
+        bigDataStream << result[i].frequency << ";";
+        bigDataStream << result[i].level << ";";
+        bigDataStream << result[i].isPasspoint << ";";
+        bigDataStream << result[i].isEphemeral << ";";
+        bigDataStream << result[i].preSharedKey << ";";
+        bigDataStream << result[i].keyMgmt << ";";
+        for (int j = 0; j < WEPKEYS_SIZE; j++) {
+            bigDataStream << result[i].wepKeys[j] << ";";
+        }
+        bigDataStream << result[i].wepTxKeyIndex << ";";
+        bigDataStream << result[i].priority << ";";
+        bigDataStream << result[i].hiddenSSID << ";";
+        bigDataStream << (int)result[i].wifiIpConfig.assignMethod << ";";
+        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.ipAddress.address, bigDataStream);
+        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.prefixLength << ";";
+        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.flags << ";";
+        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.scope << ";";
+        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.gateway, bigDataStream);
+        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.dnsServer1, bigDataStream);
+        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.dnsServer2, bigDataStream);
+        bigDataStream << result[i].wifiIpConfig.staticIpAddress.domains << ";";
+        BigDataWriteEapConfig(result[i].wifiEapConfig, bigDataStream);
+        bigDataStream << (int)result[i].wifiProxyconfig.configureMethod << ";";
+        bigDataStream << result[i].wifiProxyconfig.autoProxyConfig.pacWebAddress << ";";
+        bigDataStream << result[i].wifiProxyconfig.manualProxyConfig.serverHostName << ";";
+        bigDataStream << result[i].wifiProxyconfig.manualProxyConfig.serverPort << ";";
+        bigDataStream << result[i].wifiProxyconfig.manualProxyConfig.exclusionObjectList << ";";
+        bigDataStream << (int)result[i].wifiPrivacySetting << ";";
+        bigDataStream << result[i].uid << ";";
+        bigDataStream << result[i].callProcessName << ";";
+        bigDataStream << result[i].ancoCallProcessName << ";";
+    }
+    reply.WriteInt32(WIFI_OPT_SUCCESS);
+    reply.WriteInt32(contentSize);
+    long len = bigDataStream.str().length();
+    reply.WriteInt64(len);
+    ashmem->WriteToAshmem(bigDataStream.str().c_str(), bigDataStream.str().length(), 0);
+    reply.WriteAshmem(ashmem);
+ 
+    ashmem->UnmapAshmem();
+    ashmem->CloseAshmem();
+}
+
+void WifiDeviceStub::SendSmallConfig(int32_t size, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
+{
+    reply.WriteInt32(WIFI_OPT_SUCCESS);
+    reply.WriteInt32(size);
+    for (unsigned int i = 0; i < size; ++i) {
+        WriteWifiDeviceConfig(reply, result[i]);
+    }
+ 
+    return;
+}
+
 void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -529,15 +643,17 @@ void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, Mess
     std::vector<WifiDeviceConfig> result;
     ErrCode ret = GetDeviceConfigs(result, isCandidate);
     reply.WriteInt32(0);
-    reply.WriteInt32(ret);
 
-    if (ret == WIFI_OPT_SUCCESS) {
-        unsigned int size = result.size();
-        reply.WriteInt32(size);
-        for (unsigned int i = 0; i < size; ++i) {
-            WriteWifiDeviceConfig(reply, result[i]);
-        }
+    if (ret != WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(ret);
+        return;
     }
+    unsigned int size = result.size();
+    if (size > MAX_ASHMEM_SIZE) {
+        SendBigConfig(size, result, reply);
+        return;
+    }
+    SendSmallConfig(size, result, reply);
     return;
 }
 

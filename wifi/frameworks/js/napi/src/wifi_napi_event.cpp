@@ -89,7 +89,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         [](uv_work_t* work) {},
         [](uv_work_t* work, int status) {
             AsyncEventData *asyncData = static_cast<AsyncEventData*>(work->data);
-            WIFI_LOGI("uv_queue_work, env: %{private}p, status: %{public}d, eventType: %{public}s",
+            WIFI_LOGD("uv_queue_work, env: %{private}p, status: %{public}d, eventType: %{public}s",
                 asyncData->env, status, asyncData->eventType.c_str());
             napi_value handler = nullptr;
             napi_handle_scope scope = nullptr;

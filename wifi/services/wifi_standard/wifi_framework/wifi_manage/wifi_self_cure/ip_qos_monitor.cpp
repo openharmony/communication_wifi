@@ -80,7 +80,7 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t currentRssi = linkedInfo.rssi;
-    int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.frequency);
+    int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, mInstId);
     if ((mInternetFailedCounter >= 1) && (linkedInfo.connState == ConnState::CONNECTED)) {
         ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
         if (pSelfCureService == nullptr) {

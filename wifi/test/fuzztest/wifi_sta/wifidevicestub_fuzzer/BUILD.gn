@@ -76,7 +76,7 @@ ohos_fuzztest("WifiDeviceStubFuzzTest") {
     "private=public",
   ]
 
-  if (is_asan) {
+  if (is_asan || use_clang_coverage) {
     defines += [ "DTFUZZ_TEST" ]
   }
 

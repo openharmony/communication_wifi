@@ -510,13 +510,16 @@ int32_t OnEventGroupInfoStarted(struct IWpaCallback *self,
         return 1;
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    char tempSsid[WIFI_SSID_LENGTH] = {0};
     if (cbk.onGroupStarted) {
         OHOS::Wifi::IdlP2pGroupInfo cbInfo;
         cbInfo.isGo = groupStartedParam->isGo;
         cbInfo.isPersistent = groupStartedParam->isPersistent;
         cbInfo.frequency = groupStartedParam->frequency;
         cbInfo.groupName = (char *)(groupStartedParam->groupIfName);
-        cbInfo.ssid = (char *)(groupStartedParam->ssid);
+        StrSafeCopy(tempSsid, sizeof(tempSsid), (char *)groupStartedParam->ssid);
+        PrintfDecode((u8 *)tempSsid, sizeof(tempSsid), tempSsid);
+        cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
         char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};

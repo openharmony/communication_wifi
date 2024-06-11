@@ -464,7 +464,7 @@ void ConvertDecStrToHexStr(const std::string &inData, std::string &outData);
  * @param subEnd - find substring end
  */
 void SplitStringBySubstring(const std::string &inData, std::string &outData, const std::string &subBegin,
-    const std::string &subEnd)
+    const std::string &subEnd);
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

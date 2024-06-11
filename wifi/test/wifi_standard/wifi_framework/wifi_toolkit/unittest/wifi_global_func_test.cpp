@@ -348,7 +348,7 @@ HWTEST_F(WifiGlobalFuncTest, ConvertDecStrToHexStrTest, TestSize.Level1)
     const std::string inData = "1,2,3,4,5,6";
     std::string outData;
     ConvertDecStrToHexStr(inData, outData);
-    EXPECT_TRUE(outData = "010203040506");
+    EXPECT_TRUE(outData == "010203040506");
 }
 
 HWTEST_F(WifiGlobalFuncTest, SplitStringBySubstringTest1, TestSize.Level1)
@@ -358,7 +358,7 @@ HWTEST_F(WifiGlobalFuncTest, SplitStringBySubstringTest1, TestSize.Level1)
     const std::string subEnd = "world";
     std::string outData;
     SplitStringBySubstring(inData, outData, subBegin, subEnd);
-    EXPECT_TRUE(outData = "hello world");
+    EXPECT_TRUE(outData == "hello world");
 }
 
 HWTEST_F(WifiGlobalFuncTest, SplitStringBySubstringTest2, TestSize.Level1)

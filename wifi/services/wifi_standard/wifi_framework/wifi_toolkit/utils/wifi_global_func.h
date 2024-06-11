@@ -454,6 +454,17 @@ bool ParseJson(const std::string &jsonString, const std::string &type, const std
  * @param outData - hexstring
  */
 void ConvertDecStrToHexStr(const std::string &inData, std::string &outData);
+
+/**
+ * @Description Split string by substrings
+ *
+ * @param inData - in data
+ * @param outData - out data
+ * @param subBegin - find substring begin
+ * @param subEnd - find substring end
+ */
+void SplitStringBySubstring(const std::string &inData, std::string &outData, const std::string &subBegin,
+    const std::string &subEnd)
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

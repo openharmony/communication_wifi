@@ -186,6 +186,10 @@ void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)
     pScanService->SystemScanByInterval(appId, staScene, appId);
 }
 
+
+
+
+
 void GetAllowBandFreqsControlInfoFuzzTest(const uint8_t* data, size_t size)
 {
     std::vector<int> freqs;

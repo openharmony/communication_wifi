@@ -186,6 +186,10 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->SetRoamBlockedBssidFirmware(blocklistBssids);
 }
 
+
+
+
+
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     if (!OHOS::Wifi::InitParam()) {

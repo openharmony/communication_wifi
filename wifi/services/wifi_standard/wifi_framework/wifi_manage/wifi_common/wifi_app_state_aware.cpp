@@ -102,7 +102,7 @@ bool WifiAppStateAware::Connect()
 
 void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
 {
-    WIFI_LOGI("%{public}s enter, delayTime: %{public}lld", __func__, delayTime);
+    WIFI_LOGI("%{public}s enter", __func__);
     if (appChangeEventHandler) {
         std::function<void()> RegisterAppStateObserverFunc =
             std::bind(&WifiAppStateAware::RegisterAppStateObserver, this);

@@ -462,7 +462,7 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
     char *buffer = (char *)malloc(statBuf.st_size);
     if (buffer == nullptr) {
         LOGE("GetConfigbyBackupXml malloc fail.");
-        return -1
+        return -1;
     }
     ssize_t bufferLen = read(fd.Get(), buffer, statBuf.st_size);
     if (bufferLen < 0) {
@@ -471,10 +471,10 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
         return -1;
     }
     std::string backupData = std::string(buffer, buffer + bufferLen);
-    if (memset_s(buffer, statBuf.st_size, 0 , statBuf.st_size) != EOK) {
+    if (memset_s(buffer, statBuf.st_size, 0, statBuf.st_size) != EOK) {
         LOGE("GetConfigbyBackupXml memset_s fail.");
         free(buffer);
-        return -1; 
+        return -1;
     }
     free(buffer);
     buffer = nullptr;
@@ -502,21 +502,21 @@ int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceCon
     const std::string &key, const std::string &iv)
 {
     if (key.size() == 0 || iv.size() == 0) {
-        LOGE("OnRestore key or iv is empty.");
+        LOGE("GetConfigbyBackupFile key or iv is empty.");
         return -1;
     }
     struct stat statBuf;
     if (fd.Get() < 0 || fstat(fd.Get(), &statBuf) < 0) {
-        LOGE("OnRestore fstat fd fail.");
+        LOGE("GetConfigbyBackupFile fstat fd fail.");
         return -1;
     }
     int destFd = open(BACKUP_CONFIG_FILE_PATH, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
     if (destFd < 0) {
-        LOGE("OnRestore open file fail.");
+        LOGE("GetConfigbyBackupFile open file fail.");
         return -1;
     }
     if (sendfile(destFd, fd.Get(), nullptr, statBuf.st_size) < 0) {
-        LOGE("OnRestore fd sendfile(size: %{public}d) to destFd fail.", static_cast<int>(statBuf.st_size));
+        LOGE("GetConfigbyBackupFile fd sendfile(size: %{public}d) to destFd fail.", static_cast<int>(statBuf.st_size));
         close(destFd);
         return -1;
     }

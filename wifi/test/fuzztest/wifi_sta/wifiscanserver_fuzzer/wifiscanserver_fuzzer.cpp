@@ -33,6 +33,7 @@ constexpr int THREE = 3;
 constexpr int TWO = 3;
 constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int SIZE = 10;
+constexpr int SIZE_NUMBER = 100;
 static bool g_isInsted = false;
 static std::unique_ptr<ScanService> pScanService = nullptr;
 static std::unique_ptr<ScanInterface> pScanInterface = nullptr;
@@ -178,7 +179,7 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     ScanStatusReport scanReport;
     scanReport.scanInfoList.push_back(scanInfoList);
     scanReport.requestIndexList.push_back(static_cast<int>(data[0]));
-    scanReport.innerEvent = static_cast<ScanInnerEventType>(static_cast<int>(data[0]) % THREE + 100);
+    scanReport.innerEvent = static_cast<ScanInnerEventType>(static_cast<int>(data[0]) % THREE + SIZE_NUMBER);
     scanReport.status = static_cast<ScanStatus>(static_cast<int>(data[0]) % SIZE);
     ScanIntervalMode scanIntervalMode;
     scanIntervalMode.intervalMode = static_cast<IntervalMode>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);

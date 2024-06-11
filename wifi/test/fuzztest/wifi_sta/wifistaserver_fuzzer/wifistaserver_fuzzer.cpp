@@ -138,7 +138,6 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
 
 void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
 {
-
     std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
     bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
     int frequency = static_cast<int>(data[0]);
@@ -155,7 +154,7 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     std::vector<InterScanInfo> scanInfo;
     scanInfo.push_back(scanInfoList);
     WifiLinkedInfo info;
-    if (size >= sizeof(WifiLinkedInfo)) { 
+    if (size >= sizeof(WifiLinkedInfo)) {
         int index = 0;
         info.networkId = static_cast<int>(data[index++]);
         info.rssi = static_cast<int>(data[index++]);

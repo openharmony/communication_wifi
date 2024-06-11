@@ -24,6 +24,7 @@
 #include "wifi_log.h"
 #include "scan_interface.h"
 #include "wifi_internal_msg.h"
+#include "scan_service.h"
 #include <mutex>
 
 namespace OHOS {
@@ -39,7 +40,7 @@ void MyExit()
 {
     pScanService.reset();
     pScanInterface.reset();
-    sleep(THREE);
+    sleep(3);
     printf("exiting\n");
 }
 
@@ -62,7 +63,6 @@ void InitParam()
 void ScanInterfaceFuzzTest(const uint8_t* data, size_t size)
 {
     pScanService->scanStartedFlag = true;
-
     int index = 0;
     bool state = (static_cast<int>(data[0]) % TWO) ? true : false;
     int period = static_cast<int>(data[index++]);
@@ -82,7 +82,7 @@ void ScanInterfaceFuzzTest(const uint8_t* data, size_t size)
     std::map<int, time_t> sceneMap;
     pScanInterface->OnGetCustomSceneState(sceneMap);
     pScanInterface->OnControlStrategyChanged();
-    ScanInnerEventType innerEvent = static_cast<ScanInnerEventType>(static_cast<int>(data[0]) % THREE + 100);
+    ScanInnerEventType innerEvent = static_cast<ScanInnerEventType>(static_cast<int>(data[0]) % THREE + 200);
     pScanService->HandleInnerEventReport(innerEvent);
     pScanService->ScanWithParam(wifiScanParams);
     pScanService->StartWifiPnoScan(state, period, interval);
@@ -155,7 +155,15 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     InterScanInfo scanInfoList;
     scanInfoList.channelWidth = static_cast<WifiChannelWidth>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
     scanInfoList.wifiMode = static_cast<int>(data[0]);
+    scanInfoList.timestamp = static_cast<int64_t>(data[0]);
+    scanInfoList.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    scanInfoList.rssi = static_cast<int>(data[0]);
+    scanInfoList.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    scanInfoList.capabilities = std::string(reinterpret_cast<const char*>(data), size);
+    scanInfoList.frequency = static_cast<int>(data[0]);
+    scanInfoList.features = static_cast<int64_t>(data[0]);
     int appId = static_cast<int>(data[0]);
+    time_t now = time(nullptr);
     std::vector<InterScanInfo> infoList;
     infoList.push_back(scanInfoList);
     pScanService->StoreRequestScanConfig(scanConfig, interConfig);
@@ -167,6 +175,46 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     pScanService->AllowExternScan();
     pScanService->HandleCustomStatusChanged(appId, appId);
     pScanService->IsPackageInTrustList(config.ssid, appId, config.bssid);
+    ScanStatusReport scanReport;
+    scanReport.scanInfoList.push_back(scanInfoList);
+    scanReport.requestIndexList.push_back(static_cast<int>(data[0]));
+    scanReport.innerEvent = static_cast<ScanInnerEventType>(static_cast<int>(data[0]) % THREE + 100);
+    scanReport.status = static_cast<ScanStatus>(static_cast<int>(data[0]) % SIZE);
+    ScanIntervalMode scanIntervalMode;
+    scanIntervalMode.intervalMode = static_cast<IntervalMode>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
+    scanIntervalMode.isSingle =  (static_cast<int>(data[0]) % TWO) ? true : false;
+    scanIntervalMode.scanMode = static_cast<ScanMode>(static_cast<int>(data[0]) % SIZE);
+    scanIntervalMode.scanScene = static_cast<int>(data[0]);
+    scanIntervalMode.interval = static_cast<int>(data[0]);
+    scanIntervalMode.count = static_cast<int>(data[0]);
+    SingleAppForbid singleAppForbid;
+    singleAppForbid.scanIntervalMode = scanIntervalMode;
+    singleAppForbid.expScanCount = static_cast<int>(data[0]);
+    singleAppForbid.fixedScanCount = static_cast<int>(data[0]);
+    singleAppForbid.appID = static_cast<int>(data[0]);
+    pScanService->InitChipsetInfo();
+    pScanService->SystemScanDisconnectedPolicy(appId, appId);
+    pScanService->SystemScanConnectedPolicy(appId);
+    pScanService->IsPackageInTrustList(config.ssid, appId, config.bssid);
+    pScanService->AllowScanByIntervalBlocklist(appId, now, appId, appId, appId);
+    pScanService->AllowScanByIntervalContinue(now, appId, appId, appId);
+    pScanService->AllowScanByIntervalFixed(appId, now, appId, appId);
+    pScanService->AllowFullAppScanByInterval(appId, scanIntervalMode);
+    pScanService->AllowSingleAppScanByInterval(appId, scanIntervalMode);
+    pScanService->ExternScanByInterval(appId, singleAppForbid);
+    pScanService->SystemScanByInterval(appId, appId, appId);
+    pScanService->PnoScanByInterval(appId, now, appId, appId);
+    pScanService->SetStaCurrentTime();
+    ScanService::ScanType scanType = static_cast<ScanService::ScanType>(static_cast<int>(data[0]) % THREE);
+    pScanService->ApplyTrustListPolicy(scanType);
+    pScanService->AllowExternScan();
+    pScanService->HandleDisconnectedScanTimeout();
+    pScanService->DisconnectedTimerScan();
+    pScanService->HandleCustomStatusChanged(appId, appId);
+    int status =  (static_cast<int>(data[0]) % SIZE + 17);
+    pScanService->HandleNetworkQualityChanged(status);
+    pScanService->HandleNetworkQualityChanged(status);
+    pScanService->HandlePnoScanInfo(infoList);
 }
 
 void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)
@@ -179,16 +227,11 @@ void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)
     pScanService->AllowScanDuringScreenOff(scanMode);
     pScanService->AllowScanByMovingFreeze(scanMode);
     pScanService->IsMovingFreezeState(scanMode);
-
     pScanService->AllowExternScanByInterval(appId, staScene, scanMode);
     pScanService->AllowExternScanByIntervalMode(appId, staScene, scanMode);
     pScanService->AllowExternScanByCustomScene(appId, scanMode);
     pScanService->SystemScanByInterval(appId, staScene, appId);
 }
-
-
-
-
 
 void GetAllowBandFreqsControlInfoFuzzTest(const uint8_t* data, size_t size)
 {
@@ -199,15 +242,14 @@ void GetAllowBandFreqsControlInfoFuzzTest(const uint8_t* data, size_t size)
     pScanService->GetAllowBandFreqsControlInfo(scanBand, freqs);
     pScanService->Delete24GhzFreqs(freqs);
     pScanService->Delete5GhzFreqs(freqs);
-
     pScanService->ConvertBandNotAllow24G(scanBand);
     pScanService->ConvertBandNotAllow5G(scanBand);
-
     std::vector<std::string> savedNetworkSsid;
     savedNetworkSsid.push_back(std::string(reinterpret_cast<const char*>(data), size));
     pScanService->GetSavedNetworkSsidList(savedNetworkSsid);
     pScanService->GetHiddenNetworkSsidList(savedNetworkSsid);
 }
+
 
 void BeginPnoScanFuzzTest(const uint8_t* data, size_t size)
 {

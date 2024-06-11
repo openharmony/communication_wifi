@@ -47,7 +47,7 @@ void MyExit()
     pStaInterface.reset();
     pStaAutoConnectService.reset();
     pStaService.reset();
-    sleep(3);
+    sleep(U32_AT_SIZE_ZERO);
     printf("exiting\n");
 }
 

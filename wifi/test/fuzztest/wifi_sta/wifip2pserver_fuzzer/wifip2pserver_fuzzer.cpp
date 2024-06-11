@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "wifiserver_fuzzer.h"
+#include "wifip2pserver_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 
 #include <cstddef>
@@ -41,13 +41,12 @@ void MyExit()
 {
     pP2pInterface.reset();
     pWifiP2pGroupManager.reset();
-    sleep(3);
+    sleep(THREE);
     printf("exiting\n");
 }
 
 void InitParam()
 {
-
     if (!g_isInsted) {
         pP2pInterface = std::make_unique<P2pInterface>();
         pWifiP2pGroupManager = std::make_unique<WifiP2pGroupManager>();
@@ -164,7 +163,7 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->QueryP2pLocalDevice(device);
     std::vector<WifiP2pServiceInfo> services;
     pP2pInterface->QueryP2pServices(services);
-    std::vector<WifiP2pGroupInfo> groups; 
+    std::vector<WifiP2pGroupInfo> groups;
     pP2pInterface->QueryP2pGroups(groups);
     std::vector<WifiP2pDevice> devices;
     pP2pInterface->QueryP2pDevices(devices);

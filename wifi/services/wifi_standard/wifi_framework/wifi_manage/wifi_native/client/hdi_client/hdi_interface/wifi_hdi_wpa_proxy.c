@@ -248,8 +248,10 @@ WifiErrorNo HdiWpaStart()
         LOGE("%{public}s HDIDeviceManagerGet failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-
-    if (g_devMgr->LoadDevice(g_devMgr, HDI_WPA_SERVICE_NAME) != HDF_SUCCESS) {
+    HDF_STATUS ret = g_devMgr->LoadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
+    if (ret == HDF_ERR_DEVICE_BUSY) {
+        LOGE("%{public}s LoadDevice busy: %{public}d", __func__, ret);
+    } else if (ret != HDF_SUCCESS) {
         g_devMgr = NULL;
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s LoadDevice failed", __func__);
@@ -597,8 +599,10 @@ static WifiErrorNo GetApInstance()
         LOGE("%{public}s HDIDeviceManagerGet failed", __func__);
         return WIFI_IDL_OPT_FAILED;
     }
-
-    if (g_apDevMgr->LoadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME) != HDF_SUCCESS) {
+    HDF_STATUS ret = g_apDevMgr->LoadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME) ;
+    if (ret == HDF_ERR_DEVICE_BUSY) {
+        LOGE("%{public}s LoadDevice busy: %{public}d", __func__, ret);
+    } else if (ret != HDF_SUCCESS) {
         g_apDevMgr = NULL;
         LOGE("%{public}s LoadDevice failed", __func__);
         return WIFI_IDL_OPT_FAILED;

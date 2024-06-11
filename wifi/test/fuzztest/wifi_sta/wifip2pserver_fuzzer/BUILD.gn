@@ -64,6 +64,8 @@ ohos_fuzztest("WifiP2pServerFuzzTest") {
     "private=public",
   ]
 
+  defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+
   if (is_asan || use_clang_coverage) {
     defines += [ "DTFUZZ_TEST" ]
   }

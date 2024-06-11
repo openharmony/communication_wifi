@@ -38,6 +38,11 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr size_t MAP_SCAN_NUMS = 20;
+constexpr size_t MAP_P2P_NUMS = 50;
+constexpr size_t MAP_HOTSPOT_NUMS = 30;
+constexpr size_t MAP_DEVICE_NUMS = 60;
+constexpr size_t U32_AT_SIZE_ZERO = 4;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceService";
 const std::u16string FORMMGR_INTERFACE_TOKEN_HOSPOT = u"ohos.wifi.IWifiHotspotService";
@@ -47,12 +52,15 @@ std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotspot
 sptr<WifiP2pStub> pWifiP2pStub = WifiP2pServiceImpl::GetInstance();
 std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanServiceImpl>();
 
-bool OnSetScanOnlyAvailableTest(const uint8_t* data, size_t size)
+
+bool DoSomethingScanStubTest(const uint8_t* data, size_t size)
 {
-    uint32_t code = static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY);
+    uint32_t code = U32_AT(data) % MAP_SCAN_NUMS + static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN);
+    LOGI("wifiscanstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size); // code[0x1004, 0x101E]
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_SCAN);
     datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
@@ -60,110 +68,10 @@ bool OnSetScanOnlyAvailableTest(const uint8_t* data, size_t size)
     return true;
 }
 
-bool OnGetScanOnlyAvailableTest(const uint8_t* data, size_t size)
+bool DoSomethingP2pStubTets(const uint8_t* data, size_t size)
 {
-    uint32_t code = static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY);
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_SCAN);
-    datas.WriteInt32(0);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiScanStub->OnRemoteRequest(code, datas, reply, option);
-    return true;
-}
-
-void OnEnableWifiApTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_HOSPOT);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiHotspotStub->OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP),
-        datas, reply, option);
-}
-
-void OnDisableWifiApTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_HOSPOT);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiHotspotStub->OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI_AP),
-        datas, reply, option);
-}
-
-bool OnFactoryResetFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET),
-        datas, reply, option);
-    return true;
-}
-
-bool OnEnableWifiFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI),
-        datas, reply, option);
-    return true;
-}
-
-bool OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI),
-        datas, reply, option);
-    return true;
-}
-
-bool OnGetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
-        datas, reply, option);
-    return true;
-}
-
-bool OnSetCountryCodeFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_COUNTRY_CODE),
-        datas, reply, option);
-    return true;
-}
-
-void DoSomethingInterestingWithMyAPIS(const uint8_t* data, size_t size)
-{
+    uint32_t code = U32_AT(data) % MAP_P2P_NUMS + static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE);
+    LOGI("wifip2pstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     datas.WriteInt32(0);
@@ -171,46 +79,52 @@ void DoSomethingInterestingWithMyAPIS(const uint8_t* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    pWifiP2pStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE),
-        datas, reply, option);
+    pWifiP2pStub->OnRemoteRequest(code, datas, reply, option);
+    return true;
 }
 
-void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+
+bool DoSomethingHotSpotStubTest(const uint8_t* data, size_t size)
 {
-    LOGI("enablep2p_fuzzer enter");
+    uint32_t code = U32_AT(data) % MAP_HOTSPOT_NUMS +
+        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP);
+    LOGI("wifihotspotstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size);
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_HOSPOT);
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    pWifiP2pStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE),
-        datas, reply, option);
+    pWifiHotspotStub->OnRemoteRequest(code, datas, reply, option);
+    return true;
+}
+
+bool DoSomethingDeviceStubTest(const uint8_t* data, size_t size)
+{
+    uint32_t code = U32_AT(data) % MAP_DEVICE_NUMS + static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI);
+    LOGI("wifidevicestub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size); // code[0x1001,0x1031]
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(code, datas, reply, option);
+    return true;
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
+    if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-
-    OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
-    OHOS::Wifi::OnGetScanOnlyAvailableTest(data, size);
-    OHOS::Wifi::OnEnableWifiApTest(data, size);
-    OHOS::Wifi::OnDisableWifiApTest(data, size);
-    OHOS::Wifi::OnFactoryResetFuzzTest(data, size);
-    OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
-    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
-    OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
-    OHOS::Wifi::OnSetCountryCodeFuzzTest(data, size);
-    OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
-    OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
-    OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
-    OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
-    OHOS::Wifi::DoSomethingInterestingWithMyAPIS(data, size);
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::Wifi::DoSomethingScanStubTest(data, size);
+    OHOS::Wifi::DoSomethingP2pStubTets(data, size);
+    OHOS::Wifi::DoSomethingHotSpotStubTest(data, size);
+    OHOS::Wifi::DoSomethingDeviceStubTest(data, size);
     return 0;
 }
 }

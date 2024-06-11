@@ -649,7 +649,7 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
         return WIFI_IDL_OPT_FAILED;
     }
     int channel = config.GetChannel() | (config.GetBandWidth() << 16);
-    LOGI("WifiHdiWpaClient::%{public}s enter, channel=%{public}d", _func_, channel);
+    LOGI("WifiHdiWpaClient::%{public}s enter, channel=%{public}d", __func__, channel);
     if (HdiSetApChannel(channel, id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
@@ -804,7 +804,6 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
     }
 
     if (callbacks.onConnectSupplicant != nullptr) {
-        cWifiHdiWpaCallback.OnEventStateChanged = OnEventP2pStateChanged;
         cWifiHdiWpaCallback.OnEventDeviceFound = OnEventDeviceFound;
         cWifiHdiWpaCallback.OnEventDeviceLost = OnEventDeviceLost;
         cWifiHdiWpaCallback.OnEventGoNegotiationRequest = OnEventGoNegotiationRequest;

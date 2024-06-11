@@ -586,6 +586,23 @@ void ConvertDecStrToHexStr(const std::string &inData, std::string &outData)
     }
     outData = temp.str();
 }
+
+void SplitStringBySubstring(const std::string &inData, std::string &outData, const std::string &subBegin,
+    const std::string &subEnd)
+{
+    auto posBegin = inData.find(subBegin);
+    auto posEnd = inData.find(subEnd);
+    if (posBegin == std::string::npos || posEnd == std::string::npos) {
+        LOGE("SplitStringBySubstring find substring fail.");
+        return;
+    }
+    if (posEnd < posBegin + subEnd.length()) {
+        LOGE("SplitStringBySubstring data length is invaild.");
+        return;
+    }
+    outData = inData.substr(posBegin, posEnd - posBegin + subEnd.length());
+    return;
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

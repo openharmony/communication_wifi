@@ -450,31 +450,57 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
     return 0;
 }
 
-void WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, const std::string &key,
-    const std::string &iv)
+int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd)
 {
-    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
-    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
-    wifiBackupConfig.SetEncryptionInfo(key, iv);
-    wifiBackupConfig.LoadConfig();
-    std::vector<WifiBackupConfig> backupConfigs;
-    wifiBackupConfig.GetValue(backupConfigs);
-    wifiBackupConfig.UnsetEncryptionInfo();
-
-    for (const auto &backupCfg : backupConfigs) {
-        WifiDeviceConfig config;
-        ConvertBackupCfgToDeviceCfg(backupCfg, config);
-        deviceConfigs.push_back(config);
+    const std::string wifiBackupXmlBegin = "<WifiBackupData>";
+    const std::string wifiBackupXmlEnd = "</WifiBackupData>";
+    struct stat statBuf;
+    if (fd.Get() < 0 || fstat(fd.Get(), &statBuf) < 0) {
+        LOGE("GetConfigbyBackupXml fstat fd fail.");
+        return -1;
     }
+    char *buffer = (char *)malloc(statBuf.st_size);
+    if (buffer == nullptr) {
+        LOGE("GetConfigbyBackupXml malloc fail.");
+        return -1
+    }
+    ssize_t bufferLen = read(fd.Get(), buffer, statBuf.st_size);
+    if (bufferLen < 0) {
+        LOGE("GetConfigbyBackupXml read fail.");
+        free(buffer);
+        return -1;
+    }
+    std::string backupData = std::string(buffer, buffer + bufferLen);
+    if (memset_s(buffer, statBuf.st_size, 0 , statBuf.st_size) != EOK) {
+        LOGE("GetConfigbyBackupXml memset_s fail.");
+        free(buffer);
+        return -1; 
+    }
+    free(buffer);
+    buffer = nullptr;
+
+    std::string wifiBackupXml;
+    SplitStringBySubstring(backupData, wifiBackupXml, wifiBackupXmlBegin, wifiBackupXmlEnd);
+    std::fill(backupData.begin(), backupData.end(), 0);
+    std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
+    bool ret = xmlParser->LoadConfigurationMemory(wifiBackupXml.c_str());
+    if (!ret) {
+        LOGE("GetConfigbyBackupXml load fail");
+        return -1;
+    }
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("GetConfigbyBackupXml Parse fail");
+        return -1;
+    }
+    deviceConfigs = xmlParser->GetNetworks();
+    std::fill(wifiBackupXml.begin(), wifiBackupXml.end(), 0);
+    return 0;
 }
 
-int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
+int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd,
+    const std::string &key, const std::string &iv)
 {
-    LOGI("OnRestore enter.");
-    std::string key;
-    std::string iv;
-    std::string version;
-    ParseBackupJson(restoreInfo, key, iv, version);
     if (key.size() == 0 || iv.size() == 0) {
         LOGE("OnRestore key or iv is empty.");
         return -1;
@@ -495,10 +521,44 @@ int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
         return -1;
     }
     close(destFd);
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.SetEncryptionInfo(key, iv);
+    wifiBackupConfig.LoadConfig();
+    std::vector<WifiBackupConfig> backupConfigs;
+    wifiBackupConfig.GetValue(backupConfigs);
+    wifiBackupConfig.UnsetEncryptionInfo();
+
+    for (const auto &backupCfg : backupConfigs) {
+        WifiDeviceConfig config;
+        ConvertBackupCfgToDeviceCfg(backupCfg, config);
+        deviceConfigs.push_back(config);
+    }
+    return 0;
+}
+
+int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
+{
+    LOGI("OnRestore enter.");
+    const std::string versionForXml = "9";
+    std::string key;
+    std::string iv;
+    std::string version;
+    ParseBackupJson(restoreInfo, key, iv, version);
 
     std::vector<WifiDeviceConfig> deviceConfigs;
-    GetConfigbyBackupFile(deviceConfigs, key, iv);
+    int ret = 0;
+    if (version == versionForXml) {
+        ret = GetConfigbyBackupXml(deviceConfigs, fd);
+    } else {
+        ret = GetConfigbyBackupFile(deviceConfigs, fd, key, iv);
+    }
     std::fill(key.begin(), key.end(), 0);
+    if (ret < 0) {
+        LOGE("OnRestore fail to get config from backup.");
+        return ret;
+    }
+
     LOGI("OnRestore end. Restore count: %{public}d", static_cast<int>(deviceConfigs.size()));
     ConfigsDeduplicateAndSave(deviceConfigs);
     return 0;

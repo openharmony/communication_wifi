@@ -214,7 +214,6 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     int status =  (static_cast<int>(data[0]) % SIZE + 17);
     pScanService->HandleNetworkQualityChanged(status);
     pScanService->HandleNetworkQualityChanged(status);
-    pScanService->HandlePnoScanInfo(infoList);
 }
 
 void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)

@@ -396,7 +396,7 @@ void WifiSettings::ParseBackupJson(const std::string &backupInfo, std::string &k
     ParseJson(backupInfo, type, encryptionSymkey, keyStr);
     ParseJson(backupInfo, type, gcmParamsIv, ivStr);
     ParseJson(backupInfo, type, apiVersion, version);
-
+    LOGI("ParseBackupJson version: %{public}s.", version.c_str());
     ConvertDecStrToHexStr(keyStr, key);
     std::fill(keyStr.begin(), keyStr.end(), 0);
     LOGI("ParseBackupJson key.size: %{public}d.", static_cast<int>(key.size()));
@@ -521,6 +521,7 @@ int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceCon
         return -1;
     }
     close(destFd);
+
     WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
     wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
     wifiBackupConfig.SetEncryptionInfo(key, iv);

@@ -40,7 +40,7 @@ void MyExit()
 {
     pScanService.reset();
     pScanInterface.reset();
-    sleep(3);
+    sleep(THREE);
     printf("exiting\n");
 }
 
@@ -249,7 +249,6 @@ void GetAllowBandFreqsControlInfoFuzzTest(const uint8_t* data, size_t size)
     pScanService->GetSavedNetworkSsidList(savedNetworkSsid);
     pScanService->GetHiddenNetworkSsidList(savedNetworkSsid);
 }
-
 
 void BeginPnoScanFuzzTest(const uint8_t* data, size_t size)
 {

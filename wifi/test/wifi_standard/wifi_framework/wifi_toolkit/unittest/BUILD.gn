@@ -120,7 +120,6 @@ ohos_unittest("toolkit_unittest") {
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",
     "hilog:libhilog",
-    "init:libbegetutil",
     "ipc:ipc_single",
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",

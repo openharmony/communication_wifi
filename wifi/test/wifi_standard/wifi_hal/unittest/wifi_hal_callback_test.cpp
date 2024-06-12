@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Wifi {
 const int STATUS_MSG = 0;
 const int NET_WORK = 5;
+const int DISASSOC_STA_HAS_LEFT = 0;
 
 class WifiHalCallbackTest : public testing::Test {
 public:
@@ -48,6 +49,14 @@ HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyConnectChangedTest, TestSize.Level1
     char pos[] = "WIFI_REASON_LENGTH";
     WifiHalCbNotifyConnectChanged(status, networkId, NULL);
     WifiHalCbNotifyConnectChanged(status, networkId, pos);
+}
+
+HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyDisConnectReasonTest, TestSize.Level1)
+{
+    int status = DISASSOC_STA_HAS_LEFT;
+    char bssid[] = "02:42:ac:11:00:04";
+    WifiHalCbNotifyDisConnectReason(status, NULL);
+    WifiHalCbNotifyDisConnectReason(status, bssid);
 }
 
 HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyBssidChangedTest, TestSize.Level1)

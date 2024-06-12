@@ -125,6 +125,14 @@ public:
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate) override;
 
     /**
+     * @Description set tx power for sar.
+     *
+     * @param power - 1001,1002,1003......
+     * @return ErrCode - operation result
+     */
+    ErrCode SetWifiTxPower(int power) override;
+
+    /**
      * @Description Update a wifi device configuration.
      *
      * @param config - WifiDeviceConfig object
@@ -485,6 +493,13 @@ public:
      * @return WifiErrorNo
      */
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
+
+    /**
+     * @Description set low tx power
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
 
     /**
      * @Description hilink connect

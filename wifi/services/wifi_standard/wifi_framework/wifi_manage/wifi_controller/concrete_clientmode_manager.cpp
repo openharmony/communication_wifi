@@ -45,6 +45,9 @@ void ConcreteClientModeManager::SetRole(ConcreteManagerRole role)
         pConcreteMangerMachine->SendMessage(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
     } else if (role == ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY) {
         pConcreteMangerMachine->SendMessage(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
+    } else if (role == ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE ||
+        role == ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE) {
+        pConcreteMangerMachine->SendMessage(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
     } else {
         WIFI_LOGE("setrole is invalid");
     }

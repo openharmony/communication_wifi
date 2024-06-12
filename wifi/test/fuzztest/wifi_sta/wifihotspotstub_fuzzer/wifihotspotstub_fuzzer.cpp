@@ -35,6 +35,8 @@
 #include "wifi_settings.h"
 #include "wifi_common_def.h"
 #include "wifi_manager.h"
+#include "wifi_net_agent.h"
+
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
@@ -44,6 +46,19 @@ static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 std::shared_ptr<WifiHotspotStub> pWifiHotspotServiceImpl = std::make_shared<WifiHotspotServiceImpl>();
+void MyExit()
+{
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
+    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
+    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
+    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
+    WifiManager::GetInstance().Exit();
+    sleep(5);
+    printf("exiting\n");
+}
 
 bool Init()
 {
@@ -52,6 +67,7 @@ bool Init()
             LOGE("WifiManager init failed!");
             return false;
         }
+        atexit(MyExit);
         g_isInsted = true;
     }
     return true;
@@ -363,7 +379,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnIsHotspotDualBandSupportedFuzzTest(data, size);
     OHOS::Wifi::OnSetApIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::OnGetApIfaceNameFuzzTest(data, size);
-    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    OHOS::Wifi::OnDisableWifiApTest(data, size);
     OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
     sleep(4);
     return 0;

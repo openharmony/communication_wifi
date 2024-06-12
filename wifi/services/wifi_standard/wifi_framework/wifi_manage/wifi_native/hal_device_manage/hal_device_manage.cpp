@@ -343,7 +343,7 @@ bool HalDeviceManager::GetConnectSignalInfo(const std::string &ifaceName, Signal
     }
 
     std::lock_guard<std::mutex> lock(mMutex);
-    LOGI("GetConnectSignalInfo, ifaceName:%{public}s", ifaceName.c_str());
+    LOGD("GetConnectSignalInfo, ifaceName:%{public}s", ifaceName.c_str());
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter == mIWifiStaIfaces.end()) {
         LOGE("GetConnectSignalInfo, not find iface info");
@@ -358,7 +358,7 @@ bool HalDeviceManager::GetConnectSignalInfo(const std::string &ifaceName, Signal
         return false;
     }
 
-    LOGI("GetConnectSignalInfo success");
+    LOGD("GetConnectSignalInfo success");
     return true;
 }
 
@@ -597,6 +597,32 @@ bool HalDeviceManager::SetPowerModel(const std::string &ifaceName, int model)
     return true;
 }
 
+bool HalDeviceManager::SetTxPower(const std::string &ifaceName, int power)
+{
+    if (!CheckReloadChipHdiService()) {
+        return false;
+    }
+    
+    std::lock_guard<std::mutex> lock(mMutex);
+    LOGD("SetTxPower, ifaceName:%{public}s, power:%{public}d", ifaceName.c_str(), power);
+    auto iter = mIWifiStaIfaces.find(ifaceName);
+    if (iter == mIWifiStaIfaces.end()) {
+        LOGE("SetTxPower, not find iface info");
+        return false;
+    }
+
+    sptr<IChipIface> &iface = iter->second;
+    CHECK_NULL_AND_RETURN(iface, false);
+    int32_t ret = iface->SetTxPower(power);
+    if (ret != HDF_SUCCESS) {
+        LOGE("SetTxPower, call SetTxPower failed! ret:%{public}d", ret);
+        return false;
+    }
+
+    LOGD("SetTxPower success");
+    return true;
+}
+
 bool HalDeviceManager::GetPowerModel(const std::string &ifaceName, int &model)
 {
     if (!CheckReloadChipHdiService()) {
@@ -673,10 +699,6 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     if (ret != HDF_SUCCESS) {
         LOGE("SetApMacAddress, call SetMacAddress failed! ret:%{public}d", ret);
     }
-    if (!SetNetworkUpDown(ifaceName, true)) {
-        LOGE("SetStaMacAddress, set network up fail");
-        return false;
-    }
 
     LOGI("SetApMacAddress success");
     return true;
@@ -727,7 +749,7 @@ bool HalDeviceManager::CheckChipHdiStarted()
         return false;
     }
 
-    LOGI("CheckChipHdiStarted, isStarted:%{public}d", isStarted);
+    LOGD("CheckChipHdiStarted, isStarted:%{public}d", isStarted);
     if (!isStarted) {
         ret = g_IWifi->Init();
         if (ret != HDF_SUCCESS) {
@@ -773,7 +795,7 @@ void HalDeviceManager::GetP2pIfaceInfo(WifiChipInfo &wifiChipInfo)
 
     int32_t ret = wifiChipInfo.chip->GetP2pServiceIfNames(ifnames);
     if (ret == HDF_SUCCESS) {
-        for (int i = 0; i < ifnames.size(); ++i) {
+        for (uint32_t i = 0; i < ifnames.size(); ++i) {
             wifiIfaceInfo.Clear();
             ret = wifiChipInfo.chip->GetP2pService(ifnames[i], wifiIfaceInfo.iface);
             if (ret != HDF_SUCCESS) {
@@ -799,7 +821,7 @@ void HalDeviceManager::GetApIfaceInfo(WifiChipInfo &wifiChipInfo)
 
     int32_t ret = wifiChipInfo.chip->GetApServiceIfNames(ifnames);
     if (ret == HDF_SUCCESS) {
-        for (int i = 0; i < ifnames.size(); ++i) {
+        for (uint32_t i = 0; i < ifnames.size(); ++i) {
             wifiIfaceInfo.Clear();
             ret = wifiChipInfo.chip->GetApService(ifnames[i], wifiIfaceInfo.iface);
             if (ret != HDF_SUCCESS) {
@@ -825,7 +847,7 @@ void HalDeviceManager::GetStaIfaceInfo(WifiChipInfo &wifiChipInfo)
 
     int32_t ret = wifiChipInfo.chip->GetStaServiceIfNames(ifnames);
     if (ret == HDF_SUCCESS) {
-        for (int i = 0; i < ifnames.size(); ++i) {
+        for (uint32_t i = 0; i < ifnames.size(); ++i) {
             wifiIfaceInfo.Clear();
             ret = wifiChipInfo.chip->GetStaService(ifnames[i], wifiIfaceInfo.iface);
             if (ret != HDF_SUCCESS) {
@@ -901,7 +923,7 @@ bool HalDeviceManager::GetAllChipInfo(std::vector<WifiChipInfo> &wifiChipInfos)
         return false;
     }
 
-    for (int i = 0; i < chipIds.size(); ++i) {
+    for (uint32_t i = 0; i < chipIds.size(); ++i) {
         WifiChipInfo wifiChipInfo;
         if (GetChipInfo(chipIds[i], wifiChipInfo)) {
             wifiChipInfo.chipId = chipIds[i];
@@ -1041,7 +1063,7 @@ bool HalDeviceManager::CanIfaceComboSupportRequest(WifiChipInfo &wifiChipInfo, U
     }
 
     for (auto type : IFACE_TYPES_BY_PRIORITY) {
-        int tooManyInterfaces = wifiChipInfo.ifaces[type].size() - chipIfaceCombo[type];
+        int tooManyInterfaces = static_cast<int>(wifiChipInfo.ifaces[type].size()) - chipIfaceCombo[type];
         if (createIfaceType == type) {
             tooManyInterfaces += 1;
         }
@@ -1073,19 +1095,19 @@ void HalDeviceManager::ExpandIfaceCombos(ComboIface &chipIfaceCombo,
 {
     int numOfCombos = 1;
     for (auto &limit : chipIfaceCombo.limits) {
-        for (int i = 0; i < limit.ifaceNum; ++i) {
+        for (uint32_t i = 0; i < limit.ifaceNum; ++i) {
             numOfCombos *= limit.types.size();
         }
     }
 
     expandedIfaceCombos.resize(numOfCombos);
-    for (int i = 0; i < expandedIfaceCombos.size(); ++i) {
+    for (uint32_t i = 0; i < expandedIfaceCombos.size(); ++i) {
         expandedIfaceCombos[i].resize(IFACE_TYPES_BY_PRIORITY.size(), 0);
     }
 
     int span = numOfCombos;
     for (auto &limit : chipIfaceCombo.limits) {
-        for (int i = 0; i < limit.ifaceNum; ++i) {
+        for (uint32_t i = 0; i < limit.ifaceNum; ++i) {
             span /= limit.types.size();
             for (int k = 0; k < numOfCombos; ++k) {
                 int ifaceType = limit.types.at((k / span) % limit.types.size());

@@ -212,5 +212,10 @@ HWTEST_F(WifiP2pTest, UnregisterCfgChangCallbackTest, TestSize.Level1)
 {
     EXPECT_EQ(UnregisterCfgChangCallback(), WIFI_SUCCESS);
 }
+
+HWTEST_F(WifiP2pTest, CheckCanUseP2pTest, TestSize.Level1)
+{
+    CheckCanUseP2p();
+}
 }
 }

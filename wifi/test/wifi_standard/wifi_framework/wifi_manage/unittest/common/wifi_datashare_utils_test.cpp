@@ -17,6 +17,7 @@
 #include <gmock/gmock.h>
 #include "data_ability_observer_stub.h"
 #include "wifi_datashare_utils.h"
+#include "datashare_predicates.h"
 #include "wifi_log.h"
 #include "wifi_logger.h"
 using namespace testing;
@@ -98,6 +99,25 @@ HWTEST_F(WifiDataShareHelperUtilsTest, UnRegisterObserver_ReturnsSuccess, TestSi
     ErrCode result = helper_->UnRegisterObserver(uri, observer);
 
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiDataShareHelperUtilsTest, ClearResourcesTest, TestSize.Level1)
+{
+    bool onlySettingsData = true;
+    auto operatePtr = helper_->WifiCreateDataShareHelper(onlySettingsData);
+
+    if (operatePtr == nullptr) {
+        return;
+    }
+    Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
+    DataShare::DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    std::string key = "settings.telephony.airplanemode";
+    std::string SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
+    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
+    auto result = operatePtr->Query(uri, predicates, columns);
+
+    helper_->ClearResources(operatePtr, result);
 }
 }
 }

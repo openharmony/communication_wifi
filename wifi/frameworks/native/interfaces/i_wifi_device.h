@@ -136,6 +136,14 @@ public:
     virtual ErrCode RemoveAllDevice() = 0;
 
     /**
+     * @Description Set tx power for sar.
+     *
+     * @param power - tx power
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetTxPower(int power) = 0;
+
+    /**
      * @Description Get all the device configs
      *
      * @param result - Get result vector of WifiDeviceConfig
@@ -467,6 +475,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
+
+    /**
+     * @Description SetLowTxPower
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
 
     /**
      * @Description hilink connect

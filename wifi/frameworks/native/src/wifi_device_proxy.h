@@ -149,6 +149,14 @@ public:
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     /**
+     * @Description set wifi tx power for sar
+     *
+     * @param power - txpower
+     * @return ErrCode - operation result
+     */
+    ErrCode SetTxPower(int power) override;
+
+    /**
      * @Description Enable device config, when set attemptEnable, disable other device config
      *
      * @param networkId - need enable device config's network id
@@ -480,6 +488,13 @@ public:
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 
     /**
+     * @Description set low tx power
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
+
+    /**
      * @Description Enable semi-Wifi
      *
      * @return ErrCode - operation result
@@ -536,11 +551,15 @@ private:
     void WriteIpAddress(MessageParcel &data, const WifiIpAddress &address);
     void WriteEapConfig(MessageParcel &data, const WifiEapConfig &wifiEapConfig);
     void ReadIpAddress(MessageParcel &reply, WifiIpAddress &address);
+    void BigDataReadIpAddress(WifiIpAddress &address, std::vector<std::string> &tokens);
     void ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEapConfig);
+    void BigDataReadEapConfig(WifiEapConfig &wifiEapConfig, std::vector<std::string> &tokens);
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
     void RemoveDeathRecipient(void);
+    void ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize, long len);
+    void ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
     sptr<IRemoteObject> remote_ = nullptr;
     bool mRemoteDied;

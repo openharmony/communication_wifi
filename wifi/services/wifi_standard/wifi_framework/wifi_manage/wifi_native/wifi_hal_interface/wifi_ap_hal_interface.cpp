@@ -83,6 +83,16 @@ WifiErrorNo WifiApHalInterface::SetSoftApConfig(const HotspotConfig &config, int
 #endif
 }
 
+WifiErrorNo WifiApHalInterface::EnableAp(int id)
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->EnableAp(id);
+#else
+    return WIFI_IDL_OPT_OK;
+#endif
+}
+
 WifiErrorNo WifiApHalInterface::GetStationList(std::vector<std::string> &result, int id)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT

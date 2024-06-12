@@ -26,6 +26,7 @@
         RegisterP2pPersistentGroupsChangedCallback;
         RegisterP2pConnectionChangedCallback;
         RegisterP2pPeersChangedCallback;
+        CheckCanUseP2p;
         EnableHotspot;
         DisableHotspot;
         SetHotspotConfig;
@@ -57,6 +58,7 @@
         GetIpInfo;
         GetSignalLevel;
         SetLowLatencyMode;
+        SetLowTxPower;
         IsBandTypeSupported;
         Get5GHzChannelList;
         RegisterWifiEvent;

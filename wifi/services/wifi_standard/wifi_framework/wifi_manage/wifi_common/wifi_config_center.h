@@ -439,18 +439,19 @@ public:
     /**
      * @Description Get the STA service last running state
      *
-     * @return true - sta is running
-     * @return false - sta not running
+     * @return 2 - sta is semi active
+     * @return 1 - sta is running
+     * @return 0 - sta not running
      */
-    bool GetStaLastRunState(int instId = 0);
+    int GetStaLastRunState(int instId = 0);
 
     /**
      * @Description Set the STA service running state
      *
-     * @param bRun - true / false
+     * @param bRun - 2 / 1 / 0
      * @return int - 0 success
      */
-    int SetStaLastRunState(bool bRun, int instId = 0);
+    int SetStaLastRunState(int bRun, int instId = 0);
 
     /**
      * @Description Set current phone screen state
@@ -494,20 +495,6 @@ public:
      * @return true - open; false - can't open
      */
     bool GetWifiFlagOnAirplaneMode(int instId = 0);
-
-    /**
-     * @Description Set current power sleep state
-     *
-     * @param state - 1 open; 2 close
-     */
-    void SetPowerSleepState(const int &state);
-
-    /**
-     * @Description Get current power sleep state
-     *
-     * @return int - 1 open; 2 close
-     */
-    int GetPowerSleepState() const;
 
     /**
      * @Description Set current app running mode
@@ -615,6 +602,13 @@ public:
      * @param state - want to set state
      */
     void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0);
+
+    /**
+     * @Description Get current wifi state
+     *
+     * @return int - the wifi state, DISABLING/DISABLED/ENABLING/ENABLED/UNKNOWN
+     */
+    WifiDetailState GetWifiDetailState(int instId = 0);
 
     /**
      * @Description Get sta ap exclusion type

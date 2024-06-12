@@ -186,6 +186,39 @@ WifiErrorNo HdiWpaP2pStop()
     return WIFI_IDL_OPT_OK;
 }
 
+static void InitHdiWpaP2pCallbackObj(struct IWpaCallback *callback)
+{
+    g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventBssidChanged = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventStateChanged = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventTempDisabled = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventAssociateReject = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventWpsOverlap = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventWpsTimeout = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventScanResult = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventDeviceFound = callback->OnEventDeviceFound;
+    g_hdiWpaP2pCallbackObj->OnEventDeviceLost = callback->OnEventDeviceLost;
+    g_hdiWpaP2pCallbackObj->OnEventGoNegotiationRequest = callback->OnEventGoNegotiationRequest;
+    g_hdiWpaP2pCallbackObj->OnEventGoNegotiationCompleted = callback->OnEventGoNegotiationCompleted;
+    g_hdiWpaP2pCallbackObj->OnEventInvitationReceived = callback->OnEventInvitationReceived;
+    g_hdiWpaP2pCallbackObj->OnEventInvitationResult = callback->OnEventInvitationResult;
+    g_hdiWpaP2pCallbackObj->OnEventGroupFormationSuccess = callback->OnEventGroupFormationSuccess;
+    g_hdiWpaP2pCallbackObj->OnEventGroupFormationFailure = callback->OnEventGroupFormationFailure;
+    g_hdiWpaP2pCallbackObj->OnEventGroupStarted = callback->OnEventGroupStarted;
+    g_hdiWpaP2pCallbackObj->OnEventGroupInfoStarted = callback->OnEventGroupInfoStarted;
+    g_hdiWpaP2pCallbackObj->OnEventGroupRemoved = callback->OnEventGroupRemoved;
+    g_hdiWpaP2pCallbackObj->OnEventProvisionDiscoveryCompleted = callback->OnEventProvisionDiscoveryCompleted;
+    g_hdiWpaP2pCallbackObj->OnEventFindStopped = callback->OnEventFindStopped;
+    g_hdiWpaP2pCallbackObj->OnEventServDiscReq = callback->OnEventServDiscReq;
+    g_hdiWpaP2pCallbackObj->OnEventServDiscResp = callback->OnEventServDiscResp;
+    g_hdiWpaP2pCallbackObj->OnEventStaConnectState = callback->OnEventStaConnectState;
+    g_hdiWpaP2pCallbackObj->OnEventIfaceCreated = callback->OnEventIfaceCreated;
+    g_hdiWpaP2pCallbackObj->GetVersion = NULL;
+    g_hdiWpaP2pCallbackObj->AsObject = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventVendorCb = NULL;
+}
+
 WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
 {
     LOGI("RegisterHdiWpaP2pEventCallback enter");
@@ -209,35 +242,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventBssidChanged = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventStateChanged = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventTempDisabled = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventAssociateReject = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventWpsOverlap = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventWpsTimeout = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventScanResult = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventDeviceFound = callback->OnEventDeviceFound;
-    g_hdiWpaP2pCallbackObj->OnEventDeviceLost = callback->OnEventDeviceLost;
-    g_hdiWpaP2pCallbackObj->OnEventGoNegotiationRequest = callback->OnEventGoNegotiationRequest;
-    g_hdiWpaP2pCallbackObj->OnEventGoNegotiationCompleted = callback->OnEventGoNegotiationCompleted;
-    g_hdiWpaP2pCallbackObj->OnEventInvitationReceived = callback->OnEventInvitationReceived;
-    g_hdiWpaP2pCallbackObj->OnEventInvitationResult = callback->OnEventInvitationResult;
-    g_hdiWpaP2pCallbackObj->OnEventGroupFormationSuccess = callback->OnEventGroupFormationSuccess;
-    g_hdiWpaP2pCallbackObj->OnEventGroupFormationFailure = callback->OnEventGroupFormationFailure;
-    g_hdiWpaP2pCallbackObj->OnEventGroupStarted = callback->OnEventGroupStarted;
-    g_hdiWpaP2pCallbackObj->OnEventGroupRemoved = callback->OnEventGroupRemoved;
-    g_hdiWpaP2pCallbackObj->OnEventProvisionDiscoveryCompleted = callback->OnEventProvisionDiscoveryCompleted;
-    g_hdiWpaP2pCallbackObj->OnEventFindStopped = callback->OnEventFindStopped;
-    g_hdiWpaP2pCallbackObj->OnEventServDiscReq = callback->OnEventServDiscReq;
-    g_hdiWpaP2pCallbackObj->OnEventServDiscResp = callback->OnEventServDiscResp;
-    g_hdiWpaP2pCallbackObj->OnEventStaConnectState = callback->OnEventStaConnectState;
-    g_hdiWpaP2pCallbackObj->OnEventIfaceCreated = callback->OnEventIfaceCreated;
-    g_hdiWpaP2pCallbackObj->GetVersion = NULL;
-    g_hdiWpaP2pCallbackObj->AsObject = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventVendorCb = NULL;
-
+    InitHdiWpaP2pCallbackObj(callback);
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaP2pEventCallback success.");
     return WIFI_IDL_OPT_OK;

@@ -82,7 +82,6 @@ WifiSettings::WifiSettings()
       mScreenState(MODE_STATE_DEFAULT),
       mScanGenieState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
-      mPowerSleepState(MODE_STATE_CLOSE),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
@@ -106,6 +105,8 @@ WifiSettings::WifiSettings()
     mLastDiscReason[0] = DisconnectedReason::DISC_REASON_DEFAULT;
     mThermalLevel = static_cast<int>(ThermalLevel::NORMAL);
     mValidChannels.clear();
+    mWifiDetailState[0] = WifiDetailState::STATE_INACTIVE;
+    isSemiWifiEnable = false;
 }
 
 WifiSettings::~WifiSettings()
@@ -169,48 +170,7 @@ void WifiSettings::InitHotspotConfig()
             mBlockListInfo.emplace(item.bssid, item);
         }
     }
-
-    /* init softap random mac info */
-    if (mSavedApRandomMac.LoadConfig() >= 0) {
-        std::vector<SoftApRandomMac> tmp;
-        mSavedApRandomMac.GetValue(tmp);
-        if (tmp.size() > 0) {
-            for (std::size_t i = 0; i < tmp.size(); i++) {
-                mApRandomMac[i] = tmp[i];
-            }
-        }
-    }
     return;
-}
-
-int WifiSettings::GetApRandomMac(SoftApRandomMac &randomMac, int id)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    auto iter = mApRandomMac.find(id);
-    if (iter != mApRandomMac.end()) {
-        randomMac = iter->second;
-    }
-    return 0;
-}
-
-int WifiSettings::SetApRandomMac(const SoftApRandomMac &randomMac, int id)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    if (id > AP_INSTANCE_MAX_NUM) {
-        LOGE("Id is larger than AP_INSTANCE_MAX_NUM");
-        return -1;
-    }
-
-    mApRandomMac[id] =  randomMac;
-
-    std::vector<SoftApRandomMac> tmp;
-    for (auto iter : mApRandomMac) {
-        tmp.push_back(iter.second);
-    }
-
-    mSavedApRandomMac.SetValue(tmp);
-    mSavedApRandomMac.SaveConfig();
-    return 0;
 }
 
 void WifiSettings::InitP2pVendorConfig()
@@ -273,7 +233,6 @@ int WifiSettings::Init()
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
     mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
-    mSavedApRandomMac.SetConfigFilePath(WIFI_SOFTAP_RANDOM_MAC_FILE_PATH);
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -392,13 +351,6 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
         LOGE("NewConfigs is empty!");
         return;
     }
-
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-    for (auto &config : newConfigs) {
-        EncryptionDeviceConfig(config);
-    }
-#endif
-
     mSavedDeviceConfig.LoadConfig();
     std::vector<WifiDeviceConfig> localConfigs;
     mSavedDeviceConfig.GetValue(localConfigs);
@@ -413,18 +365,50 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
         auto iter = tmp.find(configKey);
         if (iter == tmp.end()) {
             tmp.insert(configKey);
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            EncryptionDeviceConfig(config);
+#endif
             localConfigs.push_back(config);
         }
     }
-
+    std::vector<WifiDeviceConfig>().swap(newConfigs);
     mSavedDeviceConfig.SetValue(localConfigs);
     mSavedDeviceConfig.SaveConfig();
     ReloadDeviceConfig();
 }
 
+void WifiSettings::ParseBackupJson(const std::string &backupInfo, std::string &key, std::string &iv,
+    std::string &version)
+{
+    const std::string type = "detail";
+    const std::string encryptionSymkey = "encryption_symkey";
+    const std::string gcmParamsIv = "gcmParams_iv";
+    const std::string apiVersion = "api_version";
+    std::string keyStr;
+    std::string ivStr;
+
+    ParseJson(backupInfo, type, encryptionSymkey, keyStr);
+    ParseJson(backupInfo, type, gcmParamsIv, ivStr);
+    ParseJson(backupInfo, type, apiVersion, version);
+    LOGI("ParseBackupJson version: %{public}s.", version.c_str());
+    ConvertDecStrToHexStr(keyStr, key);
+    std::fill(keyStr.begin(), keyStr.end(), 0);
+    LOGI("ParseBackupJson key.size: %{public}d.", static_cast<int>(key.size()));
+    ConvertDecStrToHexStr(ivStr, iv);
+    LOGI("ParseBackupJson iv.size: %{public}d.", static_cast<int>(iv.size()));
+}
+
 int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 {
     LOGI("OnBackup enter.");
+    std::string key;
+    std::string iv;
+    std::string version;
+    ParseBackupJson(backupInfo, key, iv, version);
+    if (key.size() == 0 || iv.size() == 0) {
+        LOGE("OnBackup key or iv is empty.");
+        return -1;
+    }
     mSavedDeviceConfig.LoadConfig();
     std::vector<WifiDeviceConfig> localConfigs;
     mSavedDeviceConfig.GetValue(localConfigs);
@@ -441,11 +425,15 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
         ConvertDeviceCfgToBackupCfg(config, backupConfig);
         backupConfigs.push_back(backupConfig);
     }
+    std::vector<WifiDeviceConfig>().swap(localConfigs);
 
     WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
     wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.SetEncryptionInfo(key, iv);
     wifiBackupConfig.SetValue(backupConfigs);
     wifiBackupConfig.SaveConfig();
+    wifiBackupConfig.UnsetEncryptionInfo();
+    std::fill(key.begin(), key.end(), 0);
 
     fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH, O_RDONLY));
     if (fd.Get() < 0) {
@@ -456,21 +444,73 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
     return 0;
 }
 
-int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
+int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd)
 {
-    LOGI("OnRestore enter.");
+    const std::string wifiBackupXmlBegin = "<WifiBackupData>";
+    const std::string wifiBackupXmlEnd = "</WifiBackupData>";
     struct stat statBuf;
-    if (fstat(fd.Get(), &statBuf) < 0) {
-        LOGE("OnRestore fstat fd fail.");
+    if (fd.Get() < 0 || fstat(fd.Get(), &statBuf) < 0) {
+        LOGE("GetConfigbyBackupXml fstat fd fail.");
+        return -1;
+    }
+    char *buffer = (char *)malloc(statBuf.st_size);
+    if (buffer == nullptr) {
+        LOGE("GetConfigbyBackupXml malloc fail.");
+        return -1;
+    }
+    ssize_t bufferLen = read(fd.Get(), buffer, statBuf.st_size);
+    if (bufferLen < 0) {
+        LOGE("GetConfigbyBackupXml read fail.");
+        free(buffer);
+        return -1;
+    }
+    std::string backupData = std::string(buffer, buffer + bufferLen);
+    if (memset_s(buffer, statBuf.st_size, 0, statBuf.st_size) != EOK) {
+        LOGE("GetConfigbyBackupXml memset_s fail.");
+        free(buffer);
+        return -1;
+    }
+    free(buffer);
+    buffer = nullptr;
+
+    std::string wifiBackupXml;
+    SplitStringBySubstring(backupData, wifiBackupXml, wifiBackupXmlBegin, wifiBackupXmlEnd);
+    std::fill(backupData.begin(), backupData.end(), 0);
+    std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
+    bool ret = xmlParser->LoadConfigurationMemory(wifiBackupXml.c_str());
+    if (!ret) {
+        LOGE("GetConfigbyBackupXml load fail");
+        return -1;
+    }
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("GetConfigbyBackupXml Parse fail");
+        return -1;
+    }
+    deviceConfigs = xmlParser->GetNetworks();
+    std::fill(wifiBackupXml.begin(), wifiBackupXml.end(), 0);
+    return 0;
+}
+
+int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd,
+    const std::string &key, const std::string &iv)
+{
+    if (key.size() == 0 || iv.size() == 0) {
+        LOGE("GetConfigbyBackupFile key or iv is empty.");
+        return -1;
+    }
+    struct stat statBuf;
+    if (fd.Get() < 0 || fstat(fd.Get(), &statBuf) < 0) {
+        LOGE("GetConfigbyBackupFile fstat fd fail.");
         return -1;
     }
     int destFd = open(BACKUP_CONFIG_FILE_PATH, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
     if (destFd < 0) {
-        LOGE("OnRestore open file fail.");
+        LOGE("GetConfigbyBackupFile open file fail.");
         return -1;
     }
     if (sendfile(destFd, fd.Get(), nullptr, statBuf.st_size) < 0) {
-        LOGE("OnRestore fd sendfile(size: %{public}d) to destFd fail.", static_cast<int>(statBuf.st_size));
+        LOGE("GetConfigbyBackupFile fd sendfile(size: %{public}d) to destFd fail.", static_cast<int>(statBuf.st_size));
         close(destFd);
         return -1;
     }
@@ -478,15 +518,40 @@ int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
 
     WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
     wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.SetEncryptionInfo(key, iv);
     wifiBackupConfig.LoadConfig();
     std::vector<WifiBackupConfig> backupConfigs;
     wifiBackupConfig.GetValue(backupConfigs);
+    wifiBackupConfig.UnsetEncryptionInfo();
 
-    std::vector<WifiDeviceConfig> deviceConfigs;
     for (const auto &backupCfg : backupConfigs) {
         WifiDeviceConfig config;
         ConvertBackupCfgToDeviceCfg(backupCfg, config);
         deviceConfigs.push_back(config);
+    }
+    return 0;
+}
+
+int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
+{
+    LOGI("OnRestore enter.");
+    const std::string versionForXml = "9";
+    std::string key;
+    std::string iv;
+    std::string version;
+    ParseBackupJson(restoreInfo, key, iv, version);
+
+    std::vector<WifiDeviceConfig> deviceConfigs;
+    int ret = 0;
+    if (version == versionForXml) {
+        ret = GetConfigbyBackupXml(deviceConfigs, fd);
+    } else {
+        ret = GetConfigbyBackupFile(deviceConfigs, fd, key, iv);
+    }
+    std::fill(key.begin(), key.end(), 0);
+    if (ret < 0) {
+        LOGE("OnRestore fail to get config from backup.");
+        return ret;
     }
 
     LOGI("OnRestore end. Restore count: %{public}d", static_cast<int>(deviceConfigs.size()));
@@ -527,6 +592,34 @@ int WifiSettings::SetWifiState(int state, int instId)
     std::unique_lock<std::mutex> lock(mStaMutex);
     mWifiState[instId] = state;
     return 0;
+}
+
+WifiDetailState WifiSettings::GetWifiDetailState(int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDetailState.find(instId);
+    if (iter != mWifiDetailState.end()) {
+        return iter->second;
+    }
+    mWifiDetailState[instId] = WifiDetailState::STATE_UNKNOWN;
+    return mWifiDetailState[instId];
+}
+
+int WifiSettings::SetWifiDetailState(WifiDetailState state, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiDetailState[instId] = state;
+    return 0;
+}
+
+bool WifiSettings::GetWifiAllowSemiActive() const
+{
+    return mWifiAllowSemiActive;
+}
+
+void WifiSettings::SetWifiAllowSemiActive(bool isAllowed)
+{
+    mWifiAllowSemiActive = isAllowed;
 }
 
 bool WifiSettings::HasWifiActive()
@@ -670,6 +763,19 @@ bool WifiSettings::IsWifiToggledEnable()
     }
 }
 
+bool WifiSettings::IsSemiWifiEnable()
+{
+    if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+        return false;
+    }
+    return isSemiWifiEnable || GetWifiAllowSemiActive();
+}
+
+void WifiSettings::SetSemiWifiEnable(bool enable)
+{
+    isSemiWifiEnable = enable;
+}
+
 void WifiSettings::SetSoftapToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
@@ -761,7 +867,7 @@ int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
     if (results.empty()) {
         results.assign(mWifiScanInfoList.begin(), mWifiScanInfoList.end());
     }
-    LOGI("WifiSettings::GetScanInfoList size = %{public}u", results.size());
+    LOGI("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
     return 0;
 }
 
@@ -810,6 +916,19 @@ int WifiSettings::SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo)
     return 0;
 }
 
+int WifiSettings::SaveP2pCreatorUid(int uid)
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    mUid = uid;
+    return 0;
+}
+
+int WifiSettings::GetP2pCreatorUid()
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    return mUid;
+}
+
 int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
@@ -835,7 +954,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         LOGI("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
         return 0;
     }
-    LOGI("DecryptionDeviceConfig start");
+    LOGD("DecryptionDeviceConfig start");
     WifiEncryptionInfo mWifiEncryptionInfo;
     mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);
@@ -873,7 +992,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
-    LOGI("DecryptionDeviceConfig end");
+    LOGD("DecryptionDeviceConfig end");
     return 0;
 }
 #endif
@@ -2323,12 +2442,15 @@ void WifiSettings::UpdateLinkedInfo(int instId)
             if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
                 mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
             }
-            mWifiLinkedInfo[instId].supportedWifiCategory = iter->supportedWifiCategory;
             mWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
-            return;
+            break;
         }
     }
-    LOGD("WifiSettings UpdateLinkedInfo failed.");
+    auto iter = wifiCategoryRecord.find(mWifiLinkedInfo[instId].bssid);
+    if (iter != wifiCategoryRecord.end()) {
+        mWifiLinkedInfo[instId].supportedWifiCategory = iter->second;
+    }
+    LOGD("WifiSettings UpdateLinkedInfo.");
 }
 
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers, int instId)
@@ -2441,7 +2563,7 @@ bool WifiSettings::GetWifiFlagOnAirplaneMode(int instId)
     return mWifiConfig[0].openWifiWhenAirplane;
 }
 
-bool WifiSettings::GetStaLastRunState(int instId)
+int WifiSettings::GetStaLastRunState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);
@@ -2451,7 +2573,7 @@ bool WifiSettings::GetStaLastRunState(int instId)
     return mWifiConfig[0].staLastState;
 }
 
-int WifiSettings::SetStaLastRunState(bool bRun, int instId)
+int WifiSettings::SetStaLastRunState(int bRun, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].staLastState = bRun;
@@ -2528,16 +2650,6 @@ bool WifiSettings::SetWifiStateOnAirplaneChanged(const int &state)
 int WifiSettings::GetAirplaneModeState() const
 {
     return mAirplaneModeState.load();
-}
-
-void WifiSettings::SetPowerSleepState(const int &state)
-{
-    mPowerSleepState = state;
-}
-
-int WifiSettings::GetPowerSleepState() const
-{
-    return mPowerSleepState.load();
 }
 
 void WifiSettings::SetAppRunningState(ScanMode appRunMode)
@@ -3043,6 +3155,26 @@ int WifiSettings::SetStaApExclusionType(int type)
     mWifiConfig[0].staApExclusionType = type;
     SyncWifiConfig();
     return 0;
+}
+
+void WifiSettings::RecordWifiCategory(const std::string bssid, WifiCategory category)
+{
+    std::unique_lock<std::mutex> lock(mScanRecordMutex);
+    if (bssid.empty()) {
+        return;
+    }
+    auto iter = wifiCategoryRecord.find(bssid);
+    if (iter != wifiCategoryRecord.end()) {
+        iter->second = category;
+    } else {
+        wifiCategoryRecord.emplace(std::make_pair(bssid, category));
+    }
+}
+
+void WifiSettings::CleanWifiCategoryRecord()
+{
+    std::unique_lock<std::mutex> lock(mScanRecordMutex);
+    wifiCategoryRecord.clear();
 }
 
 long int WifiSettings::GetRandom()

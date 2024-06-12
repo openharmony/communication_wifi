@@ -26,6 +26,9 @@ namespace Wifi {
 constexpr uint32_t AES_COMMON_SIZE = 256;
 constexpr uint32_t AAD_SIZE = 16;
 constexpr uint32_t NONCE_SIZE = 16;
+constexpr uint32_t AEAD_SIZE = 16;
+constexpr uint32_t AES_256_NONCE_SIZE = 32;
+constexpr uint32_t MAX_UPDATE_SIZE = 64 * 1024;
 
 const uint8_t AAD[AAD_SIZE] = {0};
 
@@ -83,7 +86,6 @@ int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksPar
 int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &inputString,
     EncryptedData &encryptedData);
 
-
 /**
  * @Description  Decrypt encryptedData using GCM-AES based on input encryptionInfo
  * @param wifiEncryptionInfo  - keyAlias info
@@ -92,6 +94,43 @@ int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::
  * @return HKS_SUCCESS - decryption success, others - decryption failed
  */
 int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const EncryptedData &encryptedData,
+    std::string &decryptedData);
+
+/**
+ * @Description  Import GCM-AES key based on input encryptionInfo and default genParamSet
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param key - GCM-AES key(Hex string)
+ * @return HKS_SUCCESS - Import key success, others - Import key failed
+ */
+int32_t ImportKey(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &key);
+
+/**
+ * @Description  Delete existed GCM-AES key based on input encryptionInfo and default genParamSet
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @return HKS_SUCCESS - Delete key success, others - Delete key failed
+ */
+int32_t DeleteKey(const WifiEncryptionInfo &wifiEncryptionInfo);
+
+/**
+ * @Description  Encrypt inputString using GCM-AES based on input encryptionInfo
+ * Used for encryptedData is biger than 100k
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param inputString - plaint string that needs to be encrypted
+ * @param encryptedData - encrypted result with encrypted string and IV value
+ * @return HKS_SUCCESS - encryption success, others - encryption failed
+ */
+int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &inputString,
+    EncryptedData &encryptedData);
+
+/**
+ * @Description  Decrypt encryptedData using GCM-AES based on input encryptionInfo
+ * Used for encryptedData is biger than 100k
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param encryptedData - encrypted result with encrypted string and IV value
+ * @param decryptedData - string after decryption
+ * @return HKS_SUCCESS - decryption success, others - decryption failed
+ */
+int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const EncryptedData &encryptedData,
     std::string &decryptedData);
 }
 }

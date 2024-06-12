@@ -144,7 +144,6 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
         (void)ReadInt32(reply, &privacyConfig);
         config.wifiPrivacySetting = WifiPrivacyConfig(privacyConfig);
         (void)ReadInt32(reply, &config.uid);
-
         result.emplace_back(config);
     }
 }

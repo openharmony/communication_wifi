@@ -293,6 +293,14 @@ public:
     virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) = 0;
 
     /**
+     * @Description Set wifi tx power for sar.
+     *
+     * @param power - 1001,1002,1003......
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetWifiTxPower(int power) = 0;
+
+    /**
      * @Description Disable Wi-Fi device configuration.
      *
      * @param networkId - device config's network id
@@ -457,6 +465,13 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
+
+    /**
+     * @Description set low tx power
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
 
     /**
      * @Description hilink connect

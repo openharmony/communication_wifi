@@ -63,20 +63,20 @@ ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::s
     auto result = queryHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         WIFI_LOGE("WifiDataShareHelper query error, result is null");
+        ClearResources(queryHelper, result);
         return WIFI_OPT_FAILED;
     }
 
     if (result->GoToFirstRow() != DataShare::E_OK) {
         WIFI_LOGE("WifiDataShareHelper query failed,go to first row error");
-        result->Close();
+        ClearResources(queryHelper, result);
         return WIFI_OPT_FAILED;
     }
 
     int columnIndex;
     result->GetColumnIndex(SETTINGS_DATA_COLUMN_VALUE, columnIndex);
     result->GetString(columnIndex, value);
-    result->Close();
-    queryHelper->Release();
+    ClearResources(queryHelper, result);
     WIFI_LOGI("WifiDataShareHelper query success,value[%{public}s]", value.c_str());
     return WIFI_OPT_SUCCESS;
 }
@@ -94,10 +94,11 @@ ErrCode WifiDataShareHelperUtils::Insert(Uri &uri, const std::string &key, const
     int result = insertHelper->Insert(uri, valuesBucket);
     if (result <= 0) {
         WIFI_LOGE("WifiDataShareHelper insert failed, resultCode=%{public}d", result);
+        ClearResources(insertHelper, nullptr);
         return WIFI_OPT_FAILED;
     }
     insertHelper->NotifyChange(uri);
-    insertHelper->Release();
+    ClearResources(insertHelper, nullptr);
     WIFI_LOGE("DataShareHelper insert success");
     return WIFI_OPT_SUCCESS;
 }
@@ -115,10 +116,11 @@ ErrCode WifiDataShareHelperUtils::Update(Uri &uri, const std::string &key, const
     int result = updateHelper->Update(uri, predicates, valuesBucket);
     if (result <= 0) {
         WIFI_LOGE("WifiDataShareHelper update failed, resultCode=%{public}d", result);
+        ClearResources(updateHelper, nullptr);
         return WIFI_OPT_FAILED;
     }
     updateHelper->NotifyChange(uri);
-    updateHelper->Release();
+    ClearResources(updateHelper, nullptr);
     WIFI_LOGE("DataShareHelper update success");
     return WIFI_OPT_SUCCESS;
 }
@@ -129,7 +131,7 @@ ErrCode WifiDataShareHelperUtils::RegisterObserver(const Uri &uri, const sptr<AA
     CHECK_NULL_AND_RETURN(registerHelper, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(observer, WIFI_OPT_FAILED);
     registerHelper->RegisterObserver(uri, observer);
-    registerHelper->Release();
+    ClearResources(registerHelper, nullptr);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -139,7 +141,7 @@ ErrCode WifiDataShareHelperUtils::UnRegisterObserver(const Uri &uri, const sptr<
     CHECK_NULL_AND_RETURN(unregisterHelper, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(observer, WIFI_OPT_FAILED);
     unregisterHelper->UnregisterObserver(uri, observer);
-    unregisterHelper->Release();
+    ClearResources(unregisterHelper, nullptr);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -159,5 +161,17 @@ std::string WifiDataShareHelperUtils::GetLoactionDataShareUri()
     return uri;
 }
 
+void WifiDataShareHelperUtils::ClearResources(std::shared_ptr<DataShare::DataShareHelper> operatrPtr,
+    std::shared_ptr<DataShare::DataShareResultSet> result)
+{
+    if (result != nullptr) {
+        result->Close();
+        result = nullptr;
+    }
+    if (operatrPtr != nullptr) {
+        operatrPtr->Release();
+        operatrPtr = nullptr;
+    }
+}
 }   // namespace Wifi
 }   // namespace OHOS

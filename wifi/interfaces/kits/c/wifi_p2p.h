@@ -230,6 +230,14 @@ WifiErrorCode DiscoverPeers(int32_t channelid);
  * @return WifiErrorCode - operation result
  */
 WifiErrorCode DisableRandomMac(int setmode);
+
+/**
+ * @Description Check can use P2P
+ *
+ * @return WifiErrorCode - operation result
+ */
+WifiErrorCode CheckCanUseP2p();
+
 #ifdef __cplusplus
 }
 #endif

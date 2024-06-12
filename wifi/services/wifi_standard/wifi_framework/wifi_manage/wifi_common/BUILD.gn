@@ -25,6 +25,7 @@ if (defined(ohos_lite)) {
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_helper.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_utils.cpp",
+      "block_connect_service.cpp",
       "wifi_auth_center.cpp",
       "wifi_config_center.cpp",
       "wifi_dumper.cpp",
@@ -99,9 +100,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true
@@ -115,6 +118,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
@@ -140,6 +144,7 @@ if (defined(ohos_lite)) {
     sources = [
       "app_network_speed_limit/app_network_speed_limit_service.cpp",
       "app_network_speed_limit/speed_limit_configs_writer.cpp",
+      "block_connect_service.cpp",
       "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",
       "wifi_cmd_client.cpp",
@@ -151,6 +156,8 @@ if (defined(ohos_lite)) {
       "wifi_internal_event_dispatcher.cpp",
       "wifi_net_agent.cpp",
       "wifi_net_observer.cpp",
+      "wifi_netlink.cpp",
+      "wifi_network_stats/wifi_net_stats_manager.cpp",
       "wifi_notification_util.cpp",
       "wifi_permission_helper.cpp",
       "wifi_permission_utils.cpp",
@@ -191,6 +198,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_native_manager_if",
+      "netmanager_base:net_stats_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",
@@ -206,7 +214,7 @@ if (defined(ohos_lite)) {
       "FEATURE_SELF_CURE_SUPPORT",
     ]
 
-    if (is_asan) {
+    if (is_asan || use_clang_coverage) {
       defines += [ "DTFUZZ_TEST" ]
     }
 
@@ -231,12 +239,6 @@ if (defined(ohos_lite)) {
         defined(global_parts_info.msdp_movement)) {
       external_deps += [ "movement:movement_client" ]
       defines += [ "HAS_MOVEMENT_PART" ]
-    }
-
-    if (defined(global_parts_info) &&
-        defined(global_parts_info.powermgr_power_manager)) {
-      external_deps += [ "power_manager:powermgr_client" ]
-      defines += [ "HAS_POWERMGR_PART" ]
     }
 
     if (defined(global_parts_info) &&

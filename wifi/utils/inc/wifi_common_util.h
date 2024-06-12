@@ -191,6 +191,16 @@ int64_t GetElapsedMicrosecondsSinceBoot();
  */
 std::string GetBundleName();
 
+
+/**
+ * @Description get bundle name by uid
+ *
+ * @param int - uid
+ * @param std::string - bundle name
+ * @return ErrCode - operation result
+ */
+ErrCode GetBundleNameByUid(const int uid, std::string &bundleName);
+
 /**
  * @Description get calling pid
  *

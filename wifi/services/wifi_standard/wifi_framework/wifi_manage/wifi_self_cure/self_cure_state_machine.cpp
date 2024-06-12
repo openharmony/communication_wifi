@@ -26,6 +26,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_settings.h"
 #include "wifi_app_state_aware.h"
+#include "ip_qos_monitor.h"
  
 namespace OHOS {
 namespace Wifi {

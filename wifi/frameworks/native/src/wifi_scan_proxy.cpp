@@ -244,6 +244,103 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScanInfo> &result, int contentSize)
+{
+    WIFI_LOGI("WifiScanProxy ParseScanInfos");
+    std::vector<uint32_t> allSize;
+    if (!reply.ReadUInt32Vector(&allSize)) {
+        WIFI_LOGE("ParseScanInfos ReadInt32Vector error");
+        return WIFI_OPT_FAILED;
+    }
+    sptr<Ashmem> ashmem = reply.ReadAshmem();
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        WIFI_LOGE("ParseDeviceConfigs ReadAshmem error");
+        return WIFI_OPT_FAILED;
+    }
+    size_t offset = 0;
+    for (int i = 0; i < contentSize; ++i) {
+        int dataRecvLen = 0;
+        std::string net = (char *)ashmem->ReadFromAshmem(allSize[i], offset);
+        offset += allSize[i];
+        std::vector<std::string> tokens;
+        SplitStr(net, ";", tokens);
+        WifiScanInfo info;
+        info.bssid = tokens[dataRecvLen++];
+        info.ssid = tokens[dataRecvLen++];
+        info.bssidType = std::stoi(tokens[dataRecvLen++]);
+        info.capabilities = tokens[dataRecvLen++];
+        info.frequency = std::stoi(tokens[dataRecvLen++]);
+        info.band = std::stoi(tokens[dataRecvLen++]);
+        info.channelWidth = static_cast<WifiChannelWidth>(std::stoi(tokens[dataRecvLen++]));
+        info.centerFrequency0 = std::stoi(tokens[dataRecvLen++]);
+        info.centerFrequency1 = std::stoi(tokens[dataRecvLen++]);
+        info.rssi = std::stoi(tokens[dataRecvLen++]);
+        info.securityType = static_cast<WifiSecurity>(std::stoi(tokens[dataRecvLen++]));
+        size_t numInfoElems = std::stoul(tokens[dataRecvLen++]);
+        for (size_t i = 0; i < numInfoElems; i++) {
+            WifiInfoElem elem;
+            elem.id = std::stoi(tokens[dataRecvLen++]);
+            size_t ieLen = std::stoul(tokens[dataRecvLen++]);
+            for (size_t j = 0; j < ieLen; j++) {
+                elem.content.push_back(static_cast<char>(std::stoi(tokens[dataRecvLen++])));
+            }
+            info.infoElems.push_back(elem);
+        }
+        info.features = std::stoll(tokens[dataRecvLen++]);
+        info.timestamp = std::stoll(tokens[dataRecvLen++]);
+        info.wifiStandard = std::stoi(tokens[dataRecvLen++]);
+        info.maxSupportedRxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
+        info.maxSupportedTxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
+        info.disappearCount = std::stoi(tokens[dataRecvLen++]);
+        info.isHiLinkNetwork = tokens[dataRecvLen++] == "true";
+        info.supportedWifiCategory = static_cast<WifiCategory>(std::stoi(tokens[dataRecvLen++]));
+        result.emplace_back(info);
+    }
+    ashmem->UnmapAshmem();
+    ashmem->CloseAshmem();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiScanProxy::ParseScanInfosSmall(MessageParcel &reply, std::vector<WifiScanInfo> &result, int contentSize)
+{
+    for (int i = 0; i < contentSize; i++) {
+        WifiScanInfo info;
+        info.bssid = reply.ReadString();
+        info.ssid = reply.ReadString();
+        info.bssidType = reply.ReadInt32();
+        info.capabilities = reply.ReadString();
+        info.frequency = reply.ReadInt32();
+        info.band = reply.ReadInt32();
+        info.channelWidth = static_cast<WifiChannelWidth>(reply.ReadInt32());
+        info.centerFrequency0 = reply.ReadInt32();
+        info.centerFrequency1 = reply.ReadInt32();
+        info.rssi = reply.ReadInt32();
+        info.securityType = static_cast<WifiSecurity>(reply.ReadInt32());
+        // Parse infoElems vector
+        size_t numInfoElems = reply.ReadUint32();
+        for (size_t i = 0; i < numInfoElems; i++) {
+            WifiInfoElem elem;
+            elem.id = reply.ReadInt32();
+            size_t ieLen = reply.ReadUint32();
+            elem.content.resize(ieLen);
+            for (size_t j = 0; j < ieLen; j++) {
+                elem.content[j] = static_cast<char>(reply.ReadInt32());
+            }
+            info.infoElems.push_back(elem);
+        }
+        info.features = reply.ReadInt64();
+        info.timestamp = reply.ReadInt64();
+        info.wifiStandard = reply.ReadInt32();
+        info.maxSupportedRxLinkSpeed = reply.ReadInt32();
+        info.maxSupportedTxLinkSpeed = reply.ReadInt32();
+        info.disappearCount = reply.ReadInt32();
+        info.isHiLinkNetwork = reply.ReadBool();
+        info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
+        result.emplace_back(info);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
 {
     if (mRemoteDied) {
@@ -277,49 +374,17 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result, bool c
         return ErrCode(ret);
     }
 
-    constexpr int MAX_SIZE = 4096;
-    int tmpsize = reply.ReadInt32();
-    if (tmpsize > MAX_SIZE) {
-        WIFI_LOGE("Scan info size exceeds maximum allowed size: %{public}d", tmpsize);
+    constexpr int maxSize = 200;
+    constexpr int bigSize = 150;
+    int retSize = reply.ReadInt32();
+    if (retSize > maxSize || retSize < 0) {
+        WIFI_LOGE("Scan info size exceeds maximum allowed size: %{public}d", retSize);
         return WIFI_OPT_FAILED;
     }
-    for (int i = 0; i < tmpsize; ++i) {
-        WifiScanInfo info;
-        info.bssid = reply.ReadString();
-        info.bssidType = reply.ReadInt32();
-        info.ssid = reply.ReadString();
-        info.capabilities = reply.ReadString();
-        info.frequency = reply.ReadInt32();
-        info.rssi = reply.ReadInt32();
-        info.timestamp = reply.ReadInt64();
-        info.band = reply.ReadInt32();
-        info.securityType = static_cast<WifiSecurity>(reply.ReadInt32());
-        info.channelWidth = static_cast<WifiChannelWidth>(reply.ReadInt32());
-        info.centerFrequency0 = reply.ReadInt32();
-        info.centerFrequency1 = reply.ReadInt32();
-        info.features = reply.ReadInt64();
-
-        constexpr int IE_SIZE_MAX = 256;
-        int ieSize = reply.ReadInt32();
-        if (ieSize > IE_SIZE_MAX) {
-            WIFI_LOGE("ie size error: %{public}d", ieSize);
-            return WIFI_OPT_FAILED;
-        }
-        for (int m = 0; m < ieSize; ++m) {
-            WifiInfoElem tempWifiInfoElem;
-            tempWifiInfoElem.id = reply.ReadInt32();
-            int contentSize = reply.ReadInt32();
-            for (int n = 0; n < contentSize; n++) {
-                char tempChar = static_cast<char>(reply.ReadInt8());
-                tempWifiInfoElem.content.emplace_back(tempChar);
-            }
-            info.infoElems.emplace_back(tempWifiInfoElem);
-        }
-        info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
-        info.isHiLinkNetwork = reply.ReadBool();
-        result.emplace_back(info);
+    if (retSize > bigSize) {
+        return ParseScanInfos(reply, result, retSize);
     }
-    return WIFI_OPT_SUCCESS;
+    return ParseScanInfosSmall(reply, result, retSize);
 }
 
 ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback, const std::vector<std::string> &event)

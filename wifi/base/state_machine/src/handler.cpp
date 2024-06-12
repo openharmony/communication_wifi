@@ -159,8 +159,6 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
         return;
     }
 
-    LOGD("%{public}s MessageExecutedLater msg:%{public}d %{public}lld",
-        mThreadName.c_str(), msg->GetMessageName(), delayTimeMs);
     int64_t delayTime = delayTimeMs;
     if (delayTime < 0) {
         delayTime = 0;

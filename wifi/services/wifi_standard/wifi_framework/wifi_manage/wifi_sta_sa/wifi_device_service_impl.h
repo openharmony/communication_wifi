@@ -70,6 +70,8 @@ public:
 
     ErrCode RemoveAllDevice() override;
 
+    ErrCode SetTxPower(int power) override;
+
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
@@ -164,6 +166,8 @@ public:
     ErrCode FactoryReset() override;
 
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
+
+    ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
 
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 

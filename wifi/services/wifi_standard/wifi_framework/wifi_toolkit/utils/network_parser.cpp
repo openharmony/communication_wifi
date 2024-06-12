@@ -438,6 +438,10 @@ void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
         return;
     }
     xmlNodePtr networkNodeList = GotoNetworkList(innode);
+    if (networkNodeList == nullptr) {
+        WIFI_LOGE("networkNodeList null");
+        return;
+    }
     int xmlSavedNetworkCount = 0;
     for (xmlNodePtr node = networkNodeList->children; node != nullptr; node = node->next) {
         if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_SECTION_HEADER_NETWORK)) == 0) {

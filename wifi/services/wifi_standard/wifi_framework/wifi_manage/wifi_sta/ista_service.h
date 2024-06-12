@@ -48,6 +48,15 @@ public:
      */
     virtual ErrCode DisableWifi() = 0;
     /**
+     * @Description  Enable semi-wifi
+     *
+     * @Output: Return operating results to Interface Service after enable semi-wifi
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableSemiWifi() = 0;
+    /**
      * @Description  Connect to a new network
      *
      * @param config - the configuration of network which is going to connect.(in)
@@ -229,6 +238,14 @@ public:
     virtual ErrCode SetPowerMode(bool mode) = 0;
 
     /**
+     * @Description set tx power for sar.
+     *
+     * @param power: 1001,1002,1003......
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetTxPower(int power) = 0;
+
+    /**
      * @Description systemabilitychanged
      *
      * @param mode: true for setup, false for shutdown.
@@ -303,13 +320,6 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode StartPortalCertification() = 0;
-	
-    /**
-     * @Description renew dhcp.
-     *
-	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode RenewDhcp() = 0;
 
     /**
      * @Description Handle foreground app changed action.
@@ -336,6 +346,13 @@ public:
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac) = 0;
+
+    /**
+     * @Description start http detect
+     *
+	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartHttpDetect() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

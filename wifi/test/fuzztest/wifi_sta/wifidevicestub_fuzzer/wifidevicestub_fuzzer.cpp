@@ -33,6 +33,7 @@
 #include "wifi_settings.h"
 #include "wifi_common_def.h"
 #include "wifi_manager.h"
+#include "wifi_net_agent.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -42,6 +43,20 @@ static std::mutex g_instanceLock;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiDeviceService";
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 
+void MyExit()
+{
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
+    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
+    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
+    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
+    WifiManager::GetInstance().Exit();
+    sleep(5);
+    printf("exiting\n");
+}
+
 bool Init()
 {
     if (!g_isInsted) {
@@ -49,11 +64,11 @@ bool Init()
             LOGE("WifiManager init failed!");
             return false;
         }
+        atexit(MyExit);
         g_isInsted = true;
     }
     return true;
 }
-
 bool OnRemoteRequest(uint32_t code, MessageParcel &data)
 {
     std::unique_lock<std::mutex> autoLock(g_instanceLock);
@@ -646,6 +661,42 @@ void OnGetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
 }
 
+void OnEnableSemiWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI), datas);
+}
+
+void OnGetWifiDetailStateFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), datas);
+}
+
+void OnSetTxPowerFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), datas);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -696,6 +747,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetChangeDeviceConfigFuzzTest(data, size);
     OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
     OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
+    OHOS::Wifi::OnEnableSemiWifiFuzzTest(data, size);
+    OHOS::Wifi::OnGetWifiDetailStateFuzzTest(data, size);
+    OHOS::Wifi::OnSetTxPowerFuzzTest(data, size);
     OHOS::Wifi::OnSetSatelliteStateFuzzTest(data, size);
     OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
     OHOS::Wifi::OnFactoryResetFuzzTest(data, size);

@@ -49,6 +49,7 @@ struct P2pHalCallback {
     std::function<void(const std::string &, int)> onP2pIfaceCreated;
     std::function<void(const std::string &, int)> onP2pConnectFailed;
     std::function<void(int)> onP2pChannelSwitch;
+    std::function<void(const std::string &)> onEventStaNotify;
 };
 }  // namespace Wifi
 }  // namespace OHOS

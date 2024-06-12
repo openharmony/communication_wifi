@@ -298,7 +298,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetCountryCode(const std::string &countryCode);
-    static WifiErrorNo ReqWpaGetCountryCode(std::string &countryCode);
+    WifiErrorNo ReqWpaGetCountryCode(std::string &countryCode);
     /**
      * @Description Send suspend mode to wpa
      *
@@ -307,7 +307,7 @@ public:
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
     WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
-    static WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
+    WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
 
     /**
      * @Description Send SIM/AKA/AKA' authentication to wpa
@@ -809,6 +809,14 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const;
+    
+    /**
+     * @Description Enable Softap.
+     *
+     * @param id
+     * @return WifiErrorNo
+     */
+    WifiErrorNo EnableAp(int id = 0);
 
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,

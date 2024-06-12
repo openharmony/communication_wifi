@@ -60,6 +60,15 @@ public:
      */
     virtual ErrCode DisableWifi() const;
     /**
+     * @Description  Enable semi-wifi
+     *
+     * @Output: Return operating results to Interface Service after enable semi-wifi
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableSemiWifi();
+    /**
      * @Description  Connect to a new network
      *
      * @param config - the configuration of network which is going to connect.(in)
@@ -239,6 +248,15 @@ public:
     virtual ErrCode SetPowerMode(bool mode) const;
 
     /**
+     * @Description  Set tx power to reduce sar.
+     *
+     * @param power - 1001,1002,1003......
+     *
+     * @Return WifiErrorNo
+     */
+    virtual ErrCode SetTxPower(int power) const;
+
+    /**
      * @Description systemabilitychanged
      *
      * @param mode: true for setup, false for shutdown.
@@ -309,13 +327,6 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode StartPortalCertification();
-	
-	/**
-     * @Description renew dhcp.
-     *
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode RenewDhcp();
 
     /**
      * @Description Handle foreground app changed action.
@@ -342,6 +353,13 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac);
+
+    /**
+     * @Description start http detect.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartHttpDetect();
 
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;

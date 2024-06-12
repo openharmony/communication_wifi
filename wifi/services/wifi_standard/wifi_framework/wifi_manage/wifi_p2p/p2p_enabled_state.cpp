@@ -621,9 +621,10 @@ bool P2pEnabledState::ProcessCmdConnectFailed(InternalMessage &msg) const
     return EXECUTED;
 }
 
-static int AddScanChannelInTimeout(int channelid, int timeout)
+static int AddScanChannelInTimeout(uint32_t channelid, uint32_t timeout)
 {
     int ret = (channelid << CHANNEL_INDEX_OF_DISCOVER) + (timeout & TIMEOUT_MASK_OF_DISCOVER);
+    WIFI_LOGD("AddScanChannelInTimeout result = %{public}d", ret);
     return ret;
 }
 

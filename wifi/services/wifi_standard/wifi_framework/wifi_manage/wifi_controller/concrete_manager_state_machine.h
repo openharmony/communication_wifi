@@ -46,6 +46,7 @@ public:
         void HandleSwitchToConnectOrMixMode(InternalMessage *msg);
         void HandleSwitchToScanOnlyMode(InternalMessage *msg);
         void HandleStartInIdleState(InternalMessage *msg);
+        void HandleSwitchToSemiActiveMode(InternalMessage *msg);
     };
 
     class DefaultState : public State {
@@ -72,6 +73,7 @@ public:
         ConcreteMangerMachine *pConcreteMangerMachine;
         void SwitchScanOnlyInConnectState();
         void SwitchMixInConnectState();
+        void SwitchSemiActiveInConnectState();
     };
 
     class ScanonlyState : public State {
@@ -86,6 +88,7 @@ public:
         ConcreteMangerMachine *pConcreteMangerMachine;
         void SwitchConnectInScanOnlyState();
         void SwitchMixInScanOnlyState();
+        void SwitchSemiActiveInScanOnlyState();
     };
 
     class MixState : public State {
@@ -100,6 +103,22 @@ public:
         ConcreteMangerMachine *pConcreteMangerMachine;
         void SwitchConnectInMixState();
         void SwitchScanOnlyInMixState();
+        void SwitchSemiActiveInMixState();
+    };
+
+    class SemiActiveState : public State {
+    public:
+        explicit SemiActiveState(ConcreteMangerMachine *concreteMangerMachine);
+        ~SemiActiveState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
+
+    private:
+        ConcreteMangerMachine *pConcreteMangerMachine;
+        void SwitchConnectInSemiActiveState();
+        void SwitchMixInSemiActiveState();
+        void SwitchScanOnlyInSemiActiveState();
     };
 
 public:
@@ -129,10 +148,10 @@ private:
     void BuildStateTree();
     ErrCode InitConcreteMangerStates();
 
-    static ErrCode AutoStopScanOnly(int instId);
+    static ErrCode AutoStopScanOnly(int instId, bool isSemiWifiEnable);
     static ErrCode AutoStartScanOnly(int instId);
     static ErrCode AutoStopStaService(int instId);
-    static ErrCode AutoStartStaService(int instId);
+    static ErrCode AutoStartStaService(int instId, bool isSemiWifi);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     static ErrCode StartSelfCureService(int instId);
 #endif
@@ -140,6 +159,9 @@ private:
     void checkAndContinueToStopWifi(InternalMessage *msg);
     void HandleStaStop();
     void HandleStaStart();
+    void HandleStaSemiActive();
+    ErrCode SwitchSemiFromEnable();
+    ErrCode SwitchEnableFromSemi();
     void ReportClose();
     static void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
 
@@ -148,6 +170,7 @@ private:
     ConnectState *pConnectState;
     ScanonlyState *pScanonlyState;
     MixState *pMixState;
+    SemiActiveState *pSemiActiveState;
     static int mTargetRole;
     ConcreteModeCallback mcb;
     static int mid;

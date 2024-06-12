@@ -32,6 +32,7 @@
 #include "wifi_settings.h"
 #include "wifi_common_def.h"
 #include "wifi_manager.h"
+#include "wifi_net_agent.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -43,6 +44,20 @@ static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 sptr<WifiP2pStub> pWifiP2pServiceImpl = WifiP2pServiceImpl::GetInstance();
 
+void MyExit()
+{
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
+    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
+    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
+    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
+    WifiManager::GetInstance().Exit();
+    sleep(5);
+    printf("exiting\n");
+}
+
 bool Init()
 {
     if (!g_isInsted) {
@@ -50,6 +65,7 @@ bool Init()
             LOGE("WifiManager init failed!");
             return false;
         }
+        atexit(MyExit);
         g_isInsted = true;
     }
     return true;
@@ -587,6 +603,43 @@ void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
     pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI),
         datas, reply, option);
 }
+
+void OnDiscoverPeersFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_PEERS),
+        datas, reply, option);
+}
+
+void OnDisableRandomMacFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC),
+        datas, reply, option);
+}
+
+void OnCheckCanUseP2pFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P),
+        datas, reply, option);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -597,6 +650,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
     OHOS::Wifi::DoSomethingInterestingWithMyAPIS(data, size);
     OHOS::Wifi::OnDiscoverDevicesFuzzTest(data, size);
+    OHOS::Wifi::OnDiscoverPeersFuzzTest(data, size);
+    OHOS::Wifi::OnDisableRandomMacFuzzTest(data, size);
+    OHOS::Wifi::OnCheckCanUseP2pFuzzTest(data, size);
     OHOS::Wifi::OnStopDiscoverDevicesFuzzTest(data, size);
     OHOS::Wifi::OnDiscoverServicesFuzzTest(data, size);
     OHOS::Wifi::OnStopDiscoverServicesFuzzTest(data, size);
@@ -637,6 +693,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest(data, size);
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    sleep(U32_AT_SIZE_ZERO);
     return 0;
 }
 }

@@ -90,14 +90,20 @@ private:
     void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiDetailState(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetLowTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);
     void ReadIpAddress(MessageParcel &data, WifiIpAddress &address);
     void WriteEapConfig(MessageParcel &reply, const WifiEapConfig &wifiEapConfig);
+    void BigDataWriteEapConfig(const WifiEapConfig &wifiEapConfig, std::stringstream &bigDataStream);
     void WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config);
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
+    void BigDataWriteIpAddress(const WifiIpAddress &address, std::stringstream &bigDataStream);
+    void SendBigConfig(int32_t ashmemSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
+    void SendSmallConfig(int32_t size, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
 
 #ifndef OHOS_ARCH_LITE
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {

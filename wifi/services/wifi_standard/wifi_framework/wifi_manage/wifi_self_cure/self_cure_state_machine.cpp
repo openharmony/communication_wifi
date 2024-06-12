@@ -862,8 +862,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
               requestCureLevel, currentRssi);
     if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS) {
         WIFI_LOGI("SelfCureForDns");
-    } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_2_RENEW_DHCP) {
-        SelfCureForRenewDhcp(requestCureLevel);
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_RECONNECT_4_INVALID_IP) {
         SelfCureForInvalidIp();
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
@@ -873,25 +871,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_HIGH_RESET) {
         SelfCureForReset(requestCureLevel);
     }
-}
-
-void SelfCureStateMachine::InternetSelfCureState::SelfCureForRenewDhcp(int requestCureLevel)
-{
-    WIFI_LOGI("begin to self cure for internet access: RenewDhcp");
-    pSelfCureStateMachine->dhcpOfferPackets.clear();
-    pSelfCureStateMachine->dhcpResultsTestDone.clear();
-    pSelfCureStateMachine->selfCureOnGoing = true;
-    testedSelfCureLevel.push_back(requestCureLevel);
-    renewDhcpCount += 1;
-    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
-    if (pStaService == nullptr) {
-        WIFI_LOGE("Get pStaService failed!");
-        return;
-    }
-    if (pStaService->RenewDhcp()!=WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("RenewDhcp failed.\n");
-    }
-    pSelfCureStateMachine->StartTimer(WIFI_CURE_CMD_IP_CONFIG_TIMEOUT, DHCP_RENEW_TIMEOUT_MS);
 }
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForInvalidIp()

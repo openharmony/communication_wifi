@@ -48,10 +48,6 @@ std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceSer
 std::shared_ptr<WifiScanStub> pWifiScanServiceImpl = std::make_shared<WifiScanServiceImpl>();
 void MyExit()
 {
-    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
-    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
-    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
-    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
     WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
     WifiNetAgent::GetInstance().netAgentEventHandler.reset();
     WifiSettings::GetInstance().mWifiEncryptionThread.reset();

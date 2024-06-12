@@ -25,6 +25,7 @@
 #include "sta_interface.h"
 #include "sta_auto_connect_service.h"
 #include "mock_sta_state_machine.h"
+#include "wifi_settings.h"
 #include "sta_service.h"
 #include "wifi_internal_msg.h"
 #include <mutex>
@@ -73,19 +74,15 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     int uid = static_cast<int>(data[index++]);
     bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
     std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
-
     WpsConfig sconfig;
     sconfig.pin = std::string(reinterpret_cast<const char*>(data), size);
     sconfig.bssid = std::string(reinterpret_cast<const char*>(data), size);
     sconfig.setup = static_cast<SetupMethod>(static_cast<int>(data[0]) % THREE);
-
     WifiDeviceConfig config;
     config.ssid = std::string(reinterpret_cast<const char*>(data), size);
     config.bssid = std::string(reinterpret_cast<const char*>(data), size);
     config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
     config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    std::vector<InterScanInfo> results;
-
     pStaInterface->ConnectToNetwork(networkId);
     pStaInterface->ConnectToDevice(config);
     pStaInterface->ReConnect();
@@ -103,6 +100,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->DisableDeviceConfig(networkId);
     pStaInterface->StartWps(sconfig);
     pStaInterface->CancelWps();
+    std::vector<InterScanInfo> results;
     pStaInterface->ConnectivityManager(results);
     pStaInterface->SetSuspendMode(attemptEnable);
     pStaInterface->SetPowerMode(attemptEnable);
@@ -135,6 +133,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->EnableHiLinkHandshake(config, conditionName);
     pStaService->DeliverStaIfaceData(conditionName);
     pStaService->GetDataSlotId();
+    pStaService->AddDeviceConfig(config);
 }
 
 void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
@@ -142,8 +141,18 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
     bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
     int frequency = static_cast<int>(data[0]);
-    std::vector<InterScanInfo> scanInfo;
     InterScanInfo scanInfoList;
+    scanInfoList.channelWidth = static_cast<WifiChannelWidth>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
+    scanInfoList.wifiMode = static_cast<int>(data[0]);
+    scanInfoList.timestamp = static_cast<int64_t>(data[0]);
+    scanInfoList.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    scanInfoList.rssi = static_cast<int>(data[0]);
+    scanInfoList.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    scanInfoList.capabilities = std::string(reinterpret_cast<const char*>(data), size);
+    scanInfoList.frequency = static_cast<int>(data[0]);
+    scanInfoList.features = static_cast<int64_t>(data[0]);
+    std::vector<InterScanInfo> scanInfo;
+    scanInfo.push_back(scanInfoList);
     WifiLinkedInfo info;
     if (size >= sizeof(WifiLinkedInfo)) {
         int index = 0;
@@ -158,13 +167,16 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
         info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
         info.detailedState = static_cast<DetailedState>(static_cast<int>(data[0]) % STATE);
     }
+
     WifiDeviceConfig config;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = scanInfoList.bssid;
+    config.ssid = scanInfoList.ssid;
     config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
     config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
     std::vector<std::string> blocklistBssids;
     blocklistBssids.push_back(std::string(reinterpret_cast<const char*>(data), size));
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    WifiSettings::GetInstance().SaveLinkedInfo(info);
     pStaAutoConnectService->IsAllowAutoJoin();
     pStaAutoConnectService->DeregisterAutoJoinCondition(conditionName);
     pStaAutoConnectService->EnableAutoJoin(conditionName);

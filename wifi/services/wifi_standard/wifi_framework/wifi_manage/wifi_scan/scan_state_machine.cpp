@@ -814,7 +814,7 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterS
         std::string hiddenSsid = interMessage->GetStringFromMessage();
         if (hiddenSsid.empty()) {
             WIFI_LOGE("Message body is error.");
-            return false;
+            continue;
         }
         scanConfig.hiddenNetworkSsid.push_back(hiddenSsid);
     }
@@ -825,7 +825,7 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterS
         int freq = interMessage->GetIntFromMessage();
         if (freq == 0) {
             WIFI_LOGE("Message body is error.");
-            return false;
+            continue;
         }
         scanConfig.scanFreqs.push_back(freq);
     }

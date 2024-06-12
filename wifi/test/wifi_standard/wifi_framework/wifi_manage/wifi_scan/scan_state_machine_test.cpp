@@ -606,7 +606,7 @@ public:
     void StartSingleCommonScanSuccess()
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = true;
-        WifiScanParam scanParam;
+        WifiHalScanParam scanParam;
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
         pScanStateMachine->ClearRunningScanSettings();
@@ -616,7 +616,7 @@ public:
     void StartSingleCommonScanFail()
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = false;
-        WifiScanParam scanParam;
+        WifiHalScanParam scanParam;
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
         EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), false);

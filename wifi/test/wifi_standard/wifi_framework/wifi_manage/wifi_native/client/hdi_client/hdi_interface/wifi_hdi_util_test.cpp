@@ -36,7 +36,7 @@ HWTEST_F(WifiHdiUtilTest, Get80211ElemsFromIETest, TestSize.Level1)
     int show = 1;
 
     int result = Get80211ElemsFromIE(start, len, elems, show);
-    EXPECT_EQ(result, WIFI_IDL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     result = Get80211ElemsFromIE(0, len, elems, show);
     EXPECT_EQ(result, 0);
 }

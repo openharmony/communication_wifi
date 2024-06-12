@@ -87,14 +87,14 @@ public:
 HWTEST_F(ApService_test, EnableHotspot_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->EnableHotspot());
 }
 /* DisableHotspot */
 HWTEST_F(ApService_test, DisableHotspotSUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     pApService->EnableHotspot();
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->DisableHotspot());
 }
@@ -102,28 +102,28 @@ HWTEST_F(ApService_test, DisableHotspotSUCCESS, TestSize.Level1)
 HWTEST_F(ApService_test, SetHotspotConfig_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->SetHotspotConfig(apInfo));
 }
 /* AddBlockList */
 HWTEST_F(ApService_test, AddBlockList_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->AddBlockList(staInfo));
 }
 /* DelBlockList */
 HWTEST_F(ApService_test, DelBlockList_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->DelBlockList(staInfo));
 }
 /* DisconnetStation */
 HWTEST_F(ApService_test, DisconnetStation_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->DisconnetStation(staInfo));
 }
 
@@ -139,7 +139,7 @@ HWTEST_F(ApService_test, GetValidBands_SUCCESS, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidBands(Eq(vecSta)))
         .WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidBands(vecSta));
     EXPECT_EQ(temp, vecSta);
 }
@@ -154,7 +154,7 @@ HWTEST_F(ApService_test, GetValidBands_FAILED, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidBands(Eq(vecSta)))
         .WillOnce(DoAll(SetArgReferee<0>(temp), Return(-1)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetValidBands(vecSta));
 }
 
@@ -166,7 +166,7 @@ HWTEST_F(ApService_test, GetValidChannels_SUCCESS, TestSize.Level1)
     std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
     ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidChannels(BandType::BAND_2GHZ, vecChannels));
     EXPECT_EQ(vecChannels, band_2G_channel);
@@ -185,7 +185,7 @@ HWTEST_F(ApService_test, GetValidChannels_SUCCESS, TestSize.Level1)
 HWTEST_F(ApService_test, RegisterApServiceCallbacks_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     IApServiceCallbacks callbacks;
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WarpRegisterApServiceCallbacks(callbacks));
 }
@@ -194,7 +194,7 @@ HWTEST_F(ApService_test, GetStationListSuccess1, TestSize.Level1)
 {
     std::vector<StationInfo> result;
     EXPECT_CALL(WifiSettings::GetInstance(), GetStationList(_, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetStationList(result));
 }
 
@@ -207,7 +207,7 @@ HWTEST_F(ApService_test, GetStationListFailed, TestSize.Level1)
     info.ipAddr = "127.0.0.1",
     result.push_back(info);
     EXPECT_CALL(WifiSettings::GetInstance(), GetStationList(_, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetStationList(result));
 }
 
@@ -217,12 +217,12 @@ HWTEST_F(ApService_test, GetValidBandsSuccess, TestSize.Level1)
     std::vector<int> allowed2GFreq;
     allowed2GFreq.push_back(FREQUENCY2G);
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidBands(Eq(vecSta)))
-        .WillOnce(DoAll(SetArgReferee<0>(vecSta), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillOnce(DoAll(SetArgReferee<0>(vecSta), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, Eq(allowed2GFreq)))
-        .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetValidBands(vecSta));
 }
 
@@ -233,9 +233,9 @@ HWTEST_F(ApService_test, GetValidBandsFailed, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidBands(Eq(vecSta)))
         .WillOnce(DoAll(SetArgReferee<0>(vecSta), Return(0)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetValidBands(vecSta));
 }
 
@@ -247,9 +247,9 @@ HWTEST_F(ApService_test, GetValidChannelsSuccess2, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(Return(0));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, Eq(allowed2GFreq)))
-        .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(allowed5GFreq), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<2>(allowed5GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillOnce(Return(0));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidChannels(BandType::BAND_2GHZ, vecChannels));
 }
@@ -262,9 +262,9 @@ HWTEST_F(ApService_test, GetValidChannelsFail2, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
     EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(Return(0));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, Eq(allowed2GFreq)))
-        .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(allowed5GFreq), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<2>(allowed5GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillOnce(Return(0));
     EXPECT_EQ(ErrCode::WIFI_OPT_INVALID_PARAM, pApService->GetValidChannels(BandType::BAND_ANY, vecChannels));
 }
@@ -279,7 +279,7 @@ HWTEST_F(ApService_test, SetPowerModelSuccess, TestSize.Level1)
 {
     PowerModel model = PowerModel::SLEEPING;
     EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), SetPowerModel(_, _)).WillOnce(Return(ErrCode::WIFI_OPT_SUCCESS));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->SetPowerModel(model));
 }
@@ -288,7 +288,7 @@ HWTEST_F(ApService_test, SetPowerModelFailed, TestSize.Level1)
 {
     PowerModel model = PowerModel::SLEEPING;
     EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiSettings::GetInstance(), SetPowerModel(_, _)).WillRepeatedly(Return(ErrCode::WIFI_OPT_SUCCESS));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->SetPowerModel(model));
 }

@@ -49,7 +49,7 @@ public:
 
         RegisterApServiceCallbacks();
         EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-            .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+            .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
         usleep(SLEEP_TIME);
     }
     virtual void TearDown()

@@ -73,7 +73,7 @@ void P2pGroupOperatingState::Init()
 
 bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) const
 {
-    WifiErrorNo ret = WIFI_IDL_OPT_FAILED;
+    WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     const int minValidNetworkid = 0;
     WifiP2pConfigInternal config;
     msg.GetMessageObj(config);
@@ -108,13 +108,13 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
                    config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
             WifiSettings::GetInstance().SetExplicitGroup(true);
             if (p2pStateMachine.DealCreateNewGroupWithConfig(config, freq)) {
-                ret = WIFI_IDL_OPT_OK;
+                ret = WIFI_HAL_OPT_OK;
             }
         }
     } else {
         WIFI_LOGE("Invalid parameter.");
     }
-    if (WifiErrorNo::WIFI_IDL_OPT_FAILED == ret) {
+    if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
         WIFI_LOGE("p2p configure to CreateGroup failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_FAILED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
@@ -179,7 +179,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
     }
     SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
-    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_IDL_OPT_OK) {
+    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
@@ -220,7 +220,7 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
         WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GC, P2P_OFF);
     }
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-    if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
     }
     WifiP2pGroupInfo invalidGroup;
@@ -244,7 +244,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
      * Removes a current setup group.
      */
     WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
-    WifiErrorNo ret = WIFI_IDL_OPT_FAILED;
+    WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
     auto dhcpFunc = [=]() {
         if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
@@ -277,7 +277,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
             WIFI_LOGI("The P2P group is successfully removed.");
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
             ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-            if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+            if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
                 WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
             }
         }
@@ -329,7 +329,7 @@ bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessage &msg) c
 
 bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessage &msg) const
 {
-    WifiErrorNo ret = WIFI_IDL_OPT_FAILED;
+    WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     int freq = 0;
     int freqEnhance = 0;
     bool isFreqEnhance = false;
@@ -365,7 +365,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessage &m
         FreqEnhance = nullptr;
     } while (0);
     ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, PERSISTENT_NET_ID, freq);
-    if (WifiErrorNo::WIFI_IDL_OPT_FAILED == ret) {
+    if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
         WIFI_LOGE("p2p configure to CreateGroup failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_FAILED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);

@@ -21,10 +21,7 @@
 #include <vector>
 #include "wifi_internal_msg.h"
 #include "wifi_error_no.h"
-#include "wifi_sta_request.h"
-#include "wifi_scan_param.h"
-#include "wifi_idl_struct.h"
-#include "wifi_idl_define.h"
+#include "wifi_native_struct.h"
 #include "wifi_global_func.h"
 #include "i_wifi_struct.h"
 #include "wifi_event_callback.h"
@@ -122,7 +119,7 @@ public:
      * @param scanParam
      * @return WifiErrorNo
      */
-    WifiErrorNo Scan(const WifiScanParam &scanParam);
+    WifiErrorNo Scan(const WifiHalScanParam &scanParam);
 
     /**
      * @Description Obtain the scanning result.
@@ -138,7 +135,7 @@ public:
      * @param scanParam
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqStartPnoScan(const WifiPnoScanParam &scanParam);
+    WifiErrorNo ReqStartPnoScan(const WifiHalPnoScanParam &scanParam);
 
     /**
      * @Description Stop PNO Scanning.
@@ -193,7 +190,7 @@ public:
      * @param config - Setting Network Parameters.
      * @return WifiErrorNo
      */
-    WifiErrorNo SetDeviceConfig(int networkId, const WifiIdlDeviceConfig &config);
+    WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config);
 
     /**
      * @Description Set bssid to supplicant.
@@ -225,7 +222,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqStartWpsPbcMode(const WifiIdlWpsConfig &config);
+    WifiErrorNo ReqStartWpsPbcMode(const WifiHalWpsConfig &config);
 
     /**
      * @Description Enable PIN mode WPS.
@@ -234,7 +231,7 @@ public:
      * @param pinCode
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqStartWpsPinMode(const WifiIdlWpsConfig &config, int &pinCode);
+    WifiErrorNo ReqStartWpsPinMode(const WifiHalWpsConfig &config, int &pinCode);
 
     /**
      * @Description Close wps.
@@ -249,7 +246,7 @@ public:
      * @param capability - Roaming Support Capability.
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqGetRoamingCapabilities(WifiIdlRoamCapability &capability);
+    WifiErrorNo ReqGetRoamingCapabilities(WifiHalRoamCapability &capability);
 
     /**
      * @Description Setting Roaming Configurations.
@@ -257,7 +254,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqSetRoamConfig(const WifiIdlRoamConfig &config);
+    WifiErrorNo ReqSetRoamConfig(const WifiHalRoamConfig &config);
 
     /**
      * @Description Get current connect signal info, rssi, linkspeed, noise ...
@@ -266,7 +263,7 @@ public:
      * @param info - signal info
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info) const;
+    WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiHalWpaSignalInfo &info) const;
 
     /**
      * @Description Wpa_s disable/enable(0/1) automatic reconnection.
@@ -306,8 +303,8 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
-    WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
-    WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
+    WifiErrorNo GetNetworkList(std::vector<WifiHalWpaNetworkInfo> &networkList);
+    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config);
 
     /**
      * @Description Send SIM/AKA/AKA' authentication to wpa
@@ -764,7 +761,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqP2pSetGroupConfig(int networkId, const IdlP2pGroupConfig &config) const;
+    WifiErrorNo ReqP2pSetGroupConfig(int networkId, const HalP2pGroupConfig &config) const;
 
     int PushP2pGroupConfigString(P2pGroupConfig *pConfig, P2pGroupConfigType type, const std::string &str) const;
 
@@ -777,7 +774,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqP2pGetGroupConfig(int networkId, IdlP2pGroupConfig &config) const;
+    WifiErrorNo ReqP2pGetGroupConfig(int networkId, HalP2pGroupConfig &config) const;
 
     /**
      * @Description Request to obtain the next network ID.
@@ -825,7 +822,7 @@ private:
     int PushDeviceConfigAuthAlgorithm(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int alg) const;
     int PushDeviceConfigParseMask(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int mask,
         const std::string parseStr[], int size) const;
-    WifiErrorNo CheckValidDeviceConfig(const WifiIdlDeviceConfig &config) const;
+    WifiErrorNo CheckValidDeviceConfig(const WifiHalDeviceConfig &config) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

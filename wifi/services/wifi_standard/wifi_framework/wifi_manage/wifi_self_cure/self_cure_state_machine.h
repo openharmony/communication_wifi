@@ -244,7 +244,6 @@ public:
         void HandleSelfCureFailedForRandMacReassoc();
         void HandleRssiChanged();
         void HandleDelayedResetSelfCure();
-        void SelfCureForRenewDhcp(int requestCureLevel);
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);
     };

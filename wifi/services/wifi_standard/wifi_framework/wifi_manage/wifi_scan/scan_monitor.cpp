@@ -32,7 +32,7 @@ bool ScanMonitor::InitScanMonitor()
 
     SupplicantEventCallback eventCallback;
     eventCallback.onScanNotify = std::bind(&ScanMonitor::ReceiveScanEventFromIdl, this, std::placeholders::_1);
-    if (WifiSupplicantHalInterface::GetInstance().RegisterSupplicantEventCallback(eventCallback) != WIFI_IDL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().RegisterSupplicantEventCallback(eventCallback) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("RegisterSupplicantEventCallback failed.");
         return false;
     }
@@ -43,7 +43,7 @@ bool ScanMonitor::InitScanMonitor()
 void ScanMonitor::UnInitScanMonitor()
 {
     WIFI_LOGI("Enter ScanMonitor::UnInitScanMonitor.");
-    if (WifiSupplicantHalInterface::GetInstance().UnRegisterSupplicantEventCallback() != WIFI_IDL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().UnRegisterSupplicantEventCallback() != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("UnRegisterSupplicantEventCallback failed.");
     }
     return;
@@ -67,15 +67,15 @@ void ScanMonitor::ProcessReceiveScanEvent(int result)
     WIFI_LOGI("Enter ScanMonitor::ProcessReceiveScanEvent, result is %{public}d.\n", result);
 
     switch (result) {
-        case SINGLE_SCAN_OVER_OK: {
+        case HAL_SINGLE_SCAN_OVER_OK: {
             SendScanInfoEvent();
             break;
         }
-        case SINGLE_SCAN_FAILED: {
+        case HAL_SINGLE_SCAN_FAILED: {
             SendScanFailedEvent();
             break;
         }
-        case PNO_SCAN_OVER_OK: {
+        case HAL_PNO_SCAN_OVER_OK: {
             SendPnoScanInfoEvent();
             break;
         }

@@ -20,9 +20,9 @@
 #include "context.h"
 #include "i_wifi_public_func.h"
 #include "serial.h"
-#include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
+#include "wifi_native_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlSupplicantIface"
@@ -45,10 +45,10 @@ WifiErrorNo StartSupplicant(void)
     WriteBegin(context, 0);
     WriteFunc(context, "StartSupplicant");
     WriteEnd(context);
-    if (RpcClientCall(client, "StartSupplicant") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "StartSupplicant") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -63,10 +63,10 @@ WifiErrorNo StopSupplicant(void)
     WriteBegin(context, 0);
     WriteFunc(context, "StopSupplicant");
     WriteEnd(context);
-    if (RpcClientCall(client, "StopSupplicant") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "StopSupplicant") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -81,10 +81,10 @@ WifiErrorNo ConnectSupplicant(void)
     WriteBegin(context, 0);
     WriteFunc(context, "ConnectSupplicant");
     WriteEnd(context);
-    if (RpcClientCall(client, "ConnectSupplicant") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "ConnectSupplicant") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -99,10 +99,10 @@ WifiErrorNo DisconnectSupplicant(void)
     WriteBegin(context, 0);
     WriteFunc(context, "DisconnectSupplicant");
     WriteEnd(context);
-    if (RpcClientCall(client, "DisconnectSupplicant") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "DisconnectSupplicant") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -119,10 +119,10 @@ WifiErrorNo RequestToSupplicant(unsigned char *buf, int32_t bufSize)
     WriteInt(context, bufSize);
     WriteUStr(context, buf, bufSize);
     WriteEnd(context);
-    if (RpcClientCall(client, "RequestToSupplicant") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "RequestToSupplicant") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -142,24 +142,24 @@ WifiErrorNo RegisterSupplicantEventCallback(ISupplicantEventCallback callback)
     if (num == 0) { /* UnRegisterEventCallback */
         WriteFunc(context, "UnRegisterEventCallback");
         WriteInt(context, 1); /* ISupplicantEventCallback event num */
-        WriteInt(context, WIFI_IDL_CBK_CMD_SCAN_INFO_NOTIFY);
+        WriteInt(context, HAL_CBK_CMD_SCAN_INFO_NOTIFY);
     } else {
         WriteFunc(context, "RegisterEventCallback");
         WriteInt(context, num);
         if (callback.onScanNotify != NULL) {
-            WriteInt(context, WIFI_IDL_CBK_CMD_SCAN_INFO_NOTIFY);
+            WriteInt(context, HAL_CBK_CMD_SCAN_INFO_NOTIFY);
         }
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "RegisterSupplicantEventCallback") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "RegisterSupplicantEventCallback") != WIFI_HAL_OPT_OK) {
         if (num == 0) {
             SetSupplicantEventCallback(callback);
         }
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK || num == 0) {
+    if (result == WIFI_HAL_OPT_OK || num == 0) {
         SetSupplicantEventCallback(callback);
     }
     ReadClientEnd(client);
@@ -176,10 +176,10 @@ WifiErrorNo Connect(int networkId)
     WriteFunc(context, "Connect");
     WriteInt(context, networkId);
     WriteEnd(context);
-    if (RpcClientCall(client, "Connect") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "Connect") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -194,10 +194,10 @@ WifiErrorNo Reconnect(void)
     WriteBegin(context, 0);
     WriteFunc(context, "Reconnect");
     WriteEnd(context);
-    if (RpcClientCall(client, "Reconnect") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "Reconnect") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -212,10 +212,10 @@ WifiErrorNo Reassociate(void)
     WriteBegin(context, 0);
     WriteFunc(context, "Reassociate");
     WriteEnd(context);
-    if (RpcClientCall(client, "Reassociate") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "Reassociate") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -230,10 +230,10 @@ WifiErrorNo Disconnect(void)
     WriteBegin(context, 0);
     WriteFunc(context, "Disconnect");
     WriteEnd(context);
-    if (RpcClientCall(client, "Disconnect") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "Disconnect") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -249,10 +249,10 @@ WifiErrorNo SetPowerSave(int enable)
     WriteFunc(context, "SetPowerSave");
     WriteInt(context, (int)enable);
     WriteEnd(context);
-    if (RpcClientCall(client, "SetPowerSave") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SetPowerSave") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -268,10 +268,10 @@ WifiErrorNo WpaSetCountryCode(const char *countryCode)
     WriteFunc(context, "WpaSetCountryCode");
     WriteStr(context, countryCode);
     WriteEnd(context);
-    if (RpcClientCall(client, "WpaSetCountryCode") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "WpaSetCountryCode") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -286,18 +286,18 @@ WifiErrorNo WpaGetCountryCode(char *countryCode, int codeSize)
     WriteBegin(context, 0);
     WriteFunc(context, "WpaGetCountryCode");
     WriteEnd(context);
-    if (RpcClientCall(client, "WpaGetCountryCode") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "WpaGetCountryCode") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadStr(context, countryCode, codeSize);
     }
     ReadClientEnd(client);
     UnlockRpcClient(client);
     if (strlen(countryCode) <= 0) {
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     return result;
 }

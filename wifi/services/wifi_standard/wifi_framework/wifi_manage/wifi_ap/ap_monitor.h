@@ -21,7 +21,7 @@
 
 #include "wifi_ap_msg.h"
 #include "ap_define.h"
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -37,7 +37,7 @@ public:
      * @param cbInfo - structure stored STA infos, only MAC and action.
      * @return None
      */
-    virtual void OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo);
+    virtual void OnStaJoinOrLeave(const WifiHalApConnectionNofify &cbInfo);
 
     /* @Description  IDL called this interface when STA connected or
                      disconnected, report to state machine.

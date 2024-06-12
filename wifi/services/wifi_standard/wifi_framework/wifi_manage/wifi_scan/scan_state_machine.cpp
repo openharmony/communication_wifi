@@ -909,7 +909,7 @@ void ScanStateMachine::ClearRunningScanSettings()
     return;
 }
 
-bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
+bool ScanStateMachine::StartSingleCommonScan(WifiHalScanParam &scanParam)
 {
     WIFI_LOGI("Enter StartSingleCommonScan.\n");
 
@@ -924,7 +924,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
 
     WIFI_LOGI("Begin call Scan.\n");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(WifiSettings::GetInstance().GetStaIfaceName(), scanParam);
-    if ((ret != WIFI_IDL_OPT_OK) && (ret != WIFI_IDL_OPT_SCAN_BUSY)) {
+    if ((ret != WIFI_HAL_OPT_OK) && (ret != WIFI_HAL_OPT_SCAN_BUSY)) {
         WIFI_LOGE("GetInstance().scan failed.");
         return false;
     }
@@ -1368,7 +1368,7 @@ bool ScanStateMachine::StartPnoScanHardware()
     }
 
     /* Invoke the IDL interface to start PNO scanning */
-    WifiPnoScanParam pnoScanParam;
+    WifiHalPnoScanParam pnoScanParam;
     pnoScanParam.scanInterval = runningPnoScanConfig.scanInterval;
     pnoScanParam.minRssi2Dot4Ghz = runningPnoScanConfig.minRssi2Dot4Ghz;
     pnoScanParam.minRssi5Ghz = runningPnoScanConfig.minRssi5Ghz;
@@ -1380,7 +1380,7 @@ bool ScanStateMachine::StartPnoScanHardware()
     WIFI_LOGI("pnoScanParam.scanInterval is %{public}d.\n", pnoScanParam.scanInterval);
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(
         WifiSettings::GetInstance().GetStaIfaceName(), pnoScanParam);
-    if ((ret != WIFI_IDL_OPT_OK) && (ret != WIFI_IDL_OPT_SCAN_BUSY)) {
+    if ((ret != WIFI_HAL_OPT_OK) && (ret != WIFI_HAL_OPT_SCAN_BUSY)) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().StartPnoScan failed.");
         PnoScanFailedProcess();
         return false;
@@ -1402,7 +1402,7 @@ void ScanStateMachine::StopPnoScanHardware()
 
     /* Invoke the IDL interface to stop PNO scanning */
     if (WifiStaHalInterface::GetInstance().StopPnoScan(
-        WifiSettings::GetInstance().GetStaIfaceName()) != WIFI_IDL_OPT_OK) {
+        WifiSettings::GetInstance().GetStaIfaceName()) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().StopPnoScan failed.");
     }
 
@@ -1550,7 +1550,7 @@ void ScanStateMachine::CommonScanAfterPnoProcess()
     WIFI_LOGI("Enter CommonScanAfterPnoProcess.\n");
 
     StopPnoScanHardware();
-    WifiScanParam scanParam;
+    WifiHalScanParam scanParam;
     scanParam.hiddenNetworkSsid.assign(
         runningScanConfigForPno.hiddenNetworkSsid.begin(), runningScanConfigForPno.hiddenNetworkSsid.end());
     scanParam.scanFreqs.assign(runningScanConfigForPno.scanFreqs.begin(), runningScanConfigForPno.scanFreqs.end());
@@ -1611,7 +1611,7 @@ bool ScanStateMachine::GetScanInfos(std::vector<InterScanInfo> &scanInfos)
 
     WIFI_LOGI("Begin: QueryScanInfos.");
     if (WifiStaHalInterface::GetInstance().QueryScanInfos(
-        WifiSettings::GetInstance().GetStaIfaceName(), scanInfos) != WIFI_IDL_OPT_OK) {
+        WifiSettings::GetInstance().GetStaIfaceName(), scanInfos) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().GetScanInfos failed.");
         return false;
     }
@@ -1641,7 +1641,7 @@ bool ScanStateMachine::RepeatStartCommonScan()
         return false;
     }
 
-    WifiScanParam scanParam;
+    WifiHalScanParam scanParam;
     scanParam.scanFreqs.assign(runningScanConfigForPno.scanFreqs.begin(), runningScanConfigForPno.scanFreqs.end());
     scanParam.hiddenNetworkSsid.assign(
         runningScanConfigForPno.hiddenNetworkSsid.begin(), runningScanConfigForPno.hiddenNetworkSsid.end());

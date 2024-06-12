@@ -51,55 +51,55 @@ HWTEST_F(WifiChipHalInterfaceTest, GetWifiChipObjectTest, TestSize.Level1)
 {
     IWifiChip chip;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().GetWifiChipObject(1, chip);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiChipHalInterfaceTest, GetChipIdsTest, TestSize.Level1)
 {
     std::vector<int> vec;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().GetChipIds(vec);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiChipHalInterfaceTest, GetUsedChipIdTest, TestSize.Level1)
 {
     int id = 0;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().GetUsedChipId(id);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiChipHalInterfaceTest, GetChipCapabilitiesTest, TestSize.Level1)
 {
     int capabilities = 0;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().GetChipCapabilities(capabilities);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiChipHalInterfaceTest, GetSupportedModesTest, TestSize.Level1)
 {
     std::vector<int> vec;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().GetSupportedModes(vec);
-    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiChipHalInterfaceTest, ConfigRunModesTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().ConfigRunModes(0);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiChipHalInterfaceTest, GetCurrentModeTest, TestSize.Level1)
 {
     int mode = 0;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().GetCurrentMode(mode);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiChipHalInterfaceTest, RequestFirmwareDebugInfoTest, TestSize.Level1)
 {
     std::string info;
     WifiErrorNo ret = WifiChipHalInterface::GetInstance().RequestFirmwareDebugInfo(info);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 }  // namespace Wifi
 }  // namespace OHOS

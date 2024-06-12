@@ -30,13 +30,13 @@ public:
 HWTEST_F(WifiHdiWpaProxyTest, HdiWpaStartTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStart();
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiWpaStopTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStop();
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiAddWpaIfaceTest, TestSize.Level1)
@@ -44,20 +44,20 @@ HWTEST_F(WifiHdiWpaProxyTest, HdiAddWpaIfaceTest, TestSize.Level1)
     const char ifName[10] = "Wlan1";
     const char confName[10] = "";
     WifiErrorNo result = HdiAddWpaIface(ifName, confName);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     result = HdiAddWpaIface(nullptr, confName);
-    EXPECT_EQ(result, WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
     result = HdiAddWpaIface(ifName, nullptr);
-    EXPECT_EQ(result, WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiRemoveWpaIfaceTest, TestSize.Level1)
 {
     const char ifName[10] = "Wlan1";
     WifiErrorNo result = HdiRemoveWpaIface(nullptr);
-    EXPECT_EQ(result, WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
     result = HdiRemoveWpaIface(ifName);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, CopyUserFileTest, TestSize.Level1)
@@ -65,18 +65,18 @@ HWTEST_F(WifiHdiWpaProxyTest, CopyUserFileTest, TestSize.Level1)
     const char *srcFilePath;
     const char *destFilePath;
     WifiErrorNo result = CopyUserFile(srcFilePath, destFilePath);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     result = CopyUserFile(nullptr, destFilePath);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     result = CopyUserFile(srcFilePath, nullptr);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, CopyConfigFileTest, TestSize.Level1)
 {
     const char *configName = nullptr;
     WifiErrorNo result = CopyConfigFile(configName);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiApStartTest, TestSize.Level1)
@@ -84,7 +84,7 @@ HWTEST_F(WifiHdiWpaProxyTest, HdiApStartTest, TestSize.Level1)
     int id = 0;
     char ifaceName[10] = "Wlan0";
     WifiErrorNo result = HdiApStart(id, ifaceName);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 }
 }

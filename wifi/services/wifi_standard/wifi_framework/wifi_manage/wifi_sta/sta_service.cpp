@@ -130,13 +130,13 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
         std::vector<int> freqs5G;
         int band = static_cast<int>(BandType::BAND_2GHZ);
         WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs2G);
-        if (ret != WIFI_IDL_OPT_OK) {
+        if (ret != WIFI_HAL_OPT_OK) {
             WIFI_LOGE("get 2g frequencies failed.");
             WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G, m_instId);
         }
         band = static_cast<int>(BandType::BAND_5GHZ);
         ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs5G);
-        if (ret != WIFI_IDL_OPT_OK) {
+        if (ret != WIFI_HAL_OPT_OK) {
             WIFI_LOGE("get 5g frequencies failed.");
             WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G, m_instId);
         }
@@ -518,7 +518,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
 ErrCode StaService::RemoveAllDevice() const
 {
     LOGI("Enter RemoveAllDevice.\n");
-    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_HAL_OPT_OK) {
         LOGD("Remove all device config successfully!");
     } else {
         LOGE("WifiStaHalInterface:RemoveAllDevice failed!");
@@ -723,7 +723,7 @@ ErrCode StaService::ReConnect() const
 ErrCode StaService::SetSuspendMode(bool mode) const
 {
     LOGI("Enter SetSuspendMode, mode=[%{public}d]!", mode);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(mode) != WIFI_IDL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(mode) != WIFI_HAL_OPT_OK) {
         LOGE("WpaSetSuspendMode() failed!");
         return WIFI_OPT_FAILED;
     }
@@ -733,7 +733,7 @@ ErrCode StaService::SetSuspendMode(bool mode) const
 ErrCode StaService::SetPowerMode(bool mode) const
 {
     LOGI("Enter SetPowerMode, mode=[%{public}d]!", mode);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(mode) != WIFI_IDL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(mode) != WIFI_HAL_OPT_OK) {
         LOGE("SetPowerMode() failed!");
         return WIFI_OPT_FAILED;
     }
@@ -744,7 +744,7 @@ ErrCode StaService::SetTxPower(int power) const
 {
     LOGD("Enter SetTxPower, power=[%{public}d]!", power);
     if (WifiStaHalInterface::GetInstance().SetTxPower(WifiSettings::GetInstance().GetStaIfaceName(), power)
-        != WIFI_IDL_OPT_OK) {
+        != WIFI_HAL_OPT_OK) {
         LOGE("SetTxPower() failed!");
         return WIFI_OPT_FAILED;
     }

@@ -389,7 +389,7 @@ void ButtonTest(AlertDialog &dialog, std::any ctx)
 HWTEST_F(P2pStateMachineTest, HandlerDiscoverPeers, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(DISC_TIMEOUT_S))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     IP2pServiceCallbacks callback;
     pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpHandlerDiscoverPeers();
@@ -398,7 +398,7 @@ HWTEST_F(P2pStateMachineTest, HandlerDiscoverPeers, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, HandlerDiscoverPeers2, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(DISC_TIMEOUT_S))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WarpHandlerDiscoverPeers();
 }
 
@@ -423,13 +423,13 @@ HWTEST_F(P2pStateMachineTest, UpdatePersistentGroups_SUCCESS, TestSize.Level1)
     mapGroups[100] = p2pGroupInfo;
     deviceManager.AddDevice(device);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_))
-        .WillOnce(DoAll(SetArgReferee<0>(mapGroups), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillOnce(DoAll(SetArgReferee<0>(mapGroups), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     WarpUpdatePersistentGroups();
 }
 
 HWTEST_F(P2pStateMachineTest, UpdatePersistentGroups_FAILED, TestSize.Level1)
 {
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WarpUpdatePersistentGroups();
 }
 
@@ -443,22 +443,22 @@ HWTEST_F(P2pStateMachineTest, P2pConnectWithPinDisplay_SUCCESS, TestSize.Level1)
 
     AddDeviceManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), Connect(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>("11"), Return(WifiErrorNo::WIFI_IDL_OPT_FAILED)));
+        .WillOnce(DoAll(SetArgReferee<2>("11"), Return(WifiErrorNo::WIFI_HAL_OPT_FAILED)));
     WarpP2pConnectWithPinDisplay(conf);
 }
 
 HWTEST_F(P2pStateMachineTest, DealGroupCreationFailed, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WarpDealGroupCreationFailed();
 }
 
 HWTEST_F(P2pStateMachineTest, RemoveGroupByNetworkId, TestSize.Level1)
 {
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(Eq(1)))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WarpRemoveGroupByNetworkId(1);
 }
 
@@ -549,8 +549,8 @@ HWTEST_F(P2pStateMachineTest, CleanSupplicantServiceReq, TestSize.Level1)
     WarpCleanSupplicantServiceReq();
     Addsvr();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), CancelReqServiceDiscovery(testing::StrEq("queryId")))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WarpCleanSupplicantServiceReq();
     Addsvr();
     WarpCleanSupplicantServiceReq();
@@ -665,7 +665,7 @@ HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup1, TestSize.Level1)
     AddGroupManager();
     AddDeviceManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_FALSE(WarpReinvokePersistentGroup(config));
     EXPECT_FALSE(WarpReinvokePersistentGroup(config));
 }
@@ -690,10 +690,10 @@ HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup3, TestSize.Level1)
     AddDeviceManagerInViteable();
 
     ON_CALL(WifiP2PHalInterface::GetInstance(), Reinvoke(_, _))
-        .WillByDefault(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillByDefault(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
 
     ON_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_))
-        .WillByDefault(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillByDefault(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_FALSE(WarpReinvokePersistentGroup(config));
     EXPECT_FALSE(WarpReinvokePersistentGroup(config));
 }
@@ -719,7 +719,7 @@ HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnFailed, TestSize.Level1)
     int status = 1;
     std::string ifName("ifName");
     std::string reason("reason");
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     WarpDhcpResultNotifyOnFailed(status, ifName, reason);
 }
 
@@ -733,7 +733,7 @@ HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand2, TestSize.Level1)
 {
     GroupOwnerBand band = GroupOwnerBand::GO_BAND_2GHZ;
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_GE(WarpGetAvailableFreqByBand(band), 0);
 }
 
@@ -743,7 +743,7 @@ HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand3, TestSize.Level1)
     std::vector<int> freqList;
     freqList.push_back(2412);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(freqList), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillOnce(DoAll(SetArgReferee<1>(freqList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     WarpGetAvailableFreqByBand(band);
 }
 
@@ -751,7 +751,7 @@ HWTEST_F(P2pStateMachineTest, SetGroupConfig1, TestSize.Level1)
 {
     WifiP2pConfigInternal config;
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_FALSE(WarpSetGroupConfig(config, true));
 }
 
@@ -759,9 +759,9 @@ HWTEST_F(P2pStateMachineTest, SetGroupConfig2, TestSize.Level1)
 {
     WifiP2pConfigInternal config;
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetGroupConfig(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_TRUE(WarpSetGroupConfig(config, false));
 }
 
@@ -771,9 +771,9 @@ HWTEST_F(P2pStateMachineTest, SetGroupConfig3, TestSize.Level1)
     config.SetGroupName(std::string("GroupName"));
     config.SetPassphrase(std::string("12345678"));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetGroupConfig(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_TRUE(WarpSetGroupConfig(config, false));
 }
 
@@ -790,14 +790,14 @@ HWTEST_F(P2pStateMachineTest, DealCreateNewGroupWithConfig2, TestSize.Level1)
 {
     WifiP2pConfigInternal config;
     int freq = 0;
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_FALSE(WarpDealCreateNewGroupWithConfig(config, freq));
 }
 
@@ -806,15 +806,15 @@ HWTEST_F(P2pStateMachineTest, DealCreateNewGroupWithConfig3, TestSize.Level1)
     WifiP2pConfigInternal config;
     config.SetNetId(-1);
     int freq = 0;
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ListNetworks(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_TRUE(WarpDealCreateNewGroupWithConfig(config, freq));
 }
 
@@ -822,7 +822,7 @@ HWTEST_F(P2pStateMachineTest, UpdateGroupInfoToWpa1, TestSize.Level1)
 {
     AddGroupManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WarpUpdateGroupInfoToWpa();
 }
 
@@ -830,9 +830,9 @@ HWTEST_F(P2pStateMachineTest, UpdateGroupInfoToWpa2, TestSize.Level1)
 {
     AddGroupManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WarpUpdateGroupInfoToWpa();
 }
 
@@ -841,13 +841,13 @@ HWTEST_F(P2pStateMachineTest, UpdateGroupInfoToWpa3, TestSize.Level1)
     AddGroupManager();
     AddGroupManager3();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pAddNetwork(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pSetGroupConfig(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     WarpUpdateGroupInfoToWpa();
 }
 

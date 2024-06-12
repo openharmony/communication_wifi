@@ -83,7 +83,7 @@ HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg1, TestSize.Level1)
     std::string inputPin;
     msg.SetMessageObj(inputPin);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pInvitationReceivedState->ExecuteStateMsg(&msg);
 }
 

@@ -70,31 +70,31 @@ public:
 HWTEST_F(P2pEnabledStateTest, GoInState, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pDeviceName(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pSsidPostfix(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     ON_CALL(WifiP2PHalInterface::GetInstance(), SetP2pDeviceType(_))
-        .WillByDefault(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillByDefault(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pConfigMethods(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GetDeviceAddress(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), FlushService())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetServiceDiscoveryExternal(Eq(false)))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetPersistentReconnect(Eq(1)))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdateGroupInfoToWpa()).WillOnce(Return()).WillOnce(Return());
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return()).WillOnce(Return());
     pP2pEnabledState->GoInState();
@@ -115,8 +115,8 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg1, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), StopP2p()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), StopP2p()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
 
@@ -127,16 +127,16 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg2, TestSize.Level1)
     msg.SetParam2(1);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetListenChannel(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pConfigureListen(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
@@ -147,11 +147,11 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg3, TestSize.Level1)
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_LISTEN));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pConfigureListen(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -159,7 +159,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg3, TestSize.Level1)
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg4, TestSize.Level1)
 {
     InternalMessage msg;
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -169,8 +169,8 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg5, TestSize.Level1)
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -231,8 +231,8 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg10, TestSize.Level1)
     WifiP2pServiceInfo service;
     msg.SetMessageObj(service);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceAdd(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -244,8 +244,8 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg11, TestSize.Level1)
     WifiP2pServiceInfo service;
     msg.SetMessageObj(service);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceRemove(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -255,8 +255,8 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg12, TestSize.Level1)
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -268,13 +268,13 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg13, TestSize.Level1)
     std::pair<WifiP2pDevice, WifiP2pServiceRequest> info;
     msg.SetMessageObj(info);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ReqServiceDiscovery(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -291,7 +291,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg14, TestSize.Level1)
     reqList.SetDevice(device);
     msg.SetMessageObj(reqList);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RespServiceDiscovery(_, _, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
 }
@@ -331,16 +331,16 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg18, TestSize.Level1)
     InternalMessage msg;
     WifiP2pServiceInfo service;
     msg.SetMessageObj(service);
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ReqServiceDiscovery(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
@@ -351,8 +351,8 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg19, TestSize.Level1)
 {
     InternalMessage msg;
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
@@ -365,12 +365,12 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg20, TestSize.Level1)
     msg.SetMessageObj(info);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REQUEST_SERVICE));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ReqServiceDiscovery(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
     pP2pEnabledState->ExecuteStateMsg(&msg);
@@ -411,7 +411,7 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdSetDeviceName1, TestSize.Level1)
     msg.SetMessageObj(devAddr);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pDeviceName(Eq(devAddr)))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
@@ -423,11 +423,11 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdSetDeviceName2, TestSize.Level1)
     msg.SetMessageObj(devAddr);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pDeviceName(Eq(devAddr)))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastThisDeviceChanaged(_)).WillOnce(Return());
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pSsidPostfix(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
 
@@ -438,7 +438,7 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdSetWfdInfo1, TestSize.Level1)
     msg.SetMessageObj(wfdInfo);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdDeviceConfig(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
 
@@ -449,8 +449,8 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdSetWfdInfo2, TestSize.Level1)
     msg.SetMessageObj(wfdInfo);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdDeviceConfig(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdEnable(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdEnable(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
 
@@ -461,8 +461,8 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdSetWfdInfo3, TestSize.Level1)
     msg.SetMessageObj(wfdInfo);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdDeviceConfig(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdEnable(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdEnable(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
 

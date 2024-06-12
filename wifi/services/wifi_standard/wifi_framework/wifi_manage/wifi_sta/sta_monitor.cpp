@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "sta_monitor.h"
-#include "wifi_idl_define.h"
 #include "sta_define.h"
 #include "wifi_logger.h"
 #include "wifi_supplicant_hal_interface.h"
@@ -51,7 +50,7 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnReportDisConnectReasonCallBack, this, _1, _2),
     };
 
-    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("InitStaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
@@ -62,7 +61,7 @@ NO_SANITIZE("cfi") ErrCode StaMonitor::UnInitStaMonitor() const
 {
     WIFI_LOGI("Enter UnInitStaMonitor.\n");
     WifiEventCallback callBack;
-    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("~StaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
@@ -109,22 +108,22 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
-    if (status == WPA_CB_ASSOCIATING || status == WPA_CB_ASSOCIATED) {
+    if (status == HAL_WPA_CB_ASSOCIATING || status == HAL_WPA_CB_ASSOCIATED) {
         pStaStateMachine->OnNetworkHiviewEvent(status);
     }
 
     switch (status) {
-        case WPA_CB_CONNECTED: {
+        case HAL_WPA_CB_CONNECTED: {
             pStaStateMachine->OnNetworkConnectionEvent(networkId, bssid);
             break;
         }
-        case WPA_CB_DISCONNECTED: {
+        case HAL_WPA_CB_DISCONNECTED: {
             pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT, bssid);
             pStaStateMachine->OnNetworkDisconnectEvent(networkId);
             break;
         }
-        case WPA_CB_ASSOCIATING:
-        case WPA_CB_ASSOCIATED:
+        case HAL_WPA_CB_ASSOCIATING:
+        case HAL_WPA_CB_ASSOCIATED:
             pStaStateMachine->OnNetworkAssocEvent(status, bssid, pStaStateMachine);
             break;
         default:

@@ -17,7 +17,6 @@
 #include "mock_sta_state_machine.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_sta_interface.h"
-#include "wifi_idl_define.h"
 #include <string>
 
 using ::testing::_;
@@ -118,7 +117,7 @@ void StaMonitorTest::UnInitStaMonitorFail()
 
 void StaMonitorTest::OnConnectChangedCallBackSuccess1()
 {
-    int status = WPA_CB_CONNECTED;
+    int status = HAL_WPA_CB_CONNECTED;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
     WifiLinkedInfo linkedInfo;
@@ -131,7 +130,7 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess1()
 
 void StaMonitorTest::OnConnectChangedCallBackSuccess2()
 {
-    int status = WPA_CB_DISCONNECTED;
+    int status = HAL_WPA_CB_DISCONNECTED;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
     WifiLinkedInfo linkedInfo;
@@ -157,7 +156,7 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess3()
 
 void StaMonitorTest::OnConnectChangedCallBackFail1()
 {
-    int status = WPA_CB_CONNECTED;
+    int status = HAL_WPA_CB_CONNECTED;
     int networkId = 0;
     std::string bssid = "00:00:00:00:00:00";
     pStaMonitor->pStaStateMachine = nullptr;
@@ -166,7 +165,7 @@ void StaMonitorTest::OnConnectChangedCallBackFail1()
 
 void StaMonitorTest::OnConnectChangedCallBackFail2()
 {
-    int status = WPA_CB_CONNECTED;
+    int status = HAL_WPA_CB_CONNECTED;
     int networkId = 0;
     std::string bssid = "00:00:00:00:00:00";
     pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);

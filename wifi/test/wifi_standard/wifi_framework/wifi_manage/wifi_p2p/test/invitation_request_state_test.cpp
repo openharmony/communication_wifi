@@ -61,8 +61,8 @@ public:
 HWTEST_F(InvitationRequestStateTest, GoInState, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), Invite(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pInvitationRequestState->GoInState();
     pInvitationRequestState->GoInState();
 }

@@ -278,7 +278,7 @@ ErrCode ApService::SetPowerModel(const PowerModel& model)
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     LOGI("Enter ApService::SetPowerModel, model=[%d]", static_cast<int>(model));
     if (WifiApHalInterface::GetInstance().SetPowerModel(
-        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(model)) != WIFI_IDL_OPT_OK) {
+        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(model)) != WIFI_HAL_OPT_OK) {
         LOGE("SetPowerModel() failed!");
         return WIFI_OPT_FAILED;
     }

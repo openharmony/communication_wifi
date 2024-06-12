@@ -21,6 +21,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define WIFI_IDL_FALSE 0
+#define WIFI_IDL_TRUE 1
 #define WIFI_SSID_LENGTH 132
 #define WIFI_BSSID_LENGTH 18
 #define WIFI_REASON_LENGTH 32

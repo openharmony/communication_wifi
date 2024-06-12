@@ -21,7 +21,7 @@
 #include <map>
 
 #include "wifi_base_hal_interface.h"
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 #include "wifi_p2p_event_callback.h"
 
 namespace OHOS {
@@ -419,7 +419,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo P2pSetGroupConfig(int networkId, const IdlP2pGroupConfig &config) const;
+    WifiErrorNo P2pSetGroupConfig(int networkId, const HalP2pGroupConfig &config) const;
 
     /**
      * @Description Getting the P2P group config.
@@ -428,7 +428,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo P2pGetGroupConfig(int networkId, IdlP2pGroupConfig &config) const;
+    WifiErrorNo P2pGetGroupConfig(int networkId, HalP2pGroupConfig &config) const;
 
     /**
      * @Description Request to obtain the next network ID.

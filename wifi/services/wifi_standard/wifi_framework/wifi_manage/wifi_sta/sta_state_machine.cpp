@@ -583,6 +583,23 @@ void StaStateMachine::FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const
     }
 }
 
+void StaStateMachine::FillWapiCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const
+{
+    if ((strcmp(config.keyMgmt.c_str(), KEY_MGMT_WAPI_CERT.c_str()) != 0) &&
+        (strcmp(config.keyMgmt.c_str(), KEY_MGMT_WAPI_PSK.c_str()) != 0)) {
+        WIFI_LOGI("wapiPskType is not wapi_cert nor wapi_psk");
+        return;
+    }
+    idlConfig.wapiPskType = config.wifiWapiConfig.wapiPskType;
+    idlConfig.wapiAsCertData = config.wifiWapiConfig.wapiAsCertData;
+    idlConfig.wapiUserCertData = config.wifiWapiConfig.wapiUserCertData;
+    idlConfig.allowedProtocols = 0x10; // WAPI
+    idlConfig.allowedPairwiseCiphers = 0x40; // SMS4
+    idlConfig.allowedGroupCiphers = 0x40; // SMS4
+    idlConfig.wepKeyIdx = -1;
+    return;
+}
+
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
     LOGI("Enter ConvertDeviceCfg.\n");
@@ -596,6 +613,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     FillEapCfg(config, idlConfig);
     FillSuiteB192Cfg(idlConfig);
     idlConfig.wepKeyIdx = config.wepTxKeyIndex;
+    FillWapiCfg(config, idlConfig);
     if (strcmp(config.keyMgmt.c_str(), "WEP") == 0) {
         /* for wep */
         idlConfig.authAlgorithms = 0x02;

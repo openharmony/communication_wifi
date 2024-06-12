@@ -117,6 +117,12 @@ struct InterScanInfo {
             case WifiSecurity::EAP_SUITE_B:
                 mgmt = "WPA-EAP-SUITE-B-192";
                 break;
+            case WifiSecurity::WAPI_CERT:
+                mgmt = "WAPI-CERT";
+                break;
+            case WifiSecurity::WAPI_PSK:
+                mgmt = "WAPI-PSK";
+                break;
             default:
                 mgmt = "NONE";
                 break;

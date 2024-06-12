@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace Wifi {
 static constexpr int NAPI_MAX_STR_LENT = 128;
+static constexpr int NAPI_WAPI_MAX_STR_LENT = 2048;
 static constexpr int NAPI_MAX_IPV4_LEN = 16;
 static const std::int32_t SYSCAP_WIFI_CORE = 2400000;
 static const std::int32_t SYSCAP_WIFI_STA = 2500000;
@@ -135,11 +136,11 @@ enum class SecTypeJs {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
     /** Opportunistic Wireless Encryption. */
     SEC_TYPE_OWE = 7,
+#endif
     /** WAPI certificate to be specified. */
     SEC_TYPE_WAPI_CERT = 8,
     /** WAPI pre-shared key to be specified. */
     SEC_TYPE_WAPI_PSK = 9,
-#endif
 };
 
 enum class AddressTypeJs {

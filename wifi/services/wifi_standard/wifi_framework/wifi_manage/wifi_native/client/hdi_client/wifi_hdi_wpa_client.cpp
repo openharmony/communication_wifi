@@ -197,6 +197,20 @@ WifiErrorNo WifiHdiWpaClient::ReqDisableNetwork(int networkId)
     return HdiWpaStaDisableNetwork(networkId);
 }
 
+void WifiHdiWpaClient::SetWapiConfig(const WifiIdlDeviceConfig &config, SetNetworkConfig *conf, int &num)
+{
+    LOGI("Enter SetWapiConfig, keyMgmt is %{public}s, pskType is %{public}d", config.keyMgmt.c_str(),
+        config.wapiPskType);
+    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
+    if (config.keyMgmt == KEY_MGMT_WAPI_PSK) {
+        num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_WAPI_PSK_TYPE, config.wapiPskType);
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WAPI_PSK, config.psk);
+    } else if (config.keyMgmt == KEY_MGMT_WAPI_CERT) {
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WAPI_USER_CERT, config.wapiUserCertData);
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WAPI_CA_CERT, config.wapiAsCertData);
+    }
+}
+
 WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDeviceConfig &config)
 {
     if (CheckValidDeviceConfig(config) != WIFI_IDL_OPT_OK) {
@@ -210,15 +224,21 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
     }
     int num = 0;
     num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SSID, config.ssid);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PSK, config.psk);
-    if (config.keyMgmt.find(KEY_MGMT_SAE) != std::string::npos) {
-        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SAE_PASSWD, config.psk);
-    }
-    if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
-        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, KEY_MGMT_NONE);
-    } else {
-        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
-    }
+    do {
+        if (config.keyMgmt.find(KEY_MGMT_WAPI) != std::string::npos) {
+            SetWapiConfig(config, conf, num);
+            break;
+        }
+        num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PSK, config.psk);
+        if (config.keyMgmt.find(KEY_MGMT_SAE) != std::string::npos) {
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_SAE_PASSWD, config.psk);
+        }
+        if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, KEY_MGMT_NONE);
+        } else {
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
+        }
+    } while (0);
     EapMethod eapMethod = WifiEapConfig::Str2EapMethod(config.eapConfig.eap);
     LOGI("%{public}s, eap:%{public}s, eapMethod:%{public}d, identity:%{private}s, num:%{public}d",
         __func__, config.eapConfig.eap.c_str(), eapMethod, config.eapConfig.identity.c_str(), num);
@@ -293,17 +313,17 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiIdlDevice
         num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_IEEE80211W, PMF_OPTIONAL);
     }
     if (config.allowedProtocols > 0) {
-        std::string protocolsStr[] = {"WPA ", "RSN ", "WPA2 ", "OSEN "};
+        std::string protocolsStr[] = {"WPA ", "RSN ", "WPA2 ", "OSEN ", "WAPI "};
         num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_ALLOW_PROTOCOLS, config.allowedProtocols,
                                          protocolsStr, sizeof(protocolsStr)/sizeof(protocolsStr[0]));
     }
     if (config.allowedPairwiseCiphers > 0) {
-        std::string pairwiseCipherStr[] = {"NONE ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 "};
+        std::string pairwiseCipherStr[] = {"NONE ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 ", "SMS4 "};
         num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_PAIRWISE_CIPHERS, config.allowedPairwiseCiphers,
                                          pairwiseCipherStr, sizeof(pairwiseCipherStr)/sizeof(pairwiseCipherStr[0]));
     }
     if (config.allowedGroupCiphers > 0) {
-        std::string groupCipherStr[] = {"GTK_NOT_USED ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 "};
+        std::string groupCipherStr[] = {"GTK_NOT_USED ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 ", "SMS4 "};
         num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_CIPHERS, config.allowedGroupCiphers,
                                          groupCipherStr, sizeof(groupCipherStr)/sizeof(groupCipherStr[0]));
     }

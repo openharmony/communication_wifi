@@ -24,6 +24,9 @@
 #include "wifi_log.h"
 #include "p2p_interface.h"
 #include "wifi_internal_msg.h"
+#include "wifi_p2p_service.h"
+#include "wifi_p2p_group_manager.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Wifi {
@@ -32,10 +35,12 @@ constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
 static bool g_isInsted = false;
 static std::unique_ptr<P2pInterface> pP2pInterface = nullptr;
+static std::unique_ptr<WifiP2pGroupManager> pWifiP2pGroupManager = nullptr;
 
 void MyExit()
 {
     pP2pInterface.reset();
+    pWifiP2pGroupManager.reset();
     sleep(THREE);
     printf("exiting\n");
 }
@@ -44,6 +49,7 @@ void InitParam()
 {
     if (!g_isInsted) {
         pP2pInterface = std::make_unique<P2pInterface>();
+        pWifiP2pGroupManager = std::make_unique<WifiP2pGroupManager>();
         if (pP2pInterface == nullptr) {
             return;
         }
@@ -126,16 +132,13 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
     srvInfo.SetServiceName(serviceName);
     srvInfo.SetDeviceAddress(mDeviceAddress);
-
     WifiP2pLinkedInfo linkedInfo;
     bool isP2pGroupOwner = (static_cast<int>(data[0]) % TWO) ? true : false;
     std::string groupOwnerAddress = std::string(reinterpret_cast<const char*>(data), size);
     linkedInfo.SetIsGroupOwner(isP2pGroupOwner);
     linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddress);
-
     int period = static_cast<int>(data[0]);
     int interval = static_cast<int>(data[0]);
-
     pP2pInterface->DiscoverDevices();
     pP2pInterface->StopDiscoverDevices();
     pP2pInterface->DiscoverServices();
@@ -170,6 +173,24 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->GetSharedLinkCount();
     pP2pInterface->DecreaseSharedLink(interval);
     pP2pInterface->IncreaseSharedLink(interval);
+    pWifiP2pGroupManager->UpdateWpaGroup(group);
+    pWifiP2pGroupManager->ClearAll();
+    pWifiP2pGroupManager->RemoveGroup(group);
+    pWifiP2pGroupManager->RemoveClientFromGroup(interval, mDeviceAddress);
+    pWifiP2pGroupManager->GetNetworkIdFromClients(device);
+    pWifiP2pGroupManager->GetGroupNetworkId(device);
+    pWifiP2pGroupManager->GetGroupNetworkId(device, mDeviceAddress);
+    pWifiP2pGroupManager->GetGroupOwnerAddr(interval);
+    pWifiP2pGroupManager->IsInclude(interval);
+    pWifiP2pGroupManager->RefreshCurrentGroupFromGroups();
+    pWifiP2pGroupManager->SaveP2pInfo(linkedInfo);
+    std::map<int, WifiP2pGroupInfo> wpaGroups;
+    wpaGroups.insert(std::make_pair(interval, group));
+    pWifiP2pGroupManager->UpdateGroupsNetwork(wpaGroups);
+    WifiMacAddrInfoType type = static_cast<WifiMacAddrInfoType>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
+    pWifiP2pGroupManager->AddMacAddrPairInfo(type, group);
+    pWifiP2pGroupManager->SetCurrentGroup(type, group);
+    pWifiP2pGroupManager->RemoveMacAddrPairInfo(type, group);
 }
 
 /* Fuzzer entry point */

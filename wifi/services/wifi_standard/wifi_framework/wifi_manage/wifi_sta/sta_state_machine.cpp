@@ -3341,7 +3341,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
-        StartDetectTimer(DETECT_TYPE_PERIODIC);
+        if (getCurrentWifiDeviceConfig().isPortal) {
+            StartDetectTimer(DETECT_TYPE_PERIODIC);
+        }
 #ifndef OHOS_ARCH_LITE
         WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
@@ -3383,7 +3385,6 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
-        StartDetectTimer(DETECT_TYPE_PERIODIC);
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
         if (!mIsWifiInternetCHRFlag &&
@@ -3855,8 +3856,8 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
 void StaStateMachine::DealNetworkCheck(InternalMessage *msg)
 {
     LOGD("enter DealNetworkCheck.\n");
-    if (msg == nullptr) {
-        LOGE("InternalMessage msg is null.");
+    if (msg == nullptr || enableSignalPoll == false) {
+        LOGE("detection screen state [%{public}d].", enableSignalPoll);
         return;
     }
 #ifndef OHOS_ARCH_LITE
@@ -4196,7 +4197,6 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
         pStaStateMachine->InvokeOnStaConnChanged(
             OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
         /* Delay to wait for the network adapter information to take effect. */
-        pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
         pStaStateMachine->DealSetStaConnectFailedCount(0, true);
     }
     pStaStateMachine->getIpSucNum++;

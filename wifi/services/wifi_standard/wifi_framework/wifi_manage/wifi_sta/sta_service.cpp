@@ -825,6 +825,7 @@ void StaService::HandleScreenStatusChanged(int screenState)
         WIFI_LOGE("pStaStateMachine is null!");
         return;
     }
+    pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
     if (screenState == MODE_STATE_OPEN) {
         pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
     } else {
@@ -833,7 +834,6 @@ void StaService::HandleScreenStatusChanged(int screenState)
     if (pStaAppAcceleration != nullptr) {
         pStaAppAcceleration->HandleScreenStatusChanged(screenState);
     }
-    pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
 #endif
     return;
 }

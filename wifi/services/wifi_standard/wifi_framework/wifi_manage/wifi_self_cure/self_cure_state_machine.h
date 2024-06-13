@@ -192,7 +192,7 @@ public:
         SelfCureStateMachine *pSelfCureStateMachine;
         int currentRssi = -1;
         std::string currentBssid = "";
-        int selfCureFailedCounter = -1;
+        int selfCureFailedCounter = 0;
         int currentAbnormalType = -1;
         int lastSelfCureLevel = -1;
         int currentSelfCureLevel = -1;
@@ -217,6 +217,7 @@ public:
         int selfCureForInvalidIpCnt = 0;
         SelfCureIssHandleFuncMap selfCureIssHandleFuncMap;
         int InitSelfCureIssHandleMap();
+        void HandleRandMacSelfCureComplete(InternalMessage *msg);
         void HandleInternetFailedSelfCure(InternalMessage *msg);
         void HandleSelfCureWifiLink(InternalMessage *msg);
         void HandleNetworkDisconnected(InternalMessage *msg);

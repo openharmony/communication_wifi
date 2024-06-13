@@ -517,6 +517,9 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillOnce(Return(1))
             .WillRepeatedly(Return(0));
+        EXPECT_CALL(BlockConnectService::GetInstance(), EnableNetworkSelectStatus(_))
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
         pStaStateMachine->linkedInfo.networkId = 0;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
@@ -594,6 +597,9 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(BlockConnectService::GetInstance(), UpdateNetworkSelectStatus(_, _))
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);

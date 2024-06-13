@@ -1296,6 +1296,19 @@ public:
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
     }
 
+    void TestUpdatePortalState(std::map<PortalState, PortalState> &map, SystemNetWorkState netState)
+    {
+        bool updatePortalAuthTime = false;
+        for (auto& pair : map) {
+            auto initState = pair.first;
+            auto expectState = pair.second;
+
+            pStaStateMachine->portalState = initState;
+            pStaStateMachine->UpdatePortalState(netState, updatePortalAuthTime);
+            EXPECT_EQ(pStaStateMachine->portalState, expectState);
+        }
+    }
+
     void LinkedStateGoInStateSuccess()
     {
         pStaStateMachine->pLinkedState->GoInState();
@@ -2675,6 +2688,30 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess4, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
 {
     HandleNetCheckResultFail();
+}
+
+HWTEST_F(StaStateMachineTest, TestUpdatePortalState1, TestSize.Level1)
+{
+    std::map<PortalState, PortalState> map = {
+        {PortalState::UNCHECKED,   PortalState::NOT_PORTAL},
+        {PortalState::NOT_PORTAL, PortalState::NOT_PORTAL},
+        {PortalState::UNAUTHED,   PortalState::AUTHED},
+        {PortalState::AUTHED,     PortalState::AUTHED},
+        {PortalState::EXPERIED,   PortalState::AUTHED},
+    };
+    TestUpdatePortalState(map, SystemNetWorkState::NETWORK_IS_WORKING);
+}
+
+HWTEST_F(StaStateMachineTest, TestUpdatePortalState2, TestSize.Level1)
+{
+    std::map<PortalState, PortalState> map = {
+        {PortalState::UNCHECKED,   PortalState::UNAUTHED},
+        {PortalState::NOT_PORTAL, PortalState::EXPERIED},
+        {PortalState::UNAUTHED,   PortalState::UNAUTHED},
+        {PortalState::AUTHED,     PortalState::EXPERIED},
+        {PortalState::EXPERIED,   PortalState::EXPERIED},
+    };
+    TestUpdatePortalState(map, SystemNetWorkState::NETWORK_IS_PORTAL);
 }
 
 HWTEST_F(StaStateMachineTest, ApRoamingStateGoInStateSuccess, TestSize.Level1)

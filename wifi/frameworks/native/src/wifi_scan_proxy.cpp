@@ -263,7 +263,7 @@ ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScan
         std::string net = (char *)ashmem->ReadFromAshmem(allSize[i], offset);
         offset += allSize[i];
         std::vector<std::string> tokens;
-        SplitStr(net, ";", tokens);
+        SplitStr(net, ";", tokens, true, true);
         WifiScanInfo info;
         info.bssid = tokens[dataRecvLen++];
         info.ssid = tokens[dataRecvLen++];

@@ -74,6 +74,8 @@ public:
         WifiLinkedInfo info;
         int instId = 0;
         pSelfCureInterface->DealStaConnChanged(state, info, instId);
+        pSelfCureInterface->pSelfCureService == nullptr;
+        pSelfCureInterface->DealStaConnChanged(state, info, instId);
     }
 
     void DealRssiLevelChangedTest()
@@ -81,11 +83,15 @@ public:
         int rssi = MIN_VAL_LEVEL_4;
         int instId = 0;
         pSelfCureInterface->DealRssiLevelChanged(rssi, instId);
+        pSelfCureInterface->pSelfCureService == nullptr;
+        pSelfCureInterface->DealRssiLevelChanged(rssi, instId);
     }
 
     void DealP2pConnChangedTest()
     {
         WifiP2pLinkedInfo info;
+        pSelfCureInterface->DealP2pConnChanged(info);
+        pSelfCureInterface->pSelfCureService == nullptr;
         pSelfCureInterface->DealP2pConnChanged(info);
     }
 
@@ -93,6 +99,16 @@ public:
     {
         SelfCureServiceCallback callbacks;
         pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks);
+        callbacks.callbackModuleName = "test";
+        pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks);
+    }
+
+    void DealStaOpenResTest()
+    {
+        OperateResState state = OperateResState::OPEN_WIFI_SUCCEED;
+        pSelfCureInterface->DealStaOpenRes(state);
+        pSelfCureInterface->pSelfCureService == nullptr;
+        pSelfCureInterface->DealStaOpenRes(state);
     }
 };
 
@@ -129,6 +145,11 @@ HWTEST_F(SelfCureInterfaceTest, DealP2pConnChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureInterfaceTest, RegisterSelfCureServiceCallbackTest, TestSize.Level1)
 {
     RegisterSelfCureServiceCallbackTest();
+}
+
+HWTEST_F(SelfCureInterfaceTest, DealStaOpenResTest, TestSize.Level1)
+{
+    DealStaOpenResTest();
 }
 
 HWTEST_F(SelfCureInterfaceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)

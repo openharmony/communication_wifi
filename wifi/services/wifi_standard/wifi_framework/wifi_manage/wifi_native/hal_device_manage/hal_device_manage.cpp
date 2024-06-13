@@ -343,7 +343,7 @@ bool HalDeviceManager::GetConnectSignalInfo(const std::string &ifaceName, Signal
     }
 
     std::lock_guard<std::mutex> lock(mMutex);
-    LOGI("GetConnectSignalInfo, ifaceName:%{public}s", ifaceName.c_str());
+    LOGD("GetConnectSignalInfo, ifaceName:%{public}s", ifaceName.c_str());
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter == mIWifiStaIfaces.end()) {
         LOGE("GetConnectSignalInfo, not find iface info");
@@ -358,7 +358,7 @@ bool HalDeviceManager::GetConnectSignalInfo(const std::string &ifaceName, Signal
         return false;
     }
 
-    LOGI("GetConnectSignalInfo success");
+    LOGD("GetConnectSignalInfo success");
     return true;
 }
 
@@ -749,7 +749,7 @@ bool HalDeviceManager::CheckChipHdiStarted()
         return false;
     }
 
-    LOGI("CheckChipHdiStarted, isStarted:%{public}d", isStarted);
+    LOGD("CheckChipHdiStarted, isStarted:%{public}d", isStarted);
     if (!isStarted) {
         ret = g_IWifi->Init();
         if (ret != HDF_SUCCESS) {

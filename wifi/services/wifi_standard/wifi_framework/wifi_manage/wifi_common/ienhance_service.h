@@ -17,6 +17,7 @@
 
 #include "wifi_errcode.h"
 #include "wifi_scan_msg.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -71,6 +72,14 @@ public:
      */
     virtual WifiCategory GetWifiCategory(
         std::vector<WifiInfoElem> infoElems, int chipsetCategory, int chipsetFeatrureCapability) = 0;
+
+    /**
+     * @Description set low tx power
+     *
+     * @param wifiLowPowerParam - wifi low power param
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
     
     /**
      * @Description Check Chba conncted

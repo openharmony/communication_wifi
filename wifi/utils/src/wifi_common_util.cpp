@@ -289,6 +289,20 @@ std::string GetBundleName()
     return bundleInfo.name;
 }
 
+ErrCode GetBundleNameByUid(const int uid, std::string &bundleName)
+{
+    sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
+    if (bundleInstance == nullptr) {
+        WIFI_LOGE("%{public}s bundle instance is null!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    if (!bundleInstance->GetBundleNameForUid(uid, bundleName)) {
+        WIFI_LOGE("%{public}s get bundleName failed", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 int GetCallingPid()
 {
     return IPCSkeleton::GetCallingPid();

@@ -53,7 +53,7 @@ public:
     {
         WifiAppStateAware& wifiAppStateAware = WifiAppStateAware::GetInstance();
         wifiAppStateAware.appChangeEventHandler.reset();
-        wifiAppStateAware.mAppStateObServer = nullptr;
+        wifiAppStateAware.mAppStateObserver = nullptr;
         wifiAppStateAware.appMgrProxy_ = nullptr;
     }
     virtual void SetUp()

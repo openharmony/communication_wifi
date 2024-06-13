@@ -185,6 +185,7 @@ private:
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;
     static int retryConnectCnt;
+    static bool hasConnect;
 };
 } // namespace Wifi
 } // namespace OHOS

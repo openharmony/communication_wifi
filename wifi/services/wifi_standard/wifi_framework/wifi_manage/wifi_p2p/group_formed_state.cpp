@@ -272,7 +272,7 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
         return EXECUTED;
     }
 
-    if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
         WIFI_LOGE("fail to set GO Idle time.");
     }
@@ -316,7 +316,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
 
     WifiErrorNo retCode =
         WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(device.GetDeviceAddress(), request.GetTlv(), reqId);
-    if (WifiErrorNo::WIFI_IDL_OPT_OK != retCode) {
+    if (WifiErrorNo::WIFI_HAL_OPT_OK != retCode) {
         WIFI_LOGI("Failed to schedule the P2P service discovery request.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -324,7 +324,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
     p2pStateMachine.serviceManager.SetQueryId(reqId);
 
     retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFind failed, ErrorCode: %{public}d", static_cast<int>(retCode));
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;

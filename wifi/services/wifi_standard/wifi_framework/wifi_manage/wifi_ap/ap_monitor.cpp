@@ -16,7 +16,6 @@
 #include <unistd.h>
 #include <functional>
 
-#include "wifi_idl_define.h"
 #include "ap_stations_manager.h"
 #include "internal_message.h"
 #include "wifi_settings.h"
@@ -50,7 +49,7 @@ void ApMonitor::DealStaJoinOrLeave(const StationInfo &info, ApStatemachineEvent 
     SendMessage(m_selectIfacName, event, 0, 0, anySta);
 }
 
-void ApMonitor::OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo)
+void ApMonitor::OnStaJoinOrLeave(const WifiHalApConnectionNofify &cbInfo)
 {
     StationInfo info;
     info.bssid = cbInfo.mac;
@@ -58,10 +57,10 @@ void ApMonitor::OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo)
     info.deviceName = GETTING_INFO;
     info.ipAddr = GETTING_INFO;
     int event = cbInfo.type;
-    if (event == WIFI_IDL_CBK_CMD_STA_JOIN) {
+    if (event == HAL_CBK_CMD_STA_JOIN) {
         DealStaJoinOrLeave(info, ApStatemachineEvent::CMD_STATION_JOIN);
     }
-    if (event == WIFI_IDL_CBK_CMD_STA_LEAVE) {
+    if (event == HAL_CBK_CMD_STA_LEAVE) {
         DealStaJoinOrLeave(info, ApStatemachineEvent::CMD_STATION_LEAVE);
     }
 }
@@ -69,11 +68,11 @@ void ApMonitor::OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo)
 void ApMonitor::OnHotspotStateEvent(int state) const
 {
     WIFI_LOGI("update HotspotConfig result is [%{public}d].", state);
-    if (state == WIFI_IDL_CBK_CMD_AP_DISABLE) {
+    if (state == HAL_CBK_CMD_AP_DISABLE) {
         SendMessage(m_selectIfacName, ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT, 0, 0, 0);
-    } else if (state == WIFI_IDL_CBK_CMD_AP_ENABLE) {
+    } else if (state == HAL_CBK_CMD_AP_ENABLE) {
         SendMessage(m_selectIfacName, ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT, 1, 0, 0);
-    } else if (state == WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT) {
+    } else if (state == HAL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT) {
         WriteSoftApConnectFailHiSysEvent(AP_STA_PSK_MISMATCH_CNT);
     } else {
         WIFI_LOGE("Error: Incorrect status code [%{public}d].", state);

@@ -21,7 +21,7 @@
 #include <vector>
 #include "wifi_p2p_msg.h"
 #include "wifi_error_no.h"
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 #include "wifi_p2p_event_callback.h"
 #include "wifi_hid2d_msg.h"
 
@@ -75,8 +75,8 @@ public:
     virtual WifiErrorNo SetServiceDiscoveryExternal(bool isExternalProcess) const = 0;
     virtual WifiErrorNo GetP2pPeer(const std::string &deviceAddress, WifiP2pDevice &device) const = 0;
     virtual WifiErrorNo P2pGetSupportFrequenciesByBand(int band, std::vector<int> &frequencies) const = 0;
-    virtual WifiErrorNo P2pSetGroupConfig(int networkId, const IdlP2pGroupConfig &config) const = 0;
-    virtual WifiErrorNo P2pGetGroupConfig(int networkId, IdlP2pGroupConfig &config) const = 0;
+    virtual WifiErrorNo P2pSetGroupConfig(int networkId, const HalP2pGroupConfig &config) const = 0;
+    virtual WifiErrorNo P2pGetGroupConfig(int networkId, HalP2pGroupConfig &config) const = 0;
     virtual WifiErrorNo P2pAddNetwork(int &networkId) const = 0;
     virtual WifiErrorNo SetPersistentReconnect(int mode) const = 0;
     virtual WifiErrorNo SetP2pSecondaryDeviceType(const std::string &type) = 0;
@@ -133,8 +133,8 @@ public:
     MOCK_CONST_METHOD1(SetServiceDiscoveryExternal, WifiErrorNo(bool));
     MOCK_CONST_METHOD2(GetP2pPeer, WifiErrorNo(const std::string &deviceAddress, WifiP2pDevice &device));
     MOCK_CONST_METHOD2(P2pGetSupportFrequenciesByBand, WifiErrorNo(int band, std::vector<int> &frequencies));
-    MOCK_CONST_METHOD2(P2pSetGroupConfig, WifiErrorNo(int networkId, const IdlP2pGroupConfig &config));
-    MOCK_CONST_METHOD2(P2pGetGroupConfig, WifiErrorNo(int networkId, IdlP2pGroupConfig &config));
+    MOCK_CONST_METHOD2(P2pSetGroupConfig, WifiErrorNo(int networkId, const HalP2pGroupConfig &config));
+    MOCK_CONST_METHOD2(P2pGetGroupConfig, WifiErrorNo(int networkId, HalP2pGroupConfig &config));
     MOCK_CONST_METHOD1(P2pAddNetwork, WifiErrorNo(int &networkId));
     MOCK_CONST_METHOD1(SetPersistentReconnect, WifiErrorNo(int mode));
     MOCK_METHOD1(SetP2pSecondaryDeviceType, WifiErrorNo(const std::string &type));

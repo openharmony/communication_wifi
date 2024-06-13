@@ -37,7 +37,7 @@ public:
     {
         RpcClient* client = nullptr;
         char func[] = "RpcClientCall";
-        EXPECT_EQ(RpcClientCall(client, func), WIFI_IDL_OPT_FAILED);
+        EXPECT_EQ(RpcClientCall(client, func), WIFI_HAL_OPT_FAILED);
     }
 
     void RpcClientCallTest2()

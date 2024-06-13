@@ -25,7 +25,6 @@
 #include "i_wifi_sta_iface.h"
 #include "i_wifi_supplicant_iface.h"
 #include "serial.h"
-#include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
 #include "mock_wifi_public.h"
@@ -325,7 +324,7 @@ HWTEST_F(IWifiTest, GetWifiChipTest, TestSize.Level1)
     GetWifiChip(id, &chip);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(GetWifiChip(id, &chip) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(GetWifiChip(id, &chip) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -334,7 +333,7 @@ HWTEST_F(IWifiTest, StopTest, TestSize.Level1)
     Stop();
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(Stop() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(Stop() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -343,7 +342,7 @@ HWTEST_F(IWifiTest, NotifyClearTest, TestSize.Level1)
     NotifyClear();
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(NotifyClear() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(NotifyClear() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1228,7 +1227,7 @@ HWTEST_F(IWifiTest, GetWifiChipIdsTest, TestSize.Level1)
     GetWifiChipIds(&id, &chip);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
-    EXPECT_TRUE(GetWifiChipIds(&id, &chip) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(GetWifiChipIds(&id, &chip) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 }  // namespace Wifi

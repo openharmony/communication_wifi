@@ -30,7 +30,7 @@
 #include "dhcp_c_api.h"
 #include "sta_define.h"
 #include "network_status_history_manager.h"
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"
@@ -483,10 +483,10 @@ public:
      * @Description  Convert the deviceConfig structure and set it to idl structure
      *
      * @param config -The Network info(in)
-     * @param idlConfig -The Network info(in)
+     * @param halDeviceConfig -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode FillEapCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const;
+    ErrCode FillEapCfg(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
 
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
@@ -1216,7 +1216,7 @@ private:
     void ShowPortalNitification();
 #endif
     void SetConnectMethod(int connectMethod);
-    void FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const;
+    void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

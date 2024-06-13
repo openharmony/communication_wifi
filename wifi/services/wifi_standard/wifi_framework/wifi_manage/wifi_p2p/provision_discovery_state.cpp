@@ -34,7 +34,7 @@ void ProvisionDiscoveryState::GoInState()
 {
     WIFI_LOGI("             GoInState");
     Init();
-    if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().ProvisionDiscovery(p2pStateMachine.savedP2pConfig)) {
         WIFI_LOGE("Failed to invoke the provision discovery flow.");
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);

@@ -18,8 +18,6 @@
 #include "ista_service.h"
 #include "wifi_settings.h"
 
-DEFINE_WIFILOG_LABEL("IpQosMonitor");
-
 static const int32_t MIN_DELTA_TCP_TX = 3;
 static const int32_t QOS_TCP_TX_PKTS = 6;
 static const int32_t QOS_TCP_RX_PKTS = 7;
@@ -30,6 +28,8 @@ static const int32_t CMD_QUERY_PKTS = 15;
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("IpQosMonitor");
+
 IpQosMonitor &IpQosMonitor::GetInstance()
 {
     static IpQosMonitor gIpQosMonitor;
@@ -123,7 +123,7 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
 {
     WIFI_LOGI("enter %{public}s", __FUNCTION__);
     bool queryResp = (elems[QOS_MSG_FROM] == 0);
-    int32_t packetsLength = elems.size();
+    int32_t packetsLength = static_cast<int32_t>(elems.size());
     if ((queryResp) && (packetsLength > MIN_PACKET_LEN)) {
         int64_t tcpTxPkts = elems[QOS_TCP_TX_PKTS];
         int64_t tcpRxPkts = elems[QOS_TCP_RX_PKTS];

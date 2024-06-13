@@ -25,6 +25,7 @@
 #include "sta_define.h"
 #include "define.h"
 #include "sta_state_machine.h"
+#include "wifi_app_state_aware.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 
@@ -48,7 +49,13 @@ constexpr int TEST_FAIL_REASON = 16;
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void TearDownTestCase()
+    {
+        WifiAppStateAware& wifiAppStateAware = WifiAppStateAware::GetInstance();
+        wifiAppStateAware.appChangeEventHandler.reset();
+        wifiAppStateAware.mAppStateObServer = nullptr;
+        wifiAppStateAware.appMgrProxy_ = nullptr;
+    }
     virtual void SetUp()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));

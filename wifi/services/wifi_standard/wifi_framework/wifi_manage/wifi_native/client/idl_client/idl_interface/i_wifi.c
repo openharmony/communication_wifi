@@ -28,9 +28,9 @@
 #include "i_wifi_sta_iface.h"
 #include "i_wifi_supplicant_iface.h"
 #include "serial.h"
-#include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
+#include "wifi_native_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlIWifi"
@@ -44,12 +44,12 @@ WifiErrorNo GetWifiChip(uint8_t id, IWifiChip *chip)
     WriteFunc(context, "GetWifiChip");
     WriteInt(context, id);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetWifiChip") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetWifiChip") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetWifiChip deal failed!");
     } else {
         /* read IWifiChip struct */
@@ -69,18 +69,18 @@ WifiErrorNo GetWifiChipIds(uint8_t *ids, int32_t *size)
     WriteFunc(context, "GetWifiChipIds");
     WriteInt(context, *size);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetWifiChipIds") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetWifiChipIds") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetWifiChipIds deal failed!");
     } else {
         ReadInt(context, size);
         if (*size > WIFI_MAX_CHIP_IDS) {
             LOGE("GetWifiChipIds fail, size error: %{public}d", *size);
-            return WIFI_IDL_OPT_FAILED;
+            return WIFI_HAL_OPT_FAILED;
         }
         for (int i = 0; i < *size; ++i) {
             ReadInt(context, (int *)(ids + i));
@@ -99,10 +99,10 @@ WifiErrorNo Start(void)
     WriteBegin(context, 0);
     WriteFunc(context, "Start");
     WriteEnd(context);
-    if (RpcClientCall(client, "Start") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "Start") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -117,10 +117,10 @@ WifiErrorNo Stop(void)
     WriteBegin(context, 0);
     WriteFunc(context, "Stop");
     WriteEnd(context);
-    if (RpcClientCall(client, "Stop") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "Stop") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -135,10 +135,10 @@ WifiErrorNo NotifyClear(void)
     WriteBegin(context, 0);
     WriteFunc(context, "NotifyClear");
     WriteEnd(context);
-    if (RpcClientCall(client, "NotifyClear") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "NotifyClear") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -168,9 +168,9 @@ static void IdlCbkAddRemoveIface(Context *context, int event)
     }
     IWifiChipEventCallback *callback = GetWifiChipEventCallback();
     if (callback != NULL) {
-        if (event == WIFI_IDL_CBK_CMD_ADD_IFACE && callback->onIfaceAdded != NULL) {
+        if (event == HAL_CBK_CMD_ADD_IFACE && callback->onIfaceAdded != NULL) {
             callback->onIfaceAdded(type, iface);
-        } else if (event == WIFI_IDL_CBK_CMD_REMOVE_IFACE && callback->onIfaceRemoved != NULL) {
+        } else if (event == HAL_CBK_CMD_REMOVE_IFACE && callback->onIfaceRemoved != NULL) {
             callback->onIfaceRemoved(type, iface);
         }
     }
@@ -300,22 +300,22 @@ static void IdlCbkWpaEventDeal(Context *context, int event)
     if (callback == NULL) {
         return;
     }
-    if (event == WIFI_IDL_CBK_CMD_WPS_TIME_OUT && callback->onWpsTimeOut != NULL) {
+    if (event == HAL_CBK_CMD_WPS_TIME_OUT && callback->onWpsTimeOut != NULL) {
         callback->onWpsTimeOut(status);
     }
-    if (event == WIFI_IDL_CBK_CMD_WPS_OVERLAP && callback->onWpsOverlap != NULL) {
+    if (event == HAL_CBK_CMD_WPS_OVERLAP && callback->onWpsOverlap != NULL) {
         callback->onWpsOverlap(status);
     }
-    if (event == WIFI_IDL_CBK_CMD_SSID_WRONG_KEY && callback->onSsidWrongkey != NULL) {
+    if (event == HAL_CBK_CMD_SSID_WRONG_KEY && callback->onSsidWrongkey != NULL) {
         callback->onSsidWrongkey(status);
     }
-    if (event == WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM && callback->onWpaStateChanged != NULL) {
+    if (event == HAL_CBK_CMD_WPA_STATE_CHANGEM && callback->onWpaStateChanged != NULL) {
         callback->onWpaStateChanged(status);
     }
-    if (event == WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL && callback->onWpsConnectionFull != NULL) {
+    if (event == HAL_CBK_CMD_WPS_CONNECTION_FULL && callback->onWpsConnectionFull != NULL) {
         callback->onWpsConnectionFull(status);
     }
-    if (event == WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT && callback->onWpsConnectionReject != NULL) {
+    if (event == HAL_CBK_CMD_WPS_CONNECTION_REJECT && callback->onWpsConnectionReject != NULL) {
         callback->onWpsConnectionReject(status);
     }
     return;
@@ -325,41 +325,41 @@ static int IdlDealStaApEvent(Context *context, int event)
 {
     LOGI("OnTransact deal sta/ap event: %{public}d", event);
     switch (event) {
-        case WIFI_IDL_CBK_CMD_FAILURE:
-        case WIFI_IDL_CBK_CMD_STARTED:
-        case WIFI_IDL_CBK_CMD_STOPED:
+        case HAL_CBK_CMD_FAILURE:
+        case HAL_CBK_CMD_STARTED:
+        case HAL_CBK_CMD_STOPED:
             break;
-        case WIFI_IDL_CBK_CMD_ADD_IFACE:
-        case WIFI_IDL_CBK_CMD_REMOVE_IFACE:
+        case HAL_CBK_CMD_ADD_IFACE:
+        case HAL_CBK_CMD_REMOVE_IFACE:
             IdlCbkAddRemoveIface(context, event);
             break;
-        case WIFI_IDL_CBK_CMD_STA_JOIN:
-        case WIFI_IDL_CBK_CMD_STA_LEAVE:
+        case HAL_CBK_CMD_STA_JOIN:
+        case HAL_CBK_CMD_STA_LEAVE:
             IdlCbkStaJoinLeave(context);
             break;
-        case WIFI_IDL_CBK_CMD_SCAN_INFO_NOTIFY:
+        case HAL_CBK_CMD_SCAN_INFO_NOTIFY:
             IdlCbkScanInfoNotify(context);
             break;
-        case WIFI_IDL_CBK_CMD_CONNECT_CHANGED:
+        case HAL_CBK_CMD_CONNECT_CHANGED:
             IdlCbkConnectChanged(context);
             break;
-        case WIFI_IDL_CBK_CMD_STA_DISCONNECT_REASON_EVENT:
+        case HAL_CBK_CMD_STA_DISCONNECT_REASON_EVENT:
             IdlCbkDisConnectReasonNotify(context);
             break;
-        case WIFI_IDL_CBK_CMD_BSSID_CHANGED:
+        case HAL_CBK_CMD_BSSID_CHANGED:
             IdlCbkBssidChanged(context);
             break;
-        case WIFI_IDL_CBK_CMD_AP_ENABLE:
-        case WIFI_IDL_CBK_CMD_AP_DISABLE:
-        case WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT:
+        case HAL_CBK_CMD_AP_ENABLE:
+        case HAL_CBK_CMD_AP_DISABLE:
+        case HAL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT:
             IdlCbkApStateChange(context, event);
             break;
-        case WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM:
-        case WIFI_IDL_CBK_CMD_SSID_WRONG_KEY:
-        case WIFI_IDL_CBK_CMD_WPS_OVERLAP:
-        case WIFI_IDL_CBK_CMD_WPS_TIME_OUT:
-        case WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL:
-        case WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT:
+        case HAL_CBK_CMD_WPA_STATE_CHANGEM:
+        case HAL_CBK_CMD_SSID_WRONG_KEY:
+        case HAL_CBK_CMD_WPS_OVERLAP:
+        case HAL_CBK_CMD_WPS_TIME_OUT:
+        case HAL_CBK_CMD_WPS_CONNECTION_FULL:
+        case HAL_CBK_CMD_WPS_CONNECTION_REJECT:
             IdlCbkWpaEventDeal(context, event);
             break;
         default:
@@ -561,13 +561,13 @@ static void IdlCbP2pProvDiscEvent(Context *context, int event)
     if (callback == NULL) {
         return;
     }
-    if (event == WIFI_IDL_CBK_CMD_P2P_PROV_DISC_PBC_REQ_EVENT && callback->onProvisionDiscoveryPbcRequest != NULL) {
+    if (event == HAL_CBK_CMD_P2P_PROV_DISC_PBC_REQ_EVENT && callback->onProvisionDiscoveryPbcRequest != NULL) {
         callback->onProvisionDiscoveryPbcRequest(address);
     }
-    if (event == WIFI_IDL_CBK_CMD_P2P_PROV_DISC_PBC_RSP_EVENT && callback->onProvisionDiscoveryPbcResponse != NULL) {
+    if (event == HAL_CBK_CMD_P2P_PROV_DISC_PBC_RSP_EVENT && callback->onProvisionDiscoveryPbcResponse != NULL) {
         callback->onProvisionDiscoveryPbcResponse(address);
     }
-    if (event == WIFI_IDL_CBK_CMD_P2P_PROV_DISC_ENTER_PIN_EVENT && callback->onProvisionDiscoveryEnterPin != NULL) {
+    if (event == HAL_CBK_CMD_P2P_PROV_DISC_ENTER_PIN_EVENT && callback->onProvisionDiscoveryEnterPin != NULL) {
         callback->onProvisionDiscoveryEnterPin(address);
     }
     return;
@@ -692,10 +692,10 @@ static void IdlCbP2pApStaConnectEvent(Context *context, int event)
     if (callback == NULL) {
         return;
     }
-    if (event == WIFI_IDL_CBK_CMD_AP_STA_DISCONNECTED_EVENT && callback->onStaDeauthorized != NULL) {
+    if (event == HAL_CBK_CMD_AP_STA_DISCONNECTED_EVENT && callback->onStaDeauthorized != NULL) {
         callback->onStaDeauthorized(devAddress);
     }
-    if (event == WIFI_IDL_CBK_CMD_AP_STA_CONNECTED_EVENT && callback->onStaAuthorized != NULL) {
+    if (event == HAL_CBK_CMD_AP_STA_CONNECTED_EVENT && callback->onStaAuthorized != NULL) {
         callback->onStaAuthorized(devAddress, groupAddress);
     }
     return;
@@ -782,43 +782,43 @@ static void IdlCbP2pChannelSwitchEvent(Context *context)
 static int IdlDealP2pEventFirst(Context *context, int event)
 {
     switch (event) {
-        case WIFI_IDL_CBK_CMD_P2P_SUPPLICANT_CONNECT:
+        case HAL_CBK_CMD_P2P_SUPPLICANT_CONNECT:
             IdlCbP2pEventDeal(context);
             break;
-        case WIFI_IDL_CBK_CMD_SUP_CONN_FAILED_EVENT:
+        case HAL_CBK_CMD_SUP_CONN_FAILED_EVENT:
             IdlCbP2pSupConnFailedEvent();
             break;
-        case WIFI_IDL_CBK_CMD_P2P_DEVICE_FOUND_EVENT:
+        case HAL_CBK_CMD_P2P_DEVICE_FOUND_EVENT:
             IdlCbP2pDeviceFoundEventDeal(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_DEVICE_LOST_EVENT:
+        case HAL_CBK_CMD_P2P_DEVICE_LOST_EVENT:
             IdlCbP2pDeviceLostEventDeal(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_GO_NEGOTIATION_REQUEST_EVENT:
+        case HAL_CBK_CMD_P2P_GO_NEGOTIATION_REQUEST_EVENT:
             IdlCbP2pGoNegotiationRequestEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_GO_NEGOTIATION_SUCCESS_EVENT:
+        case HAL_CBK_CMD_P2P_GO_NEGOTIATION_SUCCESS_EVENT:
             IdlCbP2pGoNegotiationSuccessEvent();
             break;
-        case WIFI_IDL_CBK_CMD_P2P_GO_NEGOTIATION_FAILURE_EVENT:
+        case HAL_CBK_CMD_P2P_GO_NEGOTIATION_FAILURE_EVENT:
             IdlCbP2pGoNegotiationFailureEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_INVITATION_RECEIVED_EVENT:
+        case HAL_CBK_CMD_P2P_INVITATION_RECEIVED_EVENT:
             IdlCbP2pInvitationReceivedEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_INVITATION_RESULT_EVENT:
+        case HAL_CBK_CMD_P2P_INVITATION_RESULT_EVENT:
             IdlCbP2pInvitationResultEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_GROUP_FORMATION_SUCCESS_EVENT:
+        case HAL_CBK_CMD_P2P_GROUP_FORMATION_SUCCESS_EVENT:
             IdlCbP2pGroupFormationSuccessEvent();
             break;
-        case WIFI_IDL_CBK_CMD_P2P_GROUP_FORMATION_FAILURE_EVENT:
+        case HAL_CBK_CMD_P2P_GROUP_FORMATION_FAILURE_EVENT:
             IdlCbP2pGroupFormationFailureEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_GROUP_STARTED_EVENT:
+        case HAL_CBK_CMD_P2P_GROUP_STARTED_EVENT:
             IdlCbP2pGroupStartedEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_GROUP_REMOVED_EVENT:
+        case HAL_CBK_CMD_P2P_GROUP_REMOVED_EVENT:
             IdlCbP2pGroupRemovedEvent(context);
             break;
         default:
@@ -830,37 +830,37 @@ static int IdlDealP2pEventFirst(Context *context, int event)
 static int IdlDealP2pEventSecond(Context *context, int event)
 {
     switch (event) {
-        case WIFI_IDL_CBK_CMD_P2P_PROV_DISC_PBC_REQ_EVENT:
-        case WIFI_IDL_CBK_CMD_P2P_PROV_DISC_PBC_RSP_EVENT:
-        case WIFI_IDL_CBK_CMD_P2P_PROV_DISC_ENTER_PIN_EVENT:
+        case HAL_CBK_CMD_P2P_PROV_DISC_PBC_REQ_EVENT:
+        case HAL_CBK_CMD_P2P_PROV_DISC_PBC_RSP_EVENT:
+        case HAL_CBK_CMD_P2P_PROV_DISC_ENTER_PIN_EVENT:
             IdlCbP2pProvDiscEvent(context, event);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_PROV_DISC_SHOW_PIN_EVENT:
+        case HAL_CBK_CMD_P2P_PROV_DISC_SHOW_PIN_EVENT:
             IdlCbP2pProDiscShowPinEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_FIND_STOPPED_EVENT:
+        case HAL_CBK_CMD_P2P_FIND_STOPPED_EVENT:
             IdlCbP2pFindStopEvent();
             break;
-        case WIFI_IDL_CBK_CMD_P2P_SERV_DISC_RESP_EVENT:
+        case HAL_CBK_CMD_P2P_SERV_DISC_RESP_EVENT:
             IdlCbP2pServDiscRespEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_PROV_DISC_FAILURE_EVENT:
+        case HAL_CBK_CMD_P2P_PROV_DISC_FAILURE_EVENT:
             IdlCbP2pProvServDiscFailureEvent();
             break;
-        case WIFI_IDL_CBK_CMD_AP_STA_DISCONNECTED_EVENT:
-        case WIFI_IDL_CBK_CMD_AP_STA_CONNECTED_EVENT:
+        case HAL_CBK_CMD_AP_STA_DISCONNECTED_EVENT:
+        case HAL_CBK_CMD_AP_STA_CONNECTED_EVENT:
             IdlCbP2pApStaConnectEvent(context, event);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT:
+        case HAL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT:
             IdlCbP2pServDiscReqEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_IFACE_CREATED_EVENT:
+        case HAL_CBK_CMD_P2P_IFACE_CREATED_EVENT:
             IdlCbP2pIfaceCreatedEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_CONNECT_FAILED:
+        case HAL_CBK_CMD_P2P_CONNECT_FAILED:
             IdlCbP2pConnectFailedEvent(context);
             break;
-        case WIFI_IDL_CBK_CMD_P2P_CHANNEL_SWITCH_EVENT:
+        case HAL_CBK_CMD_P2P_CHANNEL_SWITCH_EVENT:
             IdlCbP2pChannelSwitchEvent(context);
             break;
         default:

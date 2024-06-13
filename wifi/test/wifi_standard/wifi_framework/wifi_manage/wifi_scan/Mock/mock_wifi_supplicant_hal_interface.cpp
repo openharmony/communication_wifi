@@ -27,12 +27,12 @@ namespace WifiSupplicantHalInterface {
 
 WifiErrorNo UnRegisterSupplicantEventCallback()
 {
-    return MockWifiScanInterface::GetInstance().pSupplicant.unCallback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pSupplicant.unCallback ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
 {
-    return MockWifiScanInterface::GetInstance().pSupplicant.callback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pSupplicant.callback ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 };
 }  // namespace Wifi

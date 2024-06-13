@@ -21,7 +21,6 @@
 #include <sys/socket.h>
 #include "hal_device_manage.h"
 #include "wifi_log.h"
-#include "wifi_idl_define.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_ap_hal_interface.h"
@@ -1434,7 +1433,7 @@ int32_t ChipIfaceCallback::OnScanResultsCallback(uint32_t event)
     const OHOS::Wifi::SupplicantEventCallback &cbk =
         OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onScanNotify) {
-        cbk.onScanNotify(SINGLE_SCAN_OVER_OK);
+        cbk.onScanNotify(HAL_SINGLE_SCAN_OVER_OK);
     }
     return 0;
 }

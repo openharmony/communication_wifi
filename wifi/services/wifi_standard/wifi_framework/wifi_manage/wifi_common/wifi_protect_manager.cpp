@@ -332,7 +332,7 @@ bool WifiProtectManager::ChangeWifiPowerMode()
     /* Otherwise, we need to change current mode, first reset it to normal */
     switch (mCurrentOpMode) {
         case WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF:
-            if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(true) != WIFI_IDL_OPT_OK) {
+            if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(true) != WIFI_HAL_OPT_OK) {
                 LOGE("%{public}s Failed to reset the OpMode from hi-perf to Normal", __func__);
                 return false;
             }
@@ -355,7 +355,7 @@ bool WifiProtectManager::ChangeWifiPowerMode()
     /* Now switch to the new opMode */
     switch (newProtectMode) {
         case WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF:
-            if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(false) != WIFI_IDL_OPT_OK) {
+            if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(false) != WIFI_HAL_OPT_OK) {
                 LOGE("%{public}s Failed to set the OpMode to hi-perf", __func__);
                 return false;
             }
@@ -387,7 +387,7 @@ bool WifiProtectManager::ChangeWifiPowerMode()
 bool WifiProtectManager::SetLowLatencyMode(bool enabled)
 {
     /* Only set power save mode */
-    if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(!enabled) != WIFI_IDL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(!enabled) != WIFI_HAL_OPT_OK) {
         LOGE("Failed to set power save mode");
         return false;
     }

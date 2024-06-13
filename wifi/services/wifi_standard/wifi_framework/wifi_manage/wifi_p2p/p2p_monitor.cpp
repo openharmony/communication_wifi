@@ -324,7 +324,7 @@ void P2pMonitor::Broadcast2SmChSwitch(const std::string &iface, const WifiP2pGro
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, 0, 0, anyGroup);
 }
 
-void P2pMonitor::WpaEventDeviceFound(const IdlP2pDeviceFound &deviceInfo) const
+void P2pMonitor::WpaEventDeviceFound(const HalP2pDeviceFound &deviceInfo) const
 {
     const int minWfdLength = 6;
     WIFI_LOGI("onDeviceFound callback");
@@ -423,7 +423,7 @@ void P2pMonitor::WpaEventGoNegFailure(int status) const
     Broadcast2SmGoNegFailure(selectIfacName, p2pStatus);
 }
 
-void P2pMonitor::WpaEventInvitationReceived(const IdlP2pInvitationInfo &recvInfo) const
+void P2pMonitor::WpaEventInvitationReceived(const HalP2pInvitationInfo &recvInfo) const
 {
     WIFI_LOGI("onInvitationReceived callback");
     WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::NEGO_FAILURE_ERROR),
@@ -481,7 +481,7 @@ void P2pMonitor::WpaEventGroupFormationFailure(const std::string &failureReason)
     Broadcast2SmGroupFormationFailure(selectIfacName, reason);
 }
 
-void P2pMonitor::WpaEventGroupStarted(const IdlP2pGroupInfo &groupInfo) const
+void P2pMonitor::WpaEventGroupStarted(const HalP2pGroupInfo &groupInfo) const
 {
     WIFI_LOGD("onGroupStarted callback");
     WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::FORMATION_ERROR),
@@ -588,7 +588,7 @@ void P2pMonitor::WpaEventFindStopped(void) const
     Broadcast2SmFindStopped(selectIfacName);
 }
 
-void P2pMonitor::WpaEventServDiscReq(const IdlP2pServDiscReqInfo &reqInfo) const
+void P2pMonitor::WpaEventServDiscReq(const HalP2pServDiscReqInfo &reqInfo) const
 {
     WIFI_LOGD("OnServDiscReq callback");
     WifiP2pServiceRequestList reqList;

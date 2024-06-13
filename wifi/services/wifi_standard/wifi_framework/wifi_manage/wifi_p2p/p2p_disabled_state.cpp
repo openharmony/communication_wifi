@@ -17,7 +17,6 @@
 #include "wifi_p2p_hal_interface.h"
 #include "p2p_state_machine.h"
 #include "wifi_logger.h"
-#include "wifi_idl_define.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pDisabledState");
 
@@ -55,7 +54,7 @@ bool P2pDisabledState::ExecuteStateMsg(InternalMessage *msg)
             p2pStateMachine.StartTimer(
                 static_cast<int>(P2P_STATE_MACHINE_CMD::ENABLE_P2P_TIMED_OUT), ENABLE_P2P_TIMED_OUT__INTERVAL);
             if (WifiP2PHalInterface::GetInstance().StartP2p(WifiSettings::GetInstance().GetP2pIfaceName())
-                == WifiErrorNo::WIFI_IDL_OPT_OK) {
+                == WifiErrorNo::WIFI_HAL_OPT_OK) {
                 SetVendorFeatures();
                 p2pStateMachine.SwitchState(&p2pStateMachine.p2pEnablingState);
             } else {

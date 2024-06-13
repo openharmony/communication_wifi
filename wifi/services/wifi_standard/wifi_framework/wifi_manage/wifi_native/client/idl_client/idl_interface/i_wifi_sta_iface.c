@@ -20,26 +20,26 @@
 #include "context.h"
 #include "i_wifi_public_func.h"
 #include "serial.h"
-#include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
+#include "wifi_native_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlStaIface"
 
 static int g_staCallbackEvents[] = {
-    WIFI_IDL_CBK_CMD_FAILURE,
-    WIFI_IDL_CBK_CMD_STARTED,
-    WIFI_IDL_CBK_CMD_STOPED,
-    WIFI_IDL_CBK_CMD_CONNECT_CHANGED,
-    WIFI_IDL_CBK_CMD_BSSID_CHANGED,
-    WIFI_IDL_CBK_CMD_WPA_STATE_CHANGEM,
-    WIFI_IDL_CBK_CMD_SSID_WRONG_KEY,
-    WIFI_IDL_CBK_CMD_WPS_OVERLAP,
-    WIFI_IDL_CBK_CMD_WPS_TIME_OUT,
-    WIFI_IDL_CBK_CMD_WPS_CONNECTION_FULL,
-    WIFI_IDL_CBK_CMD_WPS_CONNECTION_REJECT,
-    WIFI_IDL_CBK_CMD_STA_DISCONNECT_REASON_EVENT
+    HAL_CBK_CMD_FAILURE,
+    HAL_CBK_CMD_STARTED,
+    HAL_CBK_CMD_STOPED,
+    HAL_CBK_CMD_CONNECT_CHANGED,
+    HAL_CBK_CMD_BSSID_CHANGED,
+    HAL_CBK_CMD_WPA_STATE_CHANGEM,
+    HAL_CBK_CMD_SSID_WRONG_KEY,
+    HAL_CBK_CMD_WPS_OVERLAP,
+    HAL_CBK_CMD_WPS_TIME_OUT,
+    HAL_CBK_CMD_WPS_CONNECTION_FULL,
+    HAL_CBK_CMD_WPS_CONNECTION_REJECT,
+    HAL_CBK_CMD_STA_DISCONNECT_REASON_EVENT
 };
 
 static IWifiEventCallback g_wifiStaEventCallback = {0};
@@ -61,12 +61,12 @@ WifiErrorNo GetStaCapabilities(int32_t *capabilities)
     WriteBegin(context, 0);
     WriteFunc(context, "GetStaCapabilities");
     WriteEnd(context);
-    if (RpcClientCall(client, "GetStaCapabilities") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetStaCapabilities") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetStaCapabilities deal failed!");
     } else {
         ReadInt(context, capabilities);
@@ -85,12 +85,12 @@ WifiErrorNo GetDeviceMacAddress(unsigned char *mac, int *lenMac)
     WriteFunc(context, "GetDeviceMacAddress");
     WriteInt(context, *lenMac);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetDeviceMacAddress") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetDeviceMacAddress") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetDeviceMacAddress deal failed!");
     } else {
         ReadInt(context, lenMac);
@@ -111,12 +111,12 @@ WifiErrorNo GetFrequencies(int32_t band, int *frequencies, int32_t *size)
     WriteInt(context, band);
     WriteInt(context, *size);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetFrequencies") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetFrequencies") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetFrequencies deal failed!");
     } else {
         ReadInt(context, size);
@@ -140,10 +140,10 @@ WifiErrorNo SetAssocMacAddr(unsigned char *mac, int lenMac, const int portType)
     WriteUStr(context, mac, lenMac);
     WriteInt(context, portType);
     WriteEnd(context);
-    if (RpcClientCall(client, "SetAssocMacAddr") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SetAssocMacAddr") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -160,10 +160,10 @@ WifiErrorNo SetScanningMacAddress(unsigned char *mac, int lenMac)
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
     WriteEnd(context);
-    if (RpcClientCall(client, "SetScanningMacAddress") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SetScanningMacAddress") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -180,10 +180,10 @@ WifiErrorNo DeauthLastRoamingBssid(unsigned char *mac, int lenMac)
     WriteInt(context, lenMac);
     WriteUStr(context, mac, lenMac);
     WriteEnd(context);
-    if (RpcClientCall(client, "DeauthLastRoamingBssid") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "DeauthLastRoamingBssid") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -198,12 +198,12 @@ WifiErrorNo GetSupportFeature(long *feature)
     WriteBegin(context, 0);
     WriteFunc(context, "GetSupportFeature");
     WriteEnd(context);
-    if (RpcClientCall(client, "GetSupportFeature") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetSupportFeature") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadLong(context, feature);
     }
     ReadClientEnd(client);
@@ -223,10 +223,10 @@ WifiErrorNo RunCmd(const char *ifname, int32_t cmdId, unsigned char *buf, int32_
     WriteInt(context, bufSize);
     WriteUStr(context, buf, bufSize);
     WriteEnd(context);
-    if (RpcClientCall(client, "RunCmd") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "RunCmd") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -242,10 +242,10 @@ WifiErrorNo SetWifiTxPower(int32_t power)
     WriteFunc(context, "SetWifiTxPower");
     WriteInt(context, power);
     WriteEnd(context);
-    if (RpcClientCall(client, "SetWifiTxPower") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SetWifiTxPower") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -261,10 +261,10 @@ WifiErrorNo RemoveNetwork(int networkId)
     WriteFunc(context, "RemoveNetwork");
     WriteInt(context, networkId);
     WriteEnd(context);
-    if (RpcClientCall(client, "RemoveNetwork") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "RemoveNetwork") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -279,12 +279,12 @@ WifiErrorNo AddNetwork(int *networkId)
     WriteBegin(context, 0);
     WriteFunc(context, "AddNetwork");
     WriteEnd(context);
-    if (RpcClientCall(client, "AddNetwork") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "AddNetwork") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server AddNetwork deal failed!");
     } else {
         ReadInt(context, networkId);
@@ -303,12 +303,12 @@ WifiErrorNo EnableNetwork(int networkId)
     WriteFunc(context, "EnableNetwork");
     WriteInt(context, networkId);
     WriteEnd(context);
-    if (RpcClientCall(client, "EnableNetwork") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "EnableNetwork") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server EnableNetwork deal failed!");
     }
     ReadClientEnd(client);
@@ -325,12 +325,12 @@ WifiErrorNo DisableNetwork(int networkId)
     WriteFunc(context, "DisableNetwork");
     WriteInt(context, networkId);
     WriteEnd(context);
-    if (RpcClientCall(client, "DisableNetwork") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "DisableNetwork") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server DisableNetwork deal failed!");
     }
     ReadClientEnd(client);
@@ -352,12 +352,12 @@ WifiErrorNo SetNetwork(int networkId, SetNetworkConfig *confs, int size)
         WriteStr(context, confs[i].cfgValue);
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "SetNetwork") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SetNetwork") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server SetNetwork deal failed!");
     }
     ReadClientEnd(client);
@@ -375,12 +375,12 @@ WifiErrorNo WpaGetNetwork(GetNetworkConfig *confs)
     WriteInt(context, confs->networkId);
     WriteStr(context, confs->param);
     WriteEnd(context);
-    if (RpcClientCall(client, "WpaGetNetwork") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "WpaGetNetwork") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server WpaGetNetwork deal failed!");
     } else {
         ReadStr(context, confs->value, WIFI_NETWORK_CONFIG_VALUE_LENGTH);
@@ -398,10 +398,10 @@ WifiErrorNo SaveNetworkConfig(void)
     WriteBegin(context, 0);
     WriteFunc(context, "SaveNetworkConfig");
     WriteEnd(context);
-    if (RpcClientCall(client, "SaveNetworkConfig") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SaveNetworkConfig") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -411,7 +411,7 @@ WifiErrorNo SaveNetworkConfig(void)
 WifiErrorNo StartScan(const ScanSettings *settings)
 {
     if (settings == NULL) {
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -429,10 +429,10 @@ WifiErrorNo StartScan(const ScanSettings *settings)
     }
     WriteInt(context, settings->scanStyle);
     WriteEnd(context);
-    if (RpcClientCall(client, "StartScan") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "StartScan") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -448,12 +448,12 @@ WifiErrorNo GetNetworkList(WifiNetworkInfo *infos, int *size)
     WriteFunc(context, "GetNetworkList");
     WriteInt(context, *size);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetNetworkList") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetNetworkList") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetNetworkList deal failed!");
     } else {
         ReadInt(context, size);
@@ -506,13 +506,13 @@ ScanInfo* GetScanInfos(int *size)
     WriteFunc(context, "GetScanInfos");
     WriteInt(context, *size);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetScanInfos") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "GetScanInfos") != WIFI_HAL_OPT_OK) {
         return NULL;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ScanInfo* scanInfos = NULL;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetScanInfos deal failed!");
     } else {
         ReadInt(context, size);
@@ -551,7 +551,7 @@ ScanInfo* GetScanInfos(int *size)
 WifiErrorNo StartPnoScan(const PnoScanSettings *settings)
 {
     if (settings == NULL) {
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -576,10 +576,10 @@ WifiErrorNo StartPnoScan(const PnoScanSettings *settings)
         WriteInt(context, settings->freqs[i]);
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "StartPnoScan") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "StartPnoScan") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -594,10 +594,10 @@ WifiErrorNo StopPnoScan(void)
     WriteBegin(context, 0);
     WriteFunc(context, "StopPnoScan");
     WriteEnd(context);
-    if (RpcClientCall(client, "StopPnoScan") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "StopPnoScan") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -621,15 +621,15 @@ WifiErrorNo RegisterStaEventCallback(IWifiEventCallback callback)
         WriteInt(context, g_staCallbackEvents[i]);
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "RegisterStaEventCallback") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "RegisterStaEventCallback") != WIFI_HAL_OPT_OK) {
         if (callback.onConnectChanged == NULL) {
             SetWifiEventCallback(callback);
         }
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK || callback.onConnectChanged == NULL) {
+    if (result == WIFI_HAL_OPT_OK || callback.onConnectChanged == NULL) {
         SetWifiEventCallback(callback);
     }
     ReadClientEnd(client);
@@ -640,7 +640,7 @@ WifiErrorNo RegisterStaEventCallback(IWifiEventCallback callback)
 WifiErrorNo StartWpsPbcMode(WifiWpsParam *param)
 {
     if (param == NULL) {
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -651,10 +651,10 @@ WifiErrorNo StartWpsPbcMode(WifiWpsParam *param)
     WriteInt(context, param->multiAp);
     WriteStr(context, param->bssid);
     WriteEnd(context);
-    if (RpcClientCall(client, "StartWpsPbcMode") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "StartWpsPbcMode") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -664,7 +664,7 @@ WifiErrorNo StartWpsPbcMode(WifiWpsParam *param)
 WifiErrorNo StartWpsPinMode(WifiWpsParam *param, int *pinCode)
 {
     if (param == NULL || pinCode == NULL) {
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -676,12 +676,12 @@ WifiErrorNo StartWpsPinMode(WifiWpsParam *param, int *pinCode)
     WriteStr(context, param->bssid);
     WriteStr(context, param->pinCode);
     WriteEnd(context);
-    if (RpcClientCall(client, "StartWpsPinMode") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "StartWpsPinMode") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadInt(context, pinCode);
     }
     ReadClientEnd(client);
@@ -697,10 +697,10 @@ WifiErrorNo StopWps(void)
     WriteBegin(context, 0);
     WriteFunc(context, "StopWps");
     WriteEnd(context);
-    if (RpcClientCall(client, "StopWps") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "StopWps") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -710,7 +710,7 @@ WifiErrorNo StopWps(void)
 WifiErrorNo GetRoamingCapabilities(WifiRoamCapability *capability)
 {
     if (capability == NULL) {
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     RpcClient *client = GetStaRpcClient();
     LockRpcClient(client);
@@ -718,12 +718,12 @@ WifiErrorNo GetRoamingCapabilities(WifiRoamCapability *capability)
     WriteBegin(context, 0);
     WriteFunc(context, "GetRoamingCapabilities");
     WriteEnd(context);
-    if (RpcClientCall(client, "GetRoamingCapabilities") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetRoamingCapabilities") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadInt(context, &capability->maxBlocklistSize);
         ReadInt(context, &capability->maxTrustlistSize);
     }
@@ -752,10 +752,10 @@ WifiErrorNo SetRoamConfig(char **blocklist, int blocksize, char **trustlist, int
         }
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "SetRoamConfig") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SetRoamConfig") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -771,12 +771,12 @@ WifiErrorNo WpaAutoConnect(int enable)
     WriteFunc(context, "WpaAutoConnect");
     WriteInt(context, enable);
     WriteEnd(context);
-    if (RpcClientCall(client, "WpaAutoConnect") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "WpaAutoConnect") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("WpaAutoConnect failed!");
     }
     ReadClientEnd(client);
@@ -793,12 +793,12 @@ WifiErrorNo WpaBlocklistClear(void)
     WriteBegin(context, 0);
     WriteFunc(context, "WpaBlocklistClear");
     WriteEnd(context);
-    if (RpcClientCall(client, "WpaBlocklistClear") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "WpaBlocklistClear") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("WpaBlocklistClear failed!");
     }
     ReadClientEnd(client);
@@ -815,12 +815,12 @@ WifiErrorNo GetConnectSignalInfo(const char *endBssid, WpaSignalInfo *info)
     WriteFunc(context, "GetConnectSignalInfo");
     WriteStr(context, endBssid);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetConnectSignalInfo") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetConnectSignalInfo") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("GetConnectSignalInfo failed!");
     } else {
         ReadInt(context, &info->signal);
@@ -851,10 +851,10 @@ WifiErrorNo SetSuspendMode(bool mode)
     WriteFunc(context, "SetSuspendMode");
     WriteInt(context, mode);
     WriteEnd(context);
-    if (RpcClientCall(client, "SetSuspendMode") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SetSuspendMode") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -870,10 +870,10 @@ WifiErrorNo SetPowerMode(bool mode)
     WriteFunc(context, "SetPowerMode");
     WriteInt(context, mode);
     WriteEnd(context);
-    if (RpcClientCall(client, "SetPowerMode") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "SetPowerMode") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);

@@ -52,7 +52,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         cbk.onReportDisConnectReason(disconectParam->reasonCode, std::string(szBssid));
     }
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(WPA_CB_DISCONNECTED, disconectParam->reasonCode, std::string(szBssid));
+        cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, disconectParam->reasonCode, std::string(szBssid));
     }
     LOGI("%{public}s callback out, bssid:%{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
@@ -74,7 +74,7 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(WPA_CB_CONNECTED, connectParam->networkId, szBssid);
+        cbk.onConnectChanged(HAL_WPA_CB_CONNECTED, connectParam->networkId, szBssid);
     }
     LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
@@ -223,7 +223,7 @@ int32_t OnEventScanResult(struct IWpaCallback *self,
     const OHOS::Wifi::SupplicantEventCallback &cbk =
         OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onScanNotify) {
-        cbk.onScanNotify(SINGLE_SCAN_OVER_OK);
+        cbk.onScanNotify(HAL_SINGLE_SCAN_OVER_OK);
     }
     return 0;
 }
@@ -235,14 +235,14 @@ int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *
         LOGE("onEvenStaJoin: invalid parameter!");
         return 1;
     }
-    WifiIdlEvent event;
+    HalCallbackEvent event;
     uint8_t len = 0;
     char tmpBuf[WIFI_BSSID_LENGTH] = {0};
     if (strncmp(apCbParm->content, "AP-STA-CONNECTED", strlen("AP-STA-CONNECTED")) == 0) {
-        event = WIFI_IDL_CBK_CMD_STA_JOIN;
+        event = HAL_CBK_CMD_STA_JOIN;
         len = strlen("AP-STA-CONNECTED");
     } else if (strncmp(apCbParm->content, "AP-STA-DISCONNECTED", strlen("AP-STA-DISCONNECTED")) == 0) {
-        event = WIFI_IDL_CBK_CMD_STA_LEAVE;
+        event = HAL_CBK_CMD_STA_LEAVE;
         len = strlen("AP-STA-DISCONNECTED");
     } else {
         LOGE("onEvenStaJoin: unknown content!");
@@ -256,7 +256,7 @@ int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *
     const OHOS::Wifi::IWifiApMonitorEventCallback &cbk =
             OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst(apCbParm->id);
     if (cbk.onStaJoinOrLeave) {
-        OHOS::Wifi::WifiApConnectionNofify cbInfo;
+        OHOS::Wifi::WifiHalApConnectionNofify cbInfo;
         cbInfo.type = static_cast<int>(event);
         cbInfo.mac = tmpBuf;
         cbk.onStaJoinOrLeave(cbInfo);
@@ -271,20 +271,20 @@ int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *
         LOGE("onEvenApState: invalid parameter!");
         return 1;
     }
-    WifiIdlEvent event;
+    HalCallbackEvent event;
     if (strncmp(apCbParm->content, "AP-ENABLED", strlen("AP-ENABLED")) == 0) {
-        event = WIFI_IDL_CBK_CMD_AP_ENABLE;
+        event = HAL_CBK_CMD_AP_ENABLE;
     } else if (strncmp(apCbParm->content, "AP-DISABLED", strlen("AP-DISABLED")) == 0) {
-        event = WIFI_IDL_CBK_CMD_AP_DISABLE;
+        event = HAL_CBK_CMD_AP_DISABLE;
         if (GetExecDisable() == EXEC_DISABLE) {
             SetExecDisable(0);
             return 0;
         }
     } else if (strncmp(apCbParm->content, "CTRL-EVENT-TERMINATING", strlen("CTRL-EVENT-TERMINATING")) == 0) {
-        event = WIFI_IDL_CBK_CMD_AP_DISABLE;
+        event = HAL_CBK_CMD_AP_DISABLE;
     } else if (strncmp(apCbParm->content, "AP-STA-POSSIBLE-PSK-MISMATCH ",
         strlen("AP-STA-POSSIBLE-PSK-MISMATCH ")) == 0) {
-        event = WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT;
+        event = HAL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT;
     } else {
         return 1;
     }
@@ -316,7 +316,7 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onDeviceFound) {
-        OHOS::Wifi::IdlP2pDeviceFound cbInfo;
+        OHOS::Wifi::HalP2pDeviceFound cbInfo;
         uint32_t srcAddressLen = deviceInfoParam->srcAddressLen;
         char srcAddress[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
         ConvertMacArr2String(deviceInfoParam->srcAddress, srcAddressLen, srcAddress, sizeof(srcAddress));
@@ -399,7 +399,7 @@ int32_t OnEventInvitationReceived(struct IWpaCallback *self,
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onInvitationReceived) {
-        OHOS::Wifi::IdlP2pInvitationInfo cbInfo;
+        OHOS::Wifi::HalP2pInvitationInfo cbInfo;
         cbInfo.type = invitationReceivedParam->type;
         cbInfo.persistentNetworkId = invitationReceivedParam->persistentNetworkId;
         cbInfo.operatingFrequency = invitationReceivedParam->operatingFrequency;
@@ -474,7 +474,7 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     char tempSsid[WIFI_SSID_LENGTH] = {0};
     if (cbk.onGroupStarted) {
-        OHOS::Wifi::IdlP2pGroupInfo cbInfo;
+        OHOS::Wifi::HalP2pGroupInfo cbInfo;
         cbInfo.isGo = groupStartedParam->isGo;
         cbInfo.isPersistent = groupStartedParam->isPersistent;
         cbInfo.frequency = groupStartedParam->frequency;
@@ -507,7 +507,7 @@ int32_t OnEventGroupInfoStarted(struct IWpaCallback *self,
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     char tempSsid[WIFI_SSID_LENGTH] = {0};
     if (cbk.onGroupStarted) {
-        OHOS::Wifi::IdlP2pGroupInfo cbInfo;
+        OHOS::Wifi::HalP2pGroupInfo cbInfo;
         cbInfo.isGo = groupStartedParam->isGo;
         cbInfo.isPersistent = groupStartedParam->isPersistent;
         cbInfo.frequency = groupStartedParam->frequency;
@@ -605,7 +605,7 @@ int32_t OnEventServDiscReq(struct IWpaCallback *self,
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onP2pServDiscReq) {
-        OHOS::Wifi::IdlP2pServDiscReqInfo cbInfo;
+        OHOS::Wifi::HalP2pServDiscReqInfo cbInfo;
         cbInfo.freq = servDiscReqInfoParam->freq;
         cbInfo.dialogToken = servDiscReqInfoParam->dialogToken;
         cbInfo.updateIndic = servDiscReqInfoParam->updateIndic;

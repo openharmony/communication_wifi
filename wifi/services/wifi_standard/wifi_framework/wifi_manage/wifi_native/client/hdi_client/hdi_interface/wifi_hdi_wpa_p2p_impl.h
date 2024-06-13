@@ -19,7 +19,6 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_proxy.h"
 #include "i_wifi_struct.h"
-#include "wifi_idl_define.h"
 
 #ifdef __cplusplus
 extern "C" {

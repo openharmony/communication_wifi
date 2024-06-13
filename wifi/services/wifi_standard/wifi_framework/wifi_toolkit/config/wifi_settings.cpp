@@ -27,8 +27,6 @@
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
-#include "securec.h"
-#include "init_param.h"
 #include <random>
 #ifndef OHOS_ARCH_LITE
 #include <sys/sendfile.h>
@@ -46,10 +44,6 @@ namespace Wifi {
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
 #endif
-const std::string LANGUAGE_CHINESE = "zh-Hans";
-const std::string COUNTRY_CHINA_CAPITAL = "CN";
-const std::string COUNTRY_CHINA_LOWERCASE = "cn";
-constexpr int32_t MAX_PARAM_VALUE_LEN = 128;
 
 WifiSettings &WifiSettings::GetInstance()
 {
@@ -1109,6 +1103,10 @@ bool WifiSettings::EncryptionDeviceConfig(WifiDeviceConfig &config) const
 
 int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 {
+    if (config.ssid.empty()) {
+        LOGE("AddDeviceConfig ssid is empty");
+        return -1;
+    }
     std::unique_lock<std::mutex> lock(mConfigMutex);
     auto iter = mWifiDeviceConfig.find(config.networkId);
     if (iter != mWifiDeviceConfig.end()) {
@@ -1268,7 +1266,7 @@ int WifiSettings::GetHiddenDeviceConfig(std::vector<WifiDeviceConfig> &results)
     }
     std::unique_lock<std::mutex> lock(mConfigMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if (iter->second.hiddenSSID) {
+        if (iter->second.hiddenSSID && iter->second.ssid.length() > 0) {
             results.push_back(iter->second);
         }
     }
@@ -3291,48 +3289,6 @@ void WifiSettings::GenerateRandomMacAddress(std::string &randomMacAddr)
     }
     randomMacAddr = strMac;
     LOGD("%{public}s: randomMacAddr: %{private}s", __func__, randomMacAddr.c_str());
-}
-
-bool WifiSettings::IsValidParanValue(const char *value, uint32_t len)
-{
-    return (value != NULL) && (strlen(value) + 1 <= len);
-}
-
-std::string WifiSettings::GetParameter(const std::string &key, const std::string &def)
-{
-    uint32_t size = 0;
-    int ret = SystemReadParam(key.c_str(), NULL, &size);
-    if (ret == 0) {
-        std::vector<char> value(size + 1);
-        ret = SystemReadParam(key.c_str(), value.data(), &size);
-        if (ret == 0) {
-            return std::string(value.data());
-        }
-    }
-    if (IsValidParanValue(def.c_str(), MAX_PARAM_VALUE_LEN)) {
-        return std::string(def);
-    }
-    return "";
-}
-
-std::string WifiSettings::GetCountry()
-{
-    return GetParameter("const.cust.region", "");
-}
-
-std::string WifiSettings::GetLanguage()
-{
-    return GetParameter("persist.global.language", "");
-}
-
-std::string WifiSettings::GetOversea()
-{
-    std::string language = GetLanguage();
-    std::string country = GetCountry();
-    if (language == LANGUAGE_CHINESE && (country == COUNTRY_CHINA_CAPITAL || country == COUNTRY_CHINA_LOWERCASE)) {
-        return "internal";
-    }
-    return "oversea";
 }
 
 #ifdef SUPPORT_RANDOM_MAC_ADDR

@@ -18,7 +18,7 @@
 
 #include "wifi_log.h"
 #include "wifi_error_no.h"
-#include "wifi_idl_define.h"
+#include "wifi_native_define.h"
 #include "scan_common.h"
 #include "scan_state_machine.h"
 

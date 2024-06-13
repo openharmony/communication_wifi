@@ -283,7 +283,7 @@ private:
      *
      * @param deviceInfo - packets of device discovery
      */
-    void WpaEventDeviceFound(const IdlP2pDeviceFound &deviceInfo) const;
+    void WpaEventDeviceFound(const HalP2pDeviceFound &deviceInfo) const;
     /**
      * @Description Register the callback function for device loss.
      *
@@ -313,7 +313,7 @@ private:
      *
      * @param recvInfo - invitation requested packet
      */
-    void WpaEventInvitationReceived(const IdlP2pInvitationInfo &recvInfo) const;
+    void WpaEventInvitationReceived(const HalP2pInvitationInfo &recvInfo) const;
     /**
      * @Description Register the P2P invitation result callback function.
      *
@@ -337,7 +337,7 @@ private:
      *
      * @param groupInfo - group information data packet
      */
-    void WpaEventGroupStarted(const IdlP2pGroupInfo &groupInfo) const;
+    void WpaEventGroupStarted(const HalP2pGroupInfo &groupInfo) const;
     /**
      * @Description Register callback function for removing a group.
      *
@@ -385,7 +385,7 @@ private:
      *
      * @param reqInfo - service request packet
      */
-    void WpaEventServDiscReq(const IdlP2pServDiscReqInfo &reqInfo) const;
+    void WpaEventServDiscReq(const HalP2pServDiscReqInfo &reqInfo) const;
     /**
      * @Description register service response callback function.
      *

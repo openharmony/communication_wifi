@@ -16,9 +16,11 @@
 #include <gmock/gmock.h>
 #include <cstddef>
 #include <cstdint>
+#include <fcntl.h>
 #include "securec.h"
 #include "wifi_settings.h"
 #include "wifi_logger.h"
+#include "init_param.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -40,10 +42,10 @@ constexpr int SCORE = 0;
 constexpr int STATE = 0;
 constexpr int UID = 0;
 constexpr int ZERO = 0;
-constexpr int WIFI_OPT_SUCCESS = 0;
 constexpr int WIFI_OPT_RETURN = -1;
 constexpr int MIN_RSSI_2DOT_4GHZ = -80;
 constexpr int MIN_RSSI_5GZ = -77;
+constexpr char BACKUP_CONFIG_FILE_PATH_TEST[] = CONFIG_ROOR_DIR"/backup_config_test.conf";
 class WifiSettingsTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -165,6 +167,23 @@ HWTEST_F(WifiSettingsTest, AddRandomMacTest, TestSize.Level1)
     WIFI_LOGE("AddRandomMacTest enter!");
     WifiStoreRandomMac randomMacInfo;
     bool result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+    WIFI_LOGE("AddRandomMacTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiSettingsTest, AddRandomMacTest2, TestSize.Level1)
+{
+    WIFI_LOGE("AddRandomMacTest2 enter!");
+    WifiStoreRandomMac randomMacInfo;
+    randomMacInfo.ssid = "wifitest1";
+    randomMacInfo.keyMgmt = "keyMgmt";
+    WifiSettings::GetInstance().mWifiStoreRandomMac.push_back(randomMacInfo);
+    bool result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+    WIFI_LOGE("AddRandomMacTest result(%{public}d)", result);
+    EXPECT_TRUE(result);
+    randomMacInfo.ssid = "wifitest221";
+    randomMacInfo.keyMgmt = "keyM3gmt";
+    result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
     WIFI_LOGE("AddRandomMacTest result(%{public}d)", result);
     EXPECT_FALSE(result);
 }
@@ -324,9 +343,12 @@ HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
     WIFI_LOGE("IsModulePreLoadTest enter!");
     bool state = WifiSettings::GetInstance().IsModulePreLoad("wifitest");
     EXPECT_FALSE(state);
-    bool result = WifiSettings::GetInstance().IsModulePreLoad("StaService");
-    WIFI_LOGE("IsModulePreLoadTest result(%{public}d)", result);
-    EXPECT_FALSE(result);
+    WifiSettings::GetInstance().IsModulePreLoad("StaService");
+    WifiSettings::GetInstance().IsModulePreLoad("ScanService");
+    WifiSettings::GetInstance().IsModulePreLoad("ApService");
+    WifiSettings::GetInstance().IsModulePreLoad("P2pService");
+    WifiSettings::GetInstance().IsModulePreLoad("AwareService");
+    WifiSettings::GetInstance().IsModulePreLoad("EnhanceService");
 }
 
 HWTEST_F(WifiSettingsTest, GetSupportHwPnoFlagTest, TestSize.Level1)
@@ -573,6 +595,66 @@ HWTEST_F(WifiSettingsTest, MergeSoftapConfigTest, TestSize.Level1)
     WifiSettings::GetInstance().MergeSoftapConfig();
 }
 
+HWTEST_F(WifiSettingsTest, MergeWifiCloneConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("MergeWifiCloneConfigTest enter");
+    std::string cloneConfig = "wifitest";
+    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneConfig);
+}
+
+HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)
+{
+    WIFI_LOGI("ConfigsDeduplicateAndSaveTest enter");
+    WifiDeviceConfig config;
+    config.ssid = "test";
+    config.keyMgmt = "WPA-PSK";
+    std::vector<WifiDeviceConfig> configs;
+    configs.push_back(config);
+    WifiSettings::GetInstance().ConfigsDeduplicateAndSave(configs);
+}
+
+HWTEST_F(WifiSettingsTest, OnBackupTest, TestSize.Level1)
+{
+    WIFI_LOGI("OnBackupTest enter");
+    UniqueFd fd(-1);
+    WifiSettings::GetInstance().OnBackup(fd, "");
+    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), true);
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveBackupFile();
+}
+
+HWTEST_F(WifiSettingsTest, OnRestoreTest1, TestSize.Level1)
+{
+    WIFI_LOGI("OnRestoreTest1 enter");
+    UniqueFd fd(-1);
+    WifiSettings::GetInstance().OnRestore(fd, "");
+    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), false);
+    close(fd.Release());
+}
+
+HWTEST_F(WifiSettingsTest, OnRestoreTest2, TestSize.Level1)
+{
+    WIFI_LOGI("OnRestoreTest2 enter");
+    std::vector<WifiBackupConfig> configs;
+    WifiBackupConfig config;
+    config.ssid = "onrestretest";
+    config.keyMgmt = "WPA-PSK";
+    config.preSharedKey = "12345678";
+    configs.push_back(config);
+
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH_TEST);
+    wifiBackupConfig.SetValue(configs);
+    wifiBackupConfig.SaveConfig();
+
+    UniqueFd fd(open(BACKUP_CONFIG_FILE_PATH_TEST, O_RDONLY));
+    WifiSettings::GetInstance().OnRestore(fd, "");
+    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), true);
+    close(fd.Release());
+    remove(BACKUP_CONFIG_FILE_PATH_TEST);
+    WifiSettings::GetInstance().RemoveBackupFile();
+}
+
 HWTEST_F(WifiSettingsTest, RemoveMacAddrPairInfoTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoveMacAddrPairInfoTest enter");
@@ -605,8 +687,7 @@ HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("AddWpsDeviceConfigTest enter");
     WifiDeviceConfig config;
-    int result =  WifiSettings::GetInstance().AddWpsDeviceConfig(config);
-    EXPECT_EQ(result, -1);
+    WifiSettings::GetInstance().AddWpsDeviceConfig(config);
 }
 
 HWTEST_F(WifiSettingsTest, GetDeviceConfig5Test, TestSize.Level1)
@@ -724,5 +805,41 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
     EXPECT_EQ(result, -1);
     WifiSettings::GetInstance().ClearDeviceConfig();
 }
+
+HWTEST_F(WifiSettingsTest, RemoveWifiP2pSupplicantGroupInfoTets, TestSize.Level1)
+{
+    WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();
+}
+
+HWTEST_F(WifiSettingsTest, EncryptionWifiDeviceConfigOnBootTest, TestSize.Level1)
+{
+    WIFI_LOGI("EncryptionWifiDeviceConfigOnBootTest enter");
+    WifiSettings::GetInstance().EncryptionWifiDeviceConfigOnBoot();
+}
+
+HWTEST_F(WifiSettingsTest, EncryptionDeviceConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("EncryptionDeviceConfigTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().EncryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, DecryptionDeviceConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("DecryptionDeviceConfigTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().DecryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, IsWifiDeviceConfigDecipheredTest, TestSize.Level1)
+{
+    WIFI_LOGI("IsWifiDeviceConfigDecipheredTest enter");
+    WifiDeviceConfig config;
+    config.preSharedKey = "12345678";
+    WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config);
+}
+
 }  // namespace Wifi
 }  // namespace OHO

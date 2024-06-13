@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Wifi {
-#define DEFAULT_IFACENAME "wlan0"
 class WifiApHalInterface : public WifiBaseHalInterface {
 public:
     /**
@@ -39,7 +38,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    virtual WifiErrorNo StartAp(int id = 0, std::string ifaceName = DEFAULT_IFACENAME);
+    virtual WifiErrorNo StartAp(int id = 0, const std::string &ifaceName = "wlan0");
 
     /**
      * @Description Close Ap.
@@ -47,6 +46,14 @@ public:
      * @return WifiErrorNo
      */
     virtual WifiErrorNo StopAp(int id = 0);
+
+    /**
+     * @Description Enable SoftAP.
+     *
+     * @param id
+     * @return WifiErrorNo
+     */
+    WifiErrorNo EnableAp(int id = 0);
 
     /**
      * @Description Setting SoftAP Configurations.
@@ -98,7 +105,7 @@ public:
      * @param frequencies - Frequency list.
      * @return WifiErrorNo
      */
-    WifiErrorNo GetFrequenciesByBand(int band, std::vector<int> &frequencies, int id = 0);
+    WifiErrorNo GetFrequenciesByBand(const std::string &ifaceName, int band, std::vector<int> &frequencies);
 
     /**
      * @Description Listening to Wi-Fi disconnection or connection events
@@ -116,7 +123,7 @@ public:
      * @param code
      * @return WifiErrorNo
      */
-    WifiErrorNo SetWifiCountryCode(const std::string &code, int id = 0);
+    WifiErrorNo SetWifiCountryCode(const std::string &ifaceName, const std::string &code);
 
     /**
      * @Description Disconnect STAs based on MAC addresses.
@@ -139,7 +146,7 @@ public:
      * @param model
      * @return WifiErrorNo
      */
-    WifiErrorNo GetPowerModel(int& model, int id = 0) const;
+    WifiErrorNo GetPowerModel(const std::string &ifaceName, int& model);
 
     /**
      * @Description Set power mode.
@@ -147,7 +154,7 @@ public:
      * @param model
      * @return WifiErrorNo
      */
-    WifiErrorNo SetPowerModel(const int& model, int id = 0) const;
+    WifiErrorNo SetPowerModel(const std::string &ifaceName, int model);
 
     /**
      * @Description Set the MAC address of the ap.
@@ -155,7 +162,7 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo SetConnectMacAddr(const std::string &mac);
+    WifiErrorNo SetConnectMacAddr(const std::string &ifaceName, const std::string &mac);
 private:
     std::map<int, IWifiApMonitorEventCallback> mApCallback;
 };

@@ -217,9 +217,86 @@ void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason)
 {
     Json::Value root;
     Json::FastWriter writer;
-    root["PACKAGE_NAME"] = pkgName;
+    root["PKG_NAME"] = pkgName;
     root["FAIL_REASON"] = failReason;
-    WriteEvent("WIFI_SCAN", "EVENT_NAME", "WIFI_SCAN_API_FAIL", "EVENT_VALUE", writer.write(root));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFISCANCONTROL_TRIGGER_API_FAIL", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteWifiEncryptionFailHiSysEvent(int event, const std::string& maskSsid, const std::string &keyMgmt, int encryptedModule)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ENCRY_OR_DECRY_EVENT"] = event;
+    root["SSID"] = maskSsid;
+    root["ENCRYKEYMANAGEMENT"] = keyMgmt;
+    root["ENCRYEVENTMODULE"] = encryptedModule;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFIENCRY_OR_DECRY_FAIL", "EVENT_VALUE", writer.write(root));
+}
+
+void WritePortalStateHiSysEvent(int portalState)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["PORTAL_STATE"] = portalState;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_PORTAL_STATE", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteArpInfoHiSysEvent(uint64_t arpRtt, int arpFailedCount)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ARP_RTT"] = arpRtt;
+    root["ARP_FAILED_COUNT"] = arpFailedCount;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_ARP_DETECTION_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["LEVEL"] = signalLevel;
+    root["BAND"] = band;
+    root["RSSI"] = rssi;
+    root["LINKSPEED"] = linkSpeed;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_LINK_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WirteConnectTypeHiSysEvent(std::string connectType)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["CONNECT_TYPE"] = connectType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_CONNECT_TYPE", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiWpaStateHiSysEvent(int state)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["WPA_STATE"] = state;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WPA_STATE", "EVENT_VALUE", writer.write(root));
+}
+
+void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, int connTime,
+    int portalAuthTime, bool isNotificationClicked)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    auto now = time(nullptr);
+    if (now < 0) {
+        now = -1;
+    }
+    int64_t authDura = now - portalAuthTime;
+    int64_t connDura = now - connTime;
+    int authCostDura = portalAuthTime - connTime;
+    root["RESP_CODE"] = respCode;
+    root["DURA"] = (authDura > 0 && portalAuthTime) ? authDura : 0;
+    root["CONN_DURA"] = (connDura > 0 && connTime) ? connDura : 0;
+    root["AUTH_COST_DURA"] = (authCostDura > 0 && portalAuthTime && connTime > 0) ? authCostDura : 0;
+    root["DET_NUM"] = detectNum;
+    root["IS_NOTIFICA_CLICKED"] = isNotificationClicked ? 1 : 0;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "PORTAL_AUTH_EXPIRED", "EVENT_VALUE", writer.write(root));
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

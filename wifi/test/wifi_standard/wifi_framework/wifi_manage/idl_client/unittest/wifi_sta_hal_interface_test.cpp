@@ -129,10 +129,10 @@ HWTEST_F(WifiStaHalInterfaceTest, GetSupportFrequenciesTest, TestSize.Level1)
 HWTEST_F(WifiStaHalInterfaceTest, SetConnectMacAddrTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetConnectMacAddr(mac);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetConnectMacAddr("wlan0", mac);
     EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     mac = "38:d2:69:ef:47:59";
-    ret = WifiStaHalInterface::GetInstance().SetConnectMacAddr(mac);
+    ret = WifiStaHalInterface::GetInstance().SetConnectMacAddr("wlan0", mac);
     EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
@@ -182,14 +182,14 @@ HWTEST_F(WifiStaHalInterfaceTest, ScanTest, TestSize.Level1)
     scanParam.hiddenNetworkSsid.push_back("OHOS_testAp");
     scanParam.scanFreqs.push_back(2412);
     scanParam.scanStyle = 0;
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(scanParam);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan("wlan0", scanParam);
     EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, QueryScanInfosTest, TestSize.Level1)
 {
     std::vector<InterScanInfo> vec;
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().QueryScanInfos(vec);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().QueryScanInfos("wlan0", vec);
     EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
 }
 
@@ -206,13 +206,13 @@ HWTEST_F(WifiStaHalInterfaceTest, StartPnoScanTest, TestSize.Level1)
     scanParam.scanFreqs.push_back(2412);
     scanParam.hiddenSsid.push_back("OHOS_testAp");
     scanParam.savedSsid.push_back("cmcc");
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(scanParam);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan("wlan0", scanParam);
     EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, StopPnoScanTest, TestSize.Level1)
 {
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().StopPnoScan();
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().StopPnoScan("wlan0");
     EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
 
@@ -269,6 +269,9 @@ HWTEST_F(WifiStaHalInterfaceTest, SetDeviceConfigTest, TestSize.Level1)
     cfg.priority = 5;
     cfg.scanSsid = 1;
     cfg.wepKeyIdx = 2;
+    ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
+    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
+    cfg.allowedGroupMgmtCiphers = 4;
     ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
     EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
 }
@@ -347,10 +350,10 @@ HWTEST_F(WifiStaHalInterfaceTest, GetConnectSignalInfoTest, TestSize.Level1)
 {
     std::string endBssid;
     WifiWpaSignalInfo info;
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(endBssid, info);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo("wlan0", endBssid, info);
     EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
     endBssid = "00:00:00:00:00:00";
-    WifiStaHalInterface::GetInstance().GetConnectSignalInfo(endBssid, info);
+    WifiStaHalInterface::GetInstance().GetConnectSignalInfo("wlan0", endBssid, info);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, StopWifiTest, TestSize.Level1)

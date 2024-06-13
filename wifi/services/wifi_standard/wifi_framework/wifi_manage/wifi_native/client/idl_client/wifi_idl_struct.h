@@ -67,7 +67,7 @@ struct WifiIdlEapConfig {
     std::string realm;                      /* The field of passport credentials */
     std::string plmn;                       /* PLMN */
     int eapSubId;                           /* Sub ID of SIM card */
-    WifiIdlEapConfig() : phase2Method(0), eapSubId(-1)
+    WifiIdlEapConfig() : phase2Method(0), password{0}, certPassword{0}, eapSubId(-1)
     {}
 
     ~WifiIdlEapConfig()
@@ -90,6 +90,7 @@ struct WifiIdlDeviceConfig {
     int allowedProtocols;
     int allowedPairwiseCiphers;
     int allowedGroupCiphers;
+    int allowedGroupMgmtCiphers;
     WifiIdlDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1)
     {}
 
@@ -216,6 +217,7 @@ struct IdlP2pGroupInfo {
     std::string psk;
     std::string passphrase;
     std::string goDeviceAddress;
+    std::string goRandomAddress;
 
     IdlP2pGroupInfo() : isGo(0), isPersistent(0), frequency(0)
     {}

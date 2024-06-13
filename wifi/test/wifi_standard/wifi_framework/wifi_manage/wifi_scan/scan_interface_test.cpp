@@ -17,8 +17,7 @@
 #include "mock_wifi_manager.h"
 #include "mock_scan_service.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_supplicant_hal_interface.h"
-#include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_scan_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -188,18 +187,6 @@ HWTEST_F(ScanInterfaceTest, OnGetCustomSceneStateTest, TestSize.Level1)
     std::map<int, time_t> sceneMap;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnGetCustomSceneState(sceneMap));
 }
-
-HWTEST_F(ScanInterfaceTest, OnSystemAbilityChangedTest, TestSize.Level1)
-{
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnSystemAbilityChanged(COMMON_EVENT_SERVICE_ID, true));
-    sleep(1);
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnSystemAbilityChanged(COMMON_EVENT_SERVICE_ID, true));
-    sleep(1);
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnSystemAbilityChanged(COMMON_EVENT_SERVICE_ID, false));
-    sleep(1);
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnSystemAbilityChanged(COMMON_EVENT_SERVICE_ID, false));
-    sleep(1);
-    EXPECT_EQ(WIFI_OPT_FAILED, pScanInterface->OnSystemAbilityChanged(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID, true));
-}
 }  // namespace Wifi
 }  // namespace OHOS
+

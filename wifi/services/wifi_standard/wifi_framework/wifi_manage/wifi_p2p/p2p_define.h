@@ -22,11 +22,6 @@
 
 namespace OHOS {
 namespace Wifi {
-#ifdef NON_SEPERATE_P2P
-const std::string P2P_INTERFACE("p2p-dev-wlan0");
-#else
-const std::string P2P_INTERFACE("p2p0");
-#endif
 /* The timeout interval of enable p2p */
 constexpr long ENABLE_P2P_TIMED_OUT__INTERVAL = 15000;
 /* The time of clears service requests processed in records. */
@@ -114,6 +109,9 @@ enum class P2P_STATE_MACHINE_CMD {
     CMD_CANCEL_CONNECT,          /* cancel connect */
     CMD_HID2D_CREATE_GROUP, /* hid2d create group */
     CMD_HID2D_CONNECT,
+    CMD_REMOVE_GROUP_CLIENT,
+    CMD_DISCOVER_PEERS,
+    CMD_DISABLE_RANDOM_MAC,
 
     /* monitor to state machine */
     WPA_CONNECTED_EVENT = 100,  // result of connect
@@ -142,6 +140,8 @@ enum class P2P_STATE_MACHINE_CMD {
     P2P_EVENT_IFACE_CREATED,
     P2P_REMOVE_DEVICE,
     P2P_RETRY_CONNECT,
+    P2P_EVENT_CH_SWITCH,
+    P2P_EVENT_PRI_DEVICE_FOUND,
 
     /* if the requests to WPA is not synchronization need protected by a timeout mechanism */
     ENABLE_P2P_TIMED_OUT = 200,
@@ -160,6 +160,7 @@ enum class DHCPTYPE {
     NO_DHCP = 0,
     DHCP_P2P,
     DHCP_LEGACEGO,
+    DHCP_INVALID,
 };
 
 enum class P2P_ERROR_RES {
@@ -180,6 +181,7 @@ enum class P2P_ERROR_CODE {
 
 enum class P2P_CHR_EVENT {
     CONN_CNT = 0,
+    CONN_SUC_CNT,
     MAGICLINK_CNT,
     P2P_SUC_2G4_CNT,
     P2P_SUC_5G_CNT

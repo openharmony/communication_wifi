@@ -473,5 +473,21 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdCancelConnect, TestSize.Level1)
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
+
+HWTEST_F(P2pEnabledStateTest, ProcessCmdConnectFailed, TestSize.Level1)
+{
+    InternalMessage msg;
+    WifiP2pDevice device;
+    constexpr int connectFailed = 2;
+    constexpr int connectTimeout = 15;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED));
+    msg.SetMessageObj(device);
+    msg.SetParam1(connectFailed);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    msg.SetParam1(connectTimeout);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    msg.SetParam1(0);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+}
 } // namespace Wifi
 } // namespace OHOS

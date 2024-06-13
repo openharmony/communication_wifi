@@ -17,9 +17,12 @@
 #define OHOS_WIFI_STA_SERVICE_H
 
 #include "wifi_errcode.h"
+#ifndef OHOS_ARCH_LITE
+#include "app_state_data.h"
+#endif
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
-#include "network_selection_msg.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -45,6 +48,15 @@ public:
      */
     virtual ErrCode DisableWifi() = 0;
     /**
+     * @Description  Enable semi-wifi
+     *
+     * @Output: Return operating results to Interface Service after enable semi-wifi
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableSemiWifi() = 0;
+    /**
      * @Description  Connect to a new network
      *
      * @param config - the configuration of network which is going to connect.(in)
@@ -64,6 +76,16 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode ConnectToNetwork(int networkId) = 0;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) = 0;
+
     /**
      * @Description  Disconnect to the network
      *
@@ -216,6 +238,14 @@ public:
     virtual ErrCode SetPowerMode(bool mode) = 0;
 
     /**
+     * @Description set tx power for sar.
+     *
+     * @param power: 1001,1002,1003......
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetTxPower(int power) = 0;
+
+    /**
      * @Description systemabilitychanged
      *
      * @param mode: true for setup, false for shutdown.
@@ -290,13 +320,39 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode StartPortalCertification() = 0;
-	
+
     /**
-     * @Description renew dhcp.
+     * @Description Handle foreground app changed action.
+     *
+     * @param bundleName app name.
+     * @param uid app uid.
+     * @param pid app pid.
+     * @param state app state.
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+#ifndef OHOS_ARCH_LITE
+    virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) = 0;
+#endif
+    /**
+     * @Description enable hilink
      *
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode RenewDhcp() = 0;
+    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid) = 0;
+ 
+    /**
+     * @Description deliver mac
+     *
+	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DeliverStaIfaceData(const std::string &currentMac) = 0;
+
+    /**
+     * @Description start http detect
+     *
+	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartHttpDetect() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

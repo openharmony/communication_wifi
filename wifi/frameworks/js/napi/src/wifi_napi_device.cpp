@@ -24,6 +24,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIDevice");
 static constexpr int DEFAULT_INVALID_VALUE = -1;
+static const std::string EAP_METHOD[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", "SIM", "AKA", "AKA'" };
 
 std::shared_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
@@ -94,6 +95,9 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
             break;
         case WifiSecurity::EAP:
             jsSecurityType = SecTypeJs::SEC_TYPE_EAP;
+            break;
+        case WifiSecurity::EAP_SUITE_B:
+            jsSecurityType = SecTypeJs::SEC_TYPE_EAP_SUITE_B;
             break;
         default:
             jsSecurityType = SecTypeJs::SEC_TYPE_INVALID;
@@ -169,6 +173,8 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
         SetValueInt32(env, "centerFrequency1", each.centerFrequency1, eachObj);
         NativeInfoElemsToJsObj(env, each.infoElems, eachObj);
         SetValueInt64(env, "timestamp", each.timestamp, eachObj);
+        SetValueInt32(env, "supportedWifiCategory", static_cast<int>(each.supportedWifiCategory), eachObj);
+        SetValueBool(env, "isHiLinkNetwork", each.isHiLinkNetwork, eachObj);
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
@@ -314,6 +320,9 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
         case SecTypeJs::SEC_TYPE_EAP:
             keyMgmt = KEY_MGMT_EAP;
             break;
+        case SecTypeJs::SEC_TYPE_EAP_SUITE_B:
+            keyMgmt = KEY_MGMT_SUITE_B_192;
+            break;
         default:
             keyMgmt = KEY_MGMT_NONE;
             break;
@@ -331,11 +340,10 @@ static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& c
 
 static std::string EapMethod2Str(const int& method)
 {
-    const std::string eapMethod[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", "SIM", "AKA", "AKA'" };
-    if (method < 0 || method >= static_cast<int>(sizeof(eapMethod) / sizeof(eapMethod[0]))) {
+    if (method < 0 || method >= static_cast<int>(sizeof(EAP_METHOD) / sizeof(EAP_METHOD[0]))) {
         return "NONE";
     }
-    return eapMethod[method];
+    return EAP_METHOD[method];
 }
 
 napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
@@ -354,7 +362,11 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
     // EAP authentication mode
     JsObjectToInt(env, napiEap, "eapMethod", eapMethod);
     devConfig.wifiEapConfig.eap = EapMethod2Str(eapMethod);
-    WIFI_LOGI("%{public}s eapMethod: %{public}s", __func__, devConfig.wifiEapConfig.eap.c_str());
+    if (devConfig.wifiEapConfig.eap == EAP_METHOD_NONE) {
+        return UndefinedNapiValue(env);
+    }
+    WIFI_LOGI("%{public}s eapMethod: %{public}d[%{public}s]",
+        __func__, eapMethod, devConfig.wifiEapConfig.eap.c_str());
 
     int phase2 = static_cast<int>(Phase2Method::NONE);
     JsObjectToInt(env, napiEap, "phase2Method", phase2);
@@ -365,6 +377,7 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
     JsObjectToString(env, napiEap, "caCertAlias", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.caCertAlias);
     JsObjectToString(env, napiEap, "caPath", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.caCertPath);
     JsObjectToString(env, napiEap, "clientCertAlias", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.clientCert);
+    JsObjectToString(env, napiEap, "clientCertAlias", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.privateKey);
     devConfig.wifiEapConfig.certEntry = JsObjectToU8Vector(env, napiEap, "certEntry");
 
     std::string certPwd;
@@ -435,7 +448,7 @@ ErrCode ProcessProxyConfig(const napi_env& env, const napi_value& object, WifiDe
             WIFI_LOGE("ProcessProxyConfig, proxyConfig is null.");
             return ret;
         }
-        
+
         int proxyConfigMethod = static_cast<int>(ConfigureProxyMethod::CLOSED);
         JsObjectToInt(env, proxyConfig, "proxyMethod", proxyConfigMethod);
         cppConfig.wifiProxyconfig.configureMethod = ConfigureProxyMethod::CLOSED;
@@ -509,7 +522,7 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
-    if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP) {
+    if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP || SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP_SUITE_B) {
         return ProcessEapConfig(env, object, cppConfig);
     }
     return CreateInt32(env);
@@ -863,6 +876,7 @@ NO_SANITIZE("cfi") napi_value Disconnect(napi_env env, napi_callback_info info)
 
 NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info info)
 {
+    WIFI_LOGI("GetSignalLevel napi start...");
     size_t argc = 2;
     const int PARAMS_NUM = 2;
     napi_value argv[2];
@@ -884,6 +898,7 @@ NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info in
     int band = 0;
     napi_get_value_int32(env, argv[0], &rssi);
     napi_get_value_int32(env, argv[1], &band);
+    WIFI_LOGI("GetSignalLevel device start...");
     ErrCode ret = wifiDevicePtr->GetSignalLevel(rssi, band, level);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi signal level fail: %{public}d", ret);
@@ -891,6 +906,7 @@ NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info in
     }
     napi_value result;
     napi_create_uint32(env, level, &result);
+    WIFI_LOGI("GetSignalLevel napi end...");
     return result;
 }
 
@@ -925,9 +941,9 @@ static void IpInfoToJsObj(const napi_env& env, IpInfo& ipInfo, napi_value& resul
 static void IpV6InfoToJsObj(const napi_env& env, IpV6Info& ipInfo, napi_value& result)
 {
     napi_create_object(env, &result);
-    SetValueUtf8String(env, "linkIpV6Address", ipInfo.linkIpV6Address, result);
-    SetValueUtf8String(env, "globalIpV6Address", ipInfo.globalIpV6Address, result);
-    SetValueUtf8String(env, "randGlobalIpV6Address", ipInfo.randGlobalIpV6Address, result);
+    SetValueUtf8String(env, "linkIpv6Address", ipInfo.linkIpV6Address, result);
+    SetValueUtf8String(env, "globalIpv6Address", ipInfo.globalIpV6Address, result);
+    SetValueUtf8String(env, "randomGlobalIpv6Address", ipInfo.randGlobalIpV6Address, result);
     SetValueUtf8String(env, "gateway", ipInfo.gateway, result);
     SetValueUtf8String(env, "netmask", ipInfo.netmask, result);
     SetValueUtf8String(env, "primaryDNS", ipInfo.primaryDns, result);
@@ -984,12 +1000,14 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueUnsignedInt32(env, "ipAddress", linkedInfo.ipAddress, result);
     SetValueInt32(env, "suppState", static_cast<int>(linkedInfo.supplicantState), result);
     SetValueInt32(env, "connState", static_cast<int>(linkedInfo.connState), result);
-    SetValueInt32(env, "WifiStandard", static_cast<int>(linkedInfo.wifiStandard), result);
+    SetValueInt32(env, "wifiStandard", static_cast<int>(linkedInfo.wifiStandard), result);
     SetValueInt32(env, "maxSupportedRxLinkSpeed", static_cast<int>(linkedInfo.maxSupportedRxLinkSpeed), result);
     SetValueInt32(env, "maxSupportedTxLinkSpeed", static_cast<int>(linkedInfo.maxSupportedTxLinkSpeed), result);
     SetValueInt32(env, "rxLinkSpeed", static_cast<int>(linkedInfo.rxLinkSpeed), result);
     SetValueInt32(env, "linkSpeed", static_cast<int>(linkedInfo.txLinkSpeed), result);
     SetValueInt32(env, "channelWidth", static_cast<int>(linkedInfo.channelWidth), result);
+    SetValueInt32(env, "supportedWifiCategory", static_cast<int>(linkedInfo.supportedWifiCategory), result);
+    SetValueBool(env, "isHiLinkNetwork", linkedInfo.isHiLinkNetwork, result);
 }
 
 /* This interface has not been fully implemented */
@@ -1017,7 +1035,7 @@ NO_SANITIZE("cfi") napi_value GetLinkedInfo(napi_env env, napi_callback_info inf
         LinkedInfoAsyncContext *context = static_cast<LinkedInfoAsyncContext *>(data);
         napi_create_object(context->env, &context->result);
         LinkedInfoToJs(context->env, context->linkedInfo, context->result);
-        WIFI_LOGI("Push get linkedInfo result to client");
+        WIFI_LOGD("Push get linkedInfo result to client");
     };
 
     size_t nonCallbackArgNum = 0;
@@ -1126,6 +1144,7 @@ static SecTypeJs ConvertKeyMgmtToSecType(const std::string& keyMgmt)
         {KEY_MGMT_WPA_PSK, SecTypeJs::SEC_TYPE_PSK},
         {KEY_MGMT_SAE, SecTypeJs::SEC_TYPE_SAE},
         {KEY_MGMT_EAP, SecTypeJs::SEC_TYPE_EAP},
+        {KEY_MGMT_SUITE_B_192, SecTypeJs::SEC_TYPE_EAP_SUITE_B},
     };
 
     std::map<std::string, SecTypeJs>::iterator iter = mapKeyMgmtToSecType.find(keyMgmt);
@@ -1180,6 +1199,36 @@ static void IpConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, 
     }
 }
 
+static void ProxyConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDeviceConfig, napi_value& result)
+{
+    napi_value proxyCfgObj;
+    napi_create_object(env, &proxyCfgObj);
+    SetValueInt32(env, "proxyMethod", static_cast<int>(wifiDeviceConfig.wifiProxyconfig.configureMethod), proxyCfgObj);
+    switch (wifiDeviceConfig.wifiProxyconfig.configureMethod) {
+        case ConfigureProxyMethod::CLOSED:
+            WIFI_LOGI("%{public}s get config method closed", __FUNCTION__);
+            break;
+        case ConfigureProxyMethod::AUTOCONFIGUE:
+            SetValueUtf8String(env, "preSharedKey",
+                wifiDeviceConfig.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str(), proxyCfgObj);
+            break;
+        case ConfigureProxyMethod::MANUALCONFIGUE:
+            SetValueUtf8String(env, "serverHostName",
+                wifiDeviceConfig.wifiProxyconfig.manualProxyConfig.serverHostName.c_str(), proxyCfgObj);
+            SetValueInt32(env, "serverPort",
+                wifiDeviceConfig.wifiProxyconfig.manualProxyConfig.serverPort, proxyCfgObj);
+            SetValueUtf8String(env, "exclusionObjects",
+                wifiDeviceConfig.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str(), proxyCfgObj);
+            break;
+        default:
+            break;
+    }
+    napi_status status = napi_set_named_property(env, result, "proxyConfig", proxyCfgObj);
+    if (status != napi_ok) {
+        WIFI_LOGE("%{public}s set proxy config failed!", __FUNCTION__);
+    }
+}
+
 static void UpdateSecurityTypeAndPreSharedKey(WifiDeviceConfig& cppConfig)
 {
     if (cppConfig.keyMgmt != KEY_MGMT_NONE) {
@@ -1191,6 +1240,38 @@ static void UpdateSecurityTypeAndPreSharedKey(WifiDeviceConfig& cppConfig)
             cppConfig.preSharedKey = cppConfig.wepKeys[i];
         }
     }
+}
+
+static int Str2EapMethod(const std::string& str)
+{
+    WIFI_LOGD("%{public}s: eapMethod is %{public}s", __func__, str.c_str());
+    int len = sizeof(EAP_METHOD) / sizeof(EAP_METHOD[0]);
+    for (int i = 0; i < len; i++) {
+        if (EAP_METHOD[i] == str) {
+            WIFI_LOGD("%{public}s: index is %{public}d", __func__, i);
+            return i;
+        }
+    }
+    return 0;
+}
+
+static void EapConfigToJs(const napi_env& env, const WifiEapConfig& wifiEapConfig, napi_value& cfgObj)
+{
+    SetValueInt32(env, "eapMethod", Str2EapMethod(wifiEapConfig.eap), cfgObj);
+    SetValueInt32(env, "phase2Method", static_cast<int>(wifiEapConfig.phase2Method), cfgObj);
+    SetValueUtf8String(env, "identity", wifiEapConfig.identity.c_str(), cfgObj);
+    SetValueUtf8String(env, "anonymousIdentity", wifiEapConfig.anonymousIdentity.c_str(), cfgObj);
+    SetValueUtf8String(env, "password", wifiEapConfig.password.c_str(), cfgObj);
+    SetValueUtf8String(env, "caCertAlias", wifiEapConfig.caCertAlias.c_str(), cfgObj);
+    SetValueUtf8String(env, "caPath", wifiEapConfig.caCertPath.c_str(), cfgObj);
+    SetValueUtf8String(env, "clientCertAlias", wifiEapConfig.caCertAlias.c_str(), cfgObj);
+    SetValueU8Vector(env, "certEntry", wifiEapConfig.certEntry, cfgObj);
+    SetValueUtf8String(env, "certPassword", wifiEapConfig.certPassword, cfgObj);
+    SetValueUtf8String(env, "altSubjectMatch", wifiEapConfig.altSubjectMatch.c_str(), cfgObj);
+    SetValueUtf8String(env, "domainSuffixMatch", wifiEapConfig.domainSuffixMatch.c_str(), cfgObj);
+    SetValueUtf8String(env, "realm", wifiEapConfig.realm.c_str(), cfgObj);
+    SetValueUtf8String(env, "plmn", wifiEapConfig.plmn.c_str(), cfgObj);
+    SetValueInt32(env, "eapSubId", wifiEapConfig.eapSubId, cfgObj);
 }
 
 static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceConfig>& vecDeviceConfigs,
@@ -1225,6 +1306,16 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     if (status != napi_ok) {
         WIFI_LOGE("Set staticIp field!");
     }
+    ProxyConfigToJs(env, vecDeviceConfigs[idx], result);
+
+    napi_value eapCfgObj;
+    napi_create_object(env, &eapCfgObj);
+    EapConfigToJs(env, vecDeviceConfigs[idx].wifiEapConfig, eapCfgObj);
+    status = napi_set_named_property(env, result, "eapConfig", eapCfgObj);
+    if (status != napi_ok) {
+        WIFI_LOGE("failed to set eapConfig!");
+    }
+
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
         WIFI_LOGE("Wifi napi set element error: %{public}d", status);
@@ -1510,5 +1601,57 @@ NO_SANITIZE("cfi") napi_value FactoryReset(napi_env env, napi_callback_info info
     ErrCode ret = wifiDevicePtr->FactoryReset();
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
+
+NO_SANITIZE("cfi") napi_value EnableHiLinkHandshake(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 3;
+    napi_value argv[argc];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    napi_valuetype valueType;
+    napi_typeof(env, argv[2], &valueType);
+    WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+
+    bool uiFlag = false;
+    napi_get_value_bool(env, argv[0], &uiFlag);
+    std::string bssid;
+    char tmp[NAPI_MAX_STR_LENT] = {0};
+    size_t result = 0;
+    napi_get_value_string_utf8(env, argv[1], tmp, NAPI_MAX_STR_LENT, &result);
+    bssid = tmp;
+    WifiDeviceConfig deviceConfig;
+    napi_value napiRet = JsObjToDeviceConfig(env, argv[2], deviceConfig);
+    napi_typeof(env, napiRet, &valueType);
+    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    ErrCode ret = wifiDevicePtr->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
+NO_SANITIZE("cfi") napi_value EnableSemiWifi(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    ErrCode ret = wifiDevicePtr->EnableSemiWifi();
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
+NO_SANITIZE("cfi") napi_value GetWifiDetailState(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    WifiDetailState state = WifiDetailState::STATE_UNKNOWN;
+    ErrCode ret = wifiDevicePtr->GetWifiDetailState(state);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetWifiDetailState failed:%{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value value;
+    napi_create_int32(env, static_cast<int>(state), &value);
+    return value;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

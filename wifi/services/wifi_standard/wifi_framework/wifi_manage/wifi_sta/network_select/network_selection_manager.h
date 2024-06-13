@@ -18,11 +18,9 @@
 #define OHOS_WIFI_NETWORK_SELECTION_MANAGER_H
 
 #include "network_selection.h"
-#include "network_selection_msg.h"
 #include "network_selector_factory.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi {
 struct NetworkSelectionResult {
     InterScanInfo interScanInfo;
     WifiDeviceConfig wifiDeviceConfig;
@@ -51,7 +49,7 @@ private:
      * @param networkCandidates  Candidate network
      * @param scanInfos scanInfos
      */
-    static void GetAllDeviceConfigs(std::vector<NetworkCandidate> &networkCandidates,
+    static void GetAllDeviceConfigs(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
                                     const std::vector<InterScanInfo> &scanInfos);
 
     /**
@@ -60,18 +58,8 @@ private:
      * @param networkCandidates candidate networks
      * @param networkSelector networkSelector
      */
-    static void TryNominate(std::vector<NetworkCandidate> &networkCandidates,
-                            const std::unique_ptr<INetworkSelector> &networkSelector);
-
-    /**
-     * the function to log the networkSelection nominate result.
-     *
-     * @param networkCandidate candidate network
-     */
-    static void LogNominateResult(NetworkCandidate &networkCandidate);
-
-    static std::string VectorToJson(std::vector<std::string> &strings);
+    static void TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
+                            const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector);
 };
-}
 }
 #endif

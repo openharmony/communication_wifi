@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { TestData } from '../entryability/model/testData'
 import { TestListItem } from './testListItems';
 import ConfigData from '../utils/ConfigData';
@@ -24,21 +22,25 @@ import ConfigData from '../utils/ConfigData';
 
 @Component
 export struct TestList {
-  private testItems: TestData[]
+  private testItems!: TestData[]
+
+  aboutToAppear() {
+    console.info("TestList testItems:" + JSON.stringify(this.testItems))
+  }
 
   build() {
     Column() {
       List() {
-        ForEach( this.testItems , item => {
+        ForEach(this.testItems , (item: TestData) => {
           ListItem() {
-            TestListItem( {
+            TestListItem({
               testItem : item
-            } )
+            })
           }
-        } , item => item.id.toString() )
+        } , (item: TestData) => item.id?.toString())
       }
-      .height( ConfigData.WH_100_100 )
-      .backgroundColor( $r( "app.color.lead" ) )
+      .height(ConfigData.WH_100_100)
+      .backgroundColor($r("app.color.lead"))
     }
   }
 }

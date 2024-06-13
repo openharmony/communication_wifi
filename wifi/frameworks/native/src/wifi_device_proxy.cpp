@@ -46,7 +46,7 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
             return;
         }
         remote_ = impl;
-        WIFI_LOGI("AddDeathRecipient success! ");
+        WIFI_LOGD("AddDeathRecipient success! ");
     }
 }
 
@@ -58,7 +58,6 @@ WifiDeviceProxy::~WifiDeviceProxy()
 
 void WifiDeviceProxy::RemoveDeathRecipient(void)
 {
-    WIFI_LOGI("enter RemoveDeathRecipient!");
     std::lock_guard<std::mutex> lock(mutex_);
     if (remote_ == nullptr) {
         WIFI_LOGI("remote_ is nullptr!");
@@ -663,6 +662,35 @@ ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result,
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::SetTxPower(int power)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("Failed to `%{public}s`, remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(power);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), data, reply,
+        option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
 ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
     if (mRemoteDied) {
@@ -776,6 +804,43 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
         return WIFI_OPT_FAILED;
     }
     return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiDeviceProxy::StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to %{public}s,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(networkId);
+    data.WriteString(bssid);
+    data.WriteInt32(isCandidate);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("StartRoamToNetwork %{public}d failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("StartRoamToNetwork Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartRoamToNetwork Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
@@ -1063,6 +1128,8 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
     info.isAncoConnected = reply.ReadBool();
+    info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
+    info.isHiLinkNetwork = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
@@ -1362,6 +1429,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
 
 ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &level)
 {
+    WIFI_LOGI("GetSignalLevel proxy start...");
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -1392,6 +1460,7 @@ ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &l
     }
 
     level = reply.ReadInt32();
+    WIFI_LOGI("GetSignalLevel proxy end...");
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1555,6 +1624,7 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
+    constexpr int MAX_CHANNEL_SIZE = 36;
     MessageOption option;
     MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -1579,13 +1649,17 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
         return ErrCode(ret);
     }
     int retSize = reply.ReadInt32();
+    if (retSize > MAX_CHANNEL_SIZE) {
+        WIFI_LOGE("Get5GHzChannelList fail, size error: %{public}d", retSize);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < retSize; ++i) {
         result.emplace_back(reply.ReadInt32());
     }
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::SetAppFrozen(int uid, bool isFrozen)
+ErrCode WifiDeviceProxy::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -1598,12 +1672,17 @@ ErrCode WifiDeviceProxy::SetAppFrozen(int uid, bool isFrozen)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    data.WriteInt32(uid);
+    int size = pidList.size() < MAX_PID_LIST_SIZE ? pidList.size() : MAX_PID_LIST_SIZE;
+    int count = 0;
+    data.WriteInt32(size);
+    for (std::set<int>::iterator it = pidList.begin(); it != pidList.end() && count < size; it++, count++) {
+        data.WriteInt32(*it);
+    }
     data.WriteBool(isFrozen);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_FROZEN_APP), data,
         reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Get5GHzChannelList(%{public}d) failed,error code is %{public}d",
+        WIFI_LOGE("SetAppFrozen(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_FROZEN_APP), error);
         return WIFI_OPT_FAILED;
     }
@@ -1825,5 +1904,185 @@ ErrCode WifiDeviceProxy::FactoryReset()
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiDeviceProxy::LimitSpeed(const int controlId, const int limitMode)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to %{public}s,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(controlId);
+    data.WriteInt32(limitMode);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("LimitSpeed(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("LimitSpeed Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("LimitSpeed Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`, remote service is died.", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageParcel data, reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error, func:%{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    data.WriteInt32(0);
+    data.WriteBool(uiFlag);
+    data.WriteString(bssid);
+    WriteDeviceConfig(deviceConfig, data);
+ 
+    //Wirte device config
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("EnableHiLinkHandshake(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), error);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::SetSatelliteState(const int state)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to %{public}s,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(state);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("SetSatelliteState(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("SetSatelliteState Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetSatelliteState Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::EnableSemiWifi()
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::SEMI_ENABLE);
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiDeviceProxy::GetWifiDetailState(WifiDetailState &state)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    int tempState = reply.ReadInt32();
+    if (tempState >= 0 && tempState <= static_cast<int>(WifiDetailState::STATE_SEMI_ACTIVE)) {
+        state = static_cast<WifiDetailState>(tempState);
+    } else {
+        state = WifiDetailState::STATE_UNKNOWN;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

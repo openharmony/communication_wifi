@@ -16,13 +16,15 @@
 #ifndef OHOS_WIFI_SERVICE_H
 #define OHOS_WIFI_SERVICE_H
 
+#include <codecvt>
 #include "wifi_internal_msg.h"
 #include "sta_auto_connect_service.h"
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
-#include "network_selection_msg.h"
+#include "network_selection.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
+#include "sta_app_acceleration.h"
 #endif
 
 namespace OHOS {
@@ -58,6 +60,15 @@ public:
      */
     virtual ErrCode DisableWifi() const;
     /**
+     * @Description  Enable semi-wifi
+     *
+     * @Output: Return operating results to Interface Service after enable semi-wifi
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableSemiWifi();
+    /**
      * @Description  Connect to a new network
      *
      * @param config - the configuration of network which is going to connect.(in)
@@ -77,6 +88,16 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode ConnectToNetwork(int networkId) const;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) const;
+
     /**
      * @Description  Disconnect to the network
      *
@@ -227,6 +248,15 @@ public:
     virtual ErrCode SetPowerMode(bool mode) const;
 
     /**
+     * @Description  Set tx power to reduce sar.
+     *
+     * @param power - 1001,1002,1003......
+     *
+     * @Return WifiErrorNo
+     */
+    virtual ErrCode SetTxPower(int power) const;
+
+    /**
      * @Description systemabilitychanged
      *
      * @param mode: true for setup, false for shutdown.
@@ -297,16 +327,50 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode StartPortalCertification();
-	
-	/**
-     * @Description renew dhcp.
+
+    /**
+     * @Description Handle foreground app changed action.
+     *
+     * @param bundleName app name.
+     * @param uid app uid.
+     * @param pid app pid.
+     * @param state app state.
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+#ifndef OHOS_ARCH_LITE
+    virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
+#endif
+    /**
+     * @Description enable hilink
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode RenewDhcp();
+    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid);
+ 
+    /**
+     * @Description deliver mac
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DeliverStaIfaceData(const std::string &currentMac);
+
+    /**
+     * @Description start http detect.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartHttpDetect();
+
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
+    std::string ConvertString(const std::u16string &wideText) const;
+    int32_t GetDataSlotId() const;
+    std::string GetImsi(int32_t slotId) const;
+    std::string GetPlmn(int32_t slotId) const;
+    std::string GetMcc(const std::string &imsi) const;
+    std::string GetMnc(const std::string &imsi, const int mncLen) const;
+    void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;
 private:
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
@@ -322,6 +386,9 @@ private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
+#ifndef OHOS_ARCH_LITE
+    StaAppAcceleration *pStaAppAcceleration;
+#endif
     int m_instId;
 };
 }  // namespace Wifi

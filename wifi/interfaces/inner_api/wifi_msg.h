@@ -35,14 +35,20 @@ namespace Wifi {
 #define WIFI_INVALID_UID (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
+#define WIFI_INVALID_SIM_ID (0)
+#define WIFI_EAP_OPEN_EXTERNAL_SIM 1
+#define WIFI_EAP_CLOSE_EXTERNAL_SIM 0
 #define WIFI_PASSWORD_LEN 128
+#define MAX_PID_LIST_SIZE 128
 
 const std::string KEY_MGMT_NONE = "NONE";
 const std::string KEY_MGMT_WEP = "WEP";
 const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
 const std::string KEY_MGMT_EAP = "WPA-EAP";
+const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
 
+const std::string EAP_METHOD_NONE = "NONE";
 const std::string EAP_METHOD_PEAP = "PEAP";
 const std::string EAP_METHOD_TLS = "TLS";
 const std::string EAP_METHOD_TTLS = "TTLS";
@@ -113,6 +119,9 @@ enum ConnState {
     /** The Wi-Fi connection has been torn down. */
     DISCONNECTED,
 
+    /** The Wi-Fi special connection. */
+    SPECIAL_CONNECT,
+
     /** Failed to set up the Wi-Fi connection. */
     UNKNOWN
 };
@@ -162,8 +171,13 @@ enum class WifiOperateState {
 enum class DisconnectDetailReason {
     UNUSED = 0,
     UNSPECIFIED = 1,
+    PREV_AUTH_NOT_VALID = 2,
     DEAUTH_STA_IS_LEFING = 3,
-    DISASSOC_STA_HAS_LEFT = 8
+    DISASSOC_DUE_TO_INACTIVITY = 4,
+    DISASSOC_AP_BUSY = 5,
+    DISASSOC_STA_HAS_LEFT = 8,
+    DISASSOC_IEEE_802_1X_AUTH_FAILED = 23,
+    DISASSOC_LOW_ACK = 34
 };
 
 struct WifiLinkedInfo {
@@ -197,6 +211,8 @@ struct WifiLinkedInfo {
     int lastTxPackets;
     int retryedConnCount;
     bool isAncoConnected;
+    WifiCategory supportedWifiCategory;
+    bool isHiLinkNetwork;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -224,6 +240,8 @@ struct WifiLinkedInfo {
         lastTxPackets = 0;
         retryedConnCount = 0;
         isAncoConnected = false;
+        isHiLinkNetwork = false;
+        supportedWifiCategory = WifiCategory::DEFAULT;
     }
 };
 
@@ -251,6 +269,7 @@ struct WpsConfig {
 enum class WifiDeviceConfigStatus {
     ENABLED, /* enable */
     DISABLED, /* disabled */
+    PERMEMANTLY_DISABLED, /* permanently disabled */
     UNKNOWN
 };
 
@@ -386,6 +405,8 @@ public:
     std::string identity;                   /* Identity information */
     std::string anonymousIdentity;          /* Anonymous identity information */
     std::string password;                   /* EAP mode password */
+    std::string encryptedData;              /* EAP mode password encryptedData */
+    std::string IV;                         /* EAP mode password encrypted IV */
 
     std::string caCertPath;                 /* CA certificate path */
     std::string caCertAlias;                /* CA certificate alias */
@@ -478,12 +499,49 @@ public:
 
 enum class WifiPrivacyConfig { RANDOMMAC, DEVICEMAC };
 
+enum class DisabledReason {
+    DISABLED_UNKNOWN_REASON = -1,
+    DISABLED_NONE = 0,
+    DISABLED_ASSOCIATION_REJECTION = 1,
+    DISABLED_AUTHENTICATION_FAILURE = 2,
+    DISABLED_DHCP_FAILURE = 3,
+    DISABLED_NO_INTERNET_TEMPORARY = 4,
+    DISABLED_AUTHENTICATION_NO_CREDENTIALS = 5,
+    DISABLED_NO_INTERNET_PERMANENT = 6,
+    DISABLED_BY_WIFI_MANAGER = 7,
+    DISABLED_BY_WRONG_PASSWORD = 8,
+    DISABLED_AUTHENTICATION_NO_SUBSCRIPTION = 9,
+    DISABLED_AUTHENTICATION_PRIVATE_EAP_ERROR = 10,
+    DISABLED_NETWORK_NOT_FOUND = 1,
+    DISABLED_CONSECUTIVE_FAILURES = 12,
+    DISABLED_BY_SYSTEM = 13,
+    DISABLED_EAP_AKA_FAILURE = 14,
+    DISABLED_DISASSOC_REASON = 15,
+    NETWORK_SELECTION_DISABLED_MAX = 16
+};
+
+struct NetworkSelectionStatus {
+    WifiDeviceConfigStatus status;
+    DisabledReason networkSelectionDisableReason;
+    int64_t networkDisableTimeStamp;
+    int networkDisableCount;
+    NetworkSelectionStatus()
+    {
+        status = WifiDeviceConfigStatus::ENABLED;
+        networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
+        networkDisableTimeStamp = -1;
+        networkDisableCount = 0;
+    }
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
     int networkId;
     /* 0: CURRENT, using 1: DISABLED 2: ENABLED */
     int status;
+    /*  network selection status*/
+    NetworkSelectionStatus networkSelectionStatus;
     /* mac address */
     std::string bssid;
     /* bssid type. */
@@ -510,12 +568,16 @@ struct WifiDeviceConfig {
     bool isEphemeral;
     /* WPA-PSK mode pre shared key */
     std::string preSharedKey;
+    std::string encryptedData;
+    std::string IV;
     /* Encryption Mode */
     std::string keyMgmt;
     /* WEP mode key, max size: 4 */
     std::string wepKeys[WEPKEYS_SIZE];
     /* use WEP key index */
     int wepTxKeyIndex;
+    std::string encryWepKeys[WEPKEYS_SIZE];
+    std::string IVWep;
     /* network priority */
     int priority;
     /* is hidden network */
@@ -529,6 +591,7 @@ struct WifiDeviceConfig {
     int connFailedCount;
     unsigned int networkStatusHistory;
     bool isPortal;
+    time_t portalAuthTime;
     time_t lastHasInternetTime;
     bool noInternetAccess;
     /* save select mac address */
@@ -540,6 +603,10 @@ struct WifiDeviceConfig {
     std::string callProcessName;
     std::string ancoCallProcessName;
     std::string internetSelfCureHistory;
+    int isReassocSelfCureWithFactoryMacAddress;
+    int version;
+    bool randomizedMacSuccessEver;
+
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -564,15 +631,29 @@ struct WifiDeviceConfig {
         connFailedCount = 0;
         networkStatusHistory = 0;
         isPortal = false;
+        portalAuthTime = -1;
         lastHasInternetTime = -1;
         noInternetAccess = false;
         callProcessName = "";
         ancoCallProcessName = "";
         internetSelfCureHistory = "";
+        isReassocSelfCureWithFactoryMacAddress = 0;
+        version = -1;
+        randomizedMacSuccessEver = false;
     }
 };
 
 enum class WifiState { DISABLING = 0, DISABLED = 1, ENABLING = 2, ENABLED = 3, UNKNOWN = 4 };
+
+enum class WifiDetailState {
+    STATE_UNKNOWN = -1,
+    STATE_INACTIVE = 0,
+    STATE_ACTIVATED = 1,
+    STATE_ACTIVATING = 2,
+    STATE_DEACTIVATING = 3,
+    STATE_SEMI_ACTIVATING = 4,
+    STATE_SEMI_ACTIVE = 5
+};
 
 /* wps state */
 enum class WpsStartState {
@@ -626,6 +707,7 @@ struct IpInfo {
     unsigned int secondDns;          /* backup dns */
     unsigned int serverIp; /* DHCP server's address */
     unsigned int leaseDuration;
+    std::vector<unsigned int> dnsAddr;
 
     IpInfo()
     {
@@ -636,6 +718,7 @@ struct IpInfo {
         secondDns = 0;
         serverIp = 0;
         leaseDuration = 0;
+        dnsAddr.clear();
     }
 };
 
@@ -648,7 +731,10 @@ struct IpV6Info {
     std::string netmask;
     std::string primaryDns;
     std::string secondDns;
-
+    std::string uniqueLocalAddress1;
+    std::string uniqueLocalAddress2;
+    std::vector<std::string> dnsAddr;
+    
     IpV6Info()
     {
         linkIpV6Address = "";
@@ -658,8 +744,60 @@ struct IpV6Info {
         netmask = "";
         primaryDns = "";
         secondDns = "";
+        uniqueLocalAddress1 = "";
+        uniqueLocalAddress2 = "";
+        dnsAddr.clear();
     }
 };
+
+struct Wifi6BlackListInfo {
+    /* 0:HTC, 1:WIFI6, -1:invalid */
+    int actionType = -1;
+    int64_t updateTime = 0;
+
+    Wifi6BlackListInfo(int type, int64_t time)
+    {
+        this->actionType = type;
+        this->updateTime = time;
+    }
+};
+
+// SIM authentication
+struct EapSimGsmAuthParam {
+    std::vector<std::string> rands;
+};
+
+// AKA/AKA' authentication
+struct EapSimUmtsAuthParam {
+    std::string rand;
+    std::string autn;
+    EapSimUmtsAuthParam()
+    {
+        rand = "";
+        autn = "";
+    }
+};
+typedef enum {
+    BG_LIMIT_CONTROL_ID_GAME = 1,
+    BG_LIMIT_CONTROL_ID_STREAM,
+    BG_LIMIT_CONTROL_ID_TEMP,
+    BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT,
+} BgLimitControl;
+
+typedef enum {
+    BG_LIMIT_OFF = 0,
+    BG_LIMIT_LEVEL_1,
+    BG_LIMIT_LEVEL_2,
+    BG_LIMIT_LEVEL_3,
+    BG_LIMIT_LEVEL_4,
+    BG_LIMIT_LEVEL_5,
+    BG_LIMIT_LEVEL_6,
+    BG_LIMIT_LEVEL_7,
+    BG_LIMIT_LEVEL_8,
+    BG_LIMIT_LEVEL_9,
+    BG_LIMIT_LEVEL_10,
+    BG_LIMIT_LEVEL_11,
+} BgLimitLevel;
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

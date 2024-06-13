@@ -16,6 +16,7 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
+#include "stub_collector.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaP2pImpl"
@@ -61,7 +62,7 @@ static WifiErrorNo RegisterP2pEventCallback()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->RegisterEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, "p2p0");
+    int32_t result = wpaObj->RegisterEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterP2pEventCallback: RegisterEventCallback failed result:%{public}d", result);
@@ -85,13 +86,13 @@ static WifiErrorNo UnRegisterP2pEventCallback()
             return WIFI_IDL_OPT_FAILED;
         }
 
-        int32_t result = wpaObj->UnregisterEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, "p2p0");
+        int32_t result = wpaObj->UnregisterEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
         if (result != HDF_SUCCESS) {
             pthread_mutex_unlock(&g_hdiCallbackMutex);
             LOGE("UnRegisterP2pEventCallback: UnregisterEventCallback failed result:%{public}d", result);
             return WIFI_IDL_OPT_FAILED;
         }
-
+        StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaP2pCallbackObj);
         free(g_hdiWpaP2pCallbackObj);
         g_hdiWpaP2pCallbackObj = NULL;
     }
@@ -131,9 +132,14 @@ static WifiErrorNo AddP2pRandomMacFlag()
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo HdiWpaP2pStart()
+WifiErrorNo HdiWpaP2pStart(const char *ifaceName)
 {
     LOGI("HdiWpaP2pStart enter");
+    if (SetHdiP2pIfaceName(ifaceName) != WIFI_IDL_OPT_OK) {
+        LOGE("HdiWpaP2pStart: set p2p iface name failed!");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
     if (CopyConfigFile("p2p_supplicant.conf") != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaP2pStart: CopyConfigFile failed!");
         return WIFI_IDL_OPT_FAILED;
@@ -146,14 +152,11 @@ WifiErrorNo HdiWpaP2pStart()
 
     if (RegisterP2pEventCallback() != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaP2pStart: RegisterEventCallback failed!");
-        HdiWpaStop();
         return WIFI_IDL_OPT_FAILED;
     }
 
-    if (HdiAddWpaIface("p2p0", CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != WIFI_IDL_OPT_OK) {
+    if (HdiAddWpaIface(GetHdiP2pIfaceName(), CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf") != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaP2pStart: HdiAddWpaIface failed!");
-        UnRegisterP2pEventCallback();
-        HdiWpaStop();
         return WIFI_IDL_OPT_FAILED;
     }
     
@@ -164,23 +167,56 @@ WifiErrorNo HdiWpaP2pStart()
 WifiErrorNo HdiWpaP2pStop()
 {
     LOGI("HdiWpaP2pStop enter");
+    if (IsHdiWpaStopped() == WIFI_IDL_OPT_OK) {
+        LOGE("HdiWpaP2pStop: HdiWpa already stopped, HdiWpaP2pStop success");
+        return WIFI_IDL_OPT_OK;
+    }
+
     if (UnRegisterP2pEventCallback() != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaP2pStop: UnRegisterP2pEventCallback failed!");
         return WIFI_IDL_OPT_FAILED;
     }
 
-    if (HdiRemoveWpaIface("p2p0") != WIFI_IDL_OPT_OK) {
+    if (HdiRemoveWpaIface(GetHdiP2pIfaceName()) != WIFI_IDL_OPT_OK) {
         LOGE("HdiWpaP2pStop: HdiRemoveWpaIface failed!");
-        return WIFI_IDL_OPT_FAILED;
-    }
-
-    if (HdiWpaStop() != WIFI_IDL_OPT_OK) {
-        LOGE("HdiWpaP2pStop: HdiWpaStaStop failed!");
         return WIFI_IDL_OPT_FAILED;
     }
     
     LOGI("HdiWpaP2pStop success");
     return WIFI_IDL_OPT_OK;
+}
+
+static void InitHdiWpaP2pCallbackObj(struct IWpaCallback *callback)
+{
+    g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventBssidChanged = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventStateChanged = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventTempDisabled = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventAssociateReject = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventWpsOverlap = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventWpsTimeout = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventScanResult = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventDeviceFound = callback->OnEventDeviceFound;
+    g_hdiWpaP2pCallbackObj->OnEventDeviceLost = callback->OnEventDeviceLost;
+    g_hdiWpaP2pCallbackObj->OnEventGoNegotiationRequest = callback->OnEventGoNegotiationRequest;
+    g_hdiWpaP2pCallbackObj->OnEventGoNegotiationCompleted = callback->OnEventGoNegotiationCompleted;
+    g_hdiWpaP2pCallbackObj->OnEventInvitationReceived = callback->OnEventInvitationReceived;
+    g_hdiWpaP2pCallbackObj->OnEventInvitationResult = callback->OnEventInvitationResult;
+    g_hdiWpaP2pCallbackObj->OnEventGroupFormationSuccess = callback->OnEventGroupFormationSuccess;
+    g_hdiWpaP2pCallbackObj->OnEventGroupFormationFailure = callback->OnEventGroupFormationFailure;
+    g_hdiWpaP2pCallbackObj->OnEventGroupStarted = callback->OnEventGroupStarted;
+    g_hdiWpaP2pCallbackObj->OnEventGroupInfoStarted = callback->OnEventGroupInfoStarted;
+    g_hdiWpaP2pCallbackObj->OnEventGroupRemoved = callback->OnEventGroupRemoved;
+    g_hdiWpaP2pCallbackObj->OnEventProvisionDiscoveryCompleted = callback->OnEventProvisionDiscoveryCompleted;
+    g_hdiWpaP2pCallbackObj->OnEventFindStopped = callback->OnEventFindStopped;
+    g_hdiWpaP2pCallbackObj->OnEventServDiscReq = callback->OnEventServDiscReq;
+    g_hdiWpaP2pCallbackObj->OnEventServDiscResp = callback->OnEventServDiscResp;
+    g_hdiWpaP2pCallbackObj->OnEventStaConnectState = callback->OnEventStaConnectState;
+    g_hdiWpaP2pCallbackObj->OnEventIfaceCreated = callback->OnEventIfaceCreated;
+    g_hdiWpaP2pCallbackObj->GetVersion = NULL;
+    g_hdiWpaP2pCallbackObj->AsObject = NULL;
+    g_hdiWpaP2pCallbackObj->OnEventVendorCb = NULL;
 }
 
 WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
@@ -206,34 +242,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventBssidChanged = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventStateChanged = callback->OnEventStateChanged;
-    g_hdiWpaP2pCallbackObj->OnEventTempDisabled = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventAssociateReject = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventWpsOverlap = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventWpsTimeout = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventScanResult = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventDeviceFound = callback->OnEventDeviceFound;
-    g_hdiWpaP2pCallbackObj->OnEventDeviceLost = callback->OnEventDeviceLost;
-    g_hdiWpaP2pCallbackObj->OnEventGoNegotiationRequest = callback->OnEventGoNegotiationRequest;
-    g_hdiWpaP2pCallbackObj->OnEventGoNegotiationCompleted = callback->OnEventGoNegotiationCompleted;
-    g_hdiWpaP2pCallbackObj->OnEventInvitationReceived = callback->OnEventInvitationReceived;
-    g_hdiWpaP2pCallbackObj->OnEventInvitationResult = callback->OnEventInvitationResult;
-    g_hdiWpaP2pCallbackObj->OnEventGroupFormationSuccess = callback->OnEventGroupFormationSuccess;
-    g_hdiWpaP2pCallbackObj->OnEventGroupFormationFailure = callback->OnEventGroupFormationFailure;
-    g_hdiWpaP2pCallbackObj->OnEventGroupStarted = callback->OnEventGroupStarted;
-    g_hdiWpaP2pCallbackObj->OnEventGroupRemoved = callback->OnEventGroupRemoved;
-    g_hdiWpaP2pCallbackObj->OnEventProvisionDiscoveryCompleted = callback->OnEventProvisionDiscoveryCompleted;
-    g_hdiWpaP2pCallbackObj->OnEventFindStopped = callback->OnEventFindStopped;
-    g_hdiWpaP2pCallbackObj->OnEventServDiscReq = callback->OnEventServDiscReq;
-    g_hdiWpaP2pCallbackObj->OnEventServDiscResp = callback->OnEventServDiscResp;
-    g_hdiWpaP2pCallbackObj->OnEventStaConnectState = callback->OnEventStaConnectState;
-    g_hdiWpaP2pCallbackObj->OnEventIfaceCreated = callback->OnEventIfaceCreated;
-    g_hdiWpaP2pCallbackObj->GetVersion = NULL;
-    g_hdiWpaP2pCallbackObj->AsObject = NULL;
-
+    InitHdiWpaP2pCallbackObj(callback);
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaP2pEventCallback success.");
     return WIFI_IDL_OPT_OK;
@@ -248,7 +257,7 @@ WifiErrorNo HdiP2pSetSsidPostfixName(const char *name)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetSsidPostfixName(wpaObj, "p2p0", name);
+    int32_t result = wpaObj->P2pSetSsidPostfixName(wpaObj, GetHdiP2pIfaceName(), name);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetSsidPostfixName: P2pSetSsidPostfixName failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -267,7 +276,7 @@ WifiErrorNo HdiP2pSetWpsDeviceType(const char *type)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetWpsDeviceType(wpaObj, "p2p0", type);
+    int32_t result = wpaObj->P2pSetWpsDeviceType(wpaObj, GetHdiP2pIfaceName(), type);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWpsDeviceType: P2pSetWpsDeviceType failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -286,7 +295,7 @@ WifiErrorNo HdiP2pSetWpsConfigMethods(const char *methods)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetWpsConfigMethods(wpaObj, "p2p0", methods);
+    int32_t result = wpaObj->P2pSetWpsConfigMethods(wpaObj, GetHdiP2pIfaceName(), methods);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWpsConfigMethods: P2pSetWpsConfigMethods failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -324,7 +333,7 @@ WifiErrorNo HdiP2pSetWfdEnable(int enable)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetWfdEnable(wpaObj, "p2p0", enable);
+    int32_t result = wpaObj->P2pSetWfdEnable(wpaObj, GetHdiP2pIfaceName(), enable);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWfdEnable: P2pSetWfdEnable failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -343,7 +352,7 @@ WifiErrorNo HdiP2pSetPersistentReconnect(int status)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetPersistentReconnect(wpaObj, "p2p0", status);
+    int32_t result = wpaObj->P2pSetPersistentReconnect(wpaObj, GetHdiP2pIfaceName(), status);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetPersistentReconnect: P2pSetPersistentReconnect failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -362,7 +371,7 @@ WifiErrorNo HdiP2pSetWpsSecondaryDeviceType(const char *type)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetWpsSecondaryDeviceType(wpaObj, "p2p0", type);
+    int32_t result = wpaObj->P2pSetWpsSecondaryDeviceType(wpaObj, GetHdiP2pIfaceName(), type);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWpsSecondaryDeviceType: P2pSetWpsSecondaryDeviceType failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -438,7 +447,7 @@ WifiErrorNo HdiP2pSetDeviceName(const char *name)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetDeviceName(wpaObj, "p2p0", name);
+    int32_t result = wpaObj->P2pSetDeviceName(wpaObj, GetHdiP2pIfaceName(), name);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetDeviceName: P2pSetDeviceName failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -457,7 +466,7 @@ WifiErrorNo HdiP2pSetWfdDeviceConfig(const char *config)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetWfdDeviceConfig(wpaObj, "p2p0", config);
+    int32_t result = wpaObj->P2pSetWfdDeviceConfig(wpaObj, GetHdiP2pIfaceName(), config);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWfdDeviceConfig: P2pSetWfdDeviceConfig failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -476,7 +485,7 @@ WifiErrorNo HdiP2pSetRandomMac(int enable)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetRandomMac(wpaObj, "p2p0", enable);
+    int32_t result = wpaObj->P2pSetRandomMac(wpaObj, GetHdiP2pIfaceName(), enable);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetRandomMac: P2pSetRandomMac failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -497,7 +506,7 @@ WifiErrorNo HdiP2pStartFind(int timeout)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pStartFind(wpaObj, "p2p0", timeout);
+    int32_t result = wpaObj->P2pStartFind(wpaObj, GetHdiP2pIfaceName(), timeout);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pStartFind: P2pStartFind failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -516,7 +525,7 @@ WifiErrorNo HdiP2pSetExtListen(int enable, int period, int interval)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetExtListen(wpaObj, "p2p0", enable, period, interval);
+    int32_t result = wpaObj->P2pSetExtListen(wpaObj, GetHdiP2pIfaceName(), enable, period, interval);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetExtListen: P2pSetExtListen failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -535,7 +544,7 @@ WifiErrorNo HdiP2pSetListenChannel(int channel, int regClass)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetListenChannel(wpaObj, "p2p0", channel, regClass);
+    int32_t result = wpaObj->P2pSetListenChannel(wpaObj, GetHdiP2pIfaceName(), channel, regClass);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetListenChannel: P2pSetListenChannel failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -554,7 +563,7 @@ WifiErrorNo HdiP2pProvisionDiscovery(const char *peerBssid, int mode)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pProvisionDiscovery(wpaObj, "p2p0", peerBssid, mode);
+    int32_t result = wpaObj->P2pProvisionDiscovery(wpaObj, GetHdiP2pIfaceName(), peerBssid, mode);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pProvisionDiscovery: P2pProvisionDiscovery failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -573,7 +582,7 @@ WifiErrorNo HdiP2pAddGroup(int isPersistent, int networkId, int freq)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pAddGroup(wpaObj, "p2p0", isPersistent, networkId, freq);
+    int32_t result = wpaObj->P2pAddGroup(wpaObj, GetHdiP2pIfaceName(), isPersistent, networkId, freq);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pAddGroup: P2pAddGroup failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -592,7 +601,7 @@ WifiErrorNo HdiP2pAddService(struct HdiP2pServiceInfo *info)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pAddService(wpaObj, "p2p0", info);
+    int32_t result = wpaObj->P2pAddService(wpaObj, GetHdiP2pIfaceName(), info);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pAddService: P2pAddService failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -611,7 +620,7 @@ WifiErrorNo HdiP2pRemoveService(struct HdiP2pServiceInfo *info)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pRemoveService(wpaObj, "p2p0", info);
+    int32_t result = wpaObj->P2pRemoveService(wpaObj, GetHdiP2pIfaceName(), info);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pRemoveService: P2pRemoveService failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -630,7 +639,7 @@ WifiErrorNo HdiP2pStopFind()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pStopFind(wpaObj, "p2p0");
+    int32_t result = wpaObj->P2pStopFind(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pStopFind: P2pStopFind failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -649,7 +658,7 @@ WifiErrorNo HdiP2pFlush()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pFlush(wpaObj, "p2p0");
+    int32_t result = wpaObj->P2pFlush(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pFlush: P2pFlush failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -668,7 +677,7 @@ WifiErrorNo HdiP2pFlushService()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pFlushService(wpaObj, "p2p0");
+    int32_t result = wpaObj->P2pFlushService(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pFlushService: P2pFlushService failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -687,7 +696,7 @@ WifiErrorNo HdiP2pRemoveNetwork(int networkId)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pRemoveNetwork(wpaObj, "p2p0", networkId);
+    int32_t result = wpaObj->P2pRemoveNetwork(wpaObj, GetHdiP2pIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pRemoveNetwork: P2pRemoveNetwork failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -707,7 +716,7 @@ WifiErrorNo HdiP2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int siz
     }
 
     for (int i = 0; i < size; ++i) {
-        int32_t result = wpaObj->P2pSetGroupConfig(wpaObj, "p2p0", networkId,
+        int32_t result = wpaObj->P2pSetGroupConfig(wpaObj, GetHdiP2pIfaceName(), networkId,
             g_hdiP2pWpaNetworkFields[pConfig[i].cfgParam].fieldName, pConfig[i].cfgValue);
         if (result != HDF_SUCCESS) {
             LOGE("HdiP2pSetGroupConfig: %{public}s failed result:%{public}d",
@@ -740,14 +749,14 @@ WifiErrorNo HdiP2pInvite(const char *peerBssid, const char *goBssid, const char 
 
 WifiErrorNo HdiP2pReinvoke(int networkId, const char *bssid)
 {
-    LOGI("HdiP2pReinvoke enter networkId=%{public}d, bssid=%{public}s", networkId, bssid);
+    LOGI("HdiP2pReinvoke enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pReinvoke: wpaObj is NULL");
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pReinvoke(wpaObj, "p2p0", networkId, bssid);
+    int32_t result = wpaObj->P2pReinvoke(wpaObj, GetHdiP2pIfaceName(), networkId, bssid);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pReinvoke: P2pReinvoke failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -766,7 +775,8 @@ WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pGetDeviceAddress(wpaObj, "p2p0", deviceAddress, WIFI_IDL_P2P_DEV_ADDRESS_LEN);
+    int32_t result = wpaObj->P2pGetDeviceAddress(wpaObj, GetHdiP2pIfaceName(), deviceAddress,
+        WIFI_IDL_P2P_DEV_ADDRESS_LEN);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetDeviceAddress: P2pGetDeviceAddress failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -785,7 +795,7 @@ WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char 
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pReqServiceDiscovery(wpaObj, "p2p0", reqService,
+    int32_t result = wpaObj->P2pReqServiceDiscovery(wpaObj, GetHdiP2pIfaceName(), reqService,
         replyDisc, WIFI_IDL_P2P_TMP_BUFFER_SIZE_128);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pReqServiceDiscovery: P2pReqServiceDiscovery failed result:%{public}d", result);
@@ -805,7 +815,7 @@ WifiErrorNo HdiP2pCancelServiceDiscovery(const char *id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pCancelServiceDiscovery(wpaObj, "p2p0", id);
+    int32_t result = wpaObj->P2pCancelServiceDiscovery(wpaObj, GetHdiP2pIfaceName(), id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pCancelServiceDiscovery: P2pCancelServiceDiscovery failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -824,7 +834,7 @@ WifiErrorNo HdiP2pRespServerDiscovery(struct HdiP2pServDiscReqInfo *info)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pRespServerDiscovery(wpaObj, "p2p0", info);
+    int32_t result = wpaObj->P2pRespServerDiscovery(wpaObj, GetHdiP2pIfaceName(), info);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pRespServerDiscovery: P2pRespServerDiscovery failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -905,7 +915,7 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin)
     wpsParam.pinLen = HDI_PIN_LEN;
     LOGI("HdiP2pConnect wpsParam.pin=%{public}s wpsParam.pinLen=%{public}d", wpsParam.pin, wpsParam.pinLen);
 
-    int32_t result = wpaObj->P2pConnect(wpaObj, "p2p0", &wpsParam, replyPin, WIFI_IDL_PIN_CODE_LENGTH);
+    int32_t result = wpaObj->P2pConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam, replyPin, WIFI_IDL_PIN_CODE_LENGTH);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pConnect: P2pConnect failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -915,7 +925,7 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo HdiP2pHid2dConnect(struct HdiHid2dConnectInfo *info)
+WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
 {
     LOGI("HdiP2pHid2dConnect enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
@@ -923,8 +933,17 @@ WifiErrorNo HdiP2pHid2dConnect(struct HdiHid2dConnectInfo *info)
         LOGE("HdiP2pHid2dConnect: wpaObj is NULL");
         return WIFI_IDL_OPT_FAILED;
     }
-
-    int32_t result = wpaObj->P2pHid2dConnect(wpaObj, "p2p0", info);
+    struct HdiHid2dConnectInfo wpsParam = {0};
+    uint8_t addr[ETH_ALEN];
+    hwaddr_aton(info->bssid, addr);
+    wpsParam.ssid = (uint8_t *)info->ssid;
+    wpsParam.ssidLen = strlen(info->ssid) + 1;
+    wpsParam.bssid = addr;
+    wpsParam.bssidLen = strlen(info->bssid);
+    wpsParam.passphrase = (uint8_t *)info->passphrase;
+    wpsParam.passphraseLen = strlen(info->passphrase) + 1;
+    wpsParam.frequency = (info->frequency << 16) | (info->isLegacyGo);
+    int32_t result = wpaObj->P2pHid2dConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pHid2dConnect: P2pHid2dConnect failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -943,7 +962,7 @@ WifiErrorNo HdiP2pSetServDiscExternal(int mode)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSetServDiscExternal(wpaObj, "p2p0", mode);
+    int32_t result = wpaObj->P2pSetServDiscExternal(wpaObj, GetHdiP2pIfaceName(), mode);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetServDiscExternal: P2pSetServDiscExternal failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -962,7 +981,7 @@ WifiErrorNo HdiP2pRemoveGroup(const char *groupName)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pRemoveGroup(wpaObj, "p2p0", groupName);
+    int32_t result = wpaObj->P2pRemoveGroup(wpaObj, GetHdiP2pIfaceName(), groupName);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pRemoveGroup: P2pRemoveGroup failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -981,7 +1000,7 @@ WifiErrorNo HdiP2pCancelConnect()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pCancelConnect(wpaObj, "p2p0");
+    int32_t result = wpaObj->P2pCancelConnect(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pCancelConnect: P2pCancelConnect failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -1000,7 +1019,7 @@ WifiErrorNo HdiP2pGetGroupConfig(int networkId, char *param, char *value)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pGetGroupConfig(wpaObj, "p2p0", networkId,
+    int32_t result = wpaObj->P2pGetGroupConfig(wpaObj, GetHdiP2pIfaceName(), networkId,
         param, value, WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetGroupConfig: P2pGetGroupConfig failed result:%{public}d", result);
@@ -1020,7 +1039,7 @@ WifiErrorNo HdiP2pAddNetwork(int *networkId)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pAddNetwork(wpaObj, "p2p0", networkId);
+    int32_t result = wpaObj->P2pAddNetwork(wpaObj, GetHdiP2pIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pAddNetwork: P2pAddNetwork failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -1039,7 +1058,7 @@ WifiErrorNo HdiP2pGetPeer(const char *bssid, struct HdiP2pDeviceInfo *info)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pGetPeer(wpaObj, "p2p0", bssid, info);
+    int32_t result = wpaObj->P2pGetPeer(wpaObj, GetHdiP2pIfaceName(), bssid, info);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetPeer: P2pGetPeer failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -1058,7 +1077,7 @@ WifiErrorNo HdiP2pGetGroupCapability(const char *bssid, int cap)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pGetGroupCapability(wpaObj, "p2p0", bssid, &cap);
+    int32_t result = wpaObj->P2pGetGroupCapability(wpaObj, GetHdiP2pIfaceName(), bssid, &cap);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetGroupCapability: P2pGetGroupCapability failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -1077,7 +1096,7 @@ WifiErrorNo HdiP2pListNetworks(struct HdiP2pNetworkList *infoList)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pListNetworks(wpaObj, "p2p0", infoList);
+    int32_t result = wpaObj->P2pListNetworks(wpaObj, GetHdiP2pIfaceName(), infoList);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pListNetworks: P2pListNetworks failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -1096,13 +1115,32 @@ WifiErrorNo HdiP2pSaveConfig()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pSaveConfig(wpaObj, "p2p0");
+    int32_t result = wpaObj->P2pSaveConfig(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSaveConfig: P2pSaveConfig failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
     }
 
     LOGI("HdiP2pSaveConfig success.");
+    return WIFI_IDL_OPT_OK;
+}
+
+WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData)
+{
+    LOGI("HdiDeliverP2pData enter");
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiDeliverP2pData: wpaObj is NULL");
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, "p2p0", cmdType, dataType, carryData);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiDeliverP2pData: send failed result:%{public}d", result);
+        return WIFI_IDL_OPT_FAILED;
+    }
+
+    LOGI("HdiDeliverP2pData success.");
     return WIFI_IDL_OPT_OK;
 }
 #endif

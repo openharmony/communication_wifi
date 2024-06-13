@@ -14,35 +14,28 @@
  */
 {
   "app": {
-    //    "signingConfigs": [
-    //
-    //    ],
-    //    "compileSdkVersion": 10,
-    //    "compatibleSdkVersion": 10,
-    "products": [
-      {
-        "name": "default",
-        "signingConfig": "default",
-        "compileSdkVersion": 10,
-        "compatibleSdkVersion": 9,
-        "targetSdkVersion": 10,
-        "runtimeOS": "OpenHarmony"
-      }
-    ],
     "signingConfigs": [
       {
         "name": "default",
         "material": {
-          "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifitest_kaihong.sample.wifitest.cer",
-          "storePassword": "0000001AA825068A821704832948DE46705A5A5998C549D28D49C970D32BDB909913CBE63E1FB860C8AD",
+          "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifi_testapp_kaihong.sample.wifitest.cer",
+          "storePassword": "0000001B952FB0C0AB83E64570AF570381420949AC652C4C90AF551F686E6E746B7542BA9B63A00B4A2905",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001A93B49F7C266CDA20213B713DD79D5645AD93794E13E5689CF620245D56A7419611D9FF56881E",
-          "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifitest_kaihong.sample.wifitest.p7b",
+          "keyPassword": "0000001BB0E8C3143A5160EC74D327B05E17BABD5942876102FC6C4FA7B464851E978C9B9B66B45FD70891",
+          "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifi_testapp_kaihong.sample.wifitest.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifitest_kaihong.sample.wifitest.p12"
+          "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifi_testapp_kaihong.sample.wifitest.p12"
         }
       }
-    ]
+    ],
+    "compileSdkVersion": 11,
+    "compatibleSdkVersion": 10,
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+      }
+    ],
   },
   "modules": [
     {

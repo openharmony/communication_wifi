@@ -175,7 +175,7 @@ ErrCode ScanInterface::OnCustomControlStateChanged(int customScene, int customSc
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanInterface::OnGetCustomSceneState(std::map<int, time_t>& sceneMap) const
+ErrCode ScanInterface::OnGetCustomSceneState(std::map<int, time_t>& sceneMap)
 {
     WIFI_LOGI("Enter ScanInterface::OnGetCustomSceneState\n");
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
@@ -209,62 +209,13 @@ ErrCode ScanInterface::SetEnhanceService(IEnhanceService *enhanceService)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanInterface::StartWpa()
+ErrCode ScanInterface::SetNetworkInterfaceUpDown(bool upDown)
 {
-    WIFI_LOGI("Enter ScanInterface::StartWpa.\n");
+    LOGI("Enter ScanInterface::SetNetworkInterfaceUpDown.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    if (pScanService->StartWpa() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("StartWpa failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ScanInterface::CloseWpa()
-{
-    WIFI_LOGI("Enter ScanInterface::CloseWpa.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    if (pScanService->CloseWpa() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("CloseWpa failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ScanInterface::OpenScanOnly()
-{
-    WIFI_LOGI("Enter ScanInterface::OpenScanOnly.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    if (pScanService->OpenScanOnly() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("OpenScanOnly failed.\n");
-        CloseScanOnly();
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ScanInterface::CloseScanOnly()
-{
-    LOGI("Enter ScanInterface::CloseScanOnly.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    if (pScanService->CloseScanOnly() != WIFI_OPT_SUCCESS) {
-        LOGE("CloseScanOnly failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ScanInterface::OnSystemAbilityChanged(int systemAbilityId, bool add)
-{
-    WIFI_LOGI("Enter ScanInterface::OnSystemAbilityChanged.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    if (pScanService->OnSystemAbilityChanged(systemAbilityId, add) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("OnSystemAbilityChanged() failed!");
+    if (pScanService->SetNetworkInterfaceUpDown(upDown) != WIFI_OPT_SUCCESS) {
+        LOGE("SetNetworkInterfaceUpDown failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

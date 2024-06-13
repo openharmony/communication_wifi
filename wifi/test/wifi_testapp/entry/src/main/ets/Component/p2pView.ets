@@ -13,33 +13,34 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
-const TAG = "[P2pView]"
 import ConfigData from '../utils/ConfigData';
 import { testOnP2pConnectionChange , testGetCurrentGroupCallback } from '../entryability/model/p2pInterface'
+import wifi from '@ohos.wifi';
+
 /**
  * P2pView Component of p2p test
  */
+const TAG = "[P2pView]"
 
 @Component
 export struct P2pView {
-  private p2p: any = null
-  private securityString: Resource = $r( 'app.string.useful' )
-  private p2pConnectState: Number = 0
-  private p2pLinkedDeviceName: string = ""
+  private p2p!: wifi.WifiP2pDevice
+  private securityString: Resource = $r('app.string.useful')
+  private p2pConnectState: number = 0
+  @StorageLink("p2pLinkedDeviceName") p2pLinkedDeviceName: string = ""
   @State isLock: boolean = true
 
   aboutToAppear() {
-    console.log( TAG , `aboutToAppear ${ JSON.stringify( this.p2p ) }` )
+    console.log(TAG , `aboutToAppear ${ JSON.stringify(this.p2p) }`)
     testOnP2pConnectionChange()
-    testGetCurrentGroupCallback()
-    this.p2pConnectState = AppStorage.Get( "p2pConnectState" )
-    this.p2pLinkedDeviceName = AppStorage.Get( "p2pLinkedDeviceName" )
+    testGetCurrentGroupCallback();
+
+    this.p2pConnectState = AppStorage.get("p2pConnectState") ! //非空断言操作符
+    this.p2pLinkedDeviceName = AppStorage.get("p2pLinkedDeviceName") ! //非空断言操作符
     if ( this.p2p ) {
-      console.log( TAG , "this.p2p is true" )
+      console.log(TAG , "this.p2p is true")
     } else {
-      console.log( TAG , "this.p2p is false" )
+      console.log(TAG , "this.p2p is false")
     }
   }
 
@@ -48,40 +49,42 @@ export struct P2pView {
       Column() {
         if ( this.p2p ) {
           if ( this.p2p.deviceName ) {
-            Text( this.p2p.deviceName )
-              .fontSize( 20 )
-              .width( ConfigData.WH_100_100 )
+            Text(this.p2p.deviceName)
+              .fontSize(20)
+              .width(ConfigData.WH_100_100)
           }
         }
         if ( this.p2pConnectState == 1 && this.p2pLinkedDeviceName == this.p2p.deviceName ) {
-          Text( this.securityString = $r( 'app.string.p2pConnected' ) )
-            .fontSize( 18 )
-            .fontColor( Color.Gray )
-            .width( ConfigData.WH_100_100 )
+          // Text(this.securityString = $r('app.string.p2pConnected'))
+          Text($r('app.string.p2pConnected'))
+            .fontSize(18)
+            .fontColor(Color.Gray)
+            .width(ConfigData.WH_100_100)
         } else {
-          Text( this.securityString )
-            .fontSize( 18 )
-            .fontColor( Color.Gray )
-            .width( ConfigData.WH_100_100 )
+          Text($r('app.string.useful'))
+            // Text(this.securityString)
+            .fontSize(18)
+            .fontColor(Color.Gray)
+            .width(ConfigData.WH_100_100)
         }
       }
-      .layoutWeight( 1 )
+      .layoutWeight(1)
 
-      Stack( { alignContent : Alignment.BottomEnd } ) {
-        Image( $r( 'app.media.wifi' ) )
-          .height( 30 ).width( 30 )
-          .objectFit( ImageFit.Contain )
+      Stack({ alignContent : Alignment.BottomEnd }) {
+        Image($r('app.media.wifi'))
+          .height(30).width(30)
+          .objectFit(ImageFit.Contain)
         if ( this.isLock ) {
-          Image( $r( 'app.media.lock' ) )
-            .objectFit( ImageFit.Contain )
-            .width( 15 ).height( 15 )
+          Image($r('app.media.lock'))
+            .objectFit(ImageFit.Contain)
+            .width(15).height(15)
         }
       }
-      .width( 40 ).height( 40 )
-      .margin( { right : 10 } )
+      .width(40).height(40)
+      .margin({ right : 10 })
     }
-    .backgroundColor( Color.White )
-    .width( ConfigData.WH_100_100 )
-    .padding( 10 )
+    .backgroundColor(Color.White)
+    .width(ConfigData.WH_100_100)
+    .padding(10)
   }
 }

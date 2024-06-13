@@ -134,6 +134,19 @@ public:
      * @return - const std::string device name
      */
     virtual const std::string GetDeviceName(const std::string &deviceAddress);
+    /**
+     * @Description - Updates the address of a P2P group based on the device information.
+     * @param  device - device that need to get group
+     * @return - bool true:success    false:failed
+     */
+    virtual bool UpdateGroupAddress(const WifiP2pDevice &device);
+    /**
+     * @Description - Updates the address of a P2P group based on the device information.
+     * @param  deviceAddress - device to get group
+     * @param  groupAddress - groupAddress that need to be updated
+     * @return - bool true:success    false:failed
+     */
+    virtual bool UpdateGroupAddress(const std::string &deviceAddress, const std::string &groupAddress);
 
 private:
     /**

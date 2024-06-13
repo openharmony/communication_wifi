@@ -16,10 +16,6 @@
 #define OHOS_WIFIMANAGER_H
 
 #include <string>
-#include <thread>
-#include <deque>
-#include <mutex>
-#include <condition_variable>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "define.h"
@@ -28,6 +24,7 @@
 #include "wifi_sta_manager.h"
 #include "wifi_scan_manager.h"
 #include "wifi_toggler_manager.h"
+#include "wifi_event_handler.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "wifi_hotspot_manager.h"
 #endif
@@ -36,6 +33,8 @@
 #endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_event_subscriber_manager.h"
+#include "wifi_app_state_aware.h"
+#include "wifi_multi_vap_manager.h"
 #endif
 
 namespace OHOS {
@@ -119,6 +118,7 @@ public:
 #endif
 #ifndef OHOS_ARCH_LITE
     std::unique_ptr<WifiEventSubscriberManager>& GetWifiEventSubscriberManager();
+    std::unique_ptr<WifiMultiVapManager>& GetWifiMultiVapManager();
 #endif
 #ifdef FEATURE_HPF_SUPPORT
     void InstallPacketFilterProgram(int screenState, int instId);
@@ -126,20 +126,17 @@ public:
 
 private:
     WifiManager();
-    InitStatus GetInitStatus();
     void DealCloseServiceMsg();
     void CheckAndStartSta();
     void AutoStartServiceThread();
     void InitPidfile(void);
 
 private:
+    std::mutex initStatusMutex;
     InitStatus mInitStatus;
     long mSupportedFeatures;
-    std::thread mCloseServiceThread;
-    std::mutex mMutex;
-    std::condition_variable mCondition;
-    std::deque<WifiCloseServiceMsg> mEventQue;
-
+    std::unique_ptr<WifiEventHandler> mCloseServiceThread = nullptr;
+    std::unique_ptr<WifiEventHandler> mStartServiceThread = nullptr;
     std::unique_ptr<WifiStaManager> wifiStaManager = nullptr;
     std::unique_ptr<WifiScanManager> wifiScanManager = nullptr;
     std::unique_ptr<WifiTogglerManager> wifiTogglerManager = nullptr;
@@ -151,6 +148,7 @@ private:
 #endif
 #ifndef OHOS_ARCH_LITE
     std::unique_ptr<WifiEventSubscriberManager> wifiEventSubscriberManager = nullptr;
+    std::unique_ptr<WifiMultiVapManager> wifiMultiVapManager = nullptr;
 #endif
 };
 } // namespace Wifi

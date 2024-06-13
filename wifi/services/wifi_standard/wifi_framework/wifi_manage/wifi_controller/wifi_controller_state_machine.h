@@ -54,13 +54,16 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
         void HandleStaStartFailure(int id);
+        void HandleStaRemoved(InternalMessage *msg);
         void HandleAPServiceStartFail(int id);
+        void HandleConcreteClientRemoved(InternalMessage *msg);
         
     private:
         void HandleApStart(int id);
         void HandleWifiToggleChangeInEnabledState(InternalMessage *msg);
 #ifdef FEATURE_AP_SUPPORT
         void HandleSoftapToggleChangeInEnabledState(InternalMessage *msg);
+        void HandleApRemoved(InternalMessage *msg);
 #endif
         WifiControllerMachine *pWifiControllerMachine;
     };
@@ -80,9 +83,10 @@ public:
 public:
     ErrCode InitWifiControllerMachine();
 
-    void RmoveConcreteManager(int id);
+    void RemoveConcreteManager(int id);
     void HandleStaClose(int id);
     void HandleStaStart(int id);
+    void HandleStaSemiActive(int id);
     void HandleConcreteStop(int id);
     void ClearWifiStartFailCount();
     void ClearApStartFailCount();
@@ -92,6 +96,7 @@ public:
     void StartSoftapCloseTimer();
     void StopSoftapCloseTimer();
 #endif
+    void ShutdownWifi();
 
 private:
     template <typename T>
@@ -116,26 +121,31 @@ private:
     ErrCode InitWifiStates();
     bool HasAnyConcreteManager();
     bool HasAnyManager();
-    bool ConcreteIdExit(int id);
+    bool ConcreteIdExist(int id);
     void MakeConcreteManager(ConcreteManagerRole role, int id);
 #ifdef FEATURE_AP_SUPPORT
     bool HasAnySoftApManager();
-    bool SoftApIdExit(int id);
+    bool SoftApIdExist(int id);
     void MakeSoftapManager(SoftApManager::Role role, int id);
     bool ShouldEnableSoftap();
     void StopAllSoftapManagers();
     void StopSoftapManager(int id);
+    SoftApManager *GetSoftApManager(int id);
 #endif
     bool ShouldEnableWifi();
     ConcreteManagerRole GetWifiRole();
     void StopAllConcreteManagers();
+    void StopConcreteManager(int id);
     void SwitchRole(ConcreteManagerRole role);
     void HandleAirplaneOpen();
     void HandleAirplaneClose();
     static bool IsWifiEnable();
+    static bool IsSemiWifiEnable();
     static bool IsScanOnlyEnable();
 
-    int mApidStopWifi;
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
+    std::atomic<int> mApidStopWifi;
+#endif
     EnableState *pEnableState;
     DisableState *pDisableState;
     DefaultState *pDefaultState;

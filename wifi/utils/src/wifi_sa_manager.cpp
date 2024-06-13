@@ -24,7 +24,7 @@ DEFINE_WIFILOG_LABEL("WifiSaLoadManager");
 
 namespace OHOS {
 namespace Wifi {
-static constexpr int32_t WIFI_LOADSA_TIMEOUT_MS = 1000;
+static constexpr int32_t WIFI_LOADSA_TIMEOUT_MS = 5000;
 
 WifiSaLoadManager& WifiSaLoadManager::GetInstance()
 {
@@ -43,7 +43,6 @@ ErrCode WifiSaLoadManager::LoadWifiSa(int32_t systemAbilityId)
     }
     auto object = samgr->CheckSystemAbility(systemAbilityId);
     if (object != nullptr) {
-        WIFI_LOGE("get system ability %{public}d manager!", systemAbilityId);
         return WIFI_OPT_SUCCESS;
     }
     InitLoadState();

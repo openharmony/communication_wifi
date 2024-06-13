@@ -84,6 +84,18 @@ void WifiDeviceStub::InitHandleMapEx()
         &WifiDeviceStub::OnGetChangeDeviceConfig;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET)] =
         &WifiDeviceStub::OnFactoryReset;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED)] =
+        &WifiDeviceStub::OnLimitSpeed;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT)] =
+        &WifiDeviceStub::OnEnableHiLinkHandshake;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI)] =
+        &WifiDeviceStub::OnEnableSemiWifi;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE)] =
+        &WifiDeviceStub::OnGetWifiDetailState;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE)] =
+        &WifiDeviceStub::OnSetSatelliteState;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER)] =
+        &WifiDeviceStub::OnSetTxPower;
     return;
 }
 
@@ -115,6 +127,8 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnDisableDeviceConfig;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = &WifiDeviceStub::OnConnectTo;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = &WifiDeviceStub::OnConnect2To;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK)] =
+        &WifiDeviceStub::OnStartRoamToNetwork;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = &WifiDeviceStub::OnReConnect;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE)] = &WifiDeviceStub::OnReAssociate;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISCONNECT)] = &WifiDeviceStub::OnDisconnect;
@@ -151,8 +165,6 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
-        reply.WriteInt32(0);
-        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
         int exception = data.ReadInt32();
@@ -190,7 +202,7 @@ void WifiDeviceStub::RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &rem
             static_cast<void*>(deathRecipient_), static_cast<void*>(iter->second));
         remoteObject->RemoveDeathRecipient(iter->second);
         remoteDeathMap.erase(iter);
-        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}d.", remoteDeathMap.size());
+        WIFI_LOGI("remove death recipient success! remoteDeathMap.size: %{public}zu.", remoteDeathMap.size());
     }
 }
 
@@ -593,6 +605,18 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, MessageParcel &data, MessagePar
     return;
 }
 
+void WifiDeviceStub::OnStartRoamToNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int networkId = data.ReadInt32();
+    std::string bssid = data.ReadString();
+    bool isCandidate = data.ReadBool();
+    ErrCode ret = StartRoamToNetwork(networkId, bssid, isCandidate);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
 void WifiDeviceStub::OnIsWifiConnected(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -741,6 +765,8 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteInt32((int)wifiInfo.maxSupportedTxLinkSpeed);
         reply.WriteInt32((int)wifiInfo.channelWidth);
         reply.WriteBool(wifiInfo.isAncoConnected);
+        reply.WriteInt32((int)wifiInfo.supportedWifiCategory);
+        reply.WriteBool(wifiInfo.isHiLinkNetwork);
     }
 
     return;
@@ -852,7 +878,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             if (iter == remoteDeathMap.end()) {
                 std::lock_guard<std::mutex> lock(mutex_);
                 remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
-                WIFI_LOGI("OnRegisterCallBack, AddDeathRecipient, remote: %{public}p, remoteDeathMap.size: %{public}d",
+                WIFI_LOGI("OnRegisterCallBack, AddDeathRecipient, remote: %{public}p, remoteDeathMap.size: %{public}zu",
                     static_cast<void*>(remote), remoteDeathMap.size());
                 if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                     WIFI_LOGI("AddDeathRecipient!");
@@ -998,9 +1024,14 @@ void WifiDeviceStub::OnGetDisconnectedReason(uint32_t code, MessageParcel &data,
 void WifiDeviceStub::OnSetFrozenApp(uint32_t code, MessageParcel& data, MessageParcel& reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    int uid = data.ReadInt32();
+    int size = data.ReadInt32();
+    size = size < MAX_PID_LIST_SIZE ? size : MAX_PID_LIST_SIZE;
+    std::set<int> pidList;
+    for (int i = 0; i < size; i++) {
+        pidList.insert(data.ReadInt32());
+    }
     bool frozen = data.ReadBool();
-    ErrCode ret = SetAppFrozen(uid, frozen);
+    ErrCode ret = SetAppFrozen(pidList, frozen);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
@@ -1041,5 +1072,73 @@ void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageP
     reply.WriteInt32(ret);
     return;
 }
+
+void WifiDeviceStub::OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int controlId = data.ReadInt32();
+    int limitMode = data.ReadInt32();
+    ErrCode ret = LimitSpeed(controlId, limitMode);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__,  code, data.GetRawDataSize());
+    bool uiFlag = data.ReadBool();
+    std::string bssid = data.ReadString();
+    WifiDeviceConfig deviceConfig;
+    ReadWifiDeviceConfig(data, deviceConfig);
+    ErrCode ret = EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int state = data.ReadInt32();
+    ErrCode ret = SetSatelliteState(state);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = EnableSemiWifi();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnGetWifiDetailState(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiDetailState state = WifiDetailState::STATE_UNKNOWN;
+    ErrCode ret = GetWifiDetailState(state);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(static_cast<int>(state));
+    }
+
+    return;
+}
+
+void WifiDeviceStub::OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int power = data.ReadInt32();
+    ErrCode ret = SetTxPower(power);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

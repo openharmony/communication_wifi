@@ -12,14 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mock_wifi_supplicant_hal_interface.h"
+#include "mock_wifi_scan_interface.h"
 
 namespace OHOS {
 namespace Wifi {
-WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
+
+MockWifiScanInterface &MockWifiScanInterface::GetInstance(void)
 {
-    static WifiSupplicantHalInterface inst;
+    static MockWifiScanInterface inst;
     return inst;
 }
+
+namespace WifiSupplicantHalInterface {
+
+WifiErrorNo UnRegisterSupplicantEventCallback()
+{
+    return MockWifiScanInterface::GetInstance().pSupplicant.unCallback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+
+WifiErrorNo RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
+{
+    return MockWifiScanInterface::GetInstance().pSupplicant.callback ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+}
+};
 }  // namespace Wifi
 }  // namespace OHOS

@@ -20,9 +20,6 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_client.h"
 #endif
-#ifdef HDI_INTERFACE_SUPPORT
-#include "wifi_hdi_client.h"
-#endif
 
 
 namespace OHOS {
@@ -57,20 +54,11 @@ public:
      */
     bool InitHdiWpaClient(void);
 
-    /**
-     * @Description Init HdiClinet.
-     *
-     */
-    bool InitHdiClient(void);
-
 public:
-    WifiIdlClient *mIdlClient;
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     WifiHdiWpaClient *mHdiWpaClient;
-#endif
-
-#ifdef HDI_INTERFACE_SUPPORT
-    WifiHdiClient *mHdiClient;
+#else
+    WifiIdlClient *mIdlClient;
 #endif
 };
 }  // namespace Wifi

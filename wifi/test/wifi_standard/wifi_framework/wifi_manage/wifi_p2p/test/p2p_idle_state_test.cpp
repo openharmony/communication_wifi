@@ -23,6 +23,7 @@
 #include "mock_wifi_settings.h"
 
 using ::testing::_;
+using ::testing::AtLeast;
 using ::testing::Return;
 using ::testing::ext::TestSize;
 
@@ -398,6 +399,46 @@ HWTEST_F(P2pIdleStateTest, ProcessProvDiscPbcReqEvt, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(P2pIdleStateTest, RetryConnectTest, TestSize.Level1)
+{
+    InternalMessage msg;
+    WifiP2pConfigInternal config;
+    msg.SetMessageObj(config);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).Times(AtLeast(0));
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
+
+    AddDeviceManager();
+    config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
+    msg.SetMessageObj(config);
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(P2pIdleStateTest, RetryConnectTest2, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT));
+    AddDeviceManager();
+    Hid2dConnectConfig config;
+    config.SetSsid("abcd");
+    config.SetBssid("00:00:00:00:00:00");
+    config.SetPreSharedKey("123456789");
+    msg.SetMessageObj(config);
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(P2pIdleStateTest, ProcessP2pIfaceCreatedEvtTest, TestSize.Level1)
+{
+    InternalMessage msg;
+    std::string str = "CreatedEvt";
+    msg.SetMessageObj(str);
+    msg.SetParam1(1);
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_IFACE_CREATED));
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
+    msg.SetParam1(0);
     EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(&msg));
 }
 }  // namespace Wifi

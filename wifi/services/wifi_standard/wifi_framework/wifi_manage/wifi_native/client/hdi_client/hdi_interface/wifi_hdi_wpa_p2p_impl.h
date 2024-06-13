@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-WifiErrorNo HdiWpaP2pStart();
+WifiErrorNo HdiWpaP2pStart(const char *ifaceName);
 
 WifiErrorNo HdiWpaP2pStop();
 
@@ -95,7 +95,7 @@ WifiErrorNo HdiP2pRespServerDiscovery(struct HdiP2pServDiscReqInfo *info);
 
 WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin);
 
-WifiErrorNo HdiP2pHid2dConnect(struct HdiHid2dConnectInfo *info);
+WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info);
 
 WifiErrorNo HdiP2pSetServDiscExternal(int mode);
 
@@ -114,6 +114,8 @@ WifiErrorNo HdiP2pGetGroupCapability(const char *bssid, int cap);
 WifiErrorNo HdiP2pListNetworks(struct HdiP2pNetworkList *infoList);
 
 WifiErrorNo HdiP2pSaveConfig();
+
+WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData);
 
 #ifdef __cplusplus
 }

@@ -181,7 +181,24 @@ import {
 
 import wifi from '@ohos.wifi';
 
-const WifiTestCase: any[] = [
+interface WifiTest {
+  name: string;
+  detail: string;
+  method: string;
+  api: Function;
+  result: string;
+  category: CaseCategory;
+}
+
+interface WifiTestComposition {
+  name: string;
+  detail: string;
+  url: string;
+  image: Resource;
+  category: Category;
+}
+
+const WifiTestCase: WifiTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '注册WLAN状态改变事件' ,
@@ -480,7 +497,7 @@ const WifiTestCase: any[] = [
   },
 ]
 
-const WifiManagerTestCase: any[] = [
+const WifiManagerTestCase: WifiTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '注册WLAN状态改变事件' ,
@@ -790,7 +807,7 @@ const WifiManagerTestCase: any[] = [
   },
 ]
 
-const HotspotTestCase: any[] = [
+const HotspotTestCase: WifiTest[] = [
   {
     'name' : '注册热点状态改变事件' ,
     'detail' : '注册热点状态改变事件' ,
@@ -873,7 +890,7 @@ const HotspotTestCase: any[] = [
   }
 ]
 
-const HotspotManagerTestCase: any[] = [
+const HotspotManagerTestCase: WifiTest[] = [
   {
     'name' : '注册热点状态改变事件' ,
     'detail' : '注册热点状态改变事件' ,
@@ -956,7 +973,7 @@ const HotspotManagerTestCase: any[] = [
   }
 ]
 
-const p2pTestCase: any[] = [
+const p2pTestCase: WifiTest[] = [
   {
     'name' : '注册P2P开关状态改变事件' ,
     'detail' : '注册P2P开关状态改变事件' ,
@@ -1119,7 +1136,7 @@ const p2pTestCase: any[] = [
   },
 ]
 
-const p2pManagerTestCase: any[] = [
+const p2pManagerTestCase: WifiTest[] = [
   {
     'name' : '注册P2P开关状态改变事件' ,
     'detail' : '注册P2P开关状态改变事件' ,
@@ -1314,26 +1331,26 @@ const p2pManagerTestCase: any[] = [
   },
 ]
 
-const TestComposition: any[] = [
+const TestComposition: WifiTestComposition[] = [
   {
     'name' : 'WIFI' ,
     'detail' : 'wifi发现' ,
     'url' : 'pages/subAppTest/wifiScanTest' ,
-    'image' : $r( 'app.media.wifi' ) ,
+    'image' : $r('app.media.wifi') ,
     'category' : Category.App
   },
   {
     'name' : 'WIFI候选网络' ,
     'detail' : 'wifi候选网络' ,
     'url' : 'pages/subAppTest/wifiCandidateTest' ,
-    'image' : $r( 'app.media.wifi' ) ,
+    'image' : $r('app.media.wifi') ,
     'category' : Category.App
   },
   {
     'name' : 'p2p扫描' ,
     'detail' : 'p2p扫描结果' ,
     'url' : 'pages/subAppTest/p2pDiscoveryTest' ,
-    'image' : $r( 'app.media.WLAN' ) ,
+    'image' : $r('app.media.WLAN') ,
     'category' : Category.App
   },
 
@@ -1341,301 +1358,301 @@ const TestComposition: any[] = [
     'name' : 'WIFI' ,
     'detail' : 'wifi测试' ,
     'url' : 'pages/subManualApiTest/wifiInterfaceTest' ,
-    'image' : $r( 'app.media.wifi' ) ,
+    'image' : $r('app.media.wifi') ,
     'category' : Category.API
   },
   {
     'name' : 'WIFIManager' ,
     'detail' : 'wifiManager测试' ,
     'url' : 'pages/subManualApiTest/wifiManagerInterfaceTest' ,
-    'image' : $r( 'app.media.wifi' ) ,
+    'image' : $r('app.media.wifi') ,
     'category' : Category.API
   },
   {
     'name' : 'HotSpot' ,
     'detail' : '热点测试' ,
     'url' : 'pages/subManualApiTest/hotspotInterfaceTest' ,
-    'image' : $r( 'app.media.hotspot' ) ,
+    'image' : $r('app.media.hotspot') ,
     'category' : Category.API
   },
   {
     'name' : 'HotSpotManager' ,
     'detail' : '热点Manager测试' ,
     'url' : 'pages/subManualApiTest/hotspotManagerInterfaceTest' ,
-    'image' : $r( 'app.media.hotspot' ) ,
+    'image' : $r('app.media.hotspot') ,
     'category' : Category.API
   },
   {
     'name' : 'P2p' ,
     'detail' : 'p2p测试' ,
     'url' : 'pages/subManualApiTest/p2pInterfaceTest' ,
-    'image' : $r( 'app.media.WLAN' ) ,
+    'image' : $r('app.media.WLAN') ,
     'category' : Category.API
   },
   {
     'name' : 'P2pManager' ,
     'detail' : 'p2pManager测试' ,
     'url' : 'pages/subManualApiTest/p2pManagerInterfaceTest' ,
-    'image' : $r( 'app.media.WLAN' ) ,
+    'image' : $r('app.media.WLAN') ,
     'category' : Category.API
   },
   {
     'name' : 'WiFiSwitchStabilityTest' ,
     'detail' : 'WiFi开关稳定性测试' ,
     'url' : 'pages/subStabilityTest/wifiSwitchStabilityTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Stability
   },
   {
     'name' : 'WiFiScanStabilityTest' ,
     'detail' : 'WiFi搜索稳定性测试' ,
     'url' : 'pages/subStabilityTest/wifiScanStabilityTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Stability
   },
   {
     'name' : 'WiFiConnectStabilityTest' ,
     'detail' : 'WiFi连接稳定性测试' ,
     'url' : 'pages/subStabilityTest/wifiConnectStabilityTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Stability
   },
   {
     'name' : 'HotspotStabilityTest' ,
     'detail' : '热点稳定性测试' ,
     'url' : 'pages/subStabilityTest/hotspotStabilityTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Stability
   },
   {
     'name' : 'WebLatencyTest' ,
     'detail' : '网页时延测试' ,
     'url' : 'pages/subStabilityTest/webLatencyTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Stability
   },
   {
     'name' : 'WifiAutoTest' ,
     'detail' : 'wifi自动测试' ,
     'url' : 'pages/subAutoTest/wifiAutoTest' ,
-    'image' : $r( "app.media.AutoTestIcon" ) ,
+    'image' : $r("app.media.AutoTestIcon") ,
     'category' : Category.AutoTest
   },
   {
     'name' : 'WifiManagerAutoTest' ,
     'detail' : 'wifiManager自动测试' ,
     'url' : 'pages/subAutoTest/wifiManagerAutoTest' ,
-    'image' : $r( "app.media.AutoTestIcon" ) ,
+    'image' : $r("app.media.AutoTestIcon") ,
     'category' : Category.AutoTest
   },
   {
     'name' : 'HotspotAutoTest' ,
     'detail' : 'hotspot自动测试' ,
     'url' : 'pages/subAutoTest/hotspotAutoTest' ,
-    'image' : $r( "app.media.AutoTestIcon" ) ,
+    'image' : $r("app.media.AutoTestIcon") ,
     'category' : Category.AutoTest
   },
   {
     'name' : 'HotspotManagerAutoTest' ,
     'detail' : 'hotspotManager自动测试' ,
     'url' : 'pages/subAutoTest/hotspotManagerAutoTest' ,
-    'image' : $r( "app.media.AutoTestIcon" ) ,
+    'image' : $r("app.media.AutoTestIcon") ,
     'category' : Category.AutoTest
   },
   {
     'name' : 'P2pAutoTest' ,
     'detail' : 'p2p自动测试' ,
     'url' : 'pages/subAutoTest/p2pAutoTest' ,
-    'image' : $r( "app.media.AutoTestIcon" ) ,
+    'image' : $r("app.media.AutoTestIcon") ,
     'category' : Category.AutoTest
   },
   {
     'name' : 'P2pManagerAutoTest' ,
     'detail' : 'p2pManager自动测试' ,
     'url' : 'pages/subAutoTest/p2pManagerAutoTest' ,
-    'image' : $r( "app.media.AutoTestIcon" ) ,
+    'image' : $r("app.media.AutoTestIcon") ,
     'category' : Category.AutoTest
   },
   {
     'name' : 'WifiConnectScenarioTest' ,
     'detail' : 'Wifi连接场景测试' ,
     'url' : 'pages/subScenarioTest/wifiConnectScenarioTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Scenario
   },
   {
     'name' : 'WifiManagerScanScenarioTest' ,
     'detail' : 'WifiManager扫描场景测试' ,
     'url' : 'pages/subScenarioTest/wifiManagerConnectScenarioTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Scenario
   },
   {
     'name' : 'HotspotCreateScenarioTest' ,
     'detail' : '热点创建场景测试' ,
     'url' : 'pages/subScenarioTest/hotspotCreateScenarioTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Scenario
   },
   {
     'name' : 'HotspotManagerCreateScenarioTest' ,
     'detail' : '热点Manager创建场景测试' ,
     'url' : 'pages/subScenarioTest/hotspotManagerCreateScenarioTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Scenario
   },
   {
     'name' : 'P2pConnectScenarioTest' ,
     'detail' : 'P2p连接场景测试' ,
     'url' : 'pages/subScenarioTest/p2pConnectScenarioTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Scenario
   },
   {
     'name' : 'P2pManagerConnectScenarioTest' ,
     'detail' : 'P2p连接场景测试' ,
     'url' : 'pages/subScenarioTest/p2pManagerConnectScenarioTest' ,
-    'image' : $r( 'app.media.ScenarioTest' ) ,
+    'image' : $r('app.media.ScenarioTest') ,
     'category' : Category.Scenario
   },
   {
     'name' : 'WifiBenchmarkTest' ,
     'detail' : 'Wifi性能测试' ,
     'url' : 'pages/subBenchmarkTest/wifiBenchmarkTest' ,
-    'image' : $r( 'app.media.Benchmark' ) ,
+    'image' : $r('app.media.Benchmark') ,
     'category' : Category.BenchMark
   },
   {
     'name' : 'WifiManagerBenchmarkTest' ,
     'detail' : 'WifiManager性能测试' ,
     'url' : 'pages/subBenchmarkTest/wifiManagerBenchmarkTest' ,
-    'image' : $r( 'app.media.Benchmark' ) ,
+    'image' : $r('app.media.Benchmark') ,
     'category' : Category.BenchMark
   },
   {
     'name' : 'HotspotBenchmarkTest' ,
     'detail' : '热点性能测试' ,
     'url' : 'pages/subBenchmarkTest/hotspotBenchmarkTest' ,
-    'image' : $r( 'app.media.Benchmark' ) ,
+    'image' : $r('app.media.Benchmark') ,
     'category' : Category.BenchMark
   },
   {
     'name' : 'HotspotManagerBenchmarkTest' ,
     'detail' : '热点Manager性能测试' ,
     'url' : 'pages/subBenchmarkTest/hotspotManagerBenchmarkTest' ,
-    'image' : $r( 'app.media.Benchmark' ) ,
+    'image' : $r('app.media.Benchmark') ,
     'category' : Category.BenchMark
   },
   {
     'name' : 'P2pBenchmarkTest' ,
     'detail' : 'p2p性能测试' ,
     'url' : 'pages/subBenchmarkTest/p2pBenchmarkTest' ,
-    'image' : $r( 'app.media.Benchmark' ) ,
+    'image' : $r('app.media.Benchmark') ,
     'category' : Category.BenchMark
   },
   {
     'name' : 'P2pManagerBenchmarkTest' ,
     'detail' : 'p2pManager性能测试' ,
     'url' : 'pages/subBenchmarkTest/p2pManagerBenchmarkTest' ,
-    'image' : $r( 'app.media.Benchmark' ) ,
+    'image' : $r('app.media.Benchmark') ,
     'category' : Category.BenchMark
   },
   {
     'name' : 'WifiStressTest' ,
     'detail' : 'Wifi压力测试' ,
     'url' : 'pages/subStressTest/wifiStressTest' ,
-    'image' : $r( 'app.media.StressTest' ) ,
+    'image' : $r('app.media.StressTest') ,
     'category' : Category.Stress
   },
   {
     'name' : 'WifiManagerStressTest' ,
     'detail' : 'WifiManager压力测试' ,
     'url' : 'pages/subStressTest/wifiManagerStressTest' ,
-    'image' : $r( 'app.media.StressTest' ) ,
+    'image' : $r('app.media.StressTest') ,
     'category' : Category.Stress
   },
   {
     'name' : 'HotspotStressTest' ,
     'detail' : '热点压力测试' ,
     'url' : 'pages/subStressTest/hotspotStressTest' ,
-    'image' : $r( 'app.media.StressTest' ) ,
+    'image' : $r('app.media.StressTest') ,
     'category' : Category.Stress
   },
   {
     'name' : 'HotspotManagerStressTest' ,
     'detail' : '热点Manager压力测试' ,
     'url' : 'pages/subStressTest/hotspotManagerStressTest' ,
-    'image' : $r( 'app.media.StressTest' ) ,
+    'image' : $r('app.media.StressTest') ,
     'category' : Category.Stress
   },
   {
     'name' : 'P2pStressTest' ,
     'detail' : 'p2p压力测试' ,
     'url' : 'pages/subStressTest/p2pStressTest' ,
-    'image' : $r( 'app.media.StressTest' ) ,
+    'image' : $r('app.media.StressTest') ,
     'category' : Category.Stress
   },
   {
     'name' : 'P2pManagerStressTest' ,
     'detail' : 'p2pManager压力测试' ,
     'url' : 'pages/subStressTest/p2pManagerStressTest' ,
-    'image' : $r( 'app.media.StressTest' ) ,
+    'image' : $r('app.media.StressTest') ,
     'category' : Category.Stress
   }
 ]
 
 export function initTestData(): Array<TestData> {
   let TestDataArray: Array<TestData> = []
-  TestComposition.forEach( item => {
-    TestDataArray.push( new TestData(item.name , item.detail , item.url , item.image , item.category) );
-  } )
+  TestComposition.forEach(item => {
+    TestDataArray.push(new TestData(item.name , item.detail , item.url , item.image , item.category));
+  })
   return TestDataArray;
 }
 
 export function initWifiApiData(): Array<TestApi> {
   let TestApiArray: Array<TestApi> = []
-  WifiTestCase.forEach( item => {
-    TestApiArray.push( new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  WifiTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestApiArray;
 }
 
 export function initHotspotApIData(): Array<TestApi> {
   let TestApiArray: Array<TestApi> = []
-  HotspotTestCase.forEach( item => {
-    TestApiArray.push( new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  HotspotTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestApiArray;
 }
 
 export function initP2pApiData(): Array<TestApi> {
   let TestApiArray: Array<TestApi> = []
-  p2pTestCase.forEach( item => {
-    TestApiArray.push( new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  p2pTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestApiArray;
 }
 
 export function initWifiManagerApiData(): Array<TestApi> {
   let TestApiArray: Array<TestApi> = []
-  WifiManagerTestCase.forEach( item => {
-    TestApiArray.push( new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  WifiManagerTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestApiArray;
 }
 
 export function initHotspotManagerApIData(): Array<TestApi> {
   let TestApiArray: Array<TestApi> = []
-  HotspotManagerTestCase.forEach( item => {
-    TestApiArray.push( new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  HotspotManagerTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestApiArray;
 }
 
 export function initP2pManagerApIData(): Array<TestApi> {
   let TestApiArray: Array<TestApi> = []
-  p2pManagerTestCase.forEach( item => {
-    TestApiArray.push( new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  p2pManagerTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestApiArray;
 }

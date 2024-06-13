@@ -49,6 +49,14 @@ public:
     bool LoadConfiguration(const char *xmlPath);
 
     /**
+     * @Description load xml in memory
+     *
+     * @param xml - memory data
+     * @return bool - true for succ false for fail
+    */
+    bool LoadConfigurationMemory(const char *xml);
+
+    /**
      * @Description parse Configuration xml
      *
      * @return bool - true for succ false for fail

@@ -70,6 +70,17 @@ void OnConnectChanged(int status, int networkId, const char *mac)
     }
 }
 
+void OnDisConnectReasonCallback(int reason, const char *bssid)
+{
+    if (bssid == nullptr) {
+        return;
+    }
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (cbk.onReportDisConnectReason) {
+        cbk.onReportDisConnectReason(reason, bssid);
+    }
+}
+
 void OnBssidChanged(const char *reason, const char *bssid)
 {
     if (reason == nullptr || bssid == nullptr) {
@@ -110,6 +121,17 @@ void OnWpaConnectionReject(int status)
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onWpaConnectionReject) {
         cbk.onWpaConnectionReject(status);
+    }
+}
+
+void OnWpaStaNotifyCallBack(const char *notifyParam)
+{
+    if (notifyParam == nullptr) {
+        return;
+    }
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (cbk.onEventStaNotify) {
+        cbk.onEventStaNotify(notifyParam);
     }
 }
 
@@ -384,14 +406,14 @@ void OnP2pStaDeauthorized(const char *p2pDeviceAddress)
     }
 }
 
-void OnP2pStaAuthorized(const char *p2pDeviceAddress)
+void OnP2pStaAuthorized(const char *p2pDeviceAddress, const char *p2pGroupAddress)
 {
     if (p2pDeviceAddress == nullptr) {
         return;
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onStaAuthorized) {
-        cbk.onStaAuthorized(p2pDeviceAddress);
+        cbk.onStaAuthorized(p2pDeviceAddress, p2pGroupAddress);
     }
 }
 
@@ -441,5 +463,13 @@ void OnP2pConnectFailed(const char *bssid, int reason)
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onP2pConnectFailed) {
         cbk.onP2pConnectFailed(bssid, reason);
+    }
+}
+
+void OnP2pChannelSwitch(int freq)
+{
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
+    if (cbk.onP2pChannelSwitch) {
+        cbk.onP2pChannelSwitch(freq);
     }
 }

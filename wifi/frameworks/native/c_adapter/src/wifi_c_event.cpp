@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "../../../interfaces/kits/c/wifi_event.h"
+#include "kits/c/wifi_event.h"
 #include <set>
 #include <vector>
-#include "../../../interfaces/kits/c/wifi_device.h"
-#include "../../../interfaces/kits/c/wifi_scan_info.h"
+#include "kits/c/wifi_device.h"
+#include "kits/c/wifi_scan_info.h"
 #include "i_wifi_device_callback.h"
 #include "i_wifi_hotspot_callback.h"
 #include "i_wifi_scan_callback.h"
@@ -27,7 +27,7 @@
 #include "wifi_scan.h"
 #include "wifi_p2p.h"
 #include "wifi_common_util.h"
-#include "../../src/wifi_sa_event.h"
+#include "wifi_sa_event.h"
 DEFINE_WIFILOG_LABEL("WifiCEvent");
 std::set<WifiEvent*>& GetEventCallBacks();
 std::shared_ptr<OHOS::Wifi::WifiDevice> g_wifiStaPtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
@@ -77,7 +77,7 @@ static OHOS::Wifi::ErrCode ConvertedLinkedInfo(const OHOS::Wifi::WifiLinkedInfo&
 NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnWifiConnectionChanged(int state,
     const OHOS::Wifi::WifiLinkedInfo &info)
 {
-    WIFI_LOGI("sta received connection changed event: %{public}d", state);
+    WIFI_LOGI("sta connection changed event: %{public}d", state);
     auto &eventHandler = EventManager::GetInstance().GetWifiCEventHandler();
     if (eventHandler) {
         eventHandler->PostSyncTask([=]() {
@@ -139,7 +139,7 @@ std::vector<std::string> WifiCScanEventCallback::scanCallbackEvent = {
 
 NO_SANITIZE("cfi") void WifiCScanEventCallback::OnWifiScanStateChanged(int state)
 {
-    WIFI_LOGI("scan received state changed event: %{public}d", state);
+    WIFI_LOGI("ScanStateChanged event: %{public}d", state);
     auto &eventHandler = EventManager::GetInstance().GetWifiCEventHandler();
     if (eventHandler) {
         eventHandler->PostSyncTask([=]() {

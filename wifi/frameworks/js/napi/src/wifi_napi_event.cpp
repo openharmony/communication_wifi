@@ -70,7 +70,7 @@ std::map<std::string, std::int32_t> g_EventSysCapMap = {
 
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
-    WIFI_LOGI("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
+    WIFI_LOGD("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
     uv_loop_s* loop = nullptr;
     napi_get_uv_event_loop(asyncEvent->env, &loop);
 
@@ -122,7 +122,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
                 }
             }
             res = napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
-            WIFI_LOGI("uv_queue_work, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
+            WIFI_LOGD("uv_queue_work, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
                 res, asyncData->callbackRef, refCount);
             if (res != napi_ok || refCount <= 1) {
                 WIFI_LOGE("uv_queue_work, do NOT call back, res: %{public}d!", res);
@@ -145,7 +145,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             napi_close_handle_scope(asyncData->env, scope);
             if (unrefRef) {
                 res = napi_reference_unref(asyncData->env, asyncData->callbackRef, &refCount);
-                WIFI_LOGI("uv_queue_work, unref, res: %{public}d, refCount: %{public}d", res, refCount);
+                WIFI_LOGD("uv_queue_work, unref, res: %{public}d, refCount: %{public}d", res, refCount);
             }
             delete asyncData;
             delete work;
@@ -224,7 +224,7 @@ public:
 
 public:
     void OnWifiStateChanged(int state) override {
-        WIFI_LOGI("sta received state changed event: %{public}d [0:DISABLING, 1:DISABLED, 2:ENABLING, 3:ENABLED]",
+        WIFI_LOGI("OnWifiStateChanged event: %{public}d [0:DISABLING, 1:DISABLED, 2:ENABLING, 3:ENABLED]",
             state);
         if (m_wifiStateConvertMap.find(state) == m_wifiStateConvertMap.end()) {
             WIFI_LOGW("not find state.");
@@ -234,7 +234,7 @@ public:
     }
 
     void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {
-        WIFI_LOGI("sta received connection changed event: %{public}d [4:CONNECTED, 6:DISCONNECTED]", state);
+        WIFI_LOGI("OnWifiConnectionChanged event: %{public}d [4:CONNECTED, 6:DISCONNECTED, 7:SPECIAL_CONNECT]", state);
         if (m_connectStateConvertMap.find(state) == m_connectStateConvertMap.end()) {
             WIFI_LOGW("not find connect state.");
             return;
@@ -243,7 +243,7 @@ public:
     }
 
     void OnWifiRssiChanged(int rssi) override {
-        WIFI_LOGI("sta received rssi changed event: %{public}d", rssi);
+        WIFI_LOGI("OnWifiRssiChanged event: %{public}d", rssi);
         CheckAndNotify(EVENT_STA_RSSI_STATE_CHANGE, rssi);
     }
 
@@ -252,7 +252,7 @@ public:
 
     void OnStreamChanged(int direction) override
     {
-        WIFI_LOGI("sta received stream changed event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
+        WIFI_LOGD("OnStreamChanged event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
             direction);
         if (m_streamDirectionConvertMap.find(direction) == m_streamDirectionConvertMap.end()) {
             WIFI_LOGW("not find stream state.");
@@ -262,7 +262,7 @@ public:
     }
 
     void OnDeviceConfigChanged(ConfigChange value) override {
-        WIFI_LOGI("sta received device config changed event: %{public}d", static_cast<int>(value));
+        WIFI_LOGI("OnDeviceConfigChanged event: %{public}d", static_cast<int>(value));
         CheckAndNotify(EVENT_STA_DEVICE_CONFIG_CHANGE, static_cast<int>(value));
     }
 
@@ -281,6 +281,7 @@ private:
     enum class JsLayerConnectStatus {
         DISCONNECTED = 0,
         CONNECTED = 1,
+        SPECIAL_CONNECT = 2,
     };
 
     enum class JsLayerStreamDirection {
@@ -300,6 +301,7 @@ private:
     std::map<int, int> m_connectStateConvertMap = {
         { static_cast<int>(ConnState::CONNECTED), static_cast<int>(JsLayerConnectStatus::CONNECTED) },
         { static_cast<int>(ConnState::DISCONNECTED), static_cast<int>(JsLayerConnectStatus::DISCONNECTED) },
+        { static_cast<int>(ConnState::SPECIAL_CONNECT), static_cast<int>(JsLayerConnectStatus::SPECIAL_CONNECT) },
     };
 
     std::map<int, int> m_streamDirectionConvertMap = {
@@ -430,6 +432,20 @@ public:
     void OnConfigChanged(CfgType type, char* data, int dataLen) override {
     }
 
+    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info) override
+    {
+        WIFI_LOGI("received OnP2pGcJoinGroup event");
+    }
+
+    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override
+    {
+        WIFI_LOGI("received OnP2pGcLease event");
+    }
+
+    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override
+    {
+        WIFI_LOGI("received OnP2pPrivatePeersChanged event");
+    }
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }
@@ -633,7 +649,7 @@ NO_SANITIZE("cfi") ErrCode EventRegister::RegisterWifiEvents(int32_t sysCap, con
 
 void WifiNapiAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    WIFI_LOGI("WifiNapiAbilityStatusChange OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
+    WIFI_LOGI("OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
     std::vector<std::string> event;
     switch (systemAbilityId) {
         case WIFI_DEVICE_ABILITY_ID: {

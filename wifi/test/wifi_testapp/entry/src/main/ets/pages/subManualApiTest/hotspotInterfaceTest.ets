@@ -13,16 +13,18 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
-import Router from '@system.router';
+import router from '@ohos.router';
 import ConfigData from '../../utils/ConfigData';
 import { initHotspotApIData } from '../../entryability/model/testDataModels'
 import { TestData } from '../../entryability/model/testData'
 import { FilterTable } from '../../Component/filterTable';
+
+interface myParams extends Object {
+  testItem: TestData
+}
 
 /**
  * hotspot Test Page Of Wifi test
@@ -32,126 +34,121 @@ import { FilterTable } from '../../Component/filterTable';
 @Component
 struct hotspotInterfaceTest {
   @State showList: boolean = true;
-  private testItem: TestData = Router.getParams().testId;
+  private testItem: TestData = (router.getParams() as myParams).testItem
   @State message: string = "";
   @State h_ssid: string = "testApp1";
-  @State h_securityType: Number = 3;
-  @State h_band: Number = 2;
+  @State h_securityType: number = 3;
+  @State h_band: number = 2;
   @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: Number = 3 ;
-  @State h_channel: Number = 36 ;
-  @StorageLink( 'hotspotSsid' ) hotspotSsid: string = "";
-  @StorageLink( 'hotspotStateMessage' ) hotspotStateMessage: string = "";
-  @StorageLink( 'getStationsMessage' ) getStationsMessage: string = "";
-  @StorageLink( 'getHotspotConfigMessage' ) getHotspotConfigMessage: string = "";
-  @StorageLink( 'hotspotStaJoinMessage' ) hotspotStaJoinMessage: string = "";
-  @StorageLink( 'hotspotStaLeaveMessage' ) hotspotStaLeaveMessage: string = "";
+  @State h_maxConn: number = 3;
+  @State h_channel: number = 36;
+  @StorageLink('hotspotSsid') hotspotSsid: string = "";
+  @StorageLink('hotspotStateMessage') hotspotStateMessage: string = "";
+  @StorageLink('getStationsMessage') getStationsMessage: string = "";
+  @StorageLink('getHotspotConfigMessage') getHotspotConfigMessage: string = "";
+  @StorageLink('hotspotStaJoinMessage') hotspotStaJoinMessage: string = "";
+  @StorageLink('hotspotStaLeaveMessage') hotspotStaLeaveMessage: string = "";
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( "h_ssid" , this.h_ssid )
-    AppStorage.SetOrCreate( "h_securityType" , this.h_securityType )
-    AppStorage.SetOrCreate( "h_band" , this.h_band )
-    AppStorage.SetOrCreate( "h_preSharedKey" , this.h_preSharedKey )
-    AppStorage.SetOrCreate( "h_maxConn" , this.h_maxConn )
-    AppStorage.SetOrCreate( "h_channel" , this.h_channel )
+    AppStorage.setOrCreate("h_ssid" , this.h_ssid)
+    AppStorage.setOrCreate("h_securityType" , this.h_securityType)
+    AppStorage.setOrCreate("h_band" , this.h_band)
+    AppStorage.setOrCreate("h_preSharedKey" , this.h_preSharedKey)
+    AppStorage.setOrCreate("h_maxConn" , this.h_maxConn)
+    AppStorage.setOrCreate("h_channel" , this.h_channel)
   }
 
   init() {
-    console.log( "init-----------" )
+    console.log("init-----------")
   }
 
   build() {
     Column() {
-      Stack( { alignContent : Alignment.TopStart } ) {
-        TestImageDisplay( { testItem : this.testItem } )
-        PageTitle( { testItem : this.testItem } )
+      Stack({ alignContent : Alignment.TopStart }) {
+        TestImageDisplay({ testItem : this.testItem })
+        PageTitle({ testItem : this.testItem })
       }
 
-      Stack().height( "0.5vp" ).backgroundColor( "#000000" );
+      Stack().height("0.5vp").backgroundColor("#000000");
 
       Column() {
         Row() {
-          Text( "本设备热点名:" )
-            .fontSize( "17vp" )
-            .height( 60 )
-            .width( ConfigData.WH_30_100 )
-            .padding( { left : 10 } )
-          TextInput( { text : this.hotspotSsid , placeholder : "在右侧输入热点的配置" } )
-            .fontSize( "17vp" )
-            .backgroundColor( $r( "app.color.white" ) )
-            .onChange( ( strInput ) => {
+          Text("本设备热点名:")
+            .fontSize("17vp")
+            .height(60)
+            .width(ConfigData.WH_30_100)
+            .padding({ left : 10 })
+          TextInput({ text : this.hotspotSsid , placeholder : "在右侧输入热点的配置" })
+            .fontSize("17vp")
+            .backgroundColor($r("app.color.white"))
+            .onChange((strInput: string) => {
               this.hotspotSsid = strInput;
-            } )
-            .width( ConfigData.WH_50_100 )
-          Image( $r( 'app.media.Switch' ) )
-            .height( 50 )
-            .padding( { top : 5 , bottom : 5 , left : 10 } )
-            .width( ConfigData.WH_15_100 )
-            .onClick( () => {
+            })
+            .width(ConfigData.WH_50_100)
+          Image($r('app.media.Switch'))
+            .height(50)
+            .padding({ top : 5 , bottom : 5 , left : 10 })
+            .width(ConfigData.WH_15_100)
+            .onClick(() => {
               this.showList = !this.showList;
-            } )
+            })
         }
-        .margin( { top : "10vp" , left : "20vp" , right : "20vp" } )
-        .alignItems( VerticalAlign.Center )
-        .width( ConfigData.WH_100_100 )
-        .height( 60 )
+        .margin({ top : "10vp" , left : "20vp" , right : "20vp" })
+        .alignItems(VerticalAlign.Center)
+        .width(ConfigData.WH_100_100)
+        .height(60)
       }
-      .align( Alignment.TopStart )
+      .align(Alignment.TopStart)
 
       if ( this.showList ) {
         Column() {
           Scroll() {
             Column() {
-              //              Text("当前配置:")
-              //                .fontSize("17vp")
-              //                .margin({ top: "5vp", left: "10vp" })
-              //                .textAlign(TextAlign.Start)
-              //                .width(ConfigData.WH_100_100)
-              Text( "热点状态:" + this.hotspotStateMessage )
-                .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "10vp" } )
-                .textAlign( TextAlign.Start )
-                .width( ConfigData.WH_90_100 )
-              Text( "热点配置:" + this.getHotspotConfigMessage )
-                .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "10vp" } )
-                .textAlign( TextAlign.Start )
-                .width( ConfigData.WH_90_100 )
-              Text( "连接设备:" + this.getStationsMessage )
-                .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "10vp" } )
-                .textAlign( TextAlign.Start )
-                .width( ConfigData.WH_90_100 )
-              Text( "加入状态:" + this.hotspotStaJoinMessage )
-                .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "10vp" } )
-                .textAlign( TextAlign.Start )
-                .width( ConfigData.WH_90_100 )
-              Text( "离开状态:" + this.hotspotStaLeaveMessage )
-                .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "10vp" } )
-                .textAlign( TextAlign.Start )
-                .width( ConfigData.WH_90_100 )
+              Text("热点状态:" + this.hotspotStateMessage)
+                .fontSize("17vp")
+                .margin({ top : "5vp" , left : "10vp" })
+                .textAlign(TextAlign.Start)
+                .width(ConfigData.WH_90_100)
+              Text("热点配置:" + this.getHotspotConfigMessage)
+                .fontSize("17vp")
+                .margin({ top : "5vp" , left : "10vp" })
+                .textAlign(TextAlign.Start)
+                .width(ConfigData.WH_90_100)
+              Text("连接设备:" + this.getStationsMessage)
+                .fontSize("17vp")
+                .margin({ top : "5vp" , left : "10vp" })
+                .textAlign(TextAlign.Start)
+                .width(ConfigData.WH_90_100)
+              Text("加入状态:" + this.hotspotStaJoinMessage)
+                .fontSize("17vp")
+                .margin({ top : "5vp" , left : "10vp" })
+                .textAlign(TextAlign.Start)
+                .width(ConfigData.WH_90_100)
+              Text("离开状态:" + this.hotspotStaLeaveMessage)
+                .fontSize("17vp")
+                .margin({ top : "5vp" , left : "10vp" })
+                .textAlign(TextAlign.Start)
+                .width(ConfigData.WH_90_100)
             }
-            .width( ConfigData.WH_100_100 )
+            .width(ConfigData.WH_100_100)
           }
-          .scrollBarWidth( 10 )
-          .scrollBar( BarState.Auto )
+          .scrollBarWidth(10)
+          .scrollBar(BarState.Auto)
         }
-        .height( 100 )
-        .width( ConfigData.WH_95_100 )
-        .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
+        .height(100)
+        .width(ConfigData.WH_95_100)
+        .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 
-        ContentTable( {
+        ContentTable({
           testItem : this.testItem , apiItems : initHotspotApIData()
-        } )
+        })
       } else {
-        FilterTable( { testItem : this.testItem } )
+        FilterTable({ testItem : this.testItem })
       }
     }
-    .alignItems( HorizontalAlign.Center )
-    .backgroundColor( $r( "app.color.lead" ) )
-    .height( ConfigData.WH_100_100 )
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor($r("app.color.lead"))
+    .height(ConfigData.WH_100_100)
   }
 }
 

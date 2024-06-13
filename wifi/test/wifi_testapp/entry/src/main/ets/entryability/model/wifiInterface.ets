@@ -13,13 +13,28 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import prompt from '@system.prompt';
-import Router from '@system.router';
+import router from '@ohos.router';
 import wifi from '@ohos.wifi';
 import LogData from "../../utils/LogData"
 import MessageData from "../../utils/MessageData"
+import { BusinessError } from '@ohos.base';
+import wifiManager from '@ohos.wifiManager';
+
+interface WifiDeviceConfig {
+  ssid : string ,
+  bssid : string ,
+  preSharedKey : string ,
+  isHiddenSsid : boolean ,
+  securityType : wifi.WifiSecurityType ,
+  creatorUid : number ,
+  disableReason : number ,
+  netId : number ,
+  randomMacType : number ,
+  randomMacAddr : string ,
+  ipType : wifi.IpType ,
+  staticIp : wifi.IpConfig
+}
 
 const TAG = "[wifiInterface]";
 /**
@@ -36,7 +51,7 @@ export function testEnableWifi(): string {
     if ( wifiEnable ) {
       message = ( MessageData.testIsActive )
     } else {
-      let ret = wifi.enableWifi();
+      let ret:boolean = wifi.enableWifi();
       if ( ret ) {
         message = ( MessageData.testWifiEnableResult ) + ret
       } else {
@@ -44,7 +59,7 @@ export function testEnableWifi(): string {
         message += ( MessageData.testWifiEnableMaybe )
       }
       wifiEnable = true;
-      AppStorage.SetOrCreate( 'wifiIsOn' , wifiEnable );
+      AppStorage.setOrCreate( 'wifiIsOn' , wifiEnable );
     }
     prompt.showToast( { message : message } )
     console.log( TAG , LogData.testEnableWifi_EndLog )
@@ -62,7 +77,7 @@ export function testDisableWifi(): string {
     let message = ( MessageData.testDisableWifi );
     console.log( TAG , LogData.testDisableWifi_StartLog )
     if ( !wifiEnable ) {
-      message = ( LogData.testIsInactive );
+      message = ( MessageData.testIsInactive );
     } else {
       let ret = wifi.disableWifi();
       if ( ret ) {
@@ -72,7 +87,7 @@ export function testDisableWifi(): string {
         message += ( MessageData.testWifiDisableMaybe )
       }
       wifiEnable = false;
-      AppStorage.SetOrCreate( 'wifiIsOn' , wifiEnable );
+      AppStorage.setOrCreate( 'wifiIsOn' , wifiEnable );
     }
     prompt.showToast( { message : message } )
     console.log( TAG , LogData.testDisableWifi_EndLog )
@@ -116,7 +131,7 @@ export function testScan(): string {
     } else {
       let ret = wifi.scan()
       message = ( MessageData.testScanResult ) + ret
-      Router.push( { uri : PAGE_URI_WIFI_FOUND_MODE } );
+      router.pushUrl( { url : PAGE_URI_WIFI_FOUND_MODE } );
       prompt.showToast( { message : message } )
     }
     prompt.showToast( { message : message } )
@@ -172,7 +187,7 @@ export function testGetScanInfosPromise(): string {
         message = ( MessageData.testGetScanInfo ) + JSON.stringify( result )
         prompt.showToast( { message : message } )
         console.log( TAG , LogData.testGetScanInfosPromise_EndLog )
-      } ).catch( error => {
+      } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "testGetScanInfosPromise error:" + error )
       } )
     }
@@ -214,7 +229,7 @@ export function testGetScanInfosCallback(): string {
         console.log( TAG , LogData.testGetScanInfosCallback_successfulLog )
         message = ( MessageData.testGetScanInfo ) + JSON.stringify( result )
         let getScanInfoMessage = JSON.stringify( result )
-        AppStorage.SetOrCreate( "getScanInfoMessage" , getScanInfoMessage )
+        AppStorage.setOrCreate( "getScanInfoMessage" , getScanInfoMessage )
         prompt.showToast( { message : message } )
         console.log( TAG , LogData.testGetScanInfosCallback_EndLog )
       } );
@@ -267,35 +282,35 @@ export function testGetScanInfosCallback(): string {
 //  ipType : ipType ,
 //  staticIp : staticIp
 //}
-//AppStorage.SetOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
+//AppStorage.setOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
 
 export function testAddDeviceConfigPromise(): string {
   try {
     let message = ( MessageData.testAddDeviceConfigPromise )
     console.log( TAG , LogData.testAddDeviceConfigPromise_StartLog )
-    let ssid = AppStorage.Get( "w_ssid" )
-    let bssid = AppStorage.Get( "w_bssid" )
-    let preSharedKey = AppStorage.Get( "w_preSharedKey" )
-    let isHiddenSsid = AppStorage.Get( "w_isHiddenSsid" )
-    let securityType = AppStorage.Get( "w_securityType" )
-    let creatorUid = AppStorage.Get( "w_creatorUid" )
-    let disableReason = AppStorage.Get( "w_disableReason" )
-    let netId = AppStorage.Get( "w_netId" )
-    let randomMacType = AppStorage.Get( "w_randomMacType" )
-    let randomMacAddr = AppStorage.Get( "w_randomMacAddr" )
-    let ipType = AppStorage.Get( "w_ipType" )
-    let staticIp_ipAddress = AppStorage.Get( "w_staticIp_ipAddress" )
-    let staticIp_gateway = AppStorage.Get( "w_staticIp_gateway" )
-    let staticIp_dnsServers = AppStorage.Get( "w_staticIp_dnsServers" )
-    let staticIp_domains = AppStorage.Get( "w_staticIp_domains" )
+    let ssid : string = AppStorage.get( "w_ssid" )! //非空断言操作符
+    let bssid : string = AppStorage.get( "w_bssid" )! //非空断言操作符
+    let preSharedKey : string = AppStorage.get( "w_preSharedKey" )! //非空断言操作符
+    let isHiddenSsid : boolean = AppStorage.get( "w_isHiddenSsid" )! //非空断言操作符
+    let securityType : wifi.WifiSecurityType = AppStorage.get( "w_securityType" )! //非空断言操作符
+    let creatorUid : number = AppStorage.get( "w_creatorUid" )! //非空断言操作符
+    let disableReason : number = AppStorage.get( "w_disableReason" )! //非空断言操作符
+    let netId : number = AppStorage.get( "w_netId" )! //非空断言操作符
+    let randomMacType : number = AppStorage.get( "w_randomMacType" )! //非空断言操作符
+    let randomMacAddr : string = AppStorage.get( "w_randomMacAddr" )! //非空断言操作符
+    let ipType : wifi.IpType = AppStorage.get( "w_ipType" )! //非空断言操作符
+    let staticIp_ipAddress :number = AppStorage.get( "w_staticIp_ipAddress" )! //非空断言操作符
+    let staticIp_gateway : number = AppStorage.get( "w_staticIp_gateway" )! //非空断言操作符
+    let staticIp_dnsServers : number[] = AppStorage.get( "w_staticIp_dnsServers" )! //非空断言操作符
+    let staticIp_domains :Array<string> = AppStorage.get( "w_staticIp_domains" )! //非空断言操作符
 
-    let staticIp = {
+    let staticIp :wifi.IpConfig= {
       ipAddress : staticIp_ipAddress ,
       gateway : staticIp_gateway ,
       dnsServers : staticIp_dnsServers ,
       domains : staticIp_domains
     }
-    let wifiDeviceConfig = {
+    let wifiDeviceConfig :wifi.WifiDeviceConfig = {
       ssid : ssid ,
       bssid : bssid ,
       preSharedKey : preSharedKey ,
@@ -309,11 +324,11 @@ export function testAddDeviceConfigPromise(): string {
       ipType : ipType ,
       staticIp : staticIp
     }
-    AppStorage.SetOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
+    AppStorage.setOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let wifiDeviceConfig : WifiDeviceConfig = AppStorage.get( "wifiDeviceConfig" )! //非空断言操作符
       wifi.addDeviceConfig( wifiDeviceConfig ).then( result => {
         //  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
         console.log( TAG , LogData.testAddDeviceConfigPromise_successfulLog )
@@ -321,7 +336,7 @@ export function testAddDeviceConfigPromise(): string {
         message = ( MessageData.testAddDeviceConfig ) + result
         prompt.showToast( { message : message } )
         console.log( TAG , LogData.testAddDeviceConfigPromise_EndLog )
-      } ).catch( error => {
+      } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "testAddDeviceConfigPromise error:" + error );
       } )
     }
@@ -341,28 +356,29 @@ export function testAddDeviceConfigCallback(): string {
     console.log( TAG , LogData.testAddDeviceConfigCallback_StartLog )
 
     //TODO: 设备调试时候需要打开
-    let ssid = AppStorage.Get( "w_ssid" )
-    let bssid = AppStorage.Get( "w_bssid" )
-    let preSharedKey = AppStorage.Get( "w_preSharedKey" )
-    let isHiddenSsid = AppStorage.Get( "w_isHiddenSsid" )
-    let securityType = AppStorage.Get( "w_securityType" )
-    let creatorUid = AppStorage.Get( "w_creatorUid" )
-    let disableReason = AppStorage.Get( "w_disableReason" )
-    let netId = AppStorage.Get( "w_netId" )
-    let randomMacType = AppStorage.Get( "w_randomMacType" )
-    let randomMacAddr = AppStorage.Get( "w_randomMacAddr" )
-    let ipType = AppStorage.Get( "w_ipType" )
-    let staticIp_ipAddress = AppStorage.Get( "w_staticIp_ipAddress" )
-    let staticIp_gateway = AppStorage.Get( "w_staticIp_gateway" )
-    let staticIp_dnsServers = AppStorage.Get( "w_staticIp_dnsServers" )
-    let staticIp_domains = AppStorage.Get( "w_staticIp_domains" )
-    let staticIp = {
+    let ssid : string = AppStorage.get( "w_ssid" )! //非空断言操作符
+    let bssid : string = AppStorage.get( "w_bssid" )! //非空断言操作符
+    let preSharedKey : string = AppStorage.get( "w_preSharedKey" )! //非空断言操作符
+    let isHiddenSsid : boolean = AppStorage.get( "w_isHiddenSsid" )! //非空断言操作符
+    let securityType : wifi.WifiSecurityType = AppStorage.get( "w_securityType" )! //非空断言操作符
+    let creatorUid : number = AppStorage.get( "w_creatorUid" )! //非空断言操作符
+    let disableReason : number = AppStorage.get( "w_disableReason" )! //非空断言操作符
+    let netId : number = AppStorage.get( "w_netId" )! //非空断言操作符
+    let randomMacType : number = AppStorage.get( "w_randomMacType" )! //非空断言操作符
+    let randomMacAddr : string = AppStorage.get( "w_randomMacAddr" )! //非空断言操作符
+    let ipType : wifi.IpType = AppStorage.get( "w_ipType" )! //非空断言操作符
+    let staticIp_ipAddress :number = AppStorage.get( "w_staticIp_ipAddress" )! //非空断言操作符
+    let staticIp_gateway : number = AppStorage.get( "w_staticIp_gateway" )! //非空断言操作符
+    let staticIp_dnsServers : number[] = AppStorage.get( "w_staticIp_dnsServers" )! //非空断言操作符
+    let staticIp_domains :Array<string> = AppStorage.get( "w_staticIp_domains" )! //非空断言操作符
+
+    let staticIp :wifi.IpConfig= {
       ipAddress : staticIp_ipAddress ,
       gateway : staticIp_gateway ,
       dnsServers : staticIp_dnsServers ,
       domains : staticIp_domains
     }
-    let wifiDeviceConfig = {
+    let wifiDeviceConfig :wifi.WifiDeviceConfig = {
       ssid : ssid ,
       bssid : bssid ,
       preSharedKey : preSharedKey ,
@@ -376,12 +392,12 @@ export function testAddDeviceConfigCallback(): string {
       ipType : ipType ,
       staticIp : staticIp
     }
-    AppStorage.SetOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
+    AppStorage.setOrCreate( "wifiDeviceConfig" , wifiDeviceConfig )
 
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let wifiDeviceConfig : WifiDeviceConfig= AppStorage.get( "wifiDeviceConfig" )! //非空断言操作符
       wifi.addDeviceConfig( wifiDeviceConfig , ( err , result ) => {
         //  @returns Returns {@code networkId} if the configuration is added; returns {@code -1} otherwise.
         if ( err ) {
@@ -412,7 +428,7 @@ export function testAddUntrustedConfigPromise(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let wifiDeviceConfig : WifiDeviceConfig = AppStorage.get( "wifiDeviceConfig" )! //非空断言操作符
       wifi.addUntrustedConfig( wifiDeviceConfig ).then( result => {
         //  @returns Returns {@code true} if the untrusted hotspot configuration is added, returns {@code false} otherwise.
         console.log( TAG , LogData.testAddUntrustedConfigPromise_successfulLog )
@@ -420,7 +436,7 @@ export function testAddUntrustedConfigPromise(): string {
         message = ( MessageData.testAddUntrustedConfig ) + result
         prompt.showToast( { message : message } )
         console.log( TAG , LogData.testAddUntrustedConfigPromise_EndLog )
-      } ).catch( error => {
+      } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "testAddUntrustedConfigPromise error:" + error )
       } )
     }
@@ -441,8 +457,8 @@ export function testAddUntrustedConfigCallback(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
-      wifi.addUntrustedConfig( wifiDeviceConfig , ( err , result ) => {
+      let wifiDeviceConfig :WifiDeviceConfig= AppStorage.get( "wifiDeviceConfig" ) ! //非空断言操作符
+      wifi.addUntrustedConfig( wifiDeviceConfig as WifiDeviceConfig , ( err , result ) => {
         //  @returns Returns {@code true} if the untrusted hotspot configuration is added, returns {@code false} otherwise.
         if ( err ) {
           console.log( TAG , "AddUntrustedConfigCallback error" );
@@ -472,7 +488,7 @@ export function testRemoveUntrustedConfigPromise(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let wifiDeviceConfig : WifiDeviceConfig = AppStorage.get( "wifiDeviceConfig" )! //非空断言操作符
       wifi.removeUntrustedConfig( wifiDeviceConfig ).then( result => {
         //  @returns Returns {@code true} if the untrusted hotspot configuration is removed, returns {@code false} otherwise.
         console.log( TAG , LogData.testRemoveUntrustedConfigLog + result )
@@ -480,7 +496,7 @@ export function testRemoveUntrustedConfigPromise(): string {
         message = ( MessageData.testRemoveUntrustedConfig ) + result
         prompt.showToast( { message : message } )
         console.log( TAG , LogData.testRemoveUntrustedConfigPromise_EndLog )
-      } ).catch( error => {
+      } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "testRemoveUntrustedConfigPromise error:" + error )
       } )
     }
@@ -501,7 +517,7 @@ export function testRemoveUntrustedConfigCallback(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let wifiDeviceConfig : WifiDeviceConfig = AppStorage.get( "wifiDeviceConfig" )! //非空断言操作符
       wifi.removeUntrustedConfig( wifiDeviceConfig , ( err , result ) => {
         //  @returns Returns {@code true} if the untrusted hotspot configuration is removed, returns {@code false} otherwise.
         if ( err ) {
@@ -530,7 +546,7 @@ export function testConnectToNetwork(): string {
     let message = ( MessageData.testConnectToNetwork )
     console.log( TAG , LogData.testConnectToNetwork_StartLog )
     //testGetLinkedInfoCallback()获取的，可能也是wifiDeviceConfig中的netId
-    let networkId = AppStorage.Get( "w_networkId" )
+    let networkId : number = AppStorage.get( "w_networkId" )! //非空断言操作符
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
@@ -555,7 +571,7 @@ export function testConnectToDevice(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive )
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let wifiDeviceConfig : WifiDeviceConfig = AppStorage.get( "wifiDeviceConfig" )! //非空断言操作符
       let ret = wifi.connectToDevice( wifiDeviceConfig )
       message = "ConnectToDevice: " + ret
     }
@@ -599,12 +615,12 @@ export function testGetLinkedInfoPromise(): string {
       message = ( MessageData.testIsInactive )
     } else {
       wifi.getLinkedInfo().then( data => {
-        console.log( TAG , LogData.testGetLinkedInfoPromise_successful )
+        console.log( TAG , LogData.testGetLinkedInfoPromise_successfulLog )
         message = "get wifi linked info: " + JSON.stringify( data )
         console.log( TAG , "get wifi linked info: " + JSON.stringify( data ) );
         prompt.showToast( { message : message } )
         console.log( TAG , LogData.testGetLinkedInfoPromise_EndLog );
-      } ).catch( error => {
+      } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "get linked info error" );
         console.log( TAG , "error:" + error )
       } );
@@ -632,19 +648,19 @@ export function testGetLinkedInfoCallback(): string {
           message = "get linked info error"
           prompt.showToast( { message : message } )
         }
-        console.log( TAG , LogData.testGetLinkedInfoCallback_successful )
+        console.log( TAG , LogData.testGetLinkedInfoCallback_successfulLog )
         console.log( TAG , "get wifi linked info: " + JSON.stringify( data ) );
         message = "get wifi linked info: " + JSON.stringify( data )
         let linkedInfoMessage = JSON.stringify( data )
-        AppStorage.SetOrCreate( "linkedInfoMessage" , linkedInfoMessage )
+        AppStorage.setOrCreate( "linkedInfoMessage" , linkedInfoMessage )
         let ssid = data.ssid
-        AppStorage.SetOrCreate( "pairedSsid" , ssid )
+        AppStorage.setOrCreate( "pairedSsid" , ssid )
         let rssi = data.rssi
         let band = data.band
         let networkId = data.networkId
-        AppStorage.SetOrCreate( "w_rssi" , rssi )
-        AppStorage.SetOrCreate( "w_band" , band )
-        AppStorage.SetOrCreate( "w_networkId" , networkId )
+        AppStorage.setOrCreate( "w_rssi" , rssi )
+        AppStorage.setOrCreate( "w_band" , band )
+        AppStorage.setOrCreate( "w_networkId" , networkId )
         prompt.showToast( { message : message } )
         console.log( TAG , LogData.testGetLinkedInfoCallback_EndLog );
       } )
@@ -667,8 +683,8 @@ export function testGetSignalLevel(): string {
       message = ( MessageData.testIsInactive )
     } else {
       //testGetLinkedInfoCallback()获取的
-      let rssi = AppStorage.Get( "w_rssi" )
-      let band = AppStorage.Get( "w_band" )
+      let rssi :number= AppStorage.get( "w_rssi" )! //非空断言操作符
+      let band :number= AppStorage.get( "w_band" )! //非空断言操作符
       let number = wifi.getSignalLevel( rssi , band )
       message = "getSignalLevel is: " + number
     }
@@ -732,7 +748,7 @@ export function testIsFeatureSupported(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let featureId = AppStorage.Get( "w_featureId" )
+      let featureId :number= AppStorage.get( "w_featureId" )! //非空断言操作符
       let ret = wifi.isFeatureSupported( featureId )
       message = "isFeatureSupported: " + ret
     }
@@ -778,7 +794,7 @@ export function testGetIpInfo(): string {
       let IpInfo = wifi.getIpInfo()
       message = "IpInfo: " + JSON.stringify( IpInfo )
       let ipInfoMessage = message
-      AppStorage.SetOrCreate( "ipInfoMessage" , ipInfoMessage )
+      AppStorage.setOrCreate( "ipInfoMessage" , ipInfoMessage )
     }
     prompt.showToast( { message : message } )
     console.log( TAG , LogData.testGetIpInfo_EndLog );
@@ -864,7 +880,7 @@ export function testGetDeviceConfigs() {
       let array = wifi.getDeviceConfigs()
       message = "DeviceConfigs is: " + JSON.stringify( array )
       let getDeviceConfigsMessage = JSON.stringify( array )
-      AppStorage.SetOrCreate( "getDeviceConfigsMessage" , getDeviceConfigsMessage )
+      AppStorage.setOrCreate( "getDeviceConfigsMessage" , getDeviceConfigsMessage )
     }
     prompt.showToast( { message : message } )
     console.log( TAG , LogData.testGetDeviceConfigs_EndLog );
@@ -884,7 +900,7 @@ export function testUpdateNetwork() {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let wifiDeviceConfig = AppStorage.Get( "wifiDeviceConfig" )
+      let wifiDeviceConfig : WifiDeviceConfig = AppStorage.get( "wifiDeviceConfig" )! //非空断言操作符
       let ret = wifi.updateNetwork( wifiDeviceConfig )
       message = "updateNetwork: " + ret
     }
@@ -906,7 +922,7 @@ export function testDisableNetwork() {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let netId = AppStorage.Get( "w_netId" )
+      let netId:number = AppStorage.get( "w_netId" )! //非空断言操作符
       let ret = wifi.disableNetwork( netId )
       message = "disableNetwork: " + ret
     }
@@ -950,7 +966,7 @@ export function testRemoveDevice() {
       message = ( MessageData.testIsInactive );
     } else {
       //testGetLinkedInfoCallback()获取的，可能也是wifiDeviceConfig中的netId
-      let id = AppStorage.Get( "w_networkId" )
+      let id :number = AppStorage.get( "w_networkId" )! //非空断言操作符
       let ret = wifi.removeDevice( id )
       message = "removeDevice: " + ret
     }
@@ -1107,7 +1123,7 @@ let wifiRssiChange = false
 
 export function testOnWifiRssiChange(): string {
   try {
-    let message = ( $r( 'app.string.testOnWifiRssiChange' ) )
+    let message: Resource|string = ( $r( 'app.string.testOnWifiRssiChange' ) )
     console.log( TAG , LogData.testOnWifiRssiChange_StartLog );
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
@@ -1115,7 +1131,7 @@ export function testOnWifiRssiChange(): string {
     }
     if ( wifiRssiChange ) {
       wifi.off( "wifiRssiChange" , () => {
-        prompt.showToast( { message : ( $r( 'app.string.offWifiRssiChange' ) ) } )
+        prompt.showToast( { message : "on.wifiRssiChange监听已关闭" } )
       } )
       message = "关闭RSSI状态变化事件"
     } else {

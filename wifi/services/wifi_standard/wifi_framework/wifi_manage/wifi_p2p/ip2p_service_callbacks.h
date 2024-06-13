@@ -44,12 +44,17 @@ struct IP2pServiceCallbacks {
     std::function<void(P2pActionCallback, ErrCode)> OnP2pActionResultEvent;
     /* The event of config change */
     std::function<void(CfgType, char*, int)> OnConfigChangedEvent;
+    /* The event of gc join */
+    std::function<void(const GcInfo &)> OnP2pGcJoinGroupEvent;
+    /* The event of gc leave */
+    std::function<void(const GcInfo &)> OnP2pGcLeaveGroupEvent;
     std::function<void(P2pServicerProtocolType, const std::vector<unsigned char> &, const WifiP2pDevice &)>
         OnP2pServiceAvailable;
     std::function<void(const std::string &, const std::string &, const WifiP2pDevice &)> OnP2pDnsSdServiceAvailable;
     std::function<void(const std::string &, const std::map<std::string, std::string> &, const WifiP2pDevice &)>
         OnP2pDnsSdTxtRecordAvailable;
     std::function<void(const std::vector<std::string> &, const WifiP2pDevice &)> OnP2pUpnpServiceAvailable;
+    std::function<void(const std::string &)> OnP2pPrivatePeersChangedEvent;
 };
 }  // namespace Wifi
 }  // namespace OHOS

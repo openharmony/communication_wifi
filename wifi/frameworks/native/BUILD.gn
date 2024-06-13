@@ -19,6 +19,7 @@ if (defined(ohos_lite)) {
     sources = [
       "c_adapter/src/wifi_c_device.cpp",
       "c_adapter/src/wifi_c_utils.cpp",
+      "src/network_selection.cpp",
       "src/wifi_device.cpp",
       "src/wifi_device_callback_stub_lite.cpp",
       "src/wifi_device_impl.cpp",
@@ -31,6 +32,7 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
+      "$WIFI_ROOT_DIR/interfaces",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
@@ -38,7 +40,6 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$WIFI_ROOT_DIR/utils/inc",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
@@ -53,8 +54,9 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
@@ -75,24 +77,17 @@ if (defined(ohos_lite)) {
 
   config("wifi_sdk_header") {
     include_dirs = [
-      "//commonlibrary/c_utils/base/include",
-      "//utils/system/safwk/native/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-      "//foundation/arkui/ace_engine/frameworks/base/utils",
-      "//foundation/arkui/ace_engine/frameworks",
-      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
       "$WIFI_ROOT_DIR/interfaces",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
+      "$WIFI_ROOT_DIR/frameworks/native/src",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/",
-      "//foundation/systemabilitymgr/samgr/adapter/interfaces/innerkits/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
       "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
-      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include/bundlemgr",
     ]
   }
 
@@ -112,7 +107,14 @@ if (defined(ohos_lite)) {
 
   ohos_source_set("wifi_device_proxy_impl") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_device_impl.cpp",
@@ -130,12 +132,24 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
-    external_deps = [ "ipc:ipc_single" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
   }
 
   ohos_source_set("wifi_hotspot_proxy_impl") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_hotspot_impl.cpp",
@@ -153,12 +167,24 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
-    external_deps = [ "ipc:ipc_single" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
   }
 
   ohos_source_set("wifi_scan_proxy_impl") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_scan_impl.cpp",
@@ -176,12 +202,25 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
-    external_deps = [ "ipc:ipc_single" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
   }
 
   ohos_source_set("wifi_p2p_proxy_impl") {
     branch_protector_ret = "pac_ret"
 
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+    }
     part_name = "wifi"
     sources = [
       "src/wifi_p2p_impl.cpp",
@@ -198,18 +237,24 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
-    external_deps = [ "ipc:ipc_single" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+    ]
   }
 
   ohos_shared_library("wifi_sdk") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
-      blocklist = "../wifi_frameworks_sdk_block.txt"
     }
     install_enable = true
     sources = [
@@ -219,6 +264,7 @@ if (defined(ohos_lite)) {
       "c_adapter/src/wifi_c_hotspot.cpp",
       "c_adapter/src/wifi_c_p2p.cpp",
       "c_adapter/src/wifi_c_utils.cpp",
+      "src/network_selection.cpp",
       "src/wifi_device.cpp",
       "src/wifi_device_callback_stub.cpp",
       "src/wifi_hid2d.cpp",
@@ -240,10 +286,10 @@ if (defined(ohos_lite)) {
       ":wifi_p2p_proxy_impl",
       ":wifi_scan_proxy_impl",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "hilog:libhilog",
       "ipc:ipc_single",

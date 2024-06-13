@@ -23,17 +23,22 @@
 #include <chrono>
 #include "define.h"
 #include "wifi_cert_utils.h"
+#include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
+#include "securec.h"
+#include "init_param.h"
 #include <random>
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
 #endif
 #ifndef OHOS_ARCH_LITE
+#include <sys/sendfile.h>
 #include "wifi_country_code_define.h"
 #include "network_parser.h"
 #include "softap_parser.h"
+#include "wifi_backup_config.h"
 #endif
 #ifdef INIT_LIB_ENABLE
 #include "parameter.h"
@@ -41,22 +46,40 @@
 
 namespace OHOS {
 namespace Wifi {
-const std::string DEFAULT_IFACENAME = "wlan0";
+#ifdef DTFUZZ_TEST
+static WifiSettings* gWifiSettings = nullptr;
+#endif
+const std::string LANGUAGE_CHINESE = "zh-Hans";
+const std::string COUNTRY_CHINA_CAPITAL = "CN";
+const std::string COUNTRY_CHINA_LOWERCASE = "cn";
+constexpr int32_t MAX_PARAM_VALUE_LEN = 128;
 
 WifiSettings &WifiSettings::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiSettings gWifiSettings;
     return gWifiSettings;
+#else
+    if (gWifiSettings == nullptr) {
+        gWifiSettings = new (std::nothrow) WifiSettings();
+    }
+    return *gWifiSettings;
+#endif
 }
 
 WifiSettings::WifiSettings()
     : mNetworkId(0),
       mWifiStaCapabilities(0),
-      mWifiToggled(false),
       mWifiStoping(false),
       mSoftapToggled(false),
       mIsSupportCoex(false),
-      mApIfaceName(DEFAULT_IFACENAME),
+      mStaIfaceName("wlan0"),
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+      mP2pIfaceName("p2p0"),
+#else
+      mP2pIfaceName("p2p-dev-wlan0"),
+#endif
+      mApIfaceName("wlan0"),
       mP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED)),
       mP2pDiscoverState(0),
       mP2pConnectState(0),
@@ -65,7 +88,6 @@ WifiSettings::WifiSettings()
       mScreenState(MODE_STATE_DEFAULT),
       mScanGenieState(MODE_STATE_OPEN),
       mAirplaneModeState(MODE_STATE_CLOSE),
-      mPowerSleepState(MODE_STATE_CLOSE),
       mAppRunningModeState(ScanMode::SYS_FOREGROUND_SCAN),
       mPowerSavingModeState(MODE_STATE_CLOSE),
       mFreezeModeState(MODE_STATE_CLOSE),
@@ -89,6 +111,8 @@ WifiSettings::WifiSettings()
     mLastDiscReason[0] = DisconnectedReason::DISC_REASON_DEFAULT;
     mThermalLevel = static_cast<int>(ThermalLevel::NORMAL);
     mValidChannels.clear();
+    mWifiDetailState[0] = WifiDetailState::STATE_INACTIVE;
+    isSemiWifiEnable = false;
 }
 
 WifiSettings::~WifiSettings()
@@ -136,9 +160,11 @@ void WifiSettings::InitHotspotConfig()
                 mHotspotConfig[i] = tmp[i];
             }
         } else {
+            LOGI("load hotspot config success, but tmp.size() = 0, use default config");
             InitDefaultHotspotConfig();
         }
     } else {
+        LOGI("load hotspot config fail, use default config");
         InitDefaultHotspotConfig();
     }
     /* init block list info */
@@ -174,6 +200,7 @@ void WifiSettings::InitPackageFilterConfig()
     if (mPackageFilterConfig.LoadConfig() >= 0) {
         std::vector<PackageFilterConf> tmp;
         mPackageFilterConfig.GetValue(tmp);
+        std::unique_lock<std::mutex> lock(mInfoMutex);
         for (int i = 0; i < tmp.size(); i++) {
             mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
         }
@@ -200,7 +227,6 @@ int WifiSettings::ReloadPortalconf()
 int WifiSettings::Init()
 {
     InitSettingsNum();
-
     /* read ini config */
     mSavedDeviceConfig.SetConfigFilePath(DEVICE_CONFIG_FILE_PATH);
     mSavedHotspotConfig.SetConfigFilePath(HOTSPOT_CONFIG_FILE_PATH);
@@ -217,6 +243,9 @@ int WifiSettings::Init()
     MergeWifiConfig();
     MergeSoftapConfig();
 #endif
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    SetUpHks();
+#endif
     InitWifiConfig();
     ReloadDeviceConfig();
     InitHotspotConfig();
@@ -229,10 +258,9 @@ int WifiSettings::Init()
     ReloadPortalconf();
     InitPackageFilterConfig();
     ClearLocalHid2dInfo();
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-    SetUpHks();
-#endif
     IncreaseNumRebootsSinceLastUse();
+    mPersistWifiState = GetPersistWifiState();
+    mAirplaneModeState.store(GetLastAirplaneMode());
     return 0;
 }
 
@@ -259,13 +287,14 @@ void WifiSettings::MergeWifiConfig()
         LOGE("MergeWifiConfig Parse fail");
         return;
     }
-    std::vector<WifiDeviceConfig> wifideviceConfig =  xmlParser->GetNetworks();
+    std::vector<WifiDeviceConfig> wifideviceConfig = xmlParser->GetNetworks();
     if (wifideviceConfig.size() == 0) {
         LOGE("MergeWifiConfig wifideviceConfig empty");
         return;
     }
     mSavedDeviceConfig.SetValue(wifideviceConfig);
     mSavedDeviceConfig.SaveConfig();
+    std::unique_lock<std::mutex> lock(mStaMutex);
     std::vector<WifiStoreRandomMac> wifiStoreRandomMac = xmlParser->GetRandomMacmap();
     mSavedWifiStoreRandomMac.SetValue(wifiStoreRandomMac);
     mSavedWifiStoreRandomMac.SaveConfig();
@@ -292,13 +321,147 @@ void WifiSettings::MergeSoftapConfig()
         LOGE("MergeSoftapConfig Parse fail");
         return;
     }
-    std::vector<HotspotConfig> hotspotConfig =  xmlParser->GetSoftapConfigs();
+    std::vector<HotspotConfig> hotspotConfig = xmlParser->GetSoftapConfigs();
     if (hotspotConfig.size() == 0) {
         LOGE("MergeSoftapConfig hotspotConfig empty");
         return;
     }
     mSavedHotspotConfig.SetValue(hotspotConfig);
     mSavedHotspotConfig.SaveConfig();
+}
+
+void WifiSettings::MergeWifiCloneConfig(std::string &cloneData)
+{
+    LOGI("MergeWifiCloneConfig enter");
+    std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
+    bool ret = xmlParser->LoadConfigurationMemory(cloneData.c_str());
+    if (!ret) {
+        LOGE("MergeWifiCloneConfig load fail");
+        return;
+    }
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("MergeWifiCloneConfig Parse fail");
+        return;
+    }
+    std::vector<WifiDeviceConfig> cloneConfigs = xmlParser->GetNetworks();
+    if (cloneConfigs.empty()) {
+        return;
+    }
+    ConfigsDeduplicateAndSave(cloneConfigs);
+}
+
+void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs)
+{
+    if (newConfigs.size() == 0) {
+        LOGE("NewConfigs is empty!");
+        return;
+    }
+
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    for (auto &config : newConfigs) {
+        EncryptionDeviceConfig(config);
+    }
+#endif
+
+    mSavedDeviceConfig.LoadConfig();
+    std::vector<WifiDeviceConfig> localConfigs;
+    mSavedDeviceConfig.GetValue(localConfigs);
+
+    std::set<std::string> tmp;
+    for (const auto &localConfig : localConfigs) {
+        std::string configKey = localConfig.ssid + localConfig.keyMgmt;
+        tmp.insert(configKey);
+    }
+    for (auto &config : newConfigs) {
+        std::string configKey = config.ssid + config.keyMgmt;
+        auto iter = tmp.find(configKey);
+        if (iter == tmp.end()) {
+            tmp.insert(configKey);
+            localConfigs.push_back(config);
+        }
+    }
+
+    mSavedDeviceConfig.SetValue(localConfigs);
+    mSavedDeviceConfig.SaveConfig();
+    ReloadDeviceConfig();
+}
+
+int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
+{
+    LOGI("OnBackup enter.");
+    mSavedDeviceConfig.LoadConfig();
+    std::vector<WifiDeviceConfig> localConfigs;
+    mSavedDeviceConfig.GetValue(localConfigs);
+
+    std::vector<WifiBackupConfig> backupConfigs;
+    for (auto &config : localConfigs) {
+        if (config.wifiEapConfig.eap.length() != 0 || config.isPasspoint == true) {
+            continue;
+        }
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        DecryptionDeviceConfig(config);
+#endif
+        WifiBackupConfig backupConfig;
+        ConvertDeviceCfgToBackupCfg(config, backupConfig);
+        backupConfigs.push_back(backupConfig);
+    }
+
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.SetValue(backupConfigs);
+    wifiBackupConfig.SaveConfig();
+
+    fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH, O_RDONLY));
+    if (fd.Get() < 0) {
+        LOGE("OnBackup open fail.");
+        return -1;
+    }
+    LOGI("OnBackup end. Backup count: %{public}d, fd: %{public}d.", static_cast<int>(backupConfigs.size()), fd.Get());
+    return 0;
+}
+
+int WifiSettings::OnRestore(UniqueFd &fd, const std::string &restoreInfo)
+{
+    LOGI("OnRestore enter.");
+    struct stat statBuf;
+    if (fstat(fd.Get(), &statBuf) < 0) {
+        LOGE("OnRestore fstat fd fail.");
+        return -1;
+    }
+    int destFd = open(BACKUP_CONFIG_FILE_PATH, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (destFd < 0) {
+        LOGE("OnRestore open file fail.");
+        return -1;
+    }
+    if (sendfile(destFd, fd.Get(), nullptr, statBuf.st_size) < 0) {
+        LOGE("OnRestore fd sendfile(size: %{public}d) to destFd fail.", static_cast<int>(statBuf.st_size));
+        close(destFd);
+        return -1;
+    }
+    close(destFd);
+
+    WifiConfigFileImpl<WifiBackupConfig> wifiBackupConfig;
+    wifiBackupConfig.SetConfigFilePath(BACKUP_CONFIG_FILE_PATH);
+    wifiBackupConfig.LoadConfig();
+    std::vector<WifiBackupConfig> backupConfigs;
+    wifiBackupConfig.GetValue(backupConfigs);
+
+    std::vector<WifiDeviceConfig> deviceConfigs;
+    for (const auto &backupCfg : backupConfigs) {
+        WifiDeviceConfig config;
+        ConvertBackupCfgToDeviceCfg(backupCfg, config);
+        deviceConfigs.push_back(config);
+    }
+
+    LOGI("OnRestore end. Restore count: %{public}d", static_cast<int>(deviceConfigs.size()));
+    ConfigsDeduplicateAndSave(deviceConfigs);
+    return 0;
+}
+
+void WifiSettings::RemoveBackupFile()
+{
+    remove(BACKUP_CONFIG_FILE_PATH);
 }
 #endif
 
@@ -329,6 +492,34 @@ int WifiSettings::SetWifiState(int state, int instId)
     std::unique_lock<std::mutex> lock(mStaMutex);
     mWifiState[instId] = state;
     return 0;
+}
+
+WifiDetailState WifiSettings::GetWifiDetailState(int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDetailState.find(instId);
+    if (iter != mWifiDetailState.end()) {
+        return iter->second;
+    }
+    mWifiDetailState[instId] = WifiDetailState::STATE_UNKNOWN;
+    return mWifiDetailState[instId];
+}
+
+int WifiSettings::SetWifiDetailState(WifiDetailState state, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mWifiDetailState[instId] = state;
+    return 0;
+}
+
+bool WifiSettings::GetWifiAllowSemiActive() const
+{
+    return mWifiAllowSemiActive;
+}
+
+void WifiSettings::SetWifiAllowSemiActive(bool isAllowed)
+{
+    mWifiAllowSemiActive = isAllowed;
 }
 
 bool WifiSettings::HasWifiActive()
@@ -383,15 +574,106 @@ int WifiSettings::ClearScanInfoList()
     return 0;
 }
 
+void WifiSettings::InsertWifi6BlackListCache(const std::string currentBssid,
+    const Wifi6BlackListInfo wifi6BlackListInfo)
+{
+    std::unique_lock<std::mutex> lock(mWifiSelfcureMutex);
+    auto iter = wifi6BlackListCache.find(currentBssid);
+    if (iter != wifi6BlackListCache.end()) {
+        iter->second = wifi6BlackListInfo;
+    } else {
+        wifi6BlackListCache.emplace(std::make_pair(currentBssid, wifi6BlackListInfo));
+    }
+}
+
+void WifiSettings::RemoveWifi6BlackListCache(const std::string bssid)
+{
+    std::unique_lock<std::mutex> lock(mWifiSelfcureMutex);
+    if (wifi6BlackListCache.find(bssid) != wifi6BlackListCache.end()) {
+        wifi6BlackListCache.erase(bssid);
+    } else {
+        LOGE("%{public}s: don't exist wifi bla list, bssid: %{public}s", __func__, MacAnonymize(bssid).c_str());
+        return;
+    }
+}
+
+int WifiSettings::GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const
+{
+    blackListCache = wifi6BlackListCache;
+    return 0;
+}
+
+void WifiSettings::SetWifiSelfcureReset(const bool isReset)
+{
+    mWifiSelfcureReset = isReset;
+}
+
+bool WifiSettings::GetWifiSelfcureReset() const
+{
+    return mWifiSelfcureReset;
+}
+
+void WifiSettings::SetLastNetworkId(const int networkId)
+{
+    mLastNetworkId = networkId;
+}
+
+int WifiSettings::GetLastNetworkId() const
+{
+    return mLastNetworkId;
+}
+
 void WifiSettings::SetWifiToggledState(bool state)
 {
     std::unique_lock<std::mutex> lock(mWifiToggledMutex);
-    mWifiToggled = state;
+
+    if (state) {
+        if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+            SetWifiFlagOnAirplaneMode(true);
+            PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
+        } else {
+            PersistWifiState(WIFI_STATE_ENABLED);
+        }
+    } else {
+        if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+            SetWifiFlagOnAirplaneMode(false);
+        }
+        PersistWifiState(WIFI_STATE_DISABLED);
+    }
 }
 
-bool WifiSettings::GetWifiToggledState() const
+void WifiSettings::PersistWifiState(int state)
 {
-    return mWifiToggled;
+    mPersistWifiState = state;
+    SetOperatorWifiType(state);
+    LOGI("persist wifi state is %{public}d", state);
+}
+
+int WifiSettings::GetPersistWifiState()
+{
+    return GetOperatorWifiType();
+}
+
+bool WifiSettings::IsWifiToggledEnable()
+{
+    if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+        return mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE;
+    } else {
+        return mPersistWifiState != WIFI_STATE_DISABLED;
+    }
+}
+
+bool WifiSettings::IsSemiWifiEnable()
+{
+    if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+        return false;
+    }
+    return isSemiWifiEnable || GetWifiAllowSemiActive();
+}
+
+void WifiSettings::SetSemiWifiEnable(bool enable)
+{
+    isSemiWifiEnable = enable;
 }
 
 void WifiSettings::SetSoftapToggledState(bool state)
@@ -426,32 +708,66 @@ bool WifiSettings::GetCoexSupport() const
     return mIsSupportCoex;
 }
 
+void WifiSettings::SetStaIfaceName(const std::string &ifaceName)
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    mStaIfaceName = ifaceName;
+}
+
+std::string WifiSettings::GetStaIfaceName()
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    return mStaIfaceName;
+}
+
+void WifiSettings::SetP2pIfaceName(const std::string &ifaceName)
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    mP2pIfaceName = ifaceName;
+}
+
+std::string WifiSettings::GetP2pIfaceName()
+{
+    std::unique_lock<std::mutex> lock(mWifiToggledMutex);
+    return mP2pIfaceName;
+}
+
 void WifiSettings::SetApIfaceName(const std::string &ifaceName)
 {
+    std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
     mApIfaceName = ifaceName;
 }
 
-std::string WifiSettings::GetApIfaceName() const
+std::string WifiSettings::GetApIfaceName()
 {
+    std::unique_lock<std::mutex> lock(mSoftapToggledMutex);
     return mApIfaceName;
 }
 
 int WifiSettings::GetScanInfoList(std::vector<WifiScanInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
+    int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ) {
         if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
         #ifdef SUPPORT_RANDOM_MAC_ADDR
             WifiSettings::GetInstance().RemoveMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 iter->bssid);
         #endif
+            LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
+                SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
             iter = mWifiScanInfoList.erase(iter);
             continue;
         }
-        results.push_back(*iter);
+        if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
+            results.push_back(*iter);
+        }
         ++iter;
     }
-    LOGI("WifiSettings::GetScanInfoList size = %{public}u", results.size());
+    if (results.empty()) {
+        results.assign(mWifiScanInfoList.begin(), mWifiScanInfoList.end());
+    }
+    LOGI("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
     return 0;
 }
 
@@ -500,11 +816,146 @@ int WifiSettings::SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo)
     return 0;
 }
 
+int WifiSettings::SaveP2pCreatorUid(int uid)
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    mUid = uid;
+    return 0;
+}
+
+int WifiSettings::GetP2pCreatorUid()
+{
+    std::unique_lock<std::mutex> lock(mUidMutex);
+    return mUid;
+}
+
 int WifiSettings::SetScanControlInfo(const ScanControlInfo &info, int instId)
 {
     std::unique_lock<std::mutex> lock(mInfoMutex);
     mScanControlInfo[instId] = info;
     return 0;
+}
+
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+bool WifiSettings::IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const
+{
+    
+    int keyIndex = (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) ? 0 : config.wepTxKeyIndex;
+    if (!config.preSharedKey.empty() || !config.wepKeys[keyIndex].empty() || !config.wifiEapConfig.password.empty()) {
+        return true;
+    }
+
+    return false;
+}
+
+int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
+{
+    if (IsWifiDeviceConfigDeciphered(config)) {
+        LOGI("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
+        return 0;
+    }
+    LOGD("DecryptionDeviceConfig start");
+    WifiEncryptionInfo mWifiEncryptionInfo;
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
+    EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);
+    std::string decry = "";
+    if (WifiDecryption(mWifiEncryptionInfo, *encry, decry) == HKS_SUCCESS) {
+        config.preSharedKey = decry;
+    } else {
+        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
+            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+        config.preSharedKey = "";
+    }
+    delete encry;
+
+    if (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) {
+        config.wepTxKeyIndex = 0;
+    }
+    EncryptedData *encryWep = new EncryptedData(config.encryWepKeys[config.wepTxKeyIndex], config.IVWep);
+    std::string decryWep = "";
+    if (WifiDecryption(mWifiEncryptionInfo, *encryWep, decryWep) == HKS_SUCCESS) {
+        config.wepKeys[config.wepTxKeyIndex] = decryWep;
+    } else {
+        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
+            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+        config.wepKeys[config.wepTxKeyIndex] = "";
+    }
+    delete encryWep;
+
+    EncryptedData *encryEap = new EncryptedData(config.wifiEapConfig.encryptedData, config.wifiEapConfig.IV);
+    std::string decryEap = "";
+    if (WifiDecryption(mWifiEncryptionInfo, *encryEap, decryEap) == HKS_SUCCESS) {
+        config.wifiEapConfig.password = decryEap;
+    } else {
+        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
+            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+        config.wifiEapConfig.password = "";
+    }
+    delete encryEap;
+    LOGD("DecryptionDeviceConfig end");
+    return 0;
+}
+#endif
+
+bool WifiSettings::EncryptionDeviceConfig(WifiDeviceConfig &config) const
+{
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    if (config.version == 1) {
+        return true;
+    }
+    WifiEncryptionInfo mWifiEncryptionInfo;
+    mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
+
+    config.encryptedData = "";
+    config.IV = "";
+    if (!config.preSharedKey.empty()) {
+        EncryptedData encry;
+        if (WifiEncryption(mWifiEncryptionInfo, config.preSharedKey, encry) == HKS_SUCCESS) {
+            config.encryptedData = encry.encryptedPassword;
+            config.IV = encry.IV;
+        } else {
+            LOGE("EncryptionDeviceConfig WifiEncryption preSharedKey failed");
+            WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
+                SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+            return false;
+        }
+    }
+
+    if (config.wepTxKeyIndex < 0 || config.wepTxKeyIndex >= WEPKEYS_SIZE) {
+        config.wepTxKeyIndex = 0;
+    }
+    config.encryWepKeys[config.wepTxKeyIndex] = "";
+    config.IVWep = "";
+    if (!config.wepKeys[config.wepTxKeyIndex].empty()) {
+        EncryptedData encryWep;
+        if (WifiEncryption(mWifiEncryptionInfo, config.wepKeys[config.wepTxKeyIndex], encryWep) == HKS_SUCCESS) {
+            config.encryWepKeys[config.wepTxKeyIndex] = encryWep.encryptedPassword;
+            config.IVWep = encryWep.IV;
+        } else {
+            LOGE("EncryptionDeviceConfig WifiEncryption wepKeys failed");
+            WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
+                SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+            return false;
+        }
+    }
+
+    config.wifiEapConfig.encryptedData = "";
+    config.wifiEapConfig.IV = "";
+    if (!config.wifiEapConfig.eap.empty()) {
+        EncryptedData encryEap;
+        if (WifiEncryption(mWifiEncryptionInfo, config.wifiEapConfig.password, encryEap) == HKS_SUCCESS) {
+            config.wifiEapConfig.encryptedData = encryEap.encryptedPassword;
+            config.wifiEapConfig.IV = encryEap.IV;
+        } else {
+            LOGE("EncryptionDeviceConfig WifiEncryption eap failed");
+            WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
+                SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+            return false;
+        }
+    }
+    config.version = 1;
+#endif
+    return true;
 }
 
 int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
@@ -576,6 +1027,9 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId) {
             config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            DecryptionDeviceConfig(config);
+#endif
             return 0;
         }
     }
@@ -593,6 +1047,9 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
                 config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+                DecryptionDeviceConfig(config);
+#endif
                 return 0;
             }
         }
@@ -600,6 +1057,9 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index) {
                 config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+                DecryptionDeviceConfig(config);
+#endif
                 return 0;
             }
         }
@@ -617,6 +1077,9 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)) {
             config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            DecryptionDeviceConfig(config);
+#endif
             return 0;
         }
     }
@@ -639,6 +1102,9 @@ int WifiSettings::GetDeviceConfig(const std::string &ancoCallProcessName, const 
         if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt) &&
             iter->second.ancoCallProcessName == ancoCallProcessName) {
             config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            DecryptionDeviceConfig(config);
+#endif
             return 0;
         }
     }
@@ -692,6 +1158,17 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     iter->second.lastConnectTime = time(0);
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;
+    return 0;
+}
+
+int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mConfigMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.randomizedMacSuccessEver = true;
     return 0;
 }
 
@@ -858,7 +1335,6 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     if (numExcessNetworks <= 0) {
         return 1;
     }
-    LOGI("Remove %d configs", numExcessNetworks);
     sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
         if (a.status != b.status) {
             return (a.status == 0) < (b.status == 0);
@@ -872,6 +1348,13 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
             return a.networkId < b.networkId;
         }
     });
+    std::stringstream removeConfig;
+    int maxIndex = numExcessNetworks > MAX_CONFIGS_NUM ? MAX_CONFIGS_NUM : numExcessNetworks;
+    for (int i = 0; i < maxIndex; i++) {
+        removeConfig << SsidAnonymize(configs[i].ssid) << ",";
+    }
+    LOGI("saved config size greater than %{public}d, remove ssid(print up to 1000)=%{public}s",
+        maxNumConfigs, removeConfig.str().c_str());
     configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
     return 0;
 }
@@ -894,6 +1377,30 @@ int WifiSettings::SyncDeviceConfig()
 #endif
 }
 
+void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
+{
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    std::unique_lock<std::mutex> lock(mConfigOnBootMutex);
+    mSavedDeviceConfig.LoadConfig();
+    std::vector<WifiDeviceConfig> tmp;
+    mSavedDeviceConfig.GetValue(tmp);
+    int count = 0;
+
+    for (std::size_t i = 0; i < tmp.size(); ++i) {
+        WifiDeviceConfig &item = tmp[i];
+        if (item.version == -1 && EncryptionDeviceConfig(item)) {
+            count ++;
+        }
+    }
+    if (count > 0) {
+        mSavedDeviceConfig.SetValue(tmp);
+        mSavedDeviceConfig.SaveConfig();
+        ReloadDeviceConfig();
+    }
+    LOGI("EncryptionWifiDeviceConfigOnBoot end count:%{public}d", count);
+#endif
+}
+
 int WifiSettings::ReloadDeviceConfig()
 {
 #ifndef CONFIG_NO_CONFIG_WRITE
@@ -913,6 +1420,13 @@ int WifiSettings::ReloadDeviceConfig()
         WifiDeviceConfig &item = tmp[i];
         item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
+    }
+    if (!mEncryptionOnBootFalg.test_and_set()) {
+        mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
+        mWifiEncryptionThread->PostAsyncTask([this]() {
+            LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot start.");
+            EncryptionWifiDeviceConfigOnBoot();
+        });
     }
     return 0;
 #else
@@ -993,9 +1507,7 @@ int WifiSettings::GetLinkedInfo(WifiLinkedInfo &info, int instId)
     std::unique_lock<std::mutex> lock(mInfoMutex);
     auto iter = mWifiLinkedInfo.find(instId);
     if (iter != mWifiLinkedInfo.end()) {
-        if (iter->second.channelWidth == WifiChannelWidth::WIDTH_INVALID) {
-            GetLinkedChannelWidth(instId);
-        }
+        UpdateLinkedInfo(instId);
         info = iter->second;
     }
     return 0;
@@ -1036,10 +1548,10 @@ int WifiSettings::GetMacAddress(std::string &macAddress, int instId)
 
 int WifiSettings::ReloadStaRandomMac()
 {
+    std::unique_lock<std::mutex> lock(mStaMutex);
     if (mSavedWifiStoreRandomMac.LoadConfig()) {
         return -1;
     }
-    std::unique_lock<std::mutex> lock(mStaMutex);
     mWifiStoreRandomMac.clear();
     mSavedWifiStoreRandomMac.GetValue(mWifiStoreRandomMac);
     return 0;
@@ -1056,55 +1568,97 @@ void WifiSettings::ClearRandomMacConfig()
 
 const static uint32_t COMPARE_MAC_OFFSET = 2;
 const static uint32_t COMPARE_MAC_LENGTH = 17 - 4;
+constexpr int FUZZY_BSSID_MAX_MATCH_CNT = 30;
 
 bool CompareMac(const std::string &mac1, const std::string &mac2)
 {
     return memcmp(mac1.c_str() + COMPARE_MAC_OFFSET, mac2.c_str() + COMPARE_MAC_OFFSET, COMPARE_MAC_LENGTH) == 0;
 }
 
+std::string WifiSettings::FuzzyBssid(const std::string bssid)
+{
+    if (bssid.empty() || bssid.length() != MAC_STRING_SIZE) {
+        return "";
+    }
+    return "xx" + bssid.substr(COMPARE_MAC_OFFSET, COMPARE_MAC_LENGTH) + "xx";
+}
+
+static bool isPskEncryption(const std::string keyMgmt)
+{
+    return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
+}
+
 bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    bool isConnected = false;
-
+    bool isAdded = false;
+    std::string fuzzyBssid = "";
+    if (isPskEncryption(randomMacInfo.keyMgmt)) {
+        fuzzyBssid = FuzzyBssid(randomMacInfo.peerBssid);
+    }
+    
     for (auto &ele : mWifiStoreRandomMac) {
-        if ((randomMacInfo.ssid == ele.ssid) && (randomMacInfo.keyMgmt == ele.keyMgmt)) {
-            ele.peerBssid = randomMacInfo.peerBssid;
-            randomMacInfo.randomMac = ele.randomMac;
-            isConnected = true;
-            break;
-        } else if (CompareMac(randomMacInfo.peerBssid, ele.peerBssid) && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
-                   (randomMacInfo.keyMgmt == "NONE")) {
-            isConnected = false;
-        } else if (CompareMac(randomMacInfo.peerBssid, ele.peerBssid) && (randomMacInfo.keyMgmt == ele.keyMgmt) &&
-                   (randomMacInfo.keyMgmt != "NONE")) {
-            ele.ssid = randomMacInfo.ssid;
-            randomMacInfo.randomMac = ele.randomMac;
-            isConnected = true;
-        } else {
-            isConnected = false;
+        if (isPskEncryption(ele.keyMgmt)) {
+            if (ele.randomMac != randomMacInfo.randomMac) {
+                continue;
+            }
+            if (std::find(ele.fuzzyBssids.begin(), ele.fuzzyBssids.end(), fuzzyBssid) != ele.fuzzyBssids.end()) {
+                LOGI("AddRandomMac is contains fuzzyBssid:%{public}s", MacAnonymize(fuzzyBssid).c_str());
+                return true;
+            }
+            if (ele.fuzzyBssids.size() <= FUZZY_BSSID_MAX_MATCH_CNT) {
+                ele.fuzzyBssids.emplace_back(fuzzyBssid);
+                LOGI("AddRandomMac emplace_back fuzzyBssid:%{public}s", MacAnonymize(fuzzyBssid).c_str());
+                isAdded = true;
+                break;
+            } else {
+                LOGI("AddRandomMac ele.fuzzyBssids.size is max count");
+                return false;
+            }
+        }
+        if (ele.ssid == randomMacInfo.ssid && ele.keyMgmt == randomMacInfo.keyMgmt) {
+            return true;
         }
     }
 
-    if (!isConnected) {
+    LOGI("AddRandomMac isAdded:%{public}d", isAdded);
+    if (!isAdded) {
+        if (isPskEncryption(randomMacInfo.keyMgmt)) {
+            randomMacInfo.fuzzyBssids.emplace_back(fuzzyBssid);
+        }
         mWifiStoreRandomMac.push_back(randomMacInfo);
     }
 
     mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
     mSavedWifiStoreRandomMac.SaveConfig();
-    return isConnected;
+    return isAdded;
 }
 
 bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
+    std::string fuzzyBssid = "";
+    if (isPskEncryption(randomMacInfo.keyMgmt)) {
+        fuzzyBssid = FuzzyBssid(randomMacInfo.peerBssid);
+    }
+
     for (auto &item : mWifiStoreRandomMac) {
-        if (CompareMac(item.peerBssid, randomMacInfo.peerBssid) && item.ssid == randomMacInfo.ssid) {
-            randomMacInfo.randomMac = item.randomMac;
-            return true;
+        if (isPskEncryption(item.keyMgmt)) {
+            std::vector<std::string> fuzzyBssids = item.fuzzyBssids;
+            if (std::find(fuzzyBssids.begin(), fuzzyBssids.end(), fuzzyBssid) != fuzzyBssids.end()) {
+                LOGI("GetStaRandomMac fuzzyBssids contains fuzzyBssid:%{public}s",
+                    MacAnonymize(fuzzyBssid).c_str());
+                randomMacInfo.randomMac = item.randomMac;
+                break;
+            }
+        } else {
+            if (item.ssid == randomMacInfo.ssid && item.keyMgmt == randomMacInfo.keyMgmt) {
+                randomMacInfo.randomMac = item.randomMac;
+                break;
+            }
         }
     }
-    return false;
+    return randomMacInfo.randomMac.empty();
 }
 
 bool WifiSettings::RemoveRandomMac(const std::string &bssid, const std::string &randomMac)
@@ -1491,6 +2045,7 @@ int WifiSettings::GetScanGenieState() const
 
 int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
 {
+    LOGI("GetSignalLevel wifi settings start...");
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     int level = 0;
     auto iter = mWifiConfig.find(instId);
@@ -1533,6 +2088,7 @@ int WifiSettings::GetSignalLevel(const int &rssi, const int &band, int instId)
             }
         } while (0);
     }
+    LOGI("GetSignalLevel wifi settings end...");
     return level;
 }
 
@@ -1551,6 +2107,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetBand(BandType::BAND_2GHZ);
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
+    cfg.SetBandWidth(AP_BANDWIDTH_DEFAULT);
 #ifdef INIT_LIB_ENABLE
     cfg.SetSsid(ssid);
 #else
@@ -1574,6 +2131,7 @@ void WifiSettings::ClearHotspotConfig()
     config.SetBand(BandType::BAND_2GHZ);
     config.SetChannel(AP_CHANNEL_DEFAULT);
     config.SetMaxConn(GetApMaxConnNum());
+    config.SetBandWidth(AP_BANDWIDTH_DEFAULT);
 #ifdef INIT_LIB_ENABLE
     config.SetSsid(ssid);
 #else
@@ -1614,6 +2172,7 @@ void WifiSettings::InitSettingsNum()
 
 void WifiSettings::InitScanControlForbidList(void)
 {
+    std::unique_lock<std::mutex> lock(mInfoMutex);
     /* Disable external scanning during scanning. */
     ScanForbidMode forbidMode;
     forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
@@ -1672,6 +2231,7 @@ void WifiSettings::InitScanControlForbidList(void)
 
 void WifiSettings::InitScanControlIntervalList(void)
 {
+    std::unique_lock<std::mutex> lock(mInfoMutex);
     /* Foreground app: 4 times in 2 minutes for a single application */
     ScanIntervalMode scanIntervalMode;
     scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_ORIGIN;
@@ -1754,6 +2314,7 @@ void WifiSettings::InitScanControlInfo()
 
 void WifiSettings::GetLinkedChannelWidth(int instId)
 {
+    std::unique_lock<std::mutex> lock(mInfoMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
         if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
             mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
@@ -1772,6 +2333,24 @@ void WifiSettings::UpdateLinkedChannelWidth(const std::string bssid, WifiChannel
             iter->second.channelWidth = channelWidth;
         }
     }
+}
+
+void WifiSettings::UpdateLinkedInfo(int instId)
+{
+    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
+        if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
+            if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
+                mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
+            }
+            mWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
+            break;
+        }
+    }
+    auto iter = wifiCategoryRecord.find(mWifiLinkedInfo[instId].bssid);
+    if (iter != wifiCategoryRecord.end()) {
+        mWifiLinkedInfo[instId].supportedWifiCategory = iter->second;
+    }
+    LOGD("WifiSettings UpdateLinkedInfo.");
 }
 
 bool WifiSettings::EnableNetwork(int networkId, bool disableOthers, int instId)
@@ -1811,6 +2390,7 @@ time_t WifiSettings::GetUserLastSelectedNetworkTimeVal(int instId)
 
 int WifiSettings::SyncWifiConfig()
 {
+    std::unique_lock<std::mutex> lock(mSyncWifiConfigMutex);
     std::vector<WifiConfig> tmp;
     for (auto &item : mWifiConfig) {
         tmp.push_back(item.second);
@@ -1837,6 +2417,24 @@ int WifiSettings::SetOperatorWifiType(int type, int instId)
     return 0;
 }
 
+int WifiSettings::GetLastAirplaneMode(int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.lastAirplaneMode;
+    }
+    return mWifiConfig[0].lastAirplaneMode;
+}
+
+int WifiSettings::SetLastAirplaneMode(int mode, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig[instId].lastAirplaneMode = mode;
+    SyncWifiConfig();
+    return 0;
+}
+
 bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
@@ -1847,7 +2445,7 @@ bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
     return mWifiConfig[0].canOpenStaWhenAirplane;
 }
 
-int WifiSettings::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
+int WifiSettings::SetWifiFlagOnAirplaneMode(bool ifOpen, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].openWifiWhenAirplane = ifOpen;
@@ -1855,7 +2453,7 @@ int WifiSettings::SetOpenWifiWhenAirplaneMode(bool ifOpen, int instId)
     return 0;
 }
 
-bool WifiSettings::GetOpenWifiWhenAirplaneMode(int instId)
+bool WifiSettings::GetWifiFlagOnAirplaneMode(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);
@@ -1865,7 +2463,7 @@ bool WifiSettings::GetOpenWifiWhenAirplaneMode(int instId)
     return mWifiConfig[0].openWifiWhenAirplane;
 }
 
-bool WifiSettings::GetStaLastRunState(int instId)
+int WifiSettings::GetStaLastRunState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     auto iter = mWifiConfig.find(instId);
@@ -1875,7 +2473,7 @@ bool WifiSettings::GetStaLastRunState(int instId)
     return mWifiConfig[0].staLastState;
 }
 
-int WifiSettings::SetStaLastRunState(bool bRun, int instId)
+int WifiSettings::SetStaLastRunState(int bRun, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].staLastState = bRun;
@@ -1921,24 +2519,37 @@ int WifiSettings::GetScreenState() const
     return mScreenState;
 }
 
-void WifiSettings::SetAirplaneModeState(const int &state)
+bool WifiSettings::SetWifiStateOnAirplaneChanged(const int &state)
 {
     mAirplaneModeState = state;
+    SetLastAirplaneMode(state);
+    if (GetWifiFlagOnAirplaneMode()) {
+        if (state == MODE_STATE_OPEN && mPersistWifiState == WIFI_STATE_ENABLED) {
+            PersistWifiState(WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE);
+        } else if (state == MODE_STATE_CLOSE && mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {
+            PersistWifiState(WIFI_STATE_ENABLED);
+        }
+        if (mPersistWifiState == WIFI_STATE_DISABLED || mPersistWifiState ==  WIFI_STATE_DISABLED_AIRPLANEMODE_ON) {
+            return true;
+        }
+        return false;
+    }
+    if (state == MODE_STATE_OPEN) {
+        if (mPersistWifiState == WIFI_STATE_ENABLED) {
+            PersistWifiState(WIFI_STATE_DISABLED_AIRPLANEMODE_ON);
+        }
+    } else {
+        if (mPersistWifiState == WIFI_STATE_DISABLED_AIRPLANEMODE_ON
+            || mPersistWifiState == WIFI_STATE_ENABLED_AIRPLANEMODE_OVERRIDE) {
+            PersistWifiState(WIFI_STATE_ENABLED);
+        }
+    }
+    return true;
 }
 
 int WifiSettings::GetAirplaneModeState() const
 {
     return mAirplaneModeState.load();
-}
-
-void WifiSettings::SetPowerSleepState(const int &state)
-{
-    mPowerSleepState = state;
-}
-
-int WifiSettings::GetPowerSleepState() const
-{
-    return mPowerSleepState.load();
 }
 
 void WifiSettings::SetAppRunningState(ScanMode appRunMode)
@@ -2446,6 +3057,26 @@ int WifiSettings::SetStaApExclusionType(int type)
     return 0;
 }
 
+void WifiSettings::RecordWifiCategory(const std::string bssid, WifiCategory category)
+{
+    std::unique_lock<std::mutex> lock(mScanRecordMutex);
+    if (bssid.empty()) {
+        return;
+    }
+    auto iter = wifiCategoryRecord.find(bssid);
+    if (iter != wifiCategoryRecord.end()) {
+        iter->second = category;
+    } else {
+        wifiCategoryRecord.emplace(std::make_pair(bssid, category));
+    }
+}
+
+void WifiSettings::CleanWifiCategoryRecord()
+{
+    std::unique_lock<std::mutex> lock(mScanRecordMutex);
+    wifiCategoryRecord.clear();
+}
+
 long int WifiSettings::GetRandom()
 {
     long random = 0;
@@ -2511,6 +3142,48 @@ void WifiSettings::GenerateRandomMacAddress(std::string &randomMacAddr)
     }
     randomMacAddr = strMac;
     LOGD("%{public}s: randomMacAddr: %{private}s", __func__, randomMacAddr.c_str());
+}
+
+bool WifiSettings::IsValidParanValue(const char *value, uint32_t len)
+{
+    return (value != NULL) && (strlen(value) + 1 <= len);
+}
+
+std::string WifiSettings::GetParameter(const std::string &key, const std::string &def)
+{
+    uint32_t size = 0;
+    int ret = SystemReadParam(key.c_str(), NULL, &size);
+    if (ret == 0) {
+        std::vector<char> value(size + 1);
+        ret = SystemReadParam(key.c_str(), value.data(), &size);
+        if (ret == 0) {
+            return std::string(value.data());
+        }
+    }
+    if (IsValidParanValue(def.c_str(), MAX_PARAM_VALUE_LEN)) {
+        return std::string(def);
+    }
+    return "";
+}
+
+std::string WifiSettings::GetCountry()
+{
+    return GetParameter("const.cust.region", "");
+}
+
+std::string WifiSettings::GetLanguage()
+{
+    return GetParameter("persist.global.language", "");
+}
+
+std::string WifiSettings::GetOversea()
+{
+    std::string language = GetLanguage();
+    std::string country = GetCountry();
+    if (language == LANGUAGE_CHINESE && (country == COUNTRY_CHINA_CAPITAL || country == COUNTRY_CHINA_LOWERCASE)) {
+        return "internal";
+    }
+    return "oversea";
 }
 
 #ifdef SUPPORT_RANDOM_MAC_ADDR
@@ -2621,7 +3294,7 @@ bool WifiSettings::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std:
     } else {
         randomMacAddr = randomAddr;
     }
-    LOGI("%{public}s: type:%{public}d, address:%{private}s, randomAddr:%{private}s, randomMacAddr:%{private}s",
+    LOGD("%{public}s: type:%{public}d, address:%{private}s, randomAddr:%{private}s, randomMacAddr:%{private}s",
         __func__, type, realMacAddr.c_str(), randomAddr.c_str(), randomMacAddr.c_str());
     WifiMacAddrInfo realMacAddrInfo;
     realMacAddrInfo.bssid = realMacAddr;

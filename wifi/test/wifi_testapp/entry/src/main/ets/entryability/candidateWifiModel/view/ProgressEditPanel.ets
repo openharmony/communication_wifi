@@ -17,47 +17,47 @@ import { CommonConstants } from '../common/constant/CommonConstant';
 
 @Component
 export default struct ProgressEditPanel {
-  @Link sliderMode: Number;
+  @Link sliderMode: number;
   @Prop slidingProgress: number;
-  onCancel: () => void;
-  onClickOK: (progress: Number) => void;
+  onCancel!: () => void;
+  onClickOK!: (progress: number) => void;
 
   build() {
     Column() {
       Row() {
         Slider({
-          value: this.slidingProgress,
-          min: CommonConstants.SLIDER_MIN_VALUE,
-          max: CommonConstants.SLIDER_MAX_VALUE,
-          style: SliderStyle.InSet,
-          step: CommonConstants.SLIDER_STEP
+          value : this.slidingProgress ,
+          min : CommonConstants.SLIDER_MIN_VALUE ,
+          max : CommonConstants.SLIDER_MAX_VALUE ,
+          style : SliderStyle.InSet ,
+          step : CommonConstants.SLIDER_STEP
         })
           .width(CommonConstants.SLIDER_INNER_WIDTH)
-          .onChange((value: number, mode: SliderChangeMode) => {
+          .onChange((value: number , mode: SliderChangeMode) => {
             this.slidingProgress = Math.floor(value);
             this.sliderMode = mode;
           })
-        Text(`${this.slidingProgress}%`)
+        Text(`${ this.slidingProgress }%`)
           .fontSize($r('app.float.font_14'))
           .fontWeight(CommonConstants.FONT_WEIGHT)
           .fontColor($r('app.color.dialog_progress'))
           .textAlign(TextAlign.Center)
-          .margin({ left: $r('app.float.distance_8') })
+          .margin({ left : $r('app.float.distance_8') })
       }
       .width(CommonConstants.SLIDER_WIDTH)
       .height(CommonConstants.SLIDER_HEIGHT)
 
       Row() {
         CustomButton({
-          buttonText: $r('app.string.cancel_button')
+          buttonText : $r('app.string.cancel_button')
         })
           .onClick(() => this.onCancel())
         CustomButton({
-          buttonText: $r('app.string.confirm_button')
+          buttonText : $r('app.string.confirm_button')
         })
           .onClick(() => this.onClickOK(this.slidingProgress))
       }
-      .margin({ top: CommonConstants.SLIDER_BUTTON_MARGIN })
+      .margin({ top : CommonConstants.SLIDER_BUTTON_MARGIN })
       .width(CommonConstants.DIALOG_OPERATION_WIDTH)
       .justifyContent(FlexAlign.SpaceBetween)
     }
@@ -70,7 +70,7 @@ export default struct ProgressEditPanel {
 @Component
 struct CustomButton {
   @State buttonColor: Resource = $r('app.color.start_window_background');
-  buttonText: Resource;
+  buttonText!: Resource;
 
   build() {
     Text(this.buttonText)
@@ -79,10 +79,9 @@ struct CustomButton {
       .borderRadius(CommonConstants.LIST_RADIUS)
       .textAlign(TextAlign.Center)
       .onTouch((event: TouchEvent) => {
-        if (event.type === TouchType.Down) {
+        if ( event.type === TouchType.Down ) {
           this.buttonColor = $r('app.color.custom_button_color');
-        }
-        if (event.type === TouchType.Up) {
+        } else if ( event.type === TouchType.Up ) {
           this.buttonColor = $r('app.color.start_window_background');
         }
       })

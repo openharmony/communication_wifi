@@ -48,11 +48,16 @@ private:
     void DealP2pGroupsChanged(void);
     void DealP2pActionResult(P2pActionCallback action, ErrCode code);
     void DealConfigChanged(CfgType type, char* data, int dataLen);
+    void DealP2pGcJoinGroup(const GcInfo &info);
+    void DealP2pGcLeaveGroup(const GcInfo &info);
+    void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
+    void DealP2pPrivatePeersChanged(const std::string &privateInfo);
 
 private:
     IP2pServiceCallbacks mP2pCallback;
     uint32_t unloadP2PSaTimerId{0};
     std::mutex unloadP2PSaTimerMutex;
+    std::string ifaceName{""};
 };
 
 }  // namespace Wifi

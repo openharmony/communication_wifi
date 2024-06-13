@@ -116,6 +116,14 @@ public:
     virtual ErrCode RemoveGroup() = 0;
 
     /**
+     * @Description Remove a P2P client of current group.
+     *
+     * @param deviceMac - client deviceMac address
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveGroupClient(const GcInfo &info) = 0;
+
+    /**
      * @Description - The interface of delete a saved group.
      * @param  group - information of group.
      * @return ErrCode - operation result
@@ -212,6 +220,13 @@ public:
     virtual ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) = 0;
 
     /**
+     * @Description - The interface of unregister p2p service callbacks,
+     * @param  callbacks - information of callbacks.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) = 0;
+
+    /**
      * @Description set p2p wifi display info
      *
      * @param wfdInfo - wifi display info
@@ -270,14 +285,16 @@ public:
     /**
      * @Description Increase the reference count of the hid2d service.
      *
+     * @param callingUid - the UID of caller
      */
-    virtual void IncreaseSharedLink(void) = 0;
+    virtual void IncreaseSharedLink(int callingUid) = 0;
 
     /**
      * @Description Decrease the reference count of the hid2d service.
      *
+     * @param callingUid - the UID of caller
      */
-    virtual void DecreaseSharedLink(void) = 0;
+    virtual void DecreaseSharedLink(int callingUid) = 0;
 
     /**
      * @Description Get the reference count of the hid2d service.
@@ -285,6 +302,14 @@ public:
      * @return int - reference count
      */
     virtual int GetSharedLinkCount(void) = 0;
+
+    /**
+     * @Description Handle the exception of upper-layer business.
+     *
+     * @param systemAbilityId - systemAbilityId of upper-layer business.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode HandleBusinessSAException(int systemAbilityId) = 0;
 
     /**
      * @Description - Get P2P recommended channel.
@@ -308,6 +333,20 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode MonitorCfgChange(void) = 0;
+
+    /**
+     * @Description Remove a P2P Group.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DiscoverPeers(int32_t channelid) = 0;
+
+    /**
+     * @Description Remove a P2P Group.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DisableRandomMac(int setmode) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

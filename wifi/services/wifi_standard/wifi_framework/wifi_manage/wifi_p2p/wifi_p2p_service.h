@@ -113,6 +113,12 @@ public:
      */
     virtual ErrCode RemoveGroup() override;
     /**
+     * @Description Remove a P2P client of current group.
+     * @param deviceMac - client deviceMac address
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RemoveGroupClient(const GcInfo &info) override;
+    /**
      * @Description - Delete a persistent group.
      * @param  group - specified group
      * @return ErrCode - operation result
@@ -198,6 +204,13 @@ public:
     virtual ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) override;
 
     /**
+     * @Description - Register all callbacks provided by the P2P.
+     * @param  callbacks - all callbacks added
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) override;
+
+    /**
      * @Description set p2p wifi display info
      *
      * @param wfdInfo - wifi display info
@@ -256,14 +269,16 @@ public:
     /**
      * @Description Increase the reference count of the hid2d service.
      *
+     * @param callingUid - the UID of caller
      */
-    virtual void IncreaseSharedLink(void) override;
+    virtual void IncreaseSharedLink(int callingUid) override;
 
     /**
      * @Description Decrease the reference count of the hid2d service.
      *
+     * @param callingUid - the UID of caller
      */
-    virtual void DecreaseSharedLink(void) override;
+    virtual void DecreaseSharedLink(int callingUid) override;
 
     /**
      * @Description Get the reference count of the hid2d service.
@@ -271,6 +286,14 @@ public:
      * @return int - reference count
      */
     virtual int GetSharedLinkCount(void) override;
+
+    /**
+     * @Description Handle the exception of upper-layer business.
+     *
+     * @param systemAbilityId - systemAbilityId of upper-layer business.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode HandleBusinessSAException(int systemAbilityId) override;
 
     /**
      * @Description - Get P2P recommended channel.
@@ -295,11 +318,24 @@ public:
      */
     virtual ErrCode MonitorCfgChange(void) override;
 
+    /**
+     * @Description Discover p2p device
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Disable random mac
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode DisableRandomMac(int setmode) override;
 private:
     /**
      * @Description - P2P state machine deregistration event callback.
      */
-    virtual void UnRegisterP2pServiceCallbacks();
+    virtual void ClearAllP2pServiceCallbacks();
 
 private:
     P2pStateMachine &p2pStateMachine;

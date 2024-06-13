@@ -24,15 +24,25 @@
 #ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
 #endif
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+#include "hal_device_manage.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
+
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
 int WifiControllerMachine::mSoftapStartFailCount{0};
 
 WifiControllerMachine::WifiControllerMachine()
-    : StateMachine("WifiControllerMachine"), pEnableState(nullptr), pDisableState(nullptr), pDefaultState(nullptr)
+    : StateMachine("WifiControllerMachine"),
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
+      mApidStopWifi(0),
+#endif
+      pEnableState(nullptr),
+      pDisableState(nullptr),
+      pDefaultState(nullptr)
 {}
 
 WifiControllerMachine::~WifiControllerMachine()
@@ -48,7 +58,7 @@ WifiControllerMachine::~WifiControllerMachine()
 ErrCode WifiControllerMachine::InitWifiControllerMachine()
 {
     WIFI_LOGI("Enter WifiControllerMachine::InitWifiControllerMachine.\n");
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("WifiControllerMachine")) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }
@@ -130,9 +140,6 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessage *msg)
                     break;
                 }
                 pWifiControllerMachine->MakeConcreteManager(role, msg->GetParam2());
-                if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-                    WifiConfigCenter::GetInstance().SetOpenWifiWhenAirplaneMode(true);
-                }
                 pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
             }
             break;
@@ -218,6 +225,17 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
         case CMD_AP_SERVICE_START_FAILURE:
             HandleAPServiceStartFail(msg->GetParam1());
             break;
+        case CMD_STA_REMOVED:
+            HandleStaRemoved(msg);
+            break;
+        case CMD_CONCRETECLIENT_REMOVED:
+            HandleConcreteClientRemoved(msg);
+            break;
+        case CMD_AP_REMOVED:
+#ifdef FEATURE_AP_SUPPORT
+            HandleApRemoved(msg);
+#endif
+            break;
         default:
             break;
     }
@@ -257,21 +275,28 @@ void WifiControllerMachine::HandleAirplaneOpen()
     WifiSettings::GetInstance().SetSoftapToggledState(false);
     StopAllSoftapManagers();
 #endif
-    if (!WifiConfigCenter::GetInstance().GetOpenWifiWhenAirplaneMode()) {
+    if (!WifiConfigCenter::GetInstance().GetWifiFlagOnAirplaneMode() ||
+        WifiConfigCenter::GetInstance().GetWifiDetailState() == WifiDetailState::STATE_SEMI_ACTIVE) {
         StopAllConcreteManagers();
     }
 }
 
 void WifiControllerMachine::HandleAirplaneClose()
 {
+    WIFI_LOGI("HandleAirplaneClose in");
+#ifndef OHOS_ARCH_LITE
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetWifiAllowSemiActiveByDatashare();
+#endif
     if (!ShouldEnableWifi() || WifiSettings::GetInstance().GetWifiStopState()) {
         return;
     }
 #ifdef FEATURE_AP_SUPPORT
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
     if (!WifiSettings::GetInstance().GetCoexSupport() && HasAnySoftApManager()) {
         WIFI_LOGE("HandleAirplaneClose, has softap in runing return.");
         return;
     }
+#endif
 #endif
     ConcreteManagerRole role = GetWifiRole();
     if (role == ConcreteManagerRole::ROLE_UNKNOW) {
@@ -287,7 +312,7 @@ void WifiControllerMachine::HandleAirplaneClose()
 }
 
 #ifdef FEATURE_AP_SUPPORT
-bool WifiControllerMachine::SoftApIdExit(int id)
+bool WifiControllerMachine::SoftApIdExist(int id)
 {
     if (!HasAnySoftApManager()) {
         return false;
@@ -300,9 +325,24 @@ bool WifiControllerMachine::SoftApIdExit(int id)
     }
     return false;
 }
+
+SoftApManager *WifiControllerMachine::GetSoftApManager(int id)
+{
+    if (!HasAnySoftApManager()) {
+        return nullptr;
+    }
+
+    std::unique_lock<std::mutex> lock(softapManagerMutex);
+    for (auto iter = softapManagers.begin(); iter != softapManagers.end(); ++iter) {
+        if ((*iter)->mid == id) {
+            return *iter;
+        }
+    }
+    return nullptr;
+}
 #endif
 
-bool WifiControllerMachine::ConcreteIdExit(int id)
+bool WifiControllerMachine::ConcreteIdExist(int id)
 {
     if (!HasAnyConcreteManager()) {
         return false;
@@ -387,10 +427,11 @@ bool WifiControllerMachine::ShouldEnableWifi()
         return false;
     }
 #endif
-    if (WifiSettings::GetInstance().GetWifiToggledState() || IsScanOnlyEnable()) {
-        WIFI_LOGI("Should to start Wifi or scanonly");
+    if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsSemiWifiEnable() || IsScanOnlyEnable()) {
+        WIFI_LOGI("Should start wifi or scanonly.");
         return true;
     }
+
     WIFI_LOGI("no need to start Wifi or scanonly");
     return false;
 }
@@ -401,6 +442,10 @@ ConcreteManagerRole WifiControllerMachine::GetWifiRole()
         return ConcreteManagerRole::ROLE_CLIENT_MIX;
     } else if (IsWifiEnable()) {
         return ConcreteManagerRole::ROLE_CLIENT_STA;
+    } else if (IsSemiWifiEnable() && IsScanOnlyEnable()) {
+        return ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE;
+    } else if (IsSemiWifiEnable()) {
+        return ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE;
     } else if (IsScanOnlyEnable()) {
         return ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY;
     } else {
@@ -410,12 +455,17 @@ ConcreteManagerRole WifiControllerMachine::GetWifiRole()
 
 bool WifiControllerMachine::IsWifiEnable()
 {
-    return WifiSettings::GetInstance().GetWifiToggledState();
+    return WifiSettings::GetInstance().IsWifiToggledEnable();
+}
+
+bool WifiControllerMachine::IsSemiWifiEnable()
+{
+    return WifiSettings::GetInstance().IsSemiWifiEnable();
 }
 
 bool WifiControllerMachine::IsScanOnlyEnable()
 {
-    if (WifiSettings::GetInstance().GetScanOnlySwitchState()) {
+    if (WifiSettings::GetInstance().CheckScanOnlyAvailable()) {
         WIFI_LOGI("scanonly available is true");
 #ifndef OHOS_ARCH_LITE
         if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetLocationModeByDatashare()) {
@@ -444,6 +494,22 @@ void WifiControllerMachine::StopAllConcreteManagers()
     }
 }
 
+void WifiControllerMachine::StopConcreteManager(int id)
+{
+    if (!HasAnyConcreteManager()) {
+        return;
+    }
+
+    std::unique_lock<std::mutex> lock(concreteManagerMutex);
+    for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
+        if ((*iter)->mid == id) {
+            (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STOP);
+            return;
+        }
+    }
+    return;
+}
+
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::StopSoftapManager(int id)
 {
@@ -462,6 +528,7 @@ void WifiControllerMachine::StopSoftapManager(int id)
 void WifiControllerMachine::StopAllSoftapManagers()
 {
     if (!HasAnySoftApManager()) {
+        WIFI_LOGE("Not found AnySoftApManager.");
         return;
     }
     std::unique_lock<std::mutex> lock(softapManagerMutex);
@@ -471,19 +538,21 @@ void WifiControllerMachine::StopAllSoftapManagers()
 }
 #endif
 
-void WifiControllerMachine::RmoveConcreteManager(int id)
+void WifiControllerMachine::RemoveConcreteManager(int id)
 {
     ConcreteClientModeManager *concreteManager = nullptr;
 
     if (!HasAnyConcreteManager()) {
         return;
     }
-    std::unique_lock<std::mutex> lock(concreteManagerMutex);
-    for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
-        if ((*iter)->mid == id) {
-            concreteManager = *iter;
-            concreteManagers.erase(iter);
-            break;
+    {
+        std::unique_lock<std::mutex> lock(concreteManagerMutex);
+        for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
+            if ((*iter)->mid == id) {
+                concreteManager = *iter;
+                concreteManagers.erase(iter);
+                break;
+            }
         }
     }
     if (concreteManager != nullptr) {
@@ -540,12 +609,9 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
     ConcreteManagerRole presentRole;
     if (!(pWifiControllerMachine->ShouldEnableWifi())) {
         pWifiControllerMachine->StopAllConcreteManagers();
-        if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-            WifiConfigCenter::GetInstance().SetOpenWifiWhenAirplaneMode(false);
-        }
         return;
     }
-    if (pWifiControllerMachine->ConcreteIdExit(msg->GetParam2())) {
+    if (pWifiControllerMachine->ConcreteIdExist(msg->GetParam2())) {
         if (WifiSettings::GetInstance().GetWifiStopState()) {
             return;
         }
@@ -559,11 +625,13 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
     }
     WifiSettings::GetInstance().SetWifiStopState(false);
 #ifdef FEATURE_AP_SUPPORT
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
     if (!WifiSettings::GetInstance().GetCoexSupport() &&
         pWifiControllerMachine->HasAnySoftApManager()) {
         pWifiControllerMachine->StopAllSoftapManagers();
         return;
     }
+#endif
 #endif
     presentRole = pWifiControllerMachine->GetWifiRole();
     if (presentRole == ConcreteManagerRole::ROLE_UNKNOW) {
@@ -580,17 +648,20 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
     int id = msg->GetParam2();
     WIFI_LOGE("handleSoftapToggleChangeInEnabledState");
     if (msg->GetParam1() == 1) {
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
         if (!WifiSettings::GetInstance().GetCoexSupport() &&
             pWifiControllerMachine->HasAnyConcreteManager()) {
             pWifiControllerMachine->StopAllConcreteManagers();
             pWifiControllerMachine->mApidStopWifi = id;
             return;
         }
-        if (!pWifiControllerMachine->SoftApIdExit(id)) {
+#endif
+        if (!pWifiControllerMachine->SoftApIdExist(id)) {
             pWifiControllerMachine->MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, id);
             return;
         }
     }
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
     if (!WifiSettings::GetInstance().GetCoexSupport() &&
         pWifiControllerMachine->ShouldEnableWifi() && !WifiSettings::GetInstance().GetWifiStopState() &&
         pWifiControllerMachine->HasAnyConcreteManager()) {
@@ -599,11 +670,12 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
             pWifiControllerMachine->SwitchRole(role);
         }
     }
+#endif
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(id);
     if (apState == WifiOprMidState::CLOSING || apState == WifiOprMidState::OPENING) {
         return;
     }
-    if (pWifiControllerMachine->SoftApIdExit(id)) {
+    if (pWifiControllerMachine->SoftApIdExist(id)) {
         pWifiControllerMachine->StopSoftapManager(id);
         pWifiControllerMachine->StartTimer(CMD_AP_STOP_TIME, SFOT_AP_TIME_OUT);
         return;
@@ -614,10 +686,24 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
 void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 {
     WIFI_LOGE("HandleStaStartFailure");
-    pWifiControllerMachine->RmoveConcreteManager(id);
+    pWifiControllerMachine->RemoveConcreteManager(id);
     mWifiStartFailCount++;
     if (pWifiControllerMachine->ShouldEnableWifi() && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {
         pWifiControllerMachine->StartTimer(CMD_OPEN_WIFI_RETRY, WIFI_OPEN_RETRY_TIMEOUT);
+    }
+}
+
+void WifiControllerMachine::EnableState::HandleStaRemoved(InternalMessage *msg)
+{
+    pWifiControllerMachine->StopConcreteManager(msg->GetParam2());
+}
+
+void WifiControllerMachine::EnableState::HandleConcreteClientRemoved(InternalMessage *msg)
+{
+    int id = msg->GetParam1();
+    pWifiControllerMachine->RemoveConcreteManager(id);
+    if (!(pWifiControllerMachine->HasAnyManager())) {
+        pWifiControllerMachine->SwitchState(pWifiControllerMachine->pDisableState);
     }
 }
 
@@ -653,6 +739,16 @@ void WifiControllerMachine::HandleStaStart(int id)
     }
 }
 
+void WifiControllerMachine::HandleStaSemiActive(int id)
+{
+    mWifiStartFailCount = 0;
+    this->StopTimer(CMD_OPEN_WIFI_RETRY);
+    std::unique_lock<std::mutex> lock(concreteManagerMutex);
+    for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
+        (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STA_SEMI_ACTIVE);
+    }
+}
+
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleApStart(int id)
 {
@@ -663,36 +759,45 @@ void WifiControllerMachine::EnableState::HandleApStart(int id)
     }
     pWifiControllerMachine->StartSoftapCloseTimer();
 }
+
+void WifiControllerMachine::EnableState::HandleApRemoved(InternalMessage *msg)
+{
+    pWifiControllerMachine->StopSoftapManager(msg->GetParam2());
+    SoftApManager *softap = pWifiControllerMachine->GetSoftApManager(msg->GetParam2());
+    softap->SetRole(SoftApManager::Role::ROLE_HAS_REMOVED);
+}
 #endif
 
 void WifiControllerMachine::HandleConcreteStop(int id)
 {
-    int airplanstate = WifiConfigCenter::GetInstance().GetAirplaneModeState();
-    RmoveConcreteManager(id);
+    RemoveConcreteManager(id);
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
     if (!WifiSettings::GetInstance().GetCoexSupport()) {
 #ifdef FEATURE_AP_SUPPORT
-        if (ShouldEnableSoftap() && airplanstate != MODE_STATE_OPEN &&
-            !SoftApIdExit(mApidStopWifi)) {
+        int airplanestate = WifiConfigCenter::GetInstance().GetAirplaneModeState();
+        if (ShouldEnableSoftap() && airplanestate != MODE_STATE_OPEN &&
+            !SoftApIdExist(mApidStopWifi)) {
             MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, mApidStopWifi);
             return;
         }
 #endif
-        if (airplanstate != MODE_STATE_OPEN && !WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning()) {
-            if (ShouldEnableWifi()) {
+        if (!WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning()) {
+            if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsSemiWifiEnable()) {
                 ConcreteManagerRole presentRole = GetWifiRole();
                 MakeConcreteManager(presentRole, 0);
                 return;
             }
         }
     } else {
-        if (airplanstate != MODE_STATE_OPEN) {
-            if (ShouldEnableWifi()) {
-                ConcreteManagerRole presentRole = GetWifiRole();
-                MakeConcreteManager(presentRole, 0);
-                return;
-            }
+#endif
+        if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsSemiWifiEnable()) {
+            ConcreteManagerRole presentRole = GetWifiRole();
+            MakeConcreteManager(presentRole, 0);
+            return;
         }
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
     }
+#endif
     if (!(HasAnyManager())) {
         SwitchState(pDisableState);
     }
@@ -701,20 +806,26 @@ void WifiControllerMachine::HandleConcreteStop(int id)
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::HandleSoftapStop(int id)
 {
-    int airplanstate;
     ConcreteManagerRole role;
+    SoftApManager *softap = GetSoftApManager(id);
+    if (softap->GetRole() == SoftApManager::Role::ROLE_HAS_REMOVED) {
+        RmoveSoftapManager(id);
+        if (!HasAnyManager()) {
+            SwitchState(pDisableState);
+        } else {
+            return;
+        }
+    }
 
     RmoveSoftapManager(id);
-    if (ShouldEnableSoftap() && !SoftApIdExit(0)) {
+    if (ShouldEnableSoftap() && !SoftApIdExist(0)) {
         MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, 0);
         return;
     }
     if (HasAnyManager()) {
         return;
     }
-    airplanstate = WifiConfigCenter::GetInstance().GetAirplaneModeState();
-    if (ShouldEnableWifi() && airplanstate != MODE_STATE_OPEN &&
-        !WifiSettings::GetInstance().GetWifiStopState()) {
+    if (ShouldEnableWifi() && !WifiSettings::GetInstance().GetWifiStopState()) {
         role = GetWifiRole();
         if (role == ConcreteManagerRole::ROLE_UNKNOW) {
             WIFI_LOGE("Get unknow wifi role in HandleSoftapStop.");
@@ -765,5 +876,14 @@ void WifiControllerMachine::StopSoftapCloseTimer()
 }
 #endif
 
+void WifiControllerMachine::ShutdownWifi()
+{
+    WIFI_LOGI("shutdownWifi.");
+#ifdef FEATURE_AP_SUPPORT
+    WifiSettings::GetInstance().SetSoftapToggledState(false);
+    StopAllSoftapManagers();
+#endif
+    StopAllConcreteManagers();
+}
 } // namespace Wifi
 } // namespace OHOS

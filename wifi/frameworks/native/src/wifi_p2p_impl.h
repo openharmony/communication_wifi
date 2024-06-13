@@ -127,6 +127,14 @@ public:
     ErrCode RemoveGroup(void) override;
 
     /**
+     * @Description Remove a P2P client of current group.
+     *
+     * @param deviceMac - client deviceMac address
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveGroupClient(const GcInfo &info) override;
+
+    /**
      * @Description Delete a p2p Group
      *
      * @param group - WifiP2pGroupInfo object
@@ -383,9 +391,30 @@ public:
      */
     bool IsRemoteDied(void);
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode CheckCanUseP2p() override;
+
 private:
     bool GetWifiP2pProxy();
-    int systemAbilityId_;
+    std::atomic<int> systemAbilityId_;
     sptr<IWifiP2p> client_;
     std::mutex mutex_;
 };

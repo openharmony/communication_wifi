@@ -33,7 +33,7 @@ WifiDeviceCallBackStub::~WifiDeviceCallBackStub()
 int WifiDeviceCallBackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::OnRemoteRequest, code:%{public}u!", code);
+    WIFI_LOGD("OnRemoteRequest, code:%{public}u!", code);
 
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("Sta callback stub token verification error: %{public}d", code);
@@ -101,7 +101,7 @@ void WifiDeviceCallBackStub::SetRemoteDied(bool val)
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::OnWifiStateChanged, state:%{public}d!", state);
+    WIFI_LOGI("OnWifiStateChanged, state:%{public}d!", state);
 
     if (callback_) {
         callback_->OnWifiStateChanged(state);
@@ -111,7 +111,7 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::OnWifiConnectionChanged, state:%{public}d!", state);
+    WIFI_LOGI("OnWifiConnectionChanged, state:%{public}d!", state);
     if (callback_) {
         callback_->OnWifiConnectionChanged(state, info);
     }
@@ -129,7 +129,7 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string &pinCode)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::OnWifiWpsStateChanged, state:%{public}d!", state);
+    WIFI_LOGI("OnWifiWpsStateChanged, state:%{public}d!", state);
     if (callback_) {
         callback_->OnWifiWpsStateChanged(state, pinCode);
     }
@@ -137,7 +137,7 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state,
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::OnStreamChanged, direction:%{public}d!", direction);
+    WIFI_LOGI("OnStreamChanged, direction:%{public}d!", direction);
     if (callback_) {
         callback_->OnStreamChanged(direction);
     }

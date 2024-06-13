@@ -48,18 +48,25 @@ public:
     virtual ErrCode RegisterSelfCureServiceCallback(const SelfCureServiceCallback &callbacks) override;
 
     /**
-     * @Description Get register p2p callback
-     *
-     * @return IP2pServiceCallbacks - p2p callback
-     */
-    virtual IP2pServiceCallbacks GetP2pCallback() override;
-
-    /**
      * @Description Get register sta callback
      *
      * @return StaServiceCallback - sta callback
      */
-    virtual StaServiceCallback GetStaCallback() override;
+    virtual StaServiceCallback GetStaCallback() const override;
+
+    /**
+     * @Description Notify Internet Failure Detected
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+    */
+    virtual ErrCode NotifyInternetFailureDetected(int forceNoHttpCheck) override;
+
+    /**
+     * @Description Is SelfCure On Going
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+    */
+    virtual ErrCode IsSelfCureOnGoing() override;
 
     /**
     * @Description  init callback function.
@@ -75,6 +82,13 @@ public:
      * @param info -  const WifiLinkedInfo
      */
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
+
+    /**
+     * @Description deal sta open result
+     *
+     * @param state - OperateResState
+     */
+    void DealStaOpenRes(OperateResState state, int instId = 0);
 
     /**
      * @Description rssi level changed
@@ -95,7 +109,6 @@ private:
     std::vector<SelfCureServiceCallback> mSelfCureCallback;
     SelfCureService *pSelfCureService;
     StaServiceCallback mStaCallback;
-    IP2pServiceCallbacks mP2pCallback;
     int m_instId;
 };
 }  // namespace Wifi

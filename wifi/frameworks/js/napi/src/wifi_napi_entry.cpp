@@ -295,6 +295,7 @@ static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("enableWifi", EnableWifi),
         DECLARE_NAPI_FUNCTION("disableWifi", DisableWifi),
+        DECLARE_NAPI_FUNCTION("enableSemiWifi", EnableSemiWifi),
         DECLARE_NAPI_FUNCTION("isWifiActive", IsWifiActive),
         DECLARE_NAPI_FUNCTION("scan", Scan),
         DECLARE_NAPI_FUNCTION("startScan", StartScan),
@@ -328,6 +329,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("removeAllDeviceConfigs", RemoveAllNetwork),
         DECLARE_NAPI_FUNCTION("disableNetwork", DisableNetwork),
         DECLARE_NAPI_FUNCTION("disableDeviceConfig", DisableNetwork),
+        DECLARE_NAPI_FUNCTION("getWifiDetailState", GetWifiDetailState),
         DECLARE_NAPI_FUNCTION("getCountryCode", GetCountryCode),
         DECLARE_NAPI_FUNCTION("getDeviceConfigs", GetDeviceConfigs),
         DECLARE_NAPI_FUNCTION("updateNetwork", UpdateNetwork),
@@ -378,6 +380,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getWifiProtect", GetWifiProtect),
         DECLARE_NAPI_FUNCTION("putWifiProtect", PutWifiProtect),
         DECLARE_NAPI_FUNCTION("factoryReset", FactoryReset),
+        DECLARE_NAPI_FUNCTION("enableHiLinkHandshake", EnableHiLinkHandshake),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

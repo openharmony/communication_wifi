@@ -17,6 +17,7 @@
 #include "wifi_hdi_wpa_ap_impl.h"
 #include "wifi_hdi_util.h"
 #include <unistd.h>
+#include "stub_collector.h"
 
 #undef LOG_TAG
 #define LOG_TAG "wifiHdiWpaApImpl"
@@ -41,7 +42,7 @@ static WifiErrorNo RegisterApEventCallback()
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->RegisterEventCallback(apObj, g_hdiApCallbackObj, GetApIfaceName());
+    int32_t result = apObj->RegisterEventCallback(apObj, g_hdiApCallbackObj, GetHdiApIfaceName());
     if (result != HDF_SUCCESS) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterApEventCallback: RegisterApEventCallback failed result:%{public}d", result);
@@ -65,13 +66,13 @@ static WifiErrorNo UnRegisterApEventCallback()
             return WIFI_IDL_OPT_FAILED;
         }
 
-        int32_t result = apObj->UnregisterEventCallback(apObj, g_hdiApCallbackObj, GetApIfaceName());
+        int32_t result = apObj->UnregisterEventCallback(apObj, g_hdiApCallbackObj, GetHdiApIfaceName());
         if (result != HDF_SUCCESS) {
             pthread_mutex_unlock(&g_hdiCallbackMutex);
             LOGE("UnRegisterEventCallback: UnRegisterEventCallback failed result:%{public}d", result);
             return WIFI_IDL_OPT_FAILED;
         }
-
+        StubCollectorRemoveObject(IHOSTAPDCALLBACK_INTERFACE_DESC, g_hdiApCallbackObj);
         free(g_hdiApCallbackObj);
         g_hdiApCallbackObj = NULL;
     }
@@ -114,13 +115,15 @@ WifiErrorNo HdiRegisterApEventCallback(struct IHostapdCallback *callback)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo HdiStartAp(char *ifaceName, int id)
+WifiErrorNo HdiStartAp(const char *ifaceName, int id)
 {
     LOGI("Ready to start hostpad: %{public}d, %{public}s", id, ifaceName);
+    if (SetHdiApIfaceName(ifaceName) != WIFI_IDL_OPT_OK) {
+        LOGE("HdiStartAp: set ap iface name failed.");
+        return WIFI_IDL_OPT_FAILED;
+    }
 
-    InitCfg(ifaceName);
-
-    if (HdiApStart(id) != WIFI_IDL_OPT_OK) {
+    if (HdiApStart(id, ifaceName) != WIFI_IDL_OPT_OK) {
         LOGE("HdiStartAp: HdiApStart failed.");
         return WIFI_IDL_OPT_FAILED;
     }
@@ -137,9 +140,13 @@ WifiErrorNo HdiStartAp(char *ifaceName, int id)
 WifiErrorNo HdiStopAp(int id)
 {
     LOGI("HdiStopAp enter");
+    if (IsHdiApStopped() == WIFI_IDL_OPT_OK) {
+        LOGI("HdiStopAp: HdiAp already stopped. HdiStopAp success");
+        return WIFI_IDL_OPT_OK;
+    }
+
     if (UnRegisterApEventCallback() != WIFI_IDL_OPT_OK) {
         LOGE("HdiStopAp: UnRegisterApEventCallback failed.");
-        return WIFI_IDL_OPT_FAILED;
     }
 
     if (HdiApStop(id) != WIFI_IDL_OPT_OK) {
@@ -160,7 +167,7 @@ WifiErrorNo HdiEnableAp(int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->EnableAp(apObj, GetApIfaceName(), id);
+    int32_t result = apObj->EnableAp(apObj, GetHdiApIfaceName(), id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiEnableAp failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -178,8 +185,8 @@ WifiErrorNo HdiDisableAp(int id)
         LOGE("HdiDisableAp: apObj is NULL");
         return WIFI_IDL_OPT_FAILED;
     }
-
-    int32_t result = apObj->DisableAp(apObj, GetApIfaceName(), id);
+    SetExecDisable(EXEC_DISABLE);
+    int32_t result = apObj->DisableAp(apObj, GetHdiApIfaceName(), id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiDisableAp failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -198,7 +205,7 @@ WifiErrorNo HdiReloadApConfigInfo(int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->ReloadApConfigInfo(apObj, GetApIfaceName(), id);
+    int32_t result = apObj->ReloadApConfigInfo(apObj, GetHdiApIfaceName(), id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiReloadApConfigInfo failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -217,7 +224,7 @@ WifiErrorNo HdiSetApPasswd(const char *pass, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetApPasswd(apObj, GetApIfaceName(), pass, id);
+    int32_t result = apObj->SetApPasswd(apObj, GetHdiApIfaceName(), pass, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetApPasswd failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -236,7 +243,7 @@ WifiErrorNo HdiSetApName(const char *name, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetApName(apObj, GetApIfaceName(), name, id);
+    int32_t result = apObj->SetApName(apObj, GetHdiApIfaceName(), name, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetApName failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -255,7 +262,7 @@ WifiErrorNo HdiSetApWpaValue(int securityType, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetApWpaValue(apObj, GetApIfaceName(), securityType, id);
+    int32_t result = apObj->SetApWpaValue(apObj, GetHdiApIfaceName(), securityType, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetApWpaValue failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -274,7 +281,7 @@ WifiErrorNo HdiSetApBand(int band, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetApBand(apObj, GetApIfaceName(), band, id);
+    int32_t result = apObj->SetApBand(apObj, GetHdiApIfaceName(), band, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetApBand failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -293,7 +300,7 @@ WifiErrorNo HdiSetAp80211n(int value, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetAp80211n(apObj, GetApIfaceName(), value, id);
+    int32_t result = apObj->SetAp80211n(apObj, GetHdiApIfaceName(), value, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetAp80211n failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -312,7 +319,7 @@ WifiErrorNo HdiSetApWmm(int value, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetApWmm(apObj, GetApIfaceName(), value, id);
+    int32_t result = apObj->SetApWmm(apObj, GetHdiApIfaceName(), value, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetApWmm failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -331,7 +338,7 @@ WifiErrorNo HdiSetApChannel(int channel, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetApChannel(apObj, GetApIfaceName(), channel, id);
+    int32_t result = apObj->SetApChannel(apObj, GetHdiApIfaceName(), channel, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetApChannel failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -350,7 +357,7 @@ WifiErrorNo HdiSetApMaxConn(int maxConn, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetApMaxConn(apObj, GetApIfaceName(), maxConn, id);
+    int32_t result = apObj->SetApMaxConn(apObj, GetHdiApIfaceName(), maxConn, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetApMaxConn failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -369,7 +376,7 @@ WifiErrorNo HdiSetMacFilter(const char *mac, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->SetMacFilter(apObj, GetApIfaceName(), mac, id);
+    int32_t result = apObj->SetMacFilter(apObj, GetHdiApIfaceName(), mac, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiSetMacFilter failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -388,7 +395,7 @@ WifiErrorNo HdiDelMacFilter(const char *mac, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->DelMacFilter(apObj, GetApIfaceName(), mac, id);
+    int32_t result = apObj->DelMacFilter(apObj, GetHdiApIfaceName(), mac, id);
     if (result != HDF_SUCCESS) {
         LOGE("HHdiDelMacFilter failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -407,7 +414,7 @@ WifiErrorNo HdiGetStaInfos(char *buf, int size, int id)
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->GetStaInfos(apObj, GetApIfaceName(), buf, size, size, id);
+    int32_t result = apObj->GetStaInfos(apObj, GetHdiApIfaceName(), buf, size, size, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiGetStaInfos failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;
@@ -417,7 +424,7 @@ WifiErrorNo HdiGetStaInfos(char *buf, int size, int id)
     return WIFI_IDL_OPT_OK;
 }
 
-WifiErrorNo HdiDisassociateSta(const char *mac, int id);
+WifiErrorNo HdiDisassociateSta(const char *mac, int id)
 {
     LOGI("HdiDisassociateSta enter");
     struct IHostapdInterface *apObj = GetApInterface();
@@ -426,7 +433,7 @@ WifiErrorNo HdiDisassociateSta(const char *mac, int id);
         return WIFI_IDL_OPT_FAILED;
     }
 
-    int32_t result = apObj->DisassociateSta(apObj, GetApIfaceName(), mac, id);
+    int32_t result = apObj->DisassociateSta(apObj, GetHdiApIfaceName(), mac, id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiDisassociateSta failed result:%{public}d", result);
         return WIFI_IDL_OPT_FAILED;

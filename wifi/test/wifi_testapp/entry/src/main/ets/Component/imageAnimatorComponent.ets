@@ -13,74 +13,70 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import ComponentConfig from './componentConfig';
-import ConfigData from '../utils/ConfigData';
 /**
  * ImageAnimator component Of WiFi test
  */
 
 @Component
 export default struct ImageAnimatorComponent {
-  private imageWidth: Number | Resource = 0
-  private imageHeight: Number | Resource = 0
-  private whtl: Number | string = ComponentConfig.value_20;
+  private imageWidth: number | Resource = 0
+  private imageHeight: number | Resource = 0
+  private whtl: number | string = ComponentConfig.value_20;
 
   build() {
     Column() {
       ImageAnimator()
-        .images( [
-          {
-            src : '../entryability/res/image/hdpi/ic_loading01.png' ,
-            duration : ComponentConfig.DURATION_TIME ,
-            width : this.whtl ,
-            height : this.whtl ,
-            top : this.whtl ,
-            left : this.whtl
-          }, {
-            src : '../entryability/res/image/hdpi/ic_loading02.png' ,
-            duration : ComponentConfig.DURATION_TIME ,
-            width : this.whtl ,
-            height : this.whtl ,
-            top : this.whtl ,
-            left : this.whtl
-          }, {
-            src : '../entryability/res/image/hdpi/ic_loading03.png' ,
-            duration : ComponentConfig.DURATION_TIME ,
-            width : this.whtl ,
-            height : this.whtl ,
-            top : this.whtl ,
-            left : this.whtl
-          }, {
-            src : '../entryability/res/image/hdpi/ic_loading04.png' ,
-            duration : ComponentConfig.DURATION_TIME ,
-            width : this.whtl ,
-            height : this.whtl ,
-            top : this.whtl ,
-            left : this.whtl
-          }, {
-            src : '../entryability/res/image/hdpi/ic_loading05.png' ,
-            duration : ComponentConfig.DURATION_TIME ,
-            width : this.whtl ,
-            height : this.whtl ,
-            top : this.whtl ,
-            left : this.whtl
-          }, {
-            src : '../entryability/res/image/hdpi/ic_loading06.png' ,
-            duration : ComponentConfig.DURATION_TIME ,
-            width : this.whtl ,
-            height : this.whtl ,
-            top : this.whtl ,
-            left : this.whtl
-          } ] )
-        .width( this.imageWidth )
-        .height( this.imageHeight )
-        .iterations( - 1 )
-        .fixedSize( true )
-        .reverse( true )
-        .fillMode( FillMode.None )
-        .state( AnimationStatus.Running )
+        .images([ {
+          src : '../entryability/res/image/hdpi/ic_loading01.png' ,
+          duration : ComponentConfig.DURATION_TIME ,
+          width : this.whtl ,
+          height : this.whtl ,
+          top : this.whtl ,
+          left : this.whtl
+        }, {
+          src : '../entryability/res/image/hdpi/ic_loading02.png' ,
+          duration : ComponentConfig.DURATION_TIME ,
+          width : this.whtl ,
+          height : this.whtl ,
+          top : this.whtl ,
+          left : this.whtl
+        }, {
+          src : '../entryability/res/image/hdpi/ic_loading03.png' ,
+          duration : ComponentConfig.DURATION_TIME ,
+          width : this.whtl ,
+          height : this.whtl ,
+          top : this.whtl ,
+          left : this.whtl
+        }, {
+          src : '../entryability/res/image/hdpi/ic_loading04.png' ,
+          duration : ComponentConfig.DURATION_TIME ,
+          width : this.whtl ,
+          height : this.whtl ,
+          top : this.whtl ,
+          left : this.whtl
+        }, {
+          src : '../entryability/res/image/hdpi/ic_loading05.png' ,
+          duration : ComponentConfig.DURATION_TIME ,
+          width : this.whtl ,
+          height : this.whtl ,
+          top : this.whtl ,
+          left : this.whtl
+        }, {
+          src : '../entryability/res/image/hdpi/ic_loading06.png' ,
+          duration : ComponentConfig.DURATION_TIME ,
+          width : this.whtl ,
+          height : this.whtl ,
+          top : this.whtl ,
+          left : this.whtl
+        } ])
+        .width(this.imageWidth)
+        .height(this.imageHeight)
+        .iterations(- 1)
+        .fixedSize(true)
+        .reverse(true)
+        .fillMode(FillMode.None)
+        .state(AnimationStatus.Running)
     }
   }
 }

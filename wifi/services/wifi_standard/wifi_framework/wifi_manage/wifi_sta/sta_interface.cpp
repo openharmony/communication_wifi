@@ -26,7 +26,7 @@ StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId)
 
 StaInterface::~StaInterface()
 {
-    WIFI_LOGI("StaInterface::~StaInterface");
+    WIFI_LOGI("~StaInterface");
     std::lock_guard<std::mutex> lock(mutex);
     if (pStaService != nullptr) {
         delete pStaService;
@@ -47,26 +47,16 @@ extern "C" void Destroy(IStaService *pservice)
 
 ErrCode StaInterface::EnableWifi()
 {
-    WIFI_LOGI("Enter StaInterface::EnableWifi.\n");
+    WIFI_LOGI("Enter EnableWifi.\n");
     std::lock_guard<std::mutex> lock(mutex);
-    if(pStaService == nullptr) {
-        pStaService = new (std::nothrow) StaService(m_instId);
-        if (pStaService == nullptr) {
-            WIFI_LOGE("New StaService failed.\n");
-            return WIFI_OPT_FAILED;
-        }
-        if (pStaService->InitStaService(m_staCallback) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("InitStaService failed.\n");
-            delete pStaService;
-            pStaService = nullptr;
-            return WIFI_OPT_FAILED;
-        }
+    if (!InitStaServiceLocked()) {
+        return WIFI_OPT_FAILED;
     }
 
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->EnableWifi() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("EnableWifi failed.\n");
-        DisableWifi();
+        pStaService->DisableWifi();
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -74,11 +64,28 @@ ErrCode StaInterface::EnableWifi()
 
 ErrCode StaInterface::DisableWifi()
 {
-    LOGD("Enter StaInterface::DisableWifi.\n");
+    LOGI("Enter StaInterface::DisableWifi.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->DisableWifi() != WIFI_OPT_SUCCESS) {
-        LOGD("DisableWifi failed.\n");
+        LOGE("DisableWifi failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::EnableSemiWifi()
+{
+    LOGI("Enter StaInterface::EnableSemiWifi.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    if (!InitStaServiceLocked()) {
+        return WIFI_OPT_FAILED;
+    }
+
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->EnableSemiWifi() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("EnableSemiWifi failed.\n");
+        pStaService->DisableWifi();
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -86,11 +93,11 @@ ErrCode StaInterface::DisableWifi()
 
 ErrCode StaInterface::ConnectToNetwork(int networkId)
 {
-    LOGD("Enter StaInterface::Connect.\n");
+    LOGI("Enter StaInterface::Connect.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
-        LOGD("ConnectTo failed.\n");
+        LOGE("ConnectTo failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -98,11 +105,23 @@ ErrCode StaInterface::ConnectToNetwork(int networkId)
 
 ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
 {
-    LOGD("Enter StaInterface::Connect.\n");
+    LOGI("Enter StaInterface::Connect.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->ConnectToDevice(config) != WIFI_OPT_SUCCESS) {
-        LOGD("ConnectTo failed.\n");
+        LOGE("ConnectTo failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::StartRoamToNetwork(const int networkId, const std::string bssid)
+{
+    LOGD("Enter StaInterface::StartRoamToNetwork");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->StartRoamToNetwork(networkId, bssid) != WIFI_OPT_SUCCESS) {
+        LOGI("StartRoamToNetwork failed");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -110,11 +129,11 @@ ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
 
 ErrCode StaInterface::ReConnect()
 {
-    LOGD("Enter StaInterface::ReConnect.\n");
+    LOGI("Enter StaInterface::ReConnect.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->ReConnect() != WIFI_OPT_SUCCESS) {
-        LOGD("ReConnect failed.\n");
+        LOGE("ReConnect failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -122,11 +141,11 @@ ErrCode StaInterface::ReConnect()
 
 ErrCode StaInterface::ReAssociate()
 {
-    LOGD("Enter StaInterface::ReAssociate.\n");
+    LOGI("Enter StaInterface::ReAssociate.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->ReAssociate() != WIFI_OPT_SUCCESS) {
-        LOGD("ReAssociate failed.\n");
+        LOGE("ReAssociate failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -134,11 +153,11 @@ ErrCode StaInterface::ReAssociate()
 
 ErrCode StaInterface::Disconnect()
 {
-    LOGD("Enter StaInterface::Disconnect.\n");
+    LOGI("Enter StaInterface::Disconnect.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->Disconnect() != WIFI_OPT_SUCCESS) {
-        LOGD("Disconnect failed.\n");
+        LOGE("Disconnect failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -146,7 +165,7 @@ ErrCode StaInterface::Disconnect()
 
 ErrCode StaInterface::AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId)
 {
-    LOGD("Enter StaInterface::AddCandidateConfig.\n");
+    LOGI("Enter StaInterface::AddCandidateConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->AddCandidateConfig(uid, config, netWorkId);
@@ -154,7 +173,7 @@ ErrCode StaInterface::AddCandidateConfig(const int uid, const WifiDeviceConfig &
 
 ErrCode StaInterface::ConnectToCandidateConfig(const int uid, const int networkId)
 {
-    LOGD("Enter StaInterface::ConnectToCandidateConfig.\n");
+    LOGI("Enter StaInterface::ConnectToCandidateConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->ConnectToCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {
@@ -166,7 +185,7 @@ ErrCode StaInterface::ConnectToCandidateConfig(const int uid, const int networkI
 
 ErrCode StaInterface::RemoveCandidateConfig(const int uid, const int networkId)
 {
-    LOGD("Enter StaInterface::RemoveCandidateConfig.\n");
+    LOGI("Enter StaInterface::RemoveCandidateConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->RemoveCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {
@@ -178,7 +197,7 @@ ErrCode StaInterface::RemoveCandidateConfig(const int uid, const int networkId)
 
 ErrCode StaInterface::RemoveAllCandidateConfig(const int uid)
 {
-    LOGD("Enter StaInterface::RemoveAllCandidateConfig.\n");
+    LOGI("Enter StaInterface::RemoveAllCandidateConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->RemoveAllCandidateConfig(uid) != WIFI_OPT_SUCCESS) {
@@ -190,7 +209,7 @@ ErrCode StaInterface::RemoveAllCandidateConfig(const int uid)
 
 int StaInterface::AddDeviceConfig(const WifiDeviceConfig &config)
 {
-    LOGD("Enter StaInterface::AddDeviceConfig.\n");
+    LOGI("Enter StaInterface::AddDeviceConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->AddDeviceConfig(config);
@@ -198,18 +217,19 @@ int StaInterface::AddDeviceConfig(const WifiDeviceConfig &config)
 
 int StaInterface::UpdateDeviceConfig(const WifiDeviceConfig &config)
 {
-    LOGD("Enter StaInterface::UpdateDeviceConfig.\n");
+    LOGI("Enter StaInterface::UpdateDeviceConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->UpdateDeviceConfig(config);
 }
 
 ErrCode StaInterface::RemoveDevice(int networkId)
 {
-    LOGD("Enter StaInterface::RemoveDeviceConfig.\n");
+    LOGI("Enter StaInterface::RemoveDeviceConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->RemoveDevice(networkId) != WIFI_OPT_SUCCESS) {
-        LOGD("RemoveDeviceConfig failed.\n");
+        LOGE("RemoveDeviceConfig failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -217,18 +237,18 @@ ErrCode StaInterface::RemoveDevice(int networkId)
 
 ErrCode StaInterface::RemoveAllDevice()
 {
-    WIFI_LOGD("Enter StaInterface::RemoveAllDevice.\n");
+    LOGI("Enter StaInterface::RemoveAllDevice.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->RemoveAllDevice() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGW("RemoveAllDevice failed.\n");
+        LOGE("RemoveAllDevice failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }
 ErrCode StaInterface::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
-    LOGD("Enter StaInterface::EnableDeviceConfig.\n");
+    LOGI("Enter StaInterface::EnableDeviceConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->EnableDeviceConfig(networkId, attemptEnable);
@@ -236,7 +256,7 @@ ErrCode StaInterface::EnableDeviceConfig(int networkId, bool attemptEnable)
 
 ErrCode StaInterface::DisableDeviceConfig(int networkId)
 {
-    LOGD("Enter StaInterface::DisableDeviceConfig.\n");
+    LOGI("Enter StaInterface::DisableDeviceConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->DisableDeviceConfig(networkId);
@@ -244,11 +264,11 @@ ErrCode StaInterface::DisableDeviceConfig(int networkId)
 
 ErrCode StaInterface::StartWps(const WpsConfig &config)
 {
-    LOGD("Enter StaInterface::StartWps.\n");
+    LOGI("Enter StaInterface::StartWps.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->StartWps(config) != WIFI_OPT_SUCCESS) {
-        LOGD("StartWps failed.\n");
+        LOGE("StartWps failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -256,11 +276,11 @@ ErrCode StaInterface::StartWps(const WpsConfig &config)
 
 ErrCode StaInterface::CancelWps()
 {
-    LOGD("Enter StaInterface::CancelWps.\n");
+    LOGI("Enter StaInterface::CancelWps.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->CancelWps() != WIFI_OPT_SUCCESS) {
-        LOGD("CancelWps failed.\n");
+        LOGE("CancelWps failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -268,11 +288,11 @@ ErrCode StaInterface::CancelWps()
 
 ErrCode StaInterface::ConnectivityManager(const std::vector<InterScanInfo> &scanInfos)
 {
-    LOGD("Enter Connection management.\n");
+    LOGI("Enter Connection management.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->AutoConnectService(scanInfos) != WIFI_OPT_SUCCESS) {
-        LOGD("ConnectivityManager failed.\n");
+        LOGE("ConnectivityManager failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -292,7 +312,7 @@ ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callb
 
 ErrCode StaInterface::SetSuspendMode(bool mode)
 {
-    LOGI("Enter StaInterface::SetSuspendMode, mode=[%{public}d]!", mode);
+    LOGI("Enter SetSuspendMode, mode=[%{public}d]!", mode);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->SetSuspendMode(mode) != WIFI_OPT_SUCCESS) {
@@ -304,7 +324,7 @@ ErrCode StaInterface::SetSuspendMode(bool mode)
 
 ErrCode StaInterface::SetPowerMode(bool mode)
 {
-    LOGI("Enter StaInterface::SetPowerMode, mode=[%{public}d]!", mode);
+    LOGI("Enter SetPowerMode, mode=[%{public}d]!", mode);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->SetPowerMode(mode) != WIFI_OPT_SUCCESS) {
@@ -314,9 +334,21 @@ ErrCode StaInterface::SetPowerMode(bool mode)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::SetTxPower(int power)
+{
+    LOGD("Enter SetTxPower, power=[%{public}d]!", power);
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->SetTxPower(power) != WIFI_OPT_SUCCESS) {
+        LOGE("SetTxPower() failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 {
-    LOGI("Enter StaInterface::OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
+    LOGI("Enter OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
         systemAbilityid, add);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
@@ -329,7 +361,7 @@ ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 
 ErrCode StaInterface::OnScreenStateChanged(int screenState)
 {
-    WIFI_LOGI("Enter StaInterface::OnScreenStateChanged, screenState=%{public}d.", screenState);
+    WIFI_LOGI("Enter OnScreenStateChanged, screenState=%{public}d.", screenState);
 
     if (screenState != MODE_STATE_OPEN && screenState != MODE_STATE_CLOSE) {
         WIFI_LOGE("screenState param is error");
@@ -343,6 +375,7 @@ ErrCode StaInterface::OnScreenStateChanged(int screenState)
 
 ErrCode StaInterface::DisableAutoJoin(const std::string &conditionName)
 {
+    LOGI("Enter DisableAutoJoin");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->DisableAutoJoin(conditionName);
@@ -351,6 +384,7 @@ ErrCode StaInterface::DisableAutoJoin(const std::string &conditionName)
 
 ErrCode StaInterface::EnableAutoJoin(const std::string &conditionName)
 {
+    LOGI("Enter EnableAutoJoin");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->EnableAutoJoin(conditionName);
@@ -360,6 +394,7 @@ ErrCode StaInterface::EnableAutoJoin(const std::string &conditionName)
 ErrCode StaInterface::RegisterAutoJoinCondition(const std::string &conditionName,
                                                 const std::function<bool()> &autoJoinCondition)
 {
+    LOGI("Enter RegisterAutoJoinCondition");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->RegisterAutoJoinCondition(conditionName, autoJoinCondition);
@@ -368,6 +403,7 @@ ErrCode StaInterface::RegisterAutoJoinCondition(const std::string &conditionName
 
 ErrCode StaInterface::DeregisterAutoJoinCondition(const std::string &conditionName)
 {
+    LOGI("Enter DeregisterAutoJoinCondition");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->DeregisterAutoJoinCondition(conditionName);
@@ -378,6 +414,7 @@ ErrCode StaInterface::RegisterFilterBuilder(const FilterTag &filterTag,
                                             const std::string &filterName,
                                             const FilterBuilder &filterBuilder)
 {
+    LOGI("Enter RegisterFilterBuilder");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->RegisterFilterBuilder(filterTag, filterName, filterBuilder);
@@ -385,6 +422,7 @@ ErrCode StaInterface::RegisterFilterBuilder(const FilterTag &filterTag,
 
 ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName)
 {
+    LOGI("Enter DeregisterFilterBuilder");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->DeregisterFilterBuilder(filterTag, filterName);
@@ -392,20 +430,68 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
 
 ErrCode StaInterface::StartPortalCertification()
 {
-    WIFI_LOGI("Enter StaInterface::StartPortalCertification");
+    WIFI_LOGI("Enter StartPortalCertification");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->StartPortalCertification();
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::RenewDhcp()
+#ifndef OHOS_ARCH_LITE
+ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
-    WIFI_LOGI("Enter StaInterface::RenewDhcp");
+    WIFI_LOGI("Enter StaInterface::HandleForegroundAppChangedAction");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    pStaService->RenewDhcp();
+    pStaService->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
+}
+#endif
+
+ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
+{
+    WIFI_LOGI("Enter StaInterface::EnableHiLinkHandshake");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->EnableHiLinkHandshake(config, bssid);
+ 
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
+{
+    WIFI_LOGI("Enter StaInterface::DeliverStaIfaceData");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->DeliverStaIfaceData(currentMac);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::StartHttpDetect()
+{
+    WIFI_LOGI("Enter StaInterface::StartHttpDetect");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->StartHttpDetect();
+    return WIFI_OPT_SUCCESS;
+}
+
+bool StaInterface::InitStaServiceLocked()
+{
+    if (pStaService == nullptr) {
+        pStaService = new (std::nothrow) StaService(m_instId);
+        if (pStaService == nullptr) {
+            WIFI_LOGE("New StaService failed.\n");
+            return false;
+        }
+        if (pStaService->InitStaService(m_staCallback) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("InitStaService failed.\n");
+            delete pStaService;
+            pStaService = nullptr;
+            return false;
+        }
+    }
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

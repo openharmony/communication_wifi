@@ -14,7 +14,7 @@
  */
 #include "sta_auto_connect_service.h"
 #include "mock_sta_state_machine.h"
-#include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_sta_interface.h"
 #include "mock_wifi_settings.h"
 #include "mock_device_appraisal.h"
 #include <gtest/gtest.h>
@@ -173,16 +173,11 @@ void StaAutoConnectServiceTest::InitAutoConnectService()
 {
     WifiIdlRoamCapability capability;
     capability.maxBlocklistSize = TWO;
-
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaDeviceMacAddress(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
     EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsInitScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSameBssidScore(_)).Times(AtLeast(0));
@@ -193,10 +188,8 @@ void StaAutoConnectServiceTest::InitAutoConnectService()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSavedDeviceAppraisalPriority(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsNormalScore(_)).Times(AtLeast(0));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetRoamingCapabilities(_))
-        .WillRepeatedly(DoAll(SetArgReferee<0>(capability), Return(WIFI_IDL_OPT_OK)));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
 
     pStaAutoConnectService->InitAutoConnectService();
     for (int i = 0; i < MAX_APPRAISAL_NUM; i++) {
@@ -250,13 +243,10 @@ void StaAutoConnectServiceTest::GetAllDeviceInfos(WifiDeviceConfig &deviceConfig
 
 void StaAutoConnectServiceTest::InitAutoConnectServiceSuccess()
 {
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), RegisterStaEventCallback(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), StartWifi()).WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), WpaAutoConnect(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaDeviceMacAddress(_))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
     EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_))
         .Times(AtLeast(1))
@@ -268,17 +258,10 @@ void StaAutoConnectServiceTest::InitAutoConnectServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsLastSelectionScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSecurityScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig()).Times(AtLeast(0));
 
-    int capabilities = 1;
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_))
-        .WillOnce(DoAll(SetArgReferee<0>(capabilities), Return(WIFI_IDL_OPT_OK)));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = true;
 
-    WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = TWO;
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetRoamingCapabilities(_))
-        .WillRepeatedly(DoAll(SetArgReferee<0>(capability), Return(WIFI_IDL_OPT_OK)));
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_)).Times(AtLeast(0));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
     EXPECT_CALL(WifiSettings::GetInstance(), GetSavedDeviceAppraisalPriority(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
 
@@ -380,8 +363,6 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail6()
 void StaAutoConnectServiceTest::EnableOrDisableBssidSuccess1()
 {
     std::string bssid = "d8:c7:71:2f:14:d9";
-
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_)).Times(AtLeast(0));
     EXPECT_TRUE(pStaAutoConnectService->EnableOrDisableBssid(bssid, false, AP_CANNOT_HANDLE_NEW_STA));
 }
 
@@ -634,38 +615,21 @@ void StaAutoConnectServiceTest::AddOrDelBlockedBssidsFail()
 
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareSuccess()
 {
-    WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = TWO;
-
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_))
-        .WillOnce(Return(WIFI_IDL_OPT_FAILED)); // if it is false, it will do process.
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetRoamingCapabilities(_))
-        .WillOnce(DoAll(SetArgReferee<0>(capability), Return(WIFI_IDL_OPT_OK)));
-    EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == true);
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
+    EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
 }
 
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail1()
 {
-    unsigned int capabilities = 0;
-
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_))
-        .WillOnce(
-        DoAll(SetArgReferee<0>(capabilities), Return(WIFI_IDL_OPT_OK))); // if it is true, it will do not process.
-
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = true;
     EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
 }
 
 void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail2()
 {
-    unsigned int capabilities = 0;
-    WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = 1;
-
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_))
-        .WillOnce(
-        DoAll(SetArgReferee<0>(capabilities), Return(WIFI_IDL_OPT_FAILED))); // if it is true, it will do not process.
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetRoamingCapabilities(_))
-        .WillOnce(DoAll(SetArgReferee<0>(capability), Return(WIFI_IDL_OPT_FAILED)));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = false;
 
     EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
 }
@@ -676,11 +640,8 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareSuccess()
     std::vector<std::string> blockedBssids;
     std::string bssid = "2a:76:93:47:e2:8a";
     blockedBssids.push_back(bssid);
-
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_))
-        .WillOnce(Return(WIFI_IDL_OPT_OK))
-        .WillRepeatedly(Return(WIFI_IDL_OPT_OK));
-    EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == true);
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = true;
+    EXPECT_FALSE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids));
 }
 
 void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail1()
@@ -689,8 +650,7 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail1()
     std::string bssid = "2a:76:93:47:e2:8a";
     blockedBssids.push_back(bssid);
 
-    ON_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_))
-        .WillByDefault(Return(WIFI_IDL_OPT_FAILED));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = false;
     EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
 }
 
@@ -721,7 +681,7 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail4()
     std::vector<std::string> blockedBssids;
     std::string bssid1 = "2a:76:93:47:e2:8a";
     blockedBssids.push_back(bssid1);
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_)).WillOnce(Return(WIFI_IDL_OPT_FAILED));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = false;
     EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
 }
 
@@ -1316,30 +1276,21 @@ void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareSuccess()
     std::string bssid = "2a:76:93:47:e2:8a";
     bool enable = false;
     int reason = AP_CANNOT_HANDLE_NEW_STA;
-    WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = TWO;
 
     pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason);
 
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_))
-        .WillOnce(Return(WIFI_IDL_OPT_FAILED)); // if it is false, it will do process.
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetRoamingCapabilities(_))
-        .WillOnce(DoAll(SetArgReferee<0>(capability), Return(WIFI_IDL_OPT_OK)));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
     pStaAutoConnectService->ObtainRoamCapFromFirmware();
 
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetRoamConfig(_)).WillOnce(Return(WIFI_IDL_OPT_OK));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = true;
     pStaAutoConnectService->SyncBlockedSsidFirmware();
 }
 
 void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareFail()
 {
-    WifiIdlRoamCapability capability;
-    capability.maxBlocklistSize = TWO;
-
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetStaCapabilities(_))
-        .WillOnce(Return(WIFI_IDL_OPT_FAILED)); // if it is false, it will do process.
-    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetRoamingCapabilities(_))
-        .WillRepeatedly(DoAll(SetArgReferee<0>(capability), Return(WIFI_IDL_OPT_OK)));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getCapabilities = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getRoaming = true;
     pStaAutoConnectService->ObtainRoamCapFromFirmware();
 
     pStaAutoConnectService->SyncBlockedSsidFirmware();

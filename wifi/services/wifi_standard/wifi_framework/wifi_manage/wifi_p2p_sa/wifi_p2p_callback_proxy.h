@@ -54,6 +54,14 @@ public:
     void OnP2pPeersChanged(const std::vector<WifiP2pDevice> &device) override;
 
     /**
+     * @Description If the discover P2P device information is updated, all the
+     *        latest WifiP2P devices are reported.
+     *
+     * @param priWfdInfo - std::string &priWfdInfo object
+     */
+    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override;
+
+    /**
      * @Description This event is triggered when the discovered services are updated.
      *
      * @param srvInfo - std::vector<WifiP2pServiceInfo> object
@@ -92,6 +100,20 @@ public:
      * @param dataLen  - Config data length
      */
     void OnConfigChanged(CfgType type, char* cfgData, int dataLen) override;
+
+    /**
+     * @Description The go dhcp server send ack to gc event.
+     *
+     * @param info - WifiP2pLinkedInfo object
+     */
+    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info) override;
+
+    /**
+     * @Description The go dhcp server send ack to gc event.
+     *
+     * @param info - WifiP2pLinkedInfo object
+     */
+    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override;
 
 private:
     void WriteWifiP2pDeviceData(MessageParcel &data, const WifiP2pDevice &device);

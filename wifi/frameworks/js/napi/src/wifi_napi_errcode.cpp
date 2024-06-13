@@ -154,7 +154,7 @@ void HandleCallbackErrCode(const napi_env &env, const AsyncContext &info)
 
 void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
 {
-    WIFI_LOGI("HandlePromiseErrCode, errCode = %{public}d", (int)info.errorCode);
+    WIFI_LOGD("HandlePromiseErrCode, errCode = %{public}d", (int)info.errorCode);
     if (info.errorCode == ErrCode::WIFI_OPT_SUCCESS) {
         napi_resolve_deferred(env, info.deferred, info.result);
     } else {

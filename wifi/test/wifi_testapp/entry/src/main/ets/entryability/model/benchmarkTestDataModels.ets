@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { TestBenchmark , BenchmarkCategory } from './testData'
 
 import {
@@ -175,11 +173,20 @@ import {
 
 import wifi from '@ohos.wifi';
 
+interface BenchmarkTest {
+  name: string;
+  detail: string;
+  method: string;
+  api: Function;
+  result: string;
+  category: BenchmarkCategory;
+}
+
 /**
  * benchmarkTest DataModel of wifi test
  */
 
-const WifiBenchmarkTestCase: [] = [
+const WifiBenchmarkTestCase: BenchmarkTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '注册WLAN状态改变事件' ,
@@ -422,7 +429,7 @@ const WifiBenchmarkTestCase: [] = [
   }
 ]
 
-const WifiManagerBenchmarkTestCase: [] = [
+const WifiManagerBenchmarkTestCase: BenchmarkTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '注册WLAN状态改变事件' ,
@@ -700,7 +707,7 @@ const WifiManagerBenchmarkTestCase: [] = [
   },
 ]
 
-const HotspotBenchmarkTestCase: [] = [
+const HotspotBenchmarkTestCase: BenchmarkTest[] = [
   {
     'name' : '使能热点' ,
     'detail' : '使能热点' ,
@@ -767,7 +774,7 @@ const HotspotBenchmarkTestCase: [] = [
   }
 ]
 
-const HotspotManagerBenchmarkTestCase: [] = [
+const HotspotManagerBenchmarkTestCase: BenchmarkTest[] = [
   {
     'name' : '使能热点' ,
     'detail' : '使能热点' ,
@@ -850,7 +857,7 @@ const HotspotManagerBenchmarkTestCase: [] = [
   }
 ]
 
-const P2pBenchmarkTestCase: [] = [
+const P2pBenchmarkTestCase: BenchmarkTest[] = [
   {
     'name' : '获取P2P连接信息Callback' ,
     'detail' : '获取P2P连接信息Callback' ,
@@ -989,7 +996,7 @@ const P2pBenchmarkTestCase: [] = [
   },
 ]
 
-const P2pManagerBenchmarkTestCase: [] = [
+const P2pManagerBenchmarkTestCase: BenchmarkTest[] = [
   {
     'name' : '获取P2P连接信息Callback' ,
     'detail' : '获取P2P连接信息Callback' ,
@@ -1147,48 +1154,48 @@ const P2pManagerBenchmarkTestCase: [] = [
 
 export function initWifiBenchmarkData(): Array<TestBenchmark> {
   let TestBenchmarkArray: Array<TestBenchmark> = []
-  WifiBenchmarkTestCase.forEach( item => {
-    TestBenchmarkArray.push( new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  WifiBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestBenchmarkArray;
 }
 
 export function initWifiManagerBenchmarkData(): Array<TestBenchmark> {
   let TestBenchmarkArray: Array<TestBenchmark> = []
-  WifiManagerBenchmarkTestCase.forEach( item => {
-    TestBenchmarkArray.push( new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  WifiManagerBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestBenchmarkArray;
 }
 
 export function initHotspotBenchmarkData(): Array<TestBenchmark> {
   let TestBenchmarkArray: Array<TestBenchmark> = []
-  HotspotBenchmarkTestCase.forEach( item => {
-    TestBenchmarkArray.push( new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  HotspotBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestBenchmarkArray;
 }
 
 export function initHotspotManagerBenchmarkData(): Array<TestBenchmark> {
   let TestBenchmarkArray: Array<TestBenchmark> = []
-  HotspotManagerBenchmarkTestCase.forEach( item => {
-    TestBenchmarkArray.push( new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  HotspotManagerBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestBenchmarkArray;
 }
 
 export function initP2pBenchmarkData(): Array<TestBenchmark> {
   let TestBenchmarkArray: Array<TestBenchmark> = []
-  P2pBenchmarkTestCase.forEach( item => {
-    TestBenchmarkArray.push( new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  P2pBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestBenchmarkArray;
 }
 
 export function initP2pManagerBenchmarkData(): Array<TestBenchmark> {
   let TestBenchmarkArray: Array<TestBenchmark> = []
-  P2pManagerBenchmarkTestCase.forEach( item => {
-    TestBenchmarkArray.push( new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category) );
-  } )
+  P2pManagerBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestBenchmarkArray;
 }

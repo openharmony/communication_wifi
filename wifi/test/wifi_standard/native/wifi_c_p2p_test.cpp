@@ -14,8 +14,8 @@
  */
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "../../../interfaces/kits/c/wifi_p2p.h"
-#include "../../../interfaces/kits/c/wifi_hid2d.h"
+#include "kits/c/wifi_p2p.h"
+#include "kits/c/wifi_hid2d.h"
 #include "securec.h"
 #include "wifi_logger.h"
 
@@ -211,6 +211,11 @@ HWTEST_F(WifiP2pTest, RegisterCfgChangCallbackTest, TestSize.Level1)
 HWTEST_F(WifiP2pTest, UnregisterCfgChangCallbackTest, TestSize.Level1)
 {
     EXPECT_EQ(UnregisterCfgChangCallback(), WIFI_SUCCESS);
+}
+
+HWTEST_F(WifiP2pTest, CheckCanUseP2pTest, TestSize.Level1)
+{
+    CheckCanUseP2p();
 }
 }
 }

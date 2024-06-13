@@ -137,6 +137,14 @@ public:
     ErrCode RemoveGroup(void) override;
 
     /**
+     * @Description Remove a P2P client of current group.
+     *
+     * @param deviceMac - client deviceMac address
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveGroupClient(const GcInfo &info) override;
+
+    /**
      * @Description Delete a p2p Group
      *
      * @param group - WifiP2pGroupInfo object
@@ -400,10 +408,31 @@ public:
      */
     bool IsRemoteDied(void) override;
 
+    /**
+     * @Description Discover p2p device
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Disable random mac
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode CheckCanUseP2p() override;
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);
     bool IsP2pServiceRunning();
+    bool IsCallingAllowed();
     static void SaBasicDump(std::string& result);
 
 private:

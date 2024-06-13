@@ -28,7 +28,7 @@
 #include "wifi_global_func.h"
 #include "i_wifi_struct.h"
 #include "wifi_event_callback.h"
-#inlcude "wifi_ap_event_callback.h"
+#include "wifi_ap_event_callback.h"
 #include "wifi_p2p_event_callback.h"
 
 namespace OHOS {
@@ -44,7 +44,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWifi(void);
+    WifiErrorNo StartWifi(const std::string &ifaceName);
 
     /**
      * @Description Close Wifi.
@@ -309,13 +309,31 @@ public:
     WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
     static WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
 
+    /**
+     * @Description Send SIM/AKA/AKA' authentication to wpa
+     *
+     * @param ifName: Interface name
+     * @param cmd: Request message content
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqWpaShellCmd(const std::string &ifName, const std::string &cmd);
+
+    /**
+     * @Description get psk pass phrase
+     *
+     * @param ifName: Interface name
+     * @param psk: psk
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqWpaGetPskPassphrase(const std::string &ifName, std::string &psk);
+
     /* ************************ softAp Interface ************************** */
     /**
      * @Description Start Ap.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartAp(int id, std::string ifaceName);
+    WifiErrorNo StartAp(int id, const std::string &ifaceName);
 
     /**
      * @Description Close Ap.
@@ -386,7 +404,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqP2pStart();
+    WifiErrorNo ReqP2pStart(const std::string &ifaceName);
 
     /**
      * @Description P2P stop
@@ -784,6 +802,22 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqWpaSetPowerMode(bool mode) const;
+    /**
+     * @Description Send power mode to wpa
+     *
+     * @param mode: true for power, false for resume
+     * @return WifiErrorNo
+     */
+    WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const;
+    
+    /**
+     * @Description Enable Softap.
+     *
+     * @param id
+     * @return WifiErrorNo
+     */
+    WifiErrorNo EnableAp(int id = 0);
+
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

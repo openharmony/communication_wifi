@@ -170,7 +170,7 @@ static void OnStaDeauthorizedMock(const std::string &address)
     LOGI("OnStaDeauthorizedMock");
 }
 
-static void OnStaAuthorizedMock(const std::string &address)
+static void OnStaAuthorizedMock(const std::string &devAddress, const std::string &groupAddress)
 {
     LOGI("OnStaAuthorizedMock");
 }
@@ -352,6 +352,29 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnConnectChangedTest, TestSize.Level1)
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
     OnConnectChanged(status, networkId, mac1);
 }
+
+/**
+ * @tc.name: OnDisConnectReasonCallbackTest
+ * @tc.desc: Sta OnDisConnectReasonCallbackTest
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiIdlInnerInterfaceTest, OnDisConnectReasonCallbackTest, TestSize.Level1)
+{
+    LOGI("OnDisConnectReasonCallbackTest enter");
+    int reason = 1;
+    char *mac = nullptr;
+    OnDisConnectReasonCallback(reason, mac);
+    char mac1[] = "00:00:AA:BB:CC:DD";
+    WifiEventCallback callback;
+    RegisterStaCallbackMock(&callback);
+    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
+    OnDisConnectReasonCallback(reason, mac1);
+    UnRegisterStaCallbackMock(&callback);
+    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
+    OnDisConnectReasonCallback(reason, mac1);
+}
+
 /**
  * @tc.name: OnBssidChangedTest
  * @tc.desc: OnBssidChangedTest
@@ -744,18 +767,20 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pStaDeauthorizedTest, TestSize.Level1)
 {
     LOGI("OnP2pStaDeauthorizedTest enter");
     char *p2pDeviceAddress = nullptr;
+    char *p2pGroupAddress = nullptr;
     OnP2pStaDeauthorized(p2pDeviceAddress);
-    OnP2pStaAuthorized(p2pDeviceAddress);
+    OnP2pStaAuthorized(p2pDeviceAddress, p2pGroupAddress);
     char p2pDeviceAdd[] = "AA:BB:CC:DD:EE:FF";
+    char p2pGroupAdd[] = "AA:BB:CC:DD:EE:FF";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pStaDeauthorized(p2pDeviceAdd);
-    OnP2pStaAuthorized(p2pDeviceAdd);
+    OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAdd);
     UnRegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pStaDeauthorized(p2pDeviceAdd);
-    OnP2pStaAuthorized(p2pDeviceAdd);
+    OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAdd);
 }
 /**
  * @tc.name: OnP2pConnectSupplicantFailedTest

@@ -125,6 +125,14 @@ public:
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate) override;
 
     /**
+     * @Description set tx power for sar.
+     *
+     * @param power - 1001,1002,1003......
+     * @return ErrCode - operation result
+     */
+    ErrCode SetWifiTxPower(int power) override;
+
+    /**
      * @Description Update a wifi device configuration.
      *
      * @param config - WifiDeviceConfig object
@@ -389,11 +397,11 @@ public:
     /**
      * @Description set frozen app
      *
-     * @param uid - uid of frozen app
+     * @param pidList - pids of frozen app
      * @param isFrozen - is app frozen
      * @return ErrCode - operation result
      */
-    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+    ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) override;
 
     /**
      * @Description reset all frozen app
@@ -476,9 +484,58 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode FactoryReset() override;
+
+    /**
+     * @Description  limit speed
+     *
+     * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit
+     * @param limitMode speed limit mode, ranges 1 to 9
+     * @return WifiErrorNo
+     */
+    ErrCode LimitSpeed(const int controlId, const int limitMode) override;
+
+    /**
+     * @Description hilink connect
+     *
+     * @return ErrCode - hilink connect result
+     */
+    ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableSemiWifi() override;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetWifiDetailState(WifiDetailState &state) override;
+
+    /**
+     * @Description set satellite state
+     * @param state 3009:satellite start 3010:satellite stop 3011:satellite check
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetSatelliteState(const int state) override;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
 private:
     bool GetWifiDeviceProxy();
-    int systemAbilityId_;
+    std::atomic<int> systemAbilityId_;
     int instId_;
     std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE

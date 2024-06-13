@@ -17,12 +17,16 @@
 #include "securec.h"
 #include "wificdevice_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
-#include "../../../../../../interfaces/kits/c/wifi_device.h"
+#include "kits/c/wifi_device.h"
 
 
 static void EnableWifiTest()
 {
     EnableWifi();
+}
+static void EnableSemiWifiTest()
+{
+    EnableSemiWifi();
 }
 static void DisableWifiTest()
 {
@@ -239,6 +243,15 @@ static void GetDeviceMacAddressTest(const uint8_t* data, size_t size)
     (void)GetDeviceMacAddress(&result);
 }
 
+static void GetWifiDetailStateTest(const uint8_t* data, size_t size)
+{
+    WifiDetailState state;
+    if (size > 0) {
+        state = static_cast<WifiDetailState>(data[0]);
+    }
+    (void)GetWifiDetailState(&state);
+}
+
 static void GetIpInfoTest(const uint8_t* data, size_t size)
 {
     IpInfo info;
@@ -265,12 +278,32 @@ static void SetLowLatencyModeTest(const uint8_t* data, size_t size)
     (void)SetLowLatencyMode(enabled);
 }
 
+static void Get5GHzChannelListTest(const uint8_t* data, size_t size)
+{
+    int result = 0;
+    int sizet = 0;
+    if (size >= TWO) {
+        int index = 0;
+        result = static_cast<int>(data[index++]);
+        sizet = static_cast<int>(data[index++]);
+    }
+    (void)Get5GHzChannelList(&result, &sizet);
+}
+
+static void IsBandTypeSupportedTest(const uint8_t* data, size_t size)
+{
+    bool supported = true;
+    int bandType = static_cast<int>(data[0]);
+    (void)IsBandTypeSupported(bandType, &supported);
+}
+
 namespace OHOS {
 namespace Wifi {
     bool WifiCDeviceFuzzerTest(const uint8_t* data, size_t size)
     {
         EnableWifiTest();
         DisableWifiTest();
+        EnableSemiWifiTest();
         ScanTest();
         RemoveDeviceTest(data, size);
         DisableDeviceConfigTest(data, size);
@@ -286,8 +319,12 @@ namespace Wifi {
         ConnectToDeviceTest(data, size);
         GetLinkedInfoTest(data, size);
         GetDeviceMacAddressTest(data, size);
+        GetWifiDetailStateTest(data, size);
         GetIpInfoTest(data, size);
         SetLowLatencyModeTest(data, size);
+        Get5GHzChannelListTest(data, size);
+        IsBandTypeSupportedTest(data, size);
+
         return true;
     }
 }  // namespace Wifi

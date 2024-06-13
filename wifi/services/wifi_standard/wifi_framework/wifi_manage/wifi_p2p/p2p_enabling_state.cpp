@@ -20,6 +20,7 @@ DEFINE_WIFILOG_P2P_LABEL("P2pEnablingState");
 
 namespace OHOS {
 namespace Wifi {
+constexpr int P2P_SUPPLICANT_CONNECTED = 1;
 P2pEnablingState::P2pEnablingState(
     P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr)
     : State("P2pEnablingState"), p2pStateMachine(stateMachine), groupManager(groupMgr), deviceManager(deviceMgr)
@@ -39,8 +40,14 @@ bool P2pEnablingState::ExecuteStateMsg(InternalMessage *msg)
 {
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::WPA_CONNECTED_EVENT: {
-            p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::ENABLE_P2P_TIMED_OUT));
-            p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+            if (msg->GetParam1() == P2P_SUPPLICANT_CONNECTED) {
+                p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::ENABLE_P2P_TIMED_OUT));
+                p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+            } else {
+                p2pStateMachine.p2pMonitor.MonitorEnds(p2pStateMachine.p2pIface);
+                p2pStateMachine.SwitchState(&p2pStateMachine.p2pDisabledState);
+                p2pStateMachine.BroadcastP2pStatusChanged(P2pState::P2P_STATE_CLOSED);
+            }
             break;
         }
         case P2P_STATE_MACHINE_CMD::WPA_CONN_FAILED_EVENT:

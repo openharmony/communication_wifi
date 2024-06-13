@@ -73,6 +73,7 @@ struct InterScanInfo {
     bool isHeInfoExist;
     bool isErpExist;
     int maxRates;
+    bool isHiLinkNetwork;
 
     InterScanInfo()
         : frequency(0),
@@ -90,7 +91,8 @@ struct InterScanInfo {
           isHtInfoExist(false),
           isHeInfoExist(false),
           isErpExist(false),
-          maxRates(0) {}
+          maxRates(0),
+          isHiLinkNetwork(false) {}
 
     ~InterScanInfo() {}
 
@@ -108,6 +110,12 @@ struct InterScanInfo {
                 break;
             case WifiSecurity::OWE:
                 mgmt = "OWE";
+                break;
+            case WifiSecurity::WEP:
+                mgmt = "WEP";
+                break;
+            case WifiSecurity::EAP_SUITE_B:
+                mgmt = "WPA-EAP-SUITE-B-192";
                 break;
             default:
                 mgmt = "NONE";

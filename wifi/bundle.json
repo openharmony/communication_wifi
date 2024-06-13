@@ -52,18 +52,18 @@
             "wifi_feature_with_auth_disable",
             "wifi_feature_with_dhcp_disable",
             "wifi_feature_with_encryption",
-            "wifi_feature_with_wifi_hdi",
             "wifi_feature_with_ap_extension",
             "wifi_feature_with_app_frozen",
             "wifi_feature_non_seperate_p2p",
+            "wifi_feature_p2p_random_mac_addr",
             "wifi_feature_non_hdf_driver",
             "wifi_feature_with_local_random_mac",
             "wifi_feature_sta_ap_exclusion",
             "wifi_feature_with_random_mac_addr",
             "wifi_feature_with_hdi_wpa_supported",
-            "wifi_feature_with_rx_listen_supported",
             "wifi_feature_with_scan_control",
-            "wifi_feature_network_selection"
+            "wifi_feature_network_selection",
+            "wifi_feature_with_hdi_chip_supported"
         ],
         "adapted_system_type": [
             "small",
@@ -79,21 +79,24 @@
                 "battery_manager",
                 "bundle_framework",
                 "c_utils",
+                "cellular_data",
                 "certificate_manager",
                 "common_event_service",
                 "core_service",
                 "data_share",
                 "dhcp",
+                "distributed_notification_service",
                 "drivers_interface_wlan",
                 "drivers_interface_wpa",
-                "efficiency_manager",
                 "eventhandler",
+                "ffrt",
                 "hdf_core",
                 "hicollie",
                 "hilog",
                 "hisysevent",
                 "huks",
                 "i18n",
+                "image_framework",
                 "init",
                 "ipc",
                 "movement",
@@ -101,18 +104,17 @@
                 "netmanager_base",
                 "netstack",
                 "os_account",
+                "openssl",
+                "relational_store",
                 "safwk",
                 "samgr",
                 "power_manager",
-                "time_service"
-            ],
-            "third_party": [
+                "time_service",
                 "bounds_checking_function",
-                "wpa_supplicant",
                 "jsoncpp",
-                "libxml2",
-                "curl"
-            ]
+                "libxml2"
+            ],
+            "third_party": [ "wpa_supplicant" ]
         },
         "build": {
             "group_type": {
@@ -125,7 +127,7 @@
                 "service_group": [
                     "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_manage",
                     "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_system_ability",
-                    "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_hal:wifi_hal"
+                    "//foundation/communication/wifi/wifi/relation_services:relation_services"
                 ]
             },
             "inner_api": [
@@ -142,6 +144,13 @@
                         "header_files": [ ]
                     },
                     "name" : "//foundation/communication/wifi/wifi/base:wifi_base"
+                },
+                {
+                    "header" : {
+                        "header_base": "//foundation/communication/wifi/wifi/utils/inc",
+                        "header_files": [ ]
+                    },
+                    "name" : "//foundation/communication/wifi/wifi/utils:wifi_utils"
                 }
             ],
             "test": [

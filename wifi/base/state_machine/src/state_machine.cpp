@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ StateMachine::~StateMachine()
     }
 }
 
-bool StateMachine::InitialStateMachine()
+bool StateMachine::InitialStateMachine(const std::string &name)
 {
     LOGI("InitialStateMachine\n");
     pStateMachineHandler = new (std::nothrow) StateMachineHandler(this);
@@ -44,7 +44,7 @@ bool StateMachine::InitialStateMachine()
         return false;
     }
 
-    if (!pStateMachineHandler->InitialSmHandler()) {
+    if (!pStateMachineHandler->InitialSmHandler(name)) {
         LOGE("InitialStateMachineHandler failed.\n");
         return false;
     }
@@ -55,7 +55,7 @@ bool StateMachine::InitialStateMachine()
 void StateMachine::StartStateMachine()
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("StartStateMachine failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -79,7 +79,7 @@ void StateMachine::NotExecutedMessage(const InternalMessage *msg)
 void StateMachine::StatePlus(State *state, State *upper)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("StatePlus failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -89,7 +89,7 @@ void StateMachine::StatePlus(State *state, State *upper)
 void StateMachine::StateDelete(State *state)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("StateDelete failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -99,7 +99,7 @@ void StateMachine::StateDelete(State *state)
 void StateMachine::SetFirstState(State *firstState)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("SetFirstState failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -109,7 +109,7 @@ void StateMachine::SetFirstState(State *firstState)
 void StateMachine::SwitchState(State *targetState)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("SwitchState failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -119,7 +119,7 @@ void StateMachine::SwitchState(State *targetState)
 void StateMachine::DelayMessage(const InternalMessage *msg)
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("DelayMessage failed, pStateMachineHandler is nullptr!");
         return;
     }
 
@@ -129,7 +129,7 @@ void StateMachine::DelayMessage(const InternalMessage *msg)
 void StateMachine::StopHandlerThread()
 {
     if (pStateMachineHandler == nullptr) {
-        LOGE("Start StateMachine failed, pStateMachineHandler is nullptr!");
+        LOGE("StopHandlerThread failed, pStateMachineHandler is nullptr!");
         return;
     }
     pStateMachineHandler->StopHandlerThread();
@@ -257,16 +257,26 @@ void StateMachine::SendMessageAtFrontOfQueue(int msgName, int param1)
 
 void StateMachine::StartTimer(int timerName, int64_t interval)
 {
-    LOGD("Enter StateMachine::StartTimer, timerName is %{public}d, interval is %" PRId64 ".", timerName, interval);
+    LOGD("Enter StartTimer, timerName is %{public}d, interval is %" PRId64 ".", timerName, interval);
     MessageExecutedLater(timerName, interval);
     return;
 }
 
 void StateMachine::StopTimer(int timerName)
 {
-    LOGD("Enter StateMachine::StopTimer, timerName is %{public}d.", timerName);
+    LOGD("Enter StopTimer, timerName is %{public}d.", timerName);
     pStateMachineHandler->DeleteMessageFromQueue(timerName);
     return;
+}
+
+std::string StateMachine::GetCurStateName()
+{
+    LOGD("GetCurStateName");
+    if (pStateMachineHandler == nullptr) {
+        LOGE("GetCurStateName failed, pStateMachineHandler is nullptr!");
+        return "";
+    }
+    return pStateMachineHandler->GetCurStateName();
 }
 
 StateMachineHandler::StateMachineHandler(StateMachine *pStateMgr)
@@ -288,16 +298,16 @@ StateMachineHandler::StateMachineHandler(StateMachine *pStateMgr)
 
 StateMachineHandler::~StateMachineHandler()
 {
-    LOGI("StateMachineHandler::~StateMachineHandler");
+    LOGI("~StateMachineHandler");
     StopHandlerThread();
     ReleaseDelayedMessages();
     ClearWhenQuit();
     return;
 }
 
-bool StateMachineHandler::InitialSmHandler()
+bool StateMachineHandler::InitialSmHandler(const std::string &name)
 {
-    if (!InitialHandler()) {
+    if (!InitialHandler(name)) {
         LOGE("InitialHandler failed.");
         return false;
     }
@@ -462,7 +472,10 @@ StateInfo *StateMachineHandler::BuildSequenceStateVector(State *targetState)
 void StateMachineHandler::PlaceDelayedMsgQueueTop()
 {
     LOGD("Enter StateMachineHandler::PlaceDelayedMsgQueueTop.");
-
+    if (mDelayedMessages.size() == 0) {
+        LOGD("StateMachineHandler::PlaceDelayedMsgQueueTop mDelayedMessages.size() is 0.");
+        return;
+    }
     for (int i = mDelayedMessages.size() - 1; i >= 0; i--) {
         InternalMessage *curMsg = mDelayedMessages[i];
         if (curMsg == nullptr) {
@@ -478,6 +491,10 @@ void StateMachineHandler::PlaceDelayedMsgQueueTop()
 
 void StateMachineHandler::ReleaseDelayedMessages()
 {
+    if (mDelayedMessages.size() == 0) {
+        LOGD("StateMachineHandler::ReleaseDelayedMessages mDelayedMessages.size() is 0.");
+        return;
+    }
     for (int i = mDelayedMessages.size() - 1; i >= 0; i--) {
         InternalMessage *curMsg = mDelayedMessages[i];
         if (curMsg != nullptr) {
@@ -687,6 +704,16 @@ void StateMachineHandler::CallTreeStateEnters(int index)
     }
     /* ensure flag set to false if no methods called. */
     mSwitchingStateFlag = false;
+}
+
+std::string StateMachineHandler::GetCurStateName()
+{
+    StateInfo *curStateInfo = mStateVector[mStateVectorTopIndex];
+    if (curStateInfo == nullptr) {
+        LOGE("StateInfo is null.");
+        return "";
+    }
+    return curStateInfo->state->GetStateName();
 }
 }  // namespace Wifi
 }  // namespace OHOS

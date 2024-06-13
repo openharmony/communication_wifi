@@ -115,7 +115,7 @@ public:
      * @param sceneMap custom scene state map[out]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode OnGetCustomSceneState(std::map<int, time_t>& sceneMap) const = 0;
+    virtual ErrCode OnGetCustomSceneState(std::map<int, time_t>& sceneMap) = 0;
     /**
      * @Description Processes interface service scan control info change request.
      *
@@ -137,47 +137,14 @@ public:
      */
     virtual ErrCode SetEnhanceService(IEnhanceService *enhanceService) = 0;
     /**
-     * @Description  StartWpa
+     * @Description  SetNetworkInterfaceUpDown
      *
-     * @Output: Return operating results to Interface Service after start wpa
-               successfully.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode StartWpa() = 0;
-    /**
-     * @Description  CloseWpa
-     *
-     * @Output: Return operating results to Interface Service after close wpa
-               successfully.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode CloseWpa() = 0;
-    /**
-     * @Description  OpenScanOnly
-     *
-     * @Output: Return operating results to Interface Service after open wifi scan only
+     * @Output: Return operating results to Interface Service after set iface up dwon
                successfully through callback function instead of returning
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode OpenScanOnly() = 0;
-    /**
-     * @Description  CloseScanOnly
-     *
-     * @Output: Return operating results to Interface Service after close wifi scan only
-               successfully through callback function instead of returning
-               result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode CloseScanOnly() = 0;
-    /**
-     * @Description  OnSystemAbilityChanged
-     *
-     * @param systemAbilityId system ability id
-     * @param add true or false
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode OnSystemAbilityChanged(int systemAbilityId, bool add) = 0;
+    virtual ErrCode SetNetworkInterfaceUpDown(bool upDown) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

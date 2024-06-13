@@ -36,6 +36,8 @@ void P2pIdleState::GoInState()
     p2pStateMachine.ClearGroup();
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
     p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE), P2P_REMOVE_DEVICE_TIMEOUT);
+    p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_INVALID);
+    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
 }
 
 void P2pIdleState::GoOutState()
@@ -80,6 +82,8 @@ void P2pIdleState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE, &P2pIdleState::ProcessRemoveDevice));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT, &P2pIdleState::RetryConnect));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISABLE_RANDOM_MAC, &P2pIdleState::ProcessCmdDisableRandomMac));
 }
 
 bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
@@ -277,8 +281,7 @@ bool P2pIdleState::ProcessCmdCreateGroup(InternalMessage &msg) const
 
 bool P2pIdleState::ProcessCmdRemoveGroup(InternalMessage &msg) const
 {
-    p2pStateMachine.DelayMessage(&msg);
-    p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
+    WIFI_LOGI("p2p ildeState no processing remove group! CMD: %{public}d", msg.GetMessageName());
     return EXECUTED;
 }
 
@@ -303,11 +306,12 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
         p2pStateMachine.UpdateGroupManager();
         group.SetNetworkId(groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         WIFI_LOGI("the group network id is %{public}d set id is %{public}d",
-            group.GetNetworkId(),
-            p2pStateMachine.groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
+            group.GetNetworkId(), groupManager.GetGroupNetworkId(group.GetOwner(), group.GetGroupName()));
         p2pStateMachine.UpdatePersistentGroups();
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
+    group.SetCreatorUid(WifiSettings::GetInstance().GetP2pCreatorUid());
+    WifiSettings::GetInstance().SaveP2pCreatorUid(-1);
     p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     if (!p2pStateMachine.groupManager.GetCurrentGroup().IsGroupOwner()) {
         p2pStateMachine.StartDhcpClientInterface();
@@ -449,6 +453,13 @@ bool P2pIdleState::ExecuteStateMsg(InternalMessage *msg)
     } else {
         return NOT_EXECUTED;
     }
+}
+
+bool P2pIdleState::ProcessCmdDisableRandomMac(InternalMessage &msg) const
+{
+    const int setmode = msg.GetParam1();
+    p2pStateMachine.HandlerDisableRandomMac(setmode);
+    return EXECUTED;
 }
 }  // namespace Wifi
 }  // namespace OHOS

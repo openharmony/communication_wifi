@@ -39,21 +39,16 @@ WifiP2PHalInterface &WifiP2PHalInterface::GetInstance(void)
                 initFlag = 1;
             }
 #endif
-#ifdef HDI_INTERFACE_SUPPORT
-            if (inst.InitHdiClient()) {
-                initFlag = 1;
-            }
-#endif
         }
     }
     return inst;
 }
 
-WifiErrorNo WifiP2PHalInterface::StartP2p(void) const
+WifiErrorNo WifiP2PHalInterface::StartP2p(const std::string &ifaceName) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
-    return mHdiWpaClient->ReqP2pStart();
+    return mHdiWpaClient->ReqP2pStart(ifaceName);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqP2pStart();
@@ -341,6 +336,17 @@ WifiErrorNo WifiP2PHalInterface::GroupRemove(const std::string &groupInterface) 
 #endif
 }
 
+WifiErrorNo WifiP2PHalInterface::GroupClientRemove(const std::string &deviceMac) const
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqP2pRemoveGroupClient(deviceMac);
+#else
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    return mIdlClient->ReqP2pRemoveGroupClient(deviceMac);
+#endif
+}
+
 WifiErrorNo WifiP2PHalInterface::Invite(const WifiP2pGroupInfo &group, const std::string &deviceAddr) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
@@ -521,8 +527,13 @@ WifiErrorNo WifiP2PHalInterface::GetP2pPeer(const std::string &deviceAddress, Wi
 
 WifiErrorNo WifiP2PHalInterface::GetChba0Freq(int &chba0Freq) const
 {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    LOGE("call WifiP2PHalInterface::%{public}s!", __func__);
+    return WIFI_IDL_OPT_FAILED;
+#else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     return mIdlClient->ReqP2pGetChba0Freq(chba0Freq);
+#endif
 }
 
 WifiErrorNo WifiP2PHalInterface::P2pGetSupportFrequenciesByBand(int band, std::vector<int> &frequencies) const
@@ -585,14 +596,14 @@ WifiErrorNo WifiP2PHalInterface::Hid2dConnect(const Hid2dConnectConfig &config) 
 #endif
 }
 
-WifiErrorNo WifiP2PHalInterface::SetConnectMacAddr(const std::string &mac, const int portType)
+WifiErrorNo WifiP2PHalInterface::DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const
 {
-#ifdef HDI_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
-    return mHdiClient->SetConnectMacAddr(mac, portType);
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->DeliverP2pData(cmdType, dataType, carryData.c_str());
 #else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->SetConnectMacAddr(mac, portType);
+    LOGE("DeliverP2pData enter Ipc");
+    return WIFI_IDL_OPT_FAILED;
 #endif
 }
 }  // namespace Wifi

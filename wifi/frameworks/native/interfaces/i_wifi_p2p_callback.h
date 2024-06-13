@@ -57,6 +57,14 @@ public:
     virtual void OnP2pPeersChanged(const std::vector<WifiP2pDevice> &device) = 0;
 
     /**
+     * @Description If the discover P2P device information is updated, all the
+     *        latest WifiP2P private devices are reported.
+     *
+     * @param priWfdInfo - std::string &priWfdInfo object
+     */
+    virtual void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) = 0;
+
+    /**
      * @Description This event is triggered when the discovered services are updated.
      *
      * @param srvInfo - std::vector<WifiP2pServiceInfo> object
@@ -82,7 +90,7 @@ public:
      *
      * @param action - DiscoverDevices/StopDiscoverDevices/DiscoverServices/StopDiscoverServices
      *                 /PutLocalP2pService/StartP2pListen/StopP2pListen/CreateGroup/RemoveGroup
-     *                 /DeleteGroup/P2pConnect/P2pCancelConnect
+     *                 /DeleteGroup/P2pConnect/P2pCancelConnect/RemoveGroupClient
      * @param code   - Return code
      */
     virtual void OnP2pActionResult(P2pActionCallback action, ErrCode code) = 0;
@@ -95,6 +103,20 @@ public:
      * @param len  - Config data length
      */
     virtual void OnConfigChanged(CfgType type, char* data, int dataLen) = 0;
+
+    /**
+     * @Description Gc connect to go and obtained ip.
+     *
+     * @param info - GcInfo object
+     */
+    virtual void OnP2pGcJoinGroup(const GcInfo &info) = 0;
+
+    /**
+     * @Description Gc disconnect from group.
+     *
+     * @param info - GcInfo object
+     */
+    virtual void OnP2pGcLeaveGroup(const GcInfo &info) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiP2pCallback");

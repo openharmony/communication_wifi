@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { Category , TestData } from '../entryability/model/testData'
 import { initTestData } from '../entryability/model/testDataModels'
 import { MainPageTitle } from '../Component/mainPageTitle';
@@ -35,44 +33,44 @@ const TAG = '[homePage]'
 
 @Component
 struct TestCategory {
-  private testItems: TestData[]
+  private testItems!: TestData[]
 
   build() {
     Stack() {
       Tabs() {
         TabContent() {
-          AppTest( { testItems : this.testItems.filter( item => ( item.category === Category.App ) ) } )
-        }.tabBar( $r( "app.string.App" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+          AppTest({ testItems : this.testItems.filter(item => (item.category === Category.App)) })
+        }.tabBar($r("app.string.App")).margin({ top : $r("app.float.distance_5") })
 
         TabContent() {
-          ManualApiTest( { testItems : this.testItems.filter( item => ( item.category === Category.API ) ) } )
-        }.tabBar( $r( "app.string.api" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+          ManualApiTest({ testItems : this.testItems.filter(item => (item.category === Category.API)) })
+        }.tabBar($r("app.string.api")).margin({ top : $r("app.float.distance_5") })
 
         TabContent() {
-          StabilityTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stability ) ) } )
-        }.tabBar( $r( "app.string.stability" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+          StabilityTest({ testItems : this.testItems.filter(item => (item.category === Category.Stability)) })
+        }.tabBar($r("app.string.stability")).margin({ top : $r("app.float.distance_5") })
 
         TabContent() {
-          AutoTest( { testItems : this.testItems.filter( item => ( item.category === Category.AutoTest ) ) } )
-        }.tabBar( $r( "app.string.autotest" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+          AutoTest({ testItems : this.testItems.filter(item => (item.category === Category.AutoTest)) })
+        }.tabBar($r("app.string.autotest")).margin({ top : $r("app.float.distance_5") })
 
         TabContent() {
-          ManualSceneTest( { testItems : this.testItems.filter( item => ( item.category === Category.Scenario ) ) } )
-        }.tabBar( $r( "app.string.scenario" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+          ManualSceneTest({ testItems : this.testItems.filter(item => (item.category === Category.Scenario)) })
+        }.tabBar($r("app.string.scenario")).margin({ top : $r("app.float.distance_5") })
 
         TabContent() {
-          BenchmarkTest( { testItems : this.testItems.filter( item => ( item.category === Category.BenchMark ) ) } )
-        }.tabBar( $r( "app.string.benchmark" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+          BenchmarkTest({ testItems : this.testItems.filter(item => (item.category === Category.BenchMark)) })
+        }.tabBar($r("app.string.benchmark")).margin({ top : $r("app.float.distance_5") })
 
         TabContent() {
-          StressTest( { testItems : this.testItems.filter( item => ( item.category === Category.Stress ) ) } )
-        }.tabBar( $r( "app.string.stress" ) ).margin( { top : $r( "app.float.distance_5" ) } )
+          StressTest({ testItems : this.testItems.filter(item => (item.category === Category.Stress)) })
+        }.tabBar($r("app.string.stress")).margin({ top : $r("app.float.distance_5") })
       }
-      .barWidth( ConfigData.WH_80_100 )
-      .barHeight( "40vp" )
-      .align( Alignment.TopStart )
-      .barMode( BarMode.Scrollable )
-      .backgroundColor( $r( "app.color.white" ) )
+      .barWidth(ConfigData.WH_80_100)
+      .barHeight("40vp")
+      .align(Alignment.TopStart)
+      .barMode(BarMode.Scrollable)
+      .backgroundColor($r("app.color.white"))
     }
   }
 }
@@ -88,16 +86,16 @@ struct HomePage {
   build() {
     Column() {
       MainPageTitle()
-      Stack( { alignContent : Alignment.TopEnd } ) {
-        TestCategory( { testItems : this.testItems } )
-        Image( $r( 'app.media.Switch' ) )
-          .height( 30 )
-          .width( 30 )
-          .margin( { top : $r( "app.float.distance_5" ) , right : $r( "app.float.distance_10" ) } )
-          .onClick( () => {
-          } )
+      Stack({ alignContent : Alignment.TopEnd }) {
+        TestCategory({ testItems : this.testItems })
+        Image($r('app.media.Switch'))
+          .height(30)
+          .width(30)
+          .margin({ top : $r("app.float.distance_5") , right : $r("app.float.distance_10") })
+          .onClick(() => {
+          })
       }
-      .height( ConfigData.WH_100_100 )
+      .height(ConfigData.WH_100_100)
     }
   }
 }

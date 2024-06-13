@@ -15,6 +15,7 @@
 #ifndef OHOS_I_WIFI_DEVICE_H
 #define OHOS_I_WIFI_DEVICE_H
 
+#include <set>
 #include "wifi_errcode.h"
 #ifndef OHOS_ARCH_LITE
 #include "iremote_broker.h"
@@ -23,7 +24,7 @@
 #endif
 #include "i_wifi_device_callback.h"
 #include "wifi_errcode.h"
-#include "network_selection_msg.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -135,6 +136,14 @@ public:
     virtual ErrCode RemoveAllDevice() = 0;
 
     /**
+     * @Description Set tx power for sar.
+     *
+     * @param power - tx power
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetTxPower(int power) = 0;
+
+    /**
      * @Description Get all the device configs
      *
      * @param result - Get result vector of WifiDeviceConfig
@@ -176,6 +185,16 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode ConnectToDevice(const WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) = 0;
 
     /**
      * @Description Check whether Wi-Fi is connected.
@@ -368,11 +387,11 @@ public:
     /**
      * @Description set frozen app
      *
-     * @param uid - uid of frozen app
+     * @param pidList - pids of frozen app
      * @param isFrozen - is app frozen
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetAppFrozen(int uid, bool isFrozen) = 0;
+    virtual ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) = 0;
 
     /**
      * @Description reset all frozen app
@@ -449,6 +468,42 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode FactoryReset() = 0;
+
+    /**
+     * @Description LimitSpeed
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
+
+    /**
+     * @Description hilink connect
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) = 0;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableSemiWifi() = 0;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiDetailState(WifiDetailState &state) = 0;
+
+    /**
+     * @Description set satellite state
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetSatelliteState(const int state) = 0;
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");

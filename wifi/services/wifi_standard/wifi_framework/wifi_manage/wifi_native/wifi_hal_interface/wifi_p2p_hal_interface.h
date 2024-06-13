@@ -35,7 +35,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartP2p(void) const;
+    WifiErrorNo StartP2p(const std::string &ifaceName = "p2p0") const;
 
     /**
      * @Description Close p2p
@@ -249,6 +249,15 @@ public:
     WifiErrorNo GroupRemove(const std::string &groupInterface) const;
 
     /**
+     * @Description Sends a request for remove group to the P2P
+     *
+     * @param groupInterface - p2p group
+     * @param deviceMac - p2p client mac address
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GroupClientRemove(const std::string &deviceMac) const;
+
+    /**
      * @Description Sends a request for invite to the P2P
      *
      * @param group - p2p group info
@@ -447,11 +456,12 @@ public:
     /**
      * @Description Set the MAC address of the P2P
      *
-     * @param mac
-     * @param portType
+     * @param cmdType
+     * @param dataType
+     * @param carryData
      * @return WifiErrorNo
      */
-    WifiErrorNo SetConnectMacAddr(const std::string &mac, const int portType);
+    WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const;
 
 private:
     P2pHalCallback mP2pCallback;

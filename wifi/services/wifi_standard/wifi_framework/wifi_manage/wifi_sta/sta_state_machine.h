@@ -19,13 +19,13 @@
 #include <sys/types.h>
 #include <fstream>
 #include <vector>
-
+#include <shared_mutex>
 #include "wifi_internal_msg.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "state_machine.h"
-#include "sta_network_check.h"
+#include "arp_checker.h"
 #include "sta_service_callback.h"
 #include "dhcp_c_api.h"
 #include "sta_define.h"
@@ -33,12 +33,21 @@
 #include "wifi_idl_struct.h"
 
 #ifndef OHOS_ARCH_LITE
+#include "want.h"
 #include "wifi_net_agent.h"
 #include "wifi_net_observer.h"
+#include "sim_state_type.h"
+#include "core_service_client.h"
+#include "cellular_data_client.h"
+#include "core_manager_inner.h"
+#include "telephony_errors.h"
 #endif
 
 namespace OHOS {
 namespace Wifi {
+#ifndef OHOS_ARCH_LITE
+using namespace OHOS::Telephony;
+#endif
 constexpr int STA_CONNECT_MODE = 1;
 constexpr int STA_SCAN_ONLY_MODE = 2;
 constexpr int STA_CAN_ONLY_WITH_WIFI_OFF_MODE = 3;
@@ -52,7 +61,6 @@ constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
-constexpr int CMD_START_RENEWAL_TIMEOUT = 0X05;
 constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
@@ -95,6 +103,7 @@ constexpr int MAC_AUTH_RSP4_TIMEOUT = 5202;
 constexpr int MAC_ASSOC_RSP_TIMEOUT = 5203;
 constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
+constexpr int DHCP_LEASE_EXPIRED = 6;
 
 enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,
@@ -113,13 +122,25 @@ typedef enum EnumDhcpReturnCode {
     DHCP_RESULT,
     DHCP_JUMP,
     DHCP_RENEW_FAIL,
+    DHCP_IP_EXPIRED,
     DHCP_FAIL,
 } DhcpReturnCode;
+
+const int DETECT_TYPE_DEFAULT = 0;
+const int DETECT_TYPE_PERIODIC = 1;
+const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
+const int PORTAL_EXPERIED_DETECT_MAX_COUNT = 2;
+enum PortalState {
+    UNCHECKED = 0,
+    NOT_PORTAL,
+    UNAUTHED,
+    AUTHED,
+    EXPERIED
+};
 
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
-const std::string IF_NAME = "wlan";
 
 class StaStateMachine : public StateMachine {
     FRIEND_GTEST(StaStateMachine);
@@ -318,6 +339,21 @@ public:
     private:
         StaStateMachine *pStaStateMachine;
     };
+    /**
+     * @Description : Definition of member function of SemiActiveState class in StaStateMachine.
+     *
+     */
+    class SemiActiveState : public State {
+    public:
+        explicit SemiActiveState(StaStateMachine *staStateMachine);
+        ~SemiActiveState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
+
+    private:
+        StaStateMachine *pStaStateMachine;
+    };
 
     class DhcpResultNotify {
     public:
@@ -347,19 +383,7 @@ public:
          *
          */
         void DealDhcpResult(int ipType);
-#ifndef OHOS_ARCH_LITE
-        /**
-         * @Description : start renew timeout timer
-         *
-         */
-        void StartRenewTimeout(int64_t interval);
 
-        /**
-         * @Description : stop renew timeout timer
-         *
-         */
-        static void StopRenewTimeout();
-#endif
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
          *
@@ -375,16 +399,15 @@ public:
         void DealDhcpResultFailed();
         static void SetStaStateMachine(StaStateMachine *staStateMachine);
         static void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        static void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToCloseDhcpClient(int iptype);
         static void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
+        static void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
     private:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;
         static DhcpResult DhcpIpv6Result;
-#ifndef OHOS_ARCH_LITE
-        static uint64_t renewTimerId_;
-#endif
     };
 
 public:
@@ -435,7 +458,7 @@ public:
      *
      * @param reason - the state of wifi assoc
      */
-    void OnNetworkAssocEvent(int assocState);
+    void OnNetworkAssocEvent(int assocState, std::string bssid, StaStateMachine *pStaStateMachine);
     /**
      * @Description  Bssid change events
      *
@@ -491,21 +514,11 @@ public:
      */
     void OnNetManagerRestart(void);
 
-     /**
-     * @Description start dhcp renewal.
-     *
-     */
-    void StartDhcpRenewal();
-
     /**
-     * @Description : Deal renewal timeout.
-     *
+     * @Description : start detect timer.
+     * @param detectType - type of detect
      */
-#ifndef OHOS_ARCH_LITE
-    void DealRenewalTimeout();
-#else
-    void DealRenewalTimeout(InternalMessage *msg);
-#endif
+    void StartDetectTimer(int detectType);
 
     /**
      * @Description  start browser to login portal
@@ -513,13 +526,10 @@ public:
      */
     void HandlePortalNetworkPorcess();
     
-    /**
-     * @Description renew dhcp.
-     *
-     */
-    void RenewDhcp();
+    void SetPortalBrowserFlag(bool flag);
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
+    void DealHiLinkDataToWpa(InternalMessage *msg);
 private:
     /**
      * @Description  Destruct state.
@@ -604,12 +614,19 @@ private:
     void StartWifiProcess();
 
     /**
+     * @Description  Processing after a success response is returned after Wi-Fi
+     * is semi active successfully, such as setting the MAC address and
+     * saving the connection information.
+     *
+     */
+    void StartSemiWifiProcess();
+
+    /**
      * @Description  Update wifi status and save connection information.
      *
-     * @param networkId - the networkId of selected network which is going to be connected(in)
      * @param bssid - the mac address of wifi(in)
      */
-    void ConnectToNetworkProcess(InternalMessage *msg);
+    void ConnectToNetworkProcess(std::string bssid);
 
     /**
      * @Description On connect fail.
@@ -626,16 +643,28 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid);
+ 
     /**
      * @Description  Disconnect network
      *
      */
     void DisConnectProcess();
+
     /**
      * @Description  Disable wifi process.
      *
      */
     void StopWifiProcess();
+    /**
+     * @Description  switch semi from enable process.
+     *
+     */
+    void SwitchSemiFromEnableProcess();
+    /**
+     * @Description  switch enable from semi process.
+     *
+     */
+    void SwitchEnableFromSemiProcess();
     /**
      * @Description  Setting statemachine status during the process of enable or disable wifi.
      *
@@ -645,159 +674,191 @@ private:
     void SetSuspendMode(bool enabled);
     void SetPowerMode(bool mode);
     void SetPowerSave(bool enabled);
+
     /**
      * @Description  Configure static ipaddress.
      *
      * @param staticIpAddress- static ip address(in)
      */
     bool ConfigStaticIpAddress(StaticIpAddress &staticIpAddress);
+
     /**
      * @Description  the process of handling network check results.
      *
-     * @param netState - the state of connecting network(in)
+     * @param netState the state of connecting network(in)
+     * @param portalUrl portal network redirection address
      */
-    void HandleNetCheckResult(StaNetState netState, const std::string portalUrl);
+    void HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl);
 
-    void RegisterWifiDetection();
-
+    /**
+     * @Description implementation of the network detection callback function
+     *
+     * @param netState the state of connecting network
+     * @param url portal network redirection address
+     */
     void NetStateObserverCallback(SystemNetWorkState netState, std::string url);
+
     /**
      * @Description  the process of handling arp check results.
      *
      * @param arpState - the state of arp proto(in)
      */
     void HandleArpCheckResult(StaArpState arpState);
+
     /**
      * @Description  the process of handling network check results.
      *
      * @param dnsState - the state of dns protol(in)
      */
     void HandleDnsCheckResult(StaDnsState dnsState);
+
     /**
      * @Description  notification portal network.
      *
      */
     void PublishPortalNetworkNotification();
+
     /**
      * @Description  Remove all device configurations before enabling WPS.
      *
      */
     void RemoveAllDeviceConfigs();
+
     /**
      * @Description  Initialize the connection state processing message map
      *
      */
     int InitStaSMHandleMap();
+
     /**
      * @Description : Deal SignalPoll Result.
      *
      * @param  msg - Message body received by the state machine[in]
      */
     void DealSignalPollResult(InternalMessage *msg);
+
     /**
      * @Description : Converting frequencies to channels.
      *
      */
     void ConvertFreqToChannel();
+
     /**
      * @Description : send packet direction to hisysevent
      *
      */
     void DealSignalPacketChanged(int txPackets, int rxPackets);
+
     /**
      * @Description  Connect to selected network.
      *
      * @param  msg - Message body received by the state machine[in]
      */
     void DealConnectToSelectedNetCmd(InternalMessage *msg);
+
     /**
      * @Description : Ready to connect to the network selected by user.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealConnectToUserSelectedNetwork(InternalMessage *msg);
+
     /**
      * @Description  Operations after the disconnection Event is reported.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealDisconnectEvent(InternalMessage *msg);
+
     /**
      * @Description  Operations after the Connection Event is reported.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealConnectionEvent(InternalMessage *msg);
+
     /**
      * @Description  Operations after Disable specified network commands.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealConnectTimeOutCmd(InternalMessage *msg);
+
     /**
      * @Description  Operations after Clear blocklist is reported.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealWpaBlockListClearEvent(InternalMessage *msg);
+
     /**
      * @Description  Operations after StartWps commands.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealStartWpsCmd(InternalMessage *msg);
+
     /**
      * @Description  Operations after the Wps Connect TimeOut Event is reported.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealWpsConnectTimeOutEvent(InternalMessage *msg);
+
     /**
      * @Description  Cancel wps connection
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealCancelWpsCmd(InternalMessage *msg);
+
     /**
      * @Description  Reconnect network
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealReConnectCmd(InternalMessage *msg);
+
     /**
      * @Description  Operations after the Reassociate lead is issued
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealReassociateCmd(InternalMessage *msg);
+
     /**
      * @Description  Roaming connection.
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealStartRoamCmd(InternalMessage *msg);
+
     /**
      * @Description  Operation after the password error is reported
      *
      * @param msg - Message body received by the state machine[in]
      */
     void DealWpaLinkFailEvent(InternalMessage *msg);
+
     /**
      * @Description  try to connect the saved network for three times
      *@Return true: try to reconnect  fail: try max
      */
     bool DealReconnectSavedNetwork();
+
     /**
      * @Description  set sta connect failed count
      *@Return void
      */
     void DealSetStaConnectFailedCount(int count, bool set);
+
     /**
      * @Description  Wps mode is ON
      *
      * @param msg - Message body received by the state machine[in]
      */
     void StartWpsMode(InternalMessage *msg);
+
     /**
      * @Description  Reassociate network.
      *
@@ -805,17 +866,36 @@ private:
     void ReassociateProcess();
 
     /**
+     * @Description  Set value of randomMacInfo.
+     *
+     * @param deviceConfig - deviceConfig[in]
+     * @param bssid - bssid[in]
+     * @param deviceConfig - randomMacInfo[out]
+     */
+    void InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, const std::string &bssid,
+        WifiStoreRandomMac &randomMacInfo);
+
+    /**
      * @Description  Set a random MAC address.
      *
      * @param networkId - network id[in]
      */
-    bool SetRandomMac(int networkId);
+    bool SetRandomMac(int networkId, const std::string &bssid);
+
+    /**
+     * @Description  check whether the current bssid are consistent.
+     *
+     * @param bssid - bssid
+     */
+    bool CheckRoamingBssidIsSame(std::string bssid);
+
     /**
      * @Description  Generate a random MAC address.
      *
      * @param strMac - Randomly generated MAC address[out]
      */
     void MacAddressGenerate(WifiStoreRandomMac &randomMacInfo);
+
     /**
      * @Description  Compare the encryption mode of the current network with that of the network in the scanning result.
      *
@@ -823,6 +903,7 @@ private:
      * @param deviceKeymgmt - Encryption mode of the current network[in]
      */
     bool ComparedKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt);
+
     /**
      * @Description : Deal network check cmd.
      *
@@ -888,8 +969,163 @@ private:
      * @param msg - Message body received by the state machine[in]
      */
     void DealScreenStateChangedEvent(InternalMessage *msg);
-	
+
+    /**
+     * @Description set external sim
+     *
+     * @param ifName - port name(in)
+     * @param eap - eap method(in)
+     * @Return success: 0  fail: others
+     */
+    ErrCode SetExternalSim(const std::string ifName, const std::string &eap, int value) const;
+
+    /**
+     * @Description : Check Current DisConnect event is should retry.
+     *
+     * @param eventName - eventName.
+     * @Return true: need retry.
+     */
+    bool IsStaDisConnectReasonShouldRetryEvent(int eventName);
+
+    /**
+     * @Description : Check wpa report DisConnect reason is should stoptimer.
+     *
+     * @param reason - reason.
+     * @Return true: need stop timer.
+     */
+    bool IsDisConnectReasonShouldStopTimer(int reason);
+
+    /**
+     * @Description : should sta connect use factory mac address.
+     *
+     * @param networkId - networkId.
+     */
+    bool ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig);
+
+    /**
+     * @Description : Check Current Connect is used randomized mac or not.
+     *
+     * @param networkId - networkId.
+     * @Return true: used randomized mac address.
+     */
+    bool CurrentIsRandomizedMac();
+
 #ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Get slot id.
+     * @Return int32_t - 0:success, other value:failed
+     */
+    int32_t GetDataSlotId();
+
+    /**
+     * @Description Get card type.
+     * @param cardType - card type
+     * @Return int32_t - 0:success, other value:failed
+     */
+    int32_t GetCardType(CardType &cardType);
+
+    /**
+     * @Description Get default slot id.
+     * @param slotId - slot id
+     * @Return int32_t - 0 success, other value:failed
+     */
+    int32_t GetDefaultId(int32_t slotId);
+
+    /**
+     * @Description Get card state.
+     * @param slotId - slot id
+     * @Return int32_t - card state
+     */
+    int32_t GetSimCardState(int32_t slotId);
+
+    /**
+     * @Description verify simId.
+     * @param simId - sim id
+     * @Return int32_t - true: success, false: failed
+     */
+    bool IsValidSimId(int32_t simId);
+
+    /**
+     * @Description Check whether the SIM card is a multi-SIM card.
+     * @Return int32_t - true: success, false: failed
+     */
+    bool IsMultiSimEnabled();
+
+    /**
+     * @Description sim authenticate
+     * @param nonce - sim id
+     * @Return int32_t - 0:success, other value:failed
+     */
+    std::string SimAkaAuth(const std::string &nonce, AuthType authType);
+
+    /**
+     * @Description Get SIM card authentication information.
+     * @param param - authentication information
+     * @Return int32_t - 0:success, other value:failed
+     */
+    std::string GetGsmAuthResponseWithLength(EapSimGsmAuthParam param);
+
+    /**
+     * @Description Get SIM card authentication information.
+     * @param param - authentication information
+     * @Return int32_t - 0:success, other value:failed
+     */
+    std::string GetGsmAuthResponseWithoutLength(EapSimGsmAuthParam param);
+
+    /**
+     * @Description sim authentication notify events
+     *
+     * @param msg: authentication data
+     */
+    void DealWpaEapSimAuthEvent(InternalMessage *msg);
+
+    /**
+     * @Description aka/aka' authentication Pre-process
+     *
+     */
+    bool PreWpaEapUmtsAuthEvent();
+
+    /**
+     * @Description fill aka/aka' authentication request message
+     *
+     * @param param: authentication data
+     */
+    std::vector<uint8_t> FillUmtsAuthReq(EapSimUmtsAuthParam &param);
+
+    /**
+     * @Description fill aka/aka' authentication request message
+     *
+     * @param nonce: authentication data
+     */
+    std::string ParseAndFillUmtsAuthParam(std::vector<uint8_t> &nonce);
+
+    /**
+     * @Description Get aka/aka' card authentication information
+     *
+     * @param param: authentication data
+     */
+    std::string GetUmtsAuthResponse(EapSimUmtsAuthParam &param);
+
+    /**
+     * @Description aka/aka' authentication notify events
+     *
+     * @param msg: authentication data
+     */
+    void DealWpaEapUmtsAuthEvent(InternalMessage *msg);
+
+    /**
+     * @Description Get the SIM card ID.
+     *
+     */
+    int32_t GetSimId();
+
+    /**
+     * @Description Set the SIM card ID.
+     *
+     * @param id - Sim card id
+     */
+    void SetSimId(int32_t simId);
+
     /**
      * @Description Subscribe system ability changed.
      */
@@ -909,6 +1145,7 @@ private:
 
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
+    std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
@@ -928,8 +1165,12 @@ private:
     int getIpFailNum;
     bool enableSignalPoll;
     bool isRoam;
-    int netNoWorkNum;
+    int64_t lastTimestamp;
     bool portalFlag;
+    int portalState;
+    int detectNum;
+    int portalExpiredDetectCount;
+    bool mIsWifiInternetCHRFlag;
     bool networkStatusHistoryInserted;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
@@ -949,23 +1190,33 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    SemiActiveState *pSemiActiveState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
     std::string mPortalUrl;
+    int mLastConnectNetId;      /* last request connect netword id */
+    int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
     /**
      * @Description Replace empty dns
      */
     void ReplaceEmptyDns(DhcpResult *result);
     void InvokeOnStaOpenRes(OperateResState state);
     void InvokeOnStaCloseRes(OperateResState state);
+    void InvokeOnStaSemiActiveRes(OperateResState state);
     void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
     void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);
     void InvokeOnStaRssiLevelChanged(int level);
     WifiDeviceConfig getCurrentWifiDeviceConfig();
-    void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
+    void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus, bool updatePortalAuthTime);
     bool CanArpReachable();
+    ErrCode ConfigRandMacSelfCure(const int networkId);
+#ifndef OHOS_ARCH_LITE
+    void ShowPortalNitification();
+#endif
+    void SetConnectMethod(int connectMethod);
+    void FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

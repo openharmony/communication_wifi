@@ -55,6 +55,8 @@ void OnWpsOverlap(int status);
 void OnWpsTimeOut(int status);
 void OnWpaConnectionFull(int status);
 void OnWpaConnectionReject(int status);
+void OnWpaStaNotifyCallBack(const char *notifyParam);
+void OnDisConnectReasonCallback(int reason, const char *bssid);
 
 /**
  * @Description Get the Supplicant Rpc Client object.
@@ -93,11 +95,12 @@ void OnP2pFindStopped(void);
 void OnP2pServiceDiscoveryResponse(
     const char *srcAddress, short updateIndicator, const unsigned char *tlvs, size_t tlvsLength);
 void OnP2pStaDeauthorized(const char *p2pDeviceAddress);
-void OnP2pStaAuthorized(const char *p2pDeviceAddress);
+void OnP2pStaAuthorized(const char *p2pDeviceAddress, const char *p2pGroupAddress);
 void OnP2pConnectSupplicantFailed(void);
 void OnP2pServDiscReq(const P2pServDiscReqInfo *info);
 void OnP2pIfaceCreated(const char *ifName, int isGo);
 void OnP2pConnectFailed(const char *bssid, int reason);
+void OnP2pChannelSwitch(int freq);
 #ifdef __cplusplus
 }
 #endif

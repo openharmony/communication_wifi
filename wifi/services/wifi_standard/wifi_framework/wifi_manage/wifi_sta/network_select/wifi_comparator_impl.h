@@ -20,8 +20,7 @@
 #include <functional>
 #include "network_selection.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi::NetworkSelection  {
 
 class WifiScorerComparator : public IWifiComparator {
 public:
@@ -44,12 +43,8 @@ private:
     void LogWorseCandidate(NetworkCandidate &worseNetworkCandidates,
                            NetworkCandidate &selectedNetworkCandidate,
                            ScoreResult &scoreResults);
-
-    std::string getAllNetworkCandidateMsg(std::vector<NetworkCandidate *> &networkCandidates);
-    std::string getAllScoreMsg(std::vector<ScoreResult> &scoreResults);
     std::vector<std::shared_ptr<IWifiScorer>> scorers;
     std::string comparatorName;
 };
-}
 }
 #endif

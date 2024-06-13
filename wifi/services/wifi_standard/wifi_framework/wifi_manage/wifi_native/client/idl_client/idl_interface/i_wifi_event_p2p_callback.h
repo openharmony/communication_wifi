@@ -45,11 +45,12 @@ typedef struct IWifiEventP2pCallback {
     void (*onServiceDiscoveryResponse)(
         const char *srcAddress, short updateIndicator, const unsigned char *tlvs, size_t tlvsLength);
     void (*onStaDeauthorized)(const char *p2pDeviceAddress);
-    void (*onStaAuthorized)(const char *p2pDeviceAddress);
+    void (*onStaAuthorized)(const char *p2pDeviceAddress, const char *p2pGroupAddress);
     void (*connectSupplicantFailed)(void);
     void (*onP2pServDiscReq)(const P2pServDiscReqInfo *info);
     void (*onP2pIfaceCreated)(const char *ifName, int isGo);
     void (*onP2pConnectFailed)(const char *bssid, int reason);
+    void (*onP2pChannelSwitch)(int freq);
 } IWifiEventP2pCallback;
 
 #ifdef __cplusplus

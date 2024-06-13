@@ -79,7 +79,7 @@ ErrCode StaSavedDeviceAppraisal::DeviceAppraisals(
         }
     }
     if (sign == 1) {
-        WIFI_LOGI("DeviceAppraisals, Selected device, networkId:%{public}d, ssid:%{public}s, bssid:%{public}s.",
+        WIFI_LOGI("DeviceAppraisals, networkId:%{public}d, ssid:%{public}s, bssid:%{public}s.",
             electedDevice.networkId, SsidAnonymize(electedDevice.ssid).c_str(),
             MacAnonymize(electedDevice.bssid).c_str());
         if (info.connState == ConnState::CONNECTED && electedDevice.networkId == info.networkId) {

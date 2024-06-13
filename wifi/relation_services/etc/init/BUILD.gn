@@ -1,0 +1,96 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/wpa.gni")
+} else {
+  import("//build/ohos.gni")
+  import("//foundation/communication/wifi/wifi/wifi.gni")
+}
+
+group("etc") {
+  deps = [ ":wpa_supplicant.conf" ]
+  if (!defined(ohos_lite)) {
+    deps += [
+      ":hostapd.conf",
+      ":hostapd_coex.conf",
+      ":p2p_supplicant.conf",
+      ":wifi_hal_service.cfg",
+    ]
+  }
+}
+
+if (defined(ohos_lite)) {
+  copy("wpa_supplicant.conf") {
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      sources = [ "unix_socket/wpa_supplicant.conf" ]
+    } else {
+      sources = [ "udp_socket/wpa_supplicant.conf" ]
+    }
+    outputs = [ "$root_out_dir/system/etc/wifi/wpa_supplicant.conf" ]
+  }
+} else {
+  ohos_prebuilt_etc("wifi_hal_service.cfg") {
+    source = "wifi_hal_service.cfg"
+    relative_install_dir = "init"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_prebuilt_etc("wpa_supplicant.conf") {
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "unix_socket/wpa_supplicant.conf"
+    } else {
+      source = "udp_socket/wpa_supplicant.conf"
+    }
+    relative_install_dir = "wifi"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_prebuilt_etc("hostapd.conf") {
+    source = "hostapd.conf"
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "default_conf/unix_socket/hostapd.conf"
+    } else {
+      source = "default_conf/udp_socket/hostapd.conf"
+    }
+    relative_install_dir = "wifi"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_prebuilt_etc("p2p_supplicant.conf") {
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "unix_socket/p2p_supplicant.conf"
+    } else {
+      source = "udp_socket/p2p_supplicant.conf"
+    }
+    relative_install_dir = "wifi"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+
+  ohos_prebuilt_etc("hostapd_coex.conf") {
+    source = "hostapd_coex.conf"
+    if ("${CONFIG_CTRL_IFACE}" == "unix") {
+      source = "default_conf/unix_socket/hostapd_coex.conf"
+    } else {
+      source = "default_conf/udp_socket/hostapd_coex.conf"
+    }
+    relative_install_dir = "wifi"
+    part_name = "wifi"
+    subsystem_name = "communication"
+  }
+}

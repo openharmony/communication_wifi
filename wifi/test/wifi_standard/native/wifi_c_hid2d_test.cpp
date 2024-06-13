@@ -18,8 +18,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "securec.h"
-#include "../../../interfaces/kits/c/wifi_hid2d.h"
-#include "../../../interfaces/kits/c/wifi_device.h"
+#include "kits/c/wifi_hid2d.h"
+#include "kits/c/wifi_device.h"
 #include "wifi_logger.h"
 
 using ::testing::_;

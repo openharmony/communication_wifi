@@ -29,7 +29,6 @@
 #include "scan_common.h"
 #include "scan_monitor.h"
 #include "scan_state_machine.h"
-#include "scan_standby_listerner.h"
 #include "ienhance_service.h"
 
 namespace OHOS {
@@ -264,53 +263,25 @@ public:
      */
     virtual void SetEnhanceService(IEnhanceService* enhanceService);
     /**
-     * @Description  StartWpa
-     *
-     * @Output: Return operating results to Interface Service after start wpa
-               successfully.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     * @Description Init chipset info.
      */
-    virtual ErrCode StartWpa();
+    virtual void InitChipsetInfo();
     /**
-     * @Description  CloseWpa
+     * @Description  SetNetworkInterfaceUpDown
      *
-     * @Output: Return operating results to Interface Service after close wpa
-               successfully.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode CloseWpa();
-    /**
-     * @Description  OpenScanOnly
-     *
-     * @Output: Return operating results to Interface Service after enable wifi scan only
+     * @Output: Return operating results to Interface Service after set iface up dwon
                successfully through callback function instead of returning
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode OpenScanOnly() const;
-    /**
-     * @Description  CloseScanOnly
-     *
-     * @Output: Return operating results to Interface Service after close wifi scan only
-               successfully through callback function instead of returning
-               result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode CloseScanOnly() const;
-    /**
-     * @Description OnSystemAbilityChanged
-     *
-     * @param systemAbilityId system ability id
-     * @param add true or false
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_INVALID_PARAM
-     */
-    virtual ErrCode OnSystemAbilityChanged(int systemAbilityId, bool add);
+    virtual ErrCode SetNetworkInterfaceUpDown(bool upDown);
 
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;
     using ScanInfoHandlerMap = std::map<std::string, ScanInfoHandler>;
     using PnoScanInfoHandlerMap = std::map<std::string, PnoScanInfoHandler>;
 
+    std::shared_mutex mScanCallbackMutex;
     IScanSerivceCallbacks mScanSerivceCallbacks;
     ScanStateMachine *pScanStateMachine;             /* Scanning state machine pointer */
     ScanMonitor *pScanMonitor;                       /* Scanning Monitor Pointer */
@@ -359,15 +330,15 @@ private:
     };
     bool scanTrustMode;                              /* scan trustlist mode */
     std::unordered_set<int> scanTrustSceneIds;       /* scan scene ids */
-    bool isAbsFreezeState;                           /* absolute freeze state. */
+    bool lastFreezeState;                            /* last freeze state. */
     bool isAbsFreezeScaned;                          /* scanned in freeze state. */
     int scanResultBackup;                            /* scan result backup. */
     IEnhanceService *mEnhanceService;                /* EnhanceService handle */
-#ifndef OHOS_ARCH_LITE
-    StandByListerner standByListerner;         /* standby Listerner*/
-#endif
     int m_instId;
     int lastNetworkQuality;
+    int chipsetCategory;
+    int chipsetFeatrureCapability;
+    bool isChipsetInfoObtained;
     /**
      * @Description Obtains the frequency of a specified band.
      *
@@ -410,6 +381,10 @@ private:
      * @return success: true, failed: false
      */
     bool StoreUserScanInfo(const StoreScanConfig &scanConfig, std::vector<InterScanInfo> &scanInfoList);
+
+    void ReportScanStartEvent();
+    void ReportScanStopEvent();
+    void ReportScanFinishEvent(int event);
     /**
      * @Description Sends the scanning result to the interface service,
      *              which then sends the scanning result to the connection
@@ -547,17 +522,12 @@ private:
      */
     bool IsInScanTrust(int sceneId) const;
     /**
-     * @Description Set the moving freeze status by state.
-     *
-     * @param state - state value.
-     */
-    void SetMovingFreezeState(bool state);
-    /**
      * @Description Is it the moving freeze state?
      *
-    * @return true: success, false: failed
+     * @param appRunMode - current scan mode.
+     * @return true: success, false: failed
      */
-    bool IsMovingFreezeState() const;
+    bool IsMovingFreezeState(ScanMode appRunMode) const;
     /**
      * @Description Set the moving freeze state to scanned.
      *
@@ -877,9 +847,10 @@ private:
     /**
      * @Description Determines whether scanning is allowed in movingfreeze mode.
      *
+     * @param appRunMode scan mode
      * @return true: allow, false: not allowed.
      */
-    bool AllowScanByMovingFreeze();
+    bool AllowScanByMovingFreeze(ScanMode appRunMode);
     /**
      * @Description Determines whether scanning is allowed in hid2d state.
      *

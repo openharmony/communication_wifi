@@ -66,7 +66,7 @@ public:
      * @param ifaceName - Network Interface
      * @return true: success      false: fail
      */
-    bool StopDhcpServer(const std::string &ifaceName);
+    bool StopDhcp(const std::string &ifaceName);
 
     /**
      * @Description Get currently connected station info: ip address, device name

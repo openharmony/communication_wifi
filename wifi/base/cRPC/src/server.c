@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,8 +49,16 @@ static int OnAccept(RpcServer *server, unsigned int mask)
     if (fd < 0) {
         return -1;
     }
-    SetNonBlock(fd, 1);
-    fcntl(fd, F_SETFD, FD_CLOEXEC);
+    if (SetNonBlock(fd, 1) != 0) {
+        LOGE("OnAccept  SetNonBlock failed!");
+        close(fd);
+        return -1;
+    }
+    if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
+        LOGE("OnAccept  fcntl failed!");
+        close(fd);
+        return -1;
+    }
     Context *context = CreateContext(CONTEXT_BUFFER_MIN_SIZE);
     if (context != NULL) {
         context->fd = fd;
@@ -148,8 +156,10 @@ static void DealFdReadEvent(RpcServer *server, Context *client, unsigned int mas
     DealReadMessage(server, client);
     int ret = ContextReadNet(client);
     if ((ret == SOCK_ERR) || ((ret == SOCK_CLOSE) && (mask & EXCP_EVENT))) {
+        LOGE("ContextReadNet failed: %{public}d", ret);
         DelFdEvent(server->loop, client->fd, READ_EVENT | WRIT_EVENT);
     } else if (ret == SOCK_CLOSE) {
+        LOGE("Socket close.");
         DelFdEvent(server->loop, client->fd, READ_EVENT);
     } else if (ret > 0) {
         int haveMsg;
@@ -169,9 +179,11 @@ static void DealFdWriteEvent(RpcServer *server, Context *client)
     if (client->wBegin != client->wEnd) {
         int tmp = ContextWriteNet(client);
         if (tmp < 0) {
+            LOGE("ContextWriteNet failed: %{public}d", tmp);
             DelFdEvent(server->loop, client->fd, READ_EVENT | WRIT_EVENT);
         }
     } else {
+        LOGE("Del write event.");
         DelFdEvent(server->loop, client->fd, WRIT_EVENT);
     }
     return;
@@ -299,6 +311,9 @@ int RegisterCallback(RpcServer *server, int event, Context *context)
 
     int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     int pos = event % num;
+    if (pos >= MAX_EVENT_NODE_COUNT) {
+        return -1;
+    }
     server->eventNode[pos].event = event;
     struct Node *p = server->eventNode[pos].head;
     while (p != NULL && p->context->fd != context->fd) {
@@ -323,6 +338,9 @@ int UnRegisterCallback(RpcServer *server, int event, const Context *context)
 
     int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     int pos = event % num;
+    if (pos >= MAX_EVENT_NODE_COUNT) {
+        return -1;
+    }
     server->eventNode[pos].event = event;
     struct Node *p = server->eventNode[pos].head;
     struct Node *q = p;

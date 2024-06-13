@@ -192,6 +192,97 @@ int WifiScanStub::OnIsWifiClosedScan(uint32_t code, MessageParcel &data, Message
     return ret;
 }
 
+constexpr int ASH_MEM_SIZE = 1024 * 200;
+void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result, MessageParcel &reply)
+{
+    WIFI_LOGI("WifiScanStub SendScanInfo");
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem("scaninfo", ASH_MEM_SIZE);
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        reply.WriteInt32(WIFI_OPT_FAILED);
+        if (ashmem != nullptr) {
+            ashmem->UnmapAshmem();
+            ashmem->CloseAshmem();
+        }
+        return;
+    }
+    std::vector<uint32_t> scanInfoSize;
+    int offset = 0;
+    for (int i = 0; i < contentSize; ++i) {
+        std::stringstream scanInfoStream;
+        scanInfoStream << result[i].bssid << ";";
+        scanInfoStream << result[i].ssid << ";";
+        scanInfoStream << result[i].bssidType << ";";
+        scanInfoStream << result[i].capabilities << ";";
+        scanInfoStream << result[i].frequency << ";";
+        scanInfoStream << result[i].band << ";";
+        scanInfoStream << static_cast<int>(result[i].channelWidth) << ";";
+        scanInfoStream << result[i].centerFrequency0 << ";";
+        scanInfoStream << result[i].centerFrequency1 << ";";
+        scanInfoStream << result[i].rssi << ";";
+        scanInfoStream << static_cast<int>(result[i].securityType) << ";";
+        scanInfoStream << result[i].infoElems.size() << ";";
+        for (const auto& elem : result[i].infoElems) {
+            scanInfoStream << elem.id << ";";
+            scanInfoStream << elem.content.size() << ";";
+            for (const auto& byte : elem.content) {
+                scanInfoStream << static_cast<int>(byte) << ";";
+            }
+        }
+        scanInfoStream << result[i].features << ";";
+        scanInfoStream << result[i].timestamp << ";";
+        scanInfoStream << result[i].wifiStandard << ";";
+        scanInfoStream << result[i].maxSupportedRxLinkSpeed << ";";
+        scanInfoStream << result[i].maxSupportedTxLinkSpeed << ";";
+        scanInfoStream << result[i].disappearCount << ";";
+        scanInfoStream << result[i].isHiLinkNetwork << ";";
+        scanInfoStream << static_cast<int>(result[i].supportedWifiCategory) << ";";
+        scanInfoSize.push_back(scanInfoStream.str().length());
+        ashmem->WriteToAshmem(scanInfoStream.str().c_str(), scanInfoStream.str().length(), offset);
+        offset += scanInfoSize[i];
+    }
+    reply.WriteInt32(WIFI_OPT_SUCCESS);
+    reply.WriteInt32(contentSize);
+    reply.WriteUInt32Vector(scanInfoSize);
+    reply.WriteAshmem(ashmem);
+    ashmem->UnmapAshmem();
+    ashmem->CloseAshmem();
+}
+
+void WifiScanStub::SendScanInfoSmall(int32_t contentSize, std::vector<WifiScanInfo> &result, MessageParcel &reply)
+{
+    reply.WriteInt32(WIFI_OPT_SUCCESS);
+    reply.WriteInt32(contentSize);
+    for (unsigned int i = 0; i < contentSize; i++) {
+        reply.WriteString(result[i].bssid);
+        reply.WriteString(result[i].ssid);
+        reply.WriteInt32(result[i].bssidType);
+        reply.WriteString(result[i].capabilities);
+        reply.WriteInt32(result[i].frequency);
+        reply.WriteInt32(result[i].band);
+        reply.WriteInt32(static_cast<int>(result[i].channelWidth));
+        reply.WriteInt32(result[i].centerFrequency0);
+        reply.WriteInt32(result[i].centerFrequency1);
+        reply.WriteInt32(result[i].rssi);
+        reply.WriteInt32(static_cast<int>(result[i].securityType));
+        reply.WriteUint32(result[i].infoElems.size());
+        for (const auto& elem : result[i].infoElems) {
+            reply.WriteInt32(elem.id);
+            reply.WriteUint32(elem.content.size());
+            for (const auto& byte : elem.content) {
+                reply.WriteInt32(static_cast<int>(byte));
+            }
+        }
+        reply.WriteInt64(result[i].features);
+        reply.WriteInt64(result[i].timestamp);
+        reply.WriteInt32(result[i].wifiStandard);
+        reply.WriteInt32(result[i].maxSupportedRxLinkSpeed);
+        reply.WriteInt32(result[i].maxSupportedTxLinkSpeed);
+        reply.WriteInt32(result[i].disappearCount);
+        reply.WriteBool(result[i].isHiLinkNetwork);
+        reply.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
+    }
+}
+
 int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     bool compatible = data.ReadBool();
@@ -200,37 +291,20 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
     std::vector<WifiScanInfo> result;
     ErrCode ret = GetScanInfoList(result, compatible);
     reply.WriteInt32(0);
-    reply.WriteInt32(ret);
     if (ret != WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(ret);
         return ret;
     }
-
     unsigned int size = result.size();
-    reply.WriteInt32(size);
-    for (unsigned int i = 0; i < size; ++i) {
-        reply.WriteString(result[i].bssid);
-        reply.WriteInt32(result[i].bssidType);
-        reply.WriteString(result[i].ssid);
-        reply.WriteString(result[i].capabilities);
-        reply.WriteInt32(result[i].frequency);
-        reply.WriteInt32(result[i].rssi);
-        reply.WriteInt64(result[i].timestamp);
-        reply.WriteInt32(result[i].band);
-        reply.WriteInt32(static_cast<int>(result[i].securityType));
-        reply.WriteInt32(static_cast<int>(result[i].channelWidth));
-        reply.WriteInt32(result[i].centerFrequency0);
-        reply.WriteInt32(result[i].centerFrequency1);
-        reply.WriteInt64(result[i].features);
-        reply.WriteInt32(result[i].infoElems.size());
-        for (unsigned int m = 0; m < result[i].infoElems.size(); ++m) {
-            reply.WriteInt32(result[i].infoElems[m].id);
-            reply.WriteInt32(result[i].infoElems[m].content.size());
-            for (unsigned int n = 0; n < result[i].infoElems[m].content.size(); ++n) {
-                reply.WriteInt8(result[i].infoElems[m].content[n]);
-            }
-        }
-        reply.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
-        reply.WriteBool(result[i].isHiLinkNetwork);
+    constexpr int maxSize = 200;
+    constexpr int bigSize = 150;
+    if (size > maxSize) {
+        size = maxSize;
+    }
+    if (size > bigSize) {
+        SendScanInfo(size, result, reply);
+    } else {
+        SendScanInfoSmall(size, result, reply);
     }
     return ret;
 }

@@ -495,6 +495,13 @@ public:
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 
     /**
+     * @Description set low tx power
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
+
+    /**
      * @Description hilink connect
      *
      * @return ErrCode - hilink connect result

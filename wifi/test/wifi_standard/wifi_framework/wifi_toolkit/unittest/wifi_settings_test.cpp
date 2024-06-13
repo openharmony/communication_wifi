@@ -20,7 +20,6 @@
 #include "securec.h"
 #include "wifi_settings.h"
 #include "wifi_logger.h"
-#include "init_param.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -617,8 +616,7 @@ HWTEST_F(WifiSettingsTest, OnBackupTest, TestSize.Level1)
 {
     WIFI_LOGI("OnBackupTest enter");
     UniqueFd fd(-1);
-    WifiSettings::GetInstance().OnBackup(fd, "");
-    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), true);
+    EXPECT_EQ(WifiSettings::GetInstance().OnBackup(fd, ""), -1);
     close(fd.Release());
     WifiSettings::GetInstance().RemoveBackupFile();
 }
@@ -627,8 +625,7 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest1, TestSize.Level1)
 {
     WIFI_LOGI("OnRestoreTest1 enter");
     UniqueFd fd(-1);
-    WifiSettings::GetInstance().OnRestore(fd, "");
-    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), false);
+    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, ""), -1);
     close(fd.Release());
 }
 
@@ -648,8 +645,7 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest2, TestSize.Level1)
     wifiBackupConfig.SaveConfig();
 
     UniqueFd fd(open(BACKUP_CONFIG_FILE_PATH_TEST, O_RDONLY));
-    WifiSettings::GetInstance().OnRestore(fd, "");
-    EXPECT_EQ(std::filesystem::exists(BACKUP_CONFIG_FILE_PATH), true);
+    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, ""), -1);
     close(fd.Release());
     remove(BACKUP_CONFIG_FILE_PATH_TEST);
     WifiSettings::GetInstance().RemoveBackupFile();

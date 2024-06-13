@@ -1741,6 +1741,26 @@ ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMo
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam)
+{
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d",
+        __FUNCTION__, GetCallingPid(), GetCallingUid());
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    if (pEnhanceService->SetLowTxPower(wifiLowPowerParam)) {
+        WIFI_LOGE("%{public}s set low tx power fail!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 void WifiDeviceServiceImpl::StartWatchdog(void)
 {
     constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;
@@ -1907,7 +1927,9 @@ ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& repl
 {
     UniqueFd fd(-1);
     std::string replyCode = EXTENSION_SUCCESS;
-    int ret = WifiSettings::GetInstance().OnBackup(fd, "");
+    std::string backupInfo = data.ReadString();
+    int ret = WifiSettings::GetInstance().OnBackup(fd, backupInfo);
+    std::fill(backupInfo.begin(), backupInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnBackup fail: backup data fail!");
         replyCode = EXTENSION_FAIL;
@@ -1927,7 +1949,9 @@ ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& rep
 {
     UniqueFd fd(data.ReadFileDescriptor());
     std::string replyCode = EXTENSION_SUCCESS;
-    int ret = WifiSettings::GetInstance().OnRestore(fd, "");
+    std::string restoreInfo = data.ReadString();
+    int ret = WifiSettings::GetInstance().OnRestore(fd, restoreInfo);
+    std::fill(restoreInfo.begin(), restoreInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnRestore fail: restore data fail!");
         replyCode = EXTENSION_FAIL;

@@ -1633,12 +1633,6 @@ public:
      */
     int SetDeviceRandomizedMacSuccessEver(int networkId);
 
-    bool IsValidParanValue(const char *value, uint32_t len);
-    std::string GetParameter(const std::string &key, const std::string &def);
-    std::string GetCountry();
-    std::string GetLanguage();
-    std::string GetOversea();
-
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 
     /**
@@ -1788,6 +1782,10 @@ private:
     void MergeSoftapConfig();
     void MergeWifiConfig();
     void ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs);
+    void ParseBackupJson(const std::string &backupInfo, std::string &key, std::string &iv, std::string &version);
+    int GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd);
+    int GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd, const std::string &key,
+        const std::string &iv);
 #endif
     void InitPackageFilterConfig();
 

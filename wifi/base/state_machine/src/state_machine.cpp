@@ -657,7 +657,7 @@ State *StateMachineHandler::ExecuteTreeStateMsg(InternalMessage *msg)
     }
 
     if (curStateInfo->state) {
-        LOGI("ExecuteTreeStateMsg, State machine: %{public}s execute Cmd:%{public}d",
+        LOGD("ExecuteTreeStateMsg, State machine: %{public}s execute Cmd:%{public}d",
             curStateInfo->state->GetStateName().c_str(), msg->GetMessageName());
     }
 

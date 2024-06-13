@@ -798,6 +798,15 @@ typedef enum {
     BG_LIMIT_LEVEL_10,
     BG_LIMIT_LEVEL_11,
 } BgLimitLevel;
+
+typedef struct {
+    std::string ifName;
+    int scene;
+    int rssiThreshold;
+    std::string peerMacaddr;
+    std::string powerParam;
+    int powerParamLen;
+} WifiLowPowerParam;
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

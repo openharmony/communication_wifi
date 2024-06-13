@@ -26,18 +26,13 @@
 #include "wifi_hisysevent.h"
 #include "wifi_settings.h"
 #include "wifi_app_state_aware.h"
-#include "wifi_net_agent.h"
-#include "parameter.h"
 #include "ip_qos_monitor.h"
  
 namespace OHOS {
 namespace Wifi {
 const std::string CLASS_NAME = "WifiSelfCure";
-const int PUBLIC_DNS_SERVERS_SIZE = 32;
 
 DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
-std::vector<std::string> chinaPublicDnses;
-std::vector<std::string> overseaPublicDnses;
 
 const uint32_t CONNECT_NETWORK_RETRY = 1;
 const uint32_t WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
@@ -60,7 +55,6 @@ SelfCureStateMachine::SelfCureStateMachine(int instId)
       pNoInternetState(nullptr),
       m_instId(instId)
 {
-    InitDnsServer();
 }
 
 SelfCureStateMachine::~SelfCureStateMachine()
@@ -197,7 +191,8 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     mobileHotspot = linkedInfo.isDataRestricted == 1 ? true : false;
     pSelfCureStateMachine->connectNetworkRetryCnt = 0;
     WifiSettings::GetInstance().SetWifiSelfcureReset(false);
-    lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.frequency);
+    lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
+        pSelfCureStateMachine->m_instId);
     if (!SetupSelfCureMonitor()) {
         WIFI_LOGI("ConnectedMonitorState, config is null when connected broadcast received, delay to setup again.");
         pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RESETUP_SELF_CURE_MONITOR,
@@ -866,7 +861,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
     WIFI_LOGI("SelfCureWifiLink, requestCureLevel = %{public}d, currentRssi = %{public}d",
               requestCureLevel, currentRssi);
     if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS) {
-        SelfCureForDns();
+        WIFI_LOGI("SelfCureForDns");
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_RECONNECT_4_INVALID_IP) {
         SelfCureForInvalidIp();
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
@@ -876,106 +871,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_HIGH_RESET) {
         SelfCureForReset(requestCureLevel);
     }
-}
-
-void SelfCureStateMachine::InitDnsServer()
-{
-    std::vector<std::string> strPublicIpAddr;
-    char dnsIpAddr[PUBLIC_DNS_SERVERS_SIZE];
-    GetParamValue("const.wifi.dnscure_ipcfg", "", dnsIpAddr, PUBLIC_DNS_SERVERS_SIZE);
-    std::string temp = "";
-    int publicDDnsSize = sizeof(dnsIpAddr) - 1;
-    for (int i = 0; i < publicDDnsSize; i++) {
-        if (dnsIpAddr[i] == ';') {
-            strPublicIpAddr.push_back(temp);
-            temp = "";
-            continue;
-        } else if (i == publicDDnsSize - 1) {
-            temp = temp + dnsIpAddr[i];
-            strPublicIpAddr.push_back(temp);
-            continue;
-        } else {
-            temp = temp + dnsIpAddr[i];
-        }
-    }
-    for (int i = 0; i < overseaPublicDnses.size(); i++) {
-        overseaPublicDnses[i] = strPublicIpAddr[i];
-    }
-    int spaceSize = chinaPublicDnses.size();
-    strPublicIpAddr.erase(strPublicIpAddr.begin(), strPublicIpAddr.begin() + spaceSize);
-    for (int i = 0; i < chinaPublicDnses.size(); i++) {
-        chinaPublicDnses[i] = strPublicIpAddr[i];
-    }
-}
-
-bool SelfCureStateMachine::InternetSelfCureState::UseOperatorOverSea()
-{
-    std::string oversea = WifiSettings::GetInstance().GetOversea();
-    if ((oversea == "oversea")) {
-        return true;
-    }
-    return false;
-}
-
-void SelfCureStateMachine::InternetSelfCureState::GetPublicDnsServers(std::vector<std::string>& publicDnsServers)
-{
-    if (!UseOperatorOverSea() && chinaPublicDnses[0].empty()) {
-        publicDnsServers = chinaPublicDnses;
-    } else {
-        publicDnsServers = overseaPublicDnses;
-    }
-}
-
-void SelfCureStateMachine::InternetSelfCureState::GetReplacedDnsServers(
-    std::vector<std::string>& curDnses, std::vector<std::string>& replaceDnses)
-{
-    if (curDnses.empty()) {
-        return;
-    }
-    std::vector<std::string> publicServer;
-    replaceDnses = curDnses;
-    GetPublicDnsServers(publicServer);
-    replaceDnses[1] = publicServer[0];
-}
-
-void SelfCureStateMachine::InternetSelfCureState::UpdateDnsServers(std::vector<std::string>& dnsServers)
-{
-    IpInfo ipInfo;
-    IpV6Info ipV6Info;
-    WifiDeviceConfig config;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
-    WifiSettings::GetInstance().GetIpv6Info(ipV6Info, 0);
-    ipInfo.primaryDns = IpTools::ConvertIpv4Address(dnsServers[0]);
-    ipInfo.secondDns = IpTools::ConvertIpv4Address(dnsServers[1]);
-    WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipV6Info, config.wifiProxyconfig, 0);
-}
-
-void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
-{
-    WIFI_LOGI("begin to SelfCureForDns");
-    pSelfCureStateMachine->selfCureOnGoing = true;
-    testedSelfCureLevel.push_back(WIFI_CURE_RESET_LEVEL_LOW_1_DNS);
-    if (pSelfCureStateMachine->internetUnknown) {
-        IpInfo ipInfo;
-        WifiSettings::GetInstance().GetIpInfo(ipInfo, 0);
-        std::string ipV4PrimaryDns = IpTools::ConvertIpv4Address(ipInfo.primaryDns);
-        std::string ipV4SecondDns = IpTools::ConvertIpv4Address(ipInfo.secondDns);
-        std::vector<std::string> servers = {ipV4PrimaryDns, ipV4SecondDns};
-        if (ipInfo.primaryDns != 0 && ipInfo.secondDns != 0) {
-            std::vector<std::string> replacedDnsServers;
-            GetReplacedDnsServers(servers, replacedDnsServers);
-            UpdateDnsServers(replacedDnsServers);
-        } else {
-            std::vector<std::string> publicDnsServers;
-            GetPublicDnsServers(publicDnsServers);
-            UpdateDnsServers(publicDnsServers);
-        }
-    } else {
-        std::vector<std::string> publicDnsServers;
-        GetPublicDnsServers(publicDnsServers);
-        UpdateDnsServers(publicDnsServers);
-    }
-    pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, DNS_UPDATE_CONFIRM_DELAYED_MS);
 }
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForInvalidIp()
@@ -1660,7 +1555,7 @@ int SelfCureStateMachine::GetCurSignalLevel()
 {
     WifiLinkedInfo linkedInfo;
     WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
-    int signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.frequency);
+    int signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
     WIFI_LOGD("GetCurSignalLevel, signalLevel : %{public}d", signalLevel);
     return signalLevel;
 }

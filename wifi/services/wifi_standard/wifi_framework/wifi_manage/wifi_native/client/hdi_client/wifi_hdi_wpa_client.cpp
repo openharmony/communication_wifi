@@ -431,7 +431,7 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCod
     return HdiWpaStaSetCountryCode(countryCode.c_str());
 }
 
-static WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
+WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
 {
     char szCountryCode[WIFI_IDL_COUNTRY_CODE_LENGTH + 1] = "";
     if (WIFI_IDL_OPT_OK != HdiWpaStaGetCountryCode(szCountryCode, WIFI_IDL_COUNTRY_CODE_LENGTH)) {
@@ -593,7 +593,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiWpaNetworkInfo> &ne
     return WIFI_IDL_OPT_OK;
 }
 
-static WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
+WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiIdlGetDeviceConfig &config)
 {
     int32_t networkId = config.networkId;
     char param[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
@@ -648,8 +648,8 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int i
     if (HdiSetApBand(static_cast<int>(config.GetBand()), id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
-    int channel = config.GetChannel() | (config.GetBandWidth << 16);
-    LOGI("WifiHdiWpaClient::%{public}s enter, channel=%{public}d", _func_, channel);
+    int channel = config.GetChannel() | (config.GetBandWidth() << 16);
+    LOGI("WifiHdiWpaClient::%{public}s enter, channel=%{public}d", __func__, channel);
     if (HdiSetApChannel(channel, id) != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
@@ -804,7 +804,6 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRegisterCallback(const P2pHalCallback &callb
     }
 
     if (callbacks.onConnectSupplicant != nullptr) {
-        cWifiHdiWpaCallback.OnEventStateChanged = OnEventP2pStateChanged;
         cWifiHdiWpaCallback.OnEventDeviceFound = OnEventDeviceFound;
         cWifiHdiWpaCallback.OnEventDeviceLost = OnEventDeviceLost;
         cWifiHdiWpaCallback.OnEventGoNegotiationRequest = OnEventGoNegotiationRequest;
@@ -1296,8 +1295,8 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pHid2dConnect(const Hid2dConnectConfig &confi
         return WIFI_IDL_OPT_FAILED;
     }
     info.frequency = config.GetFrequency();
-    if (config.GetDhcoMode() == DhcoMode::CONNECT_AP_DHCP ||
-        config.GetDhcoMode() == DhcoMode::CONNECT_AP_NODHCP) {
+    if (config.GetDhcpMode() == DhcpMode::CONNECT_AP_DHCP ||
+        config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
         info.isLegacyGo = 1;
     } else {
         info.isLegacyGo = 0;

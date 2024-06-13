@@ -1060,6 +1060,10 @@ bool WifiSettings::EncryptionDeviceConfig(WifiDeviceConfig &config) const
 
 int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 {
+    if (config.ssid.empty()) {
+        LOGE("AddDeviceConfig ssid is empty");
+        return -1;
+    }
     std::unique_lock<std::mutex> lock(mConfigMutex);
     auto iter = mWifiDeviceConfig.find(config.networkId);
     if (iter != mWifiDeviceConfig.end()) {
@@ -1219,7 +1223,7 @@ int WifiSettings::GetHiddenDeviceConfig(std::vector<WifiDeviceConfig> &results)
     }
     std::unique_lock<std::mutex> lock(mConfigMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if (iter->second.hiddenSSID) {
+        if (iter->second.hiddenSSID && iter->second.ssid.length() > 0) {
             results.push_back(iter->second);
         }
     }

@@ -17,6 +17,7 @@
 #include "wifi_hdi_wpa_sta_impl.h"
 #include "wifi_hdi_util.h"
 #include "stub_collector.h"
+#include "wifi_native_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaStaImpl"
@@ -28,7 +29,6 @@
 #define COLUMN_INDEX_FIVE 5
 #define REPLY_BUF_LENGTH (4096 * 10)
 #define ETH_ADDR_LEN 6
-#define WIFI_IDL_BSSID_LENGTH 17
 
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
@@ -75,26 +75,26 @@ static WifiErrorNo RegisterEventCallback()
     if (g_hdiWpaStaCallbackObj == NULL) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterEventCallback: g_hdiWpaStaCallbackObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterEventCallback: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->RegisterEventCallback(wpaObj, g_hdiWpaStaCallbackObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterEventCallback: RegisterEventCallback failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterEventCallback success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 static WifiErrorNo UnRegisterEventCallback()
@@ -106,14 +106,14 @@ static WifiErrorNo UnRegisterEventCallback()
         if (wpaObj == NULL) {
             pthread_mutex_unlock(&g_hdiCallbackMutex);
             LOGE("UnRegisterEventCallback: wpaObj is NULL");
-            return WIFI_IDL_OPT_FAILED;
+            return WIFI_HAL_OPT_FAILED;
         }
 
         int32_t result = wpaObj->UnregisterEventCallback(wpaObj, g_hdiWpaStaCallbackObj, GetHdiStaIfaceName());
         if (result != HDF_SUCCESS) {
             pthread_mutex_unlock(&g_hdiCallbackMutex);
             LOGE("UnRegisterEventCallback: UnregisterEventCallback failed result:%{public}d", result);
-            return WIFI_IDL_OPT_FAILED;
+            return WIFI_HAL_OPT_FAILED;
         }
         StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaStaCallbackObj);
         free(g_hdiWpaStaCallbackObj);
@@ -122,7 +122,7 @@ static WifiErrorNo UnRegisterEventCallback()
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("UnRegisterEventCallback success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 static int CalcQuotationMarksFlag(int pos, const char value[WIFI_NETWORK_CONFIG_VALUE_LENGTH])
@@ -160,100 +160,100 @@ static WifiErrorNo SetNetwork(int networkId, SetNetworkConfig conf)
     }
     if (pos < 0) {
         LOGE("SetNetwork: unsupported param: %{public}d", conf.cfgParam);
-        return WIFI_IDL_OPT_INVALID_PARAM;
+        return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     char tmpCfgValue[WIFI_NETWORK_CONFIG_VALUE_LENGTH] = {0};
     if (CalcQuotationMarksFlag(pos, conf.cfgValue) == QUOTATION_MARKS_FLAG_YES) {
         if (snprintf_s(tmpCfgValue, sizeof(tmpCfgValue), sizeof(tmpCfgValue) - 1, "\"%s\"", conf.cfgValue) < 0) {
             LOGE("SetNetwork: snprintf_s failed!");
-            return WIFI_IDL_OPT_FAILED;
+            return WIFI_HAL_OPT_FAILED;
         }
         if (snprintf_s(conf.cfgValue, sizeof(conf.cfgValue), sizeof(conf.cfgValue) - 1, "%s", tmpCfgValue) < 0) {
             LOGE("SetNetwork: snprintf_s failed!");
-            return WIFI_IDL_OPT_FAILED;
+            return WIFI_HAL_OPT_FAILED;
         }
     }
 
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("SetNetwork: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->SetNetwork(wpaObj, GetHdiStaIfaceName(), networkId, g_wpaSsidFields[pos].fieldName,
         conf.cfgValue);
     if (result != HDF_SUCCESS) {
         LOGE("SetNetwork: SetNetwork failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("SetNetwork success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaStart(const char *ifaceName)
 {
     LOGI("HdiWpaStaStart enter");
-    if (SetHdiStaIfaceName(ifaceName) != WIFI_IDL_OPT_OK) {
+    if (SetHdiStaIfaceName(ifaceName) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStart: set sta iface name failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    if (CopyConfigFile("wpa_supplicant.conf") != WIFI_IDL_OPT_OK) {
+    if (CopyConfigFile("wpa_supplicant.conf") != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStart: CopyConfigFile failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    if (HdiWpaStart() != WIFI_IDL_OPT_OK) {
+    if (HdiWpaStart() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStart: HdiWpaStart failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    if (RegisterEventCallback() != WIFI_IDL_OPT_OK) {
+    if (RegisterEventCallback() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStart: RegisterEventCallback failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    if (HdiAddWpaIface(GetHdiStaIfaceName(), CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != WIFI_IDL_OPT_OK) {
+    if (HdiAddWpaIface(GetHdiStaIfaceName(), CONFIG_ROOR_DIR"/wpa_supplicant/wpa_supplicant.conf") != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStart: HdiAddWpaIface failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     
     LOGI("HdiWpaStaStart success");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaStop()
 {
     LOGI("HdiWpaStaStop enter");
-    if (IsHdiWpaStopped() == WIFI_IDL_OPT_OK) {
+    if (IsHdiWpaStopped() == WIFI_HAL_OPT_OK) {
         LOGI("HdiWpa already stopped, HdiWpaStaStop success!");
-        return WIFI_IDL_OPT_OK;
+        return WIFI_HAL_OPT_OK;
     }
 
-    if (UnRegisterEventCallback() != WIFI_IDL_OPT_OK) {
+    if (UnRegisterEventCallback() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: UnRegisterEventCallback failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    if (HdiRemoveWpaIface(GetHdiP2pIfaceName()) != WIFI_IDL_OPT_OK) {
+    if (HdiRemoveWpaIface(GetHdiP2pIfaceName()) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: HdiRemoveWpaP2pIface failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    if (HdiRemoveWpaIface(GetHdiStaIfaceName()) != WIFI_IDL_OPT_OK) {
+    if (HdiRemoveWpaIface(GetHdiStaIfaceName()) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: HdiRemoveWpaStaIface failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    if (HdiWpaStop() != WIFI_IDL_OPT_OK) {
+    if (HdiWpaStop() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: HdiWpaStaStop failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     
     LOGI("HdiWpaStaStop success");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaConnect(int networkId)
@@ -262,17 +262,17 @@ WifiErrorNo HdiWpaStaConnect(int networkId)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaConnect: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->SelectNetwork(wpaObj, GetHdiStaIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaConnect: SelectNetwork failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaConnect success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaReconnect()
@@ -281,17 +281,17 @@ WifiErrorNo HdiWpaStaReconnect()
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaReconnect: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->Reconnect(wpaObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaReconnect: Reconnect failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaReconnect success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaReassociate()
@@ -299,16 +299,16 @@ WifiErrorNo HdiWpaStaReassociate()
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaReassociate: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->Reassociate(wpaObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaReassociate: Reassociate failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaDisconnect()
@@ -317,22 +317,22 @@ WifiErrorNo HdiWpaStaDisconnect()
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaDisconnect: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->Disconnect(wpaObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaDisconnect: Disconnect failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaDisconnect success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 int ConvertMacToStr(char *mac, int macSize, char *macStr, int strLen)
 {
-    if (mac == NULL || macStr == NULL || macSize < ETH_ADDR_LEN || strLen <= WIFI_IDL_BSSID_LENGTH) {
+    if (mac == NULL || macStr == NULL || macSize < ETH_ADDR_LEN || strLen <= HAL_BSSID_LENGTH) {
         return -1;
     }
     const int posZero = 0;
@@ -353,39 +353,39 @@ WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen)
     LOGI("HdiWpaStaGetDeviceMacAddress enter");
     if (macAddr == NULL) {
         LOGE("HdiWpaStaGetDeviceMacAddress: invalid parameter!");
-        return WIFI_IDL_OPT_INVALID_PARAM;
+        return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     struct HdiWpaCmdStatus status;
     if (memset_s(&status, sizeof(status), 0, sizeof(status)) != EOK) {
         LOGE("HdiWpaStaGetDeviceMacAddress: memset_s failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaGetDeviceMacAddress: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->WifiStatus(wpaObj, GetHdiStaIfaceName(), &status);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaGetDeviceMacAddress: WifiStatus failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     if (macAddrLen < status.addressLen) {
         LOGE("Input mac length %{public}d is little than mac address length %{public}d", macAddrLen, status.addressLen);
-        return WIFI_IDL_OPT_BUFFER_TOO_LITTLE;
+        return WIFI_HAL_OPT_BUFFER_TOO_LITTLE;
     }
 
     if (ConvertMacToStr((char *)status.address, status.addressLen, macAddr, macAddrLen) != EOK) {
         LOGE("HdiWpaStaGetDeviceMacAddress: convertMacToStr failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaGetDeviceMacAddress success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaScan()
@@ -394,17 +394,17 @@ WifiErrorNo HdiWpaStaScan()
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaScan: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->Scan(wpaObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaScan: Scan failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaScan success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 ScanInfo *HdiWpaStaGetScanInfos(int *size)
@@ -490,17 +490,17 @@ WifiErrorNo HdiWpaStaRemoveNetwork(int networkId)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaRemoveNetwork: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->RemoveNetwork(wpaObj, GetHdiStaIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaRemoveNetwork: RemoveNetwork failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaRemoveNetwork success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaAddNetwork(int *networkId)
@@ -508,23 +508,23 @@ WifiErrorNo HdiWpaStaAddNetwork(int *networkId)
     LOGI("HdiWpaStaAddNetwork enter");
     if (networkId == NULL) {
         LOGE("HdiWpaStaAddNetwork: invalid parameter!");
-        return WIFI_IDL_OPT_INVALID_PARAM;
+        return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaAddNetwork: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->AddNetwork(wpaObj, GetHdiStaIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaAddNetwork: AddNetwork failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaAddNetwork success, networkId:%{public}d", *networkId);
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaEnableNetwork(int networkId)
@@ -533,17 +533,17 @@ WifiErrorNo HdiWpaStaEnableNetwork(int networkId)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaEnableNetwork: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->EnableNetwork(wpaObj, GetHdiStaIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaEnableNetwork: EnableNetwork failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaEnableNetwork success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaDisableNetwork(int networkId)
@@ -552,17 +552,17 @@ WifiErrorNo HdiWpaStaDisableNetwork(int networkId)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaDisableNetwork: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->DisableNetwork(wpaObj, GetHdiStaIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaDisableNetwork: DisableNetwork failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaDisableNetwork success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaSetNetwork(int networkId, SetNetworkConfig *confs, int size)
@@ -570,14 +570,14 @@ WifiErrorNo HdiWpaStaSetNetwork(int networkId, SetNetworkConfig *confs, int size
     LOGI("HdiWpaStaSetNetwork enter");
     if (confs == NULL) {
         LOGE("HdiWpaStaSetNetwork: invalid parameter!");
-        return WIFI_IDL_OPT_INVALID_PARAM;
+        return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     for (int i = 0; i < size; ++i) {
         SetNetwork(networkId, confs[i]);
     }
 
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaSaveConfig()
@@ -586,17 +586,17 @@ WifiErrorNo HdiWpaStaSaveConfig()
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaSaveConfig: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->SaveConfig(wpaObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaSaveConfig: SaveConfig failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaSaveConfig success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
@@ -606,20 +606,20 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     if (callback == NULL || callback->OnEventConnected == NULL) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterHdiWpaStaEventCallback: invalid parameter!");
-        return WIFI_IDL_OPT_INVALID_PARAM;
+        return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     if (g_hdiWpaStaCallbackObj != NULL) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGI("RegisterHdiWpaStaEventCallback: already register!");
-        return WIFI_IDL_OPT_OK;
+        return WIFI_HAL_OPT_OK;
     }
 
     g_hdiWpaStaCallbackObj = (struct IWpaCallback *)malloc(sizeof(struct IWpaCallback ));
     if (g_hdiWpaStaCallbackObj == NULL) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterHdiWpaStaEventCallback: IWpaCallback malloc failed!");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     g_hdiWpaStaCallbackObj->OnEventDisconnected = callback->OnEventDisconnected;
@@ -658,7 +658,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
 
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaStaEventCallback3 success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaStartWpsPbcMode(WifiWpsParam *config)
@@ -666,7 +666,7 @@ WifiErrorNo HdiWpaStaStartWpsPbcMode(WifiWpsParam *config)
     LOGI("HdiWpaStaStartWpsPbcMode enter");
     if (config == NULL) {
         LOGE("HdiWpaStaStartWpsPbcMode: invalid parameter!");
-        return WIFI_IDL_OPT_INVALID_PARAM;
+        return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     struct HdiWifiWpsParam wpsParam = {0};
@@ -678,17 +678,17 @@ WifiErrorNo HdiWpaStaStartWpsPbcMode(WifiWpsParam *config)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaStartWpsPbcMode: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->WpsPbcMode(wpaObj, GetHdiStaIfaceName(), &wpsParam);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaStartWpsPbcMode: WpsPbcMode failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaStartWpsPbcMode success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaStartWpsPinMode(WifiWpsParam *config, int *pinCode)
@@ -696,7 +696,7 @@ WifiErrorNo HdiWpaStaStartWpsPinMode(WifiWpsParam *config, int *pinCode)
     LOGI("HdiWpaStaStartWpsPinMode enter");
     if (config == NULL || pinCode == NULL) {
         LOGE("HdiWpaStaStartWpsPinMode: invalid parameter!");
-        return WIFI_IDL_OPT_INVALID_PARAM;
+        return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     struct HdiWifiWpsParam wpsParam = {0};
@@ -710,17 +710,17 @@ WifiErrorNo HdiWpaStaStartWpsPinMode(WifiWpsParam *config, int *pinCode)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaStartWpsPinMode: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->WpsPinMode(wpaObj, GetHdiStaIfaceName(), &wpsParam, pinCode);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaStartWpsPinMode: WpsPbcMode failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaStartWpsPinMode success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiStopWpsSta()
@@ -729,17 +729,17 @@ WifiErrorNo HdiStopWpsSta()
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiStopWpsSta: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->WpsCancel(wpaObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiStopWpsSta: WpsCancel failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiStopWpsSta success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaAutoConnect(int enable)
@@ -748,17 +748,17 @@ WifiErrorNo HdiWpaStaAutoConnect(int enable)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaAutoConnect: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->AutoConnect(wpaObj, GetHdiStaIfaceName(), enable);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaAutoConnect: AutoConnect failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaAutoConnect success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaBlocklistClear()
@@ -767,17 +767,17 @@ WifiErrorNo HdiWpaStaBlocklistClear()
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaBlocklistClear: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->BlocklistClear(wpaObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaBlocklistClear: BlocklistClear failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaBlocklistClear success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaSetPowerSave(int enable)
@@ -786,17 +786,17 @@ WifiErrorNo HdiWpaStaSetPowerSave(int enable)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaSetPowerSave: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->SetPowerSave(wpaObj, GetHdiStaIfaceName(), enable);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaSetPowerSave: SetPowerSave failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaSetPowerSave success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaSetCountryCode(const char *countryCode)
@@ -805,17 +805,17 @@ WifiErrorNo HdiWpaStaSetCountryCode(const char *countryCode)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaSetCountryCode: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->SetCountryCode(wpaObj, GetHdiStaIfaceName(), countryCode);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaSetCountryCode: SetCountryCode failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaSetCountryCode success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaGetCountryCode(char *countryCode, uint32_t size)
@@ -824,17 +824,17 @@ WifiErrorNo HdiWpaStaGetCountryCode(char *countryCode, uint32_t size)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaGetCountryCode: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->GetCountryCode(wpaObj, GetHdiStaIfaceName(), countryCode, size);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaGetCountryCode: SetCountryCode failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaGetCountryCode success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaSetSuspendMode(int mode)
@@ -843,17 +843,17 @@ WifiErrorNo HdiWpaStaSetSuspendMode(int mode)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaSetSuspendMode: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->SetSuspendMode(wpaObj, GetHdiStaIfaceName(), mode);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaSetSuspendMode: SetSuspendMode failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaStaSetSuspendMode success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32_t *size)
@@ -862,17 +862,17 @@ WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaListNetworks: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->ListNetworks(wpaObj, GetHdiStaIfaceName(), networkList, size);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaListNetworks: ListNetworks failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaListNetworks success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen)
@@ -881,17 +881,17 @@ WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, 
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaGetNetwork: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->GetNetwork(wpaObj, GetHdiStaIfaceName(), networkId, param, value, valueLen);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaGetNetwork: GetNetwork failed result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     LOGI("HdiWpaGetNetwork success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd)
@@ -899,16 +899,16 @@ WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaSetShellCmd: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
  
     int32_t result = wpaObj->StaShellCmd(wpaObj, ifName, cmd);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaSetShellCmd: failed to StaShellCmd, result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     LOGI("HdiWpaStaSetShellCmd success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 
 WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t pskLen)
@@ -916,15 +916,15 @@ WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t ps
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("GetPskPassphrase: wpaObj is NULL");
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->GetPskPassphrase(wpaObj, ifName, psk, pskLen);
     if (result != HDF_SUCCESS) {
         LOGE("GetPskPassphrase: failed to StaShellCmd, result:%{public}d", result);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     LOGI("GetPskPassphrase success.");
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }
 #endif

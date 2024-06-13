@@ -73,7 +73,7 @@ HWTEST_F(ApIdleState_test, GoOutState, TestSize.Level1)
 HWTEST_F(ApIdleState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
 
     InternalMessage msg;
 

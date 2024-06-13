@@ -82,8 +82,6 @@ if (defined(ohos_lite)) {
       "-fPIC",
       "-Wl,-E",
     ]
-
-    external_deps = [ "init:libbegetutil" ]
   }
 } else {
   ohos_shared_library("wifi_toolkit") {

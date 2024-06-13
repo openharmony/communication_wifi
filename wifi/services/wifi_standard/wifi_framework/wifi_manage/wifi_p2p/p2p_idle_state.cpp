@@ -25,12 +25,14 @@ DEFINE_WIFILOG_P2P_LABEL("P2pIdleState");
 namespace OHOS {
 namespace Wifi {
 int P2pIdleState::retryConnectCnt{0};
+bool P2pIdleState::hasConnect{false};
 P2pIdleState::P2pIdleState(
     P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr)
     : State("P2pIdleState"), p2pStateMachine(stateMachine), groupManager(groupMgr), deviceManager(deviceMgr)
 {}
 void P2pIdleState::GoInState()
 {
+    hasConnect = false;
     Init();
     WIFI_LOGI("             GoInState");
     p2pStateMachine.ClearGroup();
@@ -47,6 +49,7 @@ void P2pIdleState::GoOutState()
     const int exceptionTimeOut = 120000;
     p2pStateMachine.MessageExecutedLater(
         static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT), exceptionTimeOut);
+    hasConnect = false;
 }
 
 void P2pIdleState::Init()
@@ -90,9 +93,9 @@ bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
 {
     WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pStopFind();
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_OK) {
         retCode = WifiP2PHalInterface::GetInstance().P2pFlush();
-        if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
             WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(retCode));
         }
         p2pStateMachine.serviceManager.SetQueryId(std::string(""));
@@ -132,7 +135,7 @@ bool P2pIdleState::RetryConnect(InternalMessage &msg) const
         return EXECUTED;
     } else {
         retryConnectCnt = 0;
-        if (WifiErrorNo::WIFI_IDL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
+        if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
             WIFI_LOGE("Attempt to connect but cannot stop find");
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
             return EXECUTED;
@@ -183,7 +186,7 @@ bool P2pIdleState::ProcessCmdConnect(InternalMessage &msg) const
         return EXECUTED;
     } else {
         p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
-        if (WifiErrorNo::WIFI_IDL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
+        if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
             WIFI_LOGE("Attempt to connect but cannot stop find");
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
             return EXECUTED;
@@ -218,11 +221,12 @@ bool P2pIdleState::ProcessCmdHid2dConnect(InternalMessage &msg) const
     if (!p2pStateMachine.p2pDevIface.empty()) {
         WIFI_LOGE("Hid2d connect:exists dev iface %{public}s", p2pStateMachine.p2pDevIface.c_str());
     }
-    if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().Hid2dConnect(config)) {
         WIFI_LOGE("Hid2d Connection failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::Hid2dConnect, ErrCode::WIFI_OPT_FAILED);
     }
+    hasConnect = true;
     return EXECUTED;
 }
 
@@ -281,6 +285,12 @@ bool P2pIdleState::ProcessCmdCreateGroup(InternalMessage &msg) const
 
 bool P2pIdleState::ProcessCmdRemoveGroup(InternalMessage &msg) const
 {
+    if (hasConnect == true) {
+        hasConnect = false;
+        p2pStateMachine.DelayMessage(&msg);
+        p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
+        return EXECUTED;
+    }
     WIFI_LOGI("p2p ildeState no processing remove group! CMD: %{public}d", msg.GetMessageName());
     return EXECUTED;
 }
@@ -294,6 +304,7 @@ bool P2pIdleState::ProcessCmdDeleteGroup(InternalMessage &msg) const
 
 bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
 {
+    hasConnect = false;
     WifiP2pGroupInfo group;
     msg.GetMessageObj(group);
     WIFI_LOGI("P2P_EVENT_GROUP_STARTED create group interface name : %{private}s, network name : %{private}s, owner "
@@ -343,7 +354,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
         }
     }
     SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
-    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_IDL_OPT_OK) {
+    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
 
@@ -378,7 +389,7 @@ bool P2pIdleState::ProcessInvitationReceivedEvt(InternalMessage &msg) const
     }
 
     WifiP2pDevice device;
-    if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().GetP2pPeer(owner.GetDeviceAddress(), device)) {
         WIFI_LOGW("Failed to get the peer information.");
     } else {

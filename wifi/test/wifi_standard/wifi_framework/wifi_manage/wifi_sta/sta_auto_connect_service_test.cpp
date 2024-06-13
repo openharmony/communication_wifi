@@ -24,7 +24,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 #include "sta_device_appraisal.h"
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 #include "wifi_error_no.h"
 
 using ::testing::_;
@@ -171,7 +171,7 @@ public:
 
 void StaAutoConnectServiceTest::InitAutoConnectService()
 {
-    WifiIdlRoamCapability capability;
+    WifiHalRoamCapability capability;
     capability.maxBlocklistSize = TWO;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
@@ -250,7 +250,7 @@ void StaAutoConnectServiceTest::InitAutoConnectServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_))
         .Times(AtLeast(1))
-        .WillOnce(Return(WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsInitScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSameBssidScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSameNetworkScore(_)).Times(AtLeast(0));

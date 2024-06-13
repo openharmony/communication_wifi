@@ -122,7 +122,7 @@ public:
 
 void StaServiceTest::StaServiceInitStaServiceSuccess()
 {
-    WifiIdlRoamCapability capability;
+    WifiHalRoamCapability capability;
     capability.maxBlocklistSize = 1;
     std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
     std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
@@ -131,7 +131,7 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
-    EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsInitScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSameBssidScore(_)).Times(AtLeast(0));

@@ -27,7 +27,7 @@ InvitationRequestState::InvitationRequestState(
 void InvitationRequestState::GoInState()
 {
     WIFI_LOGI("             GoInState");
-    if (WifiErrorNo::WIFI_IDL_OPT_OK == WifiP2PHalInterface::GetInstance().Invite(groupManager.GetCurrentGroup(),
+    if (WifiErrorNo::WIFI_HAL_OPT_OK == WifiP2PHalInterface::GetInstance().Invite(groupManager.GetCurrentGroup(),
         p2pStateMachine.savedP2pConfig.GetDeviceAddress())) {
         deviceManager.UpdateDeviceStatus(
             p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED);

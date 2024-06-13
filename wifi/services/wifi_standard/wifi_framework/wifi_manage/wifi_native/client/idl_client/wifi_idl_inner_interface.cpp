@@ -38,7 +38,7 @@ void OnApStaJoinOrLeave(const CStationInfo *info, int id)
     const OHOS::Wifi::IWifiApMonitorEventCallback &cbk =
         OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst(id);
     if (cbk.onStaJoinOrLeave) {
-        OHOS::Wifi::WifiApConnectionNofify cbInfo;
+        OHOS::Wifi::WifiHalApConnectionNofify cbInfo;
         cbInfo.type = info->type;
         cbInfo.mac = info->mac;
         cbk.onStaJoinOrLeave(cbInfo);
@@ -185,7 +185,7 @@ void OnP2pDeviceFound(const P2pDeviceInfo *info)
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onDeviceFound) {
-        OHOS::Wifi::IdlP2pDeviceFound cbInfo;
+        OHOS::Wifi::HalP2pDeviceFound cbInfo;
         cbInfo.srcAddress = info->srcAddress;
         cbInfo.p2pDeviceAddress = info->p2pDeviceAddress;
         cbInfo.primaryDeviceType = info->primaryDeviceType;
@@ -258,7 +258,7 @@ void OnP2pInvitationReceived(const P2pInvitationInfo *info)
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onInvitationReceived) {
-        OHOS::Wifi::IdlP2pInvitationInfo cbInfo;
+        OHOS::Wifi::HalP2pInvitationInfo cbInfo;
         cbInfo.type = info->type;
         cbInfo.persistentNetworkId = info->persistentNetworkId;
         cbInfo.operatingFrequency = info->operatingFrequency;
@@ -295,7 +295,7 @@ void OnP2pGroupStarted(const P2pGroupInfo *group)
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onGroupStarted) {
-        OHOS::Wifi::IdlP2pGroupInfo cbInfo;
+        OHOS::Wifi::HalP2pGroupInfo cbInfo;
         cbInfo.isGo = group->isGo;
         cbInfo.isPersistent = group->isPersistent;
         cbInfo.frequency = group->frequency;
@@ -432,7 +432,7 @@ void OnP2pServDiscReq(const P2pServDiscReqInfo *info)
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onP2pServDiscReq) {
-        OHOS::Wifi::IdlP2pServDiscReqInfo cbInfo;
+        OHOS::Wifi::HalP2pServDiscReqInfo cbInfo;
         cbInfo.freq = info->freq;
         cbInfo.dialogToken = info->dialogToken;
         cbInfo.updateIndic = info->updateIndic;

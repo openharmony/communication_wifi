@@ -185,7 +185,7 @@ void P2pStateMachine::UpdateGroupManager() const
 {
     std::map<int, WifiP2pGroupInfo> wpaGroups;
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().ListNetworks(wpaGroups);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to get listNetworks");
         return;
     }
@@ -226,7 +226,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
              * If GO is running on the peer device and the GO has been connected,
              * you can directly connect to the peer device through p2p_group_add.
              */
-            if (WifiErrorNo::WIFI_IDL_OPT_OK != WifiP2PHalInterface::GetInstance().GroupAdd(true, networkId, 0)) {
+            if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().GroupAdd(true, networkId, 0)) {
                 return false;
             }
             return true;
@@ -265,7 +265,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
              * If a persistent group that has been connected to the peer device exists,
              * the reinvoke process is triggered.
              */
-            if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+            if (WifiErrorNo::WIFI_HAL_OPT_OK !=
                 WifiP2PHalInterface::GetInstance().Reinvoke(networkId, device.GetDeviceAddress())) {
                 WIFI_LOGE("Failed to reinvoke.");
                 UpdateGroupManager();
@@ -291,7 +291,7 @@ WifiP2pDevice P2pStateMachine::FetchNewerDeviceInfo(const std::string &deviceAdd
     }
     WifiP2pDevice newDevice = deviceManager.GetDevices(deviceAddr);
     if (WifiP2PHalInterface::GetInstance().GetP2pPeer(deviceAddr, device) ==
-        WifiErrorNo::WIFI_IDL_OPT_OK) {
+        WifiErrorNo::WIFI_HAL_OPT_OK) {
         int groupCap = device.GetGroupCapabilitys();
         deviceManager.UpdateDeviceGroupCap(deviceAddr, groupCap);
         newDevice.SetGroupCapabilitys(groupCap);
@@ -313,7 +313,7 @@ void P2pStateMachine::DealGroupCreationFailed()
         BroadcastP2pPeersChanged();
     }
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-    if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
     }
     SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
@@ -321,7 +321,7 @@ void P2pStateMachine::DealGroupCreationFailed()
 
 void P2pStateMachine::RemoveGroupByNetworkId(int networkId) const
 {
-    if (WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("failed to remove networkId, networkId is %{public}d.", networkId);
     }
     UpdateGroupManager();
@@ -667,7 +667,7 @@ void P2pStateMachine::CancelSupplicantSrvDiscReq()
     }
 
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().CancelReqServiceDiscovery(serviceManager.GetQueryId());
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGI("The request has been processed normally.");
     } else {
         serviceManager.SetQueryId(std::string(""));
@@ -773,7 +773,7 @@ void P2pStateMachine::P2pConnectByShowingPin(const WifiP2pConfigInternal &config
     }
 
     std::string pin;
-    if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().Connect(config, device.IsGroupOwner(), pin)) {
         WIFI_LOGE("Connection failed.");
     }
@@ -789,7 +789,7 @@ void P2pStateMachine::HandlerDiscoverPeers()
     WIFI_LOGD("p2p_enabled_state recv CMD_DEVICE_DISCOVERS");
     CancelSupplicantSrvDiscReq();
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGD("call P2pFind successful, CMD_DEVICE_DISCOVERS successful.");
         BroadcastActionResult(P2pActionCallback::DiscoverDevices, ErrCode::WIFI_OPT_SUCCESS);
         BroadcastP2pDiscoveryChanged(true);
@@ -1016,7 +1016,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         return 0;
     }
     if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(static_cast<int>(band), freqList) ==
-        WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+        WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         constexpr int DEFAULT_5G_FREQUENCY = 5745; // channal:149, frequency:5745
         if (band == GroupOwnerBand::GO_BAND_5GHZ) {
             WIFI_LOGE("Get support frequencies failed, use default 5g frequency!");
@@ -1039,7 +1039,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
 bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool newGroup) const
 {
     WifiErrorNo ret;
-    IdlP2pGroupConfig wpaConfig;
+    HalP2pGroupConfig wpaConfig;
     WifiP2pGroupInfo group;
     if (newGroup) {
         WIFI_LOGI("SetGroupConfig, new group");
@@ -1052,9 +1052,9 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool n
         wpaConfig.mode = p2pMode;
     } else {
         WIFI_LOGI("SetGroupConfig, not new group");
-        IdlP2pGroupConfig knownConfig;
+        HalP2pGroupConfig knownConfig;
         ret = WifiP2PHalInterface::GetInstance().P2pGetGroupConfig(config.GetNetId(), knownConfig);
-        if (ret == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+        if (ret == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
             WIFI_LOGW("P2pGetGroupConfig failed");
         }
         if (!config.GetGroupName().empty()) {
@@ -1081,7 +1081,7 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool n
     group.SetNetworkId(config.GetNetId());
     groupManager.AddOrUpdateGroup(group);
     ret = WifiP2PHalInterface::GetInstance().P2pSetGroupConfig(config.GetNetId(), wpaConfig);
-    if (ret == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (ret == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         return false;
     } else {
         return true;
@@ -1103,7 +1103,7 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
     }
 
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pAddNetwork(createdNetId);
-    if (ret == WIFI_IDL_OPT_OK) {
+    if (ret == WIFI_HAL_OPT_OK) {
         cfgBuf.SetNetId(createdNetId);
         if (!SetGroupConfig(cfgBuf, true)) {
             WIFI_LOGW("Some configuration settings failed!");
@@ -1111,7 +1111,7 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
         ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, createdNetId, freq);
     }
 
-    if (ret == WIFI_IDL_OPT_FAILED || netId == TEMPORARY_NET_ID) {
+    if (ret == WIFI_HAL_OPT_FAILED || netId == TEMPORARY_NET_ID) {
         WIFI_LOGD("Remove network %{public}d!", createdNetId);
         WifiP2PHalInterface::GetInstance().RemoveNetwork(createdNetId);
         WifiP2pGroupInfo removedInfo;
@@ -1121,7 +1121,7 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
 
     UpdateGroupManager();
     UpdatePersistentGroups();
-    return (ret == WIFI_IDL_OPT_FAILED) ? false : true;
+    return (ret == WIFI_HAL_OPT_FAILED) ? false : true;
 }
 
 bool P2pStateMachine::IsInterfaceReuse() const
@@ -1140,7 +1140,7 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
     }
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     if (grpInfo.size() > 0) {
-        if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_IDL_OPT_OK) {
+        if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_HAL_OPT_OK) {
             WIFI_LOGE("Failed to delete all group info before update group info to wpa! Stop update!");
             return;
         }
@@ -1148,11 +1148,11 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
 
     int createdNetId = -1;
     WifiP2pGroupInfo grpBuf;
-    IdlP2pGroupConfig wpaConfig;
+    HalP2pGroupConfig wpaConfig;
     for (unsigned int i = 0; i < grpInfo.size(); ++i) {
         grpBuf = grpInfo.at(i);
         WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pAddNetwork(createdNetId);
-        if (ret == WIFI_IDL_OPT_OK) {
+        if (ret == WIFI_HAL_OPT_OK) {
             grpBuf.SetNetworkId(createdNetId);
             wpaConfig.ssid = grpBuf.GetGroupName();
             wpaConfig.psk = grpBuf.GetPassphrase();

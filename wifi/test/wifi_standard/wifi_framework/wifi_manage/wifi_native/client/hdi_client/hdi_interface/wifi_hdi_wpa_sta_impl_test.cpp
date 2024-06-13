@@ -31,42 +31,42 @@ public:
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartTest_01, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStaStart(nullptr);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     result = HdiWpaStaStart("wlan0");
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStopTest_01, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStaStop();
-    EXPECT_EQ(result, WIFI_IDL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaConnectTest, TestSize.Level1)
 {
     int networkId = 1;
     WifiErrorNo result = HdiWpaStaConnect(networkId);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaAddNetworkTest, TestSize.Level1)
 {
     int *networkId = nullptr;
     WifiErrorNo result = HdiWpaStaAddNetwork(networkId);
-    EXPECT_EQ(result, WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaDisableNetworkTest, TestSize.Level1)
 {
     int networkId = 1;
     WifiErrorNo result = HdiWpaStaDisableNetwork(networkId);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSaveConfigTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStaSaveConfig();
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartWpsPinModeTest, TestSize.Level1)
@@ -74,27 +74,27 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartWpsPinModeTest, TestSize.Level1)
     WifiWpsParam *config = nullptr;
     int *pinCode = nullptr;
     WifiErrorNo result = HdiWpaStaStartWpsPinMode(nullptr, pinCode);
-    EXPECT_EQ(result, WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
     result = HdiWpaStaStartWpsPinMode(config, nullptr);
-    EXPECT_EQ(result, WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
     result = HdiWpaStaStartWpsPinMode(config, pinCode);
-    EXPECT_EQ(result, WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartWpsPbcModeTest, TestSize.Level1)
 {
     WifiWpsParam config;
     WifiErrorNo result = HdiWpaStaStartWpsPbcMode(nullptr);
-    EXPECT_EQ(result, WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
     result = HdiWpaStaStartWpsPbcMode(&config);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetCountryCodeTest, TestSize.Level1)
 {
     char countryCode[10] = "CN";
     WifiErrorNo result = HdiWpaStaSetCountryCode(countryCode);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetCountryCodeTest, TestSize.Level1)
@@ -102,14 +102,14 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetCountryCodeTest, TestSize.Level1)
     char countryCode[2];
     uint32_t size = 2;
     WifiErrorNo result = HdiWpaStaGetCountryCode(countryCode, size);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetSuspendModeTest, TestSize.Level1)
 {
     int mode = 1;
     WifiErrorNo result = HdiWpaStaSetSuspendMode(mode);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaListNetworksTest, TestSize.Level1)
@@ -117,7 +117,7 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaListNetworksTest, TestSize.Level1)
     struct HdiWifiWpaNetworkInfo networkList[10];
     uint32_t size = 10;
     WifiErrorNo result = HdiWpaListNetworks(networkList, &size);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaGetNetworkTest, TestSize.Level1)
@@ -127,7 +127,7 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaGetNetworkTest, TestSize.Level1)
     char value[10];
     uint32_t valueLen = 10;
     WifiErrorNo result = HdiWpaGetNetwork(networkId, param, value, valueLen);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetShellCmdTest, TestSize.Level1)
@@ -135,7 +135,7 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetShellCmdTest, TestSize.Level1)
     const char *ifName = "wlan0";
     const char *cmd = "command";
     WifiErrorNo result = HdiWpaStaSetShellCmd(ifName, cmd);
-    EXPECT_EQ(result, WIFI_IDL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 }
 }

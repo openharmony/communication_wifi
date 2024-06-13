@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "sta_auto_connect_service.h"
+#include "mock_block_connect_service.h"
 #include "mock_sta_state_machine.h"
 #include "mock_wifi_sta_interface.h"
 #include "mock_wifi_settings.h"

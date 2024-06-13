@@ -88,7 +88,6 @@ ohos_unittest("idl_client_unittest") {
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",

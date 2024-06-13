@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "internal_message.h"
+#include "mock_block_connect_service.h"
 #include "mock_dhcp_service.h"
 #include "mock_if_config.h"
 #include "mock_wifi_chip_hal_interface.h"

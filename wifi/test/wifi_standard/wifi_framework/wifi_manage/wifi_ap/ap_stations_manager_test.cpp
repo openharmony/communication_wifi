@@ -95,14 +95,14 @@ public:
 HWTEST_F(ApStationsManager_test, AddBlockList_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), AddBlockByMac(StrEq(staInfo.bssid), 0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
 
     EXPECT_TRUE(pApStaMgr->AddBlockList(staInfo));
 }
 HWTEST_F(ApStationsManager_test, AddBlockList_FAILED, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), AddBlockByMac(StrEq(staInfo.bssid), 0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
 
     EXPECT_FALSE(pApStaMgr->AddBlockList(staInfo));
 }
@@ -111,14 +111,14 @@ HWTEST_F(ApStationsManager_test, AddBlockList_FAILED, TestSize.Level1)
 HWTEST_F(ApStationsManager_test, DelBlockList_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), DelBlockByMac(StrEq(staInfo.bssid), 0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
 
     EXPECT_TRUE(pApStaMgr->DelBlockList(staInfo));
 }
 HWTEST_F(ApStationsManager_test, DelBlockList_FAILED, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), DelBlockByMac(StrEq(staInfo.bssid), 0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
 
     EXPECT_FALSE(pApStaMgr->DelBlockList(staInfo));
 }
@@ -133,7 +133,7 @@ HWTEST_F(ApStationsManager_test, EnableAllBlockList_SUCCESS, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetBlockList(Eq(valueCom), 0))
         .WillOnce(DoAll(testing::SetArgReferee<0>(value), Return(0)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), AddBlockByMac(An<const std::string &>(), 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_TRUE(pApStaMgr->EnableAllBlockList());
 }
 HWTEST_F(ApStationsManager_test, EnableAllBlockList_FAILED0, TestSize.Level1)
@@ -155,8 +155,8 @@ HWTEST_F(ApStationsManager_test, EnableAllBlockList_FAILED1, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetBlockList(valueCom, 0))
         .WillOnce(DoAll(testing::SetArgReferee<0>(value), Return(0)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), AddBlockByMac(An<const std::string &>(), 0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_FALSE(pApStaMgr->EnableAllBlockList());
 }
 
@@ -306,14 +306,14 @@ HWTEST_F(ApStationsManager_test, StationJoin5, TestSize.Level1)
 HWTEST_F(ApStationsManager_test, DisConnectStion_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), DisconnectStaByMac(StrEq(Mac), 0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
 
     EXPECT_TRUE(pApStaMgr->DisConnectStation(staInfo));
 }
 HWTEST_F(ApStationsManager_test, DisConnectStion_FAILED, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), DisconnectStaByMac(StrEq(Mac), 0))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
 
     EXPECT_FALSE(pApStaMgr->DisConnectStation(staInfo));
 }
@@ -328,7 +328,7 @@ HWTEST_F(ApStationsManager_test, GetAllConnectedStations_SUCCESS, TestSize.Level
     staMacList.push_back(staMacList1);
     staMacList.push_back(staMacList2);
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetStationList(Eq(staMacListCom), 0))
-        .WillOnce(DoAll(testing::SetArgReferee<0>(staMacList), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<0>(staMacList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
 
     EXPECT_EQ(staMacList, pApStaMgr->GetAllConnectedStations());
 }
@@ -341,7 +341,7 @@ HWTEST_F(ApStationsManager_test, GetAllConnectedStations_FAILED, TestSize.Level1
     staMacList.push_back(staMacList1);
     staMacList.push_back(staMacList2);
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetStationList(Eq(staMacListCom), 0))
-        .WillOnce(DoAll(testing::SetArgReferee<0>(staMacList), Return(WifiErrorNo::WIFI_IDL_OPT_FAILED)));
+        .WillOnce(DoAll(testing::SetArgReferee<0>(staMacList), Return(WifiErrorNo::WIFI_HAL_OPT_FAILED)));
     staMacList.erase(staMacList.begin());
     EXPECT_NE(staMacList, pApStaMgr->GetAllConnectedStations());
 }

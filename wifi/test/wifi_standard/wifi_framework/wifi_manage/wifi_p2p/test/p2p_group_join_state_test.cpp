@@ -104,12 +104,12 @@ HWTEST_F(P2pGroupJoinStateTest, ExecuteStateMsg, TestSize.Level1)
     std::string inputPin;
     msg.SetMessageObj(inputPin);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), StartWpsPin(_, _, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), StartWpsPbc(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pP2pGroupJoinState->ExecuteStateMsg(&msg);
     AddSaveP2pConfig1();
     pP2pGroupJoinState->ExecuteStateMsg(&msg);

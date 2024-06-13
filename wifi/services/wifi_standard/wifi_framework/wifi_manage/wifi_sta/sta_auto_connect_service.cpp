@@ -271,15 +271,15 @@ bool StaAutoConnectService::ObtainRoamCapFromFirmware()
     WIFI_LOGI("Enter ObtainRoamCapFromFirmware.\n");
 
     unsigned int capabilities;
-    if (WifiStaHalInterface::GetInstance().GetStaCapabilities(capabilities) == WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().GetStaCapabilities(capabilities) == WIFI_HAL_OPT_OK) {
         if ((capabilities & STA_CAP_ROAMING) == 0) {
             WIFI_LOGE("Firmware roaming is not supported.\n");
             return false;
         }
     }
 
-    WifiIdlRoamCapability capability;
-    if (WifiStaHalInterface::GetInstance().GetRoamingCapabilities(capability) == WIFI_IDL_OPT_OK) {
+    WifiHalRoamCapability capability;
+    if (WifiStaHalInterface::GetInstance().GetRoamingCapabilities(capability) == WIFI_HAL_OPT_OK) {
         if (capability.maxBlocklistSize > 0) {
             firmwareRoamFlag = true;
             maxBlockedBssidNum = capability.maxBlocklistSize;
@@ -308,9 +308,9 @@ bool StaAutoConnectService::SetRoamBlockedBssidFirmware(const std::vector<std::s
         return false;
     }
 
-    WifiIdlRoamConfig capability;
+    WifiHalRoamConfig capability;
     capability.blocklistBssids = blocklistBssids;
-    if (WifiStaHalInterface::GetInstance().SetRoamConfig(capability) == WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().SetRoamConfig(capability) == WIFI_HAL_OPT_OK) {
         return true;
     }
     return false;

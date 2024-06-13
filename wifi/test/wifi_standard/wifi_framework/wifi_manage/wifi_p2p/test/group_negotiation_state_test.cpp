@@ -115,7 +115,7 @@ HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt2, TestSize.Level1)
     msg.SetMessageObj(group);
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return());
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pGroupIdle(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     AddDeviceManager();
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
     EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
@@ -129,7 +129,7 @@ HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt3, TestSize.Level1)
     group.SetIsPersistent(true);
     msg.SetMessageObj(group);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pGroupIdle(_, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return());
     AddDeviceManager();
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));

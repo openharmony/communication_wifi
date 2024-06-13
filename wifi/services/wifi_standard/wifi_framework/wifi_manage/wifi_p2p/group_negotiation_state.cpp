@@ -114,12 +114,12 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
             WIFI_LOGE("failed to startup Dhcp server.");
             p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
         }
-        if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+        if (WifiErrorNo::WIFI_HAL_OPT_OK !=
             WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
             WIFI_LOGE("failed to set GO Idle time.");
         }
     } else {
-        if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+        if (WifiErrorNo::WIFI_HAL_OPT_OK !=
             WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
             WIFI_LOGE("failed to set GC Idle time.");
         }
@@ -148,7 +148,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         }
     }
     SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
-    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_IDL_OPT_OK) {
+    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
@@ -168,7 +168,7 @@ bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessage &msg) const
     WIFI_LOGE("Negotiation failure. Error code: %{public}d", status);
     WriteP2pConnectFailedHiSysEvent(status, static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-    if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
@@ -231,7 +231,7 @@ bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
         p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
         ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-        if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
             WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
         }
     }

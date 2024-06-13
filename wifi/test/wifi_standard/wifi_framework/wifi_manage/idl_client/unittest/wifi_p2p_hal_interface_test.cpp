@@ -30,7 +30,7 @@ void onConnectSupplicant(int status)
     LOGD("onConnectSupplicant...status: %d\n", status);
 }
 
-void onDeviceFound(const IdlP2pDeviceFound &info)
+void onDeviceFound(const HalP2pDeviceFound &info)
 {
     LOGD("onDeviceFound...deviceCapabilities: %d\n", info.deviceCapabilities);
 }
@@ -55,7 +55,7 @@ void onGoNegotiationFailure(int status)
     LOGD("onGoNegotiationFailure...status: %d\n", status);
 }
 
-void onInvitationReceived(const IdlP2pInvitationInfo &info)
+void onInvitationReceived(const HalP2pInvitationInfo &info)
 {
     LOGD("onInvitationReceived...operatingFrequency: %d\n", info.operatingFrequency);
 }
@@ -75,7 +75,7 @@ void onGroupFormationFailure(const std::string &reason)
     LOGD("onGroupFormationFailure...reason: %s\n", reason.c_str());
 }
 
-void onGroupStarted(const IdlP2pGroupInfo &info)
+void onGroupStarted(const HalP2pGroupInfo &info)
 {
     LOGD("onGroupStarted...frequency: %d\n", info.frequency);
 }
@@ -139,7 +139,7 @@ void connectSupplicantFailed()
     LOGD("connectSupplicantFailed...\n");
 }
 
-void onP2pServDiscReq(const IdlP2pServDiscReqInfo &info)
+void onP2pServDiscReq(const HalP2pServDiscReqInfo &info)
 {
     LOGD("onP2pServDiscReq    \n");
     LOGD("          service discovery freq: %d\n", info.freq);
@@ -184,7 +184,7 @@ void WifiP2pHalInterfaceTest::TearDownTestCase()
 
 HWTEST_F(WifiP2pHalInterfaceTest, P2pStart_SUCCESS, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().StartP2p());
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().StartP2p());
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetupWpsPbc_SUCCESS, TestSize.Level1)
@@ -192,7 +192,7 @@ HWTEST_F(WifiP2pHalInterfaceTest, SetupWpsPbc_SUCCESS, TestSize.Level1)
     std::string groupInterface = "groupInterface";
     std::string bssid = "bssid";
 
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().StartWpsPbc(groupInterface, bssid));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().StartWpsPbc(groupInterface, bssid));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetupWpsPin_SUCCESS, TestSize.Level1)
@@ -202,84 +202,84 @@ HWTEST_F(WifiP2pHalInterfaceTest, SetupWpsPin_SUCCESS, TestSize.Level1)
     std::string pin = "adc123456";
     std::string result;
 
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().StartWpsPin(groupInterface, bssid, pin, result));
     pin.clear();
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK,
         WifiP2PHalInterface::GetInstance().StartWpsPin(groupInterface, bssid, pin, result));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, RemoveNetwork_SUCCESS, TestSize.Level1)
 {
     int networkId = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, ListNetworksTest, TestSize.Level1)
 {
     std::map<int, WifiP2pGroupInfo> mapGroups;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().ListNetworks(mapGroups));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().ListNetworks(mapGroups));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetWpsDeviceName_SUCCESS, TestSize.Level1)
 {
     std::string name = "testName";
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pDeviceName(name));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pDeviceName(name));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetWpsDeviceType_SUCCESS, TestSize.Level1)
 {
     std::string type = "testType";
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().SetP2pDeviceType(type));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().SetP2pDeviceType(type));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetWpsConfigMethods_SUCCESS, TestSize.Level1)
 {
     std::string config = "testConfig";
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pConfigMethods(config));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pConfigMethods(config));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetSsidPostfixName_SUCCESS, TestSize.Level1)
 {
     std::string postfixName = "testPostfixName";
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pSsidPostfix(postfixName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pSsidPostfix(postfixName));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetGroupMaxIdle_SUCCESS, TestSize.Level1)
 {
     std::string groupInterface = "testGroupName";
     size_t time = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupInterface, time));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupInterface, time));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetPowerSave_SUCCESS, TestSize.Level1)
 {
     std::string groupInterface;
     bool enable = false;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pPowerSave(groupInterface, enable));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetP2pPowerSave(groupInterface, enable));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetWfdEnable_SUCCESS, TestSize.Level1)
 {
     bool enable = false;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().SetWfdEnable(enable));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().SetWfdEnable(enable));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetWfdDeviceConfig_SUCCESS, TestSize.Level1)
 {
     std::string config;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetWfdDeviceConfig(config));
+    EXPECT_NE(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetWfdDeviceConfig(config));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, StartP2pFind_SUCCESS, TestSize.Level1)
 {
     size_t timeout = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pFind(timeout));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pFind(timeout));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, StopP2pFind_SUCCESS, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pStopFind());
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pStopFind());
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetExtListen_SUCCESS, TestSize.Level1)
@@ -288,32 +288,32 @@ HWTEST_F(WifiP2pHalInterfaceTest, SetExtListen_SUCCESS, TestSize.Level1)
     size_t period = 0;
     size_t interval = 0;
     EXPECT_EQ(
-        WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pConfigureListen(enable, period, interval));
+        WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pConfigureListen(enable, period, interval));
     enable = true;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().P2pConfigureListen(enable, period, interval));
     period = 65536;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().P2pConfigureListen(enable, period, interval));
     period = 10;
     interval = 65536;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().P2pConfigureListen(enable, period, interval));
     interval = 60;
     EXPECT_EQ(
-        WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pConfigureListen(enable, period, interval));
+        WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pConfigureListen(enable, period, interval));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetListenChannel_SUCCESS, TestSize.Level1)
 {
     size_t channel = 0;
     unsigned char regClass = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().SetListenChannel(channel, regClass));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().SetListenChannel(channel, regClass));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, P2pFlush_SUCCESS, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pFlush());
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pFlush());
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, Connect_SUCCESS, TestSize.Level1)
@@ -321,22 +321,22 @@ HWTEST_F(WifiP2pHalInterfaceTest, Connect_SUCCESS, TestSize.Level1)
     WifiP2pConfigInternal config;
     bool isJoinExistingGroup = false;
     std::string pin;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().Connect(config, isJoinExistingGroup, pin));
     config.SetDeviceAddress("00:00:00:00:00:00");
     WpsInfo wpsInfo;
     wpsInfo.SetPin("12345678");
     wpsInfo.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
     config.SetWpsInfo(wpsInfo);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().Connect(config, isJoinExistingGroup, pin));
     wpsInfo.SetPin("");
     config.SetWpsInfo(wpsInfo);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
         WifiP2PHalInterface::GetInstance().Connect(config, isJoinExistingGroup, pin));
     isJoinExistingGroup = true;
     EXPECT_EQ(
-        WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().Connect(config, isJoinExistingGroup, pin));
+        WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().Connect(config, isJoinExistingGroup, pin));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, CancelConnect_SUCCESS, TestSize.Level1)
@@ -347,7 +347,7 @@ HWTEST_F(WifiP2pHalInterfaceTest, CancelConnect_SUCCESS, TestSize.Level1)
 HWTEST_F(WifiP2pHalInterfaceTest, ProvisionDiscovery_SUCCESS, TestSize.Level1)
 {
     WifiP2pConfigInternal config;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().ProvisionDiscovery(config));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().ProvisionDiscovery(config));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, AddToGroup_SUCCESS, TestSize.Level1)
@@ -355,85 +355,85 @@ HWTEST_F(WifiP2pHalInterfaceTest, AddToGroup_SUCCESS, TestSize.Level1)
     bool isPersistent = false;
     int networkId = 0;
     int freq = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK,
         WifiP2PHalInterface::GetInstance().GroupAdd(isPersistent, networkId, freq));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, RemoveGroup_SUCCESS, TestSize.Level1)
 {
     std::string groupInterface;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().GroupRemove(groupInterface));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().GroupRemove(groupInterface));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, Invite_SUCCESS, TestSize.Level1)
 {
     WifiP2pGroupInfo group;
     std::string deviceAddr;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().Invite(group, deviceAddr));
+    EXPECT_NE(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().Invite(group, deviceAddr));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, Reinvoke_SUCCESS, TestSize.Level1)
 {
     int networkId = 13;
     std::string deviceAddr;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().Reinvoke(networkId, deviceAddr));
+    EXPECT_NE(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().Reinvoke(networkId, deviceAddr));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, GetDeviceAddress_SUCCESS, TestSize.Level1)
 {
     std::string deviceAddress;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddress));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddress));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, GetGroupCapability_SUCCESS, TestSize.Level1)
 {
     std::string deviceAddress;
     uint32_t capacity = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
         WifiP2PHalInterface::GetInstance().GetGroupCapability(deviceAddress, capacity));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, P2pServiceAddTest, TestSize.Level1)
 {
     WifiP2pServiceInfo info;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pServiceAdd(info));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pServiceAdd(info));
     std::vector<std::string> vec;
     vec.push_back("upnp 0");
     info.SetQueryList(vec);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceAdd(info));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceAdd(info));
     vec.clear();
     vec.push_back("upnpp 1 letusplaygame");
     info.SetQueryList(vec);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceAdd(info));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceAdd(info));
     vec.clear();
     vec.push_back("upnp 0 letusplaygames");
     vec.push_back("bonjour from china");
     info.SetQueryList(vec);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceAdd(info));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceAdd(info));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, P2pServiceRemoveTest, TestSize.Level1)
 {
     WifiP2pServiceInfo info;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pServiceRemove(info));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().P2pServiceRemove(info));
     std::vector<std::string> vec;
     vec.push_back("upnp 0");
     info.SetQueryList(vec);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceRemove(info));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceRemove(info));
     vec.clear();
     vec.push_back("upnpp 1 letusplaygame");
     info.SetQueryList(vec);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceRemove(info));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceRemove(info));
     vec.clear();
     vec.push_back("upnp 0 letusplaygames");
     vec.push_back("bonjour from china");
     info.SetQueryList(vec);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceRemove(info));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().P2pServiceRemove(info));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, FlushService_SUCCESS, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().FlushService());
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().FlushService());
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, ReqServiceDiscovery_SUCCESS, TestSize.Level1)
@@ -441,20 +441,20 @@ HWTEST_F(WifiP2pHalInterfaceTest, ReqServiceDiscovery_SUCCESS, TestSize.Level1)
     std::string macAddr;
     std::vector<unsigned char> tlvs;
     std::string reqID;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(macAddr, tlvs, reqID));
     macAddr = "00:00:00:00:00:00";
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(macAddr, tlvs, reqID));
     tlvs.push_back('a');
     EXPECT_EQ(
-        WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(macAddr, tlvs, reqID));
+        WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(macAddr, tlvs, reqID));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, CancalReqServiceDiscovery_SUCCESS, TestSize.Level1)
 {
     std::string id;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().CancelReqServiceDiscovery(id));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().CancelReqServiceDiscovery(id));
 }
 
 /**
@@ -471,19 +471,19 @@ HWTEST_F(WifiP2pHalInterfaceTest, StoreConfig_SUCCESS, TestSize.Level1)
 HWTEST_F(WifiP2pHalInterfaceTest, SetRandomMacAddr_SUCCESS, TestSize.Level1)
 {
     bool enable = false;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED, WifiP2PHalInterface::GetInstance().SetRandomMacAddr(enable));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiP2PHalInterface::GetInstance().SetRandomMacAddr(enable));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetMiracastType_SUCCESS, TestSize.Level1)
 {
     int type = 0;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetMiracastMode(type));
+    EXPECT_NE(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetMiracastMode(type));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetPersistentReconnectTest, TestSize.Level1)
 {
     int mode = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetPersistentReconnect(mode));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetPersistentReconnect(mode));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, RespServiceDiscoveryTest, TestSize.Level1)
@@ -492,21 +492,21 @@ HWTEST_F(WifiP2pHalInterfaceTest, RespServiceDiscoveryTest, TestSize.Level1)
     int frequency = 0;
     int dialogToken = 0;
     std::vector<unsigned char> tlvs;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_INVALID_PARAM,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_INVALID_PARAM,
         WifiP2PHalInterface::GetInstance().RespServiceDiscovery(device, frequency, dialogToken, tlvs));
     tlvs.push_back(0x01);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_FAILED,
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
         WifiP2PHalInterface::GetInstance().RespServiceDiscovery(device, frequency, dialogToken, tlvs));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetServiceDiscoveryExternalTest, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().SetServiceDiscoveryExternal(false));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SetServiceDiscoveryExternal(false));
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, P2pStop_SUCCESS, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, WifiP2PHalInterface::GetInstance().StopP2p());
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().StopP2p());
 }
 }  // namespace Wifi
 }  // namespace OHOS

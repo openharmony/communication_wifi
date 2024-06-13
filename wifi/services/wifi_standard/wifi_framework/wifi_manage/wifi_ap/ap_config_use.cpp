@@ -115,7 +115,7 @@ std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandT
     std::vector<int> freqs;
     WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand(
         WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(bandType), freqs);
-    if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(bandType, freqs);
         WIFI_LOGI("get freqs from drv fail, use default, bandType=%{public}d, size=%{public}d",
             static_cast<int>(bandType), static_cast<int>(freqs.size()));

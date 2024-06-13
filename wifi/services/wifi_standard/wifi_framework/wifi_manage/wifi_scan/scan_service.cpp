@@ -113,10 +113,10 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         return false;
     }
 
-    if ((WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_24_GHZ, freqs2G) != WIFI_IDL_OPT_OK) ||
-        (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ, freqs5G) != WIFI_IDL_OPT_OK) ||
+    if ((WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_24_GHZ, freqs2G) != WIFI_HAL_OPT_OK) ||
+        (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ, freqs5G) != WIFI_HAL_OPT_OK) ||
         (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ_DFS_ONLY, freqsDfs) !=
-        WIFI_IDL_OPT_OK)) {
+        WIFI_HAL_OPT_OK)) {
         WIFI_LOGE("GetSupportFrequencies failed.\n");
     }
 
@@ -2658,7 +2658,7 @@ ErrCode ScanService::SetNetworkInterfaceUpDown(bool upDown)
     WIFI_LOGI("Enter SetNetworkInterfaceUpDown.\n");
     int res = WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(
         WifiSettings::GetInstance().GetStaIfaceName(), upDown);
-    if (res != static_cast<int>(WIFI_IDL_OPT_OK)) {
+    if (res != static_cast<int>(WIFI_HAL_OPT_OK)) {
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -2729,9 +2729,9 @@ void ScanService::InitChipsetInfo()
 {
     WIFI_LOGI("Enter InitChipsetInfo");
     if (WifiStaHalInterface::GetInstance().GetChipsetCategory(
-        WifiSettings::GetInstance().GetStaIfaceName(), chipsetCategory) != WIFI_IDL_OPT_OK
+        WifiSettings::GetInstance().GetStaIfaceName(), chipsetCategory) != WIFI_HAL_OPT_OK
         || WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(
-            WifiSettings::GetInstance().GetStaIfaceName(), chipsetFeatrureCapability) != WIFI_IDL_OPT_OK) {
+            WifiSettings::GetInstance().GetStaIfaceName(), chipsetFeatrureCapability) != WIFI_HAL_OPT_OK) {
                 WIFI_LOGE("GetChipsetCategory or GetChipsetWifiFeatrureCapability failed.\n");
                 isChipsetInfoObtained = false;
     } else {

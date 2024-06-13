@@ -16,12 +16,12 @@
 #define OHOS_WIFI_AP_EVENT_CALLBACK_H
 
 #include <functional>
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 
 namespace OHOS {
 namespace Wifi {
 struct IWifiApMonitorEventCallback {
-    std::function<void(const WifiApConnectionNofify &)> onStaJoinOrLeave;
+    std::function<void(const WifiHalApConnectionNofify &)> onStaJoinOrLeave;
     std::function<void(int)> onApEnableOrDisable;
 };
 }  // namespace Wifi

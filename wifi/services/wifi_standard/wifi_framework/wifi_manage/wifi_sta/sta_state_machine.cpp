@@ -3246,6 +3246,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     want.AddEntity(PORTAL_ENTITY);
     want.SetBundle(BROWSER_BUNDLE);
     want.SetParam("netId", netId);
+    want.SetParam("ohos.ability.params.showDefaultPicker", true);
     WIFI_LOGI("wifi netId is %{public}d", netId);
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
     if (err != ERR_OK) {

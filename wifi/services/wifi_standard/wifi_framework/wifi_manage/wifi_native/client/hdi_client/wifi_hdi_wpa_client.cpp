@@ -945,8 +945,8 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pConnect(const WifiP2pConfigInternal &config,
     } else {
         info.goIntent = config.GetGroupOwnerIntent();
     }
-    if (info.goIntent < HAL_P2P_MIN_GO_INTENT || info.goIntent > HAL_P2P_MAX_GO_INTENT) {
-        info.goIntent = HAL_P2P_DEFAULT_GO_INTENT;
+    if (info.goIntent < HAL_P2P_GO_INTENT_MIN_LENGTH || info.goIntent > HAL_P2P_GO_INTENT_MAX_LENGTH) {
+        info.goIntent = HAL_P2P_GO_INTENT_DEFAULT_LENGTH;
     }
     std::string address = config.GetDeviceAddress();
     if (address.size() < HAL_BSSID_LENGTH) {

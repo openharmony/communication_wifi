@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "../../..//services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface/i_wifi_public_func.h"
+#include "i_wifi_public_func.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <cstddef>

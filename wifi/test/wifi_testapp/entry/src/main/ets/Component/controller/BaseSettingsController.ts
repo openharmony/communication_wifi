@@ -13,17 +13,13 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import ISettingsController from './ISettingsController'
 
 /**
  * BaseSettingsController Of Wifi test
  */
 
-export default abstract
-
-class BaseSettingsController implements ISettingsController {
+export default abstract class BaseSettingsController implements ISettingsController {
   protected getComponent: () => any;
 
   /**
@@ -33,7 +29,7 @@ class BaseSettingsController implements ISettingsController {
     this.getComponent = () => component;
 
     // set default property values by component
-    for (var key in this) {
+    for (let key in this) {
       if (key in component) {
         this[key] = component[key];
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,11 +15,13 @@
 
 #ifndef OHOS_HANDLER_H
 #define OHOS_HANDLER_H
-
-#include <pthread.h>
 #include "internal_message.h"
+#ifdef OHOS_ARCH_LITE
+#include <pthread.h>
 #include "message_queue.h"
-
+#else
+#include "wifi_event_handler.h"
+#endif
 namespace OHOS {
 namespace Wifi {
 const int USEC_1000 = 1000;
@@ -43,14 +45,7 @@ public:
      *
      * @return true : Initialize Handler success, false: Initialize Handler failed.
      */
-    bool InitialHandler();
-
-    /**
-     * @Description : Thread processing function
-     *
-     * @param pInstance - Handler Instance pointer.[in]
-     */
-    static void *RunHandleThreadFunc(void *pInstance);
+    bool InitialHandler(const std::string &name);
 
     /**
      * @Description :Stop the thread for obtaining messages.
@@ -98,13 +93,6 @@ public:
     void DeleteMessageFromQueue(int messageName);
 
     /**
-     * @Description : Distributing Messages.
-     *
-     * @param msg - Messages to be processed.[in]
-     */
-    void DistributeMessage(InternalMessage *msg);
-
-    /**
      * @Description : Invoke the ExecuteStateMsg interface of the current state
                      to process messages sent to the state machine. The entry/exit
                     of the state machine is also called, and the delayed message
@@ -113,6 +101,21 @@ public:
     * @param msg - Messages.[in]
     */
     virtual void ExecuteMessage(InternalMessage *msg) = 0;
+private:
+#ifdef OHOS_ARCH_LITE
+    /**
+     * @Description : Thread processing function
+     *
+     * @param pInstance - Handler Instance pointer.[in]
+     */
+    static void *RunHandleThreadFunc(void *pInstance);
+
+    /**
+     * @Description : Distributing Messages.
+     *
+     * @param msg - Messages to be processed.[in]
+     */
+    void DistributeMessage(InternalMessage *msg);
 
     /**
      * @Description : Obtains messages from the message queue, distributes the
@@ -120,8 +123,6 @@ public:
      *
      */
     void GetAndDistributeMessage();
-
-private:
     /* message queue. */
     std::unique_ptr<MessageQueue> pMyQueue;
     /* Thread handle. */
@@ -129,6 +130,12 @@ private:
 
     /* Running flag. */
     bool isRunning;
+#else
+    /* task queue. */
+    std::unique_ptr<WifiEventHandler> pMyTaskQueue;
+    std::vector<InternalMessage *> mMessageQueue;
+#endif
+    std::string mThreadName = "";
 };
 }  // namespace Wifi
 }  // namespace OHOS

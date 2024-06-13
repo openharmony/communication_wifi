@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import wifi from '@ohos.wifi'
+
 const TAG = "[basicDataSource]"
+
 /**
  * BasicDataSource page of WiFi test
  */
@@ -24,87 +24,87 @@ const TAG = "[basicDataSource]"
 class BasicDataSource implements IDataSource {
   private listeners: DataChangeListener[] = []
 
-  public totalCount(): Number {
+  public totalCount(): number {
     return 0
   }
 
-  public getData( index: Number ): any {
+  public getData(index: number): any {
     return undefined
   }
 
-  registerDataChangeListener( listener: DataChangeListener ): void {
-    if ( this.listeners.indexOf( listener ) < 0 ) {
-      console.log( TAG, 'add listener' )
-      this.listeners.push( listener )
+  registerDataChangeListener(listener: DataChangeListener): void {
+    if ( this.listeners.indexOf(listener) < 0 ) {
+      console.log(TAG , 'add listener')
+      this.listeners.push(listener)
     } else {
-      console.log( TAG, 'indexOf(listener) >= 0' )
+      console.log(TAG , 'indexOf(listener) >= 0')
     }
   }
 
-  unregisterDataChangeListener( listener: DataChangeListener ): void {
-    const pos = this.listeners.indexOf( listener );
+  unregisterDataChangeListener(listener: DataChangeListener): void {
+    const pos = this.listeners.indexOf(listener);
     if ( pos >= 0 ) {
-      console.log( TAG, 'remove listener' )
-      this.listeners.splice( pos , 1 )
+      console.log(TAG , 'remove listener')
+      this.listeners.splice(pos , 1)
     } else {
-      console.log( TAG, 'pos < 0' )
+      console.log(TAG , 'pos < 0')
     }
   }
 
   notifyDataReload(): void {
-    this.listeners.forEach( listener => {
+    this.listeners.forEach(listener => {
       listener.onDataReloaded()
-    } )
+    })
   }
 
-  notifyDataAdd( index: Number ): void {
-    this.listeners.forEach( listener => {
-      listener.onDataAdd( index )
-    } )
+  notifyDataAdd(index: number): void {
+    this.listeners.forEach(listener => {
+      listener.onDataAdd(index)
+    })
   }
 
-  notifyDataChange( index: Number ): void {
-    this.listeners.forEach( listener => {
-      listener.onDataChange( index )
-    } )
+  notifyDataChange(index: number): void {
+    this.listeners.forEach(listener => {
+      listener.onDataChange(index)
+    })
   }
 
-  notifyDataDelete( index: Number ): void {
-    this.listeners.forEach( listener => {
-      listener.onDataDelete( index )
-    } )
+  notifyDataDelete(index: number): void {
+    this.listeners.forEach(listener => {
+      listener.onDataDelete(index)
+    })
   }
 
-  notifyDataMove( from: Number , to: Number ): void {
-    this.listeners.forEach( listener => {
-      listener.onDataMove( from , to )
-    } )
+  notifyDataMove(from: number , to: number): void {
+    this.listeners.forEach(listener => {
+      listener.onDataMove(from , to)
+    })
   }
 }
 
 export default class WifiDataSource extends BasicDataSource {
   private dataArray: wifi.WifiScanInfo[] = []
 
-  constructor( data: wifi.WifiScanInfo[] ) {
+  constructor(data: wifi.WifiScanInfo[]) {
     super()
     this.dataArray = data
   }
 
-  public totalCount(): Number {
+  public totalCount(): number {
     return this.dataArray.length
   }
 
-  public getData( index: Number ): any {
-    return this.dataArray[index]
+  public getData(index: number): any {
+    return this.dataArray[ index ]
   }
 
-  public addData( index: Number , data: wifi.WifiScanInfo ): void {
-    this.dataArray.splice( index , 0 , data )
-    this.notifyDataAdd( index )
+  public addData(index: number , data: wifi.WifiScanInfo): void {
+    this.dataArray.splice(index , 0 , data)
+    this.notifyDataAdd(index)
   }
 
-  public pushData( data: wifi.WifiScanInfo ): void {
-    this.dataArray.push( data )
-    this.notifyDataAdd( this.dataArray.length - 1 )
+  public pushData(data: wifi.WifiScanInfo): void {
+    this.dataArray.push(data)
+    this.notifyDataAdd(this.dataArray.length - 1)
   }
 }

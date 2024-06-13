@@ -16,6 +16,7 @@ fuzz_test_output_path = "wifi/wifi/wifi_sta"
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
 DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"
+CONFIG_CTRL_IFACE = "unix"
 
 declare_args() {
   wifi_feature_with_p2p = true
@@ -24,8 +25,7 @@ declare_args() {
   wifi_feature_with_sta_num = 1
   wifi_feature_with_auth_disable = false
   wifi_feature_with_dhcp_disable = false
-  wifi_feature_with_encryption = false
-  wifi_feature_with_wifi_hdi = false
+  wifi_feature_with_encryption = true
   wifi_feature_with_ap_extension = false
   wifi_feature_with_app_frozen = false
   wifi_feature_non_seperate_p2p = false
@@ -35,11 +35,19 @@ declare_args() {
       defined(global_parts_info.resourceschedule_efficiency_manager)) {
     wifi_feature_with_app_frozen = true
   }
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_ffrt)) {
+    wifi_ffrt_enable = true
+  }
   wifi_feature_sta_ap_exclusion = true
   wifi_feature_with_random_mac_addr = true
   wifi_feature_with_hdi_wpa_supported = false
   wifi_feature_with_hpf_supported = true
-  wifi_feature_with_rx_listen_supported = false
   wifi_feature_with_scan_control = true
   wifi_feature_network_selection = false
+  wifi_feature_p2p_random_mac_addr = true
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.hdf_drivers_interface_wlan)) {
+    wifi_feature_with_hdi_chip_supported = true
+  }
 }

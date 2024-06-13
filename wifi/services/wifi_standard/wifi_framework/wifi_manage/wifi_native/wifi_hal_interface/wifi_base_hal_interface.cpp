@@ -23,37 +23,41 @@ namespace OHOS {
 namespace Wifi {
 WifiBaseHalInterface::WifiBaseHalInterface()
 {
-    mIdlClient = nullptr;
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     mHdiWpaClient = nullptr;
-#endif
-
-#ifdef HDI_INTERFACE_SUPPORT
-    mHdiClient = nullptr;
+#else
+    mIdlClient = nullptr;
 #endif
 }
 
 WifiBaseHalInterface::~WifiBaseHalInterface()
 {
-    if (mIdlClient != nullptr) {
-        delete mIdlClient;
-        mIdlClient = nullptr;
-    }
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     if (mHdiWpaClient != nullptr) {
         delete mHdiWpaClient;
         mHdiWpaClient = nullptr;
     }
-#endif
-
-#ifdef HDI_INTERFACE_SUPPORT
-    if (mHdiClient != nullptr) {
-        delete mHdiClient;
-        mHdiClient = nullptr;
+#else
+    if (mIdlClient != nullptr) {
+        delete mIdlClient;
+        mIdlClient = nullptr;
     }
 #endif
 }
 
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+bool WifiBaseHalInterface::InitHdiWpaClient(void)
+{
+    if (mHdiWpaClient == nullptr) {
+        mHdiWpaClient = new (std::nothrow) WifiHdiWpaClient;
+    }
+    if (mHdiWpaClient == nullptr) {
+        LOGE("Failed to create hdi wpa client");
+        return false;
+    }
+    return true;
+}
+#else
 bool WifiBaseHalInterface::InitIdlClient(void)
 {
     if (mIdlClient == nullptr) {
@@ -78,35 +82,6 @@ void WifiBaseHalInterface::ExitAllIdlClient(void)
     }
     return;
 }
-
-bool WifiBaseHalInterface::InitHdiWpaClient(void)
-{
-#ifdef HDI_WPA_INTERFACE_SUPPORT
-    if (mHdiWpaClient == nullptr) {
-        mHdiWpaClient = new (std::nothrow) WifiHdiWpaClient;
-    }
-    if (mHdiWpaClient == nullptr) {
-        LOGE("Failed to create hdi wpa client");
-        return false;
-    }
 #endif
-    return true;
-}
-
-bool WifiBaseHalInterface::InitHdiClient(void)
-{
-#ifdef HDI_INTERFACE_SUPPORT
-    if (mHdiClient == nullptr) {
-        mHdiClient = new (std::nothrow) WifiHdiClient;
-        if (mHdiClient == nullptr) {
-            LOGE("failed to create hdi wifi client");
-            return false;
-        } else {
-            LOGI("success to create wifi hdi client");
-        }
-    }
-#endif
-    return true;
-}
 }  // namespace Wifi
 }  // namespace OHOS

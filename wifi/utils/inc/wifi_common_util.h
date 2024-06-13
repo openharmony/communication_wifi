@@ -23,7 +23,7 @@
 #include "securec.h"
 #include "define.h"
 #ifndef OHOS_ARCH_LITE
-#include "timer.h"
+#include "wifi_timer.h"
 #endif
 #include "wifi_errcode.h"
 
@@ -77,6 +77,9 @@ static std::map<std::string, int> g_p2pCallBackNameEventIdMap = {
     { EVENT_P2P_DISCOVERY_CHANGE, WIFI_CBK_MSG_DISCOVERY_CHANGE },
     { EVENT_P2P_ACTION_RESULT, WIFI_CBK_MSG_P2P_ACTION_RESULT },
     { EVENT_P2P_CONFIG_CHANGE, WIFI_CBK_MSG_CFG_CHANGE },
+    { EVENT_P2P_GC_JOIN_GROUP, WIFI_CBK_MSG_P2P_GC_JOIN_GROUP},
+    { EVENT_P2P_GC_LEAVE_GROUP, WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP},
+    { EVENT_P2P_PRIVATE_PEER_DEVICE_CHANGE, WIFI_CBK_MSG_PRIVATE_PEER_CHANGE},
 };
 
 /**
@@ -210,21 +213,13 @@ int GetCallingUid();
 int GetCallingTokenId();
 
 /**
- * @Description Check uid the app is a foregroud app
- *
- * @param uid - Input uid
- * @return bool - Returns true for yes, false for no.
- */
-bool IsForegroundApp(const int uid);
-
-/**
  * @Description by Process uid ,the app is a wifi broker process
  *
  * @param uid - Input uid
  * @param pid - Input pid
  * @return string - Returns processname
  */
-std::string GetRunningProcessNameByPid(const int uid, const int pid);
+std::string GetBrokerProcessNameByPid(const int uid, const int pid);
 
 /**
  * @Description set Process pid and processname
@@ -249,23 +244,6 @@ private:
     std::string m_desc;
     std::chrono::steady_clock::time_point m_startTime;
 };
-
-class WifiTimer {
-public:
-    using TimerCallback = std::function<void()>;
-    static constexpr uint32_t DEFAULT_TIMEROUT = 10000;
-    static WifiTimer *GetInstance(void);
-
-    WifiTimer();
-    ~WifiTimer();
-
-    ErrCode Register(
-        const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval = DEFAULT_TIMEROUT, bool once = true);
-    void UnRegister(uint32_t timerId);
-
-private:
-    std::unique_ptr<Utils::Timer> timer_{nullptr};
-};
 #endif
 
 /**
@@ -282,6 +260,11 @@ int FrequencyToChannel(int freq);
  */
 int ChannelToFrequency(int channel);
 bool IsOtherVapConnect();
+int HexString2Byte(const char *hex, uint8_t *buf, size_t len);
+void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t hexstrLen);
+bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);
+std::string EncodeBase64(const std::vector<uint8_t> &input);
+std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

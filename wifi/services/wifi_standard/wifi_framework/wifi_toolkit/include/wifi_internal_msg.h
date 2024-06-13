@@ -50,8 +50,10 @@ constexpr int RSSI_LEVEL_1_5G = -85;
 constexpr int RSSI_LEVEL_2_5G = -79;
 constexpr int RSSI_LEVEL_3_5G = -72;
 constexpr int RSSI_LEVEL_4_5G = -65;
+constexpr int AIRPLANE_MODE_OPEN = 1;
+constexpr int AIRPLANE_MODE_CLOSE = 2;
 
-enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, UNKNOWN };
+enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, SEMI_ACTIVE, UNKNOWN };
 
 enum class WifiFeatures {
     WIFI_FEATURE_INFRA = 0x0001,             // The feature id indicates support basic infrastructure mode
@@ -104,9 +106,13 @@ enum class OperateResState {
     CLOSE_SCAN_ONLY_CLOSING,                /* close scan only closing */
     CLOSE_SCAN_ONLY_SUCCEED,                /* close scan only succeed */
     CLOSE_SCAN_ONLY_FAILED,                 /* close scan only failed */
+    SPECIAL_CONNECTED,                  /* special connected */
+    ENABLE_SEMI_WIFI_OPENING,               /* enable semi wifi opening */
+    ENABLE_SEMI_WIFI_SUCCEED,               /* enable semi wifi succeed */
+    ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
 };
 
-/* is wps connected to a network */
+/* is wps connected to a network  */
 enum class IsWpsConnected {
     WPS_CONNECTED = 0,
     WPS_INVALID = -1,
@@ -165,6 +171,8 @@ struct WifiEventCallbackMsg {
     WifiP2pDevice p2pDevice;
     P2pActionCallback p2pAction;
     CfgInfo* cfgInfo;
+    GcInfo gcInfo;
+    std::string privateWfdInfo;
     WifiEventCallbackMsg()
     {
         msgCode = 0;
@@ -182,13 +190,10 @@ enum class DhcpIpType { /* dhcp IP type: ipv4 ipv6 mix */
 };
 
 enum class OperatorWifiType {
-    USER_OPEN_WIFI_IN_NO_AIRPLANEMODE,      /* User open Wifi in non-airplane mode */
-    USER_CLOSE_WIFI_IN_NO_AIRPLANEMODE,     /* User clsoe Wifi in non-airplane mode */
-    USER_OPEN_WIFI_IN_AIRPLANEMODE,         /* User open Wifi in airplane mode */
-    USER_CLOSE_WIFI_IN_AIRPLANEMODE,        /* User close Wifi in airplane mode */
-    OPEN_WIFI_DUE_TO_AIRPLANEMODE_CLOSED,   /* Open Wifi due to airplane mode closed */
-    CLOSE_WIFI_DUE_TO_AIRPLANEMODE_OPENED,  /* Close Wifi due to airplane mode opened */
-    INITIAL_TYPE,                            /* initial type */
+    WIFI_DISABLED,
+    WIFI_ENABLED,
+    WIFI_ENABLED_AIRPLANEMODE_OVERRIDE,
+    WIFI_DISABLED_AIRPLANEMODE_ON,
 };
 
 enum class StaApExclusionType {
@@ -208,10 +213,11 @@ struct WifiConfig {
      * last sta service state, when service started, power
      * saving off, airplane mode off we use this saved state to
      * discuss whether need restore sta service. when open sta
-     * service, set true; when user call DisableWifi succeed,
-     * set false;
+     * service, set 1; when user call DisableWifi succeed,
+     * set 0; when sta is semi active, set 2;
      */
-    bool staLastState;
+    int staLastState;
+    int lastAirplaneMode;
     int savedDeviceAppraisalPriority;
     int scoretacticsScoreSlope;
     int scoretacticsInitScore;
@@ -250,10 +256,11 @@ struct WifiConfig {
     WifiConfig()
     {
         scanAlwaysSwitch = false;
-        staAirplaneMode = static_cast<int>(OperatorWifiType::INITIAL_TYPE);
+        staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
         canOpenStaWhenAirplane = true;
         openWifiWhenAirplane = false;
-        staLastState = false;
+        staLastState = 0;
+        lastAirplaneMode = AIRPLANE_MODE_CLOSE;
         savedDeviceAppraisalPriority = PRIORITY_1;
         scoretacticsScoreSlope = SCORE_SLOPE;
         scoretacticsInitScore = INIT_SCORE;
@@ -320,6 +327,7 @@ struct WifiStoreRandomMac {
     std::string peerBssid;
     std::string randomMac;
     std::string preSharedKey;
+    std::vector<std::string> fuzzyBssids;
 };
 
 struct WifiPortalConf {

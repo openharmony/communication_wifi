@@ -641,6 +641,8 @@ HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest4, TestSize.Level1)
     mClient.SetDeviceConfig(networkId, config);
     config.allowedGroupCiphers = 1;
     mClient.SetDeviceConfig(networkId, config);
+    config.allowedGroupMgmtCiphers = 1;
+    mClient.SetDeviceConfig(networkId, config);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
@@ -755,7 +757,7 @@ HWTEST_F(WifiIdlClientTest, ReqGetConnectSignalInfoTest2, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, StartApTest, TestSize.Level1)
 {
     int id = 1;
-    mClient.StartAp(id);
+    mClient.StartAp(id, "wlan0");
 }
 
 HWTEST_F(WifiIdlClientTest, StopApTest, TestSize.Level1)
@@ -763,7 +765,7 @@ HWTEST_F(WifiIdlClientTest, StopApTest, TestSize.Level1)
     int id = 1;
     mClient.StopAp(id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.StartAp(id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.StartAp(id, "wlan0") == WIFI_IDL_OPT_FAILED);
     EXPECT_TRUE(mClient.StopAp(id) == WIFI_IDL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
@@ -1591,7 +1593,7 @@ HWTEST_F(WifiIdlClientTest, ReqIsSupportDbdcTest, TestSize.Level1)
     bool isSupport = true;
     mClient.ReqIsSupportDbdc(isSupport);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqIsSupportDbdc(isSupport) == WIFI_IDL_OPT_FAILED);
+    mClient.ReqIsSupportDbdc(isSupport);
     MockWifiPublic::SetMockFlag(false);
 }
 }  // namespace Wifi

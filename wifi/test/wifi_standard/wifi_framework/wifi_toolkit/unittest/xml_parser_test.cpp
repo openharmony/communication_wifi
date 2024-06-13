@@ -73,6 +73,12 @@ HWTEST_F(XmlParserTest, LoadConfigurationTest, TestSize.Level1)
     EXPECT_FALSE(m_xmlParser->LoadConfiguration(nullptr));
 }
 
+HWTEST_F(XmlParserTest, LoadConfigurationMemoryTest, TestSize.Level1)
+{
+    WIFI_LOGI("LoadConfigurationMemoryTest enter");
+    EXPECT_FALSE(m_xmlParser->LoadConfigurationMemory(nullptr));
+}
+
 HWTEST_F(XmlParserTest, ParseTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseTest enter");

@@ -24,14 +24,8 @@ config("module_private_config") {
 ohos_unittest("wifi_p2p_test") {
   module_out_path = "wifi/p2p_test"
   sources = [
-    "$WIFI_ROOT_DIR/base/state_machine/src/handler.cpp",
-    "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
-    "$WIFI_ROOT_DIR/base/state_machine/src/message_queue.cpp",
-    "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
-    "$WIFI_ROOT_DIR/base/state_machine/src/state_machine.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/wifi_broadcast_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/authorizing_negotiation_request_state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/group_formed_state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/group_negotiation_state.cpp",
@@ -111,16 +105,15 @@ ohos_unittest("wifi_p2p_test") {
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/base/state_machine/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
@@ -131,13 +124,14 @@ ohos_unittest("wifi_p2p_test") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
   ]
   ldflags = [
     "-fPIC",
     "--coverage",
   ]
   deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base",
+    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",

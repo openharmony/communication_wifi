@@ -15,21 +15,22 @@
 
 import TaskItemBean from '../common/bean/TaskItemBean';
 import { CommonConstants } from '../common/constant/CommonConstant';
-import { changeProgress } from '../viewmodel/TaskListItemModel';
 import ProgressEditPanel from './ProgressEditPanel';
+import getCurrentTime from '../common/utils/DateUtil';
+import DataModel from '../viewmodel/DataModel';
 
 @Component
 export default struct TargetListItem {
-  private taskItem: TaskItemBean;
+  private taskItem!: TaskItemBean;
   @State latestProgress: number = 0;
   @State updateDate: string = '';
   @Link selectArr: Array<boolean>;
   @Prop isEditMode: boolean;
-  @Link @Watch('onClickIndexChanged') clickIndex: Number;
+  @Link @Watch('onClickIndexChanged') clickIndex: number;
   @State isExpanded: boolean = false;
   @Consume overAllProgressChanged: boolean;
-  @State sliderMode: Number = CommonConstants.DEFAULT_SLIDER_MODE;
-  private index: number;
+  @State sliderMode: number = CommonConstants.DEFAULT_SLIDER_MODE;
+  private index!: number;
 
   aboutToAppear() {
     this.latestProgress = this.taskItem.progressValue;
@@ -40,68 +41,68 @@ export default struct TargetListItem {
    * Listening click index.
    */
   onClickIndexChanged() {
-    if (this.clickIndex !== this.index) {
+    if ( this.clickIndex !== this.index ) {
       this.isExpanded = false;
     }
   }
 
   build() {
-    Stack({ alignContent: Alignment.Start }) {
+    Stack({ alignContent : Alignment.Start }) {
       Column() {
         this.TargetItem()
-        if (this.isExpanded) {
+        if ( this.isExpanded ) {
           Blank()
           ProgressEditPanel({
-            slidingProgress: this.latestProgress,
-            onCancel: () => this.isExpanded = false,
-            onClickOK: changeProgress.bind(this),
-            sliderMode: $sliderMode
+            slidingProgress : this.latestProgress ,
+            onCancel : () => this.isExpanded = false ,
+            onClickOK : this.changeProgress.bind(this) ,
+            sliderMode : $sliderMode
           })
             .transition({
-              scale: {
-                x: CommonConstants.TRANSITION_ANIMATION_X,
-                y: CommonConstants.TRANSITION_ANIMATION_Y
+              scale : {
+                x : CommonConstants.TRANSITION_ANIMATION_X ,
+                y : CommonConstants.TRANSITION_ANIMATION_Y
               }
             })
         }
       }
       .padding({
-        left: $r('app.float.distance_16'),
-        top: $r('app.float.distance_14'),
-        bottom: $r('app.float.distance_12'),
-        right: this.isEditMode ? $r('app.float.distance_54') : $r('app.float.distance_16')
+        left : $r('app.float.distance_16') ,
+        top : $r('app.float.distance_14') ,
+        bottom : $r('app.float.distance_12') ,
+        right : this.isEditMode ? $r('app.float.distance_54') : $r('app.float.distance_16')
       })
       .height(this.isExpanded ? $r('app.float.expanded_item_height') : $r('app.float.list_item_height'))
       .width(CommonConstants.FULL_WIDTH)
       .opacity(
-        this.latestProgress === CommonConstants.SLIDER_MAX_VALUE ?
+          this.latestProgress === CommonConstants.SLIDER_MAX_VALUE ?
         CommonConstants.OPACITY : CommonConstants.NO_OPACITY
       )
       .borderRadius(CommonConstants.LIST_RADIUS)
-      .animation({ duration: CommonConstants.DURATION })
-      .backgroundColor(this.selectArr[this.index] ? $r('app.color.edit_blue') : Color.White)
+      .animation({ duration : CommonConstants.DURATION })
+      .backgroundColor(this.selectArr[ this.index ] ? $r('app.color.edit_blue') : Color.White)
       .onClick(() => {
-        if (this.sliderMode === CommonConstants.CLICK_SLIDER_MODE) {
+        if ( this.sliderMode === CommonConstants.CLICK_SLIDER_MODE ) {
           this.sliderMode = CommonConstants.DEFAULT_SLIDER_MODE;
           return;
         }
-        if (!this.isEditMode) {
-          animateTo({ duration: CommonConstants.DURATION }, () => {
+        if ( !this.isEditMode ) {
+          animateTo({ duration : CommonConstants.DURATION } , () => {
             this.isExpanded = !this.isExpanded;
           })
           this.clickIndex = this.index;
         }
       })
 
-      if (this.isEditMode) {
+      if ( this.isEditMode ) {
         Row() {
           Checkbox()
-            .select(this.selectArr[this.index])
+            .select(this.selectArr[ this.index ])
             .selectedColor($r('app.color.main_blue'))
             .width(CommonConstants.CHECKBOX_WIDTH)
-            .margin({ right: $r('app.float.distance_16') })
+            .margin({ right : $r('app.float.distance_16') })
             .onChange((isCheck: boolean) => {
-              this.selectArr[this.index] = isCheck;
+              this.selectArr[ this.index ] = isCheck;
             })
         }
         .width(CommonConstants.FULL_WIDTH)
@@ -109,6 +110,21 @@ export default struct TargetListItem {
       }
     }
     .width(CommonConstants.FULL_WIDTH)
+  }
+
+  /**
+   * Save the adjustment progress.
+   *
+   * @param progress progress value saved.
+   */
+  changeProgress(progress: number) {
+    this.latestProgress = progress;
+    this.updateDate = getCurrentTime();
+    let result = DataModel.updateProgress(this.index , this.latestProgress , this.updateDate);
+    if ( result ) {
+      this.overAllProgressChanged = !this.overAllProgressChanged;
+    }
+    this.isExpanded = false
   }
 
   @Builder TargetItem() {
@@ -122,7 +138,7 @@ export default struct TargetListItem {
         .maxLines(CommonConstants.MAX_LINES)
       Blank()
       Column() {
-        Text(`${this.latestProgress}%`)
+        Text(`${ this.latestProgress }%`)
           .fontSize($r('app.float.font_16'))
           .fontWeight(CommonConstants.FONT_WEIGHT)
           .fontColor($r('app.color.title_black_color'))
@@ -132,7 +148,7 @@ export default struct TargetListItem {
           Text(this.updateDate)
             .opacityTextStyle()
         }
-        .margin({ top: $r('app.float.distance_2') })
+        .margin({ top : $r('app.float.distance_2') })
       }
       .alignItems(HorizontalAlign.End)
     }

@@ -13,65 +13,12 @@
  * limitations under the License.
  */
 
-#ifdef HDI_INTERFACE_SUPPORT
-#include <unistd.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <pthread.h>
-
 #include "securec.h"
 #include "wifi_hdi_common.h"
 #include "wifi_log.h"
-#include "v1_1/iwlan_callback.h"
-#include "wifi_hdi_proxy.h"
-#include "wifi_hdi_sta_impl.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiCommon"
-
-void HdiDeathCallbackCheck(HdiPortType portType, bool isRemoteDied)
-{
-    if (isRemoteDied) {
-        switch (portType) {
-            case HDI_PORT_TYPE_STATION:
-                HdiReleaseLocalResources();
-                if (HdiStop() != WIFI_IDL_OPT_OK) {
-                    LOGE("failed to stop sta hdi");
-                    return;
-                }
-                if (StartHdiWifi() != WIFI_IDL_OPT_OK) {
-                    LOGE("[STA] Start hdi failed!");
-                    return;
-                }
-                struct IWlanCallback cEventCallback;
-                if (memset_s(&cEventCallback, sizeof(cEventCallback), 0, sizeof(cEventCallback)) != EOK) {
-                    LOGE("%{public}s: failed to memset", __func__);
-                    return;
-                }
-                cEventCallback.ScanResults = HdiWifiScanResultsCallback;
-                if (HdiRegisterEventCallback(&cEventCallback) != WIFI_IDL_OPT_OK) {
-                    LOGE("[STA] RegisterHdiStaCallbackEvent failed!");
-                    return;
-                }
-                break;
-            case HDI_PORT_TYPE_AP:
-            case HDI_PORT_TYPE_P2P_DEVICE:
-                if (HdiStop() != WIFI_IDL_OPT_OK) {
-                    LOGE("failed to stop ap hdi");
-                    return;
-                }
-                if (StartHdiWifi() != WIFI_IDL_OPT_OK) {
-                    LOGE("failed to start %{public}d", portType);
-                    return;
-                }
-                break;
-            default:
-                LOGE("invalid portType:%{public}d", portType);
-                break;
-        }
-    }
-}
 
 static int hex2num(char c)
 {
@@ -99,6 +46,106 @@ int hex2byte(const char *hex)
         return -1;
     }
     return (a << HDI_POS_FOURTH) | b;
+}
+
+static void DealDigital(u8 *buf, const char **pos, size_t *len)
+{
+    int val;
+    switch (**pos) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+            val = **pos++ - '0';
+            if (**pos >= '0' && **pos <= '7') {
+                val = val * HDI_POS_EIGHT + (**pos++ - '0');
+            }
+            if (**pos >= '0' && **pos <= '7') {
+                val = val * HDI_POS_EIGHT + (**pos++ - '0');
+            }
+            buf[(*len)++] = val;
+            return;
+        default:
+            return;
+    }
+}
+
+static void DealSymbol(u8 *buf, const char **pos, size_t *len)
+{
+    int val;
+    switch (**pos) {
+        case '\\':
+            buf[(*len)++] = '\\';
+            (*pos)++;
+            return;
+        case '"':
+            buf[(*len)++] = '"';
+            (*pos)++;
+            return;
+        case 'n':
+            buf[(*len)++] = '\n';
+            (*pos)++;
+            return;
+        case 'r':
+            buf[(*len)++] = '\r';
+            (*pos)++;
+            return;
+        case 't':
+            buf[(*len)++] = '\t';
+            (*pos)++;
+            return;
+        case 'e':
+            buf[(*len)++] = '\033';
+            (*pos)++;
+            return;
+        case 'x':
+            (*pos)++;
+            val = hex2byte(*pos);
+            if (val < 0) {
+                val = hex2num(**pos);
+                if (val < 0) {
+                    return;
+                }
+                buf[(*len)++] = val;
+                (*pos)++;
+            } else {
+                buf[(*len)++] = val;
+                (*pos) += HDI_POS_SECOND;
+            }
+            return;
+        default:
+            DealDigital(buf, pos, len);
+            return;
+    }
+}
+
+size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str)
+{
+    const char *pos = str;
+    size_t len = 0;
+
+    while (*pos) {
+        if (len + 1 >= maxlen) {
+            break;
+        }
+        switch (*pos) {
+            case '\\':
+                pos++;
+                DealSymbol(buf, &pos, &len);
+                break;
+            default:
+                buf[len++] = *pos++;
+                break;
+        }
+    }
+    if (maxlen > len) {
+        buf[len] = '\0';
+    }
+    return len;
 }
 
 int HdiTxtPrintf(char *str, size_t size, const char *format, ...)
@@ -599,6 +646,7 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_PSK, ret, pos, end, "+", "%sPSK");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_HDI_NONE, ret, pos, end, "+", "%sNone");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_SAE, ret, pos, end, "+", "%sSAE");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_SUITE_B_192, ret, pos, end, "+", "%sEAP-SUITE-B-192");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_OSEN, ret, pos, end, "+", "%sOSEN");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_OWE, ret, pos, end, "+", "%sOWE");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_PSK_SHA256, ret, pos, end, "+", "%sPSK");
@@ -734,142 +782,21 @@ int CheckMacIsValid(const char *macStr)
     }
     return 0;
 }
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-static const uint32_t MAC_ADDR_INDEX_0 = 0;
-static const uint32_t MAC_ADDR_INDEX_1 = 1;
-static const uint32_t MAC_ADDR_INDEX_2 = 2;
-static const uint32_t MAC_ADDR_INDEX_3 = 3;
-static const uint32_t MAC_ADDR_INDEX_4 = 4;
-static const uint32_t MAC_ADDR_INDEX_5 = 5;
-static const uint32_t MAC_ADDR_INDEX_SIZE = 6;
 
-uint8_t FillIfrName(char *ifrName, int ifrNameLen, int portType)
+void StrSafeCopy(char *dst, unsigned len, const char *src)
 {
-    if (ifrName == NULL) {
-        LOGE("%{public}s: ifrName is null", __func__);
-        return WIFI_IDL_OPT_INVALID_PARAM;
+    if (dst == NULL) {
+        return;
     }
-    if (ifrNameLen > IFNAMSIZ) {
-        LOGE("%{public}s: invalid length:%{public}d", __func__, ifrNameLen);
-        return WIFI_IDL_OPT_INVALID_PARAM;
+    if (src == NULL) {
+        dst[0] = '\0';
+        return;
     }
-    switch (portType) {
-        case HDI_PORT_TYPE_STATION:
-        case HDI_PORT_TYPE_AP:
-            if (strcpy_s(ifrName, ifrNameLen, "wlan0") != EOK) {
-                LOGE("%{public}s: failed to copy the wlan0", __func__);
-                return WIFI_IDL_OPT_FAILED;
-            }
-            break;
-        case HDI_PORT_TYPE_P2P_DEVICE:
-            if (strcpy_s(ifrName, ifrNameLen, "p2p0") != EOK) {
-                LOGE("%{public}s: failed to copy the p2p0", __func__);
-                return WIFI_IDL_OPT_FAILED;
-            }
-            break;
-        default:
-            LOGE("%{public}s: invalid type:%{public}d", __func__, portType);
-            return WIFI_IDL_OPT_INVALID_PARAM;
+    unsigned i = 0;
+    while (i + 1 < len && src[i] != '\0') {
+        dst[i] = src[i];
+        ++i;
     }
-    return WIFI_IDL_OPT_OK;
+    dst[i] = '\0';
+    return;
 }
-
-int32_t GetFeatureType(int portType)
-{
-    switch (portType) {
-        case HDI_PORT_TYPE_STATION:
-            return PROTOCOL_80211_IFTYPE_STATION;
-        case HDI_PORT_TYPE_AP:
-            return PROTOCOL_80211_IFTYPE_AP;
-        case HDI_PORT_TYPE_P2P_CLIENT:
-            return PROTOCOL_80211_IFTYPE_P2P_CLIENT;
-        case HDI_PORT_TYPE_P2P_GO:
-            return PROTOCOL_80211_IFTYPE_P2P_GO;
-        case HDI_PORT_TYPE_P2P_DEVICE:
-            return PROTOCOL_80211_IFTYPE_P2P_DEVICE;
-        default:
-            return PROTOCOL_80211_IFTYPE_UNSPECIFIED;
-    }
-}
-
-void UpDownLink(int flag, int type, char *iface)
-{
-    struct ifreq ifr;
-    int32_t ret = 0;
-    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
-        LOGE("%{public}s: failed to init", __func__);
-        return;
-    }
-    if (memcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), iface, strlen(iface)) != EOK) {
-        LOGE("memcpy iface name fail");
-        return;
-    }
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
-        LOGE("%{public}s: failed to create the socket", __func__);
-        return;
-    }
-    ret = ioctl(fd, SIOCGIFFLAGS, &ifr);
-    if (ret != 0) {
-        LOGE("%{public}s: failed to ioctl[SIOCGIFFLAGS], error:%{public}d(%{public}s)",
-            __func__, errno, strerror(errno));
-        close(fd);
-        return;
-    }
-    if (flag == 1) {
-        ifr.ifr_flags |= IFF_UP;
-    } else {
-        ifr.ifr_flags &= ~IFF_UP;
-    }
-    LOGD("%{public}s: flag=%{public}d, ifr_flags=%{public}d", __func__, flag, ifr.ifr_flags);
-    ret = ioctl(fd, SIOCSIFFLAGS, &ifr);
-    if (ret < 0) {
-        LOGE("%{public}s: failed to ioctl[SIOCSIFFLAGS], error:%{public}d(%{public}s)",
-            __func__, errno, strerror(errno));
-        close(fd);
-        return;
-    }
-
-    close(fd);
-}
-
-WifiErrorNo HdiSetAssocMacAddr(const unsigned char *mac, int lenMac, const int portType)
-{
-    if (mac == NULL) {
-        LOGE("HdiSetAssocMacAddr is NULL");
-        return WIFI_IDL_OPT_FAILED;
-    }
-    LOGD("%{public}s: begin to set random mac address, type:%{public}d, mac:%{private}s",
-        __func__, portType, mac);
-    HdiDeathCallbackCheck(portType, IsHdiRemoteDied());
-    if (strlen((const char *)mac) != HDI_MAC_LENGTH || lenMac != HDI_MAC_LENGTH) {
-        LOGE("%{public}s: Mac size not correct! real len:%{public}zu, lenMac:%{public}d",
-            __func__, strlen((const char *)mac), lenMac);
-        return WIFI_IDL_OPT_FAILED;
-    }
-    int32_t featureType = GetFeatureType(portType);
-    WifiHdiProxy proxy = GetHdiProxy(featureType);
-    CHECK_HDI_PROXY_AND_RETURN(proxy, WIFI_IDL_OPT_FAILED);
-
-    unsigned char mac_bin[MAC_ADDR_INDEX_SIZE];
-    int32_t ret = sscanf_s((char *)mac, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
-           &mac_bin[MAC_ADDR_INDEX_0], &mac_bin[MAC_ADDR_INDEX_1], &mac_bin[MAC_ADDR_INDEX_2],
-           &mac_bin[MAC_ADDR_INDEX_3], &mac_bin[MAC_ADDR_INDEX_4], &mac_bin[MAC_ADDR_INDEX_5]);
-    if (ret <= EOK) {
-        LOGE("%{public}s: failed to parse mac, ret:%{public}d", __func__, ret);
-        return WIFI_IDL_OPT_FAILED;
-    }
-
-    UpDownLink(0, portType, proxy.feature->ifName);
-    ret = proxy.wlanObj->SetMacAddress(proxy.wlanObj, proxy.feature, mac_bin, MAC_ADDR_INDEX_SIZE);
-    if (ret != HDF_SUCCESS) {
-        LOGE("%{public}s: failed to set the mac, ret:%{public}d, portType:%{public}d",
-            __func__, ret, portType);
-    }
-    UpDownLink(1, portType, proxy.feature->ifName);
-    LOGI("%{public}s: result is %{public}d", __func__, ret);
-    return (ret == 0) ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
-}
-#endif
-
-#endif

@@ -15,16 +15,22 @@
 
 #include "wifi_p2p_service.h"
 #include "abstract_ui.h"
+#include "ipc_skeleton.h"
 #include "p2p_define.h"
 #include "wifi_common_util.h"
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#include "wifi_country_code_manager.h"
+#include "wifi_p2p_hal_interface.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 
 namespace OHOS {
 namespace Wifi {
+#define COUNTRY_CODE_JAPAN_L "jp"
+#define COUNTRY_CODE_JAPAN_C "JP"
+#define SOFT_BUS_UID 1024
 WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pGroupManager &setGroupMgr, WifiP2pServiceManager &setSvrMgr)
     : p2pStateMachine(p2pStateMachine),
@@ -35,7 +41,7 @@ WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceMa
 
 WifiP2pService::~WifiP2pService()
 {
-    UnRegisterP2pServiceCallbacks();
+    ClearAllP2pServiceCallbacks();
 }
 
 ErrCode WifiP2pService::EnableP2p()
@@ -120,6 +126,7 @@ ErrCode WifiP2pService::StopP2pListen()
 
 ErrCode WifiP2pService::CreateGroup(const WifiP2pConfig &config)
 {
+    WifiSettings::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     WIFI_LOGI("CreateGroup name: %{private}s, address:%{private}s, addressType:%{public}d",
         config.GetGroupName().c_str(), config.GetDeviceAddress().c_str(), config.GetDeviceAddressType());
     WifiP2pConfigInternal configInternal(config);
@@ -138,6 +145,14 @@ ErrCode WifiP2pService::RemoveGroup()
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiP2pService::RemoveGroupClient(const GcInfo &gcInfo)
+{
+    WIFI_LOGI("RemoveGroupClient");
+    const std::any info = gcInfo;
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP_CLIENT), info);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     WIFI_LOGI("DeleteGroup");
@@ -149,6 +164,7 @@ ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 {
     WIFI_LOGI("P2pConnect");
+    WifiSettings::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     WifiP2pConfigInternal configInternal(config);
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
@@ -187,6 +203,13 @@ ErrCode WifiP2pService::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
 {
     WIFI_LOGI("QueryP2pLinkedInfo");
     linkedInfo = groupManager.GetP2pInfo();
+    if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
+    WifiP2pGroupInfo groupInfo = groupManager.GetCurrentGroup();
+    if (!groupInfo.IsGroupOwner()) {
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -261,14 +284,22 @@ ErrCode WifiP2pService::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-void WifiP2pService::UnRegisterP2pServiceCallbacks()
+ErrCode WifiP2pService::UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)
 {
-    p2pStateMachine.UnRegisterP2pServiceCallbacks();
+    WIFI_LOGI("UnRegisterP2pServiceCallbacks");
+    p2pStateMachine.UnRegisterP2pServiceCallbacks(callbacks);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+void WifiP2pService::ClearAllP2pServiceCallbacks()
+{
+    p2pStateMachine.ClearAllP2pServiceCallbacks();
 }
 
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
 {
     WIFI_LOGI("Create hid2d group");
+    WifiSettings::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     const std::any info = std::pair<int, FreqType>(frequency, type);
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP), info);
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -277,7 +308,7 @@ ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
 ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
 {
     WIFI_LOGI("Hid2dConnect");
-
+    WifiSettings::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     DHCPTYPE dhcpType = DHCPTYPE::DHCP_LEGACEGO;
     if (config.GetDhcpMode() == DhcpMode::CONNECT_GO_NODHCP ||
         config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
@@ -318,16 +349,16 @@ ErrCode WifiP2pService::Hid2dRequestGcIp(const std::string& gcMac, std::string& 
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiP2pService::IncreaseSharedLink(void)
+void WifiP2pService::IncreaseSharedLink(int callingUid)
 {
-    WIFI_LOGI("IncreaseSharedLink");
-    SharedLinkManager::IncreaseSharedLink();
+    WIFI_LOGI("Uid %{public}d increaseSharedLink", callingUid);
+    SharedLinkManager::IncreaseSharedLink(callingUid);
 }
 
-void WifiP2pService::DecreaseSharedLink(void)
+void WifiP2pService::DecreaseSharedLink(int callingUid)
 {
-    WIFI_LOGI("DecreaseSharedLink");
-    SharedLinkManager::DecreaseSharedLink();
+    WIFI_LOGI("Uid %{public}d decreaseSharedLink", callingUid);
+    SharedLinkManager::DecreaseSharedLink(callingUid);
 }
 
 int WifiP2pService::GetSharedLinkCount(void)
@@ -336,10 +367,35 @@ int WifiP2pService::GetSharedLinkCount(void)
     return SharedLinkManager::GetSharedLinkCount();
 }
 
+ErrCode WifiP2pService::HandleBusinessSAException(int systemAbilityId)
+{
+    WIFI_LOGI("HandleBusinessSAException");
+    if (SharedLinkManager::GetSharedLinkCount() == 0) {
+        return WIFI_OPT_SUCCESS;
+    }
+    int callingUid = -1;
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        callingUid = SOFT_BUS_UID;
+    } else {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    SharedLinkManager::DecreaseSharedLink(callingUid);
+    if (SharedLinkManager::GetSharedLinkCount() == 0) {
+        RemoveGroup();
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 int WifiP2pService::GetP2pRecommendChannel(void)
 {
     WIFI_LOGI("GetP2pRecommendChannel");
-
+    const int COMMON_USING_2G_CHANNEL = 6;
+    std::string countryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
+    if (countryCode == COUNTRY_CODE_JAPAN_C || countryCode == COUNTRY_CODE_JAPAN_L) {
+        return COMMON_USING_2G_CHANNEL;
+    }
     int channel = 0; // 0 is invalid channel
     int COMMON_USING_5G_CHANNEL = 149;
     WifiLinkedInfo linkedInfo;
@@ -365,7 +421,6 @@ int WifiP2pService::GetP2pRecommendChannel(void)
         vec5GChannels = channels[BandType::BAND_5GHZ];
     }
 
-    const int COMMON_USING_2G_CHANNEL = 6;
     if (!vec5GChannels.empty()) {
         auto it = std::find(vec5GChannels.begin(), vec5GChannels.end(), COMMON_USING_5G_CHANNEL);
         if (it != vec5GChannels.end()) {
@@ -394,6 +449,18 @@ ErrCode WifiP2pService::MonitorCfgChange(void)
 {
     WIFI_LOGI("MonitorCfgChange");
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::DiscoverPeers(int32_t channelid)
+{
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_PEERS), channelid);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::DisableRandomMac(int setmode)
+{
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISABLE_RANDOM_MAC), setmode);
+    return ErrCode::WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

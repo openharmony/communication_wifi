@@ -24,6 +24,9 @@
 #include "wifi_common_event_helper.h"
 #include "wifi_country_code_manager.h"
 #include "i_ap_service.h"
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+#include "hal_device_manage.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -41,13 +44,20 @@ SoftapManagerMachine::~SoftapManagerMachine()
     ParsePointer(pDefaultState);
     ParsePointer(pIdleState);
     ParsePointer(pStartedState);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!ifaceName.empty()) {
+        DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveApIface(ifaceName);
+        ifaceName.clear();
+        WifiSettings::GetInstance().SetApIfaceName("");
+    }
+#endif
 }
 
 /* --------------------------Initialization functions--------------------------*/
 ErrCode SoftapManagerMachine::InitSoftapManagerMachine()
 {
     WIFI_LOGE("Enter SoftapManagerMachine::InitSoftapManagerMachine.\n");
-    if (!InitialStateMachine()) {
+    if (!InitialStateMachine("SoftapManagerMachine")) {
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }
@@ -211,21 +221,8 @@ void SoftapManagerMachine::StopSoftap()
     SwitchState(pIdleState);
 }
 
-ErrCode SoftapManagerMachine::AutoStartApService(int id)
+ErrCode SoftapManagerMachine::TryToStartApService(int id)
 {
-    WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(id);
-    WIFI_LOGE("AutoStartApService, current ap state:%{public}d", apState);
-    if (apState != WifiOprMidState::CLOSED) {
-        if (apState == WifiOprMidState::CLOSING) {
-            return WIFI_OPT_FAILED;
-        } else {
-            return WIFI_OPT_SUCCESS;
-        }
-    }
-    if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0)) {
-        WIFI_LOGE("AutoStartApService, set ap mid state opening failed!");
-        return WIFI_OPT_FAILED;
-    }
     ErrCode errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_AP) < 0) {
@@ -237,7 +234,8 @@ ErrCode SoftapManagerMachine::AutoStartApService(int id)
             WIFI_LOGE("Instance get hotspot service is null!");
             break;
         }
-        errCode = pService->RegisterApServiceCallbacks(WifiManager::GetInstance().GetWifiHotspotManager()->GetApCallback());
+        errCode = pService->RegisterApServiceCallbacks(
+            WifiManager::GetInstance().GetWifiHotspotManager()->GetApCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Register ap service callback failed!");
             break;
@@ -254,6 +252,34 @@ ErrCode SoftapManagerMachine::AutoStartApService(int id)
             break;
         }
     } while (false);
+    return errCode;
+}
+
+ErrCode SoftapManagerMachine::AutoStartApService(int id)
+{
+    WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(id);
+    WIFI_LOGE("AutoStartApService, current ap state:%{public}d", apState);
+    if (apState != WifiOprMidState::CLOSED) {
+        if (apState == WifiOprMidState::CLOSING) {
+            return WIFI_OPT_FAILED;
+        } else {
+            return WIFI_OPT_SUCCESS;
+        }
+    }
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
+        std::bind(&SoftapManagerMachine::IfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
+        ifaceName)) {
+        WIFI_LOGE("AutoStartApService, create iface failed!");
+        return WIFI_OPT_FAILED;
+    }
+    WifiSettings::GetInstance().SetApIfaceName(ifaceName);
+#endif
+    if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0)) {
+        WIFI_LOGE("AutoStartApService, set ap mid state opening failed!");
+        return WIFI_OPT_FAILED;
+    }
+    ErrCode errCode = TryToStartApService(id);
     if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, mid);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, mid);
@@ -295,6 +321,20 @@ ErrCode SoftapManagerMachine::AutoStopApService(int id)
         return ret;
     }
     return WIFI_OPT_SUCCESS;
+}
+
+void SoftapManagerMachine::IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType)
+{
+    WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
+        destoryIfaceName.c_str(), createIfaceType);
+    if (destoryIfaceName == ifaceName) {
+        ifaceName.clear();
+        WifiSettings::GetInstance().SetApIfaceName("");
+    }
+
+    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    ins->SendMessage(CMD_AP_REMOVED, createIfaceType, mid);
+    return;
 }
 
 } // namespace Wifi

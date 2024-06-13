@@ -48,6 +48,15 @@ public:
      */
     virtual ErrCode DisableWifi() override;
     /**
+     * @Description  Enable semi-wifi
+     *
+     * @Output: Return operating results to Interface Service after enable semi-wifi
+               successfully through callback function instead of returning
+               result immediately.
+     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    virtual ErrCode EnableSemiWifi() override;
+    /**
      * @Description  Connect to a new network
      *
      * @param config - the configuration of network which is going to connect.(in)
@@ -67,6 +76,16 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) override;
+
     /**
      * @Description  Disconnect to the network
      *
@@ -214,6 +233,14 @@ public:
     virtual ErrCode SetPowerMode(bool mode) override;
 
     /**
+     * @Description send tx power for sar.
+     *
+     * @param power: 1001,1002,1003......
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetTxPower(int power) override;
+
+    /**
      * @Description systemabilitychanged
      *
      * @param add: true for setup, false for shutdown.
@@ -287,14 +314,41 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode StartPortalCertification() override;
-	
+
+    /**
+     * @Description Handle foreground app changed action.
+     *
+     * @param bundleName app name.
+     * @param uid app uid.
+     * @param pid app pid.
+     * @param state app state.
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+#ifndef OHOS_ARCH_LITE
+    virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) override;
+#endif
 	/**
-     * @Description renew dhcp.
+     * @Description EnableHiLinkHandshake.
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode RenewDhcp() override;
+    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid) override;
+ 
+	/**
+     * @Description DeliverStaIfaceData.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DeliverStaIfaceData(const std::string &bssid) override;
+
+    /**
+     * @Description start http detect.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartHttpDetect() override;
 private:
+    bool InitStaServiceLocked();
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;
     std::mutex mutex;

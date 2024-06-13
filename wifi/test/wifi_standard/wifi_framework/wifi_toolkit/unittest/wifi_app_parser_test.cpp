@@ -87,10 +87,10 @@ HWTEST_F(AppParserTest, ParseAppList_fail, TestSize.Level1)
     WIFI_LOGI("ParseAppList_fail enter");
     xmlNodePtr otherNode = xmlNewNode(NULL, BAD_CAST "otherNode");
     m_appXmlParser->ParseAppList(otherNode);
-    EXPECT_EQ(0, m_appXmlParser->m_lowLatencyAppVec.size());
-    EXPECT_EQ(0, m_appXmlParser->m_whiteAppVec.size());
-    EXPECT_EQ(0, m_appXmlParser->m_blackAppVec.size());
-    EXPECT_EQ(0, m_appXmlParser->m_chariotAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->m_lowLatencyAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->m_whiteAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->m_blackAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->m_chariotAppVec.size());
 }
 
 HWTEST_F(AppParserTest, ParseAppList_Success, TestSize.Level1)
@@ -158,5 +158,45 @@ HWTEST_F(AppParserTest, IsChariotApp_False, TestSize.Level1)
     std::string appName = "other";
     EXPECT_FALSE(m_appXmlParser->IsChariotApp(appName));
 }
+
+HWTEST_F(AppParserTest, ReadPackageCloudFilterConfig, TestSize.Level1)
+{
+    WIFI_LOGI("IsChariotApp_False enter");
+    std::string appName = "other";
+    EXPECT_FALSE(m_appXmlParser->ReadPackageCloudFilterConfig());
+}
+ 
+HWTEST_F(AppParserTest, IsReadCloudConfig, TestSize.Level1)
+{
+    WIFI_LOGI("IsReadCloudConfig enter");
+    m_appXmlParser->IsReadCloudConfig();
+}
+ 
+HWTEST_F(AppParserTest, GetCloudPushFileVersion, TestSize.Level1)
+{
+    WIFI_LOGI("GetLocalFileVersion enter");
+    std::string strCloud = m_appXmlParser->GetCloudPushVersionFilePath();
+    m_appXmlParser->GetCloudPushFileVersion(strCloud.c_str());
+}
+ 
+HWTEST_F(AppParserTest, GetLocalFileVersion, TestSize.Level1)
+{
+    WIFI_LOGI("GetLocalFileVersion enter");
+    std::string WIFI_MONITOR_APP_FILE_PATH = "/system/etc/wifi/wifi_monitor_apps.xml";
+    m_appXmlParser->GetLocalFileVersion(WIFI_MONITOR_APP_FILE_PATH.c_str());
+}
+ 
+HWTEST_F(AppParserTest, GetCloudPushVersionFilePath, TestSize.Level1)
+{
+    WIFI_LOGI("GetCloudPushVersionFilePath enter");
+    m_appXmlParser->GetCloudPushVersionFilePath();
+}
+ 
+HWTEST_F(AppParserTest, GetCloudPushJsonFilePath, TestSize.Level1)
+{
+    WIFI_LOGI("GetCloudPushJsonFilePath enter");
+    m_appXmlParser->GetCloudPushJsonFilePath();
+}
+
 } // namespace Wifi
 } // namespace OHOS

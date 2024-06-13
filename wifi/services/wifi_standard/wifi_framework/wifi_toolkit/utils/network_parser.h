@@ -71,6 +71,12 @@ enum class NetworkSection {
     UNVALID,
 };
 
+enum class NetworkParseType {
+    UNKNOWN,
+    MIGRATE,
+    CLONE
+};
+
 namespace OHOS {
 namespace Wifi {
 class NetworkXmlParser : public XmlParser {
@@ -97,11 +103,14 @@ private:
 
     bool ParseInternal(xmlNodePtr node) override;
     void ParseNetworkList(xmlNodePtr innode);
+    NetworkParseType GetParseType(xmlNodePtr node);
+    void EnableNetworks();
     xmlNodePtr GotoNetworkList(xmlNodePtr innode);
     WifiDeviceConfig ParseNetwork(xmlNodePtr innode);
     WifiConfigType GetConfigNameAsInt(xmlNodePtr node);
     NetworkSection GetNodeNameAsInt(xmlNodePtr node);
     WifiDeviceConfig ParseWifiConfig(xmlNodePtr innode);
+    void ParseNetworkStatus(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
     WifiIpConfig ParseIpConfig(xmlNodePtr innode);
     ConfigureProxyMethod GetProxyMethod(xmlNodePtr innode);
     WifiProxyConfig ParseProxyConfig(xmlNodePtr innode);

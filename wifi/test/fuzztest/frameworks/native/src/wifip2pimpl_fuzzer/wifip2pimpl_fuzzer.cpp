@@ -18,8 +18,8 @@
 #include "securec.h"
 #include "wifip2pimpl_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
-#include "../../../../../../frameworks/native/src/wifi_p2p_impl.h"
-#include "../../../../../../interfaces/inner_api/wifi_p2p.h"
+#include "src/wifi_p2p_impl.h"
+#include "wifi_p2p.h"
 
 namespace OHOS {
 namespace Wifi {

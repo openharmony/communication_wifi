@@ -24,16 +24,6 @@ namespace OHOS {
 namespace Wifi {
 constexpr int PID_NUM_1001 = 1001;
 constexpr int UID_NUM_1001 = 1001;
-static std::map<std::string, int> permissions = {
-    {"ohos.permission.GET_WIFI_INFO", PERMISSION_DENIED},
-    {"ohos.permission.SET_WIFI_INFO", PERMISSION_DENIED},
-    {"ohos.permission.GET_WIFI_CONFIG", PERMISSION_DENIED},
-    {"ohos.permission.MANAGE_WIFI_CONNECTION", PERMISSION_DENIED},
-    {"ohos.permission.MANAGE_WIFI_HOTSPOT", PERMISSION_GRANTED},
-    {"ohos.permission.GET_WIFI_LOCAL_MAC", PERMISSION_DENIED},
-    {"ohos.permission.LOCATION", PERMISSION_DENIED},
-    {"ohos.permission.MANAGE_WIFI_HOTSPOT_EXT", PERMISSION_DENIED},
-};
 
 class WifiPermissionHelperTest : public testing::Test {
 public:
@@ -46,7 +36,6 @@ public:
         pid = PID_NUM_1001;
         uid = UID_NUM_1001;
         pWifiPermissionHelper = std::make_unique<WifiPermissionHelper>();
-        pWifiPermissionHelper->InitPermission(pid, uid);
     }
 
     virtual void TearDown()
@@ -58,116 +47,7 @@ public:
     int uid;
     std::unique_ptr<WifiPermissionHelper> pWifiPermissionHelper;
 };
-/**
- * @tc.name: ChangePermission001
- * @tc.desc: ChangePermission
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, ChangePermission001, TestSize.Level1)
-{
-    WIFI_LOGI("ChangePermission001 enter");
-    EXPECT_TRUE(pWifiPermissionHelper->ChangePermission(permissions, pid, uid) == 0);
-}
-/**
- * @tc.name: ClearPermission001
- * @tc.desc: ClearPermission
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, ClearPermission001, TestSize.Level1)
-{
-    WIFI_LOGI("ClearPermission001 enter");
-    EXPECT_TRUE(pWifiPermissionHelper->ClearPermission(pid, uid) == 0);
-}
-/**
- * @tc.name: MockVerifyPermission001
- * @tc.desc: MockVerifyPermission with error pid
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, MockVerifyPermission001, TestSize.Level1)
-{
-    WIFI_LOGI("MockVerifyPermission001 enter");
-    std::string permissionName = "ohos.permission.MANAGE_WIFI_CONNECTION";
-    EXPECT_TRUE(pWifiPermissionHelper->MockVerifyPermission(permissionName, 1, uid) == PERMISSION_DENIED);
-}
-/**
- * @tc.name: MockVerifyPermission002
- * @tc.desc: MockVerifyPermission with error permission
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, MockVerifyPermission002, TestSize.Level1)
-{
-    WIFI_LOGI("MockVerifyPermission002 enter");
-    std::string permissionName = "test";
-    EXPECT_TRUE(pWifiPermissionHelper->MockVerifyPermission(permissionName, pid, uid) == PERMISSION_DENIED);
-}
-/**
- * @tc.name: MockVerifyPermission003
- * @tc.desc: MockVerifyPermission with permission DENIED
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, MockVerifyPermission003, TestSize.Level1)
-{
-    WIFI_LOGI("MockVerifyPermission003 enter");
-    std::string permissionName = "ohos.permission.MANAGE_WIFI_CONNECTION";
-    EXPECT_TRUE(pWifiPermissionHelper->ChangePermission(permissions, pid, uid) == 0);
-    EXPECT_TRUE(pWifiPermissionHelper->MockVerifyPermission(permissionName, pid, uid) == PERMISSION_DENIED);
-}
-/**
- * @tc.name: MockVerifyPermission004
- * @tc.desc: MockVerifyPermission with error uid
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, MockVerifyPermission004, TestSize.Level1)
-{
-    WIFI_LOGI("MockVerifyPermission004 enter");
-    std::string permissionName = "ohos.permission.MANAGE_WIFI_HOTSPOT";
-    EXPECT_TRUE(pWifiPermissionHelper->ChangePermission(permissions, pid, uid) == 0);
-    EXPECT_TRUE(pWifiPermissionHelper->MockVerifyPermission(permissionName, pid, 1) == PERMISSION_DENIED);
-}
-/**
- * @tc.name: MockVerifyPermission005
- * @tc.desc: MockVerifyPermission with error permission
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, MockVerifyPermission005, TestSize.Level1)
-{
-    WIFI_LOGI("MockVerifyPermission005 enter");
-    std::string permissionName = "test";
-    EXPECT_TRUE(pWifiPermissionHelper->ChangePermission(permissions, pid, uid) == 0);
-    EXPECT_TRUE(pWifiPermissionHelper->MockVerifyPermission(permissionName, pid, uid) == PERMISSION_DENIED);
-}
-/**
- * @tc.name: MockVerifyPermission006
- * @tc.desc: MockVerifyPermission with  permission DENIED
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, MockVerifyPermission006, TestSize.Level1)
-{
-    WIFI_LOGI("MockVerifyPermission006 enter");
-    std::string permissionName = "ohos.permission.MANAGE_WIFI_CONNECTION";
-    EXPECT_TRUE(pWifiPermissionHelper->ChangePermission(permissions, pid, uid) == 0);
-    EXPECT_TRUE(pWifiPermissionHelper->MockVerifyPermission(permissionName, pid, uid) == PERMISSION_DENIED);
-}
-/**
- * @tc.name: MockVerifyPermission007
- * @tc.desc: MockVerifyPermission
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(WifiPermissionHelperTest, MockVerifyPermission007, TestSize.Level1)
-{
-    WIFI_LOGI("MockVerifyPermission007 enter");
-    std::string permissionName = "ohos.permission.MANAGE_WIFI_HOTSPOT";
-    EXPECT_TRUE(pWifiPermissionHelper->MockVerifyPermission(permissionName, pid, uid) == PERMISSION_GRANTED);
-}
+
 /**
  * @tc.name: VerifyPermission001
  * @tc.desc: VerifyPermission

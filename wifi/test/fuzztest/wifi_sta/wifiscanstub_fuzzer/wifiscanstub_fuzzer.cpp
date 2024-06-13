@@ -18,7 +18,9 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#include <unistd.h>
+#include "wifi_device_stub.h"
+#include "wifi_device_service_impl.h"
 #include "wifi_scan_stub.h"
 #include "wifi_scan_mgr_stub.h"
 #include "message_parcel.h"
@@ -28,56 +30,193 @@
 #include "wifi_scan_service_impl.h"
 #include "wifi_scan_mgr_service_impl.h"
 #include "wifi_log.h"
+#include <mutex>
+#include "wifi_config_center.h"
+#include "wifi_settings.h"
+#include "wifi_common_def.h"
+#include "wifi_manager.h"
+#include "wifi_net_agent.h"
 
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
-constexpr size_t MAP_SCAN_NUMS = 31;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiScan";
-const std::u16string FORMMGR_INTERFACE_TOKEN_EX = u"ohos.wifi.IWifiScanMgr";
-sptr<WifiScanMgrStub> pWifiScanMgrStub = WifiScanMgrServiceImpl::GetInstance();
-std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanServiceImpl>();
-
-bool DoSomethingInterestingWithMyAPIEx(const uint8_t* data, size_t size)
+const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceService";
+static bool g_isInsted = false;
+static std::mutex g_instanceLock;
+std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
+std::shared_ptr<WifiScanStub> pWifiScanServiceImpl = std::make_shared<WifiScanServiceImpl>();
+void MyExit()
 {
-    uint32_t code = static_cast<uint32_t>(ScanInterfaceCode::WIFI_MGR_GET_SCAN_SERVICE);
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_EX);
-    datas.WriteInt32(0);
-    datas.RewindRead(0);
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
+    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
+    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
+    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
+    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
+    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
+    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
+    WifiManager::GetInstance().Exit();
+    sleep(5);
+    printf("exiting\n");
+}
+
+bool Init()
+{
+    if (!g_isInsted) {
+        if (WifiManager::GetInstance().Init() < 0) {
+            LOGE("WifiManager init failed!");
+            return false;
+        }
+        atexit(MyExit);
+        g_isInsted = true;
+    }
+    return true;
+}
+bool OnRemoteRequest(uint32_t code, MessageParcel &data)
+{
+    std::unique_lock<std::mutex> autoLock(g_instanceLock);
+    if (!g_isInsted) {
+        if (!Init()) {
+            LOGE("OnRemoteRequest Init failed!");
+            return false;
+        }
+    }
     MessageParcel reply;
     MessageOption option;
-    pWifiScanMgrStub->OnRemoteRequest(code, datas, reply, option);
+    pWifiScanServiceImpl->OnRemoteRequest(code, data, reply, option);
     return true;
 }
 
-void OnGetSupportedFeaturesTest(const uint8_t* data, size_t size)
+void OnSetScanControlInfoFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO), datas);
+}
+
+void OnScanByParamsFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN), datas);
+}
+
+void OnIsWifiClosedScanFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE), datas);
+}
+
+void OnGetScanInfoListFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST), datas);
+}
+
+void OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK), datas);
+}
+
+void OnStartWifiPnoScanFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), datas);
+}
+
+void OnScanFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), datas);
+}
+
+void OnSetScanOnlyAvailableTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY), datas);
+}
+
+void OnGetScanOnlyAvailableTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY), datas);
+}
+
+void OnEnableWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
     MessageParcel reply;
     MessageOption option;
-    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI),
         datas, reply, option);
 }
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
 {
-    uint32_t code = U32_AT(data) % MAP_SCAN_NUMS + static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN);
-    LOGI("wifiscanstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size); // code[0x1004, 0x101E]
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    pWifiScanStub->OnRemoteRequest(code, datas, reply, option);
-    OnGetSupportedFeaturesTest(data, size);
-    return true;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI),
+        datas, reply, option);
 }
 
 /* Fuzzer entry point */
@@ -86,8 +225,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
-    OHOS::Wifi::DoSomethingInterestingWithMyAPIEx(data, size);
+    Init();
+    OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
+    OHOS::Wifi::OnSetScanControlInfoFuzzTest(data, size);
+    OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
+    OHOS::Wifi::OnGetScanOnlyAvailableTest(data, size);
+    OHOS::Wifi::OnScanFuzzTest(data, size);
+    OHOS::Wifi::OnScanByParamsFuzzTest(data, size);
+    OHOS::Wifi::OnIsWifiClosedScanFuzzTest(data, size);
+    OHOS::Wifi::OnGetScanInfoListFuzzTest(data, size);
+    OHOS::Wifi::OnRegisterCallBackFuzzTest(data, size);
+    OHOS::Wifi::OnStartWifiPnoScanFuzzTest(data, size);
+    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
+    sleep(4);
     return 0;
 }
 }

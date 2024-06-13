@@ -28,12 +28,15 @@ public:
     enum class Role {
         ROLE_UNKNOW = -1,
         ROLE_SOFTAP = 0,
+        ROLE_HAS_REMOVED = 1,
     };
 
     ErrCode RegisterCallback(const SoftApModeCallback &callbacks);
     explicit SoftApManager(SoftApManager::Role role, int id);
     ~SoftApManager();
     ErrCode InitSoftapManager();
+    void SetRole(Role role);
+    Role GetRole();
     SoftapManagerMachine *GetSoftapMachine();
     int mid;
 

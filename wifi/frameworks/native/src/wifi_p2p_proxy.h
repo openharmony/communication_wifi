@@ -127,6 +127,14 @@ public:
     ErrCode RemoveGroup(void) override;
 
     /**
+     * @Description Remove a P2P client of current group.
+     *
+     * @param info - client gcInfo
+     * @return ErrCode - operation result
+     */
+    ErrCode RemoveGroupClient(const GcInfo &info) override;
+
+    /**
      * @Description Delete a p2p Group
      *
      * @param group - WifiP2pGroupInfo object
@@ -366,6 +374,17 @@ public:
      * @return ErrCode - operate result
      */
     ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) override;
+
+    ErrCode DiscoverPeers(int32_t channelid) override;
+
+    ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode CheckCanUseP2p() override;
 
     /**
     * @Description Handle remote object died event.

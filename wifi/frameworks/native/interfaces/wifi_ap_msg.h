@@ -31,6 +31,11 @@ namespace Wifi {
 #define DHCP_LEASE_TIME 21600
 #define WIFI_SSID_MAX_LEN 32
 #define WIFI_IP_MAX_LEN 15
+#define AP_BANDWIDTH_DEFAULT 0
+#define AP_BANDWIDTH_160 8
+#define AP_BANDWIDTH_5G_160M_DEFAULT 36
+#define AP_BANDWIDTH_5G_160M_SET_BEGIN 36
+#define AP_BANDWIDTH_5G_160M_SET_END 48
 enum class ApState {
     AP_STATE_NONE = 0,
     AP_STATE_IDLE,
@@ -75,6 +80,7 @@ struct HotspotConfig {
         channel = AP_CHANNEL_DEFAULT;
         maxConn = -1;
         leaseTime = DHCP_LEASE_TIME;
+        apBandWidth = AP_BANDWIDTH_DEFAULT;
     }
 
     inline void SetSsid(const std::string &newSsid)
@@ -113,6 +119,14 @@ struct HotspotConfig {
         return band;
     }
 
+    inline void SetBandWidth(int32_t bandWidth)
+    {
+        apBandWidth = bandWidth;
+    }
+    inline int32_t GetBandWidth() const
+    {
+        return apBandWidth;
+    }
     inline void SetChannel(int32_t newchannel)
     {
         channel = newchannel;
@@ -159,6 +173,7 @@ private:
     int32_t maxConn;
     std::string ipAddress;    /* Hotspot IP address of the dhcp server */
     int32_t leaseTime;
+    int32_t apBandWidth;
 };
 
 struct StationInfo {

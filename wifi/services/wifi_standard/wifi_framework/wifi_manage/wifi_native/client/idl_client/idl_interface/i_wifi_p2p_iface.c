@@ -28,6 +28,7 @@
 #define LOG_TAG "WifiIdlP2pIface"
 
 #define P2P_EVENT_MAX_NUM 32
+#define INFO_NUM_MAX 4096
 
 static IWifiEventP2pCallback g_wifiP2pEventCallback = {0};
 void SetWifiP2pEventCallback(IWifiEventP2pCallback callback)
@@ -295,7 +296,8 @@ static int GetP2pCallbackEvents(int *events, int size)
         WIFI_IDL_CBK_CMD_SUP_CONN_FAILED_EVENT,
         WIFI_IDL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT,
         WIFI_IDL_CBK_CMD_P2P_IFACE_CREATED_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_CONNECT_FAILED
+        WIFI_IDL_CBK_CMD_P2P_CONNECT_FAILED,
+        WIFI_IDL_CBK_CMD_P2P_CHANNEL_SWITCH_EVENT
     };
     int max = sizeof(p2pEvents) / sizeof(p2pEvents[0]);
     int num = 0;
@@ -424,7 +426,7 @@ WifiErrorNo P2pListNetworks(P2pNetworkList *infoList)
         int infoNum = 0;
         ReadInt(context, &infoNum);
         infoList->infoNum = infoNum;
-        if (infoNum <= 0) {
+        if (infoNum <= 0 || infoNum > INFO_NUM_MAX) {
             break;
         }
         infoList->infos = (P2pNetworkInfo *)calloc(infoNum, sizeof(P2pNetworkInfo));
@@ -701,6 +703,25 @@ WifiErrorNo P2pRemoveGroup(const char *interface)
     WriteStr(context, interface);
     WriteEnd(context);
     if (RpcClientCall(client, "P2pRemoveGroup") != WIFI_IDL_OPT_OK) {
+        return WIFI_IDL_OPT_FAILED;
+    }
+    int result = WIFI_IDL_OPT_FAILED;
+    ReadInt(context, &result);
+    ReadClientEnd(client);
+    UnlockRpcClient(client);
+    return result;
+}
+
+WifiErrorNo P2pRemoveGroupClient(const char *deviceMac)
+{
+    RpcClient *client = GetP2pRpcClient();
+    LockRpcClient(client);
+    Context *context = client->context;
+    WriteBegin(context, 0);
+    WriteFunc(context, "P2pRemoveGroupClient");
+    WriteStr(context, deviceMac);
+    WriteEnd(context);
+    if (RpcClientCall(client, "P2pRemoveGroupClient") != WIFI_IDL_OPT_OK) {
         return WIFI_IDL_OPT_FAILED;
     }
     int result = WIFI_IDL_OPT_FAILED;

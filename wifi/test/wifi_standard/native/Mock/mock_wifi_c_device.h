@@ -16,7 +16,7 @@
 #define OHOS_MOCK_WIFICDEVICE_H
 
 #include <gmock/gmock.h>
-#include "../../../../interfaces/kits/c/wifi_device_config.h"
+#include "kits/c/wifi_device_config.h"
 #include "wifi_errcode.h"
 
 namespace OHOS {

@@ -23,11 +23,16 @@ config("module_private_config") {
 ohos_unittest("utils_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/utils/src/wifi_common_util.cpp",
     "$WIFI_ROOT_DIR/utils/src/wifi_event_handler.cpp",
+    "wifi_common_util_test.cpp",
     "wifi_event_handler_test.cpp",
+    "wifi_hisysevent_test.cpp",
   ]
 
   include_dirs = [
+    "$WIFI_ROOT_DIR/interfaces/inner_api",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
@@ -39,13 +44,25 @@ ohos_unittest("utils_unittest") {
   ]
 
   deps = [
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "ability_base:want",
+    "ability_runtime:app_manager",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
+    "samgr:samgr_proxy",
   ]
 
   configs = [ ":module_private_config" ]

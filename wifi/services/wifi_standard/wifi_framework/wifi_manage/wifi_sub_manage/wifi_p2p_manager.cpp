@@ -22,11 +22,15 @@
 #include "wifi_common_event_helper.h"
 #include "wifi_system_timer.h"
 #include "wifi_hisysevent.h"
+#include "p2p_define.h"
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
+#endif
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+#include "hal_device_manage.h"
 #endif
 
 DEFINE_WIFILOG_LABEL("WifiP2pManager");
@@ -56,6 +60,16 @@ ErrCode WifiP2pManager::AutoStartP2pService()
         }
     }
 
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface(
+        std::bind(&WifiP2pManager::IfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
+        ifaceName)) {
+        WIFI_LOGE("AutoStartP2pService, create iface failed!");
+        return WIFI_OPT_FAILED;
+    }
+    WifiSettings::GetInstance().SetP2pIfaceName(ifaceName);
+#endif
+
     if (!WifiConfigCenter::GetInstance().SetP2pMidState(p2pState, WifiOprMidState::OPENING)) {
         WIFI_LOGE("AutoStartP2pService, set p2p mid state opening failed!");
         return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
@@ -77,14 +91,7 @@ ErrCode WifiP2pManager::AutoStartP2pService()
             WIFI_LOGE("Register p2p service callback failed!");
             break;
         }
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        ret = pService->RegisterP2pServiceCallbacks(
-            WifiServiceManager::GetInstance().GetSelfCureServiceInst()->GetP2pCallback());
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SelfCure register p2p service callback failed!");
-            break;
-        }
-#endif
+
         ret = pService->EnableP2p();
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service EnableP2p failed, ret %{public}d!", static_cast<int>(ret));
@@ -118,7 +125,7 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         WIFI_LOGE("AutoStopP2pService, set p2p mid state opening failed!");
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
-    
+
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("AutoStopP2pService, Instance get p2p service is null!");
@@ -126,7 +133,7 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
-        
+
     ErrCode ret = pService->DisableP2p();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("service disable p2p failed, ret %{public}d!", static_cast<int>(ret));
@@ -184,6 +191,13 @@ void WifiP2pManager::CloseP2pService(void)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(P2pState::P2P_STATE_CLOSED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!ifaceName.empty()) {
+        DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveP2pIface(ifaceName);
+        ifaceName.clear();
+        WifiSettings::GetInstance().SetP2pIfaceName("");
+    }
+#endif
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close p2p SA!");
@@ -202,6 +216,7 @@ void WifiP2pManager::CloseP2pService(void)
 void WifiP2pManager::InitP2pCallback(void)
 {
     using namespace std::placeholders;
+    mP2pCallback.callbackModuleName = "P2pManager";
     mP2pCallback.OnP2pStateChangedEvent = std::bind(&WifiP2pManager::DealP2pStateChanged, this, _1);
     mP2pCallback.OnP2pPeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPeersChanged, this, _1);
     mP2pCallback.OnP2pServicesChangedEvent = std::bind(&WifiP2pManager::DealP2pServiceChanged, this, _1);
@@ -211,6 +226,9 @@ void WifiP2pManager::InitP2pCallback(void)
     mP2pCallback.OnP2pGroupsChangedEvent = std::bind(&WifiP2pManager::DealP2pGroupsChanged, this);
     mP2pCallback.OnP2pActionResultEvent = std::bind(&WifiP2pManager::DealP2pActionResult, this, _1, _2);
     mP2pCallback.OnConfigChangedEvent = std::bind(&WifiP2pManager::DealConfigChanged, this, _1, _2, _3);
+    mP2pCallback.OnP2pGcJoinGroupEvent = std::bind(&WifiP2pManager::DealP2pGcJoinGroup, this, _1);
+    mP2pCallback.OnP2pGcLeaveGroupEvent = std::bind(&WifiP2pManager::DealP2pGcLeaveGroup, this, _1);
+    mP2pCallback.OnP2pPrivatePeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPrivatePeersChanged, this, _1);
     return;
 }
 
@@ -257,6 +275,15 @@ void WifiP2pManager::DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeer
     return;
 }
 
+void WifiP2pManager::DealP2pPrivatePeersChanged(const std::string &privateInfo)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_PRIVATE_PEER_CHANGE;
+    cbMsg.privateWfdInfo = privateInfo;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
 void WifiP2pManager::DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &vServices)
 {
     WifiEventCallbackMsg cbMsg;
@@ -285,6 +312,9 @@ void WifiP2pManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
         return;
     }
     WriteWifiP2pStateHiSysEvent(group.GetInterface(), (int32_t)info.IsGroupOwner(), (int32_t)info.GetConnectState());
+    if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
+        WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_SUC_CNT));
+    }
     return;
 }
 
@@ -327,6 +357,24 @@ void WifiP2pManager::DealP2pActionResult(P2pActionCallback action, ErrCode code)
     return;
 }
 
+void WifiP2pManager::DealP2pGcJoinGroup(const GcInfo &info)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_P2P_GC_JOIN_GROUP;
+    cbMsg.gcInfo = info;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiP2pManager::DealP2pGcLeaveGroup(const GcInfo &info)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP;
+    cbMsg.gcInfo = info;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
 void WifiP2pManager::DealConfigChanged(CfgType type, char* data, int dataLen)
 {
     if (data == nullptr || dataLen <= 0) {
@@ -358,6 +406,18 @@ void WifiP2pManager::DealConfigChanged(CfgType type, char* data, int dataLen)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     return;
 }
+
+void WifiP2pManager::IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType)
+{
+    WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
+        destoryIfaceName.c_str(), createIfaceType);
+    if (destoryIfaceName == ifaceName) {
+        ifaceName.clear();
+        WifiSettings::GetInstance().SetP2pIfaceName("");
+    }
+    return;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -15,7 +15,6 @@
 
 #include "wifi_scan_service_impl.h"
 #include "define.h"
-#include "permission_def.h"
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
 #ifdef OHOS_ARCH_LITE
@@ -90,6 +89,10 @@ WifiScanServiceImpl::~WifiScanServiceImpl()
 ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 {
     WIFI_LOGI("WifiScanServiceImpl::SetScanControlInfo");
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetScanControlInfo:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetScanControlInfo:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -390,17 +393,11 @@ bool WifiScanServiceImpl::IsRemoteDied(void)
 void WifiScanServiceImpl::UpdateScanMode()
 {
     int uid = GetCallingUid();
-    int pid = GetCallingPid();
-    std::string processName = GetRunningProcessNameByPid(uid, pid);
-    if (!processName.empty()) {
-        if (IsForegroundApp(uid)) {
+    if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
             WifiSettings::GetInstance().SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
         } else {
             WifiSettings::GetInstance().SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
         }
-    } else {
-        WifiSettings::GetInstance().SetAppRunningState(ScanMode::SYS_BACKGROUND_SCAN);
-    }
 }
 #endif
 }  // namespace Wifi

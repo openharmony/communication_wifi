@@ -27,12 +27,12 @@ struct Index {
   build() {
     Row() {
       Column() {
-        Text( this.message )
-          .fontSize( 50 )
-          .fontWeight( FontWeight.Bold )
+        Text(this.message)
+          .fontSize(50)
+          .fontWeight(FontWeight.Bold)
       }
-      .width( ConfigData.WH_100_100 )
+      .width(ConfigData.WH_100_100)
     }
-    .height( ConfigData.WH_100_100 )
+    .height(ConfigData.WH_100_100)
   }
 }

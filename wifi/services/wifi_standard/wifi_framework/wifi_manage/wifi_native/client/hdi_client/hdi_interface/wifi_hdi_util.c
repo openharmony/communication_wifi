@@ -13,14 +13,10 @@
  * limitations under the License.
  */
 
-#ifdef HDI_INTERFACE_SUPPORT
-
 #include "securec.h"
 #include "wifi_hdi_util.h"
-#include "wifi_hdi_common.h"
 #include "wifi_common_def.h"
 #include "wifi_log.h"
-#include "utils/common.h" /* request for printf_decode to decode wpa's returned ssid info */
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiUtil"
@@ -39,6 +35,10 @@
 #define REPLY_BUF_LENGTH (4096 * 10)
 #define REPLY_BUF_SMALL_LENGTH 64
 #define CMD_FREQ_MAX_LEN 8
+#define MAC_UINT_SIZE 6
+#define MAC_STRING_SIZE 17
+#define HILINK_OUI_HEAD_LEN 9
+#define MASK_HILINK 0xFF
 
 const unsigned int HT_OPER_EID = 61;
 const unsigned int VHT_OPER_EID = 192;
@@ -68,9 +68,6 @@ const unsigned int CHAN_WIDTH_40MHZ = 1;
 const unsigned int CHAN_WIDTH_80MHZ = 2;
 const unsigned int CHAN_WIDTH_160MHZ = 3;
 const unsigned int CHAN_WIDTH_80MHZ_MHZ = 4;
-
-#define MAC_UINT_SIZE 6
-#define MAC_STRING_SIZE 17
 
 #ifndef OHOS_ARCH_LITE
 static int ConvertChanToFreqMhz(int channel, int band)
@@ -391,6 +388,10 @@ static void RecordIeNeedParse(unsigned int id, ScanInfoElem* ie, struct NeedPars
 
 static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
 {
+    if (pcmd == NULL) {
+        LOGE("%{public}s, pcmd is NULL", __func__);
+        return;
+    }
     int len;
     int start = end + 1;
     int last = end + 1;
@@ -763,6 +764,10 @@ int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems
     }
 
     HDI_CHECK_ELEMENT(elem, start, len) {
+        if (elem == NULL) {
+            LOGE("%{public}s, elem is NULL", __func__);
+            return false;
+        }
         uint8_t id = elem->id, elen = elem->datalen;
         const uint8_t *pos = elem->data;
 
@@ -995,7 +1000,7 @@ done:
 }
 
 /* Format one result on one text line into a buffer. */
-int GetScanResultText(const struct HdfWifiScanResultExt *scanResult,
+int GetScanResultText(const struct WifiScanResultExt *scanResult,
     struct HdiElems *elems, char* buf, int bufLen)
 {
     char *pos, *end;
@@ -1030,6 +1035,7 @@ int GetScanResultText(const struct HdfWifiScanResultExt *scanResult,
         pos = HdiGetIeTxt(pos, end, mesh ? "RSN" : "WPA2",
                         ie2, HDI_POS_SECOND + ie2[1]);
     }
+
     rsnxe = HdiBssGetIe(scanResult->ie, scanResult->ieLen, HDI_EID_RSNX);
     if (HdiGetRsnCapab(rsnxe, HDI_RSNX_CAPAB_SAE_H2E)) {
         ret = HdiTxtPrintf(pos, end - pos, "[SAE-H2E]");
@@ -1225,7 +1231,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             start = length;
             break;
 #else
@@ -1234,7 +1240,7 @@ int DelScanInfoLine(ScanInfo *pcmd, char *srcBuf, int length)
                 fail = 1;
                 break;
             }
-            printf_decode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
+            PrintfDecode((u8 *)pcmd->ssid, sizeof(pcmd->ssid), pcmd->ssid);
             GetInfoElems(length, end, srcBuf, pcmd);
             start = length;
             break;
@@ -1270,4 +1276,80 @@ int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *dest
     }
     return 0;
 }
-#endif
+
+void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
+{
+    const struct HdiElem *elem;
+    int ieIndex = 0;
+    ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
+    if (infoElemsTemp == NULL) {
+        LOGE("failed to alloc memory");
+        return;
+    }
+    memset_s(infoElemsTemp, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem),
+        0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem));
+    HDI_CHECK_ELEMENT(elem, start, len) {
+        uint8_t id = elem->id, elen = elem->datalen;
+        infoElemsTemp[ieIndex].id = id;
+        infoElemsTemp[ieIndex].size = elen;
+        infoElemsTemp[ieIndex].content = (char *)calloc(elen+1, sizeof(char));
+        if (infoElemsTemp[ieIndex].content == NULL) {
+            break;
+        }
+        if (memcpy_s(infoElemsTemp[ieIndex].content, elen+1, elem->data, elen) != EOK) {
+            LOGE("memcpy content fail");
+        }
+        ieIndex++;
+    }
+    // clear old infoElems first
+    if (scanInfo->infoElems != NULL) {
+        for (int i = 0; i < scanInfo->ieSize; i++) {
+            if (scanInfo->infoElems[i].content != NULL) {
+                free(scanInfo->infoElems[i].content);
+                scanInfo->infoElems[i].content = NULL;
+            }
+        }
+        free(scanInfo->infoElems);
+        scanInfo->infoElems = NULL;
+    }
+    scanInfo->infoElems = infoElemsTemp;
+    scanInfo->ieSize = ieIndex;
+}
+
+static bool CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
+{
+    int formatHiLink[] = {0, 0xE0, 0XFC, 0X80, 0, 0, 0, 0X01, 0};
+    int formatHiLinkOUI[] = {0, 0xE0, 0XFC, 0X40, 0, 0, 0, 0X01, 0};
+    if (bytes == NULL || len < HILINK_OUI_HEAD_LEN) {
+        return false;
+    }
+
+    for (int index = 0; index < HILINK_OUI_HEAD_LEN; index++) {
+        int element = bytes[index] & MASK_HILINK;
+        if (element != formatHiLink[index] && element != formatHiLinkOUI[index]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
+{
+    const struct HdiElem *elem;
+    bool num = false;
+
+    if (!start) {
+        return false;
+    }
+
+    HDI_CHECK_ELEMENT(elem, start, len) {
+        uint8_t id = elem->id, elen = elem->datalen;
+        const uint8_t *pos = elem->data;
+        if (id == HDI_EID_VENDOR_SPECIFIC) {
+            num |= CheckHiLinkOUISection(pos, elen);
+        }
+    }
+
+    return num;
+}

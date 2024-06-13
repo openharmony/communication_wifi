@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import hilog from '@ohos.hilog';
-import AbilityStage from "@ohos.application.AbilityStage"
+import AbilityStage from "@ohos.app.ability.AbilityStage"
 
 /**
  * MyAbilityStage Of Wifi test

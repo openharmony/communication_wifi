@@ -23,8 +23,8 @@
 #include <sstream>
 #include "network_selection.h"
 
-namespace OHOS {
-namespace Wifi {
+
+namespace OHOS::Wifi::NetworkSelection {
 
 class RssiScorer : public SimpleWifiScorer {
 public:
@@ -148,5 +148,5 @@ public:
     explicit SavedNetworkScorer(const std::string &scorerName);
 };
 }
-}
+
 #endif

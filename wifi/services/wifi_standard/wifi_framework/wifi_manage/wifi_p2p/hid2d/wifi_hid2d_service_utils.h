@@ -43,13 +43,13 @@ const int SHARED_LINKE_COUNT_ON_DISCONNECTED = 0;
 const int SHARED_LINKE_COUNT_ON_CONNECTED = 1;
 class SharedLinkManager {
 public:
-    static void IncreaseSharedLink();
-    static void DecreaseSharedLink();
+    static void IncreaseSharedLink(int callingUid);
+    static void DecreaseSharedLink(int callingUid);
     static void SetSharedLinkCount(int count);
     static int GetSharedLinkCount();
 
 private:
-    static std::atomic_int sharedLinkCount;
+    static std::map<int, int> sharedLinkCountMap;
 };
 }  // namespace Wifi
 }  // namespace OHOS

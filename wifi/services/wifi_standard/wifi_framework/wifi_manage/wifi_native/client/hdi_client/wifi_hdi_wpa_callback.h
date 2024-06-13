@@ -18,11 +18,11 @@
 #define OHOS_WIFI_HDI_WPA_CALLBACK_H
 
 #include "wifi_hdi_wpa_proxy.h"
+typedef unsigned char u8;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 int32_t OnEventDisconnected(struct IWpaCallback *self,
     const struct HdiWpaDisconnectParam *disconectParam, const char* ifName);
 int32_t OnEventConnected(struct IWpaCallback *self,
@@ -35,6 +35,7 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
     const struct HdiWpaTempDisabledParam *tempDisabledParam, const char *ifName);
 int32_t OnEventAssociateReject(struct IWpaCallback *self,
     const struct HdiWpaAssociateRejectParam *associateRejectParam, const char *ifName);
+int32_t OnEventStaNotify(struct IWpaCallback *self, const char *notifyParam, const char *ifName);
 int32_t OnEventWpsOverlap(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventWpsTimeout(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventScanResult(struct IWpaCallback *self,
@@ -59,6 +60,8 @@ int32_t OnEventGroupFormationSuccess(struct IWpaCallback *self, const char *ifNa
 int32_t OnEventGroupFormationFailure(struct IWpaCallback *self, const char *reason, const char *ifName);
 int32_t OnEventGroupStarted(struct IWpaCallback *self,
     const struct HdiP2pGroupStartedParam *groupStartedParam, const char* ifName);
+int32_t OnEventGroupInfoStarted(struct IWpaCallback *self,
+    const struct HdiP2pGroupInfoStartedParam *groupStartedParam, const char* ifName);
 int32_t OnEventGroupRemoved(struct IWpaCallback *self,
     const struct HdiP2pGroupRemovedParam *groupRemovedParam, const char* ifName);
 int32_t OnEventProvisionDiscoveryCompleted(struct IWpaCallback *self,
@@ -72,6 +75,8 @@ int32_t OnEventStaConnectState(struct IWpaCallback *self,
     const struct HdiP2pStaConnectStateParam *staConnectStateParam, const char* ifName);
 int32_t OnEventIfaceCreated(struct IWpaCallback *self,
     const struct HdiP2pIfaceCreatedParam *ifaceCreatedParam, const char* ifName);
+
+size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str);
 #ifdef __cplusplus
 }
 #endif

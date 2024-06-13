@@ -28,6 +28,7 @@
 #include "sta_state_machine.h"
 #include "sta_saved_device_appraisal.h"
 #include "network_selection_manager.h"
+#include "magic_enum.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -143,6 +144,7 @@ private:
         ~BlockedBssidInfo(){}
     };
     std::unordered_map<std::string, BlockedBssidInfo> blockedBssidMap;
+    std::mutex m_blockBssidMapMutex;
     /**
      * @Description  Clear all BSSIDs in BSSID Blocklist
      *

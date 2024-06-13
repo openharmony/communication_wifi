@@ -97,7 +97,7 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
         deviceMgr = new (std::nothrow) WifiDeviceMgrProxy(object);
     }
     if (deviceMgr == nullptr) {
-        WIFI_LOGE("wifi device init failed, %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi device init failed, %{public}d", systemAbilityId_.load());
         return false;
     }
 
@@ -112,7 +112,7 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
         client_ = new (std::nothrow) WifiDeviceProxy(service);
     }
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi device instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_);
+        WIFI_LOGE("wifi device instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_.load());
         return false;
     }
     return true;
@@ -220,6 +220,13 @@ ErrCode WifiDeviceImpl::RemoveAllDevice()
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->RemoveAllDevice();
+}
+
+ErrCode WifiDeviceImpl::SetWifiTxPower(int power)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetTxPower(power);
 }
 
 ErrCode WifiDeviceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
@@ -437,11 +444,11 @@ bool WifiDeviceImpl::SetLowLatencyMode(bool enabled)
     return client_->SetLowLatencyMode(enabled);
 }
 
-ErrCode WifiDeviceImpl::SetAppFrozen(int uid, bool isFrozen)
+ErrCode WifiDeviceImpl::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
-    return client_->SetAppFrozen(uid, isFrozen);
+    return client_->SetAppFrozen(pidList, isFrozen);
 }
 
 ErrCode WifiDeviceImpl::ResetAllFrozenApp()
@@ -521,6 +528,48 @@ ErrCode WifiDeviceImpl::FactoryReset()
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->FactoryReset();
+}
+
+ErrCode WifiDeviceImpl::LimitSpeed(const int controlId, const int limitMode)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->LimitSpeed(controlId, limitMode);
+}
+
+ErrCode WifiDeviceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
+}
+
+ErrCode WifiDeviceImpl::SetSatelliteState(const int state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetSatelliteState(state);
+}
+
+ErrCode WifiDeviceImpl::EnableSemiWifi()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->EnableSemiWifi();
+}
+
+ErrCode WifiDeviceImpl::GetWifiDetailState(WifiDetailState &state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetWifiDetailState(state);
+}
+
+ErrCode WifiDeviceImpl::StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->StartRoamToNetwork(networkId, bssid, isCandidate);
 }
 }  // namespace Wifi
 }  // namespace OHOS

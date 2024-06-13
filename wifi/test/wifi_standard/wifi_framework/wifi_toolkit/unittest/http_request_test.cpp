@@ -149,17 +149,5 @@ HWTEST_F(HttpRequestTest, HttpDataTransmit_001, TestSize.Level1)
     pHttpRequest->httpHead = "Connection: Keep-Alive\r\n";
     EXPECT_TRUE(pHttpRequest->HttpDataTransmit(iSockFd) == -1);
 }
-/**
- * @tc.name: GetIPFromUrl_001
- * @tc.desc: test GetIPFromUrl error
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(HttpRequestTest, GetIPFromUrl_001, TestSize.Level1)
-{
-    WIFI_LOGI("GetIPFromUrl_001");
-    pHttpRequest->strHost = "Connection: Keep-Alive\r\n";
-    pHttpRequest->GetIPFromUrl();
-}
 }  // namespace Wifi
 }  // namespace OHOS

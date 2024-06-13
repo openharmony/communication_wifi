@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#include "../../../interfaces/kits/c/wifi_device.h"
-#include "../../../interfaces/inner_api/wifi_device.h"
-#include "../../../interfaces/inner_api/wifi_scan.h"
-#include "../../../interfaces/kits/c/wifi_scan_info.h"
-#include "../../../interfaces/kits/c/wifi_device_config.h"
+#include "kits/c/wifi_device.h"
+#include "inner_api/wifi_device.h"
+#include "inner_api/wifi_scan.h"
+#include "kits/c/wifi_scan_info.h"
+#include "kits/c/wifi_device_config.h"
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
-#include "../../../interfaces/inner_api/wifi_msg.h"
+#include "inner_api/wifi_msg.h"
 
 DEFINE_WIFILOG_LABEL("WifiCDevice");
 
@@ -561,5 +561,27 @@ NO_SANITIZE("cfi") WifiErrorCode FactoryReset()
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->FactoryReset());
+}
+
+NO_SANITIZE("cfi") WifiErrorCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid,
+    OHOS::Wifi::WifiDeviceConfig &deviceConfig)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiDevicePtr->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig));
+}
+
+NO_SANITIZE("cfi") WifiErrorCode EnableSemiWifi()
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiDevicePtr->EnableSemiWifi());
+}
+
+NO_SANITIZE("cfi") WifiErrorCode GetWifiDetailState(WifiDetailState *state)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    OHOS::Wifi::WifiDetailState detailState;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetWifiDetailState(detailState);
+    *state = (WifiDetailState)detailState;
+    return GetCErrorCode(ret);
 }
 #endif

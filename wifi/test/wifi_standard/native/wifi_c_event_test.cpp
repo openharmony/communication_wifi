@@ -12,11 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "../../../interfaces/kits/c/wifi_event.h"
+#include "kits/c/wifi_event.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "../../../interfaces/kits/c/wifi_device.h"
-#include "../../../interfaces/kits/c/wifi_scan_info.h"
+#include "kits/c/wifi_device.h"
+#include "kits/c/wifi_scan_info.h"
 #include "wifi_logger.h"
 
 using ::testing::Return;

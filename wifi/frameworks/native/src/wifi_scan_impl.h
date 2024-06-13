@@ -124,7 +124,7 @@ public:
 
 private:
     bool GetWifiScanProxy();
-    int systemAbilityId_;
+    std::atomic<int> systemAbilityId_;
     int instId_;
     std::mutex mutex_;
 #ifdef OHOS_ARCH_LITE

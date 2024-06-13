@@ -39,6 +39,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+  "$WIFI_ROOT_DIR/utils/inc",
 ]
 
 if (defined(ohos_lite)) {
@@ -48,13 +49,39 @@ if (defined(ohos_lite)) {
     include_dirs = local_base_include_dirs
 
     deps = [
-      "$WIFI_ROOT_DIR/base/cRPC:rpc_client",
+      "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     ]
 
     external_deps = [ "hilog_lite:hilog_shared" ]
 
-    config -= [ "//build/lite/config:language_cpp" ]
+    configs -= [ "//build/lite/config:language_cpp" ]
+
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+
+    defines = [ "OHOS_ARCH_LITE" ]
+  }
+  shared_library("wifi_base_without_crpc") {
+    sources = local_base_sources
+
+    include_dirs = local_base_include_dirs
+
+    deps = [
+      "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    ]
+
+    external_deps = [ "hilog_lite:hilog_shared" ]
+
+    configs -= [ "//build/lite/config:language_cpp" ]
 
     cflags_cc = [
       "-std=c++17",
@@ -78,9 +105,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
 
@@ -90,8 +119,53 @@ if (defined(ohos_lite)) {
     include_dirs = local_base_include_dirs
 
     deps = [
-      "$WIFI_ROOT_DIR/base/cRPC:rpc_client",
+      "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
+    ]
+
+    external_deps = [
+      "c_utils:utils",
+      "hilog:libhilog",
+    ]
+
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+    ]
+
+    ldflags = [
+      "-fPIC",
+      "-Wl,-E",
+    ]
+
+    public_configs = [ ":wifi_base_exported_header" ]
+
+    part_name = "wifi"
+    subsystem_name = "communication"
+    innerapi_tags = [ "platformsdk" ]
+  }
+
+  ohos_shared_library("wifi_base_without_crpc") {
+    branch_protector_ret = "pac_ret"
+
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+    }
+
+    install_enable = true
+    sources = local_base_sources
+
+    include_dirs = local_base_include_dirs
+
+    deps = [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
     external_deps = [

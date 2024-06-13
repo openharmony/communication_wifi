@@ -13,15 +13,11 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
-import prompt from '@ohos.prompt';
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { StressContentTable } from '../../Component/stressContentTable';
-import router from '@system.router';
+import router from '@ohos.router';
 import ConfigData from '../../utils/ConfigData';
-import LogUtil from '../../utils/LogUtil';
 import { initP2pManagerStressData } from '../../entryability/model/stressTestDataModels'
 import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
@@ -30,19 +26,41 @@ import socket from '@ohos.net.socket';
 
 import http from '@ohos.net.http'
 import request from '@ohos.request'
-import resourceManager from '@ohos.resourceManager'
-import featureAbility from '@ohos.ability.featureAbility'
+import common from '@ohos.app.ability.common';
+import abilityAccessCtrl , { Context , PermissionRequestResult } from '@ohos.abilityAccessCtrl';
+import { BusinessError } from '@ohos.base';
 
 const TAG = '[Stress]'
 
 const G_NAME = 'DaYu200'
 
-let localAddr = {
-  address : resolveIP( wifi.getIpInfo().ipAddress ) ,
+interface DownloadConfig {
+  url: string,
+  filePath: string
+}
+
+interface LocalAddr {
+  address: string,
+  family: number,
+  port: number
+}
+
+interface OppositeAddr {
+  address: string,
+  family: number,
+  port: number
+}
+
+interface myParams extends Object {
+  testItem: TestData
+}
+
+let localAddr: LocalAddr = {
+  address : resolveIP(wifi.getIpInfo().ipAddress) ,
   family : 1 ,
   port : 9090
 }
-let oppositeAddr = {
+let oppositeAddr: OppositeAddr = {
   address : '' ,
   family : 1 ,
   port : 0
@@ -61,68 +79,69 @@ struct P2pManagerStressTest {
   @State showList: boolean = false;
   @State showListItems: boolean = false;
   @State showListItem: boolean = false;
-  private testItem: TestData = router.getParams().testId;
+  private testItem: TestData = (router.getParams() as myParams).testItem
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: Number = - 1;
+  @State currentClick: number = - 1;
   @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
-  @State netIdManager: Number = - 2 ;
-  @State passphraseManager: string = "12345678" ;
+  @State netIdManager: number = - 2;
+  @State passphraseManager: string = "12345678";
   @State groupNameManager: string = "testGroup"
-  @State goBandManager: Number = 0 ;
+  @State goBandManager: number = 0;
   @State devNameManager: string = "MyTestDevice"
-  @StorageLink( 'stressNumber' ) stressNumber: Number = 0 ;
-  @StorageLink( 'stressTime' ) stressTime: Number = 0;
+  @StorageLink('stressNumber') stressNumber: number = 0;
+  @StorageLink('stressTime') stressTime: number = 0;
+  @StorageLink('pairedMac') pairedMac: string = "";
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
-    AppStorage.SetOrCreate( "netIdManager" , this.netIdManager )
-    AppStorage.SetOrCreate( "passphraseManager" , this.passphraseManager )
-    AppStorage.SetOrCreate( "groupNameManager" , this.groupNameManager )
-    AppStorage.SetOrCreate( "goBandManager" , this.goBandManager )
-    AppStorage.SetOrCreate( "devNameManager" , this.devNameManager )
+    AppStorage.setOrCreate("deviceAddressManager" , this.deviceAddressManager)
+    AppStorage.setOrCreate("netIdManager" , this.netIdManager)
+    AppStorage.setOrCreate("passphraseManager" , this.passphraseManager)
+    AppStorage.setOrCreate("groupNameManager" , this.groupNameManager)
+    AppStorage.setOrCreate("goBandManager" , this.goBandManager)
+    AppStorage.setOrCreate("devNameManager" , this.devNameManager)
   }
 
   init() {
-    console.log( "init-----------" )
+    console.log("init-----------")
   }
 
   build() {
     Column() {
-      Stack( { alignContent : Alignment.TopStart } ) {
-        TestImageDisplay( { testItem : this.testItem } )
-        PageTitle( { testItem : this.testItem } )
+      Stack({ alignContent : Alignment.TopStart }) {
+        TestImageDisplay({ testItem : this.testItem })
+        PageTitle({ testItem : this.testItem })
       }
 
-      Stack().height( "0.5vp" ).backgroundColor( "#000000" );
+      Stack().height("0.5vp").backgroundColor("#000000");
       Column() {
         Row() {
-          Text( "目标设备IP：" )
-            .fontSize( "20vp" )
-            .height( 40 )
-            .padding( { top : 5 } )
-            .width( ConfigData.WH_28_100 )
-            .align( Alignment.Start )
+          Text("目标设备IP：")
+            .fontSize("20vp")
+            .height(40)
+            .padding({ top : 5 })
+            .width(ConfigData.WH_28_100)
+            .align(Alignment.Start)
 
-          TextInput( { text : this.pairedMac , placeholder : "请输入即将连接的设备MAC" } )
-            .height( 40 )
-            .borderStyle( BorderStyle.Dashed )
-            .backgroundColor( $r( "app.color.white" ) )
-            .onChange( ( str ) => {
+          TextInput({ text : this.pairedMac , placeholder : "请输入即将连接的设备MAC" })
+            .height(40)
+            .borderStyle(BorderStyle.Dashed)
+            .backgroundColor($r("app.color.white"))
+            .onChange((str) => {
               this.deviceId = str;
-            } )
-            .width( ConfigData.WH_45_100 )
-            .padding( { top : 5 , left : 5 } )
-          Image( $r( 'app.media.Switch' ) )
-            .height( 50 )
-            .padding( { top : 5 , bottom : 5 , left : 10 } )
-            .width( ConfigData.WH_15_100 )
-            .onClick( () => {
+            })
+            .width(ConfigData.WH_45_100)
+            .padding({ top : 5 , left : 5 })
+          Image($r('app.media.Switch'))
+            .height(50)
+            .padding({ top : 5 , bottom : 5 , left : 10 })
+            .width(ConfigData.WH_15_100)
+            .onClick(() => {
               this.showList = !this.showList;
-            } )
+            })
         }
       }
-      .align( Alignment.Start )
+      .align(Alignment.Start)
 
       if ( this.showList ) {
         p2pManagerSetting()
@@ -130,231 +149,231 @@ struct P2pManagerStressTest {
         Column() {
           Scroll() {
             Column() {
-              Text( "stress测试：" )
-                .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
-                .textAlign( TextAlign.Start )
-                .width( ConfigData.WH_100_100 )
-              Text( "stress测试次数:" + this.stressNumber )
-                .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
-                .textAlign( TextAlign.Start )
-                .width( ConfigData.WH_90_100 )
-              Text( "stress测试时间：" + this.stressTime + "ms" )
-                .fontSize( "17vp" )
-                .margin( { top : "5vp" , left : "15vp" } )
-                .textAlign( TextAlign.Start )
-                .width( ConfigData.WH_90_100 )
+              Text("stress测试：")
+                .fontSize("17vp")
+                .margin({ top : "5vp" , left : "15vp" })
+                .textAlign(TextAlign.Start)
+                .width(ConfigData.WH_100_100)
+              Text("stress测试次数:" + this.stressNumber)
+                .fontSize("17vp")
+                .margin({ top : "5vp" , left : "15vp" })
+                .textAlign(TextAlign.Start)
+                .width(ConfigData.WH_90_100)
+              Text("stress测试时间：" + this.stressTime + "ms")
+                .fontSize("17vp")
+                .margin({ top : "5vp" , left : "15vp" })
+                .textAlign(TextAlign.Start)
+                .width(ConfigData.WH_90_100)
 
-              Flex( { alignItems : ItemAlign.Center , justifyContent : FlexAlign.SpaceBetween } ) {
-                Button( { type : ButtonType.Normal , stateEffect : true } ) {
-                  Text( '传输数据' ).fontSize( "20vp" ).fontColor( 0xffffff ).margin( { left : 2 , right : 2 } )
+              Flex({ alignItems : ItemAlign.Center , justifyContent : FlexAlign.SpaceBetween }) {
+                Button({ type : ButtonType.Normal , stateEffect : true }) {
+                  Text('传输数据').fontSize("20vp").fontColor(0xffffff).margin({ left : 2 , right : 2 })
                 }
-                .borderRadius( 8 )
-                .backgroundColor( $r( "app.color.blue" ) )
-                .width( 100 )
-                .height( 60 )
-                .margin( { top : "5vp" , left : "10vp" , bottom : "5vp" } )
-                .align( Alignment.Start )
-                .onClick( async( event: ClickEvent ) => {
+                .borderRadius(8)
+                .backgroundColor($r("app.color.blue"))
+                .width(100)
+                .height(60)
+                .margin({ top : "5vp" , left : "10vp" , bottom : "5vp" })
+                .align(Alignment.Start)
+                .onClick(async(event: ClickEvent) => {
                   this.showListItems = true
                   this.showListItem = false
-                } )
+                })
 
-                Button( { type : ButtonType.Normal , stateEffect : true } ) {
+                Button({ type : ButtonType.Normal , stateEffect : true }) {
                   Row() {
-                    Text( '上传下载' ).fontSize( "20vp" ).fontColor( 0xffffff ).margin( { left : 2 , right : 2 } )
-                  }.alignItems( VerticalAlign.Center )
+                    Text('上传下载').fontSize("20vp").fontColor(0xffffff).margin({ left : 2 , right : 2 })
+                  }.alignItems(VerticalAlign.Center)
                 }
-                .borderRadius( 8 )
-                .backgroundColor( $r( "app.color.blue" ) )
-                .width( 100 )
-                .height( 60 )
-                .margin( { top : "5vp" , left : "10vp" , right : "10vp" , bottom : "5vp" } )
-                .align( Alignment.Center )
-                .onClick( async( event: ClickEvent ) => {
+                .borderRadius(8)
+                .backgroundColor($r("app.color.blue"))
+                .width(100)
+                .height(60)
+                .margin({ top : "5vp" , left : "10vp" , right : "10vp" , bottom : "5vp" })
+                .align(Alignment.Center)
+                .onClick(async(event: ClickEvent) => {
                   this.showListItem = true
                   this.showListItems = false
-                } )
+                })
 
-                Button( { type : ButtonType.Normal , stateEffect : true } ) {
+                Button({ type : ButtonType.Normal , stateEffect : true }) {
                   Row() {
-                    Text( '返回接口' ).fontSize( "20vp" ).fontColor( 0xffffff ).margin( { left : 2 , right : 2 } )
-                  }.alignItems( VerticalAlign.Bottom )
+                    Text('返回接口').fontSize("20vp").fontColor(0xffffff).margin({ left : 2 , right : 2 })
+                  }.alignItems(VerticalAlign.Bottom)
                 }
-                .borderRadius( 8 )
-                .backgroundColor( $r( "app.color.blue" ) )
-                .width( 100 )
-                .height( 60 )
-                .margin( { top : "5vp" , right : "10vp" , bottom : "5vp" } )
-                .align( Alignment.End )
-                .onClick( async( event: ClickEvent ) => {
+                .borderRadius(8)
+                .backgroundColor($r("app.color.blue"))
+                .width(100)
+                .height(60)
+                .margin({ top : "5vp" , right : "10vp" , bottom : "5vp" })
+                .align(Alignment.End)
+                .onClick(async(event: ClickEvent) => {
                   this.showListItem = false
                   this.showListItems = false
-                } )
+                })
               }
-              .backgroundColor( $r( "sys.color.ohos_id_color_sub_background" ) )
-              .width( ConfigData.WH_100_100 )
+              .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
+              .width(ConfigData.WH_100_100)
             }
-            .width( ConfigData.WH_100_100 )
+            .width(ConfigData.WH_100_100)
           }
-          .scrollBarWidth( 10 )
-          .scrollBar( BarState.Auto )
+          .scrollBarWidth(10)
+          .scrollBar(BarState.Auto)
         }
-        .height( 130 )
-        .width( ConfigData.WH_95_100 )
-        .backgroundColor( $r( "sys.color.ohos_id_color_foreground_contrary" ) )
+        .height(130)
+        .width(ConfigData.WH_95_100)
+        .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 
         if ( this.showListItems == true && this.showListItem == false ) {
           socketTest()
         } else if ( this.showListItems == false && this.showListItem == true ) {
           upDownLoad()
         } else {
-          StressContentTable( { testItem : this.testItem , apiItems : initP2pManagerStressData() } )
+          StressContentTable({ testItem : this.testItem , apiItems : initP2pManagerStressData() })
         }
       }
     }
-    .alignItems( HorizontalAlign.Center )
-    .backgroundColor( $r( "app.color.lead" ) )
-    .height( ConfigData.WH_100_100 )
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor($r("app.color.lead"))
+    .height(ConfigData.WH_100_100)
   }
 }
 
 @Component
 struct p2pManagerSetting {
   @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
-  @State netIdManager: Number = - 2 ;
-  @State passphraseManager: string = "12345678" ;
+  @State netIdManager: number = - 2;
+  @State passphraseManager: string = "12345678";
   @State groupNameManager: string = "testGroup"
-  @State goBandManager: Number = 0 ;
+  @State goBandManager: number = 0;
   @State devNameManager: string = "MyTestDevice"
 
   aboutToAppear() {
-    AppStorage.SetOrCreate( "deviceAddressManager" , this.deviceAddressManager )
-    AppStorage.SetOrCreate( "netIdManager" , this.netIdManager )
-    AppStorage.SetOrCreate( "passphraseManager" , this.passphraseManager )
-    AppStorage.SetOrCreate( "groupNameManager" , this.groupNameManager )
-    AppStorage.SetOrCreate( "goBandManager" , this.goBandManager )
-    AppStorage.SetOrCreate( "devNameManager" , this.devNameManager )
+    AppStorage.setOrCreate("deviceAddressManager" , this.deviceAddressManager)
+    AppStorage.setOrCreate("netIdManager" , this.netIdManager)
+    AppStorage.setOrCreate("passphraseManager" , this.passphraseManager)
+    AppStorage.setOrCreate("groupNameManager" , this.groupNameManager)
+    AppStorage.setOrCreate("goBandManager" , this.goBandManager)
+    AppStorage.setOrCreate("devNameManager" , this.devNameManager)
   }
 
   build() {
     Column() {
       Row() {
-        Text( "deviceAddressManager:" ).fontSize( 16 ).width( 120 )
-        TextInput( { text : this.deviceAddressManager , placeholder : '6c:96:d7:3d:87:6f' } )
-          .fontSize( "15vp" )
-          .onChange( ( strInput ) => {
+        Text("deviceAddressManager:").fontSize(16).width(120)
+        TextInput({ text : this.deviceAddressManager , placeholder : '6c:96:d7:3d:87:6f' })
+          .fontSize("15vp")
+          .onChange((strInput: string) => {
             this.deviceAddressManager = strInput;
             //判断合法性
             if ( strInput.length >= 1 ) {
-              AppStorage.SetOrCreate( 'deviceAddressManager' , strInput );
+              AppStorage.setOrCreate('deviceAddressManager' , strInput);
             }
-          } )
-          .width( ConfigData.WH_80_100 )
-          .borderRadius( 1 )
+          })
+          .width(ConfigData.WH_80_100)
+          .borderRadius(1)
       }
-      .backgroundColor( $r( "app.color.moon" ) )
-      .padding( 5 )
-      .justifyContent( FlexAlign.Start )
-      .alignItems( VerticalAlign.Center )
+      .backgroundColor($r("app.color.moon"))
+      .padding(5)
+      .justifyContent(FlexAlign.Start)
+      .alignItems(VerticalAlign.Center)
 
       Column() {
-        Stack().height( "0.25vp" ).backgroundColor( "#000000" );
+        Stack().height("0.25vp").backgroundColor("#000000");
         Column() {
           Row() {
-            Text( "netIdManager:" ).fontSize( 15 ).width( 60 );
-            TextInput( { text : this.netIdManager , placeholder : "-2" } )
-              .fontSize( "15vp" )
-              .onChange( ( strInput ) => {
-                this.netIdManager = strInput;
+            Text("netIdManager:").fontSize(15).width(60);
+            TextInput({ text : this.netIdManager.toString() , placeholder : "-2" })
+              .fontSize("15vp")
+              .onChange((strInput: string) => {
+                this.netIdManager = Number(strInput);
                 //判断合法性
                 if ( strInput.length >= 1 ) {
-                  AppStorage.SetOrCreate( 'netIdManager' , strInput );
+                  AppStorage.setOrCreate('netIdManager' , strInput);
                 }
-              } )
-              .width( ConfigData.WH_80_100 )
-              .borderRadius( 1 )
+              })
+              .width(ConfigData.WH_80_100)
+              .borderRadius(1)
           }
-          .padding( 5 )
-          .justifyContent( FlexAlign.Start )
-          .alignItems( VerticalAlign.Center )
-          .backgroundColor( $r( "app.color.spring" ) )
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
+          .backgroundColor($r("app.color.spring"))
 
           Row() {
-            Text( "passphraseManager:" ).fontSize( 15 ).width( 100 );
-            TextInput( { text : this.passphraseManager , placeholder : "input passphrase" } )
-              .fontSize( "15vp" )
-              .onChange( ( strInput ) => {
+            Text("passphraseManager:").fontSize(15).width(100);
+            TextInput({ text : this.passphraseManager , placeholder : "input passphrase" })
+              .fontSize("15vp")
+              .onChange((strInput: string) => {
                 this.passphraseManager = strInput;
                 if ( strInput.length >= 1 ) {
-                  AppStorage.SetOrCreate( 'passphraseManager' , strInput );
+                  AppStorage.setOrCreate('passphraseManager' , strInput);
                 }
-              } )
-              .width( ConfigData.WH_80_100 )
-              .borderRadius( 1 )
+              })
+              .width(ConfigData.WH_80_100)
+              .borderRadius(1)
           }
-          .backgroundColor( $r( "app.color.spring" ) )
-          .padding( 5 )
-          .justifyContent( FlexAlign.Start )
-          .alignItems( VerticalAlign.Center )
+          .backgroundColor($r("app.color.spring"))
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
 
           Row() {
-            Text( "groupNameManager:" ).fontSize( 15 ).width( 100 );
-            TextInput( { text : this.groupNameManager , placeholder : "testGroup" } )
-              .fontSize( "15vp" )
-              .onChange( ( strInput ) => {
+            Text("groupNameManager:").fontSize(15).width(100);
+            TextInput({ text : this.groupNameManager , placeholder : "testGroup" })
+              .fontSize("15vp")
+              .onChange((strInput: string) => {
                 this.groupNameManager = strInput;
                 if ( strInput.length >= 1 ) {
-                  AppStorage.SetOrCreate( 'groupNameManager' , strInput );
+                  AppStorage.setOrCreate('groupNameManager' , strInput);
                 }
-              } )
-              .width( ConfigData.WH_80_100 )
-              .borderRadius( 1 )
+              })
+              .width(ConfigData.WH_80_100)
+              .borderRadius(1)
           }
-          .backgroundColor( $r( "app.color.spring" ) )
-          .padding( 5 )
-          .justifyContent( FlexAlign.Start )
-          .alignItems( VerticalAlign.Center )
+          .backgroundColor($r("app.color.spring"))
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
 
           Row() {
-            Text( "goBandManager:" ).fontSize( 15 ).width( 80 );
-            TextInput( { text : this.goBandManager , placeholder : "0" } )
-              .fontSize( "15vp" )
-              .onChange( ( strInput ) => {
-                this.goBandManager = strInput;
+            Text("goBandManager:").fontSize(15).width(80);
+            TextInput({ text : this.goBandManager.toString() , placeholder : "0" })
+              .fontSize("15vp")
+              .onChange((strInput: string) => {
+                this.goBandManager = Number(strInput);
                 if ( strInput.length >= 1 ) {
-                  AppStorage.SetOrCreate( 'goBandManager' , strInput );
+                  AppStorage.setOrCreate('goBandManager' , strInput);
                 }
-              } )
-              .width( ConfigData.WH_80_100 )
-              .borderRadius( 1 )
+              })
+              .width(ConfigData.WH_80_100)
+              .borderRadius(1)
           }
-          .backgroundColor( $r( "app.color.spring" ) )
-          .padding( 5 )
-          .justifyContent( FlexAlign.Start )
-          .alignItems( VerticalAlign.Center )
+          .backgroundColor($r("app.color.spring"))
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
 
           Row() {
-            Text( "devNameManager:" ).fontSize( 15 ).width( 100 );
-            TextInput( { text : this.devNameManager , placeholder : "MyTestDevice" } )
-              .fontSize( "15vp" )
-              .onChange( ( strInput ) => {
+            Text("devNameManager:").fontSize(15).width(100);
+            TextInput({ text : this.devNameManager , placeholder : "MyTestDevice" })
+              .fontSize("15vp")
+              .onChange((strInput: string) => {
                 this.devNameManager = strInput;
                 if ( strInput.length >= 1 ) {
-                  AppStorage.SetOrCreate( 'devNameManager' , strInput );
+                  AppStorage.setOrCreate('devNameManager' , strInput);
                 }
-              } )
-              .width( ConfigData.WH_80_100 )
-              .borderRadius( 1 )
+              })
+              .width(ConfigData.WH_80_100)
+              .borderRadius(1)
           }
-          .backgroundColor( $r( "app.color.spring" ) )
-          .padding( 5 )
-          .justifyContent( FlexAlign.Start )
-          .alignItems( VerticalAlign.Center )
+          .backgroundColor($r("app.color.spring"))
+          .padding(5)
+          .justifyContent(FlexAlign.Start)
+          .alignItems(VerticalAlign.Center)
         }
 
-        Stack().height( "0.25vp" ).backgroundColor( "#000000" );
+        Stack().height("0.25vp").backgroundColor("#000000");
       }
     }
   }
@@ -376,190 +395,160 @@ struct socketTest {
   @State receiveMsg: string = '待接收数据'
 
   bindOption() {
-    let bindOption = udp.bind( localAddr )
-    bindOption.then( () => {
-      console.log( TAG , 'bind success' )
+    let bindOption = udp.bind(localAddr)
+    bindOption.then(() => {
+      console.log(TAG , 'bind success')
       this.bindMsg = "绑定成功"
-    } ).catch( err => {
-      console.log( TAG , 'bind fail' + err )
+    }).catch((err: BusinessError) => {
+      console.log(TAG , 'bind fail' + err)
       this.bindMsg = "绑定失败"
-    } )
-    udp.on( 'message' , data => {
-      console.log( TAG , `data:${ JSON.stringify( data ) }` )
+    })
+    udp.on('message' , data => {
+      console.log(TAG , `data:${ JSON.stringify(data) }`)
       let buffer = data.message
       let dataView = new DataView(buffer)
-      console.log( TAG , `length = ${ dataView.byteLength }` )
+      console.log(TAG , `length = ${ dataView.byteLength }`)
       let str = ""
       for ( let i = 0 ;i < dataView.byteLength ; ++i ) {
-        let c = String.fromCharCode( dataView.getUint8( i ) )
+        let c = String.fromCharCode(dataView.getUint8(i))
         if ( c != "\n" ) {
           str += c
         }
       }
-//      if ( str == 'ok' ) {
-//        router.clear()
-//        loginCount += 1
-//        router.push( {
-//          url : 'pages/Index' ,
-//          params : { address : oppositeAddr.address , port : oppositeAddr.port , loginCount : loginCount }
-//        } )
-//      }
-//      else {
-        this.receiveMsg = str
-        this.confirmDialog = true
-//      }
-    } )
+      this.receiveMsg = str
+      this.confirmDialog = true
+
+    })
   }
 
   build() {
-    Stack( { alignContent : Alignment.Center } ) {
+    Stack({ alignContent : Alignment.Center }) {
       Column() {
-//        if ( !this.ipDialog ) {
-//          Column() {
-//            Image( this.login_feng ? $r( 'app.color.blue' ) : $r( 'app.color.moon' ) )
-//              .width( 100 )
-//              .height( 100 )
-//              .objectFit( ImageFit.Fill )
-//            Text( '用户名：' + this.user ).fontSize( 25 ).margin( { top : 50 } )
-//
-//            Button() {
-//              Text( $r( 'app.string.create_room' ) ).fontSize( 25 ).fontColor( Color.White )
-//            }
-//            .width( '150' )
-//            .height( 50 )
-//            .margin( { top : 30 } )
-//            .type( ButtonType.Capsule )
-//            .onClick( () => {
-//              this.roomDialog = true
-//              this.bindOption()
-//            } )
-//          }.width( '90%' ).margin( { top : 100 } )
-//        }
-
         if ( this.ipDialog ) {
           Column() {
-            Text( '本地IP：' + localAddr.address )
-              .fontSize( 25 )
-              .margin( { top : 10 } )
-            TextInput( { placeholder : '请输入对端ip' } )
-              .width( 200 )
-              .fontSize( 25 )
-              .margin( { top : 10 } )
-              .onChange( ( value: string ) => {
+            Text('本地IP：' + localAddr.address)
+              .fontSize(25)
+              .margin({ top : 10 })
+            TextInput({ placeholder : '请输入对端ip' })
+              .width(200)
+              .fontSize(25)
+              .margin({ top : 10 })
+              .onChange((value: string) => {
                 oppositeAddr.address = value
                 oppositeAddr.port = 9090
-              } )
+              })
 
             if ( this.warnDialog ) {
-              Text( this.warnText )
-                .width( 200 )
-                .fontSize( 10 )
-                .fontColor( Color.Red ).margin( { top : 5 } )
+              Text(this.warnText)
+                .width(200)
+                .fontSize(10)
+                .fontColor(Color.Red).margin({ top : 5 })
             }
             Row() {
-              Button( $r( 'app.string.confirm' ) )
-                .fontColor( Color.Black )
-                .height( 40 )
-                .width( 130 )
-                .fontSize( 25 )
-                .margin( { bottom : 10 } )
-                .onClick( () => {
+              Button($r('app.string.confirm'))
+                .fontColor(Color.Black)
+                .height(40)
+                .width(130)
+                .fontSize(25)
+                .margin({ bottom : 10 })
+                .onClick(() => {
                   if ( oppositeAddr.address === '' ) {
                     this.warnDialog = true
                     this.warnText = '请先输入对端IP'
                   } else {
                     this.bindOption()
                     this.txtDialog = true
-                    console.log( TAG , `peer ip=${ oppositeAddr.address }` )
-                    console.log( TAG , `peer port=${ oppositeAddr.port }` )
-                    console.log( TAG , `peer port=${ localAddr.port }` )
+                    console.log(TAG , `peer ip=${ oppositeAddr.address }`)
+                    console.log(TAG , `peer port=${ oppositeAddr.port }`)
+                    console.log(TAG , `peer port=${ localAddr.port }`)
                   }
-                } )
-                .backgroundColor( 0xffffff )
+                })
+                .backgroundColor(0xffffff)
 
-              Button( $r( 'app.string.send_message' ) )
-                .fontColor( Color.Black )
-                .height( 40 )
-                .width( 130 )
-                .fontSize( 25 )
-                .margin( { bottom : 10 } )
-                .onClick( () => {
+              Button($r('app.string.send_message'))
+                .fontColor(Color.Black)
+                .height(40)
+                .width(130)
+                .fontSize(25)
+                .margin({ bottom : 10 })
+                .onClick(() => {
                   {
                     //发送数据
-                    udp.send( {
+                    udp.send({
                       data : '1' , //online
                       address : oppositeAddr
-                    } ).then( data => {
-                      console.log( TAG , `send sucess : ${ data }` )
-                    } ).catch( function( err ) {
-                      console.log( TAG , `TAG,send : ${ JSON.stringify( err ) }` )
-                    } )
+                    }).then(data => {
+                      console.log(TAG , `send sucess : ${ data }`)
+                    }).catch((error: BusinessError) => {
+                      console.log(TAG , `TAG,send : ${ JSON.stringify(error) }`)
+                    })
 
-                    console.log( TAG , `send peer ip=${ oppositeAddr.address }` )
-                    console.log( TAG , `send peer port=${ oppositeAddr.port }` )
-                    console.log( TAG , `send peer port=${ localAddr.port }` )
+                    console.log(TAG , `send peer ip=${ oppositeAddr.address }`)
+                    console.log(TAG , `send peer port=${ oppositeAddr.port }`)
+                    console.log(TAG , `send peer port=${ localAddr.port }`)
                   }
-                } )
-                .backgroundColor( 0xffffff )
+                })
+                .backgroundColor(0xffffff)
             }
-            Text( this.bindMsg )
-              .width( 200 )
-              .fontSize( 25 )
-              .fontColor( Color.Red ).margin( { top : 5 } )
+
+            Text(this.bindMsg)
+              .width(200)
+              .fontSize(25)
+              .fontColor(Color.Red).margin({ top : 5 })
           }
-          .width( '80%' )
-          .height( 200 )
-          .margin( { top : '3%' } )
-          .backgroundColor( Color.White )
-          .border( { radius : 10 , width : 3 } )
+          .width(ConfigData.WH_80_100)
+          .height(200)
+          .margin({ top : ConfigData.WH_3_100 })
+          .backgroundColor(Color.White)
+          .border({ radius : 10 , width : 3 })
         }
 
         if ( this.txtDialog ) {
           Column() {
-            Text( '接收本地IP：' + localAddr.address )
-              .fontSize( 25 )
-              .margin( { top : 10 } )
+            Text('接收本地IP：' + localAddr.address)
+              .fontSize(25)
+              .margin({ top : 10 })
 
-            Text( this.receiveMsg )
-              .width( 200 )
-              .fontSize( 25 )
-              .fontColor( Color.Red ).margin( { top : 5 } )
+            Text(this.receiveMsg)
+              .width(200)
+              .fontSize(25)
+              .fontColor(Color.Red).margin({ top : 5 })
 
           }
-          .width( '80%' )
-          .height( 180 )
-          .margin( { top : '3%' } )
-          .backgroundColor( Color.White )
-          .border( { radius : 10 , width : 3 } )
+          .width(ConfigData.WH_80_100)
+          .height(180)
+          .margin({ top : ConfigData.WH_3_100 })
+          .backgroundColor(Color.White)
+          .border({ radius : 10 , width : 3 })
         }
 
-      }.width( '100%' ).height( '100%' )
+      }.width(ConfigData.WH_100_100).height(ConfigData.WH_100_100)
     }
   }
 }
 
 @Component
 struct upDownLoad {
-  @State receivedSize: Number = 0
-  @State totalSize: Number = 0
+  @State receivedSize: number = 0
+  @State totalSize: number = 0
   @State message: string = ''
   @State files: Array<string> = []
   @State uploads: Array<string> = []
-  private downloadConfig = {
+  private downloadConfig: DownloadConfig = {
     url : 'http://192.168.62.127:8000' ,
     filePath : ""
   }
-  handlerClickButton = () => {
-    featureAbility.terminateSelf()
-  }
 
   aboutToAppear() {
-    console.log( TAG , `enter Index aboutToAppear` )
-    featureAbility.getContext()
-      .requestPermissionsFromUser( [ 'ohos.permission.INTERNET' ] , 2 , ( result ) => {
-        console.log( TAG , `grantPermission,requestPermissionsFromUser,result.requestCode=${ result }` )
-      } )
-    this.files.push( "http://192.168.62.127:8000" )
+    console.log(TAG , `enter Index aboutToAppear`)
+    let context: Context = getContext(this) as common.UIAbilityContext;
+    let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
+    // requestPermissionsFromUser会判断权限的授权状态来决定是否唤起弹窗
+    atManager.requestPermissionsFromUser(context , [ 'ohos.permission.INTERNET' ])
+      .then((data: PermissionRequestResult) => {
+        console.log(TAG , `grantPermission,requestPermissionsFromUser,result.requestCode=${ data }`)
+      })
+    this.files.push("http://192.168.62.127:8000")
     let httpRequest = http.createHttp()
     httpRequest.request(
       'http://192.168.0.123/?tpl=list&folders-filter=&recursive' ,
@@ -568,144 +557,121 @@ struct upDownLoad {
         header : {
           'Content-Type' : 'text/plain'
         }
-      } , ( err , data ) => {
-      console.log( TAG , `error = ${ JSON.stringify( err ) }` )
+      } , (err , data) => {
+      console.log(TAG , `error = ${ JSON.stringify(err) }`)
       if ( !err ) {
-        console.log( TAG , `data = ${ JSON.stringify( data ) }` )
+        console.log(TAG , `data = ${ JSON.stringify(data) }`)
         let result: string = data.result.toString()
-        console.log( TAG , `Result = ${ result }` )
+        console.log(TAG , `Result = ${ result }`)
 
-        let tempFiles = result.split( '\r\n' )
+        let tempFiles = result.split('\r\n')
         for ( let i = 0 ; i < tempFiles.length ; i ++ ) {
-          let splitFiles = tempFiles[i].split( '//' )[1].split( '/' )
-          console.log( TAG , `splitFiles = ${ JSON.stringify( splitFiles ) }` )
-          if ( splitFiles.indexOf( 'upload' ) === - 1 ) {
-            this.files.push( tempFiles[i] )
+          let splitFiles = tempFiles[ i ].split('//')[ 1 ].split('/')
+          console.log(TAG , `splitFiles = ${ JSON.stringify(splitFiles) }`)
+          if ( splitFiles.indexOf('upload') === - 1 ) {
+            this.files.push(tempFiles[ i ])
           }
         }
-        console.log( TAG , `files = ${ JSON.stringify( this.files ) }` )
+        console.log(TAG , `files = ${ JSON.stringify(this.files) }`)
       } else {
-        console.log( TAG , `error: ${ JSON.stringify( err ) }` )
+        console.log(TAG , `error: ${ JSON.stringify(err) }`)
         httpRequest.destroy()
       }
-    } )
+    })
   }
 
   build() {
     Column() {
       Scroll() {
         Column() {
-          Text( $r( 'app.string.choice_download_file' ) )
-            .fontSize( 25 )
-            .alignSelf( ItemAlign.Start )
-            .margin( { top : 20 , left : 10 } )
-          ForEach( this.files , ( item , index ) => {
+          Text($r('app.string.choice_download_file'))
+            .fontSize(25)
+            .alignSelf(ItemAlign.Start)
+            .margin({ top : 20 , left : 10 })
+          ForEach(this.files , (item: string , index) => {
             Divider()
-              .margin( { top : 20 } )
+              .margin({ top : 20 })
             Row() {
-              Text( item )
-                .fontSize( 25 )
-                .constraintSize( { maxWidth : '75%' } )
-                .fontWeight( FontWeight.Bold )
-                .margin( { top : 20 , left : 10 } )
+              Text(item)
+                .fontSize(25)
+                .constraintSize({ maxWidth : ConfigData.WH_75_100 })
+                .fontWeight(FontWeight.Bold)
+                .margin({ top : 20 , left : 10 })
               Blank()
 
-              Button( $r( 'app.string.click_download' ) )
-                .margin( { top : 20 , right : 10 } )
-                .onClick( async() => {
+              Button($r('app.string.click_download'))
+                .margin({ top : 20 , right : 10 })
+                .onClick(async() => {
                   let fileindex = 1;
-                  setInterval( () => {
+                  setInterval(() => {
                     //                    let resourceManage = await resourceManager.getResourceManager()
                     //                    let downloadSuccess = await resourceManage.getString($r('app.string.download_success').id)
                     this.downloadConfig.url = item
-                    console.log( TAG , `downloadConfig.url = ${ JSON.stringify( this.downloadConfig.url ) }` )
+                    console.log(TAG , `downloadConfig.url = ${ JSON.stringify(this.downloadConfig.url) }`)
                     this.downloadConfig.filePath = `/data/storage/el2/base/haps/entry/cache/ ${
-                    item.split( '//' )[1].split( '/' )[1] + fileindex }`
+                    item.split('//')[ 1 ].split('/')[ 1 ] + fileindex }`
                     //                    /data/storage/el2/base/haps/entry/cache/
                     fileindex += 1
-                    console.log( TAG , `downloadConfig.filePath = ${ JSON.stringify( this.downloadConfig.filePath ) }` )
-                    request.download( this.downloadConfig , ( err , downloadTask ) => {
-                      console.log( TAG , `download enter` )
+                    console.log(TAG , `downloadConfig.filePath = ${ JSON.stringify(this.downloadConfig.filePath) }`)
+                    request.downloadFile(getContext() , this.downloadConfig , (err , downloadTask) => {
+                      console.log(TAG , `download enter`)
                       if ( err ) {
-                        console.log( TAG , `download err = ${ JSON.stringify( err ) }` )
+                        console.log(TAG , `download err = ${ JSON.stringify(err) }`)
                         return
                       }
-                      console.log( TAG , `download data = ${ JSON.stringify( downloadTask ) }` )
+                      console.log(TAG , `download data = ${ JSON.stringify(downloadTask) }`)
 
-                      console.log( TAG , `download end` )
-                    } )
-                  } , 1000 )
+                      console.log(TAG , `download end`)
+                    })
+                  } , 1000)
 
-                } )
+                })
             }
-            .width( '100%' )
-          } )
-          Button( $r( 'app.string.upload_page' ) )
-            .fontSize( 30 )
-            .width( 180 )
-            .height( 50 )
-            .margin( { top : 30 } )
-            .key( 'uploadBtn' )
-            .onClick( () => {
-              router.push( {
+            .width(ConfigData.WH_100_100)
+          } , (item: string) => item)
+          Button($r('app.string.upload_page'))
+            .fontSize(30)
+            .width(180)
+            .height(50)
+            .margin({ top : 30 })
+            .key('uploadBtn')
+            .onClick(() => {
+              router.pushUrl({
                 url : 'pages/Upload' ,
                 params : { uploads : this.uploads }
-              } )
-            } )
+              })
+            })
 
         }
-        .width( '100%' )
+        .width(ConfigData.WH_100_100)
       }
-      .constraintSize( { maxHeight : '87%' } )
+      .constraintSize({ maxHeight : ConfigData.WH_87_100 })
 
       if ( this.receivedSize !== 0 && this.totalSize !== 0 && this.files.length > 0 ) {
         Row() {
-          Text( $r( 'app.string.download_progress' ) )
-            .fontSize( 25 )
-            .fontWeight( FontWeight.Bold )
-            .margin( { left : 10 } )
-          Progress( { value : this.receivedSize , total : this.totalSize , type : ProgressType.Capsule } )
-            .color( Color.Grey )
-            .width( '40%' )
-            .height( 10 )
-            .margin( { left : 10 } )
-          Text( `${ JSON.stringify( Math.floor( this.receivedSize / this.totalSize * 100 ) ) }%` )
-            .margin( { left : 10 } )
+          Text($r('app.string.download_progress'))
+            .fontSize(25)
+            .fontWeight(FontWeight.Bold)
+            .margin({ left : 10 })
+          Progress({ value : this.receivedSize , total : this.totalSize , type : ProgressType.Capsule })
+            .color(Color.Grey)
+            .width(ConfigData.WH_40_100)
+            .height(10)
+            .margin({ left : 10 })
+          Text(`${ JSON.stringify(Math.floor(this.receivedSize / this.totalSize * 100)) }%`)
+            .margin({ left : 10 })
         }
-        .margin( { top : 10 } )
-        .alignSelf( ItemAlign.Center )
+        .margin({ top : 10 })
+        .alignSelf(ItemAlign.Center)
       }
     }
   }
 }
 
-export function testFunc( func ) {
-  let start = new Date().getTime()
-  switch ( func ) {
-    case testSetDeviceName: {
-      func( "MyTestDevice" )
-    }
-      break;
-    default: {
-      func()
-    }
-      break;
-  }
-  let end = new Date().getTime()
-  console.log( "开始:" + Number( start ) + "ms" )
-  console.log( "结束:" + Number( end ) + "ms" )
-
-  console.log( "花费:" + Number( end - start ) + "ms" )
-  let message = ""
-  message += "花费:" + Number( end - start ) + "ms" + "\n"
-  message += "开始:" + Number( start ) + "ms; " + "结束:" + Number( end ) + "ms" + "\n"
-  return message
-}
-
-function sleep( time ) {
-  return new Promise(( resolve , reject ) => {
-    setTimeout( () => {
-      resolve()
-    } , time * 1000 )
-  })
+async function sleep(time: number): Promise<void> {
+  return new Promise<void>((resolve , reject) => {
+    setTimeout(() => {
+      resolve();
+    } , time * 1000);
+  });
 }

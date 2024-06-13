@@ -315,6 +315,8 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result, bool c
             }
             info.infoElems.emplace_back(tempWifiInfoElem);
         }
+        info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
+        info.isHiLinkNetwork = reply.ReadBool();
         result.emplace_back(info);
     }
     return WIFI_OPT_SUCCESS;

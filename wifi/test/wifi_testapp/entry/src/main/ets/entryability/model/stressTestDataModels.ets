@@ -13,12 +13,9 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 /**
  * stress DataModel of wifi test
  */
-
 
 import { TestStress , StressCategory } from './testData'
 
@@ -180,7 +177,16 @@ import {
 
 import wifi from '@ohos.wifi';
 
-export const WifiStressTestCase: [] = [
+interface StressTest {
+  name: string;
+  detail: string;
+  method: string;
+  api: Function;
+  result: string;
+  category: StressCategory;
+}
+
+export const WifiStressTestCase: StressTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '1' ,
@@ -463,7 +469,7 @@ export const WifiStressTestCase: [] = [
   }
 ]
 
-export const WifiManagerStressTestCase: [] = [
+export const WifiManagerStressTestCase: StressTest[] = [
   {
     'name' : '注册WLAN状态改变事件' ,
     'detail' : '1' ,
@@ -773,7 +779,7 @@ export const WifiManagerStressTestCase: [] = [
   }
 ]
 
-export const HotspotStressTestCase: [] = [
+export const HotspotStressTestCase: StressTest[] = [
   {
     'name' : '使能热点' ,
     'detail' : '1' ,
@@ -840,7 +846,7 @@ export const HotspotStressTestCase: [] = [
   }
 ]
 
-export const HotspotManagerStressTestCase: [] = [
+export const HotspotManagerStressTestCase: StressTest[] = [
   {
     'name' : '使能热点' ,
     'detail' : '1' ,
@@ -923,7 +929,7 @@ export const HotspotManagerStressTestCase: [] = [
   }
 ]
 
-export const P2pStressTestCase: [] = [
+export const P2pStressTestCase: StressTest[] = [
   {
     'name' : '获取P2P连接信息Promise' ,
     'detail' : '获取P2P连接信息Promise' ,
@@ -1086,7 +1092,7 @@ export const P2pStressTestCase: [] = [
   },
 ]
 
-export const P2pManagerStressTestCase: [] = [
+export const P2pManagerStressTestCase: StressTest[] = [
   {
     'name' : '获取P2P连接信息Promise' ,
     'detail' : '获取P2P连接信息Promise' ,
@@ -1284,48 +1290,48 @@ export const P2pManagerStressTestCase: [] = [
 
 export function initWifiStressData(): Array<TestStress> {
   let TestStressArray: Array<TestStress> = []
-  WifiStressTestCase.forEach( item => {
-    TestStressArray.push( new TestStress(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  WifiStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestStressArray;
 }
 
 export function initWifiManagerStressData(): Array<TestStress> {
   let TestStressArray: Array<TestStress> = []
-  WifiManagerStressTestCase.forEach( item => {
-    TestStressArray.push( new TestStress(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  WifiManagerStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestStressArray;
 }
 
 export function initHotspotStressData(): Array<TestStress> {
   let TestStressArray: Array<TestStress> = []
-  HotspotStressTestCase.forEach( item => {
-    TestStressArray.push( new TestStress(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  HotspotStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestStressArray;
 }
 
 export function initHotspotManagerStressData(): Array<TestStress> {
   let TestStressArray: Array<TestStress> = []
-  HotspotManagerStressTestCase.forEach( item => {
-    TestStressArray.push( new TestStress(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  HotspotManagerStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestStressArray;
 }
 
 export function initP2pStressData(): Array<TestStress> {
   let TestStressArray: Array<TestStress> = []
-  P2pStressTestCase.forEach( item => {
-    TestStressArray.push( new TestStress(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  P2pStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestStressArray;
 }
 
 export function initP2pManagerStressData(): Array<TestStress> {
   let TestStressArray: Array<TestStress> = []
-  P2pManagerStressTestCase.forEach( item => {
-    TestStressArray.push( new TestStress(item.name , item.detail , item.method , item.api , item.result , item.Category) );
-  } )
+  P2pManagerStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name , item.detail , item.method , item.api , item.result , item.category));
+  })
   return TestStressArray;
 }

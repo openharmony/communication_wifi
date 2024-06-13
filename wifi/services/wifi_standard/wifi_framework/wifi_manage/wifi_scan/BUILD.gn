@@ -20,29 +20,23 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
-  "../common/handler.cpp",
-  "../common/internal_message.cpp",
-  "../common/message_queue.cpp",
-  "../common/state.cpp",
-  "../common/state_machine.cpp",
   "scan_interface.cpp",
   "scan_monitor.cpp",
   "scan_service.cpp",
-  "scan_standby_listerner.cpp",
   "scan_state_machine.cpp",
 ]
 
 local_base_include_dirs = [
+  "$WIFI_ROOT_DIR/base/state_machine/include",
+  "$WIFI_ROOT_DIR/base/cRPC/include",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-  "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
-  "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
@@ -67,13 +61,15 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_service_base",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
     ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [ "OHOS_ARCH_LITE" ]
     configs -= [ "//build/lite/config:language_cpp" ]
@@ -91,22 +87,21 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true
     sources = local_base_sources
 
     include_dirs = local_base_include_dirs
-    include_dirs += [
-      "//commonlibrary/c_utils/base/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    ]
 
     deps = [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",

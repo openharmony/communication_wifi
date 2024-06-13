@@ -321,6 +321,7 @@ WifiErrorNo WifiIdlClient::QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
         if (results[i].infoElems) {
             free(results[i].infoElems);
         }
+        tmp.isHiLinkNetwork = results[i].isHiLinkNetwork;
         scanInfos.emplace_back(tmp);
     }
     free(results);
@@ -586,6 +587,12 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_PASSWORD, config.eapConfig.password);
             break;
+        case EapMethod::EAP_SIM:
+        case EapMethod::EAP_AKA:
+        case EapMethod::EAP_AKA_PRIME:
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
+            num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_IDENTITY, config.eapConfig.identity);
+            break;
         default:
             LOGE("%{public}s, invalid eapMethod:%{public}d", __func__, eapMethod);
             break;
@@ -629,6 +636,11 @@ WifiErrorNo WifiIdlClient::SetDeviceConfig(int networkId, const WifiIdlDeviceCon
         num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_CIPHERS, config.allowedGroupCiphers,
                                          groupCipherStr, sizeof(groupCipherStr)/sizeof(groupCipherStr[0]));
     }
+    if (config.allowedGroupMgmtCiphers > 0) {
+        std::string groupMgmtCipherStr[] = {"AES-128-CMAC ", "BIP-GMAC-128 ", "BIP-GMAC-256 ", "BIP-CMAC-256 "};
+        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_MGMT_CIPHERS, config.allowedGroupMgmtCiphers,
+                                         groupMgmtCipherStr, sizeof(groupMgmtCipherStr)/sizeof(groupMgmtCipherStr[0]));
+    }
     if (num == 0) {
         return WIFI_IDL_OPT_OK;
     }
@@ -644,7 +656,7 @@ WifiErrorNo WifiIdlClient::SetBssid(int networkId, const std::string &bssid)
         LOGE("SetBssid, PushDeviceConfigString return error!");
         return WIFI_IDL_OPT_OK;
     }
-    
+
     return SetNetwork(networkId, &conf, num);
 }
 
@@ -670,6 +682,8 @@ WifiErrorNo WifiIdlClient::ReqRegisterStaEventCallback(const WifiEventCallback &
         cEventCallback.onWpsTimeOut = OnWpsTimeOut;
         cEventCallback.onWpsConnectionFull = OnWpaConnectionFull;
         cEventCallback.onWpsConnectionReject = OnWpaConnectionReject;
+        cEventCallback.onEventStaNotify = OnWpaStaNotifyCallBack;
+        cEventCallback.onDisConnectReasonNotify = OnDisConnectReasonCallback;
     }
     return RegisterStaEventCallback(cEventCallback);
 }
@@ -831,13 +845,24 @@ WifiErrorNo WifiIdlClient::ReqGetConnectSignalInfo(const std::string &endBssid, 
     return err;
 }
 
-WifiErrorNo WifiIdlClient::StartAp(int id, std::string ifaceName)
+WifiErrorNo WifiIdlClient::ReqSetPmMode(int frequency, int mode) const
 {
     CHECK_CLIENT_NOT_NULL;
-    char ifName[ifaceName.size() + 1];
-    ifaceName.copy(ifName, ifaceName.size() + 1);
-    ifName[ifaceName.size()] = '\0';
-    return StartSoftAp(id, ifName);
+    LOGE("not support set pm mode.");
+    return WIFI_IDL_OPT_NOT_SUPPORT;
+}
+
+WifiErrorNo WifiIdlClient::ReqSetDpiMarkRule(int uid, int protocol, int enable) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    LOGE("not support set dpi mark rule.");
+    return WIFI_IDL_OPT_NOT_SUPPORT;
+}
+
+WifiErrorNo WifiIdlClient::StartAp(int id, const std::string &ifaceName)
+{
+    CHECK_CLIENT_NOT_NULL;
+    return StartSoftAp(id, ifaceName.c_str());
 }
 
 WifiErrorNo WifiIdlClient::StopAp(int id)
@@ -1289,6 +1314,7 @@ WifiErrorNo WifiIdlClient::ReqP2pRegisterCallback(const P2pHalCallback &callback
         cEventCallback.onP2pServDiscReq = OnP2pServDiscReq;
         cEventCallback.onP2pIfaceCreated = OnP2pIfaceCreated;
         cEventCallback.onP2pConnectFailed = OnP2pConnectFailed;
+        cEventCallback.onP2pChannelSwitch = OnP2pChannelSwitch;
     }
 
     return RegisterP2pEventCallback(cEventCallback);
@@ -1481,6 +1507,12 @@ WifiErrorNo WifiIdlClient::ReqP2pRemoveGroup(const std::string &groupInterface) 
 {
     CHECK_CLIENT_NOT_NULL;
     return P2pRemoveGroup(groupInterface.c_str());
+}
+
+WifiErrorNo WifiIdlClient::ReqP2pRemoveGroupClient(const std::string &deviceMac) const
+{
+    CHECK_CLIENT_NOT_NULL;
+    return P2pRemoveGroupClient(deviceMac.c_str());
 }
 
 WifiErrorNo WifiIdlClient::ReqP2pInvite(const WifiP2pGroupInfo &group, const std::string &deviceAddr) const

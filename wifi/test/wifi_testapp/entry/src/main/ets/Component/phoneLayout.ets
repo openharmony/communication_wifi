@@ -14,7 +14,7 @@
  */
 import { Browser } from '../entryability/model/bowser';
 import { WebTab } from './webTitleBar';
-import Logger from '../entryability/model/Logger';
+import ConfigData from '../Utils/ConfigData'
 
 const TAG: string = '[PhoneLayout]';
 const BUTTON_WIDTH: number = 22;
@@ -22,56 +22,58 @@ const BUTTON_RADIUS: number = 4;
 const DOWN_COLOR: string = '#e4e4e4';
 const UP_COLOR: string = '#00000000';
 
+interface ImageSrcId {
+  imageSrc: Resource,
+  id: number
+}
+
 @Component
 export struct PhoneLayout {
   @Link browser: Browser;
   @State isPhone: boolean = true;
   @State hasDown: boolean = false;
   @State pageCount: string = '1';
-  @State arrayIndex: Number = 0;
+  @State arrayIndex: number = 0;
   private addr: string = '';
-  private toolPoneArray: Array<{
-    imageSrc: Resource,
-    id: Number
-  }> = [
+  private toolPoneArray: Array<ImageSrcId> = [
     {
-      imageSrc: $r('app.media.ic_public_back'),
-      id: 1
+      imageSrc : $r('app.media.ic_public_back') ,
+      id : 1
     },
     {
-      imageSrc: $r('app.media.ic_public_advance'),
-      id: 2
+      imageSrc : $r('app.media.ic_public_advance') ,
+      id : 2
     },
     {
-      imageSrc: $r('app.media.ic_public_home'),
-      id: 5
+      imageSrc : $r('app.media.ic_public_home') ,
+      id : 5
     },
     {
-      imageSrc: $r('app.media.ic_public_refresh'),
-      id: 3
+      imageSrc : $r('app.media.ic_public_refresh') ,
+      id : 3
     }
   ];
 
   @Builder ToolBar() {
     Column() {
-      if (!this.browser.hideProgress) {
-        Progress({ value: this.browser.progress, total: 100 })
+      if ( !this.browser.hideProgress ) {
+        Progress({ value : this.browser.progress , total : 100 })
           .color('#0000ff')
       }
       Row() {
-        ForEach(this.toolPoneArray, (item: any, index: Number) => {
+        ForEach(this.toolPoneArray , (item: ImageSrcId , index: number) => {
           Column() {
             Divider().color('#e9eaec')
-            Button({ type: ButtonType.Normal }) {
+            Button({ type : ButtonType.Normal }) {
               Column() {
-                if (item.id !== 4) {
+                if ( item.id !== 4 ) {
                   Image(item.imageSrc)
                 } else {
                   Column() {
                     Text(this.pageCount)
                       .fontSize(16)
                   }
-                  .border({ width: 2 })
+                  .border({ width : 2 })
                   .width(22)
                   .height(22)
                   .borderRadius(5)
@@ -82,20 +84,20 @@ export struct PhoneLayout {
               .height(BUTTON_WIDTH)
               .justifyContent(FlexAlign.Center)
             }
-            .height('100%')
-            .width('100%')
+            .height(ConfigData.WH_100_100)
+            .width(ConfigData.WH_100_100)
             .backgroundColor(this.arrayIndex === item.id ? DOWN_COLOR : UP_COLOR)
             .borderRadius(BUTTON_RADIUS)
             .flexShrink(0)
             .onTouch((event: TouchEvent) => {
-              if (event.type === TouchType.Down) {
+              if ( event.type === TouchType.Down ) {
                 this.arrayIndex = item.id;
-              } else if (event.type === TouchType.Up) {
+              } else if ( event.type === TouchType.Up ) {
                 this.arrayIndex = 0;
               }
             })
             .onClick((event: ClickEvent) => {
-              switch (item.id) {
+              switch ( item.id ) {
                 case 1:
                   this.browser.Back();
                   break;
@@ -106,8 +108,8 @@ export struct PhoneLayout {
                   this.browser.Refresh();
                   break;
                 case 5:
-                  this.browser.webControllerArray[this.browser.tabArrayIndex].controller.loadUrl({
-                    url: $rawfile('phone.html')
+                  this.browser.webControllerArray[ this.browser.tabArrayIndex ].controller.loadUrl({
+                    url : $rawfile('phone.html')
                   });
                   break;
                 default:
@@ -115,60 +117,60 @@ export struct PhoneLayout {
               }
             })
           }
-          .width('20%')
-          .id(`navigationButton${index}`)
+          .width(ConfigData.WH_20_100)
+          .id(`navigationButton${ index }`)
         })
       }
       .justifyContent(FlexAlign.SpaceAround)
-      .width('100%')
-      .height('100%')
+      .width(ConfigData.WH_100_100)
+      .height(ConfigData.WH_100_100)
       .backgroundColor('#fdfdfd')
     }
-    .height('100%')
+    .height(ConfigData.WH_100_100)
   }
 
   @Builder TitleBar() {
-    Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
+    Flex({ justifyContent : FlexAlign.SpaceBetween , alignItems : ItemAlign.Center }) {
       Column() {
-        TextInput({ placeholder: $r('app.string.Input_url'), text: this.browser.inputValue })
-          .placeholderFont({ size: 16, weight: 500 })
+        TextInput({ placeholder : $r('app.string.Input_url') , text : this.browser.inputValue })
+          .placeholderFont({ size : 16 , weight : 500 })
           .fontSize(16)
           .height(34)
-          .margin({ left: 6 })
+          .margin({ left : 6 })
           .id('inputUrl')
           .onChange((value: string) => {
-            console.log(TAG, `onChange`);
+            console.log(TAG , `onChange`);
             this.addr = value;
           })
           .onSubmit((enterKey: EnterKeyType) => {
-            console.log(TAG, `onSubmit`);
-            this.browser.webControllerArray[this.browser.tabArrayIndex].controller.loadUrl({
-              url: `https://${this.addr}`
+            console.log(TAG , `onSubmit`);
+            this.browser.webControllerArray[ this.browser.tabArrayIndex ].controller.loadUrl({
+              url : `https://${ this.addr }`
             });
             this.addr = '';
           })
       }
 
       Column() {
-        Button({ type: ButtonType.Normal }) {
+        Button({ type : ButtonType.Normal }) {
           Image($r('app.media.submit'))
         }
         .width(BUTTON_WIDTH)
         .height(BUTTON_WIDTH)
         .backgroundColor(this.hasDown ? DOWN_COLOR : UP_COLOR)
-        .margin({ top: 6 })
+        .margin({ top : 6 })
         .id(`actionButton0`)
       }
-      .width('10%')
+      .width(ConfigData.WH_10_100)
       .height(34)
       .flexShrink(0)
       .backgroundColor(this.hasDown ? DOWN_COLOR : UP_COLOR)
       .borderRadius(BUTTON_RADIUS)
-      .margin({ left: 6, right: 6 })
+      .margin({ left : 6 , right : 6 })
       .onTouch((event: TouchEvent) => {
-        if (event.type === TouchType.Down) {
+        if ( event.type === TouchType.Down ) {
           this.hasDown = true;
-        } else if (event.type === TouchType.Up) {
+        } else if ( event.type === TouchType.Up ) {
           this.hasDown = false;
         }
       })
@@ -177,18 +179,18 @@ export struct PhoneLayout {
         this.addr = '';
       })
     }
-    .position({ x: 0, y: 3 })
+    .position({ x : 0 , y : 3 })
   }
 
   build() {
     Column() {
       Navigation() {
-        WebTab({ browser: $browser, isPhone: $isPhone }).height("100%")
+        WebTab({ browser : $browser , isPhone : $isPhone }).height(ConfigData.WH_100_100)
       }
       // .title({ builder: this.TitleBar, height: 40 })
       .toolBar(this.ToolBar)
       .hideBackButton(true)
     }
-    .height("100%")
+    .height(ConfigData.WH_100_100)
   }
 }

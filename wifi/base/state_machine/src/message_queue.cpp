@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,12 +26,12 @@ namespace OHOS {
 namespace Wifi {
 MessageQueue::MessageQueue() : pMessageQueue(nullptr), mIsBlocked(false), mNeedQuit(false)
 {
-    LOGI("MessageQueue::MessageQueue");
+    LOGI("MessageQueue");
 }
 
 MessageQueue::~MessageQueue()
 {
-    LOGI("MessageQueue::~MessageQueue");
+    LOGI("~MessageQueue");
     /* Releasing Messages in a Queue */
     std::unique_lock<std::mutex> lock(mMtxQueue);
     InternalMessage *current = pMessageQueue;
@@ -51,7 +51,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
         return false;
     }
 
-    LOGD("MessageQueue::AddMessageToQueue, msg: %{public}d, timestamp:%" PRId64 "\n",
+    LOGD("AddMessageToQueue, msg: %{public}d, timestamp:%" PRId64 "\n",
         message->GetMessageName(), handleTime);
 
     if (mNeedQuit) {
@@ -95,7 +95,6 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
 
     LOGD("Add message needWakeup: %{public}d", static_cast<int>(mNeedWakeup));
     if (mNeedWakeup) {
-        std::unique_lock<std::mutex> lck(mMtxBlock);
         mIsBlocked = false;
     }
     /* Wake up the process. */
@@ -105,7 +104,6 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
 
 bool MessageQueue::DeleteMessageFromQueue(int messageName)
 {
-    LOGI("MessageQueue::DeleteMessageFromQueue");
     std::unique_lock<std::mutex> lck(mMtxQueue);
     InternalMessage *pTop = pMessageQueue;
     if (pTop == nullptr) {
@@ -133,7 +131,7 @@ bool MessageQueue::DeleteMessageFromQueue(int messageName)
 
 InternalMessage *MessageQueue::GetNextMessage()
 {
-    LOGD("MessageQueue::GetNextMessage");
+    LOGD("GetNextMessage");
     int nextBlockTime = 0;
 
     while (!mNeedQuit) {
@@ -170,8 +168,9 @@ InternalMessage *MessageQueue::GetNextMessage()
             }
         }
 
-        std::unique_lock<std::mutex> lck(mMtxBlock); // mCvQueue lock
         if (mIsBlocked && (!mNeedQuit)) {
+            std::mutex mtxBlock;
+            std::unique_lock<std::mutex> lck(mtxBlock); // mCvQueue lock
             LOGD("mCvQueue wait_for: %{public}d", nextBlockTime);
             if (mCvQueue.wait_for(lck, std::chrono::milliseconds(nextBlockTime)) == std::cv_status::timeout) {
                 LOGD("mCvQueue wake up, reason: cv_status::timeout: %{public}d", nextBlockTime);
@@ -190,7 +189,6 @@ void MessageQueue::StopQueueLoop()
     LOGI("Start stop queue loop.");
     mNeedQuit = true;
     if (mIsBlocked) {
-        std::unique_lock<std::mutex> lck(mMtxBlock);
         mIsBlocked = false;
     }
     mCvQueue.notify_one();

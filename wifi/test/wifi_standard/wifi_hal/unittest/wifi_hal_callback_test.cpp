@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Wifi {
 const int STATUS_MSG = 0;
 const int NET_WORK = 5;
+const int DISASSOC_STA_HAS_LEFT = 0;
 
 class WifiHalCallbackTest : public testing::Test {
 public:
@@ -48,6 +49,14 @@ HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyConnectChangedTest, TestSize.Level1
     char pos[] = "WIFI_REASON_LENGTH";
     WifiHalCbNotifyConnectChanged(status, networkId, NULL);
     WifiHalCbNotifyConnectChanged(status, networkId, pos);
+}
+
+HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyDisConnectReasonTest, TestSize.Level1)
+{
+    int status = DISASSOC_STA_HAS_LEFT;
+    char bssid[] = "02:42:ac:11:00:04";
+    WifiHalCbNotifyDisConnectReason(status, NULL);
+    WifiHalCbNotifyDisConnectReason(status, bssid);
 }
 
 HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyBssidChangedTest, TestSize.Level1)
@@ -194,9 +203,9 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbGroupFormationFailureTest, TestSize.Level1
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbGroupStartedTest, TestSize.Level1)
 {
-    P2pGroupInfo *info;
+    P2pGroupInfo info;
     P2pHalCbGroupStarted(NULL);
-    P2pHalCbGroupStarted(info);
+    P2pHalCbGroupStarted(&info);
 }
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbGroupRemovedTest, TestSize.Level1)
@@ -243,24 +252,29 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbProvisionDiscoveryFailureTest, TestSize.Le
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbServiceDiscoveryResponseTest, TestSize.Level1)
 {
-    P2pServDiscRespInfo *info;
+    P2pServDiscRespInfo info;
+    char buff[] = "\t1002callback";
+    info.tlvs = buff;
     P2pHalCbServiceDiscoveryResponse(NULL);
-    P2pHalCbServiceDiscoveryResponse(info);
+    P2pHalCbServiceDiscoveryResponse(&info);
 }
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbStaConnectStateTest, TestSize.Level1)
 {
     int state = STATUS_MSG;
     char p2pDeviceAddress[] = "wifibssid";
-    P2pHalCbStaConnectState(NULL, state);
-    P2pHalCbStaConnectState(p2pDeviceAddress, state);
+    char p2pGroupAddress[] = "wifiGroupAddr";
+    P2pHalCbStaConnectState(NULL, NULL, state);
+    P2pHalCbStaConnectState(p2pDeviceAddress, p2pGroupAddress, state);
 }
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbServDiscReqTest, TestSize.Level1)
 {
-    P2pServDiscReqInfo *info;
+    P2pServDiscReqInfo info;
+    char buff[] = "\t1002request";
+    info.tlvs = buff;
     P2pHalCbServDiscReq(NULL);
-    P2pHalCbServDiscReq(info);
+    P2pHalCbServDiscReq(&info);
 }
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbP2pIfaceCreatedTest, TestSize.Level1)

@@ -37,7 +37,6 @@
 
 namespace OHOS {
 namespace Wifi {
-#define DEFAULT_IFACENAME "wlan0"
 class WifiIdlClient {
 public:
     /**
@@ -343,6 +342,25 @@ public:
      */
     WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiWpaSignalInfo &info) const;
 
+    /**
+     * @Description set power save mode
+     *
+     * @param frequency - connected ap frequency
+     * @param mode - power save mode
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetPmMode(int frequency, int mode) const;
+
+    /**
+     * @Description set data packet identification mark rule
+     *
+     * @param uid - target app uid
+     * @param protocol - target protocol type
+     * @param enable - enable/disable dpi mark rule
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqSetDpiMarkRule(int uid, int protocol, int enable) const;
+
     /* -------------------AP Interface-------------------------- */
 
     /**
@@ -350,7 +368,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartAp(int id = 0, std::string ifaceName = DEFAULT_IFACENAME);
+    WifiErrorNo StartAp(int id, const std::string &ifaceName);
 
     /**
      * @Description Close Ap.
@@ -883,6 +901,15 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo ReqP2pRemoveGroup(const std::string &groupInterface) const;
+
+    /**
+     * @Description Send a request for remove group to the P2P
+     *
+     * @param groupInterface
+     * @param deviceMac
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pRemoveGroupClient(const std::string &deviceMac) const;
 
     /**
      * @Description Send a request for invite to the P2P

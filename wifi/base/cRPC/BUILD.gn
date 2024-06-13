@@ -22,7 +22,7 @@ crpc_server_sources = [
 
 crpc_client_sources = [
   "./src/client.c",
-  "./src/client_updater.c",
+  "./src/client_init.c",
   "./src/context.c",
   "./src/net.c",
   "./src/serial.c",
@@ -32,16 +32,17 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//foundation/communication/wifi/wifi/wifi_lite.gni")
 
-  static_library("rpc_server") {
+  static_library("crpc_server") {
     sources = crpc_server_sources
 
-    include_dirs = [ "include" ]
-
-    external_deps = [
-      "hilog_lite:hilog_shared",
-      "third_party:libsec_shared",
+    include_dirs = [
+      "include",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
     ]
 
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
     cflags_c = [
       "-fPIC",
       "-std=c99",
@@ -49,17 +50,18 @@ if (defined(ohos_lite)) {
     defines = [ "OHOS_ARCH_LITE" ]
   }
 
-  static_library("rpc_client") {
+  static_library("crpc_client") {
     sources = crpc_client_sources
     include_dirs = [
       "include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//third_party/bounds_checking_function/include",
     ]
 
-    external_deps = [
-      "hilog_lite:hilog_shared",
-      "third_party:libsec_shared",
-    ]
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     configs -= [ "//build/lite/config:language_c" ]
     cflags_c = [
@@ -72,9 +74,16 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
 
-  ohos_static_library("rpc_server") {
+  ohos_static_library("crpc_server") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+    }
     sources = crpc_server_sources
 
     include_dirs = [ "include" ]
@@ -88,9 +97,16 @@ if (defined(ohos_lite)) {
     part_name = "wifi"
   }
 
-  ohos_static_library("rpc_client") {
+  ohos_static_library("crpc_client") {
     branch_protector_ret = "pac_ret"
-
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+    }
     sources = crpc_client_sources
     include_dirs = [
       "include",
@@ -105,11 +121,37 @@ if (defined(ohos_lite)) {
     subsystem_name = "communication"
     part_name = "wifi"
   }
+
+  ohos_shared_library("crpc_client_updater") {
+    branch_protector_ret = "pac_ret"
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
+      debug = false
+    }
+    install_enable = true
+    sources = [ "./src/client_updater.c" ]
+    include_dirs = [ "include" ]
+    cflags_cc = [ "-fno-rtti" ]
+    ldflags = [ "-fPIC" ]
+    deps = [ ":crpc_client" ]
+    external_deps = [ "hilog:libhilog" ]
+    subsystem_name = "communication"
+    part_name = "wifi"
+    install_images = [
+      "system",
+      "updater",
+    ]
+    version_script = "libcrpc_client_updater.map"
+  }
 }
 
 group("ipc_framework") {
   deps = [
-    ":rpc_client",
-    ":rpc_server",
+    ":crpc_client",
+    ":crpc_server",
   ]
 }

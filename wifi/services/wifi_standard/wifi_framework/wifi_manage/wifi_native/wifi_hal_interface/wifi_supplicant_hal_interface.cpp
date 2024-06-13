@@ -38,11 +38,6 @@ WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
                 initFlag = 1;
             }
 #endif
-#ifdef HDI_INTERFACE_SUPPORT
-            if (inst.InitHdiClient()) {
-                initFlag = 1;
-            }
-#endif
         }
     }
     return inst;
@@ -105,34 +100,30 @@ WifiErrorNo WifiSupplicantHalInterface::RequestToSupplicant(const std::string &r
 
 WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
 {
-#ifdef HDI_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
-    WifiErrorNo err = mHdiClient->ReqRegisterSupplicantEventCallback(callback);
-    if (err == WIFI_IDL_OPT_OK) {
-        mCallback = callback;
-    }
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    mCallback = callback;
+    return WIFI_IDL_OPT_OK;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo err = mIdlClient->ReqRegisterSupplicantEventCallback(callback);
     if (err == WIFI_IDL_OPT_OK) {
         mCallback = callback;
     }
-#endif
     return err;
+#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
 {
-#ifdef HDI_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
-    WifiErrorNo err = mHdiClient->ReqUnRegisterSupplicantEventCallback();
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     mCallback.onScanNotify = nullptr;
+    return WIFI_IDL_OPT_OK;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
     WifiErrorNo err = mIdlClient->ReqUnRegisterSupplicantEventCallback();
     mCallback.onScanNotify = nullptr;
-#endif
     return err;
+#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable) const
@@ -186,12 +177,12 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
 
 WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const
 {
-#ifdef HDI_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiClient, WIFI_IDL_OPT_FAILED);
-    return mHdiClient->ReqSetPowerModel(mode);
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_IDL_OPT_FAILED);
+    return mHdiWpaClient->ReqSetPowerSave(mode);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
-    return mIdlClient->ReqWpaSetPowerMode(mode);
+    return mIdlClient->ReqWpaSetPowerMode(!mode);   // idl impl need revese power mode
 #endif
 }
 }  // namespace Wifi

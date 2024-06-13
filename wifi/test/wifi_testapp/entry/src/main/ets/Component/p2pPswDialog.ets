@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import wifi from '@ohos.wifi'
 import ConfigData from '../utils/ConfigData';
 /**
@@ -23,58 +21,58 @@ import ConfigData from '../utils/ConfigData';
 
 @CustomDialog
 export struct P2pPswDialog {
-  private p2pScanInfo: any = null
+  private p2pScanInfo!: wifi.WifiP2pDevice
   private psw: string = ''
   private controller: CustomDialogController
-  private action: ( p2pScanInfo , psw  ) => void
+  private action!: (p2pScanInfo: wifi.WifiP2pDevice , psw: string) => void
 
   build() {
     Column() {
-      Text( this.p2pScanInfo.deviceName )
-        .fontSize( 20 )
-        .width( ConfigData.WH_95_100 )
-      TextInput( { placeholder : 'input password' } )
-        .key( 'input' )
-        .type( InputType.Password )
-        .placeholderColor( Color.Gray )
-        .fontSize( 19 )
-        .margin( { top : 15 } )
-        .width( ConfigData.WH_95_100 )
-        .onChange( ( value: string ) => {
+      Text(this.p2pScanInfo.deviceName)
+        .fontSize(20)
+        .width(ConfigData.WH_95_100)
+      TextInput({ placeholder : 'input password' })
+        .key('input')
+        .type(InputType.Password)
+        .placeholderColor(Color.Gray)
+        .fontSize(19)
+        .margin({ top : 15 })
+        .width(ConfigData.WH_95_100)
+        .onChange((value: string) => {
           this.psw = value
-        } )
+        })
       Row() {
         Button() {
-          Text( $r( 'app.string.sure' ) )
-            .fontColor( Color.Blue )
-            .fontSize( 17 )
+          Text($r('app.string.sure'))
+            .fontColor(Color.Blue)
+            .fontSize(17)
         }
-        .layoutWeight( 7 )
-        .backgroundColor( Color.White )
-        .margin( 5 )
-        .onClick( () => {
+        .layoutWeight(7)
+        .backgroundColor(Color.White)
+        .margin(5)
+        .onClick(() => {
           this.controller.close()
-          this.action( this.p2pScanInfo , this.psw )
-        } )
+          this.action(this.p2pScanInfo , this.psw)
+        })
 
         Text()
-          .width( 1 ).height( 35 )
-          .backgroundColor( '#8F8F8F' )
+          .width(1).height(35)
+          .backgroundColor('#8F8F8F')
         Button() {
-          Text( $r( 'app.string.cancel' ) )
-            .fontColor( Color.Red )
-            .fontSize( 17 )
+          Text($r('app.string.cancel'))
+            .fontColor(Color.Red)
+            .fontSize(17)
         }
-        .layoutWeight( 7 )
-        .backgroundColor( Color.White )
-        .margin( 5 )
-        .onClick( () => {
+        .layoutWeight(7)
+        .backgroundColor(Color.White)
+        .margin(5)
+        .onClick(() => {
           this.controller.close()
-        } )
+        })
       }
-      .width( ConfigData.WH_100_100 )
-      .margin( { top : ConfigData.WH_3_100 } )
+      .width(ConfigData.WH_100_100)
+      .margin({ top : ConfigData.WH_3_100 })
     }
-    .padding( 15 )
+    .padding(15)
   }
 }

@@ -18,25 +18,21 @@ ohos_shared_library("wifi") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    cfi = true
-    boundary_sanitize = true
-    cfi_cross_dso = true
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
+    "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
   ]
@@ -78,24 +74,20 @@ ohos_shared_library("wifiext") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    cfi = true
-    boundary_sanitize = true
-    cfi_cross_dso = true
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
   ]
 
   sources = [
@@ -132,26 +124,22 @@ ohos_shared_library("wifi_native_js") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    cfi = true
-    boundary_sanitize = true
-    cfi_cross_dso = true
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
 
@@ -192,25 +180,21 @@ ohos_shared_library("wifimanager") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    cfi = true
-    boundary_sanitize = true
-    cfi_cross_dso = true
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
+    "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
   ]
@@ -249,24 +233,20 @@ ohos_shared_library("wifimanagerext") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    cfi = true
-    boundary_sanitize = true
-    cfi_cross_dso = true
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
     debug = false
-    blocklist = "../../wifi_frameworks_sdk_block.txt"
   }
   install_enable = true
   include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
-    "${ability_runtime_path}/interfaces/kits/native/appkit/ability_runtime/context",
   ]
 
   sources = [

@@ -15,6 +15,7 @@
 #ifndef OHOS_P2P_STATE_MACHINE_H
 #define OHOS_P2P_STATE_MACHINE_H
 
+#include <mutex>
 #include "state_machine.h"
 #include "ip2p_service_callbacks.h"
 #include "p2p_define.h"
@@ -46,6 +47,14 @@ namespace Wifi {
 const int MIN_GROUP_NAME_LENGTH = 9;
 const int MAX_GROUP_NAME_LENGTH = 32;
 const int DISC_TIMEOUT_S = 120;
+enum {
+    P2P_GC,
+    P2P_GO,
+};
+enum {
+    P2P_OFF,
+    P2P_ON,
+};
 class P2pStateMachine : public StateMachine {
     class DhcpResultNotify {
     public:
@@ -54,6 +63,7 @@ class P2pStateMachine : public StateMachine {
         static void OnSuccess(int status, const char *ifname, DhcpResult *result);
         static void OnFailed(int status, const char *ifname, const char *reason);
         static void SetP2pStateMachine(P2pStateMachine *p2pStateMachine, WifiP2pGroupManager *pGroupManager);
+        static void OnDhcpServerSuccess(const char *ifname, DhcpStationInfo *stationInfos, size_t size);
     private:
        static P2pStateMachine *pP2pStateMachine;
        static WifiP2pGroupManager *groupManager;
@@ -102,9 +112,15 @@ public:
     virtual void RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback);
 
     /**
+     * @Description - Callbacks of event registered by the p2pService.
+     * @param  callback - event callback object
+     */
+    virtual void UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callback);
+
+    /**
      * @Description - Callbacks of event unregistered by the p2pService.
      */
-    virtual void UnRegisterP2pServiceCallbacks();
+    virtual void ClearAllP2pServiceCallbacks();
 
     /**
      * @Description - Set is need dhcp.
@@ -288,6 +304,10 @@ private:
      */
     virtual void BroadcastP2pPeersChanged() const;
     /**
+     * @Description - Peers private update detected by broadcast.
+     */
+    virtual void BroadcastP2pPrivatePeersChanged(std::string &privateInfo) const;
+    /**
      * @Description - Broadcast the scanned service information update.
      */
     virtual void BroadcastP2pServicesChanged() const;
@@ -305,6 +325,15 @@ private:
      * @param  isActive - current status
      */
     virtual void BroadcastP2pDiscoveryChanged(bool isActive) const;
+     /**
+     * @Description - Broadcast P2pGcJoinGroup event.
+     */
+    virtual void BroadcastP2pGcJoinGroup(GcInfo &info) const;
+
+     /**
+     * @Description - Broadcast P2pGcLeaveGroup event.
+     */
+    virtual void BroadcastP2pGcLeaveGroup(WifiP2pDevice &device) const;
     /**
      * @Description - Broadcast persistent group update event.
      */
@@ -362,15 +391,21 @@ private:
      * @return true: success   false: fail
      */
     virtual bool StopDhcpServer();
+
+    virtual bool HandlerDisableRandomMac(int setmode) const;
 private:
     virtual void NotifyUserInvitationSentMessage(const std::string &pin, const std::string &peerAddress) const;
     virtual void NotifyUserProvDiscShowPinRequestMessage(const std::string &pin, const std::string &peerAddress);
     virtual void NotifyUserInvitationReceivedMessage();
+    virtual ErrCode AddClientInfo(std::vector<GcInfo> &gcInfos);
+    virtual ErrCode RemoveClientInfo(std::string mac);
 
 private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;
+    GcInfo MatchDevInGcInfos(const std::string &deviceAddr, const std::string &groupAddr, std::vector<GcInfo> &gcInfos);
 
 private:
+    mutable std::mutex cbMapMutex;
     std::map<std::string, IP2pServiceCallbacks> p2pServiceCallbacks;  /* state machine -> service callback */
     std::string p2pIface;               /* P2P iface */
     WifiP2pConfigInternal savedP2pConfig;    /* record P2P config when communicating with the peer device */
@@ -379,6 +414,7 @@ private:
     WifiP2pDeviceManager &deviceManager; /* device manager */
     WifiP2pServiceManager &serviceManager;   /* service manager */
     ClientCallBack clientCallBack;
+    ServerCallBack serverCallBack;
     DhcpResultNotify *pDhcpResultNotify;
     DhcpdInterface m_DhcpdInterface;
     AuthorizingNegotiationRequestState &p2pAuthorizingNegotiationRequestState;
@@ -399,6 +435,10 @@ private:
     ProvisionDiscoveryState &p2pProvisionDiscoveryState;
     static DHCPTYPE m_isNeedDhcp;
     std::string p2pDevIface;
+    static std::mutex m_gcJoinmutex;
+
+public:
+    std::vector<std::string> curClientList;
 };
 }  // namespace Wifi
 }  // namespace OHOS

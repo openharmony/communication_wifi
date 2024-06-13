@@ -14,24 +14,23 @@
 import("//build/ohos.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
-ohos_shared_library("wifi_self_cure") {
+ohos_static_library("wifi_self_cure") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    cfi = true
-    boundary_sanitize = true
-    cfi_cross_dso = true
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
     debug = false
   }
-  install_enable = true
   include_dirs = [
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
@@ -39,7 +38,6 @@ ohos_shared_library("wifi_self_cure") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
@@ -50,30 +48,33 @@ ohos_shared_library("wifi_self_cure") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
   ]
 
   sources = [
-    "../common/handler.cpp",
-    "../common/internal_message.cpp",
-    "../common/message_queue.cpp",
-    "../common/state.cpp",
-    "../common/state_machine.cpp",
+    "../wifi_sta/network_status_history_manager.cpp",
+    "ip_qos_monitor.cpp",
     "self_cure_interface.cpp",
     "self_cure_service.cpp",
     "self_cure_state_machine.cpp",
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
+    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "init:libbegetutil",
+    "netmanager_base:net_conn_manager_if",
     "netstack:http_client",
   ]
 

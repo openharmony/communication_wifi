@@ -35,7 +35,7 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiScan> WifiScan::GetInstance(int systemAbi
 
     std::shared_ptr<WifiScanImpl> pImpl = std::make_shared<WifiScanImpl>();
     if (pImpl && pImpl->Init(systemAbilityId, instId)) {
-        WIFI_LOGI("init scan %{public}d successfully!", instId);
+        WIFI_LOGD("init scan %{public}d successfully!", instId);
         return pImpl;
     }
 

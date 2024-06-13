@@ -17,7 +17,13 @@
 #include <sstream>
 #include <iterator>
 #include <regex>
+
 #ifndef OHOS_ARCH_LITE
+#include <vector>
+#include <openssl/bio.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
 #include "app_mgr_client.h"
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
@@ -56,7 +62,12 @@ constexpr int FREQ_CHANNEL_1 = 2412;
 constexpr int FREQ_CHANNEL_36 = 5180;
 constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
 constexpr int MICROSECOND_TO_NANOSECOND = 1000;
-constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+
+const uint32_t BASE64_UNIT_ONE_PADDING = 1;
+const uint32_t BASE64_UNIT_TWO_PADDING = 2;
+const uint32_t BASE64_SRC_UNIT_SIZE = 3;
+const uint32_t BASE64_DEST_UNIT_SIZE = 4;
+
 static std::pair<std::string, int> g_brokerProcessInfo;
 
 static std::string DataAnonymize(const std::string str, const char delim,
@@ -245,7 +256,7 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
 int64_t GetElapsedMicrosecondsSinceBoot()
 {
     struct timespec times = {0, 0};
-    clock_gettime(CLOCK_MONOTONIC, &times);
+    clock_gettime(CLOCK_BOOTTIME, &times);
     return static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICROSECOND + times.tv_nsec / MICROSECOND_TO_NANOSECOND;
 }
 
@@ -271,7 +282,6 @@ std::string GetBundleName()
     AppExecFwk::BundleInfo bundleInfo;
     auto ret = bundleInstance->GetBundleInfoForSelf(0, bundleInfo);
     if (ret != OHOS::ERR_OK) {
-        WIFI_LOGE("GetBundleInfoForSelf failed! ret[%{public}d]", ret);
         return "";
     }
 
@@ -294,57 +304,10 @@ int GetCallingTokenId()
     return IPCSkeleton::GetCallingTokenID();
 }
 
-bool IsForegroundApp(const int uid)
+std::string GetBrokerProcessNameByPid(const int uid, const int pid)
 {
-    using namespace OHOS::AppExecFwk;
-    using namespace OHOS::AppExecFwk::Constants;
-    int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
-
-    auto appMgrClient = std::make_unique<AppMgrClient>();
-    appMgrClient->ConnectAppMgrService();
-    AppMgrResultCode ret;
-    std::vector<RunningProcessInfo> infos;
-    ret = appMgrClient->GetProcessRunningInfosByUserId(infos, userId);
-    if (ret != AppMgrResultCode::RESULT_OK) {
-        WIFI_LOGE("GetProcessRunningInfosByUserId fail, ret = [%{public}d]", ret);
-        return false;
-    }
-
-    auto iter = std::find_if(infos.begin(), infos.end(), [&uid](const RunningProcessInfo &rhs) {
-        return ((rhs.uid_ == uid) && (rhs.state_ == AppProcessState::APP_STATE_FOREGROUND ||
-                rhs.state_ == AppProcessState::APP_STATE_FOCUS));
-    });
-    if (iter != infos.end()) {
-        return true;
-    }
-    return false;
-}
-
-std::string GetRunningProcessNameByPid(const int uid, const int pid)
-{
-    using namespace OHOS::AppExecFwk;
-    using namespace OHOS::AppExecFwk::Constants;
-   
-    int32_t userId = static_cast<int32_t>(uid / UID_CALLINGUID_TRANSFORM_DIVISOR);
-    auto appMgrClient = std::make_unique<AppMgrClient>();
-    appMgrClient->ConnectAppMgrService();
-    AppMgrResultCode ret;
-    std::vector<RunningProcessInfo> infos;
-    ret = appMgrClient->GetProcessRunningInfosByUserId(infos, userId);
-    if (ret != AppMgrResultCode::RESULT_OK) {
-        WIFI_LOGE("GetProcessRunningInfosByUserId fail, ret = [%{public}d]", ret);
-        return "";
-    }
     std::string processName = "";
-    auto iter = infos.begin();
-    while (iter != infos.end()) {
-        if (iter->pid_ == pid) {
-            processName = iter->processName_;
-            break;
-        }
-        iter++;
-    }
-    if (processName.empty() && g_brokerProcessInfo.second == pid) {
+    if (g_brokerProcessInfo.second == pid) {
         processName = g_brokerProcessInfo.first;
     }
     return processName;
@@ -369,57 +332,6 @@ TimeStats::~TimeStats()
     constexpr int TIME_BASE = 1000;
     WIFI_LOGI("[Time stats][end] %{public}s, time cost:%{public}lldus, %{public}lldms, %{public}llds",
         m_desc.c_str(), us, us / TIME_BASE, us / TIME_BASE / TIME_BASE);
-}
-
-WifiTimer *WifiTimer::GetInstance()
-{
-    static WifiTimer instance;
-    return &instance;
-}
-
-WifiTimer::WifiTimer() : timer_(std::make_unique<Utils::Timer>("WifiManagerTimer"))
-{
-    timer_->Setup();
-}
-
-WifiTimer::~WifiTimer()
-{
-    if (timer_) {
-        timer_->Shutdown(true);
-    }
-}
-
-ErrCode WifiTimer::Register(const TimerCallback &callback, uint32_t &outTimerId, uint32_t interval, bool once)
-{
-    if (timer_ == nullptr) {
-        WIFI_LOGE("timer_ is nullptr");
-        return WIFI_OPT_FAILED;
-    }
-
-    uint32_t ret = timer_->Register(callback, interval, once);
-    if (ret == Utils::TIMER_ERR_DEAL_FAILED) {
-        WIFI_LOGE("Register timer failed");
-        return WIFI_OPT_FAILED;
-    }
-
-    outTimerId = ret;
-    return WIFI_OPT_SUCCESS;
-}
-
-void WifiTimer::UnRegister(uint32_t timerId)
-{
-    if (timerId == 0) {
-        WIFI_LOGE("timerId is 0, no register timer");
-        return;
-    }
-
-    if (timer_ == nullptr) {
-        WIFI_LOGE("timer_ is nullptr");
-        return;
-    }
-
-    timer_->Unregister(timerId);
-    return;
 }
 #endif
 
@@ -497,5 +409,159 @@ bool IsOtherVapConnect()
     return p2pOrHmlConnected && hotspotEnable;
 }
 
+static int Hex2num(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (c >= 'a' && c <= 'f') {
+        return c - 'a' + 10; // convert to decimal
+    }
+    if (c >= 'A' && c <= 'F') {
+        return c - 'A' + 10; // convert to decimal
+    }
+    return -1;
+}
+
+int Hex2byte(const char *hex)
+{
+    int a = Hex2num(*hex++);
+    if (a < 0) {
+        return -1;
+    }
+    int b = Hex2num(*hex++);
+    if (b < 0) {
+        return -1;
+    }
+    return (a << 4) | b; // convert to binary
+}
+
+int HexString2Byte(const char *hex, uint8_t *buf, size_t len)
+{
+    size_t i;
+    int a;
+    const char *ipos = hex;
+    uint8_t *opos = buf;
+
+    for (i = 0; i < len; i++) {
+        a = Hex2byte(ipos);
+        if (a < 0) {
+            return -1;
+        }
+        *opos++ = a;
+        ipos += 2; // convert to binary
+    }
+    return 0;
+}
+
+void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t hexstrLen)
+{
+    if ((byte == nullptr) || (hexstr == nullptr)) {
+        WIFI_LOGE("%{public}s: invalid parameter", __func__);
+        return;
+    }
+
+    if (hexstrLen < bytesLen * 2) { // verify length
+        WIFI_LOGE("%{public}s: invalid byteLen:%{public}d or hexStrLen:%{public}d",
+            __func__, bytesLen, hexstrLen);
+        return;
+    }
+
+    WIFI_LOGI("%{public}s byteLen:%{public}d, hexStrLen:%{public}d", __func__, bytesLen, hexstrLen);
+    uint8_t hexstrIndex = 0;
+    for (uint8_t i = 0; i < bytesLen; i++) {
+        if (snprintf_s(hexstr + hexstrIndex, hexstrLen - hexstrIndex, hexstrLen - hexstrIndex - 1,
+            "%02x", byte[i]) <= 0) {
+            WIFI_LOGI("%{public}s: failed to snprintf_s", __func__);
+        }
+        hexstrIndex += 2; // offset
+        if (hexstrIndex >= hexstrLen) {
+            break;
+        }
+    }
+}
+
+bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output)
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGD("%{public}s input:%{private}s, length:%{public}zu", __func__, input.c_str(), input.length());
+    if (input.length() % BASE64_DEST_UNIT_SIZE != 0) {
+        WIFI_LOGE("%{public}s: wrong data length for base64 encode string", __func__);
+        return false;
+    }
+    uint32_t decodedLen = input.length() * BASE64_SRC_UNIT_SIZE / BASE64_DEST_UNIT_SIZE;
+    if (input.at(input.length() - BASE64_UNIT_ONE_PADDING) == '=') {
+        decodedLen--;
+        if (input.at(input.length() - BASE64_UNIT_TWO_PADDING) == '=') {
+            decodedLen--;
+        }
+    }
+    output.resize(decodedLen);
+
+    BIO *b64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+    BIO *bio = BIO_new_mem_buf(input.c_str(), input.length());
+    bio = BIO_push(b64, bio);
+    if (BIO_read(bio, &output[0], input.length()) != static_cast<int32_t>(decodedLen)) {
+        WIFI_LOGE("%{public}s: wrong data length for decoded buffer", __func__);
+        return false;
+    }
+    BIO_free_all(bio);
+#endif
+    return true;
+}
+
+std::string EncodeBase64(const std::vector<uint8_t> &input)
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGD("%{public}s: size:%{public}zu", __func__, input.size());
+    if (input.empty()) {
+        WIFI_LOGE("%{public}s: wrong data length for string to encode.", __func__);
+        return "";
+    }
+    BIO *b64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+    BIO *bio = BIO_new(BIO_s_mem());
+    bio = BIO_push(b64, bio);
+    BIO_write(bio, &input[0], input.size());
+    BIO_flush(bio);
+
+    BUF_MEM *bptr = nullptr;
+    BIO_get_mem_ptr(bio, &bptr);
+    std::string output = "";
+    if (bptr != nullptr) {
+        std::vector<char> outputBuffer {};
+        WIFI_LOGI("%{public}s: length is %{public}zu", __func__, bptr->length);
+        outputBuffer.insert(outputBuffer.end(), bptr->data, bptr->data + bptr->length);
+        outputBuffer[bptr->length] = 0;
+        output = static_cast<char*>(&outputBuffer[0]);
+    }
+    BIO_free_all(bio);
+    return output;
+#else
+    return "";
+#endif
+}
+
+std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter)
+{
+    size_t pos = 0;
+    std::string token;
+    std::vector<std::string> results;
+
+    std::string splitStr = input;
+    WIFI_LOGD("%{public}s input:%{private}s, delimiter:%{public}s", __func__, input.c_str(), delimiter.c_str());
+    while ((pos = splitStr.find(delimiter)) != std::string::npos) {
+        token = splitStr.substr(0, pos);
+        if (token.length() > 0) {
+            results.push_back(token);
+            splitStr.erase(0, pos + delimiter.length());
+            WIFI_LOGD("%{public}s token:%{private}s, splitStr:%{public}s", __func__, token.c_str(), splitStr.c_str());
+        }
+    }
+    results.push_back(splitStr);
+    WIFI_LOGD("%{public}s size:%{public}zu", __func__, results.size());
+    return results;
+}
 }  // namespace Wifi
 }  // namespace OHOS

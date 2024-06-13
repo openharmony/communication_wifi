@@ -17,7 +17,6 @@ if (defined(ohos_lite)) {
   import("//foundation/communication/wifi/wifi/wifi_lite.gni")
 } else {
   import("//build/ohos.gni")
-  import("//foundation/communication/dhcp/dhcp.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 
@@ -50,11 +49,8 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
-  "//commonlibrary/c_utils/base/include",
-  "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-  "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
   "$WIFI_ROOT_DIR/utils/inc",
 ]
@@ -67,6 +63,7 @@ if (defined(ohos_lite)) {
       "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
       "$DHCP_ROOT_DIR/interfaces/inner_api/include",
       "$DHCP_ROOT_DIR/interfaces/kits/c",
+      "$DHCP_ROOT_DIR/services",
     ]
 
     deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
@@ -85,20 +82,25 @@ if (defined(ohos_lite)) {
       "-fPIC",
       "-Wl,-E",
     ]
+
+    external_deps = [ "init:libbegetutil" ]
   }
 } else {
   ohos_shared_library("wifi_toolkit") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true
     sources = local_base_sources
     sources += [
+      "config/wifi_backup_config.cpp",
       "utils/network_parser.cpp",
       "utils/softap_parser.cpp",
       "utils/wifi_app_parser.cpp",
@@ -108,16 +110,11 @@ if (defined(ohos_lite)) {
 
     include_dirs = local_base_include_dirs
     include_dirs += [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_country_code",
-      "//base/security/certificate_manager/frameworks/cert_manager_standard/main/common/include",
-      "//base/security/certificate_manager/interfaces/innerkits/cert_manager_standard/main/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
       "$WIFI_ROOT_DIR/utils/inc",
     ]
 
-    deps = [
-      "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//third_party/libxml2:xml2",
-    ]
+    deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
 
     defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
@@ -128,11 +125,19 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
     }
 
+    if (is_asan) {
+      defines += [ "DTFUZZ_TEST" ]
+    }
+
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
     if (wifi_feature_with_scan_control) {
       defines += [ "SUPPORT_SCAN_CONTROL" ]
+    }
+
+    if (wifi_feature_with_hdi_chip_supported) {
+      defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
     }
 
     external_deps = [
@@ -141,9 +146,12 @@ if (defined(ohos_lite)) {
       "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
       "dhcp:dhcp_sdk",
+      "dhcp:dhcp_utils",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
-      "huks:libhukssdk",
+      "ipc:ipc_single",
+      "jsoncpp:jsoncpp",
+      "libxml2:libxml2",
     ]
 
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {

@@ -13,35 +13,36 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
-const TAG = "[wifiView]"
 import ConfigData from '../utils/ConfigData';
+import wifi from '@ohos.wifi';
+
 /**
  * WifiView Component of wifi test
  */
 
+const TAG = "[wifiView]"
+
 @Component
 export struct WifiView {
-  private wifi: any = null
-  private securityString: Resource = $r( 'app.string.encryption' )
+  private wifi!: wifi.WifiScanInfo;
+  private securityString: Resource = $r('app.string.encryption')
   @State isLock: boolean = true
 
   aboutToAppear() {
-    console.log( TAG , `aboutToAppear ${ JSON.stringify( this.wifi ) }` )
+    console.log(TAG , `aboutToAppear ${ JSON.stringify(this.wifi) }`)
     if ( this.wifi ) {
       if ( this.wifi.securityType ) {
-        if ( this.wifi.securityType === 0 || this.wifi.securityType === 1 ) {
-          this.securityString = $r( 'app.string.open' )
+        if ( this.wifi.securityType === 1 ) {
+          this.securityString = $r('app.string.open')
           this.isLock = false
         } else {
-          console.log( TAG , "this.wifi.securityType /= 0 && this.wifi.securityType /= 1" )
+          console.log(TAG , "this.wifi.securityType /= 0 && this.wifi.securityType /= 1")
         }
       } else {
-        console.log( TAG , "this.wifi.securityType is false" )
+        console.log(TAG , "this.wifi.securityType is false")
       }
     } else {
-      console.log( TAG , "this.wifi is false" )
+      console.log(TAG , "this.wifi is false")
     }
   }
 
@@ -50,33 +51,33 @@ export struct WifiView {
       Column() {
         if ( this.wifi ) {
           if ( this.wifi.ssid ) {
-            Text( this.wifi.ssid )
-              .fontSize( 20 )
-              .width( ConfigData.WH_100_100 )
+            Text(this.wifi.ssid)
+              .fontSize(20)
+              .width(ConfigData.WH_100_100)
           }
         }
-        Text( this.securityString )
-          .fontSize( 18 )
-          .fontColor( Color.Gray )
-          .width( ConfigData.WH_100_100 )
+        Text(this.securityString)
+          .fontSize(18)
+          .fontColor(Color.Gray)
+          .width(ConfigData.WH_100_100)
       }
-      .layoutWeight( 1 )
+      .layoutWeight(1)
 
-      Stack( { alignContent : Alignment.BottomEnd } ) {
-        Image( $r( 'app.media.wifi' ) )
-          .height( 30 ).width( 30 )
-          .objectFit( ImageFit.Contain )
+      Stack({ alignContent : Alignment.BottomEnd }) {
+        Image($r('app.media.wifi'))
+          .height(30).width(30)
+          .objectFit(ImageFit.Contain)
         if ( this.isLock ) {
-          Image( $r( 'app.media.lock' ) )
-            .objectFit( ImageFit.Contain )
-            .width( 15 ).height( 15 )
+          Image($r('app.media.lock'))
+            .objectFit(ImageFit.Contain)
+            .width(15).height(15)
         }
       }
-      .width( 40 ).height( 40 )
-      .margin( { right : 10 } )
+      .width(40).height(40)
+      .margin({ right : 10 })
     }
-    .backgroundColor( Color.White )
-    .width( ConfigData.WH_100_100 )
-    .padding( 10 )
+    .backgroundColor(Color.White)
+    .width(ConfigData.WH_100_100)
+    .padding(10)
   }
 }

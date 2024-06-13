@@ -314,6 +314,7 @@ WifiErrorNo SetSuspendMode(bool mode);
  * @return WifiErrorNo
  */
 WifiErrorNo SetPowerMode(bool mode);
+
 #ifdef __cplusplus
 }
 #endif

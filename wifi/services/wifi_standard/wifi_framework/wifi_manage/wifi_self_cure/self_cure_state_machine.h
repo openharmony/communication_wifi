@@ -29,9 +29,9 @@
 #include "iself_cure_service.h"
 #include "wifi_service_manager.h"
 #include "wifi_msg.h"
-#include "sta_network_check.h"
+#include <fcntl.h>
+#include "arp_checker.h"
 #include "self_cure_msg.h"
-#include "wifi_settings.h"
 #include "wifi_common_util.h"
 
 namespace OHOS {
@@ -44,6 +44,7 @@ constexpr int VEC_POS_2 = 2;
 constexpr int VEC_POS_3 = 3;
 constexpr int TRY_TIMES = 3;
 constexpr int STATIC_IP_ADDR = 156;
+constexpr int IP_ADDR_LIMIT = 255;
 constexpr int GET_NEXT_IP_MAC_CNT = 10;
 constexpr int IP_ADDR_SIZE = 4;
 constexpr int NET_MASK_LENGTH = 24;
@@ -87,12 +88,11 @@ public:
      */
     class DefaultState : public State {
     public:
-        explicit DefaultState(SelfCureStateMachine *pSelfCureStateMachine);
+        explicit DefaultState(SelfCureStateMachine *selfCureStateMachine);
         ~DefaultState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
-
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
     };
@@ -103,31 +103,41 @@ public:
      */
     class ConnectedMonitorState : public State {
     public:
-        explicit ConnectedMonitorState(SelfCureStateMachine *pSelfCureStateMachine);
+        explicit ConnectedMonitorState(SelfCureStateMachine *selfCureStateMachine);
         ~ConnectedMonitorState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
+        using selfCureCmsHandleFunc = void (SelfCureStateMachine::ConnectedMonitorState::*)(InternalMessage *msg);
+        using SelfCureCmsHandleFuncMap = std::map<int, selfCureCmsHandleFunc>;
 
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
-        int lastSignalLevel;
+        int lastSignalLevel = -1;
         std::string lastConnectedBssid;
-        bool mobileHotspot;
-        bool ipv4DnsEnabled;
+        bool mobileHotspot = false;
+        bool ipv4DnsEnabled = false;
         bool gatewayInvalid = false;
         std::string configAuthType = "-1";
-        bool hasInternetRecently;
-        bool portalUnthenEver;
-        bool userSetStaticIpConfig;
-        bool wifiSwitchAllowed;
+        bool hasInternetRecently = false;
+        bool portalUnthenEver = false;
+        bool userSetStaticIpConfig = false;
+        bool wifiSwitchAllowed = false;
+        SelfCureCmsHandleFuncMap selfCureCmsHandleFuncMap;
+        int InitSelfCureCmsHandleMap();
+        void HandleResetupSelfCure(InternalMessage *msg);
+        void HandlePeriodicArpDetection(InternalMessage *msg);
+        void HandleNetworkConnect(InternalMessage *msg);
+        void HandleNetworkDisconnect(InternalMessage *msg);
+        void HandleRssiLevelChange(InternalMessage *msg);
         void TransitionToSelfCureState(int reason);
-        void HandArpDetectionFailed(InternalMessage *msg);
+        void HandleArpDetectionFailed(InternalMessage *msg);
         bool SetupSelfCureMonitor();
         void UpdateInternetAccessHistory();
         void RequestReassocWithFactoryMac();
         void HandleInvalidIp(InternalMessage *msg);
         void HandleInternetFailedDetected(InternalMessage *msg);
+        void HandleTcpQualityQuery(InternalMessage *msg);
     };
 
     /* *
@@ -136,15 +146,16 @@ public:
      */
     class DisconnectedMonitorState : public State {
     public:
-        explicit DisconnectedMonitorState(SelfCureStateMachine *pSelfCureStateMachine);
+        explicit DisconnectedMonitorState(SelfCureStateMachine *selfCureStateMachine);
         ~DisconnectedMonitorState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
+        void HandleResetConnectNetwork(InternalMessage *msg);
         SelfCureStateMachine *pSelfCureStateMachine;
-        bool setStaticIpConfig;
+        bool setStaticIpConfig = false;
     };
 
     /* *
@@ -153,7 +164,7 @@ public:
      */
     class ConnectionSelfCureState : public State {
     public:
-        explicit ConnectionSelfCureState(SelfCureStateMachine *pSelfCureStateMachine);
+        explicit ConnectionSelfCureState(SelfCureStateMachine *selfCureStateMachine);
         ~ConnectionSelfCureState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -169,44 +180,58 @@ public:
      */
     class InternetSelfCureState : public State {
     public:
-        explicit InternetSelfCureState(SelfCureStateMachine *pSelfCureStateMachine);
+        explicit InternetSelfCureState(SelfCureStateMachine *selfCureStateMachine);
         ~InternetSelfCureState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
+        using selfCureIssHandleFunc = void (SelfCureStateMachine::InternetSelfCureState::*)(InternalMessage *msg);
+        using SelfCureIssHandleFuncMap = std::map<int, selfCureIssHandleFunc>;
 
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
-        int currentRssi;
-        std::string currentBssid;
-        int selfCureFailedCounter;
-        int currentAbnormalType;
-        int lastSelfCureLevel;
-        int currentSelfCureLevel;
-        int renewDhcpCount;
-        bool hasInternetRecently;
-        bool portalUnthenEver;
-        bool userSetStaticIpConfig;
-        long lastHasInetTimeMillis;
-        bool delayedReassocSelfCure;
-        bool delayedRandMacReassocSelfCure;
-        bool delayedResetSelfCure;
-        bool setStaticIp4InvalidIp;
-        bool isRenewDhcpTimeout;
-        std::string unConflictedIp;
-        int lastMultiGwSelfFailedType;
+        int currentRssi = -1;
+        std::string currentBssid = "";
+        int selfCureFailedCounter = -1;
+        int currentAbnormalType = -1;
+        int lastSelfCureLevel = -1;
+        int currentSelfCureLevel = -1;
+        int renewDhcpCount = -1;
+        bool hasInternetRecently = false;
+        bool portalUnthenEver = false;
+        bool userSetStaticIpConfig = false;
+        uint64_t lastHasInetTimeMillis = 0;
+        bool delayedReassocSelfCure = false;
+        bool delayedRandMacReassocSelfCure = false;
+        bool delayedResetSelfCure = false;
+        bool setStaticIp4InvalidIp = false;
+        bool isRenewDhcpTimeout = false;
+        std::string unConflictedIp = "";
+        int lastMultiGwSelfFailedType = -1;
         bool usedMultiGwSelfcure = false;
-        std::string configAuthType;
-        bool finalSelfCureUsed;
+        std::string configAuthType = "";
+        bool finalSelfCureUsed = false;
         std::vector<int> testedSelfCureLevel;
         WifiSelfCureHistoryInfo selfCureHistoryInfo;
-        std::string currentGateway;
+        std::string currentGateway = "";
         int selfCureForInvalidIpCnt = 0;
+        SelfCureIssHandleFuncMap selfCureIssHandleFuncMap;
+        int InitSelfCureIssHandleMap();
+        void HandleInternetFailedSelfCure(InternalMessage *msg);
+        void HandleSelfCureWifiLink(InternalMessage *msg);
+        void HandleNetworkDisconnected(InternalMessage *msg);
+        void HandleInternetRecovery(InternalMessage *msg);
+        void HandleRssiChangedEvent(InternalMessage *msg);
+        void HandleP2pDisconnected(InternalMessage *msg);
+        void HandlePeriodicArpDetecte(InternalMessage *msg);
+        void HandleArpFailedDetected(InternalMessage *msg);
+        void HandleHttpReachableRecv(InternalMessage *msg);
         void SelectSelfCureByFailedReason(int internetFailedType);
         int SelectBestSelfCureSolution(int internetFailedType);
         void SelfCureWifiLink(int requestCureLevel);
         bool SelectedSelfCureAcceptable();
-        void SelfCureForRandMacReassoc();
+        void SelfCureForRandMacReassoc(int requestCureLevel);
+        void SelfCureForReset(int requestCureLevel);
         void HandleIpConfigCompleted();
         void HandleIpConfigCompletedAfterRenewDhcp();
         void HandleInternetRecoveryConfirm();
@@ -219,7 +244,11 @@ public:
         void HandleSelfCureFailedForRandMacReassoc();
         void HandleRssiChanged();
         void HandleDelayedResetSelfCure();
-        void SelfCureForRenewDhcp(int requestCureLevel);
+        void SelfCureForDns();
+        bool UseOperatorOverSea();
+        void GetPublicDnsServers(std::vector<std::string>& dnsServers);
+        void GetReplacedDnsServers(std::vector<std::string>& curDnses, std::vector<std::string>& replacedDnses);
+        void UpdateDnsServers(std::vector<std::string>& dnsServers);
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);
     };
@@ -230,8 +259,31 @@ public:
      */
     class Wifi6SelfCureState : public State {
     public:
-        explicit Wifi6SelfCureState(SelfCureStateMachine *pSelfCureStateMachine);
+        explicit Wifi6SelfCureState(SelfCureStateMachine *selfCureStateMachine);
         ~Wifi6SelfCureState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
+
+    private:
+        SelfCureStateMachine *pSelfCureStateMachine;
+        int wifi6HtcArpDetectionFailedCnt = 0;
+        int wifi6ArpDetectionFailedCnt = 0;
+        void PeriodicWifi6WithHtcArpDetect(InternalMessage *msg);
+        void PeriodicWifi6WithoutHtcArpDetect(InternalMessage *msg);
+        void HandleWifi6WithHtcArpFail(InternalMessage *msg);
+        void HandleWifi6WithoutHtcArpFail(InternalMessage *msg);
+        void Wifi6ReassocSelfcure();
+    };
+
+    /* *
+     * @Description  Definition of NoInternetState class in SelfCureStateMachine.
+     *
+     */
+    class NoInternetState : public State {
+    public:
+        explicit NoInternetState(SelfCureStateMachine *selfCureStateMachine);
+        ~NoInternetState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
@@ -241,6 +293,8 @@ public:
     };
 
     ErrCode Initialize();
+    void SetHttpMonitorStatus(bool isHttpReachable);
+    bool IsSelfCureOnGoing();
 
 private:
 
@@ -281,39 +335,50 @@ private:
      *
      */
     ErrCode InitSelfCureStates();
-
+    int64_t GetNowMilliSeconds();
+    void SendBlaListToDriver();
+    std::string BlackListToString(std::map<std::string, Wifi6BlackListInfo> &map);
+    std::string ParseWifi6BlackListInfo(std::pair<std::string, Wifi6BlackListInfo> iter);
+    void AgeOutWifi6Black(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache);
     int GetCurSignalLevel();
     bool IsHttpReachable();
-    std::string TransVecToIpAddress(std::vector<int> vec);
-    std::vector<int> TransIpAddressToVec(std::string addr);
+    std::string TransVecToIpAddress(std::vector<uint32_t> vec);
+    std::vector<uint32_t> TransIpAddressToVec(std::string addr);
     int GetLegalIpConfiguration(IpInfo &dhcpResults);
     bool CanArpReachable();
     bool DoSlowArpTest(std::string testIpAddr);
-    std::string GetNextIpAddr(std::string gateway, std::string currentAddr, std::vector<std::string> testedAddr);
+    std::string GetNextIpAddr(const std::string gateway, const std::string currentAddr,
+                              std::vector<std::string> testedAddr);
     bool IsIpAddressInvalid();
     std::vector<std::string> TransStrToVec(std::string str, char c);
     bool IsUseFactoryMac();
     bool IsSameEncryptType(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt);
-    int GetBssidCounter(std::vector<WifiScanInfo> &scanResults);
+    int GetBssidCounter(const std::vector<WifiScanInfo> &scanResults);
     bool IsNeedWifiReassocUseDeviceMac();
-    int String2InternetSelfCureHistoryInfo(std::string selfCureHistory, WifiSelfCureHistoryInfo &info);
+    int String2InternetSelfCureHistoryInfo(const std::string selfCureHistory, WifiSelfCureHistoryInfo &info);
     int SetSelfCureFailInfo(OHOS::Wifi::WifiSelfCureHistoryInfo &info, std::vector<std::string> histories, int cnt);
     int SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string> histories, int cnt);
     bool IfP2pConnected();
-    bool ShouldTransToWifi6SelfCure(InternalMessage *msg, std::string lastConnectedBssid);
+    bool ShouldTransToWifi6SelfCure(InternalMessage *msg, std::string currConnectedBssid);
+    int GetCurrentRssi();
+    std::string GetCurrentBssid();
+    bool IsWifi6Network(std::string currConnectedBssid);
     void PeriodicArpDetection();
     bool IsSuppOnCompletedState();
     bool IfPeriodicArpDetection();
     std::string GetAuthType();
     int GetIpAssignment(AssignIpMethod &ipAssignment);
     time_t GetLastHasInternetTime();
+    uint32_t GetNetworkStatusHistory();
     std::string GetSelfCureHistoryInfo();
-    int SetSelfCureHistoryInfo(std::string internetSelfCureHistory);
-    WifiDeviceConfig GetCurrentWifiDeviceConfig();
+    int SetSelfCureHistoryInfo(const std::string selfCureHistory);
+    int GetIsReassocWithFactoryMacAddress();
+    int SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress);
+    ErrCode GetCurrentWifiDeviceConfig(WifiDeviceConfig &config);
     bool SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel);
     void HandleNetworkConnected();
     bool UpdateConnSelfCureFailedHistory();
-    static bool IsEncryptedAuthType(std::string authType);
+    static bool IsEncryptedAuthType(const std::string authType);
     std::string GetCurrentGateway();
     bool DoArpTest(std::string ipAddress, std::string gateway);
     void RequestArpConflictTest();
@@ -324,6 +389,8 @@ private:
                                                  bool success);
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     bool IfMultiGateway();
+    bool IsSettingsPage();
+    void InitDnsServer();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;
@@ -335,17 +402,18 @@ private:
     ConnectionSelfCureState *pConnectionSelfCureState;
     InternetSelfCureState *pInternetSelfCureState;
     Wifi6SelfCureState *pWifi6SelfCureState;
+    NoInternetState *pNoInternetState;
 
     int m_instId;
-    bool mIsHttpRedirected;
+    bool mIsHttpReachable = false;
     int useWithRandMacAddress = 0;
-    ArpChecker arpChecker;
-    std::atomic<bool> selfCureOnGoing;
-    std::atomic<bool> p2pConnected;
-    std::atomic<bool> hmlConnected;
+    std::atomic<bool> selfCureOnGoing = false;
+    std::atomic<bool> p2pConnected = false;
+    std::atomic<bool> notAllowSelfcure = true;
     int arpDetectionFailedCnt = 0;
-    int selfCureReason;
+    int selfCureReason = -1;
     int noTcpRxCounter = 0;
+    uint32_t connectNetworkRetryCnt = 0;
     bool internetUnknown = false;
     std::map<std::string, IpInfo> dhcpOfferPackets;
     std::vector<std::string> dhcpResultsTestDone;
@@ -355,7 +423,7 @@ private:
     bool isWifi6ArpSuccess = false;
     bool hasTestWifi6Reassoc = false;
     bool isReassocSelfCureWithRealMacAddress = false;
-    clock_t connectedTimeMills;
+    uint64_t connectedTimeMills = 0;
     std::mutex dhcpFailedBssidLock;
     std::vector<std::string> dhcpFailedBssids;
     std::vector<std::string> dhcpFailedConfigKeys;

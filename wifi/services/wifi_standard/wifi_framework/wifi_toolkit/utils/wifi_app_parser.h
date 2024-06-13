@@ -27,6 +27,7 @@ enum class AppType {
     WHITE_LIST_APP,
     BLACK_LIST_APP,
     CHARIOT_APP,
+    HIGH_TEMP_LIMIT_SPEED_APP,
     OTHER_APP
 };
 
@@ -38,6 +39,7 @@ struct LowLatencyAppInfo : CommonAppInfo {};
 struct WhiteListAppInfo : CommonAppInfo {};
 struct BlackListAppInfo : CommonAppInfo {};
 struct ChariotAppInfo : CommonAppInfo {};
+struct HighTempLimitSpeedAppInfo : CommonAppInfo {};
 
 class AppParser : public XmlParser {
 public:
@@ -48,6 +50,7 @@ public:
     bool IsWhiteListApp(const std::string &bundleName) const;
     bool IsBlackListApp(const std::string &bundleName) const;
     bool IsChariotApp(const std::string &bundleName) const;
+    bool IsHighTempLimitSpeedApp(const std::string &bundleName) const;
 
 private:
     bool InitAppParser(const char *appXmlFilePath);
@@ -57,13 +60,22 @@ private:
     WhiteListAppInfo ParseWhiteAppInfo(const xmlNodePtr &innode);
     BlackListAppInfo ParseBlackAppInfo(const xmlNodePtr &innode);
     ChariotAppInfo ParseChariotAppInfo(const xmlNodePtr &innode);
+    HighTempLimitSpeedAppInfo ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
-
+    bool ReadPackageCloudFilterConfig();
+    bool IsReadCloudConfig();
+    std::string GetLocalFileVersion(const char *appXmlVersionFilePath);
+    std::string GetCloudPushFileVersion(const char *appVersionFilePath);
+    std::string GetCloudPushVersionFilePath();
+    std::string GetCloudPushJsonFilePath();
 private:
     std::vector<LowLatencyAppInfo> m_lowLatencyAppVec {};
     std::vector<WhiteListAppInfo> m_whiteAppVec {};
     std::vector<BlackListAppInfo> m_blackAppVec {};
     std::vector<ChariotAppInfo> m_chariotAppVec {};
+    std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVec {};
+    std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVecCloudPush {};
+    bool mIshighTempLimitSpeedReadCloudPush = false;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -65,6 +65,21 @@ public:
     /**
      * @Description : Callback of the connection state change event.
      *
+     * @param reason - reason id [in]
+     * @param bssid - bssid of the network [in]
+     */
+    void OnReportDisConnectReasonCallBack(int reason, const std::string &bssid);
+
+    /**
+     * @Description : Callback of the hilink trigger boardcast and wps.
+     *
+     * @param bssid - bssid of the network [in]
+     */
+    void OnWpaHilinkCallBack(const std::string &bssid);
+
+    /**
+     * @Description : Callback of the connection state change event.
+     *
      * @param reason : reason for bssid change [in]
      * @param bssid: bssid of the network [in]
      */
@@ -111,6 +126,20 @@ public:
      * @param status - status codes [in]
      */
     void OnWpsTimeOutCallBack(int status);
+
+    /**
+     * @Description : Callback of the SIM/AKA/AKA' authentication event.
+     *
+     * @param notifyParam - authentication information [in]
+     */
+    void OnWpaEapSimAuthCallBack(const std::string &notifyParam);
+
+    /**
+     * @Description : Callback of the STA event.
+     *
+     * @param notifyParam - authentication information [in]
+     */
+    void OnWpaStaNotifyCallBack(const std::string &notifyParam);
 
 private:
     StaStateMachine *pStaStateMachine;

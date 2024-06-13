@@ -451,6 +451,38 @@ ErrCode WifiP2pProxy::RemoveGroup()
     return ErrCode(reply.ReadInt32());
 }
 
+ErrCode WifiP2pProxy::RemoveGroupClient(const GcInfo &info)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteString(info.ip);
+    data.WriteString(info.mac);
+    data.WriteString(info.host);
+
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT, error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
 ErrCode WifiP2pProxy::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     if (mRemoteDied) {
@@ -553,6 +585,7 @@ void WifiP2pProxy::ReadWifiP2pDeviceData(MessageParcel &reply, WifiP2pDevice &de
 {
     device.SetDeviceName(reply.ReadString());
     device.SetDeviceAddress(reply.ReadString());
+    device.SetRandomDeviceAddress(reply.ReadString());
     device.SetDeviceAddressType(reply.ReadInt32());
     device.SetPrimaryDeviceType(reply.ReadString());
     device.SetSecondaryDeviceType(reply.ReadString());
@@ -721,6 +754,10 @@ ErrCode WifiP2pProxy::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
     std::string groupOwnerAddr = reply.ReadString();
     linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddr);
 
+    int size = reply.ReadInt32();
+    for (int i = 0; i < size; i++) {
+        linkedInfo.AddClientInfoList(reply.ReadString(), reply.ReadString(), reply.ReadString());
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1632,6 +1669,92 @@ ErrCode WifiP2pProxy::Hid2dSetUpperScene(const std::string& ifName, const Hid2dU
         reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGW("Set Attr(%{public}d) failed", static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE));
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::DiscoverPeers(int32_t channelid)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(channelid);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_PEERS),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_PEERS), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::DisableRandomMac(int setmode)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(setmode);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiP2pProxy::CheckCanUseP2p()
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();

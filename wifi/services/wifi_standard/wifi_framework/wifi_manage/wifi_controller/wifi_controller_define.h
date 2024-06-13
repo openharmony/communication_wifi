@@ -38,6 +38,9 @@ namespace Wifi {
 #define CMD_AP_STOP_TIME 0x11
 #define CMD_OPEN_WIFI_RETRY 0x12
 #define CMD_AP_SERVICE_START_FAILURE 0x13
+#define CMD_STA_REMOVED 0x14
+#define CMD_CONCRETECLIENT_REMOVED 0x15
+#define CMD_AP_REMOVED 0x16
 
 #define CONCRETE_CMD_START 0x101
 #define CONCRETE_CMD_SWITCH_TO_CONNECT_MODE 0x102
@@ -46,6 +49,8 @@ namespace Wifi {
 #define CONCRETE_CMD_STA_STOP 0x105
 #define CONCRETE_CMD_STA_START 0x106
 #define CONCRETE_CMD_STOP 0x107
+#define CONCRETE_CMD_STA_SEMI_ACTIVE 0x108
+#define CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE 0x109
 
 #define SOFTAP_CMD_START 0x201
 #define SOFTAP_CMD_STOP 0x202
@@ -55,6 +60,7 @@ namespace Wifi {
 struct ConcreteModeCallback {
     std::function<void(int)> onStopped;
     std::function<void(int)> onStartFailure;
+    std::function<void(int)> onRemoved;
 };
 
 struct SoftApModeCallback {
@@ -67,6 +73,8 @@ enum class ConcreteManagerRole {
     ROLE_CLIENT_SCAN_ONLY = 0,
     ROLE_CLIENT_STA,
     ROLE_CLIENT_MIX,
+    ROLE_CLIENT_MIX_SEMI_ACTIVE,
+    ROLE_CLIENT_STA_SEMI_ACTIVE,
 };
 
 enum class SoftApperateType {

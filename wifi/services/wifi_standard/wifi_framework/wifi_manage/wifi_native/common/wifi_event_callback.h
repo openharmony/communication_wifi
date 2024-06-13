@@ -29,7 +29,16 @@ struct WifiEventCallback {
     std::function<void(int)> onWpsTimeOut;
     std::function<void(int)> onWpaConnectionFull;
     std::function<void(int)> onWpaConnectionReject;
+    std::function<void(const std::string &)> onEventStaNotify;
+    std::function<void(int, const std::string &)> onReportDisConnectReason;
 };
+
+enum class WpaEventCallback {
+    HILINK_NUM = 1,
+    EAP_SIM_NUM = 2,
+    CSA_CHSWITCH_NUM = 3,
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 

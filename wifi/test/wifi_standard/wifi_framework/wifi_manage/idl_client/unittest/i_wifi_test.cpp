@@ -267,7 +267,7 @@ public:
         LOGI("Mock OnStaDeauthorizedTest!");
     }
 
-    static void OnStaAuthorizedTest(const char *p2pDeviceAddress)
+    static void OnStaAuthorizedTest(const char *p2pDeviceAddress, const char *p2pGroupAddress)
     {
         LOGI("Mock OnStaAuthorizedTest!");
     }

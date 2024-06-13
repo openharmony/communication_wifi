@@ -62,6 +62,8 @@ enum class P2pActionCallback : unsigned char {
     P2pSetDeviceName,
     CreateHid2dGroup,
     Hid2dConnect,
+    RemoveGroupClient,
+    DiscoverPeers,
     UNKNOWN
 };
 
@@ -131,6 +133,12 @@ enum class P2pGroupCapability {
     PGC_IP_ADDR_ALLOC = 1 << 7
 };
 
+struct GcInfo {
+    std::string ip;
+    std::string mac;
+    std::string host;
+};
+
 enum class GroupOwnerBand { GO_BAND_AUTO, GO_BAND_2GHZ, GO_BAND_5GHZ };
 const int MAX_WFD_SUBELEMS = 12;
 const char DeviceInfoSubelemLenHex[] = {"0006"};
@@ -183,7 +191,9 @@ public:
     void SetNetworkName(const std::string &name);
     const std::string &GetNetworkName() const;
     void SetDeviceAddress(const std::string &deviceAddress);
+    void SetRandomDeviceAddress(const std::string &deviceAddress);
     const std::string &GetDeviceAddress() const;
+    const std::string &GetRandomDeviceAddress() const;
     void SetDeviceAddressType(int devAddressType);
     int GetDeviceAddressType() const;
     void SetPrimaryDeviceType(const std::string &setPrimaryDeviceType);
@@ -210,11 +220,15 @@ public:
     bool WpsPbcSupported() const;
     bool WpsDisplaySupported() const;
     bool WpKeypadSupported() const;
+    void SetGroupAddress(const std::string &groupAddress);
+    const std::string &GetGroupAddress() const;
 
 private:
     std::string deviceName; /* the value range is 0 to 32 characters. */
     std::string networkName; /* oper_ssid of peer device */
     std::string mDeviceAddress; /* the device MAC address, the length is 17 characters. */
+    std::string mGroupAddress; /* the group MAC address, the length is 17 characters. */
+    std::string mRandomDeviceAddress; /* the device random MAC address, the length is 17 characters. */
     int deviceAddressType; /* the device MAC address type */
     std::string primaryDeviceType;
     std::string secondaryDeviceType;
@@ -271,6 +285,8 @@ public:
     void ClearClientDevices();
     bool IsExplicitGroup(void) const;
     void SetExplicitGroup(bool isExplicit);
+    void SetCreatorUid(int uid);
+    int GetCreatorUid();
 
 private:
     WifiP2pDevice owner;
@@ -285,6 +301,7 @@ private:
     std::vector<WifiP2pDevice> clientDevices;
     std::string goIpAddress;
     bool explicitGroup;
+    int creatorUid = -1;
 };
 
 class WpsInfo {
@@ -394,11 +411,15 @@ public:
     const bool &IsGroupOwner() const;
     void SetIsGroupOwnerAddress(const std::string &setGroupOwnerAddress);
     const std::string &GetGroupOwnerAddress() const;
-
+    void AddClientInfoList(const std::string &mac, const std::string &ip, const std::string &host);
+    void RemoveClientInfo(std::string mac);
+    void ClearClientInfo();
+    const std::vector<GcInfo> &GetClientInfoList() const;
 private:
     P2pConnectedState connectState;
     bool isP2pGroupOwner;
     std::string groupOwnerAddress; /* the length is 17 characters. */
+    std::vector<GcInfo> gc_info_list;
 };
 
 const int SERVICE_TLV_LENGTH_SIZE = 2;

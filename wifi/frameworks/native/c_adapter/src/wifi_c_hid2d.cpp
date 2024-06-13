@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "../../../interfaces/kits/c/wifi_hid2d.h"
-#include "../../../interfaces/inner_api/wifi_hid2d.h"
+#include "kits/c/wifi_hid2d.h"
+#include "inner_api/wifi_hid2d.h"
 #include "define.h"
 #include "wifi_logger.h"
 #include "wifi_c_utils.h"
 #include "wifi_common_util.h"
-#include "../../../interfaces/kits/c/wifi_device.h"
+#include "kits/c/wifi_device.h"
 
 DEFINE_WIFILOG_LABEL("WifiCHid2d");
 

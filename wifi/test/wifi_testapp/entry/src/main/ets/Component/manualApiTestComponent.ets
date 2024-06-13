@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-
 import { TestData } from '../entryability/model/testData'
 import { TestList } from './testList';
 
@@ -24,13 +22,17 @@ import { TestList } from './testList';
 
 @Component
 export struct ManualApiTest {
-  private testItems: TestData[]
+  private testItems!: TestData[]
+
+  aboutToAppear() {
+    console.info("ManualApiTest testItems:" + JSON.stringify(this.testItems))
+  }
 
   build() {
     Column() {
-      TestList( {
+      TestList({
         testItems : this.testItems
-      } )
+      })
     }
   }
 }

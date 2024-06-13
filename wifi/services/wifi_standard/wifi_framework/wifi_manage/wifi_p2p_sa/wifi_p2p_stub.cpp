@@ -71,6 +71,12 @@ void WifiP2pStub::InitHandleMapEx()
         &WifiP2pStub::OnQueryP2pLocalDevice;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE)] =
         &WifiP2pStub::OnHid2dSetUpperScene;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_PEERS)] =
+        &WifiP2pStub::OnDiscoverPeers;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC)] =
+        &WifiP2pStub::OnDisableRandomMac;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P)] =
+        &WifiP2pStub::OnCheckCanUseP2p;
     return;
 }
 
@@ -100,6 +106,8 @@ void WifiP2pStub::InitHandleMap()
         &WifiP2pStub::OnCreateGroup;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP)] =
         &WifiP2pStub::OnRemoveGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT)] =
+        &WifiP2pStub::OnRemoveGroupClient;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_GROUP)] =
         &WifiP2pStub::OnDeleteGroup;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CONNECT)] = &WifiP2pStub::OnP2pConnect;
@@ -290,6 +298,19 @@ void WifiP2pStub::OnRemoveGroup(uint32_t code, MessageParcel &data, MessageParce
     return;
 }
 
+void WifiP2pStub::OnRemoveGroupClient(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    GcInfo info;
+    info.ip = data.ReadString();
+    info.mac = data.ReadString();
+    info.host = data.ReadString();
+    ErrCode ret = RemoveGroupClient(info);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
 void WifiP2pStub::OnDeleteGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -338,6 +359,14 @@ void WifiP2pStub::OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, Messa
         reply.WriteInt32(static_cast<int>(config.GetConnectState()));
         reply.WriteBool(config.IsGroupOwner());
         reply.WriteString(config.GetGroupOwnerAddress());
+        std::vector<GcInfo> gcInfos = config.GetClientInfoList();
+        int size = gcInfos.size();
+        reply.WriteInt32(size);
+        for (int i = 0; i < size; i++) {
+            reply.WriteString(gcInfos[i].mac);
+            reply.WriteString(gcInfos[i].ip);
+            reply.WriteString(gcInfos[i].host);
+        }
     }
     return;
 }
@@ -465,6 +494,35 @@ void WifiP2pStub::OnQueryP2pServices(uint32_t code, MessageParcel &data, Message
     return;
 }
 
+void WifiP2pStub::OnDiscoverPeers(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int channelid = data.ReadInt32();
+    ErrCode ret = DiscoverPeers(channelid);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiP2pStub::OnDisableRandomMac(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int setmode = data.ReadInt32();
+    ErrCode ret = DisableRandomMac(setmode);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiP2pStub::OnCheckCanUseP2p(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = CheckCanUseP2p();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
 bool WifiP2pStub::ReadWifiP2pServiceInfo(MessageParcel &data, WifiP2pServiceInfo &info)
 {
     const char *readStr = nullptr;
@@ -543,6 +601,7 @@ void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevi
 {
     reply.WriteString(device.GetDeviceName());
     reply.WriteString(device.GetDeviceAddress());
+    reply.WriteString(device.GetRandomDeviceAddress());
     reply.WriteInt32(device.GetDeviceAddressType());
     reply.WriteString(device.GetPrimaryDeviceType());
     reply.WriteString(device.GetSecondaryDeviceType());

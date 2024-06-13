@@ -149,6 +149,14 @@ public:
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     /**
+     * @Description set wifi tx power for sar
+     *
+     * @param power - txpower
+     * @return ErrCode - operation result
+     */
+    ErrCode SetTxPower(int power) override;
+
+    /**
      * @Description Enable device config, when set attemptEnable, disable other device config
      *
      * @param networkId - need enable device config's network id
@@ -181,6 +189,16 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
 
     /**
      * @Description Check whether Wi-Fi is connected.
@@ -372,11 +390,11 @@ public:
     /**
      * @Description set frozen app
      *
-     * @param uid - uid of frozen app
+     * @param pidList - pids of frozen app
      * @param isFrozen - is app frozen
      * @return ErrCode - operation result
      */
-    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+    ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) override;
 
     /**
      * @Description reset all frozen app
@@ -452,6 +470,44 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode FactoryReset() override;
+
+    /**
+     * @Description  limit speed
+     *
+     * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit
+     * @param limitMode speed limit mode, ranges 1 to 9
+     * @return WifiErrorNo
+     */
+    ErrCode LimitSpeed(const int controlId, const int limitMode) override;
+	
+    /**
+     * @Description hilink connect
+     *
+     * @return ErrCode - hilink connect result
+     */
+    ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableSemiWifi() override;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetWifiDetailState(WifiDetailState &state) override;
+
+    /**
+     * @Description set satellite state
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetSatelliteState(const int state) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

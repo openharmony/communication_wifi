@@ -45,6 +45,8 @@ public:
 #else
     explicit WifiDeviceServiceImpl(int instId);
     static void StartWatchdog(void);
+    static ErrCode OnBackup(MessageParcel& data, MessageParcel& reply);
+    static ErrCode OnRestore(MessageParcel& data, MessageParcel& reply);
 #endif
     virtual ~WifiDeviceServiceImpl();
 
@@ -68,6 +70,8 @@ public:
 
     ErrCode RemoveAllDevice() override;
 
+    ErrCode SetTxPower(int power) override;
+
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
@@ -77,6 +81,8 @@ public:
     ErrCode ConnectToNetwork(int networkId, bool isCandidate) override;
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
+
+    ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
 
     ErrCode IsConnected(bool &isConnected) override;
 
@@ -108,7 +114,7 @@ public:
 
     ErrCode GetCountryCode(std::string &countryCode) override;
 
-    ErrCode SetAppFrozen(int uid, bool isFrozen) override;
+    ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) override;
 
     ErrCode ResetAllFrozenApp() override;
 
@@ -158,6 +164,17 @@ public:
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
 
     ErrCode FactoryReset() override;
+
+    ErrCode LimitSpeed(const int controlId, const int limitMode) override;
+
+    ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
+    ErrCode EnableSemiWifi() override;
+
+    ErrCode GetWifiDetailState(WifiDetailState &state) override;
+
+    ErrCode SetSatelliteState(const int state) override;
+
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);
@@ -169,6 +186,7 @@ private:
     bool IsWifiBrokerProcess(int uid);
     ErrCode CheckRemoveCandidateConfig(void);
     void SetWifiConnectedMode(void);
+    ErrCode HilinkGetMacAddress(WifiDeviceConfig &deviceConfig, std::string &currentMac);
 #ifndef OHOS_ARCH_LITE
     bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
 #endif

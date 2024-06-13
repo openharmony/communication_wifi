@@ -320,5 +320,37 @@ HWTEST_F(GroupFormedStateTest, ProcessCmdCancelConnect, TestSize.Level1)
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
     EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
 }
+
+HWTEST_F(GroupFormedStateTest, ProcessCmdDiscServices, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ReqServiceDiscovery(_, _, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+}
+
+HWTEST_F(GroupFormedStateTest, ProcessCmdStartListen, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetListenChannel(_, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pConfigureListen(_, _, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pGroupFormedState->ExecuteStateMsg(&msg));
+}
 }  // namespace Wifi
 }  // namespace OHOS

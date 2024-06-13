@@ -19,8 +19,7 @@
 #include <sys/time.h>
 #include "mock_sta_service.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_sta_hal_interface.h"
-#include "mock_wifi_supplicant_hal_interface.h"
+#include "mock_wifi_sta_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -78,6 +77,20 @@ public:
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         pStaInterface->EnableWifi();
+    }
+
+    void EnableSemiWifiSuccess()
+    {
+        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, EnableSemiWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->EnableSemiWifi() == WIFI_OPT_SUCCESS);
+    }
+
+    void EnableSemiWifiFail()
+    {
+        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, EnableSemiWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->EnableSemiWifi() == WIFI_OPT_FAILED);
     }
 
     void DisableWifiSuceess()
@@ -362,6 +375,31 @@ public:
         EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->ReConnect() == WIFI_OPT_FAILED);
     }
+
+    void StartHttpDetectSucc()
+    {
+        EXPECT_CALL(*pMockStaService, StartHttpDetect()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->StartHttpDetect() == WIFI_OPT_SUCCESS);
+    }
+
+    void StartHttpDetectFail()
+    {
+        EXPECT_CALL(*pMockStaService, StartHttpDetect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->StartHttpDetect() == WIFI_OPT_SUCCESS);
+    }
+    
+    void EnableHiLinkHandshakeSuceess()
+    {
+        WifiDeviceConfig config;
+        std::string bssid = "01:23:45:67:89:ab";
+        pStaInterface->EnableHiLinkHandshake(config, bssid);
+    }
+
+    void DeliverStaIfaceDataSuceess()
+    {
+        std::string mac = "01:23:45:67:89:ab";
+        pStaInterface->DeliverStaIfaceData(mac);
+    }
 };
 
 extern "C" IStaService *Create(void);
@@ -380,6 +418,16 @@ HWTEST_F(StaInterfaceTest, EnableWifiSuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, EnableWifiFail1, TestSize.Level1)
 {
     EnableWifiFail1();
+}
+
+HWTEST_F(StaInterfaceTest, EnableSemiWifiSuccess, TestSize.Level1)
+{
+    EnableSemiWifiSuccess();
+}
+
+HWTEST_F(StaInterfaceTest, EnableSemiWifiFail, TestSize.Level1)
+{
+    EnableSemiWifiFail();
 }
 
 HWTEST_F(StaInterfaceTest, DisableWifiSuceess, TestSize.Level1)
@@ -593,6 +641,16 @@ HWTEST_F(StaInterfaceTest, ReConnectFail, TestSize.Level1)
     ReConnectFail();
 }
 
+HWTEST_F(StaInterfaceTest, StartHttpDetectSucc, TestSize.Level1)
+{
+    StartHttpDetectSucc();
+}
+
+HWTEST_F(StaInterfaceTest, StartHttpDetectFail, TestSize.Level1)
+{
+    StartHttpDetectFail();
+}
+
 HWTEST_F(StaInterfaceTest, OnScreenStateChangedSuccess1, TestSize.Level1)
 {
     int screenState = MODE_STATE_OPEN;
@@ -636,12 +694,8 @@ HWTEST_F(StaInterfaceTest, DeregisterAutoJoinCondition, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, RegisterFilterBuilderSuccess, TestSize.Level1)
 {
     EXPECT_CALL(*pMockStaService, RegisterFilterBuilder(_, _, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-    FilterBuilder filterBuilder = [](auto & filterFunc) {
-        filterFunc = [](NetworkCandidate & network_candidate) {
-            return true;
-        };
-    };
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
+    FilterBuilder filterBuilder = [](auto & compositeWifiFilter) {};
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG,
                                                                      "testFilterBuilder",
                                                                      filterBuilder));
 }
@@ -649,12 +703,8 @@ HWTEST_F(StaInterfaceTest, RegisterFilterBuilderSuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, RegisterFilterBuilderFail, TestSize.Level1)
 {
     EXPECT_CALL(*pMockStaService, RegisterFilterBuilder(_, _, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-    FilterBuilder filterBuilder = [](auto &filterFunc) {
-        filterFunc = [](NetworkCandidate &network_candidate) {
-            return true;
-        };
-    };
-    EXPECT_EQ(WIFI_OPT_FAILED, pStaInterface->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
+    FilterBuilder filterBuilder = [](auto &filterFunc) {};
+    EXPECT_EQ(WIFI_OPT_FAILED, pStaInterface->RegisterFilterBuilder(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG,
                                                                     "testFilterBuilder",
                                                                     filterBuilder));
 }
@@ -662,16 +712,25 @@ HWTEST_F(StaInterfaceTest, RegisterFilterBuilderFail, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, DeregisterFilterBuilderSuccess, TestSize.Level1)
 {
     EXPECT_CALL(*pMockStaService, DeregisterFilterBuilder(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->DeregisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->DeregisterFilterBuilder(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG,
                                                                        "testFilterBuilder"));
 }
 
 HWTEST_F(StaInterfaceTest, DeregisterFilterBuilderFail, TestSize.Level1)
 {
     EXPECT_CALL(*pMockStaService, DeregisterFilterBuilder(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-    EXPECT_EQ(WIFI_OPT_FAILED, pStaInterface->DeregisterFilterBuilder(FilterTag::SAVED_NETWORK_SELECTOR_FILTER_TAG,
+    EXPECT_EQ(WIFI_OPT_FAILED, pStaInterface->DeregisterFilterBuilder(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG,
                                                                       "testFilterBuilder"));
 }
 
+HWTEST_F(StaInterfaceTest, EnableHiLinkHandshakeSuccess, TestSize.Level1)
+{
+    EnableHiLinkHandshakeSuceess();
+}
+
+HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
+{
+    DeliverStaIfaceDataSuceess();
+}
 } // namespace Wifi
 } // namespace OHOS

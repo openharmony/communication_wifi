@@ -26,15 +26,9 @@ config("module_private_config") {
 ohos_unittest("wifi_scan_unittest") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/handler.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/internal_message.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/message_queue.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common/state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_monitor.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_service.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_standby_listerner.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_state_machine.cpp",
     "Mock/mock_scan_service.cpp",
     "Mock/mock_scan_state_machine.cpp",
@@ -43,7 +37,9 @@ ohos_unittest("wifi_scan_unittest") {
     "Mock/mock_wifi_sta_hal_interface.cpp",
     "Mock/mock_wifi_supplicant_hal_interface.cpp",
     "global_test.cpp",
+    "scan_interface_test.cpp",
     "scan_monitor_test.cpp",
+    "scan_service_test.cpp",
     "scan_state_machine_test.cpp",
   ]
 
@@ -52,13 +48,13 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/cRPC/include",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/",
@@ -88,7 +84,9 @@ ohos_unittest("wifi_scan_unittest") {
     "--coverage",
   ]
   deps = [
+    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",

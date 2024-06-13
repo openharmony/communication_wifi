@@ -15,10 +15,13 @@
 
 #include "network_parser.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("NetworkXmlParser");
+constexpr auto XML_TAG_MIGRATE_DOCUMENT_HEADER = "WifiConfigStoreData";
+constexpr auto XML_TAG_CLONE_DOCUMENT_HEADER = "WifiBackupData";
 constexpr auto XML_TAG_SECTION_HEADER_NETWORK_LIST = "NetworkList";
 constexpr auto XML_TAG_SECTION_HEADER_NETWORK = "Network";
 constexpr auto XML_TAG_SECTION_HEADER_WIFI_CONFIGURATION = "WifiConfiguration";
@@ -33,7 +36,7 @@ constexpr auto XML_TAG_HIDDEN_SSID = "HiddenSSID";
 constexpr auto XML_TAG_ALLOWED_KEY_MGMT = "AllowedKeyMgmt";
 constexpr auto XML_TAG_RANDOMIZED_MAC_ADDRESS = "RandomizedMacAddress";
 constexpr auto XML_TAG_MAC_RANDOMIZATION_SETTING = "MacRandomizationSetting";
-constexpr auto XML_TAG_STATUS = "Status";
+constexpr auto XML_TAG_STATUS = "SelectionStatus";
 constexpr auto XML_TAG_IP_ASSIGNMENT = "IpAssignment";
 constexpr auto XML_TAG_LINK_ADDRESS = "LinkAddress";
 constexpr auto XML_TAG_LINK_PREFIX_LENGTH = "LinkPrefixLength";
@@ -336,9 +339,6 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
             case WifiConfigType::RANDOMIZEDMACADDRESS:
                 wifiConfig.macAddress = GetStringValue(node);
                 break;
-            case WifiConfigType::STATUS:
-                ParseStatus(node, wifiConfig);
-                break;
             case WifiConfigType::WEPKEYINDEX:
                 wifiConfig.wepTxKeyIndex = GetPrimValue<int>(node, PrimType::INT);
                 break;
@@ -351,6 +351,25 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
         }
     }
     return wifiConfig;
+}
+
+void NetworkXmlParser::ParseNetworkStatus(xmlNodePtr innode, WifiDeviceConfig& wifiConfig)
+{
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseWifiConfig node null");
+        return;
+    }
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
+        switch (GetConfigNameAsInt(node)) {
+            case WifiConfigType::STATUS: {
+                ParseStatus(node, wifiConfig);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
 }
 
 void NetworkXmlParser::ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig)
@@ -373,8 +392,8 @@ void NetworkXmlParser::ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDevice
         WIFI_LOGE("ParseStatus node null");
         return;
     }
-    int status = GetPrimValue<int>(node, PrimType::INT);
-    if (status == 1) { // 1 means DISABLED else enable
+    std::string status = GetStringValue(node);
+    if (status.compare("NETWORK_SELECTION_ENABLED")) {
         wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
     } else {
         wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
@@ -393,6 +412,10 @@ WifiDeviceConfig NetworkXmlParser::ParseNetwork(xmlNodePtr innode)
         switch (GetNodeNameAsInt(node)) {
             case NetworkSection::WIFI_CONFIGURATION: {
                 wifiConfig = ParseWifiConfig(node);
+                break;
+            }
+            case NetworkSection::NETWORK_STATUS: {
+                ParseNetworkStatus(node, wifiConfig);
                 break;
             }
             case NetworkSection::IP_CONFIGURATION: {
@@ -415,15 +438,18 @@ void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
         return;
     }
     xmlNodePtr networkNodeList = GotoNetworkList(innode);
+    int xmlSavedNetworkCount = 0;
     for (xmlNodePtr node = networkNodeList->children; node != nullptr; node = node->next) {
         if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_SECTION_HEADER_NETWORK)) == 0) {
+            xmlSavedNetworkCount++;
             WifiDeviceConfig wifiDeviceConfig = ParseNetwork(node);
             if (IsWifiConfigValid(wifiDeviceConfig)) {
                 wifiConfigs.push_back(wifiDeviceConfig);
             }
         }
     }
-    WIFI_LOGI("ParseNetworkList size[%{public}lu]", (unsigned long) wifiConfigs.size());
+    WIFI_LOGI("ParseNetwork size=%{public}lu, xml config total size=%{public}d",
+        (unsigned long) wifiConfigs.size(), xmlSavedNetworkCount);
 }
 
 void NetworkXmlParser::ParseMacMap()
@@ -440,19 +466,50 @@ void NetworkXmlParser::ParseMacMap()
     }
 }
 
+NetworkParseType NetworkXmlParser::GetParseType(xmlNodePtr node)
+{
+    if (node == nullptr) {
+        WIFI_LOGE("GetParseType node null");
+        return NetworkParseType::UNKNOWN;
+    }
+
+    if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_MIGRATE_DOCUMENT_HEADER)) == 0) {
+        return NetworkParseType::MIGRATE;
+    } else if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_CLONE_DOCUMENT_HEADER)) == 0) {
+        return NetworkParseType::CLONE;
+    }
+    return NetworkParseType::UNKNOWN;
+}
+
 bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
 {
     if (node == nullptr) {
         WIFI_LOGE("ParseInternal node null");
         return false;
     }
-    if (IsDocValid(node) != true) {
-        WIFI_LOGE("ParseInternal Doc invalid");
+
+    NetworkParseType parseType = GetParseType(node);
+    if (parseType == NetworkParseType::UNKNOWN) {
+        WIFI_LOGE("ParseInternal Doc invaild");
         return false;
     }
+    WIFI_LOGI("ParseInternal parseType: %{public}d.", static_cast<int>(parseType));
+
     ParseNetworkList(node);
-    ParseMacMap();
+    if (parseType == NetworkParseType::CLONE) {
+        // Enable all networks restored and no need to parse randommac.
+        EnableNetworks();
+    } else if (parseType == NetworkParseType::MIGRATE) {
+        ParseMacMap();
+    }
     return true;
+}
+
+void NetworkXmlParser::EnableNetworks()
+{
+    for (auto &wifiConfig : wifiConfigs) {
+        wifiConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
+    }
 }
 
 bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)
@@ -461,6 +518,8 @@ bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)
         || wifiConfig.keyMgmt == OHOS::Wifi::KEY_MGMT_WEP || wifiConfig.keyMgmt == OHOS::Wifi::KEY_MGMT_WPA_PSK) {
         return true;
     }
+    WIFI_LOGE("invalid wifiConfig: ssid=%{public}s, keyMgmt=%{public}s",
+        SsidAnonymize(wifiConfig.ssid).c_str(), wifiConfig.keyMgmt.c_str());
     return false;
 }
 

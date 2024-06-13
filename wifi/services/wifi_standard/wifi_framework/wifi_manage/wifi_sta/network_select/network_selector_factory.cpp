@@ -17,8 +17,7 @@
 #include "network_selector_factory.h"
 #include "wifi_logger.h"
 
-namespace OHOS {
-namespace Wifi {
+namespace OHOS::Wifi {
 DEFINE_WIFILOG_LABEL("NetworkSelectorFactory")
 
 NetworkSelectorFactory::NetworkSelectorFactory()
@@ -27,7 +26,7 @@ NetworkSelectorFactory::NetworkSelectorFactory()
         &NetworkSelectorFactory::CreateAutoConnectNetworkSelector;
 }
 
-std::optional<std::unique_ptr<INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(
+std::optional<std::unique_ptr<NetworkSelection::INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(
     NetworkSelectType networkSelectType)
 {
     auto iter = handleFuncMap.find(static_cast<uint32_t>(networkSelectType));
@@ -38,9 +37,8 @@ std::optional<std::unique_ptr<INetworkSelector>> NetworkSelectorFactory::GetNetw
     return std::nullopt;
 }
 
-std::unique_ptr<INetworkSelector> NetworkSelectorFactory::CreateAutoConnectNetworkSelector()
+std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateAutoConnectNetworkSelector()
 {
-    return std::make_unique<AutoConnectNetworkSelector>();
-}
+    return std::make_unique<NetworkSelection::AutoConnectIntegrator>();
 }
 } // namespace OHOS::Wifi

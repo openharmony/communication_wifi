@@ -78,6 +78,10 @@ WifiErrorNo GetWifiChipIds(uint8_t *ids, int32_t *size)
         LOGE("server GetWifiChipIds deal failed!");
     } else {
         ReadInt(context, size);
+        if (*size > WIFI_MAX_CHIP_IDS) {
+            LOGE("GetWifiChipIds fail, size error: %{public}d", *size);
+            return WIFI_IDL_OPT_FAILED;
+        }
         for (int i = 0; i < *size; ++i) {
             ReadInt(context, (int *)(ids + i));
         }
@@ -150,7 +154,7 @@ static void IdlCbkAddRemoveIface(Context *context, int event)
     }
     char *iface = NULL;
     int len = ReadStr(context, iface, 0);
-    if (len < 0) {
+    if (len < 0 || len > WIFI_INTERFACE_NAME_SIZE) {
         return;
     }
     iface = (char *)calloc(len + 1, sizeof(char));
@@ -187,7 +191,7 @@ static void IdlCbkStaJoinLeave(Context *context)
         return;
     }
     int len = ReadStr(context, reason, 0);
-    if (len < 0) {
+    if (len < 0 || len > WIFI_REASON_LENGTH) {
         return;
     }
     reason = (char *)calloc(len + 1, sizeof(char));
@@ -238,6 +242,21 @@ static void IdlCbkConnectChanged(Context *context)
     IWifiEventCallback *callback = GetWifiEventCallback();
     if (callback != NULL && callback->onConnectChanged != NULL) {
         callback->onConnectChanged(status, networkId, pMac);
+    }
+    return;
+}
+
+static void IdlCbkDisConnectReasonNotify(Context *context)
+{
+    int reason = 0;
+    char bssid[WIFI_BSSID_LENGTH] = {0};
+    if (ReadInt(context, &reason) < 0 ||
+        ReadStr(context, bssid, sizeof(bssid)) != 0) {
+        return;
+    }
+    IWifiEventCallback *callback = GetWifiEventCallback();
+    if (callback != NULL && callback->onDisConnectReasonNotify != NULL) {
+        callback->onDisConnectReasonNotify(reason, bssid);
     }
     return;
 }
@@ -323,6 +342,9 @@ static int IdlDealStaApEvent(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_CONNECT_CHANGED:
             IdlCbkConnectChanged(context);
+            break;
+        case WIFI_IDL_CBK_CMD_STA_DISCONNECT_REASON_EVENT:
+            IdlCbkDisConnectReasonNotify(context);
             break;
         case WIFI_IDL_CBK_CMD_BSSID_CHANGED:
             IdlCbkBssidChanged(context);
@@ -621,7 +643,7 @@ static void IdlCbP2pServDiscRespEvent(Context *context)
         return;
     }
     unsigned char *tlvs = NULL;
-    if (tlvsLength > 0) {
+    if (tlvsLength > 0 && tlvsLength < WIFI_MAX_TLVS_LENGTH) {
         tlvs = (unsigned char *)calloc(tlvsLength + 1, sizeof(unsigned char));
         if (tlvs == NULL) {
             return;
@@ -658,8 +680,12 @@ static void IdlCbP2pProvServDiscFailureEvent()
 
 static void IdlCbP2pApStaConnectEvent(Context *context, int event)
 {
-    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
-    if (ReadStr(context, address, sizeof(address)) != 0) {
+    char devAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
+    char groupAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
+    if (ReadStr(context, devAddress, sizeof(devAddress)) != 0) {
+        return;
+    }
+    if (ReadStr(context, groupAddress, sizeof(groupAddress)) != 0) {
         return;
     }
     IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();
@@ -667,10 +693,10 @@ static void IdlCbP2pApStaConnectEvent(Context *context, int event)
         return;
     }
     if (event == WIFI_IDL_CBK_CMD_AP_STA_DISCONNECTED_EVENT && callback->onStaDeauthorized != NULL) {
-        callback->onStaDeauthorized(address);
+        callback->onStaDeauthorized(devAddress);
     }
     if (event == WIFI_IDL_CBK_CMD_AP_STA_CONNECTED_EVENT && callback->onStaAuthorized != NULL) {
-        callback->onStaAuthorized(address);
+        callback->onStaAuthorized(devAddress, groupAddress);
     }
     return;
 }
@@ -686,7 +712,7 @@ static void IdlCbP2pServDiscReqEvent(Context *context)
         ReadInt(context, &info.tlvsLength) < 0) {
         return;
     }
-    if (info.tlvsLength > 0) {
+    if (info.tlvsLength > 0 && info.tlvsLength < WIFI_MAX_TLVS_LENGTH) {
         info.tlvs = (unsigned char *)calloc(info.tlvsLength + 1, sizeof(unsigned char));
         if (info.tlvs == NULL) {
             return;
@@ -735,6 +761,20 @@ static void IdlCbP2pConnectFailedEvent(Context *context)
     IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();
     if (callback != NULL && callback->onP2pConnectFailed != NULL) {
         callback->onP2pConnectFailed(macAddress, reason);
+    }
+    return;
+}
+
+static void IdlCbP2pChannelSwitchEvent(Context *context)
+{
+    int freq = 0;
+    if (ReadInt(context, &freq) < 0) {
+        LOGE("Failed to read P2pChannelSwitchEvent");
+        return;
+    }
+    IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();
+    if (callback != NULL && callback->onP2pChannelSwitch != NULL) {
+        callback->onP2pChannelSwitch(freq);
     }
     return;
 }
@@ -819,6 +859,9 @@ static int IdlDealP2pEventSecond(Context *context, int event)
             break;
         case WIFI_IDL_CBK_CMD_P2P_CONNECT_FAILED:
             IdlCbP2pConnectFailedEvent(context);
+            break;
+        case WIFI_IDL_CBK_CMD_P2P_CHANNEL_SWITCH_EVENT:
+            IdlCbP2pChannelSwitchEvent(context);
             break;
         default:
             return -1;

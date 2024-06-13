@@ -15,10 +15,11 @@
 #ifndef OHOS_WIFI_DEVICE_H
 #define OHOS_WIFI_DEVICE_H
 
+#include <set>
 #include "i_wifi_device_callback.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
-#include "network_selection_msg.h"
+#include "network_selection.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -292,6 +293,14 @@ public:
     virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) = 0;
 
     /**
+     * @Description Set wifi tx power for sar.
+     *
+     * @param power - 1001,1002,1003......
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetWifiTxPower(int power) = 0;
+
+    /**
      * @Description Disable Wi-Fi device configuration.
      *
      * @param networkId - device config's network id
@@ -372,11 +381,11 @@ public:
     /**
      * @Description set frozen app
      *
-     * @param uid - uid of frozen app
+     * @param pidList - pids of frozen app
      * @param isFrozen - is app frozen
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetAppFrozen(int uid, bool isFrozen) = 0;
+    virtual ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) = 0;
 
     /**
      * @Description reset all frozen app
@@ -447,6 +456,54 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode FactoryReset() = 0;
+    
+    /**
+     * @Description  limit speed
+     *
+     * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit
+     * @param limitMode speed limit mode, ranges 1 to 9
+     * @return WifiErrorNo
+     */
+    virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
+
+    /**
+     * @Description hilink connect
+     *
+     * @return ErrCode - hilink connect result
+     */
+    virtual ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) = 0;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableSemiWifi() = 0;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiDetailState(WifiDetailState &state) = 0;
+
+    /**
+     * @Description set satellite state
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetSatelliteState(const int state) = 0;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

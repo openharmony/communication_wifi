@@ -16,6 +16,7 @@
 #define OHOS_IDL_IWIFI_STRUCT_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +32,8 @@ extern "C" {
 #define WIFI_AP_PASSWORD_LENGTH 64
 #define WIFI_INTERFACE_NAME_SIZE 32
 #define WIFI_PIN_CODE_LENGTH 8
+#define WIFI_MAX_TLVS_LENGTH 4096
+#define WIFI_MAX_CHIP_IDS 4096
 
 /* IWifiIface */
 /*
@@ -111,6 +114,7 @@ typedef struct ScanInfo {
     int isErpExist;
     int maxRates;
     int extMaxRates;
+    bool isHiLinkNetwork;
 } ScanInfo;
 
 typedef struct WifiNetworkInfo {
@@ -159,6 +163,7 @@ typedef enum DeviceConfigType {
     DEVICE_CONFIG_SAE_PASSWD = 22,
     DEVICE_CONFIG_EAP_CA_CERT = 23,
     DEVICE_CONFIG_EAP_CERT_PWD = 24,
+    DEVICE_CONFIG_GROUP_MGMT_CIPHERS = 25,
     DEVICE_CONFIG_END_POS, /* Number of network configuration parameters, which is used as the last parameter. */
 } DeviceConfigType;
 
@@ -245,7 +250,7 @@ typedef enum IfaceType { TYPE_STA, TYPE_AP, TYPE_P2P, TYPE_NAN } IfaceType;
 #define WIFI_P2P_MAX_GROUP_IFACE_NAME_LENGTH 64
 #define WIFI_P2P_DEVICE_TYPE_LENGTH 64
 #define WIFI_P2P_DEVICE_NAME_LENGTH 128
-#define WIFI_P2P_WFD_DEVICE_INFO_LENGTH 32
+#define WIFI_P2P_WFD_DEVICE_INFO_LENGTH 128
 #define WIFI_P2P_IDL_SERVER_NAME_LENGTH 256
 #define WIFI_P2P_IDL_SERVER_INFO_LENGTH 256
 #define WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH 256

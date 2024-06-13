@@ -83,6 +83,11 @@ public:
         WIFI_LOGI("OnP2pPeersChanged Mock");
     }
 
+    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override
+    {
+        WIFI_LOGI("OnP2pPrivatePeersChanged Mock");
+    }
+
     void OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo>& srvInfo) override
     {
         WIFI_LOGI("OnP2pServicesChanged Mock");
@@ -106,6 +111,16 @@ public:
     void OnConfigChanged(CfgType type, char* data, int dataLen) override
     {
         WIFI_LOGI("OnConfigChanged Mock");
+    }
+
+    void OnP2pGcJoinGroup(const GcInfo &info) override
+    {
+        WIFI_LOGI("OnP2pGcJoinGroup Mock");
+    }
+
+    void OnP2pGcLeaveGroup(const GcInfo &info) override
+    {
+        WIFI_LOGI("OnP2pGcLeaveGroup Mock");
     }
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override{
@@ -377,6 +392,26 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest2, TestSize.Level1)
     data.WriteInt32(0);
     data.WriteInt32(1);
     data.WriteInt32(1);
+    pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
+    const sptr<IWifiP2pCallback> userCallback = new (std::nothrow) IWifiP2pCallbackMock();
+    pWifiP2pCallbackStub->RegisterCallBack(userCallback);
+    if (!data.WriteInterfaceToken(IWifiP2pCallback::GetDescriptor())) {
+        return;
+    }
+    pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
+    delete userCallback;
+}
+
+HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pGcJoinGroupTest, TestSize.Level1)
+{
+    WIFI_LOGI("RemoteOnP2pGcJoinGroup enter");
+    uint32_t code = static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_GC_JOIN_GROUP);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(IWifiP2pCallback::GetDescriptor())) {
+        return;
+    }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
     const sptr<IWifiP2pCallback> userCallback = new (std::nothrow) IWifiP2pCallbackMock();
     pWifiP2pCallbackStub->RegisterCallBack(userCallback);

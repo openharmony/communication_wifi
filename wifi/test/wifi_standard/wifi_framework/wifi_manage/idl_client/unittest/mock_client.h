@@ -22,9 +22,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
- 
+
 typedef struct RpcClient RpcClient;
- 
+
 /*
  * RPC CLIENT
  * RPC client sends a request and wait for a response from the server,
@@ -37,7 +37,7 @@ typedef struct RpcClient RpcClient;
  * 2. thread: poll read ---> server callback msg ---> OnTransact
  *    client: OnTransact ---> deal event callback functions
  */
- 
+
 struct RpcClient {
     Context *context;
     int threadRunFlag;
@@ -49,7 +49,7 @@ struct RpcClient {
     pthread_mutex_t lockMutex;
     pthread_cond_t lockCond;
 };
- 
+
 RpcClient *CreateRpcClient(const char *path);
 void LockRpcClient(RpcClient *client);
 void UnlockRpcClient(RpcClient *client);

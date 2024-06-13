@@ -14,10 +14,10 @@
  */
 #ifndef OHOS_MOCK_BLOCK_CONNECT_SERVICE_H
 #define OHOS_MOCK_BLOCK_CONNECT_SERVICE_H
- 
+
 #include <gmock/gmock.h>
 #include "wifi_msg.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 class MockBlockConnectService {
@@ -26,7 +26,7 @@ public:
   virtual bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason) = 0;
   virtual bool UpdateAllNetworkSelectStatus() = 0;
 };
- 
+
 class BlockConnectService : public MockBlockConnectService {
 public:
     BlockConnectService() = default;

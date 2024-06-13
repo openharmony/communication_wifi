@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "mock_block_connect_service.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 BlockConnectService &BlockConnectService::GetInstance()

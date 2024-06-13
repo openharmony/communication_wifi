@@ -12,17 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef MOCK_CRPC_SERIAL_H
 #define MOCK_CRPC_SERIAL_H
- 
+
 #include <stdint.h>
 #include "context.h"
- 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
- 
+
 /**
  * @Description Write the message start flag to the context
  *
@@ -31,7 +31,7 @@ extern "C" {
  * @return int - 0 Success; -1 Failed
  */
 int WriteBegin(Context *context, int type);
- 
+
 /**
  * @Description Write the function to be invoked by the peer end
  *
@@ -40,7 +40,7 @@ int WriteBegin(Context *context, int type);
  * @return int - 0 Success; -1 Failed
  */
 int WriteFunc(Context *context, const char *funcName);
- 
+
 /**
  * @Description Write data of the int type
  *
@@ -49,7 +49,7 @@ int WriteFunc(Context *context, const char *funcName);
  * @return int - 0 Success; -1 Failed
  */
 int WriteInt(Context *context, int i);
- 
+
 /**
  * @Description Write data of the long type
  *
@@ -58,7 +58,7 @@ int WriteInt(Context *context, int i);
  * @return int - 0 Success; -1 Failed
  */
 int WriteLong(Context *context, long l);
- 
+
 /**
  * @Description Write data of the int64 type
  *
@@ -67,7 +67,7 @@ int WriteLong(Context *context, long l);
  * @return int - 0 Success; -1 Failed
  */
 int WriteInt64(Context *context, int64_t i);
- 
+
 /**
  * @Description Write data of the double type
  *
@@ -76,7 +76,7 @@ int WriteInt64(Context *context, int64_t i);
  * @return int - 0 Success; -1 Failed
  */
 int WriteDouble(Context *context, double d);
- 
+
 /**
  * @Description Write data of the char type
  *
@@ -85,7 +85,7 @@ int WriteDouble(Context *context, double d);
  * @return int - 0 Success; -1 Failed
  */
 int WriteChar(Context *context, char c);
- 
+
 /**
  * @Description Write data of a string type
  *
@@ -94,7 +94,7 @@ int WriteChar(Context *context, char c);
  * @return int - 0 Success; -1 Failed
  */
 int WriteStr(Context *context, const char *str);
- 
+
 /**
  * @Description Write data of the unsigned char* type
  *
@@ -104,7 +104,7 @@ int WriteStr(Context *context, const char *str);
  * @return int - 0 Success; -1 Failed
  */
 int WriteUStr(Context *context, const unsigned char *uStr, unsigned int len);
- 
+
 /**
  * @Description Write the message end flag to the context
  *
@@ -112,7 +112,7 @@ int WriteUStr(Context *context, const unsigned char *uStr, unsigned int len);
  * @return int - 0 Success; -1 Failed
  */
 int WriteEnd(Context *context);
- 
+
 /**
  * @Description Read the function to be called from the context
  *
@@ -122,7 +122,7 @@ int WriteEnd(Context *context);
  * @return int - 0 success; < 0 read error; > 0 the message is longger than count, return the length
  */
 int ReadFunc(Context *context, char *funcName, int count);
- 
+
 /**
  * @Description Reads data of the int type from the context
  *
@@ -131,7 +131,7 @@ int ReadFunc(Context *context, char *funcName, int count);
  * @return int - 0 Success; < 0 read error
  */
 int ReadInt(Context *context, int *i);
- 
+
 /**
  * @Description Reads data of the long type from the context
  *
@@ -140,7 +140,7 @@ int ReadInt(Context *context, int *i);
  * @return int - 0 Success; < 0 read error
  */
 int ReadLong(Context *context, long *l);
- 
+
 /**
  * @Description Reads data of the int64 type from the context
  *
@@ -149,7 +149,7 @@ int ReadLong(Context *context, long *l);
  * @return int - 0 Success; < 0 read error
  */
 int ReadInt64(Context *context, int64_t *i);
- 
+
 /**
  * @Description Reads data of the double type from the context
  *
@@ -158,7 +158,7 @@ int ReadInt64(Context *context, int64_t *i);
  * @return int - 0 Success; < 0 read error
  */
 int ReadDouble(Context *context, double *d);
- 
+
 /**
  * @Description Reads data of the char type from the context
  *
@@ -167,7 +167,7 @@ int ReadDouble(Context *context, double *d);
  * @return int - 0 Success; < 0 read error
  */
 int ReadChar(Context *context, char *c);
- 
+
 /**
  * @Description Reads data of the char* type from the context
  *
@@ -177,7 +177,7 @@ int ReadChar(Context *context, char *c);
  * @return int - 0 Success; < 0 read error; > 0 the message is longger than count, return the length
  */
 int ReadStr(Context *context, char *str, int count);
- 
+
 /**
  * @Description Reads data of the unsigned char* type from the context
  *
@@ -187,7 +187,7 @@ int ReadStr(Context *context, char *str, int count);
  * @return int - 0 Success; < 0 read error; > 0 the message is longger than count, return the length
  */
 int ReadUStr(Context *context, unsigned char *uStr, int count);
- 
+
 #ifdef __cplusplus
 }
 #endif

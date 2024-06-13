@@ -24,15 +24,15 @@
 #include "common.h"
 #include "wifi_log.h"
 #include "net.h"
- 
+
 #undef LOG_TAG
 #define LOG_TAG "WifiRpcClient"
- 
+
 const int FD_CHECK_TIMEOUT = 1000; /* poll wait time, units: ms */
 const int CLIENT_STATE_IDLE = 0;
 const int CLIENT_STATE_DEAL_REPLY = 1;
 const int CLIENT_STATE_EXIT = 2;
- 
+
 #define TMP_BUFF_SIZE 16
 RpcClient *CreateRpcClient(const char *path)
 {
@@ -43,7 +43,7 @@ RpcClient *CreateRpcClient(const char *path)
     client->context = CreateContext(CONTEXT_BUFFER_MIN_SIZE);
     return client;
 }
- 
+
 void LockRpcClient(RpcClient *client)
 {
     if (client == NULL) {
@@ -58,7 +58,7 @@ void LockRpcClient(RpcClient *client)
     pthread_mutex_unlock(&client->lockMutex);
     return;
 }
- 
+
 void ReleaseRpcClient(RpcClient *client)
 {
     if (client != NULL) {
@@ -77,12 +77,12 @@ void ReleaseRpcClient(RpcClient *client)
     }
     return;
 }
- 
+
 int RemoteCall(RpcClient *client)
 {
     return 0;
 }
- 
+
 void ReadClientEnd(RpcClient *client)
 {
     if (client == NULL) {
@@ -99,7 +99,7 @@ void ReadClientEnd(RpcClient *client)
     pthread_mutex_unlock(&client->mutex);
     return;
 }
- 
+
 void UnlockRpcClient(RpcClient *client)
 {
     if (client == NULL) {

@@ -401,10 +401,10 @@ bool WifiEventSubscriberManager::IsMdmForbidden()
 void WifiEventSubscriberManager::DelayedAccessDataShare()
 {
     WIFI_LOGI("DelayedAccessDataShare enter!");
-    GetAirplaneModeByDatashare();
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH)) {
         CheckAndStartStaByDatashare();
     }
+    GetAirplaneModeByDatashare();
 
     if (accessDatashareTimerId != 0) {
         WifiTimer::GetInstance()->UnRegister(accessDatashareTimerId);

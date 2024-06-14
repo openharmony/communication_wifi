@@ -200,7 +200,7 @@ void WifiCountryCodeManager::DealStaCloseRes(OperateResState state, int instId)
 
 void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    WIFI_LOGI("wifi connection state change, state=%{public}d, id=%{public}d", state, instId);
+    WIFI_LOGD("wifi connection state change, state=%{public}d, id=%{public}d", state, instId);
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiCountryCodeManager::GetInstance().m_isFirstConnected = true;
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();

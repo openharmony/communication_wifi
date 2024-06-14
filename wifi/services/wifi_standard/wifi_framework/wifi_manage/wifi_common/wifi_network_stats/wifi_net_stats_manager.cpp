@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("WifiNetStatsManager");
+DEFINE_WIFILOG_LABEL("WifiNetStats");
 
 const char* WLAN_0 = "wlan0";
 const char* UNKNOWN_PACKAGE_NAME = "unknown_package";
@@ -169,6 +169,9 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
     });
     int maxCount = netStats.size() >= MAX_LOG_TRAFFIC ? MAX_LOG_TRAFFIC : static_cast<int>(netStats.size());
     NetStatsInfo totalNetStats = GetTotalNetStatsInfo(netStats);
+    if (totalNetStats.HasNoData()) {
+        return;
+    }
     std::string allTrafficLog;
     allTrafficLog += GetTrafficLog(GetBundleName(totalNetStats.uid_), totalNetStats);
     for (int i = 0; i < maxCount; i++) {
@@ -178,7 +181,7 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
             allTrafficLog += GetTrafficLog(GetBundleName(netStats[i].uid_), netStats[i], false);
         }
     }
-    WIFI_LOGI("%{public}s %{public}s", __FUNCTION__, allTrafficLog.c_str());
+    WIFI_LOGI("%{public}s", allTrafficLog.c_str());
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -297,7 +297,7 @@ ErrCode GetBundleNameByUid(const int uid, std::string &bundleName)
         return WIFI_OPT_FAILED;
     }
     if (!bundleInstance->GetBundleNameForUid(uid, bundleName)) {
-        WIFI_LOGE("%{public}s get bundleName failed", __FUNCTION__);
+        WIFI_LOGD("%{public}s get bundleName failed", __FUNCTION__);
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

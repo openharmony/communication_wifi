@@ -184,7 +184,7 @@ public:
             if (iter->second != nullptr) {
                 int32_t ret = eventQueue->cancel(iter->second);
                 if (ret != 0) {
-                    WIFI_LOGE("RemoveAsyncTask failed, error code : %{public}d", ret);
+                    WIFI_LOGD("RemoveAsyncTask failed, error code : %{public}d", ret);
                 }
                 iter->second = nullptr;
             }

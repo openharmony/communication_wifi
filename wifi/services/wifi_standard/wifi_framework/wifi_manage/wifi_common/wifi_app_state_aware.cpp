@@ -162,7 +162,7 @@ void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &a
         foregroundAppBundleName_ = "";
         foregroundAppUid_ = -1;
     } else {
-        WIFI_LOGI("state = %{pubilc}d, not handle.", appStateData.state);
+        WIFI_LOGD("state = %{public}d, not handle.", appStateData.state);
     }
     WifiProtectManager::GetInstance().OnAppForegroudChanged(appStateData.bundleName, appStateData.state);
 #ifndef OHOS_ARCH_LITE
@@ -246,7 +246,7 @@ void AppStateObserver::OnAppStarted(const AppExecFwk::AppStateData &appStateData
 
 void AppStateObserver::OnAppStopped(const AppExecFwk::AppStateData &appStateData)
 {
-    WIFI_LOGI("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
+    WIFI_LOGD("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
         __func__, appStateData.bundleName.c_str(), appStateData.uid,
         appStateData.state, appStateData.isFocused);
 

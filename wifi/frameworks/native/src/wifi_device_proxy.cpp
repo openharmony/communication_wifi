@@ -57,7 +57,7 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
 
 WifiDeviceProxy::~WifiDeviceProxy()
 {
-    WIFI_LOGI("enter ~WifiDeviceProxy!");
+    WIFI_LOGD("enter ~WifiDeviceProxy!");
     RemoveDeathRecipient();
 }
 

@@ -433,7 +433,7 @@ int WifiProtectManager::GetFgLowlatyProtectCount()
 
 void WifiProtectManager::OnAppDied(const std::string bundlename)
 {
-    LOGI("Enter %{public}s, remove app bundlename %{public}s.",
+    LOGD("Enter %{public}s, remove app bundlename %{public}s.",
         __func__, bundlename.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
     bool needUpdate = false;

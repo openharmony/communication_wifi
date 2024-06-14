@@ -137,7 +137,7 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state,
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 {
-    WIFI_LOGI("OnStreamChanged, direction:%{public}d!", direction);
+    WIFI_LOGD("OnStreamChanged, direction:%{public}d!", direction);
     if (callback_) {
         callback_->OnStreamChanged(direction);
     }

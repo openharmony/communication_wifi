@@ -73,16 +73,137 @@ HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
     wifiManager.wifiStaManager->StartUnloadStaSaTimer();
 }
 
+HWTEST_F(WifiManagerTest, ForceStopWifiTest, TestSize.Level1)
+{
+    WIFI_LOGI("ForceStopWifiTest enter!");
+    wifiManager.wifiStaManager->ForceStopWifi();
+}
+
+HWTEST_F(WifiManagerTest, StaManagerDealStaOpenResTest_001, TestSize.Level1)
+{
+    WIFI_LOGI("StaManagerDealStaOpenResTest_001 enter!");
+    wifiManager.wifiStaManager->DealStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
+}
+
+HWTEST_F(WifiManagerTest, DealStaCloseResTest_001, TestSize.Level1)
+{
+    WIFI_LOGI("DealStaCloseResTest_001 enter!");
+    wifiManager.wifiStaManager->DealStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
+}
+
+HWTEST_F(WifiManagerTest, ResetSelfcureOpenWifiTest, TestSize.Level1)
+{
+    WIFI_LOGI("ResetSelfcureOpenWifiTest enter!");
+    wifiManager.wifiStaManager->ResetSelfcureOpenWifi();
+}
+
+HWTEST_F(WifiManagerTest, DealStaSemiActiveResTest_001, TestSize.Level1)
+{
+    WIFI_LOGI("DealStaSemiActiveResTest_001 enter!");
+    wifiManager.wifiStaManager->DealStaSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_OPENING);
+}
+
+HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealStaConnChangedTest enter!");
+    WifiLinkedInfo info;
+    info.connState = ConnState::AUTHENTICATING;
+    wifiManager.wifiStaManager->DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info);
+}
+
+HWTEST_F(WifiManagerTest, DealWpsChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealWpsChangedTest enter!");
+    wifiManager.wifiStaManager->DealWpsChanged(WpsStartState::START_PBC_SUCCEED, 123456);
+}
+
+HWTEST_F(WifiManagerTest, DealStreamChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealStreamChangedTest enter!");
+    wifiManager.wifiStaManager->DealStreamChanged(StreamDirection::STREAM_DIRECTION_DOWN);
+}
+
+HWTEST_F(WifiManagerTest, DealRssiChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealRssiChangedTest enter!");
+    wifiManager.wifiStaManager->DealRssiChanged(-66);
+}
+
+HWTEST_F(WifiManagerTest, StopSatelliteTimerTest, TestSize.Level1)
+{
+    WIFI_LOGI("StopSatelliteTimerTest enter!");
+    wifiManager.wifiStaManager->StopSatelliteTimer();
+}
+
+HWTEST_F(WifiManagerTest, StartSatelliteTimerTest, TestSize.Level1)
+{
+    WIFI_LOGI("StartSatelliteTimerTest enter!");
+    wifiManager.wifiStaManager->StartSatelliteTimer();
+}
+
 HWTEST_F(WifiManagerTest, StartUnloadScanSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartUnloadScanSaTimerTest enter!");
     wifiManager.wifiScanManager->StartUnloadScanSaTimer();
 }
 
+HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)
+{
+    WIFI_LOGI("CheckAndStartScanService_001 enter!");
+    WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::RUNNING);
+    wifiManager.wifiScanManager->CheckAndStartScanService();
+}
+
+HWTEST_F(WifiManagerTest, CheckAndStartScanService_002, TestSize.Level1)
+{
+    WIFI_LOGI("CheckAndStartScanService_002 enter!");
+    WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::CLOSED);
+    wifiManager.wifiScanManager->CheckAndStartScanService();
+}
+
+HWTEST_F(WifiManagerTest, CheckAndStopScanServiceTest, TestSize.Level1)
+{
+    WIFI_LOGI("ExitTest enter!");
+    wifiManager.wifiScanManager->CheckAndStopScanService();
+}
+
+HWTEST_F(WifiManagerTest, DealScanInfoNotifyTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealScanInfoNotifyTest enter!");
+    std::vector<InterScanInfo> results;
+    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING);
+    wifiManager.wifiScanManager->DealScanInfoNotify(results);
+}
+
+HWTEST_F(WifiManagerTest, ScanManagerDealStaOpenResTest_001, TestSize.Level1)
+{
+    WIFI_LOGI("ScanManagerDealStaOpenResTest_001 enter!");
+    wifiManager.wifiScanManager->DealStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
+}
+
+HWTEST_F(WifiManagerTest, ScanManagerDealStaOpenResTest_002, TestSize.Level1)
+{
+    WIFI_LOGI("ScanManagerDealStaOpenResTest_002 enter!");
+    wifiManager.wifiScanManager->DealStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
+}
+
 HWTEST_F(WifiManagerTest, StartUnloadApSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartUnloadApSaTimerTest enter!");
     wifiManager.wifiHotspotManager->StartUnloadApSaTimer();
+}
+
+HWTEST_F(WifiManagerTest, DealApStateChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealApStateChangedTest enter!");
+    wifiManager.wifiHotspotManager->DealApStateChanged(ApState::AP_STATE_NONE);
+}
+
+HWTEST_F(WifiManagerTest, DealApGetStaLeaveTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealApGetStaLeaveTest enter!");
+    StationInfo info;
+    wifiManager.wifiHotspotManager->DealApGetStaLeave(info);
 }
 
 HWTEST_F(WifiManagerTest, AutoStartP2pService_001, TestSize.Level1)
@@ -123,6 +244,90 @@ HWTEST_F(WifiManagerTest, StartUnloadP2PSaTimerTest, TestSize.Level1)
     wifiManager.wifiP2pManager->StartUnloadP2PSaTimer();
 }
 
+HWTEST_F(WifiManagerTest, CloseP2pServiceTest, TestSize.Level1)
+{
+    WIFI_LOGI("CloseP2pServiceTest enter!");
+    wifiManager.wifiP2pManager->CloseP2pService();
+}
+
+HWTEST_F(WifiManagerTest, DealP2pStateChangedTest_001, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pStateChangedTest_001 enter!");
+    wifiManager.wifiP2pManager->DealP2pStateChanged(P2pState::P2P_STATE_STARTED);
+}
+
+HWTEST_F(WifiManagerTest, DealP2pStateChangedTest_002, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pStateChangedTest_002 enter!");
+    wifiManager.wifiP2pManager->DealP2pStateChanged(P2pState::P2P_STATE_CLOSED);
+}
+
+HWTEST_F(WifiManagerTest, DealP2pPeersChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pPeersChangedTest enter!");
+    std::vector<WifiP2pDevice> vPeers;
+    wifiManager.wifiP2pManager->DealP2pPeersChanged(vPeers);
+}
+
+HWTEST_F(WifiManagerTest, DealP2pPrivatePeersChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pPrivatePeersChangedTest enter!");
+    wifiManager.wifiP2pManager->DealP2pPrivatePeersChanged("test");
+}
+
+HWTEST_F(WifiManagerTest, DealP2pServiceChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pServiceChangedTest enter!");
+    std::vector<WifiP2pServiceInfo> vServices;
+    wifiManager.wifiP2pManager->DealP2pServiceChanged(vServices);
+}
+
+HWTEST_F(WifiManagerTest, DealP2pConnectionChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pConnectionChangedTest enter!");
+    WifiP2pLinkedInfo info;
+    wifiManager.wifiP2pManager->DealP2pConnectionChanged(info);
+}
+
+HWTEST_F(WifiManagerTest, DealP2pThisDeviceChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pThisDeviceChangedTest enter!");
+    WifiP2pDevice info;
+    wifiManager.wifiP2pManager->DealP2pThisDeviceChanged(info);
+}
+
+HWTEST_F(WifiManagerTest, DealP2pDiscoveryChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pDiscoveryChangedTest enter!");
+    wifiManager.wifiP2pManager->DealP2pDiscoveryChanged(true);
+}
+
+HWTEST_F(WifiManagerTest, DealP2pGroupsChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pGroupsChangedTest enter!");
+    wifiManager.wifiP2pManager->DealP2pGroupsChanged();
+}
+
+HWTEST_F(WifiManagerTest, DealP2pActionResultTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealP2pActionResultTest enter!");
+    wifiManager.wifiP2pManager->DealP2pActionResult(P2pActionCallback::P2pConnect, WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiManagerTest, DealConfigChangedTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealConfigChangedTest enter!");
+    char* data = new (std::nothrow) char[6];
+    wifiManager.wifiP2pManager->DealConfigChanged(CfgType::GET_SELF_CONFIG, data, 6);
+}
+
+HWTEST_F(WifiManagerTest, IfaceDestoryCallbackTest, TestSize.Level1)
+{
+    WIFI_LOGI("IfaceDestoryCallbackTest enter!");
+    std::string destoryIfaceName = "test";
+    wifiManager.wifiP2pManager->IfaceDestoryCallback(destoryIfaceName, 1);
+}
+
 HWTEST_F(WifiManagerTest, GetSupportedFeaturesTest, TestSize.Level1)
 {
     WIFI_LOGI("GetSupportedFeaturesTest enter!");
@@ -155,20 +360,6 @@ HWTEST_F(WifiManagerTest, DealCloneDataChangeEventTest, TestSize.Level1)
 {
     WIFI_LOGI("DealCloneDataChangeEventTest enter!");
     wifiManager.wifiEventSubscriberManager->DealCloneDataChangeEvent();
-}
-
-HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)
-{
-    WIFI_LOGI("CheckAndStartScanService_001 enter!");
-    WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::RUNNING);
-    wifiManager.wifiScanManager->CheckAndStartScanService();
-}
-
-HWTEST_F(WifiManagerTest, CheckAndStartScanService_002, TestSize.Level1)
-{
-    WIFI_LOGI("CheckAndStartScanService_002 enter!");
-    WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::CLOSED);
-    wifiManager.wifiScanManager->CheckAndStartScanService();
 }
 
 HWTEST_F(WifiManagerTest, RegisterCesEventTest, TestSize.Level1)
@@ -215,12 +406,6 @@ HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
     wifiManager.Exit();
 }
 
-HWTEST_F(WifiManagerTest, CheckAndStopScanServiceTest, TestSize.Level1)
-{
-    WIFI_LOGI("ExitTest enter!");
-    wifiManager.wifiScanManager->CheckAndStopScanService();
-}
-
 HWTEST_F(WifiManagerTest, AutoStartEnhanceServiceTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");
@@ -265,6 +450,56 @@ HWTEST_F(WifiManagerTest, ForceStopSoftApTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, ShowToastTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->ShowToast();
+}
+
+HWTEST_F(WifiManagerTest, HasAnyApRuningTest, TestSize.Level1)
+{
+    WIFI_LOGI("HasAnyApRuningTest enter!");
+    wifiManager.wifiTogglerManager->HasAnyApRuning();
+}
+
+HWTEST_F(WifiManagerTest, DealConcreateStartFailureTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealConcreateStartFailureTest enter!");
+    wifiManager.wifiTogglerManager->DealConcreateStartFailure(1);
+}
+
+HWTEST_F(WifiManagerTest, DealSoftapStopTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealSoftapStopTest enter!");
+    wifiManager.wifiTogglerManager->DealSoftapStop(1);
+}
+
+HWTEST_F(WifiManagerTest, DealSoftapStartFailureTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealSoftapStartFailureTest enter!");
+    wifiManager.wifiTogglerManager->DealSoftapStartFailure(1);
+}
+
+HWTEST_F(WifiManagerTest, SatelliteToggledTest, TestSize.Level1)
+{
+    WIFI_LOGI("SatelliteToggledTest enter!");
+    wifiManager.wifiTogglerManager->SatelliteToggled(3011);
+    wifiManager.wifiTogglerManager->SatelliteToggled(3012);
+}
+
+HWTEST_F(WifiManagerTest, SetSatelliteStartStateTest, TestSize.Level1)
+{
+    WIFI_LOGI("SetSatelliteStartStateTest enter!");
+    wifiManager.wifiTogglerManager->SetSatelliteStartState(true);
+}
+
+HWTEST_F(WifiManagerTest, CheckSatelliteStateTest, TestSize.Level1)
+{
+    WIFI_LOGI("CheckSatelliteStateTest enter!");
+    wifiManager.wifiTogglerManager->CheckSatelliteState();
+}
+
+HWTEST_F(WifiManagerTest, IsInterfaceUpTest, TestSize.Level1)
+{
+    WIFI_LOGI("IsInterfaceUpTest enter!");
+    std::string iface = "wlan0";
+    wifiManager.wifiTogglerManager->IsInterfaceUp(iface);
 }
 }  // namespace Wifi
 }  // namespace OHOS

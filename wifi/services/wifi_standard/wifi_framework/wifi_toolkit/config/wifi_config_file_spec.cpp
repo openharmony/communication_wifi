@@ -113,6 +113,16 @@ static void ClearWifiDeviceConfigPrivacy(WifiDeviceConfig &item)
     return;
 }
 
+static void ClearWifiDeviceConfigWapi(WifiDeviceConfig &item)
+{
+    item.wifiWapiConfig.wapiPskType = -1;
+    item.wifiWapiConfig.wapiAsCertData.clear();
+    item.wifiWapiConfig.wapiUserCertData.clear();
+    item.wifiWapiConfig.encryptedUserCertData.clear();
+    item.wifiWapiConfig.IV.clear();
+    return;
+}
+
 template<>
 void ClearTClass<WifiDeviceConfig>(WifiDeviceConfig &item)
 {
@@ -121,6 +131,7 @@ void ClearTClass<WifiDeviceConfig>(WifiDeviceConfig &item)
     ClearWifiDeviceConfigEap(item);
     ClearWifiProxyConfig(item.wifiProxyconfig);
     ClearWifiDeviceConfigPrivacy(item);
+    ClearWifiDeviceConfigWapi(item);
     return;
 }
 
@@ -401,6 +412,24 @@ static int SetWifiDeviceconfigPrivacy(WifiDeviceConfig &item, const std::string 
     return errorKeyValue;
 }
 
+static int SetWifiDeviceconfigWapi(WifiDeviceConfig &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "wifiWapiConfig.wapiPskType") {
+        item.wifiWapiConfig.wapiPskType = std::stoi(value);
+    } else if (key == "wifiWapiConfig.wapiAsCertData") {
+        item.wifiWapiConfig.wapiAsCertData = value;
+    } else if (key == "wifiWapiConfig.encryptedUserCertData") {
+        item.wifiWapiConfig.encryptedUserCertData = value;
+    } else if (key == "wifiWapiConfig.IV") {
+        item.wifiWapiConfig.IV = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+
 template<>
 int SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
@@ -413,6 +442,8 @@ int SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::strin
         errorKeyValue += SetWifiProxyConfig(item.wifiProxyconfig, key, value);
     } else if (key.compare(0, strlen("wifiPrivacySetting"), "wifiPrivacySetting") == 0) {
         errorKeyValue += SetWifiDeviceconfigPrivacy(item, key, value);
+    } else if (key.compare(0, strlen("wifiWapiConfig"), "wifiWapiConfig") == 0) {
+        errorKeyValue += SetWifiDeviceconfigWapi(item, key, value);
     } else {
         errorKeyValue += SetWifiDeviceConfig(item, key, value);
     }
@@ -589,13 +620,25 @@ static std::string OutPutWifiDeviceConfigPrivacy(WifiDeviceConfig &item)
     return ss.str();
 }
 
+static std::string OutPutWifiWapiConfig(WifiDeviceConfig &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"<WifiDeviceConfigWapi>" << std::endl;
+    ss << "    " <<"wifiWapiConfig.wapiPskType=" << item.wifiWapiConfig.wapiPskType << std::endl;
+    ss << "    " <<"wifiWapiConfig.wapiAsCertData=" << item.wifiWapiConfig.wapiAsCertData << std::endl;
+    ss << "    " <<"wifiWapiConfig.encryptedUserCertData=" << item.wifiWapiConfig.encryptedUserCertData << std::endl;
+    ss << "    " <<"wifiWapiConfig.IV=" << item.wifiWapiConfig.IV << std::endl;
+    ss << "    " <<"</WifiDeviceConfigWapi>" << std::endl;
+    return ss.str();
+}
+
 template<>
 std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << OutPutWifiDeviceConfig(item) << OutPutWifiIpConfig(item.wifiIpConfig)
        << OutPutWifiDeviceConfigEap(item) << OutPutWifiProxyConfig(item.wifiProxyconfig)
-       << OutPutWifiDeviceConfigPrivacy(item);
+       << OutPutWifiDeviceConfigPrivacy(item) << OutPutWifiWapiConfig(item);
     return ss.str();
 }
 

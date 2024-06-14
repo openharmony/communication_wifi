@@ -28,9 +28,6 @@
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
 #include <random>
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-#include "wifi_encryption_util.h"
-#endif
 #ifndef OHOS_ARCH_LITE
 #include <sys/sendfile.h>
 #include "wifi_country_code_define.h"
@@ -948,6 +945,20 @@ bool WifiSettings::IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) 
     return false;
 }
 
+void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const
+{
+    EncryptedData *encryWapi = new EncryptedData(config.wifiWapiConfig.encryptedUserCertData, config.wifiWapiConfig.IV);
+    std::string decryWapi = "";
+    if (WifiDecryption(wifiEncryptionInfo, *encryWapi, decryWapi) == HKS_SUCCESS) {
+        config.wifiWapiConfig.wapiUserCertData = decryWapi;
+    } else {
+        WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
+            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+        config.wifiWapiConfig.wapiUserCertData = "";
+    }
+    delete encryWapi;
+}
+
 int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
 {
     if (IsWifiDeviceConfigDeciphered(config)) {
@@ -992,9 +1003,38 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
+    DecryptionWapiConfig(mWifiEncryptionInfo, config);
     LOGD("DecryptionDeviceConfig end");
     return 0;
 }
+
+bool WifiSettings::EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const
+{
+    if (config.keyMgmt != KEY_MGMT_WAPI_CERT) {
+        return true;
+    }
+
+    if (config.wifiWapiConfig.wapiUserCertData.empty()) {
+        LOGE("EncryptionDeviceConfig wapiUserCertData empty");
+        return false;
+    }
+
+    config.wifiWapiConfig.encryptedUserCertData = "";
+    config.wifiWapiConfig.IV = "";
+
+    EncryptedData encryWapi;
+    if (WifiEncryption(wifiEncryptionInfo, config.wifiWapiConfig.wapiUserCertData, encryWapi) == HKS_SUCCESS) {
+        config.wifiWapiConfig.encryptedUserCertData = encryWapi.encryptedPassword;
+        config.wifiWapiConfig.IV = encryWapi.IV;
+    } else {
+        LOGE("EncryptionDeviceConfig WifiEncryption wapiUserCertData failed");
+        WriteWifiEncryptionFailHiSysEvent(ENCRYPTION_EVENT,
+            SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
+        return false;
+    }
+    return true;
+}
+
 #endif
 
 bool WifiSettings::EncryptionDeviceConfig(WifiDeviceConfig &config) const
@@ -1052,6 +1092,9 @@ bool WifiSettings::EncryptionDeviceConfig(WifiDeviceConfig &config) const
                 SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
             return false;
         }
+    }
+    if (!EncryptionWapiConfig(mWifiEncryptionInfo, config)) {
+        return false;
     }
     config.version = 1;
 #endif

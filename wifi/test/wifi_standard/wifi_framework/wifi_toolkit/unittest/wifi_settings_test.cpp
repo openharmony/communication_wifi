@@ -837,5 +837,22 @@ HWTEST_F(WifiSettingsTest, IsWifiDeviceConfigDecipheredTest, TestSize.Level1)
     WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config);
 }
 
+HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("EncryptionWapiConfigTest enter");
+    WifiDeviceConfig config;
+    config.keyMgmt = KEY_MGMT_WAPI_CERT;
+    config.wifiWapiConfig.wapiUserCertData = "12345678";
+    WifiSettings::GetInstance().EncryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("DecryptionWapiConfigTest enter");
+    WifiDeviceConfig config;
+    config.keyMgmt = KEY_MGMT_WAPI_CERT;
+    config.wifiWapiConfig.wapiUserCertData = "12345678";
+    WifiSettings::GetInstance().DecryptionDeviceConfig(config);
+}
 }  // namespace Wifi
 }  // namespace OHO

@@ -406,6 +406,36 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->InitSelfCureIssHandleMap();
     }
 
+    void HandleRandMacSelfCureCompleteTest()
+    {
+        LOGI("Enter HandleRandMacSelfCureCompleteTest");
+        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(nullptr);
+
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE);
+        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(&msg);
+
+        pSelfCureStateMachine->mIsHttpReachable = false;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(&msg);
+
+        pSelfCureStateMachine->mIsHttpReachable = true;
+        std::string MacAddress = CURR_BSSID;
+        std::string RealMacAddress = REAL_MAC;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(MacAddress), Return(0)));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(RealMacAddress), Return(0)));
+        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(&msg);
+
+        MacAddress = CURR_BSSID;
+        RealMacAddress = CURR_BSSID;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetMacAddress(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(MacAddress), Return(0)));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(RealMacAddress), Return(0)));
+        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(&msg);
+    }
+
     void HandleInternetFailedSelfCureTest()
     {
         LOGI("Enter HandleInternetFailedSelfCureTest");
@@ -1613,10 +1643,16 @@ HWTEST_F(SelfCureStateMachineTest, InitSelfCureIssHandleMapTest, TestSize.Level1
     InitSelfCureIssHandleMapTest();
 }
 
+HWTEST_F(SelfCureStateMachineTest, HandleRandMacSelfCureCompleteTest, TestSize.Level1)
+{
+    HandleRandMacSelfCureCompleteTest();
+}
+
 HWTEST_F(SelfCureStateMachineTest, HandleInternetFailedSelfCureTest, TestSize.Level1)
 {
     HandleInternetFailedSelfCureTest();
 }
+
 HWTEST_F(SelfCureStateMachineTest, HandleSelfCureWifiLinkTest, TestSize.Level1)
 {
     HandleSelfCureWifiLinkTest();

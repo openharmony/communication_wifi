@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "internal_message.h"
+#include "mock_block_connect_service.h"
 #include "mock_dhcp_service.h"
 #include "mock_if_config.h"
 #include "mock_wifi_chip_hal_interface.h"
@@ -24,6 +25,7 @@
 #include "sta_define.h"
 #include "define.h"
 #include "sta_state_machine.h"
+#include "wifi_app_state_aware.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 
@@ -47,7 +49,13 @@ constexpr int TEST_FAIL_REASON = 16;
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void TearDownTestCase()
+    {
+        WifiAppStateAware& wifiAppStateAware = WifiAppStateAware::GetInstance();
+        wifiAppStateAware.appChangeEventHandler.reset();
+        wifiAppStateAware.mAppStateObserver = nullptr;
+        wifiAppStateAware.appMgrProxy_ = nullptr;
+    }
     virtual void SetUp()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
@@ -516,6 +524,9 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillOnce(Return(1))
             .WillRepeatedly(Return(0));
+        EXPECT_CALL(BlockConnectService::GetInstance(), EnableNetworkSelectStatus(_))
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
         pStaStateMachine->linkedInfo.networkId = 0;
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(&msg);
@@ -593,6 +604,9 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(BlockConnectService::GetInstance(), UpdateNetworkSelectStatus(_, _))
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);

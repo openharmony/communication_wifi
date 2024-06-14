@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "sta_auto_connect_service.h"
+#include "mock_block_connect_service.h"
 #include "mock_sta_state_machine.h"
 #include "mock_wifi_sta_interface.h"
 #include "mock_wifi_settings.h"
@@ -279,6 +280,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess1()
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
         .WillRepeatedly(Return(-1)); // if it is false, it will do process.
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
+    EXPECT_CALL(BlockConnectService::GetInstance(), UpdateAllNetworkSelectStatus()).Times(AtLeast(1));
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -291,6 +293,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess2()
     EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
+    EXPECT_CALL(BlockConnectService::GetInstance(), UpdateAllNetworkSelectStatus()).Times(AtLeast(1));
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 

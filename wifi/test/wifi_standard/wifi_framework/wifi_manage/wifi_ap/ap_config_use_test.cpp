@@ -18,7 +18,6 @@
 #include "operator_overload.h"
 #include "ap_config_use.h"
 #include "mock_wifi_ap_hal_interface.h"
-#include "mock_wifi_country_code_manager.h"
 #include "mock_wifi_settings.h"
 #include "wifi_ap_msg.h"
 #include "wifi_logger.h"

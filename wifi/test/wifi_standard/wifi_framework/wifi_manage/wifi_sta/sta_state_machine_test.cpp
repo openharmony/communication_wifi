@@ -3031,5 +3031,13 @@ HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest3, TestSize.Level1)
 {
     DealHiLinkDataToWpaSuccessTest3();
 }
+
+HWTEST_F(StaStateMachineTest, DealFillWapiCfgTest, TestSize.Level1)
+{
+    WifiDeviceConfig config;
+    WifiHalDeviceConfig halDeviceConfig;
+    config.keyMgmt = KEY_MGMT_WAPI_CERT;
+    pStaStateMachine->FillWapiCfg(config, halDeviceConfig);
+}
 } // namespace Wifi
 } // namespace OHOS

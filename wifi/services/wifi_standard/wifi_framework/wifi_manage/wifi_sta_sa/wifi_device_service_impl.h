@@ -184,6 +184,7 @@ private:
     bool IsScanServiceRunning();
     bool CheckConfigEap(const WifiDeviceConfig &config);
     bool CheckConfigPwd(const WifiDeviceConfig &config);
+    bool CheckConfigWapi(const WifiDeviceConfig &config);
     ErrCode CheckCallingUid(int &uid);
     bool IsWifiBrokerProcess(int uid);
     ErrCode CheckRemoveCandidateConfig(void);

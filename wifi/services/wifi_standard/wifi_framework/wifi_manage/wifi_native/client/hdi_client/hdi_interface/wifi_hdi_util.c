@@ -1036,6 +1036,12 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
                         ie2, HDI_POS_SECOND + ie2[1]);
     }
 
+    const uint8_t *wapi;
+    wapi = HdiBssGetIe(scanResult->ie, scanResult->ieLen, HDI_EID_WAPI);
+    if (wapi) {
+        pos = HdiGetWapiTxt(pos, end, wapi);
+    }
+
     rsnxe = HdiBssGetIe(scanResult->ie, scanResult->ieLen, HDI_EID_RSNX);
     if (HdiGetRsnCapab(rsnxe, HDI_RSNX_CAPAB_SAE_H2E)) {
         ret = HdiTxtPrintf(pos, end - pos, "[SAE-H2E]");
@@ -1064,7 +1070,7 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
         }
         pos += ret;
     }
-    if (!ie && !ie2 && !osen_ie && (scanResult->caps & HDI_CAP_PRIVACY)) {
+    if (!ie && !ie2 && !osen_ie && !wapi && (scanResult->caps & HDI_CAP_PRIVACY)) {
         ret = HdiTxtPrintf(pos, end - pos, "[WEP]");
         if (HdiCheckError(end - pos, ret)) {
             return -1;

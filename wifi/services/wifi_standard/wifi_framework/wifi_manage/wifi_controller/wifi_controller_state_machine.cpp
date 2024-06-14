@@ -808,7 +808,7 @@ void WifiControllerMachine::HandleSoftapStop(int id)
 {
     ConcreteManagerRole role;
     SoftApManager *softap = GetSoftApManager(id);
-    if (softap->GetRole() == SoftApManager::Role::ROLE_HAS_REMOVED) {
+    if (softap != nullptr && softap->GetRole() == SoftApManager::Role::ROLE_HAS_REMOVED) {
         RmoveSoftapManager(id);
         if (!HasAnyManager()) {
             SwitchState(pDisableState);

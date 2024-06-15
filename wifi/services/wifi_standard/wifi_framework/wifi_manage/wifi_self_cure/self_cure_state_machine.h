@@ -247,6 +247,9 @@ public:
         void HandleDelayedResetSelfCure();
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);
+        void SelfcureForMultiGateway(InternalMessage *msg);
+        void MultiGatewaySelfcureResult(InternalMessage *msg);
+        bool IsNeedMultiGatewaySelfcure();
     };
 
     /* *

@@ -26,81 +26,81 @@ WifiAuthCenter &WifiAuthCenter::GetInstance()
 
 int WifiAuthCenter::Init()
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 bool WifiAuthCenter::IsSystemAppByToken()
 {
-    return true;
+    return false;
 }
 
 bool WifiAuthCenter::IsNativeProcess()
 {
-    return true;
+    return false;
 }
 
 int WifiAuthCenter::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyGetWifiInfoPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyGetScanInfosPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyGetWifiLocalMacPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyWifiConnectionPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifySetWifiConfigPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyManageWifiHotspotPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyGetWifiPeersMacPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 int WifiAuthCenter::VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 
 int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid)
 {
-    return PERMISSION_GRANTED;
+    return PERMISSION_DENIED;
 }
 } // namespace Wifi
 } // namespace OHOS

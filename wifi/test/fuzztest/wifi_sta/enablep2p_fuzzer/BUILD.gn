@@ -55,8 +55,8 @@ ohos_fuzztest("EnableP2pFuzzTest") {
   }
 
   sources = [
-    "enablep2p_fuzzer.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth.cpp",
+    "enablep2p_fuzzer.cpp",
   ]
 
   deps = [

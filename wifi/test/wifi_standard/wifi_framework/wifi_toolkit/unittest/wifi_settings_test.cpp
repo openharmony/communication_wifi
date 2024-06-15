@@ -612,11 +612,28 @@ HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)
     WifiSettings::GetInstance().ConfigsDeduplicateAndSave(configs);
 }
 
-HWTEST_F(WifiSettingsTest, OnBackupTest, TestSize.Level1)
+HWTEST_F(WifiSettingsTest, OnBackupTest1, TestSize.Level1)
 {
-    WIFI_LOGI("OnBackupTest enter");
+    WIFI_LOGI("OnBackupTest1 enter");
     UniqueFd fd(-1);
     EXPECT_EQ(WifiSettings::GetInstance().OnBackup(fd, ""), -1);
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveBackupFile();
+}
+
+HWTEST_F(WifiSettingsTest, OnBackupTest2, TestSize.Level1)
+{
+    WIFI_LOGI("OnBackupTest2 enter");
+    UniqueFd fd(-1);
+    std::string backupInfo = R"(
+        [{
+            "detail": [{
+                "encryption_symkey": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                "gcmParams_iv": "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1",
+            }]
+        }]
+    )";
+    EXPECT_EQ(WifiSettings::GetInstance().OnBackup(fd, backupInfo), 0);
     close(fd.Release());
     WifiSettings::GetInstance().RemoveBackupFile();
 }
@@ -644,11 +661,75 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest2, TestSize.Level1)
     wifiBackupConfig.SetValue(configs);
     wifiBackupConfig.SaveConfig();
 
-    UniqueFd fd(open(BACKUP_CONFIG_FILE_PATH_TEST, O_RDONLY));
-    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, ""), -1);
+    UniqueFd fd(-1);
+    std::string restoreInfo = R"(
+        [{
+            "detail": [{
+                "encryption_symkey": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                "gcmParams_iv": "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1",
+            }]
+        }]
+    )";
+    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, restoreInfo), -1);
+
+
+    fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH_TEST, O_RDONLY));
+    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, ""), 0);
     close(fd.Release());
     remove(BACKUP_CONFIG_FILE_PATH_TEST);
     WifiSettings::GetInstance().RemoveBackupFile();
+}
+
+HWTEST_F(WifiSettingsTest, OnRestoreTest3, TestSize.Level1)
+{
+    WIFI_LOGI("OnRestoreTest3 enter");
+    UniqueFd fd(-1);
+    std::string restoreInfo = R"(
+        [{
+            "detail": [{
+                "api_version": 9
+            }]
+        }]
+    )";
+    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, restoreInfo), -1);
+
+    std::string xml = R"(
+        <WifiBackupData>
+        <float name="Version" value="1.3" />
+        <NetworkList>
+        <Network>
+        <WifiConfiguration>
+        <string name="SSID">&quot;test&quot;</string>
+        <null name="PreSharedKey" />
+        <byte-array name="AllowedKeyMgmt" num="1">01</byte-array>
+        </WifiConfiguration>
+        </Network>
+        </NetworkList>
+        </WifiBackupData>
+    )";
+    write(fd.Get(), xml.str(), xml.size());
+    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, restoreInfo), -1);
+
+    lseek(fd.Get(), 0, SEEK_SET);
+    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, ""), 0);
+    close(fd.Release());
+    remove(BACKUP_CONFIG_FILE_PATH_TEST);
+}
+
+HWTEST_F(WifiSettingsTest, ConvertBackupCfgToDeviceCfgTest, TestSize.Level1)
+{
+    WIFI_LOGI("ConvertBackupCfgToDeviceCfgTest enter");
+    WifiBackupConfig backupCfg;
+    WifiDeviceConfig config;
+    ConvertBackupCfgToDeviceCfg(backupCfg, config);
+}
+
+HWTEST_F(WifiSettingsTest, ConvertDeviceCfgToBackupCfgTest, TestSize.Level1)
+{
+    WIFI_LOGI("ConvertDeviceCfgToBackupCfg enter");
+    WifiBackupConfig backupCfg;
+    WifiDeviceConfig config;
+    ConvertDeviceCfgToBackupCfg(config, backupCfg);
 }
 
 HWTEST_F(WifiSettingsTest, RemoveMacAddrPairInfoTest, TestSize.Level1)

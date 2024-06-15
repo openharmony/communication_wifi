@@ -38,7 +38,7 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr size_t MAP_SCAN_NUMS = 20;
+constexpr size_t MAP_SCAN_NUMS = 35;
 constexpr size_t MAP_P2P_NUMS = 50;
 constexpr size_t MAP_HOTSPOT_NUMS = 30;
 constexpr size_t MAP_DEVICE_NUMS = 60;

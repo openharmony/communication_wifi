@@ -672,7 +672,6 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest2, TestSize.Level1)
     )";
     EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, restoreInfo), -1);
 
-
     fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH_TEST, O_RDONLY));
     EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, restoreInfo), 0);
     close(fd.Release());
@@ -693,7 +692,9 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest3, TestSize.Level1)
     )";
     EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, restoreInfo), -1);
 
-    fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH_TEST, O_CREAT | O_EXCL |O_RDWR));
+    fd = UniqueFd(open(BACKUP_CONFIG_FILE_PATH_TEST, O_CREAT | O_EXCL | O_RDWR));
+    EXPECT_EQ(WifiSettings::GetInstance().OnRestore(fd, restoreInfo), -1);
+
     std::string xml = R"(
         <WifiBackupData>
         <float name="Version" value="1.3" />
@@ -727,7 +728,7 @@ HWTEST_F(WifiSettingsTest, ConvertBackupCfgToDeviceCfgTest, TestSize.Level1)
 
 HWTEST_F(WifiSettingsTest, ConvertDeviceCfgToBackupCfgTest, TestSize.Level1)
 {
-    WIFI_LOGI("ConvertDeviceCfgToBackupCfg enter");
+    WIFI_LOGI("ConvertDeviceCfgToBackupCfgTest enter");
     WifiBackupConfig backupCfg;
     WifiDeviceConfig config;
     ConvertDeviceCfgToBackupCfg(config, backupCfg);

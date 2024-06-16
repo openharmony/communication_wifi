@@ -339,21 +339,6 @@ public:
     private:
         StaStateMachine *pStaStateMachine;
     };
-    /**
-     * @Description : Definition of member function of SemiActiveState class in StaStateMachine.
-     *
-     */
-    class SemiActiveState : public State {
-    public:
-        explicit SemiActiveState(StaStateMachine *staStateMachine);
-        ~SemiActiveState() override;
-        void GoInState() override;
-        void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
-
-    private:
-        StaStateMachine *pStaStateMachine;
-    };
 
     class DhcpResultNotify {
     public:
@@ -614,14 +599,6 @@ private:
     void StartWifiProcess();
 
     /**
-     * @Description  Processing after a success response is returned after Wi-Fi
-     * is semi active successfully, such as setting the MAC address and
-     * saving the connection information.
-     *
-     */
-    void StartSemiWifiProcess();
-
-    /**
      * @Description  Update wifi status and save connection information.
      *
      * @param bssid - the mac address of wifi(in)
@@ -655,16 +632,6 @@ private:
      *
      */
     void StopWifiProcess();
-    /**
-     * @Description  switch semi from enable process.
-     *
-     */
-    void SwitchSemiFromEnableProcess();
-    /**
-     * @Description  switch enable from semi process.
-     *
-     */
-    void SwitchEnableFromSemiProcess();
     /**
      * @Description  Setting statemachine status during the process of enable or disable wifi.
      *
@@ -1198,7 +1165,6 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
-    SemiActiveState *pSemiActiveState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
@@ -1209,9 +1175,6 @@ private:
      * @Description Replace empty dns
      */
     void ReplaceEmptyDns(DhcpResult *result);
-    void InvokeOnStaOpenRes(OperateResState state);
-    void InvokeOnStaCloseRes(OperateResState state);
-    void InvokeOnStaSemiActiveRes(OperateResState state);
     void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
     void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);

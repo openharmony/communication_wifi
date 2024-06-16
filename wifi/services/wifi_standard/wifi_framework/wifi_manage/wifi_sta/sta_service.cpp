@@ -187,9 +187,9 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::EnableWifi()
+ErrCode StaService::EnableStaService()
 {
-    WIFI_LOGI("Enter EnableWifi.\n");
+    WIFI_LOGI("Enter EnableStaService.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 #ifndef OHOS_ARCH_LITE
     // notification of registration country code change
@@ -201,37 +201,19 @@ ErrCode StaService::EnableWifi()
     }
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
 #endif
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::DisableWifi() const
+ErrCode StaService::DisableStaService() const
 {
-    WIFI_LOGI("Enter DisableWifi.\n");
+    WIFI_LOGI("Enter DisableStaService.\n");
 #ifndef OHOS_ARCH_LITE
     // deregistration country code change notification
     WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_staObserver);
 #endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_WIFI);
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaService::EnableSemiWifi()
-{
-    WIFI_LOGI("Enter EnableSemiWifi.\n");
-    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-#ifndef OHOS_ARCH_LITE
-    // notification of registration country code change
-    std::string moduleName = "StaService_" + std::to_string(m_instId);
-    m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
-    if (m_staObserver == nullptr) {
-        WIFI_LOGI("m_staObserver is null\n");
-        return WIFI_OPT_FAILED;
-    }
-    WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
-#endif
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_SEMI_WIFI, STA_CONNECT_MODE);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_STA);
     return WIFI_OPT_SUCCESS;
 }
 

@@ -35,7 +35,7 @@ public:
     virtual void RegisterSelfCureServiceCallback(const std::vector<SelfCureServiceCallback> &callbacks) const;
     void HandleRssiLevelChanged(int rssi);
     void HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
-    void HandleStaOpenRes(OperateResState state);
+    void HandleStaOpened();
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     void NotifyInternetFailureDetected(int forceNoHttpCheck);
     bool IsSelfCureOnGoing();

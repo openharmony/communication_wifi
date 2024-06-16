@@ -198,6 +198,11 @@ void WifiP2pManager::CloseP2pService(void)
         WifiSettings::GetInstance().SetP2pIfaceName("");
     }
 #endif
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
+    if (staState == WifiOprMidState::RUNNING || staState == WifiOprMidState::SEMI_ACTIVE) {
+        AutoStartP2pService();
+        return;
+    }
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close p2p SA!");
@@ -205,11 +210,6 @@ void WifiP2pManager::CloseP2pService(void)
     }
     StartUnloadP2PSaTimer();
 #endif
-    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
-    WIFI_LOGI("CloseP2pService, current sta state:%{public}d", staState);
-    if (staState == WifiOprMidState::OPENING || staState == WifiOprMidState::RUNNING) {
-        AutoStartP2pService();
-    }
     return;
 }
 
@@ -254,11 +254,7 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
         bool ret = WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         if (ret) {
             WIFI_LOGE("P2p start failed, stop wifi!");
-            WifiSettings::GetInstance().SetWifiToggledState(false);
-            WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 0);
-            cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-            cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
-            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+            AutoStopP2pService();
         }
     }
     WifiCommonEventHelper::PublishP2pStateChangedEvent((int)state, "OnP2pStateChanged");

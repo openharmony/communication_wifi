@@ -136,14 +136,14 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_WIFI);
+        msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_STA);
         EXPECT_TRUE(pStaStateMachine->pInitState->ExecuteStateMsg(&msg));
     }
 
     void InitStateExeMsgFail1()
     {
         InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_DISABLE_WIFI);
+        msg.SetMessageName(WIFI_SVR_CMD_STA_DISABLE_STA);
         EXPECT_FALSE(pStaStateMachine->pInitState->ExecuteStateMsg(&msg));
     }
 
@@ -235,107 +235,6 @@ public:
         pStaStateMachine->StartWifiProcess();
     }
 
-    void StartSemiWifiProcessSuccess()
-    {
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaSemiActiveRes(_, _)).Times(testing::AtLeast(1));
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).Times(testing::AtLeast(0));
-        WifiDeviceConfig wifiDeviceConfig;
-        std::vector<WifiDeviceConfig> results;
-        wifiDeviceConfig.networkId = 1;
-        results.push_back(wifiDeviceConfig);
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = false;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(results), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_, _)).Times(testing::AtLeast(0));
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = true;
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartSemiWifiProcess();
-    }
-
-    void StartSemiWifiProcessFail1()
-    {
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = false;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaSemiActiveRes(_, _)).Times(testing::AtLeast(0));
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
-        WifiDeviceConfig wifiDeviceConfig;
-        std::vector<WifiDeviceConfig> results;
-        wifiDeviceConfig.networkId = 1;
-        results.push_back(wifiDeviceConfig);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(results), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).Times(testing::AtLeast(0));
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = true;
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartSemiWifiProcess();
-    }
-
-    void StartSemiWifiProcessFail2()
-    {
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = false;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaSemiActiveRes(_, _)).Times(testing::AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->StartSemiWifiProcess();
-    }
-
-    void SwitchEnableFromSemiProcessSuccess()
-    {
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->SwitchEnableFromSemiProcess();
-    }
-
-    void SwitchSemiFromEnableProcessSuccess1()
-    {
-        pStaStateMachine->currentTpType = IPTYPE_IPV4;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaSemiActiveRes(_, _)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->SwitchSemiFromEnableProcess();
-    }
-
-    void SwitchSemiFromEnableProcessSuccess2()
-    {
-        pStaStateMachine->currentTpType = IPTYPE_IPV6;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaSemiActiveRes(_, _)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->SwitchSemiFromEnableProcess();
-    }
-
-    void SwitchSemiFromEnableProcessSuccess3()
-    {
-        pStaStateMachine->currentTpType = IPTYPE_IPV6;
-        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaSemiActiveRes(_, _)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->SwitchSemiFromEnableProcess();
-    }
-
     void WpaStartingStateExeMsgSuccess()
     {
         pStaStateMachine->pWpaStartingState->InitWpsSettings();
@@ -387,14 +286,14 @@ public:
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.stopWifi = true;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_DISABLE_WIFI);
+        msg.SetMessageName(WIFI_SVR_CMD_STA_DISABLE_STA);
         EXPECT_TRUE(pStaStateMachine->pWpaStartedState->ExecuteStateMsg(&msg));
     }
 
     void WpaStartedStateExeMsgFail1()
     {
         InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_WIFI);
+        msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_STA);
         EXPECT_FALSE(pStaStateMachine->pWpaStartedState->ExecuteStateMsg(&msg));
     }
 
@@ -1032,7 +931,7 @@ public:
     {
         EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _));
         InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_WIFI);
+        msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_STA);
         EXPECT_TRUE(pStaStateMachine->pSeparatedState->ExecuteStateMsg(&msg));
     }
 
@@ -1383,48 +1282,6 @@ public:
         msg.SetMessageName(WIFI_SVR_CMD_STA_ERROR);
         EXPECT_FALSE(pStaStateMachine->pApRoamingState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pStaStateMachine->pApRoamingState->ExecuteStateMsg(&msg));
-    }
-
-    void SemiActiveStateGoInStateSuccess()
-    {
-        pStaStateMachine->pSemiActiveState->GoInState();
-    }
-
-    void SemiActiveStateGoOutStateSuccess()
-    {
-        pStaStateMachine->pSemiActiveState->GoOutState();
-    }
-
-    void SemiActiveStateExeMsgSuccess1()
-    {
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_ENABLE_WIFI);
-        EXPECT_TRUE(pStaStateMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-    }
-
-    void SemiActiveStateExeMsgSuccess2()
-    {
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(IfConfig::GetInstance(), FlushIpAddr(_, _)).Times(AtLeast(0));
-        MockWifiStaInterface::GetInstance().pWifiStaHalInfo.stopWifi = true;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
-        InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_DISABLE_WIFI);
-        EXPECT_TRUE(pStaStateMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-    }
-
-    void SemiActiveStateExeMsgFail()
-    {
-        InternalMessage msg;
-        msg.SetMessageName(WIFI_SVR_CMD_STA_ERROR);
-        EXPECT_FALSE(pStaStateMachine->pSemiActiveState->ExecuteStateMsg(nullptr));
-        EXPECT_FALSE(pStaStateMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
 
     void ConnectToNetworkProcessSuccess()
@@ -1823,22 +1680,6 @@ public:
         pStaStateMachine->IsWpa3Transition(RANDOMMAC_SSID);
     }
 
-    void InvokeOnStaOpenRes(const OperateResState &state)
-    {
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(AtLeast(0));
-        pStaStateMachine->InvokeOnStaOpenRes(state);
-    }
-
-    void InvokeOnStaCloseRes(const OperateResState &state)
-    {
-        pStaStateMachine->InvokeOnStaCloseRes(state);
-    }
-
-    void InvokeOnStaSemiActiveRes(const OperateResState &state)
-    {
-        pStaStateMachine->InvokeOnStaSemiActiveRes(state);
-    }
-
     void InvokeOnStaConnChanged(const OperateResState &state, WifiLinkedInfo &info)
     {
         pStaStateMachine->GetLinkedInfo(info);
@@ -2064,41 +1905,6 @@ HWTEST_F(StaStateMachineTest, StartWifiProcessFail2, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, StartWifiProcessFail1, TestSize.Level1)
 {
     StartWifiProcessFail1();
-}
-
-HWTEST_F(StaStateMachineTest, StartSemiWifiProcessSuccess, TestSize.Level1)
-{
-    StartSemiWifiProcessSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, StartSemiWifiProcessFail2, TestSize.Level1)
-{
-    StartSemiWifiProcessFail2();
-}
-
-HWTEST_F(StaStateMachineTest, StartSemiWifiProcessFail1, TestSize.Level1)
-{
-    StartSemiWifiProcessFail1();
-}
-
-HWTEST_F(StaStateMachineTest, SwitchEnableFromSemiProcessSuccess, TestSize.Level1)
-{
-    SwitchEnableFromSemiProcessSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, SwitchSemiFromEnableProcessSuccess1, TestSize.Level1)
-{
-    SwitchSemiFromEnableProcessSuccess1();
-}
-
-HWTEST_F(StaStateMachineTest, SwitchSemiFromEnableProcessSuccess2, TestSize.Level1)
-{
-    SwitchSemiFromEnableProcessSuccess2();
-}
-
-HWTEST_F(StaStateMachineTest, SwitchSemiFromEnableProcessSuccess3, TestSize.Level1)
-{
-    SwitchSemiFromEnableProcessSuccess3();
 }
 
 HWTEST_F(StaStateMachineTest, WpaStartingStateExeMsgSuccess, TestSize.Level1)
@@ -2711,31 +2517,6 @@ HWTEST_F(StaStateMachineTest, ApRoamingStateExeMsgFail, TestSize.Level1)
     ApRoamingStateExeMsgFail();
 }
 
-HWTEST_F(StaStateMachineTest, SemiActiveStateGoInStateSuccess, TestSize.Level1)
-{
-    SemiActiveStateGoInStateSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, SemiActiveStateGoOutStateSuccess, TestSize.Level1)
-{
-    SemiActiveStateGoOutStateSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, SemiActiveStateExeMsgSuccess1, TestSize.Level1)
-{
-    SemiActiveStateExeMsgSuccess1();
-}
-
-HWTEST_F(StaStateMachineTest, SemiActiveStateExeMsgSuccess2, TestSize.Level1)
-{
-    SemiActiveStateExeMsgSuccess2();
-}
-
-HWTEST_F(StaStateMachineTest, SemiActiveStateExeMsgFail, TestSize.Level1)
-{
-    SemiActiveStateExeMsgFail();
-}
-
 HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess, TestSize.Level1)
 {
 }
@@ -2963,21 +2744,6 @@ HWTEST_F(StaStateMachineTest, OnWifiWpa3SelfCureFailTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, IsWpa3TransitionTest, TestSize.Level1)
 {
     IsWpa3TransitionTest();
-}
-
-HWTEST_F(StaStateMachineTest, InvokeOnStaOpenResTest, TestSize.Level1)
-{
-    InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
-}
-
-HWTEST_F(StaStateMachineTest, InvokeOnStaCloseResTest, TestSize.Level1)
-{
-    InvokeOnStaCloseRes(OperateResState::OPEN_WIFI_SUCCEED);
-}
-
-HWTEST_F(StaStateMachineTest, InvokeOnStaSemiActiveResTest, TestSize.Level1)
-{
-    InvokeOnStaSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaConnChangedTest, TestSize.Level1)

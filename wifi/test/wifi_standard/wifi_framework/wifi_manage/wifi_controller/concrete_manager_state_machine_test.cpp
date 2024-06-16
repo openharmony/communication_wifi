@@ -108,16 +108,6 @@ public:
         pConcreteManagerMachine->pScanonlyState->GoOutState();
     }
 
-    void MixStateGoInStateSuccess()
-    {
-        pConcreteManagerMachine->pMixState->GoInState();
-    }
-
-    void MixStateGoOutStateSuccess()
-    {
-        pConcreteManagerMachine->pMixState->GoOutState();
-    }
-
     void SemiActiveStateGoInStateSuccess()
     {
         pConcreteManagerMachine->pSemiActiveState->GoInState();
@@ -138,7 +128,7 @@ public:
         InternalMessage msg;
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_MIX_MODE);
+        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
     }
@@ -185,13 +175,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
     }
 
-    void SwitchMixInConnectStateTest()
-    {
-        InternalMessage msg;
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_MIX_MODE);
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-    }
-
     void SwitchSemiFromEnableTest()
     {
         InternalMessage msg;
@@ -211,16 +194,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
     }
 
-    void SwitchMixInScanOnlyStateTest()
-    {
-        InternalMessage msg;
-        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
-        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_MIX_MODE);
-        sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-    }
-
     void SwitchSemiActiveInScanOnlyStateTest()
     {
         InternalMessage msg;
@@ -231,46 +204,11 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
     }
 
-    void SwitchConnectInMixStateTest()
-    {
-        InternalMessage msg;
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
-    }
-
-    void SwitchScanOnlyInMixStateTest()
-    {
-        InternalMessage msg;
-        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
-        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
-        sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
-    }
-
-    void SwitchSemiActiveInMixStateTest()
-    {
-        InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
-        sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
-    }
-
     void SwitchConnectInSemiActiveStateTest()
     {
         InternalMessage msg;
         WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
-        sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-    }
-
-    void SwitchMixInSemiActiveStateTest()
-    {
-        InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_MIX_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
@@ -290,35 +228,31 @@ public:
         InternalMessage msg;
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX);
+        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         msg.SetMessageName(CONCRETE_CMD_STA_STOP);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
 
@@ -328,14 +262,13 @@ public:
         WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
         WifiSettings::GetInstance().SetWifiStopState(true);
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSED, 0);
-        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX);
+        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
         msg.SetMessageName(CONCRETE_CMD_STA_STOP);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         WifiSettings::GetInstance().SetWifiStopState(false);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
@@ -343,33 +276,29 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         EXPECT_FALSE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(nullptr));
-        EXPECT_FALSE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(nullptr));
     }
 
     void HandleStaStartTest1()
     {
         InternalMessage msg;
-        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX);
+        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         msg.SetMessageName(CONCRETE_CMD_STA_START);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
 
@@ -384,14 +313,12 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
 
@@ -407,7 +334,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
 
@@ -421,7 +347,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         WifiSettings::GetInstance().SetWifiStopState(false);
     }
@@ -435,14 +360,12 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
 
@@ -457,14 +380,12 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
 
@@ -480,14 +401,12 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pMixState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
 };
@@ -532,16 +451,6 @@ HWTEST_F(ConcreteManagerMachineTest, ScanOnlyStateGoOutStateSuccess, TestSize.Le
     ScanOnlyStateGoOutStateSuccess();
 }
 
-HWTEST_F(ConcreteManagerMachineTest, MixStateGoInStateSuccess, TestSize.Level1)
-{
-    MixStateGoInStateSuccess();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, MixStateGoOutStateSuccess, TestSize.Level1)
-{
-    MixStateGoOutStateSuccess();
-}
-
 HWTEST_F(ConcreteManagerMachineTest, SemiActiveStateGoInStateSuccess, TestSize.Level1)
 {
     SemiActiveStateGoInStateSuccess();
@@ -582,11 +491,6 @@ HWTEST_F(ConcreteManagerMachineTest, SwitchScanOnlyInConnectStateTest, TestSize.
     SwitchScanOnlyInConnectStateTest();
 }
 
-HWTEST_F(ConcreteManagerMachineTest, SwitchMixInConnectStateTest, TestSize.Level1)
-{
-    SwitchMixInConnectStateTest();
-}
-
 HWTEST_F(ConcreteManagerMachineTest, SwitchSemiFromEnableTest, TestSize.Level1)
 {
     SwitchSemiFromEnableTest();
@@ -597,39 +501,14 @@ HWTEST_F(ConcreteManagerMachineTest, SwitchConnectInScanOnlyStateTest, TestSize.
     SwitchConnectInScanOnlyStateTest();
 }
 
-HWTEST_F(ConcreteManagerMachineTest, SwitchMixInScanOnlyStateTest, TestSize.Level1)
-{
-    SwitchMixInScanOnlyStateTest();
-}
-
 HWTEST_F(ConcreteManagerMachineTest, SwitchSemiActiveInScanOnlyStateTest, TestSize.Level1)
 {
     SwitchSemiActiveInScanOnlyStateTest();
 }
 
-HWTEST_F(ConcreteManagerMachineTest, SwitchConnectInMixStateTest, TestSize.Level1)
-{
-    SwitchConnectInMixStateTest();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, SwitchScanOnlyInMixStateTest, TestSize.Level1)
-{
-    SwitchScanOnlyInMixStateTest();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, SwitchSemiActiveInMixStateTest, TestSize.Level1)
-{
-    SwitchSemiActiveInMixStateTest();
-}
-
 HWTEST_F(ConcreteManagerMachineTest, SwitchConnectInSemiActiveStateTest, TestSize.Level1)
 {
     SwitchConnectInSemiActiveStateTest();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, SwitchMixInSemiActiveStateTest, TestSize.Level1)
-{
-    SwitchMixInSemiActiveStateTest();
 }
 
 HWTEST_F(ConcreteManagerMachineTest, SwitchScanOnlyInSemiActiveStateTest, TestSize.Level1)

@@ -80,10 +80,7 @@ public:
 
     void HandleStaOpenResTest()
     {
-        OperateResState state = OperateResState::OPEN_WIFI_SUCCEED;
-        pSelfCureService->HandleStaOpenRes(state);
-        state = OperateResState::CONNECT_AP_CONNECTED;
-        pSelfCureService->HandleStaOpenRes(state);
+        pSelfCureService->HandleStaOpened();
     }
 
     void HandleStaConnChangedTest2()

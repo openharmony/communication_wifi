@@ -36,12 +36,12 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        pConcreteModeManager = std::make_unique<ConcreteClientModeManager>(ConcreteManagerRole::ROLE_CLIENT_MIX, 0);
+        pConcreteModeManager = std::make_unique<ConcreteClientModeManager>(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         if (pConcreteModeManager != nullptr) {
             pConcreteModeManager->pConcreteMangerMachine = new MockConcreteMangerMachine();
         }
         pConcreteModeManager->GetConcreteMachine()->SendMessage(CONCRETE_CMD_START,
-            static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX), 0);
+            static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA), 0);
     }
 
     virtual void TearDown()

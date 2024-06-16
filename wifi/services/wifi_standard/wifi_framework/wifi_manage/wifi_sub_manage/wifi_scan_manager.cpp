@@ -205,7 +205,6 @@ void WifiScanManager::InitScanCallback(void)
     mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiScanManager::DealStoreScanInfoEvent, this, _1, _2);
 
     mStaCallback.callbackModuleName = "WifiScanManager";
-    mStaCallback.OnStaOpenRes = std::bind(&WifiScanManager::DealStaOpenRes, this, _1, _2);
 }
 
 void WifiScanManager::DealScanOpenRes(int instId)
@@ -244,16 +243,11 @@ void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results
     WIFI_LOGI("DealStoreScanInfoEvent");
 }
 
-void WifiScanManager::DealStaOpenRes(OperateResState state, int instId)
+void WifiScanManager::DealStaOpened(int instId)
 {
-    WIFI_LOGI("wifi open result, state=%{public}d, id=%{public}d", state, instId);
-    if (state == OperateResState::OPEN_WIFI_OPENING) {
-        WifiSettings::GetInstance().CleanWifiCategoryRecord();
-    } else if (state == OperateResState::OPEN_WIFI_SUCCEED) {
-        CheckAndStartScanService(instId);
-    } else {
-        WIFI_LOGD("Unknown sta state");
-    }
+    WIFI_LOGI("wifi opened id=%{public}d", instId);
+    WifiSettings::GetInstance().CleanWifiCategoryRecord();
+    CheckAndStartScanService(instId);
 }
 }  // namespace Wifi
 }  // namespace OHOS

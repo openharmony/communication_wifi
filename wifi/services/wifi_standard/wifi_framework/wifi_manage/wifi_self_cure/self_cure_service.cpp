@@ -99,16 +99,13 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
     }
 }
 
-void SelfCureService::HandleStaOpenRes(OperateResState state)
+void SelfCureService::HandleStaOpened()
 {
-    WIFI_LOGD("self cure wifi open state change, state = %{public}d", state);
     if (pSelfCureStateMachine == nullptr) {
         WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;
     }
-    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
-    }
+    pSelfCureStateMachine->SendMessage(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
 }
 
 void SelfCureService::NotifyInternetFailureDetected(int forceNoHttpCheck)

@@ -122,8 +122,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(true);
-        WifiSettings::GetInstance().SetSemiWifiEnable(false);
+        WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
@@ -150,9 +149,8 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     }
 
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(false);
+        WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
         WifiSettings::GetInstance().SetWifiAllowSemiActive(false);
-        WifiSettings::GetInstance().SetSemiWifiEnable(false);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
@@ -188,8 +186,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
     }
 #endif
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(false);
-        WifiSettings::GetInstance().SetSemiWifiEnable(true);
+        WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
@@ -1604,8 +1601,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(false);
-        WifiSettings::GetInstance().SetSemiWifiEnable(true);
+        WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);

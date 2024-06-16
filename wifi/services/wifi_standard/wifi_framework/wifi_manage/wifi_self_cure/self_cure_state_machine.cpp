@@ -994,7 +994,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     WifiSettings::GetInstance().SetWifiSelfcureReset(true);
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
-    WifiSettings::GetInstance().SetWifiToggledState(false);
+    WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
     if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
         WIFI_LOGI("GetWifiTogglerManager is nullptr");
         return;

@@ -45,47 +45,30 @@ extern "C" void Destroy(IStaService *pservice)
     pservice = nullptr;
 }
 
-ErrCode StaInterface::EnableWifi()
+ErrCode StaInterface::EnableStaService()
 {
-    WIFI_LOGI("Enter EnableWifi.\n");
+    WIFI_LOGI("Enter EnableStaService.\n");
     std::lock_guard<std::mutex> lock(mutex);
     if (!InitStaServiceLocked()) {
         return WIFI_OPT_FAILED;
     }
 
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->EnableWifi() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("EnableWifi failed.\n");
+    if (pStaService->EnableStaService() != WIFI_OPT_SUCCESS) {
+        LOGE("EnableStaService failed.\n");
         pStaService->DisableWifi();
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::DisableWifi()
+ErrCode StaInterface::DisableStaService()
 {
-    LOGI("Enter DisableWifi.\n");
+    LOGI("Enter DisableStaService.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->DisableWifi() != WIFI_OPT_SUCCESS) {
-        LOGE("DisableWifi failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaInterface::EnableSemiWifi()
-{
-    LOGI("Enter EnableSemiWifi.\n");
-    std::lock_guard<std::mutex> lock(mutex);
-    if (!InitStaServiceLocked()) {
-        return WIFI_OPT_FAILED;
-    }
-
-    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->EnableSemiWifi() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("EnableSemiWifi failed.\n");
-        pStaService->DisableWifi();
+    if (pStaService->DisableStaService() != WIFI_OPT_SUCCESS) {
+        LOGE("DisableStaService failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

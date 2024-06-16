@@ -209,6 +209,7 @@ struct WifiConfig {
     int staAirplaneMode; /* operator wifi type */
     bool canOpenStaWhenAirplane; /* if airplane is opened, whether can open sta */
     bool openWifiWhenAirplane;
+    bool wifiDisabledByAirplane;
     /**
      * last sta service state, when service started, power
      * saving off, airplane mode off we use this saved state to
@@ -259,6 +260,7 @@ struct WifiConfig {
         staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
         canOpenStaWhenAirplane = true;
         openWifiWhenAirplane = false;
+        wifiDisabledByAirplane = false;
         staLastState = 0;
         lastAirplaneMode = AIRPLANE_MODE_CLOSE;
         savedDeviceAppraisalPriority = PRIORITY_1;

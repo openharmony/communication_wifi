@@ -868,6 +868,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
+    item.wifiDisabledByAirplane = false;
     item.staLastState = 0;
     item.lastAirplaneMode = AIRPLANE_MODE_CLOSE;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
@@ -916,6 +917,8 @@ static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, con
         item.canOpenStaWhenAirplane = (std::stoi(value) != 0);
     } else if (key == "openWifiWhenAirplane") {
         item.openWifiWhenAirplane = (std::stoi(value) != 0);
+    } else if (key == "wifiDisabledByAirplane") {
+        item.wifiDisabledByAirplane = (std::stoi(value) != 0);
     } else if (key == "staLastState") {
         item.staLastState = std::stoi(value);
     } else if (key == "lastAirplaneMode") {
@@ -1032,6 +1035,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"staAirplaneMode=" << item.staAirplaneMode << std::endl;
     ss << "    " <<"canOpenStaWhenAirplane=" << item.canOpenStaWhenAirplane << std::endl;
     ss << "    " <<"openWifiWhenAirplane=" << item.openWifiWhenAirplane << std::endl;
+    ss << "    " <<"wifiDisabledByAirplane=" << item.wifiDisabledByAirplane << std::endl;
     ss << "    " <<"staLastState=" << item.staLastState << std::endl;
     ss << "    " <<"lastAirplaneMode=" << item.lastAirplaneMode << std::endl;
     ss << "    " <<"savedDeviceAppraisalPriority=" << item.savedDeviceAppraisalPriority << std::endl;

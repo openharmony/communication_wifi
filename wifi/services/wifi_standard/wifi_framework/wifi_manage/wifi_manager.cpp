@@ -99,13 +99,9 @@ int WifiManager::Init()
     mInitStatus = INIT_OK;
 
     int lastState = WifiConfigCenter::GetInstance().GetStaLastRunState();
-    if (lastState != WIFI_STATE_CLOSED) { /* Automatic startup upon startup */
+    if (lastState != WIFI_STATE_DISABLED) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
-        if (lastState == WIFI_STATE_SEMI_ACTIVE) {
-            WifiSettings::GetInstance().SetSemiWifiEnable(true);
-        } else {
-            WifiSettings::GetInstance().SetWifiToggledState(true);
-        }
+        WifiSettings::GetInstance().SetWifiToggledState(lastState);
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();
@@ -211,6 +207,17 @@ void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
             });
             break;
 #endif
+        case WifiCloseServiceCode::STA_MSG_OPENED:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiStaManager->DealStaOpened(instId);
+                wifiScanManager->DealStaOpened(instId);
+            });
+            break;
+        case WifiCloseServiceCode::STA_MSG_STOPED:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiStaManager->DealStaStoped(instId);
+            });
+            break;
         case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
             WIFI_LOGI("DealCloseServiceMsg exit!");
             return;

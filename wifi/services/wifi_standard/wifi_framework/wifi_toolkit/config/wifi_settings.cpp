@@ -723,7 +723,8 @@ void WifiSettings::SetWifiToggledState(int state)
 {
     std::unique_lock<std::mutex> lock(mWifiToggledMutex);
 
-    if (GetAirplaneModeState()) {
+    if (GetAirplaneModeState() == MODE_STATE_OPEN) {
+        SetWifiDisabledByAirplane(false);
         if (state == WIFI_STATE_ENABLED) {
             SetWifiFlagOnAirplaneMode(true);
         } else {
@@ -2689,6 +2690,7 @@ bool WifiSettings::SetWifiStateOnAirplaneChanged(const int &state)
         if (mPersistWifiState == WIFI_STATE_ENABLED) {
             SetWifiDisabledByAirplane(true);
         }
+        SetPersistWifiState(WIFI_STATE_DISABLED);
     } else {
         if (GetWifiDisabledByAirplane()) {
             SetPersistWifiState(WIFI_STATE_ENABLED);

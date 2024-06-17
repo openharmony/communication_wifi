@@ -68,14 +68,14 @@ public:
     void EnableWifiSuccess()
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, EnableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_TRUE(pStaInterface->EnableStaService() == WIFI_OPT_SUCCESS);
     }
 
     void EnableWifiFail1()
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, EnableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         pStaInterface->EnableStaService();
     }
 

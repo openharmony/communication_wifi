@@ -136,8 +136,6 @@ public:
     virtual void SetPersistWifiState(int state) = 0;
     virtual int GetPersistWifiState() = 0;
     virtual int GetWifiToggledEnable() = 0;
-    virtual bool IsSemiWifiEnable() = 0;
-    virtual void SetSemiWifiEnable(bool enable) = 0;
     virtual void SetWifiStopState(bool state) = 0;
     virtual bool GetWifiStopState() const= 0;
     virtual void SetCoexSupport(bool isSupport) = 0;
@@ -173,7 +171,7 @@ public:
     virtual int GetLastAirplaneMode(int instId = 0) = 0;
     virtual int SetLastAirplaneMode(int mode, int instId = 0) = 0;
     virtual bool GetCanOpenStaWhenAirplaneMode(int instId = 0) = 0;
-    virtual bool GetWifiFlagOnAirplaneMode(int instId = 0)= 0;
+    virtual bool GetWifiFlagOnAirplaneMode(int instId = 0) = 0;
     virtual int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0) = 0;
     virtual int SetWifiDisabledByAirplane(bool disabledByAirplane, int instId = 0) = 0;
     virtual bool GetWifiDisabledByAirplane(int instId = 0)= 0;
@@ -298,7 +296,7 @@ public:
     MOCK_CONST_METHOD0(GetWifiAllowSemiActive, bool());
     MOCK_METHOD1(SetPersistWifiState, void(int state));
     MOCK_METHOD0(GetPersistWifiState, int());
-    MOCK_METHOD0(GetWifiToggledEnable, bool());
+    MOCK_METHOD0(GetWifiToggledEnable, int());
     MOCK_METHOD1(SetWifiStopState, void(bool state));
     MOCK_CONST_METHOD0(GetWifiStopState, bool());
     MOCK_METHOD1(SetCoexSupport, void(bool isSupport));

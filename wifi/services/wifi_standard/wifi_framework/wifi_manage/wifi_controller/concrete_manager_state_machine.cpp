@@ -690,10 +690,10 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
         return WIFI_OPT_FAILED;
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
-    DispatchWifiOpenRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
+    DispatchWifiCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
 #ifdef FEATURE_SELF_CURE_SUPPORT
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
 #endif
     WifiManager::GetInstance().GetWifiStaManager()->CloseStaService();
     HandleStaStop();

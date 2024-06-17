@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "wifi_error_no.h"
 #include "wifi_hdi_wpa_sta_impl.h"
 
@@ -20,6 +21,8 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+constexpr int MAC_LEN = 17;
+constexpr int LENTH = 6;
 class WifiHdiWpaStaImplTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -54,6 +57,10 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaAddNetworkTest, TestSize.Level1)
     int *networkId = nullptr;
     WifiErrorNo result = HdiWpaStaAddNetwork(networkId);
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
+
+    int workld = 1;
+    result = HdiWpaStaAddNetwork(&workld);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaDisableNetworkTest, TestSize.Level1)
@@ -71,14 +78,16 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSaveConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartWpsPinModeTest, TestSize.Level1)
 {
-    WifiWpsParam *config = nullptr;
-    int *pinCode = nullptr;
-    WifiErrorNo result = HdiWpaStaStartWpsPinMode(nullptr, pinCode);
+    WifiWpsParam config;
+    int pinCode;
+    WifiErrorNo result = HdiWpaStaStartWpsPinMode(nullptr, &pinCode);
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
-    result = HdiWpaStaStartWpsPinMode(config, nullptr);
+    result = HdiWpaStaStartWpsPinMode(&config, nullptr);
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
-    result = HdiWpaStaStartWpsPinMode(config, pinCode);
+    result = HdiWpaStaStartWpsPinMode(nullptr, nullptr);
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
+    result = HdiWpaStaStartWpsPinMode(&config, &pinCode);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartWpsPbcModeTest, TestSize.Level1)
@@ -135,6 +144,188 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetShellCmdTest, TestSize.Level1)
     const char *ifName = "wlan0";
     const char *cmd = "command";
     WifiErrorNo result = HdiWpaStaSetShellCmd(ifName, cmd);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetPskPassphraseTest, TestSize.Level1)
+{
+    char ifName[] = "wlan0";
+    char psk[32];
+    uint32_t pskLen = 6;
+    WifiErrorNo result = HdiWpaStaGetPskPassphrase(ifName, psk, pskLen);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetPowerSaveTest, TestSize.Level1)
+{
+    int enable = true;
+    WifiErrorNo result = HdiWpaStaSetPowerSave(enable);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaBlocklistClearTest, TestSize.Level1)
+{
+    WifiErrorNo result = HdiWpaStaBlocklistClear();
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaAutoConnectTest, TestSize.Level1)
+{
+    int enable = true;
+    WifiErrorNo result = HdiWpaStaAutoConnect(enable);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiStopWpsStaTest, TestSize.Level1)
+{
+    WifiErrorNo result = HdiStopWpsSta();
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetNetworkTest, TestSize.Level1)
+{
+    int networkId = 1;
+    int size = 1;
+    WifiErrorNo result = HdiWpaStaSetNetwork(networkId, nullptr, size);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaEnableNetworkTest, TestSize.Level1)
+{
+    int networkId = 2;
+    WifiErrorNo result = HdiWpaStaEnableNetwork(networkId);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaRemoveNetworkTest, TestSize.Level1)
+{
+    int networkId = 3;
+    WifiErrorNo result = HdiWpaStaRemoveNetwork(networkId);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaScanTest, TestSize.Level1)
+{
+    WifiErrorNo result = HdiWpaStaScan();
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetDeviceMacAddressTest, TestSize.Level1)
+{
+    char macAddr[18] = {0};
+    int macAddrLen = 0;
+    WifiErrorNo result = HdiWpaStaGetDeviceMacAddress(nullptr, macAddrLen);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
+
+    result = HdiWpaStaGetDeviceMacAddress(macAddr, macAddrLen);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrFail1, TestSize.Level1)
+{
+    char *mac = NULL;
+    int macSize = LENTH;
+    char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
+    int strLen = MAC_LEN + 1;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrFail2, TestSize.Level1)
+{
+    char *macStr = NULL;
+    int macSize = LENTH;
+    char mac[LENTH] = "ABCDE";
+    int strLen = MAC_LEN + 1;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrFail3, TestSize.Level1)
+{
+    char mac[LENTH] = "ABCDE";
+    int macSize = 1;
+    char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
+    int strLen = MAC_LEN + 1;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrFail4, TestSize.Level1)
+{
+    char mac[LENTH] = "ABCDE";
+    int macSize = 7;
+    char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
+    int strLen = LENTH;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrFail5, TestSize.Level1)
+{
+    char mac[LENTH] = "ABCDE";
+    int macSize = 7;
+    char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
+    int strLen = MAC_LEN + 1;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrFail6, TestSize.Level1)
+{
+    char mac[LENTH] = "ABCDE";
+    int macSize = LENTH;
+    char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
+    int strLen = MAC_LEN;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrFail7, TestSize.Level1)
+{
+    char mac[LENTH] = "ABCDE";
+    int macSize = LENTH;
+    char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
+    int strLen = LENTH;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrFail8, TestSize.Level1)
+{
+    char *macStr = NULL;
+    int macSize = 7;
+    char *mac = NULL;
+    int strLen = MAC_LEN + 1;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrSuccess, TestSize.Level1)
+{
+    char mac[LENTH] = "ABCDE";
+    int macSize = LENTH;
+    char macStr[MAC_LEN + 1] = "00:00:00:00:00:00";
+    int strLen = MAC_LEN + 1;
+    int result = ConvertMacToStr(mac, macSize, macStr, strLen);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaDisconnectTest, TestSize.Level1)
+{
+    WifiErrorNo result = HdiWpaStaDisconnect();
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaReassociateTest, TestSize.Level1)
+{
+    WifiErrorNo result = HdiWpaStaReassociate();
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaReconnectTest, TestSize.Level1)
+{
+    WifiErrorNo result = HdiWpaStaReconnect();
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 }

@@ -49,6 +49,16 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventBssidChangedTest, TestSize.Level1)
     bssidChangedParam.bssidLen = 0;
     result = OnEventBssidChanged(nullptr, &bssidChangedParam, "wlan0");
     EXPECT_EQ(result, 1);
+
+    bssidChangedParam.reasonLen = 16;
+    result = OnEventBssidChanged(nullptr, &bssidChangedParam, "wlan0");
+    EXPECT_EQ(result, 1);
+    bssidChangedParam.reasonLen = 0;
+    result = OnEventBssidChanged(nullptr, &bssidChangedParam, "wlan0");
+    EXPECT_EQ(result, 1);
+    bssidChangedParam.reasonLen = 33;
+    result = OnEventBssidChanged(nullptr, &bssidChangedParam, "wlan0");
+    EXPECT_EQ(result, 1);
 }
 
 HWTEST_F(WifiHdiWpaCallbackTest, OnEventTempDisabledTest, TestSize.Level1)
@@ -200,6 +210,238 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventStaConnectState_02, TestSize.Level1)
     EXPECT_EQ(result, 0);
 
     result = OnEventStaConnectState(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventDisconnectedTest, TestSize.Level1)
+{
+    struct HdiWpaDisconnectParam disconectParam;
+    disconectParam.bssidLen = 17;
+
+    int32_t result = OnEventDisconnected(nullptr, &disconectParam, "wlan0");
+    EXPECT_EQ(result, 1);
+    result = OnEventDisconnected(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    disconectParam.bssid = nullptr;
+    disconectParam.bssidLen = 0;
+    result = OnEventDisconnected(nullptr, &disconectParam, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventStateChangedTest, TestSize.Level1)
+{
+    struct HdiWpaStateChangedParam statechangedParam;
+    int32_t result = OnEventStateChanged(nullptr, &statechangedParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventStateChanged(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventStaNotifyTest, TestSize.Level1)
+{
+    char *notifyParam;
+    int32_t result = OnEventStaNotify(nullptr, notifyParam, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    result = OnEventStaNotify(nullptr, notifyParam, "p2p");
+    EXPECT_EQ(result, 1);
+
+    result = OnEventStaNotify(nullptr, notifyParam, "Test");
+    EXPECT_EQ(result, 1);
+
+    result = OnEventStaNotify(nullptr, nullptr, "Test");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventWpsOverlapTest, TestSize.Level1)
+{
+    int32_t result = OnEventWpsOverlap(nullptr, "wlan0");
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventWpsTimeoutTest, TestSize.Level1)
+{
+    int32_t result = OnEventWpsTimeout(nullptr, "wlan0");
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventScanResultTest, TestSize.Level1)
+{
+    struct HdiWpaRecvScanResultParam recvScanResultParam;
+    int32_t result = OnEventScanResult(nullptr, &recvScanResultParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventScanResult(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, onEventStaJoinTest, TestSize.Level1)
+{
+    struct HdiApCbParm apCbParm;
+    int32_t result = onEventStaJoin(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    result = onEventStaJoin(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    apCbParm.content = nullptr;
+    result = onEventStaJoin(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    const char *str = "AP-STA-CONNECTED";
+    apCbParm.content = const_cast<char *>(str);
+    result = onEventStaJoin(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    const char *str2 = "AP-STA-DISCONNECTED";
+    apCbParm.content = const_cast<char *>(str2);
+    result = onEventStaJoin(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    const char *str3 = "1234567890abcdf123456";
+    apCbParm.content = const_cast<char *>(str3);
+    result = onEventStaJoin(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    const char *str4 = "Test";
+    apCbParm.content = const_cast<char *>(str4);
+    result = onEventStaJoin(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, onEventApStateTest, TestSize.Level1)
+{
+    struct HdiApCbParm apCbParm;
+    int32_t result = onEventApState(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    result = onEventApState(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    apCbParm.content = nullptr;
+    result = onEventApState(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    const char *str = "AP-ENABLED";
+    apCbParm.content = const_cast<char *>(str);
+    result = onEventApState(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    const char *str1 = "AP-DISABLED";
+    apCbParm.content = const_cast<char *>(str1);
+    result = onEventApState(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    const char *str2 = "CTRL-EVENT-TERMINATING";
+    apCbParm.content = const_cast<char *>(str2);
+    result = onEventApState(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    const char *str3 = "AP-STA-POSSIBLE-PSK-MISMATCH ";
+    apCbParm.content = const_cast<char *>(str3);
+    result = onEventApState(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    const char *str4 = "Test";
+    apCbParm.content = const_cast<char *>(str4);
+    result = onEventApState(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventGoNegotiationRequestTest, TestSize.Level1)
+{
+    struct HdiP2pGoNegotiationRequestParam goNegotiationRequestParam;
+    int32_t result = OnEventGoNegotiationRequest(nullptr, &goNegotiationRequestParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventGoNegotiationRequest(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventGoNegotiationCompletedTest, TestSize.Level1)
+{
+    struct HdiP2pGoNegotiationCompletedParam goNegotiationCompletedParam;
+    int32_t result = OnEventGoNegotiationCompleted(nullptr, &goNegotiationCompletedParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventGoNegotiationCompleted(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventInvitationResultTest, TestSize.Level1)
+{
+    struct HdiP2pInvitationResultParam invitationResultParam;
+    int32_t result = OnEventInvitationResult(nullptr, &invitationResultParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventInvitationResult(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventGroupFormationSuccessTest, TestSize.Level1)
+{
+    int32_t result = OnEventGroupFormationSuccess(nullptr, "wlan0");
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventGroupFormationFailureTest, TestSize.Level1)
+{
+    int32_t result = OnEventGroupFormationFailure(nullptr, "reason", "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventGroupFormationFailure(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventGroupInfoStartedTest, TestSize.Level1)
+{
+    struct HdiP2pGroupInfoStartedParam groupStartedParam;
+    int32_t result = OnEventGroupInfoStarted(nullptr, &groupStartedParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventGroupInfoStarted(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventGroupRemovedTest, TestSize.Level1)
+{
+    struct HdiP2pGroupRemovedParam groupRemovedParam;
+    int32_t result = OnEventGroupRemoved(nullptr, &groupRemovedParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventGroupRemoved(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventFindStoppedTest, TestSize.Level1)
+{
+    int32_t result = OnEventFindStopped(nullptr, "wlan0");
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventServDiscRespTest, TestSize.Level1)
+{
+    struct HdiP2pServDiscRespParam servDiscRespParam;
+    int32_t result = OnEventServDiscResp(nullptr, &servDiscRespParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventServDiscResp(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    servDiscRespParam.tlvs = nullptr;
+    result = OnEventServDiscResp(nullptr, &servDiscRespParam, "wlan0");
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventIfaceCreatedTest, TestSize.Level1)
+{
+    struct HdiP2pIfaceCreatedParam ifaceCreatedParam;
+    int32_t result = OnEventIfaceCreated(nullptr, &ifaceCreatedParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventIfaceCreated(nullptr, nullptr, "wlan0");
     EXPECT_EQ(result, 1);
 }
 } // namespace Wifi

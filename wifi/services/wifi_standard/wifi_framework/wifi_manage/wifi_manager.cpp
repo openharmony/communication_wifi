@@ -215,7 +215,7 @@ void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
             break;
         case WifiCloseServiceCode::STA_MSG_STOPED:
             mCloseServiceThread->PostAsyncTask([this, instId]() {
-                wifiStaManager->DealStaStoped(instId);
+                wifiStaManager->DealStaStopped(instId);
             });
             break;
         case WifiCloseServiceCode::SERVICE_THREAD_EXIT:

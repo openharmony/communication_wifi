@@ -56,7 +56,7 @@ ErrCode StaInterface::EnableStaService()
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->EnableStaService() != WIFI_OPT_SUCCESS) {
         LOGE("EnableStaService failed.\n");
-        pStaService->DisableWifi();
+        pStaService->DisableStaService();
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

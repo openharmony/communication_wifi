@@ -57,7 +57,7 @@ HashTable *InitHashTable(int slots)
     if (p == NULL) {
         return NULL;
     }
-    p->slots = CalcNextPrime(slots);
+    p->slots = (uint32_t)CalcNextPrime(slots);
     p->list = (ListNode **)calloc(p->slots, sizeof(ListNode *));
     if (p->list == NULL) {
         free(p);
@@ -69,7 +69,7 @@ HashTable *InitHashTable(int slots)
 void DestroyHashTable(HashTable *p)
 {
     int i = 0;
-    int nCount = p->slots;
+    uint32_t nCount = p->slots;
     for (; i < nCount; ++i) {
         ListNode *t = p->list[i];
         while (t != NULL) {
@@ -99,8 +99,8 @@ static int RebuildHashTable(HashTable *p)
         LOGE("rebuild hash table calloc failed!");
         return -1;
     }
-    int orgSlot = p->slots;
-    p->slots = slot;
+    uint32_t orgSlot = p->slots;
+    p->slots = (uint32_t)slot;
     for (int i = 0; i < orgSlot; ++i) {
         ListNode *t = p->list[i];
         while (t != NULL) {

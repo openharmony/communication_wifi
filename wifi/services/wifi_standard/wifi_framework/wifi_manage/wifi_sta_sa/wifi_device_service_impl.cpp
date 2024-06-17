@@ -328,13 +328,13 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return false;
     }
 
-    int len = config.preSharedKey.length();
+    int len = static_cast<int>(config.preSharedKey.length());
     bool isAllHex = std::all_of(config.preSharedKey.begin(), config.preSharedKey.end(), isxdigit);
     WIFI_LOGI("CheckConfigPwd, ssid: %{public}s, psk len: %{public}d", SsidAnonymize(config.ssid).c_str(), len);
     if (config.keyMgmt == KEY_MGMT_WEP) {
         for (int i = 0; i != WEPKEYS_SIZE; ++i) {
             if (!config.wepKeys[i].empty()) { // wep
-                int wepLen = config.wepKeys[i].size();
+                uint32_t wepLen = config.wepKeys[i].size();
                 if (wepLen == WEP_KEY_LEN1 || wepLen == WEP_KEY_LEN2 || wepLen == WEP_KEY_LEN3) {
                     return true;
                 }

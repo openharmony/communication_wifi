@@ -23,10 +23,7 @@ namespace Wifi {
 class WifiConfigCenterTest : public testing::Test {
 public:
     static void SetUpTestCase()
-    {
-        WifiConfigCenter::GetInstance().Init();
-        WifiSettings::GetInstance().Init();
-    }
+    {}
     static void TearDownTestCase()
     {}
     virtual void SetUp()

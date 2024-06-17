@@ -19,6 +19,7 @@
 #include "wifi_log.h"
 #include "wifi_logger.h"
 #include "app_network_speed_limit_service.h"
+
 #include "mock_wifi_app_parser.h"
 
 using ::testing::_;

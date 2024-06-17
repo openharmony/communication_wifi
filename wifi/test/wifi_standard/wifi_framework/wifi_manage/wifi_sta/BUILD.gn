@@ -70,6 +70,7 @@ ohos_unittest("wifi_sta_unittest") {
     "sta_saved_device_appraisal_test.cpp",
     "sta_service_test.cpp",
     "sta_state_machine_test.cpp",
+    
   ]
 
   include_dirs = [

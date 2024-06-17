@@ -3165,6 +3165,7 @@ HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_004, TestSize.Level1)
 {
     AllowCustomSceneCheckTest4();
 }
+
 /**
  * @tc.name: GetAllowBandFreqsControlInfoSuccess1
  * @tc.desc: GetAllowBandFreqsControlInfo()

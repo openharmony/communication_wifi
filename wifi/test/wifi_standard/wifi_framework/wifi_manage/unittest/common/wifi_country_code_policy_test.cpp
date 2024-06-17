@@ -26,6 +26,7 @@
 #include "wifi_scan_msg.h"
 #include "wifi_settings.h"
  
+ 
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;

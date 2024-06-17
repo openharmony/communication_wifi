@@ -168,6 +168,10 @@ public:
     void RoamingSelectionFail4();
     void SyncBlockedSsidFirmwareSuccess();
     void SyncBlockedSsidFirmwareFail();
+    void DisableAutoJoinSuccess();
+    void EnableAutoJoinSuccess();
+    void RegisterAutoJoinConditionSuccess();
+    void DeregisterAutoJoinConditionSuccess();
 };
 
 void StaAutoConnectServiceTest::InitAutoConnectService()
@@ -1300,7 +1304,31 @@ void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareFail()
     pStaAutoConnectService->SyncBlockedSsidFirmware();
 }
 
+void StaAutoConnectServiceTest::DisableAutoJoinSuccess()
+{
+    std::string conditionName;
+    pStaAutoConnectService->DisableAutoJoin(conditionName);
+}
+ 
+void StaAutoConnectServiceTest::EnableAutoJoinSuccess()
+{
+    std::string conditionName;
+    pStaAutoConnectService->EnableAutoJoin(conditionName);
+}
+ 
+void StaAutoConnectServiceTest::RegisterAutoJoinConditionSuccess()
+{
+    std::string conditionName;
+    pStaAutoConnectService->RegisterAutoJoinCondition(conditionName, []() {return true;});
+}
+void StaAutoConnectServiceTest::DeregisterAutoJoinConditionSuccess()
+{
+    std::string conditionName;
+    pStaAutoConnectService->DeregisterAutoJoinCondition(conditionName);
+}
+
 /* ************************ HWTEST_F  ************************************ */
+
 
 HWTEST_F(StaAutoConnectServiceTest, InitAutoConnectServiceSuccess, TestSize.Level1)
 {

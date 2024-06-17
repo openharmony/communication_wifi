@@ -16,7 +16,7 @@
 #include "wifi_hdi_wpa_client.h"
 #include "wifi_hdi_wpa_callback.h"
 #include "wifi_error_no.h"
-
+1
 using ::testing::ext::TestSize;
 
 namespace OHOS {

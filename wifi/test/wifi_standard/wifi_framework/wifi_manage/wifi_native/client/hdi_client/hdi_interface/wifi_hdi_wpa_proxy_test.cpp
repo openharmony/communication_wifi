@@ -16,7 +16,7 @@
 #include "wifi_hdi_wpa_proxy.h"
 
 using ::testing::ext::TestSize;
-
+1
 namespace OHOS {
 namespace Wifi {
 class WifiHdiWpaProxyTest : public testing::Test {

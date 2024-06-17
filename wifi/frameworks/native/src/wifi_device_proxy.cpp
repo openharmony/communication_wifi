@@ -275,7 +275,7 @@ void WifiDeviceProxy::WriteIpAddress(MessageParcel &data, const WifiIpAddress &a
 {
     data.WriteInt32(address.family);
     data.WriteInt32(address.addressIpv4);
-    int size = address.addressIpv6.size();
+    int size = static_cast<int>(address.addressIpv6.size());
     data.WriteInt32(size);
     for (int i = 0; i < size; i++) {
         data.WriteInt8(address.addressIpv6[i]);
@@ -546,7 +546,7 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
 void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address)
 {
     address.family = reply.ReadInt32();
-    address.addressIpv4 = reply.ReadInt32();
+    address.addressIpv4 = static_cast<int>(reply.ReadInt32());
     int size = reply.ReadInt32();
     if (size > MAX_SIZE) {
         WIFI_LOGE("Read IP address size error: %{public}d", size);
@@ -1224,7 +1224,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.linkSpeed = reply.ReadInt32();
     info.macAddress = reply.ReadString();
     info.macType = reply.ReadInt32();
-    info.ipAddress = reply.ReadInt32();
+    info.ipAddress = static_cast<uint32_t>(reply.ReadInt32());
     int tmpConnState = reply.ReadInt32();
     if ((tmpConnState >= 0) && (tmpConnState <= (int)ConnState::UNKNOWN)) {
         info.connState = ConnState(tmpConnState);
@@ -1400,13 +1400,13 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
         return ErrCode(ret);
     }
 
-    info.ipAddress = reply.ReadInt32();
-    info.gateway = reply.ReadInt32();
-    info.netmask = reply.ReadInt32();
-    info.primaryDns = reply.ReadInt32();
-    info.secondDns = reply.ReadInt32();
-    info.serverIp = reply.ReadInt32();
-    info.leaseDuration = reply.ReadInt32();
+    info.ipAddress = static_cast<uint32_t>(reply.ReadInt32());
+    info.gateway = static_cast<uint32_t>(reply.ReadInt32());
+    info.netmask = static_cast<uint32_t>(reply.ReadInt32());
+    info.primaryDns = static_cast<uint32_t>(reply.ReadInt32());
+    info.secondDns = static_cast<uint32_t>(reply.ReadInt32());
+    info.serverIp = static_cast<uint32_t>(reply.ReadInt32());
+    info.leaseDuration = static_cast<uint32_t>(reply.ReadInt32());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1538,7 +1538,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
     data.WriteInt32(pid);
     int tokenId = GetCallingTokenId();
     data.WriteInt32(tokenId);
-    int eventNum = event.size();
+    int eventNum = static_cast<int>(event.size());
     data.WriteInt32(eventNum);
     if (eventNum > 0) {
         for (auto &eventName : event) {

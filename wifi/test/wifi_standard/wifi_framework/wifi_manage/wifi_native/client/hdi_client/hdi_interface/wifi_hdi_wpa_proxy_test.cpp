@@ -16,7 +16,7 @@
 #include "wifi_hdi_wpa_proxy.h"
 
 using ::testing::ext::TestSize;
-1
+
 namespace OHOS {
 namespace Wifi {
 class WifiHdiWpaProxyTest : public testing::Test {
@@ -30,13 +30,13 @@ public:
 HWTEST_F(WifiHdiWpaProxyTest, HdiWpaStartTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStart();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiWpaStopTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStop();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiAddWpaIfaceTest, TestSize.Level1)

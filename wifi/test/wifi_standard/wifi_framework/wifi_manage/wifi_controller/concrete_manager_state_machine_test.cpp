@@ -159,7 +159,7 @@ public:
     {
         InternalMessage msg;
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
-        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
+        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
         msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
@@ -198,7 +198,7 @@ public:
     {
         InternalMessage msg;
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
-        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
+        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
         msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
@@ -236,6 +236,8 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
@@ -391,6 +393,31 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
+    void AutoStopStaServiceTest()
+    {
+        pConcreteManagerMachine->AutoStopStaService(0);
+    }
+    void AutoStartStaServiceTest()
+    {
+        pConcreteManagerMachine->AutoStartStaService(0);
+    }
+    void AutoStartSemiStaServiceTest()
+    {
+        pConcreteManagerMachine->AutoStartSemiStaService(0);
+    }
+    void PreStartWifiTest()
+    {
+        pConcreteManagerMachine->PreStartWifi(0);
+    }
+    void PostStartWifiTest()
+    {
+        pConcreteManagerMachine->PostStartWifi(0);
+    }
+    void InitStaServiceTest()
+    {
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+        pConcreteManagerMachine->InitStaService(pService);
+    }
 };
 
 HWTEST_F(ConcreteManagerMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
@@ -541,6 +568,36 @@ HWTEST_F(ConcreteManagerMachineTest, HandleStaSemiActiveTest2, TestSize.Level1)
 HWTEST_F(ConcreteManagerMachineTest, HandleStaSemiActiveTest3, TestSize.Level1)
 {
     HandleStaSemiActiveTest3();
+}
+
+HWTEST_F(ConcreteManagerMachineTest, AutoStopStaServiceTest, TestSize.Level1)
+{
+    AutoStopStaServiceTest();
+}
+
+HWTEST_F(ConcreteManagerMachineTest, AutoStartStaServiceTest, TestSize.Level1)
+{
+    AutoStartStaServiceTest();
+}
+
+HWTEST_F(ConcreteManagerMachineTest, AutoStartSemiStaServiceTest, TestSize.Level1)
+{
+    AutoStartSemiStaServiceTest();
+}
+
+HWTEST_F(ConcreteManagerMachineTest, PreStartWifiTest, TestSize.Level1)
+{
+    PreStartWifiTest();
+}
+
+HWTEST_F(ConcreteManagerMachineTest, PostStartWifiTest, TestSize.Level1)
+{
+    PostStartWifiTest();
+}
+
+HWTEST_F(ConcreteManagerMachineTest, InitStaServiceTest, TestSize.Level1)
+{
+    InitStaServiceTest();
 }
 }
 }

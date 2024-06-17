@@ -157,7 +157,7 @@ public:
     bool GetWifiAllowSemiActive() const;
     void SetPersistWifiState(int state);
     int GetPersistWifiState();
-    bool GetWifiToggledEnable();
+    int GetWifiToggledEnable();
     void SetWifiToggledState(int state);
     void InsertWifi6BlackListCache(const std::string currentBssid,
         const Wifi6BlackListInfo wifi6BlackListInfo);

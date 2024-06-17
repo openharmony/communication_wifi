@@ -101,14 +101,14 @@ public:
 #ifdef FEATURE_STA_SUPPORT
     /**
      * @Description deal wifi open result
-     * 
+     *
      * @param instId - instance Id
      */
     void DealStaOpened(int instId);
 
     /**
      * @Description deal wifi close result
-     * 
+     *
      * @param instId - instance Id
      */
     void DealStaStopped(int instId);

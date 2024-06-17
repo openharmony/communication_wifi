@@ -100,7 +100,6 @@ public:
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
         void SwitchConnectInSemiActiveState();
-        void SwitchMixInSemiActiveState();
         void SwitchScanOnlyInSemiActiveState();
     };
 

@@ -24,6 +24,7 @@
 #include "iscan_service_callbacks.h"
 #include "wifi_internal_msg.h"
 #include "wifi_controller_define.h"
+#include "wifi_service_manager.h"
 #include "state.h"
 
 namespace OHOS {
@@ -137,6 +138,7 @@ private:
     ErrCode AutoStartSemiStaService(int instId);
     ErrCode PreStartWifi(int instId);
     ErrCode PostStartWifi(int instId);
+    ErrCode InitStaService(IStaService *pService);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     static ErrCode StartSelfCureService(int instId);
 #endif

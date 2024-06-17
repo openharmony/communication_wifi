@@ -16,7 +16,6 @@
 #include "concrete_manager_state_machine.h"
 #include "wifi_controller_define.h"
 #include "wifi_manager.h"
-#include "wifi_service_manager.h"
 #include "wifi_config_center.h"
 #include "wifi_internal_msg.h"
 #include "wifi_internal_event_dispatcher.h"
@@ -499,6 +498,41 @@ ErrCode ConcreteMangerMachine::StartSelfCureService(int instId)
 }
 #endif
 
+ErrCode ConcreteMangerMachine::InitStaService(IStaService *pService)
+{
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr");
+        return WIFI_OPT_FAILED;
+    }
+    ErrCode errCode = pService->RegisterStaServiceCallback(
+        WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register sta service callback failed!");
+        return WIFI_OPT_FAILED;
+    }
+    errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiScanManager()->GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("WifiScanManager register sta service callback failed!");
+        return WIFI_OPT_FAILED;
+    }
+#ifndef OHOS_ARCH_LITE
+    errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+            static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+
+    errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
+            static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+#endif
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode ConcreteMangerMachine::PreStartWifi(int instId)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
@@ -531,36 +565,13 @@ ErrCode ConcreteMangerMachine::PostStartWifi(int instId)
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
-        errCode = pService->RegisterStaServiceCallback(
-            WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register sta service callback failed!");
-            break;
-        }
-        errCode = pService->RegisterStaServiceCallback(
-            WifiManager::GetInstance().GetWifiScanManager()->GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("WifiScanManager register sta service callback failed!");
+        if (InitStaService(pService) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("InitStaService failed!");
             break;
         }
 #ifdef FEATURE_SELF_CURE_SUPPORT
         if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("StartSelfCureService failed!");
-            break;
-        }
-#endif
-#ifndef OHOS_ARCH_LITE
-        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
-            break;
-        }
-
-        errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
             break;
         }
 #endif
@@ -597,7 +608,7 @@ ErrCode ConcreteMangerMachine::AutoStartSemiStaService(int instId)
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
         WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED), "TIME_OUT",
             static_cast<int>(staState));
-        return WIFI_OPT_FAILED; 
+        return WIFI_OPT_FAILED;
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED, instId);
@@ -616,7 +627,7 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
         return WIFI_OPT_SUCCESS;
     }
     if (PreStartWifi(instId) != WIFI_OPT_SUCCESS) {
-        return WIFI_OPT_FAILED; 
+        return WIFI_OPT_FAILED;
     }
     DispatchWifiOpenRes(OperateResState::OPEN_WIFI_OPENING, instId);
     int ret = WifiStaHalInterface::GetInstance().StartWifi(WifiSettings::GetInstance().GetStaIfaceName());

@@ -18,7 +18,6 @@
 #include <cstdint>
 #include "securec.h"
 #include "wifi_manager.h"
-
 #include "wifi_config_center.h"
 #include "wifi_service_manager.h"
 #include "wifi_logger.h"
@@ -173,18 +172,6 @@ HWTEST_F(WifiManagerTest, DealScanInfoNotifyTest, TestSize.Level1)
     std::vector<InterScanInfo> results;
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING);
     wifiManager.wifiScanManager->DealScanInfoNotify(results);
-}
-
-HWTEST_F(WifiManagerTest, ScanManagerDealStaOpenResTest_001, TestSize.Level1)
-{
-    WIFI_LOGI("ScanManagerDealStaOpenResTest_001 enter!");
-    wifiManager.wifiScanManager->DealStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
-}
-
-HWTEST_F(WifiManagerTest, ScanManagerDealStaOpenResTest_002, TestSize.Level1)
-{
-    WIFI_LOGI("ScanManagerDealStaOpenResTest_002 enter!");
-    wifiManager.wifiScanManager->DealStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
 }
 
 HWTEST_F(WifiManagerTest, StartUnloadApSaTimerTest, TestSize.Level1)

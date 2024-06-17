@@ -81,13 +81,13 @@ public:
 
     void DisableWifiSuceess()
     {
-        EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_SUCCESS);
     }
 
     void DisableWifiFail()
     {
-        EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_FAILED);
     }
 

@@ -174,7 +174,7 @@ public:
     virtual bool GetWifiFlagOnAirplaneMode(int instId = 0) = 0;
     virtual int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0) = 0;
     virtual int SetWifiDisabledByAirplane(bool disabledByAirplane, int instId = 0) = 0;
-    virtual bool GetWifiDisabledByAirplane(int instId = 0)= 0;
+    virtual bool GetWifiDisabledByAirplane(int instId = 0) = 0;
     virtual int GetStaLastRunState(int instId = 0) = 0;
     virtual int SetStaLastRunState(int bRun, int instId = 0) = 0;
     virtual std::string GetDefaultWifiInterface(int instId = 0) = 0;

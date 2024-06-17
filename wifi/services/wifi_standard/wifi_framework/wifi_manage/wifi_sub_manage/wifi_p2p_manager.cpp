@@ -210,6 +210,7 @@ void WifiP2pManager::CloseP2pService(void)
     }
     StartUnloadP2PSaTimer();
 #endif
+    WIFI_LOGI("CloseP2pService, current sta state:%{public}d", staState);
     return;
 }
 

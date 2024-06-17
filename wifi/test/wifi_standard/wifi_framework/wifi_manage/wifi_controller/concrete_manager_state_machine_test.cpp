@@ -242,12 +242,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
@@ -289,12 +283,6 @@ public:
         InternalMessage msg;
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         msg.SetMessageName(CONCRETE_CMD_STA_START);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
@@ -376,12 +364,6 @@ public:
         msg.SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));

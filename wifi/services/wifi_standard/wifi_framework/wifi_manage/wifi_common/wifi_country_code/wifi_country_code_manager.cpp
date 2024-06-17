@@ -179,7 +179,7 @@ ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(const st
 #ifdef FEATURE_STA_SUPPORT
 void WifiCountryCodeManager::DealStaOpened(int instId)
 {
-    WIFI_LOGI("wifi open, id=%{public}d", instId);
+    WIFI_LOGI("wifi opened, id=%{public}d", instId);
     WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
 }
 

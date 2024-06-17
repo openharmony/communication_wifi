@@ -284,6 +284,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess1()
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
+
 void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess2()
 {
     std::vector<InterScanInfo> scanInfos;

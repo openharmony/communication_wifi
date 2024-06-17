@@ -18,7 +18,7 @@
 #include <cstdint>
 #include "securec.h"
 #include "wifi_manager.h"
-#include "wifi_settings.h"
+
 #include "wifi_config_center.h"
 #include "wifi_service_manager.h"
 #include "wifi_logger.h"

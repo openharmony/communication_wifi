@@ -46,6 +46,7 @@ static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 constexpr int TEST_FAIL_REASON = 16;
 
+
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}

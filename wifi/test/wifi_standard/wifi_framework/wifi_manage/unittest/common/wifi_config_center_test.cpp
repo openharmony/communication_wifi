@@ -26,6 +26,7 @@ HWTEST_F(WifiConfigCenterTest, Init_SUCCESS, TestSize.Level1)
     EXPECT_EQ(0, WifiConfigCenter::GetInstance().Init());
 }
 
+
 HWTEST_F(WifiConfigCenterTest, SetGetWifiMidState_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState state = OHOS::Wifi::WifiOprMidState::RUNNING;

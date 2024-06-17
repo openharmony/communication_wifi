@@ -18,6 +18,7 @@
 using namespace testing::ext;
 DEFINE_WIFILOG_LABEL("WifiServiceManagerTest");
 
+
 namespace OHOS {
 namespace Wifi {
 constexpr int ID = 0;

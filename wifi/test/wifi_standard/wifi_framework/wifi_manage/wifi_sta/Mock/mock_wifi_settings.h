@@ -20,7 +20,6 @@
 #include <gmock/gmock.h>
 #include "wifi_internal_msg.h"
 
-
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
@@ -182,7 +181,10 @@ public:
     virtual bool IsLoadStabak(int instId = 0) = 0;
     virtual int GetDisconnectedReason(DisconnectedReason &discReason, int instId = 0) = 0;
     virtual void SetScanOnlySwitchState(const int &state, int instId = 0) = 0;
-
+    virtual  bool IsModulePreLoad(const std::string &name) = 0;
+    virtual WifiP2pGroupInfo GetCurrentP2pGroupInfo() = 0;
+    virtual int GetHotspotState(int id = 0) = 0;
+    virtual bool SetWifiStateOnAirplaneChanged(const int &state);
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -345,6 +347,10 @@ public:
     MOCK_METHOD2(GetDisconnectedReason, int(DisconnectedReason &discReason, int instId));
     MOCK_METHOD2(SetScanOnlySwitchState, void(const int &state, int instId));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
+    MOCK_METHOD1(IsModulePreLoad,  bool(const std::string &name));
+    MOCK_METHOD0(GetCurrentP2pGroupInfo, WifiP2pGroupInfo());
+    MOCK_METHOD1(GetHotspotState, int(int id));
+    MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
 };
 }  // namespace OHOS
 }  // namespace Wifi

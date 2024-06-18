@@ -78,6 +78,8 @@ void GroupFormedState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &GroupFormedState::ProcessCmdCancelConnect));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, &GroupFormedState::ProcessCmdChSwitch));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IP_ADDRESS, &GroupFormedState::ProcessCmdSetIpAddress));
 }
 
 bool GroupFormedState::ProcessCmdConnect(const InternalMessage &msg) const
@@ -392,6 +394,20 @@ bool GroupFormedState::ProcessCmdChSwitch(const InternalMessage &msg) const
     int freq = group.GetFrequency();
     WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
     currGroup.SetFrequency(freq);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
+    return EXECUTED;
+}
+
+bool GroupFormedState::ProcessCmdSetIpAddress(const InternalMessage &msg) const
+{
+    IpAddrInfo ipInfo;
+    if (!msg.GetMessageObj(ipInfo)) {
+        WIFI_LOGE("Failed to obtain the group information.");
+        return EXECUTED;
+    }
+    WIFI_LOGI("set ip address");
+    WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
+    currGroup.SetGcIpAddress(ipInfo.ip);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
     return EXECUTED;
 }

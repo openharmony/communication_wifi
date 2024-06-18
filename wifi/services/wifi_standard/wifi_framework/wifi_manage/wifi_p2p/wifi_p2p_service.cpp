@@ -462,5 +462,12 @@ ErrCode WifiP2pService::DisableRandomMac(int setmode)
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISABLE_RANDOM_MAC), setmode);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiP2pService::SetGcIpAddress(const IpAddrInfo& ipInfo)
+{
+    WIFI_LOGI("SetGcIpAddress");
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_IP_ADDRESS), ipInfo);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

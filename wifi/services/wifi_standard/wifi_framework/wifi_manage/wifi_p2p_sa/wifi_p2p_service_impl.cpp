@@ -1212,7 +1212,13 @@ ErrCode WifiP2pServiceImpl::Hid2dConfigIPAddr(const std::string& ifName, const I
     }
     IfConfig::GetInstance().AddIpAddr(ifName, ipInfo.ip, ipInfo.netmask, IpType::IPTYPE_IPV4);
     WifiNetAgent::GetInstance().AddRoute(ifName, ipInfo.ip, IpTools::GetMaskLength(ipInfo.netmask));
-    return WIFI_OPT_SUCCESS;
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    ErrCode ret = pService->SetGcIpAddress(ipInfo);
+    return ret;
 }
 
 ErrCode WifiP2pServiceImpl::Hid2dReleaseIPAddr(const std::string& ifName)

@@ -23,6 +23,8 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
+#endif
+#ifdef FEATURE_STA_SUPPORT
 #include "wifi_country_code_manager.h"
 #endif
 #include "wifi_service_manager.h"

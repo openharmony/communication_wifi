@@ -406,7 +406,7 @@ HWTEST_F(WifiConfigCenterTest, GetHiddenDeviceConfig_SUCCESS, TestSize.Level1)
         EXPECT_EQ(config1.hiddenSSID, configArr.at(0).hiddenSSID);
     } else  {
         EXPECT_TRUE(false);
-    }   
+    }
 }
 
 HWTEST_F(WifiConfigCenterTest, SyncDeviceConfig_SUCCESS, TestSize.Level1)

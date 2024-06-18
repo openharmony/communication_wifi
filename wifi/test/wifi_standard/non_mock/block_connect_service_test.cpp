@@ -83,7 +83,7 @@ HWTEST_F(BlockConnectServiceTest, EnableNetworkSelectStatus_ReturnsFalseWhenInva
     int targetNetworkId = -1;
     bool result = BlockConnectService::GetInstance().EnableNetworkSelectStatus(targetNetworkId);
     EXPECT_EQ(result, false);
-} 
+}
 
 HWTEST_F(BlockConnectServiceTest, CalculateDisablePolicy_ReturnsCorrectDisablePolicy, TestSize.Level1)
 {

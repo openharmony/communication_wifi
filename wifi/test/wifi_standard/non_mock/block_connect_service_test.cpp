@@ -12,19 +12,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
- 
+
 #include <gtest/gtest.h>
 #include <memory>
 #include "wifi_log.h"
 #include "wifi_logger.h"
 #include "block_connect_service.h"
- 
+
 namespace OHOS {
 namespace Wifi {
- 
+
 using namespace testing;
 using ::testing::ext::TestSize;
- 
+
 class BlockConnectServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -40,7 +40,7 @@ public:
     }
     virtual void TearDown() {}
 };
- 
+
 HWTEST_F(BlockConnectServiceTest, shouldAutoConnect_ReturnsTrueWhenStatusIsEnabled, TestSize.Level1)
 {
     // Test logic here
@@ -49,7 +49,7 @@ HWTEST_F(BlockConnectServiceTest, shouldAutoConnect_ReturnsTrueWhenStatusIsEnabl
     bool result = BlockConnectService::GetInstance().ShouldAutoConnect(config);
     EXPECT_EQ(result, true);
 }
-  
+
 HWTEST_F(BlockConnectServiceTest, shouldAutoConnect_ReturnsFalseWhenStatusIsDisabled, TestSize.Level1)
 {
     // Test logic here
@@ -58,14 +58,14 @@ HWTEST_F(BlockConnectServiceTest, shouldAutoConnect_ReturnsFalseWhenStatusIsDisa
     bool result = BlockConnectService::GetInstance().ShouldAutoConnect(config);
     EXPECT_EQ(result, false);
 }
- 
+
 HWTEST_F(BlockConnectServiceTest, updateAllNetworkSelectStatus_ReturnsTrueWhenSuccessful, TestSize.Level1)
 {
     // Test logic here
     bool result = BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     EXPECT_EQ(result, true);
 }
- 
+
 HWTEST_F(BlockConnectServiceTest, EnableNetworkSelectStatus_ReturnsTrueWhenSuccessful, TestSize.Level1)
 {
     // Test logic here
@@ -76,7 +76,7 @@ HWTEST_F(BlockConnectServiceTest, EnableNetworkSelectStatus_ReturnsTrueWhenSucce
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
 }
- 
+
 HWTEST_F(BlockConnectServiceTest, EnableNetworkSelectStatus_ReturnsFalseWhenInvalidId, TestSize.Level1)
 {
     // Test logic here
@@ -84,7 +84,7 @@ HWTEST_F(BlockConnectServiceTest, EnableNetworkSelectStatus_ReturnsFalseWhenInva
     bool result = BlockConnectService::GetInstance().EnableNetworkSelectStatus(targetNetworkId);
     EXPECT_EQ(result, false);
 } 
- 
+
 HWTEST_F(BlockConnectServiceTest, CalculateDisablePolicy_ReturnsCorrectDisablePolicy, TestSize.Level1)
 {
     // Test logic here
@@ -94,7 +94,7 @@ HWTEST_F(BlockConnectServiceTest, CalculateDisablePolicy_ReturnsCorrectDisablePo
     EXPECT_EQ(policy.disableCount, 3);
     EXPECT_EQ(policy.disableStatus, WifiDeviceConfigStatus::DISABLED);
 }
- 
+
 HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsTrueWhenSuccessful, TestSize.Level1)
 {
     // Test logic here
@@ -115,7 +115,7 @@ HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsTrueWhenSucce
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::DISABLED);
     EXPECT_EQ(config.networkSelectionStatus.networkSelectionDisableReason, reason);
 }
- 
+
 HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsFalseWhenInvalidReason, TestSize.Level1)
 {
     // Test logic here
@@ -134,7 +134,7 @@ HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsFalseWhenInva
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
 }
- 
+
 HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsTrueWhenValidReason, TestSize.Level1)
 {
     // Test logic here
@@ -177,7 +177,7 @@ HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsTrueWhenValid
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::DISABLED);
 }
- 
+
 HWTEST_F(BlockConnectServiceTest, isFrequentDisconnect_ReturnsFalseWhenFrequentDisconnects, TestSize.Level1)
 {
     // Test logic here

@@ -393,25 +393,9 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
     }
-    void AutoStopStaServiceTest()
-    {
-        pConcreteManagerMachine->AutoStopStaService(0);
-    }
-    void AutoStartStaServiceTest()
-    {
-        pConcreteManagerMachine->AutoStartStaService(0);
-    }
-    void AutoStartSemiStaServiceTest()
-    {
-        pConcreteManagerMachine->AutoStartSemiStaService(0);
-    }
     void PreStartWifiTest()
     {
         pConcreteManagerMachine->PreStartWifi(0);
-    }
-    void PostStartWifiTest()
-    {
-        pConcreteManagerMachine->PostStartWifi(0);
     }
     void InitStaServiceTest()
     {
@@ -570,29 +554,9 @@ HWTEST_F(ConcreteManagerMachineTest, HandleStaSemiActiveTest3, TestSize.Level1)
     HandleStaSemiActiveTest3();
 }
 
-HWTEST_F(ConcreteManagerMachineTest, AutoStopStaServiceTest, TestSize.Level1)
-{
-    AutoStopStaServiceTest();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, AutoStartStaServiceTest, TestSize.Level1)
-{
-    AutoStartStaServiceTest();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, AutoStartSemiStaServiceTest, TestSize.Level1)
-{
-    AutoStartSemiStaServiceTest();
-}
-
 HWTEST_F(ConcreteManagerMachineTest, PreStartWifiTest, TestSize.Level1)
 {
     PreStartWifiTest();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, PostStartWifiTest, TestSize.Level1)
-{
-    PostStartWifiTest();
 }
 
 HWTEST_F(ConcreteManagerMachineTest, InitStaServiceTest, TestSize.Level1)

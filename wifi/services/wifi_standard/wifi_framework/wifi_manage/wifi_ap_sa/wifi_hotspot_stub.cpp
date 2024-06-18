@@ -256,7 +256,7 @@ void WifiHotspotStub::OnGetStationList(uint32_t code, MessageParcel &data, Messa
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = result.size();
+        int size = static_cast<int>(result.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; i++) {
             reply.WriteCString(result[i].deviceName.c_str());
@@ -302,7 +302,7 @@ void WifiHotspotStub::OnGetValidBands(uint32_t code, MessageParcel &data, Messag
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int count = bands.size();
+        int count = static_cast<int>(bands.size());
         reply.WriteInt32(count);
         for (int i = 0; i < count; i++) {
             reply.WriteInt32((int)bands[i]);
@@ -322,7 +322,7 @@ void WifiHotspotStub::OnGetValidChannels(
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int count = channels.size();
+        int count = static_cast<int>(channels.size());
         reply.WriteInt32(count);
         for (int i = 0; i < count; i++) {
             reply.WriteInt32(channels[i]);
@@ -411,7 +411,7 @@ void WifiHotspotStub::OnGetBlockLists(uint32_t code, MessageParcel &data, Messag
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = infos.size();
+        int size = static_cast<int>(infos.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; i++) {
             reply.WriteCString(infos[i].deviceName.c_str());

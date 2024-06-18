@@ -19,6 +19,7 @@
 #include "wifi_log.h"
 #include "wifi_logger.h"
 #include "app_network_speed_limit_service.h"
+#include "wifi_app_state_aware.h"
 #include "mock_wifi_app_parser.h"
 
 using ::testing::_;
@@ -37,7 +38,13 @@ DEFINE_WIFILOG_LABEL("AppNetworkSpeedLimitServiceTest");
 class AppNetworkSpeedLimitServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void TearDownTestCase()
+    {
+        WifiAppStateAware& wifiAppStateAware = WifiAppStateAware::GetInstance();
+        wifiAppStateAware.appChangeEventHandler.reset();
+        wifiAppStateAware.mAppStateObserver = nullptr;
+        wifiAppStateAware.appMgrProxy_ = nullptr;
+    }
     virtual void SetUp() {}
     virtual void TearDown() {}
 };

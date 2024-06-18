@@ -1959,35 +1959,35 @@ public:
 
     void InitRandomMacInfoTest()
     {
-        const std::string bssid="";
+        const std::string bssid ="";
         WifiDeviceConfig deviceConfig;
         deviceConfig.keyMgmt = KEY_MGMT_NONE;
         WifiStoreRandomMac randomMacInfo;
         pStaStateMachine->InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
     }
  
-   void OnNetworkHiviewEventTest() 
-   {
-        const int  wpaCBAssocing= 3;
-        const int  wpaCBAssoced= 4;
+    void OnNetworkHiviewEventTest() 
+    {
+        const int  wpaCBAssocing = 3;
+        const int  wpaCBAssoced = 4;
         pStaStateMachine->OnNetworkHiviewEvent(wpaCBAssocing);
         pStaStateMachine->OnNetworkHiviewEvent(wpaCBAssoced);
-   }
+    }
  
-   void OnNetworkAssocEventTest()
-   {
-        const int  wpaCBAssocing= 3;
+    void OnNetworkAssocEventTest()
+    {
+        const int  wpaCBAssocing = 3;
         pStaStateMachine->OnNetworkConnectionEvent(-1, "a2:b1:f5:c7:d1");
-   }
-   void GetDataSlotIdTest() 
-   {
+    }
+    void GetDataSlotIdTest() 
+    {
         pStaStateMachine->GetDataSlotId();
-   }
-   void GetCardTypeTest()
-   {
+    }
+    void GetCardTypeTest()
+    {
         CardType cardType;
         pStaStateMachine->GetCardType(cardType);
-   }
+    }
     void GetDefaultIdTest() 
     {
         pStaStateMachine->GetDefaultId(WIFI_INVALID_SIM_ID);

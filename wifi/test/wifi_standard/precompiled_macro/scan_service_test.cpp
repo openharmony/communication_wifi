@@ -50,7 +50,7 @@ public:
 public:
     std::unique_ptr<ScanService> pScanService;
  
-     void SystemScanByIntervalSuccess()
+    void SystemScanByIntervalSuccess()
     {
         int expScanCount = 1;
         int interval = 1;

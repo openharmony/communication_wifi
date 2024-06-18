@@ -771,9 +771,10 @@ void StaServiceTest::DeliverStaIfaceDataSuccessTest()
 }
 
 void StaServiceTest::GetDataSlotIdTest()
- {
-      pStaService->GetDataSlotId();
- }
+{
+    pStaService->GetDataSlotId();
+}
+
 void StaServiceTest::GetImsiTest()
 {
     int32_t slotId = 0;
@@ -808,7 +809,7 @@ void StaServiceTest::UpdateEapConfigTest()
 void StaServiceTest::OnWifiCountryCodeChangedTest()
 {
     const std::string wifiCountryCode = "CN";
-    // pStaService->OnWifiCountryCodeChanged(wifiCountryCode);
+    pStaService->OnWifiCountryCodeChanged(wifiCountryCode);
 }
  
 void StaServiceTest::StartPortalCertificationTest()
@@ -824,7 +825,7 @@ void StaServiceTest::HandleForegroundAppChangedActionTest()
 void StaServiceTest::EnableHiLinkHandshakeTest()
 {
     WifiDeviceConfig config;
-    std::string bssid ="11:22:33:44";
+    std::string bssid = "11:22:33:44";
     pStaService->EnableHiLinkHandshake(config, bssid);
 }
  

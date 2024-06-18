@@ -20,18 +20,17 @@ module_output_path = "wifi/wifi_non_mock_unittest"
 
 config("module_private_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-  ]
+  include_dirs = []
 }
 
 ohos_unittest("wifi_non_mock_unittest") {
   module_out_path = module_output_path
   sources = [
-    "wifi_config_center_test.cpp",
     "block_connect_service_test.cpp",
+    "wifi_config_center_test.cpp",
   ]
 
-   include_dirs = [
+  include_dirs = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
@@ -65,8 +64,8 @@ ohos_unittest("wifi_non_mock_unittest") {
 
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gtest_main",
   ]

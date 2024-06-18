@@ -26,8 +26,7 @@
 #include "state_machine.h"
 #include "i_ap_service_callbacks.h"
 #include "sta_service_callback.h"
-#include "wifi_settings.h"
-#include "wifi_config_center.h"
+#include "mock_wifi_settings.h"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -150,6 +149,8 @@ HWTEST_F(WifiCountryCodeManagerTest, UnregisterWifiCountryCodeChangeListenerFail
 HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaOpenResTest enter");
+    EXPECT_CALL(WifiSettings::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetLastAirplaneMode(_, _)).WillRepeatedly(Return(1));
     StaServiceCallback cbk = WifiCountryCodeManager::GetInstance().GetStaCallback();
     sleep(1);
     ASSERT_TRUE(cbk.OnStaOpenRes != nullptr);
@@ -159,7 +160,6 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
     sleep(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED, 0);
     sleep(1);
-    WifiSettings::GetInstance().SetWifiStateOnAirplaneChanged(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED, 0);
     sleep(1);
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED, 0);
@@ -169,6 +169,7 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
 HWTEST_F(WifiCountryCodeManagerTest, DealStaCloseResTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaCloseResTest enter");
+    EXPECT_CALL(WifiSettings::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
     StaServiceCallback cbk = WifiCountryCodeManager::GetInstance().GetStaCallback();
     sleep(1);
     ASSERT_TRUE(cbk.OnStaOpenRes != nullptr);
@@ -176,8 +177,6 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaCloseResTest, TestSize.Level1)
     cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED, 0);
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING, 0);
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, 0);
-    WifiSettings::GetInstance().SetWifiStateOnAirplaneChanged(1);
-    WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::RUNNING);
     cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, 0);
     sleep(2);
 }

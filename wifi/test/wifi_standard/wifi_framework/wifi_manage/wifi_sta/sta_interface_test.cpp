@@ -732,5 +732,6 @@ HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
 {
     DeliverStaIfaceDataSuceess();
 }
+
 } // namespace Wifi
 } // namespace OHOS

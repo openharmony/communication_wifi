@@ -26,8 +26,7 @@
 #include "state_machine.h"
 #include "i_ap_service_callbacks.h"
 #include "sta_service_callback.h"
-#include "wifi_settings.h"
-#include "wifi_config_center.h"
+#include "mock_wifi_settings.h"
 
 using ::testing::_;
 using ::testing::DoAll;

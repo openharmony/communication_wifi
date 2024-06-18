@@ -20,6 +20,7 @@
 #include <gmock/gmock.h>
 #include "wifi_internal_msg.h"
 
+
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
@@ -181,6 +182,7 @@ public:
     virtual bool IsLoadStabak(int instId = 0) = 0;
     virtual int GetDisconnectedReason(DisconnectedReason &discReason, int instId = 0) = 0;
     virtual void SetScanOnlySwitchState(const int &state, int instId = 0) = 0;
+
 };
 
 class WifiSettings : public MockWifiSettings {

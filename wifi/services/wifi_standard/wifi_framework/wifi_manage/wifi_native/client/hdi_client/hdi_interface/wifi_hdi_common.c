@@ -344,9 +344,9 @@ const uint8_t *HdiBssGetVendorIe(const uint8_t *ies, size_t len, uint32_t vendor
 {
     const struct HdiElem *elem;
     HDI_CHECK_ELEMENT_BY_ID(elem, HDI_EID_VENDOR_SPECIFIC, ies, len) {
-        if (elem->datalen >= HDI_POS_FOURTH &&
-            vendorType == HdiGetBe32(elem->data))
+        if (elem->datalen >= HDI_POS_FOURTH && vendorType == HdiGetBe32(elem->data)) {
             return &elem->id;
+        }
     }
 
     return NULL;
@@ -356,15 +356,16 @@ const uint8_t* HdiBssGetVendorBeacon(const uint8_t *ies, size_t len, size_t beac
 {
     const struct HdiElem *elem;
 
-    if (beaconIeLen == 0)
+    if (beaconIeLen == 0) {
         return NULL;
+    }
 
     ies += len;
 
     HDI_CHECK_ELEMENT_BY_ID(elem, HDI_EID_VENDOR_SPECIFIC, ies, beaconIeLen) {
-        if (elem->datalen >= HDI_POS_FOURTH &&
-            vendorType == HdiGetBe32(elem->data))
+        if (elem->datalen >= HDI_POS_FOURTH && vendorType == HdiGetBe32(elem->data)) {
             return &elem->id;
+        }
     }
 
     return NULL;
@@ -655,8 +656,9 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
 
     if (data.capabilities & HDI_CAPABILITY_PREAUTH) {
         ret = HdiTxtPrintf(pos, end - pos, "-preauth");
-        if (HdiCheckError(end - pos, ret))
+        if (HdiCheckError(end - pos, ret)) {
             return pos;
+        }
         pos += ret;
     }
 
@@ -693,8 +695,9 @@ void HdiBufEncode(char *txt, size_t maxlen, const uint8_t *data, size_t len)
     size_t i;
 
     for (i = 0; i < len; i++) {
-        if (txt + HDI_POS_FOURTH >= end)
+        if (txt + HDI_POS_FOURTH >= end) {
             break;
+        }
 
         switch (data[i]) {
             case '\"':

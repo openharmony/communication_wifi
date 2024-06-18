@@ -424,7 +424,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    int passLen = config.GetPassphrase().length();
+    uint32_t passLen = config.GetPassphrase().length();
     if ((!config.GetPassphrase().empty()) &&
               (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN)) {
         WIFI_LOGE("CreateGroup:VerifyPassphrase length failed!");
@@ -553,7 +553,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         return WIFI_OPT_INVALID_PARAM;
     }
 
-    int passLen = config.GetPassphrase().length();
+    uint32_t passLen = config.GetPassphrase().length();
     if (passLen != 0 && (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN)) {
         WIFI_LOGE("P2pConnect:VerifyPassphrase failed!");
         return WIFI_OPT_INVALID_PARAM;
@@ -1014,7 +1014,7 @@ ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    int length = deviceName.length();
+    uint32_t length = deviceName.length();
     if (length > DEVICE_NAME_LENGTH || length < 0) {
         return WIFI_OPT_INVALID_PARAM;
     }

@@ -24,6 +24,7 @@
 #include "wifi_msg.h"
 #include "wifi_internal_msg.h"
 
+
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;
@@ -115,6 +116,18 @@ public:
     void EnableHiLinkHandshakeFailTest();
     void EnableHiLinkHandshakeSuceessTest();
     void DeliverStaIfaceDataSuccessTest();
+    void InitStaServiceFailed();
+    void GetDataSlotIdTest();
+    void GetImsiTest();
+    void GetPlmnTest();
+    void GetMccTest();
+    void GetMncTest();
+    void UpdateEapConfigTest();
+    void OnWifiCountryCodeChangedTest();
+    void StartPortalCertificationTest();
+    void HandleForegroundAppChangedActionTest();
+    void EnableHiLinkHandshakeTest();
+    void DeliverStaIfaceDataTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -750,6 +763,72 @@ void StaServiceTest::DeliverStaIfaceDataSuccessTest()
     pStaService->DeliverStaIfaceData(mac);
 }
 
+void StaServiceTest::GetDataSlotIdTest()
+{
+    pStaService->GetDataSlotId();
+}
+
+void StaServiceTest::GetImsiTest()
+{
+    int32_t slotId = 0;
+    pStaService->GetImsi(slotId);
+}
+
+void StaServiceTest::GetPlmnTest()
+{
+    int32_t slotId = 0;
+    pStaService->GetPlmn(slotId);
+}
+
+void StaServiceTest::GetMccTest()
+{
+    std::string imsi = "";
+    pStaService->GetMcc(imsi);
+}
+
+void StaServiceTest::GetMncTest()
+{
+    std::string imsi = "1234";
+    const int mncLen = 4;
+    pStaService->GetMnc(imsi, mncLen);
+}
+
+void StaServiceTest::UpdateEapConfigTest()
+{
+    const WifiDeviceConfig config;
+    WifiEapConfig wifiEapConfig;
+    pStaService->UpdateEapConfig(config, wifiEapConfig);
+}
+
+void StaServiceTest::OnWifiCountryCodeChangedTest()
+{
+    const std::string wifiCountryCode = "CN";
+}
+
+void StaServiceTest::StartPortalCertificationTest()
+{
+    pStaService->StartPortalCertification();
+}
+
+void StaServiceTest::HandleForegroundAppChangedActionTest()
+{
+    AppExecFwk::AppStateData appData;
+    pStaService->HandleForegroundAppChangedAction(appData);
+}
+
+void StaServiceTest::EnableHiLinkHandshakeTest()
+{
+    WifiDeviceConfig config;
+    std::string bssid = "11:22:33:44";
+    pStaService->EnableHiLinkHandshake(config, bssid);
+}
+
+void StaServiceTest::DeliverStaIfaceDataTest()
+{
+    const std::string currentMac = "11:22:33:44";
+    pStaService->DeliverStaIfaceData(currentMac);
+}
+
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
 }
@@ -1022,6 +1101,61 @@ HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level1)
 {
     DeliverStaIfaceDataSuccessTest();
+}
+
+HWTEST_F(StaServiceTest, GetDataSlotIdTest, TestSize.Level1)
+{
+    GetDataSlotIdTest();
+}
+
+HWTEST_F(StaServiceTest, GetImsiTest, TestSize.Level1)
+{
+    GetImsiTest();
+}
+
+HWTEST_F(StaServiceTest, GetPlmnTest, TestSize.Level1)
+{
+    GetPlmnTest();
+}
+
+HWTEST_F(StaServiceTest, GetMccTest, TestSize.Level1)
+{
+    GetMccTest();
+}
+
+HWTEST_F(StaServiceTest, GetMncTest, TestSize.Level1)
+{
+    GetMncTest();
+}
+
+HWTEST_F(StaServiceTest, UpdateEapConfigTest, TestSize.Level1)
+{
+    UpdateEapConfigTest();
+}
+
+HWTEST_F(StaServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level1)
+{
+    OnWifiCountryCodeChangedTest();
+}
+
+HWTEST_F(StaServiceTest, StartPortalCertificationTest, TestSize.Level1)
+{
+    StartPortalCertificationTest();
+}
+
+HWTEST_F(StaServiceTest, HandleForegroundAppChangedActionTest, TestSize.Level1)
+{
+    HandleForegroundAppChangedActionTest();
+}
+
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeTest, TestSize.Level1)
+{
+    EnableHiLinkHandshakeTest();
+}
+
+HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
+{
+    DeliverStaIfaceDataTest();
 }
 } // namespace Wifi
 } // namespace OHOS

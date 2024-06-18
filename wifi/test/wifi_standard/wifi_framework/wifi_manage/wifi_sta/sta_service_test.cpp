@@ -796,7 +796,8 @@ void StaServiceTest::GetMccTest()
 void StaServiceTest::GetMncTest()
 {
     std::string imsi = "1234";
-    pStaService->GetMnc(imsi, 4);
+    const int mncLen = 4;
+    pStaService->GetMnc(imsi, mncLen);
 }
 
 void StaServiceTest::UpdateEapConfigTest()
@@ -818,7 +819,8 @@ void StaServiceTest::StartPortalCertificationTest()
 }
 
 void StaServiceTest::HandleForegroundAppChangedActionTest()
-{   AppExecFwk::AppStateData appData;
+{
+    AppExecFwk::AppStateData appData;
     pStaService->HandleForegroundAppChangedAction(appData);
 }
 

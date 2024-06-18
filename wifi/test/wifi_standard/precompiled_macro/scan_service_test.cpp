@@ -18,7 +18,7 @@
 #include "mock_wifi_settings.h"
 #include "mock_scan_state_machine.h"
 #include "mock_wifi_scan_interface.h"
- 
+
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;
@@ -28,10 +28,10 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
- 
+
 namespace OHOS {
 namespace Wifi {
- 
+
 class ScanServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -46,7 +46,7 @@ public:
     {
         pScanService.reset();
     }
- 
+
 public:
     std::unique_ptr<ScanService> pScanService;
  
@@ -59,11 +59,11 @@ public:
         EXPECT_EQ(pScanService->SystemScanByInterval(expScanCount, interval, count), true);
     }
 };
- 
+
 HWTEST_F(ScanServiceTest, SystemScanByIntervalSuccess, TestSize.Level1)
 {
     SystemScanByIntervalSuccess();
 }
- 
+
 }  // namespace Wifi
 }  // namespace OHOS

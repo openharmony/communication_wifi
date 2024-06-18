@@ -21,7 +21,6 @@ module_output_path = "wifi/precompiled_macro"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
   ]
 }
 
@@ -39,7 +38,6 @@ ohos_unittest("precompiled_macro_unittest") {
   ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
@@ -61,7 +59,6 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/hardware/libhardware/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/frameworks/native/include",

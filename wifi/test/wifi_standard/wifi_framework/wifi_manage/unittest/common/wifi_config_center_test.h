@@ -22,10 +22,8 @@ namespace OHOS {
 namespace Wifi {
 class WifiConfigCenterTest : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {}
     virtual void TearDown()

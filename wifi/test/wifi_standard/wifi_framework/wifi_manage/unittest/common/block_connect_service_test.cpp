@@ -65,5 +65,6 @@ HWTEST_F(BlockConnectServiceTest, shouldAutoConnect_ReturnsFalseWhenStatusIsDisa
     bool result = BlockConnectService::GetInstance().ShouldAutoConnect(config);
     EXPECT_EQ(result, false);
 }
+
 }
 }

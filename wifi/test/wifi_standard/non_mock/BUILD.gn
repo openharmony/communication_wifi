@@ -10,18 +10,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
- 
+
 ################################################################################
- 
+
 module_output_path = "wifi/wifi_non_mock_unittest"
- 
+
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
   ]
 }
 
@@ -31,7 +30,7 @@ ohos_unittest("wifi_non_mock_unittest") {
     "wifi_config_center_test.cpp",
     "block_connect_service_test.cpp",
   ]
- 
+
    include_dirs = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
@@ -59,19 +58,8 @@ ohos_unittest("wifi_non_mock_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/base/cRPC/include",
-    "//commonlibrary/c_utils/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/notification/common_event_service/cesfwk/innerkits/include",
-    "//base/notification/common_event_service/cesfwk/kits/native/include",
-    "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
-    "//base/powermgr/power_manager/interfaces/inner_api/native/include",
-    "//base/powermgr/power_manager/services/zidl/include",
     "$WIFI_ROOT_DIR/utils/inc",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/systemabilitymgr/samgr/utils/native/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
     ".",
   ]
 
@@ -82,7 +70,7 @@ ohos_unittest("wifi_non_mock_unittest") {
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gtest_main",
   ]
- 
+
   ldflags = [
     "-fPIC",
     "--coverage",

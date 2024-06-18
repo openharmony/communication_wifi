@@ -1940,27 +1940,27 @@ int SelfCureStateMachine::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info, std
         if (i == 0) {
             info.dnsSelfCureFailedCnt = stoi(histories[i]);
         } else if (i == POS_DNS_FAILED_TS) {
-            info.lastDnsSelfCureFailedTs = stol(histories[i]);
+            info.lastDnsSelfCureFailedTs = stoll(histories[i]);
         } else if (i == POS_RENEW_DHCP_FAILED_CNT) {
             info.renewDhcpSelfCureFailedCnt = stoi(histories[i]);
         } else if (i == POS_RENEW_DHCP_FAILED_TS) {
-            info.lastRenewDhcpSelfCureFailedTs = stol(histories[i]);
+            info.lastRenewDhcpSelfCureFailedTs = stoll(histories[i]);
         } else if (i == POS_STATIC_IP_FAILED_CNT) {
             info.staticIpSelfCureFailedCnt = stoi(histories[i]);
         } else if (i == POS_STATIC_IP_FAILED_TS) {
-            info.lastStaticIpSelfCureFailedTs = stol(histories[i]);
+            info.lastStaticIpSelfCureFailedTs = stoll(histories[i]);
         } else if (i == POS_REASSOC_FAILED_CNT) {
             info.reassocSelfCureFailedCnt = stoi(histories[i]);
         } else if (i == POS_REASSOC_FAILED_TS) {
-            info.lastReassocSelfCureFailedTs = stol(histories[i]);
+            info.lastReassocSelfCureFailedTs = stoll(histories[i]);
         } else if (i == POS_RANDMAC_FAILED_CNT) {
             info.randMacSelfCureFailedCnt = stoi(histories[i]);
         } else if (i == POS_RANDMAC_FAILED_TS) {
-            info.lastRandMacSelfCureFailedCntTs = stol(histories[i]);
+            info.lastRandMacSelfCureFailedCntTs = stoll(histories[i]);
         } else if (i == POS_RESET_FAILED_CNT) {
             info.resetSelfCureFailedCnt = stoi(histories[i]);
         } else if (i == POS_RESET_FAILED_TS) {
-            info.lastResetSelfCureFailedTs = stol(histories[i]);
+            info.lastResetSelfCureFailedTs = stoll(histories[i]);
         } else {
             WIFI_LOGI("exception happen.");
         }
@@ -1980,15 +1980,15 @@ int SelfCureStateMachine::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &in
         if (i == POS_REASSOC_CONNECT_FAILED_CNT) {
             info.reassocSelfCureConnectFailedCnt = stoi(histories[i]);
         } else if (i == POS_REASSOC_CONNECT_FAILED_TS) {
-            info.lastReassocSelfCureConnectFailedTs = stol(histories[i]);
+            info.lastReassocSelfCureConnectFailedTs = stoll(histories[i]);
         } else if (i == POS_RANDMAC_CONNECT_FAILED_CNT) {
             info.randMacSelfCureConnectFailedCnt = stoi(histories[i]);
         } else if (i == POS_RANDMAC_CONNECT_FAILED_TS) {
-            info.lastRandMacSelfCureConnectFailedCntTs = stol(histories[i]);
+            info.lastRandMacSelfCureConnectFailedCntTs = stoll(histories[i]);
         } else if (i == POS_RESET_CONNECT_FAILED_CNT) {
             info.resetSelfCureConnectFailedCnt = stoi(histories[i]);
         } else if (i == POS_RESET_CONNECT_FAILED_TS) {
-            info.lastResetSelfCureConnectFailedTs = stol(histories[i]);
+            info.lastResetSelfCureConnectFailedTs = stoll(histories[i]);
         } else {
             WIFI_LOGI("exception happen.");
         }

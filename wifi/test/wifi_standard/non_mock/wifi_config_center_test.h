@@ -15,15 +15,22 @@
 #ifndef OHOS_WIFI_CONFIG_CENTER_TEST_H
 #define OHOS_WIFI_CONFIG_CENTER_TEST_H
 #include <gtest/gtest.h>
-
+ 
 #include "wifi_config_center.h"
-
+ 
+ 
 namespace OHOS {
 namespace Wifi {
 class WifiConfigCenterTest : public testing::Test {
 public:
-    static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void SetUpTestCase()
+    {
+        WifiConfigCenter::GetInstance().Init();
+        WifiSettings::GetInstance().Init();
+    }
+    static void TearDownTestCase()
+    {
+    }
     virtual void SetUp()
     {}
     virtual void TearDown()

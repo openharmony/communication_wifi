@@ -659,7 +659,7 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
         WIFI_LOGE("WifiHotspotProxy::RegisterCallBack WriteDate fail, write callback.");
         return WIFI_OPT_FAILED;
     }
-    int eventNum = event.size();
+    int eventNum = static_cast<int>(event.size());
     data.WriteInt32(eventNum);
     if (eventNum > 0) {
         for (auto &eventName : event) {

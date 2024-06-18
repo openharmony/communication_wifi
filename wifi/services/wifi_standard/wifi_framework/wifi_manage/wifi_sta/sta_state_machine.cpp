@@ -2072,7 +2072,8 @@ bool StaStateMachine::IsValidSimId(int32_t simId)
     return false;
 }
 
-bool StaStateMachine::IsMultiSimEnabled() {
+bool StaStateMachine::IsMultiSimEnabled()
+{
     int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
     LOGI("StaStateMachine::IsMultiSimEnabled simCount:%{public}d", simCount);
     if (simCount > 1) {

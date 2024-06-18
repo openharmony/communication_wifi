@@ -1979,7 +1979,7 @@ public:
         const int  wpaCBAssocing = 3;
         pStaStateMachine->OnNetworkConnectionEvent(-1, "a2:b1:f5:c7:d1");
     }
-    void GetDataSlotIdTest() 
+    void GetDataSlotIdTest()
     {
         pStaStateMachine->GetDataSlotId();
     }
@@ -1988,7 +1988,7 @@ public:
         CardType cardType;
         pStaStateMachine->GetCardType(cardType);
     }
-    void GetDefaultIdTest() 
+    void GetDefaultIdTest()
     {
         pStaStateMachine->GetDefaultId(WIFI_INVALID_SIM_ID);
         pStaStateMachine->GetDefaultId(1);
@@ -1999,7 +1999,7 @@ public:
         pStaStateMachine->GetSimCardState(0);
     }
 
-    void IsValidSimIdTest() 
+    void IsValidSimIdTest()
     {
         pStaStateMachine->IsValidSimId(0);
         pStaStateMachine->IsValidSimId(1);

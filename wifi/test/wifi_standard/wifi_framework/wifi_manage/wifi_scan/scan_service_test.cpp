@@ -2109,7 +2109,7 @@ public:
         pScanService->SystemScanConnectedPolicy(interval);
     }
 
-    void SystemScanDisconnectedPolicyTest() 
+    void SystemScanDisconnectedPolicyTest()
     {
         int interval = 0;
         int count = 0;

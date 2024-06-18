@@ -1966,7 +1966,7 @@ public:
         pStaStateMachine->InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
     }
 
-    void OnNetworkHiviewEventTest() 
+    void OnNetworkHiviewEventTest()
     {
         const int  wpaCBAssocing = 3;
         const int  wpaCBAssoced = 4;
@@ -3181,7 +3181,7 @@ HWTEST_F(StaStateMachineTest, OnNetworkHiviewEventTest, TestSize.Level1)
 {
     OnNetworkHiviewEventTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, OnNetworkAssocEventTest, TestSize.Level1)
 {
     OnNetworkAssocEventTest();
@@ -3236,7 +3236,7 @@ HWTEST_F(StaStateMachineTest, PreWpaEapUmtsAuthEventTest, TestSize.Level1)
 {
     PreWpaEapUmtsAuthEventTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, FillUmtsAuthReqTest, TestSize.Level1)
 {
     FillUmtsAuthReqTest();

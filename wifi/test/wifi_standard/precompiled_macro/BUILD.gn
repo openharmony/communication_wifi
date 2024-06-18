@@ -20,8 +20,7 @@ module_output_path = "wifi/precompiled_macro"
 
 config("module_private_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-  ]
+  include_dirs = []
 }
 
 ohos_unittest("precompiled_macro_unittest") {

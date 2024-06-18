@@ -183,6 +183,13 @@ private:
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessCmdChSwitch(const InternalMessage &msg) const;
+
+    /**
+     * @Description Process the set p2p gc ip address
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdSetIpAddress(const InternalMessage &msg) const;
 private:
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

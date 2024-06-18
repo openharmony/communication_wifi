@@ -405,6 +405,16 @@ const std::string &WifiP2pGroupInfo::GetGoIpAddress() const
     return goIpAddress;
 }
 
+void WifiP2pGroupInfo::SetGcIpAddress(const std::string &ipAddr)
+{
+    gcIpAddress = ipAddr;
+}
+
+const std::string &WifiP2pGroupInfo::GetGcIpAddress() const
+{
+    return gcIpAddress;
+}
+
 void WifiP2pGroupInfo::AddClientDevice(const WifiP2pDevice &clientDevice)
 {
     for (auto it = clientDevices.begin(); it != clientDevices.end(); ++it) {

@@ -331,6 +331,13 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Set gc ip information
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) override;
 private:
     /**
      * @Description - P2P state machine deregistration event callback.

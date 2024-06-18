@@ -1,0 +1,115 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+ 
+import("//build/test.gni")
+import("//foundation/communication/wifi/wifi/wifi.gni")
+ 
+################################################################################
+ 
+module_output_path = "wifi/wifi_non_mock_unittest"
+ 
+config("module_private_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+  ]
+}
+ 
+ohos_unittest("wifi_non_mock_unittest") {
+  module_out_path = module_output_path
+  sources = [
+    "wifi_config_center_test.cpp",
+    "block_connect_service_test.cpp",
+  ]
+ 
+   include_dirs = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
+    "$WIFI_ROOT_DIR/interfaces/inner_api",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
+    "//commonlibrary/c_utils/base/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "//base/notification/common_event_service/cesfwk/innerkits/include",
+    "//base/notification/common_event_service/cesfwk/kits/native/include",
+    "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
+    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "//base/powermgr/power_manager/interfaces/inner_api/native/include",
+    "//base/powermgr/power_manager/services/zidl/include",
+    "$WIFI_ROOT_DIR/utils/inc",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/utils/native/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/include",
+    "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
+    ".",
+  ]
+ 
+  deps = [
+    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
+    "//third_party/googletest:gtest_main",
+  ]
+ 
+  ldflags = [
+    "-fPIC",
+    "--coverage",
+  ]
+ 
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+ 
+  defines = [
+    "private = public",
+    "protected = public",
+  ]
+ 
+  defines += [
+    "FEATURE_AP_SUPPORT",
+    "FEATURE_STA_SUPPORT",
+    "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+  ]
+  defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+  configs = [ ":module_private_config" ]
+ 
+  part_name = "wifi"
+  subsystem_name = "communication"
+  testonly = true
+}

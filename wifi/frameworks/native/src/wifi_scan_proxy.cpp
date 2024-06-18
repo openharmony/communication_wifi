@@ -417,7 +417,7 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
     data.WriteInt32(pid);
     int tokenId = GetCallingTokenId();
     data.WriteInt32(tokenId);
-    int eventNum = event.size();
+    int eventNum = static_cast<int>(event.size());
     data.WriteInt32(eventNum);
     if (eventNum > 0) {
         for (auto &eventName : event) {

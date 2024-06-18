@@ -32,8 +32,8 @@ Context *CreateContext(int capacity)
     if (context == NULL) {
         return NULL;
     }
-    context->rCapacity = capacity;
-    context->wCapacity = capacity;
+    context->rCapacity = (uint32_t)capacity;
+    context->wCapacity = (uint32_t)capacity;
     context->szRead = (char *)calloc(capacity, sizeof(char));
     if (context->szRead == NULL) {
         free(context);
@@ -76,10 +76,10 @@ static int ExpandReadCache(Context *context, int len)
         return -1;
     }
 
-    int left = (context->rBegin <= context->rEnd) ? (context->rCapacity - 1 - context->rEnd + context->rBegin)
-                                                  : (context->rBegin - context->rEnd - 1);
+    int left = (int)((context->rBegin <= context->rEnd) ? (context->rCapacity - 1 - context->rEnd + context->rBegin)
+                                                  : (context->rBegin - context->rEnd - 1));
     if (left < len) {
-        int capacity = context->rCapacity;
+        uint32_t capacity = context->rCapacity;
         while (left < len) {
             capacity += context->rCapacity;
             left += context->rCapacity;
@@ -117,13 +117,13 @@ static int ExpandWriteCache(Context *context, int len)
         return -1;
     }
 
-    int left = (context->wBegin <= context->wEnd) ? (context->wCapacity - 1 - context->wEnd + context->wBegin)
-                                                  : (context->wBegin - context->wEnd - 1);
+    int left = (int)((context->wBegin <= context->wEnd) ? (context->wCapacity - 1 - context->wEnd + context->wBegin)
+                                                  : (context->wBegin - context->wEnd - 1));
     if (left < len) {
-        int capacity = context->wCapacity;
+        uint32_t capacity = context->wCapacity;
         while (left < len) {
             capacity += context->wCapacity;
-            left += context->wCapacity;
+            left += (int)context->wCapacity;
         }
         char *p = (char *)calloc(capacity, sizeof(char));
         if (p == NULL) {
@@ -172,14 +172,14 @@ static int ContextAppendRead(Context *context, const char *buf, int len)
         }
         context->rEnd += len;
     } else {
-        int tmp = context->rCapacity - context->rEnd;
+        int tmp = (int)(context->rCapacity - context->rEnd);
         if (tmp > 0 && memmove_s(context->szRead + context->rEnd, tmp, buf, tmp) != EOK) {
             return -1;
         }
         if (tmp < len && memmove_s(context->szRead, len - tmp, buf + tmp, len - tmp) != EOK) {
             return -1;
         }
-        context->rEnd = len - tmp;
+        context->rEnd = (uint32_t)(len - tmp);
     }
     return 0;
 }
@@ -199,14 +199,14 @@ int ContextAppendWrite(Context *context, const char *buf, int len)
         }
         context->wEnd += len;
     } else {
-        int tmp = context->wCapacity - context->wEnd;
+        int tmp = (int)(context->wCapacity - context->wEnd);
         if (tmp > 0 && memmove_s(context->szWrite + context->wEnd, tmp, buf, tmp) != EOK) {
             return -1;
         }
         if (tmp < len && memmove_s(context->szWrite, len - tmp, buf + tmp, len - tmp) != EOK) {
             return -1;
         }
-        context->wEnd = len - tmp;
+        context->wEnd = (uint32_t)(len - tmp);
     }
     return 0;
 }
@@ -220,7 +220,7 @@ char *ContextGetReadRecord(Context *context)
     if (context->rBegin == context->rEnd) {
         return NULL;
     }
-    int len = (context->rBegin <= context->rEnd) ? (context->rEnd - context->rBegin)
+    uint32_t len = (context->rBegin <= context->rEnd) ? (context->rEnd - context->rBegin)
                                                  : (context->rCapacity - context->rBegin + context->rEnd);
     char *buf = (char *)calloc(len + 1, sizeof(char));
     if (buf == NULL) {
@@ -232,7 +232,7 @@ char *ContextGetReadRecord(Context *context)
             return NULL;
         }
     } else {
-        int tmp = context->rCapacity - context->rBegin;
+        int tmp = (int)(context->rCapacity - context->rBegin);
         if (tmp > 0 && memmove_s(buf, len + 1, context->szRead + context->rBegin, tmp) != EOK) {
             free(buf);
             return NULL;
@@ -249,7 +249,7 @@ char *ContextGetReadRecord(Context *context)
         return NULL;
     }
     *p = 0;
-    int num = p - buf + strlen(context->cMsgEnd);
+    uint32_t num = p - buf + strlen(context->cMsgEnd);
     context->rBegin += num;
     if (context->rBegin >= context->rCapacity) {
         context->rBegin -= context->rCapacity;
@@ -291,7 +291,7 @@ int ContextWriteNet(Context *context)
         }
         return ret;
     }
-    int len = context->wCapacity - context->wBegin;
+    int len = (int)(context->wCapacity - context->wBegin);
     int ret = MyWrite(context->fd, context->szWrite + context->wBegin, len);
     if (ret < 0) {
         return ret;
@@ -303,7 +303,7 @@ int ContextWriteNet(Context *context)
     context->wBegin = 0;
     ret = MyWrite(context->fd, context->szWrite, context->wEnd);
     if (ret > 0) {
-        context->wBegin = ret;
+        context->wBegin = (uint32_t)ret;
     }
     return ret;
 }

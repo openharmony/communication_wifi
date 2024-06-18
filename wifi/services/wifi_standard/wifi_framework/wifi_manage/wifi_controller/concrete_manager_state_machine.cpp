@@ -18,12 +18,14 @@
 #include "wifi_manager.h"
 #include "wifi_config_center.h"
 #include "wifi_internal_msg.h"
-#include "wifi_internal_event_dispatcher.h"
 #include "wifi_sta_hal_interface.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_manager.h"
 #include "wifi_common_util.h"
 #include "app_network_speed_limit_service.h"
+#include "wifi_internal_event_dispatcher.h"
+#else
+#include "wifi_internal_event_dispatcher_lite.h"
 #endif
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"

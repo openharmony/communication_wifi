@@ -68,86 +68,91 @@ std::map<std::string, std::int32_t> g_EventSysCapMap = {
     { EVENT_P2P_DISCOVERY_CHANGE, SYSCAP_WIFI_P2P },
 };
 
-static void ThreadFinished(napi_env env, void* data, [[maybe_unused]] void* context)
-{
-    WIFI_LOGD("ThreadFinished");
-}
-
-static void ThreadSafeCallback(napi_env env, napi_value tsfn_cb, void* context, void* data)
-{
-    AsyncEventData *asyncData = static_cast<AsyncEventData*>(data);
-    WIFI_LOGD("uv_queue_work, env: %{private}p, eventType: %{public}s",
-        asyncData->env, asyncData->eventType.c_str());
-    napi_value handler = nullptr;
-    napi_handle_scope scope = nullptr;
-    napi_value jsEvent = nullptr;
-    uint32_t refCount = INVALID_REF_COUNT;
-    napi_status res;
-    bool unrefRef = false;
-    {
-        bool find = false;
-        std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
-        auto it = g_eventRegisterInfo.find(asyncData->eventType);
-        napi_open_handle_scope(asyncData->env, &scope);
-        if (scope == nullptr) {
-            WIFI_LOGE("uv_queue_work, scope is nullptr");
-            goto EXIT;
-        }
-        if (it == g_eventRegisterInfo.end()) {
-            WIFI_LOGW("uv_queue_work, event has been unregistered.");
-            goto EXIT;
-        }
-        for (auto& each : it->second) {
-            if (each.m_regEnv == asyncData->env && each.m_regHanderRef == asyncData->callbackRef) {
-                find = true;
-                break;
-            }
-        }
-        if (find == false) {
-            WIFI_LOGW("uv_queue_work, NOT find the event.");
-            goto EXIT;
-        }
-    }
-    res = napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
-    WIFI_LOGI("uv_queue_work, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
-        res, asyncData->callbackRef, refCount);
-    if (res != napi_ok || refCount <= 1) {
-        WIFI_LOGE("uv_queue_work, do NOT call back, res: %{public}d!", res);
-        goto EXIT;
-    }
-    unrefRef = true;
-    res = napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
-    if (res != napi_ok || handler == nullptr) {
-        WIFI_LOGE("uv_queue_work, handler is nullptr or res: %{public}d!", res);
-        goto EXIT;
-    }
-    napi_value undefine;
-    napi_get_undefined(asyncData->env, &undefine);
-    jsEvent = asyncData->packResult();
-    if (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok) {
-        WIFI_LOGE("uv_queue_work, Report event to Js failed");
-    }
-    EXIT:
-    napi_close_handle_scope(asyncData->env, scope);
-    if (unrefRef) {
-        res = napi_reference_unref(asyncData->env, asyncData->callbackRef, &refCount);
-        WIFI_LOGI("uv_queue_work, unref, res: %{public}d, refCount: %{public}d", res, refCount);
-    }
-    delete asyncData;
-    asyncData = nullptr;
-}
-
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
-    WIFI_LOGI("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
-    napi_threadsafe_function tsfn_ = nullptr;
-    napi_value resourceName = 0;
-    napi_create_string_latin1(asyncEvent->env, __func__, NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_threadsafe_function(asyncEvent->env, nullptr, nullptr, resourceName, 0, 1, nullptr,
-        ThreadFinished, nullptr, ThreadSafeCallback, &tsfn_);
-    napi_acquire_threadsafe_function(tsfn_);
-    napi_call_threadsafe_function(tsfn_, asyncEvent, napi_tsfn_nonblocking);
-    napi_release_threadsafe_function(tsfn_, napi_tsfn_release);
+    WIFI_LOGD("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
+    uv_loop_s* loop = nullptr;
+    napi_get_uv_event_loop(asyncEvent->env, &loop);
+
+    uv_work_t* work = new uv_work_t;
+    if (work == nullptr) {
+        WIFI_LOGE("uv_work_t work is null.");
+        delete asyncEvent;
+        asyncEvent = nullptr;
+        return;
+    }
+
+    work->data = asyncEvent;
+    uv_queue_work(
+        loop,
+        work,
+        [](uv_work_t* work) {},
+        [](uv_work_t* work, int status) {
+            AsyncEventData *asyncData = static_cast<AsyncEventData*>(work->data);
+            WIFI_LOGD("uv_queue_work, env: %{private}p, status: %{public}d, eventType: %{public}s",
+                asyncData->env, status, asyncData->eventType.c_str());
+            napi_value handler = nullptr;
+            napi_handle_scope scope = nullptr;
+            napi_value jsEvent = nullptr;
+            uint32_t refCount = INVALID_REF_COUNT;
+            napi_status res;
+            bool unrefRef = false;
+            {
+                bool find = false;
+                std::shared_lock<std::shared_mutex> guard(g_regInfoMutex);
+                auto it = g_eventRegisterInfo.find(asyncData->eventType);
+                napi_open_handle_scope(asyncData->env, &scope);
+                if (scope == nullptr) {
+                    WIFI_LOGE("uv_queue_work, scope is nullptr");
+                    goto EXIT;
+                }
+                if (it == g_eventRegisterInfo.end()) {
+                    WIFI_LOGW("uv_queue_work, event has been unregistered.");
+                    goto EXIT;
+                }
+                for (auto& each : it->second) {
+                    if (each.m_regEnv == asyncData->env && each.m_regHanderRef == asyncData->callbackRef) {
+                        find = true;
+                        break;
+                    }
+                }
+                if (find == false) {
+                    WIFI_LOGW("uv_queue_work, NOT find the event.");
+                    goto EXIT;
+                }
+            }
+            res = napi_reference_ref(asyncData->env, asyncData->callbackRef, &refCount);
+            WIFI_LOGD("uv_queue_work, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
+                res, asyncData->callbackRef, refCount);
+            if (res != napi_ok || refCount <= 1) {
+                WIFI_LOGE("uv_queue_work, do NOT call back, res: %{public}d!", res);
+                goto EXIT;
+            }
+            unrefRef = true;
+            res = napi_get_reference_value(asyncData->env, asyncData->callbackRef, &handler);
+            if (res != napi_ok || handler == nullptr) {
+                WIFI_LOGE("uv_queue_work, handler is nullptr or res: %{public}d!", res);
+                goto EXIT;
+            }
+            napi_value undefine;
+            napi_get_undefined(asyncData->env, &undefine);
+            jsEvent = asyncData->packResult();
+            if (napi_call_function(asyncData->env, nullptr, handler, 1, &jsEvent, &undefine) != napi_ok) {
+                WIFI_LOGE("uv_queue_work, Report event to Js failed");
+            }
+
+        EXIT:
+            napi_close_handle_scope(asyncData->env, scope);
+            if (unrefRef) {
+                res = napi_reference_unref(asyncData->env, asyncData->callbackRef, &refCount);
+                WIFI_LOGD("uv_queue_work, unref, res: %{public}d, refCount: %{public}d", res, refCount);
+            }
+            delete asyncData;
+            delete work;
+            asyncData = nullptr;
+            work = nullptr;
+        }
+    );
 }
 
 napi_value NapiEvent::CreateResult(const napi_env& env, int value)

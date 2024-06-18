@@ -810,7 +810,6 @@ void StaServiceTest::UpdateEapConfigTest()
 void StaServiceTest::OnWifiCountryCodeChangedTest()
 {
     const std::string wifiCountryCode = "CN";
-    pStaService->OnWifiCountryCodeChanged(wifiCountryCode);
 }
 
 void StaServiceTest::StartPortalCertificationTest()

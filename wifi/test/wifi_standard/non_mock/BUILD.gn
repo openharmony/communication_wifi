@@ -24,7 +24,7 @@ config("module_private_config") {
     "//commonlibrary/c_utils/base/include",
   ]
 }
- 
+
 ohos_unittest("wifi_non_mock_unittest") {
   module_out_path = module_output_path
   sources = [
@@ -74,7 +74,7 @@ ohos_unittest("wifi_non_mock_unittest") {
     "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
     ".",
   ]
- 
+
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
@@ -87,19 +87,19 @@ ohos_unittest("wifi_non_mock_unittest") {
     "-fPIC",
     "--coverage",
   ]
- 
+
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
     "c_utils:utils",
     "hilog:libhilog",
   ]
- 
+
   defines = [
     "private = public",
     "protected = public",
   ]
- 
+
   defines += [
     "FEATURE_AP_SUPPORT",
     "FEATURE_STA_SUPPORT",
@@ -108,7 +108,7 @@ ohos_unittest("wifi_non_mock_unittest") {
   ]
   defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   configs = [ ":module_private_config" ]
- 
+
   part_name = "wifi"
   subsystem_name = "communication"
   testonly = true

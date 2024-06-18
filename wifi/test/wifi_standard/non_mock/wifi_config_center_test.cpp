@@ -12,28 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "wifi_config_center_test.h"
 #include "wifi_global_func.h"
 #include "wifi_internal_msg.h"
- 
+
 using namespace testing;
 using ::testing::ext::TestSize;
- 
+
 namespace OHOS {
 namespace Wifi {
 HWTEST_F(WifiConfigCenterTest, Init_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiConfigCenter::GetInstance().Init());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetWifiMidState_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState state = OHOS::Wifi::WifiOprMidState::RUNNING;
     WifiConfigCenter::GetInstance().SetWifiMidState(state);
     EXPECT_EQ(state, WifiConfigCenter::GetInstance().GetWifiMidState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetWifiMidStateExp_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState cloState = OHOS::Wifi::WifiOprMidState::CLOSED;
@@ -47,7 +47,7 @@ HWTEST_F(WifiConfigCenterTest, SetGetWifi_SUCCESS, TestSize.Level1)
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(cloState));
     EXPECT_EQ((int)cloState, WifiConfigCenter::GetInstance().GetWifiState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetWifi_FAILED, TestSize.Level1)
 {
     WifiOprMidState cloState = OHOS::Wifi::WifiOprMidState::CLOSED;
@@ -55,19 +55,19 @@ HWTEST_F(WifiConfigCenterTest, SetGetWifi_FAILED, TestSize.Level1)
     WifiSettings::GetInstance().SetWifiState(static_cast<int>(cloState));
     EXPECT_NE((int)runState, WifiConfigCenter::GetInstance().GetWifiState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScanAlwaysState_SUCCESS, TestSize.Level1)
 {
     WifiSettings::GetInstance().SetScanAlwaysState(true);
     EXPECT_EQ(true, WifiConfigCenter::GetInstance().IsScanAlwaysActive());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScanAlwaysState_FAILED, TestSize.Level1)
 {
     WifiSettings::GetInstance().SetScanAlwaysState(false);
     EXPECT_NE(true, WifiConfigCenter::GetInstance().IsScanAlwaysActive());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetScanInfoList_SUCCESS, TestSize.Level1)
 {
     std::vector<WifiScanInfo> setInfo;
@@ -77,7 +77,7 @@ HWTEST_F(WifiConfigCenterTest, GetScanInfoList_SUCCESS, TestSize.Level1)
     info2.bssid = "adsgds";
     struct timespec clkTime = {0, 0};
     clock_gettime(CLOCK_MONOTONIC, &clkTime);
-    int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC; 
+    int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC;
     info1.timestamp = curr;
     info2.timestamp = curr;
     setInfo.push_back(info1);
@@ -88,7 +88,7 @@ HWTEST_F(WifiConfigCenterTest, GetScanInfoList_SUCCESS, TestSize.Level1)
     EXPECT_EQ(setInfo.at(0).bssid, getInfo.at(0).bssid);
     EXPECT_EQ(setInfo.at(1).bssid, getInfo.at(1).bssid);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetScanInfoList_FAILED, TestSize.Level1)
 {
     std::vector<WifiScanInfo> setInfo;
@@ -96,7 +96,7 @@ HWTEST_F(WifiConfigCenterTest, GetScanInfoList_FAILED, TestSize.Level1)
     WifiScanInfo info1;
     struct timespec clkTime = {0, 0};
     clock_gettime(CLOCK_MONOTONIC, &clkTime);
-    int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC; 
+    int64_t curr = static_cast<int64_t>(clkTime.tv_sec) * MSEC * MSEC + clkTime.tv_nsec / MSEC;
     info1.timestamp = curr;
     info1.bssid = "asdfg";
     setInfo.push_back(info1);
@@ -106,7 +106,7 @@ HWTEST_F(WifiConfigCenterTest, GetScanInfoList_FAILED, TestSize.Level1)
     setInfo.at(0).bssid = "adsgds";
     EXPECT_NE(setInfo.at(0).bssid, getInfo.at(0).bssid);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetScanControlInfo_SUCCESS, TestSize.Level1)
 {
     ScanControlInfo setInfo, getInfo;
@@ -133,7 +133,7 @@ HWTEST_F(WifiConfigCenterTest, GetScanControlInfo_SUCCESS, TestSize.Level1)
     }
     EXPECT_EQ(setInfoInterval, getInfoInterval);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScanControlInfo_SUCCESS, TestSize.Level1)
 {
     ScanControlInfo setInfo, getInfo;
@@ -160,7 +160,7 @@ HWTEST_F(WifiConfigCenterTest, SetGetScanControlInfo_SUCCESS, TestSize.Level1)
     }
     EXPECT_EQ(setInfoInterval, getInfoInterval);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetIpInfo_SUCCESS, TestSize.Level1)
 {
     IpInfo setInfo, getInfo;
@@ -169,7 +169,7 @@ HWTEST_F(WifiConfigCenterTest, GetIpInfo_SUCCESS, TestSize.Level1)
     WifiConfigCenter::GetInstance().GetIpInfo(getInfo);
     EXPECT_EQ(setInfo.ipAddress, getInfo.ipAddress);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetLinkedInfo_SUCCESS, TestSize.Level1)
 {
     WifiLinkedInfo setInfo, getInfo;
@@ -178,7 +178,7 @@ HWTEST_F(WifiConfigCenterTest, GetLinkedInfo_SUCCESS, TestSize.Level1)
     WifiConfigCenter::GetInstance().GetLinkedInfo(getInfo);
     EXPECT_EQ(setInfo.bssid, getInfo.bssid);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetMacAddress_SUCCESS, TestSize.Level1)
 {
     std::string getMacAddr, setMacAddr;
@@ -187,7 +187,7 @@ HWTEST_F(WifiConfigCenterTest, SetGetMacAddress_SUCCESS, TestSize.Level1)
     WifiConfigCenter::GetInstance().GetMacAddress(getMacAddr);
     EXPECT_EQ(setMacAddr, getMacAddr);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetApMidState_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState setState;
@@ -195,7 +195,7 @@ HWTEST_F(WifiConfigCenterTest, SetGetApMidState_SUCCESS, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetApMidState(setState);
     EXPECT_EQ(setState, WifiConfigCenter::GetInstance().GetApMidState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetApMidStateExp_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState setState, getState;
@@ -204,7 +204,7 @@ HWTEST_F(WifiConfigCenterTest, SetApMidStateExp_SUCCESS, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetApMidState(setState);
     EXPECT_EQ(true, WifiConfigCenter::GetInstance().SetApMidState(setState, getState));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetApMidStateExp_FAILED, TestSize.Level1)
 {
     WifiOprMidState setState, getState;
@@ -213,14 +213,14 @@ HWTEST_F(WifiConfigCenterTest, SetApMidStateExp_FAILED, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetApMidState(setState);
     EXPECT_NE(true, WifiConfigCenter::GetInstance().SetApMidState(getState, setState));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetHotspotState_SUCCESS, TestSize.Level1)
 {
     int state = 1;
     WifiSettings::GetInstance().SetHotspotState(state);
     EXPECT_EQ((int)state, WifiConfigCenter::GetInstance().GetHotspotState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetHotspotConfig_SUCCESS, TestSize.Level1)
 {
     HotspotConfig setConfig, getConfig;
@@ -229,7 +229,7 @@ HWTEST_F(WifiConfigCenterTest, SetGetHotspotConfig_SUCCESS, TestSize.Level1)
     WifiConfigCenter::GetInstance().GetHotspotConfig(getConfig);
     EXPECT_EQ(setConfig.GetSsid(), getConfig.GetSsid());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetStationList_SUCCESS, TestSize.Level1)
 {
     StationInfo info;
@@ -241,7 +241,7 @@ HWTEST_F(WifiConfigCenterTest, GetStationList_SUCCESS, TestSize.Level1)
     EXPECT_EQ(thisList.size(), getList.size());
     EXPECT_EQ(thisList.at(0).bssid, getList.at(0).bssid);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetBlockLists_SUCCESS, TestSize.Level1)
 {
     StationInfo info;
@@ -254,7 +254,7 @@ HWTEST_F(WifiConfigCenterTest, GetBlockLists_SUCCESS, TestSize.Level1)
     EXPECT_EQ(thisList.at(0).bssid, getList.at(0).bssid);
     EXPECT_EQ(0, WifiConfigCenter::GetInstance().DelBlockList(info));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, AddDelBlockList_SUCCESS, TestSize.Level1)
 {
     StationInfo info;
@@ -262,33 +262,33 @@ HWTEST_F(WifiConfigCenterTest, AddDelBlockList_SUCCESS, TestSize.Level1)
     EXPECT_EQ(0, WifiConfigCenter::GetInstance().AddBlockList(info));
     EXPECT_EQ(0, WifiConfigCenter::GetInstance().DelBlockList(info));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetValidBands_SUCCESS, TestSize.Level1)
 {
     std::vector<BandType> bands;
     EXPECT_EQ(0, WifiConfigCenter::GetInstance().GetValidBands(bands));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetValidChannels_SUCCESS, TestSize.Level1)
 {
     ChannelsTable channelsInfo;
     EXPECT_EQ(0, WifiConfigCenter::GetInstance().GetValidChannels(channelsInfo));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScanMidState_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState state = OHOS::Wifi::WifiOprMidState::OPENING;
     WifiConfigCenter::GetInstance().SetScanMidState(state);
     EXPECT_EQ(state, WifiConfigCenter::GetInstance().GetScanMidState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetScanMidStateExp_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState state = OHOS::Wifi::WifiOprMidState::OPENING;
     WifiConfigCenter::GetInstance().SetScanMidState(state);
     EXPECT_EQ(true, WifiConfigCenter::GetInstance().SetScanMidState(state, OHOS::Wifi::WifiOprMidState::RUNNING));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetSignalLevel_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(
@@ -324,54 +324,54 @@ HWTEST_F(WifiConfigCenterTest, GetSignalLevel_SUCCESS, TestSize.Level1)
     EXPECT_EQ(
         4, WifiConfigCenter::GetInstance().GetSignalLevel(RSSI_LEVEL_4_5G, static_cast<int>(BandType::BAND_5GHZ)));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetStaLastRunState_SUCCESS, TestSize.Level1)
 {
     bool mode = true;
     WifiConfigCenter::GetInstance().SetStaLastRunState(mode);
     EXPECT_EQ(mode, WifiConfigCenter::GetInstance().GetStaLastRunState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScreenState_SUCCESS, TestSize.Level1)
 {
     int mode = 1;
     WifiConfigCenter::GetInstance().SetScreenState(mode);
     EXPECT_EQ(mode, WifiConfigCenter::GetInstance().GetScreenState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetAirplaneModeState_SUCCESS, TestSize.Level1)
 {
     int mode = 1;
     WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(mode);
     EXPECT_EQ(mode, WifiConfigCenter::GetInstance().GetAirplaneModeState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetAppRunningState_SUCCESS, TestSize.Level1)
 {
     ScanMode mode = ScanMode::APP_BACKGROUND_SCAN;
     WifiConfigCenter::GetInstance().SetAppRunningState(mode);
     EXPECT_EQ(mode, WifiConfigCenter::GetInstance().GetAppRunningState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetPowerSavingModeState_SUCCESS, TestSize.Level1)
 {
     int mode = 1;
     WifiConfigCenter::GetInstance().SetPowerSavingModeState(mode);
     EXPECT_EQ(mode, WifiConfigCenter::GetInstance().GetPowerSavingModeState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SettingsInit_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiSettings::GetInstance().Init());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetWifiStaCapabilities_SUCCESS, TestSize.Level1)
 {
     int cap = 3;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetWifiStaCapabilities(cap));
     EXPECT_EQ(cap, WifiSettings::GetInstance().GetWifiStaCapabilities());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetDeviceConfig_SUCCESS, TestSize.Level1)
 {
     std::string bssid = "asdgdsklf";
@@ -384,7 +384,7 @@ HWTEST_F(WifiConfigCenterTest, GetDeviceConfig_SUCCESS, TestSize.Level1)
     EXPECT_EQ(config.bssid, getConfig.bssid);
     EXPECT_EQ(config.networkId, getConfig.networkId);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetHiddenDeviceConfig_SUCCESS, TestSize.Level1)
 {
     WifiDeviceConfig config1, config2;
@@ -408,32 +408,32 @@ HWTEST_F(WifiConfigCenterTest, GetHiddenDeviceConfig_SUCCESS, TestSize.Level1)
         EXPECT_TRUE(false);
     }   
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SyncDeviceConfig_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiSettings::GetInstance().SyncDeviceConfig());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, ReloadDeviceConfig_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiSettings::GetInstance().ReloadDeviceConfig());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SyncHotspotConfig_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiSettings::GetInstance().SyncHotspotConfig());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, ClearStationList_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiSettings::GetInstance().ClearStationList());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SyncBlockList_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiSettings::GetInstance().SyncBlockList());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetValidChannels_SUCCESS, TestSize.Level1)
 {
     ChannelsTable setInfos, getInfos;
@@ -448,106 +448,106 @@ HWTEST_F(WifiConfigCenterTest, SetGetValidChannels_SUCCESS, TestSize.Level1)
     EXPECT_EQ(setInfos.at(BandType::BAND_2GHZ).size(), getInfos.at(BandType::BAND_2GHZ).size());
     EXPECT_EQ(setInfos.at(BandType::BAND_5GHZ).size(), getInfos.at(BandType::BAND_5GHZ).size());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, ClearValidChannels_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiSettings::GetInstance().ClearValidChannels());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetApMaxConnNum_SUCCESS, TestSize.Level1)
 {
     WifiSettings::GetInstance().Init();
     EXPECT_EQ(MAX_AP_CONN, WifiSettings::GetInstance().GetApMaxConnNum());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, EnableNetwork_SUCCESS, TestSize.Level1)
 {
     int networkId = 15;
     bool disableOthers = true;
     EXPECT_EQ(true, WifiSettings::GetInstance().EnableNetwork(networkId, disableOthers));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetUserLastSelectedNetworkId_SUCCESS, TestSize.Level1)
 {
     int networkId = 15;
     WifiSettings::GetInstance().SetUserLastSelectedNetworkId(networkId);
     EXPECT_EQ(networkId, WifiSettings::GetInstance().GetUserLastSelectedNetworkId());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SyncWifiConfig_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(0, WifiSettings::GetInstance().SyncWifiConfig());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetDhcpIpType_SUCCESS, TestSize.Level1)
 {
     int stat = 1234;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetDhcpIpType(stat));
     EXPECT_EQ(stat, WifiSettings::GetInstance().GetDhcpIpType());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScoretacticsScoreSlope_SUCCESS, TestSize.Level1)
 {
     int stat = 134;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetScoretacticsScoreSlope(stat));
     EXPECT_EQ(stat, WifiSettings::GetInstance().GetScoretacticsScoreSlope());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScoretacticsSameBssidScore_SUCCESS, TestSize.Level1)
 {
     bool stat = true;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetScoretacticsSameBssidScore(stat));
     EXPECT_EQ(stat, WifiSettings::GetInstance().GetScoretacticsSameBssidScore());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScoretacticsSameNetworkScore_SUCCESS, TestSize.Level1)
 {
     int stat = 1234;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetScoretacticsSameNetworkScore(stat));
     EXPECT_EQ(stat, WifiSettings::GetInstance().GetScoretacticsSameNetworkScore());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScoretacticsFrequency5GHzScore_SUCCESS, TestSize.Level1)
 {
     int stat = 234;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetScoretacticsFrequency5GHzScore(stat));
     EXPECT_EQ(stat, WifiSettings::GetInstance().GetScoretacticsFrequency5GHzScore());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScoretacticsLastSelectionScore_SUCCESS, TestSize.Level1)
 {
     int stat = 1234;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetScoretacticsLastSelectionScore(stat));
     EXPECT_EQ(stat, WifiSettings::GetInstance().GetScoretacticsLastSelectionScore());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetScoretacticsSecurityScore_SUCCESS, TestSize.Level1)
 {
     int stat = 123;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetScoretacticsSecurityScore(stat));
     EXPECT_EQ(stat, WifiSettings::GetInstance().GetScoretacticsSecurityScore());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetSavedDeviceAppraisalPriority_SUCCESS, TestSize.Level1)
 {
     int stat = 532;
     EXPECT_EQ(0, WifiSettings::GetInstance().SetSavedDeviceAppraisalPriority(stat));
     EXPECT_EQ(stat, WifiSettings::GetInstance().GetSavedDeviceAppraisalPriority());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetP2pStateTest, TestSize.Level1)
 {
     WifiSettings::GetInstance().SetP2pState(1);
     EXPECT_TRUE(WifiConfigCenter::GetInstance().GetP2pState() == 1);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetGetP2pMidState_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState state = WifiOprMidState::RUNNING;
     WifiConfigCenter::GetInstance().SetP2pMidState(state);
     EXPECT_EQ(state, WifiConfigCenter::GetInstance().GetP2pMidState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetP2pMidStateExp_SUCCESS, TestSize.Level1)
 {
     WifiOprMidState cloState = WifiOprMidState::CLOSED;
@@ -555,7 +555,7 @@ HWTEST_F(WifiConfigCenterTest, SetP2pMidStateExp_SUCCESS, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetP2pMidState(cloState);
     EXPECT_EQ(true, WifiConfigCenter::GetInstance().SetP2pMidState(cloState, runState));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetP2pMidStateExp_FAILED, TestSize.Level1)
 {
     WifiOprMidState cloState = WifiOprMidState::CLOSED;
@@ -563,12 +563,12 @@ HWTEST_F(WifiConfigCenterTest, SetP2pMidStateExp_FAILED, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetP2pMidState(cloState);
     EXPECT_NE(true, WifiConfigCenter::GetInstance().SetP2pMidState(runState, cloState));
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, GetCanOpenStaWhenAirplaneModeTest, TestSize.Level1)
 {
     EXPECT_TRUE(WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode() == true);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetWifiStateWhenAirplaneModeTest, TestSize.Level1)
 {
     WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(false);
@@ -576,7 +576,7 @@ HWTEST_F(WifiConfigCenterTest, SetWifiStateWhenAirplaneModeTest, TestSize.Level1
     WifiConfigCenter::GetInstance().SetWifiStateWhenAirplaneMode(true);
     EXPECT_TRUE(WifiConfigCenter::GetInstance().GetWifiStateWhenAirplaneMode() == true);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetAppPackageName_SUCCESS, TestSize.Level1)
 {
     std::string setname;
@@ -584,27 +584,27 @@ HWTEST_F(WifiConfigCenterTest, SetAppPackageName_SUCCESS, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetAppPackageName(setname);
     EXPECT_EQ(setname, WifiConfigCenter::GetInstance().GetAppPackageName());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetFreezeModeState_SUCCESS, TestSize.Level1)
 {
     int state = 15;
     WifiConfigCenter::GetInstance().SetFreezeModeState(state);
     EXPECT_EQ(state, WifiConfigCenter::GetInstance().GetFreezeModeState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetNoChargerPlugModeState_SUCCESS, TestSize.Level1)
 {
     int state = 15;
     WifiConfigCenter::GetInstance().SetNoChargerPlugModeState(state);
     EXPECT_EQ(state, WifiConfigCenter::GetInstance().GetNoChargerPlugModeState());
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, SetP2pDeviceName_SUCCESS, TestSize.Level1)
 {
     std::string setname = "name";
     WifiConfigCenter::GetInstance().SetP2pDeviceName(setname);
 }
- 
+
 HWTEST_F(WifiConfigCenterTest, AddDeviceConfig_SUCCESS, TestSize.Level1)
 {
     std::vector<WifiDeviceConfig> getconfig;

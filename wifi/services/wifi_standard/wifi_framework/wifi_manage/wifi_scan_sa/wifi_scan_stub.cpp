@@ -167,7 +167,7 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
         int tmp = data.ReadInt32();
         params.freqs.push_back(tmp);
     }
-    params.band = data.ReadInt32();
+    params.band = static_cast<uint32_t>(data.ReadInt32());
     std::string name = data.ReadString();
 
     WifiSettings::GetInstance().SetAppPackageName(name);

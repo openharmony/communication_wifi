@@ -418,7 +418,7 @@ void WifiDeviceStub::ReadIpAddress(MessageParcel &data, WifiIpAddress &address)
 {
     constexpr int MAX_LIMIT_SIZE = 1024;
     address.family = data.ReadInt32();
-    address.addressIpv4 = data.ReadInt32();
+    address.addressIpv4 = static_cast<uint32_t>(data.ReadInt32());
     int size = data.ReadInt32();
     if (size > MAX_LIMIT_SIZE) {
         WIFI_LOGE("Read ip address parameter error: %{public}d", size);
@@ -523,7 +523,7 @@ void WifiDeviceStub::WriteIpAddress(MessageParcel &reply, const WifiIpAddress &a
 {
     reply.WriteInt32(address.family);
     reply.WriteInt32(address.addressIpv4);
-    int size = address.addressIpv6.size();
+    int size = static_cast<int>(address.addressIpv6.size());
     reply.WriteInt32(size);
     for (int i = 0; i < size; i++) {
         reply.WriteInt8(address.addressIpv6[i]);

@@ -29,7 +29,7 @@
 #include "wifi_internal_msg.h"
 #include "sta_service_callback.h"
 #include "wifi_log.h"
-
+#include "net_manager_constants.h"
 namespace OHOS {
 namespace Wifi {
 class WifiNetAgent {
@@ -132,8 +132,12 @@ public:
          *
          * @param ident - identity
          * @param netCaps - Net capability to request a network
+         * @param registerType - Inner API or outer API
+         *
          */
-        int32_t RequestNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) override;
+        int32_t RequestNetwork(
+            const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps,
+            const int32_t registerType = NetManagerStandard::REGISTER) override;
         /**
          * @Description : Connection Management triggers the close automatic connection feature.
          *

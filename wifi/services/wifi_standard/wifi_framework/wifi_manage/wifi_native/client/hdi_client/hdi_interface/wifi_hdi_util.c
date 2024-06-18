@@ -473,13 +473,15 @@ static int HdiParseExtensionInfo(const uint8_t *pos, size_t elen,
 
     switch (ext_id) {
         case HDI_EID_EXT_ASSOC_DELAY_INFO:
-            if (elen != 1)
+            if (elen != 1) {
                 break;
+            }
             elems->assocDelayInfo = pos;
             break;
         case HDI_EID_EXT_FILS_REQ_PARAMS:
-            if (elen < HDI_POS_THIRD)
+            if (elen < HDI_POS_THIRD) {
                 break;
+            }
             elems->filsReqParams = pos;
             elems->filsReqParamsLen = elen;
             break;
@@ -488,25 +490,29 @@ static int HdiParseExtensionInfo(const uint8_t *pos, size_t elen,
             elems->filsKeyConfirmLen = elen;
             break;
         case HDI_EID_EXT_FILS_SESSION:
-            if (elen != HDI_FILS_SESSION_LEN)
+            if (elen != HDI_FILS_SESSION_LEN) {
                 break;
+            }
             elems->filsSession = pos;
             break;
         case HDI_EID_EXT_FILS_HLP_CONTAINER:
-            if (elen < HDI_POS_SECOND * ETH_ALEN)
+            if (elen < HDI_POS_SECOND * ETH_ALEN) {
                 break;
+            }
             elems->filsHlp = pos;
             elems->filsHlpLen = elen;
             break;
         case HDI_EID_EXT_FILS_IP_ADDR_ASSIGN:
-            if (elen < 1)
+            if (elen < 1) {
                 break;
+            }
             elems->addrAssign = pos;
             elems->filsIpAddrAssignLen = elen;
             break;
         case HDI_EID_EXT_KEY_DELIVERY:
-            if (elen < HDI_KEY_RSC_LEN)
+            if (elen < HDI_KEY_RSC_LEN) {
                 break;
+            }
             elems->delivery = pos;
             elems->keyDeliveryLen = elen;
             break;
@@ -515,19 +521,22 @@ static int HdiParseExtensionInfo(const uint8_t *pos, size_t elen,
             elems->filWrappedDataLen = elen;
             break;
         case HDI_EID_EXT_FILS_PUBLIC_KEY:
-            if (elen < 1)
+            if (elen < 1) {
                 break;
+            }
             elems->filsPk = pos;
             elems->filsPkLen = elen;
             break;
         case HDI_EID_EXT_FILS_NONCE:
-            if (elen != HDI_FILS_NONCE_LEN)
+            if (elen != HDI_FILS_NONCE_LEN) {
                 break;
+            }
             elems->filsNonce = pos;
             break;
         case HDI_EID_EXT_OWE_DH_PARAM:
-            if (elen < HDI_POS_SECOND)
+            if (elen < HDI_POS_SECOND) {
                 break;
+            }
             elems->oweDh = pos;
             elems->oweDhLen = elen;
             break;
@@ -673,8 +682,9 @@ static int HdiParseVendorSpec(const uint8_t *pos, size_t elen,
                         pos[HDI_POS_FOURTH] == HDI_VHT_SUBTYPE2)) {
                         elems->vendorVht = pos;
                         elems->vendorVhtLen = elen;
-                    } else
+                    } else {
                         return -1;
+                    }
                     break;
                 default:
                     return -1;
@@ -1058,9 +1068,9 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
         pos += ret;
     }
     osen_ie = HdiBssGetVendorIe(scanResult->ie, scanResult->ieLen, HDI_OSEN_IE_VENDOR_TYPE);
-    if (osen_ie)
-        pos = HdiGetIeTxt(pos, end, "OSEN",
-                        osen_ie, HDI_POS_SECOND + osen_ie[1]);
+    if (osen_ie) {
+        pos = HdiGetIeTxt(pos, end, "OSEN", osen_ie, HDI_POS_SECOND + osen_ie[1]);
+    }
     owe = HdiBssGetVendorIe(scanResult->ie, scanResult->ieLen, HDI_OWE_VENDOR_TYPE);
     if (owe) {
         ret = HdiTxtPrintf(pos, end - pos,
@@ -1089,14 +1099,16 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
 
         if (HdiBssGetIeExt(scanResult->ie, scanResult->ieLen, HDI_EID_EXT_EDMG_OPERATION)) {
             ret = HdiTxtPrintf(pos, end - pos, "[EDMG]");
-            if (HdiCheckError(end - pos, ret))
+            if (HdiCheckError(end - pos, ret)) {
                 return -1;
+            }
             pos += ret;
         }
 
         ret = HdiTxtPrintf(pos, end - pos, "[DMG]");
-        if (HdiCheckError(end - pos, ret))
+        if (HdiCheckError(end - pos, ret)) {
             return -1;
+        }
         pos += ret;
         switch (scanResult->caps & HDI_CAP_DMG_MASK) {
             case HDI_CAP_DMG_IBSS:
@@ -1120,34 +1132,39 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
     } else {
         if (scanResult->caps & HDI_CAP_IBSS) {
             ret = HdiTxtPrintf(pos, end - pos, "[IBSS]");
-            if (HdiCheckError(end - pos, ret))
+            if (HdiCheckError(end - pos, ret)) {
                 return -1;
+            }
             pos += ret;
         }
         if (scanResult->caps & HDI_CAP_ESS) {
             ret = HdiTxtPrintf(pos, end - pos, "[ESS]");
-            if (HdiCheckError(end - pos, ret))
+            if (HdiCheckError(end - pos, ret)) {
                 return -1;
+            }
             pos += ret;
         }
     }
     if (p2p) {
         ret = HdiTxtPrintf(pos, end - pos, "[P2P]");
-        if (HdiCheckError(end - pos, ret))
+        if (HdiCheckError(end - pos, ret)) {
             return -1;
+        }
         pos += ret;
     }
 
     if (HdiCheckBssExtCap(scanResult->ie, scanResult->ieLen, HDI_EXT_CAPAB_UTF_8_SSID)) {
         ret = HdiTxtPrintf(pos, end - pos, "[UTF-8]");
-        if (HdiCheckError(end - pos, ret))
+        if (HdiCheckError(end - pos, ret)) {
             return -1;
+        }
         pos += ret;
     }
 
     ret = HdiTxtPrintf(pos, end - pos, "\t%s\t", HdiSSid2Txt(elems->ssid, elems->ssidLen));
-    if (HdiCheckError(end - pos, ret))
+    if (HdiCheckError(end - pos, ret)) {
         return -1;
+    }
     pos += ret;
 
     for (int j = 0; j < HDI_EID_EXTENSION; j++) {
@@ -1158,18 +1175,21 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
         infoEle = HdiBssGetIe(scanResult->ie, scanResult->ieLen, j);
         if (infoEle && infoEle[1] > 0) {
             ret = HdiTxtPrintf(pos, end - pos, "[%d ", j);
-            if (HdiCheckError(end - pos, ret))
+            if (HdiCheckError(end - pos, ret)) {
                 return -1;
+            }
             pos += ret;
             for (uint8_t i = 0; i < infoEle[1]; i++) {
                 ret = HdiTxtPrintf(pos, end - pos, "%02x", infoEle[i + HDI_POS_SECOND]);
-                if (HdiCheckError(end - pos, ret))
+                if (HdiCheckError(end - pos, ret)) {
                     return -1;
+                }
                 pos += ret;
             }
             ret = HdiTxtPrintf(pos, end - pos, "]");
-            if (HdiCheckError(end - pos, ret))
+            if (HdiCheckError(end - pos, ret)) {
                 return -1;
+            }
             pos += ret;
         }
     }
@@ -1180,18 +1200,21 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
         if (len > 1 && infoEle[HDI_POS_SECOND] == HDI_EID_EXT_HE_OPERATION) {
             ret = HdiTxtPrintf(pos, end - pos, "[%d %d ",
                 HDI_EID_EXTENSION, HDI_EID_EXT_HE_OPERATION);
-            if (HdiCheckError(end - pos, ret))
+            if (HdiCheckError(end - pos, ret)) {
                 return -1;
+            }
             pos += ret;
             for (size_t i = 0; i < len; i++) {
                 ret = HdiTxtPrintf(pos, end - pos, "%02x", infoEle[i + HDI_POS_THIRD]);
-                if (HdiCheckError(end - pos, ret))
+                if (HdiCheckError(end - pos, ret)) {
                     return -1;
+                }
                 pos += ret;
             }
             ret = HdiTxtPrintf(pos, end - pos, "]");
-            if (HdiCheckError(end - pos, ret))
+            if (HdiCheckError(end - pos, ret)) {
                 return -1;
+            }
             pos += ret;
         }
     }

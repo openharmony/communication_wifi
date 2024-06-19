@@ -81,6 +81,15 @@ public:
     bool AddRoute(const std::string interface, const std::string ipAddress, int prefixLength);
 
     /**
+     * Delete interface address
+     *
+     * @param interface interface name
+     * @param ipAddress IP address
+     * @param prefixLength prefix length
+     */
+    bool DelInterfaceAddress(const std::string interface, const std::string ipAddress, int prefixLength);
+
+    /**
      * Add OnStaMachineUpdateNetLinkInfo
      *
      * @param wifiIpInfo wifi network link data information

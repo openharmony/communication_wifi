@@ -360,6 +360,13 @@ public:
     virtual ErrCode DiscoverPeers(int32_t channelid) override;
 
     virtual ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Set gc ip infomation
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) override;
 private:
     WifiP2pGroupManager groupManager;    /* group manager */
     WifiP2pDeviceManager deviceMgr;  /* device manager */

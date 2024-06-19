@@ -21,11 +21,13 @@
 #include "if_config.h"
 #include "wifi_settings.h"
 #include "wifi_hisysevent.h"
+#include "wifi_net_agent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupOperatingState");
 
 #define P2P_ENHANCE_MASK 0x08000000
 #define BAND_MASK 5
+#define P2P_IP_ADDR_PREFIX_LEN 24
 
 namespace OHOS {
 namespace Wifi {
@@ -262,6 +264,13 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
         WIFI_LOGI("now remove : %{private}s.", group.GetInterface().c_str());
         if (p2pStateMachine.p2pDevIface == group.GetInterface()) {
             p2pStateMachine.p2pDevIface = "";
+        }
+        if (group.IsGroupOwner()) {
+            WifiNetAgent::GetInstance().DelInterfaceAddress(group.GetInterface(),
+                group.GetGoIpAddress(), P2P_IP_ADDR_PREFIX_LEN);
+        } else {
+            WifiNetAgent::GetInstance().DelInterfaceAddress(group.GetInterface(),
+                group.GetGcIpAddress(), P2P_IP_ADDR_PREFIX_LEN);
         }
         ret = WifiP2PHalInterface::GetInstance().GroupRemove(group.GetInterface());
         if (ret) {

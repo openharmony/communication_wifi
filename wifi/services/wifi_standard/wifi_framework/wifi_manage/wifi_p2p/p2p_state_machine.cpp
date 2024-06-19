@@ -902,6 +902,7 @@ void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
     p2pInfo.SetIsGroupOwnerAddress(result->strOptServerId);
     WifiP2pGroupInfo currGroup = groupManager->GetCurrentGroup();
     currGroup.SetGoIpAddress(result->strOptServerId);
+    currGroup.SetGcIpAddress(result->strOptClientId);
     groupManager->SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
     WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager->SaveP2pInfo(p2pInfo);

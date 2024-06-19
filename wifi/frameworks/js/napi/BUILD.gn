@@ -64,7 +64,9 @@ ohos_shared_library("wifi") {
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
-
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
   relative_install_dir = "module"
   part_name = "wifi"
   subsystem_name = "communication"
@@ -114,7 +116,9 @@ ohos_shared_library("wifiext") {
   if (wifi_feature_with_random_mac_addr) {
     defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   }
-
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
   relative_install_dir = "module"
   part_name = "wifi"
   subsystem_name = "communication"
@@ -170,7 +174,9 @@ ohos_shared_library("wifi_native_js") {
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
-
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
   relative_install_dir = "module"
   part_name = "wifi"
   subsystem_name = "communication"
@@ -224,6 +230,9 @@ ohos_shared_library("wifimanager") {
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
   relative_install_dir = "module"
   part_name = "wifi"
   subsystem_name = "communication"
@@ -270,7 +279,9 @@ ohos_shared_library("wifimanagerext") {
     "hilog:libhilog",
     "napi:ace_napi",
   ]
-
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
   relative_install_dir = "module"
   part_name = "wifi"
   subsystem_name = "communication"

@@ -1,0 +1,17 @@
+1.0 {
+    global:
+        "*WifiManager*";
+        "*WifiStaManager*";
+        "*WifiTogglerManager*";
+        "*WifiServiceManager*";
+        "*SaTimer*";
+        "*IsMdmForbidden*";
+        "*GetAirplaneModeByDatashare*";
+        "*Get*Callback*";
+        "*CheckCanUseP2p*";
+        "*QosMonitor*";
+        "*SelfCure*";
+        "*Gateway*";
+    local:
+        *;
+};

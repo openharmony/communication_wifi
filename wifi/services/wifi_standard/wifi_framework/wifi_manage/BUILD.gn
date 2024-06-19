@@ -200,8 +200,10 @@ if (defined(ohos_lite)) {
   config("wifi_manager_service_config") {
     visibility = [ ":*" ]
     include_dirs = [ ":wifi_fw_common_header" ]
-
-    cflags = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags += [
       "-std=c++17",
       "-fno-rtti",
     ]
@@ -454,6 +456,7 @@ if (defined(ohos_lite)) {
       ubsan = true  # Enable some Ubsan options
       debug = false
     }
+
     install_enable = true
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
@@ -493,7 +496,9 @@ if (defined(ohos_lite)) {
     ]
 
     configs = [ ":wifi_manager_service_header" ]
-
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
     external_deps = [
       "ability_base:want",
       "ability_base:zuri",
@@ -605,7 +610,7 @@ if (defined(ohos_lite)) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
     }
-
+    version_script = "libwifi_manager.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

@@ -1,0 +1,9 @@
+1.0 {
+    global:
+        "*HalInterface*";
+        "*Hid2dConnectConfig*";
+        "*HalDeviceManager*";
+        "*WifiEapConfig*";
+    local:
+        *;
+};

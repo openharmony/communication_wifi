@@ -87,7 +87,10 @@ if (defined(ohos_lite)) {
     sources = crpc_server_sources
 
     include_dirs = [ "include" ]
-    cflags_cc = [ "-fno-rtti" ]
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [ "-fno-rtti" ]
     deps = []
     external_deps = [
       "c_utils:utils",
@@ -112,7 +115,10 @@ if (defined(ohos_lite)) {
       "include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     ]
-    cflags_cc = [ "-fno-rtti" ]
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [ "-fno-rtti" ]
     deps = []
     external_deps = [
       "c_utils:utils",

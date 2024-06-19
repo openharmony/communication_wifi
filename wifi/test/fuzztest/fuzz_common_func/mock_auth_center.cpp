@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Wifi {
-
+constexpr int PERMISSION_GRANTED = 1;
 WifiAuthCenter &WifiAuthCenter::GetInstance()
 {
     static WifiAuthCenter gWifiAuthCenter;
@@ -101,6 +101,23 @@ int WifiAuthCenter::VerifyManageWifiHotspotExtPermission(const int &pid, const i
 int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid)
 {
     return PERMISSION_GRANTED;
+}
+
+WifiAppSateAware &WifiAppSateAware::GetInstance()
+{
+    static WifiAppSateAware gWifiAppSateAware;
+    return gWifiAppSateAware;
+}
+
+WifiAppSateAware::WifiAppSateAware()
+{}
+
+WifiAppSateAware::~WifiAppSateAware()
+{}
+
+bool WifiAppSateAware::IsForegroundApp(int32_t uid)
+{
+    return true;
 }
 } // namespace Wifi
 } // namespace OHOS

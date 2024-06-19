@@ -61,6 +61,13 @@ public:
      * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode IsSelfCureOnGoing() = 0;
+
+    /**
+     * @Description Deal sta opened result
+     *
+     * @param instId - instance Id
+     */
+    virtual void DealStaOpened(int instId) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

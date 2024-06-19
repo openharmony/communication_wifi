@@ -57,6 +57,8 @@ enum class WifiCloseServiceCode {
     AP_SERVICE_CLOSE,
     P2P_SERVICE_CLOSE,
     SERVICE_THREAD_EXIT,
+    STA_MSG_OPENED,
+    STA_MSG_STOPED,
 };
 
 struct WifiCloseServiceMsg

@@ -105,10 +105,9 @@ public:
 
     void DealStaOpenResTest()
     {
-        OperateResState state = OperateResState::OPEN_WIFI_SUCCEED;
-        pSelfCureInterface->DealStaOpenRes(state);
+        pSelfCureInterface->DealStaOpened(0);
         pSelfCureInterface->pSelfCureService == nullptr;
-        pSelfCureInterface->DealStaOpenRes(state);
+        pSelfCureInterface->DealStaOpened(0);
     }
 };
 

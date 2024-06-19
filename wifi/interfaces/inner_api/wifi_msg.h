@@ -543,8 +543,10 @@ public:
     int wapiPskType;
     std::string wapiAsCertData;
     std::string wapiUserCertData;
+    std::string encryptedAsCertData;
+    std::string asCertDataIV;
     std::string encryptedUserCertData;
-    std::string IV;
+    std::string userCertDataIV;
 
     WifiWapiConfig()
     {

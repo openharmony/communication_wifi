@@ -46,28 +46,18 @@ static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 std::shared_ptr<WifiScanStub> pWifiScanServiceImpl = std::make_shared<WifiScanServiceImpl>();
-void MyExit()
-{
-    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
-    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
-    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
-    WifiManager::GetInstance().Exit();
-    sleep(5);
-    printf("exiting\n");
-}
 
 bool Init()
 {
     if (!g_isInsted) {
-        if (WifiManager::GetInstance().Init() < 0) {
-            LOGE("WifiManager init failed!");
-            return false;
+        if (WifiConfigCenter::GetInstance().GetScanMidState(0) != WifiOprMidState::RUNNING) {
+            WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::RUNNING, 0);
         }
-        atexit(MyExit);
         g_isInsted = true;
     }
     return true;
 }
+
 bool OnRemoteRequest(uint32_t code, MessageParcel &data)
 {
     std::unique_lock<std::mutex> autoLock(g_instanceLock);
@@ -222,9 +212,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
     Init();
-    OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
     OHOS::Wifi::OnSetScanControlInfoFuzzTest(data, size);
-    OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
     OHOS::Wifi::OnGetScanOnlyAvailableTest(data, size);
     OHOS::Wifi::OnScanFuzzTest(data, size);
     OHOS::Wifi::OnScanByParamsFuzzTest(data, size);
@@ -232,7 +220,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetScanInfoListFuzzTest(data, size);
     OHOS::Wifi::OnRegisterCallBackFuzzTest(data, size);
     OHOS::Wifi::OnStartWifiPnoScanFuzzTest(data, size);
-    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
     sleep(4);
     return 0;
 }

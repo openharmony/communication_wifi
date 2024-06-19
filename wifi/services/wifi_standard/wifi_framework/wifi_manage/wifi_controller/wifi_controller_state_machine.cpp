@@ -764,7 +764,9 @@ void WifiControllerMachine::EnableState::HandleApRemoved(InternalMessage *msg)
 {
     pWifiControllerMachine->StopSoftapManager(msg->GetParam2());
     SoftApManager *softap = pWifiControllerMachine->GetSoftApManager(msg->GetParam2());
-    softap->SetRole(SoftApManager::Role::ROLE_HAS_REMOVED);
+    if (softap != nullptr) {
+        softap->SetRole(SoftApManager::Role::ROLE_HAS_REMOVED);
+    }
 }
 #endif
 

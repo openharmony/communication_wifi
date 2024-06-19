@@ -608,6 +608,10 @@ if (defined(ohos_lite)) {
       external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
     }
 
+    if (wifi_feature_powermgr_support) {
+      defines += [ "HAS_POWERMGR_PART" ]
+    }
+
     part_name = "wifi"
     subsystem_name = "communication"
   }

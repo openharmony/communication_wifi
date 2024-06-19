@@ -16,9 +16,9 @@
 #ifndef OHOS_MOCK_AUTH_CENTER_H
 #define OHOS_MOCK_AUTH_CENTER_H
 
-#define PERMISSION_GRANTED (1)
-#define PERMISSION_DENIED (0)
-
+#include "irmote_object.h"
+#include "wifi_event_handler.h"
+#include "wifi_errcode.h"
 namespace OHOS {
 namespace Wifi {
 class WifiAuthCenter {
@@ -56,6 +56,15 @@ public:
     int VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid);
 
     int VerifyGetWifiConfigPermission(const int &pid, const int &uid);
+};
+
+class WifiAppSateAware {
+public:
+    static WifiAppSateAware &GetInstance();
+
+    explicit WifiAppSateAware();
+    ~WifiAppSateAware();
+    bool IsForegroundApp(int32_t uid);
 };
 } // namespace Wifi
 } // namespace OHOS

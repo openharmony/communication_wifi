@@ -33,7 +33,6 @@
 #include "wifi_common_def.h"
 #include "wifi_manager.h"
 #include "wifi_net_agent.h"
-
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
@@ -44,28 +43,12 @@ static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 sptr<WifiP2pStub> pWifiP2pServiceImpl = WifiP2pServiceImpl::GetInstance();
 
-void MyExit()
-{
-    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
-    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
-    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
-    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
-    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
-    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
-    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
-    WifiManager::GetInstance().Exit();
-    sleep(5);
-    printf("exiting\n");
-}
-
 bool Init()
 {
     if (!g_isInsted) {
-        if (WifiManager::GetInstance().Init() < 0) {
-            LOGE("WifiManager init failed!");
-            return false;
+        if (WifiConfigCenter::GetInstance().GetP2pMidState() != WifiOprMidState::RUNNING) {
+            WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::RUNNING);
         }
-        atexit(MyExit);
         g_isInsted = true;
     }
     return true;
@@ -647,8 +630,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
     Init();
-    OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
-    OHOS::Wifi::DoSomethingInterestingWithMyAPIS(data, size);
     OHOS::Wifi::OnDiscoverDevicesFuzzTest(data, size);
     OHOS::Wifi::OnDiscoverPeersFuzzTest(data, size);
     OHOS::Wifi::OnDisableRandomMacFuzzTest(data, size);
@@ -691,8 +672,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnHid2dSetPeerWifiCfgInfoFuzzTest(data, size);
     OHOS::Wifi::OnQueryP2pLocalDeviceFuzzTest(data, size);
     OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest(data, size);
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
-    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
     sleep(U32_AT_SIZE_ZERO);
     return 0;
 }

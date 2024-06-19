@@ -23,7 +23,9 @@
 #include "wifi_hisysevent.h"
 #include "wifi_protect_manager.h"
 #include "wifi_system_timer.h"
+#ifdef FEATURE_STA_SUPPORT
 #include "wifi_country_code_manager.h"
+#endif
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else

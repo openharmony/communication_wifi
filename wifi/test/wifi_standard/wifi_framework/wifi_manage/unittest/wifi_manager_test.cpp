@@ -72,34 +72,22 @@ HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
     wifiManager.wifiStaManager->StartUnloadStaSaTimer();
 }
 
-HWTEST_F(WifiManagerTest, ForceStopWifiTest, TestSize.Level1)
-{
-    WIFI_LOGI("ForceStopWifiTest enter!");
-    wifiManager.wifiStaManager->ForceStopWifi();
-}
-
 HWTEST_F(WifiManagerTest, StaManagerDealStaOpenResTest_001, TestSize.Level1)
 {
     WIFI_LOGI("StaManagerDealStaOpenResTest_001 enter!");
-    wifiManager.wifiStaManager->DealStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
+    wifiManager.wifiStaManager->DealStaOpened(0);
 }
 
 HWTEST_F(WifiManagerTest, DealStaCloseResTest_001, TestSize.Level1)
 {
     WIFI_LOGI("DealStaCloseResTest_001 enter!");
-    wifiManager.wifiStaManager->DealStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
+    wifiManager.wifiStaManager->DealStaStopped(0);
 }
 
 HWTEST_F(WifiManagerTest, ResetSelfcureOpenWifiTest, TestSize.Level1)
 {
     WIFI_LOGI("ResetSelfcureOpenWifiTest enter!");
     wifiManager.wifiStaManager->ResetSelfcureOpenWifi();
-}
-
-HWTEST_F(WifiManagerTest, DealStaSemiActiveResTest_001, TestSize.Level1)
-{
-    WIFI_LOGI("DealStaSemiActiveResTest_001 enter!");
-    wifiManager.wifiStaManager->DealStaSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_OPENING);
 }
 
 HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)

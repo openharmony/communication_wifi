@@ -37,7 +37,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableWifi() override;
+    virtual ErrCode EnableStaService() override;
     /**
      * @Description  Disable wifi
      *
@@ -46,16 +46,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode DisableWifi() override;
-    /**
-     * @Description  Enable semi-wifi
-     *
-     * @Output: Return operating results to Interface Service after enable semi-wifi
-               successfully through callback function instead of returning
-               result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode EnableSemiWifi() override;
+    virtual ErrCode DisableStaService() override;
     /**
      * @Description  Connect to a new network
      *

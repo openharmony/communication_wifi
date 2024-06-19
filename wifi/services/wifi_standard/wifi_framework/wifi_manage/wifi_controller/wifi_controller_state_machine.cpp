@@ -427,7 +427,7 @@ bool WifiControllerMachine::ShouldEnableWifi()
         return false;
     }
 #endif
-    if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsSemiWifiEnable() || IsScanOnlyEnable()) {
+    if (WifiSettings::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED || IsScanOnlyEnable()) {
         WIFI_LOGI("Should start wifi or scanonly.");
         return true;
     }
@@ -438,9 +438,7 @@ bool WifiControllerMachine::ShouldEnableWifi()
 
 ConcreteManagerRole WifiControllerMachine::GetWifiRole()
 {
-    if (IsWifiEnable() && IsScanOnlyEnable()) {
-        return ConcreteManagerRole::ROLE_CLIENT_MIX;
-    } else if (IsWifiEnable()) {
+    if (IsWifiEnable()) {
         return ConcreteManagerRole::ROLE_CLIENT_STA;
     } else if (IsSemiWifiEnable() && IsScanOnlyEnable()) {
         return ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE;
@@ -455,12 +453,12 @@ ConcreteManagerRole WifiControllerMachine::GetWifiRole()
 
 bool WifiControllerMachine::IsWifiEnable()
 {
-    return WifiSettings::GetInstance().IsWifiToggledEnable();
+    return WifiSettings::GetInstance().GetWifiToggledEnable() == WIFI_STATE_ENABLED;
 }
 
 bool WifiControllerMachine::IsSemiWifiEnable()
 {
-    return WifiSettings::GetInstance().IsSemiWifiEnable();
+    return WifiSettings::GetInstance().GetWifiToggledEnable() == WIFI_STATE_SEMI_ENABLED;
 }
 
 bool WifiControllerMachine::IsScanOnlyEnable()
@@ -784,7 +782,7 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
 #endif
         if (!WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning()) {
-            if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsSemiWifiEnable()) {
+            if (WifiSettings::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
                 ConcreteManagerRole presentRole = GetWifiRole();
                 MakeConcreteManager(presentRole, 0);
                 return;
@@ -792,7 +790,7 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
     } else {
 #endif
-        if (WifiSettings::GetInstance().IsWifiToggledEnable() || IsSemiWifiEnable()) {
+        if (WifiSettings::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
             ConcreteManagerRole presentRole = GetWifiRole();
             MakeConcreteManager(presentRole, 0);
             return;

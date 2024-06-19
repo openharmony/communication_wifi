@@ -144,7 +144,6 @@ StaStateMachine::StaStateMachine(int instId)
       pGetIpState(nullptr),
       pLinkedState(nullptr),
       pApRoamingState(nullptr),
-      pSemiActiveState(nullptr),
       m_instId(instId),
       mLastConnectNetId(INVALID_NETWORK_ID),
       mConnectFailedCnt(0)
@@ -154,6 +153,7 @@ StaStateMachine::StaStateMachine(int instId)
 StaStateMachine::~StaStateMachine()
 {
     WIFI_LOGI("~StaStateMachine");
+    StopWifiProcess();
     StopHandlerThread();
     ParsePointer(pRootState);
     ParsePointer(pInitState);
@@ -231,8 +231,6 @@ ErrCode StaStateMachine::InitStaStates()
     tmpErrNumber += JudgmentEmpty(pLinkedState);
     pApRoamingState = new (std::nothrow)ApRoamingState(this);
     tmpErrNumber += JudgmentEmpty(pApRoamingState);
-    pSemiActiveState = new (std::nothrow)SemiActiveState(this);
-    tmpErrNumber += JudgmentEmpty(pSemiActiveState);
     pDhcpResultNotify = new (std::nothrow)DhcpResultNotify();
     tmpErrNumber += JudgmentEmpty(pDhcpResultNotify);
     if (tmpErrNumber != 0) {
@@ -306,7 +304,6 @@ void StaStateMachine::BuildStateTree()
     StatePlus(pInitState, pRootState);
     StatePlus(pWpaStartingState, pRootState);
     StatePlus(pWpaStartedState, pRootState);
-    StatePlus(pSemiActiveState, pRootState);
     StatePlus(pLinkState, pWpaStartedState);
     StatePlus(pSeparatingState, pLinkState);
     StatePlus(pSeparatedState, pLinkState);
@@ -323,36 +320,6 @@ void StaStateMachine::RegisterStaServiceCallback(const StaServiceCallback &callb
     WIFI_LOGI("RegisterStaServiceCallback, callback module name: %{public}s", callback.callbackModuleName.c_str());
     std::unique_lock<std::shared_mutex> lock(m_staCallbackMutex);
     m_staCallback.insert_or_assign(callback.callbackModuleName, callback);
-}
-
-void StaStateMachine::InvokeOnStaOpenRes(OperateResState state)
-{
-    std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
-    for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.second.OnStaOpenRes != nullptr) {
-            callBackItem.second.OnStaOpenRes(state, m_instId);
-        }
-    }
-}
-
-void StaStateMachine::InvokeOnStaCloseRes(OperateResState state)
-{
-    std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
-    for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.second.OnStaCloseRes != nullptr) {
-            callBackItem.second.OnStaCloseRes(state, m_instId);
-        }
-    }
-}
-
-void StaStateMachine::InvokeOnStaSemiActiveRes(OperateResState state)
-{
-    std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
-    for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.second.OnStaSemiActiveRes != nullptr) {
-            callBackItem.second.OnStaSemiActiveRes(state, m_instId);
-        }
-    }
 }
 
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
@@ -494,16 +461,10 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
     WIFI_LOGI("InitState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_ENABLE_WIFI: {
+        case WIFI_SVR_CMD_STA_ENABLE_STA: {
             ret = EXECUTED;
             pStaStateMachine->operationalMode = msg->GetParam1();
             pStaStateMachine->StartWifiProcess();
-            break;
-        }
-        case WIFI_SVR_CMD_STA_ENABLE_SEMI_WIFI: {
-            ret = EXECUTED;
-            pStaStateMachine->operationalMode = msg->GetParam1();
-            pStaStateMachine->StartSemiWifiProcess();
             break;
         }
         case WIFI_SVR_CMD_STA_OPERATIONAL_MODE:
@@ -652,108 +613,40 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 
 void StaStateMachine::StartWifiProcess()
 {
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING), m_instId);
-    WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATING, m_instId);
-    InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
-    int res = WifiStaHalInterface::GetInstance().StartWifi(WifiSettings::GetInstance().GetStaIfaceName());
-    if (res == static_cast<int>(WIFI_HAL_OPT_OK)) {
-        WIFI_LOGI("Start wifi successfully!");
-        if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false) != WIFI_HAL_OPT_OK) {
-            WIFI_LOGI("The automatic Wpa connection is disabled failed.");
+    if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("The automatic Wpa connection is disabled failed.");
+    }
+    int screenState = WifiSettings::GetInstance().GetScreenState();
+    WIFI_LOGI("set suspend mode to chip when wifi started, screenState: %{public}d", screenState);
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
+        != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("%{public}s WpaSetSuspendMode failed!", __FUNCTION__);
+    }
+    /* Sets the MAC address of WifiSettings. */
+    std::string mac;
+    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_HAL_OPT_OK) {
+        WifiSettings::GetInstance().SetMacAddress(mac, m_instId);
+        std::string realMacAddress;
+        WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
+        if (realMacAddress.empty()) {
+            WifiSettings::GetInstance().SetRealMacAddress(mac, m_instId);
         }
-        int screenState = WifiSettings::GetInstance().GetScreenState();
-        WIFI_LOGI("set suspend mode to chip when wifi started, screenState: %{public}d", screenState);
-        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
-            != WIFI_HAL_OPT_OK) {
-            WIFI_LOGE("%{public}s WpaSetSuspendMode failed!", __FUNCTION__);
-        }
-
-        /* callback the InterfaceService that wifi is enabled successfully. */
-        WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), m_instId);
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, m_instId);
-        InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
-        /* Sets the MAC address of WifiSettings. */
-        std::string mac;
-        if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_HAL_OPT_OK) {
-            WifiSettings::GetInstance().SetMacAddress(mac, m_instId);
-            std::string realMacAddress;
-            WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
-            if (realMacAddress.empty()) {
-                WifiSettings::GetInstance().SetRealMacAddress(mac, m_instId);
-            }
-        } else {
-            WIFI_LOGI("GetStaDeviceMacAddress failed!");
-        }
+    } else {
+        WIFI_LOGI("GetStaDeviceMacAddress failed!");
+    }
 #ifndef OHOS_ARCH_LITE
-        WIFI_LOGI("Register netsupplier");
-        WifiNetAgent::GetInstance().OnStaMachineWifiStart();
+    WIFI_LOGI("Register netsupplier");
+    WifiNetAgent::GetInstance().OnStaMachineWifiStart();
 #endif
-        /* Initialize Connection Information. */
-        InitWifiLinkedInfo();
-        InitLastWifiLinkedInfo();
-        WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-        WifiSettings::GetInstance().ReloadDeviceConfig();
-        /* The current state of StaStateMachine transfers to SeparatedState after
-         * enable supplicant.
-         */
-        SwitchState(pSeparatedState);
-    } else {
-        /* Notify the InterfaceService that wifi is failed to enable wifi. */
-        LOGE("StartWifi failed, and errcode is %d.", res);
-        WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, m_instId);
-        WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
-        InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_FAILED);
-    }
-}
-
-void StaStateMachine::StartSemiWifiProcess()
-{
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), m_instId);
-    WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVATING, m_instId);
-    InvokeOnStaSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_OPENING);
-    int res = WifiStaHalInterface::GetInstance().StartWifi(WifiSettings::GetInstance().GetStaIfaceName());
-    if (res == static_cast<int>(WIFI_HAL_OPT_OK)) {
-        WIFI_LOGI("Start wifi successfully!");
-        if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false) != WIFI_HAL_OPT_OK) {
-            WIFI_LOGI("The automatic Wpa connection is disabled failed.");
-        }
-        int screenState = WifiSettings::GetInstance().GetScreenState();
-        WIFI_LOGI("set suspend mode to chip when wifi started, screenState: %{public}d", screenState);
-        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
-            != WIFI_HAL_OPT_OK) {
-            WIFI_LOGE("%{public}s WpaSetSuspendMode failed!", __FUNCTION__);
-        }
-        WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, m_instId);
-        InvokeOnStaSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED);
-        /* Sets the MAC address of WifiSettings. */
-        std::string mac;
-        if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac)) == WIFI_HAL_OPT_OK) {
-            WifiSettings::GetInstance().SetMacAddress(mac, m_instId);
-            std::string realMacAddress;
-            WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
-            if (realMacAddress.empty()) {
-                WifiSettings::GetInstance().SetRealMacAddress(mac, m_instId);
-            }
-        } else {
-            WIFI_LOGI("GetStaDeviceMacAddress failed!");
-        }
-        /* Initialize Connection Information. */
-        InitWifiLinkedInfo();
-        InitLastWifiLinkedInfo();
-        WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-        WifiSettings::GetInstance().ReloadDeviceConfig();
-        SwitchState(pSemiActiveState);
-        WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
-    } else {
-        /* Notify the InterfaceService that wifi is failed to enable wifi. */
-        LOGE("enable semi wifi failed, and errcode is %d.", res);
-        WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, m_instId);
-        WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
-        InvokeOnStaSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_FAILED);
-    }
+    /* Initialize Connection Information. */
+    InitWifiLinkedInfo();
+    InitLastWifiLinkedInfo();
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+    WifiSettings::GetInstance().ReloadDeviceConfig();
+    /* The current state of StaStateMachine transfers to SeparatedState after
+     * enable supplicant.
+     */
+    SwitchState(pSeparatedState);
 }
 
 /* --------------------------- state machine WpaStarting State ------------------------------ */
@@ -835,17 +728,11 @@ bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
     WIFI_LOGI("WpaStartedState ExecuteStateMsg-msgCode:%{public}d.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_DISABLE_WIFI: {
+        case WIFI_SVR_CMD_STA_DISABLE_STA: {
             ret = EXECUTED;
             pStaStateMachine->StopWifiProcess();
             break;
         }
-        case WIFI_SVR_CMD_STA_ENABLE_SEMI_WIFI: {
-            ret = EXECUTED;
-            pStaStateMachine->SwitchSemiFromEnableProcess();
-            break;
-        }
-
         default:
             break;
     }
@@ -860,9 +747,6 @@ void StaStateMachine::StopWifiProcess()
     m_NetWorkState->StopNetStateObserver(m_NetWorkState);
 #endif
     WIFI_LOGI("Stop wifi is in process...\n");
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), m_instId);
-    WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_DEACTIVATING, m_instId);
-    InvokeOnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING);
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     std::string ifname = WifiSettings::GetInstance().GetStaIfaceName();
     if (currentTpType == IPTYPE_IPV4) {
@@ -889,105 +773,14 @@ void StaStateMachine::StopWifiProcess()
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     if (curConnState == ConnState::CONNECTING || curConnState == ConnState::AUTHENTICATING
         || curConnState == ConnState::OBTAINING_IPADDR ||curConnState == ConnState::CONNECTED) {
+        WifiStaHalInterface::GetInstance().Disconnect();
         /* Callback result to InterfaceService. */
         linkedInfo.ssid = ssid;
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
         linkedInfo.ssid = "";
     }
-
-    if (WifiStaHalInterface::GetInstance().StopWifi() == WIFI_HAL_OPT_OK) {
-        WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(m_instId);
-        if (scanState != WifiOprMidState::RUNNING) {
-            WIFI_LOGI("scan is not running, set sta iface:%{public}s down", ifname.c_str());
-            WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(ifname, false);
-        }
-        /* Callback result to InterfaceService. */
-        WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, m_instId);
-        InvokeOnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED);
-        WIFI_LOGI("Stop WifiProcess successfully!");
-        /* The current state of StaStateMachine transfers to InitState. */
-        SwitchState(pInitState);
-    } else {
-        WIFI_LOGE("StopWifiProcess failed.");
-        WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::UNKNOWN), m_instId);
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_UNKNOWN, m_instId);
-        InvokeOnStaCloseRes(OperateResState::CLOSE_WIFI_FAILED);
-    }
-
+    SwitchState(pInitState);
     WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
-}
-
-void StaStateMachine::SwitchSemiFromEnableProcess()
-{
-    WIFI_LOGI("Enter StaStateMachine::SwitchSemiFromEnableProcess.\n");
-#ifndef OHOS_ARCH_LITE
-    WifiNetAgent::GetInstance().UnregisterNetSupplier();
-    m_NetWorkState->StopNetStateObserver(m_NetWorkState);
-#endif
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), m_instId);
-    WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVATING, m_instId);
-    InvokeOnStaSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_OPENING);
-    StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-    std::string ifname = WifiSettings::GetInstance().GetStaIfaceName();
-    if (currentTpType == IPTYPE_IPV4) {
-        StopDhcpClient(ifname.c_str(), false);
-    } else {
-        StopDhcpClient(ifname.c_str(), true);
-    }
-    isRoam = false;
-
-    WifiSettings::GetInstance().SaveIpInfo({}, m_instId);
-    WifiSettings::GetInstance().SaveIpV6Info({}, m_instId);
-#ifdef OHOS_ARCH_LITE
-    IfConfig::GetInstance().FlushIpAddr(WifiSettings::GetInstance().GetStaIfaceName(), IPTYPE_IPV4);
-#endif
-
-    ConnState curConnState = linkedInfo.connState;
-    WIFI_LOGI("current connect state is %{public}d\n", curConnState);
-    std::string ssid = linkedInfo.ssid;
-    /* clear connection information. */
-    InitWifiLinkedInfo();
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    if (curConnState == ConnState::CONNECTING || curConnState == ConnState::AUTHENTICATING
-        || curConnState == ConnState::OBTAINING_IPADDR ||curConnState == ConnState::CONNECTED) {
-        /* Callback result to InterfaceService. */
-        linkedInfo.ssid = ssid;
-        InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
-        linkedInfo.ssid = "";
-    }
-
-    WifiStaHalInterface::GetInstance().Disconnect();
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), m_instId);
-    WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, m_instId);
-    WIFI_LOGI("SwitchSemiFromEnableProcess successfully!");
-    InvokeOnStaSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED);
-    /* The current state of StaStateMachine transfers to InitState. */
-    SwitchState(pSemiActiveState);
-
-    WifiSettings::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
-}
-
-void StaStateMachine::SwitchEnableFromSemiProcess()
-{
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING), m_instId);
-    WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATING, m_instId);
-    InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_OPENING);
-    WIFI_LOGI("SwitchEnableFromSemiProcess successfully!");
-    /* callback the InterfaceService that wifi is enabled successfully. */
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), m_instId);
-    WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, m_instId);
-    InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED);
-
-#ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("Register netsupplier");
-    WifiNetAgent::GetInstance().OnStaMachineWifiStart();
-#endif
-    /* Initialize Connection Information. */
-    InitWifiLinkedInfo();
-    InitLastWifiLinkedInfo();
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    SwitchState(pSeparatedState);
 }
 
 /* --------------------------- state machine WpaStopping State ------------------------------ */
@@ -2775,11 +2568,9 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
             break;
         }
 
-        case WIFI_SVR_CMD_STA_ENABLE_WIFI: {
+        case WIFI_SVR_CMD_STA_ENABLE_STA: {
             ret = EXECUTED;
-            WIFI_LOGE("Wifi has already started! start Wifi failed!");
-            /* Callback result to InterfaceService. */
-            pStaStateMachine->InvokeOnStaOpenRes(OperateResState::OPEN_WIFI_OVERRIDE_OPEN_FAILED);
+            WIFI_LOGE("Wifi has already started!");
             break;
         }
 
@@ -3659,61 +3450,6 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
         }
         default:
             WIFI_LOGI("ApRoamingState-msgCode=%d not handled.", msg->GetMessageName());
-            break;
-    }
-
-    return ret;
-}
-
-/* --------------------------- state machine sta disable State ------------------------------ */
-StaStateMachine::SemiActiveState::SemiActiveState(StaStateMachine *staStateMachine)
-    : State("SemiActiveState"), pStaStateMachine(staStateMachine)
-{}
-
-StaStateMachine::SemiActiveState::~SemiActiveState()
-{}
-
-void StaStateMachine::SemiActiveState::GoInState()
-{
-    WIFI_LOGI("SemiActiveState GoInState function.");
-}
-
-void StaStateMachine::SemiActiveState::GoOutState()
-{
-    WIFI_LOGI("SemiActiveState GoOutState function.");
-}
-
-bool StaStateMachine::SemiActiveState::ExecuteStateMsg(InternalMessage *msg)
-{
-    if (msg == nullptr) {
-        return false;
-    }
-
-    WIFI_LOGI("SemiActiveState, reveived msgCode=%{public}d msg.", msg->GetMessageName());
-    bool ret = NOT_EXECUTED;
-    switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_ENABLE_WIFI: {
-            ret = EXECUTED;
-            pStaStateMachine->operationalMode = msg->GetParam1();
-            pStaStateMachine->SwitchEnableFromSemiProcess();
-            break;
-        }
-        case WIFI_SVR_CMD_STA_DISABLE_WIFI: {
-            ret = EXECUTED;
-            pStaStateMachine->StopWifiProcess();
-            break;
-        }
-        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
-            ret = EXECUTED;
-            int screenState = msg->GetParam1();
-            if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE) !=
-                WIFI_HAL_OPT_OK) {
-                WIFI_LOGE("WpaSetSuspendMode failed!");
-            }
-            break;
-        }
-        default:
-            WIFI_LOGI("SemiActiveState-msgCode=%d not handled.", msg->GetMessageName());
             break;
     }
 

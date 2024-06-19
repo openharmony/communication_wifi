@@ -75,10 +75,6 @@ constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore
 constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
 
-constexpr int WIFI_STATE_CLOSED = 0;
-constexpr int WIFI_STATE_OPENED = 1;
-constexpr int WIFI_STATE_SEMI_ACTIVE = 2;
-
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
@@ -159,13 +155,10 @@ public:
 
     void SetWifiAllowSemiActive(bool isAllowed);
     bool GetWifiAllowSemiActive() const;
-    void PersistWifiState(int state);
+    void SetPersistWifiState(int state);
     int GetPersistWifiState();
-    bool IsWifiToggledEnable();
-    bool IsSemiWifiEnable();
-    void SetSemiWifiEnable(bool enable);
-    void SetWifiToggledState(bool state);
-    bool GetWifiToggledState() const;
+    int GetWifiToggledEnable();
+    void SetWifiToggledState(int state);
     void InsertWifi6BlackListCache(const std::string currentBssid,
         const Wifi6BlackListInfo wifi6BlackListInfo);
     void RemoveWifi6BlackListCache(const std::string bssid);
@@ -1044,6 +1037,22 @@ public:
     int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0);
 
     /**
+     * @Description Get the config whether wifi is disabled by airplane mode opened
+     *
+     * @return true - wifi is disabled by airplane mode opened
+     * @return false - wifi is not disabled by airplane mode opened
+     */
+    bool GetWifiDisabledByAirplane(int instId = 0);
+
+    /**
+     * @Description Set the config whether wifi is disabled by airplane mode opened
+     *
+     * @param disabledByAirplane - whether wifi is disabled by airplane mode opened
+     * @return int - 0 success
+     */
+    int SetWifiDisabledByAirplane(bool disabledByAirplane, int instId = 0);
+
+    /**
      * @Description Get the STA service last running state
      *
      * @return 2 - semi active
@@ -1801,7 +1810,6 @@ private:
     std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
     std::map <int, WifiDetailState> mWifiDetailState;    /* Sta service detail state */
     bool mWifiAllowSemiActive;
-    bool isSemiWifiEnable;
     std::atomic<bool> mWifiSelfcureReset;
     std::atomic<int> mLastNetworkId;
     bool mWifiStoping;

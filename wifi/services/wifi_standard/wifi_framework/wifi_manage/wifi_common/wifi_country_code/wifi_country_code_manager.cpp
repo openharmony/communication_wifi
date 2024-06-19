@@ -58,8 +58,6 @@ ErrCode WifiCountryCodeManager::Init()
     m_wifiCountryCodePolicy = std::make_shared<WifiCountryCodePolicy>();
 
     m_staCallback.callbackModuleName = CLASS_NAME;
-    m_staCallback.OnStaOpenRes = DealStaOpenRes;
-    m_staCallback.OnStaCloseRes = DealStaCloseRes;
     m_staCallback.OnStaConnChanged = DealStaConnChanged;
     m_apCallback.callbackModuleName = CLASS_NAME;
     m_apCallback.OnApStateChangedEvent = DealApStateChanged;
@@ -178,25 +176,20 @@ ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(const st
     return ret > 0 ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
 }
 
-void WifiCountryCodeManager::DealStaOpenRes(OperateResState state, int instId)
+#ifdef FEATURE_STA_SUPPORT
+void WifiCountryCodeManager::DealStaOpened(int instId)
 {
-    WIFI_LOGI("wifi open result, state=%{public}d, id=%{public}d", state, instId);
-    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
-        WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
-    } else if (state == OperateResState::OPEN_WIFI_FAILED) {
-        std::string moduleName = "StaService_" + std::to_string(instId);
-        WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
-    }
+    WIFI_LOGI("wifi opened, id=%{public}d", instId);
+    WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
 }
 
-void WifiCountryCodeManager::DealStaCloseRes(OperateResState state, int instId)
+void WifiCountryCodeManager::DealStaStopped(int instId)
 {
-    WIFI_LOGI("wifi close result, state=%{public}d, id=%{public}d", state, instId);
-    if (state == OperateResState::CLOSE_WIFI_FAILED || state == OperateResState::CLOSE_WIFI_SUCCEED) {
-        std::string moduleName = "StaService_" + std::to_string(instId);
-        WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
-    }
+    WIFI_LOGI("wifi close, id=%{public}d", instId);
+    std::string moduleName = "StaService_" + std::to_string(instId);
+    WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
 }
+#endif
 
 void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {

@@ -868,6 +868,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
+    item.wifiDisabledByAirplane = false;
     item.staLastState = 0;
     item.lastAirplaneMode = AIRPLANE_MODE_CLOSE;
     item.savedDeviceAppraisalPriority = PRIORITY_1;
@@ -906,99 +907,140 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     return;
 }
 
-static int SetWifiConfigValueFirst(WifiConfig &item, const std::string &key, const std::string &value)
-{
-    if (key == "scanAlwaysSwitch") {
-        item.scanAlwaysSwitch = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "staAirplaneMode") {
-        item.staAirplaneMode = std::stoi(value);
-    } else if (key == "canOpenStaWhenAirplane") {
-        item.canOpenStaWhenAirplane = (std::stoi(value) != 0);
-    } else if (key == "openWifiWhenAirplane") {
-        item.openWifiWhenAirplane = (std::stoi(value) != 0);
-    } else if (key == "staLastState") {
-        item.staLastState = std::stoi(value);
-    } else if (key == "lastAirplaneMode") {
-        item.lastAirplaneMode = std::stoi(value);
-    } else if (key == "savedDeviceAppraisalPriority") {
-        item.savedDeviceAppraisalPriority = std::stoi(value);
-    } else if (key == "scoretacticsScoreSlope") {
-        item.scoretacticsScoreSlope = std::stoi(value);
-    } else if (key == "scoretacticsInitScore") {
-        item.scoretacticsInitScore = std::stoi(value);
-    } else if (key == "scoretacticsSameBssidScore") {
-        item.scoretacticsSameBssidScore = std::stoi(value);
-    } else if (key == "scoretacticsSameNetworkScore") {
-        item.scoretacticsSameNetworkScore = std::stoi(value);
-    } else if (key == "scoretacticsFrequency5GHzScore") {
-        item.scoretacticsFrequency5GHzScore = std::stoi(value);
-    } else if (key == "scoretacticsLastSelectionScore") {
-        item.scoretacticsLastSelectionScore = std::stoi(value);
-    } else if (key == "scoretacticsSecurityScore") {
-        item.scoretacticsSecurityScore = std::stoi(value);
-    } else if (key == "scoretacticsNormalScore") {
-        item.scoretacticsNormalScore = std::stoi(value);
-    } else if (key == "whetherToAllowNetworkSwitchover") {
-        item.whetherToAllowNetworkSwitchover = (std::stoi(value) != 0);
-    } else if (key == "dhcpIpType") {
-        item.dhcpIpType = std::stoi(value);
-    } else if (key == "defaultWifiInterface") {
-        item.defaultWifiInterface = value;
-    } else {
-        return -1;
-    }
-    return 0;
-}
+using Func = std::function<void(WifiConfig &item, const std::string &value)>;
 
-static int SetWifiConfigValueSecond(WifiConfig &item, const std::string &key, const std::string &value)
-{
-    if (key == "preLoadSta") {
-        item.preLoadSta = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "preLoadScan") {
-        item.preLoadScan = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "preLoadAp") {
-        item.preLoadAp = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "preLoadP2p") {
-        item.preLoadP2p = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "preLoadAware") {
-        item.preLoadAware = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "preLoadEnhance") {
-        item.preLoadEnhance = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "supportHwPnoFlag") {
+std::map<std::string, Func> g_wifiConfigSetValueMap = {
+    {"scanAlwaysSwitch", [](WifiConfig &item, const std::string &value) -> void {
+        item.scanAlwaysSwitch = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    }},
+    {"staAirplaneMode", [](WifiConfig &item, const std::string &value) -> void {
+        item.staAirplaneMode = std::stoi(value);
+    }},
+    {"canOpenStaWhenAirplane", [](WifiConfig &item, const std::string &value) -> void {
+        item.canOpenStaWhenAirplane = (std::stoi(value) != 0);
+    }},
+    {"openWifiWhenAirplane", [](WifiConfig &item, const std::string &value) -> void {
+        item.openWifiWhenAirplane = (std::stoi(value) != 0);
+    }},
+    {"wifiDisabledByAirplane", [](WifiConfig &item, const std::string &value) -> void {
+        item.wifiDisabledByAirplane = (std::stoi(value) != 0);
+    }},
+    {"staLastState", [](WifiConfig &item, const std::string &value) -> void {
+        item.staLastState = std::stoi(value);
+    }},
+    {"lastAirplaneMode", [](WifiConfig &item, const std::string &value) -> void {
+        item.lastAirplaneMode = std::stoi(value);
+    }},
+    {"savedDeviceAppraisalPriority", [](WifiConfig &item, const std::string &value) -> void {
+        item.savedDeviceAppraisalPriority = std::stoi(value);
+    }},
+    {"scoretacticsScoreSlope", [](WifiConfig &item, const std::string &value) -> void {
+        item.scoretacticsScoreSlope = std::stoi(value);
+    }},
+    {"scoretacticsInitScore", [](WifiConfig &item, const std::string &value) -> void {
+        item.scoretacticsInitScore = std::stoi(value);
+    }},
+    {"scoretacticsSameBssidScore", [](WifiConfig &item, const std::string &value) -> void {
+        item.scoretacticsSameBssidScore = std::stoi(value);
+    }},
+    {"scoretacticsSameNetworkScore", [](WifiConfig &item, const std::string &value) -> void {
+        item.scoretacticsSameNetworkScore = std::stoi(value);
+    }},
+    {"scoretacticsFrequency5GHzScore", [](WifiConfig &item, const std::string &value) -> void {
+        item.scoretacticsFrequency5GHzScore = std::stoi(value);
+    }},
+    {"scoretacticsLastSelectionScore", [](WifiConfig &item, const std::string &value) -> void {
+        item.scoretacticsLastSelectionScore = std::stoi(value);
+    }},
+    {"scoretacticsSecurityScore", [](WifiConfig &item, const std::string &value) -> void {
+        item.scoretacticsSecurityScore = std::stoi(value);
+    }},
+    {"scoretacticsNormalScore", [](WifiConfig &item, const std::string &value) -> void {
+        item.scoretacticsNormalScore = std::stoi(value);
+    }},
+    {"whetherToAllowNetworkSwitchover", [](WifiConfig &item, const std::string &value) -> void {
+        item.whetherToAllowNetworkSwitchover = (std::stoi(value) != 0);
+    }},
+    {"dhcpIpType", [](WifiConfig &item, const std::string &value) -> void {
+        item.dhcpIpType = std::stoi(value);
+    }},
+    {"defaultWifiInterface", [](WifiConfig &item, const std::string &value) -> void {
+        item.defaultWifiInterface = value;
+    }},
+    {"preLoadSta", [](WifiConfig &item, const std::string &value) -> void {
+        item.preLoadSta = (std::stoi(value) != 0);
+    }},
+    {"preLoadScan", [](WifiConfig &item, const std::string &value) -> void {
+        item.preLoadScan = (std::stoi(value) != 0);
+    }},
+    {"preLoadAp", [](WifiConfig &item, const std::string &value) -> void {
+        item.preLoadAp = (std::stoi(value) != 0);
+    }},
+    {"preLoadP2p", [](WifiConfig &item, const std::string &value) -> void {
+        item.preLoadP2p = (std::stoi(value) != 0);
+    }},
+    {"preLoadAware", [](WifiConfig &item, const std::string &value) -> void {
+        item.preLoadAware = (std::stoi(value) != 0);
+    }},
+    {"preLoadEnhance", [](WifiConfig &item, const std::string &value) -> void {
+        item.preLoadEnhance = (std::stoi(value) != 0);
+    }},
+    {"supportHwPnoFlag", [](WifiConfig &item, const std::string &value) -> void {
         item.supportHwPnoFlag = std::stoi(value);
-    } else if (key == "minRssi2Dot4Ghz") {
+    }},
+    {"minRssi2Dot4Ghz", [](WifiConfig &item, const std::string &value) -> void {
         item.minRssi2Dot4Ghz = std::stoi(value);
-    } else if (key == "minRssi5Ghz") {
+    }},
+    {"minRssi5Ghz", [](WifiConfig &item, const std::string &value) -> void {
         item.minRssi5Ghz = std::stoi(value);
-    } else if (key == "firstRssiLevel2G") {
+    }},
+    {"firstRssiLevel2G", [](WifiConfig &item, const std::string &value) -> void {
         item.firstRssiLevel2G = std::stoi(value);
-    } else if (key == "secondRssiLevel2G") {
+    }},
+    {"secondRssiLevel2G", [](WifiConfig &item, const std::string &value) -> void {
         item.secondRssiLevel2G = std::stoi(value);
-    } else if (key == "thirdRssiLevel2G") {
+    }},
+    {"thirdRssiLevel2G", [](WifiConfig &item, const std::string &value) -> void {
         item.thirdRssiLevel2G = std::stoi(value);
-    } else if (key == "fourthRssiLevel2G") {
+    }},
+    {"fourthRssiLevel2G", [](WifiConfig &item, const std::string &value) -> void {
         item.fourthRssiLevel2G = std::stoi(value);
-    } else if (key == "firstRssiLevel5G") {
+    }},
+    {"firstRssiLevel5G", [](WifiConfig &item, const std::string &value) -> void {
         item.firstRssiLevel5G = std::stoi(value);
-    } else if (key == "secondRssiLevel5G") {
+    }},
+    {"secondRssiLevel5G", [](WifiConfig &item, const std::string &value) -> void {
         item.secondRssiLevel5G = std::stoi(value);
-    } else if (key == "thirdRssiLevel5G") {
+    }},
+    {"thirdRssiLevel5G", [](WifiConfig &item, const std::string &value) -> void {
         item.thirdRssiLevel5G = std::stoi(value);
-    } else if (key == "fourthRssiLevel5G") {
+    }},
+    {"fourthRssiLevel5G", [](WifiConfig &item, const std::string &value) -> void {
         item.fourthRssiLevel5G = std::stoi(value);
-    } else if (key == "strDnsBak") {
+    }},
+    {"strDnsBak", [](WifiConfig &item, const std::string &value) -> void {
         item.strDnsBak = value;
-    } else if (key == "isLoadStabak") {
+    }},
+    {"isLoadStabak", [](WifiConfig &item, const std::string &value) -> void {
         item.isLoadStabak = (std::stoi(value) != 0);
-    } else if (key == "scanOnlySwitch") {
-        item.scanOnlySwitch  = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
-    } else if (key == "realMacAddress") {
+    }},
+    {"scanOnlySwitch", [](WifiConfig &item, const std::string &value) -> void {
+        item.scanOnlySwitch = (std::stoi(value) != 0);
+    }},
+    {"realMacAddress", [](WifiConfig &item, const std::string &value) -> void {
         item.realMacAddress = value;
-    } else if (key == "staApExclusionType") {
+    }},
+    {"staApExclusionType", [](WifiConfig &item, const std::string &value) -> void {
         item.staApExclusionType = std::stoi(value);
-    } else {
+    }}
+};
+static int SetWifiConfigValue(WifiConfig &item, const std::string &key, const std::string &value)
+{
+    auto it = g_wifiConfigSetValueMap.find(key);
+    if (it == g_wifiConfigSetValueMap.end()) {
         return -1;
     }
+    it->second(item, value);
     return 0;
 }
 
@@ -1006,10 +1048,7 @@ template<>
 int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    if (SetWifiConfigValueFirst(item, key, value) == 0) {
-        return errorKeyValue;
-    }
-    if (SetWifiConfigValueSecond(item, key, value) == 0) {
+    if (SetWifiConfigValue(item, key, value) == 0) {
         return errorKeyValue;
     }
     LOGE("Invalid config key value");
@@ -1032,6 +1071,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"staAirplaneMode=" << item.staAirplaneMode << std::endl;
     ss << "    " <<"canOpenStaWhenAirplane=" << item.canOpenStaWhenAirplane << std::endl;
     ss << "    " <<"openWifiWhenAirplane=" << item.openWifiWhenAirplane << std::endl;
+    ss << "    " <<"wifiDisabledByAirplane=" << item.wifiDisabledByAirplane << std::endl;
     ss << "    " <<"staLastState=" << item.staLastState << std::endl;
     ss << "    " <<"lastAirplaneMode=" << item.lastAirplaneMode << std::endl;
     ss << "    " <<"savedDeviceAppraisalPriority=" << item.savedDeviceAppraisalPriority << std::endl;

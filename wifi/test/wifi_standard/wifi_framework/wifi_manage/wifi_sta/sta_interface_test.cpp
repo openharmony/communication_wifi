@@ -68,41 +68,27 @@ public:
     void EnableWifiSuccess()
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->EnableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_CALL(*pMockStaService, EnableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->EnableStaService() == WIFI_OPT_SUCCESS);
     }
 
     void EnableWifiFail1()
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        pStaInterface->EnableWifi();
-    }
-
-    void EnableSemiWifiSuccess()
-    {
-        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_CALL(*pMockStaService, EnableSemiWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->EnableSemiWifi() == WIFI_OPT_SUCCESS);
-    }
-
-    void EnableSemiWifiFail()
-    {
-        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_CALL(*pMockStaService, EnableSemiWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->EnableSemiWifi() == WIFI_OPT_FAILED);
+        EXPECT_CALL(*pMockStaService, EnableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        pStaInterface->EnableStaService();
     }
 
     void DisableWifiSuceess()
     {
-        EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_SUCCESS);
     }
 
     void DisableWifiFail()
     {
-        EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_FAILED);
+        EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_FAILED);
     }
 
     void ConnectToNetworkIdSuceess()
@@ -418,16 +404,6 @@ HWTEST_F(StaInterfaceTest, EnableWifiSuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, EnableWifiFail1, TestSize.Level1)
 {
     EnableWifiFail1();
-}
-
-HWTEST_F(StaInterfaceTest, EnableSemiWifiSuccess, TestSize.Level1)
-{
-    EnableSemiWifiSuccess();
-}
-
-HWTEST_F(StaInterfaceTest, EnableSemiWifiFail, TestSize.Level1)
-{
-    EnableSemiWifiFail();
 }
 
 HWTEST_F(StaInterfaceTest, DisableWifiSuceess, TestSize.Level1)

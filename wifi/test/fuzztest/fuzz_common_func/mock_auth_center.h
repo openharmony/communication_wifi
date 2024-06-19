@@ -16,7 +16,6 @@
 #ifndef OHOS_MOCK_AUTH_CENTER_H
 #define OHOS_MOCK_AUTH_CENTER_H
 
-#include "irmote_object.h"
 #include "wifi_event_handler.h"
 #include "wifi_errcode.h"
 namespace OHOS {

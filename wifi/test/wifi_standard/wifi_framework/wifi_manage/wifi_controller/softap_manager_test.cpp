@@ -40,6 +40,9 @@ public:
         if (pSoftApManager != nullptr) {
             pSoftApManager->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
         }
+        mCb.onStartFailure = DealSoftapStartFailure;
+        mCb.onStopped = DealSoftapStop;
+        pSoftApManager->mcb = mCb;
         pSoftApManager->GetSoftapMachine()->SendMessage(SOFTAP_CMD_START,
             static_cast<int>(SoftApManager::Role::ROLE_UNKNOW), 0);
     }
@@ -52,7 +55,18 @@ public:
         }
     }
 
+    static void DealSoftapStartFailure(int id = 0)
+    {
+        return;
+    }
+
+    static void DealSoftapStop(int id = 0)
+    {
+        return;
+    }
+
     std::unique_ptr<SoftApManager> pSoftApManager;
+    SoftApModeCallback mCb;
 
     void SetRoleTest()
     {
@@ -66,6 +80,7 @@ public:
     {
         SoftApModeCallback cb;
         if (pSoftApManager != nullptr) {
+            pSoftApManager->InitSoftapManager();
             EXPECT_TRUE(pSoftApManager->RegisterCallback(cb) == WIFI_OPT_SUCCESS);
         }
     }

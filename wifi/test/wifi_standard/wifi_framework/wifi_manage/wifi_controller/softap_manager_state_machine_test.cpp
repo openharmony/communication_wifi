@@ -29,6 +29,8 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
+#define INVILAD_MSG 0x1111
+
 namespace OHOS {
 namespace Wifi {
 class SoftapManagerMachineTest : public testing::Test {
@@ -100,6 +102,12 @@ public:
         msg.SetMessageName(SOFTAP_CMD_START);
         sleep(1);
         EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
+        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSED, 0);
+        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
     }
 
     void StopSoftapTest()
@@ -115,6 +123,18 @@ public:
         EXPECT_FALSE(pSoftapManagerMachine->pDefaultState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(nullptr));
+        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
+        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(&msg));
+        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0);
+        pSoftapManagerMachine->AutoStopApService(0);
+        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::RUNNING, 0);
+        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(&msg));
+        msg.SetMessageName(INVILAD_MSG);
+        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(&msg));
     }
 };
 

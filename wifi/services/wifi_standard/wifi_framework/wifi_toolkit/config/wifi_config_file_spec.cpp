@@ -118,8 +118,10 @@ static void ClearWifiDeviceConfigWapi(WifiDeviceConfig &item)
     item.wifiWapiConfig.wapiPskType = -1;
     item.wifiWapiConfig.wapiAsCertData.clear();
     item.wifiWapiConfig.wapiUserCertData.clear();
+    item.wifiWapiConfig.encryptedAsCertData.clear();
+    item.wifiWapiConfig.asCertDataIV.clear();
     item.wifiWapiConfig.encryptedUserCertData.clear();
-    item.wifiWapiConfig.IV.clear();
+    item.wifiWapiConfig.userCertDataIV.clear();
     return;
 }
 
@@ -415,17 +417,28 @@ static int SetWifiDeviceconfigPrivacy(WifiDeviceConfig &item, const std::string 
 static int SetWifiDeviceconfigWapi(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    if (key == "wifiWapiConfig.wapiPskType") {
-        item.wifiWapiConfig.wapiPskType = std::stoi(value);
-    } else if (key == "wifiWapiConfig.wapiAsCertData") {
-        item.wifiWapiConfig.wapiAsCertData = value;
+    if (item.keyMgmt != KEY_MGMT_WAPI_CERT && item.keyMgmt != KEY_MGMT_WAPI_PSK) {
+        return errorKeyValue;
+    }
+    if (item.keyMgmt == KEY_MGMT_WAPI_PSK) {
+        if (key == "wifiWapiConfig.wapiPskType") {
+            item.wifiWapiConfig.wapiPskType = std::stoi(value);
+        } else {
+            LOGE("Invalid config key value");
+        }
+        return errorKeyValue;
+    }
+
+    if (key == "wifiWapiConfig.encryptedAsCertData") {
+        item.wifiWapiConfig.encryptedAsCertData = value;
+    } else if (key == "wifiWapiConfig.asCertDataIV") {
+        item.wifiWapiConfig.asCertDataIV = value;
     } else if (key == "wifiWapiConfig.encryptedUserCertData") {
         item.wifiWapiConfig.encryptedUserCertData = value;
-    } else if (key == "wifiWapiConfig.IV") {
-        item.wifiWapiConfig.IV = value;
+    } else if (key == "wifiWapiConfig.userCertDataIV") {
+        item.wifiWapiConfig.userCertDataIV = value;
     } else {
         LOGE("Invalid config key value");
-        errorKeyValue++;
     }
     return errorKeyValue;
 }
@@ -623,11 +636,19 @@ static std::string OutPutWifiDeviceConfigPrivacy(WifiDeviceConfig &item)
 static std::string OutPutWifiWapiConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
+    if (item.keyMgmt != KEY_MGMT_WAPI_CERT && item.keyMgmt != KEY_MGMT_WAPI_PSK) {
+        return ss.str();
+    }
     ss << "    " <<"<WifiDeviceConfigWapi>" << std::endl;
-    ss << "    " <<"wifiWapiConfig.wapiPskType=" << item.wifiWapiConfig.wapiPskType << std::endl;
-    ss << "    " <<"wifiWapiConfig.wapiAsCertData=" << item.wifiWapiConfig.wapiAsCertData << std::endl;
+    if (item.keyMgmt == KEY_MGMT_WAPI_PSK) {
+        ss << "    " <<"wifiWapiConfig.wapiPskType=" << item.wifiWapiConfig.wapiPskType << std::endl;
+        ss << "    " <<"</WifiDeviceConfigWapi>" << std::endl;
+        return ss.str();
+    }
+    ss << "    " <<"wifiWapiConfig.encryptedAsCertData=" << item.wifiWapiConfig.encryptedAsCertData << std::endl;
+    ss << "    " <<"wifiWapiConfig.asCertDataIV=" << item.wifiWapiConfig.asCertDataIV << std::endl;
     ss << "    " <<"wifiWapiConfig.encryptedUserCertData=" << item.wifiWapiConfig.encryptedUserCertData << std::endl;
-    ss << "    " <<"wifiWapiConfig.IV=" << item.wifiWapiConfig.IV << std::endl;
+    ss << "    " <<"wifiWapiConfig.userCertDataIV=" << item.wifiWapiConfig.userCertDataIV << std::endl;
     ss << "    " <<"</WifiDeviceConfigWapi>" << std::endl;
     return ss.str();
 }

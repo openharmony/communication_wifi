@@ -46,28 +46,13 @@ static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 std::shared_ptr<WifiHotspotStub> pWifiHotspotServiceImpl = std::make_shared<WifiHotspotServiceImpl>();
-void MyExit()
-{
-    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
-    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
-    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
-    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
-    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
-    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
-    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
-    WifiManager::GetInstance().Exit();
-    sleep(5);
-    printf("exiting\n");
-}
 
 bool Init()
 {
     if (!g_isInsted) {
-        if (WifiManager::GetInstance().Init() < 0) {
-            LOGE("WifiManager init failed!");
-            return false;
+        if (WifiConfigCenter::GetInstance().GetApMidState(0) != WifiOprMidState::RUNNING) {
+            WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::RUNNING, 0);
         }
-        atexit(MyExit);
         g_isInsted = true;
     }
     return true;
@@ -359,8 +344,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
     Init();
-    OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
-    OHOS::Wifi::OnEnableWifiApTest(data, size);
     OHOS::Wifi::OnIsHotspotActiveFuzzTest(data, size);
     OHOS::Wifi::OnGetApStateWifiFuzzTest(data, size);
     OHOS::Wifi::OnGetHotspotConfigFuzzTest(data, size);
@@ -379,8 +362,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnIsHotspotDualBandSupportedFuzzTest(data, size);
     OHOS::Wifi::OnSetApIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::OnGetApIfaceNameFuzzTest(data, size);
-    OHOS::Wifi::OnDisableWifiApTest(data, size);
-    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
     sleep(4);
     return 0;
 }

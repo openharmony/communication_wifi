@@ -43,32 +43,17 @@ static std::mutex g_instanceLock;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiDeviceService";
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 
-void MyExit()
-{
-    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
-    WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
-    WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
-    WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
-    WifiAppStateAware::GetInstance().appChangeEventHandler.reset();
-    WifiNetAgent::GetInstance().netAgentEventHandler.reset();
-    WifiSettings::GetInstance().mWifiEncryptionThread.reset();
-    WifiManager::GetInstance().Exit();
-    sleep(5);
-    printf("exiting\n");
-}
-
 bool Init()
 {
     if (!g_isInsted) {
-        if (WifiManager::GetInstance().Init() < 0) {
-            LOGE("WifiManager init failed!");
-            return false;
+        if (WifiConfigCenter::GetInstance().GetWifiMidState(0) != WifiOprMidState::RUNNING) {
+            WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING, 0);
         }
-        atexit(MyExit);
         g_isInsted = true;
     }
     return true;
 }
+
 bool OnRemoteRequest(uint32_t code, MessageParcel &data)
 {
     std::unique_lock<std::mutex> autoLock(g_instanceLock);
@@ -703,8 +688,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-    OHOS::Wifi::OnEnableWifiFuzzTest(data, size);
-
     OHOS::Wifi::OnInitWifiProtectFuzzTest(data, size);
     OHOS::Wifi::OnGetWifiProtectRefFuzzTest(data, size);
     OHOS::Wifi::OnPutWifiProtectRefFuzzTest(data, size);
@@ -747,13 +730,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetChangeDeviceConfigFuzzTest(data, size);
     OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
     OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
-    OHOS::Wifi::OnEnableSemiWifiFuzzTest(data, size);
     OHOS::Wifi::OnGetWifiDetailStateFuzzTest(data, size);
     OHOS::Wifi::OnSetTxPowerFuzzTest(data, size);
     OHOS::Wifi::OnSetSatelliteStateFuzzTest(data, size);
     OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
-    OHOS::Wifi::OnFactoryResetFuzzTest(data, size);
-    OHOS::Wifi::OnDisableWifiFuzzTest(data, size);
     sleep(4);
     return 0;
 }

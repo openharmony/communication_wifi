@@ -69,7 +69,9 @@ struct WifiHalDeviceConfig {
     int wapiPskType;
     std::string wapiAsCertData;
     std::string wapiUserCertData;
-    WifiHalDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1)
+    WifiHalDeviceConfig() : networkId(-1), priority(-1), scanSsid(-1), authAlgorithms(-1), wepKeyIdx(-1),
+                            isRequirePmf(false), allowedProtocols(-1), allowedPairwiseCiphers(-1),
+                            allowedGroupCiphers(-1), allowedGroupMgmtCiphers(-1), wapiPskType(-1)
     {}
 
     ~WifiHalDeviceConfig()

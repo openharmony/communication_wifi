@@ -160,7 +160,7 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
     } else if (key == "numAssociation") {
         item.numAssociation = std::stoi(value);
     } else if (key == "networkStatusHistory") {
-        item.networkStatusHistory = std::stoi(value);
+        item.networkStatusHistory = static_cast<unsigned int>(std::stoi(value));
     } else if (key == "isPortal") {
         item.isPortal = std::stoi(value);
     } else if (key == "lastHasInternetTime") {
@@ -1547,7 +1547,7 @@ template <> std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item)
 
 int SetNetworkStatusHistory(WifiDeviceConfig &item, const std::string &value)
 {
-    item.networkStatusHistory = std::stoi(value);
+    item.networkStatusHistory = static_cast<unsigned int>(std::stoi(value));
     return 0;
 }
 
@@ -1638,7 +1638,7 @@ static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, c
         return 0;
     }
     if (key == "networkStatusHistory") {
-        item.networkStatusHistory = std::stoi(value);
+        item.networkStatusHistory = static_cast<unsigned int>(std::stoi(value));
     } else if (key == "isPortal") {
         item.isPortal = std::stoi(value);
     } else if (key == "lastHasInternetTime") {

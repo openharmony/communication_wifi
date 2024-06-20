@@ -18,7 +18,7 @@
 #include "wifi_hdi_wpa_sta_impl.h"
 
 using ::testing::ext::TestSize;
-1
+
 namespace OHOS {
 namespace Wifi {
 constexpr int MAC_LEN = 17;
@@ -327,6 +327,20 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaReconnectTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStaReconnect();
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetScanInfosTest, TestSize.Level1)
+{
+    int *size = nullptr;
+    ScanInfo *result = HdiWpaStaGetScanInfos(size);
+    EXPECT_EQ(result, NULL);
+}
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetScanInfosTest1, TestSize.Level1)
+{
+    int size = 1;
+    ScanInfo *result = HdiWpaStaGetScanInfos(&size);
+    EXPECT_EQ(result, NULL);
 }
 }
 }

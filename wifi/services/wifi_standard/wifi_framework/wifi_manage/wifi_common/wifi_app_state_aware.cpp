@@ -160,6 +160,7 @@ void WifiAppStateAware::RegisterAppStateObserver()
         RegisterAppStateChangedCallback(WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY);
         return;
     }
+    GetForegroundApp();
     WIFI_LOGI("register application state observer success.");
 }
 
@@ -195,6 +196,7 @@ void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &a
 
 void WifiAppStateAware::GetForegroundApp()
 {
+    curForegroundApps_.clear();
     if (!Connect()) {
         WIFI_LOGE("%{public}s connect failed", __FUNCTION__);
         return ;

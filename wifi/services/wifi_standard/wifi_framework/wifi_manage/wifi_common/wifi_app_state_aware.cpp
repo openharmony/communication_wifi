@@ -176,6 +176,7 @@ void WifiAppStateAware::UnSubscribeAppState()
         appMgrProxy_ = nullptr;
         mAppStateObserver = nullptr;
     }
+    curForegroundApps_.clear();
     WIFI_LOGI("UnSubscribeAppState end");
     return;
 }

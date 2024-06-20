@@ -165,11 +165,11 @@ void WifiEventSubscriberManager::UnRegisterCesEvent()
 void WifiEventSubscriberManager::HandleAppMgrServiceChange(bool add)
 {
     WIFI_LOGI("%{public}s enter, add flag: %{public}d", __FUNCTION__, add);
-    if (!add) {
+    if (add) {
+        WifiAppStateAware::GetInstance().RegisterAppStateObserver();
+    } else {
         WifiAppStateAware::GetInstance().UnSubscribeAppState();
-        return;
     }
-    WifiAppStateAware::GetInstance().RegisterAppStateObserver();
 }
 
 void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbilityId, bool add)

@@ -196,11 +196,11 @@ void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &a
 
 void WifiAppStateAware::GetForegroundApp()
 {
-    curForegroundApps_.clear();
     if (!Connect()) {
         WIFI_LOGE("%{public}s connect failed", __FUNCTION__);
-        return ;
+        return;
     }
+    curForegroundApps_.clear();
     appMgrProxy_->GetForegroundApplications(curForegroundApps_);
 }
 

@@ -57,7 +57,7 @@ private:
     sptr<AppExecFwk::IAppMgr> appMgrProxy_ {nullptr};
     sptr<AppStateObserver> mAppStateObserver {nullptr};
     WifiAppStateAwareCallbacks mWifiAppStateAwareCallbacks;
-    std::vector<AppExecFwk::RunningProcessInfo> curForegroundApps_;
+    std::vector<AppExecFwk::AppStateData> curForegroundApps_;
 };
 
 class AppStateObserver : public AppExecFwk::ApplicationStateObserverStub {

@@ -114,17 +114,17 @@ void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
 
 bool WifiAppStateAware::UpdateCurForegroundAppInfo(const AppExecFwk::AppStateData &appStateData)
 {
-    if (static_cast<ApplicationState>(appStateData.state) == ApplicationState::APP_STATE_FOREGROUND &&
+    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND) &&
         !HasRecordInCurForegroundApps(appStateData)) {
         curForegroundApps_.push_back(appStateData);
         return true;
     }
 
-    if (static_cast<ApplicationState>(appStateData.state) == ApplicationState::APP_STATE_BACKGROUND &&
+    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_BACKGROUND) &&
         HasRecordInCurForegroundApps(appStateData)) {
         curForegroundApps_.erase(std::remove_if(curForegroundApps_.begin(), curForegroundApps_.end(),
             [&](const AppExecFwk::AppStateData &recordApp) {
-                return recordApp.uid == appStateData.uid || recordApp.bundleName == appStateData.bundleName;
+                return recordApp.uid == appStateData.uid;
             }), curForegroundApps_.end());
         return true;
     }
@@ -134,7 +134,7 @@ bool WifiAppStateAware::UpdateCurForegroundAppInfo(const AppExecFwk::AppStateDat
 bool WifiAppStateAware::HasRecordInCurForegroundApps(const AppExecFwk::AppStateData &appStateData)
 {
     for (auto recordApp : curForegroundApps_) {
-        if (recordApp.uid == appStateData.uid || recordApp.bundleName == appStateData.bundleName) {
+        if (recordApp.uid == appStateData.uid) {
             return true;
         }
     }

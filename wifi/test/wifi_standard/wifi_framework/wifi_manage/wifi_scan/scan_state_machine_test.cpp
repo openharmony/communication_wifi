@@ -1045,6 +1045,66 @@ public:
         pScanStateMachine->InitPnoScanState();
     }
 
+        void RecordFilteredScanResultTest()
+    {
+        WifiDeviceConfig deviceConfig;
+        deviceConfig.wepTxKeyIndex = 1;
+        deviceConfig.keyMgmt = "WPA-PSK";
+        InterScanInfo interScanInfo;
+        interScanInfo.securityType = WifiSecurity::WEP;
+        int indexType = DEVICE_CONFIG_INDEX_SSID;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(interScanInfo.ssid, indexType, _))
+        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
+        ScanStateMachine::FilterScanResultRecord records;
+        records.RecordFilteredScanResult(interScanInfo);
+    }
+ 
+    void GetScanInfoMsgTest()
+    {
+        InterScanInfo interScanInfo;
+        interScanInfo.securityType = WifiSecurity::WEP;
+        ScanStateMachine::FilterScanResultRecord records;
+        records.GetScanInfoMsg(interScanInfo);
+    }
+ 
+    void GetFilteredScanResultMsgTest()
+    {   
+        ScanStateMachine::FilterScanResultRecord records;
+        records.GetFilteredScanResultMsg();
+    }
+ 
+    void FilterScanResultTest()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetConnectedBssid(_)).Times(AtLeast(1));
+        std::vector<InterScanInfo> scanInfoList;
+        pScanStateMachine->FilterScanResult(scanInfoList);
+    }
+ 
+    void SetWifiModeTest()
+    {
+        InterScanInfo scanInfo;
+        scanInfo. isHeInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo);
+        InterScanInfo scanInfo1;
+        scanInfo1. band =SCAN_5GHZ_BAND;
+        scanInfo1.isVhtInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo1);
+        InterScanInfo scanInfo2;
+        scanInfo2.isHtInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo2);
+        InterScanInfo scanInfo3;
+        scanInfo3.isErpExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo3);
+        InterScanInfo scanInfo4;
+        scanInfo4. band =SCAN_24GHZ_BAND;
+        scanInfo4.isVhtInfoExist =false;
+        pScanStateMachine->SetWifiMode(scanInfo4);
+        InterScanInfo scanInfo5;
+        scanInfo4. band =SCAN_24GHZ_BAND;
+        pScanStateMachine->SetWifiMode(scanInfo5);
+    }
+};
+
 };
 
 HWTEST_F(ScanStateMachineTest, InitGoInStateTest, TestSize.Level1)
@@ -1707,6 +1767,26 @@ HWTEST_F(ScanStateMachineTest, PnoScanRequestProcessFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, StartPnoScanHardwareFail, TestSize.Level1)
 {
     StartPnoScanHardwareFail();
+}
+
+HWTEST_F(ScanStateMachineTest, RecordFilteredScanResultTest, TestSize.Level1)
+{
+    RecordFilteredScanResultTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, GetFilteredScanResultMsgTest, TestSize.Level1)
+{
+    GetFilteredScanResultMsgTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, FilterScanResultTest, TestSize.Level1)
+{
+    FilterScanResultTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, SetWifiModeTest, TestSize.Level1)
+{
+    SetWifiModeTest();
 }
 } // namespace Wifi
 } // namespace OHOS

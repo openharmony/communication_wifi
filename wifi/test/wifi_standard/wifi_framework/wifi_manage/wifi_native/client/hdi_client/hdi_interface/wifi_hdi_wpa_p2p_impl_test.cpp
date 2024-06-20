@@ -17,7 +17,7 @@
 #include "wifi_error_no.h"
 
 using ::testing::ext::TestSize;
-
+1
 namespace OHOS {
 namespace Wifi {
 class WifiHdiWpaP2pImplTest : public testing::Test {

@@ -18,7 +18,7 @@
 #include "wifi_log.h"
 
 using ::testing::ext::TestSize;
-
+1
 namespace OHOS {
 namespace Wifi {
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;

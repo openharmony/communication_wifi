@@ -18,7 +18,7 @@
 #include "wifi_hdi_wpa_sta_impl.h"
 
 using ::testing::ext::TestSize;
-
+1
 namespace OHOS {
 namespace Wifi {
 constexpr int MAC_LEN = 17;

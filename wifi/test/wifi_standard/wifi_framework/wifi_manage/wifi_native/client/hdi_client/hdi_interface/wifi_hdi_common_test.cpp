@@ -16,7 +16,7 @@
 #include "wifi_hdi_common.h"
 
 using ::testing::ext::TestSize;
-
+1
 #define PROTOCOL_80211_IFTYPE_P2P_CLIENT 8
 
 class WifiHdiCommonTest : public testing::Test {

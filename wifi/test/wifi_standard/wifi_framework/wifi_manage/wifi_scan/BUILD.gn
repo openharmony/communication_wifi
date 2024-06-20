@@ -96,6 +96,7 @@ ohos_unittest("wifi_scan_unittest") {
   defines = [
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    "private = public",
   ]
   external_deps = [
     "ability_base:want",

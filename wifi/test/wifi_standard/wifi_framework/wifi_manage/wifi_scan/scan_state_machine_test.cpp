@@ -1587,14 +1587,17 @@ HWTEST_F(ScanStateMachineTest, GetPnoScanConfigFail2, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest1, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest2, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest3, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest3();
 }
 
 HWTEST_F(ScanStateMachineTest, ReportPnoScanInfosTest, TestSize.Level1)

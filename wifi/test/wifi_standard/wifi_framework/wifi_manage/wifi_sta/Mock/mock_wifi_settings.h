@@ -185,6 +185,7 @@ public:
     virtual WifiP2pGroupInfo GetCurrentP2pGroupInfo() = 0;
     virtual int GetHotspotState(int id = 0) = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
+    
 };
 
 class WifiSettings : public MockWifiSettings {

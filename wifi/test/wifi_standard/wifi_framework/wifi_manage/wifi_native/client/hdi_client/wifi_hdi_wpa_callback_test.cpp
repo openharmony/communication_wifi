@@ -18,7 +18,7 @@
 #include "wifi_log.h"
 
 using ::testing::ext::TestSize;
-1
+
 namespace OHOS {
 namespace Wifi {
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
@@ -61,6 +61,21 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventBssidChangedTest, TestSize.Level1)
     EXPECT_EQ(result, 1);
 }
 
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventBssidChangedTest1, TestSize.Level1)
+{
+    struct HdiWpaBssidChangedParam bssidChangedParam;
+    bssidChangedParam.bssidLen = 17;
+    char reason[] = "wlan0";
+    memcpy_s(bssidChangedParam.reason, sizeof(reason), reason, sizeof(reason));
+    bssidChangedParam.reasonLen = 10;
+    int32_t result = OnEventBssidChanged(nullptr, &bssidChangedParam, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    bssidChangedParam.reasonLen = 36;
+    result = OnEventBssidChanged(nullptr, &bssidChangedParam, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
 HWTEST_F(WifiHdiWpaCallbackTest, OnEventTempDisabledTest, TestSize.Level1)
 {
     struct HdiWpaTempDisabledParam tempDisabledParam;
@@ -68,6 +83,20 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventTempDisabledTest, TestSize.Level1)
     EXPECT_EQ(result, 0);
     result = OnEventTempDisabled(nullptr, nullptr, "wlan0");
     EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventTempDisabledTest1, TestSize.Level1)
+{
+    struct HdiWpaTempDisabledParam tempDisabledParam;
+    char ssid[] = "wlan0";
+    memcpy_s(tempDisabledParam.ssid, sizeof(ssid), ssid, sizeof(ssid));
+    int32_t result = OnEventTempDisabled(nullptr, &tempDisabledParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    char reason[] = "wlan0";
+    memcpy_s(tempDisabledParam.reason, sizeof(reason), reason, sizeof(reason));
+    result = OnEventTempDisabled(nullptr, &tempDisabledParam, "wlan0");
+    EXPECT_EQ(result, 0);
 }
 
 HWTEST_F(WifiHdiWpaCallbackTest, OnEventAssociateRejectTEST, TestSize.Level1)
@@ -442,6 +471,44 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventIfaceCreatedTest, TestSize.Level1)
     EXPECT_EQ(result, 0);
 
     result = OnEventIfaceCreated(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventConnectedTest, TestSize.Level1)
+{
+    struct HdiWpaConnectParam connectParam;
+    int32_t result = OnEventConnected(nullptr, &connectParam, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    result = OnEventConnected(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    connectParam.bssidLen = 0;
+    result = OnEventConnected(nullptr, &connectParam, "wlan0");
+    EXPECT_EQ(result, 1);
+
+    connectParam.bssidLen = 10;
+    result = OnEventConnected(nullptr, &connectParam, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventDeviceLostTest, TestSize.Level1)
+{
+    struct HdiP2pDeviceLostParam deviceLostParam;
+    int32_t result = OnEventDeviceLost(nullptr, &deviceLostParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventDeviceLost(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventInvitationReceivedTest, TestSize.Level1)
+{
+    struct HdiP2pInvitationReceivedParam invitationReceivedParam;
+    int32_t result = OnEventInvitationReceived(nullptr, &invitationReceivedParam, "wlan0");
+    EXPECT_EQ(result, 0);
+
+    result = OnEventInvitationReceived(nullptr, nullptr, "wlan0");
     EXPECT_EQ(result, 1);
 }
 } // namespace Wifi

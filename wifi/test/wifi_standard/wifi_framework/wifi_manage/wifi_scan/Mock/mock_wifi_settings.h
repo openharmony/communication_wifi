@@ -61,6 +61,7 @@ public:
     virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo)  = 0;
     virtual int GetWifiState(int instId = 0) = 0;
+    
 };
 
 class WifiSettings : public MockWifiSettings {

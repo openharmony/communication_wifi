@@ -60,10 +60,12 @@ public:
     }
 };
 
+
 HWTEST_F(ScanServiceTest, SystemScanByIntervalSuccess, TestSize.Level1)
 {
     SystemScanByIntervalSuccess();
 }
+
 
 }  // namespace Wifi
 }  // namespace OHOS

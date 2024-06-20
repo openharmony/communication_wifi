@@ -233,6 +233,7 @@ void WifiEventSubscriberManager::HandlP2pBusinessChange(int systemAbilityId, boo
 
 void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
 {
+    WIFI_LOGI("%{public}s enter, systemAbilityId: %{public}d", __FUNCTION__, systemAbilityId);
     switch (systemAbilityId) {
         case APP_MGR_SERVICE_ID:
             HandleAppMgrServiceChange(add);
@@ -428,6 +429,7 @@ void WifiEventSubscriberManager::DelayedAccessDataShare()
 
 void WifiEventSubscriberManager::InitSubscribeListener()
 {
+    SubscribeSystemAbility(APP_MGR_SERVICE_ID);
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
     SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
 #ifdef HAS_MOVEMENT_PART

@@ -265,7 +265,9 @@ void StateMachine::StartTimer(int timerName, int64_t interval)
 void StateMachine::StopTimer(int timerName)
 {
     LOGD("Enter StopTimer, timerName is %{public}d.", timerName);
-    pStateMachineHandler->DeleteMessageFromQueue(timerName);
+    if (pStateMachineHandler != nullptr) {
+        pStateMachineHandler->DeleteMessageFromQueue(timerName);
+    }
     return;
 }
 

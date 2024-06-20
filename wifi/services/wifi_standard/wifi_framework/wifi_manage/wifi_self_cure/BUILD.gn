@@ -56,6 +56,7 @@ ohos_static_library("wifi_self_cure") {
   sources = [
     "../wifi_sta/network_status_history_manager.cpp",
     "ip_qos_monitor.cpp",
+    "multi_gateway.cpp",
     "self_cure_interface.cpp",
     "self_cure_service.cpp",
     "self_cure_state_machine.cpp",

@@ -27,6 +27,7 @@ public:
     void Stop();
     bool DoArpCheck(int timeoutMillis, bool isFillSenderIp);
     bool DoArpCheck(int timeoutMillis, bool isFillSenderIp, uint64_t &timeCost);
+    void GetGwMacAddrList(int32_t timeoutMillis, bool isFillSenderIp, std::vector<std::string>& gwMacLists);
 private:
     DHCP::DhcpArpChecker m_dhcpArpChecker;
 };

@@ -16,9 +16,10 @@
 #include "wifi_hdi_common.h"
 
 using ::testing::ext::TestSize;
-1
-#define PROTOCOL_80211_IFTYPE_P2P_CLIENT 8
 
+#define PROTOCOL_80211_IFTYPE_P2P_CLIENT 8
+#define HDI_POS_TEN 10
+#define HDI_POS_FOURTH 4
 class WifiHdiCommonTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -192,7 +193,7 @@ HWTEST_F(WifiHdiCommonTest, HdiGetIeTxtTest, TestSize.Level1)
     uint8_t ie[10] = {0};
     size_t ieLen = 10;
 
-    char* result = HdiGetIeTxt(pos, end, proto, ie, ieLen);
+    char *result = HdiGetIeTxt(pos, end, proto, ie, ieLen);
     EXPECT_STREQ(pos, result);
 }
 
@@ -224,7 +225,7 @@ HWTEST_F(WifiHdiCommonTest, HdiGetWapiTxtTest, TestSize.Level1)
     uint8_t ie[] = {0, 0, 0, 0, 0, 0, 0, 0};
     char pos[] = "test";
     char end[] = "end";
-    char* result = HdiGetWapiTxt(pos, end, ie);
+    char *result = HdiGetWapiTxt(pos, end, ie);
     EXPECT_STREQ(result, pos);
 }
 extern "C" int HdiGetCipherInfo(char *start, char *end, int ciphers, const char *delim);
@@ -419,7 +420,9 @@ HWTEST_F(WifiHdiCommonTest, HdiConvertIeTest3, TestSize.Level1)
     uint8_t hdiIe[10];
     size_t wpaIeLen = sizeof(struct HdiIeHdr) + 1;
     struct HdiIeData data;
-    hdiIe[2] = 0x00; hdiIe[3] = 0x00; hdiIe[4] = 0x00;
+    hdiIe[2] = 0x00;
+    hdiIe[3] = 0x00;
+    hdiIe[4] = 0x00;
     int result = HdiConvertIe(hdiIe, wpaIeLen, &data);
     EXPECT_EQ(result, -1);
 }
@@ -429,7 +432,8 @@ HWTEST_F(WifiHdiCommonTest, HdiConvertIeRsnTest4, TestSize.Level1)
     uint8_t hdiIe[10];
     size_t wpaIeLen = sizeof(struct HdiIeHdr) + 1;
     struct HdiIeData data;
-    hdiIe[5] = 0x00; hdiIe[6] = 0x00;
+    hdiIe[5] = 0x00;
+    hdiIe[6] = 0x00;
     int result = HdiConvertIe(hdiIe, wpaIeLen, &data);
     EXPECT_EQ(result, -1);
 }
@@ -450,4 +454,52 @@ HWTEST_F(WifiHdiCommonTest, HdiConvertIeRsnTest6, TestSize.Level1)
     struct HdiIeData data;
     int result = HdiConvertIe(hdiIe, wpaIeLen, &data);
     EXPECT_EQ(result, -1);
+}
+
+extern "C" int hex2byte(const char *hex);
+HWTEST_F(WifiHdiCommonTest, hex2byteTest, TestSize.Level1)
+{
+    EXPECT_EQ(hex2byte("z"), -1);
+    EXPECT_EQ(hex2byte("5"), -1);
+    EXPECT_EQ(hex2byte("a"), -1);
+    EXPECT_EQ(hex2byte("F"), -1);
+    EXPECT_EQ(hex2byte("5a"), (5 << HDI_POS_FOURTH) | HDI_POS_TEN);
+    EXPECT_EQ(hex2byte("Aa"), (HDI_POS_TEN << HDI_POS_FOURTH) | HDI_POS_TEN);
+    EXPECT_EQ(hex2byte("zz"), -1);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealSymbolTest, TestSize.Level1)
+{
+    u8 buf[10];
+    size_t maxlen = 10;
+    const char *str = "\\abc";
+    size_t len = PrintfDecode(buf, maxlen, str);
+    EXPECT_EQ(len, 3);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealSymbolTest1, TestSize.Level1)
+{
+    u8 buf[10];
+    size_t maxlen = 1;
+    const char *str = "abc";
+    size_t len = PrintfDecode(buf, maxlen, str);
+    EXPECT_EQ(len, 0);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealSymbolTest2, TestSize.Level1)
+{
+    u8 buf[10];
+    size_t maxlen = 10;
+    const char *str = "abc";
+    size_t len = PrintfDecode(buf, maxlen, str);
+    EXPECT_EQ(len, 3);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealSymbolTest3, TestSize.Level1)
+{
+    u8 buf[10];
+    size_t maxlen = 10;
+    const char *str = "\\abc";
+    size_t len = PrintfDecode(buf, maxlen, str);
+    EXPECT_EQ(len, 3);
 }

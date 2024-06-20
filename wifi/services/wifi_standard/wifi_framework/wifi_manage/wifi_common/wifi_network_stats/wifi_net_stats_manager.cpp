@@ -36,6 +36,10 @@ const int64_t NET_STATS_DELAY_TIME = 2 * 1000;
 void WifiNetStatsManager::StartNetStats()
 {
     WIFI_LOGI("%{public}s, enter", __FUNCTION__);
+    if (m_netStatsTimerId != 0) {
+        WIFI_LOGI("%{public}s, m_netStatsTimerId is not zero", __FUNCTION__);
+        return;
+    }
     std::shared_ptr<WifiSysTimer> netStatsTimer =
         std::make_shared<WifiSysTimer>(true, NET_STATS_POLL_INTERVAL, true, false);
     std::function<void()> callback = std::bind(&WifiNetStatsManager::PerformPollAndLog, this);

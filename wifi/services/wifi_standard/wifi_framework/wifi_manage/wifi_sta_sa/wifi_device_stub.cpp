@@ -536,7 +536,7 @@ void WifiDeviceStub::BigDataWriteIpAddress(const WifiIpAddress &address, std::st
 {
     bigDataStream << address.family << ";";
     bigDataStream << address.addressIpv4 << ";";
-    int size = address.addressIpv6.size();
+    int size = static_cast<int>(address.addressIpv6.size());
     bigDataStream << size << ";";
     for (int i = 0; i < size; i++) {
         bigDataStream << address.addressIpv6[i] << ";";
@@ -580,7 +580,7 @@ void WifiDeviceStub::SendBigConfig(int contentSize, std::vector<WifiDeviceConfig
         return;
     }
     std::stringstream bigDataStream;
-    for (unsigned int i = 0; i < contentSize; ++i) {
+    for (int i = 0; i < contentSize; ++i) {
         bigDataStream << result[i].networkId << ";";
         bigDataStream << result[i].status << ";";
         bigDataStream << result[i].bssid << ";";
@@ -622,7 +622,7 @@ void WifiDeviceStub::SendBigConfig(int contentSize, std::vector<WifiDeviceConfig
     }
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteInt32(contentSize);
-    long len = bigDataStream.str().length();
+    long len = static_cast<long>(bigDataStream.str().length());
     reply.WriteInt64(len);
     ashmem->WriteToAshmem(bigDataStream.str().c_str(), bigDataStream.str().length(), 0);
     reply.WriteAshmem(ashmem);
@@ -635,7 +635,7 @@ void WifiDeviceStub::SendSmallConfig(int32_t size, std::vector<WifiDeviceConfig>
 {
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteInt32(size);
-    for (unsigned int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
         WriteWifiDeviceConfig(reply, result[i]);
     }
  

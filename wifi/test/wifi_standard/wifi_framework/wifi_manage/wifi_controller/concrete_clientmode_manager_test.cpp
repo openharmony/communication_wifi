@@ -40,6 +40,10 @@ public:
         if (pConcreteModeManager != nullptr) {
             pConcreteModeManager->pConcreteMangerMachine = new MockConcreteMangerMachine();
         }
+        mCb.onStartFailure = DealConcreteStartFailure;
+        mCb.onStopped = DealConcreteStop;
+        mCb.onRemoved = DealClientRemoved;
+        pConcreteModeManager->mcb = mCb;
         pConcreteModeManager->GetConcreteMachine()->SendMessage(CONCRETE_CMD_START,
             static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA), 0);
     }
@@ -52,7 +56,23 @@ public:
         }
     }
 
+    static void DealConcreteStartFailure(int id = 0)
+    {
+        return;
+    }
+
+    static void DealConcreteStop(int id = 0)
+    {
+        return;
+    }
+
+    static void DealClientRemoved(int id = 0)
+    {
+        return;
+    }
+
     std::unique_ptr<ConcreteClientModeManager> pConcreteModeManager;
+    ConcreteModeCallback mCb;
 
     void SetRoleTest()
     {
@@ -65,6 +85,7 @@ public:
     {
         ConcreteModeCallback cb;
         if (pConcreteModeManager != nullptr) {
+            pConcreteModeManager->InitConcreteManager();
             EXPECT_TRUE(pConcreteModeManager->RegisterCallback(cb) == WIFI_OPT_SUCCESS);
         }
     }

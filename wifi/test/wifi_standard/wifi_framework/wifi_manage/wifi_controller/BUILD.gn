@@ -123,6 +123,7 @@ ohos_unittest("wifi_controller_unittest") {
   ]
   defines += [
     "FEATURE_AP_SUPPORT",
+    "FEATURE_SELF_CURE_SUPPORT",
     "FEATURE_STA_SUPPORT",
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
   ]

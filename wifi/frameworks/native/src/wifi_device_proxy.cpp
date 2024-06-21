@@ -561,7 +561,7 @@ void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address
 void WifiDeviceProxy::BigDataReadIpAddress(WifiIpAddress &address, std::vector<std::string> &tokens)
 {
     address.family = std::stoi(tokens[g_bigDataRecvLen++]);
-    address.addressIpv4 = std::stoi(tokens[g_bigDataRecvLen++]);
+    address.addressIpv4 = static_cast<unsigned int>(std::stoi(tokens[g_bigDataRecvLen++]));
     int size = std::stoi(tokens[g_bigDataRecvLen++]);
     if (size > MAX_SIZE) {
         WIFI_LOGE("Read IP address size error: %{public}d", size);

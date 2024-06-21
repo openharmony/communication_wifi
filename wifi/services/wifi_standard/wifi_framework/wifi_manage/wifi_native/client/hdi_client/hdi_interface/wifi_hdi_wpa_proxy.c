@@ -615,6 +615,10 @@ static WifiErrorNo GetApInstance()
 
 static WifiErrorNo StartApHdi(int id, const char *ifaceName)
 {
+    if (g_apObj == NULL) {
+        LOGE("%{public}s Pointer g_apObj is NULL", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
     int32_t ret = g_apObj->StartApWithCmd(g_apObj, ifaceName, id);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);

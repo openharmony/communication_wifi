@@ -37,7 +37,10 @@ using ::testing::ext::TestSize;
 
 errno_t strcpy_s(char *strDest, size_t destMax, const char *strSrc)
 {
-    memcpy_s(strDest, destMax, strSrc, strlen(strSrc));
+    int retCode = memcpy_s(strDest, destMax, strSrc, strlen(strSrc));
+    if (retCode != 0) {
+        return 1; 
+    }
     return 1;
 }
 

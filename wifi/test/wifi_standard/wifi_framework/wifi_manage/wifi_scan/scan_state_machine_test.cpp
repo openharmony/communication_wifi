@@ -1048,7 +1048,7 @@ public:
         pScanStateMachine->InitPnoScanState();
     }
 
-   void RecordFilteredScanResultTest()
+    void RecordFilteredScanResultTest()
     {
         WifiDeviceConfig config;
         config.bssid = "01:23:45:67:89:AB";

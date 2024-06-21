@@ -3125,6 +3125,42 @@ void StaStateMachine::StartDetectTimer(int detectType)
     }
 }
 
+void StaStateMachine::PortalExpiredDetect()
+{
+    if (portalState == PortalState::EXPERIED) {
+        if (portalExpiredDetectCount < PORTAL_EXPERIED_DETECT_MAX_COUNT) {
+            portalExpiredDetectCount++;
+            StartDetectTimer(DETECT_TYPE_CHECK_PORTAL_EXPERIED);
+        } else if (portalExpiredDetectCount == PORTAL_EXPERIED_DETECT_MAX_COUNT) {
+            portalExpiredDetectCount = 0;
+            auto config = getCurrentWifiDeviceConfig();
+            WritePortalAuthExpiredHisysevent(SystemNetWorkState::NETWORK_IS_PORTAL,
+                detectNum, config.lastConnectTime, config.portalAuthTime, false);
+        }
+    }
+}
+
+void StaStateMachine::UpdatePortalState(SystemNetWorkState netState, bool &updatePortalAuthTime)
+{
+    if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
+        if (portalState == PortalState::UNCHECKED) {
+            auto config = getCurrentWifiDeviceConfig();
+            portalState = config.isPortal ? PortalState::AUTHED : PortalState::NOT_PORTAL;
+        } else if (portalState == PortalState::UNAUTHED || portalState == PortalState::EXPERIED) {
+            portalState = PortalState::AUTHED;
+            updatePortalAuthTime = true;
+        }
+    } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
+        if (portalState == PortalState::UNCHECKED) {
+            portalState = PortalState::UNAUTHED;
+        } else if (portalState == PortalState::AUTHED || portalState == PortalState::NOT_PORTAL) {
+            portalState = PortalState::EXPERIED;
+            portalExpiredDetectCount = 0;
+        }
+        PortalExpiredDetect();
+    }
+}
+
 void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std::string url)
 {
     SendMessage(WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT, netState, 0, url);
@@ -3141,15 +3177,10 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         return;
     }
     mPortalUrl = portalUrl;
+    bool updatePortalAuthTime = false;
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
-        bool updatePortalAuthTime = false;
         mIsWifiInternetCHRFlag = false;
-        if (portalState == PortalState::UNCHECKED) {
-            portalState = PortalState::NOT_PORTAL;
-        } else if (portalState == PortalState::UNAUTHED || portalState == PortalState::EXPERIED) {
-            portalState = PortalState::AUTHED;
-            updatePortalAuthTime = true;
-        }
+        UpdatePortalState(netState, updatePortalAuthTime);
         /* Save connection information to WifiSettings. */
         WriteIsInternetHiSysEvent(NETWORK);
         WritePortalStateHiSysEvent(portalFlag ? HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED
@@ -3167,24 +3198,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         WifiLinkedInfo linkedInfo;
         GetLinkedInfo(linkedInfo);
-        if (portalState == PortalState::UNCHECKED) {
-            portalState = PortalState::UNAUTHED;
-        } else if (portalState == PortalState::AUTHED || portalState == PortalState::NOT_PORTAL) {
-            portalState = PortalState::EXPERIED;
-            portalExpiredDetectCount = 0;
-        }
-
-        if (portalState == PortalState::EXPERIED) {
-            if (portalExpiredDetectCount < PORTAL_EXPERIED_DETECT_MAX_COUNT) {
-                portalExpiredDetectCount++;
-                StartDetectTimer(DETECT_TYPE_CHECK_PORTAL_EXPERIED);
-            } else if (portalExpiredDetectCount == PORTAL_EXPERIED_DETECT_MAX_COUNT) {
-                portalExpiredDetectCount = 0;
-                auto config = getCurrentWifiDeviceConfig();
-                WritePortalAuthExpiredHisysevent(SystemNetWorkState::NETWORK_IS_PORTAL,
-                    detectNum, config.lastConnectTime, config.portalAuthTime, false);
-            }
-        }
+        UpdatePortalState(netState, updatePortalAuthTime);
 #ifndef OHOS_ARCH_LITE
         if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
             ShowPortalNitification();

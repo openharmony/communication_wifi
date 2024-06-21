@@ -39,7 +39,7 @@ errno_t strcpy_s(char *strDest, size_t destMax, const char *strSrc)
 {
     int retCode = memcpy_s(strDest, destMax, strSrc, strlen(strSrc));
     if (retCode != 0) {
-        return 1; 
+        return 1;
     }
     return 1;
 }

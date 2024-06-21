@@ -25,6 +25,7 @@
 #include "sta_define.h"
 #include "define.h"
 #include "sta_state_machine.h"
+#include "sta_service.h"
 #include "wifi_app_state_aware.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
@@ -573,6 +574,8 @@ public:
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
         pStaStateMachine->wpsState = SetupMethod::INVALID;
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         pStaStateMachine->DealStartWpsCmd(nullptr);
         pStaStateMachine->DealStartWpsCmd(&msg);
     }
@@ -583,6 +586,8 @@ public:
         EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->wpsState = SetupMethod::KEYPAD;
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         msg.SetParam1(static_cast<int>(SetupMethod::INVALID));
         pStaStateMachine->DealStartWpsCmd(&msg);
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.clearDevice = true;
@@ -1713,6 +1718,9 @@ public:
 
     void InvokeOnWpsChanged(const WpsStartState &state, const int code)
     {
+        std::vector<StaServiceCallback> callbacks;
+        callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
+        pStaService->InitStaService(callbacks);
         EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->InvokeOnWpsChanged(state, 0);
     }
@@ -1954,7 +1962,7 @@ public:
         pStaStateMachine->DealWpaEapUmtsAuthEvent(&msg1);
     }
 
-      void HilinkSaveConfigTest()
+    void HilinkSaveConfigTest()
     {
         pStaStateMachine->HilinkSaveConfig();
     }
@@ -2976,6 +2984,7 @@ HWTEST_F(StaStateMachineTest, InvokeOnStaRssiLevelChangedTest, TestSize.Level1)
 */
 HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest, TestSize.Level1)
 {
+    DealScreenStateChangedEventTest();
 }
 
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaFailTest, TestSize.Level1)

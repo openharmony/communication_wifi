@@ -698,6 +698,13 @@ private:
     int InitStaSMHandleMap();
 
     /**
+     * @Description : Update RSSI to LinkedInfo.
+     *
+     * @param  inRssi - Rssi get from SignalPoll Result
+     */
+    void UpdateLinkInfoRssi(int inRssi);
+
+    /**
      * @Description : Deal SignalPoll Result.
      *
      * @param  msg - Message body received by the state machine[in]

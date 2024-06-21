@@ -1848,7 +1848,7 @@ public:
     {
         const int  wpaCBAssocing = 3;
         StaStateMachine staStateMachine;
-        pStaStateMachine->OnNetworkAssocEventTest(-1, "a2:b1:f5:c7:d1", &staStateMachine);
+        pStaStateMachine->OnNetworkAssocEvent(-1, "a2:b1:f5:c7:d1", &staStateMachine);
     }
     void GetDataSlotIdTest()
     {

@@ -702,7 +702,7 @@ private:
      *
      * @param  inRssi - Rssi get from SignalPoll Result
      */
-    void UpdateLinkInfoRssi(int inRssi);
+    int UpdateLinkInfoRssi(int inRssi);
 
     /**
      * @Description : Deal SignalPoll Result.

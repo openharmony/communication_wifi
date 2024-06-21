@@ -62,6 +62,7 @@ ohos_unittest("wifi_native_test") {
     "$HDI_ROOT_DIR/wifi_framework/wifi_manage/wifi_native/client/hdi_client/wifi_hdi_wpa_callback.cpp",
     "$HDI_ROOT_DIR/wifi_framework/wifi_manage/wifi_native/client/hdi_client/wifi_hdi_wpa_client.cpp",
     "client/hdi_client/hdi_interface/global_test.cpp",
+    "client/hdi_client/hdi_interface/mock_wifi_hdi_wpa_ap_impl.cpp",
     "client/hdi_client/hdi_interface/wifi_hdi_common_test.cpp",
     "client/hdi_client/hdi_interface/wifi_hdi_util_test.cpp",
     "client/hdi_client/hdi_interface/wifi_hdi_wpa_ap_impl_test.cpp",
@@ -75,6 +76,16 @@ ohos_unittest("wifi_native_test") {
   ldflags = [
     "-fPIC",
     "--coverage",
+    "-Wl,--wrap=HdiSetApPasswd",
+    "-Wl,--wrap=HdiSetApName",
+    "-Wl,--wrap=HdiSetApWpaValue",
+    "-Wl,--wrap=HdiSetApBand",
+    "-Wl,--wrap=HdiSetApChannel",
+    "-Wl,--wrap=HdiSetApMaxConn",
+    "-Wl,--wrap=HdiSetAp80211n",
+    "-Wl,--wrap=HdiSetApWmm",
+    "-Wl,--wrap=HdiReloadApConfigInfo",
+    "-Wl,--wrap=HdiDisableAp",
   ]
 
   defines = [
@@ -83,6 +94,8 @@ ohos_unittest("wifi_native_test") {
     "HDI_INTERFACE_SUPPORT",
     "SUPPORT_LOCAL_RANDOM_MAC",
     "HDI_WPA_INTERFACE_SUPPORT",
+    "private = public",
+    "protected = public",
   ]
 
   deps = [

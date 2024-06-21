@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_error_no.h"
+#include "mock_wifi_hdi_wpa_ap_impl.h"
 
 using ::testing::ext::TestSize;
 
@@ -226,6 +227,9 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pInviteTest, TestSize.Level1)
     const char *ifname = nullptr;
     WifiErrorNo result = HdiP2pInvite(peerBssid, goBssid, ifname);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+
+    result = HdiP2pInvite("peerBssid", "goBssid", "ifname");
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pReinvokeTest, TestSize.Level1)
@@ -352,6 +356,21 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiDeliverP2pDataTest, TestSize.Level1)
     const char *carryData = "1";
     WifiErrorNo result = HdiDeliverP2pData(cmdType, dataType, carryData);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+}
+
+HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRemoveServiceTest, TestSize.Level1)
+{
+    struct HdiP2pServiceInfo info;
+    WifiErrorNo result = HdiP2pRemoveService(&info);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaP2pImplTest, RegisterHdiWpaP2pEventCallbackTest, TestSize.Level1)
+{
+    struct IWpaCallback callback;
+    callback.OnEventDeviceFound = nullptr;
+    EXPECT_EQ(RegisterHdiWpaP2pEventCallback(nullptr), WIFI_HAL_OPT_INVALID_PARAM);
+    EXPECT_EQ(RegisterHdiWpaP2pEventCallback(&callback), WIFI_HAL_OPT_INVALID_PARAM);
 }
 }
 }

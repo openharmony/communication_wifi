@@ -92,7 +92,7 @@ public:
     virtual void SetLastNetworkId(const int networkId) = 0;
     virtual int GetLastNetworkId() const = 0;
     virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
-    virtual void SetWifiToggledState(bool state) = 0;
+    virtual void SetWifiToggledState(int state) = 0;
     virtual int GetScreenState() const = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
     virtual bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
@@ -185,6 +185,7 @@ public:
     virtual WifiP2pGroupInfo GetCurrentP2pGroupInfo() = 0;
     virtual int GetHotspotState(int id = 0) = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
+    virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
     
 };
 
@@ -260,7 +261,7 @@ public:
     MOCK_METHOD1(SetLastNetworkId, void(const int networkId));
     MOCK_CONST_METHOD0(GetLastNetworkId, int());
     MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &linkedInfo));
-    MOCK_METHOD1(SetWifiToggledState, void(bool state));
+    MOCK_METHOD1(SetWifiToggledState, void(int state));
     MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
     MOCK_METHOD1(SetValidChannels, int(const ChannelsTable &channelsInfo));
@@ -352,6 +353,7 @@ public:
     MOCK_METHOD0(GetCurrentP2pGroupInfo, WifiP2pGroupInfo());
     MOCK_METHOD1(GetHotspotState, int(int id));
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
+    MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int));
 };
 }  // namespace OHOS
 }  // namespace Wifi

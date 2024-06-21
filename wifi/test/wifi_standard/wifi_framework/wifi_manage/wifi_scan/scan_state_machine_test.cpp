@@ -1110,8 +1110,6 @@ public:
     }
 };
 
-};
-
 HWTEST_F(ScanStateMachineTest, InitGoInStateTest, TestSize.Level1)
 {
     InitGoInStateTest();

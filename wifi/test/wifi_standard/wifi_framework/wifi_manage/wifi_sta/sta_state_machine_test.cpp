@@ -47,6 +47,9 @@ static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 constexpr int TEST_FAIL_REASON = 16;
 constexpr int UMTS_AUTH_TYPE_TAG = 0xdb;
 constexpr int UMTS_AUTS_TYPE_TAG = 0xdc;
+constexpr int WPA3_BLACKMAP_MAX_NUM = 20;
+constexpr int TWO = 2;
+static constexpr int MAX_STR_LENT =127;  
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -853,6 +856,7 @@ public:
     {
         WifiDeviceConfig deviceConfig;
         deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+        deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
         EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
@@ -866,6 +870,7 @@ public:
     {
         WifiDeviceConfig deviceConfig;
         deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+        deviceConfig.keyMgmt = KEY_MGMT_SAE;
         WifiStoreRandomMac randomMacInfo;
         randomMacInfo.ssid = RANDOMMAC_SSID;
         randomMacInfo.keyMgmt = KEY_MGMT_WEP;
@@ -1665,6 +1670,11 @@ public:
     void AddWpa3BlackMapTest()
     {
         std::string ssid = RANDOMMAC_SSID;
+        for (int i = 0; i < WPA3_BLACKMAP_MAX_NUM; i++)
+        {
+           pStaStateMachine->AddWpa3BlackMap(std::to_string(i));
+        }
+        
         pStaStateMachine->AddWpa3BlackMap(ssid);
     }
 
@@ -1942,6 +1952,48 @@ public:
         param.autn = "222222";
         msg2.SetMessageObj(param);
         pStaStateMachine->DealWpaEapUmtsAuthEvent(&msg1);
+    }
+
+      void HilinkSaveConfigTest()
+    {
+        pStaStateMachine->HilinkSaveConfig();
+    }
+ 
+    void IsRoamingTest()
+    {
+        pStaStateMachine->IsRoaming();
+    }
+    void OnDhcpResultNotifyEventTest()
+    {
+        pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_RENEW_FAIL);
+    }
+ 
+    void DealGetDhcpIpTimeoutTest()
+    {
+        InternalMessage *msg = nullptr;
+        pStaStateMachine->DealGetDhcpIpTimeout(msg);
+        InternalMessage msg1;
+        msg1.SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT);
+        pStaStateMachine->DealGetDhcpIpTimeout(&msg1);
+    }
+ 
+    void FillSuiteB192CfgTest()
+    {
+        WifiHalDeviceConfig  halDeviceConfig;
+        halDeviceConfig.keyMgmt = "WPA-EAP-SUITE-B-192";
+        pStaStateMachine->FillSuiteB192Cfg(halDeviceConfig);
+    }
+ 
+    void ReplaceEmptyDnsTest()
+    {
+        DhcpResult *result = nullptr;
+        pStaStateMachine->ReplaceEmptyDns(result);
+        DhcpResult resultO;
+        std::string bssid1 = "11:22:33:44";
+        std::string bssid2 = "11:22:33:44";
+        strcpy_s(resultO.strOptDns1, MAX_STR_LENT, bssid1.c_str());
+        strcpy_s(resultO.strOptDns2, MAX_STR_LENT, bssid2.c_str());
+        pStaStateMachine->ReplaceEmptyDns(&resultO);
     }
 };
 
@@ -3047,6 +3099,16 @@ HWTEST_F(StaStateMachineTest, HandlePortalNetworkPorcessTests, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealWpaEapUmtsAuthEventTest, TestSize.Level1)
 {
     DealWpaEapUmtsAuthEventTest();
+}
+
+HWTEST_F(StaStateMachineTest, HilinkSaveConfigTest, TestSize.Level1)
+{
+    HilinkSaveConfigTest();
+}
+ 
+HWTEST_F(StaStateMachineTest, ReplaceEmptyDnsTest, TestSize.Level1)
+{
+    ReplaceEmptyDnsTest();
 }
 } // namespace Wifi
 } // namespace OHOS

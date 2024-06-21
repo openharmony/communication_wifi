@@ -186,7 +186,6 @@ public:
     virtual int GetHotspotState(int id = 0) = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
-    
 };
 
 class WifiSettings : public MockWifiSettings {

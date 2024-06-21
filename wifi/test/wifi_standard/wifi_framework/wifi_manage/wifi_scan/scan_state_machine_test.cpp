@@ -1687,18 +1687,22 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoProcessTest2, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest1, TestSize.Level1)
 {
+    CommonScanAfterPnoResultTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest2, TestSize.Level1)
 {
+    CommonScanAfterPnoResultTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosSuccess, TestSize.Level1)
 {
+    GetScanInfosSuccess();
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosFail, TestSize.Level1)
 {
+    GetScanInfosFail();
 }
 
 HWTEST_F(ScanStateMachineTest, GetSecurityTypeAndBandTest, TestSize.Level1)

@@ -38,6 +38,85 @@ public:
 
     static void DestoryCallback(std::string &destoryIfaceName, int createIfaceType);
 };
+
+class IChipIfaceTest : public IChipIface {
+public:
+    IChipIfaceTest() = default;
+    ~IChipIfaceTest() = default;
+    virtual int32_t GetIfaceType(IfaceType& type)
+    {
+        return 0;
+    }
+    virtual int32_t GetIfaceName(std::string& name)
+    {
+        return 0;
+    }
+    virtual int32_t GetIfaceCap(uint32_t& capabilities)
+    {
+        return 0;
+    }
+    virtual int32_t GetSupportFreqs(int32_t band, std::vector<uint32_t>& frequencies)
+    {
+        return 0;
+    }
+    virtual int32_t SetMacAddress(const std::string& mac)
+    {
+        return 0;
+    }
+    virtual int32_t SetCountryCode(const std::string& code)
+    {
+        return 0;
+    }
+    virtual int32_t GetPowerMode(int32_t& powerMode)
+    {
+        return 0;
+    }
+    virtual int32_t RegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
+    {
+        return 0;
+    }
+    virtual int32_t UnRegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
+    {
+        return 0;
+    }
+    virtual int32_t StartScan(const ScanParams& scanParam)
+    {
+        return 0;
+    }
+    virtual int32_t GetScanInfos(std::vector<ScanResultsInfo>& scanResultsInfo)
+    {
+        return 0;
+    }
+    virtual int32_t StartPnoScan(const PnoScanParams& pnoParams)
+    {
+        return 0;
+    }
+    virtual int32_t StopPnoScan()
+    {
+        return 0;
+    }
+    virtual int32_t GetSignalPollInfo(SignalPollResult& signalPollresult)
+    {
+        return 0;
+    }
+    virtual int32_t EnablePowerMode(int32_t mode)
+    {
+        return 0;
+    }
+    virtual int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
+    {
+        return 0;
+    }
+    virtual int32_t SetTxPower(int32_t power)
+    {
+        return 0;
+    }
+    virtual int32_t SetPowerMode(int32_t powerMode)
+    {
+        return 0;
+    }
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -53,6 +53,7 @@ private:
     bool UpdateCurForegroundAppInfo(const AppExecFwk::AppStateData &appStateData);
     bool HasRecordInCurForegroundApps(const AppExecFwk::AppStateData &appStateData);
     std::mutex mutex_ {};
+    sdt::mutex mutexForCurForegroundApps_ {};
     std::unique_ptr<WifiEventHandler> appChangeEventHandler = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy_ {nullptr};
     sptr<AppStateObserver> mAppStateObserver {nullptr};

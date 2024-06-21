@@ -386,6 +386,31 @@ public:
         std::string mac = "01:23:45:67:89:ab";
         pStaInterface->DeliverStaIfaceData(mac);
     }
+
+    void StartRoamToNetwork()
+    {
+        std::string bssid = "01:23:45:67:89:ab";
+        pStaInterface->StartRoamToNetwork(0, bssid);
+    }
+    void SetPowerMode()
+    {
+        pStaInterface->SetPowerMode(0);
+    }
+
+    void SetTxPower()
+    {
+        pStaInterface->SetTxPower(0);
+    }
+
+    void OnSystemAbilityChanged()
+    {
+        pStaInterface->OnSystemAbilityChanged(0, 0);
+    }
+
+    void StartPortalCertification()
+    {
+        pStaInterface->StartPortalCertification();
+    }
 };
 
 extern "C" IStaService *Create(void);
@@ -708,5 +733,24 @@ HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
 {
     DeliverStaIfaceDataSuceess();
 }
+
+HWTEST_F(StaInterfaceTest, StartRoamToNetwork, TestSize.Level1)
+{
+    StartRoamToNetwork();
+}
+HWTEST_F(StaInterfaceTest, SetPowerMode, TestSize.Level1)
+{
+    SetPowerMode();
+}
+HWTEST_F(StaInterfaceTest, SetTxPower, TestSize.Level1)
+{
+    SetTxPower();
+}
+
+HWTEST_F(StaInterfaceTest, OnSystemAbilityChanged, TestSize.Level1)
+{
+    OnSystemAbilityChanged();
+}
+
 } // namespace Wifi
 } // namespace OHOS

@@ -67,10 +67,12 @@ public:
         pStaStateMachine->InitStaStateMachine();
         pStaStateMachine->InitWifiLinkedInfo();
         pStaStateMachine->InitLastWifiLinkedInfo();
+        pStaService  = std::make_unique<StaService>();
     }
     virtual void TearDown()
     {
         pStaStateMachine.reset();
+        pStaService.reset();
     }
     void SleepMs(const int sleepMs)
     {
@@ -78,7 +80,7 @@ public:
         mCvTest.wait_for(lck, std::chrono::milliseconds(sleepMs));
     }
     std::unique_ptr<StaStateMachine> pStaStateMachine;
-
+    std::unique_ptr<StaService> pStaService;
     std::mutex mMtxBlock;
     std::condition_variable mCvTest;
 
@@ -167,6 +169,7 @@ public:
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = false;
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
         WifiDeviceConfig config;
+        config.keyMgmt = "WEP";
         EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config));
     }
 
@@ -509,6 +512,8 @@ public:
             .WillOnce(Return(1))
             .WillRepeatedly(Return(0));
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);
         pStaStateMachine->DealWpaLinkFailEvent(nullptr);
@@ -519,6 +524,8 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);
     }
@@ -528,6 +535,8 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         msg.SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
         pStaStateMachine->DealWpaLinkFailEvent(&msg);
     }
@@ -537,6 +546,8 @@ public:
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.reassociate = true;
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
         pStaStateMachine->DealReassociateCmd(&msg);
     }
 
@@ -1818,7 +1829,8 @@ public:
     void OnNetworkAssocEventTest()
     {
         const int  wpaCBAssocing = 3;
-        pStaStateMachine->OnNetworkConnectionEvent(-1, "a2:b1:f5:c7:d1");
+        StaStateMachine staStateMachine;
+        pStaStateMachine->OnNetworkAssocEventTest(-1, "a2:b1:f5:c7:d1", &staStateMachine);
     }
     void GetDataSlotIdTest()
     {
@@ -1857,12 +1869,14 @@ public:
     void GetGsmAuthResponseWithLengthTest()
     {
         EapSimGsmAuthParam param;
+        param.rands.push_back("11111");
         pStaStateMachine->GetGsmAuthResponseWithLength(param);
     }
 
     void GetGsmAuthResponseWithoutLengthTest()
     {
         EapSimGsmAuthParam param;
+        param.rands.push_back("11111");
         pStaStateMachine->GetGsmAuthResponseWithoutLength(param);
     }
 
@@ -1874,6 +1888,8 @@ public:
     void FillUmtsAuthReqTest()
     {
         EapSimUmtsAuthParam param;
+        param.rand ="11111";
+        param.autn = "22222";
         pStaStateMachine->FillUmtsAuthReq(param);
     }
     void ParseAndFillUmtsAuthParamTest()

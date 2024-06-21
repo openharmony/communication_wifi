@@ -1157,5 +1157,6 @@ HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
 {
     DeliverStaIfaceDataTest();
 }
+
 } // namespace Wifi
 } // namespace OHOS

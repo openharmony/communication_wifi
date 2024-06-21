@@ -196,7 +196,9 @@ void StateMachine::SendMessage(InternalMessage *msg)
     if (msg == nullptr) {
         return;
     }
-    pStateMachineHandler->SendMessage(msg);
+    if (pStateMachineHandler != nullptr) {
+        pStateMachineHandler->SendMessage(msg);
+    }
     return;
 }
 

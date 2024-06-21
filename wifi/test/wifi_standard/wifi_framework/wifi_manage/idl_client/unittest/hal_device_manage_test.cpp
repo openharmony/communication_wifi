@@ -389,7 +389,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetPowerModeTest_01, TestSize.Level1)
 {
     std::string ifaceName = "Wlan0";
     int model = 0;
-    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetPowerMode(ifaceName, model);
+    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetPowerModel(ifaceName, model);
     EXPECT_EQ(result, true);
 }
 
@@ -422,7 +422,7 @@ HWTEST_F(WifiHalDeviceManagerTest, StopPnoScanTest_01, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest_01, TestSize.Level1)
 {
     std::string ifaceName = "Wlan0";
-    std::string mac{"12:34:56:78:90:AB"}
+    std::string mac{"12:34:56:78:90:AB"};
 
     IChipIfaceTest *data = new IChipIfaceTest;
     sptr<IChipIface> iface = static_cast<IChipIface*>(data);
@@ -430,6 +430,114 @@ HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest_01, TestSize.Level1)
         std::pair<std::string, sptr<IChipIface>>(ifaceName, iface));
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetApMacAddress(ifaceName, mac);
     EXPECT_EQ(result, false);
+}
+
+HWTEST_F(WifiHalDeviceManagerTest, ValidateInterfaceCacheTest_01, TestSize.Level1)
+{
+    std::string ifaceName = "Wlan0";
+    IfaceType type = IfaceType::STA;
+    InterfaceCacheEntry cacheEntry;
+    cacheEntry.chipId = 10;
+
+    DelayedSingleton<HalDeviceManager>::GetInstance()->mInterfaceInfoCache.insert(
+        std::make_pair(std::make_pair(ifaceName, type), cacheEntry));
+
+    std::vector<WifiChipInfo> wifiChipInfos;
+    WifiChipInfo wifiChipInfo;
+    wifiChipInfo.chipId = 10;
+    IConcreteChipTest *data = new IConcreteChipTest;
+    wifiChipInfo.chip = static_cast<IConcreteChip*>(data);
+    wifiChipInfos.push_back(wifiChipInfo);
+
+    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->ValidateInterfaceCache(wifiChipInfos);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(WifiHalDeviceManagerTest, SelectInterfacesToDeleteTest_01, TestSize.Level1)
+{
+    std::string ifaceName;
+    IfaceType ifaceType = IfaceType::STA;
+
+    std::vector<WifiIfaceInfo> existingIface;
+    std::vector<WifiIfaceInfo> interfacesToBeRemovedFirst;
+    WifiChipInfo wifiChipInfo;
+
+    WifiIfaceInfo wifiChipInfo_1, wifiChipInfo_2;
+
+    IChipIfaceTest *data = new IChipIfaceTest;
+
+    wifiChipInfo_1.name = "AB";
+    wifiChipInfo_1.iface = static_cast<IChipIface*>(data);
+
+    wifiChipInfo_2.name = "BC";
+    wifiChipInfo_2.iface = static_cast<IChipIface*>(data);
+
+    existingIface.push_back(wifiChipInfo_1);
+    existingIface.push_back(wifiChipInfo_2);
+
+    DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipInfo(0, wifiChipInfo);
+    DelayedSingleton<HalDeviceManager>::GetInstance()->SelectInterfacesToDelete(
+        1, ifaceType, ifaceType, existingIface, interfacesToBeRemovedFirst);
+}
+
+HWTEST_F(WifiHalDeviceManagerTest, CanIfaceComboSupportRequestTest_01, TestSize.Level1)
+{
+    WifiChipInfo wifiChipInfo;
+    UsableMode chipMode;
+    chipMode.modeId = 0;
+
+    std::vector<int> chipIfaceCombo;
+    chipIfaceCombo.push_back(1);
+
+    IfaceCreationData ifaceCreationData;
+
+    std::vector<WifiIfaceInfo> wifiIfaceInfo;
+    IfaceType createIfaceType = IfaceType::STA;
+
+    wifiChipInfo.ifaces.insert(std::pair<IfaceType, std::vector<WifiIfaceInfo>>(createIfaceType, wifiIfaceInfo));
+
+    DelayedSingleton<HalDeviceManager>::GetInstance()->CanIfaceComboSupportRequest(wifiChipInfo,
+        chipMode, chipIfaceCombo, createIfaceType, ifaceCreationData);
+}
+
+HWTEST_F(WifiHalDeviceManagerTest, CompareIfaceCreationDataTest_01, TestSize.Level1)
+{
+    WifiChipInfo chipInfoParam;
+
+    IfaceCreationData data1;
+    IfaceCreationData data2;
+
+    IConcreteChipTest *data = new IConcreteChipTest;
+    chipInfoParam.chip = static_cast<IConcreteChip*>(data);
+    chipInfoParam.chipId = 1;
+
+    data1.chipInfo = chipInfoParam;
+    data1.chipModeId = 2;
+
+    data2.chipInfo = chipInfoParam;
+    data2.chipModeId = 2;
+
+    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->CompareIfaceCreationData(data1, data2);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(WifiHalDeviceManagerTest, RemoveIfaceTest_01, TestSize.Level1)
+{
+    IChipIfaceTest *data = new IChipIfaceTest;
+    sptr<IChipIface> iface = static_cast<IChipIface*>(data);
+    bool isCallback = true;
+    IfaceType createIfaceType = IfaceType::STA;
+
+    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveIface(iface, isCallback, createIfaceType);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(WifiHalDeviceManagerTest, OnScanResultsCallbackTest_01, TestSize.Level1)
+{
+    uint32_t event = 1;
+    ChipIfaceCallback data;
+    int result = data.OnScanResultsCallback(event);
+    EXPECT_EQ(result, 0);
 }
 
 }  // namespace Wifi

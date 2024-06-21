@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <gtest/gtest.h>
 #include "internal_message.h"
 #include "sta_define.h"
@@ -32,14 +46,11 @@ namespace Wifi {
 static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
-
+static constexpr int NAPI_MAX_STR_LENT = 127;
 
 class StaStateMachineTest : public testing::Test {
 public:
-    static void SetUpTestCase() 
-    {
-       
-    }
+    static void SetUpTestCase() {}
     static void TearDownTestCase()
     {
         WifiAppStateAware& wifiAppStateAware = WifiAppStateAware::GetInstance();
@@ -72,7 +83,7 @@ public:
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
         pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
@@ -125,14 +136,15 @@ public:
 
     void ReplaceEmptyDnsTest()
     {
-        DhcpResult *result =nullptr;
+        DhcpResult *result = nullptr;
         pStaStateMachine->ReplaceEmptyDns(result);
         DhcpResult resultO;
-        memcpy_s(resultO.strOptDns1, 127, "11:22:33:44", strlen("11:22:33:44"));
-        memcpy_s(resultO.strOptDns2, 127, "11:22:33:45", strlen("11:22:33:45"));
+        std::string bssid = "11:22:33:44";
+        std::string bssid1 = "11:22:33:45";
+        memcpy_s(resultO.strOptDns1, NAPI_MAX_STR_LENT, bssid.c_str(), bssid.length());
+        memcpy_s(resultO.strOptDns2, NAPI_MAX_STR_LENT,  bssid1.c_str(), bssid1.length());
         pStaStateMachine->ReplaceEmptyDns(&resultO);
     }
-
 };
 
 HWTEST_F(StaStateMachineTest, ConfigStaticIpAddressSuccess1, TestSize.Level1)

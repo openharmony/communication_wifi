@@ -128,6 +128,8 @@ public:
     void HandleForegroundAppChangedActionTest();
     void EnableHiLinkHandshakeTest();
     void DeliverStaIfaceDataTest();
+    void StartRoamToNetworkTest();
+    void SetTxPowerTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -829,8 +831,29 @@ void StaServiceTest::DeliverStaIfaceDataTest()
     pStaService->DeliverStaIfaceData(currentMac);
 }
 
+void StaServiceTest::StartRoamToNetworkTest()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    WifiLinkedInfo info;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    pStaService->StartRoamToNetwork(0, "11:22:33:44");
+}
+ 
+void StaServiceTest::SetTxPowerTest()
+{
+    pStaService->SetTxPower(0);
+}
+
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
+    StaServiceStartPortalCertificationTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level1)
@@ -1158,5 +1181,14 @@ HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
     DeliverStaIfaceDataTest();
 }
 
+HWTEST_F(StaServiceTest, StartRoamToNetworkTest, TestSize.Level1)
+{
+    StartRoamToNetworkTest();
+}
+ 
+HWTEST_F(StaServiceTest, SetTxPowerTest, TestSize.Level1)
+{
+    SetTxPowerTest();
+}
 } // namespace Wifi
 } // namespace OHOS

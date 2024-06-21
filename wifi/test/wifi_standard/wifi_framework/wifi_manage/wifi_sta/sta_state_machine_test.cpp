@@ -50,7 +50,7 @@ constexpr int UMTS_AUTH_TYPE_TAG = 0xdb;
 constexpr int UMTS_AUTS_TYPE_TAG = 0xdc;
 constexpr int WPA3_BLACKMAP_MAX_NUM = 20;
 constexpr int TWO = 2;
-static constexpr int MAX_STR_LENT =127;  
+static constexpr int MAX_STR_LENT = 127;
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -1675,11 +1675,9 @@ public:
     void AddWpa3BlackMapTest()
     {
         std::string ssid = RANDOMMAC_SSID;
-        for (int i = 0; i < WPA3_BLACKMAP_MAX_NUM; i++)
-        {
-           pStaStateMachine->AddWpa3BlackMap(std::to_string(i));
+        for (int i = 0; i < WPA3_BLACKMAP_MAX_NUM; i++) {
+            pStaStateMachine->AddWpa3BlackMap(std::to_string(i));
         }
-        
         pStaStateMachine->AddWpa3BlackMap(ssid);
     }
 

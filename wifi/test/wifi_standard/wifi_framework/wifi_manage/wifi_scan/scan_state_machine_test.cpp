@@ -37,6 +37,9 @@ namespace OHOS {
 namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ_VALUE = 2410;
 constexpr int FREQ_5_GHZ_VALUE = 5010;
+constexpr int NETWORK_ID = 15;
+constexpr int BAND = 2;
+constexpr int TWO = 2;
 
 class ScanStateMachineTest : public testing::Test {
 public:
@@ -1045,17 +1048,19 @@ public:
         pScanStateMachine->InitPnoScanState();
     }
 
-        void RecordFilteredScanResultTest()
+   void RecordFilteredScanResultTest()
     {
-        WifiDeviceConfig deviceConfig;
-        deviceConfig.wepTxKeyIndex = 1;
-        deviceConfig.keyMgmt = "WPA-PSK";
+        WifiDeviceConfig config;
+        config.bssid = "01:23:45:67:89:AB";
+        config.band = BAND;
+        config.networkId = NETWORK_ID;
+        config.ssid = "networkId";
+        config.keyMgmt = "123456";
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
+        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
+        ScanStateMachine::FilterScanResultRecord records;
         InterScanInfo interScanInfo;
         interScanInfo.securityType = WifiSecurity::WEP;
-        int indexType = DEVICE_CONFIG_INDEX_SSID;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(interScanInfo.ssid, indexType, _))
-        .WillOnce(DoAll(SetArgReferee<2>(deviceConfig), Return(0)));
-        ScanStateMachine::FilterScanResultRecord records;
         records.RecordFilteredScanResult(interScanInfo);
     }
  
@@ -1068,7 +1073,7 @@ public:
     }
  
     void GetFilteredScanResultMsgTest()
-    {   
+    {
         ScanStateMachine::FilterScanResultRecord records;
         records.GetFilteredScanResultMsg();
     }

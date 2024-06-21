@@ -193,5 +193,57 @@ HWTEST_F(ScanServiceTest, AllowExternScanFail4, TestSize.Level1)
     AllowExternScanFail4();
 }
 
+
+    void HilinkSaveConfigTest()
+    {
+        pStaStateMachine->HilinkSaveConfig();
+    }
+ 
+    void IsRoamingTest()
+    {
+        pStaStateMachine->IsRoaming();
+    }
+    void OnDhcpResultNotifyEventTest()
+    {
+        pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_RENEW_FAIL);
+    }
+ 
+    void DealGetDhcpIpTimeoutTest()
+    {
+        InternalMessage *msg = nullptr;
+        pStaStateMachine->DealGetDhcpIpTimeout(msg);
+        InternalMessage msg1;
+        msg1.SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT);
+        pStaStateMachine->DealGetDhcpIpTimeout(&msg1);
+    }
+ 
+    void FillSuiteB192CfgTest()
+    {
+        WifiHalDeviceConfig  halDeviceConfig;
+        halDeviceConfig.keyMgmt = "WPA-EAP-SUITE-B-192";
+        pStaStateMachine->FillSuiteB192Cfg(halDeviceConfig);
+    }
+ 
+    void ReplaceEmptyDnsTest()
+    {
+        DhcpResult *result = nullptr;
+        pStaStateMachine->ReplaceEmptyDns(result);
+        DhcpResult resultO;
+        std::string bssid1 = "11:22:33:44";
+        std::string bssid2 = "11:22:33:44";
+        strcpy_s(resultO.strOptDns1, MAX_STR_LENT, bssid1.c_str());
+        strcpy_s(resultO.strOptDns2, MAX_STR_LENT, bssid2.c_str());
+        pStaStateMachine->ReplaceEmptyDns(&resultO);
+    }
+
+    HWTEST_F(StaStateMachineTest, HilinkSaveConfigTest, TestSize.Level1)
+{
+    HilinkSaveConfigTest();
+}
+ 
+HWTEST_F(StaStateMachineTest, ReplaceEmptyDnsTest, TestSize.Level1)
+{
+    ReplaceEmptyDnsTest();
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -658,6 +658,19 @@ private:
     void HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl);
 
     /**
+     * @Description  update portalState
+     *
+     * @param netState the state of connecting network(in)
+     * @param updatePortalAuthTime need update portalAuthTime or not [out]
+     */
+    void UpdatePortalState(SystemNetWorkState netState, bool &updatePortalAuthTime);
+
+    /**
+     * @Description  start detection if portalState is expired
+     */
+    void PortalExpiredDetect();
+
+    /**
      * @Description implementation of the network detection callback function
      *
      * @param netState the state of connecting network
@@ -1142,7 +1155,7 @@ private:
     bool isRoam;
     int64_t lastTimestamp;
     bool portalFlag;
-    int portalState;
+    PortalState portalState;
     int detectNum;
     int portalExpiredDetectCount;
     bool mIsWifiInternetCHRFlag;

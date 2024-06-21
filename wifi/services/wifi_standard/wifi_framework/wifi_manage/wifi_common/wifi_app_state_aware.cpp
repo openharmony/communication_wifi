@@ -114,6 +114,7 @@ void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
 
 bool WifiAppStateAware::UpdateCurForegroundAppInfo(const AppExecFwk::AppStateData &appStateData)
 {
+    std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
     if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND) &&
         !HasRecordInCurForegroundApps(appStateData)) {
         curForegroundApps_.push_back(appStateData);

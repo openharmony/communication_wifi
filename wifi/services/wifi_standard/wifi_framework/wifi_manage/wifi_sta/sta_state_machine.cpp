@@ -895,6 +895,21 @@ int setRssi(int rssi)
     return rssi;
 }
 
+int StaStateMachine::UpdateLinkInfoRssi(int inRssi)
+{
+    int outRssi = 0;
+    if (inRssi > INVALID_RSSI_VALUE && inRssi < MAX_RSSI_VALUE) {
+        if (inRssi > 0) {
+            outRssi = setRssi((inRssi - SIGNAL_INFO));
+        } else {
+            outRssi = setRssi(inRssi);
+        }
+    } else {
+        outRssi = INVALID_RSSI_VALUE;
+    }
+    return outRssi;
+}
+
 void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
 {
     LOGD("enter SignalPoll.");
@@ -929,6 +944,8 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
     } else {
         linkedInfo.rssi = INVALID_RSSI_VALUE;
     }
+    linkedInfo.c0Rssi = UpdateLinkInfoRssi(signalInfo.c0Rssi);
+    linkedInfo.c1Rssi = UpdateLinkInfoRssi(signalInfo.c1Rssi);
     if (signalInfo.txrate > 0) {
         linkedInfo.txLinkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
         linkedInfo.linkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
@@ -948,13 +965,15 @@ void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
         "rssi:%{public}d,noise:%{public}d,chload:%{public}d,snr:%{public}d,ulDelay:%{public}d,txLinkSpeed:%{public}d,"
         "rxLinkSpeed:%{public}d,txBytes:%{public}d,rxBytes:%{public}d,txFailed:%{public}d,txPackets:%{public}d,"
         "rxPackets:%{public}d,GetWifiStandard:%{public}d,rxmax:%{public}d,txmax:%{public}d,connState:%{public}d,"
-        "detState:%{public}d,curSignal:%{public}d,lastSignal:%{public}d",
+        "detState:%{public}d,curSignal:%{public}d,lastSignal:%{public}d,chloadSelf:%{public}d,c0Rssi:%{public}d,"
+        "c1Rssi=%{public}d",
         MacAnonymize(linkedInfo.bssid).c_str(), SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.networkId,
         linkedInfo.band, signalInfo.frequency, signalInfo.signal, signalInfo.noise, signalInfo.chload, signalInfo.snr,
         signalInfo.ulDelay, signalInfo.txrate, signalInfo.rxrate, signalInfo.txBytes, signalInfo.rxBytes,
         signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets, linkedInfo.wifiStandard,
         linkedInfo.maxSupportedRxLinkSpeed, linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.connState,
-        linkedInfo.detailedState, currentSignalLevel, lastSignalLevel);
+        linkedInfo.detailedState, currentSignalLevel, lastSignalLevel,
+        signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
 
     WriteLinkInfoHiSysEvent(lastSignalLevel, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);

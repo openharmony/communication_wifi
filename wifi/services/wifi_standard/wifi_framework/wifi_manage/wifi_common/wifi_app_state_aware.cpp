@@ -121,8 +121,7 @@ bool WifiAppStateAware::UpdateCurForegroundAppInfo(const AppExecFwk::AppStateDat
         return true;
     }
 
-    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_BACKGROUND) &&
-        HasRecordInCurForegroundApps(appStateData)) {
+    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_BACKGROUND)) {
         curForegroundApps_.erase(std::remove_if(curForegroundApps_.begin(), curForegroundApps_.end(),
             [&](const AppExecFwk::AppStateData &recordApp) {
                 return recordApp.uid == appStateData.uid;
@@ -178,7 +177,10 @@ void WifiAppStateAware::UnSubscribeAppState()
         appMgrProxy_ = nullptr;
         mAppStateObserver = nullptr;
     }
-    curForegroundApps_.clear();
+    {
+        std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
+        curForegroundApps_.clear();
+    }
     WIFI_LOGI("UnSubscribeAppState end");
     return;
 }
@@ -201,6 +203,7 @@ void WifiAppStateAware::GetForegroundApp()
         WIFI_LOGE("%{public}s connect failed", __FUNCTION__);
         return;
     }
+    std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
     curForegroundApps_.clear();
     appMgrProxy_->GetForegroundApplications(curForegroundApps_);
 }
@@ -221,6 +224,7 @@ ErrCode WifiAppStateAware::GetProcessRunningInfos(std::vector<AppExecFwk::Runnin
 
 bool WifiAppStateAware::IsForegroundApp(int32_t uid)
 {
+    std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
     for (auto foregroudApp : curForegroundApps_) {
         if (foregroudApp.uid == uid) {
             return true;
@@ -231,6 +235,7 @@ bool WifiAppStateAware::IsForegroundApp(int32_t uid)
 
 bool WifiAppStateAware::IsForegroundApp(const std::string &bundleName)
 {
+    std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
     for (auto foregroudApp : curForegroundApps_) {
         if (foregroudApp.bundleName == bundleName) {
             return true;

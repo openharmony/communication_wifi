@@ -159,6 +159,7 @@ public:
     virtual ~ChipIfaceCallback() = default;
 
     virtual int32_t OnScanResultsCallback(uint32_t event) override;
+    virtual int32_t OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi) override;
 };
 
 class HalDeviceManager {

@@ -1438,6 +1438,13 @@ int32_t ChipIfaceCallback::OnScanResultsCallback(uint32_t event)
     return 0;
 }
 
+int32_t ChipIfaceCallback::OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi)
+{
+    LOGI("OnTasRssiReport, index:%{public}d c0Rssi:%{public}d c1Rssi:%{public}d", index, c0Rssi, c1Rssi);
+
+    return 0;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

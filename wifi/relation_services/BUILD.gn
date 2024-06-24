@@ -88,15 +88,17 @@ if (defined(ohos_lite)) {
       "bounds_checking_function:libsec_shared",
       "hilog_lite:hilog_shared",
     ]
-
-    cflags_cc = [ "-fno-rtti" ]
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [ "-fno-rtti" ]
     defines = [
       "_GNU_SOURCE",
       "OHOS_ARCH_LITE",
       "AP_INTF=\"$wifi_feature_with_ap_intf\"",
       "AP_NUM=$wifi_feature_with_ap_num",
     ]
-    ldflags = [ "-lwpa_client" ]
+    ldflags += [ "-lwpa_client" ]
   }
 } else {
   ohos_executable("wifi_hal_service") {

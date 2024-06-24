@@ -74,11 +74,14 @@ if (defined(ohos_lite)) {
     ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -165,16 +168,19 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]
     }
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
-
+    version_script = "libwifi_toolkit.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

@@ -107,14 +107,14 @@ NetworkSelectionManager::NetworkSelectionManager()
 {}
 
 bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelectionResult,
-                    NetworkSelectType type,
-                    const std::vector<InterScanInfo> &scanInfos)
+                                            NetworkSelectType type,
+                                            const std::vector<InterScanInfo> &scanInfos)
 {
     return true;
 }
 
 void NetworkSelectionManager::TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
-                        const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector)
+                                          const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector)
 {
     return;
 }

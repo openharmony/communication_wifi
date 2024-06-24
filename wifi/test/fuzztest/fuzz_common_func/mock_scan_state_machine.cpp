@@ -49,10 +49,75 @@ void MockScanStateMachine::StartTimer(int timerName, int64_t interval)
     (void)interval;
     WIFI_LOGD("Enter MockScanStateMachine::StartTimer");
 }
+
 void MockScanStateMachine::StopTimer(int timerName)
 {
     (void)timerName;
     WIFI_LOGD("Enter MockScanStateMachine::StopTimer");
+}
+
+InternalMessage *MockScanStateMachine::CreateMessage(int msgName)
+{
+    WIFI_LOGD("Enter MockScanStateMachine::CreateMessage");
+    return nullptr;
+}
+
+InternalMessage *MockScanStateMachine::CreateMessage(int msgName, int param1)
+{
+    WIFI_LOGD("Enter MockScanStateMachine::CreateMessage");
+    return nullptr;
+}
+
+WifiManager &WifiManager::GetInstance()
+{
+    static WifiManager gWifiManager;
+    return gWifiManager;
+}
+
+WifiManager::WifiManager()
+{
+    InitScanCallback();
+}
+
+IScanSerivceCallbacks WifiManager::GetScanCallback(void)
+{
+    return mScanCallback;
+}
+
+void WifiManager::InitScanCallback(void)
+{
+    using namespace std::placeholders;
+    mScanCallback.OnScanStartEvent = std::bind(&WifiManager::DealScanOpenRes, this, _1);
+    mScanCallback.OnScanStopEvent = std::bind(&WifiManager::DealScanCloseRes, this, _1);
+    mScanCallback.OnScanFinishEvent = std::bind(&WifiManager::DealScanFinished, this, _1, _2);
+    mScanCallback.OnScanInfoEvent = std::bind(&WifiManager::DealScanInfoNotify, this, _1, _2);
+    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManager::DealStoreScanInfoEvent, this, _1, _2);
+    return;
+}
+
+void WifiManager::DealScanOpenRes(int instId)
+{
+    return;
+}
+
+void WifiManager::DealScanCloseRes(int instId)
+{
+    return;
+}
+
+void WifiManager::DealScanFinished(int state, int instId)
+{
+    return;
+}
+
+void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)
+{
+    return;
+}
+
+void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)
+{
+    return;
 }
 } // namespace Wifi
 } // namespace OHOS

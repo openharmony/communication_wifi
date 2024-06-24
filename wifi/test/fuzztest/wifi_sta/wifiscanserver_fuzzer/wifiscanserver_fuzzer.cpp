@@ -61,6 +61,12 @@ void InitParam()
     return;
 }
 
+
+
+
+
+
+
 void ScanInterfaceFuzzTest(const uint8_t* data, size_t size)
 {
     pScanService->scanStartedFlag = true;

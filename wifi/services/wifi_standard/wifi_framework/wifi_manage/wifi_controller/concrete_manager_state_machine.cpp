@@ -19,6 +19,7 @@
 #include "wifi_config_center.h"
 #include "wifi_internal_msg.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_common_event_helper.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_manager.h"
 #include "wifi_common_util.h"
@@ -540,6 +541,7 @@ ErrCode ConcreteMangerMachine::PreStartWifi(int instId)
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(ConcreteMangerMachine::IfaceDestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        std::bind(ConcreteMangerMachine::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName)) {
         WIFI_LOGE("PreStartWifi, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -720,6 +722,7 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(ConcreteMangerMachine::IfaceDestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        std::bind(ConcreteMangerMachine::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -977,6 +980,14 @@ void ConcreteMangerMachine::IfaceDestoryCallback(std::string &destoryIfaceName, 
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->SendMessage(CMD_STA_REMOVED, createIfaceType, mid);
     return;
+}
+
+void ConcreteMangerMachine::OnRssiReportCallback(int index, int antRssi)
+{
+    WIFI_LOGI("HwWiTas OnRssiReportCallback, index:%{public}d, antRssi:%{public}d", index, antRssi);
+
+    std::string data = std::to_string(antRssi);
+    WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(index, data);
 }
 
 void ConcreteMangerMachine::DispatchWifiOpenRes(OperateResState state, int instId)

@@ -94,6 +94,11 @@ bool WifiCommonEventHelper::PublishRssiValueChangedEvent(const int &code, const 
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_RSSI_VALUE, code, data);
 }
 
+bool WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(const int &code, const std::string &data)
+{
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WITAS_RSSI_VALUE, code, data);
+}
+
 bool WifiCommonEventHelper::PublishConnStateChangedEvent(const int &code, const std::string &data)
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_CONN_STATE, code, data);

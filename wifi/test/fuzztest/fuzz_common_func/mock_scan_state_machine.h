@@ -15,7 +15,6 @@
 #ifndef OHOS_MOCK_SCANSTATEMACHINE_H
 #define OHOS_MOCK_SCANSTATEMACHINE_H
 
-#include <gmock/gmock.h>
 #include "scan_state_machine.h"
 #include "iscan_service_callbacks.h"
 

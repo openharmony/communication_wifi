@@ -110,12 +110,12 @@ void WifiManager::DealScanFinished(int state, int instId)
     return;
 }
 
-void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)
+void WifiManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)
 {
     return;
 }
 
-void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)
+void WifiManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)
 {
     return;
 }

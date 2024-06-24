@@ -117,6 +117,83 @@ public:
     }
 };
 
+class IConcreteChipTest : public IConcreteChip {
+public:
+    IConcreteChipTest() = default;
+    ~IConcreteChipTest() = default;
+    virtual int32_t GetChipId(int32_t& id)
+    {
+        return 0;
+    }
+    virtual int32_t RegisterChipEventCallback(const sptr<IConcreteChipCallback>& chipEventcallback)
+    {
+        return 0;
+    }
+    virtual int32_t GetChipModes(std::vector<UsableMode>& modes)
+    {
+        return 0;
+    }
+    virtual int32_t GetChipCaps(uint32_t& capabilities)
+    {
+        return 0;
+    }
+    virtual int32_t GetCurrentMode(uint32_t& modeId)
+    {
+        return 0;
+    }
+    virtual int32_t CreateApService(sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t GetApServiceIfNames(std::vector<std::string>& ifnames)
+    {
+        return 0;
+    }
+    virtual int32_t GetApService(const std::string& ifname, sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t RemoveApService(const std::string& ifname)
+    {
+        return 0;
+    }
+    virtual int32_t CreateP2pService(sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t GetP2pServiceIfNames(std::vector<std::string>& ifnames)
+    {
+        return 0;
+    }
+    virtual int32_t GetP2pService(const std::string& ifname, sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t RemoveP2pService(const std::string& ifname)
+    {
+        return 0;
+    }
+    virtual int32_t CreateStaService(sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t GetStaServiceIfNames(std::vector<std::string>& ifnames)
+    {
+        return 0;
+    }
+    virtual int32_t GetStaService(const std::string& ifname, sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t RemoveStaService(const std::string& ifname)
+    {
+        return 0;
+    }
+    virtual int32_t SetChipMode(uint32_t modeId)
+    {
+        return 0;
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

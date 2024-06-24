@@ -119,5 +119,8 @@ bool WifiAppSateAware::IsForegroundApp(int32_t uid)
 {
     return true;
 }
+
+
+
 } // namespace Wifi
 } // namespace OHOS

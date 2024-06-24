@@ -31,6 +31,8 @@ public:
     void SendMessage(InternalMessage *msg);
     void StartTimer(int timerName, int64_t interval);
     void StopTimer(int timerName);
+    InternalMessage *CreateMessage(int msgName, int param1);
+    InternalMessage *CreateMessage(int msgName)
 };
 
 class WifiManager {

@@ -112,7 +112,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->OnScreenStateChanged(networkId);
     pStaInterface->DeregisterAutoJoinCondition(conditionName);
     pStaInterface->DeliverStaIfaceData(conditionName);
-    pStaInterface->DisableWifi();
+    pStaInterface->DisableStaService();
     pStaInterface->StartRoamToNetwork(uid, config.keyMgmt);
     pStaInterface->DisableAutoJoin(config.keyMgmt);
     pStaInterface->EnableAutoJoin(conditionName);

@@ -56,7 +56,6 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock",
   ]
 
   cflags = [
@@ -83,7 +82,6 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure/self_cure_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/external_wifi_filter_builder_manager.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selection_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selection_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selector_factory.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selector_impl.cpp",
@@ -100,7 +98,7 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_state_machine.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_netconn_client.cpp",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_sta_state_machine.cpp",
+    "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_sta_state_machine.cpp",
     "wifistaserver_fuzzer.cpp",
   ]
 
@@ -131,6 +129,8 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "ipc:ipc_core",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
+    "netmanager_base:net_native_manager_if",
+    "netmanager_base:net_stats_manager_if",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",

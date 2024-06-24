@@ -217,6 +217,8 @@ struct WifiLinkedInfo {
     bool isAncoConnected;
     WifiCategory supportedWifiCategory;
     bool isHiLinkNetwork;
+    int c0Rssi;
+    int c1Rssi;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -246,6 +248,8 @@ struct WifiLinkedInfo {
         isAncoConnected = false;
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
+        c0Rssi = 0;
+        c1Rssi = 0;
     }
 };
 

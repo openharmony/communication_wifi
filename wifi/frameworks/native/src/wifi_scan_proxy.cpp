@@ -396,7 +396,7 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
     WIFI_LOGD("RegisterCallBack start!");
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option;
 
     if (g_wifiScanCallbackStub == nullptr) {
         WIFI_LOGE("g_wifiScanCallbackStub is nullptr!");

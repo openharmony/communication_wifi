@@ -61,57 +61,12 @@ void MockStaStateMachine::StartRoamToNetwork(std::string bssid)
     WIFI_LOGD("MockStaStateMachine::StartRoamToNetwork, bssid is %{private}s.", bssid.c_str());
 }
 
-WifiManager &WifiManager::GetInstance()
+void MockStaStateMachine::StopTimer(int timeName)
 {
-    static WifiManager gWifiManager;
-    return gWifiManager;
+    WIFI_LOGD("MockStaStateMachine::StopTimer, timeName is %{private}d.", timeName);
 }
 
-WifiManager::WifiManager()
-{
-    InitScanCallback();
-}
-
-IScanSerivceCallbacks WifiManager::GetScanCallback(void)
-{
-    return mScanCallback;
-}
-
-void WifiManager::InitScanCallback(void)
-{
-    using namespace std::placeholders;
-    mScanCallback.OnScanStartEvent = std::bind(&WifiManager::DealScanOpenRes, this, _1);
-    mScanCallback.OnScanStopEvent = std::bind(&WifiManager::DealScanCloseRes, this, _1);
-    mScanCallback.OnScanFinishEvent = std::bind(&WifiManager::DealScanFinished, this, _1, _2);
-    mScanCallback.OnScanInfoEvent = std::bind(&WifiManager::DealScanInfoNotify, this, _1, _2);
-    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManager::DealStoreScanInfoEvent, this, _1, _2);
-    return;
-}
-
-void WifiManager::DealScanOpenRes(int instId)
-{
-    return;
-}
-
-void WifiManager::DealScanCloseRes(int instId)
-{
-    return;
-}
-
-void WifiManager::DealScanFinished(int state, int instId)
-{
-    return;
-}
-
-void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)
-{
-    return;
-}
-
-void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)
-{
-    return;
-}
-
+void MockStaStateMachine::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
+{}
 }  // namespace Wifi
 }  // namespace OHOS

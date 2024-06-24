@@ -37,6 +37,7 @@ constexpr const char *CHIP_SERVICE_NAME = "chip_interface_service";
 std::atomic_bool HalDeviceManager::g_chipHdiServiceDied = false;
 std::mutex HalDeviceManager::mMutex;
 static HdfRemoteService *g_chipHdiService = nullptr;
+static RssiReportCallback g_rssiReportCallback = nullptr;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -100,7 +101,8 @@ void HalDeviceManager::StopChipHdi()
     return;
 }
 
-bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback, std::string &ifaceName)
+bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback,
+                                      const RssiReportCallback &rssiReportCallback, std::string &ifaceName)
 {
     if (!CheckReloadChipHdiService()) {
         return false;
@@ -120,6 +122,8 @@ bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCa
         LOGE("CreateStaIface, call RegisterChipIfaceCallBack failed! ret:%{public}d", ret);
         return false;
     }
+
+    g_rssiReportCallback = rssiReportCallback;
 
     mIWifiStaIfaces[ifaceName] = iface;
     LOGI("CreateStaIface success! ifaceName:%{public}s", ifaceName.c_str());
@@ -1365,6 +1369,7 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
             if (iface && g_chipIfaceCallback) {
                 iface->UnRegisterChipIfaceCallBack(g_chipIfaceCallback);
             }
+            g_rssiReportCallback = nullptr;
             ret = chip->RemoveStaService(ifaceName);
             break;
         case IfaceType::AP :
@@ -1434,6 +1439,16 @@ int32_t ChipIfaceCallback::OnScanResultsCallback(uint32_t event)
         OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onScanNotify) {
         cbk.onScanNotify(HAL_SINGLE_SCAN_OVER_OK);
+    }
+    return 0;
+}
+
+int32_t ChipIfaceCallback::OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi)
+{
+    LOGI("OnRssiReport, index:%{public}d c0Rssi:%{public}d c1Rssi:%{public}d", index, c0Rssi, c1Rssi);
+
+    if (g_rssiReportCallback) {
+        g_rssiReportCallback(index, c0Rssi);
     }
     return 0;
 }

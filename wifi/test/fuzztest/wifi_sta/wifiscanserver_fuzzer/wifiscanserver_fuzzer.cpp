@@ -26,22 +26,24 @@
 #include "wifi_internal_msg.h"
 #include "scan_service.h"
 #include <mutex>
+#include "mock_scan_state_machine.h"
 
 namespace OHOS {
 namespace Wifi {
 constexpr int THREE = 3;
-constexpr int TWO = 3;
+constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int SIZE = 10;
 constexpr int SIZE_NUMBER = 100;
 static bool g_isInsted = false;
 static std::unique_ptr<ScanService> pScanService = nullptr;
 static std::unique_ptr<ScanInterface> pScanInterface = nullptr;
+
 void MyExit()
 {
     pScanService.reset();
     pScanInterface.reset();
-    sleep(THREE);
+    sleep(U32_AT_SIZE_ZERO);
     printf("exiting\n");
 }
 
@@ -49,6 +51,8 @@ void InitParam()
 {
     if (!g_isInsted) {
         pScanService = std::make_unique<ScanService>();
+        pScanService->pScanStateMachine = new MockScanStateMachine();
+        pScanService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
         pScanInterface = std::make_unique<ScanInterface>();
         if (pScanService == nullptr || pScanInterface) {
             return;
@@ -88,6 +92,10 @@ void ScanInterfaceFuzzTest(const uint8_t* data, size_t size)
     pScanService->ScanWithParam(wifiScanParams);
     pScanService->StartWifiPnoScan(state, period, interval);
     pScanService->StopPnoScan();
+    pScanInterface->StartWifiPnoScan(state, period, interval);
+    pScanInterface->OnClientModeStatusChanged(period);
+    pScanInterface->SetNetworkInterfaceUpDown(state);
+    pScanInterface->SetEnhanceService(nullptr);
 }
 
 void SingleScanFuzzTest(const uint8_t* data, size_t size)
@@ -215,6 +223,37 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     int status =  (static_cast<int>(data[0]) % SIZE + 17);
     pScanService->HandleNetworkQualityChanged(status);
     pScanService->HandleNetworkQualityChanged(status);
+    PnoScanConfig pnoScanConfig;
+    pnoScanConfig.scanInterval = static_cast<int>(data[0]);
+    pnoScanConfig.minRssi2Dot4Ghz = static_cast<int>(data[0]);
+    pnoScanConfig.hiddenNetworkSsid.push_back(std::string(reinterpret_cast<const char*>(data), size));
+    pnoScanConfig.savedNetworkSsid.push_back(std::string(reinterpret_cast<const char*>(data), size));
+    pnoScanConfig.minRssi5Ghz = static_cast<int>(data[0]);
+    WifiSettings::GetInstance().SetScanGenieState(MODE_STATE_CLOSE);
+    WifiSettings::GetInstance().SetAppPackageName(scanConfig.ssid);
+    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
+    pScanService->SystemScanDisconnectedPolicy(appId, appId);
+    pScanService->SetNetworkInterfaceUpDown(config.externFlag);
+    pScanService->ApplyScanPolices(scanType);
+    pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_CHECK_PORTAL);
+    pScanService->AllowSystemTimerScan();
+    pScanService->AllowExternScan();
+    pScanService->GetScanControlInfo();
+    pScanService->HandleDisconnectedScanTimeout();
+    pScanService->EndPnoScan();
+    pScanService->HandlePnoScanInfo(infoList);
+    pScanService->AddPnoScanMessageBody(&msg, pnoScanConfig);
+    pScanService->PnoScan(pnoScanConfig, interConfig);
+    pScanService->ReportScanStartEvent();
+    pScanService->ReportStoreScanInfos(infoList);
+    pScanService->ReportScanInfos(infoList);
+    pScanService->ReportScanFinishEvent(appId);
+    pScanService->ReportScanStopEvent();
+    pScanService->StoreUserScanInfo(config, infoList);
+    pScanService->HandleCommonScanInfo(scanConfig.scanFreqs, infoList);
+    pScanService->HandleCommonScanFailed(scanConfig.scanFreqs);
+    pScanService->Scan(config.externFlag);
+    pScanService->HandleScanStatusReport(scanReport);
 }
 
 void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)
@@ -294,6 +333,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    OHOS::Wifi::InitParam();
     OHOS::Wifi::WifiScanServerFuzzerTest(data, size);
     return 0;
 }

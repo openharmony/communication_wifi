@@ -103,21 +103,62 @@ int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid
     return PERMISSION_GRANTED;
 }
 
-WifiAppSateAware &WifiAppSateAware::GetInstance()
-{
-    static WifiAppSateAware gWifiAppSateAware;
-    return gWifiAppSateAware;
-}
-
-WifiAppSateAware::WifiAppSateAware()
+NetworkSelectionManager::NetworkSelectionManager()
 {}
 
-WifiAppSateAware::~WifiAppSateAware()
-{}
-
-bool WifiAppSateAware::IsForegroundApp(int32_t uid)
+bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelectionResult,
+                                            NetworkSelectType type,
+                                            const std::vector<InterScanInfo> &scanInfos)
 {
     return true;
 }
+
+void NetworkSelectionManager::TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
+                                          const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector)
+{
+    return;
+}
+
+WifiAppStateAware &WifiAppStateAware::GetInstance()
+{
+    static WifiAppStateAware gWifiAppStateAware;
+    return gWifiAppStateAware;
+}
+
+WifiAppStateAware::WifiAppStateAware()
+{}
+WifiAppStateAware::~WifiAppStateAware()
+{}
+
+bool WifiAppStateAware::IsForegroundApp(int32_t uid)
+{
+    return true;
+}
+
+WifiNetAgent &WifiNetAgent::GetInstance()
+{
+    static WifiNetAgent gWifiNetAgent;
+    return gWifiNetAgent;
+}
+
+WifiNetAgent::WifiNetAgent()
+{}
+WifiNetAgent::~WifiNetAgent()
+{}
+
+void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
+    WifiProxyConfig &wifiProxyConfig, int instId)
+{}
+
+void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+{}
+
+void WifiNetAgent::OnStaMachineWifiStart()
+{}
+
+void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+    int instId)
+{}
+
 } // namespace Wifi
 } // namespace OHOS

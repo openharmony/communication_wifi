@@ -18,6 +18,15 @@
 
 #include "wifi_event_handler.h"
 #include "wifi_errcode.h"
+#include "network_selection.h"
+#include "network_selector_factory.h"
+#include "wifi_internal_msg.h"
+#include "wifi_log.h"
+#include "i_net_conn_service.h"
+#include "net_all_capabilities.h"
+#include "net_supplier_callback_base.h"
+#include <any>
+
 namespace OHOS {
 namespace Wifi {
 class WifiAuthCenter {
@@ -57,14 +66,49 @@ public:
     int VerifyGetWifiConfigPermission(const int &pid, const int &uid);
 };
 
-class WifiAppSateAware {
-public:
-    static WifiAppSateAware &GetInstance();
 
-    explicit WifiAppSateAware();
-    ~WifiAppSateAware();
+class WifiAppStateAware {
+public:
+    static WifiAppStateAware &GetInstance();
+
+    explicit WifiAppStateAware();
+    ~WifiAppStateAware();
     bool IsForegroundApp(int32_t uid);
 };
+
+class WifiNetAgent {
+public:
+    static WifiNetAgent &GetInstance();
+
+    explicit WifiNetAgent();
+    ~WifiNetAgent();
+    void OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig,
+        int instId = 0);
+    void OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
+    void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+        int instId = 0);
+    void OnStaMachineWifiStart();
+};
+
+struct NetworkSelectionResult {
+    InterScanInfo interScanInfo;
+    WifiDeviceConfig wifiDeviceConfig;
+};
+
+class NetworkSelectionManager {
+public:
+    NetworkSelectionManager();
+
+    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult,
+                       NetworkSelectType type,
+                       const std::vector<InterScanInfo> &scanInfos);
+
+    std::unique_ptr<NetworkSelectorFactory> pNetworkSelectorFactory = nullptr;
+
+    static void TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
+                            const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector);
+};
+
 } // namespace Wifi
 } // namespace OHOS
 #endif

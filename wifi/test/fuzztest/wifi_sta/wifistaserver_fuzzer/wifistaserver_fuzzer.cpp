@@ -15,6 +15,7 @@
 
 #include "wifistaserver_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
+#include "mock_sta_state_machine.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -24,7 +25,6 @@
 #include "wifi_log.h"
 #include "sta_interface.h"
 #include "sta_auto_connect_service.h"
-#include "mock_sta_state_machine.h"
 #include "wifi_settings.h"
 #include "sta_service.h"
 #include "wifi_internal_msg.h"
@@ -40,7 +40,6 @@ constexpr int STATE = 20;
 static std::unique_ptr<StaInterface> pStaInterface = nullptr;
 static std::unique_ptr<StaAutoConnectService> pStaAutoConnectService = nullptr;
 static std::unique_ptr<StaService> pStaService = nullptr;
-StaStateMachine *pStaStateMachine;
 
 void MyExit()
 {
@@ -54,13 +53,11 @@ void MyExit()
 bool InitParam()
 {
     if (!g_isInsted) {
-        pStaStateMachine = new (std::nothrow) MockStaStateMachine();
-        pStaInterface = std::make_unique<StaInterface>();
-        pStaAutoConnectService = std::make_unique<StaAutoConnectService>(pStaStateMachine);
         pStaService = std::make_unique<StaService>();
-        if (pStaInterface == nullptr || pStaAutoConnectService == nullptr) {
-            return false;
-        }
+        pStaService->pStaStateMachine = new MockStaStateMachine();
+        pStaService->pStaAutoConnectService = new StaAutoConnectService(pStaService->pStaStateMachine);
+        pStaInterface = std::make_unique<StaInterface>();
+        pStaAutoConnectService = std::make_unique<StaAutoConnectService>(pStaService->pStaStateMachine);
         atexit(MyExit);
         g_isInsted = true;
     }
@@ -74,6 +71,8 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     int uid = static_cast<int>(data[index++]);
     bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
     std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % THREE);
+    ConfigChange value = static_cast<ConfigChange>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
     WpsConfig sconfig;
     sconfig.pin = std::string(reinterpret_cast<const char*>(data), size);
     sconfig.bssid = std::string(reinterpret_cast<const char*>(data), size);
@@ -83,6 +82,11 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     config.bssid = std::string(reinterpret_cast<const char*>(data), size);
     config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
     config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
     pStaInterface->ConnectToNetwork(networkId);
     pStaInterface->ConnectToDevice(config);
     pStaInterface->ReConnect();
@@ -108,6 +112,21 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->OnScreenStateChanged(networkId);
     pStaInterface->DeregisterAutoJoinCondition(conditionName);
     pStaInterface->DeliverStaIfaceData(conditionName);
+    pStaInterface->DisableStaService();
+    pStaInterface->StartRoamToNetwork(uid, config.keyMgmt);
+    pStaInterface->DisableAutoJoin(config.keyMgmt);
+    pStaInterface->EnableAutoJoin(conditionName);
+    pStaInterface->StartPortalCertification();
+    pStaInterface->EnableHiLinkHandshake(config, conditionName);
+    pStaInterface->StartHttpDetect();
+    pStaInterface->SetTxPower(uid);
+    pStaInterface->DeregisterFilterBuilder(filterTag, conditionName);
+    pStaService->UpdateEapConfig(config, config.wifiEapConfig);
+    pStaService->RemoveCandidateConfig(uid, networkId);
+    pStaService->StartHttpDetect();
+    pStaService->FindDeviceConfig(config, config);
+    pStaService->OnSystemAbilityChanged(networkId, attemptEnable);
+    pStaService->NotifyDeviceConfigChange(value);
     pStaService->AddCandidateConfig(uid, config, networkId);
     pStaService->RemoveAllCandidateConfig(uid);
     pStaService->ConnectToCandidateConfig(uid, networkId);
@@ -196,6 +215,14 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->ClearOvertimeBlockedBssid();
     pStaAutoConnectService->firmwareRoamFlag = true;
     pStaAutoConnectService->SetRoamBlockedBssidFirmware(blocklistBssids);
+    pStaAutoConnectService->OnScanInfosReadyHandler(scanInfo);
+    pStaAutoConnectService->SyncBlockedSsidFirmware();
+    pStaAutoConnectService->ObtainRoamCapFromFirmware();
+    pStaAutoConnectService->AutoSelectDevice(config, scanInfo, blocklistBssids, info);
+    pStaAutoConnectService->WhetherDevice5GAvailable(scanInfo);
+    pStaAutoConnectService->GetAvailableScanInfos(scanInfo, scanInfo, blocklistBssids, info);
+    pStaAutoConnectService->ObtainRoamCapFromFirmware();
+    pStaService->AutoConnectService(scanInfo);
 }
 
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)

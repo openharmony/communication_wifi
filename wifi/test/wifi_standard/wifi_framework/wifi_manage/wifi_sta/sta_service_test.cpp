@@ -112,7 +112,6 @@ public:
     void DeregisterAutoJoinCondition();
     void RegisterFilterBuilder();
     void DeregisterFilterBuilder();
-    void StaServiceStartHttpDetectTestSucc();
     void EnableHiLinkHandshakeFailTest();
     void EnableHiLinkHandshakeSuceessTest();
     void DeliverStaIfaceDataSuccessTest();
@@ -738,11 +737,6 @@ void StaServiceTest::DeregisterFilterBuilder()
                                                                      "testFilterBuilder"));
 }
 
-void StaServiceTest::StaServiceStartHttpDetectTestSucc()
-{
-    EXPECT_TRUE(pStaService->StartHttpDetect() == WIFI_OPT_SUCCESS);
-}
-
 void StaServiceTest::EnableHiLinkHandshakeFailTest()
 {
     WifiDeviceConfig config;
@@ -1081,11 +1075,6 @@ HWTEST_F(StaServiceTest, RegisterFilterBuilder, TestSize.Level1)
 HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level1)
 {
     DeregisterFilterBuilder();
-}
-
-HWTEST_F(StaServiceTest, StaServiceStartHttpDetectTestSucc, TestSize.Level1)
-{
-    StaServiceStartHttpDetectTestSucc();
 }
 
 HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level1)

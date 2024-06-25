@@ -337,13 +337,6 @@ public:
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac) = 0;
-
-    /**
-     * @Description start http detect
-     *
-	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode StartHttpDetect() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

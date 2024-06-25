@@ -18,6 +18,7 @@
 
 #include "self_cure_service.h"
 #include "wifi_netlink.h"
+#include "wifi_net_observer.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -38,6 +39,7 @@ private:
     int64_t mLastTcpTxCounter = 0;
     int64_t mLastTcpRxCounter = 0;
     int32_t mInternetFailedCounter = 0;
+    sptr<NetStateObserver> mNetWorkDetect;
 };
 
 } // namespace Wifi

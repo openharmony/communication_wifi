@@ -30,10 +30,14 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_monitor.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_state_machine.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_state_machine.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock/mock_scan_service.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock/mock_scan_state_machine.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock/mock_wifi_manager.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_if_config.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_wifi_settings.cpp",
     "scan_service_test.cpp",
+    "sta_state_machine_test.cpp",
   ]
 
   include_dirs = [
@@ -48,7 +52,8 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
@@ -65,6 +70,10 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/libbase/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/libnetutils/include/netutils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
@@ -85,19 +94,33 @@ ohos_unittest("precompiled_macro_unittest") {
   ldflags = [
     "-fPIC",
     "--coverage",
+    "-Wl,-E",
   ]
 
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "ability_runtime:wantagent_innerkits",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "cellular_data:tel_cellular_data_api",
+    "core_service:tel_core_service_api",
+    "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "netmanager_base:net_conn_manager_if",
+    "time_service:time_client",
   ]
 
   defines = [
     "private = public",
     "protected = public",
     "SUPPORT_SCAN_CONTROL",
+    "SUPPORT_LOCAL_RANDOM_MAC",
   ]
 
   part_name = "wifi"

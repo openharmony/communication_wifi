@@ -1712,5 +1712,25 @@ HWTEST_F(StaAutoConnectServiceTest, SyncBlockedSsidFirmwareFail, TestSize.Level1
 {
     SyncBlockedSsidFirmwareFail();
 }
+
+HWTEST_F(StaAutoConnectServiceTest, DisableAutoJoinSuccess, TestSize.Level1)
+{
+    DisableAutoJoinSuccess();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, EnableAutoJoinSuccess, TestSize.Level1)
+{
+    EnableAutoJoinSuccess();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, RegisterAutoJoinConditionSuccess, TestSize.Level1)
+{
+    RegisterAutoJoinConditionSuccess();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, DeregisterAutoJoinConditionSuccess, TestSize.Level1)
+{
+    DeregisterAutoJoinConditionSuccess();
+}
 } // Wifi
 } // OHOS

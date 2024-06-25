@@ -187,6 +187,17 @@ HWTEST_F(ScanInterfaceTest, OnGetCustomSceneStateTest, TestSize.Level1)
     std::map<int, time_t> sceneMap;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnGetCustomSceneState(sceneMap));
 }
+
+HWTEST_F(ScanInterfaceTest, SetEnhanceServiceTest, TestSize.Level1)
+{
+    IEnhanceService *enhanceService =nullptr;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->SetEnhanceService(enhanceService));
+}
+ 
+HWTEST_F(ScanInterfaceTest, SetNetworkInterfaceUpDownTest, TestSize.Level1)
+{
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->SetNetworkInterfaceUpDown(false));
+}
 }  // namespace Wifi
 }  // namespace OHOS
 

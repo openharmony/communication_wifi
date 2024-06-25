@@ -196,7 +196,9 @@ void StateMachine::SendMessage(InternalMessage *msg)
     if (msg == nullptr) {
         return;
     }
-    pStateMachineHandler->SendMessage(msg);
+    if (pStateMachineHandler != nullptr) {
+        pStateMachineHandler->SendMessage(msg);
+    }
     return;
 }
 
@@ -265,7 +267,9 @@ void StateMachine::StartTimer(int timerName, int64_t interval)
 void StateMachine::StopTimer(int timerName)
 {
     LOGD("Enter StopTimer, timerName is %{public}d.", timerName);
-    pStateMachineHandler->DeleteMessageFromQueue(timerName);
+    if (pStateMachineHandler != nullptr) {
+        pStateMachineHandler->DeleteMessageFromQueue(timerName);
+    }
     return;
 }
 

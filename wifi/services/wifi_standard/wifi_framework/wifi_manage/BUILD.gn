@@ -565,7 +565,9 @@ if (defined(ohos_lite)) {
 
     if (defined(global_parts_info) &&
         defined(global_parts_info.powermgr_power_manager)) {
-      defines += [ "HAS_POWERMGR_PART" ]
+      if (wifi_feature_powermgr_support) {
+        defines += [ "HAS_POWERMGR_PART" ]
+      }
     }
 
     if (defined(global_parts_info) &&

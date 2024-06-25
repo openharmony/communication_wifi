@@ -720,7 +720,7 @@ bool ScanService::StoreFullScanInfo(
     for (auto storedIter = storeInfoList.begin(); storedIter != storeInfoList.end(); ++storedIter) {
         bool find = false;
         for (auto iter = results.begin(); iter != results.end(); ++iter) {
-            if (iter->bssid == storedIter->bssid && iter->ssid == storedIter->ssid) {
+            if (iter->bssid == storedIter->bssid) {
                 iter = results.erase(iter);
                 find = true;
                 break;
@@ -1140,7 +1140,6 @@ void ScanService::StopSystemScan()
         WIFI_LOGE("pScanStateMachine is null.\n");
         return;
     }
-    lastSystemScanTime = 0;
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     EndPnoScan();
     pnoScanFailedNum = 0;
@@ -1174,13 +1173,13 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
         scanTime = systemScanIntervalMode.scanIntervalMode.interval;
     }
     if (scanAtOnce || (lastSystemScanTime == 0) ||
-        (sinceLastScan >= systemScanIntervalMode.scanIntervalMode.interval)) {
+        (sinceLastScan / SECOND_TO_MILLI_SECOND >= systemScanIntervalMode.scanIntervalMode.interval)) {
         if (Scan(false) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Scan failed.");
         }
         lastSystemScanTime = nowTime;
     } else {
-        scanTime = systemScanIntervalMode.scanIntervalMode.interval - sinceLastScan;
+        scanTime = systemScanIntervalMode.scanIntervalMode.interval - sinceLastScan / SECOND_TO_MILLI_SECOND;
     }
     WIFI_LOGI("StartSystemTimerScan, scanTime: %{public}d,  interval:%{public}d,  count:%{public}d",
         scanTime,

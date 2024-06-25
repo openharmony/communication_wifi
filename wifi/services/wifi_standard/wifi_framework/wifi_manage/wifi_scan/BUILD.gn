@@ -110,7 +110,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
-    defines = [ 
+    defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "private=public",
     ]

@@ -744,9 +744,7 @@ void StaStateMachine::StopWifiProcess()
     WIFI_LOGI("Enter StaStateMachine::StopWifiProcess.\n");
 #ifndef OHOS_ARCH_LITE
     WifiNetAgent::GetInstance().UnregisterNetSupplier();
-    if (m_NetWorkState != nullptr) {
-        m_NetWorkState->StopNetStateObserver(m_NetWorkState);
-    }
+    m_NetWorkState->StopNetStateObserver(m_NetWorkState);
 #endif
     WIFI_LOGI("Stop wifi is in process...\n");
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));

@@ -61,9 +61,6 @@ public:
     virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
     virtual int GetValidChannels(ChannelsTable &channelsInfo)  = 0;
     virtual int GetWifiState(int instId = 0) = 0;
-    virtual int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config) = 0;
-    virtual std::string GetConnectedBssid(int instId = 0) = 0;
-    virtual int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -104,9 +101,6 @@ public:
     MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &linkedInfo));
     MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
     MOCK_METHOD1(GetWifiState, int(int));
-    MOCK_METHOD3(GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config));
-    MOCK_METHOD1(GetConnectedBssid, std::string (int instId));
-    MOCK_METHOD3(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config));
 };
 }  // namespace Wifi
 }  // namespace OHOS

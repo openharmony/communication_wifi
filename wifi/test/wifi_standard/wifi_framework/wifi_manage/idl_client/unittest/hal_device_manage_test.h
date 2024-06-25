@@ -193,7 +193,7 @@ public:
     {
         return 0;
     }
-}
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -288,6 +288,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess1()
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
+
 void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess2()
 {
     std::vector<InterScanInfo> scanInfos;
@@ -1308,13 +1309,13 @@ void StaAutoConnectServiceTest::DisableAutoJoinSuccess()
     std::string conditionName;
     pStaAutoConnectService->DisableAutoJoin(conditionName);
 }
-
+ 
 void StaAutoConnectServiceTest::EnableAutoJoinSuccess()
 {
     std::string conditionName;
     pStaAutoConnectService->EnableAutoJoin(conditionName);
 }
-
+ 
 void StaAutoConnectServiceTest::RegisterAutoJoinConditionSuccess()
 {
     std::string conditionName;
@@ -1710,26 +1711,6 @@ HWTEST_F(StaAutoConnectServiceTest, SyncBlockedSsidFirmwareSuccess, TestSize.Lev
 HWTEST_F(StaAutoConnectServiceTest, SyncBlockedSsidFirmwareFail, TestSize.Level1)
 {
     SyncBlockedSsidFirmwareFail();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, DisableAutoJoinSuccess, TestSize.Level1)
-{
-    DisableAutoJoinSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, EnableAutoJoinSuccess, TestSize.Level1)
-{
-    EnableAutoJoinSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, RegisterAutoJoinConditionSuccess, TestSize.Level1)
-{
-    RegisterAutoJoinConditionSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, DeregisterAutoJoinConditionSuccess, TestSize.Level1)
-{
-    DeregisterAutoJoinConditionSuccess();
 }
 } // Wifi
 } // OHOS

@@ -908,15 +908,5 @@ ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
  
     return WIFI_OPT_SUCCESS;
 }
-
-ErrCode StaService::StartHttpDetect()
-{
-    if (pStaStateMachine == nullptr) {
-        WIFI_LOGE("pStaStateMachine is null!");
-        return WIFI_OPT_FAILED;
-    }
-    pStaStateMachine->SendMessage(CMD_START_NETCHECK);
-    return WIFI_OPT_SUCCESS;
-}
 }  // namespace Wifi
 }  // namespace OHOS

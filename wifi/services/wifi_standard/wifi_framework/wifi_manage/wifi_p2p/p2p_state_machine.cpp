@@ -30,7 +30,7 @@
 #include "wifi_p2p_dns_sd_service_response.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_p2p_upnp_service_response.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
 
@@ -304,8 +304,8 @@ void P2pStateMachine::DealGroupCreationFailed()
 {
     WifiP2pLinkedInfo info;
     info.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
-    WifiSettings::GetInstance().SaveP2pInfo(info);
-    WifiSettings::GetInstance().ClearLocalHid2dInfo();
+    WifiConfigCenter::GetInstance().SaveP2pInfo(info);
+    WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
     groupManager.SaveP2pInfo(info);
     BroadcastP2pConnectionChanged();
 
@@ -332,10 +332,10 @@ void P2pStateMachine::RemoveGroupByNetworkId(int networkId) const
 void P2pStateMachine::SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwnerAddress)
 {
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     p2pInfo.SetIsGroupOwner(groupManager.GetCurrentGroup().IsGroupOwner());
     p2pInfo.SetIsGroupOwnerAddress(groupOwnerAddress);
-    WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager.SaveP2pInfo(p2pInfo);
 }
 
@@ -376,11 +376,11 @@ ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
         curClientList.erase(iter);
     }
     WifiP2pLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
     linkedInfo.ClearClientInfo();
     linkedInfo.AddClientInfoList(curGc.mac, curGc.ip, curDev.GetDeviceName());
 
-    if (WifiSettings::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
+    if (WifiConfigCenter::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
         groupManager.SaveP2pInfo(linkedInfo);
         BroadcastP2pGcJoinGroup(curGc);
         return ErrCode::WIFI_OPT_SUCCESS;
@@ -409,9 +409,9 @@ ErrCode P2pStateMachine::RemoveClientInfo(std::string mac)
     WIFI_LOGD("P2pStateMachine::RemoveClientInfo: mac = %s",
         MacAnonymize(mac).c_str());
     WifiP2pLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
     linkedInfo.RemoveClientInfo(mac);
-    if (WifiSettings::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
+    if (WifiConfigCenter::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
         groupManager.SaveP2pInfo(linkedInfo);
         return ErrCode::WIFI_OPT_SUCCESS;
     }
@@ -420,7 +420,7 @@ ErrCode P2pStateMachine::RemoveClientInfo(std::string mac)
 
 void P2pStateMachine::BroadcastP2pStatusChanged(P2pState state) const
 {
-    WifiSettings::GetInstance().SetP2pState(static_cast<int>(state));
+    WifiConfigCenter::GetInstance().SetP2pState(static_cast<int>(state));
     std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pStateChangedEvent != nullptr) {
@@ -466,7 +466,7 @@ void P2pStateMachine::BroadcastP2pServicesChanged() const
 void P2pStateMachine::BroadcastP2pConnectionChanged() const
 {
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pConnectionChangedEvent != nullptr) {
@@ -488,7 +488,7 @@ void P2pStateMachine::BroadcastThisDeviceChanaged(const WifiP2pDevice &device) c
 void P2pStateMachine::BroadcastP2pDiscoveryChanged(bool isActive) const
 {
     int status = isActive ? 1 : 0;
-    WifiSettings::GetInstance().SetP2pDiscoverState(status);
+    WifiConfigCenter::GetInstance().SetP2pDiscoverState(status);
     std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pDiscoveryChangedEvent != nullptr) {
@@ -509,7 +509,7 @@ void P2pStateMachine::BroadcastP2pGcJoinGroup(GcInfo &info) const
 void P2pStateMachine::BroadcastP2pGcLeaveGroup(WifiP2pDevice &device) const
 {
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     auto gcInfos = p2pInfo.GetClientInfoList();
     GcInfo curGcInfo;
     for (auto gcInfo : gcInfos) {
@@ -803,7 +803,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
 {
     WIFI_LOGI("ChangeConnectedStatus, connectedState: %{public}d", connectedState);
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     P2pConnectedState curP2pConnectedState = p2pInfo.GetConnectState();
     if (curP2pConnectedState == connectedState) {
         WIFI_LOGD("The connection status is the same, ignore this status!");
@@ -811,7 +811,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
     }
 
     p2pInfo.SetConnectState(connectedState);
-    WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager.SaveP2pInfo(p2pInfo);
 
     if (connectedState == P2pConnectedState::P2P_CONNECTED) {
@@ -827,7 +827,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
         UpdateOwnDevice(P2pDeviceStatus::PDS_AVAILABLE);
         ClearWifiP2pInfo();
         BroadcastP2pConnectionChanged();
-        WifiSettings::GetInstance().ClearLocalHid2dInfo();
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
         deviceManager.UpdateAllDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
     }
     return;
@@ -836,7 +836,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
 void P2pStateMachine::ClearWifiP2pInfo()
 {
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager.SaveP2pInfo(p2pInfo);
 }
 
@@ -897,14 +897,14 @@ void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
     }
     WIFI_LOGI("Enter P2P DhcpResultNotify::OnSuccess, status: %{public}d, ifname: %{public}s", status, ifname);
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     WIFI_LOGI("Set GO IP: %{private}s", result->strOptServerId);
     p2pInfo.SetIsGroupOwnerAddress(result->strOptServerId);
     WifiP2pGroupInfo currGroup = groupManager->GetCurrentGroup();
     currGroup.SetGoIpAddress(result->strOptServerId);
     currGroup.SetGcIpAddress(result->strOptClientId);
     groupManager->SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
-    WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
     groupManager->SaveP2pInfo(p2pInfo);
     pP2pStateMachine->BroadcastP2pConnectionChanged();
     WIFI_LOGI("Start add route on dhcp success");
@@ -1127,7 +1127,7 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
 
 bool P2pStateMachine::IsInterfaceReuse() const
 {
-    return !(WifiSettings::GetInstance().GetP2pIfaceName().compare("wlan0"));
+    return !(WifiConfigCenter::GetInstance().GetP2pIfaceName().compare("wlan0"));
 }
 
 void P2pStateMachine::UpdateGroupInfoToWpa() const

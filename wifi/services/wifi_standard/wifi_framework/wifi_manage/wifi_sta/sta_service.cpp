@@ -23,7 +23,6 @@
 #include "cellular_data_client.h"
 #endif
 #include "wifi_logger.h"
-#include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_cert_utils.h"
@@ -124,7 +123,7 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     pStaMonitor->SetStateMachine(pStaStateMachine);
 
     ChannelsTable chanTbs;
-    (void)WifiSettings::GetInstance().GetValidChannels(chanTbs);
+    (void)WifiConfigCenter::GetInstance().GetValidChannels(chanTbs);
     if (chanTbs[BandType::BAND_2GHZ].size() == 0) {
         std::vector<int> freqs2G;
         std::vector<int> freqs5G;
@@ -156,7 +155,7 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
             }
             chanTbs[BandType::BAND_5GHZ].push_back(channel);
         }
-        if (WifiSettings::GetInstance().SetValidChannels(chanTbs)) {
+        if (WifiConfigCenter::GetInstance().SetValidChannels(chanTbs)) {
             WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
         }
     }
@@ -467,7 +466,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
 {
     LOGI("Enter RemoveDevice, networkId = %{public}d.\n", networkId);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (linkedInfo.networkId == networkId) {
         WifiStaHalInterface::GetInstance().ClearDeviceConfig();
     }
@@ -570,7 +569,7 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (networkId == linkedInfo.networkId) {
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
@@ -630,7 +629,7 @@ ErrCode StaService::Disconnect() const
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
         WIFI_LOGI("The blocklist is updated.\n");
     }
@@ -725,7 +724,7 @@ ErrCode StaService::SetPowerMode(bool mode) const
 ErrCode StaService::SetTxPower(int power) const
 {
     LOGD("Enter SetTxPower, power=[%{public}d]!", power);
-    if (WifiStaHalInterface::GetInstance().SetTxPower(WifiSettings::GetInstance().GetStaIfaceName(), power)
+    if (WifiStaHalInterface::GetInstance().SetTxPower(WifiConfigCenter::GetInstance().GetStaIfaceName(), power)
         != WIFI_HAL_OPT_OK) {
         LOGE("SetTxPower() failed!");
         return WIFI_OPT_FAILED;

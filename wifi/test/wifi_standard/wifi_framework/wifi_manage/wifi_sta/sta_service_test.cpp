@@ -15,6 +15,7 @@
 #include "sta_service.h"
 #include <gtest/gtest.h>
 #include "mock_wifi_manager.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_sta_state_machine.h"
 #include "mock_wifi_sta_interface.h"
@@ -144,7 +145,8 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
-    EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(
+        Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsInitScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSameBssidScore(_)).Times(AtLeast(0));
@@ -155,9 +157,10 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSavedDeviceAppraisalPriority(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidChannels(_)).WillOnce(
+        DoAll(SetArgReferee<0>(temp), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), SetDefaultFrequenciesByCountryBand(_, _, _)).Times(AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillOnce(Return(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetValidChannels(_)).WillOnce(Return(0));
     std::vector<StaServiceCallback> callbacks;
     callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
     EXPECT_TRUE(pStaService->InitStaService(callbacks) == WIFI_OPT_SUCCESS);
@@ -179,7 +182,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigSuccess()
     config.keyMgmt = "123456";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -202,7 +205,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail1()
     config.ssid = "networkId";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -226,7 +229,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail2()
     config.ssid = "networkId";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -247,7 +250,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail3()
     config.ssid = "networkId";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -290,7 +293,7 @@ void StaServiceTest::StaServiceAddDeviceConfigSuccess()
     config.wifiEapConfig.privateKey = "//12302345//";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -314,7 +317,7 @@ void StaServiceTest::StaServiceAddDeviceConfigFail1()
     config.keyMgmt = "123456";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -338,7 +341,7 @@ void StaServiceTest::StaServiceAddDeviceConfigFail2()
     config.keyMgmt = "123456";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -359,7 +362,7 @@ void StaServiceTest::StaServiceAddDeviceConfigFail3()
     config.keyMgmt = "123456";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -379,7 +382,7 @@ void StaServiceTest::StaServiceUpdateDeviceConfigSuccess()
     config.keyMgmt = "12345678";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -469,7 +472,7 @@ void StaServiceTest::StaServiceDisableDeviceConfigFail1()
 
 void StaServiceTest::StaServiceDisconnectSuccess()
 {
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(1));
     EXPECT_TRUE(pStaService->Disconnect() == WIFI_OPT_SUCCESS);
 }
 
@@ -692,7 +695,7 @@ void StaServiceTest::StaServiceSetPowerModeTest()
 
 void StaServiceTest::StaServiceOnSystemAbilityChangedTest()
 {
-    EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(0)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(0)).Times(AtLeast(0));
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, false) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, true) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(1, true) == WIFI_OPT_SUCCESS);
@@ -834,7 +837,7 @@ void StaServiceTest::StartRoamToNetworkTest()
     config.ssid = "networkId";
     config.keyMgmt = "123456";
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
     pStaService->StartRoamToNetwork(0, "11:22:33:44");

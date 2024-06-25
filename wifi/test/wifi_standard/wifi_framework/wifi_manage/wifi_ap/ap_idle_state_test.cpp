@@ -18,6 +18,7 @@
 #include "ap_define.h"
 #include "ap_idle_state.h"
 #include "mock_pendant.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_ap_hal_interface.h"
 
@@ -36,7 +37,7 @@ public:
     virtual void SetUp()
     {
         const int SLEEP_TIEM = 20;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThreadStatusFlag(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetThreadStatusFlag(_)).Times(AtLeast(0));
 
         pMockPendant = new MockPendant();
 

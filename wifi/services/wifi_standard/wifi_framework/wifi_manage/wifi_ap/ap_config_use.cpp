@@ -27,7 +27,7 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_p2p_msg.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -114,7 +114,7 @@ std::vector<int> ApConfigUse::GetChannelFromDrvOrXmlByBand(const BandType &bandT
     }
     std::vector<int> freqs;
     WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand(
-        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(bandType), freqs);
+        WifiConfigCenter::GetInstance().GetApIfaceName(), static_cast<int>(bandType), freqs);
     if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(bandType, freqs);
         WIFI_LOGI("get freqs from drv fail, use default, bandType=%{public}d, size=%{public}d",
@@ -174,14 +174,14 @@ void ApConfigUse::Filter165Channel(std::vector<int> &channels) const
 void ApConfigUse::JudgeDbacWithP2p(HotspotConfig &apConfig) const
 {
     WifiP2pLinkedInfo p2pLinkedInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pLinkedInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pLinkedInfo);
  
     // When playing the go role on the local end, the P2P and AP channels must be consistent,
     // but the GC can be inconsistent. If consistency is required, the underlying layer will switch spontaneously.
     if (p2pLinkedInfo.GetConnectState() != P2pConnectedState::P2P_CONNECTED || !p2pLinkedInfo.IsGroupOwner()) {
         return;
     }
-    WifiP2pGroupInfo group = WifiSettings::GetInstance().GetCurrentP2pGroupInfo();
+    WifiP2pGroupInfo group = WifiConfigCenter::GetInstance().GetCurrentP2pGroupInfo();
     int p2pChannel = TransformFrequencyIntoChannel(group.GetFrequency());
     int apChannel = apConfig.GetChannel();
     if (IsChannelDbac(p2pChannel, apChannel) && TransformChannelToBand(p2pChannel) != BandType::BAND_NONE) {

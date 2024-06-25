@@ -26,7 +26,7 @@
 #include "app_mgr_constants.h"
 #include "define.h"
 #endif
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MANAGER_LOCK_MANAGER"
@@ -92,10 +92,10 @@ WifiProtectMode WifiProtectManager::GetNearlyProtectMode()
 {
 #ifndef OHOS_ARCH_LITE
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     mWifiConnected = (linkedInfo.connState == ConnState::CONNECTED) ? true : false;
 
-    int screenState = WifiSettings::GetInstance().GetScreenState();
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     mScreenOn = (screenState == MODE_STATE_OPEN || screenState == MODE_STATE_DEFAULT) ? true : false;
     int foregroudCount = GetFgLowlatyProtectCount();
     LOGD("%{public}s mWifiConnected: %{public}d, mScreenOn: %{public}d,"

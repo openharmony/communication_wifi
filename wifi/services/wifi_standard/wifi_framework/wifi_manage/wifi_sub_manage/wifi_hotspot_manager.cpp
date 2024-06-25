@@ -85,7 +85,7 @@ void WifiHotspotManager::CloseApService(int id)
     WIFI_LOGI("close %{public}d ap service", id);
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
     WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
-    WifiSettings::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);
+    WifiConfigCenter::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);
     auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->SendMessage(CMD_AP_STOPPED, id);
     WifiEventCallbackMsg cbMsg;

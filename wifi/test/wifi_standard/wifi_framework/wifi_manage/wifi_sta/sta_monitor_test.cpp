@@ -15,6 +15,7 @@
 #include "sta_monitor.h"
 #include <gtest/gtest.h>
 #include "mock_sta_state_machine.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_sta_interface.h"
 #include <string>
@@ -122,7 +123,7 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess1()
     std::string bssid = "01:23:45:67:89:AB";
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::DISCONNECTED;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .Times(AtLeast(0))
         .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
@@ -135,7 +136,7 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess2()
     std::string bssid = "01:23:45:67:89:AB";
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::DISCONNECTED;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .Times(AtLeast(0))
         .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
@@ -148,7 +149,7 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess3()
     std::string bssid = "01:23:45:67:89:AB";
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::DISCONNECTED;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .Times(AtLeast(0))
         .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
@@ -258,7 +259,7 @@ void StaMonitorTest::OnBssidChangedCallBackFail1()
     std::string bssid = "01:23:45:67:89:AB";
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::DISCONNECTED;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .Times(AtLeast(0))
         .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaMonitor->OnBssidChangedCallBack(reason, bssid);
@@ -271,7 +272,7 @@ void StaMonitorTest::OnBssidChangedCallBackFail2()
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::CONNECTED;
     linkedInfo.bssid = "01:23:45:67:89:AB";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .Times(AtLeast(0))
         .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaMonitor->OnBssidChangedCallBack(reason, bssid);

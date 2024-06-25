@@ -15,7 +15,7 @@
 
 #include <iostream>
 #include "wifi_scorer_impl.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "network_status_history_manager.h"
 #include "wifi_logger.h"
 
@@ -96,10 +96,10 @@ double ThroughputScorer::GetSavedNetworkAward(NetworkCandidate &networkCandidate
 
 bool ThroughputScorer::IsRecentUserSelected(NetworkCandidate &networkCandidate) const
 {
-    auto userLastSelectedNetworkId = WifiSettings::GetInstance().GetUserLastSelectedNetworkId();
+    auto userLastSelectedNetworkId = WifiConfigCenter::GetInstance().GetUserLastSelectedNetworkId();
     if (userLastSelectedNetworkId != INVALID_NETWORK_ID
         && userLastSelectedNetworkId == networkCandidate.wifiDeviceConfig.networkId) {
-        time_t userLastSelectedNetworkTimeVal = WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal();
+        time_t userLastSelectedNetworkTimeVal = WifiConfigCenter::GetInstance().GetUserLastSelectedNetworkTimeVal();
         auto now = time(nullptr);
         if (now < 0) {
             WIFI_LOGW("time return invalid!\n.");

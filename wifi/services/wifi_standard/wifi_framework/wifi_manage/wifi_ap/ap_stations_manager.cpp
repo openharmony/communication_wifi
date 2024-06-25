@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include "ap_service.h"
 #include "wifi_log.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_ap_hal_interface.h"
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
@@ -52,7 +52,7 @@ bool ApStationsManager::DelBlockList(const StationInfo &staInfo) const
 
 bool ApStationsManager::AddAssociationStation(const StationInfo &staInfo) const
 {
-    if (WifiSettings::GetInstance().ManageStation(staInfo, MODE_ADD, m_id)) {
+    if (WifiConfigCenter::GetInstance().ManageStation(staInfo, MODE_ADD, m_id)) {
         WIFI_LOGE("Instance is %{public}d failed add station.", m_id);
         return false;
     }
@@ -61,7 +61,7 @@ bool ApStationsManager::AddAssociationStation(const StationInfo &staInfo) const
 
 bool ApStationsManager::DelAssociationStation(const StationInfo &staInfo) const
 {
-    if (WifiSettings::GetInstance().ManageStation(staInfo, MODE_DEL, m_id)) {
+    if (WifiConfigCenter::GetInstance().ManageStation(staInfo, MODE_DEL, m_id)) {
         WIFI_LOGE("Instance is %{public}d failed to del station.", m_id);
         return false;
     }
@@ -91,7 +91,7 @@ void ApStationsManager::StationLeave(const std::string &mac) const
 {
     StationInfo staInfo;
     std::vector<StationInfo> results;
-    if (WifiSettings::GetInstance().GetStationList(results, m_id)) {
+    if (WifiConfigCenter::GetInstance().GetStationList(results, m_id)) {
         WIFI_LOGE("Instance is %{public}d failed to GetStationList.", m_id);
         return;
     }
@@ -116,7 +116,7 @@ void ApStationsManager::StationJoin(const StationInfo &staInfo) const
 {
     StationInfo staInfoTemp = staInfo;
     std::vector<StationInfo> results;
-    if (WifiSettings::GetInstance().GetStationList(results, m_id)) {
+    if (WifiConfigCenter::GetInstance().GetStationList(results, m_id)) {
         WIFI_LOGE("Instance is %{public}d failed to GetStationList.", m_id);
         return;
     }

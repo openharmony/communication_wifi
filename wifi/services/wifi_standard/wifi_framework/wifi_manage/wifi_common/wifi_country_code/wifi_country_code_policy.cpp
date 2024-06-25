@@ -26,7 +26,7 @@
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -213,7 +213,7 @@ bool WifiCountryCodePolicy::IsContainBssid(const std::vector<std::string> &bssid
 ErrCode WifiCountryCodePolicy::StatisticCountryCodeFromScanResult(std::string &wifiCountryCode)
 {
     std::vector<WifiScanInfo> results;
-    WifiSettings::GetInstance().GetScanInfoList(results);
+    WifiConfigCenter::GetInstance().GetScanInfoList(results);
     if (results.size() == 0) {
         WIFI_LOGI("get scanResult size is 0");
         return WIFI_OPT_FAILED;
@@ -303,12 +303,12 @@ ErrCode WifiCountryCodePolicy::ParseCountryCodeElement(
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByAP(std::string &wifiCountryCode)
 {
     WifiLinkedInfo result;
-    WifiSettings::GetInstance().GetLinkedInfo(result);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(result);
     if (static_cast<int>(OHOS::Wifi::ConnState::CONNECTED) != result.connState) {
         return WIFI_OPT_FAILED;
     }
     std::vector<WifiScanInfo> scanResults;
-    WifiSettings::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
     if (scanResults.empty()) {
         return WIFI_OPT_FAILED;
     }
@@ -326,7 +326,7 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByAP(std::string &wifiCountryCo
 ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByScanResult(std::string &wifiCountryCode)
 {
     // if wifi state is not ENABLED, do not obtain the country code from the scan results
-    if (WifiSettings::GetInstance().GetWifiState(SLOT_ID) != static_cast<int>(WifiState::ENABLED) ||
+    if (WifiConfigCenter::GetInstance().GetWifiState(SLOT_ID) != static_cast<int>(WifiState::ENABLED) ||
         m_wifiCountryCodeFromScanResults.empty()) {
         return WIFI_OPT_FAILED;
     }

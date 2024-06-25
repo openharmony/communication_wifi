@@ -25,7 +25,7 @@
 #include "wifi_log.h"
 #include "sta_interface.h"
 #include "sta_auto_connect_service.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "sta_service.h"
 #include "wifi_internal_msg.h"
 #include <mutex>
@@ -193,7 +193,7 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     std::vector<std::string> blocklistBssids;
     blocklistBssids.push_back(std::string(reinterpret_cast<const char*>(data), size));
     WifiSettings::GetInstance().AddDeviceConfig(config);
-    WifiSettings::GetInstance().SaveLinkedInfo(info);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(info);
     pStaAutoConnectService->IsAllowAutoJoin();
     pStaAutoConnectService->DeregisterAutoJoinCondition(conditionName);
     pStaAutoConnectService->EnableAutoJoin(conditionName);

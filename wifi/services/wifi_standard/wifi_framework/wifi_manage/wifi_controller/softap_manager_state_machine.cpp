@@ -48,7 +48,7 @@ SoftapManagerMachine::~SoftapManagerMachine()
     if (!ifaceName.empty()) {
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveApIface(ifaceName);
         ifaceName.clear();
-        WifiSettings::GetInstance().SetApIfaceName("");
+        WifiConfigCenter::GetInstance().SetApIfaceName("");
     }
 #endif
 }
@@ -273,7 +273,7 @@ ErrCode SoftapManagerMachine::AutoStartApService(int id)
         WIFI_LOGE("AutoStartApService, create iface failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiSettings::GetInstance().SetApIfaceName(ifaceName);
+    WifiConfigCenter::GetInstance().SetApIfaceName(ifaceName);
 #endif
     if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0)) {
         WIFI_LOGE("AutoStartApService, set ap mid state opening failed!");
@@ -329,7 +329,7 @@ void SoftapManagerMachine::IfaceDestoryCallback(std::string &destoryIfaceName, i
         destoryIfaceName.c_str(), createIfaceType);
     if (destoryIfaceName == ifaceName) {
         ifaceName.clear();
-        WifiSettings::GetInstance().SetApIfaceName("");
+        WifiConfigCenter::GetInstance().SetApIfaceName("");
     }
 
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();

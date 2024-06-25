@@ -100,10 +100,10 @@ int WifiManager::Init()
     }
     mInitStatus = INIT_OK;
 
-    int lastState = WifiConfigCenter::GetInstance().GetStaLastRunState();
+    int lastState = WifiSettings::GetInstance().GetStaLastRunState();
     if (lastState != WIFI_STATE_DISABLED) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
-        WifiSettings::GetInstance().SetWifiToggledState(lastState);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(lastState);
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();
@@ -317,7 +317,7 @@ void WifiManager::InstallPacketFilterProgram(int event, int instId)
     }
     // get number ip and net mask
     IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, instId);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, instId);
     if (ipInfo.ipAddress == 0 || ipInfo.netmask == 0) {
         WIFI_LOGW("%{public}s cannot get device ip address", __FUNCTION__);
     }

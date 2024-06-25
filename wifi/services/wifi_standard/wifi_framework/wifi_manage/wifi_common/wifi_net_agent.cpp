@@ -24,7 +24,7 @@
 #include "system_ability_definition.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "ipv6_address.h"
 
 DEFINE_WIFILOG_LABEL("WifiNetAgent");
@@ -213,7 +213,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
             WifiLinkedInfo linkedInfo;
-            WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+            WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
             if (linkedInfo.connState == ConnState::CONNECTED) {
 #ifndef OHOS_ARCH_LITE
                 if (supplierInfo != nullptr) {
@@ -222,9 +222,9 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
                 }
 #endif
                 IpInfo wifiIpInfo;
-                WifiSettings::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
+                WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
                 IpV6Info wifiIpV6Info;
-                WifiSettings::GetInstance().GetIpv6Info(wifiIpV6Info, m_instId);
+                WifiConfigCenter::GetInstance().GetIpv6Info(wifiIpV6Info, m_instId);
                 WifiDeviceConfig config;
                 WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, m_instId);
@@ -236,7 +236,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
 void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
     IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId)
 {
-    netLinkInfo->ifaceName_ = WifiSettings::GetInstance().GetStaIfaceName();
+    netLinkInfo->ifaceName_ = WifiConfigCenter::GetInstance().GetStaIfaceName();
 
     SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);

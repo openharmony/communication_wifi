@@ -227,7 +227,7 @@ ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    bOpen = WifiConfigCenter::GetInstance().IsScanAlwaysActive();
+    bOpen = WifiSettings::GetInstance().GetScanAlwaysState();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -260,7 +260,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
                 macAddrInfo.bssid = iter->bssid;
                 macAddrInfo.bssidType = iter->bssidType;
                 std::string randomMacAddr =
-                    WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+                    WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                         macAddrInfo);
                 WIFI_LOGD("ssid:%{private}s, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
                     iter->ssid.c_str(), macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
@@ -394,9 +394,9 @@ void WifiScanServiceImpl::UpdateScanMode()
 {
     int uid = GetCallingUid();
     if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
-            WifiSettings::GetInstance().SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
+            WifiConfigCenter::GetInstance().SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
         } else {
-            WifiSettings::GetInstance().SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
+            WifiConfigCenter::GetInstance().SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
         }
 }
 #endif

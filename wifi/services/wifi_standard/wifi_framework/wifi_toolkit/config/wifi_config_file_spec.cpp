@@ -1414,6 +1414,8 @@ template <> void ClearTClass<WifiStoreRandomMac>(WifiStoreRandomMac &item)
     item.keyMgmt.clear();
     item.peerBssid.clear();
     item.randomMac.clear();
+    item.preSharedKey.clear();
+    item.fuzzyBssids.clear();
     return;
 }
 

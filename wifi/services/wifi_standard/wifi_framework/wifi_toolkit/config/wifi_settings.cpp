@@ -1757,6 +1757,10 @@ static bool isPskEncryption(const std::string keyMgmt)
 bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
+    if (randomMacInfo.randomMac.empty()) {
+        LOGE("%{public}s failed randomMac is empty.", __func__);
+        return false;
+    }
     bool isAdded = false;
     std::string fuzzyBssid = "";
     if (isPskEncryption(randomMacInfo.keyMgmt)) {
@@ -1809,6 +1813,9 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
     }
 
     for (auto &item : mWifiStoreRandomMac) {
+        if (item.randomMac.empty()) {
+            continue;
+        }
         if (isPskEncryption(item.keyMgmt)) {
             std::vector<std::string> fuzzyBssids = item.fuzzyBssids;
             if (std::find(fuzzyBssids.begin(), fuzzyBssids.end(), fuzzyBssid) != fuzzyBssids.end()) {

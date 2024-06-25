@@ -90,18 +90,30 @@ void ScanMonitor::ProcessReceiveScanEvent(int result)
 
 void ScanMonitor::SendScanInfoEvent()
 {
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
     pScanStateMachine->SendMessage(static_cast<int>(SCAN_RESULT_EVENT));
     return;
 }
 
 void ScanMonitor::SendPnoScanInfoEvent()
 {
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
     pScanStateMachine->SendMessage(static_cast<int>(PNO_SCAN_RESULT_EVENT));
     return;
 }
 
 void ScanMonitor::SendScanFailedEvent()
 {
+    if (pScanStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
     pScanStateMachine->SendMessage(static_cast<int>(SCAN_FAILED_EVENT));
     return;
 }

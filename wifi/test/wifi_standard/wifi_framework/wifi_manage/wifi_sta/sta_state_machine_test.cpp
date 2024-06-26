@@ -1962,14 +1962,14 @@ public:
     void GetGsmAuthResponseWithLengthTest()
     {
         EapSimGsmAuthParam param;
-        param.rands.push_back("11111");
+        param.rands.push_back("aaaaa");
         pStaStateMachine->GetGsmAuthResponseWithLength(param);
     }
 
     void GetGsmAuthResponseWithoutLengthTest()
     {
         EapSimGsmAuthParam param;
-        param.rands.push_back("11111");
+        param.rands.push_back("aaaaa");
         pStaStateMachine->GetGsmAuthResponseWithoutLength(param);
     }
 
@@ -1981,8 +1981,8 @@ public:
     void FillUmtsAuthReqTest()
     {
         EapSimUmtsAuthParam param;
-        param.rand ="11111";
-        param.autn = "22222";
+        param.rand ="aaaaa";
+        param.autn = "bbbbb";
         pStaStateMachine->FillUmtsAuthReq(param);
     }
     void ParseAndFillUmtsAuthParamTest()
@@ -2008,12 +2008,13 @@ public:
         InternalMessage msg1;
         msg1.SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT);
         EapSimGsmAuthParam param;
+        param.rands.push_back("11111");
         msg1.SetMessageObj(param);
         pStaStateMachine->DealWpaEapSimAuthEvent(&msg1);
         InternalMessage msg2;
         msg2.SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT);
         msg2.SetMessageObj(param);
-        pStaStateMachine->DealWpaEapSimAuthEvent(&msg1);
+        pStaStateMachine->DealWpaEapSimAuthEvent(&msg2);
     }
     void HandlePortalNetworkPorcessTests()
     {

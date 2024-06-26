@@ -1827,7 +1827,7 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
             continue;
         }
         if (IsPskEncryption(item.keyMgmt)) {
-            if (item.fuzzyBssids.find(fuzzyBssid) != fuzzyBssids.end()) {
+            if (item.fuzzyBssids.find(fuzzyBssid) != item.fuzzyBssids.end()) {
                 LOGI("GetStaRandomMac fuzzyBssids contains fuzzyBssid:%{public}s",
                     MacAnonymize(fuzzyBssid).c_str());
                 randomMacInfo.randomMac = item.randomMac;

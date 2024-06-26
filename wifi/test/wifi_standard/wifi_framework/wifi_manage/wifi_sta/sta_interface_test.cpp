@@ -361,18 +361,6 @@ public:
         EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->ReConnect() == WIFI_OPT_FAILED);
     }
-
-    void StartHttpDetectSucc()
-    {
-        EXPECT_CALL(*pMockStaService, StartHttpDetect()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->StartHttpDetect() == WIFI_OPT_SUCCESS);
-    }
-
-    void StartHttpDetectFail()
-    {
-        EXPECT_CALL(*pMockStaService, StartHttpDetect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->StartHttpDetect() == WIFI_OPT_SUCCESS);
-    }
     
     void EnableHiLinkHandshakeSuceess()
     {
@@ -640,16 +628,6 @@ HWTEST_F(StaInterfaceTest, ReConnectSuceess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, ReConnectFail, TestSize.Level1)
 {
     ReConnectFail();
-}
-
-HWTEST_F(StaInterfaceTest, StartHttpDetectSucc, TestSize.Level1)
-{
-    StartHttpDetectSucc();
-}
-
-HWTEST_F(StaInterfaceTest, StartHttpDetectFail, TestSize.Level1)
-{
-    StartHttpDetectFail();
 }
 
 HWTEST_F(StaInterfaceTest, OnScreenStateChangedSuccess1, TestSize.Level1)

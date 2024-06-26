@@ -56,6 +56,7 @@ SelfCureStateMachine::SelfCureStateMachine(int instId)
       pNoInternetState(nullptr),
       m_instId(instId)
 {
+    mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
 }
 
 SelfCureStateMachine::~SelfCureStateMachine()
@@ -433,7 +434,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
         }
     }
     pSelfCureStateMachine->selfCureOnGoing = true;
-    if (pSelfCureStateMachine->IsHttpReachable()) {
+    if (pSelfCureStateMachine->mIsHttpReachable) {
         pSelfCureStateMachine->selfCureOnGoing = false;
         pSelfCureStateMachine->noTcpRxCounter = 0;
         return;
@@ -679,8 +680,6 @@ int SelfCureStateMachine::InternetSelfCureState::InitSelfCureIssHandleMap()
     &SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete;
     selfCureIssHandleFuncMap[WIFI_CURE_CMD_MULTI_GATEWAY] =
     &SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway;
-    selfCureIssHandleFuncMap[WIFI_CURE_CMD_MULTI_GATEWAY_RESULT] =
-    &SelfCureStateMachine::InternetSelfCureState::MultiGatewaySelfcureResult;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -992,26 +991,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
 
     std::string ifaceName = WifiSettings::GetInstance().GetStaIfaceName();
     pMultiGateway->SetStaticArp(ifaceName, ipAddr, macString);
-    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(pSelfCureStateMachine->m_instId);
-    if (pStaService == nullptr) {
-        WIFI_LOGE("SelfcureForMultiGateway pStaService is null");
-        return;
-    }
-    WIFI_LOGI("SelfcureForMultiGateway start http detect");
-    pStaService->StartHttpDetect();
-    pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_MULTI_GATEWAY_RESULT, HTTP_DETECT_TIMEOUT);
-}
-
-void SelfCureStateMachine::InternetSelfCureState::MultiGatewaySelfcureResult(InternalMessage *msg)
-{
-    WIFI_LOGI("MultiGatewaySelfcureResult enter");
-    auto pMultiGateway = DelayedSingleton<MultiGateway>::GetInstance();
-    if (pMultiGateway == nullptr) {
-        WIFI_LOGE("pMultiGateway is nullptr");
-        pSelfCureStateMachine->selfCureOnGoing = false;
-        return;
-    }
-
     if (!pSelfCureStateMachine->IsHttpReachable()) {
         std::string ifaceName = WifiSettings::GetInstance().GetStaIfaceName();
         std::string ipAddr = pMultiGateway->GetGatewayIp();
@@ -1657,6 +1636,7 @@ void SelfCureStateMachine::AgeOutWifi6Black(std::map<std::string, Wifi6BlackList
 
 void SelfCureStateMachine::SetHttpMonitorStatus(bool isHttpReachable)
 {
+    m_httpDetectResponse = true;
     mIsHttpReachable = isHttpReachable;
 }
 
@@ -1671,6 +1651,22 @@ int SelfCureStateMachine::GetCurSignalLevel()
 
 bool SelfCureStateMachine::IsHttpReachable()
 {
+    WIFI_LOGI("IsHttpReachable network detect start");
+    m_httpDetectResponse = false;
+    if (mNetWorkDetect == nullptr) {
+        WIFI_LOGI("mNetWorkDetect");
+        return mIsHttpReachable;
+    }
+    mNetWorkDetect->StartWifiDetection();
+    int64_t timeOut = GetNowMilliSeconds() + HTTP_DETECT_TIMEOUT;
+    while (timeOut > GetNowMilliSeconds()) {
+        if (m_httpDetectResponse) {
+            m_httpDetectResponse = false;
+            break;
+        }
+        usleep(HTTP_DETECT_USLEEP_TIME);
+    }
+    WIFI_LOGI("IsHttpReachable network detect end");
     return mIsHttpReachable;
 }
 

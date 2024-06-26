@@ -118,12 +118,10 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->EnableAutoJoin(conditionName);
     pStaInterface->StartPortalCertification();
     pStaInterface->EnableHiLinkHandshake(config, conditionName);
-    pStaInterface->StartHttpDetect();
     pStaInterface->SetTxPower(uid);
     pStaInterface->DeregisterFilterBuilder(filterTag, conditionName);
     pStaService->UpdateEapConfig(config, config.wifiEapConfig);
     pStaService->RemoveCandidateConfig(uid, networkId);
-    pStaService->StartHttpDetect();
     pStaService->FindDeviceConfig(config, config);
     pStaService->OnSystemAbilityChanged(networkId, attemptEnable);
     pStaService->NotifyDeviceConfigChange(value);

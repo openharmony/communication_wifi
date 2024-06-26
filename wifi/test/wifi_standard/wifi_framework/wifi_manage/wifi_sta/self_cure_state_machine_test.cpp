@@ -1462,6 +1462,14 @@ public:
         msg.SetMessageName(WIFI_CURE_CMD_HTTP_REACHABLE_RCV);
         EXPECT_TRUE(pSelfCureStateMachine->pNoInternetState->ExecuteStateMsg(&msg));
     }
+
+    void IsHttpReachableTest()
+    {
+        LOGI("Enter IsHttpReachableTest");
+        pSelfCureStateMachine->IsHttpReachable();
+        pSelfCureStateMachine->mNetWorkDetect = nullptr;
+        EXPECT_TRUE(pSelfCureStateMachine->IsHttpReachable() == false);
+    }
 };
 
 HWTEST_F(SelfCureStateMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
@@ -2804,5 +2812,9 @@ HWTEST_F(SelfCureStateMachineTest, IsEncryptedAuthTypeTest, TestSize.Level1)
     pSelfCureStateMachine->IsEncryptedAuthType(authType);
 }
 
+HWTEST_F(SelfCureStateMachineTest, IsHttpReachableTest, TestSize.Level1)
+{
+    IsHttpReachableTest();
+}
 } // namespace Wifi
 } // namespace OHOS

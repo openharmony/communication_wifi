@@ -1734,7 +1734,7 @@ int WifiSettings::ReloadStaRandomMac()
             item.version = 0;
         }
         mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
-        mSavedWifiStoreRandomMac.SaveConfig()
+        mSavedWifiStoreRandomMac.SaveConfig();
     }
     return 0;
 }

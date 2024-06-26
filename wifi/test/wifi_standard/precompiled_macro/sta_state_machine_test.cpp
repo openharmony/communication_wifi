@@ -44,6 +44,7 @@ errno_t strcpy_s(char *strDest, size_t destMax, const char *strSrc)
     return 1;
 }
 
+
 namespace OHOS {
 namespace Wifi {
 static const std::string RANDOMMAC_SSID = "testwifi";

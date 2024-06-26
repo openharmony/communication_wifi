@@ -497,5 +497,6 @@ HWTEST_F(ApStartedState_test, ProcessCmdUpdateCountryCodeTest, TestSize.Level1)
     msg->AddStringMessageBody(countryCode);
     pApStartedState->ProcessCmdUpdateCountryCode(*msg);
 }
+
 } // namespace Wifi
 } // namespace OHOS

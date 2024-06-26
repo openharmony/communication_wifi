@@ -18,6 +18,7 @@
 #include "operator_overload.h"
 #include "mock_wifi_ap_hal_interface.h"
 
+
 using namespace OHOS;
 using ::testing::_;
 using ::testing::An;

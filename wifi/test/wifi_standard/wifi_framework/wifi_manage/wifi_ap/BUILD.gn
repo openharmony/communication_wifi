@@ -114,6 +114,7 @@ ohos_unittest("WifiApServiceTest") {
   ]
   external_deps = [
     "c_utils:utils",
+    
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "libxml2:libxml2",

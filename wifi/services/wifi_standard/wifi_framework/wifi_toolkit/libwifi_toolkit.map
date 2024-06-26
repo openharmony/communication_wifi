@@ -32,6 +32,7 @@
         "*Ipv6Address*";
         "*IsAllowScanAnyTime*";
         "*IsChannelDbac*";
+        "*IsPskEncryption*";
         "*IsExistAddressForInterface*";
         "*IsFreqDbac*";
         "*IsValid24GChannel*";

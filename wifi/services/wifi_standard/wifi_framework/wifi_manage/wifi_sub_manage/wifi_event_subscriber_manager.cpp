@@ -27,6 +27,7 @@
 #include "wifi_common_util.h"
 #include "wifi_settings.h"
 #include "wifi_notification_util.h"
+#include "wifi_app_state_aware.h"
 #ifdef HAS_MOVEMENT_PART
 #include "wifi_msdp_state_listener.h"
 #endif
@@ -161,6 +162,16 @@ void WifiEventSubscriberManager::UnRegisterCesEvent()
     WIFI_LOGI("UnRegisterCesEvent finished");
 }
 
+void WifiEventSubscriberManager::HandleAppMgrServiceChange(bool add)
+{
+    WIFI_LOGI("%{public}s enter, add flag: %{public}d", __FUNCTION__, add);
+    if (add) {
+        WifiAppStateAware::GetInstance().RegisterAppStateObserver();
+    } else {
+        WifiAppStateAware::GetInstance().UnSubscribeAppState();
+    }
+}
+
 void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbilityId, bool add)
 {
     if (!add) {
@@ -222,7 +233,11 @@ void WifiEventSubscriberManager::HandlP2pBusinessChange(int systemAbilityId, boo
 
 void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
 {
+    WIFI_LOGI("%{public}s enter, systemAbilityId: %{public}d", __FUNCTION__, systemAbilityId);
     switch (systemAbilityId) {
+        case APP_MGR_SERVICE_ID:
+            HandleAppMgrServiceChange(add);
+            break;
         case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
             HandleCommNetConnManagerSysChange(systemAbilityId, add);
             break;
@@ -414,6 +429,7 @@ void WifiEventSubscriberManager::DelayedAccessDataShare()
 
 void WifiEventSubscriberManager::InitSubscribeListener()
 {
+    SubscribeSystemAbility(APP_MGR_SERVICE_ID);
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
     SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
 #ifdef HAS_MOVEMENT_PART

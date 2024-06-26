@@ -1727,8 +1727,7 @@ int WifiSettings::ReloadStaRandomMac()
             break;
         }
     }
-    LOGI("%{public}s shouldReset:%{public}s size:%{public}lu",
-        __func__, shouldReset ? "true" : "false", mWifiStoreRandomMac.size());
+    LOGI("%{public}s shouldReset:%{public}s", __func__, shouldReset ? "true" : "false");
     if (shouldReset) {
         for (auto &item: mWifiStoreRandomMac) {
             item.version = 0;

@@ -465,6 +465,14 @@ void ConvertDecStrToHexStr(const std::string &inData, std::string &outData);
  */
 void SplitStringBySubstring(const std::string &inData, std::string &outData, const std::string &subBegin,
     const std::string &subEnd);
+
+/**
+ * @Description check the keyMgmnt is Psk
+ *
+ * @param keyMgmt - in data
+ * @return true - isPsk
+ */
+bool IsPskEncryption(const std::string &keyMgmt);
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

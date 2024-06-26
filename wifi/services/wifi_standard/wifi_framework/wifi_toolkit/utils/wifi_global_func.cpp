@@ -232,6 +232,11 @@ void SplitString(const std::string &str, const std::string &split, std::vector<s
     return;
 }
 
+bool IsPskEncryption(const std::string &keyMgmt)
+{
+    return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
+}
+
 std::string Vec2Stream(const std::string &prefix, const std::vector<char> &vecChar, const std::string &sufffix)
 {
     std::ostringstream ss;

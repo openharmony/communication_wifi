@@ -66,6 +66,10 @@ public:
     virtual WifiP2pGroupInfo GetCurrentP2pGroupInfo() = 0;
     virtual int GetIpInfo(IpInfo &info, int instId = 0) = 0;
     virtual std::string GetApIfaceName() = 0;
+    virtual int GetHotspotIdleTimeout() const = 0;
+    virtual int SetHotspotIdleTimeout(int time) = 0;
+    virtual void GenerateRandomMacAddress(std::string &randomMacAddr) = 0;
+    virtual void GenerateRandomMacAddress(std::string peerBssid, std::string &randomMacAddr) = 0;
     
 };
 
@@ -103,6 +107,10 @@ public:
     MOCK_METHOD0(GetCurrentP2pGroupInfo, WifiP2pGroupInfo());
     MOCK_METHOD2(GetIpInfo, int(IpInfo &info, int));
     MOCK_METHOD0(GetApIfaceName, std::string());
+    MOCK_CONST_METHOD0(GetHotspotIdleTimeout, int());
+    MOCK_METHOD1(SetHotspotIdleTimeout, int(int));
+    MOCK_METHOD1(GenerateRandomMacAddress, void(std::string &randomMacAddr));
+    MOCK_METHOD2(GenerateRandomMacAddress, void(std::string peerBssid, std::string &randomMacAddr));
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

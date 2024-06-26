@@ -176,6 +176,7 @@ HWTEST_F(WifiSettingsTest, AddRandomMacTest2, TestSize.Level1)
     WifiStoreRandomMac randomMacInfo;
     randomMacInfo.ssid = "wifitest1";
     randomMacInfo.keyMgmt = "keyMgmt";
+    randomMacInfo.randomMac = "00:11:22:33:44:55";
     WifiSettings::GetInstance().mWifiStoreRandomMac.push_back(randomMacInfo);
     bool result = WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
     WIFI_LOGE("AddRandomMacTest result(%{public}d)", result);

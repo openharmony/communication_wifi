@@ -332,7 +332,6 @@ struct WifiStoreRandomMac {
     std::string peerBssid;
     std::string randomMac;
     std::string preSharedKey;
-    std::vector<std::string> fuzzyBssids;
     std::unordered_set<std::string> fuzzyBssids;
 };
 

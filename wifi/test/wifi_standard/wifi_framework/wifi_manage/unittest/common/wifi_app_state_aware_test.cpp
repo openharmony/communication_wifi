@@ -101,7 +101,7 @@ HWTEST_F(WifiAppStateAwareTest, UpdateCurForegroundAppInfo_RemoveForegroundApp, 
     historyAppStateData.uid = 1;
     historyAppStateData.state = static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
     appStateDataList.push_back(historyAppStateData);
-    WifiAppStateAware::GetInstance().curForegroundApps_ = appStateDataList
+    WifiAppStateAware::GetInstance().curForegroundApps_ = appStateDataList;
     bool ret = WifiAppStateAware::GetInstance().UpdateCurForegroundAppInfo(changeAppStateData);
     EXPECT_EQ(WifiAppStateAware::GetInstance().curForegroundApps_.size(), 0);
     EXPECT_TRUE(ret);
@@ -118,7 +118,7 @@ HWTEST_F(WifiAppStateAwareTest, UpdateCurForegroundAppInfo_NoNeedUpdate, TestSiz
     historyAppStateData.uid = 1;
     historyAppStateData.state = static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
     appStateDataList.push_back(historyAppStateData);
-    WifiAppStateAware::GetInstance().curForegroundApps_ = appStateDataList
+    WifiAppStateAware::GetInstance().curForegroundApps_ = appStateDataList;
     bool ret = WifiAppStateAware::GetInstance().UpdateCurForegroundAppInfo(changeAppStateData);
     EXPECT_EQ(WifiAppStateAware::GetInstance().curForegroundApps_.size(), 1);
     EXPECT_FALSE(ret);

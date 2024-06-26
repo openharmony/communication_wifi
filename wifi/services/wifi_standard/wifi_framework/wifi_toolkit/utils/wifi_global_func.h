@@ -435,6 +435,14 @@ bool IsFreqDbac(int freqA, int freqB);
  */
 bool IsChannelDbac(int channelA, int channelB);
 
+/**
+ * @Description check the keyMgmnt is Psk
+ *
+ * @param keyMgmt - in data
+ * @return true - isPsk
+ */
+bool IsPskEncryption(const std::string &keyMgmt);
+
 #ifndef OHOS_ARCH_LITE
 /**
  * @Description Parse json string, find key by type, get value by key
@@ -465,14 +473,6 @@ void ConvertDecStrToHexStr(const std::string &inData, std::string &outData);
  */
 void SplitStringBySubstring(const std::string &inData, std::string &outData, const std::string &subBegin,
     const std::string &subEnd);
-
-/**
- * @Description check the keyMgmnt is Psk
- *
- * @param keyMgmt - in data
- * @return true - isPsk
- */
-bool IsPskEncryption(const std::string &keyMgmt);
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

@@ -17,7 +17,7 @@
 #include "ap_monitor.h"
 #include "operator_overload.h"
 #include "mock_wifi_ap_hal_interface.h"
-
+#include "Mock/mock_wifi_settings.h"
 
 using namespace OHOS;
 using ::testing::_;
@@ -47,6 +47,7 @@ public:
     virtual void SetUp()
     {
         pApMonitor = new ApMonitor();
+        EXPECT_CALL(WifiSettings::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("ap"));
     }
     virtual void TearDown()
     {

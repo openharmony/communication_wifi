@@ -23,7 +23,6 @@ config("module_private_config") {
   ]
 }
 
-
 ohos_unittest("toolkit_unittest") {
   module_out_path = module_output_path
   sources = [
@@ -49,6 +48,8 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_encryption_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/xml_parser.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_cert_utils.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ipv6_address.cpp",
     "../../wifi_manage/wifi_sta/Mock/mock_dhcp_service.cpp",
     "arp_checker_test.cpp",
     "base_address_test.cpp",
@@ -106,7 +107,6 @@ ohos_unittest("toolkit_unittest") {
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -118,6 +118,7 @@ ohos_unittest("toolkit_unittest") {
   ]
   external_deps = [
     "c_utils:utils",
+    "certificate_manager:cert_manager_sdk",
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",
     "hilog:libhilog",

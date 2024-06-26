@@ -194,5 +194,21 @@ HWTEST_F(BlockConnectServiceTest, isFrequentDisconnect_ReturnsFalseWhenFrequentD
     result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason);
     EXPECT_EQ(result, true);
 }
+
+HWTEST_F(BlockConnectServiceTest, IsWrongPassword_ReturnsTrueWhenBlockedDueToWrongPassword, TestSize.Level1)
+{
+    // Test logic here
+    int targetNetworkId = 1;
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    config.numAssociation = 0;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    bool result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
+    EXPECT_EQ(result, true);
+    config.numAssociation = 1;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
+    EXPECT_EQ(result, false);
+}
 }
 }

@@ -244,57 +244,66 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     return WIFI_OPT_SUCCESS;
 }
 
+static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, int &dataRecvLen) {
+    info.bssid = tokens[dataRecvLen++];
+    info.ssid = tokens[dataRecvLen++];
+    info.bssidType = std::stoi(tokens[dataRecvLen++]);
+    info.capabilities = tokens[dataRecvLen++];
+    info.frequency = std::stoi(tokens[dataRecvLen++]);
+    info.band = std::stoi(tokens[dataRecvLen++]);
+    info.channelWidth = static_cast<WifiChannelWidth>(std::stoi(tokens[dataRecvLen++]));
+    info.centerFrequency0 = std::stoi(tokens[dataRecvLen++]);
+    info.centerFrequency1 = std::stoi(tokens[dataRecvLen++]);
+    info.rssi = std::stoi(tokens[dataRecvLen++]);
+    info.securityType = static_cast<WifiSecurity>(std::stoi(tokens[dataRecvLen++]));
+    size_t numInfoElems = std::stoul(tokens[dataRecvLen++]);
+    for (size_t i = 0; i < numInfoElems; i++) {
+        WifiInfoElem elem;
+        elem.id = std::stoi(tokens[dataRecvLen++]);
+        size_t ieLen = std::stoul(tokens[dataRecvLen++]);
+        for (size_t j = 0; j < ieLen; j++) {
+            elem.content.push_back(static_cast<char>(std::stoi(tokens[dataRecvLen++])));
+        }
+        info.infoElems.push_back(elem);
+    }
+    info.features = std::stoll(tokens[dataRecvLen++]);
+    info.timestamp = std::stoll(tokens[dataRecvLen++]);
+    info.wifiStandard = std::stoi(tokens[dataRecvLen++]);
+    info.maxSupportedRxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
+    info.maxSupportedTxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
+    info.disappearCount = std::stoi(tokens[dataRecvLen++]);
+    info.isHiLinkNetwork = tokens[dataRecvLen++] == "true";
+    info.supportedWifiCategory = static_cast<WifiCategory>(std::stoi(tokens[dataRecvLen++]));
+}
+
 ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScanInfo> &result, int contentSize)
 {
     WIFI_LOGI("WifiScanProxy ParseScanInfos");
-    std::vector<uint32_t> allSize;
-    if (!reply.ReadUInt32Vector(&allSize)) {
-        WIFI_LOGE("ParseScanInfos ReadInt32Vector error");
-        return WIFI_OPT_FAILED;
-    }
+    int32_t allSize = reply.ReadInt32(allSize);
     sptr<Ashmem> ashmem = reply.ReadAshmem();
     if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
         WIFI_LOGE("ParseDeviceConfigs ReadAshmem error");
         return WIFI_OPT_FAILED;
     }
-    size_t offset = 0;
-    for (int i = 0; i < contentSize; ++i) {
-        int dataRecvLen = 0;
-        std::string net = (char *)ashmem->ReadFromAshmem(allSize[i], offset);
-        offset += allSize[i];
-        std::vector<std::string> tokens;
-        SplitStr(net, ";", tokens, true, true);
-        WifiScanInfo info;
-        info.bssid = tokens[dataRecvLen++];
-        info.ssid = tokens[dataRecvLen++];
-        info.bssidType = std::stoi(tokens[dataRecvLen++]);
-        info.capabilities = tokens[dataRecvLen++];
-        info.frequency = std::stoi(tokens[dataRecvLen++]);
-        info.band = std::stoi(tokens[dataRecvLen++]);
-        info.channelWidth = static_cast<WifiChannelWidth>(std::stoi(tokens[dataRecvLen++]));
-        info.centerFrequency0 = std::stoi(tokens[dataRecvLen++]);
-        info.centerFrequency1 = std::stoi(tokens[dataRecvLen++]);
-        info.rssi = std::stoi(tokens[dataRecvLen++]);
-        info.securityType = static_cast<WifiSecurity>(std::stoi(tokens[dataRecvLen++]));
-        size_t numInfoElems = std::stoul(tokens[dataRecvLen++]);
-        for (size_t i = 0; i < numInfoElems; i++) {
-            WifiInfoElem elem;
-            elem.id = std::stoi(tokens[dataRecvLen++]);
-            size_t ieLen = std::stoul(tokens[dataRecvLen++]);
-            for (size_t j = 0; j < ieLen; j++) {
-                elem.content.push_back(static_cast<char>(std::stoi(tokens[dataRecvLen++])));
-            }
-            info.infoElems.push_back(elem);
+    std::string net = (char *)ashmem->ReadFromAshmem(allSize, 0);
+    std::vector<std::string> tokens;
+    SplitStr(net, ";", tokens, true, true);
+    int dataRecvLen = 0;
+    try {
+        for (int i = 0; i < contentSize; ++i) {
+            WifiScanInfo info;
+            GetScanInfo(info, tokens, dataRecvLen);
+            result.emplace_back(info);
         }
-        info.features = std::stoll(tokens[dataRecvLen++]);
-        info.timestamp = std::stoll(tokens[dataRecvLen++]);
-        info.wifiStandard = std::stoi(tokens[dataRecvLen++]);
-        info.maxSupportedRxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
-        info.maxSupportedTxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
-        info.disappearCount = std::stoi(tokens[dataRecvLen++]);
-        info.isHiLinkNetwork = tokens[dataRecvLen++] == "true";
-        info.supportedWifiCategory = static_cast<WifiCategory>(std::stoi(tokens[dataRecvLen++]));
-        result.emplace_back(info);
+    } catch (std::invalid_argument& e) {
+        WIFI_LOGE("ParseScanInfos invalid argument error %{public}s :%{public}s",
+            e.what(), tokens[dataRecvLen].c_str());
+    } catch (std::out_of_range& e) {
+        WIFI_LOGE("ParseScanInfos out of range error %{public}s :%{public}s",
+            e.what(), tokens[dataRecvLen].c_str());
+    } catch (std::exception& e) {
+        WIFI_LOGE("ParseScanInfos exception error %{public}s :%{public}s",
+            e.what(), tokens[dataRecvLen].c_str());
     }
     ashmem->UnmapAshmem();
     ashmem->CloseAshmem();

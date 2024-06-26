@@ -205,10 +205,8 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         }
         return;
     }
-    std::vector<uint32_t> scanInfoSize;
-    int offset = 0;
-    for (int i = 0; i < contentSize; ++i) {
-        std::stringstream scanInfoStream;
+    std::stringstream scanInfoStream;
+    for (int32_t i = 0; i < contentSize; ++i) {
         scanInfoStream << result[i].bssid << ";";
         scanInfoStream << result[i].ssid << ";";
         scanInfoStream << result[i].bssidType << ";";
@@ -236,13 +234,12 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         scanInfoStream << result[i].disappearCount << ";";
         scanInfoStream << result[i].isHiLinkNetwork << ";";
         scanInfoStream << static_cast<int>(result[i].supportedWifiCategory) << ";";
-        scanInfoSize.push_back(scanInfoStream.str().length());
-        ashmem->WriteToAshmem(scanInfoStream.str().c_str(), scanInfoStream.str().length(), offset);
-        offset += scanInfoSize[i];
     }
+    int32_t scanInfoSize = static_cast<int>(scanInfoStream.str().length());
+    ashmem->WriteToAshmem(scanInfoStream.str().c_str(), scanInfoStream.str().length(), 0);
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteInt32(contentSize);
-    reply.WriteUInt32Vector(scanInfoSize);
+    reply.WriteInt32(scanInfoSize);
     reply.WriteAshmem(ashmem);
     ashmem->UnmapAshmem();
     ashmem->CloseAshmem();
@@ -252,7 +249,7 @@ void WifiScanStub::SendScanInfoSmall(int32_t contentSize, std::vector<WifiScanIn
 {
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteInt32(contentSize);
-    for (unsigned int i = 0; i < contentSize; i++) {
+    for (int32_t i = 0; i < contentSize; i++) {
         reply.WriteString(result[i].bssid);
         reply.WriteString(result[i].ssid);
         reply.WriteInt32(result[i].bssidType);
@@ -295,7 +292,7 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
         reply.WriteInt32(ret);
         return ret;
     }
-    unsigned int size = result.size();
+    int32_t size = static_cast<int>(result.size());
     constexpr int maxSize = 200;
     constexpr int bigSize = 150;
     if (size > maxSize) {

@@ -1504,7 +1504,7 @@ static std::string OutWifiStoreRandomMacBssids(const std::unordered_set<std::str
     std::ostringstream ss;
     size_t count = bssids.size();
     if (count > FUZZY_BSSID_MAX_MATCH_CNT) {
-        LOGE("%{public}s fuzzyBssids.size:%{public}lu is bigger than %{public}d",
+        LOGE("%{public}s fuzzyBssids.size:%{public}zu is bigger than %{public}d",
             __func__, count, FUZZY_BSSID_MAX_MATCH_CNT);
     }
     size_t index = 0;

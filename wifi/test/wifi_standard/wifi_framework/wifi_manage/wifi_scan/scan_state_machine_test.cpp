@@ -37,6 +37,9 @@ namespace OHOS {
 namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ_VALUE = 2410;
 constexpr int FREQ_5_GHZ_VALUE = 5010;
+constexpr int NETWORK_ID = 15;
+constexpr int BAND = 2;
+constexpr int TWO = 2;
 
 class ScanStateMachineTest : public testing::Test {
 public:
@@ -1045,6 +1048,66 @@ public:
         pScanStateMachine->InitPnoScanState();
     }
 
+    void RecordFilteredScanResultTest()
+    {
+        WifiDeviceConfig config;
+        config.bssid = "01:23:45:67:89:AB";
+        config.band = BAND;
+        config.networkId = NETWORK_ID;
+        config.ssid = "networkId";
+        config.keyMgmt = "123456";
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
+        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
+        ScanStateMachine::FilterScanResultRecord records;
+        InterScanInfo interScanInfo;
+        interScanInfo.securityType = WifiSecurity::WEP;
+        records.RecordFilteredScanResult(interScanInfo);
+    }
+ 
+    void GetScanInfoMsgTest()
+    {
+        InterScanInfo interScanInfo;
+        interScanInfo.securityType = WifiSecurity::WEP;
+        ScanStateMachine::FilterScanResultRecord records;
+        records.GetScanInfoMsg(interScanInfo);
+    }
+ 
+    void GetFilteredScanResultMsgTest()
+    {
+        ScanStateMachine::FilterScanResultRecord records;
+        records.GetFilteredScanResultMsg();
+    }
+ 
+    void FilterScanResultTest()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetConnectedBssid(_)).Times(AtLeast(1));
+        std::vector<InterScanInfo> scanInfoList;
+        pScanStateMachine->FilterScanResult(scanInfoList);
+    }
+ 
+    void SetWifiModeTest()
+    {
+        InterScanInfo scanInfo;
+        scanInfo. isHeInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo);
+        InterScanInfo scanInfo1;
+        scanInfo1. band =SCAN_5GHZ_BAND;
+        scanInfo1.isVhtInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo1);
+        InterScanInfo scanInfo2;
+        scanInfo2.isHtInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo2);
+        InterScanInfo scanInfo3;
+        scanInfo3.isErpExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo3);
+        InterScanInfo scanInfo4;
+        scanInfo4. band =SCAN_24GHZ_BAND;
+        scanInfo4.isVhtInfoExist =false;
+        pScanStateMachine->SetWifiMode(scanInfo4);
+        InterScanInfo scanInfo5;
+        scanInfo4. band =SCAN_24GHZ_BAND;
+        pScanStateMachine->SetWifiMode(scanInfo5);
+    }
 };
 
 HWTEST_F(ScanStateMachineTest, InitGoInStateTest, TestSize.Level1)
@@ -1587,14 +1650,17 @@ HWTEST_F(ScanStateMachineTest, GetPnoScanConfigFail2, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest1, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest2, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest3, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest3();
 }
 
 HWTEST_F(ScanStateMachineTest, ReportPnoScanInfosTest, TestSize.Level1)
@@ -1619,18 +1685,22 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoProcessTest2, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest1, TestSize.Level1)
 {
+    CommonScanAfterPnoResultTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest2, TestSize.Level1)
 {
+    CommonScanAfterPnoResultTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosSuccess, TestSize.Level1)
 {
+    GetScanInfosSuccess();
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosFail, TestSize.Level1)
 {
+    GetScanInfosFail();
 }
 
 HWTEST_F(ScanStateMachineTest, GetSecurityTypeAndBandTest, TestSize.Level1)
@@ -1704,6 +1774,26 @@ HWTEST_F(ScanStateMachineTest, PnoScanRequestProcessFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, StartPnoScanHardwareFail, TestSize.Level1)
 {
     StartPnoScanHardwareFail();
+}
+
+HWTEST_F(ScanStateMachineTest, RecordFilteredScanResultTest, TestSize.Level1)
+{
+    RecordFilteredScanResultTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, GetFilteredScanResultMsgTest, TestSize.Level1)
+{
+    GetFilteredScanResultMsgTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, FilterScanResultTest, TestSize.Level1)
+{
+    FilterScanResultTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, SetWifiModeTest, TestSize.Level1)
+{
+    SetWifiModeTest();
 }
 } // namespace Wifi
 } // namespace OHOS

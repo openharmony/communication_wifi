@@ -1720,6 +1720,22 @@ int WifiSettings::ReloadStaRandomMac()
     }
     mWifiStoreRandomMac.clear();
     mSavedWifiStoreRandomMac.GetValue(mWifiStoreRandomMac);
+    bool shouldReset = false;
+    for (const auto &item: mWifiStoreRandomMac) {
+        if (item.version == -1) {
+            shouldReset = true;
+            break;
+        }
+    }
+    LOGI("%{public}s shouldReset:%{public}s size:%{public}lu",
+        __func__, shouldReset ? "true" : "false", mWifiStoreRandomMac.size());
+    if (shouldReset) {
+        for (auto &item: mWifiStoreRandomMac) {
+            item.version = 0;
+        }
+        mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
+        mSavedWifiStoreRandomMac.SaveConfig()
+    }
     return 0;
 }
 
@@ -1734,7 +1750,6 @@ void WifiSettings::ClearRandomMacConfig()
 
 const static uint32_t COMPARE_MAC_OFFSET = 2;
 const static uint32_t COMPARE_MAC_LENGTH = 17 - 4;
-constexpr int FUZZY_BSSID_MAX_MATCH_CNT = 30;
 
 bool CompareMac(const std::string &mac1, const std::string &mac2)
 {
@@ -1749,11 +1764,6 @@ std::string WifiSettings::FuzzyBssid(const std::string bssid)
     return "xx" + bssid.substr(COMPARE_MAC_OFFSET, COMPARE_MAC_LENGTH) + "xx";
 }
 
-static bool isPskEncryption(const std::string keyMgmt)
-{
-    return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
-}
-
 bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -1763,22 +1773,22 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
     }
     bool isAdded = false;
     std::string fuzzyBssid = "";
-    if (isPskEncryption(randomMacInfo.keyMgmt)) {
+    if (IsPskEncryption(randomMacInfo.keyMgmt)) {
         fuzzyBssid = FuzzyBssid(randomMacInfo.peerBssid);
     }
     
     for (auto &ele : mWifiStoreRandomMac) {
-        if (isPskEncryption(ele.keyMgmt)) {
+        if (IsPskEncryption(ele.keyMgmt)) {
             if (ele.randomMac != randomMacInfo.randomMac) {
                 continue;
             }
-            if (std::find(ele.fuzzyBssids.begin(), ele.fuzzyBssids.end(), fuzzyBssid) != ele.fuzzyBssids.end()) {
+            if (ele.fuzzyBssids.find(fuzzyBssid) != ele.fuzzyBssids.end()) {
                 LOGI("AddRandomMac is contains fuzzyBssid:%{public}s", MacAnonymize(fuzzyBssid).c_str());
                 return true;
             }
             if (ele.fuzzyBssids.size() <= FUZZY_BSSID_MAX_MATCH_CNT) {
-                ele.fuzzyBssids.emplace_back(fuzzyBssid);
-                LOGI("AddRandomMac emplace_back fuzzyBssid:%{public}s", MacAnonymize(fuzzyBssid).c_str());
+                ele.fuzzyBssids.insert(fuzzyBssid);
+                LOGI("AddRandomMac insert fuzzyBssid:%{public}s", MacAnonymize(fuzzyBssid).c_str());
                 isAdded = true;
                 break;
             } else {
@@ -1793,8 +1803,8 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 
     LOGI("AddRandomMac isAdded:%{public}d", isAdded);
     if (!isAdded) {
-        if (isPskEncryption(randomMacInfo.keyMgmt)) {
-            randomMacInfo.fuzzyBssids.emplace_back(fuzzyBssid);
+        if (IsPskEncryption(randomMacInfo.keyMgmt)) {
+            randomMacInfo.fuzzyBssids.insert(fuzzyBssid);
         }
         mWifiStoreRandomMac.push_back(randomMacInfo);
     }
@@ -1808,7 +1818,7 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     std::string fuzzyBssid = "";
-    if (isPskEncryption(randomMacInfo.keyMgmt)) {
+    if (IsPskEncryption(randomMacInfo.keyMgmt)) {
         fuzzyBssid = FuzzyBssid(randomMacInfo.peerBssid);
     }
 
@@ -1816,9 +1826,8 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
         if (item.randomMac.empty()) {
             continue;
         }
-        if (isPskEncryption(item.keyMgmt)) {
-            std::vector<std::string> fuzzyBssids = item.fuzzyBssids;
-            if (std::find(fuzzyBssids.begin(), fuzzyBssids.end(), fuzzyBssid) != fuzzyBssids.end()) {
+        if (IsPskEncryption(item.keyMgmt)) {
+            if (item.fuzzyBssids.find(fuzzyBssid) != fuzzyBssids.end()) {
                 LOGI("GetStaRandomMac fuzzyBssids contains fuzzyBssid:%{public}s",
                     MacAnonymize(fuzzyBssid).c_str());
                 randomMacInfo.randomMac = item.randomMac;

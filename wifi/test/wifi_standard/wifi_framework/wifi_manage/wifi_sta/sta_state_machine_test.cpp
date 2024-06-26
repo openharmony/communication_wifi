@@ -1006,6 +1006,24 @@ public:
         EXPECT_FALSE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(nullptr));
     }
 
+    void ApLinkedStateExeMsgSuccess3()
+    {
+        InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
+        msg.SetMessageName(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
+        EXPECT_TRUE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(&msg));
+    }
+
+    void ApLinkedStateExeMsgSuccess4()
+    {
+        InternalMessage msg;
+        std::string bssid = "wifitest";
+        msg.SetMessageObj(bssid);
+        msg.SetMessageName(0);
+        EXPECT_TRUE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(&msg));
+    }
+
     void DisConnectProcessSuccess()
     {
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.disconnect = true;
@@ -1284,7 +1302,20 @@ public:
 
     void LinkedStateExeMsgFail2()
     {
+        IpInfo ipInfo;
+        IpV6Info ipv6Info;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(ipv6Info), Return(0)));
         InternalMessage msg;
+        msg.SetMessageName(0);
+        msg.SetParam1(DhcpReturnCode::DHCP_IP_EXPIRED);
+        pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
+        msg.SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
+        pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
+        pStaStateMachine->linkedInfo.connState = ConnState::DISCONNECTED;
+        msg.SetMessageName(WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT);
         pStaStateMachine->pLinkedState->ExecuteStateMsg(&msg);
     }
 
@@ -1525,6 +1556,12 @@ public:
         sptr<NetManagerStandard::NetSupplierInfo> supplierInfo;
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        WifiLinkedInfo linkedInfo;
+        linkedInfo.connState = ConnState::CONNECTED;
+        linkedInfo.ssid = "111111";
+        linkedInfo.bssid = "222222";
+        EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
         pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
     }
 
@@ -1634,7 +1671,15 @@ public:
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
+        WifiLinkedInfo linkedInfo;
+        linkedInfo.connState = ConnState::CONNECTED;
+        linkedInfo.ssid = "111111";
+        linkedInfo.bssid = "222222";
+        EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
         WifiDeviceConfig config;
+        config.ssid = "111111";
+        config.bssid = "222222";
         pStaStateMachine->ReUpdateNetLinkInfo(config);
     }
 
@@ -1784,6 +1829,24 @@ public:
     {
         InternalMessage msg;
         msg.SetMessageName(WIFI_SVR_COM_STA_ENABLE_HILINK);
+        std::string bssid = "01:23:45:67:89:a0";
+        msg.SetMessageObj(bssid);
+        pStaStateMachine->DealHiLinkDataToWpa(&msg);
+    }
+
+    void DealHiLinkDataToWpaSuccessTest4()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(0);
+        std::string bssid = "01:23:45:67:89:a0";
+        msg.SetMessageObj(bssid);
+        pStaStateMachine->DealHiLinkDataToWpa(&msg);
+    }
+ 
+    void DealHiLinkDataToWpaSuccessTest5()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS);
         std::string bssid = "01:23:45:67:89:a0";
         msg.SetMessageObj(bssid);
         pStaStateMachine->DealHiLinkDataToWpa(&msg);
@@ -3154,6 +3217,31 @@ HWTEST_F(StaStateMachineTest, HilinkSaveConfigTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ReplaceEmptyDnsTest, TestSize.Level1)
 {
     ReplaceEmptyDnsTest();
+}
+
+HWTEST_F(StaStateMachineTest, IsRoamingTest, TestSize.Level1)
+{
+    IsRoamingTest();
+}
+ 
+HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess3, TestSize.Level1)
+{
+    ApLinkedStateExeMsgSuccess3();
+}
+ 
+HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess4, TestSize.Level1)
+{
+    ApLinkedStateExeMsgSuccess4();
+}
+ 
+HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest4, TestSize.Level1)
+{
+    DealHiLinkDataToWpaSuccessTest4();
+}
+ 
+HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest5, TestSize.Level1)
+{
+    DealHiLinkDataToWpaSuccessTest5();
 }
 } // namespace Wifi
 } // namespace OHOS

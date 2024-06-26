@@ -25,6 +25,7 @@ public:
   virtual bool EnableNetworkSelectStatus(int targetNetworkId) = 0;
   virtual bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason) = 0;
   virtual bool UpdateAllNetworkSelectStatus() = 0;
+  virtual bool IsWrongPassword(int targetNetworkId) = 0;
 };
 
 class BlockConnectService : public MockBlockConnectService {
@@ -35,6 +36,7 @@ public:
     MOCK_METHOD1(EnableNetworkSelectStatus, bool(int targetNetworkId));
     MOCK_METHOD2(UpdateNetworkSelectStatus, bool(int targetNetworkId, DisabledReason disableReason));
     MOCK_METHOD0(UpdateAllNetworkSelectStatus, bool());
+    MOCK_METHOD1(IsWrongPassword, bool(int targetNetworkId));
 };
 }  // namespace OHOS
 }  // namespace Wifi

@@ -511,6 +511,12 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
+        EXPECT_CALL(BlockConnectService::GetInstance(), IsWrongPassword(_))
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
         EXPECT_CALL(BlockConnectService::GetInstance(), UpdateNetworkSelectStatus(_, _))
             .WillOnce(Return(1))
             .WillRepeatedly(Return(0));

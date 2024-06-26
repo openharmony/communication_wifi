@@ -1340,8 +1340,13 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
             SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
             InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG, linkedInfo);
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
-            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
-                DisabledReason::DISABLED_BY_WRONG_PASSWORD);
+            if (BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId)) {
+                BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
+                    DisabledReason::DISABLED_BY_WRONG_PASSWORD);
+            } else {
+                BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
+                    DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
+            }
             break;
         case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
             WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);

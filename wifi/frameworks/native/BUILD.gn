@@ -97,10 +97,16 @@ if (defined(ohos_lite)) {
   config("wifi_sdk_config") {
     visibility = [ ":*" ]
     include_dirs = [ ":wifi_fw_common_header" ]
-
     cflags = [
       "-std=c++17",
       "-fno-rtti",
+      "-fexceptions",
+    ]
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+      "-fexceptions",
+      "-Os",
     ]
 
     if (target_cpu == "arm") {

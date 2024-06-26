@@ -1458,8 +1458,6 @@ static void SetWifiStoreRandomMacFuzzyBssids(WifiStoreRandomMac &item, const std
             item.fuzzyBssids.insert(it);
         }
     }
-    LOGI("%{public}s keyMgmt:%{public}s item.fuzzyBssids.size:%{public}lu",
-        __func__, item.keyMgmt.c_str(), item.fuzzyBssids.size());
     fuzzyBssids.clear();
 }
 

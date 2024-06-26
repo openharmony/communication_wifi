@@ -33,6 +33,7 @@
 #include "arp_checker.h"
 #include "self_cure_msg.h"
 #include "wifi_common_util.h"
+#include "wifi_net_observer.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -248,7 +249,6 @@ public:
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);
         void SelfcureForMultiGateway(InternalMessage *msg);
-        void MultiGatewaySelfcureResult(InternalMessage *msg);
         bool IsNeedMultiGatewaySelfcure();
     };
 
@@ -427,6 +427,8 @@ private:
     std::vector<std::string> dhcpFailedConfigKeys;
     std::map<std::string, int> autoConnectFailedNetworksRssi;
     std::atomic<bool> isWifiBackground = false;
+    sptr<NetStateObserver> mNetWorkDetect;
+    bool m_httpDetectResponse = false;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -15,7 +15,6 @@
 
 #include "ip_qos_monitor.h"
 #include "wifi_logger.h"
-#include "ista_service.h"
 #include "wifi_settings.h"
 
 static const int32_t MIN_DELTA_TCP_TX = 3;
@@ -88,13 +87,11 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
             return;
         }
         if (mHttpDetectedAllowed && signalLevel >= SIGNAL_LEVEL_2) {
-            IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(mInstId);
-            if (pStaService == nullptr) {
-                WIFI_LOGE("%{public}s: pStaService is null", __FUNCTION__);
-                return;
-            }
             WIFI_LOGI("%{public}s: start http detect", __FUNCTION__);
-            pStaService->StartHttpDetect();
+            if (mNetWorkDetect == nullptr) {
+                mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
+            }
+            mNetWorkDetect->StartWifiDetection();
             mHttpDetectedAllowed = false;
             return;
         }

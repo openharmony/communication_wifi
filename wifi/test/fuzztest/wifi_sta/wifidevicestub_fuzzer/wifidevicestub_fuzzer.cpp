@@ -682,6 +682,10 @@ void OnSetTxPowerFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), datas);
 }
 
+
+
+
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

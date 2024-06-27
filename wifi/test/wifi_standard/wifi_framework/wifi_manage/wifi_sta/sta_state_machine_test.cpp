@@ -1359,7 +1359,7 @@ public:
         config.value = "hmwifi";
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceConfig = false;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));;
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
@@ -1375,7 +1375,7 @@ public:
         config.value = "hmwifi";
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceConfig = false;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));;
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
@@ -1391,7 +1391,7 @@ public:
         config.value = "hmwifi";
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceConfig = true;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));;
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
@@ -1407,7 +1407,7 @@ public:
         config.value = "hmwifi";
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceConfig = false;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));;
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));

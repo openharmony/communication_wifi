@@ -68,7 +68,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetPortalUri(_)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveDisconnectedReason(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine.reset(new StaStateMachine());
         pStaStateMachine->InitStaStateMachine();

@@ -42,22 +42,23 @@ namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiScan";
 const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceService";
+const std::u16string FORMMGR_INTERFACE_TOKEN_SCAN_EX = u"ohos.wifi.IWifiScanMgr";
 static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 std::shared_ptr<WifiScanStub> pWifiScanServiceImpl = std::make_shared<WifiScanServiceImpl>();
-
+sptr<WifiScanMgrStub> pWifiScanMgrStub = WifiScanMgrServiceImpl::GetInstance();
 bool Init()
 {
     if (!g_isInsted) {
         if (WifiConfigCenter::GetInstance().GetScanMidState(0) != WifiOprMidState::RUNNING) {
+            LOGE("Init setmidstate!");
             WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::RUNNING, 0);
         }
         g_isInsted = true;
     }
     return true;
 }
-
 bool OnRemoteRequest(uint32_t code, MessageParcel &data)
 {
     std::unique_lock<std::mutex> autoLock(g_instanceLock);
@@ -205,10 +206,31 @@ void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
         datas, reply, option);
 }
 
+void OnGetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
+}
 
-
-
-
+bool DoSomethingScanMgrStubTest(const uint8_t* data, size_t size)
+{
+    uint32_t code = static_cast<uint32_t>(ScanInterfaceCode::WIFI_MGR_GET_SCAN_SERVICE);
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_SCAN_EX);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiScanMgrStub->OnRemoteRequest(code, datas, reply, option);
+    return true;
+}
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
@@ -225,6 +247,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetScanInfoListFuzzTest(data, size);
     OHOS::Wifi::OnRegisterCallBackFuzzTest(data, size);
     OHOS::Wifi::OnStartWifiPnoScanFuzzTest(data, size);
+    OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
+    OHOS::Wifi::DoSomethingScanMgrStubTest(data, size);
     sleep(4);
     return 0;
 }

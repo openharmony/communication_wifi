@@ -172,7 +172,8 @@ public:
         scanInfoList.push_back(temp);
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_)).WillOnce(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_))
+            .WillOnce(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
     }
  
@@ -198,7 +199,7 @@ public:
  
     void DealApRoamingStateTimeoutTest()
     {
-        InternalMessage *msg =nullptr;
+        InternalMessage *msg = nullptr;
         pStaStateMachine->DealApRoamingStateTimeout(msg);
     }
  
@@ -232,33 +233,33 @@ public:
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4ResultExt(ipInfo, ipv6Info, &result1);
     }
  
-   void TryToSaveIpV4ResultTest()
-   {
+    void TryToSaveIpV4ResultTest()
+    {
         IpInfo ipInfo;
         IpV6Info ipv6Info;
         DhcpResult *result = nullptr;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, result);
         DhcpResult result1;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, &result1);
-   }
- 
+    }
+
     void TryToSaveIpV6ResultTest()
-   {
+    {
         IpInfo ipInfo;
         IpV6Info ipv6Info;
         DhcpResult *result = nullptr;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6Result(ipInfo, ipv6Info, result);
         DhcpResult result1;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6Result(ipInfo, ipv6Info, &result1);
-   }
+    }
  
-   void SetConnectMethodTest()
-   {
+    void SetConnectMethodTest()
+    {
         int connectMethod = NETWORK_SELECTED_BY_AUTO;
         pStaStateMachine->SetConnectMethod(connectMethod);
         connectMethod = NETWORK_SELECTED_BY_USER;
         pStaStateMachine->SetConnectMethod(connectMethod);
-   }
+    }
 };
 
 HWTEST_F(StaStateMachineTest, ConfigStaticIpAddressSuccess1, TestSize.Level1)

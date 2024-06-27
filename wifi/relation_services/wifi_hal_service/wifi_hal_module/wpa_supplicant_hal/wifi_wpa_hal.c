@@ -22,7 +22,6 @@
 #include "wifi_hal_common_func.h"
 #include "wifi_hal_p2p_struct.h"
 #include "wifi_hal_struct.h"
-#include "wifi_log.h"
 #include "wifi_p2p_hal.h"
 #include "wifi_wpa_common.h"
 #include "wifi_hal_sta_interface.h"
@@ -30,6 +29,17 @@
 #include "wifi_hal_p2p_interface.h"
 #include "wifi_hal_module_manage.h"
 #include "wifi_common_hal.h"
+
+#ifndef __UT__
+#include "wifi_log.h"
+#endif
+
+#ifdef __UT__
+#define static
+#define LOGI(...) ;
+#define LOGD(...) ;
+#define LOGE(...) ;
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "WifiWpaHal"

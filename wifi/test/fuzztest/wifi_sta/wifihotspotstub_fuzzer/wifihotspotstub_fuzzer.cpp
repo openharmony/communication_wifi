@@ -396,7 +396,7 @@ void WifiHotspotServiceImplFuzzTest(const uint8_t* data, size_t size)
         updateInfo.deviceName = deviceName;
         updateInfo.bssid = networkName;
         updateInfo.ipAddr = mDeviceAddress;
-        updateInfo.bssidType = static_cast<int >(data[index++]);;
+        updateInfo.bssidType = static_cast<int>(data[index++]);
     }
     mWifiHotspotServiceImpl.SetHotspotConfig(config);
     mWifiHotspotServiceImpl.TransRandomToRealMac(updateInfo, updateInfo);

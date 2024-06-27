@@ -62,7 +62,7 @@ void InitParam()
 
 class WifiP2pManager {
 public:
-    WifiP2pManager() 
+    WifiP2pManager()
     {
         InitP2pCallback();
     }
@@ -98,7 +98,8 @@ public:
         mP2pCallback.OnP2pPrivatePeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPrivatePeersChanged, this, _1);
         return;
     }
-}; 
+};
+
 void P2pServerFuzzTest(const uint8_t* data, size_t size)
 {
     WifiP2pDevice device;

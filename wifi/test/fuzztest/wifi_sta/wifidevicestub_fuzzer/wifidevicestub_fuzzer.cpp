@@ -754,7 +754,7 @@ void WifiDeviceServiceImplTest(const uint8_t* data, size_t size)
     mWifiDeviceServiceImpl.CheckConfigEap(config);
     pWifiDeviceStub->WriteEapConfig(datas, config.wifiEapConfig);
     pWifiDeviceStub->WriteWifiDeviceConfig(datas, config);
-} 
+}
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

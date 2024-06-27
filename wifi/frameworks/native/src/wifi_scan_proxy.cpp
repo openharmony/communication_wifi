@@ -244,9 +244,30 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     return WIFI_OPT_SUCCESS;
 }
 
+static constexpr uint8_t STEP_2BIT = 2;
+static std::string HexToString(const std::string &str)
+{
+     std::string result;
+     uint8_t hexDecimal = 16;
+     uint8_t hexStep = 2;
+     if (str.length() <= 0) {
+         return result;
+     }
+     for (size_t i = 0; i < str.length() - 1; i += STEP_2BIT) {
+         std::string byte = str.substr(i, hexStep);
+         char chr = 0;
+         long strTemp = strtol(byte.c_str(), nullptr, hexDecimal);
+         if (strTemp > 0) {
+             chr = static_cast<char>(strTemp);
+         }
+         result.push_back(chr);
+     }
+     return result;
+}
+
 static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, int &dataRecvLen) {
     info.bssid = tokens[dataRecvLen++];
-    info.ssid = tokens[dataRecvLen++];
+    info.ssid = HexToString(tokens[dataRecvLen++]);
     info.bssidType = std::stoi(tokens[dataRecvLen++]);
     info.capabilities = tokens[dataRecvLen++];
     info.frequency = std::stoi(tokens[dataRecvLen++]);
@@ -289,21 +310,10 @@ ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScan
     std::vector<std::string> tokens;
     SplitStr(net, ";", tokens, true, true);
     int dataRecvLen = 0;
-    try {
-        for (int i = 0; i < contentSize; ++i) {
-            WifiScanInfo info;
-            GetScanInfo(info, tokens, dataRecvLen);
-            result.emplace_back(info);
-        }
-    } catch (std::invalid_argument& e) {
-        WIFI_LOGE("ParseScanInfos invalid argument error %{public}s :%{public}s",
-            e.what(), tokens[dataRecvLen].c_str());
-    } catch (std::out_of_range& e) {
-        WIFI_LOGE("ParseScanInfos out of range error %{public}s :%{public}s",
-            e.what(), tokens[dataRecvLen].c_str());
-    } catch (std::exception& e) {
-        WIFI_LOGE("ParseScanInfos exception error %{public}s :%{public}s",
-            e.what(), tokens[dataRecvLen].c_str());
+    for (int i = 0; i < contentSize; ++i) {
+        WifiScanInfo info;
+        GetScanInfo(info, tokens, dataRecvLen);
+        result.emplace_back(info);
     }
     ashmem->UnmapAshmem();
     ashmem->CloseAshmem();

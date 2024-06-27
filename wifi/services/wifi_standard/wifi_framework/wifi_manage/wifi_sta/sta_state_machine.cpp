@@ -1874,11 +1874,6 @@ bool StaStateMachine::ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig)
     return false;
 }
 
-static bool isPskEncryption(const std::string keyMgmt)
-{
-    return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
-}
-
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
     LOGD("enter SetRandomMac.");
@@ -1918,7 +1913,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
                     MacAnonymize(randomMacInfo.peerBssid).c_str());
                 WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
             }
-        } else if (isPskEncryption(deviceConfig.keyMgmt)) {
+        } else if (IsPskEncryption(deviceConfig.keyMgmt)) {
             randomMacInfo.randomMac = deviceConfig.macAddress;
             currentMac = randomMacInfo.randomMac;
             WifiSettings::GetInstance().AddRandomMac(randomMacInfo);

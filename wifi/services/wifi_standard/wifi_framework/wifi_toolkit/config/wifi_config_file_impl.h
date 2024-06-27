@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr int WIFI_CONFIG_FILE_LINE_MAX_LENGTH = 4096;
 /**
  * @Description Remove head and tail space
  *
@@ -198,6 +199,11 @@ int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::istream &fs, std::st
         if (line.empty()) {
             continue;
         }
+        if (line.length() > WIFI_CONFIG_FILE_LINE_MAX_LENGTH) {
+            LOGE("%{public}s %{public}s line length is too big.", __func__, GetTClassName<T>().c_str());
+            sectionError++;
+            break;
+        }
         if (line[0] == '<' && line[line.length() - 1] == '>') {
             return sectionError;
         }
@@ -213,6 +219,7 @@ int WifiConfigFileImpl<T>::ReadNetworkSection(T &item, std::istream &fs, std::st
         TrimString(value);
         /* template function, needing specialization */
         sectionError += SetTClassKeyValue(item, key, value);
+        std::fill(value.begin(), value.end(), 0);
     }
     LOGE("Section config not end correctly");
     sectionError++;

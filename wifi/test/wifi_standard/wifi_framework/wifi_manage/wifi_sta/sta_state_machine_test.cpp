@@ -1303,9 +1303,9 @@ public:
     {
         IpInfo ipInfo;
         IpV6Info ipv6Info;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _))
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetIpv6Info(_, _))
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipv6Info), Return(0)));
         InternalMessage msg;
         msg.SetMessageName(0);

@@ -15,7 +15,7 @@
 
 #include "ip_qos_monitor.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 static const int32_t MIN_DELTA_TCP_TX = 3;
 static const int32_t QOS_TCP_TX_PKTS = 6;
@@ -77,7 +77,7 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     mInternetFailedCounter++;
     WIFI_LOGI("%{public}s: mInternetFailedCounter = %{public}d", __FUNCTION__, mInternetFailedCounter);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t currentRssi = linkedInfo.rssi;
     int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, mInstId);
     if ((mInternetFailedCounter >= 1) && (linkedInfo.connState == ConnState::CONNECTED)) {

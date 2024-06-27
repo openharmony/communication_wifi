@@ -435,6 +435,14 @@ bool IsFreqDbac(int freqA, int freqB);
  */
 bool IsChannelDbac(int channelA, int channelB);
 
+/**
+ * @Description check the keyMgmnt is Psk
+ *
+ * @param keyMgmt - in data
+ * @return true - isPsk
+ */
+bool IsPskEncryption(const std::string &keyMgmt);
+
 #ifndef OHOS_ARCH_LITE
 /**
  * @Description Parse json string, find key by type, get value by key

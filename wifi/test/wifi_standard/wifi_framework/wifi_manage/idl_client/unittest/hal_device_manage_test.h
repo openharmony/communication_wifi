@@ -37,6 +37,7 @@ public:
     }
 
     static void DestoryCallback(std::string &destoryIfaceName, int createIfaceType);
+    static void OnRssiReportCallback(int index, int antRssi);
 };
 
 class IChipIfaceTest : public IChipIface {
@@ -193,7 +194,7 @@ public:
     {
         return 0;
     }
-}
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

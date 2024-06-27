@@ -85,9 +85,9 @@ public:
     void WifiToggledTest1()
     {
         InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg.SetMessageName(CMD_WIFI_TOGGLED);
         msg.SetParam1(1);
         msg.SetParam2(0);
@@ -102,9 +102,9 @@ public:
     void WifiToggledTest2()
     {
         InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg.SetMessageName(CMD_WIFI_TOGGLED);
         msg.SetParam1(0);
         msg.SetParam2(0);
@@ -121,13 +121,13 @@ public:
     void HandleStaStartFail()
     {
         InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg.SetMessageName(CMD_STA_START_FAILURE);
         msg.SetParam1(0);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        WifiSettings::GetInstance().SetWifiStateOnAirplaneChanged(1);
+        WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(1);
         msg.SetMessageName(CMD_CONCRETE_STOPPED);
         msg.SetParam1(0);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
@@ -217,7 +217,7 @@ public:
         msg.SetParam1(1);
         EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, 0);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, 0);
         EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
         msg.SetMessageName(INVILAD_MSG);
@@ -261,7 +261,7 @@ public:
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
         msg.SetMessageName(CMD_AP_STOP_TIME);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        WifiSettings::GetInstance().SetSoftapToggledState(true);
+        WifiConfigCenter::GetInstance().SetSoftapToggledState(true);
         EXPECT_TRUE(pWifiControllerMachine->ShouldEnableSoftap());
     }
 
@@ -315,7 +315,7 @@ public:
         pWifiControllerMachine->HandleStaSemiActive(0);
         pWifiControllerMachine->HandleStaClose(0);
         pWifiControllerMachine->SwitchRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
-        WifiSettings::GetInstance().SetWifiToggledState(1);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(1);
         EXPECT_TRUE(pWifiControllerMachine->ShouldEnableWifi());
         pWifiControllerMachine->RemoveConcreteManager(1);
         pWifiControllerMachine->RemoveConcreteManager(0);

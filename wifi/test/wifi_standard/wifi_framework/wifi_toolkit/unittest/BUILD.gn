@@ -28,6 +28,7 @@ ohos_unittest("toolkit_unittest") {
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_backup_config.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_center.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_file_spec.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_settings.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/log_helper.c",
@@ -63,6 +64,7 @@ ohos_unittest("toolkit_unittest") {
     "raw_socket_test.cpp",
     "softap_parser_test.cpp",
     "wifi_app_parser_test.cpp",
+    "wifi_config_center_test.cpp",
     "wifi_config_file_test.cpp",
     "wifi_encryption_util_test.cpp",
     "wifi_global_func_test.cpp",

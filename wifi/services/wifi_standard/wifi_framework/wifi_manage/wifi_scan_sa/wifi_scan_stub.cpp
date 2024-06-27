@@ -192,6 +192,18 @@ int WifiScanStub::OnIsWifiClosedScan(uint32_t code, MessageParcel &data, Message
     return ret;
 }
 
+static constexpr uint8_t HEX_OFFSET = 4;
+static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
+static std::string StringToHex(const std::string &data)
+{
+     std::stringstream ss;
+     for (std::string::size_type i = 0; i < data.size(); ++i) {
+         unsigned char temp = static_cast<unsigned char>(data[i]) >> HEX_OFFSET;
+         ss << HEX_TABLE[temp] << HEX_TABLE[static_cast<unsigned char>(data[i]) & 0xf];
+     }
+     return ss.str();
+}
+
 constexpr int ASH_MEM_SIZE = 1024 * 200;
 void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result, MessageParcel &reply)
 {
@@ -208,7 +220,7 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
     std::stringstream scanInfoStream;
     for (int32_t i = 0; i < contentSize; ++i) {
         scanInfoStream << result[i].bssid << ";";
-        scanInfoStream << result[i].ssid << ";";
+        scanInfoStream << StringToHex(result[i].ssid) << ";";
         scanInfoStream << result[i].bssidType << ";";
         scanInfoStream << result[i].capabilities << ";";
         scanInfoStream << result[i].frequency << ";";

@@ -1181,7 +1181,6 @@ public:
         ;
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
-        pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1196,7 +1195,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
-        pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1211,7 +1209,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
-        pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1454,7 +1451,6 @@ public:
         DhcpResult result;
         pStaStateMachine->pDhcpResultNotify->OnSuccess(0, nullptr, &result);
         pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), nullptr);
-        pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
         pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), &result);
     }
 

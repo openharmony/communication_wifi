@@ -100,12 +100,10 @@ if (defined(ohos_lite)) {
     cflags = [
       "-std=c++17",
       "-fno-rtti",
-      "-fexceptions",
     ]
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",
-      "-fexceptions",
       "-Os",
     ]
 

@@ -38,10 +38,14 @@
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
+constexpr int TWO = 2;
+constexpr int THREE = 5;
 static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiDeviceService";
+const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE_EX = u"ohos.wifi.IWifiDeviceMgr";
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
+sptr<WifiDeviceMgrStub> pWifiDeviceMgrStub = WifiDeviceMgrServiceImpl::GetInstance();
 
 bool Init()
 {
@@ -68,7 +72,6 @@ bool OnRemoteRequest(uint32_t code, MessageParcel &data)
     pWifiDeviceStub->OnRemoteRequest(code, data, reply, option);
     return true;
 }
-
 
 void OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
 {
@@ -682,9 +685,76 @@ void OnSetTxPowerFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), datas);
 }
 
+void OnSetLowTxPowerTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER), datas);
+}
 
+void DoSomethingDeviceMgrStubTest(const uint8_t* data, size_t size)
+{
+    std::string networkName = "backup";
+    std::string name = "restore";
+    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_MGR_GET_DEVICE_SERVICE);
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE_EX);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    WifiDeviceMgrServiceImpl mWifiDeviceMgrServiceImpl;
+    pWifiDeviceMgrStub->OnRemoteRequest(code, datas, reply, option);
+    mWifiDeviceMgrServiceImpl.OnExtension(networkName, datas, reply);
+    mWifiDeviceMgrServiceImpl.OnExtension(name, datas, reply);
+}
 
+bool WifiFuzzTest()
+{
+    return true;
+}
 
+void WifiDeviceServiceImplTest(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    int networkId = static_cast<int>(data[index++]);
+    int uid = static_cast<int>(data[index++]);
+    std::string networkName = std::string(reinterpret_cast<const char*>(data), size);
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % THREE);
+    bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
+    WifiDeviceServiceImpl mWifiDeviceServiceImpl;
+    MessageParcel datas;
+    WifiDeviceConfig config;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+
+    mWifiDeviceServiceImpl.StartWatchdog();
+    mWifiDeviceServiceImpl.DeregisterAutoJoinCondition(networkName);
+    mWifiDeviceServiceImpl.DeregisterFilterBuilder(filterTag, networkName);
+    mWifiDeviceServiceImpl.RegisterAutoJoinCondition(networkName, WifiFuzzTest);
+    mWifiDeviceServiceImpl.HilinkGetMacAddress(config, config.ssid);
+    mWifiDeviceServiceImpl.SaBasicDump(config.ssid);
+    mWifiDeviceServiceImpl.IsScanServiceRunning();
+    mWifiDeviceServiceImpl.StartRoamToNetwork(networkId, networkName, attemptEnable);
+    mWifiDeviceServiceImpl.IsWifiBrokerProcess(uid);
+    mWifiDeviceServiceImpl.CheckConfigPwd(config);
+    mWifiDeviceServiceImpl.CheckConfigEap(config);
+    pWifiDeviceStub->WriteEapConfig(datas, config.wifiEapConfig);
+    pWifiDeviceStub->WriteWifiDeviceConfig(datas, config);
+} 
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
@@ -738,6 +808,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnSetTxPowerFuzzTest(data, size);
     OHOS::Wifi::OnSetSatelliteStateFuzzTest(data, size);
     OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
+    OHOS::Wifi::OnSetLowTxPowerTest(data, size);
+    OHOS::Wifi::DoSomethingDeviceMgrStubTest(data, size);
+    OHOS::Wifi::WifiDeviceServiceImplTest(data, size);
     sleep(4);
     return 0;
 }

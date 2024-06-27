@@ -123,7 +123,7 @@ HWTEST_F(ApConfigUse_Test, GetBestChannelFor5G160MTest, TestSize.Level1)
         .WillRepeatedly(DoAll(SetArgReferee<2>(frequencies), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     int channel = m_apConfigUse->GetBestChannelFor5G(apConfig);
     WIFI_LOGI("GetBestChannelFor5GTest channel=%{public}d", channel);
-    EXPECT_EQ(channel, AP_CHANNEL_5G_160M_DEFAULT);
+    EXPECT_EQ(channel, AP_BANDWIDTH_5G_160M_DEFAULT);
 }
 
 HWTEST_F(ApConfigUse_Test, FilterIndoorChannelTest, TestSize.Level1)

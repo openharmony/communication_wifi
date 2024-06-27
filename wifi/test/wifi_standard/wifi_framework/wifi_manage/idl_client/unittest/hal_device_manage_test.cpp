@@ -33,7 +33,7 @@ HWTEST_F(WifiHalDeviceManagerTest, ScanTest, TestSize.Level1)
 {
     std::string ifaceName;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
-        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1,
+        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName);
     ScanParams scanParams;

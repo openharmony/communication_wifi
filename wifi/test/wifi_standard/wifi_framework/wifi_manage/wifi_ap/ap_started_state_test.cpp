@@ -504,7 +504,7 @@ HWTEST_F(ApStartedState_test, UpdatMacAddressTest, TestSize.Level1)
 {
     std::string ssid = "1234";
     KeyMgmt securityType = KeyMgmt::WPA2_PSK;
-    HotspotConfig curApConfig; 
+    HotspotConfig curApConfig;
     curApConfig.SetSsid("1234");
     curApConfig.SetSecurityType(KeyMgmt::WPA2_PSK);
     EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(_, 0))

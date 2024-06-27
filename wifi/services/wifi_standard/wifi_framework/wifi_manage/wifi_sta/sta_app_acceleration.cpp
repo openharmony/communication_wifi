@@ -18,7 +18,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_app_parser.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "app_mgr_client.h"
 #include "app_network_speed_limit_service.h"
 
@@ -97,9 +97,9 @@ void StaAppAcceleration::SetPmMode(int mode)
     }
 
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode(
-        WifiSettings::GetInstance().GetStaIfaceName(), linkedInfo.frequency, mode);
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), linkedInfo.frequency, mode);
     if (ret != 0) {
         WIFI_LOGE("SetPmMode failed, ret = %{public}d.", ret);
         return;
@@ -137,7 +137,7 @@ void StaAppAcceleration::HighPriorityTransmit(int uid, int protocol, int enable)
 {
     WIFI_LOGI("Enter HighPriorityTransmit.\n");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetDpiMarkRule(
-        WifiSettings::GetInstance().GetStaIfaceName(), uid, protocol, enable);
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), uid, protocol, enable);
     if (ret != 0) {
         WIFI_LOGE("HighPriorityTransmit failed, ret = %{public}d.", ret);
         return;

@@ -15,7 +15,7 @@
 
 #include "wifiscanserver_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include <cstddef>
 #include <cstdint>
 #include <unistd.h>
@@ -229,9 +229,9 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     pnoScanConfig.hiddenNetworkSsid.push_back(std::string(reinterpret_cast<const char*>(data), size));
     pnoScanConfig.savedNetworkSsid.push_back(std::string(reinterpret_cast<const char*>(data), size));
     pnoScanConfig.minRssi5Ghz = static_cast<int>(data[0]);
-    WifiSettings::GetInstance().SetScanGenieState(MODE_STATE_CLOSE);
-    WifiSettings::GetInstance().SetAppPackageName(scanConfig.ssid);
-    WifiSettings::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
+    WifiConfigCenter::GetInstance().SetScanGenieState(MODE_STATE_CLOSE);
+    WifiConfigCenter::GetInstance().SetAppPackageName(scanConfig.ssid);
+    WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
     pScanService->SystemScanDisconnectedPolicy(appId, appId);
     pScanService->SetNetworkInterfaceUpDown(config.externFlag);
     pScanService->ApplyScanPolices(scanType);

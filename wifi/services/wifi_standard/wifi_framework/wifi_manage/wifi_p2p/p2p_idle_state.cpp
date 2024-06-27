@@ -18,7 +18,7 @@
 #include "p2p_state_machine.h"
 #include "wifi_p2p_temp_disc_event.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pIdleState");
 
@@ -111,7 +111,7 @@ bool P2pIdleState::ProcessRemoveDevice(InternalMessage &msg) const
     WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     LOGI("remove all device");
-    WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO);
+    WifiConfigCenter::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO);
 #endif
     return EXECUTED;
 }
@@ -321,8 +321,8 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessage &msg) const
         p2pStateMachine.UpdatePersistentGroups();
     }
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
-    group.SetCreatorUid(WifiSettings::GetInstance().GetP2pCreatorUid());
-    WifiSettings::GetInstance().SaveP2pCreatorUid(-1);
+    group.SetCreatorUid(WifiConfigCenter::GetInstance().GetP2pCreatorUid());
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(-1);
     p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     if (!p2pStateMachine.groupManager.GetCurrentGroup().IsGroupOwner()) {
         p2pStateMachine.StartDhcpClientInterface();

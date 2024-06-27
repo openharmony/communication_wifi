@@ -24,7 +24,6 @@
 #include "wifi_log.h"
 #include "wifi_logger.h"
 #include "wifi_scan_msg.h"
-#include "wifi_settings.h"
  
 using ::testing::_;
 using ::testing::AtLeast;
@@ -117,7 +116,7 @@ HWTEST_F(WifiCountryCodePolicyTest, HandleScanResultActionTest, TestSize.Level1)
     info2.infoElems = std::move(infoElems2);
     list.push_back(info2);
 
-    WifiSettings::GetInstance().SaveScanInfoList(list);
+    WifiConfigCenter::GetInstance().SaveScanInfoList(list);
     m_wifiCountryCodePolicy->HandleScanResultAction();
 }
 
@@ -175,7 +174,7 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultSuccessTes
     info2.infoElems = std::move(infoElems2);
     wifiScanInfoList.push_back(info2);
 
-    WifiSettings::GetInstance().SaveScanInfoList(wifiScanInfoList);
+    WifiConfigCenter::GetInstance().SaveScanInfoList(wifiScanInfoList);
 
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
@@ -251,13 +250,13 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPTest, TestSize.Level1)
     infoElems1.push_back(elem1);
     info1.infoElems = std::move(infoElems1);
     wifiScanInfoList.push_back(info1);
-    WifiSettings::GetInstance().SaveScanInfoList(wifiScanInfoList);
+    WifiConfigCenter::GetInstance().SaveScanInfoList(wifiScanInfoList);
 
     // Add simulated wifi connection results
     WifiLinkedInfo info;
     info.connState = OHOS::Wifi::ConnState::CONNECTED;
     info.bssid = "11:22:33:44:55:66";
-    WifiSettings::GetInstance().SaveLinkedInfo(info, 0);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(info, 0);
 
     std::string code;
     m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code);
@@ -272,7 +271,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultTest, TestSize
     m_wifiCountryCodePolicy->m_wifiCountryCodeFromScanResults = "CN";
     int wifiState = 3;
     int instId = 0;
-    WifiSettings::GetInstance().SetWifiState(wifiState, instId);
+    WifiConfigCenter::GetInstance().SetWifiState(wifiState, instId);
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code));
 }
 

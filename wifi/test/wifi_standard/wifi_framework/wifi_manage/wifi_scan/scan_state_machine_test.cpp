@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "mock_wifi_manager.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_scan_interface.h"
 #include "mock_scan_service.h"
@@ -1080,7 +1081,7 @@ public:
  
     void FilterScanResultTest()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetConnectedBssid(_)).Times(AtLeast(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetConnectedBssid(_)).Times(AtLeast(1));
         std::vector<InterScanInfo> scanInfoList;
         pScanStateMachine->FilterScanResult(scanInfoList);
     }

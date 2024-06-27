@@ -167,6 +167,7 @@ public:
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setDeviceConfig = true;
         MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
         WifiDeviceConfig config;
+        config.keyMgmt = "WEP";
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
     }
 
@@ -1842,7 +1843,7 @@ public:
         msg.SetMessageObj(bssid);
         pStaStateMachine->DealHiLinkDataToWpa(&msg);
     }
- 
+
     void DealHiLinkDataToWpaSuccessTest5()
     {
         InternalMessage msg;
@@ -1857,7 +1858,7 @@ public:
         int event = 0x3018;
         EXPECT_TRUE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
     }
-    
+
     void IsStaDisConnectReasonShouldRetryEventFailedTest()
     {
         int event = 0;
@@ -1869,7 +1870,7 @@ public:
         int event = 8;
         EXPECT_TRUE(pStaStateMachine->IsDisConnectReasonShouldStopTimer(event));
     }
-    
+
     void IsDisConnectReasonShouldStopTimerFailedTest()
     {
         int event = 0;
@@ -2035,14 +2036,14 @@ public:
         param.rand = "1111111";
         param.autn = "222222";
         msg2.SetMessageObj(param);
-        pStaStateMachine->DealWpaEapUmtsAuthEvent(&msg1);
+        pStaStateMachine->DealWpaEapUmtsAuthEvent(&msg2);
     }
 
     void HilinkSaveConfigTest()
     {
         pStaStateMachine->HilinkSaveConfig();
     }
- 
+
     void IsRoamingTest()
     {
         pStaStateMachine->IsRoaming();
@@ -2051,7 +2052,7 @@ public:
     {
         pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_RENEW_FAIL);
     }
- 
+
     void DealGetDhcpIpTimeoutTest()
     {
         InternalMessage *msg = nullptr;
@@ -2060,14 +2061,14 @@ public:
         msg1.SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT);
         pStaStateMachine->DealGetDhcpIpTimeout(&msg1);
     }
- 
+
     void FillSuiteB192CfgTest()
     {
         WifiHalDeviceConfig  halDeviceConfig;
         halDeviceConfig.keyMgmt = "WPA-EAP-SUITE-B-192";
         pStaStateMachine->FillSuiteB192Cfg(halDeviceConfig);
     }
- 
+
     void ReplaceEmptyDnsTest()
     {
         DhcpResult *result = nullptr;
@@ -2869,19 +2870,22 @@ HWTEST_F(StaStateMachineTest, SetWifiLinkedInfoSuccess2, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnSuccessTest, TestSize.Level1)
 {
-    DhcpResultNotifyOnSuccessTest1();
+    DhcpResultNotifyOnSuccessTest();
 }
 
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest1, TestSize.Level1)
 {
+    DhcpResultNotifyOnFailedTest1();
 }
 
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest2, TestSize.Level1)
 {
+    DhcpResultNotifyOnFailedTest2();
 }
 
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest3, TestSize.Level1)
 {
+    DhcpResultNotifyOnFailedTest3();
 }
 
 HWTEST_F(StaStateMachineTest, SaveLinkstateSuccess, TestSize.Level1)

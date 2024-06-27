@@ -78,7 +78,7 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
     std::vector<int> freq2G = {2412, 2417, 2422};
     EXPECT_CALL(WifiSettings::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, 1, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(freq2G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(freq2G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     std::vector<int> channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_2GHZ);
     for (int c : channels) {
         EXPECT_TRUE(IsValid24GChannel(c));
@@ -86,7 +86,7 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
 
     std::vector<int> freq5G = {5180, 5200, 5220};
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, 2, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(freq5G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(freq5G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_5GHZ);
     for (int c : channels) {
         EXPECT_TRUE(IsValid5GChannel(c));
@@ -163,7 +163,6 @@ HWTEST_F(ApConfigUse_Test, JudgeDbacWithP2pTest, TestSize.Level1)
     WifiP2pGroupInfo wifiP2pGroupInfo;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCurrentP2pGroupInfo())
         .WillOnce(DoAll(Return(wifiP2pGroupInfo)));
-
     m_apConfigUse->JudgeDbacWithP2p(apConfig);
 }
 } // namespace Wifi

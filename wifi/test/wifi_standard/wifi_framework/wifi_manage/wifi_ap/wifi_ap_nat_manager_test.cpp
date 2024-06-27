@@ -16,7 +16,7 @@
 #include "wifi_ap_nat_manager.h"
 #include "mock_network_interface.h"
 #include "mock_system_interface.h"
-
+#include "mock_wifi_settings.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -76,7 +76,6 @@ HWTEST_F(WifiApNatManager_test, EnableInterfaceNat_SUCCESS, TestSize.Level1)
     EXPECT_FALSE(mApNatManager.EnableInterfaceNat(true, badifc, ifc1));
     EXPECT_FALSE(mApNatManager.EnableInterfaceNat(true, std::string(""), ifc1));
 }
-
 
 HWTEST_F(WifiApNatManager_test, SetForwarding_SUCCESS, TestSize.Level1)
 {

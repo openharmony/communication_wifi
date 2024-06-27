@@ -40,7 +40,8 @@ WifiScanStub::WifiScanStub(int instId) : mSingleCallback(false), m_instId(instId
 }
 
 WifiScanStub::~WifiScanStub()
-{}
+{
+}
 
 void WifiScanStub::InitHandleMap()
 {
@@ -136,8 +137,8 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
 {
     bool compatible = data.ReadBool();
     std::string name = data.ReadString();
-    WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d",
-        code, data.GetRawDataSize(), compatible);
+    WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d", code, data.GetRawDataSize(),
+        compatible);
     WifiSettings::GetInstance().SetAppPackageName(name);
     ErrCode ret = Scan(compatible);
     WifiSettings::GetInstance().SetAppPackageName("");
@@ -196,12 +197,12 @@ static constexpr uint8_t HEX_OFFSET = 4;
 static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
 static std::string StringToHex(const std::string &data)
 {
-     std::stringstream ss;
-     for (std::string::size_type i = 0; i < data.size(); ++i) {
-         unsigned char temp = static_cast<unsigned char>(data[i]) >> HEX_OFFSET;
-         ss << HEX_TABLE[temp] << HEX_TABLE[static_cast<unsigned char>(data[i]) & 0xf];
-     }
-     return ss.str();
+    std::stringstream ss;
+    for (std::string::size_type i = 0; i < data.size(); ++i) {
+        unsigned char temp = static_cast<unsigned char>(data[i]) >> HEX_OFFSET;
+        ss << HEX_TABLE[temp] << HEX_TABLE[static_cast<unsigned char>(data[i]) & 0xf];
+    }
+    return ss.str();
 }
 
 constexpr int ASH_MEM_SIZE = 1024 * 200;
@@ -231,10 +232,10 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         scanInfoStream << result[i].rssi << ";";
         scanInfoStream << static_cast<int>(result[i].securityType) << ";";
         scanInfoStream << result[i].infoElems.size() << ";";
-        for (const auto& elem : result[i].infoElems) {
+        for (const auto &elem : result[i].infoElems) {
             scanInfoStream << elem.id << ";";
             scanInfoStream << elem.content.size() << ";";
-            for (const auto& byte : elem.content) {
+            for (const auto &byte : elem.content) {
                 scanInfoStream << static_cast<int>(byte) << ";";
             }
         }
@@ -274,10 +275,10 @@ void WifiScanStub::SendScanInfoSmall(int32_t contentSize, std::vector<WifiScanIn
         reply.WriteInt32(result[i].rssi);
         reply.WriteInt32(static_cast<int>(result[i].securityType));
         reply.WriteUint32(result[i].infoElems.size());
-        for (const auto& elem : result[i].infoElems) {
+        for (const auto &elem : result[i].infoElems) {
             reply.WriteInt32(elem.id);
             reply.WriteUint32(elem.content.size());
-            for (const auto& byte : elem.content) {
+            for (const auto &byte : elem.content) {
                 reply.WriteInt32(static_cast<int>(byte));
             }
         }
@@ -295,8 +296,8 @@ void WifiScanStub::SendScanInfoSmall(int32_t contentSize, std::vector<WifiScanIn
 int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     bool compatible = data.ReadBool();
-    WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %{public}zu, compatible:%{public}d",
-        code, data.GetRawDataSize(), compatible);
+    WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %{public}zu, compatible:%{public}d", code,
+        data.GetRawDataSize(), compatible);
     std::vector<WifiScanInfo> result;
     ErrCode ret = GetScanInfoList(result, compatible);
     reply.WriteInt32(0);
@@ -345,7 +346,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             }
         }
         WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
-        
+
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
@@ -369,8 +370,8 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
     return 0;
 }
 
-int WifiScanStub::OnGetSupportedFeatures(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     long features = 0;
@@ -395,8 +396,8 @@ void WifiScanStub::SetSingleCallback(const bool isSingleCallback)
     mSingleCallback = true;
 }
 
-int WifiScanStub::OnSetScanOnlyAvailable(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnSetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     bool enabled = data.ReadBool();
     WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable enabled is %{public}d", enabled);
@@ -405,8 +406,8 @@ int WifiScanStub::OnSetScanOnlyAvailable(
     return 0;
 }
 
-int WifiScanStub::OnGetScanOnlyAvailable(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnGetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     WIFI_LOGI("In WifiScanStub::OnGetScanOnlyAvailable");
     bool state = false;
@@ -419,8 +420,7 @@ int WifiScanStub::OnGetScanOnlyAvailable(
     return 0;
 }
 
-int WifiScanStub::OnStartWifiPnoScan(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnStartWifiPnoScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGI("In WifiScanStub::OnStartWifiPnoScan");
     bool isStart = data.ReadBool();
@@ -431,5 +431,5 @@ int WifiScanStub::OnStartWifiPnoScan(
     reply.WriteInt32(ret);
     return 0;
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

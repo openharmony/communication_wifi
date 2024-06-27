@@ -232,7 +232,6 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->UnRegisterP2pServiceCallbacks(mP2pCallback);
     pP2pInterface->Hid2dCreateGroup(period, scanType);
     pP2pInterface->Hid2dConnect(hidConfig);
-    pP2pInterface->SetGroupUid(period);
     pP2pInterface->Hid2dRequestGcIp(groupOwnerAddress, serviceName);
     pP2pInterface->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, period);
     pP2pInterface->Hid2dGetSelfWifiCfgInfo(cfgTyp, cfgData, &period);

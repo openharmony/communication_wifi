@@ -19,7 +19,7 @@
 #include "wifi_hid2d_msg.h"
 #include "wifi_p2p_msg.h"
 #include "wifi_p2p_service.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -146,7 +146,7 @@ HWTEST_F(WifiP2pServiceTest, GetCurrentGroup, TestSize.Level1)
 {
     WifiP2pLinkedInfo p2pInfo;
     p2pInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
-    WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
     WifiP2pGroupInfo group;
     EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_FAILED);
 }

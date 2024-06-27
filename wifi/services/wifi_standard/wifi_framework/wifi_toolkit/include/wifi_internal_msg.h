@@ -53,6 +53,8 @@ constexpr int RSSI_LEVEL_4_5G = -65;
 constexpr int AIRPLANE_MODE_OPEN = 1;
 constexpr int AIRPLANE_MODE_CLOSE = 2;
 
+constexpr int FUZZY_BSSID_MAX_MATCH_CNT = 30;
+
 enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, SEMI_ACTIVE, UNKNOWN };
 
 enum class WifiFeatures {
@@ -324,12 +326,13 @@ struct MovingFreezePolicy {
 
 /* wifi RandomMac store */
 struct WifiStoreRandomMac {
+    int version = 0;
     std::string ssid;
     std::string keyMgmt;
     std::string peerBssid;
     std::string randomMac;
     std::string preSharedKey;
-    std::vector<std::string> fuzzyBssids;
+    std::unordered_set<std::string> fuzzyBssids;
 };
 
 struct WifiPortalConf {

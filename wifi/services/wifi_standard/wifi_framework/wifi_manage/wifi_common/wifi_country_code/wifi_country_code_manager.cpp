@@ -24,7 +24,7 @@
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -96,7 +96,7 @@ bool WifiCountryCodeManager::IsAllowUpdateWifiCountryCode()
         return ret;
     }
 
-    std::map <int, WifiLinkedInfo> allLinkedInfo = WifiSettings::GetInstance().GetAllWifiLinkedInfo();
+    std::map <int, WifiLinkedInfo> allLinkedInfo = WifiConfigCenter::GetInstance().GetAllWifiLinkedInfo();
     for (auto item : allLinkedInfo) {
         if (item.second.connState == ConnState::CONNECTED) {
             WIFI_LOGI("wifi connected, not allow update wifi country code, instId=%{public}d", item.first);

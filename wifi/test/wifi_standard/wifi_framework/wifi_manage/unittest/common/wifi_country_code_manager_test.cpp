@@ -26,6 +26,7 @@
 #include "state_machine.h"
 #include "i_ap_service_callbacks.h"
 #include "sta_service_callback.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 
 using ::testing::_;
@@ -149,8 +150,7 @@ HWTEST_F(WifiCountryCodeManagerTest, UnregisterWifiCountryCodeChangeListenerFail
 HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaOpenResTest enter");
-    EXPECT_CALL(WifiSettings::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetLastAirplaneMode(_, _)).WillRepeatedly(Return(1));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
     StaServiceCallback cbk = WifiCountryCodeManager::GetInstance().GetStaCallback();
     sleep(1);
     ASSERT_TRUE(cbk.OnStaOpenRes != nullptr);
@@ -169,7 +169,7 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
 HWTEST_F(WifiCountryCodeManagerTest, DealStaCloseResTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaCloseResTest enter");
-    EXPECT_CALL(WifiSettings::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
     StaServiceCallback cbk = WifiCountryCodeManager::GetInstance().GetStaCallback();
     sleep(1);
     ASSERT_TRUE(cbk.OnStaOpenRes != nullptr);

@@ -25,10 +25,7 @@ config("module_private_config") {
 
 ohos_unittest("wifi_non_mock_unittest") {
   module_out_path = module_output_path
-  sources = [
-    "block_connect_service_test.cpp",
-    "wifi_config_center_test.cpp",
-  ]
+  sources = [ "block_connect_service_test.cpp" ]
 
   include_dirs = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",

@@ -18,6 +18,7 @@
 #include "operator_overload.h"
 #include "ap_config_use.h"
 #include "mock_wifi_ap_hal_interface.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "wifi_ap_msg.h"
 #include "wifi_logger.h"
@@ -60,12 +61,12 @@ HWTEST_F(ApConfigUse_Test, UpdateApChannelConfigTest, TestSize.Level1)
     apConfig.SetChannel(1);
     WifiLinkedInfo wifiLinkedInfo;
     wifiLinkedInfo.connState = ConnState::DISCONNECTED;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, 0))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, 0))
         .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
 
     WifiP2pLinkedInfo p2pLinkedInfo;
     p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pInfo(_))
         .WillRepeatedly(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)));
 
     m_apConfigUse->UpdateApChannelConfig(apConfig);
@@ -75,7 +76,7 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
 {
     WIFI_LOGI("GetChannelFromDrvOrXmlByBandTest enter");
     std::vector<int> freq2G = {2412, 2417, 2422};
-    EXPECT_CALL(WifiSettings::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, 1, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(freq2G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     std::vector<int> channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_2GHZ);
@@ -119,11 +120,11 @@ HWTEST_F(ApConfigUse_Test, JudgeDbacWithP2pTest, TestSize.Level1)
 
     WifiP2pLinkedInfo p2pLinkedInfo;
     p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pInfo(_))
         .WillOnce(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)))
         .WillRepeatedly(Return(0));
     WifiP2pGroupInfo wifiP2pGroupInfo;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCurrentP2pGroupInfo())
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetCurrentP2pGroupInfo())
         .WillOnce(DoAll(Return(wifiP2pGroupInfo)));
 
     m_apConfigUse->JudgeDbacWithP2p(apConfig);

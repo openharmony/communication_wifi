@@ -138,9 +138,9 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
     std::string name = data.ReadString();
     WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d",
         code, data.GetRawDataSize(), compatible);
-    WifiSettings::GetInstance().SetAppPackageName(name);
+    WifiConfigCenter::GetInstance().SetAppPackageName(name);
     ErrCode ret = Scan(compatible);
-    WifiSettings::GetInstance().SetAppPackageName("");
+    WifiConfigCenter::GetInstance().SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -170,9 +170,9 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
     params.band = static_cast<uint32_t>(data.ReadInt32());
     std::string name = data.ReadString();
 
-    WifiSettings::GetInstance().SetAppPackageName(name);
+    WifiConfigCenter::GetInstance().SetAppPackageName(name);
     ErrCode ret = AdvanceScan(params);
-    WifiSettings::GetInstance().SetAppPackageName("");
+    WifiConfigCenter::GetInstance().SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

@@ -15,6 +15,7 @@
 #include "scan_service.h"
 #include <gtest/gtest.h>
 #include "Mock/mock_wifi_manager.h"
+#include "mock_wifi_config_center.h"
 #include "Mock/mock_wifi_settings.h"
 #include "Mock/mock_scan_state_machine.h"
 #include "Mock/mock_wifi_scan_interface.h"
@@ -76,13 +77,13 @@ public:
 
     void GetScanControlInfoSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(0));
         pScanService->GetScanControlInfo();
     }
 
     void GetScanControlInfoFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(-1));
         pScanService->GetScanControlInfo();
     }
 
@@ -108,9 +109,9 @@ public:
 
     void AllowExternScanFail2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppRunningState())
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
@@ -124,16 +125,16 @@ public:
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         pScanService->staStatus = STATUS;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppRunningState())
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
     void AllowExternScanFail4()
     {
         pScanService->disableScanFlag = true;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 

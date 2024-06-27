@@ -23,7 +23,7 @@
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 #include "wifi_p2p_msg.h"
 #include "wifi_common_msg.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #endif
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
@@ -842,7 +842,7 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
         macAddrInfo.bssid = iter->GetDeviceAddress();
         macAddrInfo.bssidType = iter->GetDeviceAddressType();
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("%{public}s: no record found, bssid:%{private}s, bssidType:%{public}d",
                 __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);

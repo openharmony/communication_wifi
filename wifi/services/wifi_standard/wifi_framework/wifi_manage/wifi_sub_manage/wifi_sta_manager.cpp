@@ -144,7 +144,7 @@ void WifiStaManager::DealStaStopped(int instId)
 
 void WifiStaManager::ResetSelfcureOpenWifi(int instId)
 {
-    if (!WifiSettings::GetInstance().GetWifiSelfcureReset()) {
+    if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         return;
     }
     WIFI_LOGI("reset selfcure wifi off->open!");
@@ -153,7 +153,7 @@ void WifiStaManager::ResetSelfcureOpenWifi(int instId)
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
     auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaClose(instId);
-    WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     return;
 }
@@ -195,7 +195,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         magic_enum::Enum2Name(state).c_str());
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
-    if (isReport && !WifiSettings::GetInstance().GetWifiSelfcureReset()) {
+    if (isReport && !WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiEventCallbackMsg cbMsg;
         cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
         cbMsg.msgData = reportStateNum;
@@ -224,7 +224,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     }
 #ifdef FEATURE_HPF_SUPPORT
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
-        int screenState = WifiSettings::GetInstance().GetScreenState();
+        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
         WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
     }
 #endif

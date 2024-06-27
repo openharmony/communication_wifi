@@ -70,6 +70,7 @@
         "*WriteDataToFile*";
         "*XmlParser*";
         "*WifiBackupConfig*";
+        "*WifiConfigCenter*";
     local:
         *;
 };

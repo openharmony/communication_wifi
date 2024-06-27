@@ -27,7 +27,6 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "xcollie/watchdog.h"
 #include "wifi_sa_manager.h"
-#include "wifi_settings.h"
 #include "mac_address.h"
 #include "wifi_p2p_service_impl.h"
 #include "wifi_country_code_manager.h"
@@ -122,7 +121,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
@@ -149,8 +148,8 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     }
 
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
-        WifiSettings::GetInstance().SetWifiAllowSemiActive(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+        WifiConfigCenter::GetInstance().SetWifiAllowSemiActive(false);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
@@ -186,7 +185,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
     }
 #endif
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
@@ -449,7 +448,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
     }
     /* get all candidate configs */
     std::vector<WifiDeviceConfig> configs;
-    if (WifiConfigCenter::GetInstance().GetCandidateConfigs(uid, configs) != 0) {
+    if (WifiSettings::GetInstance().GetAllCandidateConfig(uid, configs) != 0) {
         WIFI_LOGE("NOT find the caller's configs!");
         return WIFI_OPT_INVALID_CONFIG;
     }
@@ -536,7 +535,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     macAddrInfo.bssid = config.bssid;
     macAddrInfo.bssidType = config.bssidType;
     std::string macAddr =
-        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+        WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
             macAddrInfo);
     if (macAddr.empty()) {
         WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
@@ -728,9 +727,9 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
                 return WIFI_OPT_INVALID_PARAM;
             }
         }
-        WifiConfigCenter::GetInstance().GetCandidateConfigs(uid, result);
+        WifiSettings::GetInstance().GetAllCandidateConfig(uid, result);
     } else {
-        WifiConfigCenter::GetInstance().GetDeviceConfig(result);
+        WifiSettings::GetInstance().GetDeviceConfig(result);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -893,7 +892,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         macAddrInfo.bssid = config.bssid;
         macAddrInfo.bssidType = config.bssidType;
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
@@ -1300,7 +1299,7 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    level = WifiConfigCenter::GetInstance().GetSignalLevel(rssi, band, m_instId);
+    level = WifiSettings::GetInstance().GetSignalLevel(rssi, band, m_instId);
     WIFI_LOGI("GetSignalLevel device impl end...");
     return WIFI_OPT_SUCCESS;
 }
@@ -1379,7 +1378,7 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
     WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
 #endif
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
-        !WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode(m_instId)) {
+        !WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(m_instId)) {
         WIFI_LOGI("current airplane mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
     }
@@ -1479,7 +1478,7 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
         ss << "  Connection.macAddress: " << MacAnonymize(linkedInfo.macAddress) << "\n";
         ss << "  Connection.isHiddenSSID: " << (linkedInfo.ifHiddenSSID ? "true" : "false") << "\n";
 
-        int level = WifiConfigCenter::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
+        int level = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
         ss << "  Connection.signalLevel: " << level << "\n";
         result += ss.str();
     }
@@ -1521,7 +1520,7 @@ ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported
         return WIFI_OPT_INVALID_PARAM;
     } else {
         ChannelsTable channels;
-        WifiSettings::GetInstance().GetValidChannels(channels);
+        WifiConfigCenter::GetInstance().GetValidChannels(channels);
         supported = channels.find((BandType)bandType) != channels.end();
     }
     return WIFI_OPT_SUCCESS;
@@ -1546,7 +1545,7 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
 
     ChannelsTable channels;
-    WifiSettings::GetInstance().GetValidChannels(channels);
+    WifiConfigCenter::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
         result = channels[BandType::BAND_5GHZ];
     }
@@ -1601,7 +1600,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);
@@ -1646,7 +1645,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
     } else {
         WifiStoreRandomMac randomMacInfo;
         std::vector<WifiScanInfo> scanInfoList;
-        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
+        WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
         for (auto scanInfo : scanInfoList) {
             if ((deviceConfig.ssid == scanInfo.ssid) &&
                 (ComparedHinlinkKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
@@ -1666,7 +1665,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
         if (randomMacInfo.randomMac.empty()) {
             /* Sets the MAC address of WifiSettings. */
             std::string macAddress;
-            WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+            WifiConfigCenter::GetInstance().GenerateRandomMacAddress(macAddress);
             randomMacInfo.randomMac = macAddress;
             LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
                 __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
@@ -1787,8 +1786,8 @@ void WifiDeviceServiceImpl::StartWatchdog(void)
     auto taskFunc = []() {
         uint64_t now = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count());
-        uint64_t interval = now - WifiSettings::GetInstance().GetThreadStartTime();
-        if ((WifiSettings::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
+        uint64_t interval = now - WifiConfigCenter::GetInstance().GetThreadStartTime();
+        if ((WifiConfigCenter::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
             WIFI_LOGE("watchdog happened, thread need restart");
         } else {
             WIFI_LOGD("thread work normally");

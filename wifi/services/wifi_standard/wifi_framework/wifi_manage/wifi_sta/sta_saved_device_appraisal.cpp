@@ -14,7 +14,7 @@
  */
 #include "sta_saved_device_appraisal.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("StaSavedDeviceAppraisal");
@@ -109,7 +109,7 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
         WIFI_LOGI("Skip disabled Network %{public}s.", SsidAnonymize(device.ssid).c_str());
         return true;
     }
-    std::string bssid = WifiSettings::GetInstance().GetConnectTimeoutBssid(m_instId);
+    std::string bssid = WifiConfigCenter::GetInstance().GetConnectTimeoutBssid(m_instId);
     if (!bssid.empty() && bssid == device.bssid) {
         WIFI_LOGI("Skip the connect timeout Network %{public}s.", SsidAnonymize(device.ssid).c_str());
         return true;
@@ -141,9 +141,10 @@ void StaSavedDeviceAppraisal::AppraiseDeviceQuality(int &score, InterScanInfo &s
     }
 
     /* Bonus points for last user selection */
-    int userLastSelectedNetworkId = WifiSettings::GetInstance().GetUserLastSelectedNetworkId(m_instId);
+    int userLastSelectedNetworkId = WifiConfigCenter::GetInstance().GetUserLastSelectedNetworkId(m_instId);
     if (userLastSelectedNetworkId != INVALID_NETWORK_ID && userLastSelectedNetworkId == device.networkId) {
-        time_t userLastSelectedNetworkTimeVal = WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal(m_instId);
+        time_t userLastSelectedNetworkTimeVal = WifiConfigCenter::GetInstance().GetUserLastSelectedNetworkTimeVal(
+            m_instId);
         time_t now = time(0);
         time_t timeDifference = now - userLastSelectedNetworkTimeVal;
         /*

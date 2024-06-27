@@ -18,7 +18,7 @@
 
 #include "ap_stations_manager.h"
 #include "internal_message.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "ap_state_machine.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_logger.h"
@@ -88,7 +88,7 @@ void ApMonitor::StartMonitor()
     };
     WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 
-    std::string iface = WifiSettings::GetInstance().GetApIfaceName();
+    std::string iface = WifiConfigCenter::GetInstance().GetApIfaceName();
     m_selectIfacName = iface;
     m_setMonitorIface.insert(iface);
 }

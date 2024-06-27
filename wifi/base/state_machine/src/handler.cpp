@@ -16,7 +16,7 @@
 #include <iostream>
 #include <sys/time.h>
 #include "wifi_log.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_HANDLER"
 
@@ -127,10 +127,10 @@ void Handler::GetAndDistributeMessage()
             continue;
         }
         LOGD("Handler get message: %{public}d\n", msg->GetMessageName());
-        WifiSettings::GetInstance().SetThreadStatusFlag(true);
+        WifiConfigCenter::GetInstance().SetThreadStatusFlag(true);
         DistributeMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);
-        WifiSettings::GetInstance().SetThreadStatusFlag(false);
+        WifiConfigCenter::GetInstance().SetThreadStatusFlag(false);
     }
 
     return;

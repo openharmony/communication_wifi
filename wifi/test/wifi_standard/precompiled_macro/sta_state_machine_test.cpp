@@ -154,14 +154,14 @@ public:
         int value = 1;
         pStaStateMachine->SetExternalSim("wlan0", EAP_METHOD_NONE, value);
     }
- 
+
     void FillSuiteB192CfgTest()
     {
         WifiHalDeviceConfig  halDeviceConfig;
         halDeviceConfig.keyMgmt = "WPA-EAP";
         pStaStateMachine->FillSuiteB192Cfg(halDeviceConfig);
     }
- 
+
     void ConvertDeviceCfgSuccess()
     {
         std::vector<WifiScanInfo> scanInfoList;
@@ -176,33 +176,33 @@ public:
             .WillOnce(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
     }
- 
+
     void GetGsmAuthResponseWithoutLengthTest()
     {
         EapSimGsmAuthParam param;
         param.rands.push_back("aaaaa");
         pStaStateMachine->GetGsmAuthResponseWithoutLength(param);
     }
- 
+
     void GetGsmAuthResponseWithLengthTest()
     {
         EapSimGsmAuthParam param;
         param.rands.push_back("aaaaa");
         pStaStateMachine->GetGsmAuthResponseWithLength(param);
     }
- 
+
     void StartDetectTimerTest()
     {
         int detectType = DETECT_TYPE_PERIODIC;
         pStaStateMachine->StartDetectTimer(detectType);
     }
- 
+
     void DealApRoamingStateTimeoutTest()
     {
         InternalMessage *msg = nullptr;
         pStaStateMachine->DealApRoamingStateTimeout(msg);
     }
- 
+
     void SaveDhcpResultTest()
     {
         DhcpResult *dest = nullptr;
@@ -212,7 +212,7 @@ public:
         DhcpResult sourceObj;
         pStaStateMachine->pDhcpResultNotify->SaveDhcpResult(&destObj, &sourceObj);
     }
- 
+
     void SaveDhcpResultExtTest()
     {
         DhcpResult *dest = nullptr;
@@ -222,7 +222,7 @@ public:
         DhcpResult sourceObj;
         pStaStateMachine->pDhcpResultNotify->SaveDhcpResultExt(&destObj, &sourceObj);
     }
- 
+
     void TryToSaveIpV4ResultExtTest()
     {
         IpInfo ipInfo;
@@ -232,7 +232,7 @@ public:
         DhcpResult result1;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4ResultExt(ipInfo, ipv6Info, &result1);
     }
- 
+
     void TryToSaveIpV4ResultTest()
     {
         IpInfo ipInfo;
@@ -252,7 +252,7 @@ public:
         DhcpResult result1;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6Result(ipInfo, ipv6Info, &result1);
     }
- 
+
     void SetConnectMethodTest()
     {
         int connectMethod = NETWORK_SELECTED_BY_AUTO;
@@ -291,62 +291,62 @@ HWTEST_F(StaStateMachineTest, SetExternalSimTest, TestSize.Level1)
 {
     SetExternalSimTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, FillSuiteB192CfgTest, TestSize.Level1)
 {
     FillSuiteB192CfgTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, ConvertDeviceCfgSuccess, TestSize.Level1)
 {
     ConvertDeviceCfgSuccess();
 }
- 
+
 HWTEST_F(StaStateMachineTest, GetGsmAuthResponseWithoutLengthTest, TestSize.Level1)
 {
     GetGsmAuthResponseWithoutLengthTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, GetGsmAuthResponseWithLengthTest, TestSize.Level1)
 {
     GetGsmAuthResponseWithLengthTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, StartDetectTimerTest, TestSize.Level1)
 {
     StartDetectTimerTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, DealApRoamingStateTimeoutTest, TestSize.Level1)
 {
     DealApRoamingStateTimeoutTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, SaveDhcpResultTest, TestSize.Level1)
 {
     SaveDhcpResultTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, SaveDhcpResultExtTest, TestSize.Level1)
 {
     SaveDhcpResultExtTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultExtTest, TestSize.Level1)
 {
     TryToSaveIpV4ResultExtTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultTest, TestSize.Level1)
 {
     TryToSaveIpV4ResultTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultTest, TestSize.Level1)
 {
     TryToSaveIpV6ResultTest();
 }
- 
+
 HWTEST_F(StaStateMachineTest, SetConnectMethodTest, TestSize.Level1)
 {
     SetConnectMethodTest();

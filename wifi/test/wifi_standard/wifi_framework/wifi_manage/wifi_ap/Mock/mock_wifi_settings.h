@@ -70,7 +70,6 @@ public:
     virtual int SetHotspotIdleTimeout(int time) = 0;
     virtual void GenerateRandomMacAddress(std::string &randomMacAddr) = 0;
     virtual void GenerateRandomMacAddress(std::string peerBssid, std::string &randomMacAddr) = 0;
-    
 };
 
 class WifiSettings : public MockWifiSettings {

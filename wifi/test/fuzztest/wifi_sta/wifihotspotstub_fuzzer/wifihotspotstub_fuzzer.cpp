@@ -40,17 +40,21 @@
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
+constexpr int THREE = 8;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiHotspotService";
 const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceService";
+const std::u16string FORMMGR_INTERFACE_TOKEN_HOSPOT_EX = u"ohos.wifi.IWifiHotspotMgr";
 static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 std::shared_ptr<WifiHotspotStub> pWifiHotspotServiceImpl = std::make_shared<WifiHotspotServiceImpl>();
+sptr<WifiHotspotMgrStub> pWifiHotspotMgrStub = WifiHotspotMgrServiceImpl::GetInstance();
 
 bool Init()
 {
     if (!g_isInsted) {
         if (WifiConfigCenter::GetInstance().GetApMidState(0) != WifiOprMidState::RUNNING) {
+            LOGE("Init setmidstate!");
             WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::RUNNING, 0);
         }
         g_isInsted = true;
@@ -337,11 +341,74 @@ void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
         datas, reply, option);
 }
 
+void OnGetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
+}
 
+bool DoSomethingHotSpotMgrStubTest(const uint8_t* data, size_t size)
+{
+    uint32_t code = static_cast<uint32_t>(HotspotInterfaceCode::WIFI_MGR_GET_HOTSPOT_SERVICE);
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_HOSPOT_EX);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiHotspotMgrStub->OnRemoteRequest(code, datas, reply, option);
+    return true;
+}
 
-
-
-
+void WifiHotspotServiceImplFuzzTest(const uint8_t* data, size_t size)
+{
+    WifiHotspotServiceImpl mWifiHotspotServiceImpl;
+    int index = 0;
+    KeyMgmt type = static_cast<KeyMgmt>(static_cast<int>(data[0]) % THREE);
+    BandType newBand = static_cast<BandType>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
+    int channelid = static_cast<int32_t >(data[0]);
+    std::string primaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
+    std::string secondaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
+    std::vector<BandType> bandsFromCenter;
+    bandsFromCenter.push_back(newBand);
+    ChannelsTable channInfoFromCenter;
+    HotspotConfig config;
+    StationInfo updateInfo;
+    if (size >= U32_AT_SIZE_ZERO) {
+        std::string deviceName = std::string(reinterpret_cast<const char*>(data), size);
+        std::string networkName = std::string(reinterpret_cast<const char*>(data), size);
+        std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
+        config.SetSsid(deviceName);
+        config.SetPreSharedKey(networkName);
+        config.SetSecurityType(type);
+        config.SetBand(newBand);
+        config.SetBandWidth(channelid);
+        config.SetChannel(channelid);
+        config.SetMaxConn(channelid);
+        config.SetIpAddress(mDeviceAddress);
+        updateInfo.deviceName = deviceName;
+        updateInfo.bssid = networkName;
+        updateInfo.ipAddr = mDeviceAddress;
+        updateInfo.bssidType = static_cast<int >(data[index++]);;
+    }
+    mWifiHotspotServiceImpl.SetHotspotConfig(config);
+    mWifiHotspotServiceImpl.TransRandomToRealMac(updateInfo, updateInfo);
+    mWifiHotspotServiceImpl.ConfigInfoDump(primaryDeviceType);
+    mWifiHotspotServiceImpl.StationsInfoDump(secondaryDeviceType);
+    mWifiHotspotServiceImpl.SaBasicDump(secondaryDeviceType);
+    mWifiHotspotServiceImpl.CfgCheckSsid(config);
+    mWifiHotspotServiceImpl.CfgCheckPsk(config);
+    mWifiHotspotServiceImpl.CfgCheckBand(config, bandsFromCenter);
+    mWifiHotspotServiceImpl.CfgCheckIpAddress(secondaryDeviceType);
+    mWifiHotspotServiceImpl.IsValidHotspotConfig(config, config, bandsFromCenter, channInfoFromCenter);
+}
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
@@ -368,6 +435,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnIsHotspotDualBandSupportedFuzzTest(data, size);
     OHOS::Wifi::OnSetApIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::OnGetApIfaceNameFuzzTest(data, size);
+    OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
+    OHOS::Wifi::WifiHotspotServiceImplFuzzTest(data, size);
+    OHOS::Wifi::DoSomethingHotSpotMgrStubTest(data, size);
     sleep(4);
     return 0;
 }

@@ -173,7 +173,7 @@ public:
         scanInfoList.push_back(temp);
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_))
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
             .WillOnce(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
     }

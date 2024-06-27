@@ -1466,7 +1466,7 @@ int SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::s
 {
     int errorKeyValue = 0;
     if (key == "version") {
-        item.version = std::stoi(value);;
+        item.version = std::stoi(value);
     } else if (key == "ssid") {
         item.ssid = value;
     } else if (key == "HexSsid") {

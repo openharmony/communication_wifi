@@ -161,9 +161,40 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
         LOGE("OnEventAssociateReject: invalid parameter!");
         return 1;
     }
+   const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
 
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    /* Special handling for WPA3-Personal networks. If the password is
+       incorrect, the AP will send association rejection, with status code 1
+       (unspecified failure). In SAE networks, the password authentication
+       is not related to the 4-way handshake. In this case, we will send an
+       authentication failure event up. */
+    bool isWrongPwd = false;
+    char bssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+    ConvertMacArr2String(associateRejectParam->bssid, associateRejectParam->bssidLen, bssid, sizeof(bssid));
+    std::vector<OHOS::Wifi::WifiScanInfo> scanResults;
+    OHOS::Wifi::WifiSettings::GetInstance().GetScanInfoList(scanResults);
+    for (OHOS::Wifi::WifiScanInfo &item : scanResults) {
+        if (strcasecmp(item.bssid.c_str(), bssid) == 0) {
+            if (strcasecmp(item.bssid.c_str(), bssid) == 0) {
+            if (associateRejectParam->statusCode == WLAN_STATUS_UNSPECIFIED_FAILURE &&
+                (item.capabilities.find("SAE") != std::string::npos)) {
+                isWrongPwd = true;
+                break;
+            } else if (associateRejectParam->statusCode == WLAN_STATUS_CHALLENGE_FAIL &&
+                item.capabilities.find("WEP") != std::string::npos) {
+                isWrongPwd = true;
+                break;
+            }
+        }
+        }
+    }
+    if (isWrongPwd && cbk.onWpaSsidWrongKey) {
+        LOGI("OnEventAssociateReject onWpaSsidWrongKey");
+        cbk.onWpaSsidWrongKey(1);
+        return 0;
+    }
     if (cbk.onWpaConnectionReject) {
+        LOGI("OnEventAssociateReject onWpaConnectionReject");
         cbk.onWpaConnectionReject(associateRejectParam->statusCode);
     }
     return 0;

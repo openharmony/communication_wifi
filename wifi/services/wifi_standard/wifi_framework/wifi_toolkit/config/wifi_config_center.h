@@ -124,14 +124,6 @@ public:
 
     bool EnableNetwork(int networkId, bool disableOthers, int instId = 0);
 
-    void SetAppPackageName(const std::string &appPackageName);
-
-    const std::string GetAppPackageName();
-
-    void SetAppRunningState(ScanMode appRunMode);
-
-    ScanMode GetAppRunningState() const;
-
     WifiOprMidState GetScanMidState(int instId = 0);
 
     bool SetScanMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0);
@@ -358,8 +350,6 @@ private:
 
     // SCAN
     std::mutex mScanMutex;
-    std::string mAppPackageName;
-    std::atomic<ScanMode> mAppRunningModeState {ScanMode::SYS_FOREGROUND_SCAN};
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
     std::map<int, ScanControlInfo> mScanControlInfo;

@@ -14,6 +14,7 @@
  */
 
 #include "wifi_config_file_spec.h"
+#include <unordered_set>
 #include "wifi_global_func.h"
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
@@ -1410,18 +1411,63 @@ template <> std::string OutTClassString<MovingFreezePolicy>(MovingFreezePolicy &
 
 template <> void ClearTClass<WifiStoreRandomMac>(WifiStoreRandomMac &item)
 {
+    item.version = -1;
     item.ssid.clear();
     item.keyMgmt.clear();
     item.peerBssid.clear();
     item.randomMac.clear();
+    item.preSharedKey.clear();
+    item.fuzzyBssids.clear();
     return;
+}
+
+static void SetWifiStoreRandomMacFuzzyBssids(WifiStoreRandomMac &item, const std::string &value)
+{
+    item.fuzzyBssids.clear();
+    if (!IsPskEncryption(item.keyMgmt)) {
+        item.fuzzyBssids.clear();
+        return;
+    }
+
+    std::vector<std::string> fuzzyBssids;
+    SplitString(value, "|", fuzzyBssids);
+    if (fuzzyBssids.empty()) {
+        return;
+    }
+    int tmpMax;
+    switch (item.version) {
+        case -1:
+            tmpMax = 1;
+            break;
+        default:
+            tmpMax = FUZZY_BSSID_MAX_MATCH_CNT;
+            break;
+    }
+    if (fuzzyBssids.size() > FUZZY_BSSID_MAX_MATCH_CNT) {
+        int i = 0;
+        std::vector<std::string>::reverse_iterator rIter;
+        for (rIter = fuzzyBssids.rbegin(); rIter != fuzzyBssids.rend(); ++rIter) {
+            item.fuzzyBssids.insert(*rIter);
+            i++;
+            if (i >= tmpMax) {
+                break;
+            }
+        }
+    } else {
+        for (auto &it: fuzzyBssids) {
+            item.fuzzyBssids.insert(it);
+        }
+    }
+    fuzzyBssids.clear();
 }
 
 template <>
 int SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
-    if (key == "ssid") {
+    if (key == "version") {
+        item.version = std::stoi(value);
+    } else if (key == "ssid") {
         item.ssid = value;
     } else if (key == "HexSsid") {
         std::vector<char> vec;
@@ -1439,7 +1485,7 @@ int SetTClassKeyValue<WifiStoreRandomMac>(WifiStoreRandomMac &item, const std::s
     } else if (key == "randomMac") {
         item.randomMac = value;
     } else if (key == "fuzzyBssids") {
-        SplitString(value, "|", item.fuzzyBssids);
+        SetWifiStoreRandomMacFuzzyBssids(item, value);
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -1452,18 +1498,27 @@ template <> std::string GetTClassName<WifiStoreRandomMac>()
     return "WifiStoreRandomMac";
 }
 
-static std::string OutWifiStoreRandomMacBssids(const std::vector<std::string> &bssids, const std::string prefix = "|")
+static std::string OutWifiStoreRandomMacBssids(const std::unordered_set<std::string> &bssids,
+    const std::string prefix = "|")
 {
     std::ostringstream ss;
     size_t count = bssids.size();
-    for (size_t index = 0; index < count; index ++) {
+    if (count > FUZZY_BSSID_MAX_MATCH_CNT) {
+        LOGE("%{public}s fuzzyBssids.size:%{public}zu is bigger than %{public}d",
+            __func__, count, FUZZY_BSSID_MAX_MATCH_CNT);
+    }
+    size_t index = 0;
+    for (const auto &item: bssids) {
         if (index != count -1) {
-            ss << bssids[index] << prefix;
+            ss << item << prefix;
         } else {
-            ss << bssids[index] << std::endl;
+            ss << item << std::endl;
+        }
+        index++;
+        if (index >= FUZZY_BSSID_MAX_MATCH_CNT) {
+            break;
         }
     }
-
     return ss.str();
 }
 
@@ -1471,6 +1526,7 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
+    ss << "    " <<"version=" << item.version << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
     ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;

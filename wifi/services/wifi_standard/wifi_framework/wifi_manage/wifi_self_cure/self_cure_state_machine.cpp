@@ -25,7 +25,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "network_status_history_manager.h"
 #include "wifi_hisysevent.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_app_state_aware.h"
 #include "ip_qos_monitor.h"
  
@@ -180,7 +180,7 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     WIFI_LOGI("ConnectedMonitorState GoInState function.");
     IpQosMonitor::GetInstance().StartMonitor();
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     lastConnectedBssid = linkedInfo.bssid;
     pSelfCureStateMachine->arpDetectionFailedCnt = 0;
     hasInternetRecently = false;
@@ -191,7 +191,7 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     wifiSwitchAllowed = false;
     mobileHotspot = linkedInfo.isDataRestricted == 1 ? true : false;
     pSelfCureStateMachine->connectNetworkRetryCnt = 0;
-    WifiSettings::GetInstance().SetWifiSelfcureReset(false);
+    WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
     lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
         pSelfCureStateMachine->m_instId);
     if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing == true) {
@@ -263,9 +263,9 @@ void SelfCureStateMachine::ConnectedMonitorState::TransitionToSelfCureState(int 
     }
     WIFI_LOGI("transitionToSelfCureState, reason is : %{public}d.", reason);
     IpInfo wifiIpInfo;
-    WifiSettings::GetInstance().GetIpInfo(wifiIpInfo, pSelfCureStateMachine->m_instId);
+    WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, pSelfCureStateMachine->m_instId);
     IpV6Info wifiIpv6Info;
-    WifiSettings::GetInstance().GetIpv6Info(wifiIpv6Info, pSelfCureStateMachine->m_instId);
+    WifiConfigCenter::GetInstance().GetIpv6Info(wifiIpv6Info, pSelfCureStateMachine->m_instId);
     ipv4DnsEnabled = wifiIpInfo.primaryDns != 0 || wifiIpInfo.secondDns != 0;
     gatewayInvalid = wifiIpInfo.gateway == 0 && wifiIpv6Info.gateway == "";
     if (!ipv4DnsEnabled || gatewayInvalid) {
@@ -517,13 +517,13 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(I
         WIFI_LOGE("msg is nullptr.");
         return;
     }
-    if (!WifiSettings::GetInstance().GetWifiSelfcureReset() ||
+    if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset() ||
         pSelfCureStateMachine->connectNetworkRetryCnt > CONNECT_NETWORK_RETRY) {
         return;
     }
     pSelfCureStateMachine->connectNetworkRetryCnt++;
     WIFI_LOGI("reset selfcure, connect to last connected network.");
-    if (WifiSettings::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
+    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
         pSelfCureStateMachine->StartTimer(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET, CMD_WIFI_CONNECT_TIMEOUT_SCREEN);
     } else {
         pSelfCureStateMachine->StartTimer(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET, CMD_WIFI_CONNECT_TIMEOUT);
@@ -533,7 +533,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(I
         WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
         return;
     }
-    int networkId = WifiSettings::GetInstance().GetLastNetworkId();
+    int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
     pSelfCureStateMachine->selfCureOnGoing = false;
     if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("ConnectToNetwork failed.\n");
@@ -615,10 +615,10 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     renewDhcpCount = 0;
     lastMultiGwSelfFailedType = -1;
     usedMultiGwSelfcure = false;
-    WifiSettings::GetInstance().SetWifiSelfcureReset(false);
+    WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
 
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     currentRssi = linkedInfo.rssi;
     currentBssid = linkedInfo.bssid;
     pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
@@ -989,10 +989,10 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
         return;
     }
 
-    std::string ifaceName = WifiSettings::GetInstance().GetStaIfaceName();
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     pMultiGateway->SetStaticArp(ifaceName, ipAddr, macString);
     if (!pSelfCureStateMachine->IsHttpReachable()) {
-        std::string ifaceName = WifiSettings::GetInstance().GetStaIfaceName();
+        std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
         std::string ipAddr = pMultiGateway->GetGatewayIp();
         pMultiGateway->DelStaticArp(ifaceName, ipAddr);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_MULTI_GATEWAY);
@@ -1015,7 +1015,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
     pSelfCureStateMachine->useWithRandMacAddress = FAC_MAC_REASSOC;
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(FAC_MAC_REASSOC);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
     if (pStaService == nullptr) {
@@ -1049,12 +1049,12 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     testedSelfCureLevel.push_back(requestCureLevel);
 
     WifiLinkedInfo wifiLinkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo);
-    WifiSettings::GetInstance().SetLastNetworkId(wifiLinkedInfo.networkId);
-    WifiSettings::GetInstance().SetWifiSelfcureReset(true);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
+    WifiConfigCenter::GetInstance().SetLastNetworkId(wifiLinkedInfo.networkId);
+    WifiConfigCenter::GetInstance().SetWifiSelfcureReset(true);
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
-    WifiSettings::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
     if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
         WIFI_LOGI("GetWifiTogglerManager is nullptr");
         return;
@@ -1110,7 +1110,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleIpConfigTimeout()
     pSelfCureStateMachine->selfCureOnGoing = false;
     isRenewDhcpTimeout = true;
     std::vector<WifiScanInfo> scanResults;
-    WifiSettings::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
     if (currentAbnormalType == WIFI_CURE_INTERNET_FAILED_TYPE_ROAMING &&
         pSelfCureStateMachine->IsEncryptedAuthType(configAuthType) &&
         pSelfCureStateMachine->GetBssidCounter(scanResults) <= DEAUTH_BSSID_CNT && !finalSelfCureUsed) {
@@ -1208,7 +1208,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
         pSelfCureStateMachine->useWithRandMacAddress = RAND_MAC_REASSOC;
         pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(RAND_MAC_REASSOC);
         WifiLinkedInfo linkedInfo;
-        WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
         int networkId = linkedInfo.networkId;
         IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
         if (pStaService == nullptr) {
@@ -1449,7 +1449,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(Interna
         Wifi6ReassocSelfcure();
         return;
     }
-    WifiSettings::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
+    WifiConfigCenter::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
     WIFI_LOGI("add %{public}s to HTC bla list", MacAnonymize(currentBssid).c_str());
     pSelfCureStateMachine->SendBlaListToDriver();
     std::string param = "1";
@@ -1477,7 +1477,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(Inte
     pSelfCureStateMachine->isWifi6ArpSuccess = false;
     Wifi6BlackListInfo wifi6BlackListInfo(ACTION_TYPE_WIFI6, pSelfCureStateMachine->GetNowMilliSeconds());
 
-    WifiSettings::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
+    WifiConfigCenter::GetInstance().InsertWifi6BlackListCache(currentBssid, wifi6BlackListInfo);
 
     WIFI_LOGI("add %{public}s to wifi6 bla list", MacAnonymize(currentBssid).c_str());
     pSelfCureStateMachine->SendBlaListToDriver();
@@ -1528,7 +1528,7 @@ bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessage *msg
         case CMD_INTERNET_STATUS_DETECT_INTERVAL:
             ret = EXECUTED;
             pSelfCureStateMachine->StopTimer(CMD_INTERNET_STATUS_DETECT_INTERVAL);
-            if (WifiSettings::GetInstance().GetScreenState() != MODE_STATE_CLOSE) {
+            if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_CLOSE) {
                 IpQosMonitor::GetInstance().QueryPackets();
                 pSelfCureStateMachine->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
                     NO_INTERNET_DETECT_INTERVAL_MS);
@@ -1556,7 +1556,7 @@ int64_t SelfCureStateMachine::GetNowMilliSeconds()
 void SelfCureStateMachine::SendBlaListToDriver()
 {
     std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
-    WifiSettings::GetInstance().GetWifi6BlackListCache(wifi6BlackListCache);
+    WifiConfigCenter::GetInstance().GetWifi6BlackListCache(wifi6BlackListCache);
     if (wifi6BlackListCache.empty()) {
         return;
     }
@@ -1618,7 +1618,7 @@ void SelfCureStateMachine::AgeOutWifi6Black(std::map<std::string, Wifi6BlackList
 {
     for (auto iter = wifi6BlackListCache.begin(); iter != wifi6BlackListCache.end(); ++iter) {
         if (GetNowMilliSeconds() - iter->second.updateTime >= WIFI6_BLA_LIST_TIME_EXPIRED) {
-            WifiSettings::GetInstance().RemoveWifi6BlackListCache(iter->first);
+            WifiConfigCenter::GetInstance().RemoveWifi6BlackListCache(iter->first);
         }
     }
     if (wifi6BlackListCache.size() >= WIFI6_MAX_BLA_LIST_NUM) {
@@ -1630,7 +1630,7 @@ void SelfCureStateMachine::AgeOutWifi6Black(std::map<std::string, Wifi6BlackList
                 earliestTime = iter->second.updateTime;
             }
         }
-        WifiSettings::GetInstance().RemoveWifi6BlackListCache(delBssid);
+        WifiConfigCenter::GetInstance().RemoveWifi6BlackListCache(delBssid);
     }
 }
 
@@ -1643,7 +1643,7 @@ void SelfCureStateMachine::SetHttpMonitorStatus(bool isHttpReachable)
 int SelfCureStateMachine::GetCurSignalLevel()
 {
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
     WIFI_LOGD("GetCurSignalLevel, signalLevel : %{public}d", signalLevel);
     return signalLevel;
@@ -1704,7 +1704,7 @@ std::string SelfCureStateMachine::TransVecToIpAddress(std::vector<uint32_t> vec)
 
 int SelfCureStateMachine::GetLegalIpConfiguration(IpInfo &dhcpResults)
 {
-    WifiSettings::GetInstance().GetIpInfo(dhcpResults);
+    WifiConfigCenter::GetInstance().GetIpInfo(dhcpResults);
     if ((dhcpResults.gateway != 0) && (dhcpResults.ipAddress != 0)) {
         std::string gateway = IpTools::ConvertIpv4Address(dhcpResults.gateway);
         std::string initialIpAddr = IpTools::ConvertIpv4Address(dhcpResults.ipAddress);
@@ -1742,11 +1742,11 @@ bool SelfCureStateMachine::CanArpReachable()
 {
     ArpChecker arpChecker;
     std::string macAddress;
-    WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);
+    WifiConfigCenter::GetInstance().GetMacAddress(macAddress, m_instId);
     IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, m_instId);
     std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
-    std::string ifName = WifiSettings::GetInstance().GetStaIfaceName();
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     if (ipInfo.gateway == 0) {
         WIFI_LOGE("gateway is null");
         return false;
@@ -1768,9 +1768,9 @@ bool SelfCureStateMachine::DoSlowArpTest(std::string testIpAddr)
 {
     ArpChecker arpChecker;
     std::string macAddress;
-    WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);
+    WifiConfigCenter::GetInstance().GetMacAddress(macAddress, m_instId);
     std::string ipAddress = testIpAddr;
-    std::string ifName = WifiSettings::GetInstance().GetStaIfaceName();
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     IpInfo ipInfo;
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
@@ -1786,8 +1786,8 @@ bool SelfCureStateMachine::DoArpTest(std::string ipAddress, std::string gateway)
 {
     ArpChecker arpChecker;
     std::string macAddress;
-    WifiSettings::GetInstance().GetMacAddress(macAddress, m_instId);
-    std::string ifName = WifiSettings::GetInstance().GetStaIfaceName();
+    WifiConfigCenter::GetInstance().GetMacAddress(macAddress, m_instId);
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
     return arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true);
 }
@@ -1846,7 +1846,7 @@ bool SelfCureStateMachine::IsIpAddressInvalid()
 {
     IpInfo dhcpInfo;
     std::vector<uint32_t> currAddr;
-    WifiSettings::GetInstance().GetIpInfo(dhcpInfo);
+    WifiConfigCenter::GetInstance().GetIpInfo(dhcpInfo);
     if (dhcpInfo.ipAddress != 0) {
         std::string addr = IpTools::ConvertIpv4Address(dhcpInfo.ipAddress);
         currAddr = TransIpAddressToVec(addr);
@@ -1882,7 +1882,7 @@ bool SelfCureStateMachine::IsUseFactoryMac()
     WifiLinkedInfo wifiLinkedInfo;
     std::string currMacAddress;
     std::string realMacAddress;
-    WifiSettings::GetInstance().GetMacAddress(currMacAddress);
+    WifiConfigCenter::GetInstance().GetMacAddress(currMacAddress);
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddress);
     if (!currMacAddress.empty() && !realMacAddress.empty() && currMacAddress == realMacAddress) {
         WIFI_LOGI("use factory mac address currently.");
@@ -1916,7 +1916,7 @@ int SelfCureStateMachine::GetBssidCounter(const std::vector<WifiScanInfo> &scanR
         WIFI_LOGI("scanResults ie empty.");
         return 0;
     }
-    WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
     std::string currentSsid = wifiLinkedInfo.ssid;
     WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, config);
     std::string configKey = config.keyMgmt;
@@ -1952,7 +1952,7 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
         return false;
     }
     std::vector<WifiScanInfo> scanResults;
-    WifiSettings::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
     if (GetBssidCounter(scanResults) < MULTI_BSSID_NUM) {
         WIFI_LOGI("not multi bssid condition!");
         return false;
@@ -2076,7 +2076,7 @@ int SelfCureStateMachine::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &in
 bool SelfCureStateMachine::IsSuppOnCompletedState()
 {
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (linkedInfo.connState == ConnState::CONNECTED) {
         return true;
     }
@@ -2086,7 +2086,7 @@ bool SelfCureStateMachine::IsSuppOnCompletedState()
 bool SelfCureStateMachine::IfPeriodicArpDetection()
 {
     int curSignalLevel = GetCurSignalLevel();
-    int state = WifiSettings::GetInstance().GetScreenState();
+    int state = WifiConfigCenter::GetInstance().GetScreenState();
     WIFI_LOGD("IfPeriodicArpDetection, GetScreenState: %{public}d", state);
     return (curSignalLevel >= SIGNAL_LEVEL_2) && (!selfCureOnGoing) && (IsSuppOnCompletedState()) &&
            (state == MODE_STATE_OPEN);
@@ -2126,7 +2126,7 @@ bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessage *msg, std:
         return false;
     }
     std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
-    WifiSettings::GetInstance().GetWifi6BlackListCache(wifi6BlackListCache);
+    WifiConfigCenter::GetInstance().GetWifi6BlackListCache(wifi6BlackListCache);
     if (wifi6BlackListCache.find(currConnectedBssid) == wifi6BlackListCache.end()) {
         MessageExecutedLater(WIFI_CURE_CMD_WIFI6_SELFCURE, SELF_CURE_DELAYED_MS);
         SwitchState(pWifi6SelfCureState);
@@ -2147,7 +2147,7 @@ bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessage *msg, std:
 int SelfCureStateMachine::GetCurrentRssi()
 {
     WifiLinkedInfo wifiLinkedInfo;
-    if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
+    if (WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
         WIFI_LOGE("Get current link info failed!");
     }
     int currentRssi = wifiLinkedInfo.rssi;
@@ -2172,7 +2172,7 @@ bool SelfCureStateMachine::IsWifi6Network(std::string currConnectedBssid)
         return false;
     }
     WifiLinkedInfo wifiLinkedInfo;
-    if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
+    if (WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
         WIFI_LOGE("Get current link info failed!");
     }
     if (wifiLinkedInfo.supportedWifiCategory == WifiCategory::WIFI6 ||
@@ -2186,7 +2186,7 @@ bool SelfCureStateMachine::IsWifi6Network(std::string currConnectedBssid)
 bool SelfCureStateMachine::IfP2pConnected()
 {
     WifiP2pLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
     WIFI_LOGI("P2p connection state : %{public}d", linkedInfo.GetConnectState());
     return linkedInfo.GetConnectState() == P2pConnectedState::P2P_CONNECTED;
 }
@@ -2291,7 +2291,7 @@ int SelfCureStateMachine::SetIsReassocWithFactoryMacAddress(int isReassocWithFac
 ErrCode SelfCureStateMachine::GetCurrentWifiDeviceConfig(WifiDeviceConfig &config)
 {
     WifiLinkedInfo wifiLinkedInfo;
-    if (WifiSettings::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
+    if (WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
         WIFI_LOGE("Get current link info failed!");
         return WIFI_OPT_FAILED;
     }
@@ -2463,7 +2463,7 @@ std::string SelfCureStateMachine::GetCurrentGateway()
 {
     std::string gateway = "";
     IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, m_instId);
     gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     return gateway;
 }
@@ -2575,7 +2575,7 @@ void SelfCureStateMachine::UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryI
 void SelfCureStateMachine::RequestArpConflictTest()
 {
     IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo);
     std::string ipAddr = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
     if (ipAddr != "" && DoSlowArpTest(ipAddr)) {
         WIFI_LOGI("RequestArpConflictTest, Upload static ip conflicted chr!");

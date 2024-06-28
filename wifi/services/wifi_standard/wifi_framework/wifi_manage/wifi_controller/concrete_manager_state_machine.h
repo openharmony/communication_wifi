@@ -151,6 +151,7 @@ private:
     ErrCode SwitchEnableFromSemi();
     void ReportClose();
     static void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
+    static void OnRssiReportCallback(int index, int antRssi);
     static void DispatchWifiOpenRes(OperateResState state, int instId);
     static void DispatchWifiSemiActiveRes(OperateResState state, int instId);
     static void DispatchWifiCloseRes(OperateResState state, int instId);

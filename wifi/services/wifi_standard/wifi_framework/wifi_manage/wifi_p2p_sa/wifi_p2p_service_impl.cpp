@@ -119,7 +119,7 @@ ErrCode WifiP2pServiceImpl::CheckCanEnableP2p(void)
      * opened, then can open sta; other, return forbid.
      */
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
-        !WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode()) {
+        !WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode()) {
         WIFI_LOGI("current airplane mode and can not use p2p, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
     }
@@ -575,7 +575,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         macAddrInfo.bssid = config.GetDeviceAddress();
         macAddrInfo.bssidType = config.GetDeviceAddressType();
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
                 macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -694,7 +694,7 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
         ownMacAddrInfo.bssid = owner.GetDeviceAddress();
         ownMacAddrInfo.bssidType = owner.GetDeviceAddressType();
         std::string ownRandomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO,
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO,
                 ownMacAddrInfo);
         if (!ownRandomMacAddr.empty() && (ownMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
             owner.SetDeviceAddress(ownRandomMacAddr);
@@ -707,7 +707,7 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
                 clientMacAddrInfo.bssid = iter->GetDeviceAddress();
                 clientMacAddrInfo.bssidType = iter->GetDeviceAddressType();
                 std::string clientRandomMacAddr =
-                    WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO,
+                    WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO,
                         clientMacAddrInfo);
                 if (!clientRandomMacAddr.empty() &&
                     (clientMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
@@ -813,7 +813,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
             macAddrInfo.bssid = iter->GetDeviceAddress();
             macAddrInfo.bssidType = iter->GetDeviceAddressType();
             std::string randomMacAddr =
-                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
+                WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO,
+                    macAddrInfo);
             if (!randomMacAddr.empty() &&
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->SetDeviceAddress(randomMacAddr);
@@ -900,7 +901,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
             ownMacAddrInfo.bssid = owner.GetDeviceAddress();
             ownMacAddrInfo.bssidType = owner.GetDeviceAddressType();
             std::string ownRandomMacAddr =
-                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO,
+                WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO,
                     ownMacAddrInfo);
             if (!ownRandomMacAddr.empty() &&
                 (ownMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
@@ -913,9 +914,8 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
                     WifiMacAddrInfo clientMacAddrInfo;
                     clientMacAddrInfo.bssid = iter->GetDeviceAddress();
                     clientMacAddrInfo.bssidType = iter->GetDeviceAddressType();
-                    std::string clientRandomMacAddr =
-                        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO,
-                            clientMacAddrInfo);
+                    std::string clientRandomMacAddr = WifiConfigCenter::GetInstance().GetMacAddrPairs(
+                        WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, clientMacAddrInfo);
                     if (!clientRandomMacAddr.empty() &&
                         (clientMacAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                         iter->SetDeviceAddress(clientRandomMacAddr);
@@ -1018,7 +1018,7 @@ ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
     if (length > DEVICE_NAME_LENGTH || length < 0) {
         return WIFI_OPT_INVALID_PARAM;
     }
-    WifiConfigCenter::GetInstance().SetP2pDeviceName(deviceName);
+    WifiSettings::GetInstance().SetP2pDeviceName(deviceName);
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_SUCCESS;
@@ -1156,7 +1156,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    WifiSettings::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
+    WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     pService->IncreaseSharedLink(callingUid);
     return pService->Hid2dCreateGroup(frequency, type);
 }
@@ -1194,7 +1194,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    WifiSettings::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
+    WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));
     return pService->Hid2dConnect(config);
 }
@@ -1282,7 +1282,7 @@ ErrCode WifiP2pServiceImpl::Hid2dGetChannelListFor5G(std::vector<int>& vecChanne
         return WIFI_OPT_PERMISSION_DENIED;
     }
     ChannelsTable channels;
-    WifiSettings::GetInstance().GetValidChannels(channels);
+    WifiConfigCenter::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
         vecChannelList = channels[BandType::BAND_5GHZ];
     }
@@ -1370,7 +1370,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    WifiSettings::GetInstance().SetHid2dUpperScene(ifName, scene);
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(ifName, scene);
     return pService->Hid2dSetUpperScene(ifName, scene);
 }
 

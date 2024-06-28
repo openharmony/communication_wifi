@@ -63,13 +63,13 @@ bool WifiMultiVapManager::CheckStaConnected()
 bool WifiMultiVapManager::CheckP2pConnected()
 {
     WifiP2pLinkedInfo p2pLinkedInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pLinkedInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pLinkedInfo);
     if (p2pLinkedInfo.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
         WIFI_LOGI("CheckP2pConnected: P2p is connected!");
         return true;
     }
 
-    WifiP2pGroupInfo group = WifiSettings::GetInstance().GetCurrentP2pGroupInfo();
+    WifiP2pGroupInfo group = WifiConfigCenter::GetInstance().GetCurrentP2pGroupInfo();
     if (group.GetFrequency() > 0) {
         WIFI_LOGI("CheckP2pConnected: P2p is created group!");
         return true;

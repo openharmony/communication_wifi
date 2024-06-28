@@ -196,11 +196,11 @@ public:
     void SwitchSemiFromEnableTest()
     {
         InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, 0);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, 0);
         msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
     }
 
@@ -227,7 +227,7 @@ public:
     void SwitchConnectInSemiActiveStateTest()
     {
         InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
@@ -285,7 +285,7 @@ public:
     {
         InternalMessage msg;
         WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSED, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
         msg.SetMessageName(CONCRETE_CMD_STA_STOP);
@@ -295,7 +295,7 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-        WifiSettings::GetInstance().SetWifiStopState(false);
+        WifiConfigCenter::GetInstance().SetWifiStopState(false);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
@@ -324,7 +324,7 @@ public:
     void HandleStaStartTest2()
     {
         InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         msg.SetMessageName(CONCRETE_CMD_STA_START);
         sleep(1);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE);
@@ -360,7 +360,7 @@ public:
     void CheckAndContinueToStopWifiTest()
     {
         InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg.SetMessageName(CONCRETE_CMD_STOP);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
@@ -368,7 +368,7 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-        WifiSettings::GetInstance().SetWifiStopState(false);
+        WifiConfigCenter::GetInstance().SetWifiStopState(false);
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSING, 0);
@@ -399,7 +399,7 @@ public:
     void HandleStaSemiActiveTest2()
     {
         InternalMessage msg;
-        WifiSettings::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         msg.SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         sleep(1);

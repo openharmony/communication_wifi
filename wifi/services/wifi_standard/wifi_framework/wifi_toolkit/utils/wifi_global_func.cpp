@@ -528,6 +528,11 @@ bool IsChannelDbac(int channelA, int channelB)
     return false;
 }
 
+bool IsPskEncryption(const std::string &keyMgmt)
+{
+    return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
+}
+
 #ifndef OHOS_ARCH_LITE
 bool ParseJsonKey(const Json::Value &jsonValue, const std::string &key, std::string &value)
 {

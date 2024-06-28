@@ -893,142 +893,6 @@ public:
         pScanService->AllowPnoScan();
     }
 
-    void AllowExternScanByThermal()
-    {
-        pScanService->AllowExternScanByThermal();
-    }
-
-    void AllowExternScanByForbidSuccess1()
-    {
-        int staScene = 0;
-        StoreScanConfig cfg;
-        cfg.externFlag = true;
-        pScanService->scanConfigMap.emplace(staScene, cfg);
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), true);
-    }
-
-    void AllowExternScanByForbidFail1()
-    {
-        int staScene = 0;
-        StoreScanConfig cfg;
-        cfg.externFlag = true;
-        pScanService->scanConfigMap.emplace(staScene, cfg);
-
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCANNING;
-        forbidMode.scanMode = scanMode;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail2()
-    {
-        int staScene = 0;
-        StoreScanConfig cfg;
-        cfg.externFlag = true;
-        pScanService->scanConfigMap.emplace(staScene, cfg);
-
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCANNING;
-        forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail3()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = scanMode;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail4()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail5()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = staScene;
-        scanForbidMode.scanMode = scanMode;
-        scanForbidMode.forbidTime = 0;
-        scanForbidMode.forbidCount = 0;
-        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail6()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = staScene;
-        scanForbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-        scanForbidMode.forbidTime = 0;
-        scanForbidMode.forbidCount = 0;
-        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail7()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        time_t now = time(nullptr);
-        if (now < 0) {
-            return;
-        }
-        pScanService->customSceneTimeMap.emplace(staScene, now);
-        ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = staScene;
-        scanForbidMode.scanMode = scanMode;
-        scanForbidMode.forbidTime = 0;
-        scanForbidMode.forbidCount = 0;
-        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail8()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        time_t now = time(nullptr);
-        if (now < 0) {
-            return;
-        }
-        pScanService->customSceneTimeMap.emplace(staScene, now);
-        ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = staScene;
-        scanForbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-        scanForbidMode.forbidTime = 0;
-        scanForbidMode.forbidCount = 0;
-        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByIntervaluccess()
-    {
-        pScanService->AllowExternScanByInterval(0, 0, ScanMode::SYS_FOREGROUND_SCAN);
-    }
-
     void GetStaSceneSuccess1()
     {
         pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
@@ -1266,55 +1130,6 @@ public:
         EXPECT_EQ(pScanService->AllowScanDuringScanning(scanMode), false);
     }
 
-    void AllowScanDuringScreenOffSuccess()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
-    }
-
-    void AllowScanDuringScreenOffSuccess1()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        pScanService->SetScanTrustMode();
-        pScanService->scanTrustSceneIds.emplace(0);
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
-    }
-
-    void AllowScanDuringScreenOffSuccess2()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        pScanService->SetScanTrustMode();
-        pScanService->scanTrustSceneIds.emplace(1);
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCANNING;
-        forbidMode.scanMode = scanMode;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
-    }
-
-    void AllowScanDuringScreenOffSuccess3()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        pScanService->ResetToNonTrustMode();
-        pScanService->scanTrustSceneIds.emplace(1);
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = ScanMode::APP_FOREGROUND_SCAN;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
-    }
-
-    void AllowScanDuringScreenOffFail1()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = scanMode;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), false);
-    }
-
     void AllowScanDuringStaSceneSuccess1()
     {
         const int staScene = 0;
@@ -1324,10 +1139,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        pScanService->staSceneForbidCount = 1;
-        time_t nowTime = time(nullptr);
-        const int timeForTest = 2;
-        pScanService->staCurrentTime = nowTime - timeForTest;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), true);
     }
@@ -1354,7 +1165,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        pScanService->staSceneForbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), false);
     }
@@ -1368,11 +1178,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        pScanService->staSceneForbidCount = 1;
-        pScanService->staSceneForbidCount = 1;
-        time_t nowTime = time(nullptr);
-        const int timeForTest = 2;
-        pScanService->staCurrentTime = nowTime + timeForTest;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), false);
     }
@@ -1443,7 +1248,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        pScanService->staSceneForbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), false);
     }
@@ -1462,9 +1266,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        time_t nowTime = time(nullptr);
-        const int timeForTest = 2;
-        pScanService->staCurrentTime = nowTime + timeForTest;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), false);
     }
@@ -1522,22 +1323,6 @@ public:
         pScanService->scanTrustMode = false;
         pScanService->scanTrustSceneIds.emplace(0);
         EXPECT_EQ(pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYSTEM_TIMER_SCAN), true);
-    }
-
-    void AllowExternScanByCustomSceneSuccess()
-    {
-        pScanService->customSceneTimeMap.emplace(1, 0);
-        pScanService->scanTrustMode = true;
-        pScanService->scanTrustSceneIds.emplace(1);
-        EXPECT_EQ(pScanService->AllowExternScanByCustomScene(0, ScanMode::SYS_FOREGROUND_SCAN), true);
-    }
-
-    void AllowExternScanByCustomSceneSuccess1()
-    {
-        pScanService->customSceneTimeMap.emplace(1, 0);
-        pScanService->scanTrustMode = false;
-        pScanService->scanTrustSceneIds.emplace(1);
-        EXPECT_EQ(pScanService->AllowExternScanByCustomScene(0, ScanMode::SYS_FOREGROUND_SCAN), true);
     }
 
     void PnoScanByIntervalSuccess1()
@@ -1972,42 +1757,6 @@ public:
         EXPECT_TRUE(pScanService->AllowScanByHid2dState() == true);
     }
 
-    void AllowExternCustomSceneCheckTest1()
-    {
-        std::map<int, time_t> customIter;
-        customIter.insert(std::pair<int, int>(SCAN_SCENE_ALL, 0));
-        auto customIters = customIter.begin();
-        ScanIntervalMode mode;
-        mode.scanScene = SCAN_SCENE_ALL;
-        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
-        mode.isSingle = true;
-        mode.interval = 1;
-        mode.count = 0;
-        mode.intervalMode = IntervalMode::INTERVAL_FIXED;
-        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);
-        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
-    }
-
-    void AllowExternCustomSceneCheckTest2()
-    {
-        std::map<int, time_t> customIter;
-        customIter.insert(std::pair<int, int>(SCAN_SCENE_ALL, 0));
-        auto customIters = customIter.begin();
-        ScanIntervalMode mode;
-        mode.scanScene = SCAN_SCENE_ALL;
-        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
-        mode.isSingle = false;
-        mode.interval = 1;
-        mode.count = 0;
-        mode.intervalMode = IntervalMode::INTERVAL_FIXED;
-        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);
-        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
-    }
-
     void AllowCustomSceneCheckTest1()
     {
         std::map<int, time_t> customIter;
@@ -2074,10 +1823,6 @@ public:
     {
         pScanService->ClearScanTrustSceneIds();
     }
-    void SetMovingFreezeScanedTest()
-    {
-        pScanService->SetMovingFreezeScaned(false);
-    }
 
     void ApplyTrustListPolicyTest()
     {
@@ -2085,20 +1830,6 @@ public:
         pScanService->ApplyTrustListPolicy(scanType);
     }
 
-    void AllowExternScanByPowerIdelStateTest()
-    {
-        pScanService->AllowExternScanByPowerIdelState();
-    }
-
-    void AllowExternScanByGnssFixStateTest()
-    {
-        pScanService->AllowExternScanByGnssFixState();
-    }
-
-    void AllowExternScanByAbnormalAppTest()
-    {
-        pScanService->AllowExternScanByAbnormalApp();
-    }
     void SetNetworkInterfaceUpDownTest()
     {
         pScanService->SetNetworkInterfaceUpDown(false);
@@ -2613,61 +2344,6 @@ HWTEST_F(ScanServiceTest, AllowPnoScanSuccess, TestSize.Level1)
     AllowPnoScanSuccess();
 }
 
-HWTEST_F(ScanServiceTest, AllowExternScanByThermal, TestSize.Level1)
-{
-    AllowExternScanByThermal();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidSuccess1, TestSize.Level1)
-{
-    AllowExternScanByForbidSuccess1();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail1, TestSize.Level1)
-{
-    AllowExternScanByForbidFail1();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail2, TestSize.Level1)
-{
-    AllowExternScanByForbidFail2();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail3, TestSize.Level1)
-{
-    AllowExternScanByForbidFail3();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail4, TestSize.Level1)
-{
-    AllowExternScanByForbidFail4();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail5, TestSize.Level1)
-{
-    AllowExternScanByForbidFail5();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail6, TestSize.Level1)
-{
-    AllowExternScanByForbidFail6();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail7, TestSize.Level1)
-{
-    AllowExternScanByForbidFail7();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail8, TestSize.Level1)
-{
-    AllowExternScanByForbidFail8();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByIntervaluccess, TestSize.Level1)
-{
-    AllowExternScanByIntervaluccess();
-}
-
 HWTEST_F(ScanServiceTest, GetStaSceneSuccess1, TestSize.Level1)
 {
     GetStaSceneSuccess1();
@@ -2803,16 +2479,6 @@ HWTEST_F(ScanServiceTest, AllowScanDuringScanningFail, TestSize.Level1)
     AllowScanDuringScanningFail();
 }
 
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess, TestSize.Level1)
-{
-    AllowScanDuringScreenOffSuccess();
-}
-
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffFail1, TestSize.Level1)
-{
-    AllowScanDuringScreenOffFail1();
-}
-
 HWTEST_F(ScanServiceTest, AllowScanDuringStaSceneSuccess, TestSize.Level1)
 {
     AllowScanDuringStaSceneSuccess1();
@@ -2901,26 +2567,6 @@ HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_004, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_005, TestSize.Level1)
 {
     AllowExternScanByIntervalModeSuccess1();
-}
-/**
- * @tc.name: AllowExternScanByCustomScene_001
- * @tc.desc: AllowExternScanByCustomScene()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowExternScanByCustomScene_001, TestSize.Level1)
-{
-    AllowExternScanByCustomSceneSuccess();
-}
-/**
- * @tc.name: AllowExternScanByCustomScene_002
- * @tc.desc: AllowExternScanByCustomScene()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowExternScanByCustomScene_002, TestSize.Level1)
-{
-    AllowExternScanByCustomSceneSuccess1();
 }
 
 HWTEST_F(ScanServiceTest, PnoScanByIntervalSuccess1, TestSize.Level1)
@@ -3147,26 +2793,6 @@ HWTEST_F(ScanServiceTest, AllowScanByMovingFreeze_002, TestSize.Level1)
 {
     AllowScanByMovingFreezeTest2();
 }
-/**
- * @tc.name: AllowExternCustomSceneCheck_001
- * @tc.desc: WifiMaxThroughputTest()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_001, TestSize.Level1)
-{
-    AllowExternCustomSceneCheckTest1();
-}
-/**
- * @tc.name: AllowExternCustomSceneCheck_002
- * @tc.desc: AllowExternCustomSceneCheck()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_002, TestSize.Level1)
-{
-    AllowExternCustomSceneCheckTest2();
-}
 
 HWTEST_F(ScanServiceTest, SetScanTrustMode_001, TestSize.Level1)
 {
@@ -3244,36 +2870,6 @@ HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess2, TestSize.Level1)
     GetAllowBandFreqsControlInfoSuccess2();
 }
 /**
- * @tc.name: GetAllowBandFreqsControlInfoSuccess2
- * @tc.desc: GetAllowBandFreqsControlInfo()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess1, TestSize.Level1)
-{
-    AllowScanDuringScreenOffSuccess1();
-}
-/**
- * @tc.name: GetAllowBandFreqsControlInfoSuccess2
- * @tc.desc: GetAllowBandFreqsControlInfo()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess2, TestSize.Level1)
-{
-    AllowScanDuringScreenOffSuccess2();
-}
-/**
- * @tc.name: GetAllowBandFreqsControlInfoSuccess2
- * @tc.desc: GetAllowBandFreqsControlInfo()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess3, TestSize.Level1)
-{
-    AllowScanDuringScreenOffSuccess3();
-}
-/**
  * @tc.name: AllowScanDuringCustomSceneSuccess2
  * @tc.desc: AllowScanDuringCustomScene()
  * @tc.type: FUNC
@@ -3304,29 +2900,9 @@ HWTEST_F(ScanServiceTest, ClearScanTrustSceneIdsTest, TestSize.Level1)
     ClearScanTrustSceneIdsTest();
 }
 
-HWTEST_F(ScanServiceTest, SetMovingFreezeScanedTest, TestSize.Level1)
-{
-    SetMovingFreezeScanedTest();
-}
-
 HWTEST_F(ScanServiceTest, ApplyTrustListPolicyTest, TestSize.Level1)
 {
     ApplyTrustListPolicyTest();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByPowerIdelStateTest, TestSize.Level1)
-{
-    AllowExternScanByPowerIdelStateTest();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByGnssFixStateTest, TestSize.Level1)
-{
-    AllowExternScanByGnssFixStateTest();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByAbnormalAppTest, TestSize.Level1)
-{
-    AllowExternScanByAbnormalAppTest();
 }
 
 HWTEST_F(ScanServiceTest, SetNetworkInterfaceUpDownTest, TestSize.Level1)

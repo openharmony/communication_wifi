@@ -321,7 +321,7 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetConfigNameAsInt(node)) {
             case WifiConfigType::SSID:
-                ParseSssid(node, wifiConfig);
+                ParseSsid(node, wifiConfig);
                 break;
             case WifiConfigType::PRESHAREDKEY:
                 ParsePreSharedKey(node, wifiConfig);
@@ -345,7 +345,7 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
                 ParseWepKeys(node, wifiConfig);
                 break;
             case WifiConfigType::VALIDATEDINTERNETACCESS:
-                wifiConifg.noInternetAccess = GetPrimValue<bool>(node, PrimType::BOOLEAN);
+                wifiConfig.noInternetAccess = GetPrimValue<bool>(node, PrimType::BOOLEAN);
                 break;
             case WifiConfigType::PORTALNETWORK:
                 wifiConfig.isPortal = GetPrimValue<bool>(node, PrimType::BOOLEAN);
@@ -360,15 +360,15 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
     return wifiConfig;
 }
 
-void NetworkXmlParser::ParseSssid(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
+void NetworkXmlParser::ParseSsid(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
 {
     if (node == nullptr) {
-        WIFI_LOGE("ParseSssid node null");
+        WIFI_LOGE("ParseSsid node null");
         return;
     }
     std::string ssid = GetStringValue(node);
     if (ssid.length() == 0) {
-        WIFI_LOGE("ParseSssid ssid is null");
+        WIFI_LOGE("ParseSsid ssid is null");
         return;
     }
     wifiConfig.ssid = ssid.substr(1, ssid.length() - 2); // remove ""
@@ -398,7 +398,6 @@ void NetworkXmlParser::ParseInternetHistory(xmlNodePtr node, WifiDeviceConfig& w
     const int historyNoInternet = 0;
     const int historyInternet = 1;
     const int historyPortal = 2;
-
     std::string netHistory = GetStringValue(node);
     std::vector<int> netHistoryVec = SplitStringToIntVector(netHistory, "/");
     for (auto it = netHistoryVec.rbegin(); it != netHistoryVec.rend(); ++it) {
@@ -414,7 +413,7 @@ void NetworkXmlParser::ParseInternetHistory(xmlNodePtr node, WifiDeviceConfig& w
         }
         // 2: Bits occupied by history record
         wifiConfig.networkStatusHistory = wifiConfig.networkStatusHistory << 2;
-        wifiConfig.networkStatusHistory += static_cast<int>(netState);
+        wifiConfig.networkStatusHistory += static_cast<unsigned int>(netState);
     }
 }
 
@@ -553,7 +552,7 @@ void NetworkXmlParser::ParseMacMapPlus(xmlNodePtr innode)
             FillupMacByConfig();
         }
     }
-    WIFI_LOGI("ParseMacMapPlus size[%{public}lu]", (unsigned long) wifiStoreRandomMacs.size());
+    WIFI_LOGI("ParseMacMapPlus size[%{public}d]", static_cast<int>(wifiStoreRandomMacs.size()));
 }
 
 void NetworkXmlParser::SetMacByMacMapPlus(std::map<std::string, std::string> macMap)
@@ -565,7 +564,7 @@ void NetworkXmlParser::SetMacByMacMapPlus(std::map<std::string, std::string> mac
         bool isExist = false;
         for (auto &item : wifiStoreRandomMacs) {
             if (item.randomMac == it->second) {
-                item.fuzzyBssid.push_back(it->first);
+                item.fuzzyBssids.push_back(it->first);
                 isExist = true;
             }
         }
@@ -573,7 +572,7 @@ void NetworkXmlParser::SetMacByMacMapPlus(std::map<std::string, std::string> mac
             WifiStoreRandomMac wifiStoreRandomMac{};
             // need set default psk for GetRandomMac and AddRandomMac
             wifiStoreRandomMac.keyMgmt = KEY_MGMT_WPA_PSK;
-            wifiStoreRandomMac.fuzzyBssid.push_back(it->first);
+            wifiStoreRandomMac.fuzzyBssids.push_back(it->first);
             wifiStoreRandomMac.randomMac = it->second;
             wifiStoreRandomMacs.push_back(wifiStoreRandomMac);
         }
@@ -664,7 +663,7 @@ bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)
 bool NetworkXmlParser::IsRandomMacValid(const std::string &macAddress)
 {
     constexpr size_t macStringLength = 17;
-    if (macAddress.empty() || macAddress == DEFAULT_MAC_ADDRESS || macAddress != macStringLength) {
+    if (macAddress.empty() || macAddress == DEFAULT_MAC_ADDRESS || macAddress.length() != macStringLength) {
         return false;
     }
     return true;

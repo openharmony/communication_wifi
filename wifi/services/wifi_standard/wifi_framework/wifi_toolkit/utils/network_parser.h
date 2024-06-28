@@ -129,7 +129,7 @@ private:
     xmlNodePtr GotoMacAddressMap(xmlNodePtr innode);
     void SetMacByMacMapPlus(std::map<std::string, std::string> macMap);
     void FillupMacByConfig();
-    void ParseSssid(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
+    void ParseSsid(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
     void ParsePreSharedKey(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
     void ParseInternetHistory(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
 };

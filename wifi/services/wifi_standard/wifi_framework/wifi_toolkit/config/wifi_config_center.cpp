@@ -104,6 +104,9 @@ void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)
 
 bool WifiConfigCenter::GetWifiAllowSemiActive() const
 {
+    if (IsFactoryMode()) {
+        return false;
+    }
     return mWifiAllowSemiActive.load();
 }
 

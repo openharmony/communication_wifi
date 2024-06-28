@@ -49,7 +49,6 @@ enum class WifiConfigType {
     STATUS,
     WEPKEYINDEX,
     WEPKEYS,
-    GWMACADDRESS,
     IPASSIGNMENT,
     LINKADDRESS,
     PREFIXLENGTH,
@@ -60,6 +59,9 @@ enum class WifiConfigType {
     PROXYHOST,
     PROXYPORT,
     PROXYEXCLUSIONLIST,
+    VALIDATEDINTERNETACCESS,
+    PORTALNETWORK,
+    INTERNETHISTORY,
     UNVALID,
 };
 
@@ -122,7 +124,14 @@ private:
     void ParseWepKeys(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig);
     void ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDeviceConfig);
     bool IsWifiConfigValid(WifiDeviceConfig wifiConfig);
-    bool IsRandomMacValid(WifiDeviceConfig wifiConfig);
+    bool IsRandomMacValid(const std::string &macAddress);
+    void ParseMacMapPlus(xmlNodePtr innode);
+    xmlNodePtr GotoMacAddressMap(xmlNodePtr innode);
+    void SetMacByMacMapPlus(std::map<std::string, std::string> macMap);
+    void FillupMacByConfig();
+    void ParseSssid(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
+    void ParsePreSharedKey(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
+    void ParseInternetHistory(xmlNodePtr node, WifiDeviceConfig& wifiConfig);
 };
 }
 }

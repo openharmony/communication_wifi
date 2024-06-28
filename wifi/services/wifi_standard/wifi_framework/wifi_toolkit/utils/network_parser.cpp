@@ -16,6 +16,8 @@
 #include "network_parser.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "network_status_history_manager.h"
+#include "wifi_global_func.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -47,12 +49,15 @@ constexpr auto XML_TAG_PROXY_HOST = "ProxyHost";
 constexpr auto XML_TAG_PROXY_PORT = "ProxyPort";
 constexpr auto XML_TAG_PROXY_PAC_FILE = "ProxyPac";
 constexpr auto XML_TAG_PROXY_EXCLUSION_LIST = "ProxyExclusionList";
-constexpr auto XML_TAG_DEFAULT_GW_MAC_ADDRESS = "DefaultGwMacAddress";
+constexpr auto XML_TAG_VALIDATED_INTERNET_ACCESS = "ValidatedInternetAccess";
+constexpr auto XML_TAG_PORTAL_NETWORK = "PORTAL_NETWORK";
+constexpr auto XML_TAG_INTERNET_HISTORY = "INTERNET_HISTORY";
+constexpr auto XML_TAG_SECTION_HEADER_MAC_ADDRESS_MAP = "MacAddressMap";
+constexpr auto XML_TAG_MAC_MAP_PLUS = "MacMapEntryPlus";
 constexpr auto IP_DHCP = "DHCP";
 constexpr auto IP_STATIC = "STATIC";
 constexpr auto PROXY_STATIC = "STATIC";
 constexpr auto PROXY_PAC = "PAC";
-static const std::string DEFAULT_BSSID = "00:00:00:00:00:00";
 static const std::string DEFAULT_MAC_ADDRESS = "02:00:00:00:00:00";
 
 const std::unordered_map<std::string, WifiConfigType> g_wifiConfigMap = {
@@ -65,7 +70,6 @@ const std::unordered_map<std::string, WifiConfigType> g_wifiConfigMap = {
     {XML_TAG_STATUS, WifiConfigType::STATUS},
     {XML_TAG_WEP_TX_KEY_INDEX, WifiConfigType::WEPKEYINDEX},
     {XML_TAG_WEP_KEYS, WifiConfigType::WEPKEYS},
-    {XML_TAG_DEFAULT_GW_MAC_ADDRESS, WifiConfigType::GWMACADDRESS},
     {XML_TAG_IP_ASSIGNMENT, WifiConfigType::IPASSIGNMENT},
     {XML_TAG_LINK_ADDRESS, WifiConfigType::LINKADDRESS},
     {XML_TAG_LINK_PREFIX_LENGTH, WifiConfigType::PREFIXLENGTH},
@@ -76,6 +80,9 @@ const std::unordered_map<std::string, WifiConfigType> g_wifiConfigMap = {
     {XML_TAG_PROXY_HOST, WifiConfigType::PROXYHOST},
     {XML_TAG_PROXY_PORT, WifiConfigType::PROXYPORT},
     {XML_TAG_PROXY_EXCLUSION_LIST, WifiConfigType::PROXYEXCLUSIONLIST},
+    {XML_TAG_VALIDATED_INTERNET_ACCESS, WifiConfigType::VALIDATEDINTERNETACCESS},
+    {XML_TAG_PORTAL_NETWORK, WifiConfigType::PORTALNETWORK},
+    {XML_TAG_INTERNET_HISTORY, WifiConfigType::INTERNETHISTORY},
 };
 
 const std::unordered_map<std::string, NetworkSection> g_networkSectionMap = {
@@ -313,20 +320,12 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
     }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetConfigNameAsInt(node)) {
-            case WifiConfigType::SSID: {
-                std::string ssid = GetStringValue(node);
-                wifiConfig.ssid = ssid.substr(1, ssid.length() - 2); // remove ""
+            case WifiConfigType::SSID:
+                ParseSssid(node, wifiConfig);
                 break;
-            }
-            case WifiConfigType::PRESHAREDKEY: {
-                std::string preSharedKey = GetStringValue(node);
-                wifiConfig.preSharedKey = preSharedKey.substr(1, preSharedKey.length() - 2); // remove ""
+            case WifiConfigType::PRESHAREDKEY:
+                ParsePreSharedKey(node, wifiConfig);
                 break;
-            }
-            case WifiConfigType::GWMACADDRESS: {
-                wifiConfig.bssid = GetStringValue(node);
-                break;
-            }
             case WifiConfigType::HIDDENSSID:
                 wifiConfig.hiddenSSID = GetPrimValue<bool>(node, PrimType::BOOLEAN);
                 break;
@@ -345,12 +344,78 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
             case WifiConfigType::WEPKEYS:
                 ParseWepKeys(node, wifiConfig);
                 break;
-            default: {
+            case WifiConfigType::VALIDATEDINTERNETACCESS:
+                wifiConifg.noInternetAccess = GetPrimValue<bool>(node, PrimType::BOOLEAN);
                 break;
-            }
+            case WifiConfigType::PORTALNETWORK:
+                wifiConfig.isPortal = GetPrimValue<bool>(node, PrimType::BOOLEAN);
+                break;
+            case WifiConfigType::INTERNETHISTORY:
+                ParseInternetHistory(node, wifiConfig);
+                break;
+            default:
+                break;
         }
     }
     return wifiConfig;
+}
+
+void NetworkXmlParser::ParseSssid(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
+{
+    if (node == nullptr) {
+        WIFI_LOGE("ParseSssid node null");
+        return;
+    }
+    std::string ssid = GetStringValue(node);
+    if (ssid.length() == 0) {
+        WIFI_LOGE("ParseSssid ssid is null");
+        return;
+    }
+    wifiConfig.ssid = ssid.substr(1, ssid.length() - 2); // remove ""
+}
+
+void NetworkXmlParser::ParsePreSharedKey(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
+{
+    if (node == nullptr) {
+        WIFI_LOGE("ParsePreSharedKey node null");
+        return;
+    }
+    std::string preSharedKey = GetStringValue(node);
+    if (preSharedKey.length() == 0) {
+        WIFI_LOGE("ParsePreSharedKey preSharedKey is null");
+        return;
+    }
+    wifiConfig.preSharedKey = preSharedKey.substr(1, preSharedKey.length() - 2); // remove ""
+}
+
+void NetworkXmlParser::ParseInternetHistory(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
+{
+    if (node == nullptr) {
+        WIFI_LOGE("ParseInternetHistory node null");
+        return;
+    }
+
+    const int historyNoInternet = 0;
+    const int historyInternet = 1;
+    const int historyPortal = 2;
+
+    std::string netHistory = GetStringValue(node);
+    std::vector<int> netHistoryVec = SplitStringToIntVector(netHistory, "/");
+    for (auto it = netHistoryVec.rbegin(); it != netHistoryVec.rend(); ++it) {
+        NetworkStatus netState = NetworkStatus::UNKNOWN;
+        if (*it == historyNoInternet) {
+            netState = NetworkStatus::NO_INTERNET;
+        } else if (*it == historyInternet) {
+            netState = NetworkStatus::HAS_INTERNET;
+        } else if (*it == historyPortal) {
+            netState = NetworkStatus::PORTAL;
+        } else {
+            netState = NetworkStatus::UNKNOWN;
+        }
+        // 2: Bits occupied by history record
+        wifiConfig.networkStatusHistory = wifiConfig.networkStatusHistory << 2;
+        wifiConfig.networkStatusHistory += static_cast<int>(netState);
+    }
 }
 
 void NetworkXmlParser::ParseNetworkStatus(xmlNodePtr innode, WifiDeviceConfig& wifiConfig)
@@ -456,15 +521,84 @@ void NetworkXmlParser::ParseNetworkList(xmlNodePtr innode)
         (unsigned long) wifiConfigs.size(), xmlSavedNetworkCount);
 }
 
-void NetworkXmlParser::ParseMacMap()
+xmlNodePtr NetworkXmlParser::GotoMacAddressMap(xmlNodePtr innode)
 {
-    WifiStoreRandomMac wifiStoreRandomMac{};
-    for (auto wifiConfig : wifiConfigs) {
-        if (IsRandomMacValid(wifiConfig)) {
-            wifiStoreRandomMac.ssid = wifiConfig.ssid;
-            wifiStoreRandomMac.keyMgmt = wifiConfig.keyMgmt;
-            wifiStoreRandomMac.peerBssid = wifiConfig.bssid.empty() ? DEFAULT_BSSID : wifiConfig.bssid;
-            wifiStoreRandomMac.randomMac = wifiConfig.macAddress;
+    if (innode == nullptr) {
+        WIFI_LOGE("GotoMacAddressMap node null");
+        return nullptr;
+    }
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
+        if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_SECTION_HEADER_MAC_ADDRESS_MAP)) == 0) {
+            return node;
+        }
+    }
+    return nullptr;
+}
+
+void NetworkXmlParser::ParseMacMapPlus(xmlNodePtr innode)
+{
+    if (innode == nullptr) {
+        WIFI_LOGE("ParseMacMapPlus node null");
+        return;
+    }
+    xmlNodePtr macAddrNode = GotoMacAddressMap(innode);
+    if (macAddrNode == nullptr) {
+        WIFI_LOGE("ParseMacMapPlus macAddrNode null");
+        return;
+    }
+    for (xmlNodePtr node = macAddrNode->children; node != nullptr; node = node->next) {
+        if (GetNameValue(node) == XML_TAG_MAC_MAP_PLUS) {
+            std::map<std::string, std::string> macMap = GetStringMapValue(node);
+            SetMacByMacMapPlus(macMap);
+            FillupMacByConfig();
+        }
+    }
+    WIFI_LOGI("ParseMacMapPlus size[%{public}lu]", (unsigned long) wifiStoreRandomMacs.size());
+}
+
+void NetworkXmlParser::SetMacByMacMapPlus(std::map<std::string, std::string> macMap)
+{
+    for (auto it = macMap.begin(); it != macMap.end(); ++it) {
+        if (!IsRandomMacValid(it->second)) {
+            continue;
+        }
+        bool isExist = false;
+        for (auto &item : wifiStoreRandomMacs) {
+            if (item.randomMac == it->second) {
+                item.fuzzyBssid.push_back(it->first);
+                isExist = true;
+            }
+        }
+        if (!isExist) {
+            WifiStoreRandomMac wifiStoreRandomMac{};
+            // need set default psk for GetRandomMac and AddRandomMac
+            wifiStoreRandomMac.keyMgmt = KEY_MGMT_WPA_PSK;
+            wifiStoreRandomMac.fuzzyBssid.push_back(it->first);
+            wifiStoreRandomMac.randomMac = it->second;
+            wifiStoreRandomMacs.push_back(wifiStoreRandomMac);
+        }
+    }
+}
+
+void NetworkXmlParser::FillupMacByConfig()
+{
+    for (auto cfgItem : wifiConfigs) {
+        if (!IsRandomMacValid(cfgItem.macAddress)) {
+            continue;
+        }
+        bool isExist = false;
+        for (auto &macItem : wifiStoreRandomMacs) {
+            if (macItem.randomMac == cfgItem.macAddress) {
+                macItem.ssid = cfgItem.ssid;
+                macItem.keyMgmt = cfgItem.keyMgmt;
+                isExist = true;
+            }
+        }
+        if (!isExist) {
+            WifiStoreRandomMac wifiStoreRandomMac{};
+            wifiStoreRandomMac.ssid = cfgItem.ssid;
+            wifiStoreRandomMac.keyMgmt = cfgItem.keyMgmt;
+            wifiStoreRandomMac.randomMac = cfgItem.macAddress;
             wifiStoreRandomMacs.push_back(wifiStoreRandomMac);
         }
     }
@@ -504,7 +638,7 @@ bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
         // Enable all networks restored and no need to parse randommac.
         EnableNetworks();
     } else if (parseType == NetworkParseType::MIGRATE) {
-        ParseMacMap();
+        ParseMacMapPlus(node);
     }
     return true;
 }
@@ -527,9 +661,10 @@ bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)
     return false;
 }
 
-bool NetworkXmlParser::IsRandomMacValid(WifiDeviceConfig wifiConfig)
+bool NetworkXmlParser::IsRandomMacValid(const std::string &macAddress)
 {
-    if (wifiConfig.macAddress.empty() || wifiConfig.macAddress == DEFAULT_MAC_ADDRESS) {
+    constexpr size_t macStringLength = 17;
+    if (macAddress.empty() || macAddress == DEFAULT_MAC_ADDRESS || macAddress != macStringLength) {
         return false;
     }
     return true;

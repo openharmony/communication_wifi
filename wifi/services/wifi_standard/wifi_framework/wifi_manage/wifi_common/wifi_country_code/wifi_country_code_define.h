@@ -312,7 +312,7 @@ const MccEntry MCC_TABLE[] = {
     {360, "vc", 2},
 
     // Netherlands Antilles
-    {362, "ai", 2},
+    {362, "an", 2},
 
     // Aruba
     {363, "aw", 2},
@@ -651,7 +651,7 @@ const MccEntry MCC_TABLE[] = {
     {629, "cg", 2},
 
     // Democratic Republic of the Congo
-    {630, "cg", 2},
+    {630, "cd", 2},
 
     // Angola Republic of
     {631, "ao", 2},
@@ -700,6 +700,9 @@ const MccEntry MCC_TABLE[] = {
 
     // Reunion French Department of
     {647, "re", 2},
+
+    // Comoros and Mayotte
+    {647, "yt", 2},
 
     // Zimbabwe Republic of
     {648, "zw", 2},

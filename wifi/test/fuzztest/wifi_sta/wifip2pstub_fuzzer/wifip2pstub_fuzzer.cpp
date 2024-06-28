@@ -33,20 +33,22 @@
 #include "wifi_common_def.h"
 #include "wifi_manager.h"
 #include "wifi_net_agent.h"
+
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
+constexpr int THREE = 4;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceService";
 static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
 sptr<WifiP2pStub> pWifiP2pServiceImpl = WifiP2pServiceImpl::GetInstance();
-
 bool Init()
 {
     if (!g_isInsted) {
         if (WifiConfigCenter::GetInstance().GetP2pMidState() != WifiOprMidState::RUNNING) {
+            LOGE("Init setmidstate!");
             WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::RUNNING);
         }
         g_isInsted = true;
@@ -623,6 +625,60 @@ void OnCheckCanUseP2pFuzzTest(const uint8_t* data, size_t size)
         datas, reply, option);
 }
 
+void WifiP2pServiceImplFuzzTest(const uint8_t* data, size_t size)
+{
+    WifiP2pServiceInfo srvInfo;
+    std::string serviceName = std::string(reinterpret_cast<const char*>(data), size);
+    std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
+    srvInfo.SetServiceName(serviceName);
+    srvInfo.SetDeviceAddress(mDeviceAddress);
+
+    WifiP2pDevice device;
+    if (size >= THREE) {
+        int index = 0;
+        std::string deviceName = std::string(reinterpret_cast<const char*>(data), size);
+        std::string networkName = std::string(reinterpret_cast<const char*>(data), size);
+        std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
+        std::string primaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
+        std::string secondaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
+        unsigned int supportWpsConfigMethods = static_cast<unsigned int>(data[index++]);
+        int deviceCapabilitys = static_cast<int>(data[index++]);
+        int groupCapabilitys = static_cast<int>(data[index++]);
+        device.SetDeviceName(deviceName);
+        device.SetNetworkName(networkName);
+        device.SetDeviceAddress(mDeviceAddress);
+        device.SetPrimaryDeviceType(primaryDeviceType);
+        device.SetSecondaryDeviceType(secondaryDeviceType);
+        device.SetWpsConfigMethod(supportWpsConfigMethods);
+        device.SetDeviceCapabilitys(deviceCapabilitys);
+        device.SetGroupCapabilitys(groupCapabilitys);
+    }
+    WifiP2pGroupInfo group;
+    if (size >= THREE) {
+        std::string passphrase = std::string(reinterpret_cast<const char*>(data), size);
+        std::string interface = std::string(reinterpret_cast<const char*>(data), size);
+        std::string groupName = std::string(reinterpret_cast<const char*>(data), size);
+        int frequency = static_cast<int>(data[0]);
+
+        group.SetPassphrase(passphrase);
+        group.SetInterface(interface);
+        group.SetGroupName(groupName);
+        group.SetFrequency(frequency);
+    }
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
+    pWifiP2pServiceImpl->WriteWifiP2pServiceInfo(datas, srvInfo);
+    pWifiP2pServiceImpl->WriteWifiP2pDeviceData(datas, device);
+    pWifiP2pServiceImpl->WriteWifiP2pGroupData(datas, group);
+    pWifiP2pServiceImpl->WriteWifiP2pServiceInfo(datas, srvInfo);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -672,6 +728,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnHid2dSetPeerWifiCfgInfoFuzzTest(data, size);
     OHOS::Wifi::OnQueryP2pLocalDeviceFuzzTest(data, size);
     OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest(data, size);
+    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::Wifi::WifiP2pServiceImplFuzzTest(data, size);
     sleep(U32_AT_SIZE_ZERO);
     return 0;
 }

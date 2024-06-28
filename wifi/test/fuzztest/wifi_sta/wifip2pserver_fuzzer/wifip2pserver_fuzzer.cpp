@@ -36,6 +36,7 @@ constexpr int U32_AT_SIZE_ZERO = 4;
 static bool g_isInsted = false;
 static std::unique_ptr<P2pInterface> pP2pInterface = nullptr;
 static std::unique_ptr<WifiP2pGroupManager> pWifiP2pGroupManager = nullptr;
+IP2pServiceCallbacks mP2pCallback;
 
 void MyExit()
 {
@@ -58,6 +59,46 @@ void InitParam()
     }
     return;
 }
+
+class WifiP2pManager {
+public:
+    WifiP2pManager()
+    {
+        InitP2pCallback();
+    }
+    ~WifiP2pManager() {}
+    void DealP2pStateChanged(P2pState bState) {}
+    void DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers) {}
+    void DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &vServices) {}
+    void DealP2pConnectionChanged(const WifiP2pLinkedInfo &info) {}
+    void DealP2pThisDeviceChanged(const WifiP2pDevice &info) {}
+    void DealP2pDiscoveryChanged(bool bState) {}
+    void DealP2pGroupsChanged(void) {}
+    void DealP2pActionResult(P2pActionCallback action, ErrCode code) {}
+    void DealConfigChanged(CfgType type, char* data, int dataLen) {}
+    void DealP2pPrivatePeersChanged(const std::string &privateInfo) {}
+    IP2pServiceCallbacks& GetP2pCallback(void)
+    {
+        return mP2pCallback;
+    }
+
+    void InitP2pCallback(void)
+    {
+        using namespace std::placeholders;
+        mP2pCallback.callbackModuleName = "P2pManager";
+        mP2pCallback.OnP2pStateChangedEvent = std::bind(&WifiP2pManager::DealP2pStateChanged, this, _1);
+        mP2pCallback.OnP2pPeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPeersChanged, this, _1);
+        mP2pCallback.OnP2pServicesChangedEvent = std::bind(&WifiP2pManager::DealP2pServiceChanged, this, _1);
+        mP2pCallback.OnP2pConnectionChangedEvent = std::bind(&WifiP2pManager::DealP2pConnectionChanged, this, _1);
+        mP2pCallback.OnP2pThisDeviceChangedEvent = std::bind(&WifiP2pManager::DealP2pThisDeviceChanged, this, _1);
+        mP2pCallback.OnP2pDiscoveryChangedEvent = std::bind(&WifiP2pManager::DealP2pDiscoveryChanged, this, _1);
+        mP2pCallback.OnP2pGroupsChangedEvent = std::bind(&WifiP2pManager::DealP2pGroupsChanged, this);
+        mP2pCallback.OnP2pActionResultEvent = std::bind(&WifiP2pManager::DealP2pActionResult, this, _1, _2);
+        mP2pCallback.OnConfigChangedEvent = std::bind(&WifiP2pManager::DealConfigChanged, this, _1, _2, _3);
+        mP2pCallback.OnP2pPrivatePeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPrivatePeersChanged, this, _1);
+        return;
+    }
+};
 
 void P2pServerFuzzTest(const uint8_t* data, size_t size)
 {
@@ -139,6 +180,17 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddress);
     int period = static_cast<int>(data[0]);
     int interval = static_cast<int>(data[0]);
+    FreqType scanType = static_cast<FreqType>(static_cast<int>(data[0]) % TWO);
+    DhcpMode dhcpMode = static_cast<DhcpMode>(static_cast<int>(data[0]) % THREE);
+    PeerCfgType cfgType = static_cast<PeerCfgType>(static_cast<int>(data[0]) % THREE);
+    SelfCfgType cfgTyp = static_cast<SelfCfgType>(static_cast<int>(data[0]) % THREE);
+    Hid2dConnectConfig hidConfig;
+    hidConfig.SetDhcpMode(dhcpMode);
+    hidConfig.SetFrequency(interval);
+    hidConfig.SetPreSharedKey(serviceName);
+    hidConfig.SetBssid(groupOwnerAddress);
+    hidConfig.SetSsid(mDeviceAddress);
+
     pP2pInterface->DiscoverDevices();
     pP2pInterface->StopDiscoverDevices();
     pP2pInterface->DiscoverServices();
@@ -173,6 +225,20 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->GetSharedLinkCount();
     pP2pInterface->DecreaseSharedLink(interval);
     pP2pInterface->IncreaseSharedLink(interval);
+    char *cfgData = nullptr;
+    (void)memcpy_s(cfgData, CFG_DATA_MAX_BYTES, data, CFG_DATA_MAX_BYTES - 1);
+    int channelid = static_cast<int32_t >(data[0]);
+    Hid2dUpperScene scene;
+    pP2pInterface->RegisterP2pServiceCallbacks(mP2pCallback);
+    pP2pInterface->UnRegisterP2pServiceCallbacks(mP2pCallback);
+    pP2pInterface->Hid2dCreateGroup(period, scanType);
+    pP2pInterface->Hid2dConnect(hidConfig);
+    pP2pInterface->Hid2dRequestGcIp(groupOwnerAddress, serviceName);
+    pP2pInterface->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, period);
+    pP2pInterface->Hid2dGetSelfWifiCfgInfo(cfgTyp, cfgData, &period);
+    pP2pInterface->DiscoverPeers(channelid);
+    pP2pInterface->Hid2dSetUpperScene(serviceName, scene);
+    pP2pInterface->HandleBusinessSAException(period);
     pWifiP2pGroupManager->UpdateWpaGroup(group);
     pWifiP2pGroupManager->ClearAll();
     pWifiP2pGroupManager->RemoveGroup(group);

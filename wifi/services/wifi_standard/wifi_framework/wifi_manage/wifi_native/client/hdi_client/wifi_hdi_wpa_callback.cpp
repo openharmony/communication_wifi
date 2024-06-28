@@ -167,7 +167,7 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
         LOGE("OnEventAssociateReject: invalid parameter!");
         return 1;
     }
-   const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
 
     /* Special handling for WPA3-Personal networks. If the password is
        incorrect, the AP will send association rejection, with status code 1

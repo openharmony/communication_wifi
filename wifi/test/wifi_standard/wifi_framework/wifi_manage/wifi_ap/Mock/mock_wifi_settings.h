@@ -44,6 +44,18 @@ public:
     virtual void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies,
         int instId = 0) = 0;
     virtual int SyncHotspotConfig() = 0;
+    virtual int SetPowerModel(const PowerModel& model, int id = 0) = 0;
+    virtual int GetPowerModel(PowerModel& model, int id = 0) = 0;
+    virtual void SetThreadStatusFlag(bool state) = 0;
+    virtual int GetLinkedInfo(WifiLinkedInfo &info, int instId) = 0;
+    virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
+    virtual WifiP2pGroupInfo GetCurrentP2pGroupInfo() = 0;
+    virtual int GetIpInfo(IpInfo &info, int instId = 0) = 0;
+    virtual std::string GetApIfaceName() = 0;
+    virtual int GetHotspotIdleTimeout() const = 0;
+    virtual int SetHotspotIdleTimeout(int time) = 0;
+    virtual void GenerateRandomMacAddress(std::string &randomMacAddr) = 0;
+    virtual void GenerateRandomMacAddress(std::string peerBssid, std::string &randomMacAddr) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -60,6 +72,18 @@ public:
     MOCK_METHOD0(GetApMaxConnNum, int());
     MOCK_METHOD3(SetDefaultFrequenciesByCountryBand, void(const BandType band, std::vector<int> &frequencies, int));
     MOCK_METHOD0(SyncHotspotConfig, int());
+    MOCK_METHOD2(SetPowerModel, int(const PowerModel& model, int id));
+    MOCK_METHOD2(GetPowerModel, int(PowerModel& model, int id));
+    MOCK_METHOD1(SetThreadStatusFlag, void(bool state));
+    MOCK_METHOD2(GetLinkedInfo, int(WifiLinkedInfo &info, int instId));
+    MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &linkedInfo));
+    MOCK_METHOD0(GetCurrentP2pGroupInfo, WifiP2pGroupInfo());
+    MOCK_METHOD2(GetIpInfo, int(IpInfo &info, int));
+    MOCK_METHOD0(GetApIfaceName, std::string());
+    MOCK_CONST_METHOD0(GetHotspotIdleTimeout, int());
+    MOCK_METHOD1(SetHotspotIdleTimeout, int(int));
+    MOCK_METHOD1(GenerateRandomMacAddress, void(std::string &randomMacAddr));
+    MOCK_METHOD2(GenerateRandomMacAddress, void(std::string peerBssid, std::string &randomMacAddr));
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

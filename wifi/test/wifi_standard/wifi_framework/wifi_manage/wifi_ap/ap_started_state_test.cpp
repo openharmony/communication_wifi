@@ -199,11 +199,14 @@ HWTEST_F(ApStartedState_test, GoInState_SUCCESS,TestSize.Level1)
         .WillRepeatedly(DoAll(SetArgReferee<0>(valueList), Return(ErrCode::WIFI_OPT_SUCCESS)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), AddBlockByMac(StrEq("DA:BB:CC:DD:EE:FF"), 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
     pApStartedState->GoInState();
 }
 HWTEST_F(ApStartedState_test, GoInState_FAILED1,TestSize.Level1)
 {
     std::vector<StationInfo> results;
+
+    EXPECT_CALL(WifiSettings::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), SetHotspotState(A<int>(), 0)).WillRepeatedly(Return(0));
     EXPECT_CALL(*pMockApMonitor, StartMonitor()).WillRepeatedly(Return());
     EXPECT_CALL(WifiApHalInterface::GetInstance(), StartAp(0)).WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
@@ -495,6 +498,29 @@ HWTEST_F(ApStartedState_test, ProcessCmdUpdateCountryCodeTest, TestSize.Level1)
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(countryCode);
     pApStartedState->ProcessCmdUpdateCountryCode(*msg);
+}
+
+HWTEST_F(ApStartedState_test, UpdatMacAddressTest, TestSize.Level1)
+{
+    std::string ssid = "1234";
+    KeyMgmt securityType = KeyMgmt::WPA2_PSK;
+    HotspotConfig curApConfig;
+    curApConfig.SetSsid("1234");
+    curApConfig.SetSecurityType(KeyMgmt::WPA2_PSK);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(_, 0))
+        .WillOnce(DoAll(SetArgReferee<0>(curApConfig), Return(0)));
+    pApStartedState->UpdatMacAddress(ssid, securityType);
+}
+
+HWTEST_F(ApStartedState_test, ProcessCmdSetHotspotIdleTimeout, TestSize.Level1)
+{
+    InternalMessage msg;
+    pApStartedState->ProcessCmdSetHotspotIdleTimeout(msg);
+}
+
+HWTEST_F(ApStartedState_test, SetRandomMacTest, TestSize.Level1)
+{
+    pApStartedState->SetRandomMac();
 }
 } // namespace Wifi
 } // namespace OHOS

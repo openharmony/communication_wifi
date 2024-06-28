@@ -1667,7 +1667,7 @@ public:
     {
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
         WifiLinkedInfo linkedInfo;
         linkedInfo.connState = ConnState::CONNECTED;
         linkedInfo.ssid = "111111";

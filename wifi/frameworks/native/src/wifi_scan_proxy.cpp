@@ -35,8 +35,8 @@ namespace Wifi {
 static sptr<WifiScanCallbackStub> g_wifiScanCallbackStub =
     sptr<WifiScanCallbackStub>(new (std::nothrow) WifiScanCallbackStub());
 
-WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<IWifiScan>(remote),
-    mRemoteDied(false), remote_(nullptr), deathRecipient_(nullptr)
+WifiScanProxy::WifiScanProxy(const sptr<IRemoteObject> &remote)
+    : IRemoteProxy<IWifiScan>(remote), mRemoteDied(false), remote_(nullptr), deathRecipient_(nullptr)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (remote) {
@@ -147,8 +147,8 @@ ErrCode WifiScanProxy::Scan(bool compatible)
     data.WriteInt32(0);
     data.WriteBool(compatible);
     data.WriteString(GetBundleName());
-    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), data, reply,
-        option);
+    int error =
+        Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGW("Set Attr(%{public}d) failed", static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN));
         return WIFI_OPT_FAILED;
@@ -244,56 +244,76 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     return WIFI_OPT_SUCCESS;
 }
 
+static constexpr uint8_t STEP_2BIT = 2;
+static std::string HexToString(const std::string &str)
+{
+    std::string result;
+    uint8_t hexDecimal = 16;
+    uint8_t hexStep = 2;
+    if (str.length() <= 0) {
+        return result;
+    }
+    for (size_t i = 0; i < str.length() - 1; i += STEP_2BIT) {
+        std::string byte = str.substr(i, hexStep);
+        char chr = 0;
+        long strTemp = strtol(byte.c_str(), nullptr, hexDecimal);
+        if (strTemp > 0) {
+            chr = static_cast<char>(strTemp);
+        }
+        result.push_back(chr);
+    }
+    return result;
+}
+
+static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, int &dataRecvLen)
+{
+    info.bssid = tokens[dataRecvLen++];
+    info.ssid = HexToString(tokens[dataRecvLen++]);
+    info.bssidType = std::stoi(tokens[dataRecvLen++]);
+    info.capabilities = tokens[dataRecvLen++];
+    info.frequency = std::stoi(tokens[dataRecvLen++]);
+    info.band = std::stoi(tokens[dataRecvLen++]);
+    info.channelWidth = static_cast<WifiChannelWidth>(std::stoi(tokens[dataRecvLen++]));
+    info.centerFrequency0 = std::stoi(tokens[dataRecvLen++]);
+    info.centerFrequency1 = std::stoi(tokens[dataRecvLen++]);
+    info.rssi = std::stoi(tokens[dataRecvLen++]);
+    info.securityType = static_cast<WifiSecurity>(std::stoi(tokens[dataRecvLen++]));
+    size_t numInfoElems = std::stoul(tokens[dataRecvLen++]);
+    for (size_t i = 0; i < numInfoElems; i++) {
+        WifiInfoElem elem;
+        elem.id = std::stoi(tokens[dataRecvLen++]);
+        size_t ieLen = std::stoul(tokens[dataRecvLen++]);
+        for (size_t j = 0; j < ieLen; j++) {
+            elem.content.push_back(static_cast<char>(std::stoi(tokens[dataRecvLen++])));
+        }
+        info.infoElems.push_back(elem);
+    }
+    info.features = std::stoll(tokens[dataRecvLen++]);
+    info.timestamp = std::stoll(tokens[dataRecvLen++]);
+    info.wifiStandard = std::stoi(tokens[dataRecvLen++]);
+    info.maxSupportedRxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
+    info.maxSupportedTxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
+    info.disappearCount = std::stoi(tokens[dataRecvLen++]);
+    info.isHiLinkNetwork = tokens[dataRecvLen++] == "true";
+    info.supportedWifiCategory = static_cast<WifiCategory>(std::stoi(tokens[dataRecvLen++]));
+}
+
 ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScanInfo> &result, int contentSize)
 {
     WIFI_LOGI("WifiScanProxy ParseScanInfos");
-    std::vector<uint32_t> allSize;
-    if (!reply.ReadUInt32Vector(&allSize)) {
-        WIFI_LOGE("ParseScanInfos ReadInt32Vector error");
-        return WIFI_OPT_FAILED;
-    }
+    int32_t allSize = reply.ReadInt32(allSize);
     sptr<Ashmem> ashmem = reply.ReadAshmem();
     if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
         WIFI_LOGE("ParseDeviceConfigs ReadAshmem error");
         return WIFI_OPT_FAILED;
     }
-    size_t offset = 0;
+    std::string net = (char *)ashmem->ReadFromAshmem(allSize, 0);
+    std::vector<std::string> tokens;
+    SplitStr(net, ";", tokens, true, true);
+    int dataRecvLen = 0;
     for (int i = 0; i < contentSize; ++i) {
-        int dataRecvLen = 0;
-        std::string net = (char *)ashmem->ReadFromAshmem(allSize[i], offset);
-        offset += allSize[i];
-        std::vector<std::string> tokens;
-        SplitStr(net, ";", tokens, true, true);
         WifiScanInfo info;
-        info.bssid = tokens[dataRecvLen++];
-        info.ssid = tokens[dataRecvLen++];
-        info.bssidType = std::stoi(tokens[dataRecvLen++]);
-        info.capabilities = tokens[dataRecvLen++];
-        info.frequency = std::stoi(tokens[dataRecvLen++]);
-        info.band = std::stoi(tokens[dataRecvLen++]);
-        info.channelWidth = static_cast<WifiChannelWidth>(std::stoi(tokens[dataRecvLen++]));
-        info.centerFrequency0 = std::stoi(tokens[dataRecvLen++]);
-        info.centerFrequency1 = std::stoi(tokens[dataRecvLen++]);
-        info.rssi = std::stoi(tokens[dataRecvLen++]);
-        info.securityType = static_cast<WifiSecurity>(std::stoi(tokens[dataRecvLen++]));
-        size_t numInfoElems = std::stoul(tokens[dataRecvLen++]);
-        for (size_t i = 0; i < numInfoElems; i++) {
-            WifiInfoElem elem;
-            elem.id = std::stoi(tokens[dataRecvLen++]);
-            size_t ieLen = std::stoul(tokens[dataRecvLen++]);
-            for (size_t j = 0; j < ieLen; j++) {
-                elem.content.push_back(static_cast<char>(std::stoi(tokens[dataRecvLen++])));
-            }
-            info.infoElems.push_back(elem);
-        }
-        info.features = std::stoll(tokens[dataRecvLen++]);
-        info.timestamp = std::stoll(tokens[dataRecvLen++]);
-        info.wifiStandard = std::stoi(tokens[dataRecvLen++]);
-        info.maxSupportedRxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
-        info.maxSupportedTxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
-        info.disappearCount = std::stoi(tokens[dataRecvLen++]);
-        info.isHiLinkNetwork = tokens[dataRecvLen++] == "true";
-        info.supportedWifiCategory = static_cast<WifiCategory>(std::stoi(tokens[dataRecvLen++]));
+        GetScanInfo(info, tokens, dataRecvLen);
         result.emplace_back(info);
     }
     ashmem->UnmapAshmem();
@@ -424,8 +444,8 @@ ErrCode WifiScanProxy::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
             data.WriteString(eventName);
         }
     }
-    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d, tokenId: %{private}d",
-        __func__, GetCallingUid(), pid, tokenId);
+    WIFI_LOGD("%{public}s, calling uid: %{public}d, pid: %{public}d, tokenId: %{private}d", __func__, GetCallingUid(),
+        pid, tokenId);
     int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK),
         data, reply, option);
     if (error != ERR_NONE) {
@@ -470,7 +490,7 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiScanProxy::OnRemoteDied(const wptr<IRemoteObject>& remoteObject)
+void WifiScanProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
     WIFI_LOGW("Remote service is died!");
     mRemoteDied = true;
@@ -503,8 +523,8 @@ ErrCode WifiScanProxy::SetScanOnlyAvailable(bool bScanOnlyAvailable)
     }
     data.WriteInt32(0);
     data.WriteBool(bScanOnlyAvailable);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY),
-        data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY), data,
+        reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY), error);
@@ -531,8 +551,8 @@ ErrCode WifiScanProxy::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY),
-        data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY), data,
+        reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY), error);
@@ -568,8 +588,8 @@ ErrCode WifiScanProxy::StartWifiPnoScan(bool isStartAction, int periodMs, int su
     data.WriteBool(isStartAction);
     data.WriteInt32(periodMs);
     data.WriteInt32(suspendReason);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN),
-        data, reply, option);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), data,
+        reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), error);
@@ -587,5 +607,5 @@ ErrCode WifiScanProxy::StartWifiPnoScan(bool isStartAction, int periodMs, int su
     }
     return WIFI_OPT_SUCCESS;
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

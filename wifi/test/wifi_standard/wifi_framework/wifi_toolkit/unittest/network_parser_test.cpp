@@ -199,31 +199,31 @@ HWTEST_F(NetworkParserTest, IsRandomMacValidTest, TestSize.Level1)
 {
     WIFI_LOGI("IsRandomMacValidTest enter");
     std::string macAddress;
-    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(macAddress));
 
     macAddress = "02:00:00:00:00:00";
-    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(macAddress));
 
     macAddress = "02:00:00:00:00";
-    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(macAddress));
 
     macAddress = "01:02:03:04:05:06";
-    EXPECT_TRUE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+    EXPECT_TRUE(m_networkXmlParser->IsRandomMacValid(macAddress));
 }
 
 HWTEST_F(NetworkParserTest, ParseSsidTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseSsidTest enter");
     xmlNodePtr root = nullptr;
-    WifiDeviceConfig wifiConfig;
+    WifiDeviceConfig config;
     m_networkXmlParser->ParseSsid(root, config);
 
     root = xmlNewNode(nullptr, BAD_CAST "root");
-    xmlNodePtr target = xmlNewChlid(root, nullptr, BAD_CAST "target", nullptr);
+    xmlNodePtr target = xmlNewChild(root, nullptr, BAD_CAST "target", nullptr);
     m_networkXmlParser->ParseSsid(target, config);
 
     xmlNodePtr textNode = xmlNewText(BAD_CAST "0test0");
-    xmlAddChlid(taget, textNode);
+    xmlAddChild(target, textNode);
     m_networkXmlParser->ParseSsid(target, config);
     EXPECT_TRUE(config.ssid == "test");
     xmlFreeNode(root);
@@ -233,15 +233,15 @@ HWTEST_F(NetworkParserTest, ParsePreSharedKeyTest, TestSize.Level1)
 {
     WIFI_LOGI("ParsePreSharedKeyTest enter");
     xmlNodePtr root = nullptr;
-    WifiDeviceConfig wifiConfig;
+    WifiDeviceConfig config;
     m_networkXmlParser->ParsePreSharedKey(root, config);
 
     root = xmlNewNode(nullptr, BAD_CAST "root");
-    xmlNodePtr target = xmlNewChlid(root, nullptr, BAD_CAST "target", nullptr);
+    xmlNodePtr target = xmlNewChild(root, nullptr, BAD_CAST "target", nullptr);
     m_networkXmlParser->ParsePreSharedKey(target, config);
 
     xmlNodePtr textNode = xmlNewText(BAD_CAST "0test0");
-    xmlAddChlid(taget, textNode);
+    xmlAddChild(target, textNode);
     m_networkXmlParser->ParsePreSharedKey(target, config);
     EXPECT_TRUE(config.preSharedKey == "test");
     xmlFreeNode(root);
@@ -255,31 +255,31 @@ HWTEST_F(NetworkParserTest, ParseInternetHistoryTest, TestSize.Level1)
     m_networkXmlParser->ParseInternetHistory(root, config);
 
     root = xmlNewNode(nullptr, BAD_CAST "root");
-    xmlNodePtr target = xmlNewChlid(root, nullptr, BAD_CAST "target", nullptr);
+    xmlNodePtr target = xmlNewChild(root, nullptr, BAD_CAST "target", nullptr);
     m_networkXmlParser->ParseInternetHistory(target, config);
 
     xmlNodePtr textNode = xmlNewText(BAD_CAST "-1/0/1/2/0/0/0/0/0/0");
-    xmlAddChlid(taget, textNode);
+    xmlAddChild(target, textNode);
     m_networkXmlParser->ParseInternetHistory(target, config);
     // -1/0/1/2/0/0/0/0/0/0 -> 11111111111110011100 -> 1048476
     EXPECT_TRUE(config.networkStatusHistory == 1048476);
     xmlFreeNode(root);
 }
 
-HWTEST_F(NetworkParserTest, ParseNetworkStatusTest, TestSize.Level1)
+HWTEST_F(NetworkParserTest, ParseStatusTest, TestSize.Level1)
 {
-    WIFI_LOGI("ParseNetworkStatusTest enter");
+    WIFI_LOGI("ParseStatusTest enter");
     xmlNodePtr root = nullptr;
     WifiDeviceConfig config;
-    m_networkXmlParser->ParseNetworkStatus(root, config);
+    m_networkXmlParser->ParseStatus(root, config);
 
     root = xmlNewNode(nullptr, BAD_CAST "root");
-    xmlNodePtr target = xmlNewChlid(root, nullptr, BAD_CAST "target", nullptr);
-    m_networkXmlParser->ParseNetworkStatus(target, config);
+    xmlNodePtr target = xmlNewChild(root, nullptr, BAD_CAST "target", nullptr);
+    m_networkXmlParser->ParseStatus(target, config);
 
     xmlNodePtr textNode = xmlNewText(BAD_CAST "NETWORK_SELECTION_ENABLED");
-    xmlAddChlid(taget, textNode);
-    m_networkXmlParser->ParseNetworkStatus(target, config);
+    xmlAddChild(taget, textNode);
+    m_networkXmlParser->ParseStatus(target, config);
     EXPECT_TRUE(config.status == 0);
     xmlFreeNode(root);
 }
@@ -288,19 +288,18 @@ HWTEST_F(NetworkParserTest, ParseMacMapPlusTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseMacMapPlusTest enter");
     xmlNodePtr root = nullptr;
-    WifiDeviceConfig wifiConfig;
     m_networkXmlParser->ParseMacMapPlus(root);
 
     root = xmlNewNode(nullptr, BAD_CAST "root");
-    xmlNodePtr macAddressMap = xmlNewChlid(root, nullptr, BAD_CAST "MacAddressMap", nullptr);
+    xmlNodePtr macAddressMap = xmlNewChild(root, nullptr, BAD_CAST "MacAddressMap", nullptr);
     m_networkXmlParser->ParseMacMapPlus(root);
 
-    xmlNodePtr macMapEntryPlus = xmlNewChlid(macAddressMap, nullptr, BAD_CAST "map", nullptr);
+    xmlNodePtr macMapEntryPlus = xmlNewChild(macAddressMap, nullptr, BAD_CAST "map", nullptr);
     xmlNewProp(macMapEntryPlus, BAD_CAST "name", BAD_CAST "MacMapEntryPlus");
     m_networkXmlParser->ParseMacMapPlus(root);
 
-    xmlNodePtr macMapEntryPlus = xmlNewChlid(macAddressMap, nullptr, BAD_CAST "string", BAD_CAST "00:11:22:33:44:55");
-    xmlNewProp(macMapEntryPlus, BAD_CAST "name", BAD_CAST "xx::00:11:22:33:44:xx");
+    xmlNodePtr bssidAndMac = xmlNewChild(macMapEntryPlus, nullptr, BAD_CAST "string", BAD_CAST "00:11:22:33:44:55");
+    xmlNewProp(bssidAndMac, BAD_CAST "name", BAD_CAST "xx::00:11:22:33:44:xx");
     m_networkXmlParser->ParseMacMapPlus(root);
     EXPECT_TRUE(m_networkXmlParser->wifiStoreRandomMacs[0].randomMac == "00:11:22:33:44:55");
     xmlFreeNode(root);

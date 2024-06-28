@@ -74,7 +74,7 @@ public:
         WifiLinkedInfo info;
         int instId = 0;
         pSelfCureInterface->DealStaConnChanged(state, info, instId);
-        pSelfCureInterface->pSelfCureService == nullptr;
+        pSelfCureInterface->pSelfCureService = nullptr;
         pSelfCureInterface->DealStaConnChanged(state, info, instId);
     }
 
@@ -83,7 +83,7 @@ public:
         int rssi = MIN_VAL_LEVEL_4;
         int instId = 0;
         pSelfCureInterface->DealRssiLevelChanged(rssi, instId);
-        pSelfCureInterface->pSelfCureService == nullptr;
+        pSelfCureInterface->pSelfCureService = nullptr;
         pSelfCureInterface->DealRssiLevelChanged(rssi, instId);
     }
 
@@ -91,7 +91,7 @@ public:
     {
         WifiP2pLinkedInfo info;
         pSelfCureInterface->DealP2pConnChanged(info);
-        pSelfCureInterface->pSelfCureService == nullptr;
+        pSelfCureInterface->pSelfCureService = nullptr;
         pSelfCureInterface->DealP2pConnChanged(info);
     }
 
@@ -106,7 +106,7 @@ public:
     void DealStaOpenResTest()
     {
         pSelfCureInterface->DealStaOpened(0);
-        pSelfCureInterface->pSelfCureService == nullptr;
+        pSelfCureInterface->pSelfCureService = nullptr;
         pSelfCureInterface->DealStaOpened(0);
     }
 };
@@ -154,6 +154,8 @@ HWTEST_F(SelfCureInterfaceTest, DealStaOpenResTest, TestSize.Level1)
 HWTEST_F(SelfCureInterfaceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)
 {
     int forceNoHttpCheck = 0;
+    pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck);
+    pSelfCureInterface->pSelfCureService = nullptr;
     pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck);
 }
 

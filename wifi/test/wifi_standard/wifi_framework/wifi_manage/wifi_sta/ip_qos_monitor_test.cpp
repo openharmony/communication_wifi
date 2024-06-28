@@ -14,6 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include "mock_wifi_config_center.h"
 #include <vector>
 #include "ip_qos_monitor.h"
 #include "wifi_netlink.h"
@@ -71,11 +72,24 @@ HWTEST_F(IpQosMonitorTest, TestParseTcpReportMsg, TestSize.Level1)
     std::vector<int64_t> elems = {1, 2, 3};
     int32_t cmd = 123;
     IpQosMonitor::GetInstance().ParseTcpReportMsg(elems, cmd);
+
+    cmd = 15;
+    IpQosMonitor::GetInstance().ParseTcpReportMsg(elems, cmd);
+
+    elems = {};
+    IpQosMonitor::GetInstance().ParseTcpReportMsg(elems, cmd);
 }
 
 HWTEST_F(IpQosMonitorTest, TestHandleTcpPktsResp, TestSize.Level1)
 {
     std::vector<int64_t> elems = {1, 2, 3};
+    IpQosMonitor::GetInstance().HandleTcpPktsResp(elems);
+
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.rssi = -30;
+    wifiLinkedInfo.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
     IpQosMonitor::GetInstance().HandleTcpPktsResp(elems);
 }
 
@@ -88,5 +102,7 @@ HWTEST_F(IpQosMonitorTest, TestAllowSelfCureNetwork, TestSize.Level1)
 HWTEST_F(IpQosMonitorTest, TestParseNetworkInternetGood, TestSize.Level1)
 {
     std::vector<int64_t> elems = {1, 2, 3};
+    IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems);
+    elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 0};
     IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems);
 }

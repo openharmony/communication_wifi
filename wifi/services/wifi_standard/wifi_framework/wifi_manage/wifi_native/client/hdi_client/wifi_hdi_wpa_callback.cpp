@@ -202,8 +202,10 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
     if (cbk.onWpaConnectionReject) {
         LOGI("OnEventAssociateReject onWpaConnectionReject");
         cbk.onWpaConnectionReject(associateRejectParam->statusCode);
+        return 0;
     }
-    return 0;
+    LOGE("OnEventAssociateReject cbk is null");
+    return 1;
 }
 
 int32_t OnEventStaNotify(struct IWpaCallback *self, const char* notifyParam, const char *ifName)

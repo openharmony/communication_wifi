@@ -14,7 +14,7 @@
  */
 #include "wifi_p2p_device_manager.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_permission_utils.h"
 #include "wifi_log.h"
 
@@ -42,7 +42,7 @@ bool WifiP2pDeviceManager::AddDevice(const WifiP2pDevice &device)
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     LOGD("%{public}s: add a device, deviceName: %{private}s, address: %{private}s",
         __func__, device.GetDeviceName().c_str(), device.GetDeviceAddress().c_str());
-    WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO,
+    WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO,
         device.GetDeviceAddress(), "");
 #endif
     p2pDevices.push_back(device);
@@ -72,7 +72,7 @@ int WifiP2pDeviceManager::ClearAll()
     std::unique_lock<std::mutex> lock(deviceMutex);
     int num = p2pDevices.size();
 #ifdef SUPPORT_RANDOM_MAC_ADDR
-    WifiSettings::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO);
+    WifiConfigCenter::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO);
 #endif
     p2pDevices.clear();
     LOGI("WifiP2pDeviceManager::ClearAll: clear all address");
@@ -102,7 +102,7 @@ bool WifiP2pDeviceManager::UpdateDevice(const WifiP2pDevice &device)
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     LOGD("%{public}s: update a device, deviceName: %{private}s, address: %{private}s",
         __func__, device.GetDeviceName().c_str(), device.GetDeviceAddress().c_str());
-    WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO,
+    WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO,
         device.GetDeviceAddress(), "");
 #endif
     p2pDevices.push_back(device);
@@ -132,7 +132,7 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     LOGD("%{public}s: receive a event, deviceName: %{private}s, address: %{private}s",
         __func__, device.GetDeviceName().c_str(), device.GetDeviceAddress().c_str());
-    WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO,
+    WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO,
         device.GetDeviceAddress(), "");
 #endif
     /* add its if not found . be careful of the return value */

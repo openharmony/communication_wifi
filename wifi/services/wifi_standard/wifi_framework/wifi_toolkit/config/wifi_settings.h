@@ -15,6 +15,11 @@
 #ifndef OHOS_WIFI_SETTINGS_H
 #define OHOS_WIFI_SETTINGS_H
 
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -58,6 +63,8 @@ constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
+constexpr uint32_t COMPARE_MAC_OFFSET = 2;
+constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
 
 constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
 constexpr char BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/backup_config.conf";
@@ -77,8 +84,6 @@ constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2
 
 namespace OHOS {
 namespace Wifi {
-using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
-
 enum class ThermalLevel {
     COOL = 0,
     NORMAL = 1,
@@ -98,1822 +103,248 @@ enum WifiMacAddrErrCode {
 
 class WifiSettings {
 public:
-    ~WifiSettings();
     static WifiSettings &GetInstance();
+    ~WifiSettings();
 
-    /**
-     * @Description Init the WifiSettings object
-     *
-     * @return int - init result, when 0 means success, other means some fails happened
-     */
     int Init();
 
-    /**
-     * @Description Get the Wifi Sta Capabilities
-     *
-     * @return int - mWifiStaCapabilities
-     */
-    int GetWifiStaCapabilities() const;
-
-    /**
-     * @Description Save the Wifi Sta Capabilities
-     *
-     * @param capabilities - input capability
-     * @return int - 0 success
-     */
-    int SetWifiStaCapabilities(int capabilities);
-
-    /**
-     * @Description Get current STA service state
-     *
-     * @return int - the wifi state, DISABLING/DISABLED/ENABLING/ENABLED/UNKNOWN
-     */
-    int GetWifiState(int instId = 0);
-
-    /**
-     * @Description Save STA service state
-     *
-     * @param state - the wifi state
-     * @return int - 0 success
-     */
-    int SetWifiState(int state, int instId = 0);
-
-    /**
-     * @Description Get current STA service detail state
-     *
-     * @return WifiDetailState - the wifi detail state
-     */
-    WifiDetailState GetWifiDetailState(int instId = 0);
-
-    /**
-     * @Description Save STA service detail state
-     *
-     * @param state - the wifi detail state
-     * @return int - 0 success
-     */
-    int SetWifiDetailState(WifiDetailState state, int instId);
-
-    void SetWifiAllowSemiActive(bool isAllowed);
-    bool GetWifiAllowSemiActive() const;
-    void SetPersistWifiState(int state);
-    int GetPersistWifiState();
-    int GetWifiToggledEnable();
-    void SetWifiToggledState(int state);
-    void InsertWifi6BlackListCache(const std::string currentBssid,
-        const Wifi6BlackListInfo wifi6BlackListInfo);
-    void RemoveWifi6BlackListCache(const std::string bssid);
-    int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const;
-    void SetWifiSelfcureReset(const bool isReset);
-    bool GetWifiSelfcureReset() const;
-    void SetLastNetworkId(const int networkId);
-    int GetLastNetworkId() const;
-    void SetSoftapToggledState(bool state);
-    bool GetSoftapToggledState() const;
-    void SetWifiStopState(bool state);
-    bool GetWifiStopState() const;
-    void SetCoexSupport(bool isSupport);
-    bool GetCoexSupport() const;
-    void SetStaIfaceName(const std::string &ifaceName);
-    std::string GetStaIfaceName();
-    void SetP2pIfaceName(const std::string &ifaceName);
-    std::string GetP2pIfaceName();
-    void SetApIfaceName(const std::string &ifaceName);
-    std::string GetApIfaceName();
-    void RecordWifiCategory(const std::string bssid, WifiCategory category);
-    void CleanWifiCategoryRecord();
-
-    /**
-     * @Description Has STA service running
-     *
-     * @return bool - true
-     */
-    bool HasWifiActive();
-
-    /**
-     * @Description Get the ScanAlways switch state
-     *
-     * @return true - ScanAlways on, false - ScanAlways off
-     */
-    bool GetScanAlwaysState(int instId = 0);
-
-    /**
-     * @Description Set the ScanAlways switch state
-     *
-     * @param isActive - ScanAlways on/off
-     * @return int - 0 success
-     */
-    int SetScanAlwaysState(bool isActive, int instId = 0);
-
-    /**
-     * @Description Save scan results
-     *
-     * @param results - vector scan results
-     * @return int - 0 success
-     */
-    int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
-    /**
-     * @Description Clear scan results
-     *
-     * @return int - 0 success
-     */
-    int ClearScanInfoList();
-    /**
-     * @Description UpdateLinkedChannelWidth
-     *
-     * @param bssid ap ssid
-     * @param channelWidth ap channelwidth
-     * @return void
-     */
-    void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth, int instId = 0);
-
-    /**
-     * @Description Get scan results
-     *
-     * @param results - output vector of scan results
-     * @return int - 0 success
-     */
-    int GetScanInfoList(std::vector<WifiScanInfo> &results);
-
-    /**
-     * @Description Get scan result by bssid
-     *
-     * @param results - output scan result
-     * @return int - 0 success
-     */
-    int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
-    /**
-     * @Description save the p2p connected info
-     *
-     * @param linkedInfo - WifiP2pLinkedInfo object
-     * @return int - 0 success
-     */
-    int SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo);
-
-    /**
-     * @Description Get the p2p connected info
-     *
-     * @param linkedInfo - output the p2p connected info
-     * @return int - 0 success
-     */
-    int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo);
-
-    /**
-     * @Description save the p2p group creator uid
-     *
-     * @param int - uid of p2p group creator
-     * @return int - 0 success
-     */
-    int SaveP2pCreatorUid(int uid);
-
-    /**
-     * @Description get the p2p group creator uid
-     *
-     * @return uid of creator
-     */
-    int GetP2pCreatorUid();
-
-    /**
-     * @Description Get the scan control policy info
-     *
-     * @param info - output ScanControlInfo struct
-     * @return int - 0 success
-     */
-    int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
-
-    /**
-     * @Description Save the scan control policy info
-     *
-     * @param info - input ScanControlInfo struct
-     * @return int - 0 success
-     */
-    int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
-
-    /**
-     * @Description Get the filter info
-     *
-     * @param filterMap - output package map
-     * @return int - 0 success
-     */
-    int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
-
-    /**
-     * @Description Add Device Configuration
-     *
-     * @param config - WifiDeviceConfig object
-     * @return int - network id
-     */
     int AddDeviceConfig(const WifiDeviceConfig &config);
 
-    /**
-     * @Description Remove a wifi device config who's networkId equals input networkId
-     *
-     * @param networkId - a networkId that is to be removed
-     * @return int - 0 success ,other is failed
-     */
     int RemoveDevice(int networkId);
 
-    /**
-     * @Description Remove all saved wifi device config
-     *
-     */
     void ClearDeviceConfig(void);
 
-    /**
-     * @Description Get all saved wifi device config
-     *
-     * @param results - output wifi device config results
-     * @return int - 0 success
-     */
     int GetDeviceConfig(std::vector<WifiDeviceConfig> &results);
 
-    /**
-     * @Description Get the specify networkId's wifi device config
-     *
-     * @param networkId - network id
-     * @param config - output WifiDeviceConfig struct
-     * @return int - 0 success; -1 not find the device config
-     */
     int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config);
 
-    /**
-     * @brief Get the specify wifi device config which bssid is equal to input bssid
-     *
-     * @param index - bssid string or ssid string
-     * @param indexType - index type 0:ssid 1:bssid
-     * @param config - output WifiDeviceConfig struct
-     * @return int - 0 success; -1 not find the device config
-     */
     int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config);
 
-    /**
-     * @Description Get the specify wifi device config which ssid is equal to input ssid and keymgmt is equal to input
-     * keymgmt
-     *
-     * @param ssid - ssid string
-     * @param keymgmt - keymgmt string
-     * @param config - output WifiDeviceConfig struct
-     * @return int - 0 success; -1 not find the device config
-     */
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config);
 
-    /**
-     * @Description Get the specify wifi device config which ssid is equal to input ssid and keymgmt is equal to input
-     * keymgmt
-     *@param networkId - network id
-     * @param ssid - ssid string
-     * @param keymgmt - keymgmt string
-     * @param config - output WifiDeviceConfig struct
-     * @return int - 0 success; -1 not find the device config
-     */
     int GetDeviceConfig(const std::string &ancoCallProcessName, const std::string &ssid,
             const std::string &keymgmt, WifiDeviceConfig &config);
 
-    /**
-     * @Description Get the wifi device configs which hiddenSSID is true
-     *
-     * @param results - output WifiDeviceConfig structs
-     * @return int - 0 success
-     */
-    int GetHiddenDeviceConfig(std::vector<WifiDeviceConfig> &results);
-
-    /**
-     * @Description Set a wifi device's state who's networkId equals input networkId;
-     * when the param bSetOther is true and the state is ENABLED, that means we need
-     * to set other wifi device DISABLED
-     * @param networkId - the wifi device's id
-     * @param state - WifiDeviceConfigStatus DISABLED/ENABLED/UNKNOWN
-     * @param bSetOther - whether set other device config disabled
-     * @return int - when 0 means success, other means some fails happened,
-     *               Input state invalid or not find the wifi device config
-     */
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
-    /**
-     * @Description Set a wifi device's attributes who's networkId equals input networkId after connect;
-     *
-     * @param networkId - the wifi device's id
-     * @return int - when 0 means success, other means some fails happened,
-     *               Input state invalid or not find the wifi device config
-     */
     int SetDeviceAfterConnect(int networkId);
 
-    /**
-     * @Description Get the candidate device configuration
-     *
-     * @param uid - call app uid
-     * @param networkId - a networkId that is to be get
-     * @param config - WifiDeviceConfig object
-     * @return int - network id
-     */
-    int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config);
-
-    /**
-     * @Description  Get all the Candidate Device Configurations set key uuid
-     *
-     * @param uid - call app uid
-     * @param configs - WifiDeviceConfig objects
-     * @return int - 0 success
-     */
-    int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs);
-
-    /**
-     * @Description Synchronizing saved the wifi device config into config file
-     *
-     * @return int - 0 success; -1 save file failed
-     */
-    int SyncDeviceConfig();
-
-    /**
-     * @Description Increments the number of reboots since last use for each configuration
-     *
-     * @return int - 0 success; -1 save file failed
-     */
-    int IncreaseNumRebootsSinceLastUse();
-    /**
-     * @Description Remove excess networks in case the number of saved networks exceeds the mas limit
-     *
-     * @param configs - WifiDeviceConfig objects
-     * @return int - 0 if networks were removed, 1 otherwise.
-     */
-    int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const;
-
-    /**
-     * @Description Reload wifi device config from config file
-     *
-     * @return int - 0 success; -1 read config file failed
-     */
-    int ReloadDeviceConfig();
-
-    /**
-     * @Description Encryption WifiDeviceConfig for old data
-     */
-    void EncryptionWifiDeviceConfigOnBoot();
-
-    /**
-     * @Description Synchronizing saved the wifi WifiP2pGroupInfo config into config file
-     *
-     * @return int - 0 success; -1 save file failed
-     */
-    int SyncWifiP2pGroupInfoConfig();
-
-    /**
-     * @Description Reload wifi WifiP2pGroupInfo config from config file
-     *
-     * @return int - 0 success; -1 read config file failed
-     */
-    int ReloadWifiP2pGroupInfoConfig();
-
-    /**
-     * @Description Save WifiP2pGroupInfo
-     *
-     * @param groups - input wifi p2p groups config results
-     * @return int - 0 success
-     */
-    int SetWifiP2pGroupInfo(const std::vector<WifiP2pGroupInfo> &groups);
-
-    /**
-     * @Description set current WifiP2pGroupInfo
-     *
-     * @param group - input wifi p2p group config
-     */
-    void SetCurrentP2pGroupInfo(const WifiP2pGroupInfo &group);
-
-    /**
-     * @Description get current WifiP2pGroupInfo
-     *
-     * @return WifiP2pGroupInfo - WifiP2pGroupInfo result
-     */
-    WifiP2pGroupInfo GetCurrentP2pGroupInfo();
-
-    /**
-     * @brief increase sta connected failed count
-     *
-     * @param index - bssid string or ssid string
-     * @param indexType - index type 0:ssid 1:bssid
-     * @param count - the increase count to set
-     * @return int - 0 success; -1 not find the device config
-     */
-    int IncreaseDeviceConnFailedCount(const std::string &index, const int &indexType, int count);
-
-    /**
-     * @brief set sta connected failed count
-     *
-     * @param index - bssid string or ssid string
-     * @param indexType - index type 0:ssid 1:bssid
-     * @param count - the count to set
-     * @return int - 0 success; -1 not find the device config
-     */
-    int SetDeviceConnFailedCount(const std::string &index, const int &indexType, int count);
-
-    /**
-     * @Description Delete a WifiP2pGroupInfo node
-     *
-     * @return int
-     */
-    int RemoveWifiP2pGroupInfo();
-
-    /**
-     * @Description Delete a WifiP2pSupplicantGroupInfo conf
-     *
-     * @return int
-     */
-    int RemoveWifiP2pSupplicantGroupInfo();
-
-    /**
-     * @Description Get all saved wifi p2p groups config
-     *
-     * @param results - output wifi p2p groups config results
-     * @return int - 0 success
-     */
-    int GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups);
-
-    /**
-     * @Description Get the dhcp info
-     *
-     * @param info - output IpInfo struct
-     * @return int - 0 success
-     */
-    int GetIpInfo(IpInfo &info, int instId = 0);
-
-    /**
-     * @Description Save dhcp info
-     *
-     * @param info - input IpInfo struct
-     * @return int - 0 success
-     */
-    int SaveIpInfo(const IpInfo &info, int instId = 0);
-
-    /**
-     * @Description Get the dhcp ipv6info
-     *
-     * @param info - output IpV6Info struct
-     * @return int - 0 success
-     */
-    int GetIpv6Info(IpV6Info &info, int instId = 0);
-
-    /**
-     * @Description Save dhcp inV6fo
-     *
-     * @param info - input IpV6Info struct
-     * @return int - 0 success
-     */
-    int SaveIpV6Info(const IpV6Info &info, int instId = 0);
-
-    /**
-     * @Description Get all wifi linked info
-     *
-     * @return map - all wifi linked info
-     */
-    std::map<int, WifiLinkedInfo> GetAllWifiLinkedInfo();
-
-    /**
-     * @Description Get current link info
-     *
-     * @param info - output WifiLinkedInfo struct
-     * @return int - 0 success
-     */
-    int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0);
-
-    /**
-     * @Description getConnectedBssid
-     *
-     * @param connectedBssid connectedBssid
-     * @param instId target wlan id
-     */
-    std::string GetConnectedBssid(int instId = 0);
-
-    /**
-     * @Description Save link info
-     *
-     * @param info - input WifiLinkedInfo struct
-     * @return int - 0 success
-     */
-    int SaveLinkedInfo(const WifiLinkedInfo &info, int instId = 0);
-
-    /**
-     * @Description Save mac address
-     *
-     * @param macAddress - mac address info
-     * @return int - 0 success
-     */
-    int SetMacAddress(const std::string &macAddress, int instId = 0);
-
-    /**
-     * @Description Get the mac address
-     *
-     * @param macAddress - output mac address info
-     * @return int - 0 success
-     */
-    int GetMacAddress(std::string &macAddress, int instId = 0);
-
-    /**
-     * @Description reload mac address
-     *
-     * @return int - 0 success
-     */
-    int ReloadStaRandomMac();
-
-    /**
-     * @Description reload portal conf
-     *
-     * @return int - 0 success
-     */
-    int ReloadPortalconf();
-
-    /**
-     * @Description clear random mac conf
-     *
-     * @return int - 0 success
-     */
-    void ClearRandomMacConfig();
-
-    /**
-     * @Description Get portal uri
-     *
-     * @param portalUri - portal uri
-     * @return int - 0 success
-     */
-    void GetPortalUri(WifiPortalConf &urlInfo);
-
-    /**
-     * @Description add random mac address
-     *
-     * @param randomMacInfo - randmon mac address info
-     * @return int - 0 success
-     */
-    bool AddRandomMac(WifiStoreRandomMac &randomMacInfo);
-
-    /**
-     * @Description Fuzzy Bssid.
-     *
-     * @param bssid - MAC address type[in]
-     * @return std::string - the fuzzy bssid.
-     */
-    std::string FuzzyBssid(const std::string bssid);
-
-    /**
-     * @Description Get random mac address
-     *
-     * @param randomMacInfo - randmon mac address info
-     * @return int - 0 success
-     */
-    bool GetRandomMac(WifiStoreRandomMac &randomMacInfo);
-
-    /**
-     * @Description remove random mac address
-     *
-     * @param bssid - bssid string
-     * @param randomMac - randmon mac address string
-     * @return int - 1 success
-     */
-    bool RemoveRandomMac(const std::string &bssid, const std::string &randomMac);
-
-    /**
-     * @Description Get current hotspot state
-     *
-     * @return int - the hotspot state, IDLE/STARTING/STARTED/CLOSING/CLOSED
-     */
-    int GetHotspotState(int id = 0);
-
-    /**
-     * @Description Save current hotspot state
-     *
-     * @param state - hotspot state
-     * @return int - 0 success
-     */
-    int SetHotspotState(int state, int id = 0);
-
-    /**
-     * @Description Set the hotspot config
-     *
-     * @param config - input HotspotConfig struct
-     * @return int - 0 success
-     */
-    int SetHotspotConfig(const HotspotConfig &config, int id = 0);
-
-    /**
-     * @Description Get the hotspot config
-     *
-     * @param config - output HotspotConfig struct
-     * @return int - 0 success
-     */
-    int GetHotspotConfig(HotspotConfig &config, int id = 0);
-
-    /**
-     * @Description Set the idel timeout of Hotspot
-     *
-     * @return int - 0 success
-     */
-    int SetHotspotIdleTimeout(int time);
-
-    /**
-     * @Description Get the idel timeout of Hotspot
-     *
-     * @param time -input time,
-     * @return int - the hotspot idle timeout
-     */
-    int GetHotspotIdleTimeout() const;
-
-    /**
-     * @Description Synchronizing saved the Hotspot config into config file
-     *
-     * @return int - 0 success; -1 save file failed
-     */
-    int SyncHotspotConfig();
-
-    /**
-     * @Description Set the p2p vendor config
-     *
-     * @param config - input P2pVendorConfig struct
-     * @return int - 0 success
-     */
-    int SetP2pVendorConfig(const P2pVendorConfig &config);
-
-    /**
-     * @Description Get the p2p vendor config
-     *
-     * @param config - output P2pVendorConfig struct
-     * @return int - 0 success
-     */
-    int GetP2pVendorConfig(P2pVendorConfig &config);
-
-    /**
-     * @Description Synchronizing saved the P2p Vendor config into config file
-     *
-     * @return int - 0 success; -1 save file failed
-     */
-    int SyncP2pVendorConfig();
-
-    /**
-     * @Description Get current hotspot accept linked stations
-     *
-     * @param results - output StationInfo results
-     * @return int - 0 success
-     */
-    int GetStationList(std::vector<StationInfo> &results, int id = 0);
-
-    /**
-     * @Description Management (add/update/delete) connected station list
-     *
-     * @param info - input StationInfo struct
-     * @param mode - mode of MODE_ADD MODE_UPDATE MODE_DEL
-     * @return int - 0 success; -1 mode not correct
-     */
-    int ManageStation(const StationInfo &info, int mode, int id = 0); /* add / update / remove */
-
-    /**
-     * @Description Clear connected station list
-     *
-     * @return int - 0 success
-     */
-    int ClearStationList(int id = 0);
-
-    /**
-     * @Description Get the block list
-     *
-     * @param results - output StationInfo results
-     * @return int - 0 success
-     */
-    int GetBlockList(std::vector<StationInfo> &results, int id = 0);
-
-    /**
-     * @Description Manager (add/update/delete) station connect Blocklist
-     *
-     * @param info - input StationInfo struct
-     * @param mode - mode of MODE_ADD MODE_DEL MODE_UPDATE
-     * @return int - 0 success; -1 mode not correct
-     */
-    int ManageBlockList(const StationInfo &info, int mode, int id = 0); /* add / remove */
-
-    /**
-     * @Description Judge whether the station is in current linked station list
-     *
-     * @param info - input StationInfo struct
-     * @return int - 0 find the station, exist; -1 not find, not exist
-     */
-    int FindConnStation(const StationInfo &info, int id = 0);
-
-    /**
-     * @Description Synchronizing saved the block list config into config file
-     *
-     * @return int - 0 success; -1 save file failed
-     */
-    int SyncBlockList();
-
-    /**
-     * @Description Get the Valid Bands object
-     *
-     * @param bands - output vector for BandType
-     * @return int - 0 success
-     */
-    int GetValidBands(std::vector<BandType> &bands);
-
-    /**
-     * @Description Set the Valid Channels object
-     *
-     * @param channelsInfo - input ChannelsTable struct
-     * @return int - 0 success
-     */
-    int SetValidChannels(const ChannelsTable &channelsInfo);
-
-    /**
-     * @Description Get the Valid Channels object
-     *
-     * @param channelsInfo - output ChannelsTable struct
-     * @return int - 0 success
-     */
-    int GetValidChannels(ChannelsTable &channelsInfo);
-
-    /**
-     * @Description Clear the number of valid channels
-     *
-     * @return int - 0 success
-     */
-    int ClearValidChannels();
-
-    /**
-     * @Description Get supported power model list
-     *
-     * @param model - the model to be set
-     * @return ErrCode - operation result
-     */
-    int SetPowerModel(const PowerModel& model, int id = 0);
-
-    /**
-     * @Description Get power model
-     *
-     * @param model - current power model
-     * @return ErrCode - operation result
-     */
-    int GetPowerModel(PowerModel& model, int id = 0);
-
-    /**
-     * @Description set the p2p state
-     *
-     * @param state - the p2p state
-     * @return int - 0 success
-     */
-    int SetP2pState(int state);
-
-    /**
-     * @Description Get current p2p state
-     *
-     * @return int - the p2p state, NONE/IDLE/STARTING/STARTED/CLOSING/CLOSED
-     */
-    int GetP2pState();
-
-    /**
-     * @Description set the p2p discover state
-     *
-     * @param state - the p2p discover state
-     * @return int - 0 success
-     */
-    int SetP2pDiscoverState(int state);
-
-    /**
-     * @Description Get current p2p discover state
-     *
-     * @return int -the p2p discover state, P2P_DISCOVER_NONE/P2P_DISCOVER_STARTING/P2P_DISCOVER_CLOSED
-     */
-    int GetP2pDiscoverState();
-
-    /**
-     * @Description set the p2p connected state
-     *
-     * @param state - the p2p connected state
-     * @return int - 0 success
-     */
-    int SetP2pConnectedState(int state);
-
-    /**
-     * @Description Get current p2p connected state
-     *
-     * @return int - the connected state, P2P_CONNECTED_NONE/P2P_CONNECTED_STARTING/P2P_CONNECTED_CLOSED
-     */
-    int GetP2pConnectedState();
-
-    /**
-     * @Description Set the hid2d upper scene
-     *
-     * @param state - the hid2d upper scene
-     * @return int - 0 success
-     */
-    int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene);
-
-    /**
-     * @Description Get the hid2d upper scene
-     *
-     * @param state - the hid2d upper scene
-     * @return int - 0 success
-     */
-    int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene);
-
-    /**
-     * @Description Set p2p type
-     *
-     * @param type - the p2p type
-     * @return int - 0 success
-     */
-    int SetP2pBusinessType(const P2pBusinessType &type);
-
-    /**
-     * @Description Get p2p type
-     *
-     * @param state - p2p type
-     * @return int - 0 success
-     */
-    int GetP2pBusinessType(P2pBusinessType &type);
-
-    /**
-     * @Description Clear the hid2d info
-     */
-    void ClearLocalHid2dInfo();
-
-    /**
-     * @Description Get signal level about given rssi and band
-     *
-     * @param rssi - rssi info
-     * @param band - band info
-     * @return int - level
-     */
-    int GetSignalLevel(const int &rssi, const int &band, int instId = 0);
-
-    /**
-     * @Description Get the Ap Max Conn Num
-     *
-     * @return int - number
-     */
-    int GetApMaxConnNum();
-
-    /**
-     * @Description Enable Network
-     *
-     * @param networkId - enable network id
-     * @param disableOthers - when set, save this network id, and can use next time
-     * @return true
-     * @return false
-     */
-    bool EnableNetwork(int networkId, bool disableOthers, int instId = 0);
-
-    /**
-     * @Description Set the User Last Selected Network Id
-     *
-     * @param networkId - network id
-     */
-    void SetUserLastSelectedNetworkId(int networkId, int instId = 0);
-
-    /**
-     * @Description Get the User Last Selected Network Id
-     *
-     * @return int - network id
-     */
-    int GetUserLastSelectedNetworkId(int instId = 0);
-
-    /**
-     * @Description Get the User Last Selected Network time
-     *
-     * @return time_t - timestamp
-     */
-    time_t GetUserLastSelectedNetworkTimeVal(int instId = 0);
-
-    /**
-     * @Description Synchronizing saved the WifiConfig into config file
-     *
-     * @return int - 0 success; -1 save file failed
-     */
-    int SyncWifiConfig();
-
-    /**
-     * @Description Get operator wifi state
-     *
-     * @return type - enum OperatorWifiType
-     */
-    int GetOperatorWifiType(int instId = 0);
-
-    /**
-     * @Description Set operator wifi state
-     *
-     * @param type - enum OperatorWifiType
-     * @return int - 0 success
-     */
-    int SetOperatorWifiType(int type, int instId = 0);
-
-    /**
-     * @Description Get last airplane mode
-     *
-     * @return type - enum aiprlane mode
-     */
-    int GetLastAirplaneMode(int instId = 0);
-
-    /**
-     * @Description Set last airplane mode
-     *
-     * @return type - 0 success
-     */
-    int SetLastAirplaneMode(int mode, int instId = 0);
-
-    /**
-     * @Description Get the config whether can open sta when airplane mode opened
-     *
-     * @return true - can open
-     * @return false - can't open
-     */
-    bool GetCanOpenStaWhenAirplaneMode(int instId = 0);
-
-    /**
-     * @Description Get the config whether open wifi when airplane mode opened
-     *
-     * @return true - open
-     * @return false - can't open
-     */
-    bool GetWifiFlagOnAirplaneMode(int instId = 0);
-
-    /**
-     * @Description Set the config whether open wifi when airplane mode opened
-     *
-     * @param ifOpen - user want to open wifi
-     * @return int - 0 success
-     */
-    int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0);
-
-    /**
-     * @Description Get the config whether wifi is disabled by airplane mode opened
-     *
-     * @return true - wifi is disabled by airplane mode opened
-     * @return false - wifi is not disabled by airplane mode opened
-     */
-    bool GetWifiDisabledByAirplane(int instId = 0);
-
-    /**
-     * @Description Set the config whether wifi is disabled by airplane mode opened
-     *
-     * @param disabledByAirplane - whether wifi is disabled by airplane mode opened
-     * @return int - 0 success
-     */
-    int SetWifiDisabledByAirplane(bool disabledByAirplane, int instId = 0);
-
-    /**
-     * @Description Get the STA service last running state
-     *
-     * @return 2 - semi active
-     * @return 1 - running
-     * @return 0 - not running
-     */
-    int GetStaLastRunState(int instId = 0);
-
-    /**
-     * @Description Set the STA service running state
-     *
-     * @param bRun - running/semi active/not running
-     * @return int - 0 success
-     */
-    int SetStaLastRunState(int bRun, int instId = 0);
-
-    /**
-     * @Description Get the Dhcp Ip Type
-     *
-     * @return int - dhcp ip type, ipv4/ipv6/double
-     */
-    int GetDhcpIpType(int instId = 0);
-
-    /**
-     * @Description Set the Dhcp Ip Type
-     *
-     * @param dhcpIpType - ipv4/ipv6/double
-     * @return int - 0 success
-     */
-    int SetDhcpIpType(int dhcpIpType, int instId = 0);
-
-    /**
-     * @Description Get the Default Wifi Interface
-     *
-     * @return std::string - interface name
-     */
-    std::string GetDefaultWifiInterface(int instId = 0);
-
-    /**
-     * @Description Set the Screen State
-     *
-     * @param state - 1 on; 2 off
-     */
-    void SetScreenState(const int &state);
-
-    /**
-     * @Description Get the Screen State
-     *
-     * @return int - 1 on; 2 off
-     */
-    int GetScreenState() const;
-
-    /**
-     * @Description Set the Idel State
-     *
-     * @param state - 1 on; 2 off
-     */
-    void SetPowerIdelState(const int &state);
-
-    /**
-     * @Description Get the Idel State
-     *
-     * @return int - 1 on; 2 off
-     */
-    int GetPowerIdelState() const;
-
-    /**
-     * @Description Set the Battery Charge State
-     *
-     * @param state - 1 on; 2 off
-     */
-    void SetBatteryChargeState(const int &state);
-
-    /**
-     * @Description Set the Gnss Fix State
-     *
-     * @param state - 1 on; 2 off
-     */
-    void SetGnssFixState(const int &state);
-
-    /**
-     * @Description Get the Gnss Fix State
-     *
-     * @return int - 1 on; 2 off
-     */
-    int GetGnssFixState() const;
-
-    /**
-     * @Description Set the abnormal apps
-     *
-     * @param abnormalAppList - abnormal app list
-     */
-    void SetAbnormalApps(const std::vector<std::string> &abnormalAppList);
-
-    /**
-     * @Description Get the abnormal apps
-     *
-     * @param abnormalAppList - abnormal app list
-     * @return int - 0 success
-     */
-    int GetAbnormalApps(std::vector<std::string> &abnormalAppList);
-
-    /**
-     * @Description Set the scan genie state
-     *
-     * @param state - 1 on; 2 off
-     */
-    void SetScanGenieState(const int &state);
-
-    /**
-     * @Description Get the scan genie state
-     *
-     * @return int - 1 on; 2 off
-     */
-    int GetScanGenieState() const;
-
-    /**
-     * @Description Set the Airplane Mode State
-     *
-     * @param state - 1 open; 2 close
-     * @return bool - true airplane mode toggled, false airplane mode not toggled
-     */
-    bool SetWifiStateOnAirplaneChanged(const int &state);
-
-    /**
-     * @Description Get the Airplane Mode State
-     *
-     * @return int - 1 open; 2 close
-     */
-    int GetAirplaneModeState() const;
-
-    /**
-     * @Description Set the App Running State
-     *
-     * @param appRunMode - app run mode
-     */
-    void SetAppRunningState(ScanMode appRunMode);
-
-    /**
-     * @Description Get the App Running State
-     *
-     * @return ScanMode
-     */
-    ScanMode GetAppRunningState() const;
-
-    /**
-     * @Description Set the Power Saving Mode State
-     *
-     * @param state - 1 open; 2 close
-     */
-    void SetPowerSavingModeState(const int &state);
-
-    /**
-     * @Description Get the Power Saving Mode State
-     *
-     * @return int - 1 open; 2 close
-     */
-    int GetPowerSavingModeState() const;
-
-    /**
-     * @Description Set app package name.
-     *
-     * @param appPackageName - app package name
-     */
-    void SetAppPackageName(const std::string &appPackageName);
-
-    /**
-     * @Description Get app package name.
-     *
-     * @return const std::string - app package name.
-     */
-    const std::string GetAppPackageName() const;
-
-    /**
-     * @Description Set freeze mode state.
-     *
-     * @param state - 1 freeze mode; 2 moving mode
-     */
-    void SetFreezeModeState(int state);
-
-    /**
-     * @Description Get freeze mode state.
-     *
-     * @return freeze mode.
-     */
-    int GetFreezeModeState() const;
-
-    /**
-     * @Description Set no charger plugged in mode.
-     *
-     * @param state - 1 no charger plugged in mode; 2 charger plugged in mode
-     */
-    void SetNoChargerPlugModeState(int state);
-
-    /**
-     * @Description Get no charger plugged in mode.
-     *
-     * @return no charger plugged in mode.
-     */
-    int GetNoChargerPlugModeState() const;
-
-    /**
-     * @Description Set enable/disable Whether to allow network switchover
-     *
-     * @param bSwitch - enable/disable
-     * @return int - 0 success
-     */
-    int SetWhetherToAllowNetworkSwitchover(bool bSwitch, int instId = 0);
-
-    /**
-     * @Description Check whether enable network switchover
-     *
-     * @return true - enable
-     * @return false - disable
-     */
-    bool GetWhetherToAllowNetworkSwitchover(int instId = 0);
-
-    /**
-     * @Description Set the policy score slope
-     *
-     * @param score - score
-     * @return int - 0 success
-     */
-    int SetScoretacticsScoreSlope(const int &score, int instId = 0);
-
-    /**
-     * @Description Get the policy score slope
-     *
-     * @return int - score
-     */
-    int GetScoretacticsScoreSlope(int instId = 0);
-
-    /**
-     * @Description Initial score of the set strategy
-     *
-     * @param score - score
-     * @return int - 0 success
-     */
-    int SetScoretacticsInitScore(const int &score, int instId = 0);
-
-    /**
-     * @Description Obtain the initial score of the tactic
-     *
-     * @return int - score
-     */
-    int GetScoretacticsInitScore(int instId = 0);
-
-    /**
-     * @Description Set the scoring policy to the same BSSID score
-     *
-     * @param score - score
-     * @return int - 0 success
-     */
-    int SetScoretacticsSameBssidScore(const int &score, int instId = 0);
-
-    /**
-     * @Description Get the scoring policy to the same BSSID score
-     *
-     * @return int - score
-     */
-    int GetScoretacticsSameBssidScore(int instId = 0);
-
-    /**
-     * @Description Set the score policy for the same network
-     *
-     * @param score - score
-     * @return int - 0 success
-     */
-    int SetScoretacticsSameNetworkScore(const int &score, int instId = 0);
-
-    /**
-     * @Description Get the score policy for the same network
-     *
-     * @return int - score
-     */
-    int GetScoretacticsSameNetworkScore(int instId = 0);
-
-    /**
-     * @Description Set the 5 GHz score of the policy frequency
-     *
-     * @param score - score
-     * @return int - 0 success
-     */
-    int SetScoretacticsFrequency5GHzScore(const int &score, int instId = 0);
-
-    /**
-     * @Description Get the 5 GHz score of the policy frequency
-     *
-     * @return int - score
-     */
-    int GetScoretacticsFrequency5GHzScore(int instId = 0);
-
-    /**
-     * @Description Set the score policy. last select score
-     *
-     * @param score - score
-     * @return int - 0 success
-     */
-    int SetScoretacticsLastSelectionScore(const int &score, int instId = 0);
-
-    /**
-     * @Description Get the score policy, last select score
-     *
-     * @return int - score
-     */
-    int GetScoretacticsLastSelectionScore(int instId = 0);
-
-    /**
-     * @Description Setting the Score Policy Security Score
-     *
-     * @param score - score
-     * @return int - 0 success
-     */
-    int SetScoretacticsSecurityScore(const int &score, int instId = 0);
-
-    /**
-     * @Description Get the Score Policy Security Score
-     *
-     * @return int - priority
-     */
-    int GetScoretacticsSecurityScore(int instId = 0);
-
-    /**
-     * @Description Setting the Score Policy Candidate Score
-     *
-     * @param score - score
-     * @return int - 0 success
-     */
-    int SetScoretacticsNormalScore(const int &score, int instId = 0);
-
-    /**
-     * @Description Get the Score Policy Candidate Score
-     *
-     * @return int - score
-     */
-    int GetScoretacticsNormalScore(int instId = 0);
-
-    /**
-     * @Description Set the saved device appraisal priority
-     *
-     * @param priority - priority
-     * @return int - 0 success
-     */
-    int SetSavedDeviceAppraisalPriority(const int &priority, int instId = 0);
-
-    /**
-     * @Description Get the saved device appraisal priority
-     *
-     * @return int - priority
-     */
-    int GetSavedDeviceAppraisalPriority(int instId = 0);
-
-    /**
-     * @Description Judge the Module need preloaded or not
-     *
-     * @param name - module name
-     * @return true - need preload
-     * @return false - no need preload
-     */
-    bool IsModulePreLoad(const std::string &name);
-
-    /**
-     * @Description Save wps connection device config
-     *
-     * @param config - input WifiDeviceConfig struct
-     * @return int - 0 success; -1 load the device config file failed
-     */
-    int AddWpsDeviceConfig(const WifiDeviceConfig &config);
-    /**
-     * @Description Get the Support HwPno Flag object
-     *
-     * @return true - support HwPno scan
-     * @return false - not support HwPno scan
-     */
-    bool GetSupportHwPnoFlag(int instId = 0);
-    /**
-     * @Description Get the Min 2.4G strength object
-     *
-     * @return int Min 2.4G strength
-     */
-    int GetMinRssi2Dot4Ghz(int instId = 0);
-    /**
-     * @Description Get the Min 5G strength object
-     *
-     * @return int Min 5G strength
-     */
-    int GetMinRssi5Ghz(int instId = 0);
-
-    /**
-     * @Description Get the Alternate dns.
-     *
-     * @return string - dns
-     */
-    std::string GetStrDnsBak(int instId = 0);
-    /**
-     * @Description Obtaining Whether to Load the Configuration of the Standby STA.
-     *
-     * @return bool - Indicates whether to load the configuration of the standby STA.
-     */
-    bool IsLoadStabak(int instId = 0);
-
-    /**
-     * @Description Set the real mac address
-     *
-     * @param macAddress - the real mac address
-     * @return int - 0 success
-     */
-    int SetRealMacAddress(const std::string &macAddress, int instId = 0);
-
-    /**
-     * @Description Get the real mac address
-     *
-     * @param macAddress - the real mac address
-     * @return int - 0 success
-     */
-    int GetRealMacAddress(std::string &macAddress, int instId = 0);
-
-    /**
-     * @Description set the device name
-     *
-     * @param deviceName - device name
-     * @return int - result
-     */
-    int SetP2pDeviceName(const std::string &deviceName);
-
-    /**
-     * @Description get trustlist policies.
-     *
-     * @return const std::vector<TrustListPolicy> - trustlist policies.
-     */
-    const std::vector<TrustListPolicy> ReloadTrustListPolicies();
-
-    /**
-     * @Description get moving freeze state trustlist.
-     *
-     * @return const MovingFreezePolicy - moving freeze policy.
-     */
-    const MovingFreezePolicy ReloadMovingFreezePolicy();
-
-    /**
-     * @Description get bssid of connection timeout for last time.
-     *
-     * @return bssid.
-     */
-    std::string GetConnectTimeoutBssid(int instId = 0);
-
-    /**
-     * @Description set bssid of connection timeout for last time.
-     *
-     * @return int - result
-     */
-    int SetConnectTimeoutBssid(std::string &bssid, int instId = 0);
-
-    /**
-     * @Description set default frequencies for specify country band.
-     *
-     */
-    void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies, int instId = 0);
-
-    /**
-     * @Description set type of GO group
-     *
-     * @param isExplicit true: created by user; false: created by auto negotiation
-     */
-    void SetExplicitGroup(bool isExplicit);
-
-    /**
-     * @Description get type of Go group
-     *
-     * @return true: created by user; false: created by auto negotiation
-     */
-    bool IsExplicitGroup(void);
-
-    /**
-     * @Description Set the thermal level
-     *
-     * @param level 0 COOL, 1 NORMAL, 2 WARM, 3 HOT, 4 OVERHEATED, 5 WARNING, 6 EMERGENCY
-     */
-    void SetThermalLevel(const int &level);
-
-    /**
-     * @Description Get the thermal level
-     *
-     * @return int 0 COOL, 1 NORMAL, 2 WARM, 3 HOT, 4 OVERHEATED, 5 WARNING, 6 EMERGENCY
-     */
-    int GetThermalLevel() const;
-
-    /**
-     * @Description SetThreadStatusFlag
-     *
-     * @param state true thread start, false thread end
-     */
-    void SetThreadStatusFlag(bool state);
-
-    /**
-     * @Description GetThreadStatusFlag
-     *
-     * @return ThreadStatusFlag
-     */
-    bool GetThreadStatusFlag(void) const;
-
-    /**
-     * @Description GetThreadStartTime
-     *
-     * @return StartTime
-     */
-    uint64_t GetThreadStartTime(void) const;
-
-    /**
-     * @Description Save the last disconnected reason
-     *
-     * @param discReason - discReason
-     */
-    void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0);
-
-    /**
-     * @Description Get the last disconnected reason
-     *
-     * @param discReason - discReason
-     * @return int - 0 success
-     */
-    int GetDisconnectedReason(DisconnectedReason &discReason, int instId = 0);
-
-    /**
-     * @Description Set the Scan Only Switch State
-     *
-     * @param state - 1 on; 2 off
-     */
-    void SetScanOnlySwitchState(const int &state, int instId = 0);
-
-    /**
-     * @Description Get the Scan Only Switch State
-     *
-     * @return int - 1 on; 2 off
-     */
-    int GetScanOnlySwitchState(int instId = 0);
-    /**
-     * @Description Get the Scan Only Whether Available
-     *
-     * @return int - 1 on; 2 off
-     */
-    bool CheckScanOnlyAvailable(int instId = 0);
-
-    /**
-     * @Description Get sta ap exclusion type
-     *
-     * @return type - enum StaApExclusionType
-     */
-    int GetStaApExclusionType();
-
-    /**
-     * @Description Set sta ap exclusion type
-     *
-     * @param type - enum StaApExclusionType
-     * @return int - 0 success
-     */
-    int SetStaApExclusionType(int type);
-
-    /**
-     * @Description Generate random number
-     *
-     * @return long int
-     */
-    long int GetRandom();
-    /**
-     * @Description generate a MAC address
-     *
-     * @param randomMacAddr - random MAC address[out]
-     */
-    void GenerateRandomMacAddress(std::string &randomMacAddr);
-    /**
-     * @Description Clear Hotspot config
-     *
-     * @return void
-     */
-    void ClearHotspotConfig();
-    /**
-     * @Description Encryption wifi device config
-     *
-     * @param config - Encryption wifiDeviceConfig
-     */
-    bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
-
-    /**
-     * @Description Set WifiDeviceConfig by randomizedMacSuccess
-     *
-     * @param networkId - networkId[in]
-     * @return int - when 0 means success, other means some fails happened,
-     *               Input state invalid or not find the wifi device config
-     */
     int SetDeviceRandomizedMacSuccessEver(int networkId);
 
-#ifdef FEATURE_ENCRYPTION_SUPPORT
+    int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config);
 
-    /**
-     * @Description Decryption wifi device config
-     *
-     * @param config - Decryption wifiDeviceConfig
-     */
-    int DecryptionDeviceConfig(WifiDeviceConfig &config);
+    int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs);
 
-    /**
-     * @Description Check WifiDeviceConfig is deciphered
-     *
-     * @param config - wifiDeviceConfig
-     * @return bool - true: deciphered
-     */
-    bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;
+    int IncreaseDeviceConnFailedCount(const std::string &index, const int &indexType, int count);
 
-    bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
-    void DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
-#endif
-#ifdef SUPPORT_RANDOM_MAC_ADDR
-    /**
-     * @Description generate a MAC address
-     *
-     * @param peerBssid - real MAC address[in]
-     * @param randomMacAddr - random MAC address[out]
-     */
-    void GenerateRandomMacAddress(std::string peerBssid, std::string &randomMacAddr);
-    /**
-     * @Description save a MAC address pair
-     *
-     * @param type - MAC address type[in]
-     * @param realMacAddr - real MAC address[in]
-     * @param randomAddr - random MAC address[in]
-     * @return bool - false fail to save the MAC address, true success to save the MAC address
-     */
-    bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
-        const std::string &randomAddr);
-    /**
-     * @Description get random MAC address
-     *
-     * @param type - MAC address type[in]
-     * @param bssid - MAC address
-     * @return std::string - random MAC address
-     */
-    std::string GetRandomMacAddr(WifiMacAddrInfoType type, std::string bssid);
-    /**
-     * @Description remove MAC address pair
-     *
-     * @param type - MAC address type[in]
-     * @param bssid - MAC address
-     */
-    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
-    /**
-     * @Description add a MAC address pair
-     *
-     * @param type - MAC address type[in]
-     * @param macAddrInfo - MAC address info[in]
-     * @param randomMacAddr - random MAC address[out]
-     * @return WifiMacAddrErrCode - 0 success
-     */
-    WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo,
-        std::string randomMacAddr);
-    /**
-     * @Description remove a MAC address pair
-     *
-     * @param type - MAC address type[in]
-     * @param macAddrInfo - MAC address info[in]
-     * @return int - 0 success
-     */
-    int RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
-    /**
-     * @Description query a MAC address pair
-     *
-     * @param type - MAC address type[in]
-     * @param macAddrInfo - MAC address info[in]
-     * @return std::string - an empty string indicates failure
-     */
-    std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
-    /**
-     * @Description print MAC address pair
-     *
-     * @param type - MAC address type[in]
-     */
-    void PrintMacAddrPairs(WifiMacAddrInfoType type);
-    /**
-     * @Description Clear MAC address pair
-     *
-     * @param type - MAC address type[in]
-     * @return std::string - an empty string indicates failure
-     */
-    void ClearMacAddrPairs(WifiMacAddrInfoType type);
+    int SetDeviceConnFailedCount(const std::string &index, const int &indexType, int count);
 
-#endif
+    int SyncDeviceConfig();
 
-    /**
-     * @Description Get next networkId
-     *
-     * @return int - next network id
-     */
+    int ReloadDeviceConfig();
+
     int GetNextNetworkId();
 
+    int AddWpsDeviceConfig(const WifiDeviceConfig &config);
+
 #ifndef OHOS_ARCH_LITE
-    /**
-     * @Description Merge Localconfigs with cloneConfigs
-     *
-     * @param cloneData - wifi xml config
-     */
-    void MergeWifiCloneConfig(std::string &cloneData);
-
-    /**
-     * @Description Backup config file
-     *
-     * @param fd - File Descriptor
-     * @param backupInfo - Backup info
-     * @return int - 0: success
-     */
-    int OnBackup(UniqueFd &fd, const std::string &backupInfo);
-
-    /**
-     * @Description Restore config file
-     *
-     * @param fd - File Descriptor
-     * @param restoreInfo - Restore info
-     * @return int - 0: success
-     */
     int OnRestore(UniqueFd &fd, const std::string &restoreInfo);
 
-    /**
-     * @Description Remove backup config file
-     */
+    int OnBackup(UniqueFd &fd, const std::string &backupInfo);
+
+    void MergeWifiCloneConfig(std::string &cloneData);
+
     void RemoveBackupFile();
 #endif
 
+    bool AddRandomMac(WifiStoreRandomMac &randomMacInfo);
+
+    bool GetRandomMac(WifiStoreRandomMac &randomMacInfo);
+
+    void GetPortalUri(WifiPortalConf &urlInfo);
+
+    const std::vector<TrustListPolicy> ReloadTrustListPolicies();
+
+    const MovingFreezePolicy ReloadMovingFreezePolicy();
+
+    int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
+
+    int SyncHotspotConfig();
+
+    int SetHotspotConfig(const HotspotConfig &config, int id = 0);
+
+    int GetHotspotConfig(HotspotConfig &config, int id = 0);
+
+    void ClearHotspotConfig();
+
+    int GetBlockList(std::vector<StationInfo> &results, int id = 0);
+
+    int ManageBlockList(const StationInfo &info, int mode, int id = 0);
+
+    int SyncWifiP2pGroupInfoConfig();
+
+    int SetWifiP2pGroupInfo(const std::vector<WifiP2pGroupInfo> &groups);
+
+    int RemoveWifiP2pGroupInfo();
+
+    int RemoveWifiP2pSupplicantGroupInfo();
+
+    int GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups);
+
+    int SyncP2pVendorConfig();
+
+    int SetP2pDeviceName(const std::string &deviceName);
+
+    int SetP2pVendorConfig(const P2pVendorConfig &config);
+
+    int GetP2pVendorConfig(P2pVendorConfig &config);
+
+    bool GetScanAlwaysState(int instId = 0);
+
+    int GetSignalLevel(const int &rssi, const int &band, int instId = 0);
+
+    int GetOperatorWifiType(int instId = 0);
+
+    int SetOperatorWifiType(int type, int instId = 0);
+
+    int GetLastAirplaneMode(int instId = 0);
+
+    int SetLastAirplaneMode(int mode, int instId = 0);
+
+    bool GetCanOpenStaWhenAirplaneMode(int instId = 0);
+
+    int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0);
+
+    bool GetWifiFlagOnAirplaneMode(int instId = 0);
+
+    bool GetWifiDisabledByAirplane(int instId = 0);
+
+    int SetWifiDisabledByAirplane(bool disabledByAirplane, int instId = 0);
+
+    int GetStaLastRunState(int instId = 0);
+
+    int SetStaLastRunState(int bRun, int instId = 0);
+
+    int GetDhcpIpType(int instId = 0);
+
+    bool GetWhetherToAllowNetworkSwitchover(int instId = 0);
+
+    int GetScoretacticsScoreSlope(int instId = 0);
+
+    int GetScoretacticsInitScore(int instId = 0);
+
+    int GetScoretacticsSameBssidScore(int instId = 0);
+
+    int GetScoretacticsSameNetworkScore(int instId = 0);
+
+    int GetScoretacticsFrequency5GHzScore(int instId = 0);
+
+    int GetScoretacticsLastSelectionScore(int instId = 0);
+
+    int GetScoretacticsSecurityScore(int instId = 0);
+
+    int GetScoretacticsNormalScore(int instId = 0);
+
+    int GetSavedDeviceAppraisalPriority(int instId = 0);
+
+    bool IsModulePreLoad(const std::string &name);
+
+    bool GetSupportHwPnoFlag(int instId = 0);
+
+    int GetMinRssi2Dot4Ghz(int instId = 0);
+
+    int GetMinRssi5Ghz(int instId = 0);
+
+    int SetRealMacAddress(const std::string &macAddress, int instId = 0);
+
+    int GetRealMacAddress(std::string &macAddress, int instId = 0);
+
+    void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies, int instId = 0);
+
+    void SetScanOnlySwitchState(const int &state, int instId = 0);
+
+    int GetScanOnlySwitchState(int instId = 0);
+
+    bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
+
 private:
     WifiSettings();
-    void InitDefaultWifiConfig();
-    void InitWifiConfig();
+    int IncreaseNumRebootsSinceLastUse();
+    void EncryptionWifiDeviceConfigOnBoot();
+    int ReloadStaRandomMac();
+    int ReloadPortalconf();
+    void InitPackageFilterConfig();
     void InitDefaultHotspotConfig();
     void InitHotspotConfig();
+    int SyncBlockList();
+    int ReloadWifiP2pGroupInfoConfig();
     void InitDefaultP2pVendorConfig();
     void InitP2pVendorConfig();
-    void InitSettingsNum();
-    void InitScanControlForbidList();
-    void InitScanControlIntervalList();
-    void InitScanControlInfo();
-    void GetLinkedChannelWidth(int instId = 0);
-    void UpdateLinkedInfo(int instId = 0);
+    int GetApMaxConnNum();
+    void InitDefaultWifiConfig();
+    void InitWifiConfig();
+    int SyncWifiConfig();
+    int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const;
+    std::string FuzzyBssid(const std::string bssid);
 #ifndef OHOS_ARCH_LITE
-    void MergeSoftapConfig();
     void MergeWifiConfig();
+    void MergeSoftapConfig();
     void ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs);
     void ParseBackupJson(const std::string &backupInfo, std::string &key, std::string &iv, std::string &version);
     int GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd);
     int GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd, const std::string &key,
         const std::string &iv);
 #endif
-    void InitPackageFilterConfig();
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;
+    void DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
+    int DecryptionDeviceConfig(WifiDeviceConfig &config);
+    bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
+#endif
 
 private:
-    int mNetworkId;
-    int mWifiStaCapabilities;            /* Sta capability */
-    std::map <int, std::atomic<int>> mWifiState;         /* Sta service state */
-    std::map <int, WifiDetailState> mWifiDetailState;    /* Sta service detail state */
-    bool mWifiAllowSemiActive;
-    std::atomic<bool> mWifiSelfcureReset;
-    std::atomic<int> mLastNetworkId;
-    bool mWifiStoping;
-    bool mSoftapToggled;
-    bool mIsSupportCoex;
-    std::string mStaIfaceName;
-    std::string mP2pIfaceName;
-    std::string mApIfaceName;
-    std::vector<WifiScanInfo> mWifiScanInfoList;
-    std::vector<WifiP2pGroupInfo> mGroupInfoList;
-    std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
-    std::map <int, ScanControlInfo> mScanControlInfo;
-    WifiP2pLinkedInfo mWifiP2pInfo;
-    WifiP2pGroupInfo m_P2pGroupInfo;
-    std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
-    std::map <int, IpInfo> mWifiIpInfo;
-    std::map <int, IpV6Info> mWifiIpV6Info;
-    std::map <int, WifiLinkedInfo> mWifiLinkedInfo;
-    std::map <int, std::string> mMacAddress;
-    WifiPortalConf mPortalUri;
-    std::map <int, std::atomic<int>> mHotspotState;
-    std::map <int, HotspotConfig> mHotspotConfig;
-    P2pVendorConfig mP2pVendorConfig;
-    std::map<std::string, StationInfo> mConnectStationInfo;
-    std::map<std::string, StationInfo> mBlockListInfo;
-    ChannelsTable mValidChannels;
-    std::atomic<int> mP2pState;
-    std::atomic<int> mP2pDiscoverState;
-    std::atomic<int> mP2pConnectState;
-    int mApMaxConnNum;           /* ap support max sta numbers */
-    int mMaxNumConfigs;          /* max saved configs numbers */
-    std::map <int, int> mLastSelectedNetworkId;  /* last selected networkid */
-    std::map <int, time_t> mLastSelectedTimeVal; /* last selected time */
-    int mScreenState;            /* -1 MODE_STATE_DEFAULT 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
-    int mThermalLevel;           /* 1 COOL, 2 NORMAL, 3 WARM, 4 HOT, 5 OVERHEATED, 6 WARNING, 7 EMERGENCY */
-    int mIdelState;              /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
-    int mBatteryChargeState;     /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
-    int mGnssFixState;           /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
-    int mScanGenieState;         /* 1 MODE_STATE_OPEN, 2 MODE_STATE_CLOSE */
-    std::atomic<int> mAirplaneModeState;      /* 1 on 2 off */
-    std::atomic<int> mPowerSleepState;        /* 1 on 2 off */
-    ScanMode mAppRunningModeState; /* 0 app for 1 app back 2 sys for 3 sys back */
-    int mPowerSavingModeState;   /* 1 on 2 off */
-    std::string mAppPackageName;
-    int mFreezeModeState;        /* 1 on 2 off */
-    int mNoChargerPlugModeState;  /* 1 on 2 off */
-    std::map <int, WifiConfig> mWifiConfig;
-    std::map <int, std::pair<std::string, int>> mBssidToTimeoutTime;
-    std::map<int, PowerModel> powerModel;
-    int mHotspotIdleTimeout;
-    std::map <int, DisconnectedReason> mLastDiscReason;
-    std::string mUpperIfName;
-    Hid2dUpperScene mUpperScene;
-    P2pBusinessType mP2pBusinessType;
-    int mPersistWifiState;
-    int mUid = -1;
-
-    std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
-    std::map<WifiMacAddrInfo, std::string> mDeviceConfigMacAddrPair;
-    std::map<WifiMacAddrInfo, std::string> mHotspotMacAddrPair;
-    std::map<WifiMacAddrInfo, std::string> mP2pDeviceMacAddrPair;
-    std::map<WifiMacAddrInfo, std::string> mP2pGroupsInfoMacAddrPair;
-    std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
-
-    std::mutex mMacAddrPairMutex;
+    // STA
     std::mutex mStaMutex;
-    std::mutex mApMutex;
-    std::mutex mConfigMutex;
     std::mutex mConfigOnBootMutex;
-    std::mutex mInfoMutex;
-    std::mutex mP2pMutex;
-    std::mutex mWifiConfigMutex;
-    std::mutex mWifiToggledMutex;
-    std::mutex mWifiSelfcureMutex;
-    std::mutex mWifiStopMutex;
-    std::mutex mSoftapToggledMutex;
-    std::mutex mSyncWifiConfigMutex;
-    std::mutex mUidMutex;
-    std::mutex mScanRecordMutex;
-
+    int mNetworkId;
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
     std::atomic_flag mEncryptionOnBootFalg = ATOMIC_FLAG_INIT;
+    std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
+    WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig;
+    std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
+    WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
+    WifiPortalConf mPortalUri;
+    WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
+    std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
 
-    WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig; /* Persistence device config */
-    WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
-    WifiConfigFileImpl<StationInfo> mSavedBlockInfo;
-    WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
-    WifiConfigFileImpl<WifiP2pGroupInfo> mSavedWifiP2pGroupInfo;
-    WifiConfigFileImpl<P2pVendorConfig> mSavedWifiP2pVendorConfig;
+    // SCAN
+    std::mutex mScanMutex;
     WifiConfigFileImpl<TrustListPolicy> mTrustListPolicies;
     WifiConfigFileImpl<MovingFreezePolicy> mMovingFreezePolicy;
-    MovingFreezePolicy mFPolicy;
-    WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
-    WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
-    WifiConfigFileImpl<PackageFilterConf> mPackageFilterConfig;
-    bool explicitGroup;
-    std::atomic_bool mThreadStatusFlag_ { false };
-    std::atomic_uint64_t mThreadStartTime { 0 };
     std::map<std::string, std::vector<std::string>> mFilterMap;
-    std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
-    std::map<std::string, WifiCategory> wifiCategoryRecord;
-    std::vector<std::string> mAbnormalAppList;
+    WifiConfigFileImpl<PackageFilterConf> mPackageFilterConfig;
 
-    std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
+    // AP
+    std::mutex mApMutex;
+    std::map<int, HotspotConfig> mHotspotConfig;
+    WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
+    std::map<std::string, StationInfo> mBlockListInfo;
+    WifiConfigFileImpl<StationInfo> mSavedBlockInfo;
+    
+    // P2P
+    std::mutex mP2pMutex;
+    std::vector<WifiP2pGroupInfo> mGroupInfoList;
+    WifiConfigFileImpl<WifiP2pGroupInfo> mSavedWifiP2pGroupInfo;
+    P2pVendorConfig mP2pVendorConfig;
+    WifiConfigFileImpl<P2pVendorConfig> mSavedWifiP2pVendorConfig;
+
+    // COMMON
+    std::mutex mWifiConfigMutex;
+    std::mutex mSyncWifiConfigMutex;
+    std::atomic<int> mApMaxConnNum;
+    std::atomic<int> mMaxNumConfigs;
+    std::map<int, WifiConfig> mWifiConfig;
+    WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
 };
 }  // namespace Wifi
 }  // namespace OHOS

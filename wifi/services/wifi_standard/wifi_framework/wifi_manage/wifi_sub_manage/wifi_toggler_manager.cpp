@@ -77,10 +77,10 @@ ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
     if (isOpen) {
         WIFI_LOGI("set softap toggled true");
         pWifiControllerMachine->ClearApStartFailCount();
-        WifiSettings::GetInstance().SetSoftapToggledState(true);
+        WifiConfigCenter::GetInstance().SetSoftapToggledState(true);
     } else {
         WIFI_LOGI("set softap toggled false");
-        WifiSettings::GetInstance().SetSoftapToggledState(false);
+        WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     }
     pWifiControllerMachine->SendMessage(CMD_SOFTAP_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;

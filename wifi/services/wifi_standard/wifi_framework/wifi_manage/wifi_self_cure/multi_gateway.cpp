@@ -22,7 +22,7 @@
 #include "multi_gateway.h"
 #include "singleton.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -45,11 +45,11 @@ MultiGateway::~MultiGateway()
 void MultiGateway::GetGatewayAddr(int32_t instId)
 {
     std::string macAddress;
-    WifiSettings::GetInstance().GetMacAddress(macAddress, instId);
+    WifiConfigCenter::GetInstance().GetMacAddress(macAddress, instId);
     IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, instId);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, instId);
     std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
-    std::string ifName = WifiSettings::GetInstance().GetStaIfaceName();
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     if (ipInfo.gateway == 0) {
         WIFI_LOGE("gateway is null");
         return;

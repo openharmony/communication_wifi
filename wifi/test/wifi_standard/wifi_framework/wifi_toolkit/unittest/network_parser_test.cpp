@@ -138,13 +138,6 @@ HWTEST_F(NetworkParserTest, ParseWepKeysTest, TestSize.Level1)
     m_networkXmlParser->ParseWepKeys(nullptr, wifiConfig);
 }
 
-HWTEST_F(NetworkParserTest, ParseStatusTest, TestSize.Level1)
-{
-    WIFI_LOGI("ParseStatusTest enter");
-    WifiDeviceConfig wifiConfig;
-    m_networkXmlParser->ParseStatus(nullptr, wifiConfig);
-}
-
 HWTEST_F(NetworkParserTest, ParseNetworkTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseNetworkTest enter");
@@ -155,12 +148,6 @@ HWTEST_F(NetworkParserTest, ParseNetworkListTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseNetworkListTest enter");
     m_networkXmlParser->ParseNetworkList(nullptr);
-}
-
-HWTEST_F(NetworkParserTest, ParseMacMapTest, TestSize.Level1)
-{
-    WIFI_LOGI("ParseMacMapTest enter");
-    m_networkXmlParser->ParseMacMap();
 }
 
 HWTEST_F(NetworkParserTest, GetParseTypeTest, TestSize.Level1)
@@ -196,14 +183,6 @@ HWTEST_F(NetworkParserTest, IsWifiConfigValidFalseTest, TestSize.Level1)
     EXPECT_FALSE(m_networkXmlParser->IsWifiConfigValid(wifiConfig));
 }
 
-HWTEST_F(NetworkParserTest, IsRandomMacValidFalseTest, TestSize.Level1)
-{
-    WIFI_LOGI("IsRandomMacValidFalseTest enter");
-    WifiDeviceConfig wifiConfig;
-    wifiConfig.macAddress = "02:00:00:00:00:00";
-    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
-}
-
 HWTEST_F(NetworkParserTest, GetNetworksTest, TestSize.Level1)
 {
     WIFI_LOGI("GetNetworksTest enter");
@@ -214,6 +193,143 @@ HWTEST_F(NetworkParserTest, GetRandomMacmapTest, TestSize.Level1)
 {
     WIFI_LOGI("GetRandomMacmapTest enter");
     m_networkXmlParser->GetRandomMacmap();
+}
+
+HWTEST_F(NetworkParserTest, IsRandomMacValidTest, TestSize.Level1)
+{
+    WIFI_LOGI("IsRandomMacValidTest enter");
+    std::string macAddress;
+    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+
+    macAddress = "02:00:00:00:00:00";
+    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+
+    macAddress = "02:00:00:00:00";
+    EXPECT_FALSE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+
+    macAddress = "01:02:03:04:05:06";
+    EXPECT_TRUE(m_networkXmlParser->IsRandomMacValid(wifiConfig));
+}
+
+HWTEST_F(NetworkParserTest, ParseSsidTest, TestSize.Level1)
+{
+    WIFI_LOGI("ParseSsidTest enter");
+    xmlNodePtr root = nullptr;
+    WifiDeviceConfig wifiConfig;
+    m_networkXmlParser->ParseSsid(root, config);
+
+    root = xmlNewNode(nullptr, BAD_CAST "root");
+    xmlNodePtr target = xmlNewChlid(root, nullptr, BAD_CAST "target", nullptr);
+    m_networkXmlParser->ParseSsid(target, config);
+
+    xmlNodePtr textNode = xmlNewText(BAD_CAST "0test0");
+    xmlAddChlid(taget, textNode);
+    m_networkXmlParser->ParseSsid(target, config);
+    EXPECT_TRUE(config.ssid == "test");
+    xmlFreeNode(root);
+}
+
+HWTEST_F(NetworkParserTest, ParsePreSharedKeyTest, TestSize.Level1)
+{
+    WIFI_LOGI("ParsePreSharedKeyTest enter");
+    xmlNodePtr root = nullptr;
+    WifiDeviceConfig wifiConfig;
+    m_networkXmlParser->ParsePreSharedKey(root, config);
+
+    root = xmlNewNode(nullptr, BAD_CAST "root");
+    xmlNodePtr target = xmlNewChlid(root, nullptr, BAD_CAST "target", nullptr);
+    m_networkXmlParser->ParsePreSharedKey(target, config);
+
+    xmlNodePtr textNode = xmlNewText(BAD_CAST "0test0");
+    xmlAddChlid(taget, textNode);
+    m_networkXmlParser->ParsePreSharedKey(target, config);
+    EXPECT_TRUE(config.preSharedKey == "test");
+    xmlFreeNode(root);
+}
+
+HWTEST_F(NetworkParserTest, ParseInternetHistoryTest, TestSize.Level1)
+{
+    WIFI_LOGI("ParseInternetHistoryTest enter");
+    xmlNodePtr root = nullptr;
+    WifiDeviceConfig config;
+    m_networkXmlParser->ParseInternetHistory(root, config);
+
+    root = xmlNewNode(nullptr, BAD_CAST "root");
+    xmlNodePtr target = xmlNewChlid(root, nullptr, BAD_CAST "target", nullptr);
+    m_networkXmlParser->ParseInternetHistory(target, config);
+
+    xmlNodePtr textNode = xmlNewText(BAD_CAST "-1/0/1/2/0/0/0/0/0/0");
+    xmlAddChlid(taget, textNode);
+    m_networkXmlParser->ParseInternetHistory(target, config);
+    // -1/0/1/2/0/0/0/0/0/0 -> 11111111111110011100 -> 1048476
+    EXPECT_TRUE(config.networkStatusHistory == 1048476);
+    xmlFreeNode(root);
+}
+
+HWTEST_F(NetworkParserTest, ParseNetworkStatusTest, TestSize.Level1)
+{
+    WIFI_LOGI("ParseNetworkStatusTest enter");
+    xmlNodePtr root = nullptr;
+    WifiDeviceConfig config;
+    m_networkXmlParser->ParseNetworkStatus(root, config);
+
+    root = xmlNewNode(nullptr, BAD_CAST "root");
+    xmlNodePtr target = xmlNewChlid(root, nullptr, BAD_CAST "target", nullptr);
+    m_networkXmlParser->ParseNetworkStatus(target, config);
+
+    xmlNodePtr textNode = xmlNewText(BAD_CAST "NETWORK_SELECTION_ENABLED");
+    xmlAddChlid(taget, textNode);
+    m_networkXmlParser->ParseNetworkStatus(target, config);
+    EXPECT_TRUE(config.status == 0);
+    xmlFreeNode(root);
+}
+
+HWTEST_F(NetworkParserTest, ParseMacMapPlusTest, TestSize.Level1)
+{
+    WIFI_LOGI("ParseMacMapPlusTest enter");
+    xmlNodePtr root = nullptr;
+    WifiDeviceConfig wifiConfig;
+    m_networkXmlParser->ParseMacMapPlus(root);
+
+    root = xmlNewNode(nullptr, BAD_CAST "root");
+    xmlNodePtr macAddressMap = xmlNewChlid(root, nullptr, BAD_CAST "MacAddressMap", nullptr);
+    m_networkXmlParser->ParseMacMapPlus(root);
+
+    xmlNodePtr macMapEntryPlus = xmlNewChlid(macAddressMap, nullptr, BAD_CAST "map", nullptr);
+    xmlNewProp(macMapEntryPlus, BAD_CAST "name", BAD_CAST "MacMapEntryPlus");
+    m_networkXmlParser->ParseMacMapPlus(root);
+
+    xmlNodePtr macMapEntryPlus = xmlNewChlid(macAddressMap, nullptr, BAD_CAST "string", BAD_CAST "00:11:22:33:44:55");
+    xmlNewProp(macMapEntryPlus, BAD_CAST "name", BAD_CAST "xx::00:11:22:33:44:xx");
+    m_networkXmlParser->ParseMacMapPlus(root);
+    EXPECT_TRUE(m_networkXmlParser->wifiStoreRandomMacs[0].randomMac == "00:11:22:33:44:55");
+    xmlFreeNode(root);
+}
+
+HWTEST_F(NetworkParserTest, SetMacByMacMapPlusTest, TestSize.Level1)
+{
+    WIFI_LOGI("SetMacByMacMapPlusTest enter");
+    std::map<std::string, std::string> macMap;
+    macMap["xx:00:11:22:33:44:xx"] = "00:11:22:33:44:55";
+    macMap["xx:00:11:22:33:66:xx"] = "00:11:22:33:44:55";
+    m_networkXmlParser->SetMacByMacMapPlus(macMap);
+    EXPECT_TRUE(m_networkXmlParser->wifiStoreRandomMacs.size() == 1);
+}
+
+HWTEST_F(NetworkParserTest, FillupMacByConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("FillupMacByConfigTest enter");
+    WifiDeviceConfig config;
+    config.macAddress = "00:11:22:33:44:55";
+    m_networkXmlParser->wifiConfigs.push_back(config);
+    config.macAddress = "00:11:22:33:44:66";
+    m_networkXmlParser->wifiConfigs.push_back(config);
+
+    WifiStoreRandomMac wifiStoreRandomMac;
+    wifiStoreRandomMac.randomMac = "00:11:22:33:44:55";
+    m_networkXmlParser->wifiStoreRandomMacs.push_back(wifiStoreRandomMac);
+    m_networkXmlParser->FillupMacByConfig();
+    EXPECT_TRUE(m_networkXmlParser->wifiStoreRandomMacs.size() == 2);
 }
 }
 }

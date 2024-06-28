@@ -261,8 +261,8 @@ HWTEST_F(NetworkParserTest, ParseInternetHistoryTest, TestSize.Level1)
     xmlNodePtr textNode = xmlNewText(BAD_CAST "-1/0/1/2/0/0/0/0/0/0");
     xmlAddChild(target, textNode);
     m_networkXmlParser->ParseInternetHistory(target, config);
-    // -1/0/1/2/0/0/0/0/0/0 -> 11111111111110011100 -> 1048476
-    EXPECT_TRUE(config.networkStatusHistory == 1048476);
+    // -1/0/1/2/0/0/0/0/0/0 -> 11111111111110011100 -> 262119
+    EXPECT_TRUE(config.networkStatusHistory == 262119);
     xmlFreeNode(root);
 }
 
@@ -278,7 +278,7 @@ HWTEST_F(NetworkParserTest, ParseStatusTest, TestSize.Level1)
     m_networkXmlParser->ParseStatus(target, config);
 
     xmlNodePtr textNode = xmlNewText(BAD_CAST "NETWORK_SELECTION_ENABLED");
-    xmlAddChild(taget, textNode);
+    xmlAddChild(target, textNode);
     m_networkXmlParser->ParseStatus(target, config);
     EXPECT_TRUE(config.status == 0);
     xmlFreeNode(root);
@@ -299,10 +299,17 @@ HWTEST_F(NetworkParserTest, ParseMacMapPlusTest, TestSize.Level1)
     m_networkXmlParser->ParseMacMapPlus(root);
 
     xmlNodePtr bssidAndMac = xmlNewChild(macMapEntryPlus, nullptr, BAD_CAST "string", BAD_CAST "00:11:22:33:44:55");
-    xmlNewProp(bssidAndMac, BAD_CAST "name", BAD_CAST "xx::00:11:22:33:44:xx");
+    xmlNewProp(bssidAndMac, BAD_CAST "name", BAD_CAST "xx:00:11:22:33:44:xx");
     m_networkXmlParser->ParseMacMapPlus(root);
     EXPECT_TRUE(m_networkXmlParser->wifiStoreRandomMacs[0].randomMac == "00:11:22:33:44:55");
     xmlFreeNode(root);
+}
+
+HWTEST_F(NetworkParserTest, GotoMacAddressMapTest, TestSize.Level1)
+{
+    WIFI_LOGI("GotoMacAddressMapTest enter");
+    xmlNodePtr root = nullptr;
+    EXPECT_TRUE(m_networkXmlParser->GotoMacAddressMap(root) == nullptr);
 }
 
 HWTEST_F(NetworkParserTest, SetMacByMacMapPlusTest, TestSize.Level1)

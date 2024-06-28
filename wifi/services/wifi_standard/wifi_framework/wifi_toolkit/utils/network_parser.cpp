@@ -345,7 +345,7 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
                 ParseWepKeys(node, wifiConfig);
                 break;
             case WifiConfigType::VALIDATEDINTERNETACCESS:
-                wifiConfig.noInternetAccess = GetPrimValue<bool>(node, PrimType::BOOLEAN);
+                wifiConfig.noInternetAccess = !GetPrimValue<bool>(node, PrimType::BOOLEAN);
                 break;
             case WifiConfigType::PORTALNETWORK:
                 wifiConfig.isPortal = GetPrimValue<bool>(node, PrimType::BOOLEAN);
@@ -409,7 +409,7 @@ void NetworkXmlParser::ParseInternetHistory(xmlNodePtr node, WifiDeviceConfig& w
         } else if (*it == historyPortal) {
             netState = NetworkStatus::PORTAL;
         } else {
-            netState = NetworkStatus::UNKNOWN;
+            continue;
         }
         // 2: Bits occupied by history record
         wifiConfig.networkStatusHistory = wifiConfig.networkStatusHistory << 2;

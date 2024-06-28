@@ -1557,7 +1557,7 @@ public:
         linkedInfo.connState = ConnState::CONNECTED;
         linkedInfo.ssid = "111111";
         linkedInfo.bssid = "222222";
-        EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).
             WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
         pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
     }

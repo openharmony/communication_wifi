@@ -79,7 +79,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
             .WillRepeatedly(Return(defaultValue));
-        pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback();
+        pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback());
     }
 
     void InitScanServiceSuccess2()

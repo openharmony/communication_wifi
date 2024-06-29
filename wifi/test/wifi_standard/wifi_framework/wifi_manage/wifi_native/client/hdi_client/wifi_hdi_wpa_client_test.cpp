@@ -17,7 +17,7 @@
 #include "wifi_hdi_wpa_callback.h"
 #include "wifi_error_no.h"
 #include "mock_wifi_hdi_wpa_ap_impl.h"
-
+1
 using ::testing::_;
 using ::testing::Return;
 using ::testing::ext::TestSize;

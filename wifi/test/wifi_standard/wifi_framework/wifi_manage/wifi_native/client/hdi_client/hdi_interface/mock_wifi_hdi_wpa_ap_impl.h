@@ -15,7 +15,7 @@
 
 #ifndef MOCK_WIFI_HDI_WPA_AP_IMPL_H
 #define MOCK_WIFI_HDI_WPA_AP_IMPL_H
-
+1
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "wifi_hdi_wpa_ap_impl.h"

@@ -266,6 +266,7 @@ void StaMonitor::onWpaConnectionRejectCallBack(int status, const std::string &bs
         }
     }
     if (isWrongPwd) {
+        WIFI_LOGI("onWpaConnectionRejectCallBack wrong password");
         OnWpaSsidWrongKeyCallBack(1);
         return;
     }

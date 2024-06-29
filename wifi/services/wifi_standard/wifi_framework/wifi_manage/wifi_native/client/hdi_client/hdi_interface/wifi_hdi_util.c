@@ -16,7 +16,6 @@
 #include "securec.h"
 #include "wifi_hdi_util.h"
 #include "wifi_common_def.h"
-#include "wifi_log.h"
 
 #ifndef UT_TEST
 #include "wifi_log.h"

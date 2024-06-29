@@ -14,7 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include "wifi_hdi_common.h"
-1
+
 using ::testing::ext::TestSize;
 
 #define PROTOCOL_80211_IFTYPE_P2P_CLIENT 8
@@ -51,6 +51,16 @@ HWTEST_F(WifiHdiCommonTest, HdiBssGetVendorBeaconTest, TestSize.Level1)
     size_t len = 256;
     size_t beaconIeLen = 0;
     uint32_t vendorType = 0;
+    const uint8_t *result = HdiBssGetVendorBeacon(ies, len, beaconIeLen, vendorType);
+    EXPECT_EQ(result, nullptr);
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiBssGetVendorBeaconTest1, TestSize.Level1)
+{
+    uint8_t ies[] = {0x01, 0x02, 0x03, 0x04};
+    size_t len = 256;
+    size_t beaconIeLen = 4;
+    uint32_t vendorType = 0x12345678;
     const uint8_t *result = HdiBssGetVendorBeacon(ies, len, beaconIeLen, vendorType);
     EXPECT_EQ(result, nullptr);
 }
@@ -228,6 +238,28 @@ HWTEST_F(WifiHdiCommonTest, HdiGetWapiTxtTest, TestSize.Level1)
     char *result = HdiGetWapiTxt(pos, end, ie);
     EXPECT_STREQ(result, pos);
 }
+
+HWTEST_F(WifiHdiCommonTest, HdiGetWapiTxtTest1, TestSize.Level1)
+{
+    char pos[100] = {0};
+    char end[100] = {0};
+    uint8_t ie[100] = {0};
+    ie[HDI_POS_FIRST] = HDI_CAP_WAPI_BIT_OFFSET - HDI_POS_SECOND - 1;
+    char *result = HdiGetWapiTxt(pos, end, ie);
+    EXPECT_STREQ(result, pos);
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiGetWapiTxtTest2, TestSize.Level1)
+{
+    char pos[100] = {0};
+    char end[100] = {0};
+    uint8_t ie[100] = {0};
+    ie[HDI_POS_FIRST] = HDI_CAP_WAPI_BIT_OFFSET - HDI_POS_SECOND;
+    ie[HDI_CAP_WAPI_BIT_OFFSET] = HDI_KEY_MGMT_WAPI_CERT_AKM | HDI_KEY_MGMT_WAPI_PSK_AKM;
+    char *result = HdiGetWapiTxt(pos, end, ie);
+    EXPECT_STREQ(result, pos + 6);
+}
+
 extern "C" int HdiGetCipherInfo(char *start, char *end, int ciphers, const char *delim);
 HWTEST_F(WifiHdiCommonTest, HdiGetCipherInfoTest, TestSize.Level1)
 {
@@ -468,7 +500,7 @@ HWTEST_F(WifiHdiCommonTest, hex2byteTest, TestSize.Level1)
     EXPECT_EQ(hex2byte("zz"), -1);
 }
 
-HWTEST_F(WifiHdiCommonTest, DealSymbolTest, TestSize.Level1)
+HWTEST_F(WifiHdiCommonTest, PrintfDecodeTest, TestSize.Level1)
 {
     u8 buf[10];
     size_t maxlen = 10;
@@ -477,7 +509,7 @@ HWTEST_F(WifiHdiCommonTest, DealSymbolTest, TestSize.Level1)
     EXPECT_EQ(len, 3);
 }
 
-HWTEST_F(WifiHdiCommonTest, DealSymbolTest1, TestSize.Level1)
+HWTEST_F(WifiHdiCommonTest, PrintfDecodeTest1, TestSize.Level1)
 {
     u8 buf[10];
     size_t maxlen = 1;
@@ -486,7 +518,7 @@ HWTEST_F(WifiHdiCommonTest, DealSymbolTest1, TestSize.Level1)
     EXPECT_EQ(len, 0);
 }
 
-HWTEST_F(WifiHdiCommonTest, DealSymbolTest2, TestSize.Level1)
+HWTEST_F(WifiHdiCommonTest, PrintfDecodeTest2, TestSize.Level1)
 {
     u8 buf[10];
     size_t maxlen = 10;
@@ -495,11 +527,288 @@ HWTEST_F(WifiHdiCommonTest, DealSymbolTest2, TestSize.Level1)
     EXPECT_EQ(len, 3);
 }
 
-HWTEST_F(WifiHdiCommonTest, DealSymbolTest3, TestSize.Level1)
+HWTEST_F(WifiHdiCommonTest, PrintfDecodeTest3, TestSize.Level1)
 {
     u8 buf[10];
     size_t maxlen = 10;
     const char *str = "\\abc";
     size_t len = PrintfDecode(buf, maxlen, str);
     EXPECT_EQ(len, 3);
+}
+
+extern "C" int HdiKeyMgmtToAuthMgmt(const uint8_t *s);
+HWTEST_F(WifiHdiCommonTest, HdiKeyMgmtToAuthMgmtTest, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x50, 0xf2, 1};
+    EXPECT_EQ(HDI_KEY_MGMT, HdiKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiKeyMgmtToAuthMgmtTest1, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x50, 0xf2, 2};
+    EXPECT_EQ(HDI_KEY_MGMT_PSK, HdiKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiKeyMgmtToAuthMgmtTest2, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x50, 0xf2, 0};
+    EXPECT_EQ(HDI_KEY_MGMT_HDI_NONE, HdiKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiKeyMgmtToAuthMgmtTest3, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x50, 0xf2, 3};
+    EXPECT_EQ(0, HdiKeyMgmtToAuthMgmt(s));
+}
+
+extern "C" int HdiRsnIdToCipher(const uint8_t *s);
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherTest, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x50, 0xf2, 0};
+    EXPECT_EQ(HDI_CIPHER_NONE, HdiRsnIdToCipher(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherTest1, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x50, 0xf2, 2};
+    EXPECT_EQ(HDI_CIPHER_TKIP, HdiRsnIdToCipher(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherTest2, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x50, 0xf2, 4};
+    EXPECT_EQ(HDI_CIPHER_CCMP, HdiRsnIdToCipher(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherTest3, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x50, 0xf2, 7};
+    EXPECT_EQ(0, HdiRsnIdToCipher(s));
+}
+
+extern "C" int HdiRsnIdToCipherSuite(const uint8_t *s);
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 0};
+    EXPECT_EQ(HDI_CIPHER_NONE, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest1, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 2};
+    EXPECT_EQ(HDI_CIPHER_TKIP, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest2, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 4};
+    EXPECT_EQ(HDI_CIPHER_CCMP, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest3, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 8};
+    EXPECT_EQ(HDI_CIPHER_GCMP, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest4, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 10};
+    EXPECT_EQ(HDI_CIPHER_CCMP_256, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest5, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 9};
+    EXPECT_EQ(HDI_CIPHER_GCMP_256, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest6, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 11};
+    EXPECT_EQ(HDI_CIPHER_BIP_GMAC_128, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest7, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 12};
+    EXPECT_EQ(HDI_CIPHER_BIP_GMAC_256, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest8, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 13};
+    EXPECT_EQ(HDI_CIPHER_BIP_CMAC_256, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest9, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 7};
+    EXPECT_EQ(HDI_CIPHER_GTK_NOT_USED, HdiRsnIdToCipherSuite(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnIdToCipherSuiteTest10, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 20};
+    EXPECT_EQ(0, HdiRsnIdToCipherSuite(s));
+}
+
+extern "C" int HdiRsnKeyMgmtToAuthMgmt(const uint8_t *s);
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 1};
+    EXPECT_EQ(HDI_KEY_MGMT, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest1, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 8};
+    EXPECT_EQ(HDI_KEY_MGMT_SAE, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest2, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 2};
+    EXPECT_EQ(HDI_KEY_MGMT_PSK, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest3, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 11};
+    EXPECT_EQ(HDI_KEY_MGMT_SUITE_B, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest4, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 12};
+    EXPECT_EQ(HDI_KEY_MGMT_SUITE_B_192, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest5, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 14};
+    EXPECT_EQ(HDI_KEY_MGMT_FILS_SHA256, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest6, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 15};
+    EXPECT_EQ(HDI_KEY_MGMT_FILS_SHA384, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest7, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 16};
+    EXPECT_EQ(HDI_KEY_MGMT_FT_FILS_SHA256, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest8, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 17};
+    EXPECT_EQ(HDI_KEY_MGMT_FT_FILS_SHA384, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest9, TestSize.Level1)
+{
+    const uint8_t s[] = {0x50, 0x6f, 0x9a, 1};
+    EXPECT_EQ(HDI_KEY_MGMT_OSEN, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest10, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 18};
+    EXPECT_EQ(HDI_KEY_MGMT_OWE, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest11, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 6};
+    EXPECT_EQ(HDI_KEY_MGMT_PSK_SHA256, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiRsnKeyMgmtToAuthMgmtTest12, TestSize.Level1)
+{
+    const uint8_t s[] = {0x00, 0x0f, 0xac, 20};
+    EXPECT_EQ(0, HdiRsnKeyMgmtToAuthMgmt(s));
+}
+
+extern "C" void DealSymbol(u8 *buf, const char **pos, size_t *len);
+HWTEST_F(WifiHdiCommonTest, DealDigitalTest, TestSize.Level1)
+{
+    u8 buf[10];
+    const char *pos = "\\";
+    size_t len = 0;
+    DealSymbol(buf, &pos, &len);
+    EXPECT_EQ(buf[0], '\\');
+    EXPECT_EQ(len, 1);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealDigitalTest1, TestSize.Level1)
+{
+    u8 buf[10];
+    const char *pos = "\"";
+    size_t len = 0;
+    DealSymbol(buf, &pos, &len);
+    EXPECT_EQ(buf[0], '"');
+    EXPECT_EQ(len, 1);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealDigitalTest2, TestSize.Level1)
+{
+    u8 buf[10];
+    const char *pos = "n";
+    size_t len = 0;
+    DealSymbol(buf, &pos, &len);
+    EXPECT_EQ(buf[0], '\n');
+    EXPECT_EQ(len, 1);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealDigitalTest3, TestSize.Level1)
+{
+    u8 buf[10];
+    const char *pos = "r";
+    size_t len = 0;
+    DealSymbol(buf, &pos, &len);
+    EXPECT_EQ(buf[0], '\r');
+    EXPECT_EQ(len, 1);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealDigitalTest4, TestSize.Level1)
+{
+    u8 buf[10];
+    const char *pos = "t";
+    size_t len = 0;
+    DealSymbol(buf, &pos, &len);
+    EXPECT_EQ(buf[0], '\t');
+    EXPECT_EQ(len, 1);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealDigitalTest5, TestSize.Level1)
+{
+    u8 buf[10];
+    const char *pos = "e";
+    size_t len = 0;
+    DealSymbol(buf, &pos, &len);
+    EXPECT_EQ(buf[0], '\033');
+    EXPECT_EQ(len, 1);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealDigitalTest6, TestSize.Level1)
+{
+    u8 buf[10];
+    const char *pos = "x";
+    size_t len = 0;
+    DealSymbol(buf, &pos, &len);
+    EXPECT_EQ(buf[0], '\0');
+    EXPECT_EQ(len, 0);
+}
+
+HWTEST_F(WifiHdiCommonTest, DealDigitalTest7, TestSize.Level1)
+{
+    u8 buf[10];
+    const char *pos = "a";
+    size_t len = 0;
+    DealSymbol(buf, &pos, &len);
+    EXPECT_EQ(buf[0], '\0');
+    EXPECT_EQ(len, 0);
 }

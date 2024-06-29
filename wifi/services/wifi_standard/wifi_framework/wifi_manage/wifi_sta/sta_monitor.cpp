@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cstring>
 #include "sta_monitor.h"
 #include "sta_define.h"
 #include "wifi_logger.h"
@@ -20,11 +22,15 @@
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
 #include "wifi_event_callback.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_LABEL("StaMonitor");
 
 namespace OHOS {
 namespace Wifi {
+constexpr int WLAN_STATUS_UNSPECIFIED_FAILURE = 1;
+constexpr int WEP_WRONG_PASSWORD_STATUS_CODE = 5202;
+
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {}
 
@@ -45,7 +51,7 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
         std::bind(&StaMonitor::onWpaConnectionFullCallBack, this, _1),
-        std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1),
+        std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1, _2),
         std::bind(&StaMonitor::OnWpaStaNotifyCallBack, this, _1),
         std::bind(&StaMonitor::OnReportDisConnectReasonCallBack, this, _1, _2),
     };
@@ -230,11 +236,37 @@ void StaMonitor::onWpaConnectionFullCallBack(int status)
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
 }
 
-void StaMonitor::onWpaConnectionRejectCallBack(int status)
+void StaMonitor::onWpaConnectionRejectCallBack(int status, const std::string &bssid)
 {
     LOGI("onWpsConnectionRejectCallBack() status:%d.\n", status);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
+
+    /* Special handling for WPA3-Personal networks. If the password is
+       incorrect, the AP will send association rejection, with status code 1
+       (unspecified failure). In SAE networks, the password authentication
+       is not related to the 4-way handshake. In this case, we will send an
+       authentication failure event up. */
+    bool isWrongPwd = false;
+    std::vector<WifiScanInfo> scanResults;
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    for (WifiScanInfo &item : scanResults) {
+        if (strcasecmp(item.bssid.c_str(), bssid.c_str()) == 0) {
+            if (status == WLAN_STATUS_UNSPECIFIED_FAILURE &&
+                (item.capabilities.find("SAE") != std::string::npos)) {
+                isWrongPwd = true;
+                break;
+            } else if (status == WEP_WRONG_PASSWORD_STATUS_CODE &&
+                item.capabilities.find("WEP") != std::string::npos) {
+                isWrongPwd = true;
+                break;
+            }
+        }
+    }
+    if (isWrongPwd) {
+        OnWpaSsidWrongKeyCallBack(1);
         return;
     }
 

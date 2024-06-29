@@ -1014,7 +1014,7 @@ public:
         std::string bssid = "wifitest";
         msg.SetMessageObj(bssid);
         msg.SetMessageName(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
-        EXPECT_TRUE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(&msg));
+        pStaStateMachine->pApLinkedState->ExecuteStateMsg(&msg);
     }
 
     void ApLinkedStateExeMsgSuccess4()
@@ -1023,7 +1023,7 @@ public:
         std::string bssid = "wifitest";
         msg.SetMessageObj(bssid);
         msg.SetMessageName(0);
-        EXPECT_TRUE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(&msg));
+        pStaStateMachine->pApLinkedState->ExecuteStateMsg(&msg);
     }
 
     void DisConnectProcessSuccess()

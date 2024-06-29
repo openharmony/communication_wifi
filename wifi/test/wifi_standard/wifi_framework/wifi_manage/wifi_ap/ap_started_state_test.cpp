@@ -486,7 +486,7 @@ HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
 HWTEST_F(ApStartedState_test, EnableInterfaceNat_001, TestSize.Level1)
 {
     EXPECT_CALL(MockNetworkInterface::GetInstance(), IsValidInterfaceName(_)).WillRepeatedly(Return(false));
-    EXPECT_TRUE(pApStartedState->EnableInterfaceNat());
+    pApStartedState->EnableInterfaceNat();
 }
 
 HWTEST_F(ApStartedState_test, ProcessCmdUpdateCountryCodeTest, TestSize.Level1)

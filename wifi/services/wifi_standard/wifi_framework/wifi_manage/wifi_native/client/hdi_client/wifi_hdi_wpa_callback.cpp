@@ -181,7 +181,6 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
     OHOS::Wifi::WifiSettings::GetInstance().GetScanInfoList(scanResults);
     for (OHOS::Wifi::WifiScanInfo &item : scanResults) {
         if (strcasecmp(item.bssid.c_str(), bssid) == 0) {
-            if (strcasecmp(item.bssid.c_str(), bssid) == 0) {
             if (associateRejectParam->statusCode == WLAN_STATUS_UNSPECIFIED_FAILURE &&
                 (item.capabilities.find("SAE") != std::string::npos)) {
                 isWrongPwd = true;
@@ -191,7 +190,6 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
                 isWrongPwd = true;
                 break;
             }
-        }
         }
     }
     if (isWrongPwd && cbk.onWpaSsidWrongKey) {

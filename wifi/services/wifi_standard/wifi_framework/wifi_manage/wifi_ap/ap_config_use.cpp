@@ -281,6 +281,10 @@ void ApConfigUse::SoftapChannelPolicyParser::ParseCountryPolicyList(xmlNodePtr i
         return;
     }
     xmlNodePtr policyNodeList = GotoCountryPolicy(innode);
+    if (policyNodeList == nullptr) {
+        WIFI_LOGE("policyNodeList is null");
+        return;
+    }
     for (xmlNodePtr node = policyNodeList->children; node != nullptr; node = node->next) {
         if (xmlStrcmp(node->name, BAD_CAST(XML_TAG_POLICY_ITEM)) != 0) {
             continue;
@@ -356,6 +360,10 @@ void ApConfigUse::SoftapChannelPolicyParser::ParsePreferredChannelsList(xmlNodeP
         return;
     }
     xmlNodePtr policyNode = GotoSoftapSupportChannels(innode);
+    if (policyNode == nullptr) {
+        WIFI_LOGE("policyNode is null");
+        return;
+    }
     for (xmlNodePtr item = policyNode->children; item != nullptr; item = item->next) {
         std::vector<int> channels;
         switch (GetSupportChannelsItem(item)) {

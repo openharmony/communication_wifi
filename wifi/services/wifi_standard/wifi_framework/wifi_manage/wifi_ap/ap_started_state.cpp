@@ -282,6 +282,8 @@ bool ApStartedState::StopAp() const
     if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         return false;
     }
+    WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(
+        WifiConfigCenter::GetInstance().GetApIfaceName(), false);
     WriteWifiApStateHiSysEvent(0);
     return true;
 }

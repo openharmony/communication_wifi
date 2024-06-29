@@ -16,7 +16,7 @@
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_error_no.h"
 #include "mock_wifi_hdi_wpa_ap_impl.h"
-
+1
 using ::testing::ext::TestSize;
 
 namespace OHOS {

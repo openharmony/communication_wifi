@@ -14,7 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include "wifi_hdi_util.h"
-
+1
 using ::testing::ext::TestSize;
 
 namespace OHOS {

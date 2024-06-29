@@ -18,7 +18,7 @@
 #include <cstring>
 #include "wifi_error_no.h"
 #include "mock_wifi_hdi_wpa_ap_impl.h"
-
+1
 using namespace OHOS::Wifi;
 static bool g_mockTag = false;
 MockWifiHdiWpaApImpl &MockWifiHdiWpaApImpl::GetInstance()

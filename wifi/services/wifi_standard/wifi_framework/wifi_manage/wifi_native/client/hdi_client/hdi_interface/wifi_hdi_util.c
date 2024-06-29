@@ -18,6 +18,14 @@
 #include "wifi_common_def.h"
 #include "wifi_log.h"
 
+#ifndef UT_TEST
+#include "wifi_log.h"
+#else
+#define static
+#define LOGI(...)
+#define LOGE(...)
+#endif
+
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiUtil"
 

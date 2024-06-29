@@ -14,7 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include "wifi_hdi_common.h"
-
+1
 using ::testing::ext::TestSize;
 
 #define PROTOCOL_80211_IFTYPE_P2P_CLIENT 8

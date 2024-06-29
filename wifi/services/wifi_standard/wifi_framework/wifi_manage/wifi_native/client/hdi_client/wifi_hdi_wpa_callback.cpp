@@ -34,7 +34,7 @@ constexpr int PD_STATUS_CODE_PBC_REQ = 2;
 constexpr int PD_STATUS_CODE_PBC_RSP = 3;
 constexpr int PD_STATUS_CODE_FAIL = 4;
 constexpr int WLAN_STATUS_UNSPECIFIED_FAILURE = 1;
-constexpr int WLAN_STATUS_CHALLENGE_FAIL = 15;
+constexpr int WEP_WRONG_PASSWORD_STATUS_CODE = 5202;
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaCallback"
@@ -186,7 +186,7 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
                 (item.capabilities.find("SAE") != std::string::npos)) {
                 isWrongPwd = true;
                 break;
-            } else if (associateRejectParam->statusCode == WLAN_STATUS_CHALLENGE_FAIL &&
+            } else if (associateRejectParam->statusCode == WEP_WRONG_PASSWORD_STATUS_CODE &&
                 item.capabilities.find("WEP") != std::string::npos) {
                 isWrongPwd = true;
                 break;

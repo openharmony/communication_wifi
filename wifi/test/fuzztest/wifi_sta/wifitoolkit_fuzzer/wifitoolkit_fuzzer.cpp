@@ -114,7 +114,6 @@ void NetworkXmlParserTest(const uint8_t* data, size_t size)
     m_networkXmlParser->ParseStatus(root_node, config);
     m_networkXmlParser->ParseNetwork(root_node);
     m_networkXmlParser->IsWifiConfigValid(config);
-    m_networkXmlParser->IsRandomMacValid(config);
 
     m_networkXmlParser->ParseNetworkList(root_node);
     m_networkXmlParser->GetParseType(root_node);

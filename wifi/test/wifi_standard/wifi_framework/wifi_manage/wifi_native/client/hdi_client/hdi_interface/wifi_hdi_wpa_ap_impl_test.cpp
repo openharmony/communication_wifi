@@ -14,7 +14,10 @@
  */
 #include <gtest/gtest.h>
 #include "wifi_hdi_wpa_ap_impl.h"
-1
+#include "mock_wifi_hdi_wpa_proxy.h"
+
+using ::testing::_;
+using ::testing::Return;
 using ::testing::ext::TestSize;
 
 namespace OHOS {
@@ -160,6 +163,46 @@ HWTEST_F(WifiHdiWpaApImplTest, HdiDisassociateStaTest, TestSize.Level1)
     int id = 1;
     WifiErrorNo result = HdiDisassociateSta(mac, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaApImplTest, HdiStopApTest, TestSize.Level1)
+{
+    int id = 1;
+    WifiErrorNo result = HdiStopAp(id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+
+    MockWifiHdiWpaProxy::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaProxy::GetInstance(), IsHdiApStopped())
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    result = HdiStopAp(id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    MockWifiHdiWpaProxy::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaApImplTest, HdiStopApTest1, TestSize.Level1)
+{
+    int id = 1;
+    MockWifiHdiWpaProxy::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaProxy::GetInstance(), IsHdiApStopped())
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    EXPECT_CALL(MockWifiHdiWpaProxy::GetInstance(), HdiApStop(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = HdiStopAp(id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaProxy::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaApImplTest, HdiStopApTest2, TestSize.Level1)
+{
+    int id = 1;
+    MockWifiHdiWpaProxy::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaProxy::GetInstance(), IsHdiApStopped())
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    EXPECT_CALL(MockWifiHdiWpaProxy::GetInstance(), HdiApStop(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    WifiErrorNo result = HdiStopAp(id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    MockWifiHdiWpaProxy::SetMockFlag(false);
 }
 }
 }

@@ -14,7 +14,6 @@
  */
 
 #ifdef HDI_WPA_INTERFACE_SUPPORT
-#include <cstring>
 #include "wifi_hdi_wpa_callback.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
@@ -23,8 +22,6 @@
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_hdi_common.h"
 #include "wifi_common_util.h"
-#include "wifi_settings.h"
-#include "wifi_scan_msg.h"
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int WIFI_HDI_REASON_LENGTH = 32;

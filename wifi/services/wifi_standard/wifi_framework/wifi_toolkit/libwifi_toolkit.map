@@ -71,6 +71,7 @@
         "*XmlParser*";
         "*WifiBackupConfig*";
         "*WifiConfigCenter*";
+        "*WifiCodeConvertUtil*";
     local:
         *;
 };

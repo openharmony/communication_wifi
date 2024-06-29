@@ -690,6 +690,7 @@ bool ScanService::StoreFullScanInfo(
         scanInfo.bssid = iter->bssid;
         scanInfo.bssidType = REAL_DEVICE_ADDRESS;
         scanInfo.ssid = iter->ssid;
+        scanInfo.oriSsid = iter->oriSsid;
         scanInfo.capabilities = iter->capabilities;
         scanInfo.frequency = iter->frequency;
         scanInfo.channelWidth = iter->channelWidth;

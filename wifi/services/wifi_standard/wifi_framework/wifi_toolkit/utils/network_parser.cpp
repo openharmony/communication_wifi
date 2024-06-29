@@ -564,15 +564,16 @@ void NetworkXmlParser::SetMacByMacMapPlus(std::map<std::string, std::string> mac
         bool isExist = false;
         for (auto &item : wifiStoreRandomMacs) {
             if (item.randomMac == it->second) {
-                item.fuzzyBssids.push_back(it->first);
+                item.fuzzyBssids.insert(it->first);
                 isExist = true;
+                break;
             }
         }
         if (!isExist) {
             WifiStoreRandomMac wifiStoreRandomMac{};
             // need set default psk for GetRandomMac and AddRandomMac
             wifiStoreRandomMac.keyMgmt = KEY_MGMT_WPA_PSK;
-            wifiStoreRandomMac.fuzzyBssids.push_back(it->first);
+            wifiStoreRandomMac.fuzzyBssids.insert(it->first);
             wifiStoreRandomMac.randomMac = it->second;
             wifiStoreRandomMacs.push_back(wifiStoreRandomMac);
         }
@@ -591,6 +592,7 @@ void NetworkXmlParser::FillupMacByConfig()
                 macItem.ssid = cfgItem.ssid;
                 macItem.keyMgmt = cfgItem.keyMgmt;
                 isExist = true;
+                break;
             }
         }
         if (!isExist) {

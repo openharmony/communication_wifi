@@ -18,6 +18,7 @@
 #include "hal_device_manage.h"
 #include "wifi_log.h"
 #include "wifi_hdi_util.h"
+#include "wifi_code_convert.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiStaHalInterface"
@@ -224,7 +225,8 @@ WifiErrorNo WifiStaHalInterface::Scan(const std::string &ifaceName, const WifiHa
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 static void ConvertsScanInfo(InterScanInfo &interScanInfo, ScanInfo &scanInfo)
 {
-    interScanInfo.ssid = scanInfo.ssid;
+    interScanInfo.ssid = WifiCodeConvertUtil::GbkToUtf8(scanInfo.ssid);
+    interScanInfo.oriSsid = scanInfo.ssid;
     interScanInfo.bssid = scanInfo.bssid;
     interScanInfo.frequency = scanInfo.freq;
     interScanInfo.rssi = scanInfo.siglv;

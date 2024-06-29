@@ -555,10 +555,8 @@ void StaStateMachine::FillWapiCfg(const WifiDeviceConfig &config, WifiHalDeviceC
     return;
 }
 
-ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
+void StaStateMachine::TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const
 {
-    LOGI("Enter ConvertDeviceCfg.\n");
-    WifiHalDeviceConfig halDeviceConfig;
     halDeviceConfig.ssid = config.ssid;
     halDeviceConfig.bssid = config.bssid;
     halDeviceConfig.psk = config.preSharedKey;
@@ -569,6 +567,13 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     FillSuiteB192Cfg(halDeviceConfig);
     halDeviceConfig.wepKeyIdx = config.wepTxKeyIndex;
     FillWapiCfg(config, halDeviceConfig);
+}
+
+ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
+{
+    LOGI("Enter ConvertDeviceCfg.\n");
+    WifiHalDeviceConfig halDeviceConfig;
+    TransHalDeviceConfig(halDeviceConfig, config);
     if (strcmp(config.keyMgmt.c_str(), "WEP") == 0) {
         /* for wep */
         halDeviceConfig.authAlgorithms = 0x02;
@@ -598,6 +603,19 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     }
     LOGI("ConvertDeviceCfg SetDeviceConfig selected network ssid=%{public}s, bssid=%{public}s",
         SsidAnonymize(halDeviceConfig.ssid).c_str(), MacAnonymize(halDeviceConfig.bssid).c_str());
+
+    std::vector<WifiScanInfo> scanInfoList;
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    for (auto scanInfo : scanInfoList) {
+        std::string deviceKeyMgmt;
+        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (halDeviceConfig.ssid == scanInfo.ssid && halDeviceConfig.keyMgmt == deviceKeyMgmt) {
+            halDeviceConfig.ssid = scanInfo.oriSsid;
+            LOGI("ConvertDeviceCfg back to oriSsid:%{public}s", SsidAnonymize(halDeviceConfig.ssid).c_str());
+            break;
+        }
+    }
+
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, halDeviceConfig) != WIFI_HAL_OPT_OK) {
         LOGE("ConvertDeviceCfg SetDeviceConfig failed!");
         return WIFI_OPT_FAILED;

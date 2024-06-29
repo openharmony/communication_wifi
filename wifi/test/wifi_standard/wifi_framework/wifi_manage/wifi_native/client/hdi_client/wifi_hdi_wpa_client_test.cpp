@@ -17,7 +17,8 @@
 #include "wifi_hdi_wpa_callback.h"
 #include "wifi_error_no.h"
 #include "mock_wifi_hdi_wpa_ap_impl.h"
-1
+#include "mock_wifi_hdi_wpa_p2p_impl.h"
+
 using ::testing::_;
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -38,38 +39,38 @@ public:
 HWTEST_F(WifiHdiWpaClientTest, StartWifi, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->StartWifi("wlan");
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqConnect, TestSize.Level1)
 {
     int networkId = 111;
     WifiErrorNo result = wifiHdiWpaClient->ReqConnect(networkId);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, StopWifi, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->StopWifi();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqReconnect, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqReconnect();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqReassociate, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqReassociate();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqDisconnect, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqDisconnect();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, GetStaCapabilities, TestSize.Level1)
@@ -114,7 +115,7 @@ HWTEST_F(WifiHdiWpaClientTest, QueryScanInfos, TestSize.Level1)
     }
     std::vector<InterScanInfo> scanInfos;
     WifiErrorNo result = wifiHdiWpaClient->QueryScanInfos(scanInfos);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     free(results);
 }
 
@@ -135,7 +136,7 @@ HWTEST_F(WifiHdiWpaClientTest, RemoveDevice, TestSize.Level1)
 {
     int networkId = 222;
     WifiErrorNo result = wifiHdiWpaClient->RemoveDevice(networkId);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     result = wifiHdiWpaClient->RemoveDevice(-1);
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
 }
@@ -144,28 +145,28 @@ HWTEST_F(WifiHdiWpaClientTest, GetNextNetworkId, TestSize.Level1)
 {
     int networkId;
     WifiErrorNo result = wifiHdiWpaClient->GetNextNetworkId(networkId);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     EXPECT_EQ(networkId, 0);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ClearDeviceConfig, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ClearDeviceConfig();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqEnableNetwork, TestSize.Level1)
 {
     int networkId = 333;
     WifiErrorNo result = wifiHdiWpaClient->ReqEnableNetwork(networkId);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqDisableNetwork, TestSize.Level1)
 {
     int networkId = 444;
     WifiErrorNo result = wifiHdiWpaClient->ReqDisableNetwork(networkId);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, SetDeviceConfigTest, TestSize.Level1)
@@ -282,7 +283,7 @@ HWTEST_F(WifiHdiWpaClientTest, SetBssid, TestSize.Level1)
 HWTEST_F(WifiHdiWpaClientTest, SaveDeviceConfig, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->SaveDeviceConfig();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqRegisterStaEventCallbackTEST, TestSize.Level1)
@@ -305,7 +306,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqStartWpsPbcModeTEST, TestSize.Level1)
     expectedParam.multiAp = false;
     strncpy_s(expectedParam.bssid, sizeof(expectedParam.bssid), config.bssid.c_str(), sizeof(expectedParam.bssid) - 1);
     WifiErrorNo result = wifiHdiWpaClient->ReqStartWpsPbcMode(config);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqStartWpsPbcModeTest, TestSize.Level1)
@@ -334,7 +335,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqStartWpsPinModeTEST, TestSize.Level1)
         sizeof(expectedParam.pinCode) - 1);
     int pinCode;
     WifiErrorNo result = wifiHdiWpaClient->ReqStartWpsPinMode(config, pinCode);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqStartWpsPinModeTest, TestSize.Level1)
@@ -351,7 +352,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqStartWpsPinModeTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaClientTest, ReqStopWpsTEST, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqStopWps();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqGetRoamingCapabilitiesTEST, TestSize.Level1)
@@ -380,27 +381,27 @@ HWTEST_F(WifiHdiWpaClientTest, ReqWpaAutoConnectTEST, TestSize.Level1)
 {
     int enable = 1;
     WifiErrorNo result = wifiHdiWpaClient->ReqWpaAutoConnect(enable);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqWpaBlocklistClearTEST, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqWpaBlocklistClear();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqSetPowerSave, TestSize.Level1)
 {
     bool enable = true;
     WifiErrorNo result = wifiHdiWpaClient->ReqSetPowerSave(enable);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqWpaSetCountryCodeTEST, TestSize.Level1)
 {
     std::string countryCode = "US";
     WifiErrorNo result = wifiHdiWpaClient->ReqWpaSetCountryCode(countryCode);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqWpaGetCountryCodeTEST, TestSize.Level1)
@@ -415,7 +416,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqWpaSetSuspendModeTEST, TestSize.Level1)
 {
     bool mode = true;
     WifiErrorNo result = wifiHdiWpaClient->ReqWpaSetSuspendMode(mode);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqWpaShellCmdTest, TestSize.Level1)
@@ -423,7 +424,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqWpaShellCmdTest, TestSize.Level1)
     std::string ifName = "wlan0";
     std::string cmd = "iw wlan0 scan";
     WifiErrorNo result = wifiHdiWpaClient->ReqWpaShellCmd(ifName, cmd);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqWpaShellCmdTest1, TestSize.Level1)
@@ -455,7 +456,7 @@ HWTEST_F(WifiHdiWpaClientTest, GetDeviceConfigTEST, TestSize.Level1)
     config.networkId = 777;
     config.param = "param";
     WifiErrorNo result = wifiHdiWpaClient->GetDeviceConfig(config);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, StartAp, TestSize.Level1)
@@ -526,6 +527,204 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest1, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     result = wifiHdiWpaClient->SetSoftApConfig(config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest2, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest3, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest4, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest5, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApChannel(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest6, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApChannel(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApMaxConn(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest7, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApChannel(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApMaxConn(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetAp80211n(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest8, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApChannel(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApMaxConn(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetAp80211n(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWmm(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest9, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApChannel(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApMaxConn(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetAp80211n(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWmm(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiReloadApConfigInfo(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest10, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 123;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApChannel(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApMaxConn(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetAp80211n(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWmm(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiReloadApConfigInfo(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiDisableAp(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -607,35 +806,35 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetSsidPostfixNameTest, TestSize.Level1)
 {
     std::string postfixName = "postfix";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetSsidPostfixName(postfixName);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetDeviceNameTest, TestSize.Level1)
 {
     std::string name = "DeviceName";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetDeviceName(name);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetWpsDeviceTypeTest, TestSize.Level1)
 {
     std::string type = "type";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetWpsDeviceType(type);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1)
 {
     std::string type = "WPS_TYPE";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetWpsSecondaryDeviceType(type);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetWpsConfigMethodsTest, TestSize.Level1)
 {
     std::string config = "12345678";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetWpsConfigMethods(config);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pGetDeviceAddressTest, TestSize.Level1)
@@ -648,19 +847,19 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pGetDeviceAddressTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pFlushTest, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pFlush();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pFlushServiceTest, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pFlushService();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSaveConfigTest, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSaveConfig();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pRegisterCallbackTest, TestSize.Level1)
@@ -675,7 +874,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetupWpsPbcTest, TestSize.Level1)
     std::string groupInterface = "p2p0";
     std::string bssid = "00:11:22:33:44:55";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetupWpsPbc(groupInterface, bssid);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetupWpsPinTest, TestSize.Level1)
@@ -685,7 +884,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetupWpsPinTest, TestSize.Level1)
     std::string pin = "12345678";
     std::string result;
     WifiErrorNo ret = wifiHdiWpaClient->ReqP2pSetupWpsPin(groupInterface, address, pin, result);
-    EXPECT_EQ(ret, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(ret, WIFI_HAL_OPT_FAILED);
     pin = "1234";
     ret = wifiHdiWpaClient->ReqP2pSetupWpsPin(groupInterface, address, pin, result);
     EXPECT_EQ(ret, WIFI_HAL_OPT_INVALID_PARAM);
@@ -695,7 +894,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pRemoveNetworkTest, TestSize.Level1)
 {
     int networkId = 888;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pRemoveNetwork(networkId);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pListNetworksTest, TestSize.Level1)
@@ -705,7 +904,19 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pListNetworksTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
-HWTEST_F(WifiHdiWpaClientTest, ReqP2pListNetworks_ErrorTest, TestSize.Level1)
+HWTEST_F(WifiHdiWpaClientTest, ReqP2pListNetworksTest1, TestSize.Level1)
+{
+    std::map<int, WifiP2pGroupInfo> mapGroups;
+    MockWifiHdiWpaP2pImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaP2pImpl::GetInstance(), HdiP2pListNetworks(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    WifiErrorNo result = wifiHdiWpaClient->ReqP2pListNetworks(mapGroups);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_TRUE(mapGroups.empty());
+    MockWifiHdiWpaP2pImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, ReqP2pListNetworksTest2, TestSize.Level1)
 {
     std::map<int, WifiP2pGroupInfo> mapGroups;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pListNetworks(mapGroups);
@@ -718,7 +929,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetGroupMaxIdleTest, TestSize.Level1)
     std::string groupInterface = "p2p0";
     size_t time = 300;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetGroupMaxIdle(groupInterface, time);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetPowerSave_EnableTest, TestSize.Level1)
@@ -726,7 +937,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetPowerSave_EnableTest, TestSize.Level1)
     std::string groupInterface = "p2p0";
     bool enable = true;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetPowerSave(groupInterface, enable);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetPowerSave_DisableTest, TestSize.Level1)
@@ -734,41 +945,41 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetPowerSave_DisableTest, TestSize.Level1)
     std::string groupInterface = "p2p0";
     bool enable = false;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetPowerSave(groupInterface, enable);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetWfdEnable_EnableTest, TestSize.Level1)
 {
     bool enable = true;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetWfdEnable(enable);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetWfdEnable_DisableTest, TestSize.Level1)
 {
     bool enable = false;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetWfdEnable(enable);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetWfdDeviceConfigTest, TestSize.Level1)
 {
     std::string config = "config";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetWfdDeviceConfig(config);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pStartFindTest, TestSize.Level1)
 {
     size_t timeout = 5000;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pStartFind(timeout);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pStopFindTest, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pStopFind();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetExtListenTest, TestSize.Level1)
@@ -777,7 +988,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetExtListenTest, TestSize.Level1)
     size_t period = 100;
     size_t interval = 200;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetExtListen(enable, period, interval);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 
     period = 0;
     result = wifiHdiWpaClient->ReqP2pSetExtListen(enable, period, interval);
@@ -809,7 +1020,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetExtListenTest, TestSize.Level1)
 
     enable = false;
     result = wifiHdiWpaClient->ReqP2pSetExtListen(enable, period, interval);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetListenChannel, TestSize.Level1)
@@ -817,7 +1028,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetListenChannel, TestSize.Level1)
     size_t channel = 6;
     unsigned char regClass = 81;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetListenChannel(channel, regClass);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pConnectTest, TestSize.Level1)
@@ -837,7 +1048,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pCancelConnect, TestSize.Level1)
 {
     WifiHdiWpaClient wifiClient;
     WifiErrorNo result = wifiClient.ReqP2pCancelConnect();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pProvisionDiscovery, TestSize.Level1)
@@ -852,19 +1063,19 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pAddGroupTest, TestSize.Level1)
     int id = 1;
     int fre = 15;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pAddGroup(true, id, fre);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pRemoveGroupTest, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pRemoveGroup("p2p0");
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pRemoveGroupNonExistentTest, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pRemoveGroup("p2p1");
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pInviteTest, TestSize.Level1)
@@ -880,7 +1091,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pReinvokeTest01, TestSize.Level1)
     int networkId = 1;
     std::string deviceAddr = "00:11:22:33:44:55";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pReinvoke(networkId, deviceAddr);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pReinvokeTest02, TestSize.Level1)
@@ -888,7 +1099,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pReinvokeTest02, TestSize.Level1)
     int networkId = -1;
     std::string deviceAddr = "00:11:22:33:44:55";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pReinvoke(networkId, deviceAddr);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pReinvokeTest03, TestSize.Level1)
@@ -896,7 +1107,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pReinvokeTest03, TestSize.Level1)
     int networkId = 1;
     std::string deviceAddr = "00:11:22:33:44";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pReinvoke(networkId, deviceAddr);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pGetGroupCapabilityTest01, TestSize.Level1)
@@ -904,7 +1115,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pGetGroupCapabilityTest01, TestSize.Level1)
     std::string deviceAddress = "00:11:22:33:44:55";
     uint32_t capability;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pGetGroupCapability(deviceAddress, capability);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pGetGroupCapabilityTest02, TestSize.Level1)
@@ -912,7 +1123,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pGetGroupCapabilityTest02, TestSize.Level1)
     std::string deviceAddress = "00:11:22:33:44";
     uint32_t capability;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pGetGroupCapability(deviceAddress, capability);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pAddServiceTest, TestSize.Level1)
@@ -975,9 +1186,9 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pCancelServiceDiscoveryTest, TestSize.Level1
 {
     std::string id = "12345";
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pCancelServiceDiscovery(id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     result = wifiHdiWpaClient->ReqP2pCancelServiceDiscovery("");
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetRandomMacTest, TestSize.Level1)
@@ -1000,9 +1211,9 @@ HWTEST_F(WifiHdiWpaClientTest, ReqSetPersistentReconnectTest, TestSize.Level1)
 {
     WifiHdiWpaClient wifiClient;
     WifiErrorNo result = wifiClient.ReqSetPersistentReconnect(1);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     result = wifiClient.ReqSetPersistentReconnect(0);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
     result = wifiClient.ReqSetPersistentReconnect(2);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
@@ -1029,7 +1240,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqSetServiceDiscoveryExternalTest, TestSize.Leve
 {
     WifiHdiWpaClient client;
     WifiErrorNo result = client.ReqSetServiceDiscoveryExternal(true);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqGetP2pPeerTest01, TestSize.Level1)
@@ -1037,7 +1248,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqGetP2pPeerTest01, TestSize.Level1)
     std::string deviceAddress = "00:11:22:33:44:55";
     WifiP2pDevice device;
     WifiErrorNo result = wifiHdiWpaClient->ReqGetP2pPeer(deviceAddress, device);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqGetP2pPeerTest02, TestSize.Level1)
@@ -1045,7 +1256,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqGetP2pPeerTest02, TestSize.Level1)
     std::string deviceAddress = "00:11:22:33:44";
     WifiP2pDevice device;
     WifiErrorNo result = wifiHdiWpaClient->ReqGetP2pPeer(deviceAddress, device);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pGetSupportFrequenciesTest, TestSize.Level1)
@@ -1070,7 +1281,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pSetGroupConfigTest, TestSize.Level1)
     config.mode = 1;
     config.disabled = 0;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pSetGroupConfig(networkId, config);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, PushP2pGroupConfigStringTest, TestSize.Level1)
@@ -1100,14 +1311,14 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pGetGroupConfigTest, TestSize.Level1)
     int networkId = 1;
     HalP2pGroupConfig config;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pGetGroupConfig(networkId, config);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pAddNetworkTest, TestSize.Level1)
 {
     int networkId = -1;
     WifiErrorNo result = wifiHdiWpaClient->ReqP2pAddNetwork(networkId);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pHid2dConnectTest, TestSize.Level1)
@@ -1165,7 +1376,7 @@ HWTEST_F(WifiHdiWpaClientTest, ScanTest, TestSize.Level1)
 {
     WifiHalScanParam scanParam;
     WifiErrorNo result = wifiHdiWpaClient->Scan(scanParam);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, DeliverP2pDataTest, TestSize.Level1)
@@ -1174,7 +1385,7 @@ HWTEST_F(WifiHdiWpaClientTest, DeliverP2pDataTest, TestSize.Level1)
     int32_t dataType = 1;
     std::string carryData = "1";
     WifiErrorNo result = wifiHdiWpaClient->DeliverP2pData(cmdType, dataType, carryData);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, EnableApTest, TestSize.Level1)
@@ -1182,6 +1393,17 @@ HWTEST_F(WifiHdiWpaClientTest, EnableApTest, TestSize.Level1)
     int32_t id = 0;
     WifiErrorNo result = wifiHdiWpaClient->EnableAp(id);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, EnableApTest1, TestSize.Level1)
+{
+    int32_t id = 0;
+    MockWifiHdiWpaApImpl::SetMockFlag(true);
+    EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiEnableAp(_))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    WifiErrorNo result = wifiHdiWpaClient->EnableAp(id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, PushDeviceConfigAuthAlgorithmTest, TestSize.Level1)

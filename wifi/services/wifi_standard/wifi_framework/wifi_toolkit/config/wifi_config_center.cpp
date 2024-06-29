@@ -17,6 +17,7 @@
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "wifi_global_func.h"
 
 DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 

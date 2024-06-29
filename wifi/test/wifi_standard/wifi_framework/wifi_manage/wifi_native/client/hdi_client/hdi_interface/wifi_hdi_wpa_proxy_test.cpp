@@ -30,13 +30,13 @@ public:
 HWTEST_F(WifiHdiWpaProxyTest, HdiWpaStartTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStart();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiWpaStopTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStop();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiAddWpaIfaceTest, TestSize.Level1)

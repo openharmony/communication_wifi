@@ -15,7 +15,7 @@
 
 #ifndef MOCK_WIFI_HDI_WPA_AP_IMPL_H
 #define MOCK_WIFI_HDI_WPA_AP_IMPL_H
-1
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "wifi_hdi_wpa_ap_impl.h"
@@ -34,6 +34,7 @@ public:
     MOCK_METHOD2(HdiSetApWmm, WifiErrorNo(int value, int id));
     MOCK_METHOD1(HdiReloadApConfigInfo, WifiErrorNo(int id));
     MOCK_METHOD1(HdiDisableAp, WifiErrorNo(int id));
+    MOCK_METHOD1(HdiEnableAp, WifiErrorNo(int id));
 
     static MockWifiHdiWpaApImpl &GetInstance(void);
     static void SetMockFlag(bool flag);

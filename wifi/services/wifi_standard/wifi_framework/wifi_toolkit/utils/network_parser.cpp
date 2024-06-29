@@ -362,6 +362,8 @@ WifiDeviceConfig NetworkXmlParser::ParseWifiConfig(xmlNodePtr innode)
 
 void NetworkXmlParser::ParseSsid(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
 {
+    const int subStrBegin = 1;
+    const int quotesCount = 2;
     if (node == nullptr) {
         WIFI_LOGE("ParseSsid node null");
         return;
@@ -371,11 +373,14 @@ void NetworkXmlParser::ParseSsid(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
         WIFI_LOGE("ParseSsid ssid is null");
         return;
     }
-    wifiConfig.ssid = ssid.substr(1, ssid.length() - 2); // remove ""
+    // remove ""
+    wifiConfig.ssid = ssid.substr(subStrBegin, ssid.length() - quotesCount);
 }
 
 void NetworkXmlParser::ParsePreSharedKey(xmlNodePtr node, WifiDeviceConfig& wifiConfig)
 {
+    const int subStrBegin = 1;
+    const int quotesCount = 2;
     if (node == nullptr) {
         WIFI_LOGE("ParsePreSharedKey node null");
         return;
@@ -385,7 +390,8 @@ void NetworkXmlParser::ParsePreSharedKey(xmlNodePtr node, WifiDeviceConfig& wifi
         WIFI_LOGE("ParsePreSharedKey preSharedKey is null");
         return;
     }
-    wifiConfig.preSharedKey = preSharedKey.substr(1, preSharedKey.length() - 2); // remove ""
+    // remove ""
+    wifiConfig.preSharedKey = preSharedKey.substr(subStrBegin, preSharedKey.length() - quotesCount);
 }
 
 void NetworkXmlParser::ParseInternetHistory(xmlNodePtr node, WifiDeviceConfig& wifiConfig)

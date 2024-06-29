@@ -33,9 +33,6 @@ constexpr int PD_STATUS_CODE_ENTER_PIN = 1;
 constexpr int PD_STATUS_CODE_PBC_REQ = 2;
 constexpr int PD_STATUS_CODE_PBC_RSP = 3;
 constexpr int PD_STATUS_CODE_FAIL = 4;
-constexpr int WLAN_STATUS_UNSPECIFIED_FAILURE = 1;
-constexpr int WEP_WRONG_PASSWORD_STATUS_CODE = 5202;
-
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaCallback"
 

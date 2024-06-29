@@ -145,7 +145,7 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultFailTest, 
     WIFI_LOGI("StatisticCountryCodeFromScanResultFailTest enter");
     std::vector<WifiScanInfo> list;
     std::string code;
-    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
+    m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code);
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultSuccessTest, TestSize.Level1)

@@ -40,6 +40,7 @@
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
+#include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -1665,7 +1666,16 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
         if (randomMacInfo.randomMac.empty()) {
             /* Sets the MAC address of WifiSettings. */
             std::string macAddress;
-            WifiConfigCenter::GetInstance().GenerateRandomMacAddress(macAddress);
+            std::string deviceConfigKey = randomMacInfo.ssid + randomMacInfo.keyMgmt;
+            int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+            if (ret != 0) {
+                ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+            }
+            if (ret != 0) {
+                WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
+                    "Using locally generated MAC address instead.", __func__);
+                WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+            }
             randomMacInfo.randomMac = macAddress;
             LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
                 __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),

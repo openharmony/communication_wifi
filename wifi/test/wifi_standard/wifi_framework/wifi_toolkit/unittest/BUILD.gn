@@ -133,7 +133,6 @@ ohos_unittest("toolkit_unittest") {
   ]
   if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
     external_deps += [ "huks:libhukssdk" ]
-
   }
   if (wifi_feature_with_encryption) {
     defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]

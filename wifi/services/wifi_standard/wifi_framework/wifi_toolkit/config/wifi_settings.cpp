@@ -19,6 +19,7 @@
 #include "wifi_global_func.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
+#include "mac_address.h"
 #ifndef OHOS_ARCH_LITE
 #include <sys/sendfile.h>
 #include "wifi_country_code_define.h"
@@ -565,8 +566,8 @@ void WifiSettings::RemoveBackupFile()
 bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (randomMacInfo.randomMac.empty()) {
-        LOGE("%{public}s failed randomMac is empty.", __func__);
+    if (!MacAddress::IsValidMac(randomMacInfo.randomMac)) {
+        LOGE("%{public}s failed randomMac is inValid.", __func__);
         return false;
     }
     bool isAdded = false;
@@ -621,7 +622,7 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
     }
 
     for (auto &item : mWifiStoreRandomMac) {
-        if (item.randomMac.empty()) {
+        if (!MacAddress::IsValidMac(item.randomMac)) {
             continue;
         }
         if (IsPskEncryption(item.keyMgmt)) {

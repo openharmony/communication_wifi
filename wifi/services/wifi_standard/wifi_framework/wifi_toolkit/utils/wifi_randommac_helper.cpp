@@ -50,6 +50,7 @@ constexpr int OFFSET_VALUE_2 = 2;
 constexpr int OFFSET_VALUE_1 = 1;
 constexpr int OFFSET_VALUE_0 = 0;
 
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
 int WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(const std::string &content, std::string &randomMacAddr)
 {
     WIFI_LOGI("%{public}s enter", __func__);
@@ -73,6 +74,7 @@ int WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(const std::string
     }
     return 0;
 }
+#endif
 
 void WifiRandomMacHelper::GenerateRandomMacAddressByBssid(std::string peerBssid, std::string &randomMacAddr)
 {

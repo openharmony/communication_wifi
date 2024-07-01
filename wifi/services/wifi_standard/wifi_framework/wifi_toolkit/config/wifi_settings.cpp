@@ -30,6 +30,9 @@
 #ifdef INIT_LIB_ENABLE
 #include "parameter.h"
 #endif
+#if defined(FEATURE_ENCRYPTION_SUPPORT) || defined(SUPPORT_LOCAL_RANDOM_MAC)
+#include "wifi_encryption_util.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {

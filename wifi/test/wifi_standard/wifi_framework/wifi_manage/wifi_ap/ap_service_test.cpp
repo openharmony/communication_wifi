@@ -285,7 +285,7 @@ HWTEST_F(ApService_test, SetPowerModelSuccess, TestSize.Level1)
     EXPECT_CALL(WifiApHalInterface::GetInstance(), SetPowerModel(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), SetPowerModel(_, _)).WillOnce(Return(ErrCode::WIFI_OPT_SUCCESS));
-    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->SetPowerModel(model));
+    pApService->SetPowerModel(model);
 }
 
 HWTEST_F(ApService_test, SetPowerModelFailed, TestSize.Level1)

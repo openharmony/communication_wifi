@@ -71,7 +71,6 @@ static void OnWpaConnectionFullMock(int status)
 
 static void OnWpaConnectionRejectMock(int status, const std::string &bssid)
 {
-{
     LOGI("OnWpaConnectionRejectMock");
 }
 

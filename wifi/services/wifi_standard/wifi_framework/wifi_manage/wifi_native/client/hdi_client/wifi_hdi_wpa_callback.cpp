@@ -23,6 +23,14 @@
 #include "wifi_hdi_common.h"
 #include "wifi_common_util.h"
 
+#ifndef UT_TEST
+#include "wifi_log.h"
+#else
+#define static
+#define LOGI(...)
+#define LOGE(...)
+#endif
+
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int WIFI_HDI_REASON_LENGTH = 32;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;

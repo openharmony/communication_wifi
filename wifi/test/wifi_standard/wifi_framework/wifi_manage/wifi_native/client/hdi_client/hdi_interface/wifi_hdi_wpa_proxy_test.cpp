@@ -14,6 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include "wifi_hdi_wpa_proxy.h"
+#include "hdf_remote_service.h"
 
 using ::testing::ext::TestSize;
 
@@ -85,6 +86,66 @@ HWTEST_F(WifiHdiWpaProxyTest, HdiApStartTest, TestSize.Level1)
     char ifaceName[10] = "Wlan0";
     WifiErrorNo result = HdiApStart(id, ifaceName);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+extern "C" void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service);
+HWTEST_F(WifiHdiWpaProxyTest, ProxyOnApRemoteDiedTest, TestSize.Level1)
+{
+    struct HdfDeathRecipient recipient;
+    struct HdfRemoteService service;
+    ProxyOnApRemoteDied(nullptr, &service);
+    ProxyOnApRemoteDied(&recipient, nullptr);
+    ProxyOnApRemoteDied(nullptr, nullptr);
+}
+
+extern "C" WifiErrorNo RegistHdfApDeathCallBack();
+HWTEST_F(WifiHdiWpaProxyTest, RegistHdfApDeathCallBackTest, TestSize.Level1)
+{
+    WifiErrorNo result = RegistHdfApDeathCallBack();
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
+extern "C" void RemoveIfaceName(const char* ifName);
+HWTEST_F(WifiHdiWpaProxyTest, RemoveIfaceNameTest, TestSize.Level1)
+{
+    RemoveIfaceName(nullptr);
+    RemoveIfaceName("");
+    RemoveIfaceName("wlan");
+}
+
+extern "C" void AddIfaceName(const char* ifName);
+HWTEST_F(WifiHdiWpaProxyTest, AddIfaceNameTest, TestSize.Level1)
+{
+    AddIfaceName(nullptr);
+    AddIfaceName("");
+    AddIfaceName("wlan");
+}
+
+extern "C" void HdiApResetGlobalObj();
+HWTEST_F(WifiHdiWpaProxyTest, HdiApResetGlobalObjTest, TestSize.Level1)
+{
+    HdiApResetGlobalObj();
+}
+
+extern "C" bool FindifaceName(const char* ifName);
+HWTEST_F(WifiHdiWpaProxyTest, FindifaceNameTest, TestSize.Level1)
+{
+    bool result = FindifaceName(nullptr);
+    EXPECT_EQ(result, true);
+    result = FindifaceName("");
+    EXPECT_EQ(result, true);
+    result = FindifaceName("wlan0");
+    EXPECT_EQ(result, false);
+}
+
+extern "C" void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service);
+HWTEST_F(WifiHdiWpaProxyTest, ProxyOnRemoteDiedTest, TestSize.Level1)
+{
+    struct HdfDeathRecipient recipient;
+    struct HdfRemoteService service;
+    ProxyOnRemoteDied(nullptr, &service);
+    ProxyOnRemoteDied(&recipient, nullptr);
+    ProxyOnRemoteDied(nullptr, nullptr);
 }
 }
 }

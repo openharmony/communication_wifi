@@ -28,6 +28,7 @@
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
 #include "mac_address.h"
+#include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
@@ -565,7 +566,7 @@ ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
                 WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
             if (randomMacAddr.empty()) {
                 WIFI_LOGI("%{public}s: GenerateRandomMacAddress", __func__);
-                WifiConfigCenter::GetInstance().GenerateRandomMacAddress(randomMacAddr);
+                WifiRandomMacHelper::GenerateRandomMacAddress(randomMacAddr);
             }
             if (!randomMacAddr.empty() &&
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {

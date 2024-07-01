@@ -22,15 +22,8 @@ export class LogDataManager {
   testDisableWifiManager_EndLog = "testDisableWifi End----------"
   testIsWifiActiveManager_StartLog = "testIsWifiActive Start----------"
   testIsWifiActiveManager_EndLog = "testDisableWifi End----------"
-
-  testEnableSemiWifi_StartLog = "testEnableSemiWifi Start----------"
-  testEnableSemiWifi_EndLog = "testEnableSemiWifi End----------"
-
   testScanManager_StartLog = -"testScan Start----------"
   testScanManager_EndLog = "testScan End----------"
-  testStartScanManager_StartLog = -"testScan Start----------"
-  testStartScanManager_EndLog = "testScan End----------"
-
   testForcibleScanManager_StartLog = "testForcibleScan Start----------"
   testForcibleScanManager_EndLog = "testForcibleScan End----------"
   testGetScanInfoListManager_StartLog = "testGetScanInfoListManager start---------"

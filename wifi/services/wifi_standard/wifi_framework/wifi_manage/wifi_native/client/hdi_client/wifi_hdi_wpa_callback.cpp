@@ -164,7 +164,9 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
 
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onWpaConnectionReject) {
-        cbk.onWpaConnectionReject(associateRejectParam->statusCode);
+        char bssid[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
+        ConvertMacArr2String(associateRejectParam->bssid, associateRejectParam->bssidLen, bssid, sizeof(bssid));
+        cbk.onWpaConnectionReject(associateRejectParam->statusCode, bssid);
     }
     return 0;
 }

@@ -41,6 +41,7 @@ local_base_sources = [
   "utils/wifi_common_event_helper.cpp",
   "utils/wifi_encryption_util.cpp",
   "utils/wifi_global_func.cpp",
+  "utils/wifi_randommac_helper.cpp",
 ]
 
 local_base_include_dirs = [

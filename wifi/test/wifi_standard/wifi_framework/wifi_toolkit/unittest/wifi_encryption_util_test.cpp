@@ -43,7 +43,8 @@ HWTEST_F(WifiEncryptionUtilFuncTest, GetKey_001, TestSize.Level1)
     EXPECT_TRUE(HksInitParamSet(&testParamSet) == HKS_SUCCESS);
     EXPECT_TRUE(HksAddParams(testParamSet, g_genParam, sizeof(g_genParam) / sizeof(HksParam)) == HKS_SUCCESS);
     EXPECT_TRUE(HksBuildParamSet(&testParamSet) == HKS_SUCCESS);
-    EXPECT_TRUE(GetKey(testEncryptionInfo, testParamSet) == HKS_SUCCESS);
+    struct HksBlob authId = testEncryptionInfo.keyAlias;
+    EXPECT_TRUE(GetKeyByAlias(&authId, testParamSet) == HKS_SUCCESS);
 }
 
 HWTEST_F(WifiEncryptionUtilFuncTest, WifiEncryption_002, TestSize.Level1)

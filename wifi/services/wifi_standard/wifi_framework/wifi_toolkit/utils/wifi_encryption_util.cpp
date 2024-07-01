@@ -48,6 +48,14 @@ struct HksParam g_genAes256Param[] = {
     { .tag = HKS_TAG_AUTH_STORAGE_LEVEL, .uint32Param = HKS_AUTH_STORAGE_LEVEL_DE },
 };
 
+static struct HksParam g_genHmacParams[] = {
+    { .tag = HKS_TAG_ALGORITHM, .uint32Param = HKS_ALG_HMAC },
+    { .tag = HKS_TAG_PURPOSE, .uint32Param = HKS_KEY_PURPOSE_MAC },
+    { .tag = HKS_TAG_KEY_SIZE, .uint32Param = HKS_AES_KEY_SIZE_256 },
+    { .tag = HKS_TAG_DIGEST, .uint32Param = HKS_DIGEST_SHA256 },
+    { .tag = HKS_TAG_AUTH_STORAGE_LEVEL, .uint32Param = HKS_AUTH_STORAGE_LEVEL_DE },
+};
+
 int32_t SetUpHks()
 {
     int32_t ret = HksInitialize();
@@ -57,20 +65,23 @@ int32_t SetUpHks()
     return ret;
 }
 
-int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksParamSet *genParamSet)
+int32_t GetKeyByAlias(struct HksBlob *keyAlias, const struct HksParamSet *genParamSet)
 {
-    struct HksBlob authId = wifiEncryptionInfo.keyAlias;
-    int32_t keyExist = HksKeyExist(&authId, genParamSet);
+    if (keyAlias == nullptr || genParamSet == nullptr) {
+        WIFI_LOGE("%{public}s invalid param", __func__);
+        return -1;
+    }
+    int32_t keyExist = HksKeyExist(keyAlias, genParamSet);
     if (keyExist == HKS_ERROR_NOT_EXIST) {
-        int32_t ret = HksGenerateKey(&authId, genParamSet, nullptr);
+        int32_t ret = HksGenerateKey(keyAlias, genParamSet, nullptr);
         if (ret != HKS_SUCCESS) {
-            WIFI_LOGE("generate key failed");
+            WIFI_LOGE("%{public}s generate key failed:%{public}d", __func__, keyExist);
             return ret;
         } else {
             return ret;
         }
     } else if (keyExist != HKS_SUCCESS) {
-        WIFI_LOGE("search key failed");
+        WIFI_LOGE("%{public}s search key failed:%{public}d", __func__, keyExist);
         return keyExist;
     }
     return keyExist;
@@ -102,7 +113,7 @@ int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::
     HksAddParams(encryParamSet, IVParam, sizeof(IVParam) / sizeof(HksParam));
     HksBuildParamSet(&encryParamSet);
 
-    ret = GetKey(wifiEncryptionInfo, encryParamSet);
+    ret = GetKeyByAlias(&authId, encryParamSet);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("wifi encryption failed");
         return ret;
@@ -464,6 +475,90 @@ int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const Encr
     HksFreeParamSet(&decryParamSet);
     free(plainBuf);
     return ret;
+}
+
+static int32_t InitParamSet(struct HksParamSet **paramSet, const struct HksParam *params, uint32_t paramCount)
+{
+    int32_t ret = HksInitParamSet(paramSet);
+    if (ret != HKS_SUCCESS) {
+        WIFI_LOGE("%{public}s HksInitParamSet failed %{public}d", __func__, ret);
+        return ret;
+    }
+    ret = HksAddParams(*paramSet, params, paramCount);
+    if (ret != HKS_SUCCESS) {
+        WIFI_LOGE("%{public}s HksAddParams failed %{public}d", __func__, ret);
+        HksFreeParamSet(paramSet);
+        return ret;
+    }
+    ret = HksBuildParamSet(paramSet);
+    if (ret != HKS_SUCCESS) {
+        WIFI_LOGE("%{public}s HksBuildParamSet failed %{public}d", __func__, ret);
+        HksFreeParamSet(paramSet);
+        return ret;
+    }
+    return ret;
+}
+
+static const uint32_t HMAC_COMMON_SIZE = 1024;
+static int32_t CalculateHksHmac(const struct HksBlob *keyAlias, const struct HksParamSet *hmacParamSet,
+    const struct HksBlob *inData, struct HksBlob *hashText)
+{
+    uint8_t handleE[sizeof(uint64_t)] = {0};
+    struct HksBlob handle = {sizeof(uint64_t), handleE};
+    int32_t ret = HksInit(keyAlias, hmacParamSet, &handle, nullptr);
+    if (ret != HKS_SUCCESS) {
+        WIFI_LOGE("%{public}s HksInit failed %{public}d", __func__, ret);
+        return ret;
+    }
+    ret = HksFinish(&handle, hmacParamSet, inData, hashText);
+    return ret;
+}
+
+int32_t WifiGenerateMacRandomizationSecret(const std::string &keyName,
+    const std::string &data, std::vector<uint8_t> &outPlant)
+{
+    if (keyName.empty() || data.empty()) {
+        WIFI_LOGE("%{public}s failed keyName or data is empty", __func__);
+        return -1;
+    }
+    struct HksBlob keyAlias = {
+        .size = (uint32_t)keyName.length(),
+        .data = (uint8_t *)(&keyName[0])
+    };
+    struct HksParamSet *hmacParamSet = nullptr;
+    int32_t ret = InitParamSet(&hmacParamSet, g_genHmacParams, sizeof(g_genHmacParams) / sizeof(HksParam));
+    if (ret != HKS_SUCCESS) {
+        WIFI_LOGE("%{public}s InitParamSet:[%{public}s] failed:%{public}d", __func__, keyName.c_str(), ret);
+        return ret;
+    }
+
+    ret = GetKeyByAlias(&keyAlias, hmacParamSet);
+    if (ret == HKS_ERROR_NOT_EXIST) {
+        WIFI_LOGE("%{public}s GetKeyByAlias:[%{public}s] failed:%{public}d", __func__, keyName.c_str(), ret);
+        return ret;
+    }
+
+    struct HksBlob inData = {
+        .size = (uint32_t)data.length(),
+        .data = (uint8_t *)&data[0]
+    };
+    uint8_t cipher[HMAC_COMMON_SIZE] = {0};
+    struct HksBlob hashText = {
+        .size = HMAC_COMMON_SIZE,
+        .data = cipher
+    };
+    ret = CalculateHksHmac(&keyAlias, hmacParamSet, &inData, &hashText);
+    if (ret != HKS_SUCCESS) {
+        WIFI_LOGE("%{public}s HksHmacTest failed :%{public}d", __func__, ret);
+        return ret;
+    }
+
+    outPlant.clear();
+    for (size_t i = 0; i < hashText.size; i++) {
+        outPlant.emplace_back(hashText.data[i]);
+    }
+    HksFreeParamSet(&hmacParamSet);
+    return 0;
 }
 
 }  // namespace Wifi

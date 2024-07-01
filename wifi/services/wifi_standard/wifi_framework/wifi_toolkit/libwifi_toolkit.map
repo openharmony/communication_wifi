@@ -43,6 +43,7 @@
         "*IsValidInterfaceName*";
         "*IsValidateNum*";
         "*MacAddress*";
+        "*WifiRandomMacHelper*";
         "*NetworkXmlParser*";
         "*SaveIpAddress*";
         "*SetParamValue*";

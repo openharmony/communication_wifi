@@ -51,6 +51,7 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_encryption_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/xml_parser.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_randommac_helper.cpp",
     "../../wifi_manage/wifi_sta/Mock/mock_dhcp_service.cpp",
     "arp_checker_test.cpp",
     "base_address_test.cpp",
@@ -72,6 +73,7 @@ ohos_unittest("toolkit_unittest") {
     "wifi_log_helper_test.cpp",
     "wifi_settings_test.cpp",
     "xml_parser_test.cpp",
+    "wifi_randommac_helper_test.cpp",
   ]
 
   include_dirs = [

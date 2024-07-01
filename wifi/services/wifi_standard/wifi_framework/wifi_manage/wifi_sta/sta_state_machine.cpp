@@ -31,6 +31,7 @@
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #include "block_connect_service.h"
+#include "wifi_randommac_helper.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
 #include "securec.h"

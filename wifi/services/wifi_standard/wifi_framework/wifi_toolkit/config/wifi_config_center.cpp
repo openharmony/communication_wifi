@@ -447,32 +447,6 @@ bool WifiConfigCenter::EnableNetwork(int networkId, bool disableOthers, int inst
     return true;
 }
 
-void WifiConfigCenter::SetAppPackageName(const std::string &appPackageName)
-{
-    std::unique_lock<std::mutex> lock(mScanMutex);
-    mAppPackageName = appPackageName;
-}
-
-const std::string WifiConfigCenter::GetAppPackageName()
-{
-    std::unique_lock<std::mutex> lock(mScanMutex);
-    return mAppPackageName;
-}
-
-void WifiConfigCenter::SetAppRunningState(ScanMode appRunMode)
-{
-    if (static_cast<int>(appRunMode) < static_cast<int>(ScanMode::APP_FOREGROUND_SCAN) ||
-        static_cast<int>(appRunMode) > static_cast<int>(ScanMode::SYS_BACKGROUND_SCAN)) {
-        return;
-    }
-    mAppRunningModeState = appRunMode;
-}
-
-ScanMode WifiConfigCenter::GetAppRunningState() const
-{
-    return mAppRunningModeState.load();
-}
-
 WifiOprMidState WifiConfigCenter::GetScanMidState(int instId)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);

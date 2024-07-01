@@ -28,6 +28,7 @@
 #include "wifi_msg.h"
 #include "wifi_permission_utils.h"
 #include "wifi_scan_callback_proxy.h"
+#include "wifi_scan_config.h"
 #include "wifi_service_manager.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
@@ -178,6 +179,10 @@ ErrCode WifiScanServiceImpl::PermissionVerification()
         WIFI_LOGI("Scan: native process start scan !");
     }
 #endif
+    if (!IsWifiScanAllowed(externFlag)) {
+        WIFI_LOGE("Scan not allowed!");
+        return WIFI_OPT_FAILED;
+    }
     ErrCode ret = pService->Scan(externFlag);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed: %{public}d!", static_cast<int>(ret));
@@ -212,11 +217,40 @@ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
 #ifndef OHOS_ARCH_LITE
     UpdateScanMode();
 #endif
+    if (!IsWifiScanAllowed()) {
+        WIFI_LOGE("Scan not allowed!");
+        return WIFI_OPT_FAILED;
+    }
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
     return pService->ScanWithParam(params);
+}
+
+bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
+{
+    WifiScanDeviceInfo scanInfo;
+    WifiScanConfig::GetInstance().GetScanDeviceInfo(scanInfo);
+    if (externFlag) {
+        if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
+            WIFI_LOGW("extern scan not allow when wifi disable");
+            return false;
+        }
+        if (scanInfo.idelState == MODE_STATE_OPEN) {
+            WIFI_LOGW("extern scan not allow by power idel state");
+            return false;
+        }
+    }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
+        return false;
+    }
+    scanInfo.externScan = externFlag;
+    bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
+    WifiScanConfig::GetInstance().SaveScanDeviceInfo(scanInfo);
+    return allowScan;
 }
 
 ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
@@ -394,9 +428,9 @@ void WifiScanServiceImpl::UpdateScanMode()
 {
     int uid = GetCallingUid();
     if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
-            WifiConfigCenter::GetInstance().SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
+            WifiScanConfig::GetInstance().SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
         } else {
-            WifiConfigCenter::GetInstance().SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
+            WifiScanConfig::GetInstance().SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
         }
 }
 #endif

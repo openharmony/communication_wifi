@@ -89,6 +89,7 @@ ohos_unittest("idl_client_unittest") {
     "private = public",
     "protected = public",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    "__UT__",
   ]
 
   deps = [

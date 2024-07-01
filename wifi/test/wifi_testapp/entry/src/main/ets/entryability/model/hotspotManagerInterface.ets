@@ -14,13 +14,8 @@
  */
 
 import prompt from '@system.prompt';
-import router from '@ohos.router';
 
 import wifiManager from '@ohos.wifiManager';
-import ConfigData from "../../utils/ConfigData"
-import LogData from "../../utils/LogData"
-import MessageData from "../../utils/MessageData"
-import wifi from '@ohos.wifi';
 
 const TAG = "[hotspotManagerInterface]"
 /**
@@ -28,6 +23,46 @@ const TAG = "[hotspotManagerInterface]"
  */
 
 let hotspotManagerEnable = false
+
+export function testIsMeteredHotspot() {
+  try {
+    let message = ''
+    let ret = wifiManager.isMeteredHotspot()
+    message = "DisconnectedReason:" + ret
+    prompt.showToast({ message : message })
+    console.log(TAG + message);
+    return message
+  } catch( e ) {
+    console.log(TAG , `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+    let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast({ message : message })
+    return message
+  }
+}
+
+export function testEnableHiLinkHandshake() {
+  try {
+    // let config:wifiManager.WifiDeviceConfig
+    // wifiManager.enableHiLinkHandshake(true,'',config)
+  } catch( e ) {
+  }
+}
+
+export function testFactoryReset() {
+  try {
+    let message = ''
+    wifiManager.factoryReset()
+    message = "factoryReset:"
+    prompt.showToast({ message : message })
+    console.log(TAG + message);
+    return message
+  } catch( e ) {
+    console.log(TAG , `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+    let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
+    prompt.showToast({ message : message })
+    return message
+  }
+}
 
 export function testEnableHotspotManager() {
   try {
@@ -116,10 +151,10 @@ export function testSetHotspotConfigManager(): string {
     let maxConn = 3
     let channel = 6
     // TODO: 设备调试时候需要打开
-    ssid = AppStorage.get("h_ssid1") ! //非空断言操作符
+    ssid = AppStorage.get("h_ssid1")! //非空断言操作符
     //  let securityType=AppStorage.get("h_securityType1")
     //  let band = AppStorage.get("h_band1")
-    preSharedKey = AppStorage.get("h_preSharedKey1") ! //非空断言操作符
+    preSharedKey = AppStorage.get("h_preSharedKey1")! //非空断言操作符
     //  let maxConn = AppStorage.get("h_maxConn1")
     let config: wifiManager.HotspotConfig = {
       ssid : ssid ,
@@ -163,8 +198,7 @@ export function testGetHotspotConfigManager(): string {
 export function testGetHotspotStationsManager(): string {
   try {
     let message = "GetStations test"
-    let ret: string = ''
-    // let ret :boolean = wifiManager.getHotspotStations()
+    let ret = wifiManager.getStations()
     message = "GetStations is" + JSON.stringify(ret)
     console.log(TAG , "GetStations is" + JSON.stringify(ret))
     let getStationsManagerMessage = JSON.stringify(ret)
@@ -174,6 +208,39 @@ export function testGetHotspotStationsManager(): string {
   } catch( err ) {
     console.log(TAG , `Failed to testGetHotspotStationsManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testGetHotspotStationsManager. message: ${ err.message }, code: ${ err.code }`
+    prompt.showToast({ message : message })
+    return message
+  }
+}
+
+export function testAddHotspotBlockList() {
+  try {
+    // let stationInfo:wifiManager.StationInfo
+    // wifiManager.addHotspotBlockList(stationInfo)
+  } catch( e ) {
+  }
+}
+
+export function testDelHotspotBlockList() {
+  try {
+    // let stationInfo:wifiManager.StationInfo
+    // wifiManager.delHotspotBlockList(stationInfo)
+  } catch( e ) {
+
+  }
+}
+
+export function testGetHotspotBlockList() {
+  try {
+    let message = ''
+    let ret = wifiManager.getHotspotBlockList()
+    message = "DisconnectedReason:" + JSON.stringify(ret)
+    prompt.showToast({ message : message })
+    console.log(TAG + message);
+    return message
+  } catch( e ) {
+    console.log(TAG , `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+    let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
     prompt.showToast({ message : message })
     return message
   }

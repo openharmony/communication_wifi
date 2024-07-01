@@ -36,7 +36,7 @@
 #include "wifi_event_handler.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
-#ifdef FEATURE_ENCRYPTION_SUPPORT
+#if defined(FEATURE_ENCRYPTION_SUPPORT) || defined(SUPPORT_LOCAL_RANDOM_MAC)
 #include "wifi_encryption_util.h"
 #endif
 

@@ -86,7 +86,7 @@ int WifiSettings::Init()
     MergeWifiConfig();
     MergeSoftapConfig();
 #endif
-#ifdef FEATURE_ENCRYPTION_SUPPORT
+#if defined(FEATURE_ENCRYPTION_SUPPORT) || defined(SUPPORT_LOCAL_RANDOM_MAC)
     SetUpHks();
 #endif
     InitWifiConfig();

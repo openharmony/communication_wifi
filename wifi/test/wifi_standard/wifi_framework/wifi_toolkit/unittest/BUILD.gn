@@ -131,9 +131,15 @@ ohos_unittest("toolkit_unittest") {
     "libxml2:libxml2",
     "netstack:http_client",
   ]
-  if (wifi_feature_with_encryption) {
+  if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
     external_deps += [ "huks:libhukssdk" ]
+
+  }
+  if (wifi_feature_with_encryption) {
     defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
+  }
+  if (wifi_feature_with_local_random_mac) {
+    defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
   }
   defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   configs = [ ":module_private_config" ]

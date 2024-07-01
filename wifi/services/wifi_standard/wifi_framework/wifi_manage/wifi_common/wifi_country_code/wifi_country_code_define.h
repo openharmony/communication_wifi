@@ -701,7 +701,7 @@ const MccEntry MCC_TABLE[] = {
     // Reunion French Department of
     {647, "re", 2},
 
-    // Comoros and Mayotte
+    // Comoros and Mayotte(re and yt are the same mcc)
     {647, "yt", 2},
 
     // Zimbabwe Republic of

@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
+#if defined(FEATURE_ENCRYPTION_SUPPORT) || defined(SUPPORT_LOCAL_RANDOM_MAC)
 #include <iterator>
 #include <sstream>
 #include "wifi_logger.h"

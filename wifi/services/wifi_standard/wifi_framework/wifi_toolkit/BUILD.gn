@@ -135,6 +135,9 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
+    if (wifi_feature_with_local_random_mac) {
+      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
+    }
     if (wifi_feature_with_scan_control) {
       defines += [ "SUPPORT_SCAN_CONTROL" ]
     }
@@ -167,7 +170,7 @@ if (defined(ohos_lite)) {
 
     public_deps = []
 
-    if (wifi_feature_with_encryption) {
+    if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
       external_deps += [ "huks:libhukssdk" ]
     }
     cflags = memory_optimization_cflags

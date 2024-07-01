@@ -15,7 +15,9 @@
 
 #include "wifi_randommac_helper.h"
 
+#if defined(FEATURE_ENCRYPTION_SUPPORT) || defined(SUPPORT_LOCAL_RANDOM_MAC)
 #include "wifi_encryption_util.h"
+#endif
 #include "wifi_logger.h"
 
 static const std::string STA_RANDOMMAC_KEY_ALIAS = "WiFiRandMacSecret";

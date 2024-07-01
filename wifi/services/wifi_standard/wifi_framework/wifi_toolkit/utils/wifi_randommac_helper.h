@@ -58,6 +58,7 @@ public:
      */
     static int GenerateRandomMacAddressByLong(long long random, std::string &randomMacAddr);
 
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
     /**
      * @Description generate a MAC address
      *
@@ -66,6 +67,7 @@ public:
      * @return 0 - success
      */
     static int CalculateRandomMacForWifiDeviceConfig(const std::string &content, std::string &randomMacAddr);
+#endif
 
     /**
      * @Description generate a MAC address

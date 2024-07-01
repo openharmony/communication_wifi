@@ -34,6 +34,7 @@ public:
     MOCK_METHOD2(HdiSetApWmm, WifiErrorNo(int value, int id));
     MOCK_METHOD1(HdiReloadApConfigInfo, WifiErrorNo(int id));
     MOCK_METHOD1(HdiDisableAp, WifiErrorNo(int id));
+    MOCK_METHOD1(HdiEnableAp, WifiErrorNo(int id));
 
     static MockWifiHdiWpaApImpl &GetInstance(void);
     static void SetMockFlag(bool flag);

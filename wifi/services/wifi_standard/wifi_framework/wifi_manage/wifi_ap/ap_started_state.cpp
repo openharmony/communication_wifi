@@ -205,7 +205,7 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     if ((curApConfig.GetSsid() != apConfig.GetSsid()) ||
         (curApConfig.GetSecurityType() != apConfig.GetSecurityType())) {
         std::string macAddress;
-         WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+        WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
         if (MacAddress::IsValidMac(macAddress.c_str())) {
             if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
                 WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {

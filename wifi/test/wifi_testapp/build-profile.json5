@@ -18,22 +18,28 @@
       {
         "name": "default",
         "material": {
-          "certpath": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifi_testapp_kaihong.sample.wifitest.cer",
-          "storePassword": "0000001B952FB0C0AB83E64570AF570381420949AC652C4C90AF551F686E6E746B7542BA9B63A00B4A2905",
+          "certpath": "C:/Users/kaihong/.ohos/config/openharmony/default_wifi_testapp_35IRd5YaFkrlzOFUavRjmwR7larQz-n2TJJjk4LQeR0=.cer",
+          "storePassword": "0000001B70B57E15EE2E2844FE5648CF0327F7BDEF27B3CB3D917EA2A957C593DF5ED4666B3D2034B1B51E",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001BB0E8C3143A5160EC74D327B05E17BABD5942876102FC6C4FA7B464851E978C9B9B66B45FD70891",
-          "profile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifi_testapp_kaihong.sample.wifitest.p7b",
+          "keyPassword": "0000001B1D0E91154195FE69B669AFF74A84971A2DE4F36F1DEA1D16DA4F48ED5805391697144E299497F0",
+          "profile": "C:/Users/kaihong/.ohos/config/openharmony/default_wifi_testapp_35IRd5YaFkrlzOFUavRjmwR7larQz-n2TJJjk4LQeR0=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\kaihong\\.ohos\\config\\openharmony\\auto_ohos_default_wifi_testapp_kaihong.sample.wifitest.p12"
+          "storeFile": "C:/Users/kaihong/.ohos/config/openharmony/default_wifi_testapp_35IRd5YaFkrlzOFUavRjmwR7larQz-n2TJJjk4LQeR0=.p12"
         }
       }
     ],
-    "compileSdkVersion": 11,
-    "compatibleSdkVersion": 10,
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
+        "compileSdkVersion": 12,
+        //指定OpenHarmony应用/服务编译时的版本
+        "compatibleSdkVersion": 10,
+        //指定OpenHarmony应用/服务兼容的最低版本。
+        "targetSdkVersion": 10,
+        //指定OpenHarmony应用/服务目标版本。若没有设置，默认为compatibleSdkVersion
+        "runtimeOS": "OpenHarmony",
+        //指定为OpenHarmony
       }
     ],
   },

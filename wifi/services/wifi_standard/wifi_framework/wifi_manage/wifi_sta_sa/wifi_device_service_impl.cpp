@@ -1641,6 +1641,10 @@ bool ComparedHinlinkKeymgmt(const std::string scanInfoKeymgmt, const std::string
 
 ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfig, std::string &currentMac)
 {
+#ifndef SUPPORT_LOCAL_RANDOM_MAC
+    WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
+    return WIFI_OPT_SUCCESS;
+#else
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
@@ -1691,6 +1695,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
     WIFI_LOGI("EnableHiLinkHandshake mac address get success, mac = %{public}s", MacAnonymize(currentMac).c_str());
 
     return WIFI_OPT_SUCCESS;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)

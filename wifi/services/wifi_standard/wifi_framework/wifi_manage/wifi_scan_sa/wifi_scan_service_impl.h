@@ -64,6 +64,7 @@ public:
 private:
     bool Init();
     bool IsScanServiceRunning();
+    bool IsWifiScanAllowed(bool externFlag = true);
 #ifndef OHOS_ARCH_LITE
     void UpdateScanMode();
 #endif

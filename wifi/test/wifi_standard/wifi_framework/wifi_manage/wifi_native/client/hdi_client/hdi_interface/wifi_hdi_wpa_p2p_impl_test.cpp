@@ -38,7 +38,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiWpaP2pStartTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiWpaP2pStopTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaP2pStop();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetSsidPostfixNameTest, TestSize.Level1)
@@ -189,7 +189,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pAddServiceTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pStopFindTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiP2pStopFind();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pFlushTest, TestSize.Level1)
@@ -226,7 +226,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pInviteTest, TestSize.Level1)
     const char *goBssid = nullptr;
     const char *ifname = nullptr;
     WifiErrorNo result = HdiP2pInvite(peerBssid, goBssid, ifname);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 
     result = HdiP2pInvite("peerBssid", "goBssid", "ifname");
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);

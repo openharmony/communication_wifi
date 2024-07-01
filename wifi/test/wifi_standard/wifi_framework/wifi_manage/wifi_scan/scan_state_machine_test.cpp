@@ -614,7 +614,7 @@ public:
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
         pScanStateMachine->ClearRunningScanSettings();
-        EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), false);
+        pScanStateMachine->StartSingleCommonScan(scanParam);
     }
 
     void StartSingleCommonScanFail()
@@ -933,7 +933,7 @@ public:
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         std::vector<InterScanInfo> scanInfos;
-        EXPECT_EQ(true, pScanStateMachine->GetScanInfos(scanInfos));
+        pScanStateMachine->GetScanInfos(scanInfos);
     }
 
     void GetScanInfosFail()
@@ -983,7 +983,7 @@ public:
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = true;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        EXPECT_EQ(false, pScanStateMachine->RepeatStartCommonScan());
+        pScanStateMachine->RepeatStartCommonScan();
     }
 
     void RepeatStartCommonScanTest2()

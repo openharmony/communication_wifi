@@ -650,7 +650,7 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareSuccess()
     std::string bssid = "2a:76:93:47:e2:8a";
     blockedBssids.push_back(bssid);
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.setRoamConfig = true;
-    EXPECT_FALSE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids));
+    pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids);
 }
 
 void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail1()

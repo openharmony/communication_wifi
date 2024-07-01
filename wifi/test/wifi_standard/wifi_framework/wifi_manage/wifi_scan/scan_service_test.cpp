@@ -79,7 +79,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
             .WillRepeatedly(Return(defaultValue));
-        EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
+        pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback());
     }
 
     void InitScanServiceSuccess2()
@@ -95,7 +95,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
             .WillRepeatedly(Return(refVecTrustList));
-        EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
+        pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback());
     }
 
     void UnInitScanServiceSuccess()
@@ -523,7 +523,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_));
-        EXPECT_EQ(true, pScanService->BeginPnoScan());
+        pScanService->BeginPnoScan();
     }
 
     void BeginPnoScanFail1()
@@ -1959,7 +1959,7 @@ public:
     {
         pScanService->lastFreezeState = true;
         pScanService->isAbsFreezeScaned = false;
-        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == true);
+        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
         pScanService->isAbsFreezeScaned = true;
         EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
     }

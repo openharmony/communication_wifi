@@ -515,7 +515,6 @@ public:
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
     void DealHiLinkDataToWpa(InternalMessage *msg);
-    void HilinkSetMacAddress(std::string &cmd);
 private:
     /**
      * @Description  Destruct state.

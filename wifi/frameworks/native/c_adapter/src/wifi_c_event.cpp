@@ -444,14 +444,38 @@ void EventManager::Init()
 std::set<WifiEvent*> EventManager::m_setEventCallback;
 std::mutex EventManager::callbackMutex;
 bool EventManager::m_isEventRegistered = false;
+WifiEvent EventManager::g_wifiEvent = {0};
 
 std::set<WifiEvent*>& GetEventCallBacks() {
     return EventManager::GetInstance().GetEventCallBacks();
 }
 
+void EventManager::SaveWifiCallbackInfo(WifiEvent* event)
+{
+    if (event->OnWifiConnectionChanged) {
+        g_wifiEvent.OnWifiConnectionChanged = event->OnWifiConnectionChanged;
+    }
+    if (event->OnWifiScanStateChanged) {
+        g_wifiEvent.OnWifiScanStateChanged = event->OnWifiScanStateChanged;
+    }
+    if (event->OnHotspotStateChanged) {
+        g_wifiEvent.OnHotspotStateChanged = event->OnHotspotStateChanged;
+    }
+    if (event->OnHotspotStaJoin) {
+        g_wifiEvent.OnHotspotStaJoin = event->OnHotspotStaJoin;
+    }
+    if (event->OnHotspotStaLeave) {
+        g_wifiEvent.OnHotspotStaLeave = event->OnHotspotStaLeave;
+    }
+    if (event->OnDeviceConfigChange) {
+        g_wifiEvent.OnDeviceConfigChange = event->OnDeviceConfigChange;
+    }
+}
+
 WifiErrorCode RegisterWifiEvent(WifiEvent *event) {
     WIFI_LOGI("Register wifi event");
-    if (!EventManager::GetInstance().AddEventCallback(event)) {
+    EventManager::GetInstance().SaveWifiCallbackInfo(event);
+    if (!EventManager::GetInstance().AddEventCallback(&g_wifiEvent)) {
         return ERROR_WIFI_UNKNOWN;
     }
     if (!EventManager::GetInstance().IsEventRegistered()) {

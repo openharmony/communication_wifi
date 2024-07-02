@@ -205,7 +205,6 @@ public:
     static std::mutex callbackMutex;
     static WifiEvent g_wifiEvent;
 private:
-    static std::set<WifiEvent*> m_setEventCallback;
     static bool m_isEventRegistered;
     std::set<std::string> p2pRegisteredCallbackEvent;
     OHOS::sptr<WifiP2pCEventCallback> sptrP2PCallback = nullptr;

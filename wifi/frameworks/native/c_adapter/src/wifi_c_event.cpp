@@ -233,7 +233,31 @@ bool EventManager::AddEventCallback(WifiEvent *cb)
 void EventManager::RemoveEventCallback(WifiEvent *cb)
 {
     std::unique_lock<std::mutex> lock(callbackMutex);
-    m_setEventCallback.erase(cb);
+    auto &callback = GetEventCallBacks();
+    if (setCallbacks && setCallbacks->OnWifiConnectionChanged) {
+        g_wifiEvent.OnWifiConnectionChanged = 0;
+        setCallbacks->OnWifiConnectionChanged = nullptr;
+    }
+    if (setCallbacks && setCallbacks->OnWifiScanStateChanged) {
+        g_wifiEvent.OnWifiScanStateChanged = 0;
+        setCallbacks->OnWifiScanStateChanged = nullptr;    
+    }
+    if (setCallbacks && event->OnHotspotStateChanged) {
+        g_wifiEvent.OnHotspotStateChanged = 0;
+        setCallbacks->OnHotspotStateChanged = nullptr;    
+    }
+    if (setCallbacks && setCallbacks->OnHotspotStaJoin) {
+        g_wifiEvent.OnHotspotStaJoin = 0;
+        setCallbacks->OnHotspotStaJoin = nullptr; 
+    }
+    if (setCallbacks && setCallbacks->OnHotspotStaLeave) {
+        g_wifiEvent.OnHotspotStaLeave = 0;
+        setCallbacks->OnHotspotStaLeave = nullptr; 
+    }
+    if (setCallbacks && setCallbacks->OnDeviceConfigChange) {
+        g_wifiEvent.OnDeviceConfigChange = 0;
+        setCallbacks->OnDeviceConfigChange = nullptr; 
+    }
 }
 
 bool EventManager::IsEventRegistered()
@@ -452,22 +476,22 @@ std::set<WifiEvent*>& GetEventCallBacks() {
 
 void EventManager::SaveWifiCallbackInfo(WifiEvent* event)
 {
-    if (event->OnWifiConnectionChanged) {
+    if (event && event->OnWifiConnectionChanged) {
         g_wifiEvent.OnWifiConnectionChanged = event->OnWifiConnectionChanged;
     }
-    if (event->OnWifiScanStateChanged) {
+    if (event && event->OnWifiScanStateChanged) {
         g_wifiEvent.OnWifiScanStateChanged = event->OnWifiScanStateChanged;
     }
-    if (event->OnHotspotStateChanged) {
+    if (event && event->OnHotspotStateChanged) {
         g_wifiEvent.OnHotspotStateChanged = event->OnHotspotStateChanged;
     }
-    if (event->OnHotspotStaJoin) {
+    if (event && event->OnHotspotStaJoin) {
         g_wifiEvent.OnHotspotStaJoin = event->OnHotspotStaJoin;
     }
-    if (event->OnHotspotStaLeave) {
+    if (event && event->OnHotspotStaLeave) {
         g_wifiEvent.OnHotspotStaLeave = event->OnHotspotStaLeave;
     }
-    if (event->OnDeviceConfigChange) {
+    if (event && event->OnDeviceConfigChange) {
         g_wifiEvent.OnDeviceConfigChange = event->OnDeviceConfigChange;
     }
 }

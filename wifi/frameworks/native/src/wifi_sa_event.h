@@ -168,8 +168,6 @@ public:
 
     ~EventManager();
 
-    bool AddEventCallback(WifiEvent *cb);
-
     void RemoveEventCallback(WifiEvent *cb);
 
     WifiErrorCode RegisterDeviceEvent(const std::vector<std::string> &event);
@@ -181,8 +179,6 @@ public:
     bool IsEventRegistered();
 
     void SetIsEventRegistrated(bool isEventRegistered);
-
-    std::set<WifiEvent*>& GetEventCallBacks();
 
     void Init();
 

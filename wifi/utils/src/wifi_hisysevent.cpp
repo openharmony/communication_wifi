@@ -45,6 +45,12 @@ static void WriteEventBehavior(const std::string& eventType, Type... args)
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType)
 {
     WriteEvent("WIFI_STATE", "TYPE", serviceType, "OPER_TYPE", static_cast<int>(operType));
+
+    Json::Value root;
+    Json::FastWriter writer;
+    root["WIFI_STATE"] = static_cast<int>(operType);
+    root["TYPE"] = serviceType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WIFI_STATE", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteWifiApStateHiSysEvent(int32_t state)

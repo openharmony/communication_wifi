@@ -87,6 +87,16 @@ bool WifiConfigCenter::GetWifiSelfcureReset() const
     return mWifiSelfcureReset.load();
 }
 
+void WifiConfigCenter::SetWifiSelfcureResetEntered(const bool isReset)
+{
+    mWifiSelfcureResetEntered = isReset;
+}
+
+bool WifiConfigCenter::GetWifiSelfcureResetEntered() const
+{
+    return mWifiSelfcureResetEntered.load();
+}
+
 void WifiConfigCenter::SetLastNetworkId(const int networkId)
 {
     mLastNetworkId = networkId;

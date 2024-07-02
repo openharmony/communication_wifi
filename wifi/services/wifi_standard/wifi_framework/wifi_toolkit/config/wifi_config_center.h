@@ -40,6 +40,10 @@ public:
 
     bool GetWifiSelfcureReset() const;
 
+    void SetWifiSelfcureResetEntered(const bool isReset);
+
+    bool GetWifiSelfcureResetEntered() const;
+
     void SetLastNetworkId(const int networkId);
 
     int GetLastNetworkId() const;
@@ -328,6 +332,7 @@ private:
     // STA
     std::mutex mStaMutex;
     std::atomic<bool> mWifiSelfcureReset {false};
+    std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};

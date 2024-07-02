@@ -50,5 +50,10 @@ HWTEST_F(WifiHisyseventTest, WritePortalAuthExpiredHisyseventTest, TestSize.Leve
     WritePortalAuthExpiredHisysevent(0, 0, 0, 0, false);
 }
 
+HWTEST_F(WifiHisyseventTest, WriteWifiStateHiSysEventTest, TestSize.Level1)
+{
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

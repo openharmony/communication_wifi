@@ -1034,7 +1034,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     WIFI_LOGI("enter SelfCureForReset");
     if ((pSelfCureStateMachine->internetUnknown) || (!hasInternetRecently) ||
         (pSelfCureStateMachine->IsSettingsPage())) {
-        pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
         return;
     }
     if ((currentRssi < MIN_VAL_LEVEL_3_5) || pSelfCureStateMachine->IfP2pConnected() ||
@@ -2324,7 +2323,7 @@ bool AllowSelfCure(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLe
     return false;
 }
 
-bool DealDns(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, uint64_t currentMs)
+bool DealDns(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, int64_t currentMs)
 {
     if (historyInfo.dnsSelfCureFailedCnt == 0 ||
         (historyInfo.dnsSelfCureFailedCnt == SELF_CURE_FAILED_ONE_CNT &&
@@ -2338,7 +2337,7 @@ bool DealDns(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, u
     return false;
 }
 
-bool DealRenewDhcp(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, uint64_t currentMs)
+bool DealRenewDhcp(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, int64_t currentMs)
 {
     if (historyInfo.renewDhcpSelfCureFailedCnt >= 0) {
         return true;
@@ -2346,7 +2345,7 @@ bool DealRenewDhcp(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLe
     return false;
 }
 
-bool DealStaticIp(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, uint64_t currentMs)
+bool DealStaticIp(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, int64_t currentMs)
 {
     if (historyInfo.staticIpSelfCureFailedCnt <= SELF_CURE_FAILED_FOUR_CNT ||
         (historyInfo.staticIpSelfCureFailedCnt == SELF_CURE_FAILED_FIVE_CNT &&
@@ -2360,7 +2359,7 @@ bool DealStaticIp(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLev
     return false;
 }
 
-bool DealMiddleReassoc(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, uint64_t currentMs)
+bool DealMiddleReassoc(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, int64_t currentMs)
 {
     if ((historyInfo.reassocSelfCureFailedCnt == 0 ||
         (historyInfo.reassocSelfCureFailedCnt == SELF_CURE_FAILED_ONE_CNT &&
@@ -2375,7 +2374,7 @@ bool DealMiddleReassoc(WifiSelfCureHistoryInfo &historyInfo, int requestCureLeve
     return false;
 }
 
-bool DealRandMacReassoc(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, uint64_t currentMs)
+bool DealRandMacReassoc(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, int64_t currentMs)
 {
     if (historyInfo.randMacSelfCureFailedCnt < SELF_CURE_RAND_MAC_MAX_COUNT) {
         return true;
@@ -2383,7 +2382,7 @@ bool DealRandMacReassoc(const WifiSelfCureHistoryInfo &historyInfo, int requestC
     return false;
 }
 
-bool DealHighReset(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, uint64_t currentMs)
+bool DealHighReset(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, int64_t currentMs)
 {
     if ((historyInfo.resetSelfCureFailedCnt <= SELF_CURE_FAILED_ONE_CNT ||
         (historyInfo.resetSelfCureFailedCnt == SELF_CURE_FAILED_TWO_CNT &&
@@ -2401,7 +2400,10 @@ bool DealHighReset(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, u
 bool SelfCureStateMachine::SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel)
 {
     auto now = std::chrono::system_clock::now();
-    uint64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    if (currentMs <= 0) {
+        WIFI_LOGE("Get current time error, currentMs is :%{public}lld", currentMs);
+    }
     bool ifAcceptable = false;
     switch (requestCureLevel) {
         case WIFI_CURE_RESET_LEVEL_LOW_1_DNS:
@@ -2472,7 +2474,7 @@ void SelfCureStateMachine::UpdateSelfCureConnectHistoryInfo(WifiSelfCureHistoryI
                                                             bool success)
 {
     auto now = std::chrono::system_clock::now();
-    uint64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
         if (success) {
             historyInfo.reassocSelfCureConnectFailedCnt = 0;
@@ -2505,7 +2507,7 @@ void SelfCureStateMachine::UpdateSelfCureHistoryInfo(WifiSelfCureHistoryInfo &hi
 {
     WIFI_LOGI("enter %{public}s", __FUNCTION__);
     auto now = std::chrono::system_clock::now();
-    uint64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS) {
         if (success) {
             historyInfo.dnsSelfCureFailedCnt = 0;
@@ -2544,7 +2546,7 @@ void SelfCureStateMachine::UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryI
                                                             bool success)
 {
     auto now = std::chrono::system_clock::now();
-    uint64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
         if (success) {
             historyInfo.reassocSelfCureFailedCnt = 0;

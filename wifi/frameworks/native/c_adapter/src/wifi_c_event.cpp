@@ -29,6 +29,7 @@
 #include "wifi_common_util.h"
 #include "wifi_sa_event.h"
 DEFINE_WIFILOG_LABEL("WifiCEvent");
+WifiEvent EventManager::g_wifiEvent = {0};
 std::shared_ptr<OHOS::Wifi::WifiDevice> g_wifiStaPtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<OHOS::Wifi::WifiScan> g_wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 std::shared_ptr<OHOS::Wifi::WifiP2p> g_wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
@@ -87,10 +88,8 @@ NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnWifiConnectionChanged(int st
                 return;
             }
             std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
-            if (auto& callback : setCallbacks) {
-                if (callback && callback->OnWifiConnectionChanged) {
-                    callback->OnWifiConnectionChanged(state, &linkInfo);
-                }
+            if (EventManager::g_wifiEvent.OnWifiConnectionChanged) {
+                EventManager::g_wifiEvent.OnWifiConnectionChanged(state, &linkInfo);
             }
         } );
     }
@@ -116,8 +115,8 @@ NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnDeviceConfigChanged(OHOS::Wi
     if (eventHandler) {
         eventHandler->PostSyncTask([=]() {
             std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
-                if (g_wifiEvent && g_wifiEvent->OnDeviceConfigChange) {
-                    g_wifiEvent->OnDeviceConfigChange(ConfigChange(static_cast<int>(value)));
+                if (EventManager::g_wifiEvent.OnDeviceConfigChange) {
+                    EventManager::g_wifiEvent.OnDeviceConfigChange(ConfigChange(static_cast<int>(value)));
                 }
         } );
     }
@@ -139,8 +138,8 @@ NO_SANITIZE("cfi") void WifiCScanEventCallback::OnWifiScanStateChanged(int state
     if (eventHandler) {
         eventHandler->PostSyncTask([=]() {
             std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
-            if (g_wifiEvent && g_wifiEvent->OnWifiScanStateChanged) {
-                callback->OnWifiScanStateChanged(state, WIFI_SCAN_HOTSPOT_LIMIT);
+            if (EventManager::g_wifiEvent.OnWifiScanStateChanged) {
+                EventManager::g_wifiEvent.OnWifiScanStateChanged(state, WIFI_SCAN_HOTSPOT_LIMIT);
             }
         } );
     }
@@ -164,8 +163,8 @@ NO_SANITIZE("cfi") void WifiCHotspotEventCallback::OnHotspotStateChanged(int sta
     if (eventHandler) {
         eventHandler->PostSyncTask([=]() {
             std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
-            if (g_wifiEvent && g_wifiEvent->OnHotspotStateChanged) {
-                g_wifiEvent->OnHotspotStateChanged(state);
+            if (EventManager::g_wifiEvent.OnHotspotStateChanged) {
+                EventManager::g_wifiEvent.OnHotspotStateChanged(state);
             }   
         } );
     }
@@ -435,7 +434,6 @@ void EventManager::Init()
 
 std::mutex EventManager::callbackMutex;
 bool EventManager::m_isEventRegistered = false;
-WifiEvent EventManager::g_wifiEvent = {0};
 
 void EventManager::SaveWifiCallbackInfo(WifiEvent* event)
 {

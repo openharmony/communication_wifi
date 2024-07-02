@@ -1032,6 +1032,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCureLevel)
 {
     WIFI_LOGI("enter SelfCureForReset");
+    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
     if ((pSelfCureStateMachine->internetUnknown) || (!hasInternetRecently) ||
         (pSelfCureStateMachine->IsSettingsPage())) {
         return;

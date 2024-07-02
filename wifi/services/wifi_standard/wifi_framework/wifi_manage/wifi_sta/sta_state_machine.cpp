@@ -3359,32 +3359,6 @@ void StaStateMachine::DealApRoamingStateTimeout(InternalMessage *msg)
     DisConnectProcess();
 }
 
-void StaStateMachine::HilinkSetMacAddress(std::string &cmd)
-{
-    std::string::size_type begPos = 0;
-    if ((begPos = cmd.find("=")) == std::string::npos) {
-        WIFI_LOGI("HilinkSetMacAddress() cmd not find =");
-        return;
-    }
-    std::string macAddress = cmd.substr(begPos + 1);
-    if (macAddress.empty()) {
-        WIFI_LOGI("HilinkSetMacAddress() macAddress is empty");
-        return;
-    }
-
-    m_hilinkDeviceConfig.macAddress = macAddress;
-    WifiConfigCenter::GetInstance().SetMacAddress(macAddress, m_instId);
-    std::string realMacAddress = "";
-
-    WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
-    WIFI_LOGI("HilinkSetMacAddress() realMacAddress= %{public}s", MacAnonymize(realMacAddress).c_str());
-    m_hilinkDeviceConfig.wifiPrivacySetting = (macAddress == realMacAddress ?
-        WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC);
-    WIFI_LOGI("HilinkSetMacAddress() wifiPrivacySetting= %{public}d", m_hilinkDeviceConfig.wifiPrivacySetting);
-
-    return;
-}
-
 void StaStateMachine::DealHiLinkDataToWpa(InternalMessage *msg)
 {
     if (msg == nullptr) {
@@ -3404,11 +3378,10 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessage *msg)
             break;
         }
         case WIFI_SVR_COM_STA_HILINK_DELIVER_MAC: {
-            std::string cmd;
-            msg->GetMessageObj(cmd);
-            HilinkSetMacAddress(cmd);
-            LOGI("DealHiLinkMacDeliver start shell cmd, cmd = %{public}s", MacAnonymize(cmd).c_str());
-            WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd);
+            std::string mac;
+            msg->GetMessageObj(mac);
+            LOGI("DealHiLinkMacDeliver start shell cmd, mac = %{public}s", MacAnonymize(mac).c_str());
+            WifiStaHalInterface::GetInstance().ShellCmd("wlan0", mac);
             break;
         }
         case WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS: {

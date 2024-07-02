@@ -1967,7 +1967,6 @@ bool StaStateMachine::IsRoaming(void)
 
 void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 {
-    mIsWifiInternetCHRFlag = false;
     InternalMessage *msg = CreateMessage();
     if (msg == nullptr) {
         LOGE("msg is nullptr.\n");
@@ -1983,6 +1982,7 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 void StaStateMachine::OnNetworkDisconnectEvent(int reason)
 {
     mIsWifiInternetCHRFlag = false;
+    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     WriteWifiAbnormalDisconnectHiSysEvent(reason);
 }
 
@@ -3088,6 +3088,8 @@ void StaStateMachine::HandlePortalNetworkPorcess()
 void StaStateMachine::SetPortalBrowserFlag(bool flag)
 {
     portalFlag = flag;
+    mIsWifiInternetCHRFlag = false;
+    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     if (!flag) {
         portalState = PortalState::UNCHECKED;
     }
@@ -3201,6 +3203,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         WriteIsInternetHiSysEvent(NETWORK);
         WritePortalStateHiSysEvent(portalFlag ? HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED
                                               : HISYS_EVENT_PROTAL_STATE_NOT_PORTAL);
+        WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
@@ -3234,7 +3237,8 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
         if (!mIsWifiInternetCHRFlag &&
-            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL)) {
+            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL) &&
+            WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered()) {
             const int httpOpt = 1;
             WriteWifiAccessIntFailedHiSysEvent(httpOpt, StaDnsState::DNS_STATE_UNREACHABLE);
         }

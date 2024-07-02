@@ -200,9 +200,10 @@ public:
 
     static EventManager& GetInstance();
 
+    void SaveWifiCallbackInfo(WifiEvent* event);
 public:
     static std::mutex callbackMutex;
-
+    static WifiEvent g_wifiEvent;
 private:
     static std::set<WifiEvent*> m_setEventCallback;
     static bool m_isEventRegistered;

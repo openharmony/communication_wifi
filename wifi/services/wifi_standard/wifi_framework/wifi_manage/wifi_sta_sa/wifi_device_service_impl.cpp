@@ -20,6 +20,7 @@
 #include "wifi_permission_utils.h"
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
+#include "wifi_channel_helper.h"
 #include "wifi_config_center.h"
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
@@ -1521,7 +1522,7 @@ ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported
         return WIFI_OPT_INVALID_PARAM;
     } else {
         ChannelsTable channels;
-        WifiConfigCenter::GetInstance().GetValidChannels(channels);
+        WifiChannelHelper::GetInstance().GetValidChannels(channels);
         supported = channels.find((BandType)bandType) != channels.end();
     }
     return WIFI_OPT_SUCCESS;
@@ -1546,7 +1547,7 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
 
     ChannelsTable channels;
-    WifiConfigCenter::GetInstance().GetValidChannels(channels);
+    WifiChannelHelper::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
         result = channels[BandType::BAND_5GHZ];
     }

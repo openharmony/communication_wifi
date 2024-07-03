@@ -19,6 +19,7 @@
 #include "if_config.h"
 #include "ip_tools.h"
 #include "wifi_auth_center.h"
+#include "wifi_channel_helper.h"
 #include "wifi_common_util.h"
 #include "wifi_config_center.h"
 #include "wifi_dumper.h"
@@ -1282,7 +1283,7 @@ ErrCode WifiP2pServiceImpl::Hid2dGetChannelListFor5G(std::vector<int>& vecChanne
         return WIFI_OPT_PERMISSION_DENIED;
     }
     ChannelsTable channels;
-    WifiConfigCenter::GetInstance().GetValidChannels(channels);
+    WifiChannelHelper::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
         vecChannelList = channels[BandType::BAND_5GHZ];
     }

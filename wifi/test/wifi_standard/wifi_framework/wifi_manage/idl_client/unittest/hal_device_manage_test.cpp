@@ -152,6 +152,12 @@ HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest, TestSize.Level1)
     int32_t band = 0;
     std::vector<int> frequencies;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies);
+
+    DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
+        ifaceName);
+    DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SetPowerModelTest, TestSize.Level1)
@@ -178,6 +184,13 @@ HWTEST_F(WifiHalDeviceManagerTest, SetWifiCountryCodeTest, TestSize.Level1)
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
     std::string code{"AB"};
+    DelayedSingleton<HalDeviceManager>::GetInstance()->SetWifiCountryCode(ifaceName, code);
+
+    DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
+        ifaceName);
+    code = "CN";
     DelayedSingleton<HalDeviceManager>::GetInstance()->SetWifiCountryCode(ifaceName, code);
 }
 

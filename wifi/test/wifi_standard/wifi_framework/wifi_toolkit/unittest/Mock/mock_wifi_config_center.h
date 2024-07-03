@@ -75,9 +75,6 @@ public:
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
     virtual std::string GetConnectedBssid(int instId = 0) = 0;
     virtual std::string GetApIfaceName() = 0;
-    virtual int GetValidBands(std::vector<BandType> &bands)= 0;
-    virtual int SetValidChannels(const ChannelsTable &channelsInfo) = 0;
-    virtual int GetValidChannels(ChannelsTable &channelsInfo) = 0;
     virtual int SetHotspotState(int state, int id = 0) = 0;
     virtual int SetPowerModel(const PowerModel& model, int id = 0)= 0;
     virtual int GetPowerModel(PowerModel& model, int id = 0) = 0;
@@ -155,9 +152,6 @@ public:
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
     MOCK_METHOD1(GetConnectedBssid, std::string (int instId));
     MOCK_METHOD0(GetApIfaceName, std::string());
-    MOCK_METHOD1(GetValidBands, int(std::vector<BandType> &bands));
-    MOCK_METHOD1(SetValidChannels, int(const ChannelsTable &channelsInfo));
-    MOCK_METHOD1(GetValidChannels, int(ChannelsTable &channelsInfo));
     MOCK_METHOD2(SetHotspotState, int(int state, int id));
     MOCK_METHOD2(SetPowerModel, int(const PowerModel& model, int id));
     MOCK_METHOD2(GetPowerModel, int(PowerModel& model, int id));

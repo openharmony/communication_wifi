@@ -2403,7 +2403,7 @@ bool SelfCureStateMachine::SelfCureAcceptable(WifiSelfCureHistoryInfo &historyIn
     auto now = std::chrono::system_clock::now();
     int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     if (currentMs <= 0) {
-        WIFI_LOGE("Get current time error, currentMs is :%{public}lld", currentMs);
+        WIFI_LOGE("Get current time error");
     }
     bool ifAcceptable = false;
     switch (requestCureLevel) {

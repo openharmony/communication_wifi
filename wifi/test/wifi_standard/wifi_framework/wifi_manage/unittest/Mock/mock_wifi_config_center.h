@@ -38,18 +38,14 @@ public:
     virtual bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0) = 0;
     virtual void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0) = 0;
     virtual WifiDetailState GetWifiDetailState(int instId = 0) = 0;
-    virtual int SetStaLastRunState(int bRun, int instId) = 0;  // todo
     virtual WifiOprMidState GetApMidState(int id = 0) = 0;
     virtual bool SetApMidState(WifiOprMidState expState, WifiOprMidState state, int id = 0) = 0;
     virtual void SetApMidState(WifiOprMidState state, int id = 0) = 0;
-    virtual bool GetWifiFlagOnAirplaneMode(int instId) = 0;  // todo
     virtual int GetAirplaneModeState() const = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state) = 0;
-    virtual int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId) = 0;  // todo
     virtual int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0) = 0;
     virtual int GetHotspotState(int id = 0) = 0;
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
-    virtual bool IsScanAlwaysActive(int instId) = 0;  // todo
     virtual int GetPowerSavingModeState() const = 0;
 };
 
@@ -71,18 +67,14 @@ public:
     MOCK_METHOD3(SetWifiScanOnlyMidState, bool(WifiOprMidState expState, WifiOprMidState state, int instId));
     MOCK_METHOD2(SetWifiScanOnlyMidState, void(WifiOprMidState state, int instId));
     MOCK_METHOD1(GetWifiDetailState, WifiDetailState(int instId));
-    MOCK_METHOD2(SetStaLastRunState, int(int bRun, int instId));  // todo
     MOCK_METHOD1(GetApMidState, WifiOprMidState(int id));
     MOCK_METHOD3(SetApMidState, bool(WifiOprMidState expState, WifiOprMidState state, int id));
     MOCK_METHOD2(SetApMidState, void(WifiOprMidState state, int id));
-    MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
     MOCK_CONST_METHOD0(GetAirplaneModeState, int(void));
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
-    MOCK_METHOD2(SetWifiFlagOnAirplaneMode, int(bool ifOpen, int instId));  //todo
     MOCK_METHOD2(GetLinkedInfo, int(WifiLinkedInfo &info, int instId));
     MOCK_METHOD1(GetHotspotState, int(int id));
     MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int instId));
-    MOCK_METHOD1(IsScanAlwaysActive, bool(int instId));  // todo
     MOCK_CONST_METHOD0(GetPowerSavingModeState, int(void));
 };
 }  // namespace Wifi

@@ -71,7 +71,7 @@ ohos_unittest("manager_unittest") {
     "Mock/mock_wifi_app_parser.cpp",
     "Mock/mock_wifi_global_func.cpp",
     "Mock/mock_wifi_settings.cpp",
-    "Mock/mock_wifi_config_center.cpp"
+    "Mock/mock_wifi_config_center.cpp",
     "common/app_network_speed_limit_service_test.cpp",
     "common/block_connect_service_test.cpp",
     "common/speed_limit_configs_writer_test.cpp",

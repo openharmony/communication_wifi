@@ -372,7 +372,6 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByCacheSuccessTest, TestSi
 {
     WIFI_LOGI("GetWifiCountryCodeByCacheSuccessTest enter");
     std::string code;
-    // EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByCache(code));
     m_wifiCountryCodePolicy->GetWifiCountryCodeByCache(code);
 }
 
@@ -380,7 +379,6 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDefaultRegionTest, TestS
 {
     WIFI_LOGI("GetWifiCountryCodeByDefaultRegionTest enter");
     std::string code;
-    // EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByDefaultRegion(code));
     m_wifiCountryCodePolicy->GetWifiCountryCodeByDefaultRegion(code);
 }
 

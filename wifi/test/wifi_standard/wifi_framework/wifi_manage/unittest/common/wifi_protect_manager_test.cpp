@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "wifi_protect_manager.h"
-#include "wifi_settings.h"
 #include "wifi_log.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"

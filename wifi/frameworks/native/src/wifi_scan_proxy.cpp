@@ -244,27 +244,6 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     return WIFI_OPT_SUCCESS;
 }
 
-static constexpr uint8_t STEP_2BIT = 2;
-static std::string HexToString(const std::string &str)
-{
-    std::string result;
-    uint8_t hexDecimal = 16;
-    uint8_t hexStep = 2;
-    if (str.length() <= 0) {
-        return result;
-    }
-    for (size_t i = 0; i < str.length() - 1; i += STEP_2BIT) {
-        std::string byte = str.substr(i, hexStep);
-        char chr = 0;
-        long strTemp = strtol(byte.c_str(), nullptr, hexDecimal);
-        if (strTemp > 0) {
-            chr = static_cast<char>(strTemp);
-        }
-        result.push_back(chr);
-    }
-    return result;
-}
-
 static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, int &dataRecvLen)
 {
     info.bssid = tokens[dataRecvLen++];
@@ -294,7 +273,7 @@ static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, in
     info.maxSupportedRxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
     info.maxSupportedTxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
     info.disappearCount = std::stoi(tokens[dataRecvLen++]);
-    info.isHiLinkNetwork = tokens[dataRecvLen++] == "true";
+    info.isHiLinkNetwork = std::stoi(tokens[dataRecvLen++]);
     info.supportedWifiCategory = static_cast<WifiCategory>(std::stoi(tokens[dataRecvLen++]));
 }
 

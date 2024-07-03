@@ -119,6 +119,13 @@ HWTEST_F(WifiStaHalInterfaceTest, GetStaDeviceMacAddressTest, TestSize.Level1)
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
+HWTEST_F(WifiStaHalInterfaceTest, SetWifiCountryCodeTest, TestSize.Level1)
+{
+    std::string code = "AB";
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetWifiCountryCode("wlan0", code);
+    EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
+}
+
 HWTEST_F(WifiStaHalInterfaceTest, GetSupportFrequenciesTest, TestSize.Level1)
 {
     std::vector<int> freq;

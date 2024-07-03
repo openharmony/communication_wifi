@@ -19,6 +19,7 @@
 #include "wifi_permission_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_auth_center.h"
+#include "wifi_channel_helper.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_internal_event_dispatcher.h"
@@ -77,7 +78,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     }
 
     std::vector<BandType> bands;
-    if (WifiConfigCenter::GetInstance().GetValidBands(bands) < 0) {
+    if (WifiChannelHelper::GetInstance().GetValidBands(bands) < 0) {
         WIFI_LOGE("IsHotspotDualBandSupported:GetValidBands return failed!");
         return WIFI_OPT_FAILED;
     }
@@ -174,9 +175,9 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         }
     }
     std::vector<BandType> bandsFromCenter;
-    WifiConfigCenter::GetInstance().GetValidBands(bandsFromCenter);
+    WifiChannelHelper::GetInstance().GetValidBands(bandsFromCenter);
     ChannelsTable channInfoFromCenter;
-    WifiConfigCenter::GetInstance().GetValidChannels(channInfoFromCenter);
+    WifiChannelHelper::GetInstance().GetValidChannels(channInfoFromCenter);
     HotspotConfig configFromCenter;
     WifiSettings::GetInstance().GetHotspotConfig(configFromCenter, m_id);
     ErrCode validRetval = IsValidHotspotConfig(config, configFromCenter, bandsFromCenter, channInfoFromCenter);
@@ -512,7 +513,7 @@ ErrCode WifiHotspotServiceImpl::GetValidBands(std::vector<BandType> &bands)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiConfigCenter::GetInstance().GetValidBands(bands) < 0) {
+    if (WifiChannelHelper::GetInstance().GetValidBands(bands) < 0) {
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -531,7 +532,7 @@ ErrCode WifiHotspotServiceImpl::GetValidChannels(BandType band, std::vector<int3
         return WIFI_OPT_INVALID_PARAM;
     }
     ChannelsTable channInfoFromCenter;
-    WifiConfigCenter::GetInstance().GetValidChannels(channInfoFromCenter);
+    WifiChannelHelper::GetInstance().GetValidChannels(channInfoFromCenter);
     auto iter = channInfoFromCenter.find(band);
     if (iter != channInfoFromCenter.end()) {
         validchannels = iter->second;

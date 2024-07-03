@@ -100,8 +100,10 @@ public:
 
     void UnInitScanServiceSuccess()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
-        pScanService->UnInitScanService();
+        if (pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()) == true) {
+            MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
+            pScanService->UnInitScanService();
+        }
     }
 
     void HandleScanStatusReportSuccess1()
@@ -1847,6 +1849,14 @@ public:
         int count = 0;
         pScanService->SystemScanDisconnectedPolicy(interval, count);
     }
+
+    void OnWifiCountryCodeChangedTest()
+    {
+        std::string countryCode = "CN";
+        if (pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()) == true) {
+            EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pScanService->m_scanObserver->OnWifiCountryCodeChanged(countryCode));
+        }
+    }
 };
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess1, TestSize.Level1)
@@ -2918,6 +2928,11 @@ HWTEST_F(ScanServiceTest, SystemScanConnectedPolicyTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, SystemScanDisconnectedPolicyTest, TestSize.Level1)
 {
     SystemScanDisconnectedPolicyTest();
+}
+
+HWTEST_F(ScanServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level1)
+{
+    OnWifiCountryCodeChangedTest();
 }
 
 } // namespace Wifi

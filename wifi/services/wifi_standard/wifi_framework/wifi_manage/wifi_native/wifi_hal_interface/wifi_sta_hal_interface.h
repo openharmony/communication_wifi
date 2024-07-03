@@ -91,6 +91,14 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo GetStaDeviceMacAddress(std::string &mac);
+    
+    /**
+     * @Description Sets the Wi-Fi country code.
+     *
+     * @param code
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetWifiCountryCode(const std::string &ifaceName, const std::string &code);
 
     /**
      * @Description Obtains the frequencies supported by a specified frequency band.
@@ -99,7 +107,7 @@ public:
      * @param frequencies
      * @return WifiErrorNo
      */
-    WifiErrorNo GetSupportFrequencies(int band, std::vector<int> &frequencies);
+    WifiErrorNo GetSupportFrequencies(const std::string &ifaceName, int band, std::vector<int> &frequencies);
 
     /**
      * @Description Sets the MAC address of the Wi-Fi connection.

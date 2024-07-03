@@ -24,6 +24,7 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
+#include "wifi_country_code_manager.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #endif
@@ -102,6 +103,19 @@ void WifiScanManager::CheckAndStartScanService(int instId)
         WIFI_LOGW("Failed to set scan mid state opening!");
         return;
     }
+    ErrCode errCode = TryToStartScanService(instId);
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN, instId);
+    }
+#ifndef OHOS_ARCH_LITE
+    WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();
+#endif
+    return;
+}
+
+ErrCode WifiScanManager::TryToStartScanService(int instId)
+{
     ErrCode errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SCAN) < 0) {
@@ -134,11 +148,7 @@ void WifiScanManager::CheckAndStartScanService(int instId)
             break;
         }
     } while (0);
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN, instId);
-    }
-    return;
+    return errCode;
 }
 
 void WifiScanManager::CheckAndStopScanService(int instId)

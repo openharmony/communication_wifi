@@ -31,6 +31,7 @@
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #include "block_connect_service.h"
+#include "wifi_randommac_helper.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
 #include "securec.h"
@@ -1882,15 +1883,15 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
         LOGE("SetRandomMac : GetDeviceConfig failed!");
         return false;
     }
-    std::string lastMac;
     std::string currentMac;
+    std::string realMac;
+    WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
+    LOGD("%{public}s realMac is %{public}s", __func__, MacAnonymize(realMac).c_str());
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
-        LOGI("%{public}s randommac, use factory mac to connect", __func__);
-        WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
+        currentMac = realMac;
     } else {
         WifiStoreRandomMac randomMacInfo;
         InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
-
         if (randomMacInfo.peerBssid.empty()) {
             LOGE("scanInfo has no target wifi and bssid is empty!");
             return false;
@@ -1898,13 +1899,22 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
         LOGI("%{public}s randommac, ssid:%{public}s keyMgmt:%{public}s macAddress:%{public}s",
             __func__, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
             MacAnonymize(deviceConfig.macAddress).c_str());
-        if (deviceConfig.macAddress.empty()) {
+        if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
             WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-            if (!randomMacInfo.randomMac.empty()) {
+            if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
                 currentMac = randomMacInfo.randomMac;
             } else {
                 std::string macAddress;
-                WifiConfigCenter::GetInstance().GenerateRandomMacAddress(macAddress);
+                std::string deviceConfigKey = deviceConfig.ssid + deviceConfig.keyMgmt;
+                int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+                if (ret != 0) {
+                    ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+                }
+                if (ret != 0) {
+                    WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
+                        "Using locally generated MAC address instead.", __func__);
+                    WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+                }
                 randomMacInfo.randomMac = macAddress;
                 currentMac = randomMacInfo.randomMac;
                 LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
@@ -1920,14 +1930,13 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             currentMac = deviceConfig.macAddress;
         }
     }
-
+    std::string lastMac;
     if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac)) != WIFI_HAL_OPT_OK) {
         LOGE("%{public}s randommac, GetStaDeviceMacAddress failed!", __func__);
         return false;
     }
-
-    LOGI("%{public}s, randommac, use random mac to connect, currentMac:%{public}s, lastMac:%{public}s",
-        __func__, MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
+    LOGI("%{public}s, randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}s", __func__,
+        realMac == currentMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(

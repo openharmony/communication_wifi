@@ -36,6 +36,7 @@
 #include "wifi_global_func.h"
 #include "wifi_cmd_client.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_randommac_helper.h"
 #ifdef HAS_BATTERY_MANAGER_PART
 #include "battery_srv_client.h"
 #define SET_DUAL_ANTENNAS 45
@@ -171,7 +172,7 @@ bool ApStartedState::UpdatMacAddress(const std::string ssid, KeyMgmt securityTyp
     if ((curApConfig.GetSsid() != ssid) ||
         (curApConfig.GetSecurityType() != securityType)) {
         std::string macAddress;
-        WifiConfigCenter::GetInstance().GenerateRandomMacAddress(macAddress);
+        WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
         if (MacAddress::IsValidMac(macAddress.c_str())) {
             if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
                 WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {
@@ -204,7 +205,7 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     if ((curApConfig.GetSsid() != apConfig.GetSsid()) ||
         (curApConfig.GetSecurityType() != apConfig.GetSecurityType())) {
         std::string macAddress;
-        WifiConfigCenter::GetInstance().GenerateRandomMacAddress(macAddress);
+        WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
         if (MacAddress::IsValidMac(macAddress.c_str())) {
             if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
                 WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {
@@ -478,7 +479,7 @@ void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg)
 void ApStartedState::SetRandomMac() const
 {
     std::string macAddress;
-    WifiConfigCenter::GetInstance().GenerateRandomMacAddress(macAddress);
+    WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
     if (MacAddress::IsValidMac(macAddress.c_str())) {
         if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
             WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {

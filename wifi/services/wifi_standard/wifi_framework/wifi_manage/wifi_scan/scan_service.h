@@ -303,7 +303,6 @@ private:
     std::vector<int> freqsDfs;                       /* The support frequencys for DFS */
     SystemScanIntervalMode systemScanIntervalMode;   /* Store system scan data */
     PnoScanIntervalMode pnoScanIntervalMode;         /* Store pno scan data */
-    time_t staCurrentTime;                           /* Indicates the time when the STA enters the STA scenario */
     time_t customCurrentTime; /* Indicates the time when the STA enters the Customer-defined scenario */
     std::vector<SingleAppForbid> appForbidList; /* Store extern app scan data */
     /*
@@ -319,7 +318,6 @@ private:
     std::vector<std::string> scan_screen_off_trust_list;
     std::vector<std::string> scan_gps_block_list;
     std::vector<std::string> scan_hid2d_list;
-    int staSceneForbidCount;
     int customSceneForbidCount;
     mutable std::mutex scanConfigMapMutex;
     mutable std::mutex scanControlInfoMutex;
@@ -529,12 +527,6 @@ private:
      */
     bool IsMovingFreezeState(ScanMode appRunMode) const;
     /**
-     * @Description Set the moving freeze state to scanned.
-     *
-     * @param scanned - scanned flag.
-     */
-    void SetMovingFreezeScaned(bool scanned);
-    /**
      * @Description Whether scanned in moving freeze state.?
      *
      */
@@ -562,57 +554,6 @@ private:
      */
     int GetStaScene();
 
-    /**
-     * @Description Determine whether scanning is allowed and scan the control policy through thermal level.
-     *
-     * @return true - allow extern scan
-     * @return false - not allow extern scan
-     */
-    bool AllowExternScanByThermal();
-
-    /**
-     * @Description Determine whether scanning is allowed through power idel state.
-     *
-     * @return true - allow extern scan
-     * @return false - not allow extern scan
-     */
-    bool AllowExternScanByPowerIdelState();
-
-    /**
-     * @Description Determine whether navigation application's scanning is allowed through gnss state.
-     *
-     * @return true - allow extern scan
-     * @return false - not allow extern scan
-     */
-    bool AllowExternScanByGnssFixState();
-
-    /**
-     * @Description If app in the abnormal list, the scan of this app is not allowed.
-     *
-     * @return true - allow extern scan
-     * @return false - not allow extern scan
-     */
-    bool AllowExternScanByAbnormalApp();
-
-    /**
-     * @Description Determine whether scanning is allowed and scan the control policy through forbidMap.
-     *
-     * @param staScene scan scene
-     * @param scanMode scan mode
-     * @return true - allow extern scan
-     * @return false - not allow extern scan
-     */
-    bool AllowExternScanByForbid(int staScene, ScanMode scanMode);
-    /**
-     * @Description Determine whether scanning is allowed and scan the control policy through intervalMode.
-     *
-     * @param appId ID of the app to be scanned.
-     * @param staScene scan scene
-     * @param scanMode scan mode
-     * @return true - allow extern scan
-     * @return false - not allow extern scan
-     */
-    bool AllowExternScanByInterval(int appId, int staScene, ScanMode scanMode);
     /**
      * @Description Determines whether externally initiated scanning is being processed.
      *
@@ -690,14 +631,6 @@ private:
      */
     bool AllowScanDuringScanning(ScanMode scanMode) const;
     /**
-     * @Description Check whether the scan mode can be used during screen off under the forbid mode control.
-     *
-     * @param scanMode [in]
-     * @return true - success
-     * @return false  - failed
-     */
-    bool AllowScanDuringScreenOff(ScanMode scanMode) const;
-    /**
      * @Description
      *
      * @param staScene sta scan scene[in]
@@ -724,15 +657,6 @@ private:
      * @return false  - failed
      */
     bool AllowExternScanByIntervalMode(int appId, int scanScene, ScanMode scanMode);
-    /**
-     * @Description Check whether the scan mode can be used during custom scene under the interval mode control.
-     *
-     * @param appId App type for external requests to scan.[in]
-     * @param scanMode scna mode[in]
-     * @return true - success
-     * @return false  - failed
-     */
-    bool AllowExternScanByCustomScene(int appId, ScanMode scanMode);
 #ifdef SUPPORT_SCAN_CONTROL
     /**
      * @Description Determines whether to allow system scan based on scanInterval control mode.
@@ -875,16 +799,6 @@ private:
      * @return true: allow, false: not allowed.
      */
     bool AllowCustomSceneCheck(const std::map<int, time_t>::const_iterator &customIter, ScanMode scanMode);
-    /* *
-     * @Description all extern scan check at custom check.
-     *
-     * @param customIter custom iterator[in]
-     * @param appId app id[in]
-     * @param scanMode scene mode[in]
-     * @return true: allow, false: not allowed.
-     */
-    bool AllowExternCustomSceneCheck(const std::map<int, time_t>::const_iterator &customIter, int appId,
-        ScanMode scanMode);
     /* *
      * @Description Is app in the filter list.
      *

@@ -16,6 +16,7 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
+#include "wifi_log.h"
 #include "stub_collector.h"
 #include "wifi_native_define.h"
 

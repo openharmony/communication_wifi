@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef FEATURE_ENCRYPTION_SUPPORT
 #ifndef OHOS_WIFI_CONFIG_HKS_H
 #define OHOS_WIFI_CONFIG_HKS_H
+#if defined(FEATURE_ENCRYPTION_SUPPORT) || defined(SUPPORT_LOCAL_RANDOM_MAC)
 #include <string>
 #include <vector>
 #include "hks_api.h"
@@ -70,11 +70,11 @@ int32_t SetUpHks();
 
 /**
  * @Description  Generate new or get existed GCM-AES key based on input encryptionInfo and genParamSet
- * @param wifiEncryptionInfo  - keyAlias info
+ * @param keyAlias  - keyAlias info
  * @param genParamSet - generate params
  * @return HKS_SUCCESS - find key, others - find key failed
  */
-int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksParamSet *genParamSet);
+int32_t GetKeyByAlias(struct HksBlob *keyAlias, const struct HksParamSet *genParamSet);
 
 /**
  * @Description  Encrypt inputString using GCM-AES based on input encryptionInfo
@@ -132,6 +132,16 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
  */
 int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const EncryptedData &encryptedData,
     std::string &decryptedData);
+
+/**
+ * @Description  Generate MacRandomization Secret
+ * @param keyName - keyAlias name
+ * @param data  - data for hmac sha256
+ * @param outPlant - hashed vector
+ * @return HKS_SUCCESS - hmac sha256 success, others - failed
+ */
+int32_t WifiGenerateMacRandomizationSecret(const std::string &keyName,
+    const std::string &data, std::vector<uint8_t> &outPlant);
 }
 }
 #endif

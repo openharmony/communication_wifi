@@ -40,6 +40,7 @@
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
+#include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -1640,6 +1641,10 @@ bool ComparedHinlinkKeymgmt(const std::string scanInfoKeymgmt, const std::string
 
 ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfig, std::string &currentMac)
 {
+#ifndef SUPPORT_LOCAL_RANDOM_MAC
+    WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
+    return WIFI_OPT_SUCCESS;
+#else
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
@@ -1665,7 +1670,16 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
         if (randomMacInfo.randomMac.empty()) {
             /* Sets the MAC address of WifiSettings. */
             std::string macAddress;
-            WifiConfigCenter::GetInstance().GenerateRandomMacAddress(macAddress);
+            std::string deviceConfigKey = randomMacInfo.ssid + randomMacInfo.keyMgmt;
+            int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+            if (ret != 0) {
+                ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+            }
+            if (ret != 0) {
+                WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
+                    "Using locally generated MAC address instead.", __func__);
+                WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+            }
             randomMacInfo.randomMac = macAddress;
             LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
                 __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
@@ -1681,6 +1695,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
     WIFI_LOGI("EnableHiLinkHandshake mac address get success, mac = %{public}s", MacAnonymize(currentMac).c_str());
 
     return WIFI_OPT_SUCCESS;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)

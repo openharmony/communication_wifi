@@ -16,7 +16,7 @@
 #define OHOS_IENHANCE_SERVICE_H
 
 #include "wifi_errcode.h"
-#include "wifi_scan_msg.h"
+#include "wifi_scan_control_msg.h"
 #include "wifi_msg.h"
 
 namespace OHOS {
@@ -87,6 +87,14 @@ public:
      * @return true: conncted, false: not conncted
      */
     virtual bool CheckChbaConncted() = 0;
+
+    /**
+     * @Description Is external scan allowed.
+     *
+     * @param scanDeviceInfo - scan device info
+     * @return true: allowed, false: not allowed
+     */
+    virtual bool IsScanAllowed(WifiScanDeviceInfo &scanDeviceInfo) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

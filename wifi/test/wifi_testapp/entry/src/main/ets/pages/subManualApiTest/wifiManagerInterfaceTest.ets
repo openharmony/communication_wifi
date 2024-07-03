@@ -48,6 +48,7 @@ interface wifiDeviceConfigManager {
 
 @Component
 struct WifiManagerDeviceSetting {
+  @StorageLink('isAllowed') isAllowed: number = 1;
   @StorageLink('w_networkIdM') w_networkIdM: number = 0; // id,netId,networkId是一个值嘛？
   @StorageLink('w_featureIdM') w_featureIdM: number = 1;
   @StorageLink('wifiDeviceConfigManager') wifiDeviceConfigManager: wifiManager.WifiDeviceConfig = {
@@ -76,6 +77,24 @@ struct WifiManagerDeviceSetting {
 
   build() {
     Column() {
+      Row() {
+        Text("SetScanAlwaysAllowed:").fontSize("17vp").width(200)
+        TextInput({ text : this.isAllowed.toString() , placeholder : "1" })
+          .fontSize("15vp")
+          .onChange((strInput: string) => {
+            //判断合法性
+            if ( strInput.length >= 1 ) {
+              this.isAllowed = Number(strInput);
+            }
+          })
+          .width(ConfigData.WH_50_100)
+          .borderRadius(1)
+      }
+      .backgroundColor($r("app.color.moon"))
+      .padding(5)
+      .justifyContent(FlexAlign.Start)
+      .alignItems(VerticalAlign.Center)
+
       Row() {
         Text("ssidM:").fontSize("17vp").width(70)
         TextInput({ text : this.wifiDeviceConfigManager.ssid , placeholder : "TP-LINK_6365" })
@@ -396,6 +415,7 @@ struct WifiManagerInterfaceTest {
   @State message: string = "";
   @State deviceId: string = '';
   @State currentClick: number = - 1;
+  @StorageLink('isAllowed') isAllowed: number = 1;
   @StorageLink('pairedSsidM') pairedSsidM: string = "";
   @StorageLink('w_networkIdM') w_networkIdM: number = 0;
   @StorageLink('w_featureIdM') w_featureIdM: number = 1;

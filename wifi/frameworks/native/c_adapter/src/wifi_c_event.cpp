@@ -165,7 +165,7 @@ NO_SANITIZE("cfi") void WifiCHotspotEventCallback::OnHotspotStateChanged(int sta
             std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
             if (EventManager::g_wifiEvent.OnHotspotStateChanged) {
                 EventManager::g_wifiEvent.OnHotspotStateChanged(state);
-            }   
+            }
         } );
     }
 }

@@ -585,7 +585,7 @@ void WifiDeviceStub::SendBigConfig(int contentSize, std::vector<WifiDeviceConfig
         bigDataStream << result[i].status << ";";
         bigDataStream << result[i].bssid << ";";
         bigDataStream << result[i].bssidType << ";";
-        bigDataStream << result[i].ssid << ";";
+        bigDataStream << StringToHex(result[i].ssid) << ";";
         bigDataStream << result[i].band << ";";
         bigDataStream << result[i].channel << ";";
         bigDataStream << result[i].frequency << ";";

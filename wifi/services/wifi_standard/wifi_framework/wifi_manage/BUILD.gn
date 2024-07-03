@@ -299,7 +299,9 @@ if (defined(ohos_lite)) {
     if (wifi_feature_sta_ap_exclusion) {
       defines += [ "FEATURE_STA_AP_EXCLUSION" ]
     }
-
+    if (wifi_feature_with_local_random_mac) {
+      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
+    }
     deps = [
       ":wifi_manager_service",
       "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
@@ -525,7 +527,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
       "time_service:time_client",
     ]
-    if (wifi_feature_with_encryption) {
+    if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
       external_deps += [ "huks:libhukssdk" ]
     }
     defines = [

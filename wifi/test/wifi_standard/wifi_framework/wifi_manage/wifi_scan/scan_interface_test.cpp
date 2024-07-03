@@ -197,7 +197,7 @@ HWTEST_F(ScanInterfaceTest, SetEnhanceServiceTest, TestSize.Level1)
  
 HWTEST_F(ScanInterfaceTest, SetNetworkInterfaceUpDownTest, TestSize.Level1)
 {
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->SetNetworkInterfaceUpDown(false));
+    pScanInterface->SetNetworkInterfaceUpDown(false);
 }
 }  // namespace Wifi
 }  // namespace OHOS

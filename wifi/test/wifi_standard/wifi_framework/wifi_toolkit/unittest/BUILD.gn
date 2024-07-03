@@ -50,6 +50,7 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_cert_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_encryption_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_randommac_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/xml_parser.cpp",
     "../../wifi_manage/wifi_sta/Mock/mock_dhcp_service.cpp",
     "arp_checker_test.cpp",
@@ -70,6 +71,7 @@ ohos_unittest("toolkit_unittest") {
     "wifi_global_func_test.cpp",
     "wifi_ip_tools_test.cpp",
     "wifi_log_helper_test.cpp",
+    "wifi_randommac_helper_test.cpp",
     "wifi_settings_test.cpp",
     "xml_parser_test.cpp",
   ]
@@ -129,9 +131,14 @@ ohos_unittest("toolkit_unittest") {
     "libxml2:libxml2",
     "netstack:http_client",
   ]
-  if (wifi_feature_with_encryption) {
+  if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
     external_deps += [ "huks:libhukssdk" ]
+  }
+  if (wifi_feature_with_encryption) {
     defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
+  }
+  if (wifi_feature_with_local_random_mac) {
+    defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
   }
   defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   configs = [ ":module_private_config" ]

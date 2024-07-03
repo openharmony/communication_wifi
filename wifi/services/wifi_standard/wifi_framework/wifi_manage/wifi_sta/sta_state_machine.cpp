@@ -31,6 +31,7 @@
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #include "block_connect_service.h"
+#include "wifi_randommac_helper.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
 #include "securec.h"
@@ -1882,15 +1883,15 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
         LOGE("SetRandomMac : GetDeviceConfig failed!");
         return false;
     }
-    std::string lastMac;
     std::string currentMac;
+    std::string realMac;
+    WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
+    LOGD("%{public}s realMac is %{public}s", __func__, MacAnonymize(realMac).c_str());
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
-        LOGI("%{public}s randommac, use factory mac to connect", __func__);
-        WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
+        currentMac = realMac;
     } else {
         WifiStoreRandomMac randomMacInfo;
         InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
-
         if (randomMacInfo.peerBssid.empty()) {
             LOGE("scanInfo has no target wifi and bssid is empty!");
             return false;
@@ -1898,13 +1899,22 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
         LOGI("%{public}s randommac, ssid:%{public}s keyMgmt:%{public}s macAddress:%{public}s",
             __func__, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
             MacAnonymize(deviceConfig.macAddress).c_str());
-        if (deviceConfig.macAddress.empty()) {
+        if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
             WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-            if (!randomMacInfo.randomMac.empty()) {
+            if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
                 currentMac = randomMacInfo.randomMac;
             } else {
                 std::string macAddress;
-                WifiConfigCenter::GetInstance().GenerateRandomMacAddress(macAddress);
+                std::string deviceConfigKey = deviceConfig.ssid + deviceConfig.keyMgmt;
+                int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+                if (ret != 0) {
+                    ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+                }
+                if (ret != 0) {
+                    WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
+                        "Using locally generated MAC address instead.", __func__);
+                    WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+                }
                 randomMacInfo.randomMac = macAddress;
                 currentMac = randomMacInfo.randomMac;
                 LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
@@ -1920,14 +1930,13 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             currentMac = deviceConfig.macAddress;
         }
     }
-
+    std::string lastMac;
     if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac)) != WIFI_HAL_OPT_OK) {
         LOGE("%{public}s randommac, GetStaDeviceMacAddress failed!", __func__);
         return false;
     }
-
-    LOGI("%{public}s, randommac, use random mac to connect, currentMac:%{public}s, lastMac:%{public}s",
-        __func__, MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
+    LOGI("%{public}s, randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}s", __func__,
+        realMac == currentMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     if (MacAddress::IsValidMac(currentMac.c_str())) {
         if (lastMac != currentMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
@@ -1967,7 +1976,6 @@ bool StaStateMachine::IsRoaming(void)
 
 void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 {
-    mIsWifiInternetCHRFlag = false;
     InternalMessage *msg = CreateMessage();
     if (msg == nullptr) {
         LOGE("msg is nullptr.\n");
@@ -1983,6 +1991,7 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 void StaStateMachine::OnNetworkDisconnectEvent(int reason)
 {
     mIsWifiInternetCHRFlag = false;
+    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     WriteWifiAbnormalDisconnectHiSysEvent(reason);
 }
 
@@ -3088,6 +3097,8 @@ void StaStateMachine::HandlePortalNetworkPorcess()
 void StaStateMachine::SetPortalBrowserFlag(bool flag)
 {
     portalFlag = flag;
+    mIsWifiInternetCHRFlag = false;
+    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     if (!flag) {
         portalState = PortalState::UNCHECKED;
     }
@@ -3201,6 +3212,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         WriteIsInternetHiSysEvent(NETWORK);
         WritePortalStateHiSysEvent(portalFlag ? HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED
                                               : HISYS_EVENT_PROTAL_STATE_NOT_PORTAL);
+        WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
@@ -3234,11 +3246,12 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
         if (!mIsWifiInternetCHRFlag &&
-            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL)) {
+            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL) &&
+            WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered()) {
             const int httpOpt = 1;
             WriteWifiAccessIntFailedHiSysEvent(httpOpt, StaDnsState::DNS_STATE_UNREACHABLE);
+            mIsWifiInternetCHRFlag = true;
         }
-        mIsWifiInternetCHRFlag = true;
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
@@ -3359,6 +3372,32 @@ void StaStateMachine::DealApRoamingStateTimeout(InternalMessage *msg)
     DisConnectProcess();
 }
 
+void StaStateMachine::HilinkSetMacAddress(std::string &cmd)
+{
+    std::string::size_type begPos = 0;
+    if ((begPos = cmd.find("=")) == std::string::npos) {
+        WIFI_LOGI("HilinkSetMacAddress() cmd not find =");
+        return;
+    }
+    std::string macAddress = cmd.substr(begPos + 1);
+    if (macAddress.empty()) {
+        WIFI_LOGI("HilinkSetMacAddress() macAddress is empty");
+        return;
+    }
+
+    m_hilinkDeviceConfig.macAddress = macAddress;
+    WifiConfigCenter::GetInstance().SetMacAddress(macAddress, m_instId);
+    std::string realMacAddress = "";
+
+    WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
+    m_hilinkDeviceConfig.wifiPrivacySetting = (macAddress == realMacAddress ?
+        WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC);
+    WIFI_LOGI("HilinkSetMacAddress() wifiPrivacySetting= %{public}d realMacAddress= %{public}s",
+        m_hilinkDeviceConfig.wifiPrivacySetting, MacAnonymize(realMacAddress).c_str());
+
+    return;
+}
+
 void StaStateMachine::DealHiLinkDataToWpa(InternalMessage *msg)
 {
     if (msg == nullptr) {
@@ -3378,10 +3417,11 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessage *msg)
             break;
         }
         case WIFI_SVR_COM_STA_HILINK_DELIVER_MAC: {
-            std::string mac;
-            msg->GetMessageObj(mac);
-            LOGI("DealHiLinkMacDeliver start shell cmd, mac = %{public}s", MacAnonymize(mac).c_str());
-            WifiStaHalInterface::GetInstance().ShellCmd("wlan0", mac);
+            std::string cmd;
+            msg->GetMessageObj(cmd);
+            HilinkSetMacAddress(cmd);
+            LOGI("DealHiLinkMacDeliver start shell cmd, cmd = %{public}s", MacAnonymize(cmd).c_str());
+            WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd);
             break;
         }
         case WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS: {

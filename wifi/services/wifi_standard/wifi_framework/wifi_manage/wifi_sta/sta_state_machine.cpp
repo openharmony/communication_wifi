@@ -3620,6 +3620,8 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     SetWifiLinkedInfo(targetNetworkId);
     StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
+    InternalMessage *signalPollMsg = CreateMessage();
+    DealSignalPollResult(signalPollMsg);
     SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
 }
 

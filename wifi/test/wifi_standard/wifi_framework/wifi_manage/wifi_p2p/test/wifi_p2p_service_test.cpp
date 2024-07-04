@@ -20,6 +20,8 @@
 #include "wifi_p2p_msg.h"
 #include "wifi_p2p_service.h"
 #include "wifi_config_center.h"
+#include "wifi_country_code_manager.h"
+#include "wifi_country_code_manager.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;

@@ -489,5 +489,6 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdConnectFailed, TestSize.Level1)
     msg.SetParam1(0);
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
+
 } // namespace Wifi
 } // namespace OHOS

@@ -51,8 +51,6 @@ public:
 
 class WifiConfigCenter : public MockWifiConfigCenter {
 public:
-    WifiConfigCenter() = default;
-    ~WifiConfigCenter() = default;
     static WifiConfigCenter &GetInstance(void);
     MOCK_METHOD1(GetScanMidState, WifiOprMidState(int instId));
     MOCK_METHOD2(SetScanMidState, void(WifiOprMidState state, int instId));

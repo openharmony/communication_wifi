@@ -200,8 +200,6 @@ public:
 
 class WifiSettings : public MockWifiSettings {
 public:
-    WifiSettings() = default;
-    ~WifiSettings() = default;
     static WifiSettings &GetInstance(void);
     MOCK_METHOD2(SetWifiState, int(int state, int));
     MOCK_METHOD1(AddDeviceConfig, int(const WifiDeviceConfig &config));

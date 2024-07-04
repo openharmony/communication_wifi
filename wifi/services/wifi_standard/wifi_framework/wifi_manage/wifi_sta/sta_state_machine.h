@@ -307,6 +307,7 @@ public:
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
+        bool IsPublicESS();
         StaStateMachine *pStaStateMachine;
     };
     /**

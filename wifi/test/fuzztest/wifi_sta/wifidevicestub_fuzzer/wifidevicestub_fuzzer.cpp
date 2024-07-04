@@ -741,7 +741,6 @@ void WifiDeviceServiceImplTest(const uint8_t* data, size_t size)
     config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
     config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
 
-    mWifiDeviceServiceImpl.StartWatchdog();
     mWifiDeviceServiceImpl.DeregisterAutoJoinCondition(networkName);
     mWifiDeviceServiceImpl.DeregisterFilterBuilder(filterTag, networkName);
     mWifiDeviceServiceImpl.RegisterAutoJoinCondition(networkName, WifiFuzzTest);

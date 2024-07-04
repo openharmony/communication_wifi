@@ -25,7 +25,7 @@ class WifiEventHandler {
 public:
     using Callback = std::function<void()>;
 
-    explicit WifiEventHandler(const std::string &threadName);
+    explicit WifiEventHandler(const std::string &threadName, const Callback &timeOutFunc = nullptr);
     ~WifiEventHandler();
 /**
  * @submit sync task to Handler

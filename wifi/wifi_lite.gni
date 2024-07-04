@@ -39,10 +39,6 @@ memory_optimization_cflags_cc = [
   "-fvisibility-inlines-hidden",
   "-fdata-sections",
   "-ffunction-sections",
-  "-fno-unroll-loops",
-  "-fno-unwind-tables",
-  "-fno-asynchronous-unwind-tables",
-  "-g0",
   "-Os",
 ]
 

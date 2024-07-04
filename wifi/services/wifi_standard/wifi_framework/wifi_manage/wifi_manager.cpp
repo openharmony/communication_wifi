@@ -18,6 +18,7 @@
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
 #include "wifi_global_func.h"
+#include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
@@ -370,6 +371,7 @@ void WifiManager::AutoStartServiceThread()
 {
     WIFI_LOGI("Auto start service...");
     CheckAndStartSta();
+    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
 }
 
 void WifiManager::InitPidfile()

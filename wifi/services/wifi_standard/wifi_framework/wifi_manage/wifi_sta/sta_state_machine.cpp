@@ -1208,8 +1208,6 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
     ConnectToNetworkProcess(bssid);
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
-    StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
-
     if (wpsState != SetupMethod::INVALID) {
         wpsState = SetupMethod::INVALID;
     }

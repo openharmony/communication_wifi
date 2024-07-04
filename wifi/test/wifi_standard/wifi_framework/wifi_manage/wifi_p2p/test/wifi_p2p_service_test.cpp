@@ -21,7 +21,6 @@
 #include "wifi_p2p_service.h"
 #include "wifi_config_center.h"
 #include "wifi_country_code_manager.h"
-#include "wifi_country_code_manager.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
@@ -236,6 +235,157 @@ HWTEST_F(WifiP2pServiceTest, HiD2dSharedLinkTest, TestSize.Level1)
     EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
     pWifiP2pService->DecreaseSharedLink(callingUid);
     EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count);
+}
+
+
+HWTEST_F(WifiP2pServiceTest, GetCurrentGroupTest001, TestSize.Level1)
+{
+    WifiP2pLinkedInfo p2pInfo;
+    p2pInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiP2pGroupInfo group;
+    EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, Hid2dConnectTest001, TestSize.Level1)
+{
+    Hid2dConnectConfig config;
+    config.SetDhcpMode(DhcpMode::CONNECT_GO_NODHCP);
+    EXPECT_EQ(pWifiP2pService->Hid2dConnect(config), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, Hid2dConnectTest002, TestSize.Level1)
+{
+    Hid2dConnectConfig config;
+    config.SetDhcpMode(DhcpMode::CONNECT_AP_NODHCP);
+    EXPECT_EQ(pWifiP2pService->Hid2dConnect(config), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, Hid2dConnectTest003, TestSize.Level1)
+{
+    Hid2dConnectConfig config;
+    config.SetDhcpMode(DhcpMode::CONNECT_AP_DHCP);
+    EXPECT_EQ(pWifiP2pService->Hid2dConnect(config), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, Hid2dRequestGcIpTest001, TestSize.Level1)
+{
+    std::string deviceName("TestName");
+    std::string strIpAddr;
+
+    WifiP2pLinkedInfo p2pInfo;
+    p2pInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiP2pGroupInfo group;
+    EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_FAILED);
+    EXPECT_EQ(pWifiP2pService->Hid2dRequestGcIp(deviceName, strIpAddr), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, Hid2dRequestGcIpTest002, TestSize.Level1)
+{
+    std::string deviceName("TestName");
+    std::string strIpAddr;
+
+    WifiP2pLinkedInfo p2pInfo;
+    p2pInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiP2pGroupInfo group;
+    EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_SUCCESS);
+    EXPECT_EQ(pWifiP2pService->Hid2dRequestGcIp(deviceName, strIpAddr), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest001, TestSize.Level1)
+{
+    int systemAbilityId = 0;
+    int count = pWifiP2pService->GetSharedLinkCount();
+    int callingUid = 0;
+    pWifiP2pService->IncreaseSharedLink(callingUid);
+    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
+    EXPECT_EQ(pWifiP2pService->HandleBusinessSAException(systemAbilityId), ErrCode::WIFI_OPT_INVALID_PARAM);
+}
+
+HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest002, TestSize.Level1)
+{
+    int systemAbilityId = 1;
+    int count = pWifiP2pService->GetSharedLinkCount();
+    int callingUid = 0;
+    pWifiP2pService->IncreaseSharedLink(callingUid);
+    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
+    EXPECT_EQ(pWifiP2pService->HandleBusinessSAException(systemAbilityId), ErrCode::WIFI_OPT_INVALID_PARAM);
+}
+
+HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest003, TestSize.Level1)
+{
+    int systemAbilityId = 4700;
+    int count = pWifiP2pService->GetSharedLinkCount();
+    int callingUid = 0;
+    pWifiP2pService->IncreaseSharedLink(callingUid);
+    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
+    EXPECT_EQ(pWifiP2pService->HandleBusinessSAException(systemAbilityId), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, QueryP2pLocalDeviceTest001, TestSize.Level1)
+{
+    WifiP2pDevice device;
+    EXPECT_EQ(pWifiP2pService->QueryP2pLocalDevice(device), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, RegisterP2pServiceCallbacksTest001, TestSize.Level1)
+{
+    IP2pServiceCallbacks callback;
+    EXPECT_EQ(pWifiP2pService->RegisterP2pServiceCallbacks(callback), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, UnRegisterP2pServiceCallbacksTest001, TestSize.Level1)
+{
+    IP2pServiceCallbacks callback;
+    EXPECT_EQ(pWifiP2pService->UnRegisterP2pServiceCallbacks(callback), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, Hid2dCreateGroupTest001, TestSize.Level1)
+{
+    const int frequency = 1;
+    FreqType type = FreqType::FREQUENCY_160M;
+    EXPECT_EQ(pWifiP2pService->Hid2dCreateGroup(frequency, type), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, Hid2dGetSelfWifiCfgInfoTest001, TestSize.Level1)
+{
+    SelfCfgType cfgType = SelfCfgType::TYPE_OF_GET_SELF_CONFIG;
+    char cfgData[255] = {0};
+    int getDatValidLen = 1;
+    EXPECT_EQ(pWifiP2pService->Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, &getDatValidLen), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, Hid2dSetPeerWifiCfgInfoTest001, TestSize.Level1)
+{
+    PeerCfgType cfgType = PeerCfgType::TYPE_OF_SET_PEER_CONFIG;
+    char cfgData[255] = {0};
+    int setDataValidLen = 0;
+    EXPECT_EQ(pWifiP2pService->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, SetGroupUidTest001, TestSize.Level1)
+{
+    int callingUid = 1;
+    pWifiP2pService->SetGroupUid(callingUid);
+}
+
+HWTEST_F(WifiP2pServiceTest, MonitorCfgChangeTest001, TestSize.Level1)
+{
+    EXPECT_EQ(pWifiP2pService->MonitorCfgChange(), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, DiscoverPeersTest001, TestSize.Level1)
+{
+    int32_t channelid = 0;
+    EXPECT_EQ(pWifiP2pService->DiscoverPeers(channelid), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, DisableRandomMacTest001, TestSize.Level1)
+{
+    int setmode = 0;
+    EXPECT_EQ(pWifiP2pService->DisableRandomMac(setmode), ErrCode::WIFI_OPT_SUCCESS);
 }
 }  // namespace Wifi
 }  // namespace OHOS

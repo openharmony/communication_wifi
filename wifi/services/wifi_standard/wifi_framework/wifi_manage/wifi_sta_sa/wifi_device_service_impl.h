@@ -44,7 +44,6 @@ public:
     void OnStop();
 #else
     explicit WifiDeviceServiceImpl(int instId);
-    static void StartWatchdog(void);
     static ErrCode OnBackup(MessageParcel& data, MessageParcel& reply);
     static ErrCode OnRestore(MessageParcel& data, MessageParcel& reply);
 #endif

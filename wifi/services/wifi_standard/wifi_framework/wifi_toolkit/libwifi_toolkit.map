@@ -73,6 +73,7 @@
         "*WifiBackupConfig*";
         "*WifiConfigCenter*";
         "*WifiScanConfig*";
+        "*WifiCodeConvert*";
     local:
         *;
 };

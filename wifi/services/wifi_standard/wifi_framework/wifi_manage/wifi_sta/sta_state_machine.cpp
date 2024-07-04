@@ -3619,8 +3619,7 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     lastLinkedInfo.macAddress = deviceConfig.macAddress;
     lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     SetWifiLinkedInfo(targetNetworkId);
-    InternalMessage *signalPollMsg = CreateMessage();
-    DealSignalPollResult(signalPollMsg);
+    DealSignalPollResult(CreateMessage());
     SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
 }
 

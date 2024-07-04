@@ -365,12 +365,6 @@ HWTEST_F(WifiP2pServiceTest, Hid2dSetPeerWifiCfgInfoTest001, TestSize.Level1)
     EXPECT_EQ(pWifiP2pService->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen), ErrCode::WIFI_OPT_SUCCESS);
 }
 
-HWTEST_F(WifiP2pServiceTest, SetGroupUidTest001, TestSize.Level1)
-{
-    int callingUid = 1;
-    pWifiP2pService->SetGroupUid(callingUid);
-}
-
 HWTEST_F(WifiP2pServiceTest, MonitorCfgChangeTest001, TestSize.Level1)
 {
     EXPECT_EQ(pWifiP2pService->MonitorCfgChange(), ErrCode::WIFI_OPT_SUCCESS);

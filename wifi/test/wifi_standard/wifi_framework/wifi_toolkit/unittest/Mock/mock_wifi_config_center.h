@@ -28,6 +28,8 @@ public:
     virtual ~MockWifiConfigCenter() = default;
     virtual void SetWifiSelfcureReset(const bool isReset) = 0;
     virtual bool GetWifiSelfcureReset() = 0;
+    virtual void SetWifiSelfcureResetEntered(const bool isReset) = 0;
+    virtual bool GetWifiSelfcureResetEntered() = 0;
     virtual void SetLastNetworkId(const int networkId) = 0;
     virtual int GetLastNetworkId() const = 0;
     virtual void SetWifiAllowSemiActive(bool isAllowed) = 0;
@@ -108,6 +110,8 @@ public:
 
     MOCK_METHOD1(SetWifiSelfcureReset, void(const bool isReset));
     MOCK_METHOD0(GetWifiSelfcureReset, bool());
+    MOCK_METHOD1(SetWifiSelfcureResetEntered, void(const bool isReset));
+    MOCK_METHOD0(GetWifiSelfcureResetEntered, bool());
     MOCK_METHOD1(SetLastNetworkId, void(const int networkId));
     MOCK_CONST_METHOD0(GetLastNetworkId, int());
     MOCK_METHOD1(SetWifiAllowSemiActive, void(bool isAllowed));

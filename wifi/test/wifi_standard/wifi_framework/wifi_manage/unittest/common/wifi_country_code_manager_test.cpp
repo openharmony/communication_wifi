@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
+#include "mock_wifi_settings.h"
 #include "wifi_log.h"
 #include "wifi_logger.h"
 #include "wifi_internal_msg.h"
@@ -26,8 +27,6 @@
 #include "state_machine.h"
 #include "i_ap_service_callbacks.h"
 #include "sta_service_callback.h"
-#include "mock_wifi_config_center.h"
-#include "mock_wifi_settings.h"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -90,10 +89,35 @@ public:
     MockStateMachine *m_mockStateMachine;
 };
 
+HWTEST_F(WifiCountryCodeManagerTest, GetInstanceTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetInstanceTest enter");
+    WifiCountryCodeManager::GetInstance();
+}
+
 HWTEST_F(WifiCountryCodeManagerTest, InitTest, TestSize.Level1)
 {
     WIFI_LOGI("InitTest enter");
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WifiCountryCodeManager::GetInstance().Init());
+}
+
+HWTEST_F(WifiCountryCodeManagerTest, GetStaCallbackTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetStaCallbackTest enter");
+    WifiCountryCodeManager::GetInstance().GetStaCallback();
+}
+
+HWTEST_F(WifiCountryCodeManagerTest, GetApCallbackTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetApCallbackTest enter");
+    WifiCountryCodeManager::GetInstance().GetApCallback();
+}
+
+HWTEST_F(WifiCountryCodeManagerTest, GetWifiCountryCodeTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetWifiCountryCodeTest enter");
+    std::string code = "CN";
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(code);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, SetWifiCountryCodeFromExternalSuccessTest, TestSize.Level1)
@@ -103,10 +127,43 @@ HWTEST_F(WifiCountryCodeManagerTest, SetWifiCountryCodeFromExternalSuccessTest, 
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal(code));
 }
 
+HWTEST_F(WifiCountryCodeManagerTest, IsAllowUpdateWifiCountryCodeTest, TestSize.Level1)
+{
+    WIFI_LOGI("IsAllowUpdateWifiCountryCodeTest enter");
+    WifiCountryCodeManager::GetInstance().m_isFirstConnected = true;
+    EXPECT_TRUE(WifiCountryCodeManager::GetInstance().IsAllowUpdateWifiCountryCode());
+
+    std::map <int, WifiLinkedInfo> tempInfos;
+    WifiLinkedInfo info1;
+    info1.connState = ConnState::CONNECTED;
+    tempInfos.emplace(1, info1);
+    WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
+    EXPECT_FALSE(WifiCountryCodeManager::GetInstance().IsAllowUpdateWifiCountryCode());
+}
+
 HWTEST_F(WifiCountryCodeManagerTest, UpdateWifiCountryCodeTest, TestSize.Level1)
 {
     WIFI_LOGI("UpdateWifiCountryCodeTest enter");
+
+    std::map <int, WifiLinkedInfo> tempInfos;
+    WifiLinkedInfo info1;
+    info1.connState = ConnState::CONNECTED;
+    tempInfos.emplace(1, info1);
+    WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
+    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode());
+
+    WifiCountryCodeManager::GetInstance().m_isFirstConnected = true;
+    std::string tempCode = "CN";
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode(tempCode));
+
+    WifiCountryCodeManager::GetInstance().m_isFirstConnected = true;
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode());
+
+    WifiCountryCodeManager::GetInstance().m_isFirstConnected = true;
+    WifiCountryCodeManager::GetInstance().m_wifiCountryCodePolicy->m_policyList.clear();
+    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode());
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, NotifyWifiCountryCodeChangeListenersTest, TestSize.Level1)
@@ -150,72 +207,58 @@ HWTEST_F(WifiCountryCodeManagerTest, UnregisterWifiCountryCodeChangeListenerFail
 HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaOpenResTest enter");
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
-    StaServiceCallback cbk = WifiCountryCodeManager::GetInstance().GetStaCallback();
-    sleep(1);
-    ASSERT_TRUE(cbk.OnStaOpenRes != nullptr);
-    cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_FAILED, 0);
-    sleep(1);
-    cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_OPENING, 0);
-    sleep(1);
-    cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED, 0);
-    sleep(1);
-    cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED, 0);
-    sleep(1);
-    cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_DISABLED, 0);
-    sleep(2);
+    std::map <int, WifiLinkedInfo> tempInfos;
+    WifiLinkedInfo info1;
+    info1.connState = ConnState::CONNECTED;
+    tempInfos.emplace(1, info1);
+    WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetLastAirplaneMode(_, _)).WillRepeatedly(Return(1));
+    WifiCountryCodeManager::GetInstance().DealStaOpened(0);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, DealStaCloseResTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaCloseResTest enter");
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
-    StaServiceCallback cbk = WifiCountryCodeManager::GetInstance().GetStaCallback();
-    sleep(1);
-    ASSERT_TRUE(cbk.OnStaOpenRes != nullptr);
-    ASSERT_TRUE(cbk.OnStaCloseRes != nullptr);
-    cbk.OnStaOpenRes(OperateResState::OPEN_WIFI_SUCCEED, 0);
-    cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_CLOSING, 0);
-    cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, 0);
-    cbk.OnStaCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, 0);
-    sleep(2);
+    EXPECT_CALL(WifiSettings::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SetLastAirplaneMode(_, _)).WillRepeatedly(Return(1));
+    WifiCountryCodeManager::GetInstance().DealStaStopped(0);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, DealStaConnChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaConnChangedTest enter");
-    StaServiceCallback cbk = WifiCountryCodeManager::GetInstance().GetStaCallback();
-    sleep(1);
-    ASSERT_TRUE(cbk.OnStaConnChanged != nullptr);
     WifiLinkedInfo info;
-    cbk.OnStaConnChanged(OperateResState::CONNECT_CONNECTING, info, 0);
-    sleep(1);
-    cbk.OnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
-    sleep(1);
-    cbk.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, info, 0);
-    sleep(1);
-    cbk.OnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
-    sleep(2);
+    WifiCountryCodeManager::GetInstance().DealStaConnChanged(OperateResState::CONNECT_CONNECTING, info, 0);
+    WifiCountryCodeManager::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
+    WifiCountryCodeManager::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, info, 0);
+    WifiCountryCodeManager::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, DealApStateChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealApStateChangedTest enter");
-    IApServiceCallbacks cbk = WifiCountryCodeManager::GetInstance().GetApCallback();
-    sleep(1);
-    ASSERT_TRUE(cbk.OnApStateChangedEvent != nullptr);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTING, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTED, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSING, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSED, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_IDLE, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_NONE, 0);
-    sleep(2);
+    std::map <int, WifiLinkedInfo> tempInfos;
+    WifiLinkedInfo info1;
+    info1.connState = ConnState::CONNECTED;
+    tempInfos.emplace(1, info1);
+    WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_STARTING, 0);
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_STARTED, 0);
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_CLOSING, 0);
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_CLOSED, 0);
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_IDLE, 0);
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_NONE, 0);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, UpdateWifiCountryCodeCacheSuccessTest, TestSize.Level1)
 {
     WIFI_LOGI("UpdateWifiCountryCodeCacheSuccessTest enter");
+    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED,
+        WifiCountryCodeManager::GetInstance().UpdateWifiCountryCodeCache(""));
+
     std::string code = "CN";
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS,
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCodeCache(code));

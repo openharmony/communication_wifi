@@ -18,11 +18,13 @@
 #include <cstdint>
 #include "securec.h"
 #include "wifi_manager.h"
-#include "wifi_config_center.h"
 #include "wifi_service_manager.h"
 #include "wifi_logger.h"
 #include "wifi_datashare_utils.h"
 #include "common_event_support.h"
+#include "wifi_msg.h"
+#include "mock_wifi_config_center.h"
+#include "mock_wifi_settings.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -75,6 +77,13 @@ HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, StaManagerDealStaOpenResTest_001, TestSize.Level1)
 {
     WIFI_LOGI("StaManagerDealStaOpenResTest_001 enter!");
+
+    std::map <int, WifiLinkedInfo> tempInfos;
+    WifiLinkedInfo info1;
+    info1.connState = ConnState::CONNECTED;
+    tempInfos.emplace(1, info1);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
+
     wifiManager.wifiStaManager->DealStaOpened(0);
 }
 
@@ -93,6 +102,14 @@ HWTEST_F(WifiManagerTest, ResetSelfcureOpenWifiTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaConnChangedTest enter!");
+
+    // Add simulated wifi connection results
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = OHOS::Wifi::ConnState::CONNECTED;
+    wifiLinkedInfo.bssid = "11:22:33:44:55:66";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
     WifiLinkedInfo info;
     info.connState = ConnState::AUTHENTICATING;
     wifiManager.wifiStaManager->DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info);
@@ -137,14 +154,16 @@ HWTEST_F(WifiManagerTest, StartUnloadScanSaTimerTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)
 {
     WIFI_LOGI("CheckAndStartScanService_001 enter!");
-    WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::RUNNING);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanMidState(_))
+        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
     wifiManager.wifiScanManager->CheckAndStartScanService();
 }
 
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_002, TestSize.Level1)
 {
     WIFI_LOGI("CheckAndStartScanService_002 enter!");
-    WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::CLOSED);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanMidState(_))
+        .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
     wifiManager.wifiScanManager->CheckAndStartScanService();
 }
 
@@ -158,7 +177,8 @@ HWTEST_F(WifiManagerTest, DealScanInfoNotifyTest, TestSize.Level1)
 {
     WIFI_LOGI("DealScanInfoNotifyTest enter!");
     std::vector<InterScanInfo> results;
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiMidState(_))
+        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
     wifiManager.wifiScanManager->DealScanInfoNotify(results);
 }
 
@@ -184,32 +204,39 @@ HWTEST_F(WifiManagerTest, DealApGetStaLeaveTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, AutoStartP2pService_001, TestSize.Level1)
 {
     WIFI_LOGI("AutoStartP2pService_001 enter!");
-    WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSING);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
+        .WillOnce(DoAll(Return(WifiOprMidState::CLOSING)));
     EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_OPEN_FAIL_WHEN_CLOSING);
-    WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::RUNNING);
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
+        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
     EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_OPEN_SUCC_WHEN_OPENED);
 }
 
 HWTEST_F(WifiManagerTest, AutoStartP2pService_002, TestSize.Level1)
 {
     WIFI_LOGI("AutoStartP2pService_002 enter!");
-    WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
+        .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
     EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiManagerTest, AutoStopP2pService_001, TestSize.Level1)
 {
     WIFI_LOGI("AutoStopP2pService_001 enter!");
-    WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
+        .WillOnce(DoAll(Return(WifiOprMidState::OPENING)));
     EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_FAIL_WHEN_OPENING);
-    WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
+        .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
     EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
 }
 
 HWTEST_F(WifiManagerTest, AutoStopP2pService_002, TestSize.Level1)
 {
     WIFI_LOGI("AutoStopP2pService_002 enter!");
-    WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::RUNNING);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
+        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
     EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
 }
 
@@ -399,6 +426,13 @@ HWTEST_F(WifiManagerTest, CheckCanUseP2pTest, TestSize.Level1)
 
 HWTEST_F(WifiManagerTest, CheckCanUseSoftApTest, TestSize.Level1)
 {
+    // Add simulated wifi connection results
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = OHOS::Wifi::ConnState::CONNECTED;
+    wifiLinkedInfo.bssid = "11:22:33:44:55:66";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
     wifiManager.wifiMultiVapManager->CheckCanUseSoftAp();
 }
 

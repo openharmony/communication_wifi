@@ -3591,7 +3591,6 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
             if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config) != WIFI_HAL_OPT_OK) {
                 LOGE("GetDeviceConfig failed!");
             }
-
             deviceConfig.networkId = WPA_DEFAULT_NETWORKID;
             deviceConfig.bssid = bssid;
             deviceConfig.ssid = config.value;
@@ -3606,7 +3605,6 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
         WifiSettings::GetInstance().SyncDeviceConfig();
         WIFI_LOGD("Device ssid = %s", SsidAnonymize(deviceConfig.ssid).c_str());
     }
-
     std::string macAddr;
     std::string realMacAddr;
     WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);

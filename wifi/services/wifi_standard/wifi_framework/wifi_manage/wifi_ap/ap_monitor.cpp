@@ -118,7 +118,7 @@ void ApMonitor::StopMonitor()
     WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 }
 
-void ApMonitor::RegisterHandler(const std::string &iface, const std::function<HandlerMethod> &handler)
+void ApMonitor::RegisterHandler(const std::string &iface, const std::function<HandlerApMethod> &handler)
 {
     auto iter = m_mapHandler.find(iface);
     if (iter != m_mapHandler.end()) {

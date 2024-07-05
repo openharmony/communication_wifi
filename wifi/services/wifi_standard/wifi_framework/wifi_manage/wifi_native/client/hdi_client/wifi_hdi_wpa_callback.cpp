@@ -295,6 +295,14 @@ int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *
     } else if (strncmp(apCbParm->content, "AP-STA-POSSIBLE-PSK-MISMATCH ",
         strlen("AP-STA-POSSIBLE-PSK-MISMATCH ")) == 0) {
         event = HAL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT;
+    } else if (strncmp(apCbParm->content, "AP-CSA-FINISHED ", strlen("AP-CSA-FINISHED ")) == 0) {
+        const OHOS::Wifi::IWifiApMonitorEventCallback &cbk =
+            OHOS::Wifi::WifiApHalInterface::GetInstance().GetApCallbackInst(apCbParm->id);
+        const std::string str(apCbParm->content);
+        if (cbk.onEventHostApdNotify) {
+            cbk.onEventHostApdNotify(str);
+        }
+        return 0;
     } else {
         return 1;
     }

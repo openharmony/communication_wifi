@@ -43,6 +43,7 @@
         "*IsValidInterfaceName*";
         "*IsValidateNum*";
         "*MacAddress*";
+        "*WifiRandomMacHelper*";
         "*NetworkXmlParser*";
         "*SaveIpAddress*";
         "*SetParamValue*";
@@ -72,6 +73,7 @@
         "*WifiBackupConfig*";
         "*WifiConfigCenter*";
         "*WifiCodeConvertUtil*";
+        "*WifiScanConfig*";
     local:
         *;
 };

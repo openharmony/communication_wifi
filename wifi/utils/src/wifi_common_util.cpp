@@ -69,6 +69,9 @@ const uint32_t BASE64_SRC_UNIT_SIZE = 3;
 const uint32_t BASE64_DEST_UNIT_SIZE = 4;
 
 static std::pair<std::string, int> g_brokerProcessInfo;
+static constexpr uint8_t STEP_2BIT = 2;
+static constexpr uint8_t HEX_OFFSET = 4;
+static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
 
 static std::string DataAnonymize(const std::string str, const char delim,
     const char hiddenCh, const int startIdx = 0)
@@ -576,6 +579,36 @@ std::vector<std::string> getAuthInfo(const std::string &input, const std::string
     results.push_back(splitStr);
     WIFI_LOGD("%{public}s size:%{public}zu", __func__, results.size());
     return results;
+}
+
+std::string HexToString(const std::string &str)
+{
+    std::string result;
+    uint8_t hexDecimal = 16;
+    uint8_t hexStep = 2;
+    if (str.length() <= 0) {
+        return result;
+    }
+    for (size_t i = 0; i < str.length() - 1; i += STEP_2BIT) {
+        std::string byte = str.substr(i, hexStep);
+        char chr = 0;
+        long strTemp = strtol(byte.c_str(), nullptr, hexDecimal);
+        if (strTemp > 0) {
+            chr = static_cast<char>(strTemp);
+        }
+        result.push_back(chr);
+    }
+    return result;
+}
+
+std::string StringToHex(const std::string &data)
+{
+    std::stringstream ss;
+    for (std::string::size_type i = 0; i < data.size(); ++i) {
+        unsigned char temp = static_cast<unsigned char>(data[i]) >> HEX_OFFSET;
+        ss << HEX_TABLE[temp] << HEX_TABLE[static_cast<unsigned char>(data[i]) & 0xf];
+    }
+    return ss.str();
 }
 }  // namespace Wifi
 }  // namespace OHOS

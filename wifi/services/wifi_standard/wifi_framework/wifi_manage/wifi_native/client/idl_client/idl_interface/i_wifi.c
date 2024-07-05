@@ -29,8 +29,15 @@
 #include "i_wifi_supplicant_iface.h"
 #include "serial.h"
 #include "wifi_idl_inner_interface.h"
-#include "wifi_log.h"
 #include "wifi_native_define.h"
+
+#ifndef __UT__
+#include "wifi_log.h"
+#else
+#define static
+#define LOGI(...)
+#define LOGE(...)
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlIWifi"

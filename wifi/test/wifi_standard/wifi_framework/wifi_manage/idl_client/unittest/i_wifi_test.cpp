@@ -28,6 +28,7 @@
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
 #include "mock_wifi_public.h"
+#include "i_wifi_test.h"
 
 #undef LOG_TAG
 #define LOG_TAG "IWifiTest"
@@ -1229,6 +1230,191 @@ HWTEST_F(IWifiTest, GetWifiChipIdsTest, TestSize.Level1)
     EXPECT_CALL(MockWifiPublic::GetInstance(), RemoteCall(_)).WillOnce(Return(-1));
     EXPECT_TRUE(GetWifiChipIds(&id, &chip) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
+}
+
+HWTEST_F(IWifiTest, IdlCbkAddRemoveIfaceTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlCbkAddRemoveIface(mTestContext, event);
+}
+
+HWTEST_F(IWifiTest, IdlCbkStaJoinLeaveTest, TestSize.Level1)
+{
+    IdlCbkStaJoinLeave(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbkScanInfoNotifyTest, TestSize.Level1)
+{
+    IdlCbkScanInfoNotify(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbkConnectChangedTest, TestSize.Level1)
+{
+    IdlCbkConnectChanged(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbkDisConnectReasonNotifyTest, TestSize.Level1)
+{
+    IdlCbkDisConnectReasonNotify(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbkBssidChangedTest, TestSize.Level1)
+{
+    IdlCbkBssidChanged(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbkApStateChangeTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlCbkApStateChange(mTestContext, event);
+}
+
+HWTEST_F(IWifiTest, IdlCbkWpaEventDealTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlCbkWpaEventDeal(mTestContext, event);
+}
+
+HWTEST_F(IWifiTest, IdlDealStaApEventTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlDealStaApEvent(mTestContext, event);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pEventDealTest, TestSize.Level1)
+{
+    IdlCbP2pEventDeal(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pSupConnFailedEventTest, TestSize.Level1)
+{
+    IdlCbP2pSupConnFailedEvent();
+}
+
+
+HWTEST_F(IWifiTest, IdlCbP2pDeviceFoundEventDealTest, TestSize.Level1)
+{
+    IdlCbP2pDeviceFoundEventDeal(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pDeviceLostEventDealTest, TestSize.Level1)
+{
+    IdlCbP2pDeviceLostEventDeal(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pGoNegotiationRequestEventTest, TestSize.Level1)
+{
+    IdlCbP2pGoNegotiationRequestEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pGoNegotiationSuccessEventTest, TestSize.Level1)
+{
+    IdlCbP2pGoNegotiationSuccessEvent();
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pGoNegotiationFailureEventTest, TestSize.Level1)
+{
+    IdlCbP2pGoNegotiationFailureEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pInvitationReceivedEventTest, TestSize.Level1)
+{
+    IdlCbP2pInvitationReceivedEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pInvitationResultEventTest, TestSize.Level1)
+{
+    IdlCbP2pInvitationResultEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pGroupFormationSuccessEventTest, TestSize.Level1)
+{
+    IdlCbP2pGroupFormationSuccessEvent();
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pGroupFormationFailureEventTest, TestSize.Level1)
+{
+    IdlCbP2pGroupFormationFailureEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pGroupStartedEventTest, TestSize.Level1)
+{
+    IdlCbP2pGroupStartedEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pGroupRemovedEventTest, TestSize.Level1)
+{
+    IdlCbP2pGroupRemovedEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pProvDiscEventTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlCbP2pProvDiscEvent(mTestContext, event);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pProDiscShowPinEventTest, TestSize.Level1)
+{
+    IdlCbP2pProDiscShowPinEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pFindStopEventTest, TestSize.Level1)
+{
+    IdlCbP2pFindStopEvent();
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pServDiscRespEventTest, TestSize.Level1)
+{
+    IdlCbP2pServDiscRespEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pProvServDiscFailureEventTest, TestSize.Level1)
+{
+    IdlCbP2pProvServDiscFailureEvent();
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pApStaConnectEventTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlCbP2pApStaConnectEvent(mTestContext, event);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pServDiscReqEventTest, TestSize.Level1)
+{
+    IdlCbP2pServDiscReqEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pIfaceCreatedEventTest, TestSize.Level1)
+{
+    IdlCbP2pIfaceCreatedEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pConnectFailedEventTest, TestSize.Level1)
+{
+    IdlCbP2pConnectFailedEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlCbP2pChannelSwitchEventTest, TestSize.Level1)
+{
+    IdlCbP2pChannelSwitchEvent(mTestContext);
+}
+
+HWTEST_F(IWifiTest, IdlDealP2pEventFirstTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlDealP2pEventFirst(mTestContext, event);
+}
+
+HWTEST_F(IWifiTest, IdlDealP2pEventSecondTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlDealP2pEventSecond(mTestContext, event);
+}
+
+HWTEST_F(IWifiTest, IdlDealP2pEventTest, TestSize.Level1)
+{
+    int32_t event = 1;
+    IdlDealP2pEvent(mTestContext, event);
 }
 }  // namespace Wifi
 }  // namespace OHOS

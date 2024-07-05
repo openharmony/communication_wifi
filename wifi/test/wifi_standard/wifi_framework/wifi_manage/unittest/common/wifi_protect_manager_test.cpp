@@ -16,9 +16,11 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "wifi_protect_manager.h"
-#include "wifi_settings.h"
 #include "wifi_log.h"
 #include "wifi_logger.h"
+#include "wifi_msg.h"
+#include "mock_wifi_settings.h"
+
 using namespace OHOS::Wifi;
 using namespace testing;
 using ::testing::_;
@@ -70,6 +72,13 @@ HWTEST_F(WifiProtectManagerTest, IsHeldWifiProtect_ReturnsFalseIfProtectIsNotHel
 
 HWTEST_F(WifiProtectManagerTest, GetNearlyProtectMode_ReturnsCorrectMode, TestSize.Level1)
 {
+    // Add simulated wifi connection results
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = OHOS::Wifi::ConnState::CONNECTED;
+    wifiLinkedInfo.bssid = "11:22:33:44:55:66";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
     WifiProtectManager wifiProtectManager;
     wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
     ASSERT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);

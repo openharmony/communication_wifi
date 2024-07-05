@@ -137,11 +137,6 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
-
-    void SetMovingFreezeScanedTest()
-    {
-        pScanService->SetMovingFreezeScaned(true);
-    }
 };
 
 HWTEST_F(ScanServiceTest, SystemScanByIntervalSuccess, TestSize.Level1)

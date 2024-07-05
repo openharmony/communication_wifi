@@ -62,12 +62,17 @@ import {
 import {
   testEnableWifiManager ,
   testDisableWifiManager ,
+  testEnableSemiWifiManager,
   testIsWifiActiveManager ,
   testScanManager ,
+  testStartScanManager,
   testGetScanInfoListManager ,
-/*testGetScanResultsManagerPromise,
-  testGetScanResultsManagerCallback,
-  testGetScanResultsSyncManager,*/
+  testGetScanResultsPromise,
+  testGetScanResultsCallback,
+  testGetScanResultsSync,
+  testGetWifiDetailState,
+  testSetScanAlwaysAllowed,
+  testGetScanAlwaysAllowed,
   testAddDeviceConfigManagerPromise ,
   testAddDeviceConfigManagerCallback ,
   testAddCandidateConfigManagerPromise ,
@@ -87,6 +92,7 @@ import {
   testIsFeatureSupportedManager ,
   testGetDeviceMacAddressManager ,
   testGetIpInfoManager ,
+  testGetIpv6Info,
   testGetCountryCodeManager ,
   testReassociateManager ,
   testReconnectManager ,
@@ -95,6 +101,10 @@ import {
   testDisableDeviceConfigManager ,
   testRemoveAllDeviceConfigsManager ,
   testRemoveDeviceConfigManager ,
+  testIsBandTypeSupported,
+  testGet5GChannelList,
+  testGetDisconnectedReason,
+  testStartPortalCertification,
   testOnWifiStateChangeManager ,
   testOnWifiConnectionChangeManager ,
   testOnWifiScanStateChangeManager ,
@@ -531,6 +541,14 @@ const WifiManagerTestCase: WifiTest[] = [
     'category' : CaseCategory.WifiManager
   },
   {
+    'name' : '开SemiWifi' ,
+    'detail' : '使能SemiWifi' ,
+    'method' : 'enableSemiWifi' ,
+    'api' : testEnableSemiWifiManager ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
     'name' : '注册WLAN连接状态改变事件' ,
     'detail' : '注册WLAN连接状态改变事件' ,
     'method' : 'on.wifiConnectionChange' ,
@@ -563,6 +581,14 @@ const WifiManagerTestCase: WifiTest[] = [
     'category' : CaseCategory.WifiManager
   },
   {
+    'name' : '开始启动WLAN扫描' ,
+    'detail' : '开始启动WLAN扫描' ,
+    'method' : 'StartScan' ,
+    'api' : testStartScanManager ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
     'name' : '获取扫描信息列表' ,
     'detail' : '获取扫描信息列表' ,
     'method' : 'getScanInfoList' ,
@@ -570,7 +596,54 @@ const WifiManagerTestCase: WifiTest[] = [
     'result' : 'None' ,
     'category' : CaseCategory.WifiManager
   },
-
+  {
+    'name' : '获取扫描结果列表' ,
+    'detail' : '获取扫描结果列表' ,
+    'method' : 'getScanResultsSync' ,
+    'api' : testGetScanResultsSync ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '获取wifi详细状态' ,
+    'detail' : '获取wifi详细状态' ,
+    'method' : 'getWifiDetailState' ,
+    'api' : testGetWifiDetailState ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '设置始终允许标志' ,
+    'detail' : '设置wifi详细状态' ,
+    'method' : 'setScanAlwaysAllowed' ,
+    'api' : testSetScanAlwaysAllowed ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '获取扫描始终允许标志' ,
+    'detail' : '获取扫描始终允许标志' ,
+    'method' : 'getScanAlwaysAllowed' ,
+    'api' : testGetScanAlwaysAllowed ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '获取扫描结果列表Promise' ,
+    'detail' : '获取扫描结果列表Promise' ,
+    'method' : 'getScanResultsPromise' ,
+    'api' : testGetScanResultsPromise ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '获取扫描结果列表Callback' ,
+    'detail' : '获取扫描结果列表Callback' ,
+    'method' : 'getScanResultsCallback' ,
+    'api' : testGetScanResultsCallback ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
   {
     'name' : '添加网络配置Promise' ,
     'detail' : '添加网络配置Promise' ,
@@ -702,6 +775,14 @@ const WifiManagerTestCase: WifiTest[] = [
     'category' : CaseCategory.WifiManager
   },
   {
+    'name' : '获取IPv6信息' ,
+    'detail' : '获取IPv6信息' ,
+    'method' : 'getIpv6Info' ,
+    'api' : testGetIpv6Info ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
     'name' : '获取国家码信息' ,
     'detail' : '获取国家码信息' ,
     'method' : 'getCountryCode' ,
@@ -778,6 +859,38 @@ const WifiManagerTestCase: WifiTest[] = [
     'detail' : '移除指定的网络配置' ,
     'method' : 'removeDeviceConfig' ,
     'api' : testRemoveDeviceConfigManager ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '移除指定的网络配置' ,
+    'detail' : '移除指定的网络配置' ,
+    'method' : 'isBandTypeSupported' ,
+    'api' : testIsBandTypeSupported ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '获取5G频道列表' ,
+    'detail' : '获取5G频道列表' ,
+    'method' : 'get5GChannelList' ,
+    'api' : testGet5GChannelList ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '获取未连接的原因' ,
+    'detail' : '获取未连接的原因' ,
+    'method' : 'getDisconnectedReason' ,
+    'api' : testGetDisconnectedReason ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '启动门户认证' ,
+    'detail' : '启动门户认证' ,
+    'method' : 'startPortalCertification' ,
+    'api' : testStartPortalCertification ,
     'result' : 'None' ,
     'category' : CaseCategory.WifiManager
   },

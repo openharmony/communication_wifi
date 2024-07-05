@@ -19,6 +19,7 @@
 #include "ipc_skeleton.h"
 #include "want.h"
 #include "want_params_wrapper.h"
+#include <atomic>
 #include <string>
 
 namespace OHOS {
@@ -62,6 +63,8 @@ public:
     void ShowDialog(WifiDialogType type);
 
 private:
+    std::atomic<bool> isNtfPublished {false};
+
     WifiNotificationUtil();
     ~WifiNotificationUtil();
 };

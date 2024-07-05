@@ -1815,7 +1815,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
 int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
 {
     if (IsWifiDeviceConfigDeciphered(config)) {
-        LOGI("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
+        LOGD("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
         return 0;
     }
     LOGD("DecryptionDeviceConfig start");

@@ -23,6 +23,7 @@ namespace Wifi {
 struct IWifiApMonitorEventCallback {
     std::function<void(const WifiHalApConnectionNofify &)> onStaJoinOrLeave;
     std::function<void(int)> onApEnableOrDisable;
+    std::function<void(const std::string &)> onEventHostApdNotify;
 };
 }  // namespace Wifi
 }  // namespace OHOS

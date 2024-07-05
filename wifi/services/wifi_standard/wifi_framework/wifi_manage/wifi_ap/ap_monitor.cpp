@@ -26,6 +26,8 @@
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
 
+#derfine LESS_INT_MAX_NUM 9
+
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApMonitor");
 
 namespace OHOS {
@@ -81,10 +83,10 @@ void ApMonitor::OnHotspotStateEvent(int state) const
 
 void ApMonitor::WpaEventApChannelSwitch(int freq) const
 {
-    HotspotConfig m_hostapdConfig;
-    WifiSettings::GetInstance().GetHotspotConfig(m_hostapdConfig, m_id);
+    HotspotConfig hostapdConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(hostapdConfig, m_id);
     m_hostapdConfig.SetChannel(freq);
-    WifiSettings::GetInstance().SetHotspotConfig(m_hostapdConfig, m_id);
+    WifiSettings::GetInstance().SetHotspotConfig(hostapdConfig, m_id);
 }
 
 void ApMonitor::WpaEventApNotifyCallBack(const std::string &notifyParam) const
@@ -99,6 +101,10 @@ void ApMonitor::WpaEventApNotifyCallBack(const std::string &notifyParam) const
         return;
     }
     std::string data = notifyParam.substr(freqPos + strlen("freq="));
+    if (data.size() > LESS_INT_MAX_NUM) {
+        WIFI_LOGE("%{public}s notifyParam is error", __func__);
+        return;
+    }
     int freq = stoi(data);
     WpaEventApChannelSwitch(freq);
     return;

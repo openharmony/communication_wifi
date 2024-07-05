@@ -489,5 +489,14 @@ HWTEST_F(P2pEnabledStateTest, ProcessCmdConnectFailed, TestSize.Level1)
     msg.SetParam1(0);
     EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
 }
+
+HWTEST_F(P2pEnabledStateTest, ProcessPriDeviceFoundEvtTest001, TestSize.Level1)
+{
+    InternalMessage msg;
+    WifiP2pDevice device;
+    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
+    msg.SetMessageObj(device);
+    pP2pEnabledState->ExecuteStateMsg(&msg);
+}
 } // namespace Wifi
 } // namespace OHOS

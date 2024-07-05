@@ -650,7 +650,7 @@ void WifiDeviceProxy::ParseBigConfig(MessageParcel &reply, std::vector<WifiDevic
         config.status = std::stoi(tokens[g_bigDataRecvLen++]);
         config.bssid = tokens[g_bigDataRecvLen++];
         config.bssidType = std::stoi(tokens[g_bigDataRecvLen++]);
-        config.ssid = tokens[g_bigDataRecvLen++];
+        config.ssid = HexToString(tokens[g_bigDataRecvLen++]);
         config.band = std::stoi(tokens[g_bigDataRecvLen++]);
         config.channel = std::stoi(tokens[g_bigDataRecvLen++]);
         config.frequency = std::stoi(tokens[g_bigDataRecvLen++]);

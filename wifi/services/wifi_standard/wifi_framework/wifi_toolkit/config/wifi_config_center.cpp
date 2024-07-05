@@ -17,6 +17,7 @@
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 
@@ -85,6 +86,16 @@ void WifiConfigCenter::SetWifiSelfcureReset(const bool isReset)
 bool WifiConfigCenter::GetWifiSelfcureReset() const
 {
     return mWifiSelfcureReset.load();
+}
+
+void WifiConfigCenter::SetWifiSelfcureResetEntered(const bool isReset)
+{
+    mWifiSelfcureResetEntered = isReset;
+}
+
+bool WifiConfigCenter::GetWifiSelfcureResetEntered() const
+{
+    return mWifiSelfcureResetEntered.load();
 }
 
 void WifiConfigCenter::SetLastNetworkId(const int networkId)
@@ -445,32 +456,6 @@ bool WifiConfigCenter::EnableNetwork(int networkId, bool disableOthers, int inst
         SetUserLastSelectedNetworkId(networkId, instId);
     }
     return true;
-}
-
-void WifiConfigCenter::SetAppPackageName(const std::string &appPackageName)
-{
-    std::unique_lock<std::mutex> lock(mScanMutex);
-    mAppPackageName = appPackageName;
-}
-
-const std::string WifiConfigCenter::GetAppPackageName()
-{
-    std::unique_lock<std::mutex> lock(mScanMutex);
-    return mAppPackageName;
-}
-
-void WifiConfigCenter::SetAppRunningState(ScanMode appRunMode)
-{
-    if (static_cast<int>(appRunMode) < static_cast<int>(ScanMode::APP_FOREGROUND_SCAN) ||
-        static_cast<int>(appRunMode) > static_cast<int>(ScanMode::SYS_BACKGROUND_SCAN)) {
-        return;
-    }
-    mAppRunningModeState = appRunMode;
-}
-
-ScanMode WifiConfigCenter::GetAppRunningState() const
-{
-    return mAppRunningModeState.load();
 }
 
 WifiOprMidState WifiConfigCenter::GetScanMidState(int instId)
@@ -1177,7 +1162,7 @@ bool WifiConfigCenter::StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const 
 
     std::string randomMacAddr;
     if (randomAddr.empty()) {
-        GenerateRandomMacAddressByBssid(realMacAddr, randomMacAddr);
+        WifiRandomMacHelper::GenerateRandomMacAddressByBssid(realMacAddr, randomMacAddr);
     } else {
         randomMacAddr = randomAddr;
     }
@@ -1297,48 +1282,6 @@ void WifiConfigCenter::ClearMacAddrPairs(WifiMacAddrInfoType type)
             LOGE("%{public}s: invalid mac address type, type:%{public}d", __func__, type);
     }
     return;
-}
-
-void WifiConfigCenter::GenerateRandomMacAddress(std::string &randomMacAddr)
-{
-    constexpr unsigned long long high1stByteMask = 0xFF00000000000000;
-    constexpr unsigned long long high2rdByteMask = 0x00FF000000000000;
-    constexpr unsigned long long high3thByteMask = 0x0000FF0000000000;
-    constexpr unsigned long long high4thByteMask = 0x000000FF00000000;
-    constexpr unsigned long long high5thByteMask = 0x00000000FF000000;
-    constexpr unsigned long long high6thByteMask = 0x0000000000FF0000;
-    unsigned long long macAddressValidLongMask = (1ULL << 48) - 1;
-    unsigned long long macAddressSaiAssignedMask = 1ULL << 43;
-    unsigned long long macAddressEliAssignedMask = 1ULL << 42;
-    unsigned long long macAddressLocallyAssignedMask = 1ULL << 41;
-    unsigned long long macAddressMulticastMask = 1ULL << 40;
-    constexpr int maxMacSize = 18;
-    char strMac[maxMacSize] = { 0 };
-    int ret = 0;
-
-    unsigned long long random = GetRandom();
-    if (random == 0) {
-        LOGE("%{public}s: random is invalid!", __func__);
-        return;
-    }
-    LOGD("%{public}s: random is 0x%{public}llx==%{public}lld", __func__, random, random);
-    random &= macAddressValidLongMask;
-    random &= ~macAddressSaiAssignedMask;
-    random &= ~macAddressEliAssignedMask;
-    random |= macAddressLocallyAssignedMask;
-    random &= ~macAddressMulticastMask;
-
-    LOGD("mac:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx",
-        (random & high1stByteMask) >> 56, (random & high2rdByteMask) >> 48, (random & high3thByteMask) >> 40,
-        (random & high4thByteMask) >> 32, (random & high5thByteMask) >> 24, (random & high6thByteMask) >> 16);
-    ret = sprintf_s(strMac, maxMacSize, "%02llx:%02llx:%02llx:%02llx:%02llx:%02llx",
-        (random & high1stByteMask) >> 56, (random & high2rdByteMask) >> 48, (random & high3thByteMask) >> 40,
-        (random & high4thByteMask) >> 32, (random & high5thByteMask) >> 24, (random & high6thByteMask) >> 16);
-    if (ret < 0) {
-        LOGW("%{public}s: failed to sprintf_s", __func__);
-    }
-    randomMacAddr = strMac;
-    LOGD("%{public}s: randomMacAddr: %{private}s", __func__, randomMacAddr.c_str());
 }
 
 bool WifiConfigCenter::HasWifiActive()
@@ -1567,38 +1510,6 @@ void WifiConfigCenter::DelMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& m
     }
 }
 
-void WifiConfigCenter::GenerateRandomMacAddressByBssid(std::string peerBssid, std::string &randomMacAddr)
-{
-    constexpr int arraySize = 4;
-    constexpr int macBitSize = 12;
-    constexpr int firstBit = 1;
-    constexpr int lastBit = 11;
-    constexpr int two = 2;
-    constexpr int hexBase = 16;
-    constexpr int octBase = 8;
-    int ret = 0;
-    char strMacTmp[arraySize] = {0};
-    std::mt19937_64 gen(std::chrono::high_resolution_clock::now().time_since_epoch().count()
-        + std::hash<std::string>{}(peerBssid));
-    for (int i = 0; i < macBitSize; i++) {
-        if (i != firstBit) {
-            std::uniform_int_distribution<> distribution(0, hexBase - 1);
-            ret = sprintf_s(strMacTmp, arraySize, "%x", distribution(gen));
-        } else {
-            std::uniform_int_distribution<> distribution(0, octBase - 1);
-            ret = sprintf_s(strMacTmp, arraySize, "%x", two * distribution(gen));
-        }
-        if (ret == -1) {
-            LOGE("GenerateRandomMacAddressByBssid failed, sprintf_s return -1!");
-        }
-        randomMacAddr += strMacTmp;
-        if ((i % two) != 0 && (i != lastBit)) {
-            randomMacAddr.append(":");
-        }
-    }
-    LOGD("GenerateRandomMacAddressByBssid, randomMacAddr:%{private}s", randomMacAddr.c_str());
-}
-
 void WifiConfigCenter::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid)
 {
     LOGD("%{public}s: remove a mac address pair, type:%{public}d, bssid:%{private}s",
@@ -1613,7 +1524,6 @@ void WifiConfigCenter::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::stri
     randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
     RemoveMacAddrPairs(type, randomMacAddrInfo);
 }
-
 
 WifiMacAddrErrCode WifiConfigCenter::AddMacAddrPairs(WifiMacAddrInfoType type,
     const WifiMacAddrInfo &macAddrInfo, std::string randomMacAddr)
@@ -1640,31 +1550,6 @@ WifiMacAddrErrCode WifiConfigCenter::AddMacAddrPairs(WifiMacAddrInfoType type,
             break;
     }
     return WIFI_MACADDR_INVALID_PARAM;
-}
-
-long int WifiConfigCenter::GetRandom()
-{
-    long random = 0;
-    do {
-        int fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
-        ssize_t length = 0;
-        if (fd >= 0) {
-            length = read(fd, &random, sizeof(random));
-            close(fd);
-        } else {
-            LOGW("%{public}s: failed to open, try again", __func__);
-        }
-        if (random == 0) {
-            fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
-            if (fd >= 0) {
-                length = read(fd, &random, sizeof(random));
-                close(fd);
-            } else {
-                LOGE("%{public}s: retry failed", __func__);
-            }
-        }
-    } while (0);
-    return (random >= 0 ? random : -random);
 }
 }  // namespace Wifi
 }  // namespace OHOS

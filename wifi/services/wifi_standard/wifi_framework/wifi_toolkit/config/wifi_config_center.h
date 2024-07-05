@@ -40,6 +40,10 @@ public:
 
     bool GetWifiSelfcureReset() const;
 
+    void SetWifiSelfcureResetEntered(const bool isReset);
+
+    bool GetWifiSelfcureResetEntered() const;
+
     void SetLastNetworkId(const int networkId);
 
     int GetLastNetworkId() const;
@@ -123,14 +127,6 @@ public:
     int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache);
 
     bool EnableNetwork(int networkId, bool disableOthers, int instId = 0);
-
-    void SetAppPackageName(const std::string &appPackageName);
-
-    const std::string GetAppPackageName();
-
-    void SetAppRunningState(ScanMode appRunMode);
-
-    ScanMode GetAppRunningState() const;
 
     WifiOprMidState GetScanMidState(int instId = 0);
 
@@ -311,8 +307,6 @@ public:
 
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
 
-    void GenerateRandomMacAddress(std::string &randomMacAddr);
-
 private:
     WifiConfigCenter();
     bool HasWifiActive();
@@ -326,16 +320,15 @@ private:
     WifiMacAddrErrCode InsertMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
         const WifiMacAddrInfo &macAddrInfo, std::string& randomMacAddr);
     void DelMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo);
-    void GenerateRandomMacAddressByBssid(std::string peerBssid, std::string &randomMacAddr);
     void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
     WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo,
         std::string randomMacAddr);
-    long int GetRandom();
 
 private:
     // STA
     std::mutex mStaMutex;
     std::atomic<bool> mWifiSelfcureReset {false};
+    std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
@@ -358,8 +351,6 @@ private:
 
     // SCAN
     std::mutex mScanMutex;
-    std::string mAppPackageName;
-    std::atomic<ScanMode> mAppRunningModeState {ScanMode::SYS_FOREGROUND_SCAN};
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
     std::map<int, ScanControlInfo> mScanControlInfo;

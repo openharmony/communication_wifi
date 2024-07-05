@@ -230,7 +230,6 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     pnoScanConfig.savedNetworkSsid.push_back(std::string(reinterpret_cast<const char*>(data), size));
     pnoScanConfig.minRssi5Ghz = static_cast<int>(data[0]);
     WifiConfigCenter::GetInstance().SetScanGenieState(MODE_STATE_CLOSE);
-    WifiConfigCenter::GetInstance().SetAppPackageName(scanConfig.ssid);
     WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
     pScanService->SystemScanDisconnectedPolicy(appId, appId);
     pScanService->SetNetworkInterfaceUpDown(config.externFlag);
@@ -261,14 +260,10 @@ void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)
     int staScene = static_cast<int>(data[0]);
     int appId = static_cast<int>(data[0]);
     ScanMode scanMode = static_cast<ScanMode>(static_cast<int>(data[0]) % SIZE);
-    pScanService->AllowExternScanByForbid(staScene, scanMode);
     pScanService->AllowScanDuringScanning(scanMode);
-    pScanService->AllowScanDuringScreenOff(scanMode);
     pScanService->AllowScanByMovingFreeze(scanMode);
     pScanService->IsMovingFreezeState(scanMode);
-    pScanService->AllowExternScanByInterval(appId, staScene, scanMode);
     pScanService->AllowExternScanByIntervalMode(appId, staScene, scanMode);
-    pScanService->AllowExternScanByCustomScene(appId, scanMode);
     pScanService->SystemScanByInterval(appId, staScene, appId);
 }
 
@@ -305,10 +300,6 @@ void BeginPnoScanFuzzTest(const uint8_t* data, size_t size)
     pScanService->SetScanTrustMode();
     pScanService->ClearScanTrustSceneIds();
     pScanService->IsMovingFreezeScaned();
-    pScanService->AllowExternScanByThermal();
-    pScanService->AllowExternScanByPowerIdelState();
-    pScanService->AllowExternScanByGnssFixState();
-    pScanService->AllowExternScanByAbnormalApp();
     pScanService->IsExternScanning();
     pScanService->IsScanningWithParam();
     pScanService->ClearScanControlValue();

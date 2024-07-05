@@ -142,6 +142,16 @@ int __wrap_HdiDisableAp(int id)
         return __real_HdiDisableAp(id);
     }
 }
+
+int __real_HdiEnableAp(int id);
+int __wrap_HdiEnableAp(int id)
+{
+    if (g_mockTag) {
+        return MockWifiHdiWpaApImpl::GetInstance().HdiEnableAp(id);
+    } else {
+        return __real_HdiEnableAp(id);
+    }
+}
 #ifdef __cplusplus
 }
 #endif

@@ -110,8 +110,9 @@ public:
      * @Description : Callback of the Connection Refused event.
      *
      * @param status - status codes [in]
+     * @param bssid: bssid of the network [in]
      */
-    void onWpaConnectionRejectCallBack(int status);
+    void onWpaConnectionRejectCallBack(int status, const std::string &bssid);
 
     /**
      * @Description : Callback of the WPS_OVERLAP event.

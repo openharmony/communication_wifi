@@ -126,7 +126,7 @@ bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t
         WIFI_LOGE("start dhcpd fail.");
         return false;
     }
-    WifiNetAgent::GetInstance().AddRoute(ifaceName, ipAddress, ipv4.GetAddressPrefixLength());
+    WifiNetAgent::GetInstance().AddRoute(ifaceName, ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
     WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
 #else

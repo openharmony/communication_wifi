@@ -26,7 +26,7 @@
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
 
-#derfine LESS_INT_MAX_NUM 9
+#define LESS_INT_MAX_NUM 9
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApMonitor");
 
@@ -85,7 +85,7 @@ void ApMonitor::WpaEventApChannelSwitch(int freq) const
 {
     HotspotConfig hostapdConfig;
     WifiSettings::GetInstance().GetHotspotConfig(hostapdConfig, m_id);
-    m_hostapdConfig.SetChannel(freq);
+    hostapdConfig.SetChannel(freq);
     WifiSettings::GetInstance().SetHotspotConfig(hostapdConfig, m_id);
 }
 

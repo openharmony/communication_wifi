@@ -121,6 +121,8 @@ ohos_unittest("WifiApServiceTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "ability_base:base",
+    "ability_base:want",
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",

@@ -28,6 +28,9 @@
 #ifdef FEATURE_SELF_CURE_SUPPORT
 #include "self_cure_interface.h"
 #endif
+#ifdef FEATURE_AP_SUPPORT
+#include "ap_interface.h"
+#endif
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiServiceManager");
@@ -163,30 +166,11 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
 {
     WIFI_LOGI("WifiServiceManager::LoadApService");
     std::unique_lock<std::mutex> lock(mApMutex);
-    if (mApServiceHandle.handle != nullptr) {
-        WIFI_LOGE("WifiServiceManager::handle is not null: %{public}s", dlname.c_str());
+    if (mApServiceHandle.pService[0]) {
         return 0;
     }
-    mApServiceHandle.handle = dlopen(dlname.c_str(), RTLD_LAZY);
-    if (mApServiceHandle.handle == nullptr) {
-        WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
-        return -1;
-    }
-    mApServiceHandle.create = (IApService *(*)(int)) dlsym(mApServiceHandle.handle, "Create");
-    mApServiceHandle.destroy = (void *(*)(IApService *))dlsym(mApServiceHandle.handle, "Destroy");
-    if (mApServiceHandle.create == nullptr || mApServiceHandle.destroy == nullptr) {
-        WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
-        dlclose(mApServiceHandle.handle);
-        mApServiceHandle.Clear();
-        return -1;
-    }
-    if (bCreate) {
-        IApService *service = mApServiceHandle.create(0);
-        auto ret = mApServiceHandle.pService.emplace(0, service);
-        if (!ret.second) {
-            mApServiceHandle.pService[0] = service;
-        }
-    }
+    IApService *service = new ApInterface();
+    mApServiceHandle.pService[0] = service;
     WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
     return 0;
 }
@@ -326,46 +310,24 @@ bool WifiServiceManager::ApServiceSetHotspotConfig(const HotspotConfig &config, 
 {
     WIFI_LOGD("WifiServiceManager::GetApServiceInst");
     std::unique_lock<std::mutex> lock(mApMutex);
-    if (mApServiceHandle.handle == nullptr) {
-        WIFI_LOGE("Get ap service instance handle is null.");
+    auto iter = mApServiceHandle.pService.find(id);
+    if (iter == mApServiceHandle.pService.end()) {
+        WIFI_LOGE("Id %{public}d ap service is null", id);
         return false;
     }
-
-    auto findInstance = [this, id]() -> IApService* {
-        auto it = mApServiceHandle.pService.find(id);
-        return (it != mApServiceHandle.pService.end()) ? it->second : nullptr;
-    };
-    IApService *service = (IApService *)findInstance();
-    if (service == nullptr) {
-        service = mApServiceHandle.create(id);
-        mApServiceHandle.pService[id] = service;
-    }
-    return service->SetHotspotConfig(config);
+    return iter->second->SetHotspotConfig(config);
 }
 
 IApService *WifiServiceManager::GetApServiceInst(int id)
 {
     WIFI_LOGD("WifiServiceManager::GetApServiceInst");
     std::unique_lock<std::mutex> lock(mApMutex);
-    if (mApServiceHandle.handle == nullptr) {
-        WIFI_LOGE("Get ap service instance handle is null.");
-        return nullptr;
+    auto iter = mApServiceHandle.pService.find(id);
+    if (iter != mApServiceHandle.pService.end()) {
+        WIFI_LOGD("Get id %{public}d ap service instance", id);
+        return iter->second;
     }
-
-    auto findInstance = [this, id]() -> IApService* {
-        auto it = mApServiceHandle.pService.find(id);
-        return (it != mApServiceHandle.pService.end()) ? it->second : nullptr;
-    };
-    auto apInstance = findInstance();
-    if (apInstance != nullptr) {
-        WIFI_LOGI("Ap service instance is exist %{public}d", id);
-        return apInstance;
-    }
-
-    WIFI_LOGI("[Get] create a new ap service instance: %{public}d", id);
-    IApService *service = mApServiceHandle.create(id);
-    mApServiceHandle.pService[id] = service;
-    return service;
+    return nullptr;
 }
 #endif
 
@@ -465,23 +427,16 @@ NO_SANITIZE("cfi") int WifiServiceManager::UnloadApService(bool bPreLoad, int id
 {
     WIFI_LOGI("WifiServiceManager::UnloadApService id=%{public}d", id);
     std::unique_lock<std::mutex> lock(mApMutex);
-    if (mApServiceHandle.handle == nullptr) {
-        WIFI_LOGE("WifiServiceManager::UnloadApService handle is null");
-        return 0;
-    }
-
     auto iter = mApServiceHandle.pService.find(id);
     if (iter != mApServiceHandle.pService.end()) {
         if (iter->second != nullptr) {
-            mApServiceHandle.destroy(iter->second);
+            delete iter->second;
             iter->second = nullptr;
         }
         mApServiceHandle.pService.erase(id);
     }
 
     if (!bPreLoad && mApServiceHandle.pService.empty()) {
-        dlclose(mApServiceHandle.handle);
-        mApServiceHandle.handle = nullptr;
         mApServiceHandle.Clear();
     }
 

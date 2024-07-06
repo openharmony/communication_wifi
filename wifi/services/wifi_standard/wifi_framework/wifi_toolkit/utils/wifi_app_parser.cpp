@@ -182,41 +182,50 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
 LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
 {
     LowLatencyAppInfo appInfo;
-    std::string gameName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME));
+    std::string gameName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = gameName;
+    xmlFree(value);
     return appInfo;
 }
 
 WhiteListAppInfo AppParser::ParseWhiteAppInfo(const xmlNodePtr &innode)
 {
     WhiteListAppInfo appInfo;
-    appInfo.packageName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
     return appInfo;
 }
 
 BlackListAppInfo AppParser::ParseBlackAppInfo(const xmlNodePtr &innode)
 {
     BlackListAppInfo appInfo;
-    appInfo.packageName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
     return appInfo;
 }
 
 ChariotAppInfo AppParser::ParseChariotAppInfo(const xmlNodePtr &innode)
 {
     ChariotAppInfo appInfo;
-    appInfo.packageName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
     return appInfo;
 }
 
 HighTempLimitSpeedAppInfo AppParser::ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode)
 {
     HighTempLimitSpeedAppInfo appInfo;
-    appInfo.packageName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
     return appInfo;
 }
 

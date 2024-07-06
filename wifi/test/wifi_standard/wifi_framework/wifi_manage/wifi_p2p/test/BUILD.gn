@@ -141,6 +141,8 @@ ohos_unittest("wifi_p2p_test") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "ability_base:base",
+    "ability_base:want",
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",

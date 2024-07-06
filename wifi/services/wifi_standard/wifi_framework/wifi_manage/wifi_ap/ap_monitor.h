@@ -71,7 +71,7 @@ public:
      * @param handler - handler callback list
      * @return None
      */
-    virtual void RegisterHandler(const std::string &iface, const std::function<HandlerMethod> &handler);
+    virtual void RegisterHandler(const std::string &iface, const std::function<HandlerApMethod> &handler);
 
     /**
      * @Description  Unregister monitor callback handler.
@@ -96,7 +96,7 @@ private:
     DISALLOW_COPY_AND_ASSIGN(ApMonitor)
 
 private:
-    std::map<std::string, std::function<HandlerMethod>> m_mapHandler;
+    std::map<std::string, std::function<HandlerApMethod>> m_mapHandler;
     std::string m_selectIfacName;
     std::set<std::string> m_setMonitorIface;
     int m_id;

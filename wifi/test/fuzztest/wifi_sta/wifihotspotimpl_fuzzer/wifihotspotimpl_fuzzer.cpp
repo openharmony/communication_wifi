@@ -132,7 +132,8 @@ void CfgCheckIpAddressFuzzTest(const uint8_t* data, size_t size)
     if (size < IPADDR_SEG_NUMS) {
         return;
     }
-    ss << data[IPADDR_SEG_ZERO] << "." << data[IPADDR_SEG_ONE] << "." << data[IPADDR_SEG_TWO] << "."<< data[IPADDR_SEG_THREE];
+    ss << data[IPADDR_SEG_ZERO] << "." << data[IPADDR_SEG_ONE] << "." << data[IPADDR_SEG_TWO] << "."
+        << data[IPADDR_SEG_THREE];
     ss >> ipAddr;
     pWifiHotspotServiceImpl->CfgCheckIpAddress(ipAddr);
 }

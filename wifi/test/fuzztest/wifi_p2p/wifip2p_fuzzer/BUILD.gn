@@ -40,10 +40,10 @@ ohos_fuzztest("WifiP2pFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/wifi_p2p_group_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/wifi_p2p_device_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/wifi_p2p_group_info_proxy.cpp",
-    "p2p_fuzzer.cpp"
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/wifi_p2p_group_manager.cpp",
+    "p2p_fuzzer.cpp",
   ]
 
   defines = [

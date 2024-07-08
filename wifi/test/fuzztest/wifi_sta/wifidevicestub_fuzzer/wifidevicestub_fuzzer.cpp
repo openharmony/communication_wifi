@@ -756,6 +756,7 @@ void WifiDeviceServiceImplTest(const uint8_t* data, size_t size)
     pWifiDeviceStub->WriteWifiDeviceConfig(datas, config);
 }
 
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

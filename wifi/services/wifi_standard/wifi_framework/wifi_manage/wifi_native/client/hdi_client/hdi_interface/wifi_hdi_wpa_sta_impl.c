@@ -233,11 +233,6 @@ WifiErrorNo HdiWpaStaStop()
         return WIFI_HAL_OPT_OK;
     }
 
-    if (UnRegisterEventCallback() != WIFI_HAL_OPT_OK) {
-        LOGE("HdiWpaStaStop: UnRegisterEventCallback failed!");
-        return WIFI_HAL_OPT_FAILED;
-    }
-
     if (HdiRemoveWpaIface(GetHdiP2pIfaceName()) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: HdiRemoveWpaP2pIface failed!");
         return WIFI_HAL_OPT_FAILED;
@@ -245,6 +240,11 @@ WifiErrorNo HdiWpaStaStop()
 
     if (HdiRemoveWpaIface(GetHdiStaIfaceName()) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: HdiRemoveWpaStaIface failed!");
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    if (UnRegisterEventCallback() != WIFI_HAL_OPT_OK) {
+        LOGE("HdiWpaStaStop: UnRegisterEventCallback failed!");
         return WIFI_HAL_OPT_FAILED;
     }
 

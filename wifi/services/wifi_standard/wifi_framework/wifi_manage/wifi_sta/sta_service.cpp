@@ -413,6 +413,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
+    tempDeviceConfig.numAssociation = 0;
     tempDeviceConfig.instanceId = m_instId;
     tempDeviceConfig.networkId = netWorkId;
     tempDeviceConfig.status = status;

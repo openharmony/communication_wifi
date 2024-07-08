@@ -35,7 +35,7 @@ DEFINE_WIFILOG_LABEL("WifiEventHandler");
 #ifdef OHOS_ARCH_LITE
 class WifiEventHandler::WifiEventHandlerImpl {
 public:
-    WifiEventHandlerImpl(const std::string &threadName)
+    WifiEventHandlerImpl(const std::string &threadName, const Callback &timeOutFunc = nullptr)
     {
         mRunFlag = true;
         mWorkerThread = std::thread(WifiEventHandlerImpl::Run, std::ref(*this));
@@ -102,22 +102,31 @@ private:
     std::deque<Callback> mEventQue;
 };
 #elif WIFI_FFRT_ENABLE
+constexpr int WIFI_THREAD_TIMEOUT_LIMIT = 30 * 1000 * 1000; // 30s
 class WifiEventHandler::WifiEventHandlerImpl {
 public:
-    WifiEventHandlerImpl(const std::string &threadName)
+    WifiEventHandlerImpl(const std::string &threadName, const Callback &timeOutFunc = nullptr)
     {
         std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         if (eventQueue != nullptr) {
             WIFI_LOGI("WifiEventHandlerImpl already init.");
             return;
         }
-        eventQueue = std::make_shared<ffrt::queue>(threadName.c_str());
-        WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue, threadName:%{public}s", threadName.c_str());
+        if (timeOutFunc == nullptr) {
+            eventQueue = std::make_shared<ffrt::queue>(threadName.c_str());
+            WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue, threadName:%{public}s", threadName.c_str());
+        } else {
+            eventQueue = std::make_shared<ffrt::queue>(threadName.c_str(),
+            ffrt::queue_attr().timeout(WIFI_THREAD_TIMEOUT_LIMIT).callback(timeOutFunc));
+            WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue with callback,"
+                "threadName:%{public}s", threadName.c_str());
+        }
     }
+
     ~WifiEventHandlerImpl()
     {
-        std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         WIFI_LOGI("WifiEventHandler: ~WifiEventHandler");
+        std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         if (eventQueue) {
             eventQueue = nullptr;
         }
@@ -199,7 +208,7 @@ private:
 #else
 class WifiEventHandler::WifiEventHandlerImpl {
 public:
-    WifiEventHandlerImpl(const std::string &threadName)
+    WifiEventHandlerImpl(const std::string &threadName, const Callback &timeOutFunc = nullptr)
     {
         eventRunner = AppExecFwk::EventRunner::Create(threadName);
         if (eventRunner) {
@@ -258,8 +267,8 @@ private:
 };
 #endif
 
-WifiEventHandler::WifiEventHandler(const std::string &threadName)
-    :ptr(new WifiEventHandlerImpl(threadName))
+WifiEventHandler::WifiEventHandler(const std::string &threadName, const Callback &timeOutFunc)
+    :ptr(new WifiEventHandlerImpl(threadName, timeOutFunc))
 {}
 
 WifiEventHandler::~WifiEventHandler()

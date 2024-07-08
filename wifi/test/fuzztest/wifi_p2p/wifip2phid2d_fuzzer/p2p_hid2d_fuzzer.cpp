@@ -30,7 +30,8 @@ void ClearSharedLinkCountFuzzerTest(const uint8_t *data, size_t size)
 
 void IncreaseSharedLinkFuzzerTest(const uint8_t *data, size_t size)
 {
-    SharedLinkManager::IncreaseSharedLink();
+    std::unique_ptr<SharedLinkManager> pSharedLinkManager;
+    pSharedLinkManager->IncreaseSharedLink();
 }
 
 void IncreaseSharedLinkFuzzerTest1(const uint8_t *data, size_t size)

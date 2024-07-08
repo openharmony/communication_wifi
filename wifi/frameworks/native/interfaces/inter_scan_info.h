@@ -50,6 +50,8 @@ enum class Ant {
 struct InterScanInfo {
     std::string bssid;
     std::string ssid;
+    // Original SSID, used to store the original SSID of different charts like GBK, UTF-8, etc.
+    std::string oriSsid;
     /**
      * Network performance, including authentication,
      * key management, and encryption mechanisms

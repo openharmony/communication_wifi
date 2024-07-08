@@ -75,6 +75,7 @@
         "*WifiConfigCenter*";
         "*WifiCodeConvertUtil*";
         "*WifiScanConfig*";
+        "*WifiCodeConvert*";
     local:
         *;
 };

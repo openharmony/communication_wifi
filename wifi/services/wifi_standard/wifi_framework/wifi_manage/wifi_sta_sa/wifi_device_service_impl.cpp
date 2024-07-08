@@ -25,7 +25,6 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
-#include "xcollie/watchdog.h"
 #include "wifi_sa_manager.h"
 #include "mac_address.h"
 #include "wifi_p2p_service_impl.h"
@@ -1792,24 +1791,6 @@ ErrCode WifiDeviceServiceImpl::SetLowTxPower(const WifiLowPowerParam wifiLowPowe
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
-}
-
-void WifiDeviceServiceImpl::StartWatchdog(void)
-{
-    constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;
-    constexpr int32_t WATCHDOG_DELAY_MS = 15000;
-    auto taskFunc = []() {
-        uint64_t now = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()).count());
-        uint64_t interval = now - WifiConfigCenter::GetInstance().GetThreadStartTime();
-        if ((WifiConfigCenter::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
-            WIFI_LOGE("watchdog happened, thread need restart");
-        } else {
-            WIFI_LOGD("thread work normally");
-        }
-    };
-    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("WifiDeviceServiceImpl", taskFunc,
-        WATCHDOG_INTERVAL_MS, WATCHDOG_DELAY_MS);
 }
 
 ErrCode WifiDeviceServiceImpl::SetAppFrozen(std::set<int> pidList, bool isFrozen)

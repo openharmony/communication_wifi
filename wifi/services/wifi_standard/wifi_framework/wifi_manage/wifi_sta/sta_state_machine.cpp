@@ -2859,8 +2859,10 @@ void StaStateMachine::GetIpState::GoInState()
         RouterConfig config;
         if (strncpy_s(config.bssid, sizeof(config.bssid),
             pStaStateMachine->linkedInfo.bssid.c_str(), pStaStateMachine->linkedInfo.bssid.size()) == EOK) {
+            config.isPublicESS = IsPublicESS();
             SetConfiguration(ifname.c_str(), config);
         }
+
         if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
             dhcpRet = StartDhcpClient(ifname.c_str(), false);
         } else {
@@ -2928,6 +2930,46 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)
     }
 
     return ret;
+}
+
+bool StaStateMachine::GetIpState::IsPublicESS()
+{
+    constexpr int32_t BSS_NUM_MIN = 3;
+    std::vector<WifiScanInfo> scanResults;
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    if (scanResults.empty()) {
+        WIFI_LOGI("IsPublicESS scanResults is empty");
+        return false;
+    }
+
+    WifiLinkedInfo wifiLinkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
+    std::string currentSsid = wifiLinkedInfo.ssid;
+    if (currentSsid.empty()) {
+        WIFI_LOGI("IsPublicESS currentSsid is empty");
+        return false;
+    }
+
+    std::string capabilities = "";
+    for (WifiScanInfo result : scanResults) {
+        if (currentSsid == result.ssid) {
+            capabilities = result.capabilities;
+            break;
+        }
+    }
+    if (capabilities.empty()) {
+        WIFI_LOGI("IsPublicESS capabilities is empty");
+        return false;
+    }
+
+    int32_t counter = 0;
+    for (WifiScanInfo nextResult : scanResults) {
+        if (currentSsid == nextResult.ssid && (strcmp(capabilities.c_str(), nextResult.capabilities.c_str()) == 0)) {
+            counter += 1;
+        }
+    }
+    WIFI_LOGI("IsPublicESS counter is %{public}d", counter);
+    return counter >= BSS_NUM_MIN;
 }
 
 void StaStateMachine::ReplaceEmptyDns(DhcpResult *result)

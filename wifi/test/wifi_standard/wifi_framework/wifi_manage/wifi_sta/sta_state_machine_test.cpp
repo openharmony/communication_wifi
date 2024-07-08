@@ -1170,6 +1170,21 @@ public:
         pStaStateMachine->pGetIpState->ExecuteStateMsg(nullptr);
     }
 
+    void GetIpStateStateIsPublicESSTest()
+    {
+        std::vector<WifiScanInfo> scanResults;
+        WifiScanInfo scanInfo;
+        scanInfo.ssid = "1234";
+        scanResults.push_back(scanInfo);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+        WifiLinkedInfo linkedInfo;
+        linkedInfo.ssid = "1234";
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        pStaStateMachine->pGetIpState->IsPublicESS();
+    }
+
     void ConfigStaticIpAddressSuccess1()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
@@ -2736,6 +2751,11 @@ HWTEST_F(StaStateMachineTest, GetIpStateStateExeMsgSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, GetIpStateStateExeMsgFail, TestSize.Level1)
 {
     GetIpStateStateExeMsgFail();
+}
+
+HWTEST_F(StaStateMachineTest, GetIpStateStateIsPublicESSTest, TestSize.Level1)
+{
+    GetIpStateStateIsPublicESSTest();
 }
 
 HWTEST_F(StaStateMachineTest, ConfigStaticIpAddressSuccess1, TestSize.Level1)

@@ -32,6 +32,7 @@
         "*Ipv6Address*";
         "*IsAllowScanAnyTime*";
         "*IsChannelDbac*";
+        "*IsFactoryMode*";
         "*IsPskEncryption*";
         "*IsExistAddressForInterface*";
         "*IsFreqDbac*";

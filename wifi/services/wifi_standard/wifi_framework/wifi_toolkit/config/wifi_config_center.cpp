@@ -17,6 +17,7 @@
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "wifi_global_func.h"
 #include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_LABEL("WifiConfigCenter");
@@ -115,6 +116,10 @@ void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)
 
 bool WifiConfigCenter::GetWifiAllowSemiActive() const
 {
+    if (IsFactoryMode()) {
+        WIFI_LOGI("factory mode, not allow semi active.");
+        return false;
+    }
     return mWifiAllowSemiActive.load();
 }
 

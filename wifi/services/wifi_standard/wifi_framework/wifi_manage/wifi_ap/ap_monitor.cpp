@@ -26,6 +26,8 @@
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
 
+#define LESS_INT_MAX_NUM 9
+
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApMonitor");
 
 namespace OHOS {
@@ -79,12 +81,42 @@ void ApMonitor::OnHotspotStateEvent(int state) const
     }
 }
 
+void ApMonitor::WpaEventApChannelSwitch(int freq) const
+{
+    HotspotConfig hostapdConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(hostapdConfig, m_id);
+    hostapdConfig.SetChannel(freq);
+    WifiSettings::GetInstance().SetHotspotConfig(hostapdConfig, m_id);
+}
+
+void ApMonitor::WpaEventApNotifyCallBack(const std::string &notifyParam) const
+{
+    if (notifyParam.empty()) {
+        WIFI_LOGE("%{public}s notifyParam is empty", __func__);
+        return;
+    }
+    std::string::size_type freqPos = 0;
+    if ((freqPos = notifyParam.find("freq=")) == std::string::npos) {
+        WIFI_LOGE("csa channel switch notifyParam not find frequency!");
+        return;
+    }
+    std::string data = notifyParam.substr(freqPos + strlen("freq="));
+    if (data.size() > LESS_INT_MAX_NUM) {
+        WIFI_LOGE("%{public}s notifyParam is error", __func__);
+        return;
+    }
+    int freq = stoi(data);
+    WpaEventApChannelSwitch(freq);
+    return;
+}
+
 void ApMonitor::StartMonitor()
 {
     using namespace std::placeholders;
     IWifiApMonitorEventCallback wifiApEventCallback = {
         std::bind(&ApMonitor::OnStaJoinOrLeave, this, _1),
         std::bind(&ApMonitor::OnHotspotStateEvent, this, _1),
+        std::bind(&ApMonitor::WpaEventApNotifyCallBack, this, _1),
     };
     WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 

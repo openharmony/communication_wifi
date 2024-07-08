@@ -343,6 +343,11 @@ HWTEST_F(WifiGlobalFuncTest, IsChannelDbacTest, TestSize.Level1)
     EXPECT_FALSE(IsChannelDbac(1, 40));
 }
 
+HWTEST_F(WifiGlobalFuncTest, IsFactoryModeTest, TestSize.Level1)
+{
+    EXPECT_FALSE(IsFactoryMode());
+}
+
 HWTEST_F(WifiGlobalFuncTest, ParseJsonTest, TestSize.Level1)
 {
     std::string jsonString = R"(

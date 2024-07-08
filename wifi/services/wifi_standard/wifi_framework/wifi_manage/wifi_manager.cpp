@@ -101,7 +101,7 @@ int WifiManager::Init()
     mInitStatus = INIT_OK;
 
     int lastState = WifiSettings::GetInstance().GetStaLastRunState();
-    if (lastState != WIFI_STATE_DISABLED) { /* Automatic startup upon startup */
+    if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
         WifiConfigCenter::GetInstance().SetWifiToggledState(lastState);
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");

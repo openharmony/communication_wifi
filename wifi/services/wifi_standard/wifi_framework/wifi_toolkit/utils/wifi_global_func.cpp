@@ -44,6 +44,10 @@ constexpr int CHANNEL_2G_MIN = 1;
 constexpr int CHANNEL_2G_MAX = 14;  // 2484
 constexpr int CHANNEL_5G_MIN = 34;
 constexpr int CHANNEL_5G_MAX = 165;  // 5825
+constexpr int PROP_FACTORY_RUN_MODE_LEN = 10;
+constexpr int FACTORY_MODE_LEN = 7;
+constexpr const char* FACTORY_RUN_MODE = "const.runmode";
+constexpr const char* FACTORY_MODE = "factory";
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
@@ -531,6 +535,18 @@ bool IsChannelDbac(int channelA, int channelB)
 bool IsPskEncryption(const std::string &keyMgmt)
 {
     return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
+}
+
+bool IsFactoryMode()
+{
+    char preValue[PROP_FACTORY_RUN_MODE_LEN] = {0};
+    int errCode = GetParamValue(FACTORY_RUN_MODE, 0, preValue, PROP_FACTORY_RUN_MODE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, FACTORY_MODE, FACTORY_MODE_LEN) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 #ifndef OHOS_ARCH_LITE

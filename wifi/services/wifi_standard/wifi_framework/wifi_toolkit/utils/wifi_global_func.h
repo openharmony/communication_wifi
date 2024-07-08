@@ -443,6 +443,14 @@ bool IsChannelDbac(int channelA, int channelB);
  */
 bool IsPskEncryption(const std::string &keyMgmt);
 
+/**
+ * @Description is factory mode
+ *
+ * @return true - factory mode
+ * @return false - not factory mode
+ */
+bool IsFactoryMode();
+
 #ifndef OHOS_ARCH_LITE
 /**
  * @Description Parse json string, find key by type, get value by key

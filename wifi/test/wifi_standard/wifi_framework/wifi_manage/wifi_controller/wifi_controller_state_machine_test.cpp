@@ -462,5 +462,15 @@ HWTEST_F(WifiControllerMachineTest, GetWifiRoleTest, TestSize.Level1)
 {
     GetWifiRoleTest();
 }
+
+HWTEST_F(WifiControllerMachineTest, HandleApStopTest, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(CMD_AP_STOPPED);
+    msg.SetParam1(0);
+    WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+    pWifiControllerMachine->pEnableState->HandleApStop(&msg);
+}
 }
 }

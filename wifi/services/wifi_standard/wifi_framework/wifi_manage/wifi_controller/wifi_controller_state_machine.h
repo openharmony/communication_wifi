@@ -64,6 +64,7 @@ public:
 #ifdef FEATURE_AP_SUPPORT
         void HandleSoftapToggleChangeInEnabledState(InternalMessage *msg);
         void HandleApRemoved(InternalMessage *msg);
+        void HandleApStop(InternalMessage *msg);
 #endif
         WifiControllerMachine *pWifiControllerMachine;
     };

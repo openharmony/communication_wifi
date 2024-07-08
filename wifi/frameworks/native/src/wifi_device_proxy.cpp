@@ -102,7 +102,6 @@ ErrCode WifiDeviceProxy::EnableWifi()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
     return ErrCode(reply.ReadInt32());
 }
 
@@ -130,7 +129,6 @@ ErrCode WifiDeviceProxy::DisableWifi()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
     return ErrCode(reply.ReadInt32());
 }
 
@@ -2215,7 +2213,6 @@ ErrCode WifiDeviceProxy::EnableSemiWifi()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::SEMI_ENABLE);
     return ErrCode(reply.ReadInt32());
 }
 

@@ -1226,8 +1226,6 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
     ConnectToNetworkProcess(bssid);
     StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
-    StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
-
     if (wpsState != SetupMethod::INVALID) {
         wpsState = SetupMethod::INVALID;
     }
@@ -3651,7 +3649,6 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
             if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config) != WIFI_HAL_OPT_OK) {
                 LOGE("GetDeviceConfig failed!");
             }
-
             deviceConfig.networkId = WPA_DEFAULT_NETWORKID;
             deviceConfig.bssid = bssid;
             deviceConfig.ssid = config.value;
@@ -3666,7 +3663,6 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
         WifiSettings::GetInstance().SyncDeviceConfig();
         WIFI_LOGD("Device ssid = %s", SsidAnonymize(deviceConfig.ssid).c_str());
     }
-
     std::string macAddr;
     std::string realMacAddr;
     WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
@@ -3683,6 +3679,7 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     lastLinkedInfo.macAddress = deviceConfig.macAddress;
     lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     SetWifiLinkedInfo(targetNetworkId);
+    DealSignalPollResult(CreateMessage());
     SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
 }
 

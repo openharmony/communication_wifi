@@ -92,6 +92,18 @@ public:
     virtual void SendMessage(const std::string &iface, ApStatemachineEvent msgName, int param1, int param2,
         const std::any &messageObj) const;
 
+    /**
+     * @Decription Regsit the callback function for Ap channel switch
+     * @param freq - data param
+     */
+    virtual void WpaEventApChannelSwitch(int freq) const;
+
+    /**
+     * @Decription Regsit the callback function for Ap event notify
+     * @param freq - data param
+     */
+    virtual void WpaEventApNotifyCallBack(const std::string &notifyParam) const;
+
 private:
     DISALLOW_COPY_AND_ASSIGN(ApMonitor)
 

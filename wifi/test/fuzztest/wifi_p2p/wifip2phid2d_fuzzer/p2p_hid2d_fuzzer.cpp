@@ -25,28 +25,24 @@ constexpr size_t U32_AT_SIZE_ZERO = 4;
 
 void ClearSharedLinkCountFuzzerTest(const uint8_t *data, size_t size)
 {
-    SharedLinkManager pShareManager;
-    pShareManager.ClearSharedLinkCount();
+    SharedLinkManager::ClearSharedLinkCount();
 }
 
 void IncreaseSharedLinkFuzzerTest(const uint8_t *data, size_t size)
 {
-    SharedLinkManager pShareManager;
-    pShareManager.IncreaseSharedLink();
+    SharedLinkManager::IncreaseSharedLink();
 }
 
 void IncreaseSharedLinkFuzzerTest1(const uint8_t *data, size_t size)
 {
-    SharedLinkManager pShareManager;
-    pShareManager.SetGroupUid(-1);
-    pShareManager.IncreaseSharedLink();
+    SharedLinkManager::SetGroupUid(-1);
+    SharedLinkManager::IncreaseSharedLink();
 }
 
 void GetGroupUidFuzzerTest(const uint8_t *data, size_t size)
 {
-    SharedLinkManager pShareManager;
     int callingUid = static_cast<int>(data[0]);
-    pShareManager.GetGroupUid(callingUid);
+    SharedLinkManager::GetGroupUid(callingUid);
 }
 
 void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data, size_t size)

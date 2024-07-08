@@ -769,14 +769,25 @@ void CesEventSubscriber::OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData
         return;
     }
     WIFI_LOGI("Package removed of uid %{public}d.", uid);
-    std::vector<WifiDeviceConfig> tempConfigs;
-    WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
-    for (const auto &config : tempConfigs) {
-        if (WifiSettings::GetInstance().RemoveDevice(config.networkId) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("RemoveAllCandidateConfig-RemoveDevice() failed!");
+    bool removeFlag = false;
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+        if (pService != nullptr) {
+            pService->RemoveAllCandidateConfig(uid);
+            removeFlag = true;
         }
     }
-    WifiSettings::GetInstance().SyncDeviceConfig();
+    if (!removeFlag) {
+        std::vector<WifiDeviceConfig> tempConfigs;
+        WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
+        for (const auto &config : tempConfigs) {
+            if (WifiSettings::GetInstance().RemoveDevice(config.networkId) != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("RemoveAllCandidateConfig-RemoveDevice() failed!");
+            }
+        }
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
+    return;
 }
 
 void CesEventSubscriber::OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData)

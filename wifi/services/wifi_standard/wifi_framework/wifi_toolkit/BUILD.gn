@@ -39,6 +39,7 @@ local_base_sources = [
   "net_helper/mac_address.cpp",
   "net_helper/network_interface.cpp",
   "net_helper/raw_socket.cpp",
+  "utils/wifi_code_convert.cpp",
   "utils/wifi_common_event_helper.cpp",
   "utils/wifi_encryption_util.cpp",
   "utils/wifi_global_func.cpp",

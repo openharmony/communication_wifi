@@ -121,6 +121,8 @@ struct WifiScanParams {
 struct WifiScanInfo {
     std::string bssid;
     std::string ssid;
+    // Original SSID, used to store the original SSID of different charts like GBK, UTF-8, etc.
+    std::string oriSsid;
     int bssidType; /* bssid type. */
     /**
      * Network performance, including authentication,
@@ -161,6 +163,39 @@ struct WifiScanInfo {
         maxSupportedTxLinkSpeed = 0;
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
+    }
+
+    void GetDeviceMgmt(std::string &mgmt) const
+    {
+        switch (securityType) {
+            case WifiSecurity::PSK:
+                mgmt = "WPA-PSK";
+                break;
+            case WifiSecurity::EAP:
+                mgmt = "WPA-EAP";
+                break;
+            case WifiSecurity::SAE:
+                mgmt = "SAE";
+                break;
+            case WifiSecurity::OWE:
+                mgmt = "OWE";
+                break;
+            case WifiSecurity::WEP:
+                mgmt = "WEP";
+                break;
+            case WifiSecurity::EAP_SUITE_B:
+                mgmt = "WPA-EAP-SUITE-B-192";
+                break;
+            case WifiSecurity::WAPI_CERT:
+                mgmt = "WAPI-CERT";
+                break;
+            case WifiSecurity::WAPI_PSK:
+                mgmt = "WAPI-PSK";
+                break;
+            default:
+                mgmt = "NONE";
+                break;
+        }
     }
 };
 

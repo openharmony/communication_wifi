@@ -73,6 +73,7 @@
         "*XmlParser*";
         "*WifiBackupConfig*";
         "*WifiConfigCenter*";
+        "*WifiCodeConvertUtil*";
         "*WifiScanConfig*";
     local:
         *;

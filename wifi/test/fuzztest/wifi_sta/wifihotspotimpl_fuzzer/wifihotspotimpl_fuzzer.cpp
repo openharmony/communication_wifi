@@ -30,10 +30,14 @@
 #include <map>
 namespace OHOS {
 namespace Wifi {
-constexpr int bandWifiType = 6;
-constexpr int idleMaxTimeOut = 60;
-constexpr int ipAdrrSegNum = 4;
-constexpr int dataSizeMin = 1;
+constexpr int BAND_WIFI_TYPES = 6;
+constexpr int IDLE_TIME_OUT_MAX = 60;
+constexpr int IPADDR_SEG_NUMS = 4;
+constexpr int IPADDR_SEG_ZERO = 0;
+constexpr int IPADDR_SEG_ONE = 1;
+constexpr int IPADDR_SEG_TWO = 2;
+constexpr int IPADDR_SEG_THREE = 3;
+constexpr int DATA_SIZE_MIN = 1;
 static bool g_isInsted = false;
 std::shared_ptr<WifiHotspotServiceImpl> pWifiHotspotServiceImpl = std::make_shared<WifiHotspotServiceImpl>();
 std::shared_ptr<WifiHotspotMgrServiceImpl> pWifiHotspotMgrServiceImpl = std::make_shared<WifiHotspotMgrServiceImpl>();
@@ -66,7 +70,7 @@ int IsHotspotDualBandSupportedFuzzTest(const uint8_t* data, size_t size)
     ChannelsTable node;
     uint32_t key = static_cast<int>(data[0]);
     bands.push_back(key);
-    BandType idx = static_cast<BandType>(key % bandWifiType);
+    BandType idx = static_cast<BandType>(key % BAND_WIFI_TYPES);
     node[idx] = bands;
     WifiConfigCenter::GetInstance().SetValidChannels(node);
     bool status = true;
@@ -88,7 +92,7 @@ void SetHotspotConfigFuzzTest(const uint8_t* data, size_t size)
 void SetHotspotIdleTimeoutFuzzTest(const uint8_t* data, size_t size)
 {
     Init();
-    uint32_t time = static_cast<int>(data[0]) % idleMaxTimeOut;
+    uint32_t time = static_cast<int>(data[0]) % IDLE_TIME_OUT_MAX;
     pWifiHotspotServiceImpl->SetHotspotIdleTimeout(time);
 }
 
@@ -96,7 +100,7 @@ void DisassociateStaFuzzTest(const uint8_t* data, size_t size)
 {
     StationInfo info;
     info.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    info.bssidType = static_cast<int>(data[0]) % idleMaxTimeOut;
+    info.bssidType = static_cast<int>(data[0]) % IDLE_TIME_OUT_MAX;
     pWifiHotspotServiceImpl->DisassociateSta(info);
     Init();
     pWifiHotspotServiceImpl->AddBlockList(info);
@@ -125,9 +129,10 @@ void CfgCheckIpAddressFuzzTest(const uint8_t* data, size_t size)
 {
     std::string ipAddr;
     std::stringstream ss;
-    if (size < ipAdrrSegNum)
+    if (size < IPADDR_SEG_NUMS) {
         return;
-    ss << data[0] << "." << data[1] << "." << data[2] << "."<< data[3];
+    }
+    ss << data[IPADDR_SEG_ZERO] << "." << data[IPADDR_SEG_ONE] << "." << data[IPADDR_SEG_TWO] << "."<< data[IPADDR_SEG_THREE];
     ss >> ipAddr;
     pWifiHotspotServiceImpl->CfgCheckIpAddress(ipAddr);
 }
@@ -150,8 +155,9 @@ void IsValidHotspotConfigFuzzTest(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if ((data == NULL) || (size < dataSizeMin))
+    if ((data == NULL) || (size < DATA_SIZE_MIN)) {
         return 0;
+    }
     OHOS::Wifi::TransRandomToRealMacFuzzTest(data, size);
     OHOS::Wifi::IsHotspotDualBandSupportedFuzzTest(data, size);
     OHOS::Wifi::SetHotspotConfigFuzzTest(data, size);

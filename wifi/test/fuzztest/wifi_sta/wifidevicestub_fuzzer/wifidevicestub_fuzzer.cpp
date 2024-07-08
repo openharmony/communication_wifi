@@ -829,7 +829,6 @@ void CheckConfigEapTest(const uint8_t* data, size_t size)
     pWifiDeviceServiceImpl->CheckConfigEap(config);
     config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
     pWifiDeviceServiceImpl->CheckConfigEap(config);
-
 }
 
 void CheckConfigWapiTest(const uint8_t* data, size_t size)

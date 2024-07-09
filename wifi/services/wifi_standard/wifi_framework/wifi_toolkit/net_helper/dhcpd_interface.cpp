@@ -116,6 +116,10 @@ bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::
     int staNumber = 10;
     int staSize = 0;
     staInfos = (struct DhcpStationInfo*)malloc(sizeof(DhcpStationInfo) * staNumber);
+    if (staInfos == NULL) {
+        WIFI_LOGE("GetConnectedStationInfo malloc is failed!");
+        return false;
+    }
     GetConnectedStaInfo(ifaceName, staNumber, staInfos, &staSize);
     for (int i = 0; i < staSize; i++) {
         StationInfo info;

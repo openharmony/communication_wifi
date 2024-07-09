@@ -94,3 +94,4 @@ HWTEST_F(WifiCmdClientTest, SendCmdToDriver_ReturnsNegativeOneWhenCommandIdIsNot
     int result = wifiCmdClient_->SendCmdToDriver(ifName, 100, param);
     EXPECT_EQ(result, -1);
 }
+

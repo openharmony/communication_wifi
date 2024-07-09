@@ -84,4 +84,6 @@ HWTEST_F(WifiProtectManagerTest, GetNearlyProtectMode_ReturnsCorrectMode, TestSi
     ASSERT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
 }
 
+
+
 // Add more test cases as needed

@@ -42,6 +42,7 @@ public:
 
 protected:
     static const int maxPrivCmdSize = 4096;
+    static const int ifNameSize = 16;
     std::shared_ptr<WifiCmdClient> wifiCmdClient_;
 };
 

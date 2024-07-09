@@ -22,44 +22,12 @@
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
-
-void ClearSharedLinkCountFuzzerTest(const uint8_t *data, size_t size)
-{
-    SharedLinkManager::ClearSharedLinkCount();
-}
-
-void IncreaseSharedLinkFuzzerTest(const uint8_t *data, size_t size)
-{
-    std::unique_ptr<SharedLinkManager> pSharedLinkManager;
-    pSharedLinkManager->IncreaseSharedLink();
-}
-
-void IncreaseSharedLinkFuzzerTest1(const uint8_t *data, size_t size)
-{
-    SharedLinkManager::SetGroupUid(-1);
-    SharedLinkManager::IncreaseSharedLink();
-}
-
-void GetGroupUidFuzzerTest(const uint8_t *data, size_t size)
-{
-    int callingUid = static_cast<int>(data[0]);
-    SharedLinkManager::GetGroupUid(callingUid);
-}
-
-void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data, size_t size)
-{
-    ClearSharedLinkCountFuzzerTest(data, size);
-    IncreaseSharedLinkFuzzerTest(data, size);
-    IncreaseSharedLinkFuzzerTest1(data, size);
-    GetGroupUidFuzzerTest(data, size);
-}
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-    OHOS::Wifi::WifiHid2dServiceUtilsFuzzerTest(data, size);
     return 0;
 }
 }

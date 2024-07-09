@@ -17,7 +17,6 @@
 #include "wifi_logger.h"
 #ifdef OHOS_ARCH_LITE
 #include <atomic>
-#include <chrono>
 #include <condition_variable>
 #include <deque>
 #include <memory>
@@ -310,5 +309,31 @@ void WifiEventHandler::RemoveAsyncTask(const std::string &name)
     }
     ptr->RemoveAsyncTask(name);
 }
+
+
+bool WifiEventHandler::PostSyncTimeOutTask(const Callback &callback, uint64_t waitTime)
+{
+#ifdef WIFI_FFRT_ENABLE
+    ffrt::future f = ffrt::async(callback);
+    ffrt::future_status status = f.wait_for(std::chrono::milliseconds(waitTime));
+    if (status == ffrt::future_status::timeout) {
+        WIFI_LOGE("PostSyncTimeOutTask: Task timeout!");
+        return false;
+    }
+
+    return true;
+#else
+    std::future f = std::async(callback);
+    std::future_status status = f.wait_for(std::chrono::milliseconds(waitTime));
+    if (status == std::future_status::timeout) {
+        WIFI_LOGE("PostSyncTimeOutTask: Task timeout!");
+        return false;
+    }
+
+    return true;
+#endif
+}
+
+
 } // namespace Wifi
 } // namespace OHOS

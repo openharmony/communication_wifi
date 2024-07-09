@@ -175,7 +175,6 @@ private:
         IpV6Info &wifiIpV6Info);
 private:
     uint32_t supplierId;
-    std::unique_ptr<WifiEventHandler> netAgentEventHandler = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS

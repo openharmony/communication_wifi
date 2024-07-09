@@ -34,6 +34,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [ "bounds_checking_function:libsec_shared" ]
 
+    configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",

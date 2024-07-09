@@ -90,7 +90,7 @@ HWTEST_F(WifiProtectManagerTest, GetNearlyProtectModeTest001, TestSize.Level1)
     wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState == ConnState::SCANNING;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
     EXPECT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
 }
 
@@ -100,7 +100,7 @@ HWTEST_F(WifiProtectManagerTest, GetNearlyProtectModeTest002, TestSize.Level1)
     wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState == ConnState::CONNECTED;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
     wifiProtectManager.mForceHiPerfMode = true;
     EXPECT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
 }
@@ -111,7 +111,7 @@ HWTEST_F(WifiProtectManagerTest, GetNearlyProtectModeTest003, TestSize.Level1)
     wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState == ConnState::CONNECTED;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
     wifiProtectManager.mForceLowLatencyMode = true;
     EXPECT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
 }
@@ -122,7 +122,7 @@ HWTEST_F(WifiProtectManagerTest, GetNearlyProtectModeTest004, TestSize.Level1)
     wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState == ConnState::CONNECTED;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
     wifiProtectManager.AddProtect(WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF, "com.example.app");
     EXPECT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
 }

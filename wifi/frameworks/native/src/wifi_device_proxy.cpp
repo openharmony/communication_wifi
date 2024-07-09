@@ -544,7 +544,7 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
 void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address)
 {
     address.family = reply.ReadInt32();
-    address.addressIpv4 = static_cast<int>(reply.ReadInt32());
+    address.addressIpv4 = static_cast<uint32_t>(reply.ReadInt32());
     int size = reply.ReadInt32();
     if (size > MAX_SIZE) {
         WIFI_LOGE("Read IP address size error: %{public}d", size);

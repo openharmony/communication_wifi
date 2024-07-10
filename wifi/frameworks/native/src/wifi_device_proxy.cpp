@@ -977,6 +977,44 @@ ErrCode WifiDeviceProxy::StartRoamToNetwork(const int networkId, const std::stri
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::StartConnectToUserSelectNetwork(const int networkId,
+    const std::string bssid, const bool isCandidate)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to StartConnectToUserSelectNetwork, remote service is died!");
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token has error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(networkId);
+    data.WriteString(bssid);
+    data.WriteInt32(isCandidate);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(
+        DevInterfaceCode::WIFI_SVR_CMD_START_CONNECT_TO_USER_SELECT_NETWORK), data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("StartConnectToUserSelectNetwork %{public}d failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("StartConnectToUserSelectNetwork Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartConnectToUserSelectNetwork Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
 {
     if (mRemoteDied) {

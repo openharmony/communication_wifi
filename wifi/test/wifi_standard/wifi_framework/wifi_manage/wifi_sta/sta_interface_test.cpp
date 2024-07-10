@@ -378,8 +378,21 @@ public:
     void StartRoamToNetwork()
     {
         std::string bssid = "01:23:45:67:89:ab";
+        WifiDeviceConfig deviceConfig;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+            .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
         pStaInterface->StartRoamToNetwork(0, bssid);
     }
+
+    void StartConnectToUserSelectNetwork()
+    {
+        std::string bssid = "01:23:45:67:89:ab";
+        WifiDeviceConfig deviceConfig;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+            .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
+        pStaInterface->StartConnectToUserSelectNetwork(0, bssid);
+    }
+
     void SetPowerMode()
     {
         pStaInterface->SetPowerMode(0);
@@ -716,6 +729,12 @@ HWTEST_F(StaInterfaceTest, StartRoamToNetwork, TestSize.Level1)
 {
     StartRoamToNetwork();
 }
+
+HWTEST_F(StaInterfaceTest, StartConnectToUserSelectNetwork, TestSize.Level1)
+{
+    StartConnectToUserSelectNetwork();
+}
+
 HWTEST_F(StaInterfaceTest, SetPowerMode, TestSize.Level1)
 {
     SetPowerMode();

@@ -63,7 +63,8 @@ ErrCode ConcreteClientModeManager::InitConcreteManager()
         return WIFI_OPT_FAILED;
     }
     pConcreteMangerMachine->RegisterCallback(mcb);
-    pConcreteMangerMachine->SendMessage(CONCRETE_CMD_START, static_cast<int>(curRole), mid);
+    pConcreteMangerMachine->SetTargetRole(curRole);
+    pConcreteMangerMachine->SendMessage(CONCRETE_CMD_START, mid);
     return WIFI_OPT_SUCCESS;
 }
 

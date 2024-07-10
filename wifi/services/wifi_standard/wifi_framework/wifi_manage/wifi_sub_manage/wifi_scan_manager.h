@@ -35,8 +35,10 @@ public:
     void StopUnloadScanSaTimer(void);
     void StartUnloadScanSaTimer(void);
     void CheckAndStartScanService(int instId = 0);
+    ErrCode TryToStartScanService(int instId = 0);
     void CheckAndStopScanService(int instId = 0);
     void CloseScanService(int instId = 0);
+    void DealStaOpened(int instId = 0);
 
 private:
     void InitScanCallback(void);
@@ -45,7 +47,6 @@ private:
     void DealScanFinished(int state, int instId = 0);
     void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId = 0);
     void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0);
-    void DealStaOpenRes(OperateResState state, int instId = 0);
 
 private:
     IScanSerivceCallbacks mScanCallback;

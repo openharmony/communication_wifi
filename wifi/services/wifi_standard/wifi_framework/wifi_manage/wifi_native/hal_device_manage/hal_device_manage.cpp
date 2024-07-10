@@ -21,7 +21,6 @@
 #include <sys/socket.h>
 #include "hal_device_manage.h"
 #include "wifi_log.h"
-#include "wifi_idl_define.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_ap_hal_interface.h"
@@ -38,6 +37,7 @@ constexpr const char *CHIP_SERVICE_NAME = "chip_interface_service";
 std::atomic_bool HalDeviceManager::g_chipHdiServiceDied = false;
 std::mutex HalDeviceManager::mMutex;
 static HdfRemoteService *g_chipHdiService = nullptr;
+static RssiReportCallback g_rssiReportCallback = nullptr;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -101,7 +101,8 @@ void HalDeviceManager::StopChipHdi()
     return;
 }
 
-bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback, std::string &ifaceName)
+bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback,
+                                      const RssiReportCallback &rssiReportCallback, std::string &ifaceName)
 {
     if (!CheckReloadChipHdiService()) {
         return false;
@@ -121,6 +122,8 @@ bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCa
         LOGE("CreateStaIface, call RegisterChipIfaceCallBack failed! ret:%{public}d", ret);
         return false;
     }
+
+    g_rssiReportCallback = rssiReportCallback;
 
     mIWifiStaIfaces[ifaceName] = iface;
     LOGI("CreateStaIface success! ifaceName:%{public}s", ifaceName.c_str());
@@ -343,7 +346,7 @@ bool HalDeviceManager::GetConnectSignalInfo(const std::string &ifaceName, Signal
     }
 
     std::lock_guard<std::mutex> lock(mMutex);
-    LOGI("GetConnectSignalInfo, ifaceName:%{public}s", ifaceName.c_str());
+    LOGD("GetConnectSignalInfo, ifaceName:%{public}s", ifaceName.c_str());
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter == mIWifiStaIfaces.end()) {
         LOGE("GetConnectSignalInfo, not find iface info");
@@ -358,7 +361,7 @@ bool HalDeviceManager::GetConnectSignalInfo(const std::string &ifaceName, Signal
         return false;
     }
 
-    LOGI("GetConnectSignalInfo success");
+    LOGD("GetConnectSignalInfo success");
     return true;
 }
 
@@ -548,27 +551,41 @@ bool HalDeviceManager::GetFrequenciesByBand(const std::string &ifaceName, int32_
 
     std::lock_guard<std::mutex> lock(mMutex);
     LOGI("GetFrequenciesByBand, ifaceName:%{public}s, band:%{public}d", ifaceName.c_str(), band);
-    auto iter = mIWifiApIfaces.find(ifaceName);
-    if (iter == mIWifiApIfaces.end()) {
-        LOGE("GetFrequenciesByBand, not find iface info");
-        return false;
+    auto staIter = mIWifiStaIfaces.find(ifaceName);
+    if (staIter != mIWifiStaIfaces.end()) {
+        sptr<IChipIface> &iface = staIter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        std::vector<uint32_t> uifrequenciesSta;
+        int32_t ret = iface->GetSupportFreqs(band, uifrequenciesSta);
+        if (ret != HDF_SUCCESS) {
+            LOGE("GetFrequenciesByBand, call GetSupportFreqs failed! ret:%{public}d", ret);
+            return false;
+        }
+        for (auto item : uifrequenciesSta) {
+            frequencies.emplace_back(item);
+        }
+        LOGI("Sta getFrequenciesByBand success");
+        return true;
     }
 
-    sptr<IChipIface> &iface = iter->second;
-    CHECK_NULL_AND_RETURN(iface, false);
-    std::vector<uint32_t> uifrequencies;
-    int32_t ret = iface->GetSupportFreqs(band, uifrequencies);
-    if (ret != HDF_SUCCESS) {
-        LOGE("GetFrequenciesByBand, call GetSupportFreqs failed! ret:%{public}d", ret);
-        return false;
+    auto apIter = mIWifiApIfaces.find(ifaceName);
+    if (apIter != mIWifiApIfaces.end()) {
+        sptr<IChipIface> &iface = apIter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        std::vector<uint32_t> uifrequenciesAp;
+        int32_t ret = iface->GetSupportFreqs(band, uifrequenciesAp);
+        if (ret != HDF_SUCCESS) {
+            LOGE("GetFrequenciesByBand, call GetSupportFreqs failed! ret:%{public}d", ret);
+            return false;
+        }
+        for (auto item : uifrequenciesAp) {
+            frequencies.emplace_back(item);
+        }
+        LOGI("Ap getFrequenciesByBand success");
+        return true;
     }
-
-    for (auto item : uifrequencies) {
-        frequencies.emplace_back(item);
-    }
-
-    LOGI("GetFrequenciesByBand success");
-    return true;
+    LOGI("GetFrequenciesByBand failed");
+    return false;
 }
 
 bool HalDeviceManager::SetPowerModel(const std::string &ifaceName, int model)
@@ -657,22 +674,33 @@ bool HalDeviceManager::SetWifiCountryCode(const std::string &ifaceName, const st
 
     std::lock_guard<std::mutex> lock(mMutex);
     LOGI("SetWifiCountryCode, ifaceName:%{public}s", ifaceName.c_str());
-    auto iter = mIWifiApIfaces.find(ifaceName);
-    if (iter == mIWifiApIfaces.end()) {
-        LOGE("SetWifiCountryCode, not find iface info");
-        return false;
+    auto staIter = mIWifiStaIfaces.find(ifaceName);
+    if (staIter != mIWifiStaIfaces.end()) {
+        sptr<IChipIface> &iface = staIter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        int32_t ret = iface->SetCountryCode(code);
+        if (ret != HDF_SUCCESS) {
+            LOGE("SetWifiCountryCode, call SetCountryCode failed! ret:%{public}d", ret);
+            return false;
+        }
+        LOGI("Sta setWifiCountryCode success");
+        return true;
     }
 
-    sptr<IChipIface> &iface = iter->second;
-    CHECK_NULL_AND_RETURN(iface, false);
-    int32_t ret = iface->SetCountryCode(code);
-    if (ret != HDF_SUCCESS) {
-        LOGE("SetWifiCountryCode, call SetCountryCode failed! ret:%{public}d", ret);
-        return false;
+    auto apIter = mIWifiApIfaces.find(ifaceName);
+    if (apIter != mIWifiApIfaces.end()) {
+        sptr<IChipIface> &iface = apIter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        int32_t ret = iface->SetCountryCode(code);
+        if (ret != HDF_SUCCESS) {
+            LOGE("SetWifiCountryCode, call SetCountryCode failed! ret:%{public}d", ret);
+            return false;
+        }
+        LOGI("Ap setWifiCountryCode success");
+        return true;
     }
-
-    LOGI("SetWifiCountryCode success");
-    return true;
+    LOGE("SetWifiCountryCode, not find iface info");
+    return false;
 }
 
 bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::string &mac)
@@ -749,7 +777,7 @@ bool HalDeviceManager::CheckChipHdiStarted()
         return false;
     }
 
-    LOGI("CheckChipHdiStarted, isStarted:%{public}d", isStarted);
+    LOGD("CheckChipHdiStarted, isStarted:%{public}d", isStarted);
     if (!isStarted) {
         ret = g_IWifi->Init();
         if (ret != HDF_SUCCESS) {
@@ -1366,6 +1394,7 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
             if (iface && g_chipIfaceCallback) {
                 iface->UnRegisterChipIfaceCallBack(g_chipIfaceCallback);
             }
+            g_rssiReportCallback = nullptr;
             ret = chip->RemoveStaService(ifaceName);
             break;
         case IfaceType::AP :
@@ -1434,7 +1463,17 @@ int32_t ChipIfaceCallback::OnScanResultsCallback(uint32_t event)
     const OHOS::Wifi::SupplicantEventCallback &cbk =
         OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onScanNotify) {
-        cbk.onScanNotify(SINGLE_SCAN_OVER_OK);
+        cbk.onScanNotify(HAL_SINGLE_SCAN_OVER_OK);
+    }
+    return 0;
+}
+
+int32_t ChipIfaceCallback::OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi)
+{
+    LOGI("OnRssiReport, index:%{public}d c0Rssi:%{public}d c1Rssi:%{public}d", index, c0Rssi, c1Rssi);
+
+    if (g_rssiReportCallback) {
+        g_rssiReportCallback(index, c0Rssi);
     }
     return 0;
 }

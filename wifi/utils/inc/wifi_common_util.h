@@ -191,6 +191,16 @@ int64_t GetElapsedMicrosecondsSinceBoot();
  */
 std::string GetBundleName();
 
+
+/**
+ * @Description get bundle name by uid
+ *
+ * @param int - uid
+ * @param std::string - bundle name
+ * @return ErrCode - operation result
+ */
+ErrCode GetBundleNameByUid(const int uid, std::string &bundleName);
+
 /**
  * @Description get calling pid
  *
@@ -265,6 +275,8 @@ void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t
 bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);
 std::string EncodeBase64(const std::vector<uint8_t> &input);
 std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter);
+std::string HexToString(const std::string &str);
+std::string StringToHex(const std::string &data);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -124,6 +124,8 @@ int CheckMacIsValid(const char *macStr);
 
 void StrSafeCopy(char *dst, unsigned len, const char *src);
 
+char* HdiGetWapiTxt(char *pos, char *end, const uint8_t *ie);
+
 #ifdef __cplusplus
 }
 #endif

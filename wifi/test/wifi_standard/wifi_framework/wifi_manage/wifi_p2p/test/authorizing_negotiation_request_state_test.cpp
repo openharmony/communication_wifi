@@ -86,7 +86,7 @@ HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg, TestSize.Level
     std::string inputPin;
     msg.SetMessageObj(inputPin);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
 }
 
@@ -97,7 +97,7 @@ HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg1, TestSize.Leve
     std::string b = "std::any";
     msg.SetMessageObj(b);
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
 }
 
@@ -113,7 +113,7 @@ HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg3, TestSize.Leve
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_CONFIRM));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), Connect(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
 }
 

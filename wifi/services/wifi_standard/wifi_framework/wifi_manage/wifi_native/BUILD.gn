@@ -23,6 +23,7 @@ config("wifi_fw_common_header") {
   include_dirs = [
     "$WIFI_ROOT_DIR/base/state_machine/include",
     "$WIFI_ROOT_DIR/base/cRPC/include",
+    "$WIFI_ROOT_DIR/base/shared_util",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
@@ -67,18 +68,12 @@ config("wifi_idl_cxx_config") {
 idl_client_sources = [
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_msg.cpp",
-  "client/hdi_client/hdi_interface/wifi_hdi_ap_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_common.c",
-  "client/hdi_client/hdi_interface/wifi_hdi_p2p_impl.c",
-  "client/hdi_client/hdi_interface/wifi_hdi_proxy.c",
-  "client/hdi_client/hdi_interface/wifi_hdi_sta_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_util.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_ap_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_p2p_impl.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_proxy.c",
   "client/hdi_client/hdi_interface/wifi_hdi_wpa_sta_impl.c",
-  "client/hdi_client/wifi_hdi_callback.cpp",
-  "client/hdi_client/wifi_hdi_client.cpp",
   "client/hdi_client/wifi_hdi_wpa_callback.cpp",
   "client/hdi_client/wifi_hdi_wpa_client.cpp",
   "hal_device_manage/hal_device_manage.cpp",
@@ -115,6 +110,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     ]
@@ -133,16 +129,18 @@ if (defined(ohos_lite)) {
       "//build/lite/config:language_cpp",
       "//build/lite/config:language_c",
     ]
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
     cflags_c = [
       "-std=c99",
       "-fPIC",
     ]
-    cflags_cc = [
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
       "-fPIC",
     ]
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -190,6 +188,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       ":wifi_utils",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -216,26 +215,23 @@ if (defined(ohos_lite)) {
       external_deps += [ "drivers_interface_wlan:libhostapd_proxy_1.0" ]
     }
 
-    if (wifi_feature_with_wifi_hdi) {
-      defines += [ "HDI_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libwlan_proxy_1.2" ]
-    }
-
     if (wifi_feature_with_hdi_chip_supported) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
     }
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
-
+    version_script = "libwifi_native.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

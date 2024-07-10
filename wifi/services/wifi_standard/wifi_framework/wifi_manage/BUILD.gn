@@ -200,8 +200,10 @@ if (defined(ohos_lite)) {
   config("wifi_manager_service_config") {
     visibility = [ ":*" ]
     include_dirs = [ ":wifi_fw_common_header" ]
-
-    cflags = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags += [
       "-std=c++17",
       "-fno-rtti",
     ]
@@ -297,7 +299,9 @@ if (defined(ohos_lite)) {
     if (wifi_feature_sta_ap_exclusion) {
       defines += [ "FEATURE_STA_AP_EXCLUSION" ]
     }
-
+    if (wifi_feature_with_local_random_mac) {
+      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
+    }
     deps = [
       ":wifi_manager_service",
       "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
@@ -325,7 +329,6 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
-      "hicollie:libhicollie",
       "hilog:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",
@@ -359,6 +362,7 @@ if (defined(ohos_lite)) {
     deps = [
       ":wifi_manager_service",
       "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -453,6 +457,7 @@ if (defined(ohos_lite)) {
       ubsan = true  # Enable some Ubsan options
       debug = false
     }
+
     install_enable = true
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
@@ -481,6 +486,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap:wifi_ap_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p:wifi_p2p_service",
@@ -492,7 +498,9 @@ if (defined(ohos_lite)) {
     ]
 
     configs = [ ":wifi_manager_service_header" ]
-
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
     external_deps = [
       "ability_base:want",
       "ability_base:zuri",
@@ -519,7 +527,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
       "time_service:time_client",
     ]
-    if (wifi_feature_with_encryption) {
+    if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
       external_deps += [ "huks:libhukssdk" ]
     }
     defines = [
@@ -530,7 +538,7 @@ if (defined(ohos_lite)) {
       "FEATURE_SELF_CURE_SUPPORT",
     ]
 
-    if (is_asan) {
+    if (is_asan || use_clang_coverage) {
       defines += [ "DTFUZZ_TEST" ]
     }
 
@@ -559,7 +567,9 @@ if (defined(ohos_lite)) {
 
     if (defined(global_parts_info) &&
         defined(global_parts_info.powermgr_power_manager)) {
-      defines += [ "HAS_POWERMGR_PART" ]
+      if (wifi_feature_powermgr_support) {
+        defines += [ "HAS_POWERMGR_PART" ]
+      }
     }
 
     if (defined(global_parts_info) &&
@@ -604,7 +614,7 @@ if (defined(ohos_lite)) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
     }
-
+    version_script = "libwifi_manager.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

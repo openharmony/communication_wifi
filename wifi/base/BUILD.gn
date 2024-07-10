@@ -20,6 +20,7 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
+  "shared_util/wifi_watchdog_utils.cpp",
   "state_machine/src/handler.cpp",
   "state_machine/src/internal_message.cpp",
   "state_machine/src/message_queue.cpp",
@@ -31,6 +32,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/base/cRPC/include",
   "$WIFI_ROOT_DIR/base/state_machine/include",
   "$WIFI_ROOT_DIR/base/inner_api",
+  "$WIFI_ROOT_DIR/base/shared_util",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
@@ -57,12 +59,15 @@ if (defined(ohos_lite)) {
 
     configs -= [ "//build/lite/config:language_cpp" ]
 
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -82,13 +87,15 @@ if (defined(ohos_lite)) {
     external_deps = [ "hilog_lite:hilog_shared" ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -126,15 +133,18 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
+      "hicollie:libhicollie",
       "hilog:libhilog",
     ]
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -170,15 +180,18 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
+      "hicollie:libhicollie",
       "hilog:libhilog",
     ]
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]

@@ -55,6 +55,8 @@ ohos_static_library("wifi_self_cure") {
 
   sources = [
     "../wifi_sta/network_status_history_manager.cpp",
+    "ip_qos_monitor.cpp",
+    "multi_gateway.cpp",
     "self_cure_interface.cpp",
     "self_cure_service.cpp",
     "self_cure_state_machine.cpp",
@@ -72,7 +74,6 @@ ohos_static_library("wifi_self_cure") {
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
-    "init:libbegetutil",
     "netmanager_base:net_conn_manager_if",
     "netstack:http_client",
   ]
@@ -82,13 +83,15 @@ ohos_static_library("wifi_self_cure") {
   if (wifi_feature_with_local_random_mac) {
     defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
   }
-
-  cflags_cc = [
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
+  cflags_cc += [
     "-std=c++17",
     "-Wall",
   ]
 
-  ldflags = [
+  ldflags += [
     "-fPIC",
     "-Wl,-E",
   ]

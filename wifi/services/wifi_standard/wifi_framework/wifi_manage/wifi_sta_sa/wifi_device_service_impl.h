@@ -44,7 +44,6 @@ public:
     void OnStop();
 #else
     explicit WifiDeviceServiceImpl(int instId);
-    static void StartWatchdog(void);
     static ErrCode OnBackup(MessageParcel& data, MessageParcel& reply);
     static ErrCode OnRestore(MessageParcel& data, MessageParcel& reply);
 #endif
@@ -167,6 +166,8 @@ public:
 
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 
+    ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
+
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 
     ErrCode EnableSemiWifi() override;
@@ -182,6 +183,7 @@ private:
     bool IsScanServiceRunning();
     bool CheckConfigEap(const WifiDeviceConfig &config);
     bool CheckConfigPwd(const WifiDeviceConfig &config);
+    bool CheckConfigWapi(const WifiDeviceConfig &config);
     ErrCode CheckCallingUid(int &uid);
     bool IsWifiBrokerProcess(int uid);
     ErrCode CheckRemoveCandidateConfig(void);

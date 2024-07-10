@@ -33,12 +33,12 @@ WifiErrorNo GetName(char *ifname, int32_t size)
     WriteFunc(context, "GetName");
     WriteInt(context, size);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetName") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetName") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetName deal failed!");
     } else {
         ReadStr(context, ifname, size);
@@ -56,12 +56,12 @@ WifiErrorNo GetType(int32_t *type)
     WriteBegin(context, 0);
     WriteFunc(context, "GetType");
     WriteEnd(context);
-    if (RpcClientCall(client, "GetType") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetType") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetType deal failed!");
     } else {
         ReadInt(context, type);

@@ -23,13 +23,13 @@
 WifiErrorNo RpcClientCall(RpcClient *client, const char *func)
 {
     if (client == NULL) {
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
     int ret = RemoteCall(client);
     if (ret < 0) {
         LOGE("remote call %s failed!", ((func == NULL) ? "" : func));
         UnlockRpcClient(client);
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
-    return WIFI_IDL_OPT_OK;
+    return WIFI_HAL_OPT_OK;
 }

@@ -28,7 +28,7 @@
 #include "wifi_errcode.h"
 #include "wifi_log.h"
 #include "wifi_msg.h"
-#include "wifi_scan_param.h"
+#include "wifi_native_struct.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -88,6 +88,7 @@ public:
          *
          */
         void UnLoadDriver();
+        void HandleUpdateCountryCode(InternalMessage *msg);
     };
 
     class HardwareReady : public State {
@@ -272,7 +273,7 @@ private:
                                                       * being performed
                                                       */
     std::map<int, InterScanConfig> waitingScans;     /* Saves the parameters to be scanned */
-    WifiScanParam runningScanSettings;               /*
+    WifiHalScanParam runningScanSettings;               /*
                                                       * Parameter information about the scan
                                                       * that is being performed
                                                       */
@@ -354,7 +355,7 @@ private:
      * @param scanParam - Scanning parameters[in]
      * @return success: true, failed: false
      */
-    bool StartSingleCommonScan(WifiScanParam &scanParam);
+    bool StartSingleCommonScan(WifiHalScanParam &scanParam);
     /**
      * @Description  Processing of new scan requests received while scanning.
      *

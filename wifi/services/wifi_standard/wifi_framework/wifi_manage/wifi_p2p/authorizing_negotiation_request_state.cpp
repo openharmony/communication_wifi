@@ -60,7 +60,7 @@ bool AuthorizingNegotiationRequestState::ExecuteStateMsg(InternalMessage *msg)
                 p2pStateMachine.savedP2pConfig.SetWpsInfo(wpsPin);
             }
 
-            if (WifiErrorNo::WIFI_IDL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
+            if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
                 WIFI_LOGE("Failed to stop find.");
             }
             p2pStateMachine.P2pConnectByShowingPin(p2pStateMachine.savedP2pConfig);
@@ -81,7 +81,7 @@ bool AuthorizingNegotiationRequestState::ExecuteStateMsg(InternalMessage *msg)
             p2pStateMachine.savedP2pConfig.SetWpsInfo(wps);
 
             std::string pin;
-            if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+            if (WifiErrorNo::WIFI_HAL_OPT_OK !=
                 WifiP2PHalInterface::GetInstance().Connect(p2pStateMachine.savedP2pConfig, false, pin)) {
                 WIFI_LOGE("fail to connect.");
             }

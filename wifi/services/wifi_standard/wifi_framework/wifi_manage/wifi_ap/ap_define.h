@@ -51,7 +51,7 @@ enum class ApStatemachineEvent {
                                      /* (asynchronous result) */
 };
 
-using HandlerMethod = void(ApStatemachineEvent, int, int, const std::any &);
+using HandlerApMethod = void(ApStatemachineEvent, int, int, const std::any &);
 }
 } // namespace OHOS
 #endif /* OHOS_AP_DEFINE_H */

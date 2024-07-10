@@ -276,6 +276,8 @@ public:
     const int &GetNetworkId() const;
     void SetGoIpAddress(const std::string &ipAddr);
     const std::string &GetGoIpAddress() const;
+    void SetGcIpAddress(const std::string &ipAddr);
+    const std::string &GetGcIpAddress() const;
     void AddClientDevice(const WifiP2pDevice &clientDevice);
     void RemoveClientDevice(const WifiP2pDevice &clientDevice);
     bool IsContainsDevice(const WifiP2pDevice &clientDevice) const;
@@ -285,6 +287,8 @@ public:
     void ClearClientDevices();
     bool IsExplicitGroup(void) const;
     void SetExplicitGroup(bool isExplicit);
+    void SetCreatorUid(int uid);
+    int GetCreatorUid();
 
 private:
     WifiP2pDevice owner;
@@ -298,7 +302,9 @@ private:
     P2pGroupStatus groupStatus;
     std::vector<WifiP2pDevice> clientDevices;
     std::string goIpAddress;
+    std::string gcIpAddress;
     bool explicitGroup;
+    int creatorUid = -1;
 };
 
 class WpsInfo {

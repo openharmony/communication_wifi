@@ -86,6 +86,7 @@ public:
     void RemoveConcreteManager(int id);
     void HandleStaClose(int id);
     void HandleStaStart(int id);
+    void HandleStaSemiActive(int id);
     void HandleConcreteStop(int id);
     void ClearWifiStartFailCount();
     void ClearApStartFailCount();
@@ -139,6 +140,7 @@ private:
     void HandleAirplaneOpen();
     void HandleAirplaneClose();
     static bool IsWifiEnable();
+    static bool IsSemiWifiEnable();
     static bool IsScanOnlyEnable();
 
 #ifndef HDI_CHIP_INTERFACE_SUPPORT

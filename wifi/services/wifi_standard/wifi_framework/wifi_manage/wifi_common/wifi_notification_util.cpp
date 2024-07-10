@@ -48,17 +48,22 @@ void WifiNotificationUtil::PublishWifiNotification(WifiNotificationId notificati
     want.SetParam("status", status);
     want.SetParam("ssid", ssid);
     auto result = StartAbility(want);
+    isNtfPublished = true;
     WIFI_LOGI("Publishing wifi notification End, result = %{public}d", result);
 }
 
 void WifiNotificationUtil::CancelWifiNotification(WifiNotificationId notificationId)
 {
     WIFI_LOGI("Cancel notification, id [%{public}d]", static_cast<int>(notificationId));
+    if (!isNtfPublished) {
+        return;
+    }
     AAFwk::Want want;
     want.SetElementName("com.ohos.locationdialog", "WifiServiceAbility");
     want.SetParam("operateType", static_cast<int>(WifiNotificationOpetationType::CANCEL));
     want.SetParam("notificationId", static_cast<int>(notificationId));
     auto result = StartAbility(want);
+    isNtfPublished = false;
     WIFI_LOGI("Cancel notification End, result = %{public}d", result);
 }
 

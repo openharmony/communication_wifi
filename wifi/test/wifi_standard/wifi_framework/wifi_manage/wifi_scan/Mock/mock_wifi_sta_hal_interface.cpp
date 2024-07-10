@@ -17,39 +17,39 @@
 namespace OHOS {
 namespace Wifi {
 namespace WifiStaHalInterface {
-WifiErrorNo Scan(const WifiScanParam &scanParam)
+WifiErrorNo Scan(const WifiHalScanParam &scanParam)
 {
-    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo QueryScanInfos(std::vector<InterScanInfo> &scanInfos)
 {
-    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo StartPnoScan(const WifiPnoScanParam &scanParam)
+WifiErrorNo StartPnoScan(const WifiHalPnoScanParam &scanParam)
 {
-    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo StopPnoScan(void)
 {
-    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo GetSupportFrequencies(int band, std::vector<int> &frequencies)
 {
-    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFre ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFre ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo StartWifi()
 {
-    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startWifi ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo StoPWifi()
 {
-    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopWifi ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 };
 }  // namespace Wifi

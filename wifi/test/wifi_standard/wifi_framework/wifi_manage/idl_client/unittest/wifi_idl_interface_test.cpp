@@ -26,27 +26,27 @@ HWTEST_F(WifiIdlInterfaceTest, GetWifiChipTest, TestSize.Level1)
 {
     uint8_t id = 0;
     IWifiChip chip;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, GetWifiChip(id, &chip));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, GetWifiChip(id, &chip));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, GetChipIdTest, TestSize.Level1)
 {
     int32_t id = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, GetChipId(&id));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, GetChipId(&id));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, CreateIfaceTest, TestSize.Level1)
 {
     int32_t type = 0;
     IWifiIface iface;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, CreateIface(type, &iface));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, CreateIface(type, &iface));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, GetIfaceTest, TestSize.Level1)
 {
     char ifname[] = "wlan0";
     IWifiIface iface;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, GetIface(ifname, &iface));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, GetIface(ifname, &iface));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, GetIfaceNamesTest, TestSize.Level1)
@@ -54,51 +54,51 @@ HWTEST_F(WifiIdlInterfaceTest, GetIfaceNamesTest, TestSize.Level1)
     char iface[32] = {0};
     int size = 32;
     int32_t type = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, GetIfaceNames(type, iface, size));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, GetIfaceNames(type, iface, size));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, RemoveIfaceTest, TestSize.Level1)
 {
     char ifname[] = "wlan0";
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, RemoveIface(ifname));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, RemoveIface(ifname));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, ConfigComboModesTest, TestSize.Level1)
 {
     int32_t mode = 0;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, ConfigComboModes(mode));
+    EXPECT_NE(WifiErrorNo::WIFI_HAL_OPT_OK, ConfigComboModes(mode));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, GetComboModesTest, TestSize.Level1)
 {
     int32_t mode = 0;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, GetComboModes(&mode));
+    EXPECT_NE(WifiErrorNo::WIFI_HAL_OPT_OK, GetComboModes(&mode));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, RequestFirmwareDebugDumpTest, TestSize.Level1)
 {
     unsigned char buff[128] = {0};
     int size = 128;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, RequestFirmwareDebugDump(buff, &size));
+    EXPECT_NE(WifiErrorNo::WIFI_HAL_OPT_OK, RequestFirmwareDebugDump(buff, &size));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, GetNameTest, TestSize.Level1)
 {
     char ifname[32] = {0};
     int size = 32;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, GetName(ifname, size));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, GetName(ifname, size));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, GetTypeTest, TestSize.Level1)
 {
     int32_t type = 0;
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, GetType(&type));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, GetType(&type));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, GetStaCapabilitiesTest, TestSize.Level1)
 {
     int32_t capabilities = 0;
-    EXPECT_NE(WifiErrorNo::WIFI_IDL_OPT_OK, GetStaCapabilities(&capabilities));
+    EXPECT_NE(WifiErrorNo::WIFI_HAL_OPT_OK, GetStaCapabilities(&capabilities));
 }
 
 HWTEST_F(WifiIdlInterfaceTest, RunCmdTest, TestSize.Level1)
@@ -107,7 +107,7 @@ HWTEST_F(WifiIdlInterfaceTest, RunCmdTest, TestSize.Level1)
     int32_t cmdId = 0;
     unsigned char buff[] = "run cmd buffer";
     int32_t bufSize = strlen((const char *)buff);
-    EXPECT_EQ(WifiErrorNo::WIFI_IDL_OPT_OK, RunCmd(ifname, cmdId, buff, bufSize));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, RunCmd(ifname, cmdId, buff, bufSize));
 }
 }  // namespace Wifi
 }  // namespace OHOS

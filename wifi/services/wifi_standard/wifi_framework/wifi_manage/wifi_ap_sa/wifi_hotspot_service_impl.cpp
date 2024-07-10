@@ -19,6 +19,7 @@
 #include "wifi_permission_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_auth_center.h"
+#include "wifi_channel_helper.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_internal_event_dispatcher.h"
@@ -28,6 +29,7 @@
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
 #include "mac_address.h"
+#include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
@@ -76,7 +78,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     }
 
     std::vector<BandType> bands;
-    if (WifiConfigCenter::GetInstance().GetValidBands(bands) < 0) {
+    if (WifiChannelHelper::GetInstance().GetValidBands(bands) < 0) {
         WIFI_LOGE("IsHotspotDualBandSupported:GetValidBands return failed!");
         return WIFI_OPT_FAILED;
     }
@@ -134,7 +136,7 @@ ErrCode WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfig &result)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().GetHotspotConfig(result, m_id);
+    WifiSettings::GetInstance().GetHotspotConfig(result, m_id);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -173,11 +175,11 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         }
     }
     std::vector<BandType> bandsFromCenter;
-    WifiConfigCenter::GetInstance().GetValidBands(bandsFromCenter);
+    WifiChannelHelper::GetInstance().GetValidBands(bandsFromCenter);
     ChannelsTable channInfoFromCenter;
-    WifiConfigCenter::GetInstance().GetValidChannels(channInfoFromCenter);
+    WifiChannelHelper::GetInstance().GetValidChannels(channInfoFromCenter);
     HotspotConfig configFromCenter;
-    WifiConfigCenter::GetInstance().GetHotspotConfig(configFromCenter, m_id);
+    WifiSettings::GetInstance().GetHotspotConfig(configFromCenter, m_id);
     ErrCode validRetval = IsValidHotspotConfig(config, configFromCenter, bandsFromCenter, channInfoFromCenter);
     if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Instance %{public}d Hotspot config is invalid!", m_id);
@@ -195,7 +197,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
 
     if (!IsApServiceRunning() ||
         WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(config, m_id) == false) {
-        WifiConfigCenter::GetInstance().SetHotspotConfig(config, m_id);
+        WifiSettings::GetInstance().SetHotspotConfig(config, m_id);
         WifiSettings::GetInstance().SyncHotspotConfig();
     }
     return WIFI_OPT_SUCCESS;
@@ -275,7 +277,7 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
             macAddrInfo.bssid = iter->bssid;
             macAddrInfo.bssidType = iter->bssidType;
             std::string randomMacAddr =
-                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
+                WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
             if (!randomMacAddr.empty() &&
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->bssid = randomMacAddr;
@@ -301,7 +303,7 @@ ErrCode WifiHotspotServiceImpl::TransRandomToRealMac(StationInfo &updateInfo, co
         macAddrInfo.bssid = info.bssid;
         macAddrInfo.bssidType = info.bssidType;
         std::string macAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
         if (macAddr.empty()) {
             WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
                 macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -439,7 +441,7 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     TransRandomToRealMac(updateInfo, info);
 #endif
-    if (WifiConfigCenter::GetInstance().AddBlockList(updateInfo, m_id) < 0) {
+    if (WifiSettings::GetInstance().ManageBlockList(info, MODE_ADD, m_id) < 0) {
         WIFI_LOGE("Add block list failed!");
         return WIFI_OPT_FAILED;
     }
@@ -496,7 +498,7 @@ ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
         }
     }
 
-    if (WifiConfigCenter::GetInstance().DelBlockList(updateInfo, m_id) < 0) {
+    if (WifiSettings::GetInstance().ManageBlockList(info, MODE_DEL, m_id) < 0) {
         WIFI_LOGE("Delete block list failed!");
         return WIFI_OPT_FAILED;
     }
@@ -511,7 +513,7 @@ ErrCode WifiHotspotServiceImpl::GetValidBands(std::vector<BandType> &bands)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiConfigCenter::GetInstance().GetValidBands(bands) < 0) {
+    if (WifiChannelHelper::GetInstance().GetValidBands(bands) < 0) {
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -530,7 +532,7 @@ ErrCode WifiHotspotServiceImpl::GetValidChannels(BandType band, std::vector<int3
         return WIFI_OPT_INVALID_PARAM;
     }
     ChannelsTable channInfoFromCenter;
-    WifiConfigCenter::GetInstance().GetValidChannels(channInfoFromCenter);
+    WifiChannelHelper::GetInstance().GetValidChannels(channInfoFromCenter);
     auto iter = channInfoFromCenter.find(band);
     if (iter != channInfoFromCenter.end()) {
         validchannels = iter->second;
@@ -562,10 +564,10 @@ ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
             macAddrInfo.bssid = iter->bssid;
             macAddrInfo.bssidType = iter->bssidType;
             std::string randomMacAddr =
-                WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
+                WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
             if (randomMacAddr.empty()) {
                 WIFI_LOGI("%{public}s: GenerateRandomMacAddress", __func__);
-                WifiSettings::GetInstance().GenerateRandomMacAddress(randomMacAddr);
+                WifiRandomMacHelper::GenerateRandomMacAddress(randomMacAddr);
             }
             if (!randomMacAddr.empty() &&
                 (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
@@ -577,7 +579,7 @@ ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
         }
     }
 #endif
-    if (WifiConfigCenter::GetInstance().GetBlockLists(infos, m_id) < 0) {
+    if (WifiSettings::GetInstance().GetBlockList(infos, m_id) < 0) {
         WIFI_LOGE("Get block list failed!");
         return WIFI_OPT_FAILED;
     }
@@ -685,7 +687,7 @@ ErrCode WifiHotspotServiceImpl::SetPowerModel(const PowerModel& model)
 void WifiHotspotServiceImpl::ConfigInfoDump(std::string& result)
 {
     HotspotConfig config;
-    WifiConfigCenter::GetInstance().GetHotspotConfig(config);
+    WifiSettings::GetInstance().GetHotspotConfig(config);
     std::stringstream ss;
     ss << "Hotspot config: " << "\n";
     ss << "  Config.ssid: " << config.GetSsid() << "\n";
@@ -752,7 +754,7 @@ void WifiHotspotServiceImpl::StationsInfoDump(std::string& result)
     }
 
     std::vector<StationInfo> vecBlockStations;
-    WifiConfigCenter::GetInstance().GetBlockLists(vecBlockStations);
+    WifiSettings::GetInstance().GetBlockList(vecBlockStations);
     if (!vecBlockStations.empty()) {
         std::stringstream ss;
         ss << "Block station list size: " << vecBlockStations.size() << "\n";
@@ -908,7 +910,7 @@ ErrCode WifiHotspotServiceImpl::GetApIfaceName(std::string& ifaceName)
         WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

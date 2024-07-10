@@ -33,6 +33,7 @@
 #include "arp_checker.h"
 #include "self_cure_msg.h"
 #include "wifi_common_util.h"
+#include "wifi_net_observer.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -137,7 +138,7 @@ public:
         void RequestReassocWithFactoryMac();
         void HandleInvalidIp(InternalMessage *msg);
         void HandleInternetFailedDetected(InternalMessage *msg);
-        void IsWifi6SelfCureNeed(InternalMessage *msg);
+        void HandleTcpQualityQuery(InternalMessage *msg);
     };
 
     /* *
@@ -192,7 +193,7 @@ public:
         SelfCureStateMachine *pSelfCureStateMachine;
         int currentRssi = -1;
         std::string currentBssid = "";
-        int selfCureFailedCounter = -1;
+        int selfCureFailedCounter = 0;
         int currentAbnormalType = -1;
         int lastSelfCureLevel = -1;
         int currentSelfCureLevel = -1;
@@ -217,6 +218,7 @@ public:
         int selfCureForInvalidIpCnt = 0;
         SelfCureIssHandleFuncMap selfCureIssHandleFuncMap;
         int InitSelfCureIssHandleMap();
+        void HandleRandMacSelfCureComplete(InternalMessage *msg);
         void HandleInternetFailedSelfCure(InternalMessage *msg);
         void HandleSelfCureWifiLink(InternalMessage *msg);
         void HandleNetworkDisconnected(InternalMessage *msg);
@@ -225,11 +227,12 @@ public:
         void HandleP2pDisconnected(InternalMessage *msg);
         void HandlePeriodicArpDetecte(InternalMessage *msg);
         void HandleArpFailedDetected(InternalMessage *msg);
+        void HandleHttpReachableRecv(InternalMessage *msg);
         void SelectSelfCureByFailedReason(int internetFailedType);
         int SelectBestSelfCureSolution(int internetFailedType);
         void SelfCureWifiLink(int requestCureLevel);
         bool SelectedSelfCureAcceptable();
-        void SelfCureForRandMacReassoc();
+        void SelfCureForRandMacReassoc(int requestCureLevel);
         void SelfCureForReset(int requestCureLevel);
         void HandleIpConfigCompleted();
         void HandleIpConfigCompletedAfterRenewDhcp();
@@ -243,13 +246,10 @@ public:
         void HandleSelfCureFailedForRandMacReassoc();
         void HandleRssiChanged();
         void HandleDelayedResetSelfCure();
-        void SelfCureForDns();
-        bool UseOperatorOverSea();
-        void GetPublicDnsServers(std::vector<std::string>& dnsServers);
-        void GetReplacedDnsServers(std::vector<std::string>& curDnses, std::vector<std::string>& replacedDnses);
-        void UpdateDnsServers(std::vector<std::string>& dnsServers);
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);
+        void SelfcureForMultiGateway(InternalMessage *msg);
+        bool IsNeedMultiGatewaySelfcure();
     };
 
     /* *
@@ -275,8 +275,25 @@ public:
         void Wifi6ReassocSelfcure();
     };
 
+    /* *
+     * @Description  Definition of NoInternetState class in SelfCureStateMachine.
+     *
+     */
+    class NoInternetState : public State {
+    public:
+        explicit NoInternetState(SelfCureStateMachine *selfCureStateMachine);
+        ~NoInternetState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessage *msg) override;
+
+    private:
+        SelfCureStateMachine *pSelfCureStateMachine;
+    };
+
     ErrCode Initialize();
     void SetHttpMonitorStatus(bool isHttpReachable);
+    bool IsSelfCureOnGoing();
 
 private:
 
@@ -372,7 +389,6 @@ private:
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     bool IfMultiGateway();
     bool IsSettingsPage();
-    void InitDnsServer();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;
@@ -384,6 +400,7 @@ private:
     ConnectionSelfCureState *pConnectionSelfCureState;
     InternetSelfCureState *pInternetSelfCureState;
     Wifi6SelfCureState *pWifi6SelfCureState;
+    NoInternetState *pNoInternetState;
 
     int m_instId;
     bool mIsHttpReachable = false;
@@ -410,6 +427,8 @@ private:
     std::vector<std::string> dhcpFailedConfigKeys;
     std::map<std::string, int> autoConnectFailedNetworksRssi;
     std::atomic<bool> isWifiBackground = false;
+    sptr<NetStateObserver> mNetWorkDetect;
+    bool m_httpDetectResponse = false;
 };
 } // namespace Wifi
 } // namespace OHOS

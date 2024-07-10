@@ -17,7 +17,6 @@
 #include "wifi_logger.h"
 #ifdef OHOS_ARCH_LITE
 #include <atomic>
-#include <chrono>
 #include <condition_variable>
 #include <deque>
 #include <memory>
@@ -35,7 +34,7 @@ DEFINE_WIFILOG_LABEL("WifiEventHandler");
 #ifdef OHOS_ARCH_LITE
 class WifiEventHandler::WifiEventHandlerImpl {
 public:
-    WifiEventHandlerImpl(const std::string &threadName)
+    WifiEventHandlerImpl(const std::string &threadName, const Callback &timeOutFunc = nullptr)
     {
         mRunFlag = true;
         mWorkerThread = std::thread(WifiEventHandlerImpl::Run, std::ref(*this));
@@ -102,22 +101,31 @@ private:
     std::deque<Callback> mEventQue;
 };
 #elif WIFI_FFRT_ENABLE
+constexpr int WIFI_THREAD_TIMEOUT_LIMIT = 30 * 1000 * 1000; // 30s
 class WifiEventHandler::WifiEventHandlerImpl {
 public:
-    WifiEventHandlerImpl(const std::string &threadName)
+    WifiEventHandlerImpl(const std::string &threadName, const Callback &timeOutFunc = nullptr)
     {
         std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         if (eventQueue != nullptr) {
             WIFI_LOGI("WifiEventHandlerImpl already init.");
             return;
         }
-        eventQueue = std::make_shared<ffrt::queue>(threadName.c_str());
-        WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue, threadName:%{public}s", threadName.c_str());
+        if (timeOutFunc == nullptr) {
+            eventQueue = std::make_shared<ffrt::queue>(threadName.c_str());
+            WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue, threadName:%{public}s", threadName.c_str());
+        } else {
+            eventQueue = std::make_shared<ffrt::queue>(threadName.c_str(),
+            ffrt::queue_attr().timeout(WIFI_THREAD_TIMEOUT_LIMIT).callback(timeOutFunc));
+            WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue with callback,"
+                "threadName:%{public}s", threadName.c_str());
+        }
     }
+
     ~WifiEventHandlerImpl()
     {
-        std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         WIFI_LOGI("WifiEventHandler: ~WifiEventHandler");
+        std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         if (eventQueue) {
             eventQueue = nullptr;
         }
@@ -184,7 +192,7 @@ public:
             if (iter->second != nullptr) {
                 int32_t ret = eventQueue->cancel(iter->second);
                 if (ret != 0) {
-                    WIFI_LOGE("RemoveAsyncTask failed, error code : %{public}d", ret);
+                    WIFI_LOGD("RemoveAsyncTask failed, error code : %{public}d", ret);
                 }
                 iter->second = nullptr;
             }
@@ -199,7 +207,7 @@ private:
 #else
 class WifiEventHandler::WifiEventHandlerImpl {
 public:
-    WifiEventHandlerImpl(const std::string &threadName)
+    WifiEventHandlerImpl(const std::string &threadName, const Callback &timeOutFunc = nullptr)
     {
         eventRunner = AppExecFwk::EventRunner::Create(threadName);
         if (eventRunner) {
@@ -258,8 +266,8 @@ private:
 };
 #endif
 
-WifiEventHandler::WifiEventHandler(const std::string &threadName)
-    :ptr(new WifiEventHandlerImpl(threadName))
+WifiEventHandler::WifiEventHandler(const std::string &threadName, const Callback &timeOutFunc)
+    :ptr(new WifiEventHandlerImpl(threadName, timeOutFunc))
 {}
 
 WifiEventHandler::~WifiEventHandler()
@@ -269,21 +277,63 @@ WifiEventHandler::~WifiEventHandler()
 
 bool WifiEventHandler::PostSyncTask(const Callback &callback)
 {
+    if (ptr == nullptr) {
+        WIFI_LOGE("PostSyncTask: ptr is nullptr!");
+        return false;
+    }
     return ptr->PostSyncTask(const_cast<Callback &>(callback));
 }
 
 bool WifiEventHandler::PostAsyncTask(const Callback &callback, int64_t delayTime)
 {
+    if (ptr == nullptr) {
+        WIFI_LOGE("PostAsyncTask: ptr is nullptr!");
+        return false;
+    }
     return ptr->PostAsyncTask(const_cast<Callback &>(callback), delayTime);
 }
 
 bool WifiEventHandler::PostAsyncTask(const Callback &callback, const std::string &name, int64_t delayTime)
 {
+    if (ptr == nullptr) {
+        WIFI_LOGE("PostAsyncTask: ptr is nullptr!");
+        return false;
+    }
     return ptr->PostAsyncTask(const_cast<Callback &>(callback), name, delayTime);
 }
 void WifiEventHandler::RemoveAsyncTask(const std::string &name)
 {
+    if (ptr == nullptr) {
+        WIFI_LOGE("RemoveAsyncTask: ptr is nullptr!");
+        return;
+    }
     ptr->RemoveAsyncTask(name);
 }
+
+
+bool WifiEventHandler::PostSyncTimeOutTask(const Callback &callback, uint64_t waitTime)
+{
+#ifdef WIFI_FFRT_ENABLE
+    ffrt::future f = ffrt::async(callback);
+    ffrt::future_status status = f.wait_for(std::chrono::milliseconds(waitTime));
+    if (status == ffrt::future_status::timeout) {
+        WIFI_LOGE("PostSyncTimeOutTask: Task timeout!");
+        return false;
+    }
+
+    return true;
+#else
+    std::future f = std::async(callback);
+    std::future_status status = f.wait_for(std::chrono::milliseconds(waitTime));
+    if (status == std::future_status::timeout) {
+        WIFI_LOGE("PostSyncTimeOutTask: Task timeout!");
+        return false;
+    }
+
+    return true;
+#endif
+}
+
+
 } // namespace Wifi
 } // namespace OHOS

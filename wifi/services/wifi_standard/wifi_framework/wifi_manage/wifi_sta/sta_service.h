@@ -49,7 +49,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableWifi();
+    virtual ErrCode EnableStaService();
     /**
      * @Description  Disable wifi
      *
@@ -58,7 +58,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode DisableWifi() const;
+    virtual ErrCode DisableStaService() const;
     /**
      * @Description  Connect to a new network
      *
@@ -336,7 +336,7 @@ public:
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid);
+    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd);
  
     /**
      * @Description deliver mac
@@ -344,7 +344,6 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac);
-
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;

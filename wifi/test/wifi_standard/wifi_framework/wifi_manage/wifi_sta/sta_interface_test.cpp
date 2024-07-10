@@ -68,27 +68,27 @@ public:
     void EnableWifiSuccess()
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->EnableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_CALL(*pMockStaService, EnableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->EnableStaService() == WIFI_OPT_SUCCESS);
     }
 
     void EnableWifiFail1()
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        pStaInterface->EnableWifi();
+        EXPECT_CALL(*pMockStaService, EnableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        pStaInterface->EnableStaService();
     }
 
     void DisableWifiSuceess()
     {
-        EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_SUCCESS);
     }
 
     void DisableWifiFail()
     {
-        EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_FAILED);
+        EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_FAILED);
     }
 
     void ConnectToNetworkIdSuceess()
@@ -361,7 +361,7 @@ public:
         EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->ReConnect() == WIFI_OPT_FAILED);
     }
-
+    
     void EnableHiLinkHandshakeSuceess()
     {
         WifiDeviceConfig config;
@@ -373,6 +373,31 @@ public:
     {
         std::string mac = "01:23:45:67:89:ab";
         pStaInterface->DeliverStaIfaceData(mac);
+    }
+
+    void StartRoamToNetwork()
+    {
+        std::string bssid = "01:23:45:67:89:ab";
+        pStaInterface->StartRoamToNetwork(0, bssid);
+    }
+    void SetPowerMode()
+    {
+        pStaInterface->SetPowerMode(0);
+    }
+
+    void SetTxPower()
+    {
+        pStaInterface->SetTxPower(0);
+    }
+
+    void OnSystemAbilityChanged()
+    {
+        pStaInterface->OnSystemAbilityChanged(0, 0);
+    }
+
+    void StartPortalCertification()
+    {
+        pStaInterface->StartPortalCertification();
     }
 };
 
@@ -686,5 +711,24 @@ HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
 {
     DeliverStaIfaceDataSuceess();
 }
+
+HWTEST_F(StaInterfaceTest, StartRoamToNetwork, TestSize.Level1)
+{
+    StartRoamToNetwork();
+}
+HWTEST_F(StaInterfaceTest, SetPowerMode, TestSize.Level1)
+{
+    SetPowerMode();
+}
+HWTEST_F(StaInterfaceTest, SetTxPower, TestSize.Level1)
+{
+    SetTxPower();
+}
+
+HWTEST_F(StaInterfaceTest, OnSystemAbilityChanged, TestSize.Level1)
+{
+    OnSystemAbilityChanged();
+}
+
 } // namespace Wifi
 } // namespace OHOS

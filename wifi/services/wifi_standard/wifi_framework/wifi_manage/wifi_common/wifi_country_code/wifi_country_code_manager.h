@@ -98,6 +98,22 @@ public:
      */
     ErrCode UnregisterWifiCountryCodeChangeListener(const std::shared_ptr<IWifiCountryCodeChangeListener> &listener);
 
+#ifdef FEATURE_STA_SUPPORT
+    /**
+     * @Description deal wifi open result
+     *
+     * @param instId - instance Id
+     */
+    void DealStaOpened(int instId);
+
+    /**
+     * @Description deal wifi close result
+     *
+     * @param instId - instance Id
+     */
+    void DealStaStopped(int instId);
+#endif
+
     /**
      * @Description disable WifiCountryCodeManager construct
      *
@@ -131,8 +147,6 @@ private:
     void SendCountryCodeChangeCommonEvent(const std::string &wifiCountryCode);
     ErrCode UpdateWifiCountryCode(const std::string &externalCode = "");
 #ifdef FEATURE_STA_SUPPORT
-    static void DealStaOpenRes(OperateResState state, int instId = 0);
-    static void DealStaCloseRes(OperateResState state, int instId = 0);
     static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
 #endif
 #ifdef FEATURE_AP_SUPPORT

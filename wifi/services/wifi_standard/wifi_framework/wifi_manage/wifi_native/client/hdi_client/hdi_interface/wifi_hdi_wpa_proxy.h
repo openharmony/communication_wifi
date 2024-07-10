@@ -24,7 +24,6 @@
 #include "v1_1/iwpa_callback.h"
 #include "v1_1/wpa_types.h"
 #include "wifi_error_no.h"
-#include "wifi_log.h"
 #include "securec.h"
 #include "wifi_common_def.h"
 

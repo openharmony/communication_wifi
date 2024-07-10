@@ -20,8 +20,7 @@
 #include <gmock/gmock.h>
 #include "wifi_error_no.h"
 #include "wifi_internal_msg.h"
-#include "wifi_idl_struct.h"
-#include "wifi_scan_param.h"
+#include "wifi_native_struct.h"
 #include "supplicant_event_callback.h"
 #include "i_wifi_struct.h"
 

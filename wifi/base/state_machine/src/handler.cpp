@@ -16,7 +16,8 @@
 #include <iostream>
 #include <sys/time.h>
 #include "wifi_log.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
+#include "wifi_watchdog_utils.h"
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_HANDLER"
 
@@ -59,7 +60,10 @@ bool Handler::InitialHandler(const std::string &name)
     pthread_setname_np(handleThread, name.c_str());
 #else
     if (pMyTaskQueue == nullptr) {
-        pMyTaskQueue = std::make_unique<WifiEventHandler>(name);
+        std::function<void()> func = std::bind([&name]() {
+            WifiWatchDogUtils::GetInstance()->ResetProcess(true, name);
+        });
+        pMyTaskQueue = std::make_unique<WifiEventHandler>(name, func);
         if (pMyTaskQueue == nullptr) {
             LOGE("pMyTaskQueue alloc failed.\n");
             return false;
@@ -127,10 +131,10 @@ void Handler::GetAndDistributeMessage()
             continue;
         }
         LOGD("Handler get message: %{public}d\n", msg->GetMessageName());
-        WifiSettings::GetInstance().SetThreadStatusFlag(true);
+        WifiConfigCenter::GetInstance().SetThreadStatusFlag(true);
         DistributeMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);
-        WifiSettings::GetInstance().SetThreadStatusFlag(false);
+        WifiConfigCenter::GetInstance().SetThreadStatusFlag(false);
     }
 
     return;

@@ -15,7 +15,7 @@
 #include "sta_auto_connect_service.h"
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_common_util.h"
 #include "block_connect_service.h"
 
@@ -70,7 +70,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     ClearOvertimeBlockedBssid(); /* Refreshing the BSSID Blocklist */
 
     WifiLinkedInfo info;
-    WifiSettings::GetInstance().GetLinkedInfo(info, m_instId);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
     if (info.supplicantState == SupplicantState::ASSOCIATING ||
         info.supplicantState == SupplicantState::AUTHENTICATING ||
         info.supplicantState == SupplicantState::FOUR_WAY_HANDSHAKE ||
@@ -217,7 +217,7 @@ void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice
     }
 
     WifiLinkedInfo currentConnectedNetwork;
-    WifiSettings::GetInstance().GetLinkedInfo(currentConnectedNetwork, m_instId);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(currentConnectedNetwork, m_instId);
     if (currentConnectedNetwork.connState == ConnState::CONNECTED && electedDevice.networkId == INVALID_NETWORK_ID &&
         currentConnectedNetwork.ssid == electedDevice.ssid && currentConnectedNetwork.bssid != electedDevice.bssid) {
         /* Frameworks start roaming only when firmware is not supported */
@@ -271,15 +271,15 @@ bool StaAutoConnectService::ObtainRoamCapFromFirmware()
     WIFI_LOGI("Enter ObtainRoamCapFromFirmware.\n");
 
     unsigned int capabilities;
-    if (WifiStaHalInterface::GetInstance().GetStaCapabilities(capabilities) == WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().GetStaCapabilities(capabilities) == WIFI_HAL_OPT_OK) {
         if ((capabilities & STA_CAP_ROAMING) == 0) {
             WIFI_LOGE("Firmware roaming is not supported.\n");
             return false;
         }
     }
 
-    WifiIdlRoamCapability capability;
-    if (WifiStaHalInterface::GetInstance().GetRoamingCapabilities(capability) == WIFI_IDL_OPT_OK) {
+    WifiHalRoamCapability capability;
+    if (WifiStaHalInterface::GetInstance().GetRoamingCapabilities(capability) == WIFI_HAL_OPT_OK) {
         if (capability.maxBlocklistSize > 0) {
             firmwareRoamFlag = true;
             maxBlockedBssidNum = capability.maxBlocklistSize;
@@ -308,9 +308,9 @@ bool StaAutoConnectService::SetRoamBlockedBssidFirmware(const std::vector<std::s
         return false;
     }
 
-    WifiIdlRoamConfig capability;
+    WifiHalRoamConfig capability;
     capability.blocklistBssids = blocklistBssids;
-    if (WifiStaHalInterface::GetInstance().SetRoamConfig(capability) == WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().SetRoamConfig(capability) == WIFI_HAL_OPT_OK) {
         return true;
     }
     return false;
@@ -516,9 +516,10 @@ bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<InterScanI
         return false;
     }
 
-    int userLastSelectedNetworkId = WifiSettings::GetInstance().GetUserLastSelectedNetworkId(m_instId);
+    int userLastSelectedNetworkId = WifiConfigCenter::GetInstance().GetUserLastSelectedNetworkId(m_instId);
     if (userLastSelectedNetworkId != INVALID_NETWORK_ID && userLastSelectedNetworkId == network.networkId) {
-        time_t userLastSelectedNetworkTimeVal = WifiSettings::GetInstance().GetUserLastSelectedNetworkTimeVal(m_instId);
+        time_t userLastSelectedNetworkTimeVal = WifiConfigCenter::GetInstance().GetUserLastSelectedNetworkTimeVal(
+            m_instId);
         time_t now = time(0);
         int interval = static_cast<int>(now - userLastSelectedNetworkTimeVal);
         if (interval <= TIME_FROM_LAST_SELECTION) {

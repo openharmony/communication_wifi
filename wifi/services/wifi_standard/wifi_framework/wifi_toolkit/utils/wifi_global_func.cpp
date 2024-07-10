@@ -20,6 +20,7 @@
 #include <random>
 #include "wifi_log.h"
 #ifndef OHOS_ARCH_LITE
+#include "json/json.h"
 #include "wifi_country_code_define.h"
 #endif
 #ifdef INIT_LIB_ENABLE
@@ -43,6 +44,10 @@ constexpr int CHANNEL_2G_MIN = 1;
 constexpr int CHANNEL_2G_MAX = 14;  // 2484
 constexpr int CHANNEL_5G_MIN = 34;
 constexpr int CHANNEL_5G_MAX = 165;  // 5825
+constexpr int PROP_FACTORY_RUN_MODE_LEN = 10;
+constexpr int FACTORY_MODE_LEN = 7;
+constexpr const char* FACTORY_RUN_MODE = "const.runmode";
+constexpr const char* FACTORY_MODE = "factory";
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
@@ -526,5 +531,99 @@ bool IsChannelDbac(int channelA, int channelB)
     }
     return false;
 }
+
+bool IsPskEncryption(const std::string &keyMgmt)
+{
+    return keyMgmt == KEY_MGMT_WPA_PSK || keyMgmt == KEY_MGMT_SAE;
+}
+
+bool IsFactoryMode()
+{
+    char preValue[PROP_FACTORY_RUN_MODE_LEN] = {0};
+    int errCode = GetParamValue(FACTORY_RUN_MODE, 0, preValue, PROP_FACTORY_RUN_MODE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, FACTORY_MODE, FACTORY_MODE_LEN) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+#ifndef OHOS_ARCH_LITE
+bool ParseJsonKey(const Json::Value &jsonValue, const std::string &key, std::string &value)
+{
+    if (jsonValue.isArray()) {
+        int nSize = static_cast<int>(jsonValue.size());
+        for (int i = 0; i < nSize; i++) {
+            if (!jsonValue[i].isMember(key)) {
+                LOGW("ParseJsonKey JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
+                return false;
+            }
+            if (jsonValue[i][key].isString()) {
+                value = jsonValue[i][key].asString();
+                return true;
+            } else if (jsonValue[i][key].isInt()) {
+                value = std::to_string(jsonValue[i][key].asInt());
+                return true;
+            }
+            return false;
+        }
+    }
+    return false;
+}
+
+bool ParseJson(const std::string &jsonString, const std::string &type, const std::string &key, std::string &value)
+{
+    LOGI("ParseJson enter.");
+    Json::Value root;
+    Json::Reader reader;
+    bool success = reader.parse(jsonString, root);
+    if (!success) {
+        LOGE("ParseJson failed to parse json data.");
+        return false;
+    }
+    int nSize = static_cast<int>(root.size());
+    for (int i = 0; i < nSize; i++) {
+        if (!root[i].isMember(type)) {
+            LOGW("ParseJson JSON[%{public}d] has no member %{public}s.", nSize, type.c_str());
+            continue;
+        }
+        if (ParseJsonKey(root[i][type], key, value)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ConvertDecStrToHexStr(const std::string &inData, std::string &outData)
+{
+    std::stringstream ss(inData);
+    std::string token;
+    constexpr int hexCharLen = 2;
+    std::stringstream temp;
+    while (getline(ss, token, ',')) {
+        int num = ConvertStringToInt(token);
+        temp << std::setfill('0') << std::setw(hexCharLen) << std::hex << num;
+    }
+    outData = temp.str();
+}
+
+void SplitStringBySubstring(const std::string &inData, std::string &outData, const std::string &subBegin,
+    const std::string &subEnd)
+{
+    auto posBegin = inData.find(subBegin);
+    auto posEnd = inData.find(subEnd);
+    if (posBegin == std::string::npos || posEnd == std::string::npos) {
+        LOGE("SplitStringBySubstring find substring fail.");
+        return;
+    }
+    if (posEnd < posBegin + subEnd.length()) {
+        LOGE("SplitStringBySubstring data length is invaild.");
+        return;
+    }
+    outData = inData.substr(posBegin, posEnd - posBegin + subEnd.length());
+    return;
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

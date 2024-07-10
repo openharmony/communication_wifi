@@ -405,6 +405,16 @@ const std::string &WifiP2pGroupInfo::GetGoIpAddress() const
     return goIpAddress;
 }
 
+void WifiP2pGroupInfo::SetGcIpAddress(const std::string &ipAddr)
+{
+    gcIpAddress = ipAddr;
+}
+
+const std::string &WifiP2pGroupInfo::GetGcIpAddress() const
+{
+    return gcIpAddress;
+}
+
 void WifiP2pGroupInfo::AddClientDevice(const WifiP2pDevice &clientDevice)
 {
     for (auto it = clientDevices.begin(); it != clientDevices.end(); ++it) {
@@ -469,6 +479,16 @@ void WifiP2pGroupInfo::SetClientDevices(const std::vector<WifiP2pDevice> &device
 void WifiP2pGroupInfo::ClearClientDevices()
 {
     clientDevices.clear();
+}
+
+void WifiP2pGroupInfo::SetCreatorUid(int uid)
+{
+    creatorUid = uid;
+}
+
+int WifiP2pGroupInfo::GetCreatorUid()
+{
+    return creatorUid;
 }
 
 void WpsInfo::SetWpsMethod(WpsMethod wpsMethod)

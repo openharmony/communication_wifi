@@ -98,7 +98,7 @@ public:
 HWTEST_F(ProvisionDiscoveryStateTest, GoInState, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ProvisionDiscovery(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pProvisionDiscoveryState->GoInState();
 }
 
@@ -197,7 +197,7 @@ HWTEST_F(ProvisionDiscoveryStateTest, ProcessCmdCancelConnect, TestSize.Level1)
 {
     InternalMessage msg;
     msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), CancelConnect()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), CancelConnect()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
     EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));

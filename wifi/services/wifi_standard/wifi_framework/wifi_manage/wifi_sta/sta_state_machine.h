@@ -30,7 +30,7 @@
 #include "dhcp_c_api.h"
 #include "sta_define.h"
 #include "network_status_history_manager.h"
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"
@@ -307,6 +307,7 @@ public:
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
+        bool IsPublicESS();
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -468,10 +469,10 @@ public:
      * @Description  Convert the deviceConfig structure and set it to idl structure
      *
      * @param config -The Network info(in)
-     * @param idlConfig -The Network info(in)
+     * @param halDeviceConfig -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode FillEapCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const;
+    ErrCode FillEapCfg(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
 
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
@@ -515,6 +516,7 @@ public:
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
     void DealHiLinkDataToWpa(InternalMessage *msg);
+    void HilinkSetMacAddress(std::string &cmd);
 private:
     /**
      * @Description  Destruct state.
@@ -632,7 +634,6 @@ private:
      *
      */
     void StopWifiProcess();
-
     /**
      * @Description  Setting statemachine status during the process of enable or disable wifi.
      *
@@ -657,6 +658,19 @@ private:
      * @param portalUrl portal network redirection address
      */
     void HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl);
+
+    /**
+     * @Description  update portalState
+     *
+     * @param netState the state of connecting network(in)
+     * @param updatePortalAuthTime need update portalAuthTime or not [out]
+     */
+    void UpdatePortalState(SystemNetWorkState netState, bool &updatePortalAuthTime);
+
+    /**
+     * @Description  start detection if portalState is expired
+     */
+    void PortalExpiredDetect();
 
     /**
      * @Description implementation of the network detection callback function
@@ -697,6 +711,13 @@ private:
      *
      */
     int InitStaSMHandleMap();
+
+    /**
+     * @Description : Update RSSI to LinkedInfo.
+     *
+     * @param  inRssi - Rssi get from SignalPoll Result
+     */
+    int UpdateLinkInfoRssi(int inRssi);
 
     /**
      * @Description : Deal SignalPoll Result.
@@ -978,6 +999,12 @@ private:
      */
     bool CurrentIsRandomizedMac();
 
+    /**
+     * @Description : Hilink Save Data To Device Config.
+     *
+     */
+    void HilinkSaveConfig(void);
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.
@@ -1115,6 +1142,8 @@ private:
     StaSmHandleFuncMap staSmHandleFuncMap;
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
+    bool m_hilinkFlag = false;
+    WifiDeviceConfig m_hilinkDeviceConfig;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
@@ -1135,7 +1164,7 @@ private:
     bool isRoam;
     int64_t lastTimestamp;
     bool portalFlag;
-    int portalState;
+    PortalState portalState;
     int detectNum;
     int portalExpiredDetectCount;
     bool mIsWifiInternetCHRFlag;
@@ -1168,8 +1197,6 @@ private:
      * @Description Replace empty dns
      */
     void ReplaceEmptyDns(DhcpResult *result);
-    void InvokeOnStaOpenRes(OperateResState state);
-    void InvokeOnStaCloseRes(OperateResState state);
     void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
     void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);
@@ -1182,7 +1209,9 @@ private:
     void ShowPortalNitification();
 #endif
     void SetConnectMethod(int connectMethod);
-    void FillSuiteB192Cfg(WifiIdlDeviceConfig &idlConfig) const;
+    void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
+    void FillWapiCfg(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

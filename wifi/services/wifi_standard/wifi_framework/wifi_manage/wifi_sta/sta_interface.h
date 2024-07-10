@@ -37,7 +37,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableWifi() override;
+    virtual ErrCode EnableStaService() override;
     /**
      * @Description  Disable wifi
      *
@@ -46,7 +46,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode DisableWifi() override;
+    virtual ErrCode DisableStaService() override;
     /**
      * @Description  Connect to a new network
      *
@@ -332,6 +332,7 @@ public:
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &bssid) override;
 private:
+    bool InitStaServiceLocked();
     std::vector<StaServiceCallback> m_staCallback;
     StaService *pStaService;
     std::mutex mutex;

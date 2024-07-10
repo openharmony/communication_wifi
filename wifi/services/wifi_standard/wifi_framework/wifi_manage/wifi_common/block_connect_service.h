@@ -25,6 +25,7 @@ struct LastConnectedApInfo {
     std::string bssid;
     int64_t lastDisconnectTimestamp;
     int alreadyConnectedCount;
+    int sumDisconnectCount;
 };
 struct DisablePolicy {
     int64_t disableTime;
@@ -64,7 +65,11 @@ public:
     bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason);
 
     // Check if the given BSSID has frequent disconnects with the last connected network
+    // false - Not frequent disconnect true - Frequent disconnect
     bool IsFrequentDisconnect(std::string bssid, int wpaReason);
+
+    // Check if the given targetNetworkId is blocked due to wrong password
+    bool IsWrongPassword(int targetNetworkId);
 
 private:
     DisablePolicy CalculateDisablePolicy(DisabledReason disableReason);

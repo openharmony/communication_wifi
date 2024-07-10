@@ -89,7 +89,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         [](uv_work_t* work) {},
         [](uv_work_t* work, int status) {
             AsyncEventData *asyncData = static_cast<AsyncEventData*>(work->data);
-            WIFI_LOGI("uv_queue_work, env: %{private}p, status: %{public}d, eventType: %{public}s",
+            WIFI_LOGD("uv_queue_work, env: %{private}p, status: %{public}d, eventType: %{public}s",
                 asyncData->env, status, asyncData->eventType.c_str());
             napi_value handler = nullptr;
             napi_handle_scope scope = nullptr;
@@ -252,7 +252,7 @@ public:
 
     void OnStreamChanged(int direction) override
     {
-        WIFI_LOGI("OnStreamChanged event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
+        WIFI_LOGD("OnStreamChanged event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
             direction);
         if (m_streamDirectionConvertMap.find(direction) == m_streamDirectionConvertMap.end()) {
             WIFI_LOGW("not find stream state.");
@@ -807,7 +807,7 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
     if (iter == g_eventRegisterInfo.end()) {
         WIFI_LOGE("Unregister type not registered!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED, sysCap);
+        HandleSyncErrCode(env, WIFI_OPT_INVALID_CONFIG, sysCap);
 #endif
         return;
     }

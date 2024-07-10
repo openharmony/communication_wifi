@@ -24,6 +24,7 @@
 #include "iscan_service_callbacks.h"
 #include "wifi_internal_msg.h"
 #include "wifi_controller_define.h"
+#include "wifi_service_manager.h"
 #include "state.h"
 
 namespace OHOS {
@@ -43,9 +44,10 @@ public:
 
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
-        void HandleSwitchToConnectOrMixMode(InternalMessage *msg);
+        void HandleSwitchToConnectMode(InternalMessage *msg);
         void HandleSwitchToScanOnlyMode(InternalMessage *msg);
         void HandleStartInIdleState(InternalMessage *msg);
+        void HandleSwitchToSemiActiveMode(InternalMessage *msg);
     };
 
     class DefaultState : public State {
@@ -71,7 +73,7 @@ public:
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
         void SwitchScanOnlyInConnectState();
-        void SwitchMixInConnectState();
+        void SwitchSemiActiveInConnectState();
     };
 
     class ScanonlyState : public State {
@@ -85,21 +87,21 @@ public:
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
         void SwitchConnectInScanOnlyState();
-        void SwitchMixInScanOnlyState();
+        void SwitchSemiActiveInScanOnlyState();
     };
 
-    class MixState : public State {
+    class SemiActiveState : public State {
     public:
-        explicit MixState(ConcreteMangerMachine *concreteMangerMachine);
-        ~MixState() override;
+        explicit SemiActiveState(ConcreteMangerMachine *concreteMangerMachine);
+        ~SemiActiveState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
-        void SwitchConnectInMixState();
-        void SwitchScanOnlyInMixState();
+        void SwitchConnectInSemiActiveState();
+        void SwitchScanOnlyInSemiActiveState();
     };
 
 public:
@@ -129,10 +131,14 @@ private:
     void BuildStateTree();
     ErrCode InitConcreteMangerStates();
 
-    static ErrCode AutoStopScanOnly(int instId);
+    static ErrCode AutoStopScanOnly(int instId, bool setIfaceDown);
     static ErrCode AutoStartScanOnly(int instId);
-    static ErrCode AutoStopStaService(int instId);
-    static ErrCode AutoStartStaService(int instId);
+    ErrCode AutoStopStaService(int instId);
+    ErrCode AutoStartStaService(int instId);
+    ErrCode AutoStartSemiStaService(int instId);
+    ErrCode PreStartWifi(int instId);
+    ErrCode PostStartWifi(int instId);
+    ErrCode InitStaService(IStaService *pService);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     static ErrCode StartSelfCureService(int instId);
 #endif
@@ -140,14 +146,21 @@ private:
     void checkAndContinueToStopWifi(InternalMessage *msg);
     void HandleStaStop();
     void HandleStaStart();
+    void HandleStaSemiActive();
+    ErrCode SwitchSemiFromEnable();
+    ErrCode SwitchEnableFromSemi();
     void ReportClose();
     static void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
+    static void OnRssiReportCallback(int index, int antRssi);
+    static void DispatchWifiOpenRes(OperateResState state, int instId);
+    static void DispatchWifiSemiActiveRes(OperateResState state, int instId);
+    static void DispatchWifiCloseRes(OperateResState state, int instId);
 
     DefaultState *pDefaultState;
     IdleState *pIdleState;
     ConnectState *pConnectState;
     ScanonlyState *pScanonlyState;
-    MixState *pMixState;
+    SemiActiveState *pSemiActiveState;
     static int mTargetRole;
     ConcreteModeCallback mcb;
     static int mid;

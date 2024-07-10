@@ -29,7 +29,7 @@
 #include "wifi_internal_msg.h"
 #include "sta_service_callback.h"
 #include "wifi_log.h"
-
+#include "net_manager_constants.h"
 namespace OHOS {
 namespace Wifi {
 class WifiNetAgent {
@@ -79,6 +79,15 @@ public:
      * @param prefixLength prefix length
      */
     bool AddRoute(const std::string interface, const std::string ipAddress, int prefixLength);
+
+    /**
+     * Delete interface address
+     *
+     * @param interface interface name
+     * @param ipAddress IP address
+     * @param prefixLength prefix length
+     */
+    bool DelInterfaceAddress(const std::string interface, const std::string ipAddress, int prefixLength);
 
     /**
      * Add OnStaMachineUpdateNetLinkInfo
@@ -132,8 +141,12 @@ public:
          *
          * @param ident - identity
          * @param netCaps - Net capability to request a network
+         * @param registerType - Inner API or outer API
+         *
          */
-        int32_t RequestNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) override;
+        int32_t RequestNetwork(
+            const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps,
+            const int32_t registerType = NetManagerStandard::REGISTER) override;
         /**
          * @Description : Connection Management triggers the close automatic connection feature.
          *
@@ -162,7 +175,6 @@ private:
         IpV6Info &wifiIpV6Info);
 private:
     uint32_t supplierId;
-    std::unique_ptr<WifiEventHandler> netAgentEventHandler = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include "securec.h"
 #include "wifi_wpa_common.h"
+#include "wifi_wpa_common_test.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -28,8 +29,12 @@ class WifiWpaCommonTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {}
+    virtual void SetUp()
+    {
+        g_wpaInterface = &wpaInterface;
+    }
     virtual void TearDown() {}
+    WifiWpaInterface wpaInterface;
 };
 
 HWTEST_F(WifiWpaCommonTest, Hex2DecTest, TestSize.Level1)
@@ -52,6 +57,137 @@ HWTEST_F(WifiWpaCommonTest, InitWpaCtrlTest, TestSize.Level1)
     char str[] = "A1s62";
     EXPECT_TRUE(InitWpaCtrl(pCtrl, str) == -1);
 }
+
+HWTEST_F(WifiWpaCommonTest, ReleaseWpaCtrlTest, TestSize.Level1)
+{
+    WpaCtrl pCtrl;
+    char str[] = "A1s62";
+    InitWpaCtrl(&pCtrl, str);
+    ReleaseWpaCtrl(&pCtrl);
+}
+
+HWTEST_F(WifiWpaCommonTest, WpaCliCmdTest_01, TestSize.Level1)
+{
+    const size_t bufLen = 10;
+    const char cmd[bufLen] = "string";
+    char buf[bufLen] = "string";
+    int result = WpaCliCmd(cmd, buf, bufLen);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiWpaCommonTest, WpaCliCmdTest_02, TestSize.Level1)
+{
+    const size_t bufLen = 10;
+    const char cmd[bufLen] = "ENABLE";
+    char buf[bufLen] = "string";
+    int result = WpaCliCmd(cmd, buf, bufLen);
+    EXPECT_EQ(result, 0);
+}
+
+HWTEST_F(WifiWpaCommonTest, GetStrKeyValTest_01, TestSize.Level1)
+{
+    const int len = 10;
+    char src[len];
+    const char split[len] = "string";
+    WpaKeyValue out;
+    GetStrKeyVal(src, split, &out);
+}
+
+HWTEST_F(WifiWpaCommonTest, GetStrKeyValTest_02, TestSize.Level1)
+{
+    const int len = 10;
+    char src[len] = "string";
+    const char split[len] = "in";
+    WpaKeyValue out;
+    GetStrKeyVal(src, split, &out);
+}
+
+HWTEST_F(WifiWpaCommonTest, Hex2DecTest_01, TestSize.Level1)
+{
+    const char *str = "0x123456";
+    int result = Hex2Dec(str);
+    EXPECT_NE(result, 0);
+}
+
+HWTEST_F(WifiWpaCommonTest, TrimQuotationMarkTest, TestSize.Level1)
+{
+    const int len = 10;
+    char str[len] = "string";
+    char c = 'A';
+    TrimQuotationMark(str, c);
+}
+
+HWTEST_F(WifiWpaCommonTest, Hex2numTest_01, TestSize.Level1)
+{
+    char c = '1';
+    const char hex = '1';
+    int result = Hex2num(c);
+    EXPECT_NE(result, -1);
+
+    result = Hex2byte(&hex);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiWpaCommonTest, Hex2numTest_02, TestSize.Level1)
+{
+    char c = 'a';
+    const char hex = 'a';
+    int result = Hex2num(c);
+    EXPECT_NE(result, -1);
+
+    result = Hex2byte(&hex);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiWpaCommonTest, Hex2numTest_03, TestSize.Level1)
+{
+    char c = 'A';
+    const char hex = 'A';
+    int result = Hex2num(c);
+    EXPECT_NE(result, -1);
+
+    result = Hex2byte(&hex);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiWpaCommonTest, Hex2numTest_04, TestSize.Level1)
+{
+    char c = '*';
+    const char hex = '*';
+    int result = Hex2num(c);
+    EXPECT_EQ(result, -1);
+
+    result = Hex2byte(&hex);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiWpaCommonTest, DealSymbolTest_01, TestSize.Level1)
+{
+    const int len = 10;
+    u8 buf[len];
+    const char *pos = "!";
+    size_t size = 1;
+    DealSymbol(buf, &pos, &size);
+}
+
+HWTEST_F(WifiWpaCommonTest, DealSymbolTest_02, TestSize.Level1)
+{
+    const int len = 10;
+    u8 buf[len];
+    const char *pos = "x";
+    size_t size = 1;
+    DealSymbol(buf, &pos, &size);
+}
+
+HWTEST_F(WifiWpaCommonTest, DealSymbolTest_03, TestSize.Level1)
+{
+    const int len = 10;
+    u8 buf[len];
+    const char *pos = "e";
+    size_t size = 1;
+    DealSymbol(buf, &pos, &size);
+}
+
 } // namespace Wifi
 } // namespace OHOS
 

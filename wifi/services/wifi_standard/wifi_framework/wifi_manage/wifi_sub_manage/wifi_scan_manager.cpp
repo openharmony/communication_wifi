@@ -24,6 +24,7 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
+#include "wifi_country_code_manager.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #endif
@@ -102,6 +103,19 @@ void WifiScanManager::CheckAndStartScanService(int instId)
         WIFI_LOGW("Failed to set scan mid state opening!");
         return;
     }
+    ErrCode errCode = TryToStartScanService(instId);
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN, instId);
+    }
+#ifndef OHOS_ARCH_LITE
+    WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();
+#endif
+    return;
+}
+
+ErrCode WifiScanManager::TryToStartScanService(int instId)
+{
     ErrCode errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SCAN) < 0) {
@@ -134,11 +148,7 @@ void WifiScanManager::CheckAndStartScanService(int instId)
             break;
         }
     } while (0);
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN, instId);
-    }
-    return;
+    return errCode;
 }
 
 void WifiScanManager::CheckAndStopScanService(int instId)
@@ -156,7 +166,7 @@ void WifiScanManager::CheckAndStopScanService(int instId)
     }
     ScanControlInfo info;
     WifiConfigCenter::GetInstance().GetScanControlInfo(info, instId);
-    if (WifiConfigCenter::GetInstance().IsScanAlwaysActive() && IsAllowScanAnyTime(info) &&
+    if (WifiSettings::GetInstance().GetScanAlwaysState() && IsAllowScanAnyTime(info) &&
         WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_CLOSE &&
         WifiConfigCenter::GetInstance().GetPowerSavingModeState() == MODE_STATE_CLOSE) {
         return;
@@ -205,7 +215,6 @@ void WifiScanManager::InitScanCallback(void)
     mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiScanManager::DealStoreScanInfoEvent, this, _1, _2);
 
     mStaCallback.callbackModuleName = "WifiScanManager";
-    mStaCallback.OnStaOpenRes = std::bind(&WifiScanManager::DealStaOpenRes, this, _1, _2);
 }
 
 void WifiScanManager::DealScanOpenRes(int instId)
@@ -244,12 +253,11 @@ void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results
     WIFI_LOGI("DealStoreScanInfoEvent");
 }
 
-void WifiScanManager::DealStaOpenRes(OperateResState state, int instId)
+void WifiScanManager::DealStaOpened(int instId)
 {
-    WIFI_LOGI("wifi open result, state=%{public}d, id=%{public}d", state, instId);
-    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
-        CheckAndStartScanService(instId);
-    }
+    WIFI_LOGI("wifi opened id=%{public}d", instId);
+    WifiConfigCenter::GetInstance().CleanWifiCategoryRecord();
+    CheckAndStartScanService(instId);
 }
 }  // namespace Wifi
 }  // namespace OHOS

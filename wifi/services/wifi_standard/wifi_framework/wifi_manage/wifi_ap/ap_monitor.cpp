@@ -16,16 +16,17 @@
 #include <unistd.h>
 #include <functional>
 
-#include "wifi_idl_define.h"
 #include "ap_stations_manager.h"
 #include "internal_message.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "ap_state_machine.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_logger.h"
 #include "dhcpd_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
+
+#define LESS_INT_MAX_NUM 9
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApMonitor");
 
@@ -50,7 +51,7 @@ void ApMonitor::DealStaJoinOrLeave(const StationInfo &info, ApStatemachineEvent 
     SendMessage(m_selectIfacName, event, 0, 0, anySta);
 }
 
-void ApMonitor::OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo)
+void ApMonitor::OnStaJoinOrLeave(const WifiHalApConnectionNofify &cbInfo)
 {
     StationInfo info;
     info.bssid = cbInfo.mac;
@@ -58,10 +59,10 @@ void ApMonitor::OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo)
     info.deviceName = GETTING_INFO;
     info.ipAddr = GETTING_INFO;
     int event = cbInfo.type;
-    if (event == WIFI_IDL_CBK_CMD_STA_JOIN) {
+    if (event == HAL_CBK_CMD_STA_JOIN) {
         DealStaJoinOrLeave(info, ApStatemachineEvent::CMD_STATION_JOIN);
     }
-    if (event == WIFI_IDL_CBK_CMD_STA_LEAVE) {
+    if (event == HAL_CBK_CMD_STA_LEAVE) {
         DealStaJoinOrLeave(info, ApStatemachineEvent::CMD_STATION_LEAVE);
     }
 }
@@ -69,15 +70,44 @@ void ApMonitor::OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo)
 void ApMonitor::OnHotspotStateEvent(int state) const
 {
     WIFI_LOGI("update HotspotConfig result is [%{public}d].", state);
-    if (state == WIFI_IDL_CBK_CMD_AP_DISABLE) {
+    if (state == HAL_CBK_CMD_AP_DISABLE) {
         SendMessage(m_selectIfacName, ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT, 0, 0, 0);
-    } else if (state == WIFI_IDL_CBK_CMD_AP_ENABLE) {
+    } else if (state == HAL_CBK_CMD_AP_ENABLE) {
         SendMessage(m_selectIfacName, ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT, 1, 0, 0);
-    } else if (state == WIFI_IDL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT) {
+    } else if (state == HAL_CBK_CMD_AP_STA_PSK_MISMATCH_EVENT) {
         WriteSoftApConnectFailHiSysEvent(AP_STA_PSK_MISMATCH_CNT);
     } else {
         WIFI_LOGE("Error: Incorrect status code [%{public}d].", state);
     }
+}
+
+void ApMonitor::WpaEventApChannelSwitch(int freq) const
+{
+    HotspotConfig hostapdConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(hostapdConfig, m_id);
+    hostapdConfig.SetChannel(freq);
+    WifiSettings::GetInstance().SetHotspotConfig(hostapdConfig, m_id);
+}
+
+void ApMonitor::WpaEventApNotifyCallBack(const std::string &notifyParam) const
+{
+    if (notifyParam.empty()) {
+        WIFI_LOGE("%{public}s notifyParam is empty", __func__);
+        return;
+    }
+    std::string::size_type freqPos = 0;
+    if ((freqPos = notifyParam.find("freq=")) == std::string::npos) {
+        WIFI_LOGE("csa channel switch notifyParam not find frequency!");
+        return;
+    }
+    std::string data = notifyParam.substr(freqPos + strlen("freq="));
+    if (data.size() > LESS_INT_MAX_NUM) {
+        WIFI_LOGE("%{public}s notifyParam is error", __func__);
+        return;
+    }
+    int freq = stoi(data);
+    WpaEventApChannelSwitch(freq);
+    return;
 }
 
 void ApMonitor::StartMonitor()
@@ -86,10 +116,11 @@ void ApMonitor::StartMonitor()
     IWifiApMonitorEventCallback wifiApEventCallback = {
         std::bind(&ApMonitor::OnStaJoinOrLeave, this, _1),
         std::bind(&ApMonitor::OnHotspotStateEvent, this, _1),
+        std::bind(&ApMonitor::WpaEventApNotifyCallBack, this, _1),
     };
     WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 
-    std::string iface = WifiSettings::GetInstance().GetApIfaceName();
+    std::string iface = WifiConfigCenter::GetInstance().GetApIfaceName();
     m_selectIfacName = iface;
     m_setMonitorIface.insert(iface);
 }
@@ -119,7 +150,7 @@ void ApMonitor::StopMonitor()
     WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 }
 
-void ApMonitor::RegisterHandler(const std::string &iface, const std::function<HandlerMethod> &handler)
+void ApMonitor::RegisterHandler(const std::string &iface, const std::function<HandlerApMethod> &handler)
 {
     auto iter = m_mapHandler.find(iface);
     if (iter != m_mapHandler.end()) {

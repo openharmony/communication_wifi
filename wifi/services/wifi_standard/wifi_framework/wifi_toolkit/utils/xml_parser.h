@@ -99,6 +99,7 @@ public:
         T primValue{};
         xmlChar* value = xmlGetProp(node, (const xmlChar*)"value");
         std::string valueString = std::string(reinterpret_cast<char *>(value));
+        xmlFree(value);
         switch (type) {
             case PrimType::INT:
                 primValue = std::stoi(valueString);

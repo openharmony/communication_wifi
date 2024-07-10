@@ -39,6 +39,7 @@ public:
 private:
     void InitHandleMap();
     void InitHandleMapEx(void);
+    void InitHandleMapEx2();
     void OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnInitWifiProtect(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -56,6 +57,7 @@ private:
     void OnConnectTo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnect2To(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnStartRoamToNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnStartConnectToUserSelectNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReConnect(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReAssociate(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisconnect(uint32_t code, MessageParcel &data, MessageParcel &reply);

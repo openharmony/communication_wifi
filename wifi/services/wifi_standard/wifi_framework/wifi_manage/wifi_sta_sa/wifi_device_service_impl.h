@@ -84,6 +84,8 @@ public:
 
     ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
 
+    ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate) override;
+
     ErrCode IsConnected(bool &isConnected) override;
 
     ErrCode ReConnect() override;

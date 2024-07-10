@@ -110,48 +110,29 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         return false;
     }
 
-    if ((WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_24_GHZ, freqs2G) != WIFI_HAL_OPT_OK) ||
-        (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ, freqs5G) != WIFI_HAL_OPT_OK) ||
-        (WifiStaHalInterface::GetInstance().GetSupportFrequencies(SCAN_BAND_5_GHZ_DFS_ONLY, freqsDfs) !=
-        WIFI_HAL_OPT_OK)) {
-        WIFI_LOGE("GetSupportFrequencies failed.\n");
-    }
-
-    ChannelsTable chanTbs;
-    (void)WifiConfigCenter::GetInstance().GetValidChannels(chanTbs);
-    if (chanTbs[BandType::BAND_2GHZ].size() == 0) {
-        WIFI_LOGI("Update valid channels!");
-        std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
-        std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
-        for (auto iter = supp2Gfreqs.begin(); iter != supp2Gfreqs.end(); iter++) {
-            int32_t channel = FrequencyToChannel(*iter);
-            if (channel == INVALID_FREQ_OR_CHANNEL) {
-                continue;
-            }
-            chanTbs[BandType::BAND_2GHZ].push_back(channel);
-        }
-        for (auto iter = supp5Gfreqs.begin(); iter != supp5Gfreqs.end(); iter++) {
-            int32_t channel = FrequencyToChannel(*iter);
-            if (channel == INVALID_FREQ_OR_CHANNEL) {
-                continue;
-            }
-            chanTbs[BandType::BAND_5GHZ].push_back(channel);
-        }
-        if (WifiConfigCenter::GetInstance().SetValidChannels(chanTbs)) {
-            WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
-        }
-    }
     pScanMonitor->SetScanStateMachine(pScanStateMachine);
     int delayMs = 100;
     pScanStateMachine->MessageExecutedLater(static_cast<int>(CMD_SCAN_PREPARE), delayMs);
     GetScanControlInfo();
-
+#ifndef OHOS_ARCH_LITE
+    std::string moduleName = "ScanService_" + std::to_string(m_instId);
+    m_scanObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pScanStateMachine);
+    if (m_scanObserver == nullptr) {
+        WIFI_LOGI("m_scanObserver is null\n");
+        return false;
+    }
+    WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_scanObserver);
+#endif
     return true;
 }
 
 void ScanService::UnInitScanService()
 {
     WIFI_LOGI("Enter UnInitScanService.\n");
+#ifndef OHOS_ARCH_LITE
+    // deregistration country code change notification
+    WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_scanObserver);
+#endif
     pScanMonitor->UnInitScanMonitor();
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
     pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
@@ -2401,6 +2382,29 @@ void ScanService::InitChipsetInfo()
         isChipsetInfoObtained = true;
     }
 }
+
+#ifndef OHOS_ARCH_LITE
+ErrCode ScanService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const std::string &wifiCountryCode)
+{
+    if (strcasecmp(m_lastWifiCountryCode.c_str(), wifiCountryCode.c_str()) == 0) {
+        WIFI_LOGI("wifi country code is same, scan not update, code=%{public}s", wifiCountryCode.c_str());
+        return WIFI_OPT_SUCCESS;
+    }
+    WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
+    InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    CHECK_NULL_AND_RETURN(msg, WIFI_OPT_FAILED);
+    msg->SetMessageName(static_cast<int>(SCAN_UPDATE_COUNTRY_CODE));
+    msg->AddStringMessageBody(wifiCountryCode);
+    m_stateMachineObj.SendMessage(msg);
+    m_lastWifiCountryCode = wifiCountryCode;
+    return WIFI_OPT_SUCCESS;
+}
+
+std::string ScanService::WifiCountryCodeChangeObserver::GetListenerModuleName()
+{
+    return m_listenerModuleName;
+}
+#endif
 
 int CalculateBitPerTone(int snrDb)
 {

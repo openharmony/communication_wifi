@@ -149,6 +149,7 @@ enum ScanEventType {
     PNO_SCAN_RESULT_EVENT = 22, /* The PNO scanning result can be obtained */
     SCAN_FAILED_EVENT = 23,     /* Common scan failure */
     HARDWARE_UNLOAD_EVENT = 24, /* Hardware uninstalled successfully */
+    SCAN_UPDATE_COUNTRY_CODE = 25,
 };
 
 /* Internal event */

@@ -17,6 +17,7 @@
 #include "abstract_ui.h"
 #include "ipc_skeleton.h"
 #include "p2p_define.h"
+#include "wifi_channel_helper.h"
 #include "wifi_common_util.h"
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
@@ -416,7 +417,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
 
     ChannelsTable channels;
     std::vector<int32_t> vec5GChannels;
-    WifiConfigCenter::GetInstance().GetValidChannels(channels);
+    WifiChannelHelper::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
         vec5GChannels = channels[BandType::BAND_5GHZ];
     }

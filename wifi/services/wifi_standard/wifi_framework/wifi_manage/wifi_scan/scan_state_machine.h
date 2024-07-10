@@ -88,6 +88,7 @@ public:
          *
          */
         void UnLoadDriver();
+        void HandleUpdateCountryCode(InternalMessage *msg);
     };
 
     class HardwareReady : public State {

@@ -35,6 +35,7 @@ public:
     void StopUnloadScanSaTimer(void);
     void StartUnloadScanSaTimer(void);
     void CheckAndStartScanService(int instId = 0);
+    ErrCode TryToStartScanService(int instId = 0);
     void CheckAndStopScanService(int instId = 0);
     void CloseScanService(int instId = 0);
     void DealStaOpened(int instId = 0);

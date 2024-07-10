@@ -176,12 +176,6 @@ public:
 
     std::string GetApIfaceName();
 
-    int GetValidBands(std::vector<BandType> &bands);
-
-    int SetValidChannels(const ChannelsTable &channelsInfo);
-
-    int GetValidChannels(ChannelsTable &channelsInfo);
-
     WifiOprMidState GetApMidState(int id = 0);
 
     bool SetApMidState(WifiOprMidState expState, WifiOprMidState state, int id = 0);
@@ -363,7 +357,6 @@ private:
     std::atomic<bool> mSoftapToggled {false};
     std::atomic<int> mHotspotIdleTimeout {HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS};
     std::string mApIfaceName {"wlan0"};
-    ChannelsTable mValidChannels;
     std::map<int, std::atomic<WifiOprMidState>> mApMidState;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map<int, PowerModel> powerModel;

@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
+#include "wifi_channel_helper.h"
 #include "wifi_config_center.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_country_code_manager.h"
@@ -165,7 +166,7 @@ ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     std::vector<int> allowed5GFreq;
     std::vector<int> allowed2GFreq;
-    if (WifiConfigCenter::GetInstance().GetValidBands(bands) != 0) {
+    if (WifiChannelHelper::GetInstance().GetValidBands(bands) != 0) {
         WIFI_LOGE("%{public}s, GetValidBands failed!", __func__);
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -199,7 +200,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     ChannelsTable channelsInfo;
-    if (WifiConfigCenter::GetInstance().GetValidChannels(channelsInfo) != 0) {
+    if (WifiChannelHelper::GetInstance().GetValidChannels(channelsInfo) != 0) {
         WIFI_LOGE("Failed to obtain channels from the WifiSettings.");
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -234,7 +235,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
     ChannelsTable ChanTbs;
     ChanTbs[BandType::BAND_2GHZ] = allowed2GChan;
     ChanTbs[BandType::BAND_5GHZ] = allowed5GChan;
-    if (WifiConfigCenter::GetInstance().SetValidChannels(ChanTbs)) {
+    if (WifiChannelHelper::GetInstance().SetValidChannels(ChanTbs)) {
         WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
     }
     if (band == BandType::BAND_2GHZ || band == BandType::BAND_5GHZ) {

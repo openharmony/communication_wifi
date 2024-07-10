@@ -690,34 +690,6 @@ std::string WifiConfigCenter::GetApIfaceName()
     return mApIfaceName;
 }
 
-int WifiConfigCenter::GetValidBands(std::vector<BandType> &bands)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    auto it = mValidChannels.find(BandType::BAND_2GHZ);
-    if (it != mValidChannels.end() && it->second.size() > 0) {
-        bands.push_back(BandType::BAND_2GHZ);
-    }
-    it = mValidChannels.find(BandType::BAND_5GHZ);
-    if (it != mValidChannels.end() && it->second.size() > 0) {
-        bands.push_back(BandType::BAND_5GHZ);
-    }
-    return 0;
-}
-
-int WifiConfigCenter::SetValidChannels(const ChannelsTable &channelsInfo)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    mValidChannels = channelsInfo;
-    return 0;
-}
-
-int WifiConfigCenter::GetValidChannels(ChannelsTable &channelsInfo)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    channelsInfo = mValidChannels;
-    return 0;
-}
-
 WifiOprMidState WifiConfigCenter::GetApMidState(int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);

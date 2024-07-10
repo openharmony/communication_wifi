@@ -132,31 +132,18 @@ HWTEST_F(ApService_test, DisconnetStation_SUCCESS, TestSize.Level1)
 HWTEST_F(ApService_test, GetValidBands_SUCCESS, TestSize.Level1)
 {
     std::vector<BandType> vecSta;
-    std::vector<BandType> temp = {
-        BandType::BAND_2GHZ,
-        BandType::BAND_5GHZ,
-    };
 
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidBands(Eq(vecSta)))
-        .WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidBands(vecSta));
-    EXPECT_EQ(temp, vecSta);
 }
 HWTEST_F(ApService_test, GetValidBands_FAILED, TestSize.Level1)
 {
     std::vector<BandType> vecSta;
-    std::vector<BandType> temp = {
-        BandType::BAND_2GHZ,
-        BandType::BAND_5GHZ,
-    };
 
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidBands(Eq(vecSta)))
-        .WillOnce(DoAll(SetArgReferee<0>(temp), Return(-1)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetValidBands(vecSta));
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidBands(vecSta));
 }
 
 /* GetValidChannels */
@@ -168,21 +155,13 @@ HWTEST_F(ApService_test, GetValidChannels_SUCCESS, TestSize.Level1)
     ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidChannels(_)).WillOnce(
-        DoAll(SetArgReferee<0>(temp), Return(0)));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidChannels(BandType::BAND_2GHZ, vecChannels));
-    EXPECT_EQ(vecChannels, band_2G_channel);
     vecChannels.clear();
 
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidChannels(_)).WillOnce(
-        DoAll(SetArgReferee<0>(temp), Return(0)));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidChannels(BandType::BAND_5GHZ, vecChannels));
-    EXPECT_EQ(vecChannels, band_5G_channel);
     vecChannels.clear();
 
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidChannels(_)).WillOnce(
-        DoAll(SetArgReferee<0>(temp), Return(1)));
-    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetValidChannels(BandType::BAND_5GHZ, vecChannels));
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidChannels(BandType::BAND_5GHZ, vecChannels));
 }
 
 /* RegisterApServiceCallbacks */
@@ -220,27 +199,23 @@ HWTEST_F(ApService_test, GetValidBandsSuccess, TestSize.Level1)
     std::vector<BandType> vecSta;
     std::vector<int> allowed2GFreq;
     allowed2GFreq.push_back(FREQUENCY2G);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidBands(Eq(vecSta)))
-        .WillOnce(DoAll(SetArgReferee<0>(vecSta), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, Eq(allowed2GFreq)))
         .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetValidBands(vecSta));
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidBands(vecSta));
 }
 
 HWTEST_F(ApService_test, GetValidBandsFailed, TestSize.Level1)
 {
     std::vector<BandType> vecSta;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidBands(Eq(vecSta)))
-        .WillOnce(DoAll(SetArgReferee<0>(vecSta), Return(0)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->GetValidBands(vecSta));
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidBands(vecSta));
 }
 
 HWTEST_F(ApService_test, GetValidChannelsSuccess2, TestSize.Level1)
@@ -249,12 +224,10 @@ HWTEST_F(ApService_test, GetValidChannelsSuccess2, TestSize.Level1)
     std::vector<int32_t> allowed2GFreq = { 2412, 2417, 2422, 2427, 2432, 2437, 2442 };
     std::vector<int32_t> allowed5GFreq = { 5745, 5765, 5785 };
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidChannels(_)).WillOnce(Return(0));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, Eq(allowed2GFreq)))
         .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(allowed5GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetValidChannels(_)).WillOnce(Return(0));
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->GetValidChannels(BandType::BAND_2GHZ, vecChannels));
 }
 
@@ -264,12 +237,10 @@ HWTEST_F(ApService_test, GetValidChannelsFail2, TestSize.Level1)
     std::vector<int32_t> allowed2GFreq = { 2412, 2417, 2422, 2427, 2432, 2437, 2442 };
     std::vector<int32_t> allowed5GFreq = { 5745, 5765, 5785 };
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetValidChannels(_)).WillOnce(Return(0));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, Eq(allowed2GFreq)))
         .WillOnce(DoAll(SetArgReferee<2>(allowed2GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(allowed5GFreq), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetValidChannels(_)).WillOnce(Return(0));
     EXPECT_EQ(ErrCode::WIFI_OPT_INVALID_PARAM, pApService->GetValidChannels(BandType::BAND_ANY, vecChannels));
 }
 

@@ -146,6 +146,7 @@ if (defined(ohos_lite)) {
       "block_connect_service.cpp",
       "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",
+      "wifi_channel_helper.cpp",
       "wifi_cmd_client.cpp",
       "wifi_country_code/wifi_country_code_manager.cpp",
       "wifi_country_code/wifi_country_code_policy.cpp",

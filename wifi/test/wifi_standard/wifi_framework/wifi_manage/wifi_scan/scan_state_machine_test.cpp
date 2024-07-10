@@ -144,6 +144,16 @@ public:
         EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == false);
     }
 
+    void InitExeMsgSuccess11()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(SCAN_UPDATE_COUNTRY_CODE);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
+
+        msg.AddStringMessageBody("CN");
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
+    }
+
     void InitExeMsgFail()
     {
         EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(nullptr) == true);
@@ -1169,6 +1179,11 @@ HWTEST_F(ScanStateMachineTest, InitExeMsgSuccess9, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, InitExeMsgSuccess10, TestSize.Level1)
 {
     InitExeMsgSuccess10();
+}
+
+HWTEST_F(ScanStateMachineTest, InitExeMsgSuccess11, TestSize.Level1)
+{
+    InitExeMsgSuccess11();
 }
 
 HWTEST_F(ScanStateMachineTest, InitExeMsgFail, TestSize.Level1)

@@ -24,6 +24,9 @@
 #include <unordered_set>
 #include "iscan_service_callbacks.h"
 #include "define.h"
+#ifndef OHOS_ARCH_LITE
+#include "wifi_country_code_manager.h"
+#endif
 #include "wifi_scan_msg.h"
 #include "wifi_errcode.h"
 #include "scan_common.h"
@@ -819,6 +822,17 @@ private:
      * @param count adjust count[in]
      */
     void SystemScanDisconnectedPolicy(int &interval, int &count);
+#ifndef OHOS_ARCH_LITE
+    class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
+    public:
+        WifiCountryCodeChangeObserver(const std::string &name, StateMachine &stateMachineObj)
+            : IWifiCountryCodeChangeListener(name, stateMachineObj) {}
+        ~WifiCountryCodeChangeObserver() override = default;
+        ErrCode OnWifiCountryCodeChanged(const std::string &wifiCountryCode) override;
+        std::string GetListenerModuleName() override;
+    };
+    std::shared_ptr<IWifiCountryCodeChangeListener> m_scanObserver;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

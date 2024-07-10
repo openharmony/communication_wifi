@@ -136,11 +136,27 @@ WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac)
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::GetSupportFrequencies(int band, std::vector<int> &frequencies)
+WifiErrorNo WifiStaHalInterface::SetWifiCountryCode(const std::string &ifaceName, const std::string &code)
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->GetSupportFrequencies(band, frequencies);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetWifiCountryCode(ifaceName, code)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+#else
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
+    return mIdlClient->SetWifiCountryCode(code);
+#endif
+}
+
+WifiErrorNo WifiStaHalInterface::GetSupportFrequencies(const std::string &ifaceName, int band,
+    std::vector<int> &frequencies)
+{
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->GetSupportFrequencies(band, frequencies);

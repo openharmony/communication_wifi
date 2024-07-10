@@ -551,27 +551,41 @@ bool HalDeviceManager::GetFrequenciesByBand(const std::string &ifaceName, int32_
 
     std::lock_guard<std::mutex> lock(mMutex);
     LOGI("GetFrequenciesByBand, ifaceName:%{public}s, band:%{public}d", ifaceName.c_str(), band);
-    auto iter = mIWifiApIfaces.find(ifaceName);
-    if (iter == mIWifiApIfaces.end()) {
-        LOGE("GetFrequenciesByBand, not find iface info");
-        return false;
+    auto staIter = mIWifiStaIfaces.find(ifaceName);
+    if (staIter != mIWifiStaIfaces.end()) {
+        sptr<IChipIface> &iface = staIter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        std::vector<uint32_t> uifrequenciesSta;
+        int32_t ret = iface->GetSupportFreqs(band, uifrequenciesSta);
+        if (ret != HDF_SUCCESS) {
+            LOGE("GetFrequenciesByBand, call GetSupportFreqs failed! ret:%{public}d", ret);
+            return false;
+        }
+        for (auto item : uifrequenciesSta) {
+            frequencies.emplace_back(item);
+        }
+        LOGI("Sta getFrequenciesByBand success");
+        return true;
     }
 
-    sptr<IChipIface> &iface = iter->second;
-    CHECK_NULL_AND_RETURN(iface, false);
-    std::vector<uint32_t> uifrequencies;
-    int32_t ret = iface->GetSupportFreqs(band, uifrequencies);
-    if (ret != HDF_SUCCESS) {
-        LOGE("GetFrequenciesByBand, call GetSupportFreqs failed! ret:%{public}d", ret);
-        return false;
+    auto apIter = mIWifiApIfaces.find(ifaceName);
+    if (apIter != mIWifiApIfaces.end()) {
+        sptr<IChipIface> &iface = apIter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        std::vector<uint32_t> uifrequenciesAp;
+        int32_t ret = iface->GetSupportFreqs(band, uifrequenciesAp);
+        if (ret != HDF_SUCCESS) {
+            LOGE("GetFrequenciesByBand, call GetSupportFreqs failed! ret:%{public}d", ret);
+            return false;
+        }
+        for (auto item : uifrequenciesAp) {
+            frequencies.emplace_back(item);
+        }
+        LOGI("Ap getFrequenciesByBand success");
+        return true;
     }
-
-    for (auto item : uifrequencies) {
-        frequencies.emplace_back(item);
-    }
-
-    LOGI("GetFrequenciesByBand success");
-    return true;
+    LOGI("GetFrequenciesByBand failed");
+    return false;
 }
 
 bool HalDeviceManager::SetPowerModel(const std::string &ifaceName, int model)
@@ -660,22 +674,33 @@ bool HalDeviceManager::SetWifiCountryCode(const std::string &ifaceName, const st
 
     std::lock_guard<std::mutex> lock(mMutex);
     LOGI("SetWifiCountryCode, ifaceName:%{public}s", ifaceName.c_str());
-    auto iter = mIWifiApIfaces.find(ifaceName);
-    if (iter == mIWifiApIfaces.end()) {
-        LOGE("SetWifiCountryCode, not find iface info");
-        return false;
+    auto staIter = mIWifiStaIfaces.find(ifaceName);
+    if (staIter != mIWifiStaIfaces.end()) {
+        sptr<IChipIface> &iface = staIter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        int32_t ret = iface->SetCountryCode(code);
+        if (ret != HDF_SUCCESS) {
+            LOGE("SetWifiCountryCode, call SetCountryCode failed! ret:%{public}d", ret);
+            return false;
+        }
+        LOGI("Sta setWifiCountryCode success");
+        return true;
     }
 
-    sptr<IChipIface> &iface = iter->second;
-    CHECK_NULL_AND_RETURN(iface, false);
-    int32_t ret = iface->SetCountryCode(code);
-    if (ret != HDF_SUCCESS) {
-        LOGE("SetWifiCountryCode, call SetCountryCode failed! ret:%{public}d", ret);
-        return false;
+    auto apIter = mIWifiApIfaces.find(ifaceName);
+    if (apIter != mIWifiApIfaces.end()) {
+        sptr<IChipIface> &iface = apIter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        int32_t ret = iface->SetCountryCode(code);
+        if (ret != HDF_SUCCESS) {
+            LOGE("SetWifiCountryCode, call SetCountryCode failed! ret:%{public}d", ret);
+            return false;
+        }
+        LOGI("Ap setWifiCountryCode success");
+        return true;
     }
-
-    LOGI("SetWifiCountryCode success");
-    return true;
+    LOGE("SetWifiCountryCode, not find iface info");
+    return false;
 }
 
 bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::string &mac)

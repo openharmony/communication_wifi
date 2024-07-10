@@ -28,6 +28,7 @@
 #include "dhcpd_interface.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_ap_nat_manager.h"
+#include "wifi_channel_helper.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
@@ -447,6 +448,8 @@ void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessage &msg) const
     if (ret == WifiErrorNo::WIFI_HAL_OPT_OK) {
         m_wifiCountryCode = wifiCountryCode;
         WIFI_LOGI("update wifi country code success, wifiCountryCode=%{public}s", wifiCountryCode.c_str());
+        WifiChannelHelper::GetInstance().UpdateValidChannels(
+            WifiConfigCenter::GetInstance().GetApIfaceName(), m_id);
         return;
     }
     WIFI_LOGE("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",

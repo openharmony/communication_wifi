@@ -29,6 +29,7 @@ extern "C" {
 #define HDI_BIT(x) (1U << (x))
 #endif
 
+#define MAC_UINT_SIZE 6
 #define MAC_STRING_SIZE 17
 #define HDI_CHECK_ELEMENT(e, input, len)    \
     for ((e) = (const struct HdiElem *) (input);    \

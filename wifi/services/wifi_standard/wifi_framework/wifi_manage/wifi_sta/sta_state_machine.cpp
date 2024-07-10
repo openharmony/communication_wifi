@@ -3382,6 +3382,8 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
                 return false;
             }
             pStaStateMachine->isRoam = true;
+            pStaStateMachine->linkedInfo.bssid = bssid;
+            WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
             /* The current state of StaStateMachine transfers to pApRoamingState. */
             pStaStateMachine->SwitchState(pStaStateMachine->pApRoamingState);
             break;

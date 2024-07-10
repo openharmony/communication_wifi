@@ -121,6 +121,7 @@ void ConcreteMangerMachine::RegisterCallback(ConcreteModeCallback &callback)
 
 void ConcreteMangerMachine::SetTargetRole(ConcreteManagerRole role)
 {
+    WIFI_LOGI("SetTargetRole:%{public}d", static_cast<int>(role));
     mTargetRole = static_cast<int>(role);
 }
 
@@ -178,7 +179,6 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __a
     }
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_START:
-            pConcreteMangerMachine->mTargetRole = msg->GetParam1();
             HandleStartInIdleState(msg);
             break;
         case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
@@ -204,7 +204,6 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToConnectMode(InternalMessage
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
 void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessage *msg)
@@ -226,13 +225,11 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMess
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
 }
 
 void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *msg)
 {
-    mTargetRole = msg->GetParam1();
-    mid = msg->GetParam2();
+    mid = msg->GetParam1();
     WIFI_LOGI("HandleStartInIdleState targetRole:%{public}d mid:%{public}d", mTargetRole, mid);
     ErrCode res = AutoStartScanOnly(mid);
     if (res != WIFI_OPT_SUCCESS) {
@@ -247,8 +244,8 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *m
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }
-        pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
+        WIFI_LOGI("HandleStartInIdleState, current role is %{public}d, start scan only success.", mTargetRole);
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
@@ -258,7 +255,6 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *m
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }
-        pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
     } else {
         WIFI_LOGE("idlestate start role is error");
     }
@@ -309,7 +305,6 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
 void ConcreteMangerMachine::ConnectState::SwitchSemiActiveInConnectState()
@@ -366,7 +361,6 @@ void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
 void ConcreteMangerMachine::ScanonlyState::SwitchSemiActiveInScanOnlyState()
@@ -376,7 +370,6 @@ void ConcreteMangerMachine::ScanonlyState::SwitchSemiActiveInScanOnlyState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
 }
 
 ConcreteMangerMachine::SemiActiveState::SemiActiveState(ConcreteMangerMachine *concreteMangerMachine)
@@ -437,7 +430,6 @@ void ConcreteMangerMachine::SemiActiveState::SwitchConnectInSemiActiveState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
 void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
@@ -447,7 +439,6 @@ void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
 bool ConcreteMangerMachine::HandleCommonMessage(InternalMessage *msg)

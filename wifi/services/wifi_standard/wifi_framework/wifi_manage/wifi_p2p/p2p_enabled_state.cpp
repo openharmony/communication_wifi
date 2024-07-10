@@ -120,7 +120,6 @@ bool P2pEnabledState::ProcessCmdDisable(InternalMessage &msg) const
 {
     WIFI_LOGI("P2P ProcessCmdDisable recv CMD: %{public}d", msg.GetMessageName());
     p2pStateMachine.BroadcastP2pStatusChanged(P2pState::P2P_STATE_CLOSING);
-    WifiP2PHalInterface::GetInstance().P2pStopFind();
     p2pStateMachine.BroadcastP2pDiscoveryChanged(false);
     WifiP2PHalInterface::GetInstance().StopP2p();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pDisablingState);

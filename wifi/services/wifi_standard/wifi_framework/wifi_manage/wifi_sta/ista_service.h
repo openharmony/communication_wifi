@@ -78,6 +78,15 @@ public:
     virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) = 0;
 
     /**
+     * @Description connect to user select ssid and bssid network
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid) = 0;
+
+    /**
      * @Description  Disconnect to the network
      *
      * @Output: Return operating results to Interface Service after enable wifi

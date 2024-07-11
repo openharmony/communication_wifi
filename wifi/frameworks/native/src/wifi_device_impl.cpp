@@ -578,5 +578,12 @@ ErrCode WifiDeviceImpl::StartRoamToNetwork(const int networkId, const std::strin
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->StartRoamToNetwork(networkId, bssid, isCandidate);
 }
+
+ErrCode WifiDeviceImpl::StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->StartConnectToUserSelectNetwork(networkId, bssid, isCandidate);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -104,6 +104,14 @@ void WifiDeviceStub::InitHandleMapEx()
     return;
 }
 
+void WifiDeviceStub::InitHandleMapEx2()
+{
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK)] =
+        &WifiDeviceStub::OnStartRoamToNetwork;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_CONNECT_TO_USER_SELECT_NETWORK)] =
+        &WifiDeviceStub::OnStartConnectToUserSelectNetwork;
+}
+
 void WifiDeviceStub::InitHandleMap()
 {
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI)] = &WifiDeviceStub::OnEnableWifi;
@@ -132,8 +140,6 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnDisableDeviceConfig;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = &WifiDeviceStub::OnConnectTo;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = &WifiDeviceStub::OnConnect2To;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK)] =
-        &WifiDeviceStub::OnStartRoamToNetwork;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = &WifiDeviceStub::OnReConnect;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE)] = &WifiDeviceStub::OnReAssociate;
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISCONNECT)] = &WifiDeviceStub::OnDisconnect;
@@ -155,6 +161,7 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT)] =
         &WifiDeviceStub::OnRegisterCallBack;
     InitHandleMapEx();
+    InitHandleMapEx2();
     return;
 }
 
@@ -734,6 +741,18 @@ void WifiDeviceStub::OnStartRoamToNetwork(uint32_t code, MessageParcel &data, Me
     std::string bssid = data.ReadString();
     bool isCandidate = data.ReadBool();
     ErrCode ret = StartRoamToNetwork(networkId, bssid, isCandidate);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnStartConnectToUserSelectNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("enter %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int networkId = data.ReadInt32();
+    std::string bssid = data.ReadString();
+    bool isCandidate = data.ReadBool();
+    ErrCode ret = StartConnectToUserSelectNetwork(networkId, bssid, isCandidate);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

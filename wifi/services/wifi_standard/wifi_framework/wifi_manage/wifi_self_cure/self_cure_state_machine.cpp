@@ -1972,8 +1972,8 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
         return false;
     }
     auto now = std::chrono::system_clock::now();
-    uint64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    uint64_t lastConnectFailMs = selfCureInfo.lastRandMacSelfCureConnectFailedCntTs;
+    int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    int64_t lastConnectFailMs = selfCureInfo.lastRandMacSelfCureConnectFailedCntTs;
     if ((currentMs - lastConnectFailMs) < RAND_MAC_FAIL_EXPIRATION_AGE_MILLIS) {
         WIFI_LOGI("Too close to the last connection failure time return");
         return false;

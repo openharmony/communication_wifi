@@ -356,28 +356,18 @@ NO_SANITIZE("cfi") WifiErrorCode QueryP2pGroups(WifiP2pGroupInfo* groupInfo, int
 void WifiP2pCEventCallback::OnP2pStateChanged(int state)
 {
     WIFI_LOGI("received state changed event: %{public}d", state);
-    auto &eventHandler = EventManager::GetInstance().GetWifiP2pCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            std::unique_lock<std::mutex> lock(p2pCallbackMutex);
-            if (stateChangeCb) {
-                stateChangeCb(P2pState(state));
-            }
-        } );
+    std::unique_lock<std::mutex> lock(p2pCallbackMutex);
+    if (stateChangeCb) {
+        stateChangeCb(P2pState(state));
     }
 }
 
 void WifiP2pCEventCallback::OnP2pPersistentGroupsChanged(void)
 {
     WIFI_LOGI("received group changed event");
-    auto &eventHandler = EventManager::GetInstance().GetWifiP2pCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            std::unique_lock<std::mutex> lock(p2pCallbackMutex);
-            if (groupChangeCb) {
-                groupChangeCb();
-            }
-        } );
+    std::unique_lock<std::mutex> lock(p2pCallbackMutex);
+    if (groupChangeCb) {
+        groupChangeCb();
     }
 }
 
@@ -389,53 +379,43 @@ void WifiP2pCEventCallback::OnP2pThisDeviceChanged(const OHOS::Wifi::WifiP2pDevi
 void WifiP2pCEventCallback::OnP2pPeersChanged(const std::vector<OHOS::Wifi::WifiP2pDevice> &devices)
 {
     WIFI_LOGI("received peers changed event: %{public}d", (int)devices.size());
-    auto &eventHandler = EventManager::GetInstance().GetWifiP2pCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            WifiP2pDevice *devicePtr = nullptr;
-            if (!devices.empty()) {
-                devicePtr = new (std::nothrow) WifiP2pDevice[(int)devices.size()];
-                if (devicePtr == nullptr) {
-                    WIFI_LOGE("new WifiP2pDevice failed!");
-                    return;
-                }
-                WifiP2pDevice *p = devicePtr;
-                for (auto& each : devices) {
-                    if (ConvertP2PDeviceCppToC(each, p++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
-                        WIFI_LOGE("peers changed convert p2p device failed!");
-                        delete[] devicePtr;
-                        return;
-                    }
-                }
-            }
-
-            {
-                std::unique_lock<std::mutex> lock(p2pCallbackMutex);
-                if (peersChangeCb) {
-                    peersChangeCb(devicePtr, (int)devices.size());
-                }
-            }
-
-            if (devicePtr) {
+    WifiP2pDevice *devicePtr = nullptr;
+    if (!devices.empty()) {
+        devicePtr = new (std::nothrow) WifiP2pDevice[(int)devices.size()];
+        if (devicePtr == nullptr) {
+            WIFI_LOGE("new WifiP2pDevice failed!");
+            return;
+        }
+        WifiP2pDevice *p = devicePtr;
+        for (auto& each : devices) {
+            if (ConvertP2PDeviceCppToC(each, p++) != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("peers changed convert p2p device failed!");
                 delete[] devicePtr;
-                devicePtr = nullptr;
+                return;
             }
-        } );
+        }
+    }
+
+    {
+        std::unique_lock<std::mutex> lock(p2pCallbackMutex);
+        if (peersChangeCb) {
+            peersChangeCb(devicePtr, (int)devices.size());
+        }
+    }
+
+    if (devicePtr) {
+        delete[] devicePtr;
+        devicePtr = nullptr;
     }
 }
 
 void WifiP2pCEventCallback::OnP2pPrivatePeersChanged(const std::string &priWfdInfo)
 {
     WIFI_LOGI("%{public}s, received p2p Private Peer changed event", __func__);
-    auto &eventHandler = EventManager::GetInstance().GetWifiP2pCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            char* wfdInfo  = const_cast<char*>(priWfdInfo.c_str());
-            std::unique_lock<std::mutex> lock(p2pCallbackMutex);
-            if (privatepeerChangeCb) {
-                privatepeerChangeCb(wfdInfo);
-            }
-        });
+    char* wfdInfo  = const_cast<char*>(priWfdInfo.c_str());
+    std::unique_lock<std::mutex> lock(p2pCallbackMutex);
+    if (privatepeerChangeCb) {
+        privatepeerChangeCb(wfdInfo);
     }
 }
 
@@ -447,14 +427,9 @@ void WifiP2pCEventCallback::OnP2pServicesChanged(const std::vector<OHOS::Wifi::W
 void WifiP2pCEventCallback::OnP2pConnectionChanged(const OHOS::Wifi::WifiP2pLinkedInfo &info)
 {
     WIFI_LOGI("received connection changed event");
-    auto &eventHandler = EventManager::GetInstance().GetWifiP2pCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            std::unique_lock<std::mutex> lock(p2pCallbackMutex);
-            if (connectionChangeCb) {
-                connectionChangeCb(ConvertP2pLinkedInfo(info));
-            }
-        } );
+    std::unique_lock<std::mutex> lock(p2pCallbackMutex);
+    if (connectionChangeCb) {
+        connectionChangeCb(ConvertP2pLinkedInfo(info));
     }
 }
 
@@ -471,14 +446,9 @@ void WifiP2pCEventCallback::OnP2pActionResult(OHOS::Wifi::P2pActionCallback acti
 void WifiP2pCEventCallback::OnConfigChanged(OHOS::Wifi::CfgType type, char* data, int dataLen)
 {
     WIFI_LOGI("received config change event: %{public}d", static_cast<int>(type));
-    auto &eventHandler = EventManager::GetInstance().GetWifiP2pCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            std::unique_lock<std::mutex> lock(p2pCallbackMutex);
-            if (cfgChangeCallback) {
-                cfgChangeCallback(CfgType(type), data, dataLen);
-            }
-        } );
+    std::unique_lock<std::mutex> lock(p2pCallbackMutex);
+    if (cfgChangeCallback) {
+        cfgChangeCallback(CfgType(type), data, dataLen);
     }
 }
 

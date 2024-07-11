@@ -35,15 +35,19 @@ std::shared_ptr<WifiDevice> wifiDeviceSharedPtr = OHOS::Wifi::WifiDevice::GetIns
 WifiHotspotStub::WifiHotspotStub():mSingleCallback(false), m_id(0)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiHotspotStub::WifiHotspotStub(int id):mSingleCallback(false), m_id(id)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiHotspotStub::~WifiHotspotStub()
-{}
+{
+    deathRecipient_ = nullptr;
+}
 
 void WifiHotspotStub::InitHandleMap()
 {
@@ -452,8 +456,11 @@ void WifiHotspotStub::OnRegisterCallBack(
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiHotspotDeathRecipient();
+            {
+                std::unique_lock<std::mutex> lock(deathRecipientMutex);
+                if (deathRecipient_ == nullptr) {
+                    deathRecipient_ = new (std::nothrow) WifiHotspotDeathRecipient();
+                }
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");

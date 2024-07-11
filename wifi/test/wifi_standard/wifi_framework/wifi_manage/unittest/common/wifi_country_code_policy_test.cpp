@@ -330,7 +330,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPFailTest, TestSize.Lev
     wifiLinkedInfo.bssid = "11:22:33:44:55:66";
 
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
-        ..WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code));
 }
@@ -339,10 +339,12 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultFailTest, Test
 {
     WIFI_LOGI("GetWifiCountryCodeByScanResultFailTest enter");
     std::string code;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_)).WillRepeatedly(Return(static_cast<int>(WifiState::DISABLED)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_))
+        .WillRepeatedly(Return(static_cast<int>(WifiState::DISABLED)));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code));
 
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_)).WillRepeatedly(Return(static_cast<int>(WifiState::ENABLED)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_))
+        .WillRepeatedly(Return(static_cast<int>(WifiState::ENABLED)));
     m_wifiCountryCodePolicy->m_wifiCountryCodeFromScanResults = "";
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code));
 }
@@ -350,7 +352,8 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultFailTest, Test
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultSuccessTest, TestSize.Level1)
 {
     WIFI_LOGI("GetWifiCountryCodeByScanResultSuccessTest enter");
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_)).WillOnce(Return(static_cast<int>(WifiState::ENABLED)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_))
+        .WillOnce(Return(static_cast<int>(WifiState::ENABLED)));
 
     m_wifiCountryCodePolicy->m_wifiCountryCodeFromScanResults = "CN";
     std::string code;

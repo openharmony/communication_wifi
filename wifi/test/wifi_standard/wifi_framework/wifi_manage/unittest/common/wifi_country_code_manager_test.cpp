@@ -213,8 +213,8 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaOpenResTest, TestSize.Level1)
     info1.connState = ConnState::CONNECTED;
     tempInfos.emplace(1, info1);
     WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
-    EXPECT_CALL((WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
-    EXPECT_CALL((WifiConfigCenter::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiStateOnAirplaneChanged(_)).WillRepeatedly(Return(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SetLastAirplaneMode(_, _)).WillRepeatedly(Return(1));
     WifiCountryCodeManager::GetInstance().DealStaOpened(0);
 }

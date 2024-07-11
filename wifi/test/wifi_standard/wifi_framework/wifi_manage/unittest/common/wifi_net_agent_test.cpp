@@ -18,6 +18,8 @@
 #include "wifi_net_agent.h"
 #include "wifi_log.h"
 #include "wifi_logger.h"
+#include "mock_wifi_config_center.h"
+
 using namespace testing;
 using ::testing::_;
 using ::testing::DoAll;

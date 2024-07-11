@@ -258,6 +258,10 @@ static void ConvertsScanInfo(InterScanInfo &interScanInfo, ScanInfo &scanInfo)
     interScanInfo.maxRates = scanInfo.maxRates > scanInfo.extMaxRates ? scanInfo.maxRates : scanInfo.extMaxRates;
     for (int i = 0; i < scanInfo.ieSize; ++i) {
         WifiInfoElem infoElem;
+        if (!scanInfo.infoElems) {
+            LOGE("ConvertsScanInfo scanInfo.infoElems is NULL!");
+            return;
+        }
         infoElem.id = scanInfo.infoElems[i].id;
         for (int j = 0; j < scanInfo.infoElems[i].size; ++j) {
             infoElem.content.emplace_back(scanInfo.infoElems[i].content[j]);

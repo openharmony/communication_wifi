@@ -17,6 +17,7 @@
 #define OHOS_MOCK_WIFI_CONFIG_CENTER_H
 
 #include <gmock/gmock.h>
+#include <map>
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 
@@ -47,6 +48,12 @@ public:
     virtual int GetHotspotState(int id = 0) = 0;
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
     virtual int GetPowerSavingModeState() const = 0;
+    virtual int GetWifiState(int instId = 0) = 0;
+    virtual std::map<int, WifiLinkedInfo> GetAllWifiLinkedInfo() = 0;
+    virtual int GetScanInfoList(std::vector<WifiScanInfo> &results) = 0;
+    virtual std::string GetStaIfaceName() = 0;
+    virtual int GetIpInfo(IpInfo &info, int instId = 0) = 0;
+    virtual int GetIpv6Info(IpV6Info &info, int instId = 0) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -74,6 +81,12 @@ public:
     MOCK_METHOD1(GetHotspotState, int(int id));
     MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int instId));
     MOCK_CONST_METHOD0(GetPowerSavingModeState, int(void));
+    MOCK_METHOD1(GetWifiState, int(int instId));
+    MOCK_METHOD0(GetAllWifiLinkedInfo, std::map<int, WifiLinkedInfo>(void));
+    MOCK_METHOD1(GetScanInfoList, int(std::vector<WifiScanInfo> &results));
+    MOCK_METHOD0(GetStaIfaceName, std::string(void));
+    MOCK_METHOD2(GetIpInfo, int(IpInfo &info, int instId));
+    MOCK_METHOD2(GetIpv6Info, int(IpV6Info &info, int instId));
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -18,6 +18,7 @@
 #include <memory>
 #include "mock_wifi_global_func.h"
 #include "mock_wifi_settings.h"
+#include "mock_wifi_config_center.h"
 #include "wifi_country_code_policy.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_errcode.h"
@@ -123,7 +124,7 @@ HWTEST_F(WifiCountryCodePolicyTest, HandleScanResultActionTest, TestSize.Level1)
     info2.infoElems = std::move(infoElems2);
     list.push_back(info2);
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
         .WillOnce(DoAll(SetArgReferee<0>(list), Return(0)));
     m_wifiCountryCodePolicy->HandleScanResultAction();
 }
@@ -160,7 +161,7 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultFailTest, 
 {
     WIFI_LOGI("StatisticCountryCodeFromScanResultFailTest enter");
     std::vector<WifiScanInfo> wifiScanInfoList;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
         .WillOnce(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
@@ -192,7 +193,7 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultSuccessTes
     info2.infoElems = std::move(infoElems2);
     wifiScanInfoList.push_back(info2);
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
         .WillOnce(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
@@ -299,7 +300,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPSuccessTest, TestSize.
     WifiLinkedInfo wifiLinkedInfo;
     wifiLinkedInfo.connState = OHOS::Wifi::ConnState::CONNECTED;
     wifiLinkedInfo.bssid = "11:22:33:44:55:66";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
 
     // Add simulated scan results
@@ -313,7 +314,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPSuccessTest, TestSize.
     infoElems1.push_back(elem1);
     info1.infoElems = std::move(infoElems1);
     wifiScanInfoList.push_back(info1);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
         .WillOnce(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
 
     std::string code;
@@ -328,8 +329,8 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPFailTest, TestSize.Lev
     wifiLinkedInfo.connState = OHOS::Wifi::ConnState::DISCONNECTED;
     wifiLinkedInfo.bssid = "11:22:33:44:55:66";
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
-        .WillOnce(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code));
 }
@@ -338,9 +339,12 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultFailTest, Test
 {
     WIFI_LOGI("GetWifiCountryCodeByScanResultFailTest enter");
     std::string code;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_))
+        .WillRepeatedly(Return(static_cast<int>(WifiState::DISABLED)));
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code));
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(_)).WillOnce(Return(static_cast<int>(WifiState::ENABLED)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_))
+        .WillRepeatedly(Return(static_cast<int>(WifiState::ENABLED)));
     m_wifiCountryCodePolicy->m_wifiCountryCodeFromScanResults = "";
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code));
 }
@@ -348,7 +352,9 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultFailTest, Test
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByScanResultSuccessTest, TestSize.Level1)
 {
     WIFI_LOGI("GetWifiCountryCodeByScanResultSuccessTest enter");
-    EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(_)).WillOnce(Return(static_cast<int>(WifiState::ENABLED)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_))
+        .WillOnce(Return(static_cast<int>(WifiState::ENABLED)));
+
     m_wifiCountryCodePolicy->m_wifiCountryCodeFromScanResults = "CN";
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByScanResult(code));
@@ -397,7 +403,7 @@ HWTEST_F(WifiCountryCodePolicyTest, TelephoneNetworkSearchStateChangeListenerOnR
     info1.connState = ConnState::CONNECTED;
     tempInfos.emplace(1, info1);
     WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
 
 #ifndef OHOS_ARCH_LITE
     AAFwk::Want want;
@@ -437,7 +443,7 @@ HWTEST_F(WifiCountryCodePolicyTest, WifiScanEventListenerOnReceiveEventTest, Tes
     infoElems2.push_back(elem2);
     info2.infoElems = std::move(infoElems2);
     list.push_back(info2);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetScanInfoList(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
         .WillOnce(DoAll(SetArgReferee<0>(list), Return(0)));
     
     std::map <int, WifiLinkedInfo> tempInfos;
@@ -445,7 +451,7 @@ HWTEST_F(WifiCountryCodePolicyTest, WifiScanEventListenerOnReceiveEventTest, Tes
     wifiLinkedInfo.connState = OHOS::Wifi::ConnState::CONNECTED;
     tempInfos.emplace(1, wifiLinkedInfo);
     WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
 
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED);

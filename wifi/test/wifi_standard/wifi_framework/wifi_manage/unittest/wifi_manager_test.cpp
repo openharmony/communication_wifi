@@ -82,7 +82,7 @@ HWTEST_F(WifiManagerTest, StaManagerDealStaOpenResTest_001, TestSize.Level1)
     WifiLinkedInfo info1;
     info1.connState = ConnState::CONNECTED;
     tempInfos.emplace(1, info1);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
 
     wifiManager.wifiStaManager->DealStaOpened(0);
 }
@@ -170,6 +170,8 @@ HWTEST_F(WifiManagerTest, CheckAndStartScanService_002, TestSize.Level1)
 HWTEST_F(WifiManagerTest, CheckAndStopScanServiceTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanMidState(_))
+        .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
     wifiManager.wifiScanManager->CheckAndStopScanService();
 }
 
@@ -236,13 +238,15 @@ HWTEST_F(WifiManagerTest, AutoStopP2pService_002, TestSize.Level1)
 {
     WIFI_LOGI("AutoStopP2pService_002 enter!");
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
-        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
+        .WillRepeatedly(DoAll(Return(WifiOprMidState::RUNNING)));
     EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
 }
 
 HWTEST_F(WifiManagerTest, StartUnloadP2PSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartUnloadP2PSaTimerTest enter!");
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiMidState(_))
+        .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
     wifiManager.wifiP2pManager->StartUnloadP2PSaTimer();
 }
 
@@ -255,6 +259,8 @@ HWTEST_F(WifiManagerTest, CloseP2pServiceTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, DealP2pStateChangedTest_001, TestSize.Level1)
 {
     WIFI_LOGI("DealP2pStateChangedTest_001 enter!");
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiMidState(_))
+        .WillRepeatedly(DoAll(Return(WifiOprMidState::CLOSED)));
     wifiManager.wifiP2pManager->DealP2pStateChanged(P2pState::P2P_STATE_STARTED);
 }
 

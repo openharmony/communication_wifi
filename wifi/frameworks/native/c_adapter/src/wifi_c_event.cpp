@@ -78,20 +78,15 @@ NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnWifiConnectionChanged(int st
     const OHOS::Wifi::WifiLinkedInfo &info)
 {
     WIFI_LOGI("sta connection changed event: %{public}d", state);
-    auto &eventHandler = EventManager::GetInstance().GetWifiCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            WifiLinkedInfo linkInfo;
-            OHOS::Wifi::ErrCode retValue = ConvertedLinkedInfo(info, &linkInfo);
-            if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("Get linked info from cpp error!");
-                return;
-            }
-            std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
-            if (EventManager::g_wifiEvent.OnWifiConnectionChanged) {
-                EventManager::g_wifiEvent.OnWifiConnectionChanged(state, &linkInfo);
-            }
-        } );
+    WifiLinkedInfo linkInfo;
+    OHOS::Wifi::ErrCode retValue = ConvertedLinkedInfo(info, &linkInfo);
+    if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get linked info from cpp error!");
+        return;
+    }
+    std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
+    if (EventManager::g_wifiEvent.OnWifiConnectionChanged) {
+        EventManager::g_wifiEvent.OnWifiConnectionChanged(state, &linkInfo);
     }
 }
 
@@ -111,14 +106,9 @@ void WifiCDeviceEventCallback::OnStreamChanged(int direction)
 NO_SANITIZE("cfi") void WifiCDeviceEventCallback::OnDeviceConfigChanged(OHOS::Wifi::ConfigChange value)
 {
     WIFI_LOGI("sta received device config changed event: %{public}d", static_cast<int>(value));
-    auto &eventHandler = EventManager::GetInstance().GetWifiCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
-                if (EventManager::g_wifiEvent.OnDeviceConfigChange) {
-                    EventManager::g_wifiEvent.OnDeviceConfigChange(ConfigChange(static_cast<int>(value)));
-                }
-        } );
+    std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
+    if (EventManager::g_wifiEvent.OnDeviceConfigChange) {
+        EventManager::g_wifiEvent.OnDeviceConfigChange(ConfigChange(static_cast<int>(value)));
     }
 }
 
@@ -134,14 +124,9 @@ std::vector<std::string> WifiCScanEventCallback::scanCallbackEvent = {
 NO_SANITIZE("cfi") void WifiCScanEventCallback::OnWifiScanStateChanged(int state)
 {
     WIFI_LOGI("ScanStateChanged event: %{public}d", state);
-    auto &eventHandler = EventManager::GetInstance().GetWifiCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
-            if (EventManager::g_wifiEvent.OnWifiScanStateChanged) {
-                EventManager::g_wifiEvent.OnWifiScanStateChanged(state, WIFI_SCAN_HOTSPOT_LIMIT);
-            }
-        } );
+    std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
+    if (EventManager::g_wifiEvent.OnWifiScanStateChanged) {
+        EventManager::g_wifiEvent.OnWifiScanStateChanged(state, WIFI_SCAN_HOTSPOT_LIMIT);
     }
 }
 
@@ -159,14 +144,9 @@ std::vector<std::string> WifiCHotspotEventCallback::hotspotCallbackEvent = {
 NO_SANITIZE("cfi") void WifiCHotspotEventCallback::OnHotspotStateChanged(int state)
 {
     WIFI_LOGI("Hotspot received state changed event: %{public}d", state);
-    auto &eventHandler = EventManager::GetInstance().GetWifiCEventHandler();
-    if (eventHandler) {
-        eventHandler->PostSyncTask([=]() {
-            std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
-            if (EventManager::g_wifiEvent.OnHotspotStateChanged) {
-                EventManager::g_wifiEvent.OnHotspotStateChanged(state);
-            }
-        } );
+    std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
+    if (EventManager::g_wifiEvent.OnHotspotStateChanged) {
+        EventManager::g_wifiEvent.OnHotspotStateChanged(state);
     }
 }
 
@@ -194,19 +174,10 @@ OHOS::sptr<WifiCHotspotEventCallback> wifiCHotspotCallback =
 
 EventManager::EventManager()
 {
-    wifiCEventHandler = std::make_unique<OHOS::Wifi::WifiEventHandler>("WIFI_C_EVENT_WORK_THREAD");
-    wifiP2pCEventHandler = std::make_unique<OHOS::Wifi::WifiEventHandler>("WIFI_P2P_C_EVENT_WORK_THREAD");
 }
 
 EventManager::~EventManager()
 {
-    if (wifiCEventHandler) {
-        wifiCEventHandler.reset();
-    }
-
-    if (wifiP2pCEventHandler) {
-        wifiP2pCEventHandler.reset();
-    }
 }
 
 void EventManager::RemoveEventCallback(WifiEvent *cb)
@@ -390,16 +361,6 @@ std::set<std::string>& EventManager::GetP2PCallbackEvent()
 OHOS::sptr<WifiP2pCEventCallback> EventManager::GetP2PCallbackPtr()
 {
     return sptrP2PCallback;
-}
-
-std::unique_ptr<OHOS::Wifi::WifiEventHandler>& EventManager::GetWifiCEventHandler()
-{
-    return wifiCEventHandler;
-}
-
-std::unique_ptr<OHOS::Wifi::WifiEventHandler>& EventManager::GetWifiP2pCEventHandler()
-{
-    return wifiP2pCEventHandler;
 }
 
 EventManager& EventManager::GetInstance()

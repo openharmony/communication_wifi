@@ -393,7 +393,7 @@ std::string WifiConfigCenter::GetConnectTimeoutBssid(int instId)
     auto iter = mBssidToTimeoutTime.find(instId);
     if (iter != mBssidToTimeoutTime.end()) {
         const int timeout = 30; // 30s
-        if (iter->second.second - static_cast<int>(time(0)) > timeout) {
+        if (iter->second.second - static_cast<int>(time(NULL)) > timeout) {
             return "";
         }
         return iter->second.first;
@@ -404,7 +404,11 @@ std::string WifiConfigCenter::GetConnectTimeoutBssid(int instId)
 int WifiConfigCenter::SetConnectTimeoutBssid(std::string &bssid, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    time_t now = time(0);
+    time_t now = time(NULL);
+    if (now == static_cast<time_t>(-1)) {
+        LOGE("SetConnectTimeoutBssid: call time failed!");
+        return -1;
+    }
     mBssidToTimeoutTime[instId] = std::make_pair(bssid, static_cast<int>(now));
     return 0;
 }
@@ -778,7 +782,7 @@ int WifiConfigCenter::ManageStation(const StationInfo &info, int mode, int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);
     auto iter = mConnectStationInfo.find(info.bssid);
-    if (MODE_ADD == mode || MODE_UPDATE == mode) {
+    if (mode == MODE_ADD || mode == MODE_UPDATE) {
         if (iter != mConnectStationInfo.end()) {
             iter->second = info;
         } else {
@@ -787,7 +791,7 @@ int WifiConfigCenter::ManageStation(const StationInfo &info, int mode, int id)
 #ifdef SUPPORT_RANDOM_MAC_ADDR
         StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, info.bssid, "");
 #endif
-    } else if (MODE_DEL == mode) {
+    } else if (mode == MODE_DEL) {
         if (iter != mConnectStationInfo.end()) {
             mConnectStationInfo.erase(iter);
         }
@@ -1277,6 +1281,7 @@ bool WifiConfigCenter::HasWifiActive()
 
 void WifiConfigCenter::UpdateLinkedInfo(int instId)
 {
+    std::unique_lock<std::mutex> lock(mScanMutex);
     for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end(); ++iter) {
         if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
             if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
@@ -1378,28 +1383,24 @@ void WifiConfigCenter::InitScanControlIntervalList()
     /* All app: If the scanning interval is less than 5s for five  */
     /* consecutive times, the scanning can be performed only after */
     /* the scanning interval is greater than 5s. */
-    const int frequencyContinueInterval = 5;
-    const int frequencyContinueCount = 5;
     scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_CUSTOM;
     scanIntervalMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     scanIntervalMode.isSingle = false;
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_CONTINUE;
-    scanIntervalMode.interval = frequencyContinueInterval;
-    scanIntervalMode.count = frequencyContinueCount;
+    scanIntervalMode.interval = FREQUENCY_CONTINUE_INTERVAL;
+    scanIntervalMode.count = FREQUENCY_CONTINUE_COUNT;
     mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
 
     /* no charger plug */
     /* Single app: If all scanning interval in 10 times is less than */
     /* the threshold (20s), the app is added to the blocklist and  */
     /* cannot initiate scanning. */
-    const int frequencyBlocklistInterval = 20;
-    const int frequencyBlocklistCount = 10;
     scanIntervalMode.scanScene = SCAN_SCENE_FREQUENCY_CUSTOM;
     scanIntervalMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
     scanIntervalMode.isSingle = true;
     scanIntervalMode.intervalMode = IntervalMode::INTERVAL_BLOCKLIST;
-    scanIntervalMode.interval = frequencyBlocklistInterval;
-    scanIntervalMode.count = frequencyBlocklistCount;
+    scanIntervalMode.interval = FREQUENCY_BLOCKLIST_INTERVAL;
+    scanIntervalMode.count = FREQUENCY_BLOCKLIST_COUNT;
     mScanControlInfo[0].scanIntervalList.push_back(scanIntervalMode);
 
     /* PNO scanning every 20 seconds */

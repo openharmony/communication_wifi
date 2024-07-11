@@ -104,7 +104,7 @@ public:
      *
      * @param status - status codes [in]
      */
-    void onWpaConnectionFullCallBack(int status);
+    void OnWpaConnectionFullCallBack(int status);
 
     /**
      * @Description : Callback of the Connection Refused event.
@@ -112,7 +112,7 @@ public:
      * @param status - status codes [in]
      * @param bssid: bssid of the network [in]
      */
-    void onWpaConnectionRejectCallBack(int status, const std::string &bssid);
+    void OnWpaConnectionRejectCallBack(int status, const std::string &bssid);
 
     /**
      * @Description : Callback of the WPS_OVERLAP event.

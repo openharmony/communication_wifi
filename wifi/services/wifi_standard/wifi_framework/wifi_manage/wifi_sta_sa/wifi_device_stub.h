@@ -131,6 +131,7 @@ private:
 
 private:
     HandleFuncMap handleFuncMap;
+    std::mutex deathRecipientMutex;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
 

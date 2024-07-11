@@ -552,6 +552,24 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::StartConnectToUserSelectNetwork(int networkId, std::string bssid) const
+{
+    LOGI("Enter StartConnectToUserSelectNetwork, networkId: %{public}d, bssid: %{public}s",
+        networkId, MacAnonymize(bssid).c_str());
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+    message->SetParam1(networkId);
+    message->SetParam2(NETWORK_SELECTED_BY_USER);
+    message->AddStringMessageBody(bssid);
+    pStaStateMachine->SendMessage(message);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::ReAssociate() const
 {
     WIFI_LOGI("Enter ReAssociate.\n");

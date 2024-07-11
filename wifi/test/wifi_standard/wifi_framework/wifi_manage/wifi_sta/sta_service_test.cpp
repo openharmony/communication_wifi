@@ -129,6 +129,8 @@ public:
     void EnableHiLinkHandshakeTest();
     void DeliverStaIfaceDataTest();
     void StartRoamToNetworkTest();
+    int StartConnectToUserSelectNetworkSuccessTest();
+    int StartConnectToUserSelectNetworkSuccessFail();
     void SetTxPowerTest();
 public:
     std::unique_ptr<StaService> pStaService;
@@ -838,6 +840,34 @@ void StaServiceTest::StartRoamToNetworkTest()
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
     pStaService->StartRoamToNetwork(0, "11:22:33:44");
 }
+
+int StaServiceTest::StartConnectToUserSelectNetworkSuccessTest()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    WifiLinkedInfo info;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    return static_cast<int>(pStaService->StartConnectToUserSelectNetwork(0, "11:22:33:44"));
+}
+
+int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    WifiLinkedInfo info;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(1)));
+    return static_cast<int>(pStaService->StartConnectToUserSelectNetwork(0, "11:22:33:44"));
+}
  
 void StaServiceTest::SetTxPowerTest()
 {
@@ -1171,6 +1201,16 @@ HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, StartRoamToNetworkTest, TestSize.Level1)
 {
     StartRoamToNetworkTest();
+}
+
+HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessTest, TestSize.Level1)
+{
+    EXPECT_EQ(0, StartConnectToUserSelectNetworkSuccessTest());
+}
+
+HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessFail, TestSize.Level1)
+{
+    EXPECT_EQ(1, StartConnectToUserSelectNetworkSuccessFail());
 }
  
 HWTEST_F(StaServiceTest, SetTxPowerTest, TestSize.Level1)

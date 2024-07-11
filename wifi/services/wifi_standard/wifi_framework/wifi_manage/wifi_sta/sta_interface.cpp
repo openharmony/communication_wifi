@@ -110,6 +110,18 @@ ErrCode StaInterface::StartRoamToNetwork(const int networkId, const std::string 
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::StartConnectToUserSelectNetwork(int networkId, std::string bssid)
+{
+    LOGD("Enter StartConnectToUserSelectNetwork");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->StartConnectToUserSelectNetwork(networkId, bssid) != WIFI_OPT_SUCCESS) {
+        LOGI("StartConnectToUserSelectNetwork failed");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::ReConnect()
 {
     LOGI("Enter ReConnect.\n");

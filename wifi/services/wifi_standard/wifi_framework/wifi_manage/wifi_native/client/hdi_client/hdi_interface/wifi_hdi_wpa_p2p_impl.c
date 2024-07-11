@@ -385,7 +385,12 @@ WifiErrorNo HdiP2pSetWpsSecondaryDeviceType(const char *type)
 
 WifiErrorNo HdiP2pSetupWpsPbc(const char *groupIfc, const char *address)
 {
-    LOGI("HdiP2pSetupWpsPbc enter groupIfc=%{public}s address=%{public}s", groupIfc, address);
+    char anonymizeAddr[MAC_STRING_SIZE + 1] = {0};
+    if (ConvertMacArr2String((const unsigned char *)address, MAC_UINT_SIZE,
+                             anonymizeAddr, sizeof(anonymizeAddr)) != 0) {
+        LOGE("HdiP2pSetupWpsPbc: failed to convert address!");
+    }
+    LOGI("HdiP2pSetupWpsPbc enter groupIfc=%{public}s anonymizeAddr=%{public}s", groupIfc, anonymizeAddr);
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetupWpsPbc: wpaObj is NULL");

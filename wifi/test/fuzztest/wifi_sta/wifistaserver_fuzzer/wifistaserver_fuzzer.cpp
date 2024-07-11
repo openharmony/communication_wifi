@@ -103,10 +103,10 @@ public:
             std::placeholders::_2, std::placeholders::_3);
         mStaCallback.OnStaStreamChanged = std::bind(&WifiStaServerManager::DealStaStream, this, std::placeholders::_1,
             std::placeholders::_2);
-        mStaCallback.OnStaRssiLevelChanged = std::bind(&WifiStaServerManager::DealStaRssiLevel, this, std::placeholders::_1,
-            std::placeholders::_2);
-        mStaCallback.OnStaSemiActiveRes = std::bind(&WifiStaServerManager::DealStaSemActive, this, std::placeholders::_1,
-            std::placeholders::_2);
+        mStaCallback.OnStaRssiLevelChanged = std::bind(&WifiStaServerManager::DealStaRssiLevel, this,
+            std::placeholders::_1, std::placeholders::_2);
+        mStaCallback.OnStaSemiActiveRes = std::bind(&WifiStaServerManager::DealStaSemActive, this,
+            std::placeholders::_1, std::placeholders::_2);
         return;
     }
 };

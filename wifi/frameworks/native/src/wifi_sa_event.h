@@ -190,10 +190,6 @@ public:
 
     OHOS::sptr<WifiP2pCEventCallback> GetP2PCallbackPtr();
 
-    std::unique_ptr<OHOS::Wifi::WifiEventHandler>& GetWifiCEventHandler();
-    
-    std::unique_ptr<OHOS::Wifi::WifiEventHandler>& GetWifiP2pCEventHandler();
-
     static EventManager& GetInstance();
 
     void SaveWifiCallbackInfo(WifiEvent* event);
@@ -205,7 +201,5 @@ private:
     std::set<std::string> p2pRegisteredCallbackEvent;
     OHOS::sptr<WifiP2pCEventCallback> sptrP2PCallback = nullptr;
     OHOS::sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
-    std::unique_ptr<OHOS::Wifi::WifiEventHandler> wifiCEventHandler = nullptr;
-    std::unique_ptr<OHOS::Wifi::WifiEventHandler> wifiP2pCEventHandler = nullptr;
 };
 #endif

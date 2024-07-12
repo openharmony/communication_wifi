@@ -97,6 +97,7 @@ ohos_unittest("manager_unittest") {
     "mock_wifi_system_ability_listerner.cpp",
     "wifi_manager_test.cpp",
     "wifi_service_manager_test.cpp",
+    
   ]
 
   include_dirs = [

@@ -84,7 +84,6 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetLinkInfoTest001, TestSize.Level1
     IpV6Info wifiIpV6Info;
     WifiProxyConfig wifiProxyConfig;
     int instId = 0;
-    wifiNetAgent.netAgentEventHandler = std::make_unique<WifiEventHandler>(WIFI_NET_CONN_MGR_WORK_THREAD);
     wifiNetAgent.OnStaMachineUpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
 }
 
@@ -92,14 +91,12 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetSupplierInfoTest001, TestSize.Le
 {
     WifiNetAgent wifiNetAgent;
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo;
-    wifiNetAgent.netAgentEventHandler = std::make_unique<WifiEventHandler>(WIFI_NET_CONN_MGR_WORK_THREAD);
     wifiNetAgent. OnStaMachineUpdateNetSupplierInfo(netSupplierInfo);
 }
 
 HWTEST_F(WifiNetAgentTest, OnStaMachineWifiStartTest001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;
-    wifiNetAgent.netAgentEventHandler = std::make_unique<WifiEventHandler>(WIFI_NET_CONN_MGR_WORK_THREAD);
     wifiNetAgent.OnStaMachineWifiStart();
 }
 
@@ -111,7 +108,6 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineNetManagerRestartTest001, TestSize.Level1
     linkedInfo.connState == ConnState::CONNECTED;
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo;
-    wifiNetAgent.netAgentEventHandler = std::make_unique<WifiEventHandler>(WIFI_NET_CONN_MGR_WORK_THREAD);
     wifiNetAgent.OnStaMachineNetManagerRestart(netSupplierInfo, instId);
 }
 

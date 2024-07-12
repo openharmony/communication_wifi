@@ -158,4 +158,5 @@ HWTEST_F(WifiProtectManagerTest, GetWifiProtectTest004, TestSize.Level1)
     EXPECT_EQ(wifiProtectManager.GetWifiProtect(WifiProtectMode::WIFI_PROTECT_NO_HELD, "com.example2.app"), false);
 }
 
+
 // Add more test cases as needed

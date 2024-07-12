@@ -64,7 +64,7 @@ static WifiErrorNo RegisterP2pEventCallback()
         return WIFI_HAL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->RegisterEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
+    int32_t result = wpaObj->RegisterWpaEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterP2pEventCallback: RegisterEventCallback failed result:%{public}d", result);
@@ -88,7 +88,7 @@ static WifiErrorNo UnRegisterP2pEventCallback()
             return WIFI_HAL_OPT_FAILED;
         }
 
-        int32_t result = wpaObj->UnregisterEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
+        int32_t result = wpaObj->UnregisterWpaEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
         if (result != HDF_SUCCESS) {
             pthread_mutex_unlock(&g_hdiCallbackMutex);
             LOGE("UnRegisterP2pEventCallback: UnregisterEventCallback failed result:%{public}d", result);

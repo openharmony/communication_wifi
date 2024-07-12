@@ -380,6 +380,16 @@ void StaStateMachine::InvokeOnStaRssiLevelChanged(int level)
     }
 }
 
+void StaStateMachine::InvokeOnDhcpOfferReport(IpInfo ipInfo)
+{
+    std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnDhcpOfferReport != nullptr) {
+            callBackItem.second.OnDhcpOfferReport(ipInfo, m_instId);
+        }
+    }
+}
+
 /* --------------------------- state machine root state ------------------------------ */
 StaStateMachine::RootState::RootState() : State("RootState")
 {}
@@ -2819,6 +2829,7 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
 
 int StaStateMachine::RegisterCallBack()
 {
+    clientCallBack.OnDhcpOfferReport = DhcpResultNotify::OnDhcpOfferResult;
     clientCallBack.OnIpSuccessChanged = DhcpResultNotify::OnSuccess;
     clientCallBack.OnIpFailChanged = DhcpResultNotify::OnFailed;
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName();
@@ -2939,6 +2950,10 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)
                 }
                 case DhcpReturnCode::DHCP_FAIL: {
                     pStaStateMachine->pDhcpResultNotify->DealDhcpResultFailed();
+                    break;
+                }
+                case DhcpReturnCode::DHCP_OFFER_REPORT: {
+                    pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
                     break;
                 }
                 default:
@@ -3888,6 +3903,8 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(DhcpResult *dest, Dhcp
 StaStateMachine* StaStateMachine::DhcpResultNotify::pStaStateMachine = nullptr;
 DhcpResult StaStateMachine::DhcpResultNotify::DhcpIpv4Result;
 DhcpResult StaStateMachine::DhcpResultNotify::DhcpIpv6Result;
+DhcpResult StaStateMachine::DhcpResultNotify::DhcpOfferInfo;
+
 StaStateMachine::DhcpResultNotify::DhcpResultNotify()
 {
 }
@@ -3926,6 +3943,13 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
         StaStateMachine::DhcpResultNotify::SaveDhcpResult(&(StaStateMachine::DhcpResultNotify::DhcpIpv6Result), result);
     }
     pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_RESULT, result->iptype);
+}
+
+void StaStateMachine::DhcpResultNotify::OnDhcpOfferResult(int status, const char *ifname, DhcpResult *result)
+{
+    LOGI("DhcpResultNotify TYPE_DHCP_OFFER");
+    StaStateMachine::DhcpResultNotify::SaveDhcpResult(&DhcpOfferInfo, result);
+    pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_OFFER_REPORT, result->iptype);
 }
 
 void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
@@ -4135,7 +4159,27 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResultFailed()
     pStaStateMachine->getIpFailNum++;
 }
 
+void StaStateMachine::DhcpResultNotify::DealDhcpOfferResult()
+{
+    LOGI("DhcpResultNotify DealDhcpOfferResult enter");
+    IpInfo ipInfo;
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptClientId);
+    ipInfo.gateway = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptRouter1);
+    ipInfo.netmask = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptSubnet);
+    ipInfo.primaryDns = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptDns1);
+    ipInfo.secondDns = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptDns2);
+    ipInfo.serverIp = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptServerId);
+    ipInfo.leaseDuration = DhcpOfferInfo.uOptLeasetime;
+    if (DhcpOfferInfo.dnsList.dnsNumber > 0) {
+        ipInfo.dnsAddr.clear();
+        for (uint32_t i = 0; i < DhcpOfferInfo.dnsList.dnsNumber; i++) {
+            uint32_t ipv4Address = IpTools::ConvertIpv4Address(DhcpOfferInfo.dnsList.dnsAddr[i]);
+            ipInfo.dnsAddr.push_back(ipv4Address);
+        }
+    }
 
+    pStaStateMachine->InvokeOnDhcpOfferReport(ipInfo);
+}
 /* ------------------ state machine Comment function ----------------- */
 void StaStateMachine::SaveDiscReason(DisconnectedReason discReason)
 {
@@ -4248,6 +4292,7 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
     if (networkStatus == NetworkStatus::HAS_INTERNET) {
         wifiDeviceConfig.lastHasInternetTime = time(0);
         wifiDeviceConfig.noInternetAccess = false;
+        WifiConfigCenter::GetInstance().GetIpInfo(wifiDeviceConfig.lastDhcpResult, m_instId);
     }
     if (networkStatus == NetworkStatus::NO_INTERNET) {
         wifiDeviceConfig.noInternetAccess = true;

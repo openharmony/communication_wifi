@@ -32,6 +32,7 @@ struct StaServiceCallback {
     std::function<void(StreamDirection, int)> OnStaStreamChanged;
     std::function<void(int, int)> OnStaRssiLevelChanged;
     std::function<void(OperateResState, int)> OnStaSemiActiveRes;
+    std::function<void(IpInfo, int)> OnDhcpOfferReport;
 };
 }  // namespace Wifi
 }  // namespace OHOS

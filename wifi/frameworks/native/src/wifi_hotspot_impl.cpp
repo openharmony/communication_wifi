@@ -51,7 +51,10 @@ bool WifiHotspotImpl::Init(int systemAbilityId, int id)
 
 bool WifiHotspotImpl::GetWifiHotspotProxy()
 {
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+    if (WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("failed to load hotspot sa !");
+        return false;
+    }
     if (IsRemoteDied() == false) {
         return true;
     }

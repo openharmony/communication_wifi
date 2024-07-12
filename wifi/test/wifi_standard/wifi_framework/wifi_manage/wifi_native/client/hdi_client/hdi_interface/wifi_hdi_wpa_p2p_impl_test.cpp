@@ -21,6 +21,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const int SIZE = 128;
 class WifiHdiWpaP2pImplTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -242,16 +243,16 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pReinvokeTest, TestSize.Level1)
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pGetDeviceAddressTest, TestSize.Level1)
 {
-    char *deviceAddress = nullptr;
-    WifiErrorNo result = HdiP2pGetDeviceAddress(deviceAddress);
+    char deviceAddress[SIZE] = {0};
+    WifiErrorNo result = HdiP2pGetDeviceAddress(deviceAddress, SIZE);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pReqServiceDiscoveryTest, TestSize.Level1)
 {
     struct HdiP2pReqService reqService;
-    char *replyDisc = nullptr;
-    WifiErrorNo result = HdiP2pReqServiceDiscovery(&reqService, replyDisc);
+    char replyDisc[SIZE] = {0};
+    WifiErrorNo result = HdiP2pReqServiceDiscovery(&reqService, replyDisc, SIZE);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -272,8 +273,8 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRespServerDiscoveryTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pConnectTest, TestSize.Level1)
 {
     P2pConnectInfo info;
-    char *replyPin = nullptr;
-    WifiErrorNo result = HdiP2pConnect(&info, replyPin);
+    char replyPin[SIZE] = {0};
+    WifiErrorNo result = HdiP2pConnect(&info, replyPin, SIZE);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 

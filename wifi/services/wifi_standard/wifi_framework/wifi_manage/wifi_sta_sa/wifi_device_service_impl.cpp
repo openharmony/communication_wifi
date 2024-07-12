@@ -1671,7 +1671,6 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
 {
 #ifndef SUPPORT_LOCAL_RANDOM_MAC
     WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
-    return WIFI_OPT_SUCCESS;
 #else
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
@@ -1704,8 +1703,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
                 ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
             }
             if (ret != 0) {
-                WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
-                    "Using locally generated MAC address instead.", __func__);
+                WIFI_LOGI("HilinkGetMacAddress Failed to generate MAC address, Using locally generated MAC.");
                 WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
             }
             randomMacInfo.randomMac = macAddress;
@@ -1721,9 +1719,8 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
         currentMac = randomMacInfo.randomMac;
     }
     WIFI_LOGI("EnableHiLinkHandshake mac address get success, mac = %{public}s", MacAnonymize(currentMac).c_str());
-
-    return WIFI_OPT_SUCCESS;
 #endif
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)

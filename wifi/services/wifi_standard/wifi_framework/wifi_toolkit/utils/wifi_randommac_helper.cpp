@@ -168,7 +168,7 @@ long long WifiRandomMacHelper::BytesToLonglong(const std::vector<uint8_t> &byte)
         (((long long)byte[OFFSET_VALUE_3] << OFFSET_VALUE_32) & 0xFF00000000L) |
         (((long long)byte[OFFSET_VALUE_4] << OFFSET_VALUE_24) & 0xFF000000L)|
         (((long long)byte[OFFSET_VALUE_5] << OFFSET_VALUE_16) & 0xFF0000L)|
-        (((long long)byte[OFFSET_VALUE_6] << OFFSET_VALUE_8 & 0xFF00L)|
+        (((long long)byte[OFFSET_VALUE_6] << OFFSET_VALUE_8) & 0xFF00L)|
         ((long long)byte[OFFSET_VALUE_7] & 0xFFL));
     return value;
 }

@@ -84,4 +84,78 @@ HWTEST_F(WifiProtectManagerTest, GetNearlyProtectMode_ReturnsCorrectMode, TestSi
     ASSERT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
 }
 
+HWTEST_F(WifiProtectManagerTest, GetNearlyProtectModeTest001, TestSize.Level1)
+{
+    WifiProtectManager wifiProtectManager;
+    wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState == ConnState::SCANNING;
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
+    EXPECT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
+}
+
+HWTEST_F(WifiProtectManagerTest, GetNearlyProtectModeTest002, TestSize.Level1)
+{
+    WifiProtectManager wifiProtectManager;
+    wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState == ConnState::CONNECTED;
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
+    wifiProtectManager.mForceHiPerfMode = true;
+    EXPECT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
+}
+
+HWTEST_F(WifiProtectManagerTest, GetNearlyProtectModeTest003, TestSize.Level1)
+{
+    WifiProtectManager wifiProtectManager;
+    wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState == ConnState::CONNECTED;
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
+    wifiProtectManager.mForceLowLatencyMode = true;
+    EXPECT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
+}
+
+HWTEST_F(WifiProtectManagerTest, GetNearlyProtectModeTest004, TestSize.Level1)
+{
+    WifiProtectManager wifiProtectManager;
+    wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState == ConnState::CONNECTED;
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
+    wifiProtectManager.AddProtect(WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF, "com.example.app");
+    EXPECT_EQ(wifiProtectManager.GetNearlyProtectMode(), WifiProtectMode::WIFI_PROTECT_NO_HELD);
+}
+
+HWTEST_F(WifiProtectManagerTest, GetWifiProtectTest001, TestSize.Level1)
+{
+    WifiProtectManager wifiProtectManager;
+    std::string name = "";
+    wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    EXPECT_EQ(wifiProtectManager.GetWifiProtect(WifiProtectMode::WIFI_PROTECT_NO_HELD, name), false);
+}
+
+HWTEST_F(WifiProtectManagerTest, GetWifiProtectTest002, TestSize.Level1)
+{
+    WifiProtectManager wifiProtectManager;
+    wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    EXPECT_EQ(wifiProtectManager.GetWifiProtect(WifiProtectMode::WIFI_PROTECT_FULL, "com.example.app"), true);
+}
+
+HWTEST_F(WifiProtectManagerTest, GetWifiProtectTest003, TestSize.Level1)
+{
+    WifiProtectManager wifiProtectManager;
+    wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    EXPECT_EQ(wifiProtectManager.GetWifiProtect(WifiProtectMode::WIFI_PROTECT_NO_HELD, "com.example.app"), false);
+}
+
+HWTEST_F(WifiProtectManagerTest, GetWifiProtectTest004, TestSize.Level1)
+{
+    WifiProtectManager wifiProtectManager;
+    for (int i = 0; i < 101; i++) {
+        wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    }
+    EXPECT_EQ(wifiProtectManager.GetWifiProtect(WifiProtectMode::WIFI_PROTECT_NO_HELD, "com.example2.app"), false);
+}
+
 // Add more test cases as needed

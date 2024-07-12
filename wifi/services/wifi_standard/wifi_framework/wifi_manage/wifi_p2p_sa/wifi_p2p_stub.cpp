@@ -28,10 +28,13 @@ namespace Wifi {
 WifiP2pStub::WifiP2pStub() : mSingleCallback(false)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiP2pStub::~WifiP2pStub()
-{}
+{
+    deathRecipient_ = nullptr;
+}
 
 void WifiP2pStub::InitHandleMapEx()
 {
@@ -703,8 +706,11 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiP2pDeathRecipient();
+            {
+                std::unique_lock<std::mutex> lock(deathRecipientMutex);
+                if (deathRecipient_ == nullptr) {
+                    deathRecipient_ = new (std::nothrow) WifiP2pDeathRecipient();
+                }
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");

@@ -35,12 +35,14 @@ WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
 {
     WIFI_LOGI("enter WifiDeviceStub!");
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiDeviceStub::WifiDeviceStub(int instId) : mSingleCallback(false), m_instId(instId)
 {
     WIFI_LOGI("enter WifiDeviceStub!");
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiDeviceStub::~WifiDeviceStub()
@@ -49,6 +51,7 @@ WifiDeviceStub::~WifiDeviceStub()
 #ifndef OHOS_ARCH_LITE
     RemoveDeviceCbDeathRecipient();
 #endif
+    deathRecipient_ = nullptr;
 }
 
 void WifiDeviceStub::InitHandleMapEx()
@@ -1008,12 +1011,15 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            if (deathRecipient_ == nullptr) {
+            {
+                std::unique_lock<std::mutex> lock(deathRecipientMutex);
+                if (deathRecipient_ == nullptr) {
 #ifdef OHOS_ARCH_LITE
-                deathRecipient_ = new (std::nothrow) WifiDeviceDeathRecipient();
+                    deathRecipient_ = new (std::nothrow) WifiDeviceDeathRecipient();
 #else
-                deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
+                    deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
 #endif
+                }
             }
             RemoteDeathMap::iterator iter = remoteDeathMap.find(remote);
             if (iter == remoteDeathMap.end()) {

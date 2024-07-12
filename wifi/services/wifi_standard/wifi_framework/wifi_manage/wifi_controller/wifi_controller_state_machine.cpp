@@ -189,10 +189,11 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
             HandleSoftapToggleChangeInEnabledState(msg);
             break;
         case CMD_AP_STOPPED:
+            HandleApStop(msg);
+            break;
         case CMD_AP_START_FAILURE:
-            pWifiControllerMachine->StopTimer(CMD_AP_STOP_TIME);
-            pWifiControllerMachine->StopSoftapCloseTimer();
-            pWifiControllerMachine->HandleSoftapStop(msg->GetParam1());
+            HandleAPServiceStartFail(msg->GetParam1());
+            HandleApStop(msg);
             break;
         case CMD_AP_START:
             pWifiControllerMachine->StopTimer(CMD_AP_START_TIME);
@@ -764,6 +765,13 @@ void WifiControllerMachine::EnableState::HandleApRemoved(InternalMessage *msg)
     if (softap != nullptr) {
         softap->SetRole(SoftApManager::Role::ROLE_HAS_REMOVED);
     }
+}
+
+void WifiControllerMachine::EnableState::HandleApStop(InternalMessage *msg)
+{
+    pWifiControllerMachine->StopTimer(CMD_AP_STOP_TIME);
+    pWifiControllerMachine->StopSoftapCloseTimer();
+    pWifiControllerMachine->HandleSoftapStop(msg->GetParam1());
 }
 #endif
 

@@ -46,6 +46,13 @@ private:
     bool lastSleepState = false;
 };
 
+class NotificationEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit NotificationEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~NotificationEventSubscriber();
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
 #ifdef HAS_POWERMGR_PART
 class PowermgrEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
@@ -95,6 +102,8 @@ private:
     void UnRegisterCesEvent();
     void RegisterLocationEvent();
     void UnRegisterLocationEvent();
+    void RegisterNotificationEvent();
+    void UnRegisterNotificationEvent();
     void GetMdmProp();
     void GetChipProp();
     void RegisterMdmPropListener();
@@ -107,10 +116,13 @@ private:
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
+    uint32_t notificationTimerId{0};
     uint32_t accessDatashareTimerId{0};
     std::mutex cesEventMutex;
+    std::mutex notificationEventMutex;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
+    std::shared_ptr<NotificationEventSubscriber> wifiNotificationSubsciber_ = nullptr;
 #ifdef HAS_MOVEMENT_PART
     std::mutex deviceMovementEventMutex;
 #endif

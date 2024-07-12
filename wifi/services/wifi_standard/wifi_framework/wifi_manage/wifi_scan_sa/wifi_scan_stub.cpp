@@ -32,15 +32,18 @@ namespace Wifi {
 WifiScanStub::WifiScanStub() : mSingleCallback(false)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiScanStub::WifiScanStub(int instId) : mSingleCallback(false), m_instId(instId)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiScanStub::~WifiScanStub()
 {
+    deathRecipient_ = nullptr;
 }
 
 void WifiScanStub::InitHandleMap()
@@ -338,8 +341,11 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiScanDeathRecipient();
+            {
+                std::unique_lock<std::mutex> lock(deathRecipientMutex);
+                if (deathRecipient_ == nullptr) {
+                    deathRecipient_ = new (std::nothrow) WifiScanDeathRecipient();
+                }
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");

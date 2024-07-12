@@ -242,6 +242,28 @@ public:
         pSelfCureStateMachine->pConnectedMonitorState->SetupSelfCureMonitor();
     }
 
+    void IsGatewayChangedTest()
+    {
+        LOGI("Enter IsGatewayChangedTest");
+        pSelfCureStateMachine->pConnectedMonitorState->IsGatewayChanged();
+    }
+
+    void HandleGatewayChangedTest()
+    {
+        LOGI("enter HandleGatewayChangedTest");
+        pSelfCureStateMachine->pConnectedMonitorState->HandleGatewayChanged(nullptr);
+
+        InternalMessage msg;
+        msg.SetMessageName(WIFI_CURE_CMD_GATEWAY_CHANGED_DETECT);
+        pSelfCureStateMachine->pConnectedMonitorState->HandleGatewayChanged(&msg);
+        pSelfCureStateMachine->pConnectedMonitorState->hasInternetRecently = true;
+        pSelfCureStateMachine->pConnectedMonitorState->configAuthType = KEY_MGMT_WPA_PSK;
+        pSelfCureStateMachine->pConnectedMonitorState->HandleGatewayChanged(&msg);
+
+        pSelfCureStateMachine->pConnectedMonitorState->hasInternetRecently = false;
+        pSelfCureStateMachine->pConnectedMonitorState->HandleGatewayChanged(&msg);
+    }
+
     void RequestReassocWithFactoryMacTest()
     {
         LOGI("Enter RequestReassocWithFactoryMacTest");
@@ -258,12 +280,6 @@ public:
         pSelfCureStateMachine->mIsHttpReachable = false;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _)).Times(AtLeast(0));
-        pSelfCureStateMachine->pConnectedMonitorState->HandleInvalidIp(&msg);
-
-        IpInfo ipInfo;
-        ipInfo.ipAddress = 0x0100007F;
-        pSelfCureStateMachine->dhcpOfferPackets.insert({"1", ipInfo});
-        pSelfCureStateMachine->dhcpOfferPackets.insert({"2", ipInfo});
         pSelfCureStateMachine->pConnectedMonitorState->HandleInvalidIp(&msg);
     }
 
@@ -591,16 +607,40 @@ public:
     void SelectBestSelfCureSolutionTest()
     {
         LOGI("Enter SelectBestSelfCureSolutionTest");
+        int internetFailedType = WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY;
+        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolution(internetFailedType);
+        pSelfCureStateMachine->pInternetSelfCureState->configAuthType = KEY_MGMT_WPA_PSK;
+        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolution(internetFailedType);
+        pSelfCureStateMachine->connectedTime = 0;
+        pSelfCureStateMachine->pInternetSelfCureState->lastHasInetTime = static_cast<int64_t>(time(nullptr));
+        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolution(internetFailedType);
+    }
+
+    void SelectBestSelfCureSolutionExtTest()
+    {
+        LOGI("Enter SelectBestSelfCureSolutionExtTest");
         int internetFailedType = WIFI_CURE_INTERNET_FAILED_INVALID_IP;
-        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolution(internetFailedType);
+        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolutionExt(internetFailedType);
         internetFailedType = WIFI_CURE_INTERNET_FAILED_TYPE_ROAMING;
-        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolution(internetFailedType);
+        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolutionExt(internetFailedType);
         internetFailedType = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
-        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolution(internetFailedType);
+        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolutionExt(internetFailedType);
         internetFailedType = WIFI_CURE_INTERNET_FAILED_RAND_MAC;
-        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolution(internetFailedType);
+        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolutionExt(internetFailedType);
         internetFailedType = WIFI_CURE_INTERNET_FAILED_TYPE_TCP;
-        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolution(internetFailedType);
+        pSelfCureStateMachine->pInternetSelfCureState->SelectBestSelfCureSolutionExt(internetFailedType);
+    }
+
+    void GetNextTestDhcpResultsTest()
+    {
+        LOGI("Enter GetNextTestDhcpResultsTest");
+        pSelfCureStateMachine->pInternetSelfCureState->GetNextTestDhcpResults();
+    }
+
+    void GetRecordDhcpResultsTest()
+    {
+        LOGI("Enter GetRecordDhcpResultsTest");
+        pSelfCureStateMachine->pInternetSelfCureState->GetRecordDhcpResults();
     }
 
     void SelfCureWifiLinkTest()
@@ -615,6 +655,8 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureWifiLink(requestCureLevel);
         requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_2_RENEW_DHCP;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureWifiLink(requestCureLevel);
+        requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureWifiLink(requestCureLevel);
         requestCureLevel = WIFI_CURE_RESET_LEVEL_RECONNECT_4_INVALID_IP;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureWifiLink(requestCureLevel);
         requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
@@ -623,6 +665,28 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureWifiLink(requestCureLevel);
         requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureWifiLink(requestCureLevel);
+    }
+
+    void SelfCureForStaticIpTest()
+    {
+        LOGI("Enter SelfCureForStaticIpTest");
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP;
+        pSelfCureStateMachine->pInternetSelfCureState->configStaticIp4MultiDhcpServer = true;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForStaticIp(requestCureLevel);
+        pSelfCureStateMachine->pInternetSelfCureState->configStaticIp4MultiDhcpServer = false;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForStaticIp(requestCureLevel);
+    }
+
+    void RequestUseStaticIpConfigTest()
+    {
+        LOGI("Enter RequestUseStaticIpConfigTest");
+        IpInfo dhcpResult;
+        dhcpResult.ipAddress = IpTools::ConvertIpv4Address("192.168.101.39");
+        dhcpResult.gateway = IpTools::ConvertIpv4Address("192.168.101.1");
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("wlan0"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
+        pSelfCureStateMachine->pInternetSelfCureState->RequestUseStaticIpConfig(dhcpResult);
     }
 
     void SelfCureForInvalidIpTest()
@@ -852,6 +916,24 @@ public:
 
         pSelfCureStateMachine->pInternetSelfCureState->finalSelfCureUsed = false;
         pSelfCureStateMachine->pInternetSelfCureState->ConfirmInternetSelfCure(currentCureLevel);
+    }
+
+    void HandleConfirmInternetSelfCureFailedTest()
+    {
+        LOGI("Enter ConfirmInternetSelfCureFailedTest");
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).Times(AtLeast(0));
+        int currentCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+        pSelfCureStateMachine->internetUnknown = true;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleConfirmInternetSelfCureFailed(currentCureLevel);
+        pSelfCureStateMachine->internetUnknown = false;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleConfirmInternetSelfCureFailed(currentCureLevel);
+        pSelfCureStateMachine->pInternetSelfCureState->finalSelfCureUsed = true;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleConfirmInternetSelfCureFailed(currentCureLevel);
+        pSelfCureStateMachine->pInternetSelfCureState->finalSelfCureUsed = false;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleConfirmInternetSelfCureFailed(currentCureLevel);
+        currentCureLevel = WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleConfirmInternetSelfCureFailed(currentCureLevel);
     }
 
     void HandleSelfCureFailedForRandMacReassocTest()
@@ -1595,6 +1677,16 @@ HWTEST_F(SelfCureStateMachineTest, RequestReassocWithFactoryMacTest, TestSize.Le
     RequestReassocWithFactoryMacTest();
 }
 
+HWTEST_F(SelfCureStateMachineTest, IsGatewayChangedTest, TestSize.Level1)
+{
+    IsGatewayChangedTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleGatewayChangedTest, TestSize.Level1)
+{
+    HandleGatewayChangedTest();
+}
+
 HWTEST_F(SelfCureStateMachineTest, HandleInvalidIpTest, TestSize.Level1)
 {
     HandleInvalidIpTest();
@@ -1744,9 +1836,34 @@ HWTEST_F(SelfCureStateMachineTest, SelectBestSelfCureSolutionTest, TestSize.Leve
     SelectBestSelfCureSolutionTest();
 }
 
+HWTEST_F(SelfCureStateMachineTest, SelectBestSelfCureSolutionExtTest, TestSize.Level1)
+{
+    SelectBestSelfCureSolutionExtTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetNextTestDhcpResultsTest, TestSize.Level1)
+{
+    GetNextTestDhcpResultsTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetRecordDhcpResultsTest, TestSize.Level1)
+{
+    GetRecordDhcpResultsTest();
+}
+
 HWTEST_F(SelfCureStateMachineTest, SelfCureWifiLinkTest, TestSize.Level1)
 {
     SelfCureWifiLinkTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureForStaticIpTest, TestSize.Level1)
+{
+    SelfCureForStaticIpTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, RequestUseStaticIpConfigTest, TestSize.Level1)
+{
+    RequestUseStaticIpConfigTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, SelfCureForInvalidIpTest, TestSize.Level1)
@@ -1803,9 +1920,15 @@ HWTEST_F(SelfCureStateMachineTest, HandleInternetRecoveryConfirmTest, TestSize.L
 {
     HandleInternetRecoveryConfirmTest();
 }
+
 HWTEST_F(SelfCureStateMachineTest, ConfirmInternetSelfCureTest, TestSize.Level1)
 {
     ConfirmInternetSelfCureTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleConfirmInternetSelfCureFailedTest, TestSize.Level1)
+{
+    HandleConfirmInternetSelfCureFailedTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, HandleSelfCureFailedForRandMacReassocTest, TestSize.Level1)
@@ -2891,6 +3014,9 @@ HWTEST_F(SelfCureStateMachineTest, IsEncryptedAuthTypeTest, TestSize.Level1)
     pSelfCureStateMachine->IsEncryptedAuthType(authType);
 
     authType = "KEY_MGMT_WPA_PSK";
+    pSelfCureStateMachine->IsEncryptedAuthType(authType);
+
+    authType = KEY_MGMT_WAPI_PSK;
     pSelfCureStateMachine->IsEncryptedAuthType(authType);
 
     authType = "KEY_MGMT_SAE";

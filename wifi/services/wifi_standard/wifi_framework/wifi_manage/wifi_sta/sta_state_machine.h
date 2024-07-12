@@ -124,6 +124,7 @@ typedef enum EnumDhcpReturnCode {
     DHCP_RENEW_FAIL,
     DHCP_IP_EXPIRED,
     DHCP_FAIL,
+    DHCP_OFFER_REPORT,
 } DhcpReturnCode;
 
 const int DETECT_TYPE_DEFAULT = 0;
@@ -365,6 +366,15 @@ public:
         static void OnSuccess(int status, const char *ifname, DhcpResult *result);
 
         /**
+         * @Description : Get dhcp offer result of specified interface success notify asynchronously
+         *
+         * @param status - int
+         * @param ifname - interface name,eg:wlan0
+         * @param result - dhcp offer
+         */
+        static void OnDhcpOfferResult(int status, const char *ifname, DhcpResult *result);
+
+        /**
          * @Description : deal dhcp result
          *
          */
@@ -383,6 +393,7 @@ public:
          *
          */
         void DealDhcpResultFailed();
+        void DealDhcpOfferResult();
         static void SetStaStateMachine(StaStateMachine *staStateMachine);
         static void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         static void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
@@ -394,6 +405,7 @@ public:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;
         static DhcpResult DhcpIpv6Result;
+        static DhcpResult DhcpOfferInfo;
     };
 
 public:
@@ -1201,6 +1213,7 @@ private:
     void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);
     void InvokeOnStaRssiLevelChanged(int level);
+    void InvokeOnDhcpOfferReport(IpInfo ipInfo);
     WifiDeviceConfig getCurrentWifiDeviceConfig();
     void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus, bool updatePortalAuthTime);
     bool CanArpReachable();

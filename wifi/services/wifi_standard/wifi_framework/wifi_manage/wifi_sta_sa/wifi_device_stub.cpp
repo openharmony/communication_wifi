@@ -465,23 +465,22 @@ void WifiDeviceStub::WriteEapConfig(MessageParcel &reply, const WifiEapConfig &w
 
 void WifiDeviceStub::BigDataWriteEapConfig(const WifiEapConfig &wifiEapConfig, std::stringstream &bigDataStream)
 {
-    bigDataStream << wifiEapConfig.eap << ";";
+    bigDataStream << StringToHex(wifiEapConfig.eap) << ";";
     bigDataStream << static_cast<int>(wifiEapConfig.phase2Method) << ";";
-    bigDataStream << wifiEapConfig.identity << ";";
-    bigDataStream << wifiEapConfig.anonymousIdentity << ";";
-    bigDataStream << wifiEapConfig.password << ";";
+    bigDataStream << StringToHex(wifiEapConfig.identity) << ";";
+    bigDataStream << StringToHex(wifiEapConfig.anonymousIdentity) << ";";
+    bigDataStream << StringToHex(wifiEapConfig.password) << ";";
  
-    bigDataStream << wifiEapConfig.caCertPath << ";";
-    bigDataStream << wifiEapConfig.caCertAlias << ";";
+    bigDataStream << StringToHex(wifiEapConfig.caCertPath) << ";";
+    bigDataStream << StringToHex(wifiEapConfig.caCertAlias) << ";";
  
-    bigDataStream << wifiEapConfig.clientCert << ";";
-    bigDataStream << std::string(wifiEapConfig.certPassword) << ";";
-    bigDataStream << wifiEapConfig.privateKey << ";";
+    bigDataStream << StringToHex(wifiEapConfig.clientCert) << ";";
+    bigDataStream << StringToHex(wifiEapConfig.privateKey) << ";";
  
-    bigDataStream << wifiEapConfig.altSubjectMatch << ";";
-    bigDataStream << wifiEapConfig.domainSuffixMatch << ";";
-    bigDataStream << wifiEapConfig.realm << ";";
-    bigDataStream << wifiEapConfig.plmn << ";";
+    bigDataStream << StringToHex(wifiEapConfig.altSubjectMatch) << ";";
+    bigDataStream << StringToHex(wifiEapConfig.domainSuffixMatch) << ";";
+    bigDataStream << StringToHex(wifiEapConfig.realm) << ";";
+    bigDataStream << StringToHex(wifiEapConfig.plmn) << ";";
     bigDataStream << wifiEapConfig.eapSubId << ";";
 }
 
@@ -576,6 +575,51 @@ void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, MessageParcel &data, Messa
     return;
 }
 
+void WifiDeviceStub::SendBigConfigEx(int contentSize, std::vector<WifiDeviceConfig> &result,
+    std::stringstream &bigDataStream)
+{
+    for (int i = 0; i < contentSize; ++i) {
+        bigDataStream << result[i].networkId << ";";
+        bigDataStream << result[i].status << ";";
+        bigDataStream << StringToHex(result[i].bssid) << ";";
+        bigDataStream << result[i].bssidType << ";";
+        bigDataStream << StringToHex(result[i].ssid) << ";";
+        bigDataStream << result[i].band << ";";
+        bigDataStream << result[i].channel << ";";
+        bigDataStream << result[i].frequency << ";";
+        bigDataStream << result[i].level << ";";
+        bigDataStream << result[i].isPasspoint << ";";
+        bigDataStream << result[i].isEphemeral << ";";
+        bigDataStream << StringToHex(result[i].preSharedKey) << ";";
+        bigDataStream << StringToHex(result[i].keyMgmt) << ";";
+        for (int j = 0; j < WEPKEYS_SIZE; j++) {
+            bigDataStream << StringToHex(result[i].wepKeys[j]) << ";";
+        }
+        bigDataStream << result[i].wepTxKeyIndex << ";";
+        bigDataStream << result[i].priority << ";";
+        bigDataStream << result[i].hiddenSSID << ";";
+        bigDataStream << (int)result[i].wifiIpConfig.assignMethod << ";";
+        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.ipAddress.address, bigDataStream);
+        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.prefixLength << ";";
+        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.flags << ";";
+        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.scope << ";";
+        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.gateway, bigDataStream);
+        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.dnsServer1, bigDataStream);
+        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.dnsServer2, bigDataStream);
+        bigDataStream << StringToHex(result[i].wifiIpConfig.staticIpAddress.domains) << ";";
+        BigDataWriteEapConfig(result[i].wifiEapConfig, bigDataStream);
+        bigDataStream << (int)result[i].wifiProxyconfig.configureMethod << ";";
+        bigDataStream << StringToHex(result[i].wifiProxyconfig.autoProxyConfig.pacWebAddress) << ";";
+        bigDataStream << StringToHex(result[i].wifiProxyconfig.manualProxyConfig.serverHostName) << ";";
+        bigDataStream << result[i].wifiProxyconfig.manualProxyConfig.serverPort << ";";
+        bigDataStream << StringToHex(result[i].wifiProxyconfig.manualProxyConfig.exclusionObjectList) << ";";
+        bigDataStream << (int)result[i].wifiPrivacySetting << ";";
+        bigDataStream << result[i].uid << ";";
+        bigDataStream << StringToHex(result[i].callProcessName) << ";";
+        bigDataStream << StringToHex(result[i].ancoCallProcessName) << ";";
+    }
+}
+
 void WifiDeviceStub::SendBigConfig(int contentSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
 {
     WIFI_LOGI("WifiDeviceStub SendBigConfig");
@@ -590,46 +634,8 @@ void WifiDeviceStub::SendBigConfig(int contentSize, std::vector<WifiDeviceConfig
         return;
     }
     std::stringstream bigDataStream;
-    for (int i = 0; i < contentSize; ++i) {
-        bigDataStream << result[i].networkId << ";";
-        bigDataStream << result[i].status << ";";
-        bigDataStream << result[i].bssid << ";";
-        bigDataStream << result[i].bssidType << ";";
-        bigDataStream << StringToHex(result[i].ssid) << ";";
-        bigDataStream << result[i].band << ";";
-        bigDataStream << result[i].channel << ";";
-        bigDataStream << result[i].frequency << ";";
-        bigDataStream << result[i].level << ";";
-        bigDataStream << result[i].isPasspoint << ";";
-        bigDataStream << result[i].isEphemeral << ";";
-        bigDataStream << result[i].preSharedKey << ";";
-        bigDataStream << result[i].keyMgmt << ";";
-        for (int j = 0; j < WEPKEYS_SIZE; j++) {
-            bigDataStream << result[i].wepKeys[j] << ";";
-        }
-        bigDataStream << result[i].wepTxKeyIndex << ";";
-        bigDataStream << result[i].priority << ";";
-        bigDataStream << result[i].hiddenSSID << ";";
-        bigDataStream << (int)result[i].wifiIpConfig.assignMethod << ";";
-        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.ipAddress.address, bigDataStream);
-        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.prefixLength << ";";
-        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.flags << ";";
-        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.scope << ";";
-        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.gateway, bigDataStream);
-        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.dnsServer1, bigDataStream);
-        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.dnsServer2, bigDataStream);
-        bigDataStream << result[i].wifiIpConfig.staticIpAddress.domains << ";";
-        BigDataWriteEapConfig(result[i].wifiEapConfig, bigDataStream);
-        bigDataStream << (int)result[i].wifiProxyconfig.configureMethod << ";";
-        bigDataStream << result[i].wifiProxyconfig.autoProxyConfig.pacWebAddress << ";";
-        bigDataStream << result[i].wifiProxyconfig.manualProxyConfig.serverHostName << ";";
-        bigDataStream << result[i].wifiProxyconfig.manualProxyConfig.serverPort << ";";
-        bigDataStream << result[i].wifiProxyconfig.manualProxyConfig.exclusionObjectList << ";";
-        bigDataStream << (int)result[i].wifiPrivacySetting << ";";
-        bigDataStream << result[i].uid << ";";
-        bigDataStream << result[i].callProcessName << ";";
-        bigDataStream << result[i].ancoCallProcessName << ";";
-    }
+    SendBigConfigEx(contentSize, result, bigDataStream);
+
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteInt32(contentSize);
     long len = static_cast<long>(bigDataStream.str().length());

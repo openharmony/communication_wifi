@@ -610,5 +610,15 @@ std::string StringToHex(const std::string &data)
     }
     return ss.str();
 }
+
+int CheckDataLegal(std::string &data)
+{
+    std::regex hex("^[0-9]+$");
+    if (std::regex_search(data, hex)) {
+        return std::stoi(data);
+    }
+ 
+    return 0;
+}
 }  // namespace Wifi
 }  // namespace OHOS

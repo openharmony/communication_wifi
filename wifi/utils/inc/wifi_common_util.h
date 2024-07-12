@@ -277,6 +277,7 @@ std::string EncodeBase64(const std::vector<uint8_t> &input);
 std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter);
 std::string HexToString(const std::string &str);
 std::string StringToHex(const std::string &data);
+int CheckDataLegal(std::string &data);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

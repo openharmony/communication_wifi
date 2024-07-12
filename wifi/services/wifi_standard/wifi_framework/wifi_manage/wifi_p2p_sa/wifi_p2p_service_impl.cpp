@@ -1363,7 +1363,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
 {
     WIFI_LOGI("Hid2dSetUpperScene");
     int callingUid = GetCallingUid();
-    if (callingUid != SOFT_BUS_SERVICE_UID || callingUid != CAST_ENGINE_SERVICE_UID) {
+    if (callingUid != SOFT_BUS_SERVICE_UID && callingUid != CAST_ENGINE_SERVICE_UID) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }

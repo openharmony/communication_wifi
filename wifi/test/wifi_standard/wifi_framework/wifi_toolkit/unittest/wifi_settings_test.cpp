@@ -34,6 +34,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
 DEFINE_WIFILOG_LABEL("WifiSettingsTest");
 constexpr int NETWORK_ID = 15;
 constexpr int TYPE = 3;

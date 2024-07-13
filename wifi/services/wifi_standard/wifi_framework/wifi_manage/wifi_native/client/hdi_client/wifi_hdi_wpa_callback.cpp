@@ -174,7 +174,8 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
     if (cbk.onWpaConnectionReject) {
         char bssid[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(associateRejectParam->bssid, associateRejectParam->bssidLen, bssid, sizeof(bssid));
-        cbk.onWpaConnectionReject(associateRejectParam->statusCode, bssid);
+        std::string bssidStr(bssid);
+        cbk.onWpaConnectionReject(associateRejectParam->statusCode, bssidStr);
     }
     return 0;
 }

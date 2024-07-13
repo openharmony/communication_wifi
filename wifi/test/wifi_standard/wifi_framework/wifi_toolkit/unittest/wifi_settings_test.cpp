@@ -34,7 +34,6 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-
 DEFINE_WIFILOG_LABEL("WifiSettingsTest");
 constexpr int NETWORK_ID = 15;
 constexpr int TYPE = 3;
@@ -562,6 +561,16 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest, TestSize.Level1)
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().EncryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)
+{
+    WIFI_LOGI("DecryptionWapiConfigTest_001 enter");
+    WifiDeviceConfig config;
+    config.keyMgmt = KEY_MGMT_NONE;
+    config.wifiWapiConfig.wapiUserCertData = "12345678";
+    config.wifiWapiConfig.wapiAsCertData = "abcdefg";
+    WifiSettings::GetInstance().DecryptionDeviceConfig(config);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)

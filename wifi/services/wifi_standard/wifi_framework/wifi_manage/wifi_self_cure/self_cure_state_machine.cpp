@@ -1958,9 +1958,9 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
         return false;
     }
     bool hasInternetEver = NetworkStatusHistoryManager::HasInternetEverByHistory(GetNetworkStatusHistory());
-    bool hasPortalHistory = NetworkStatusHistoryManager::IsPortalByHistory(GetNetworkStatusHistory());
-    if (hasInternetEver || hasPortalHistory) {
-        WIFI_LOGI("has internethistory, don't to reassoc with factory mac!");
+    bool isPortalNetwork = config.isPortal;
+    if (hasInternetEver || isPortalNetwork) {
+        WIFI_LOGI("hasinternet or portal network, don't to reassoc with factory mac!");
         return false;
     }
     WifiSelfCureHistoryInfo selfCureInfo;

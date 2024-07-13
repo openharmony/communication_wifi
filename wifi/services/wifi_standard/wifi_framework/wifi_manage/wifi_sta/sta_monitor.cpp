@@ -50,8 +50,8 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnWpaSsidWrongKeyCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
-        std::bind(&StaMonitor::onWpaConnectionFullCallBack, this, _1),
-        std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1, _2),
+        std::bind(&StaMonitor::OnWpaConnectionFullCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpaConnectionRejectCallBack, this, _1, _2),
         std::bind(&StaMonitor::OnWpaStaNotifyCallBack, this, _1),
         std::bind(&StaMonitor::OnReportDisConnectReasonCallBack, this, _1, _2),
     };
@@ -224,7 +224,7 @@ void StaMonitor::OnWpaSsidWrongKeyCallBack(int status)
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
 }
 
-void StaMonitor::onWpaConnectionFullCallBack(int status)
+void StaMonitor::OnWpaConnectionFullCallBack(int status)
 {
     LOGI("onWpaConnectionFullCallBack() status:%d.\n", status);
     if (pStaStateMachine == nullptr) {
@@ -236,7 +236,7 @@ void StaMonitor::onWpaConnectionFullCallBack(int status)
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
 }
 
-void StaMonitor::onWpaConnectionRejectCallBack(int status, const std::string &bssid)
+void StaMonitor::OnWpaConnectionRejectCallBack(int status, const std::string &bssid)
 {
     LOGI("onWpsConnectionRejectCallBack() status:%d.\n", status);
     if (pStaStateMachine == nullptr) {

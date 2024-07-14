@@ -932,7 +932,6 @@ int StaStateMachine::UpdateLinkInfoRssi(int inRssi)
 void StaStateMachine::DealSignalPollResult()
 {
     LOGD("enter SignalPoll.");
-    int currentSignalLevel = 0;
     WifiHalWpaSignalInfo signalInfo;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), linkedInfo.bssid, signalInfo);
@@ -944,23 +943,7 @@ void StaStateMachine::DealSignalPollResult()
         linkedInfo.frequency = signalInfo.frequency;
     }
     ConvertFreqToChannel();
-    if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
-        if (signalInfo.signal > 0) {
-            linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
-        } else {
-            linkedInfo.rssi = setRssi(signalInfo.signal);
-        }
-        currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
-        if (currentSignalLevel != lastSignalLevel) {
-            WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-            InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
-            lastSignalLevel = currentSignalLevel;
-        }
-    } else {
-        linkedInfo.rssi = INVALID_RSSI_VALUE;
-    }
-    linkedInfo.c0Rssi = UpdateLinkInfoRssi(signalInfo.c0Rssi);
-    linkedInfo.c1Rssi = UpdateLinkInfoRssi(signalInfo.c1Rssi);
+    UpdateLinkRssi(signalInfo);
     if (signalInfo.txrate > 0) {
         linkedInfo.txLinkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
         linkedInfo.linkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
@@ -998,6 +981,28 @@ void StaStateMachine::DealSignalPollResult()
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
     }
+}
+
+void StaStateMachine::UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo)
+{
+    int currentSignalLevel = 0;
+    if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
+        if (signalInfo.signal > 0) {
+            linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
+        } else {
+            linkedInfo.rssi = setRssi(signalInfo.signal);
+        }
+        currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
+        if (currentSignalLevel != lastSignalLevel) {
+            WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+            InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
+            lastSignalLevel = currentSignalLevel;
+        }
+    } else {
+        linkedInfo.rssi = INVALID_RSSI_VALUE;
+    }
+    linkedInfo.c0Rssi = UpdateLinkInfoRssi(signalInfo.c0Rssi);
+    linkedInfo.c1Rssi = UpdateLinkInfoRssi(signalInfo.c1Rssi);
 }
 
 void StaStateMachine::DealSignalPacketChanged(int txPackets, int rxPackets)
@@ -2695,7 +2700,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
             break;
         }
         case CMD_SIGNAL_POLL:
-            DealSignalPollResult();
+            pStaStateMachine->DealSignalPollResult();
             break;
         default:
             break;
@@ -3639,6 +3644,11 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::PBC) || (wpsState == SetupMethod::KEYPAD)) {
         targetNetworkId = WPA_DEFAULT_NETWORKID;
     }
+
+    WifiDeviceConfig deviceConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig) != 0) {
+        WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
+    }
     UpdateDeviceConfigAfterWifiConnected(bssid);
     
     std::string macAddr;
@@ -3663,13 +3673,9 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
 }
 
-void StaStateMachine::UpdateDeviceConfigAfterWifiConnected(const std::string &bssid)
+void StaStateMachine::UpdateDeviceConfigAfterWifiConnected(WifiDeviceConfig &deviceConfig, const std::string &bssid)
 {
-    WifiDeviceConfig deviceConfig;
-    int result = WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig);
-    WIFI_LOGD("Device config networkId = %{public}d", deviceConfig.networkId);
-
-    if (result == 0 && deviceConfig.bssid == bssid) {
+    if (deviceConfig.bssid == bssid) {
         LOGI("Device Configuration already exists.");
     } else {
         deviceConfig.bssid = bssid;

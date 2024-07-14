@@ -963,15 +963,13 @@ void StaStateMachine::DealSignalPollResult()
         "rssi:%{public}d,noise:%{public}d,chload:%{public}d,snr:%{public}d,ulDelay:%{public}d,txLinkSpeed:%{public}d,"
         "rxLinkSpeed:%{public}d,txBytes:%{public}d,rxBytes:%{public}d,txFailed:%{public}d,txPackets:%{public}d,"
         "rxPackets:%{public}d,GetWifiStandard:%{public}d,rxmax:%{public}d,txmax:%{public}d,connState:%{public}d,"
-        "detState:%{public}d,curSignal:%{public}d,lastSignal:%{public}d,chloadSelf:%{public}d,c0Rssi:%{public}d,"
-        "c1Rssi:%{public}d",
+        "detState:%{public}d,lastSignal:%{public}d,chloadSelf:%{public}d,c0Rssi:%{public}d,c1Rssi:%{public}d",
         MacAnonymize(linkedInfo.bssid).c_str(), SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.networkId,
         linkedInfo.band, signalInfo.frequency, signalInfo.signal, signalInfo.noise, signalInfo.chload, signalInfo.snr,
         signalInfo.ulDelay, signalInfo.txrate, signalInfo.rxrate, signalInfo.txBytes, signalInfo.rxBytes,
         signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets, linkedInfo.wifiStandard,
         linkedInfo.maxSupportedRxLinkSpeed, linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.connState,
-        linkedInfo.detailedState, currentSignalLevel, lastSignalLevel,
-        signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
+        linkedInfo.detailedState, lastSignalLevel, signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
 
     WriteLinkInfoHiSysEvent(lastSignalLevel, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
@@ -3649,7 +3647,7 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig) != 0) {
         WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
     }
-    UpdateDeviceConfigAfterWifiConnected(bssid);
+    UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
     
     std::string macAddr;
     std::string realMacAddr;

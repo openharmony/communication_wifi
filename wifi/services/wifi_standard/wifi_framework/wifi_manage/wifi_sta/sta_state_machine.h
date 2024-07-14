@@ -610,6 +610,7 @@ private:
     /**
      * @Description  Update wifi device config after wifi connected.
      *
+     * @param deviceConfig - deviceConfig
      * @param bssid - the mac address of wifi(in)
      */
     void UpdateDeviceConfigAfterWifiConnected(WifiDeviceConfig &deviceConfig, const std::string &bssid);
@@ -728,12 +729,14 @@ private:
 
     /**
      * @Description : Deal SignalPoll Result.
-     *
-     * @param  msg - Message body received by the state machine[in]
      */
     void DealSignalPollResult();
 
-
+    /**
+     * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
+     *
+     * @param  signalInfo - SignalPoll Result
+     */
     void UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo);
 
     /**

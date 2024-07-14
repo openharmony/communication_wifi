@@ -1703,10 +1703,8 @@ public:
 
     void DealSignalPollResultTest()
     {
-        InternalMessage msg;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiLinkedStandardAndMaxSpeed(_)).Times(testing::AtLeast(0));
-        pStaStateMachine->DealSignalPollResult(nullptr);
-        pStaStateMachine->DealSignalPollResult(&msg);
+        pStaStateMachine->DealSignalPollResult();
         pStaStateMachine->linkedInfo.lastTxPackets = 1;
         pStaStateMachine->linkedInfo.lastRxPackets = 1;
         pStaStateMachine->linkedInfo.lastPacketDirection = 1;

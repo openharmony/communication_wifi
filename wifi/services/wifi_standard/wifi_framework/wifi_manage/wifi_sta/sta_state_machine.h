@@ -612,7 +612,7 @@ private:
      *
      * @param bssid - the mac address of wifi(in)
      */
-    void UpdateDeviceConfigAfterWifiConnected(const std::string &bssid);
+    void UpdateDeviceConfigAfterWifiConnected(WifiDeviceConfig &deviceConfig, const std::string &bssid);
 
     /**
      * @Description On connect fail.
@@ -732,6 +732,9 @@ private:
      * @param  msg - Message body received by the state machine[in]
      */
     void DealSignalPollResult();
+
+
+    void UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo);
 
     /**
      * @Description : Converting frequencies to channels.

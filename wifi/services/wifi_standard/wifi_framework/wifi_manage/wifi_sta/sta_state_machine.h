@@ -608,6 +608,13 @@ private:
     void ConnectToNetworkProcess(std::string bssid);
 
     /**
+     * @Description  Update wifi device config after wifi connected.
+     *
+     * @param bssid - the mac address of wifi(in)
+     */
+    void UpdateDeviceConfigAfterWifiConnected(const std::string &bssid);
+
+    /**
      * @Description On connect fail.
      *
      * @param networkId - the networkId of network which is going to be connected.(in)
@@ -724,7 +731,7 @@ private:
      *
      * @param  msg - Message body received by the state machine[in]
      */
-    void DealSignalPollResult(InternalMessage *msg);
+    void DealSignalPollResult();
 
     /**
      * @Description : Converting frequencies to channels.

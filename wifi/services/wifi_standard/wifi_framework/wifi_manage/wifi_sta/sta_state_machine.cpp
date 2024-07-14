@@ -872,7 +872,6 @@ bool StaStateMachine::LinkState::ExecuteStateMsg(InternalMessage *msg)
 /* -- state machine Connect State Message processing function -- */
 int StaStateMachine::InitStaSMHandleMap()
 {
-    staSmHandleFuncMap[CMD_SIGNAL_POLL] = &StaStateMachine::DealSignalPollResult;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_CONNECT_NETWORK] = &StaStateMachine::DealConnectToUserSelectedNetwork;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK] = &StaStateMachine::DealConnectToUserSelectedNetwork;
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT] = &StaStateMachine::DealDisconnectEvent;
@@ -930,13 +929,9 @@ int StaStateMachine::UpdateLinkInfoRssi(int inRssi)
     return outRssi;
 }
 
-void StaStateMachine::DealSignalPollResult(InternalMessage *msg)
+void StaStateMachine::DealSignalPollResult()
 {
     LOGD("enter SignalPoll.");
-    if (msg == nullptr) {
-        LOGE("msg is nullptr.");
-        return;
-    }
     int currentSignalLevel = 0;
     WifiHalWpaSignalInfo signalInfo;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(
@@ -2699,6 +2694,9 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
             }
             break;
         }
+        case CMD_SIGNAL_POLL:
+            DealSignalPollResult();
+            break;
         default:
             break;
     }
@@ -3641,6 +3639,32 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::PBC) || (wpsState == SetupMethod::KEYPAD)) {
         targetNetworkId = WPA_DEFAULT_NETWORKID;
     }
+    UpdateDeviceConfigAfterWifiConnected(bssid);
+    
+    std::string macAddr;
+    std::string realMacAddr;
+    WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
+    WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
+    linkedInfo.networkId = targetNetworkId;
+    linkedInfo.bssid = bssid;
+    linkedInfo.ssid = deviceConfig.ssid;
+    linkedInfo.macType = (macAddr == realMacAddr ?
+        static_cast<int>(WifiPrivacyConfig::DEVICEMAC) : static_cast<int>(WifiPrivacyConfig::RANDOMMAC));
+    linkedInfo.macAddress = macAddr;
+    linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
+    lastLinkedInfo.bssid = bssid;
+    lastLinkedInfo.macType = static_cast<int>(deviceConfig.wifiPrivacySetting);
+    lastLinkedInfo.macAddress = deviceConfig.macAddress;
+    lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
+    SetWifiLinkedInfo(targetNetworkId);
+
+    lastSignalLevel = -1;   // Reset signal level when first start signal poll
+    DealSignalPollResult();
+    SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
+}
+
+void StaStateMachine::UpdateDeviceConfigAfterWifiConnected(const std::string &bssid)
+{
     WifiDeviceConfig deviceConfig;
     int result = WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig);
     WIFI_LOGD("Device config networkId = %{public}d", deviceConfig.networkId);
@@ -3671,24 +3695,6 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
         WifiSettings::GetInstance().SyncDeviceConfig();
         WIFI_LOGD("Device ssid = %s", SsidAnonymize(deviceConfig.ssid).c_str());
     }
-    std::string macAddr;
-    std::string realMacAddr;
-    WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
-    WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
-    linkedInfo.networkId = targetNetworkId;
-    linkedInfo.bssid = bssid;
-    linkedInfo.ssid = deviceConfig.ssid;
-    linkedInfo.macType = (macAddr == realMacAddr ?
-        static_cast<int>(WifiPrivacyConfig::DEVICEMAC) : static_cast<int>(WifiPrivacyConfig::RANDOMMAC));
-    linkedInfo.macAddress = macAddr;
-    linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
-    lastLinkedInfo.bssid = bssid;
-    lastLinkedInfo.macType = static_cast<int>(deviceConfig.wifiPrivacySetting);
-    lastLinkedInfo.macAddress = deviceConfig.macAddress;
-    lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
-    SetWifiLinkedInfo(targetNetworkId);
-    DealSignalPollResult(CreateMessage());
-    SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
 }
 
 void StaStateMachine::SetWifiLinkedInfo(int networkId)
@@ -3781,6 +3787,7 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessage *msg)
     WIFI_LOGI("DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
     if (screenState == MODE_STATE_OPEN) {
         enableSignalPoll = true;
+        lastSignalLevel = -1;   // Reset signal level when first start signal poll
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
     }
 

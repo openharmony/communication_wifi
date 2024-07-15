@@ -157,6 +157,7 @@ public:
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
+        void HandleConnectFailed(InternalMessage *msg);
         void HandleResetConnectNetwork(InternalMessage *msg);
         SelfCureStateMachine *pSelfCureStateMachine;
         bool setStaticIpConfig = false;

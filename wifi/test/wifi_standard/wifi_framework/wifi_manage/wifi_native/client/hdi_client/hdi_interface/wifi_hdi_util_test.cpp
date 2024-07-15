@@ -16,7 +16,7 @@
 #include "wifi_hdi_util.h"
 
 using ::testing::ext::TestSize;
-
+1
 namespace OHOS {
 namespace Wifi {
 const int MAC_SIZE = 6;

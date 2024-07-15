@@ -58,9 +58,9 @@ public:
      /**
      * @Description Is SelfCure On Going
      *
-     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     * @return bool - true: selfcure is ongoing, false: selfcure is not ongoing
      */
-    virtual ErrCode IsSelfCureOnGoing() = 0;
+    virtual bool IsSelfCureOnGoing() = 0;
 
     /**
      * @Description Deal sta opened result

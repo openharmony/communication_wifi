@@ -510,7 +510,8 @@ WifiErrorNo P2pSetupWpsPbc(const char *groupIfc, const char *address)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pSetupWpsPin(const char *groupIfc, const char *address, const char *pin, char *result, int resultLen)
+WifiErrorNo P2pSetupWpsPin(const char *groupIfc, const char *address,
+    const char *pin, char *result, int resultLen)
 {
     return WIFI_HAL_SUCCESS;
 }

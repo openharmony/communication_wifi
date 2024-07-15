@@ -645,7 +645,7 @@ void WifiDeviceStub::SendSmallConfig(int32_t size, std::vector<WifiDeviceConfig>
 {
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteInt32(size);
-    for (int i = 0; i < size; ++i) {
+    for (int32_t i = 0; i < size; ++i) {
         WriteWifiDeviceConfig(reply, result[i]);
     }
  

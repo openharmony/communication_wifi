@@ -83,9 +83,11 @@ void ApMonitor::OnHotspotStateEvent(int state) const
 
 void ApMonitor::WpaEventApChannelSwitch(int freq) const
 {
+    WIFI_LOGI("%{public}s, freq = %{public}d", __func__, freq);
     HotspotConfig hostapdConfig;
     WifiSettings::GetInstance().GetHotspotConfig(hostapdConfig, m_id);
-    hostapdConfig.SetChannel(freq);
+    int channel = TransformFrequencyIntoChannel(freq);
+    hostapdConfig.SetChannel(channel);
     WifiSettings::GetInstance().SetHotspotConfig(hostapdConfig, m_id);
 }
 

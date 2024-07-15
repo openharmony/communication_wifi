@@ -73,6 +73,7 @@ ErrCode SelfCureInterface::InitCallback()
     mStaCallback.callbackModuleName = "SelfCureService";
     mStaCallback.OnStaConnChanged = std::bind(&SelfCureInterface::DealStaConnChanged, this, _1, _2, _3);
     mStaCallback.OnStaRssiLevelChanged = std::bind(&SelfCureInterface::DealRssiLevelChanged, this, _1, _2);
+    mStaCallback.OnDhcpOfferReport = std::bind(&SelfCureInterface::DealDhcpOfferReport, this, _1, _2);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -113,6 +114,16 @@ void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLink
         return;
     }
     pSelfCureService->HandleStaConnChanged(state, info);
+}
+
+void SelfCureInterface::DealDhcpOfferReport(const IpInfo &ipInfo, int instId)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return;
+    }
+    pSelfCureService->HandleDhcpOfferReport(ipInfo);
 }
 
 void SelfCureInterface::DealStaOpened(int instId)

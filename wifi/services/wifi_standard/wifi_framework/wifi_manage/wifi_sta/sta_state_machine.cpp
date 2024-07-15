@@ -115,7 +115,7 @@ StaStateMachine::StaStateMachine(int instId)
       targetNetworkId(INVALID_NETWORK_ID),
       pinCode(0),
       wpsState(SetupMethod::INVALID),
-      lastSignalLevel(-1),
+      lastSignalLevel(INVALID_SIGNAL_LEVEL),
       targetRoamBssid(WPA_BSSID_ANY),
       currentTpType(IPTYPE_IPV4),
       isWpsConnect(IsWpsConnected::WPS_INVALID),
@@ -3666,7 +3666,7 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     SetWifiLinkedInfo(targetNetworkId);
 
-    lastSignalLevel = -1;   // Reset signal level when first start signal poll
+    lastSignalLevel = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
     DealSignalPollResult();
     SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
 }
@@ -3791,7 +3791,7 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessage *msg)
     WIFI_LOGI("DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
     if (screenState == MODE_STATE_OPEN) {
         enableSignalPoll = true;
-        lastSignalLevel = -1;   // Reset signal level when first start signal poll
+        lastSignalLevel = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
     }
 

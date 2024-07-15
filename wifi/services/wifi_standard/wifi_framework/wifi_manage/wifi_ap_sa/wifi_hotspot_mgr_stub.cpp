@@ -51,11 +51,9 @@ int WifiHotspotMgrStub::OnRemoteRequest(
     FuncHandleMap::iterator iter = funcHandleMap_.find(code);
     if (iter == funcHandleMap_.end()) {
         WIFI_LOGE("not find function to deal, code %{public}u", code);
-        reply.WriteInt32(0);
-        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
-        return (this->*(iter->second))(code, data, reply, option);
+        (this->*(iter->second))(code, data, reply, option);
     }
     return 0;
 }

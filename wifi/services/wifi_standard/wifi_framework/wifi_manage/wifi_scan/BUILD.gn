@@ -37,6 +37,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
@@ -73,11 +74,14 @@ if (defined(ohos_lite)) {
 
     defines = [ "OHOS_ARCH_LITE" ]
     configs -= [ "//build/lite/config:language_cpp" ]
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -87,9 +91,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true
@@ -119,13 +125,15 @@ if (defined(ohos_lite)) {
       "common_event_service:cesfwk_innerkits",
       "hilog:libhilog",
     ]
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]

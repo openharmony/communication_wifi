@@ -45,6 +45,12 @@ static void WriteEventBehavior(const std::string& eventType, Type... args)
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType)
 {
     WriteEvent("WIFI_STATE", "TYPE", serviceType, "OPER_TYPE", static_cast<int>(operType));
+
+    Json::Value root;
+    Json::FastWriter writer;
+    root["WIFI_STATE"] = static_cast<int>(operType);
+    root["TYPE"] = serviceType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WIFI_STATE", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteWifiApStateHiSysEvent(int32_t state)
@@ -267,6 +273,35 @@ void WirteConnectTypeHiSysEvent(std::string connectType)
     Json::FastWriter writer;
     root["CONNECT_TYPE"] = connectType;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_CONNECT_TYPE", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteWifiWpaStateHiSysEvent(int state)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["WPA_STATE"] = state;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WPA_STATE", "EVENT_VALUE", writer.write(root));
+}
+
+void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, int connTime,
+    int portalAuthTime, bool isNotificationClicked)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    auto now = time(nullptr);
+    if (now < 0) {
+        now = -1;
+    }
+    int64_t authDura = now - portalAuthTime;
+    int64_t connDura = now - connTime;
+    int authCostDura = portalAuthTime - connTime;
+    root["RESP_CODE"] = respCode;
+    root["DURA"] = (authDura > 0 && portalAuthTime) ? authDura : 0;
+    root["CONN_DURA"] = (connDura > 0 && connTime) ? connDura : 0;
+    root["AUTH_COST_DURA"] = (authCostDura > 0 && portalAuthTime && connTime > 0) ? authCostDura : 0;
+    root["DET_NUM"] = detectNum;
+    root["IS_NOTIFICA_CLICKED"] = isNotificationClicked ? 1 : 0;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "PORTAL_AUTH_EXPIRED", "EVENT_VALUE", writer.write(root));
 }
 
 }  // namespace Wifi

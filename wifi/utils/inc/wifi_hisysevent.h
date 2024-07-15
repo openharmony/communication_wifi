@@ -32,7 +32,8 @@ namespace OHOS {
 namespace Wifi {
 enum class WifiOperType {
     ENABLE,
-    DISABLE
+    DISABLE,
+    SEMI_ENABLE
 };
 
 enum class WifiConnectionType {
@@ -42,8 +43,8 @@ enum class WifiConnectionType {
 
 const int HISYS_EVENT_DEFAULT_VALUE = -1;
 const int HISYS_EVENT_PROTAL_STATE_NOT_PORTAL = 0;
-const int HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED = 0;
 const int HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED = 1;
+const int HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED = 2;
 
 const std::string HISYS_STA_POWER_STATE_CHANGE = "wifiStateChange";
 const std::string HISYS_STA_CONN_STATE_CHANGE = "wifiConnectionChange";
@@ -121,6 +122,11 @@ void WriteArpInfoHiSysEvent(uint64_t arpRtt, int arpFailedCount);
 void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed);
 
 void WirteConnectTypeHiSysEvent(std::string connectType);
+
+void WriteWifiWpaStateHiSysEvent(int state);
+
+void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, int connTime,
+    int portalAuthTime, bool isNotificationClicked);
 
 }  // namespace Wifi
 }  // namespace OHOS

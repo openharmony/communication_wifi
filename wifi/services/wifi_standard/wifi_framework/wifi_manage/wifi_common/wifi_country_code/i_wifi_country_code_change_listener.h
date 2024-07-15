@@ -17,6 +17,7 @@
 #define I_WIFI_COUNTRY_CODE_CHANGE_LISTENER_H
 
 #include <functional>
+#include "wifi_errcode.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 #include "state_machine.h"

@@ -22,7 +22,9 @@ if (defined(ohos_lite)) {
 
 local_base_sources = [
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
+  "config/wifi_config_center.cpp",
   "config/wifi_config_file_spec.cpp",
+  "config/wifi_scan_config.cpp",
   "config/wifi_settings.cpp",
   "log/log_helper.c",
   "net_helper/arp_checker.cpp",
@@ -37,9 +39,11 @@ local_base_sources = [
   "net_helper/mac_address.cpp",
   "net_helper/network_interface.cpp",
   "net_helper/raw_socket.cpp",
+  "utils/wifi_code_convert.cpp",
   "utils/wifi_common_event_helper.cpp",
   "utils/wifi_encryption_util.cpp",
   "utils/wifi_global_func.cpp",
+  "utils/wifi_randommac_helper.cpp",
 ]
 
 local_base_include_dirs = [
@@ -49,6 +53,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
@@ -74,11 +79,14 @@ if (defined(ohos_lite)) {
     ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -88,19 +96,21 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true
     sources = local_base_sources
     sources += [
+      "config/wifi_backup_config.cpp",
       "utils/network_parser.cpp",
       "utils/softap_parser.cpp",
       "utils/wifi_app_parser.cpp",
       "utils/wifi_cert_utils.cpp",
-      "utils/wifi_notification_util.cpp",
       "utils/xml_parser.cpp",
     ]
 
@@ -121,8 +131,15 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
     }
 
+    if (is_asan || use_clang_coverage) {
+      defines += [ "DTFUZZ_TEST" ]
+    }
+
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+    }
+    if (wifi_feature_with_local_random_mac) {
+      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
     }
     if (wifi_feature_with_scan_control) {
       defines += [ "SUPPORT_SCAN_CONTROL" ]
@@ -134,22 +151,16 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
-      "ability_base:zuri",
-      "ability_runtime:wantagent_innerkits",
       "c_utils:utils",
       "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
       "dhcp:dhcp_sdk",
       "dhcp:dhcp_utils",
-      "distributed_notification_service:ans_innerkits",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
-      "i18n:intl_util",
-      "image_framework:image_native",
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
       "libxml2:libxml2",
-      "relational_store:native_rdb",
     ]
 
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {
@@ -162,19 +173,22 @@ if (defined(ohos_lite)) {
 
     public_deps = []
 
-    if (wifi_feature_with_encryption) {
+    if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
       external_deps += [ "huks:libhukssdk" ]
     }
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
-
+    version_script = "libwifi_toolkit.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

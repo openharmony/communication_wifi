@@ -14,14 +14,7 @@
  */
 #ifndef WIFI_MOCK_WPA_CTRL_H
 #define WIFI_MOCK_WPA_CTRL_H
-#include "common/wpa_ctrl.h"
-#ifdef  __cplusplus
-extern "C" {
-#endif
-#include "utils/common.h"
-#ifdef  __cplusplus
-}
-#endif
+#include "wpa_ctrl.h"
 #include <string>
 #include <vector>
 #include <map>

@@ -96,6 +96,15 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
         case WifiSecurity::EAP:
             jsSecurityType = SecTypeJs::SEC_TYPE_EAP;
             break;
+        case WifiSecurity::EAP_SUITE_B:
+            jsSecurityType = SecTypeJs::SEC_TYPE_EAP_SUITE_B;
+            break;
+        case WifiSecurity::WAPI_CERT:
+            jsSecurityType = SecTypeJs::SEC_TYPE_WAPI_CERT;
+            break;
+        case WifiSecurity::WAPI_PSK:
+            jsSecurityType = SecTypeJs::SEC_TYPE_WAPI_PSK;
+            break;
         default:
             jsSecurityType = SecTypeJs::SEC_TYPE_INVALID;
             break;
@@ -317,6 +326,15 @@ static void ConvertEncryptionMode(const SecTypeJs& securityType, std::string& ke
         case SecTypeJs::SEC_TYPE_EAP:
             keyMgmt = KEY_MGMT_EAP;
             break;
+        case SecTypeJs::SEC_TYPE_EAP_SUITE_B:
+            keyMgmt = KEY_MGMT_SUITE_B_192;
+            break;
+        case SecTypeJs::SEC_TYPE_WAPI_CERT:
+            keyMgmt = KEY_MGMT_WAPI_CERT;
+            break;
+        case SecTypeJs::SEC_TYPE_WAPI_PSK:
+            keyMgmt = KEY_MGMT_WAPI_PSK;
+            break;
         default:
             keyMgmt = KEY_MGMT_NONE;
             break;
@@ -371,6 +389,7 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
     JsObjectToString(env, napiEap, "caCertAlias", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.caCertAlias);
     JsObjectToString(env, napiEap, "caPath", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.caCertPath);
     JsObjectToString(env, napiEap, "clientCertAlias", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.clientCert);
+    JsObjectToString(env, napiEap, "clientCertAlias", NAPI_MAX_STR_LENT, devConfig.wifiEapConfig.privateKey);
     devConfig.wifiEapConfig.certEntry = JsObjectToU8Vector(env, napiEap, "certEntry");
 
     std::string certPwd;
@@ -475,6 +494,24 @@ ErrCode ProcessProxyConfig(const napi_env& env, const napi_value& object, WifiDe
     return ret;
 }
 
+napi_value JsObjToWapiConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& devConfig)
+{
+    bool hasProperty = false;
+    NAPI_CALL(env, napi_has_named_property(env, object, "wapiConfig", &hasProperty));
+    if (!hasProperty) {
+        WIFI_LOGI("Js has no property: wapiConfig.");
+        return UndefinedNapiValue(env);
+    }
+
+    napi_value napiEap;
+    napi_get_named_property(env, object, "wapiConfig", &napiEap);
+    
+    JsObjectToInt(env, napiEap, "wapiPskType", devConfig.wifiWapiConfig.wapiPskType);
+    JsObjectToString(env, napiEap, "wapiAsCert", NAPI_WAPI_MAX_STR_LENT, devConfig.wifiWapiConfig.wapiAsCertData);
+    JsObjectToString(env, napiEap, "wapiUserCert", NAPI_WAPI_MAX_STR_LENT, devConfig.wifiWapiConfig.wapiUserCertData);
+    return CreateInt32(env);
+}
+
 static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
     JsObjectToString(env, object, "ssid", NAPI_MAX_STR_LENT, cppConfig.ssid); /* ssid max length is 32 + '\0' */
@@ -515,8 +552,11 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
-    if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP) {
+    if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP || SecTypeJs(type) == SecTypeJs::SEC_TYPE_EAP_SUITE_B) {
         return ProcessEapConfig(env, object, cppConfig);
+    }
+    if (SecTypeJs(type) == SecTypeJs::SEC_TYPE_WAPI_CERT || SecTypeJs(type) == SecTypeJs::SEC_TYPE_WAPI_PSK) {
+        return JsObjToWapiConfig(env, object, cppConfig);
     }
     return CreateInt32(env);
 }
@@ -936,7 +976,7 @@ static void IpV6InfoToJsObj(const napi_env& env, IpV6Info& ipInfo, napi_value& r
     napi_create_object(env, &result);
     SetValueUtf8String(env, "linkIpv6Address", ipInfo.linkIpV6Address, result);
     SetValueUtf8String(env, "globalIpv6Address", ipInfo.globalIpV6Address, result);
-    SetValueUtf8String(env, "randGlobalIpv6Address", ipInfo.randGlobalIpV6Address, result);
+    SetValueUtf8String(env, "randomGlobalIpv6Address", ipInfo.randGlobalIpV6Address, result);
     SetValueUtf8String(env, "gateway", ipInfo.gateway, result);
     SetValueUtf8String(env, "netmask", ipInfo.netmask, result);
     SetValueUtf8String(env, "primaryDNS", ipInfo.primaryDns, result);
@@ -1137,6 +1177,9 @@ static SecTypeJs ConvertKeyMgmtToSecType(const std::string& keyMgmt)
         {KEY_MGMT_WPA_PSK, SecTypeJs::SEC_TYPE_PSK},
         {KEY_MGMT_SAE, SecTypeJs::SEC_TYPE_SAE},
         {KEY_MGMT_EAP, SecTypeJs::SEC_TYPE_EAP},
+        {KEY_MGMT_SUITE_B_192, SecTypeJs::SEC_TYPE_EAP_SUITE_B},
+        {KEY_MGMT_WAPI_CERT, SecTypeJs::SEC_TYPE_WAPI_CERT},
+        {KEY_MGMT_WAPI_PSK, SecTypeJs::SEC_TYPE_WAPI_PSK},
     };
 
     std::map<std::string, SecTypeJs>::iterator iter = mapKeyMgmtToSecType.find(keyMgmt);
@@ -1266,6 +1309,18 @@ static void EapConfigToJs(const napi_env& env, const WifiEapConfig& wifiEapConfi
     SetValueInt32(env, "eapSubId", wifiEapConfig.eapSubId, cfgObj);
 }
 
+static void WapiConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDeviceConfig, napi_value& result)
+{
+    napi_value wapiCfgObj;
+    napi_create_object(env, &wapiCfgObj);
+    SetValueInt32(env, "wapiPskType", wifiDeviceConfig.wifiWapiConfig.wapiPskType, wapiCfgObj);
+
+    napi_status status = napi_set_named_property(env, result, "wapiConfig", wapiCfgObj);
+    if (status != napi_ok) {
+        WIFI_LOGE("%{public}s set wapi config failed!", __FUNCTION__);
+    }
+}
+
 static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceConfig>& vecDeviceConfigs,
     const int idx, napi_value& arrayResult)
 {
@@ -1307,6 +1362,8 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     if (status != napi_ok) {
         WIFI_LOGE("failed to set eapConfig!");
     }
+
+    WapiConfigToJs(env, vecDeviceConfigs[idx], result);
 
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
@@ -1621,5 +1678,29 @@ NO_SANITIZE("cfi") napi_value EnableHiLinkHandshake(napi_env env, napi_callback_
     ErrCode ret = wifiDevicePtr->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig);
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
+
+NO_SANITIZE("cfi") napi_value EnableSemiWifi(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    ErrCode ret = wifiDevicePtr->EnableSemiWifi();
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
+NO_SANITIZE("cfi") napi_value GetWifiDetailState(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    WifiDetailState state = WifiDetailState::STATE_UNKNOWN;
+    ErrCode ret = wifiDevicePtr->GetWifiDetailState(state);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetWifiDetailState failed:%{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value value;
+    napi_create_int32(env, static_cast<int>(state), &value);
+    return value;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

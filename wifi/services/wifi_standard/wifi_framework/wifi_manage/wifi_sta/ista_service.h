@@ -37,7 +37,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableWifi() = 0;
+    virtual ErrCode EnableStaService() = 0;
     /**
      * @Description  Disable wifi
      *
@@ -46,7 +46,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode DisableWifi() = 0;
+    virtual ErrCode DisableStaService() = 0;
     /**
      * @Description  Connect to a new network
      *
@@ -67,6 +67,25 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode ConnectToNetwork(int networkId) = 0;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) = 0;
+
+    /**
+     * @Description connect to user select ssid and bssid network
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid) = 0;
+
     /**
      * @Description  Disconnect to the network
      *
@@ -219,6 +238,14 @@ public:
     virtual ErrCode SetPowerMode(bool mode) = 0;
 
     /**
+     * @Description set tx power for sar.
+     *
+     * @param power: 1001,1002,1003......
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetTxPower(int power) = 0;
+
+    /**
      * @Description systemabilitychanged
      *
      * @param mode: true for setup, false for shutdown.
@@ -293,13 +320,6 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode StartPortalCertification() = 0;
-	
-    /**
-     * @Description renew dhcp.
-     *
-	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode RenewDhcp() = 0;
 
     /**
      * @Description Handle foreground app changed action.

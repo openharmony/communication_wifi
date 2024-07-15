@@ -26,10 +26,15 @@ export class MessageDataManager {
   testWifiDisableResult = "Wifi去使能执行结果："
   testDisableResult = "去使能结果："
   testWifiDisableMaybe = "Wifi已关闭或关闭失败,请确认"
+
+  testEnableSemiWifi ="enableSemiWifi test";
+
   testIsWifiActive = "testIsWifiActive"
   testIsActiveResult = "wifi使能结果为："
   testScan = "scan test"
   testScanResult = "scan: "
+  testStartScan = "startScan test"
+
   testForcibleScan = "ForcibleScan test"
   testForcibleScanResult = "ForcibleScan: "
   testGetScanInfoList = "getScanInfoList test"

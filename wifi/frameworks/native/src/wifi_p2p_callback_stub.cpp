@@ -56,6 +56,8 @@ void WifiP2pCallbackStub::InitHandleMap()
         &WifiP2pCallbackStub::RemoteOnP2pGcJoinGroup;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_P2P_GC_LEAVE_GROUP)] =
         &WifiP2pCallbackStub::RemoteOnP2pGcLeaveGroup;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PRIVATE_PEER_CHANGE)] =
+        &WifiP2pCallbackStub::RemoteOnP2pPrivatePeersChanged;
     return;
 }
 
@@ -139,6 +141,14 @@ void WifiP2pCallbackStub::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &de
         userCallback_->OnP2pPeersChanged(device);
     }
     WriteWifiEventReceivedHiSysEvent(HISYS_P2P_PEER_DEVICE_CHANGE, HISYS_EVENT_DEFAULT_VALUE);
+}
+
+void WifiP2pCallbackStub::OnP2pPrivatePeersChanged(const std::string &priWfdInfo)
+{
+    WIFI_LOGI("WifiP2pCallbackStub::OnP2pPrivatePeersChanged");
+    if (userCallback_) {
+        userCallback_->OnP2pPrivatePeersChanged(priWfdInfo);
+    }
 }
 
 void WifiP2pCallbackStub::OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo> &srvInfo)
@@ -255,6 +265,14 @@ void WifiP2pCallbackStub::RemoteOnP2pPeersChanged(uint32_t code, MessageParcel &
         device.emplace_back(config);
     }
     OnP2pPeersChanged(device);
+}
+
+void WifiP2pCallbackStub::RemoteOnP2pPrivatePeersChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+ 
+    std::string priWfdInfo = data.ReadString();
+    OnP2pPrivatePeersChanged(priWfdInfo);
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)

@@ -268,6 +268,29 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo) = 0;
+
+    /**
+     * @Description set p2p wifi display info
+     *
+     * @param wfdInfo - wifi display info
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DiscoverPeers(int32_t channelid) = 0;
+
+    /**
+     * @Description set p2p wifi display info
+     *
+     * @param wfdInfo - wifi display info
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DisableRandomMac(int setmode) = 0;
+
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode CheckCanUseP2p() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

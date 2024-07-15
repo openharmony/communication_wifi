@@ -26,6 +26,8 @@ config("module_private_config") {
 ohos_unittest("idl_client_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/base/cRPC/src/context.c",
+    "$WIFI_ROOT_DIR/base/cRPC/src/net.c",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_msg.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
@@ -51,6 +53,8 @@ ohos_unittest("idl_client_unittest") {
     "hal_device_manage_test.cpp",
     "i_wifi_iface_test.cpp",
     "i_wifi_test.cpp",
+    "mock_client.c",
+    "mock_serial.c",
     "mock_wifi_public.cpp",
     "wifi_chip_hal_interface_test.cpp",
     "wifi_idl_client_test.cpp",
@@ -63,6 +67,7 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/base/cRPC/include",
+    "$WIFI_ROOT_DIR/base/shared_util",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
@@ -81,10 +86,15 @@ ohos_unittest("idl_client_unittest") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
 
-  defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
+  defines = [
+    "private = public",
+    "protected = public",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    "__UT__",
+  ]
 
   deps = [
-    "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
+    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
@@ -122,18 +132,18 @@ ohos_unittest("idl_client_unittest") {
 ohos_unittest("mock_wifi_hal_service") {
   module_out_path = module_output_path
   sources = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common/wifi_hal_common_func.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/main.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_adapter.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_callback.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_ap.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_base.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_chip.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_common.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_p2p.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_server.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_sta.c",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/wifi_hal_crpc_supplicant.c",
+    "$WIFI_ROOT_DIR/relation_services/common/wifi_hal_common_func.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/main.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_adapter.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_callback.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_crpc_ap.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_crpc_base.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_crpc_chip.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_crpc_common.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_crpc_p2p.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_crpc_server.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_crpc_sta.c",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_crpc_supplicant.c",
     "mock_wifi_hal_service.c",
   ]
 
@@ -143,8 +153,8 @@ ohos_unittest("mock_wifi_hal_service") {
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/base/cRPC/include",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_hal/common",
+    "$WIFI_ROOT_DIR/relation_services/common",
+    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
   ]
 

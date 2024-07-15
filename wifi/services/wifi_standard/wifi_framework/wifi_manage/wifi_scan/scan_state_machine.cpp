@@ -16,7 +16,8 @@
 #include "scan_state_machine.h"
 #include "wifi_error_no.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_channel_helper.h"
+#include "wifi_config_center.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
 
@@ -237,10 +238,29 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
         case RESTART_PNO_SCAN_TIMER:
             pScanStateMachine->ReportScanInnerEvent((ScanInnerEventType)msg->GetMessageName());
             return true;
-
+        case SCAN_UPDATE_COUNTRY_CODE:
+            HandleUpdateCountryCode(msg);
+            return true;
         default:
             return false;
     }
+}
+void ScanStateMachine::InitState::HandleUpdateCountryCode(InternalMessage *msg)
+{
+    std::string wifiCountryCode = msg->GetStringFromMessage();
+    if (wifiCountryCode.empty()) {
+        return;
+    }
+    WifiErrorNo result = WifiStaHalInterface::GetInstance().SetWifiCountryCode(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), wifiCountryCode);
+    if (result == WifiErrorNo::WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("update wifi country code sucess, wifiCountryCode=%{public}s", wifiCountryCode.c_str());
+        WifiChannelHelper::GetInstance().UpdateValidChannels(
+            WifiConfigCenter::GetInstance().GetStaIfaceName(), pScanStateMachine->m_instId);
+        return;
+    }
+    WIFI_LOGE("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",
+        wifiCountryCode.c_str(), result);
 }
 
 ScanStateMachine::HardwareReady::HardwareReady(ScanStateMachine *paraScanStateMachine) : State("HardwareReady")
@@ -814,7 +834,7 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterS
         std::string hiddenSsid = interMessage->GetStringFromMessage();
         if (hiddenSsid.empty()) {
             WIFI_LOGE("Message body is error.");
-            return false;
+            continue;
         }
         scanConfig.hiddenNetworkSsid.push_back(hiddenSsid);
     }
@@ -825,7 +845,7 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterS
         int freq = interMessage->GetIntFromMessage();
         if (freq == 0) {
             WIFI_LOGE("Message body is error.");
-            return false;
+            continue;
         }
         scanConfig.scanFreqs.push_back(freq);
     }
@@ -909,7 +929,7 @@ void ScanStateMachine::ClearRunningScanSettings()
     return;
 }
 
-bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
+bool ScanStateMachine::StartSingleCommonScan(WifiHalScanParam &scanParam)
 {
     WIFI_LOGI("Enter StartSingleCommonScan.\n");
 
@@ -923,8 +943,9 @@ bool ScanStateMachine::StartSingleCommonScan(WifiScanParam &scanParam)
     }
 
     WIFI_LOGI("Begin call Scan.\n");
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(WifiSettings::GetInstance().GetStaIfaceName(), scanParam);
-    if ((ret != WIFI_IDL_OPT_OK) && (ret != WIFI_IDL_OPT_SCAN_BUSY)) {
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), scanParam);
+    if ((ret != WIFI_HAL_OPT_OK) && (ret != WIFI_HAL_OPT_SCAN_BUSY)) {
         WIFI_LOGE("GetInstance().scan failed.");
         return false;
     }
@@ -1044,7 +1065,7 @@ std::string ScanStateMachine::FilterScanResultRecord::GetFilteredScanResultMsg()
 
 void ScanStateMachine::FilterScanResult(std::vector<InterScanInfo> &scanInfoList)
 {
-    std::string connectedBssid = WifiSettings::GetInstance().GetConnectedBssid(m_instId);
+    std::string connectedBssid = WifiConfigCenter::GetInstance().GetConnectedBssid(m_instId);
     auto validScanInfosEnd = scanInfoList.begin();
     int numFilteredScanResults = 0;
     const int64_t scanInfoValidSinceTime = lastScanStartTime - SCAN_INFO_VALIDITY;
@@ -1145,7 +1166,7 @@ void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanIn
             iter->securityType = WifiSecurity::WEP;
             continue;
         }
-        if (iter->capabilities.find("EAP_SUITE_B_192") != std::string::npos) {
+        if (iter->capabilities.find("EAP-SUITE-B-192") != std::string::npos) {
             iter->securityType = WifiSecurity::EAP_SUITE_B;
             continue;
         }
@@ -1368,7 +1389,7 @@ bool ScanStateMachine::StartPnoScanHardware()
     }
 
     /* Invoke the IDL interface to start PNO scanning */
-    WifiPnoScanParam pnoScanParam;
+    WifiHalPnoScanParam pnoScanParam;
     pnoScanParam.scanInterval = runningPnoScanConfig.scanInterval;
     pnoScanParam.minRssi2Dot4Ghz = runningPnoScanConfig.minRssi2Dot4Ghz;
     pnoScanParam.minRssi5Ghz = runningPnoScanConfig.minRssi5Ghz;
@@ -1379,8 +1400,8 @@ bool ScanStateMachine::StartPnoScanHardware()
     pnoScanParam.scanFreqs.assign(runningPnoScanConfig.freqs.begin(), runningPnoScanConfig.freqs.end());
     WIFI_LOGI("pnoScanParam.scanInterval is %{public}d.\n", pnoScanParam.scanInterval);
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(
-        WifiSettings::GetInstance().GetStaIfaceName(), pnoScanParam);
-    if ((ret != WIFI_IDL_OPT_OK) && (ret != WIFI_IDL_OPT_SCAN_BUSY)) {
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), pnoScanParam);
+    if ((ret != WIFI_HAL_OPT_OK) && (ret != WIFI_HAL_OPT_SCAN_BUSY)) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().StartPnoScan failed.");
         PnoScanFailedProcess();
         return false;
@@ -1402,7 +1423,7 @@ void ScanStateMachine::StopPnoScanHardware()
 
     /* Invoke the IDL interface to stop PNO scanning */
     if (WifiStaHalInterface::GetInstance().StopPnoScan(
-        WifiSettings::GetInstance().GetStaIfaceName()) != WIFI_IDL_OPT_OK) {
+        WifiConfigCenter::GetInstance().GetStaIfaceName()) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().StopPnoScan failed.");
     }
 
@@ -1550,7 +1571,7 @@ void ScanStateMachine::CommonScanAfterPnoProcess()
     WIFI_LOGI("Enter CommonScanAfterPnoProcess.\n");
 
     StopPnoScanHardware();
-    WifiScanParam scanParam;
+    WifiHalScanParam scanParam;
     scanParam.hiddenNetworkSsid.assign(
         runningScanConfigForPno.hiddenNetworkSsid.begin(), runningScanConfigForPno.hiddenNetworkSsid.end());
     scanParam.scanFreqs.assign(runningScanConfigForPno.scanFreqs.begin(), runningScanConfigForPno.scanFreqs.end());
@@ -1611,7 +1632,7 @@ bool ScanStateMachine::GetScanInfos(std::vector<InterScanInfo> &scanInfos)
 
     WIFI_LOGI("Begin: QueryScanInfos.");
     if (WifiStaHalInterface::GetInstance().QueryScanInfos(
-        WifiSettings::GetInstance().GetStaIfaceName(), scanInfos) != WIFI_IDL_OPT_OK) {
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), scanInfos) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("WifiStaHalInterface::GetInstance().GetScanInfos failed.");
         return false;
     }
@@ -1641,7 +1662,7 @@ bool ScanStateMachine::RepeatStartCommonScan()
         return false;
     }
 
-    WifiScanParam scanParam;
+    WifiHalScanParam scanParam;
     scanParam.scanFreqs.assign(runningScanConfigForPno.scanFreqs.begin(), runningScanConfigForPno.scanFreqs.end());
     scanParam.hiddenNetworkSsid.assign(
         runningScanConfigForPno.hiddenNetworkSsid.begin(), runningScanConfigForPno.hiddenNetworkSsid.end());

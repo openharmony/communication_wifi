@@ -62,6 +62,11 @@ public:
         EXPECT_FALSE(DisableWifi() == WIFI_SUCCESS);
     }
 
+    void EnableSemiWifiSuccess()
+    {
+        EXPECT_FALSE(EnableSemiWifi() == WIFI_SUCCESS);
+    }
+
     void IsWifiActiveEnable()
     {
         EXPECT_FALSE(IsWifiActive() == true);
@@ -88,6 +93,12 @@ public:
         result.timestamp = TIMESTAMP;
         unsigned int mSize = 0;
         EXPECT_TRUE(GetScanInfoList(&result, &mSize) != WIFI_SUCCESS);
+    }
+
+    void GetWifiDetailStateSucess()
+    {
+        WifiDetailState state;
+        EXPECT_TRUE(GetWifiDetailState(&state) != WIFI_SUCCESS);
     }
 
     void GetScanInfoListFail()
@@ -373,6 +384,11 @@ HWTEST_F(WifiCDeviceTest, DisableWifiSuccess, TestSize.Level1)
     DisableWifiSuccess();
 }
 
+HWTEST_F(WifiCDeviceTest, EnableSemiWifiSuccess, TestSize.Level1)
+{
+    EnableSemiWifiSuccess();
+}
+
 HWTEST_F(WifiCDeviceTest, IsWifiActiveEnable, TestSize.Level1)
 {
     IsWifiActiveEnable();
@@ -386,6 +402,11 @@ HWTEST_F(WifiCDeviceTest, ScanSuccess, TestSize.Level1)
 HWTEST_F(WifiCDeviceTest, GetScanInfoListSucess, TestSize.Level1)
 {
     GetScanInfoListSucess();
+}
+
+HWTEST_F(WifiCDeviceTest, GetWifiDetailStateSucess, TestSize.Level1)
+{
+    GetWifiDetailStateSucess();
 }
 
 HWTEST_F(WifiCDeviceTest, GetScanInfoListFail, TestSize.Level1)

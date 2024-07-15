@@ -234,19 +234,24 @@ ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ip
     return p2pService.Hid2dRequestGcIp(gcMac, ipAddr);
 }
 
-void P2pInterface::IncreaseSharedLink(void)
+void P2pInterface::IncreaseSharedLink(int callingUid)
 {
-    p2pService.IncreaseSharedLink();
+    p2pService.IncreaseSharedLink(callingUid);
 }
 
-void P2pInterface::DecreaseSharedLink(void)
+void P2pInterface::DecreaseSharedLink(int callingUid)
 {
-    p2pService.DecreaseSharedLink();
+    p2pService.DecreaseSharedLink(callingUid);
 }
 
 int P2pInterface::GetSharedLinkCount(void)
 {
     return p2pService.GetSharedLinkCount();
+}
+
+ErrCode P2pInterface::HandleBusinessSAException(int systemAbilityId)
+{
+    return p2pService.HandleBusinessSAException(systemAbilityId);
 }
 
 int P2pInterface::GetP2pRecommendChannel(void)
@@ -262,6 +267,21 @@ ErrCode P2pInterface::Hid2dSetUpperScene(const std::string& ifName, const Hid2dU
 ErrCode P2pInterface::MonitorCfgChange(void)
 {
     return p2pService.MonitorCfgChange();
+}
+
+ErrCode P2pInterface::DiscoverPeers(int32_t channelid)
+{
+    return p2pService.DiscoverPeers(channelid);
+}
+
+ErrCode P2pInterface::DisableRandomMac(int setmode)
+{
+    return p2pService.DisableRandomMac(setmode);
+}
+
+ErrCode P2pInterface::SetGcIpAddress(const IpAddrInfo& ipInfo)
+{
+    return p2pService.SetGcIpAddress(ipInfo);
 }
 }  // namespace Wifi
 }  // namespace OHOS

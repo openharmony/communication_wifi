@@ -27,22 +27,22 @@ namespace WifiSupplicantHalInterface {
 
 WifiErrorNo StartSupplicant()
 {
-    return MockWifiStaInterface::GetInstance().pSupplicant.startSipplicant ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pSupplicant.startSipplicant ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo WpaSetCountryCode(const std::string &countryCode)
 {
-    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetCountryCode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetCountryCode ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo WpaSetSuspendMode(bool mode)
 {
-    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo WpaSetPowerMode(bool mode)
 {
-    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetPowerMode ? WIFI_IDL_OPT_OK : WIFI_IDL_OPT_FAILED;
+    return MockWifiStaInterface::GetInstance().pSupplicant.wpaSetPowerMode ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 };
 }  // namespace Wifi

@@ -23,6 +23,8 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
+#endif
+#ifdef FEATURE_STA_SUPPORT
 #include "wifi_country_code_manager.h"
 #endif
 #include "wifi_service_manager.h"
@@ -33,11 +35,20 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiManager");
-
+#ifdef DTFUZZ_TEST
+static WifiManager* gWifiManager = nullptr;
+#endif
 WifiManager &WifiManager::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiManager gWifiManager;
     return gWifiManager;
+#else
+    if (gWifiManager == nullptr) {
+        gWifiManager = new (std::nothrow) WifiManager();
+    }
+    return *gWifiManager;
+#endif
 }
 
 WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0)
@@ -70,6 +81,7 @@ int WifiManager::Init()
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
+    wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
 #endif
     wifiStaManager = std::make_unique<WifiStaManager>();
     wifiScanManager = std::make_unique<WifiScanManager>();
@@ -88,34 +100,31 @@ int WifiManager::Init()
     }
     mInitStatus = INIT_OK;
 
-    if (WifiConfigCenter::GetInstance().GetStaLastRunState()) { /* Automatic startup upon startup */
-        WIFI_LOGI("AutoStartServiceThread");
-        WifiSettings::GetInstance().SetWifiToggledState(true);
+    int lastState = WifiSettings::GetInstance().GetStaLastRunState();
+    if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
+        WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(lastState);
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();
         });
     } else {
-        /**
-         * The sta service automatically starts upon startup. After the sta
-         * service is started, the scanning is directly started.
-         */
         if (WifiSettings::GetInstance().GetScanOnlySwitchState()) {
             WIFI_LOGI("Auto start scan only!");
             wifiTogglerManager->ScanOnlyToggled(1);
         }
-#ifndef DTFUZZ_TEST
-        AutoStartEnhanceService();
-#endif
-        wifiScanManager->CheckAndStartScanService();
     }
+#ifndef DTFUZZ_TEST
     InitPidfile();
+#endif
     return 0;
 }
 
 void WifiManager::Exit()
 {
     WIFI_LOGI("[WifiManager] Exit.");
+    std::unique_lock<std::mutex> lock(initStatusMutex);
+    mInitStatus = INIT_UNKNOWN;
     WifiServiceManager::GetInstance().UninstallAllService();
     PushServiceCloseMsg(WifiCloseServiceCode::SERVICE_THREAD_EXIT);
     if (mCloseServiceThread) {
@@ -146,6 +155,9 @@ void WifiManager::Exit()
 #ifndef OHOS_ARCH_LITE
     if (wifiEventSubscriberManager) {
         wifiEventSubscriberManager.reset();
+    }
+    if (wifiMultiVapManager) {
+        wifiMultiVapManager.reset();
     }
 #endif
     return;
@@ -197,6 +209,17 @@ void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
             });
             break;
 #endif
+        case WifiCloseServiceCode::STA_MSG_OPENED:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiStaManager->DealStaOpened(instId);
+                wifiScanManager->DealStaOpened(instId);
+            });
+            break;
+        case WifiCloseServiceCode::STA_MSG_STOPED:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiStaManager->DealStaStopped(instId);
+            });
+            break;
         case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
             WIFI_LOGI("DealCloseServiceMsg exit!");
             return;
@@ -264,12 +287,17 @@ std::unique_ptr<WifiEventSubscriberManager>& WifiManager::GetWifiEventSubscriber
 {
     return wifiEventSubscriberManager;
 }
+
+std::unique_ptr<WifiMultiVapManager>& WifiManager::GetWifiMultiVapManager()
+{
+    return wifiMultiVapManager;
+}
 #endif
 
 #ifdef FEATURE_HPF_SUPPORT
-void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
+void WifiManager::InstallPacketFilterProgram(int event, int instId)
 {
-    WIFI_LOGD("%{public}s enter screenState: %{public}d, instId: %{public}d", __FUNCTION__, screenState, instId);
+    WIFI_LOGD("%{public}s enter event: %{public}d, instId: %{public}d", __FUNCTION__, event, instId);
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGW("%{public}s pEnhanceService is nullptr", __FUNCTION__);
@@ -289,7 +317,7 @@ void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
     }
     // get number ip and net mask
     IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, instId);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, instId);
     if (ipInfo.ipAddress == 0 || ipInfo.netmask == 0) {
         WIFI_LOGW("%{public}s cannot get device ip address", __FUNCTION__);
     }
@@ -300,7 +328,7 @@ void WifiManager::InstallPacketFilterProgram(int screenState, int instId)
         __FUNCTION__,
         OHOS::Wifi::MacAnonymize(ipAddrStr).c_str(), OHOS::Wifi::MacAnonymize(ipMaskStr).c_str(), netMaskLen);
     if (pEnhanceService->InstallFilterProgram(
-        ipInfo.ipAddress, netMaskLen, macAddr, WIFI_MAC_LEN, screenState) != WIFI_OPT_SUCCESS) {
+        ipInfo.ipAddress, netMaskLen, macAddr, WIFI_MAC_LEN, event) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("%{public}s InstallFilterProgram fail", __FUNCTION__);
         return;
     }

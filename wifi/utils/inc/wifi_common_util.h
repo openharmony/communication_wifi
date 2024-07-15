@@ -79,6 +79,7 @@ static std::map<std::string, int> g_p2pCallBackNameEventIdMap = {
     { EVENT_P2P_CONFIG_CHANGE, WIFI_CBK_MSG_CFG_CHANGE },
     { EVENT_P2P_GC_JOIN_GROUP, WIFI_CBK_MSG_P2P_GC_JOIN_GROUP},
     { EVENT_P2P_GC_LEAVE_GROUP, WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP},
+    { EVENT_P2P_PRIVATE_PEER_DEVICE_CHANGE, WIFI_CBK_MSG_PRIVATE_PEER_CHANGE},
 };
 
 /**
@@ -190,6 +191,16 @@ int64_t GetElapsedMicrosecondsSinceBoot();
  */
 std::string GetBundleName();
 
+
+/**
+ * @Description get bundle name by uid
+ *
+ * @param int - uid
+ * @param std::string - bundle name
+ * @return ErrCode - operation result
+ */
+ErrCode GetBundleNameByUid(const int uid, std::string &bundleName);
+
 /**
  * @Description get calling pid
  *
@@ -264,6 +275,8 @@ void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t
 bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);
 std::string EncodeBase64(const std::vector<uint8_t> &input);
 std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter);
+std::string HexToString(const std::string &str);
+std::string StringToHex(const std::string &data);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

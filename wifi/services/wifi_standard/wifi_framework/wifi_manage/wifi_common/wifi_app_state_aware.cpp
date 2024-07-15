@@ -30,17 +30,16 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+constexpr const int APP_INFO_USERID = 100;
+constexpr int64_t WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY = 3 * 1000;
+#ifdef DTFUZZ_TEST
+static WifiAppStateAware* gWifiAppStateAware = nullptr;
+#endif
 WifiAppStateAware::WifiAppStateAware(int instId)
 {
     GetForegroundApp();
     appChangeEventHandler = std::make_unique<WifiEventHandler>(WIFI_APP_STATE_AWARE_THREAD);
-    if (appChangeEventHandler) {
-        std::function<void()> RegisterAppStateObserverFunc =
-                            std::bind(&WifiAppStateAware::RegisterAppStateObserver, this);
-        appChangeEventHandler->PostSyncTask(RegisterAppStateObserverFunc);
-    } else {
-        WIFI_LOGE("Create event handler failed.");
-    }
+    RegisterAppStateChangedCallback();
     WIFI_LOGI("Register app state observer successful.");
 }
 
@@ -57,8 +56,15 @@ WifiAppStateAware::~WifiAppStateAware()
 
 WifiAppStateAware &WifiAppStateAware::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiAppStateAware gWifiAppStateAware;
     return gWifiAppStateAware;
+#else
+    if (gWifiAppStateAware == nullptr) {
+        gWifiAppStateAware = new (std::nothrow) WifiAppStateAware();
+    }
+    return *gWifiAppStateAware;
+#endif
 }
 
 ErrCode WifiAppStateAware::InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks)
@@ -94,6 +100,47 @@ bool WifiAppStateAware::Connect()
     return true;
 }
 
+void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
+{
+    WIFI_LOGI("%{public}s enter", __func__);
+    if (appChangeEventHandler) {
+        std::function<void()> RegisterAppStateObserverFunc =
+            std::bind(&WifiAppStateAware::RegisterAppStateObserver, this);
+        appChangeEventHandler->PostAsyncTask(RegisterAppStateObserverFunc, delayTime);
+    } else {
+        WIFI_LOGE("%{public}s appChangeEventHandler is null", __func__);
+    }
+}
+
+bool WifiAppStateAware::UpdateCurForegroundAppInfo(const AppExecFwk::AppStateData &appStateData)
+{
+    std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
+    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND) &&
+        !HasRecordInCurForegroundApps(appStateData)) {
+        curForegroundApps_.push_back(appStateData);
+        return true;
+    }
+
+    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_BACKGROUND)) {
+        curForegroundApps_.erase(std::remove_if(curForegroundApps_.begin(), curForegroundApps_.end(),
+            [&](const AppExecFwk::AppStateData &recordApp) {
+                return recordApp.uid == appStateData.uid;
+            }), curForegroundApps_.end());
+        return true;
+    }
+    return false;
+}
+
+bool WifiAppStateAware::HasRecordInCurForegroundApps(const AppExecFwk::AppStateData &appStateData)
+{
+    for (auto recordApp : curForegroundApps_) {
+        if (recordApp.uid == appStateData.uid) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void WifiAppStateAware::RegisterAppStateObserver()
 {
     WIFI_LOGI("%{public}s called", __func__);
@@ -102,14 +149,18 @@ void WifiAppStateAware::RegisterAppStateObserver()
         WIFI_LOGI("mAppStateObserver already registered");
     }
     if (!Connect()) {
+        WIFI_LOGI("%{public}s connect fail", __func__);
+        RegisterAppStateChangedCallback(WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY);
         return;
     }
     mAppStateObserver = sptr<AppStateObserver>(new (std::nothrow) AppStateObserver());
     int ret = appMgrProxy_->RegisterApplicationStateObserver(mAppStateObserver);
     if (ret != ERR_OK) {
         WIFI_LOGE("register application state observer fail, ret = %{public}d", ret);
+        RegisterAppStateChangedCallback(WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY);
         return;
     }
+    GetForegroundApp();
     WIFI_LOGI("register application state observer success.");
 }
 
@@ -126,22 +177,18 @@ void WifiAppStateAware::UnSubscribeAppState()
         appMgrProxy_ = nullptr;
         mAppStateObserver = nullptr;
     }
+    {
+        std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
+        curForegroundApps_.clear();
+    }
     WIFI_LOGI("UnSubscribeAppState end");
     return;
 }
 
 void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId)
 {
-    if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND) &&
-        appStateData.isFocused) {
-        foregroundAppBundleName_ = appStateData.bundleName;
-        foregroundAppUid_ = appStateData.uid;
-    } else if (appStateData.state == static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_BACKGROUND) &&
-        foregroundAppBundleName_ == appStateData.bundleName) {
-        foregroundAppBundleName_ = "";
-        foregroundAppUid_ = -1;
-    } else {
-        WIFI_LOGI("state = %{pubilc}d, not handle.", appStateData.state);
+    if (!UpdateCurForegroundAppInfo(appStateData)) {
+        return;
     }
     WifiProtectManager::GetInstance().OnAppForegroudChanged(appStateData.bundleName, appStateData.state);
 #ifndef OHOS_ARCH_LITE
@@ -153,29 +200,48 @@ void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &a
 void WifiAppStateAware::GetForegroundApp()
 {
     if (!Connect()) {
-        return ;
-    }
-    std::vector<AppExecFwk::AppStateData> fgAppList;
-    appMgrProxy_->GetForegroundApplications(fgAppList);
-    if (fgAppList.size() > 0) {
-        WIFI_LOGI("fgApp: %{public}s, state = %{public}d", fgAppList[0].bundleName.c_str(), fgAppList[0].state);
-        foregroundAppBundleName_ = fgAppList[0].bundleName;
-        foregroundAppUid_ = fgAppList[0].uid;
+        WIFI_LOGE("%{public}s connect failed", __FUNCTION__);
         return;
     }
-    return;
+    std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
+    curForegroundApps_.clear();
+    appMgrProxy_->GetForegroundApplications(curForegroundApps_);
+}
+
+ErrCode WifiAppStateAware::GetProcessRunningInfos(std::vector<AppExecFwk::RunningProcessInfo> &info)
+{
+    if (!Connect()) {
+        WIFI_LOGE("%{public}s connect failed", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    if (appMgrProxy_->GetProcessRunningInfosByUserId(info, APP_INFO_USERID)
+        != AppExecFwk::AppMgrResultCode::RESULT_OK) {
+        WIFI_LOGE("%{public}s GetProcessRunningInfoByUserId failed", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 bool WifiAppStateAware::IsForegroundApp(int32_t uid)
 {
-    WIFI_LOGD("IsForegroundApp %{public}s %{public}d, try uid: %{public}d",
-        foregroundAppBundleName_.c_str(), foregroundAppUid_, uid);
-    return foregroundAppUid_ == uid;
+    std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
+    for (auto foregroudApp : curForegroundApps_) {
+        if (foregroudApp.uid == uid) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool WifiAppStateAware::IsForegroundApp(const std::string &bundleName)
 {
-    return bundleName == foregroundAppBundleName_;
+    std::lock_guard<std::mutex> lock(mutexForCurForegroundApps_);
+    for (auto foregroudApp : curForegroundApps_) {
+        if (foregroudApp.bundleName == bundleName) {
+            return true;
+        }
+    }
+    return false;
 }
 
 std::string WifiAppStateAware::GetRunningProcessNameByPid(const int uid, const int pid)
@@ -211,7 +277,7 @@ void AppStateObserver::OnAppStarted(const AppExecFwk::AppStateData &appStateData
 
 void AppStateObserver::OnAppStopped(const AppExecFwk::AppStateData &appStateData)
 {
-    WIFI_LOGI("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
+    WIFI_LOGD("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
         __func__, appStateData.bundleName.c_str(), appStateData.uid,
         appStateData.state, appStateData.isFocused);
 

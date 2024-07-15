@@ -24,6 +24,10 @@ static void EnableWifiTest()
 {
     EnableWifi();
 }
+static void EnableSemiWifiTest()
+{
+    EnableSemiWifi();
+}
 static void DisableWifiTest()
 {
     DisableWifi();
@@ -239,6 +243,15 @@ static void GetDeviceMacAddressTest(const uint8_t* data, size_t size)
     (void)GetDeviceMacAddress(&result);
 }
 
+static void GetWifiDetailStateTest(const uint8_t* data, size_t size)
+{
+    WifiDetailState state;
+    if (size > 0) {
+        state = static_cast<WifiDetailState>(data[0]);
+    }
+    (void)GetWifiDetailState(&state);
+}
+
 static void GetIpInfoTest(const uint8_t* data, size_t size)
 {
     IpInfo info;
@@ -290,6 +303,7 @@ namespace Wifi {
     {
         EnableWifiTest();
         DisableWifiTest();
+        EnableSemiWifiTest();
         ScanTest();
         RemoveDeviceTest(data, size);
         DisableDeviceConfigTest(data, size);
@@ -305,6 +319,7 @@ namespace Wifi {
         ConnectToDeviceTest(data, size);
         GetLinkedInfoTest(data, size);
         GetDeviceMacAddressTest(data, size);
+        GetWifiDetailStateTest(data, size);
         GetIpInfoTest(data, size);
         SetLowLatencyModeTest(data, size);
         Get5GHzChannelListTest(data, size);

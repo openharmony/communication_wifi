@@ -408,10 +408,31 @@ public:
      */
     bool IsRemoteDied(void) override;
 
+    /**
+     * @Description Discover p2p device
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Disable random mac
+     *
+     * @return ErrCode - operate result
+     */
+    ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode CheckCanUseP2p() override;
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);
     bool IsP2pServiceRunning();
+    bool IsCallingAllowed();
     static void SaBasicDump(std::string& result);
 
 private:

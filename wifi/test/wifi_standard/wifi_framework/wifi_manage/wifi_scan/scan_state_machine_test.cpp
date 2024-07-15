@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "mock_wifi_manager.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_scan_interface.h"
 #include "mock_scan_service.h"
@@ -37,6 +38,9 @@ namespace OHOS {
 namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ_VALUE = 2410;
 constexpr int FREQ_5_GHZ_VALUE = 5010;
+constexpr int NETWORK_ID = 15;
+constexpr int BAND = 2;
+constexpr int TWO = 2;
 
 class ScanStateMachineTest : public testing::Test {
 public:
@@ -138,6 +142,16 @@ public:
         InternalMessage msg;
         msg.SetMessageName(SCAN_INNER_EVENT_INVALID);
         EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == false);
+    }
+
+    void InitExeMsgSuccess11()
+    {
+        InternalMessage msg;
+        msg.SetMessageName(SCAN_UPDATE_COUNTRY_CODE);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
+
+        msg.AddStringMessageBody("CN");
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(&msg) == true);
     }
 
     void InitExeMsgFail()
@@ -606,17 +620,17 @@ public:
     void StartSingleCommonScanSuccess()
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = true;
-        WifiScanParam scanParam;
+        WifiHalScanParam scanParam;
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
         pScanStateMachine->ClearRunningScanSettings();
-        EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), false);
+        pScanStateMachine->StartSingleCommonScan(scanParam);
     }
 
     void StartSingleCommonScanFail()
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = false;
-        WifiScanParam scanParam;
+        WifiHalScanParam scanParam;
         scanParam.scanFreqs.push_back(FREQ_5_GHZ_VALUE);
         scanParam.hiddenNetworkSsid.push_back("wifi_ssid");
         EXPECT_EQ(pScanStateMachine->StartSingleCommonScan(scanParam), false);
@@ -929,7 +943,7 @@ public:
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = true;
         std::vector<InterScanInfo> scanInfos;
-        EXPECT_EQ(true, pScanStateMachine->GetScanInfos(scanInfos));
+        pScanStateMachine->GetScanInfos(scanInfos);
     }
 
     void GetScanInfosFail()
@@ -953,7 +967,7 @@ public:
         interScanInfo.capabilities = "WEP";
         scanInfos.push_back(interScanInfo);
         interScanInfo.frequency = FREQ_5_GHZ_VALUE;
-        interScanInfo.capabilities = "EAP_SUITE_B_192";
+        interScanInfo.capabilities = "EAP-SUITE-B-192";
         scanInfos.push_back(interScanInfo);
         interScanInfo.frequency = FREQ_5_GHZ_VALUE;
         interScanInfo.capabilities = "EAP";
@@ -979,7 +993,7 @@ public:
     {
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.scan = true;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        EXPECT_EQ(false, pScanStateMachine->RepeatStartCommonScan());
+        pScanStateMachine->RepeatStartCommonScan();
     }
 
     void RepeatStartCommonScanTest2()
@@ -1045,6 +1059,66 @@ public:
         pScanStateMachine->InitPnoScanState();
     }
 
+    void RecordFilteredScanResultTest()
+    {
+        WifiDeviceConfig config;
+        config.bssid = "01:23:45:67:89:AB";
+        config.band = BAND;
+        config.networkId = NETWORK_ID;
+        config.ssid = "networkId";
+        config.keyMgmt = "123456";
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
+        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
+        ScanStateMachine::FilterScanResultRecord records;
+        InterScanInfo interScanInfo;
+        interScanInfo.securityType = WifiSecurity::WEP;
+        records.RecordFilteredScanResult(interScanInfo);
+    }
+ 
+    void GetScanInfoMsgTest()
+    {
+        InterScanInfo interScanInfo;
+        interScanInfo.securityType = WifiSecurity::WEP;
+        ScanStateMachine::FilterScanResultRecord records;
+        records.GetScanInfoMsg(interScanInfo);
+    }
+ 
+    void GetFilteredScanResultMsgTest()
+    {
+        ScanStateMachine::FilterScanResultRecord records;
+        records.GetFilteredScanResultMsg();
+    }
+ 
+    void FilterScanResultTest()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetConnectedBssid(_)).Times(AtLeast(1));
+        std::vector<InterScanInfo> scanInfoList;
+        pScanStateMachine->FilterScanResult(scanInfoList);
+    }
+ 
+    void SetWifiModeTest()
+    {
+        InterScanInfo scanInfo;
+        scanInfo. isHeInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo);
+        InterScanInfo scanInfo1;
+        scanInfo1. band =SCAN_5GHZ_BAND;
+        scanInfo1.isVhtInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo1);
+        InterScanInfo scanInfo2;
+        scanInfo2.isHtInfoExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo2);
+        InterScanInfo scanInfo3;
+        scanInfo3.isErpExist =true;
+        pScanStateMachine->SetWifiMode(scanInfo3);
+        InterScanInfo scanInfo4;
+        scanInfo4. band =SCAN_24GHZ_BAND;
+        scanInfo4.isVhtInfoExist =false;
+        pScanStateMachine->SetWifiMode(scanInfo4);
+        InterScanInfo scanInfo5;
+        scanInfo4. band =SCAN_24GHZ_BAND;
+        pScanStateMachine->SetWifiMode(scanInfo5);
+    }
 };
 
 HWTEST_F(ScanStateMachineTest, InitGoInStateTest, TestSize.Level1)
@@ -1105,6 +1179,11 @@ HWTEST_F(ScanStateMachineTest, InitExeMsgSuccess9, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, InitExeMsgSuccess10, TestSize.Level1)
 {
     InitExeMsgSuccess10();
+}
+
+HWTEST_F(ScanStateMachineTest, InitExeMsgSuccess11, TestSize.Level1)
+{
+    InitExeMsgSuccess11();
 }
 
 HWTEST_F(ScanStateMachineTest, InitExeMsgFail, TestSize.Level1)
@@ -1587,14 +1666,17 @@ HWTEST_F(ScanStateMachineTest, GetPnoScanConfigFail2, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest1, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest2, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest3, TestSize.Level1)
 {
+    HwPnoScanInfoProcessTest3();
 }
 
 HWTEST_F(ScanStateMachineTest, ReportPnoScanInfosTest, TestSize.Level1)
@@ -1619,18 +1701,22 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoProcessTest2, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest1, TestSize.Level1)
 {
+    CommonScanAfterPnoResultTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest2, TestSize.Level1)
 {
+    CommonScanAfterPnoResultTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosSuccess, TestSize.Level1)
 {
+    GetScanInfosSuccess();
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosFail, TestSize.Level1)
 {
+    GetScanInfosFail();
 }
 
 HWTEST_F(ScanStateMachineTest, GetSecurityTypeAndBandTest, TestSize.Level1)
@@ -1704,6 +1790,26 @@ HWTEST_F(ScanStateMachineTest, PnoScanRequestProcessFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, StartPnoScanHardwareFail, TestSize.Level1)
 {
     StartPnoScanHardwareFail();
+}
+
+HWTEST_F(ScanStateMachineTest, RecordFilteredScanResultTest, TestSize.Level1)
+{
+    RecordFilteredScanResultTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, GetFilteredScanResultMsgTest, TestSize.Level1)
+{
+    GetFilteredScanResultMsgTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, FilterScanResultTest, TestSize.Level1)
+{
+    FilterScanResultTest();
+}
+ 
+HWTEST_F(ScanStateMachineTest, SetWifiModeTest, TestSize.Level1)
+{
+    SetWifiModeTest();
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -23,13 +23,16 @@
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 #include "wifi_p2p_msg.h"
 #include "wifi_common_msg.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #endif
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
 namespace OHOS {
 namespace Wifi {
+#ifdef DTFUZZ_TEST
+static WifiInternalEventDispatcher* gWifiEventBroadcast = nullptr;
+#endif
 std::set<std::int32_t> g_CallbackEventChkSysAppList = {
     WIFI_CBK_MSG_HOTSPOT_STATE_JOIN,
     WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE,
@@ -105,8 +108,15 @@ CallbackEventPermissionMap g_CallbackEventPermissionMap = {
 
 WifiInternalEventDispatcher &WifiInternalEventDispatcher::GetInstance()
 {
+#ifndef DTFUZZ_TEST
     static WifiInternalEventDispatcher gWifiEventBroadcast;
     return gWifiEventBroadcast;
+#else
+    if (gWifiEventBroadcast == nullptr) {
+        gWifiEventBroadcast = new (std::nothrow) WifiInternalEventDispatcher();
+    }
+    return *gWifiEventBroadcast;
+#endif
 }
 
 WifiInternalEventDispatcher::WifiInternalEventDispatcher()
@@ -383,9 +393,9 @@ ErrCode WifiInternalEventDispatcher::AddHotspotCallback(
 int WifiInternalEventDispatcher::RemoveHotspotCallback(const sptr<IRemoteObject> &remote, int id)
 {
     if (remote != nullptr) {
+        std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
         auto iter = mHotspotCallbacks.find(id);
         if (iter != mHotspotCallbacks.end()) {
-            std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
             auto item = iter->second.find(remote);
             if (item != iter->second.end()) {
                 iter->second.erase(item);
@@ -416,9 +426,9 @@ sptr<IWifiHotspotCallback> WifiInternalEventDispatcher::GetSingleHotspotCallback
 bool WifiInternalEventDispatcher::HasHotspotRemote(const sptr<IRemoteObject> &remote, int id)
 {
     if (remote != nullptr) {
+        std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
         auto iter = mHotspotCallbacks.find(id);
         if (iter != mHotspotCallbacks.end()) {
-            std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
             if (iter->second.find(remote) != iter->second.end()) {
                 return true;
             }
@@ -832,7 +842,7 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
         macAddrInfo.bssid = iter->GetDeviceAddress();
         macAddrInfo.bssidType = iter->GetDeviceAddressType();
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("%{public}s: no record found, bssid:%{private}s, bssidType:%{public}d",
                 __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -907,6 +917,9 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             break;
         case WIFI_CBK_MSG_CFG_CHANGE:
             SendConfigChangeEvent(callback, msg.cfgInfo);
+            break;
+        case WIFI_CBK_MSG_PRIVATE_PEER_CHANGE:
+            callback->OnP2pPrivatePeersChanged(msg.privateWfdInfo);
             break;
         default:
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
@@ -1008,7 +1021,7 @@ bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackE
 void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     std::unique_lock<std::mutex> lock(mPidFrozenMutex);
-    WIFI_LOGI("%{public}s, list size:%{public}u, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
+    WIFI_LOGD("%{public}s, list size:%{public}zu, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
     for (auto itr : pidList) {
         if (isFrozen) {
             frozenPidList.insert(itr);
@@ -1016,7 +1029,7 @@ void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFro
             frozenPidList.erase(itr);
         }
     }
-    WIFI_LOGI("%{public}s finish, size:%{public}u", __func__, frozenPidList.size());
+    WIFI_LOGD("%{public}s finish, size:%{public}zu", __func__, frozenPidList.size());
 }
 
 void WifiInternalEventDispatcher::ResetAllFrozenApp()
@@ -1028,6 +1041,7 @@ void WifiInternalEventDispatcher::ResetAllFrozenApp()
 
 bool WifiInternalEventDispatcher::IsAppFrozen(int pid)
 {
+    std::unique_lock<std::mutex> lock(mPidFrozenMutex);
     auto it = frozenPidList.find(pid);
     if (it != frozenPidList.end()) {
         return true;

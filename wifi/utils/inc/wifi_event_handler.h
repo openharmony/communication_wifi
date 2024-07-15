@@ -18,6 +18,8 @@
 
 #include <string>
 #include <memory>
+#include <chrono>
+#include <future>
 
 namespace OHOS {
 namespace Wifi {
@@ -25,7 +27,7 @@ class WifiEventHandler {
 public:
     using Callback = std::function<void()>;
 
-    explicit WifiEventHandler(const std::string &threadName);
+    explicit WifiEventHandler(const std::string &threadName, const Callback &timeOutFunc = nullptr);
     ~WifiEventHandler();
 /**
  * @submit sync task to Handler
@@ -57,6 +59,15 @@ public:
  * @param name - Describer of task
  */
     void RemoveAsyncTask(const std::string &name);
+
+    /**
+    * @submit sync timeout task to Handler
+    *
+    * @param callback - Input task
+    * @param waitTime - Wait time(ms) excute task
+    * @return bool - true: excute task success, false: excute task timeout
+    */
+    static bool PostSyncTimeOutTask(const Callback &callback, uint64_t waitTime = 5000);
 
 private:
     class WifiEventHandlerImpl;

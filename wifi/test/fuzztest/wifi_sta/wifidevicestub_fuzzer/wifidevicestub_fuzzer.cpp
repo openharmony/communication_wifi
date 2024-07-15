@@ -32,37 +32,76 @@
 #include "wifi_config_center.h"
 #include "wifi_settings.h"
 #include "wifi_common_def.h"
+#include "wifi_manager.h"
+#include "wifi_net_agent.h"
 
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
+constexpr int TWO = 2;
+constexpr int FIVE = 5;
+constexpr int NINE = 9;
 static bool g_isInsted = false;
 static std::mutex g_instanceLock;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiDeviceService";
-static sptr<WifiDeviceMgrServiceImpl> pWifiDeviceMgrServiceImpl = nullptr;
-static sptr<WifiDeviceServiceImpl> pWifiDeviceServiceImpl = nullptr;
+const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE_EX = u"ohos.wifi.IWifiDeviceMgr";
+std::shared_ptr<WifiDeviceServiceImpl> pWifiDeviceServiceImpl = std::make_shared<WifiDeviceServiceImpl>();
+std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
+sptr<WifiDeviceMgrStub> pWifiDeviceMgrStub = WifiDeviceMgrServiceImpl::GetInstance();
+
+class IWifiDeviceCallBackMock : public IWifiDeviceCallBack {
+public:
+    IWifiDeviceCallBackMock()
+    {
+        LOGE("IWifiDeviceCallBackMock");
+    }
+
+    ~IWifiDeviceCallBackMock()
+    {
+        LOGE("~IWifiDeviceCallBackMock");
+    }
+
+public:
+    void OnWifiStateChanged(int state) override
+    {
+        LOGE("OnWifiStateChanged test");
+    }
+
+    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override
+    {
+        LOGE("OnWifiConnectionChanged test");
+    }
+
+    void OnWifiRssiChanged(int rssi) override
+    {
+        LOGE("OnWifiRssiChanged test");
+    }
+
+    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override
+    {
+        LOGE("OnWifiWpsStateChanged test");
+    }
+
+    void OnStreamChanged(int direction) override
+    {
+        LOGE("OnStreamChanged test");
+    }
+
+    void OnDeviceConfigChanged(ConfigChange value) override
+    {
+        LOGE("OnDeviceConfigChanged test");
+    }
+
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
+    {
+        return nullptr;
+    }
+};
 
 bool Init()
 {
     if (!g_isInsted) {
-        pWifiDeviceMgrServiceImpl = WifiDeviceMgrServiceImpl::GetInstance();
-        if (!pWifiDeviceMgrServiceImpl) {
-            LOGE("Init failed pWifiDeviceMgrServiceImpl is nullptr!");
-            return false;
-        }
-        pWifiDeviceMgrServiceImpl->OnStart();
-        sptr<IRemoteObject> remote = pWifiDeviceMgrServiceImpl->GetWifiRemote(0);
-        if (!remote) {
-            LOGE("Init failed remote is nullptr!");
-            return false;
-        }
-        pWifiDeviceServiceImpl = iface_cast<WifiDeviceServiceImpl>(remote);
-        if (!pWifiDeviceServiceImpl) {
-            LOGE("Init failed pWifiDeviceServiceImpl is nullptr!");
-            return false;
-        }
         if (WifiConfigCenter::GetInstance().GetWifiMidState(0) != WifiOprMidState::RUNNING) {
-            LOGE("Init setmidstate!");
             WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::RUNNING, 0);
         }
         g_isInsted = true;
@@ -81,10 +120,9 @@ bool OnRemoteRequest(uint32_t code, MessageParcel &data)
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = pWifiDeviceServiceImpl->OnRemoteRequest(code, data, reply, option);
-    return ret;
+    pWifiDeviceStub->OnRemoteRequest(code, data, reply, option);
+    return true;
 }
-
 
 void OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
 {
@@ -602,6 +640,401 @@ void OnEnableHiLinkHandshakeFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), datas);
 }
 
+void OnSetSatelliteStateFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE), datas);
+}
+
+void OnFactoryResetFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET), datas);
+}
+
+void OnEnableWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI), datas);
+}
+
+void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI), datas);
+}
+
+void OnGetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
+}
+
+void OnEnableSemiWifiFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI), datas);
+}
+
+void OnGetWifiDetailStateFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), datas);
+}
+
+void OnSetTxPowerFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), datas);
+}
+
+void OnSetLowTxPowerTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER), datas);
+}
+
+void DoSomethingDeviceMgrStubTest(const uint8_t* data, size_t size)
+{
+    std::string networkName = "backup";
+    std::string name = "restore";
+    uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_MGR_GET_DEVICE_SERVICE);
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE_EX);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    WifiDeviceMgrServiceImpl mWifiDeviceMgrServiceImpl;
+    pWifiDeviceMgrStub->OnRemoteRequest(code, datas, reply, option);
+    mWifiDeviceMgrServiceImpl.OnExtension(networkName, datas, reply);
+    mWifiDeviceMgrServiceImpl.OnExtension(name, datas, reply);
+}
+
+bool WifiFuzzTest()
+{
+    return true;
+}
+
+void WifiDeviceServiceImplTest(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    int networkId = static_cast<int>(data[index++]);
+    int uid = static_cast<int>(data[index++]);
+    std::string networkName = std::string(reinterpret_cast<const char*>(data), size);
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
+    bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
+    WifiDeviceServiceImpl mWifiDeviceServiceImpl;
+    MessageParcel datas;
+    WifiDeviceConfig config;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+
+    mWifiDeviceServiceImpl.DeregisterAutoJoinCondition(networkName);
+    mWifiDeviceServiceImpl.DeregisterFilterBuilder(filterTag, networkName);
+    mWifiDeviceServiceImpl.RegisterAutoJoinCondition(networkName, WifiFuzzTest);
+    mWifiDeviceServiceImpl.HilinkGetMacAddress(config, config.ssid);
+    mWifiDeviceServiceImpl.SaBasicDump(config.ssid);
+    mWifiDeviceServiceImpl.IsScanServiceRunning();
+    mWifiDeviceServiceImpl.StartRoamToNetwork(networkId, networkName, attemptEnable);
+    mWifiDeviceServiceImpl.IsWifiBrokerProcess(uid);
+    mWifiDeviceServiceImpl.CheckConfigPwd(config);
+    mWifiDeviceServiceImpl.CheckConfigEap(config);
+    pWifiDeviceStub->WriteEapConfig(datas, config.wifiEapConfig);
+    pWifiDeviceStub->WriteWifiDeviceConfig(datas, config);
+}
+
+void CheckConfigEapTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int index = 0;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    std::string keyMgmtWapiPsk = "WPA-PSK";
+    config.keyMgmt = keyMgmtWapiPsk;
+    pWifiDeviceServiceImpl->CheckConfigEap(config);
+    config.keyMgmt.clear();
+    std::string eapMethodPeap = "PEAP";
+    config.wifiEapConfig.eap = EAP_METHOD_PEAP;
+    pWifiDeviceServiceImpl->CheckConfigEap(config);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiDeviceServiceImpl->CheckConfigEap(config);
+}
+
+void CheckConfigWapiTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int index = 0;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    std::string keyMgmtwapiPsk = "WAPI-PSK";
+    config.keyMgmt = keyMgmtwapiPsk;
+    pWifiDeviceServiceImpl->CheckConfigWapi(config);
+    config.keyMgmt.clear();
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiDeviceServiceImpl->CheckConfigWapi(config);
+}
+
+void CheckConfigPwdTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int index = 0;
+    std::string ssidLength = "name";
+    config.ssid = ssidLength;
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiDeviceServiceImpl->CheckConfigPwd(config);
+}
+
+void InitWifiBrokerProcessInfoTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int index = 0;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    std::string ancoServiceBroker = "anco_service_broker";
+    config.callProcessName = ancoServiceBroker;
+    pWifiDeviceServiceImpl->InitWifiBrokerProcessInfo(config);
+}
+
+void SetWifiConnectedModeTest(const uint8_t* data, size_t size)
+{
+    pWifiDeviceServiceImpl->SetWifiConnectedMode();
+}
+
+void RemoveCandidateConfigFuzzTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int index = 0;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.callProcessName = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiDeviceServiceImpl->RemoveCandidateConfig(config);
+}
+
+void RemoveCandidateConfigTest(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    int networkId = static_cast<int>(data[index++]);
+    pWifiDeviceServiceImpl->RemoveCandidateConfig(networkId);
+}
+
+void AddDeviceConfigTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int result = 0;
+    int index = 0;
+    bool isCandidate = (static_cast<int>(data[0]) % TWO) ? true : false;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.callProcessName = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiDeviceServiceImpl->AddDeviceConfig(config, result, isCandidate);
+}
+
+void ConnectToNetworkTest(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    int networkId = static_cast<int>(data[index++]);
+    bool isCandidate = (static_cast<int>(data[0]) % TWO) ? true : false;
+    pWifiDeviceServiceImpl->ConnectToNetwork(networkId, isCandidate);
+}
+
+void ConnectToDeviceTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int index = 0;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiDeviceServiceImpl->ConnectToDevice(config);
+}
+
+void SaBasicDumpTest(const uint8_t* data, size_t size)
+{
+    WifiLinkedInfo info;
+    info.connState = static_cast<ConnState>(static_cast<int>(data[0]) % NINE);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(info, 0);
+    std::string result;
+    pWifiDeviceServiceImpl->SaBasicDump(result);
+}
+
+void IsRemoteDiedTest(const uint8_t* data, size_t size)
+{
+    pWifiDeviceServiceImpl->IsRemoteDied();
+}
+
+void IsBandTypeSupportedTest(const uint8_t* data, size_t size)
+{
+    int bandType = static_cast<int>(data[0]);
+    bool supported = (static_cast<int>(data[0]) % TWO) ? true : false;
+    pWifiDeviceServiceImpl->IsBandTypeSupported(bandType, supported);
+}
+
+void RegisterCallBackTest(const uint8_t* data, size_t size)
+{
+    std::vector<std::string> event;
+    sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
+    pWifiDeviceServiceImpl->RegisterCallBack(callBack, event);
+    pWifiDeviceServiceImpl->RegisterCallBack(nullptr, event);
+}
+
+void CheckCanEnableWifiTest(const uint8_t* data, size_t size)
+{
+    pWifiDeviceServiceImpl->CheckCanEnableWifi();
+}
+
+void HilinkGetMacAddressTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int index = 0;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    std::string currentMac = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiDeviceServiceImpl->HilinkGetMacAddress(config, currentMac);
+}
+
+void EnableHiLinkHandshakeTest(const uint8_t* data, size_t size)
+{
+    WifiDeviceConfig config;
+    int index = 0;
+    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
+    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    bool uiFlag = (static_cast<int>(data[0]) % TWO) ? true : false;
+    std::string bssid = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiDeviceServiceImpl->EnableHiLinkHandshake(uiFlag, bssid, config);
+}
+
+void RegisterFilterBuilderTest(const uint8_t* data, size_t size)
+{
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
+    std::string bssid = std::string(reinterpret_cast<const char*>(data), size);
+    FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
+    pWifiDeviceServiceImpl->RegisterFilterBuilder(filterTag, bssid, filterBuilder);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -650,6 +1083,32 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetChangeDeviceConfigFuzzTest(data, size);
     OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
     OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
+    OHOS::Wifi::OnGetWifiDetailStateFuzzTest(data, size);
+    OHOS::Wifi::OnSetTxPowerFuzzTest(data, size);
+    OHOS::Wifi::OnSetSatelliteStateFuzzTest(data, size);
+    OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
+    OHOS::Wifi::OnSetLowTxPowerTest(data, size);
+    OHOS::Wifi::DoSomethingDeviceMgrStubTest(data, size);
+    OHOS::Wifi::WifiDeviceServiceImplTest(data, size);
+    OHOS::Wifi::CheckConfigEapTest(data, size);
+    OHOS::Wifi::CheckConfigWapiTest(data, size);
+    OHOS::Wifi::CheckConfigPwdTest(data, size);
+    OHOS::Wifi::InitWifiBrokerProcessInfoTest(data, size);
+    OHOS::Wifi::SetWifiConnectedModeTest(data, size);
+    OHOS::Wifi::RemoveCandidateConfigFuzzTest(data, size);
+    OHOS::Wifi::RemoveCandidateConfigTest(data, size);
+    OHOS::Wifi::AddDeviceConfigTest(data, size);
+    OHOS::Wifi::ConnectToNetworkTest(data, size);
+    OHOS::Wifi::ConnectToDeviceTest(data, size);
+    OHOS::Wifi::SaBasicDumpTest(data, size);
+    OHOS::Wifi::IsRemoteDiedTest(data, size);
+    OHOS::Wifi::IsBandTypeSupportedTest(data, size);
+    OHOS::Wifi::RegisterCallBackTest(data, size);
+    OHOS::Wifi::CheckCanEnableWifiTest(data, size);
+    OHOS::Wifi::HilinkGetMacAddressTest(data, size);
+    OHOS::Wifi::EnableHiLinkHandshakeTest(data, size);
+    OHOS::Wifi::RegisterFilterBuilderTest(data, size);
+    sleep(4);
     return 0;
 }
 }

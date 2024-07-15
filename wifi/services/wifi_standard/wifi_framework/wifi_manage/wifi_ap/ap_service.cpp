@@ -17,7 +17,8 @@
 #include <unistd.h>
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_channel_helper.h"
+#include "wifi_config_center.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_country_code_manager.h"
 
@@ -138,7 +139,7 @@ ErrCode ApService::DisconnetStation(const StationInfo &stationInfo) const
 ErrCode ApService::GetStationList(std::vector<StationInfo> &result) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    WifiSettings::GetInstance().GetStationList(result);
+    WifiConfigCenter::GetInstance().GetStationList(result);
     if (result.empty()) {
         WIFI_LOGW("GetStationList is empty.");
         return ErrCode::WIFI_OPT_SUCCESS;
@@ -165,7 +166,7 @@ ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     std::vector<int> allowed5GFreq;
     std::vector<int> allowed2GFreq;
-    if (WifiSettings::GetInstance().GetValidBands(bands) != 0) {
+    if (WifiChannelHelper::GetInstance().GetValidBands(bands) != 0) {
         WIFI_LOGE("%{public}s, GetValidBands failed!", __func__);
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -175,11 +176,11 @@ ErrCode ApService::GetValidBands(std::vector<BandType> &bands)
 
     /* Get freqs from hal */
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(
-        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
+        WifiConfigCenter::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 2.4G channel", __func__);
     }
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(
-        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
+        WifiConfigCenter::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 5G channel", __func__);
     }
     if (allowed2GFreq.size() > 0) {
@@ -199,7 +200,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     ChannelsTable channelsInfo;
-    if (WifiSettings::GetInstance().GetValidChannels(channelsInfo) != 0) {
+    if (WifiChannelHelper::GetInstance().GetValidChannels(channelsInfo) != 0) {
         WIFI_LOGE("Failed to obtain channels from the WifiSettings.");
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -218,11 +219,11 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
     std::vector<int32_t> allowed5GFreq, allowed2GFreq;
     std::vector<int32_t> allowed5GChan, allowed2GChan;
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(
-        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
+        WifiConfigCenter::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_2GHZ), allowed2GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 2.4G channel", __func__);
     }
     if (WifiApHalInterface::GetInstance().GetFrequenciesByBand(
-        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
+        WifiConfigCenter::GetInstance().GetApIfaceName(), static_cast<int>(BandType::BAND_5GHZ), allowed5GFreq)) {
         WIFI_LOGW("%{public}s, fail to get 5G channel", __func__);
     }
     if (allowed2GFreq.size() == 0) {
@@ -234,7 +235,7 @@ ErrCode ApService::GetValidChannels(BandType band, std::vector<int32_t> &validCh
     ChannelsTable ChanTbs;
     ChanTbs[BandType::BAND_2GHZ] = allowed2GChan;
     ChanTbs[BandType::BAND_5GHZ] = allowed5GChan;
-    if (WifiSettings::GetInstance().SetValidChannels(ChanTbs)) {
+    if (WifiChannelHelper::GetInstance().SetValidChannels(ChanTbs)) {
         WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
     }
     if (band == BandType::BAND_2GHZ || band == BandType::BAND_5GHZ) {
@@ -268,7 +269,7 @@ ErrCode ApService::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelLis
 ErrCode ApService::GetPowerModel(PowerModel& model)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    WifiSettings::GetInstance().GetPowerModel(model, m_id);
+    WifiConfigCenter::GetInstance().GetPowerModel(model, m_id);
     LOGI("ApService::GetPowerModel, model=[%{public}d]", static_cast<int>(model));
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -278,12 +279,12 @@ ErrCode ApService::SetPowerModel(const PowerModel& model)
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     LOGI("Enter ApService::SetPowerModel, model=[%d]", static_cast<int>(model));
     if (WifiApHalInterface::GetInstance().SetPowerModel(
-        WifiSettings::GetInstance().GetApIfaceName(), static_cast<int>(model)) != WIFI_IDL_OPT_OK) {
+        WifiConfigCenter::GetInstance().GetApIfaceName(), static_cast<int>(model)) != WIFI_HAL_OPT_OK) {
         LOGE("SetPowerModel() failed!");
         return WIFI_OPT_FAILED;
     }
     LOGI("SetPowerModel() succeed!");
-    WifiSettings::GetInstance().SetPowerModel(model);
+    WifiConfigCenter::GetInstance().SetPowerModel(model);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

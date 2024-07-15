@@ -240,6 +240,15 @@ static napi_value ProxyMethodInit(napi_env env)
         static_cast<int>(ConfigureProxyMethod::MANUALCONFIGUE), "METHOD_MANUAL");
     return proxyMethod;
 }
+
+static napi_value WapiPskTypeInit(napi_env env)
+{
+    napi_value wapiPskType = nullptr;
+    napi_create_object(env, &wapiPskType);
+    SetNamedPropertyByInteger(env, wapiPskType, static_cast<int>(WapiPskType::WAPI_PSK_ASCII), "WAPI_PSK_ASCII");
+    SetNamedPropertyByInteger(env, wapiPskType, static_cast<int>(WapiPskType::WAPI_PSK_HEX), "WAPI_PSK_HEX");
+    return wapiPskType;
+}
 #endif
 
 static napi_value PropertyValueInit(napi_env env, napi_value exports)
@@ -262,6 +271,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value WifiStandardObj = WifiStandardInit(env);
     napi_value bandTypeObj = WifiBandTypeInit(env);
     napi_value proxyMethodObj = ProxyMethodInit(env);
+    napi_value wapiPskTypeObj = WapiPskTypeInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
@@ -271,6 +281,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("WifiStandard", WifiStandardObj),
         DECLARE_NAPI_PROPERTY("WifiBandType", bandTypeObj),
         DECLARE_NAPI_PROPERTY("ProxyMethod", proxyMethodObj),
+        DECLARE_NAPI_PROPERTY("WapiPskType", wapiPskTypeObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
@@ -295,6 +306,7 @@ static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("enableWifi", EnableWifi),
         DECLARE_NAPI_FUNCTION("disableWifi", DisableWifi),
+        DECLARE_NAPI_FUNCTION("enableSemiWifi", EnableSemiWifi),
         DECLARE_NAPI_FUNCTION("isWifiActive", IsWifiActive),
         DECLARE_NAPI_FUNCTION("scan", Scan),
         DECLARE_NAPI_FUNCTION("startScan", StartScan),
@@ -328,6 +340,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("removeAllDeviceConfigs", RemoveAllNetwork),
         DECLARE_NAPI_FUNCTION("disableNetwork", DisableNetwork),
         DECLARE_NAPI_FUNCTION("disableDeviceConfig", DisableNetwork),
+        DECLARE_NAPI_FUNCTION("getWifiDetailState", GetWifiDetailState),
         DECLARE_NAPI_FUNCTION("getCountryCode", GetCountryCode),
         DECLARE_NAPI_FUNCTION("getDeviceConfigs", GetDeviceConfigs),
         DECLARE_NAPI_FUNCTION("updateNetwork", UpdateNetwork),

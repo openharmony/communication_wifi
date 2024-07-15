@@ -19,9 +19,9 @@
 #include "context.h"
 #include "i_wifi_public_func.h"
 #include "serial.h"
-#include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
+#include "wifi_native_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlWifiChip"
@@ -46,12 +46,12 @@ WifiErrorNo GetChipId(int32_t *id)
     WriteBegin(context, 0);
     WriteFunc(context, "GetChipId");
     WriteEnd(context);
-    if (RpcClientCall(client, "GetChipId") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetChipId") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetChipId deal failed!");
     } else {
         ReadInt(context, id);
@@ -70,12 +70,12 @@ WifiErrorNo CreateIface(int32_t type, IWifiIface *iface)
     WriteFunc(context, "CreateIface");
     WriteInt(context, type);
     WriteEnd(context);
-    if (RpcClientCall(client, "CreateIface") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "CreateIface") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server CreateIface deal failed!");
     } else {
         /* read IWifiIface struct */
@@ -98,12 +98,12 @@ WifiErrorNo GetIface(const char *ifname, IWifiIface *iface)
     WriteFunc(context, "GetIface");
     WriteStr(context, ifname);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetIface") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetIface") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetIface deal failed!");
     } else {
         /*  read IWifiIface struct */
@@ -127,12 +127,12 @@ WifiErrorNo GetIfaceNames(int32_t type, char *ifaces, int32_t size)
     WriteInt(context, type);
     WriteInt(context, size);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetIfaceNames") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetIfaceNames") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetIfaceNames deal failed!");
     } else {
         ReadStr(context, ifaces, size);
@@ -151,10 +151,10 @@ WifiErrorNo RemoveIface(const char *ifname)
     WriteFunc(context, "RemoveIface");
     WriteStr(context, ifname);
     WriteEnd(context);
-    if (RpcClientCall(client, "RemoveIface") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "RemoveIface") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -169,12 +169,12 @@ WifiErrorNo GetCapabilities(uint32_t *capabilities)
     WriteBegin(context, 0);
     WriteFunc(context, "GetCapabilities");
     WriteEnd(context);
-    if (RpcClientCall(client, "GetCapabilities") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetCapabilities") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetCapabilities deal failed!");
     } else {
         ReadInt(context, (int *)capabilities);
@@ -193,18 +193,18 @@ WifiErrorNo GetSupportedComboModes(int32_t *modes, int32_t *size)
     WriteFunc(context, "GetSupportedComboModes");
     WriteInt(context, *size);
     WriteEnd(context);
-    if (RpcClientCall(client, "GetSupportedComboModes") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetSupportedComboModes") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetSupportedComboModes deal failed!");
     } else {
         ReadInt(context, size);
         if (*size > WIFI_MAX_CHIP_IDS) {
             LOGE("GetSupportedComboModes fail, size error: %{public}d", *size);
-            return WIFI_IDL_OPT_FAILED;
+            return WIFI_HAL_OPT_FAILED;
         }
         for (int i = 0; i < *size; ++i) {
             ReadInt(context, modes + i);
@@ -224,10 +224,10 @@ WifiErrorNo ConfigComboModes(int32_t mode)
     WriteFunc(context, "ConfigComboModes");
     WriteInt(context, mode);
     WriteEnd(context);
-    if (RpcClientCall(client, "ConfigComboModes") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "ConfigComboModes") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -242,12 +242,12 @@ WifiErrorNo GetComboModes(int32_t *id)
     WriteBegin(context, 0);
     WriteFunc(context, "GetComboModes");
     WriteEnd(context);
-    if (RpcClientCall(client, "GetComboModes") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "GetComboModes") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server GetComboModes deal failed!");
     } else {
         ReadInt(context, id);
@@ -273,28 +273,28 @@ WifiErrorNo RegisterEventCallback(IWifiChipEventCallback callback)
     if (num == 0) {
         WriteFunc(context, "UnRegisterEventCallback");
         WriteInt(context, EVENTS_IFACE_ADD_DEL_NUM);
-        WriteInt(context, WIFI_IDL_CBK_CMD_ADD_IFACE);
-        WriteInt(context, WIFI_IDL_CBK_CMD_REMOVE_IFACE);
+        WriteInt(context, HAL_CBK_CMD_ADD_IFACE);
+        WriteInt(context, HAL_CBK_CMD_REMOVE_IFACE);
     } else {
         WriteFunc(context, "RegisterEventCallback");
         WriteInt(context, num);
         if (callback.onIfaceAdded != NULL) {
-            WriteInt(context, WIFI_IDL_CBK_CMD_ADD_IFACE);
+            WriteInt(context, HAL_CBK_CMD_ADD_IFACE);
         }
         if (callback.onIfaceRemoved != NULL) {
-            WriteInt(context, WIFI_IDL_CBK_CMD_REMOVE_IFACE);
+            WriteInt(context, HAL_CBK_CMD_REMOVE_IFACE);
         }
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "RegisterEventCallback") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "RegisterEventCallback") != WIFI_HAL_OPT_OK) {
         if (num == 0) {
             SetWifiChipEventCallback(callback);
         }
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK || num == 0) {
+    if (result == WIFI_HAL_OPT_OK || num == 0) {
         SetWifiChipEventCallback(callback);
     }
     ReadClientEnd(client);
@@ -311,12 +311,12 @@ WifiErrorNo RequestFirmwareDebugDump(unsigned char *bytes, int32_t *size)
     WriteFunc(context, "RequestFirmwareDebugDump");
     WriteInt(context, *size);
     WriteEnd(context);
-    if (RpcClientCall(client, "RequestFirmwareDebugDump") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "RequestFirmwareDebugDump") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server RequestFirmwareDebugDump deal failed!");
     } else {
         ReadInt(context, size);
@@ -335,13 +335,13 @@ WifiErrorNo IsChipSupportDbdc(bool *isSupport)
     WriteBegin(context, 0);
     WriteFunc(context, "IsChipSupportDbdc");
     WriteEnd(context);
-    if (RpcClientCall(client, "IsChipSupportDbdc") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "IsChipSupportDbdc") != WIFI_HAL_OPT_OK) {
         return false;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     int retValue = WIFI_IDL_FALSE;
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadInt(context, &retValue);
         *isSupport = (retValue == WIFI_IDL_TRUE);
     }
@@ -358,13 +358,13 @@ WifiErrorNo IsChipSupportCsa(bool *isSupport)
     WriteBegin(context, 0);
     WriteFunc(context, "IsChipSupportCsa");
     WriteEnd(context);
-    if (RpcClientCall(client, "IsChipSupportCsa") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "IsChipSupportCsa") != WIFI_HAL_OPT_OK) {
         return false;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     int retValue = WIFI_IDL_FALSE;
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadInt(context, &retValue);
         *isSupport = (retValue == WIFI_IDL_TRUE);
     }
@@ -381,13 +381,13 @@ WifiErrorNo IsChipSupportRadarDetect(bool *isSupport)
     WriteBegin(context, 0);
     WriteFunc(context, "IsChipSupportRadarDetect");
     WriteEnd(context);
-    if (RpcClientCall(client, "IsChipSupportRadarDetect") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "IsChipSupportRadarDetect") != WIFI_HAL_OPT_OK) {
         return false;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     int retValue = WIFI_IDL_FALSE;
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadInt(context, &retValue);
         *isSupport = (retValue == WIFI_IDL_TRUE);
     }
@@ -404,13 +404,13 @@ WifiErrorNo IsChipSupportDfsChannel(bool *isSupport)
     WriteBegin(context, 0);
     WriteFunc(context, "IsChipSupportDfsChannel");
     WriteEnd(context);
-    if (RpcClientCall(client, "IsChipSupportDfsChannel") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "IsChipSupportDfsChannel") != WIFI_HAL_OPT_OK) {
         return false;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     int retValue = WIFI_IDL_FALSE;
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadInt(context, &retValue);
         *isSupport = (retValue == WIFI_IDL_TRUE);
     }
@@ -427,13 +427,13 @@ WifiErrorNo IsChipSupportIndoorChannel(bool *isSupport)
     WriteBegin(context, 0);
     WriteFunc(context, "IsChipSupportIndoorChannel");
     WriteEnd(context);
-    if (RpcClientCall(client, "IsChipSupportIndoorChannel") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "IsChipSupportIndoorChannel") != WIFI_HAL_OPT_OK) {
         return false;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     int retValue = WIFI_IDL_FALSE;
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadInt(context, &retValue);
         *isSupport = (retValue == WIFI_IDL_TRUE);
     }

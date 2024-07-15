@@ -77,15 +77,20 @@ if (defined(ohos_lite)) {
   ohos_static_library("crpc_server") {
     branch_protector_ret = "pac_ret"
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     sources = crpc_server_sources
 
     include_dirs = [ "include" ]
-    cflags_cc = [ "-fno-rtti" ]
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [ "-fno-rtti" ]
     deps = []
     external_deps = [
       "c_utils:utils",
@@ -98,9 +103,11 @@ if (defined(ohos_lite)) {
   ohos_static_library("crpc_client") {
     branch_protector_ret = "pac_ret"
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     sources = crpc_client_sources
@@ -108,7 +115,10 @@ if (defined(ohos_lite)) {
       "include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     ]
-    cflags_cc = [ "-fno-rtti" ]
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [ "-fno-rtti" ]
     deps = []
     external_deps = [
       "c_utils:utils",
@@ -121,9 +131,11 @@ if (defined(ohos_lite)) {
   ohos_shared_library("crpc_client_updater") {
     branch_protector_ret = "pac_ret"
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true

@@ -647,7 +647,7 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
     WIFI_LOGD("WifiHotspotProxy::RegisterCallBack!");
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option;
 
     g_wifiHotspotCallbackStub->RegisterCallBack(callback);
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -659,7 +659,7 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
         WIFI_LOGE("WifiHotspotProxy::RegisterCallBack WriteDate fail, write callback.");
         return WIFI_OPT_FAILED;
     }
-    int eventNum = event.size();
+    int eventNum = static_cast<int>(event.size());
     data.WriteInt32(eventNum);
     if (eventNum > 0) {
         for (auto &eventName : event) {
@@ -687,7 +687,8 @@ ErrCode WifiHotspotProxy::GetSupportedFeatures(long &features)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;

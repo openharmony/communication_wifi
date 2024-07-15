@@ -22,7 +22,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_scan_death_recipient.h"
 #include "wifi_common_def.h"
-#include "wifi_config_center.h"
+#include "wifi_scan_config.h"
 #include "wifi_common_util.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
@@ -32,15 +32,19 @@ namespace Wifi {
 WifiScanStub::WifiScanStub() : mSingleCallback(false)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiScanStub::WifiScanStub(int instId) : mSingleCallback(false), m_instId(instId)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiScanStub::~WifiScanStub()
-{}
+{
+    deathRecipient_ = nullptr;
+}
 
 void WifiScanStub::InitHandleMap()
 {
@@ -77,16 +81,15 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
-        reply.WriteInt32(0);
-        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
         int exception = data.ReadInt32();
         if (exception) {
             return WIFI_OPT_FAILED;
         }
-        return (this->*(iter->second))(code, data, reply, option);
+        (this->*(iter->second))(code, data, reply, option);
     }
+    return 0;
 }
 
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -139,9 +142,9 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
     std::string name = data.ReadString();
     WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d",
         code, data.GetRawDataSize(), compatible);
-    WifiSettings::GetInstance().SetAppPackageName(name);
+    WifiScanConfig::GetInstance().SetAppPackageName(name);
     ErrCode ret = Scan(compatible);
-    WifiSettings::GetInstance().SetAppPackageName("");
+    WifiScanConfig::GetInstance().SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -168,12 +171,12 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
         int tmp = data.ReadInt32();
         params.freqs.push_back(tmp);
     }
-    params.band = data.ReadInt32();
+    params.band = static_cast<uint32_t>(data.ReadInt32());
     std::string name = data.ReadString();
 
-    WifiSettings::GetInstance().SetAppPackageName(name);
+    WifiScanConfig::GetInstance().SetAppPackageName(name);
     ErrCode ret = AdvanceScan(params);
-    WifiSettings::GetInstance().SetAppPackageName("");
+    WifiScanConfig::GetInstance().SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -193,45 +196,116 @@ int WifiScanStub::OnIsWifiClosedScan(uint32_t code, MessageParcel &data, Message
     return ret;
 }
 
-int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+constexpr int ASH_MEM_SIZE = 1024 * 200;
+void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result, MessageParcel &reply)
 {
-    bool compatible = data.ReadBool();
-    WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %{public}zu, compatible:%{public}d",
-        code, data.GetRawDataSize(), compatible);
-    std::vector<WifiScanInfo> result;
-    ErrCode ret = GetScanInfoList(result, compatible);
-    reply.WriteInt32(0);
-    reply.WriteInt32(ret);
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ret;
+    WIFI_LOGI("WifiScanStub SendScanInfo");
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem("scaninfo", ASH_MEM_SIZE);
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        reply.WriteInt32(WIFI_OPT_FAILED);
+        if (ashmem != nullptr) {
+            ashmem->UnmapAshmem();
+            ashmem->CloseAshmem();
+        }
+        return;
     }
+    std::stringstream scanInfoStream;
+    for (int32_t i = 0; i < contentSize; ++i) {
+        scanInfoStream << result[i].bssid << ";";
+        scanInfoStream << StringToHex(result[i].ssid) << ";";
+        scanInfoStream << result[i].bssidType << ";";
+        scanInfoStream << result[i].capabilities << ";";
+        scanInfoStream << result[i].frequency << ";";
+        scanInfoStream << result[i].band << ";";
+        scanInfoStream << static_cast<int>(result[i].channelWidth) << ";";
+        scanInfoStream << result[i].centerFrequency0 << ";";
+        scanInfoStream << result[i].centerFrequency1 << ";";
+        scanInfoStream << result[i].rssi << ";";
+        scanInfoStream << static_cast<int>(result[i].securityType) << ";";
+        scanInfoStream << result[i].infoElems.size() << ";";
+        for (const auto &elem : result[i].infoElems) {
+            scanInfoStream << elem.id << ";";
+            scanInfoStream << elem.content.size() << ";";
+            for (const auto &byte : elem.content) {
+                scanInfoStream << static_cast<int>(byte) << ";";
+            }
+        }
+        scanInfoStream << result[i].features << ";";
+        scanInfoStream << result[i].timestamp << ";";
+        scanInfoStream << result[i].wifiStandard << ";";
+        scanInfoStream << result[i].maxSupportedRxLinkSpeed << ";";
+        scanInfoStream << result[i].maxSupportedTxLinkSpeed << ";";
+        scanInfoStream << result[i].disappearCount << ";";
+        scanInfoStream << result[i].isHiLinkNetwork << ";";
+        scanInfoStream << static_cast<int>(result[i].supportedWifiCategory) << ";";
+    }
+    int32_t scanInfoSize = static_cast<int>(scanInfoStream.str().length());
+    ashmem->WriteToAshmem(scanInfoStream.str().c_str(), scanInfoStream.str().length(), 0);
+    reply.WriteInt32(WIFI_OPT_SUCCESS);
+    reply.WriteInt32(contentSize);
+    reply.WriteInt32(scanInfoSize);
+    reply.WriteAshmem(ashmem);
+    ashmem->UnmapAshmem();
+    ashmem->CloseAshmem();
+}
 
-    unsigned int size = result.size();
-    reply.WriteInt32(size);
-    for (unsigned int i = 0; i < size; ++i) {
+void WifiScanStub::SendScanInfoSmall(int32_t contentSize, std::vector<WifiScanInfo> &result, MessageParcel &reply)
+{
+    reply.WriteInt32(WIFI_OPT_SUCCESS);
+    reply.WriteInt32(contentSize);
+    for (int32_t i = 0; i < contentSize; i++) {
         reply.WriteString(result[i].bssid);
-        reply.WriteInt32(result[i].bssidType);
         reply.WriteString(result[i].ssid);
+        reply.WriteInt32(result[i].bssidType);
         reply.WriteString(result[i].capabilities);
         reply.WriteInt32(result[i].frequency);
-        reply.WriteInt32(result[i].rssi);
-        reply.WriteInt64(result[i].timestamp);
         reply.WriteInt32(result[i].band);
-        reply.WriteInt32(static_cast<int>(result[i].securityType));
         reply.WriteInt32(static_cast<int>(result[i].channelWidth));
         reply.WriteInt32(result[i].centerFrequency0);
         reply.WriteInt32(result[i].centerFrequency1);
-        reply.WriteInt64(result[i].features);
-        reply.WriteInt32(result[i].infoElems.size());
-        for (unsigned int m = 0; m < result[i].infoElems.size(); ++m) {
-            reply.WriteInt32(result[i].infoElems[m].id);
-            reply.WriteInt32(result[i].infoElems[m].content.size());
-            for (unsigned int n = 0; n < result[i].infoElems[m].content.size(); ++n) {
-                reply.WriteInt8(result[i].infoElems[m].content[n]);
+        reply.WriteInt32(result[i].rssi);
+        reply.WriteInt32(static_cast<int>(result[i].securityType));
+        reply.WriteUint32(result[i].infoElems.size());
+        for (const auto &elem : result[i].infoElems) {
+            reply.WriteInt32(elem.id);
+            reply.WriteUint32(elem.content.size());
+            for (const auto &byte : elem.content) {
+                reply.WriteInt32(static_cast<int>(byte));
             }
         }
-        reply.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
+        reply.WriteInt64(result[i].features);
+        reply.WriteInt64(result[i].timestamp);
+        reply.WriteInt32(result[i].wifiStandard);
+        reply.WriteInt32(result[i].maxSupportedRxLinkSpeed);
+        reply.WriteInt32(result[i].maxSupportedTxLinkSpeed);
+        reply.WriteInt32(result[i].disappearCount);
         reply.WriteBool(result[i].isHiLinkNetwork);
+        reply.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
+    }
+}
+
+int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    bool compatible = data.ReadBool();
+    WIFI_LOGD("run OnGetScanInfoList code %{public}u, datasize %{public}zu, compatible:%{public}d", code,
+        data.GetRawDataSize(), compatible);
+    std::vector<WifiScanInfo> result;
+    ErrCode ret = GetScanInfoList(result, compatible);
+    reply.WriteInt32(0);
+    if (ret != WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(ret);
+        return ret;
+    }
+    int32_t size = static_cast<int>(result.size());
+    constexpr int maxSize = 200;
+    constexpr int bigSize = 150;
+    if (size > maxSize) {
+        size = maxSize;
+    }
+    if (size > bigSize) {
+        SendScanInfo(size, result, reply);
+    } else {
+        SendScanInfoSmall(size, result, reply);
     }
     return ret;
 }
@@ -263,12 +337,15 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             }
         }
         WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
-        
+
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiScanDeathRecipient();
+            {
+                std::unique_lock<std::mutex> lock(deathRecipientMutex);
+                if (deathRecipient_ == nullptr) {
+                    deathRecipient_ = new (std::nothrow) WifiScanDeathRecipient();
+                }
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");
@@ -287,8 +364,8 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
     return 0;
 }
 
-int WifiScanStub::OnGetSupportedFeatures(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     long features = 0;
@@ -313,8 +390,8 @@ void WifiScanStub::SetSingleCallback(const bool isSingleCallback)
     mSingleCallback = true;
 }
 
-int WifiScanStub::OnSetScanOnlyAvailable(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnSetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     bool enabled = data.ReadBool();
     WIFI_LOGI("In WifiScanStub::OnSetScanOnlyAvailable enabled is %{public}d", enabled);
@@ -323,8 +400,8 @@ int WifiScanStub::OnSetScanOnlyAvailable(
     return 0;
 }
 
-int WifiScanStub::OnGetScanOnlyAvailable(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnGetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     WIFI_LOGI("In WifiScanStub::OnGetScanOnlyAvailable");
     bool state = false;
@@ -337,8 +414,7 @@ int WifiScanStub::OnGetScanOnlyAvailable(
     return 0;
 }
 
-int WifiScanStub::OnStartWifiPnoScan(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int WifiScanStub::OnStartWifiPnoScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGI("In WifiScanStub::OnStartWifiPnoScan");
     bool isStart = data.ReadBool();
@@ -349,5 +425,5 @@ int WifiScanStub::OnStartWifiPnoScan(
     reply.WriteInt32(ret);
     return 0;
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

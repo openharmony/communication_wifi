@@ -19,6 +19,7 @@
 #include "wifi_logger.h"
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupNegotiationState");
 
@@ -78,7 +79,13 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         WIFI_LOGE("Failed to obtain the group information.");
         return EXECUTED;
     }
+    WifiP2pLinkedInfo p2pInfo;
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
+    p2pInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
+    group.SetCreatorUid(WifiConfigCenter::GetInstance().GetP2pCreatorUid());
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(-1);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
 
     if (groupManager.GetCurrentGroup().IsGroupOwner() &&
@@ -107,27 +114,32 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
             WIFI_LOGE("failed to startup Dhcp server.");
             p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
         }
-        if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+        if (WifiErrorNo::WIFI_HAL_OPT_OK !=
             WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
             WIFI_LOGE("failed to set GO Idle time.");
         }
     } else {
-        if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+        if (WifiErrorNo::WIFI_HAL_OPT_OK !=
             WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
             WIFI_LOGE("failed to set GC Idle time.");
         }
 
         /* GC start DHCP Client. */
-        p2pStateMachine.StartDhcpClientInterface();
-
+        if (p2pStateMachine.GetIsNeedDhcp() == DHCPTYPE::NO_DHCP) {
+            p2pStateMachine.BroadcastP2pConnectionChanged();
+        } else {
+            p2pStateMachine.StartDhcpClientInterface();
+        }
         const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
         WifiP2pDevice device = deviceManager.GetDevices(owner.GetDeviceAddress());
         if (device.IsValid()) {
+            device.SetRandomDeviceAddress(owner.GetRandomDeviceAddress());
             device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
             WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
             copy.SetOwner(device);
             groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
-
+            WIFI_LOGI("GetGcDeviceAddress %{private}s %{private}s", device.GetDeviceAddress().c_str(),
+                device.GetRandomDeviceAddress().c_str());
             deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
 
             p2pStateMachine.BroadcastP2pPeersChanged();
@@ -136,10 +148,9 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         }
     }
     SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
-    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_IDL_OPT_OK) {
+    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
-    p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
 }
@@ -157,7 +168,7 @@ bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessage &msg) const
     WIFI_LOGE("Negotiation failure. Error code: %{public}d", status);
     WriteP2pConnectFailedHiSysEvent(status, static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-    if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
@@ -220,7 +231,7 @@ bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
         p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
         ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-        if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
             WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
         }
     }

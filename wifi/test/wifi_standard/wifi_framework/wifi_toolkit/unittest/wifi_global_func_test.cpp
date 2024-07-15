@@ -342,5 +342,90 @@ HWTEST_F(WifiGlobalFuncTest, IsChannelDbacTest, TestSize.Level1)
     EXPECT_TRUE(IsChannelDbac(1, 2));
     EXPECT_FALSE(IsChannelDbac(1, 40));
 }
+
+HWTEST_F(WifiGlobalFuncTest, IsFactoryModeTest, TestSize.Level1)
+{
+    EXPECT_FALSE(IsFactoryMode());
+}
+
+HWTEST_F(WifiGlobalFuncTest, ParseJsonTest, TestSize.Level1)
+{
+    std::string jsonString = R"(
+        [{
+            "test": [{
+                "ParseJsonTest": 0
+            }]
+        }]
+    )";
+    std::string type = "test";
+    std::string key = "ParseJsonTest";
+    std::string value;
+    EXPECT_TRUE(ParseJson(jsonString, type, key, value) == true);
+
+    jsonString = R"(
+        [{
+            "test": [{
+                "ParseJsonTest": "0"
+            }]
+        }]
+    )";
+    EXPECT_TRUE(ParseJson(jsonString, type, key, value) == true);
+
+    jsonString = R"(
+        [{
+            "test": "ParseJsonTest"
+        }]
+    )";
+    EXPECT_TRUE(ParseJson(jsonString, type, key, value) == false);
+
+    key = "ParseJsonTest1";
+    EXPECT_TRUE(ParseJson(jsonString, type, key, value) == false);
+
+    type = "test1";
+    EXPECT_TRUE(ParseJson(jsonString, type, key, value) == false);
+
+    jsonString = "";
+    type = "";
+    key = "";
+    EXPECT_TRUE(ParseJson(jsonString, type, key, value) == false);
+}
+
+HWTEST_F(WifiGlobalFuncTest, ConvertDecStrToHexStrTest, TestSize.Level1)
+{
+    const std::string inData = "1,2,3,4,5,6";
+    std::string outData;
+    ConvertDecStrToHexStr(inData, outData);
+    EXPECT_TRUE(outData == "010203040506");
+}
+
+HWTEST_F(WifiGlobalFuncTest, SplitStringBySubstringTest1, TestSize.Level1)
+{
+    const std::string inData = "testbegin hello world testend";
+    const std::string subBegin = "hello";
+    const std::string subEnd = "world";
+    std::string outData;
+    SplitStringBySubstring(inData, outData, subBegin, subEnd);
+    EXPECT_TRUE(outData == "hello world");
+}
+
+HWTEST_F(WifiGlobalFuncTest, SplitStringBySubstringTest2, TestSize.Level1)
+{
+    const std::string inData = "testbegin hello world testend";
+    const std::string subBegin = "world";
+    const std::string subEnd = "hello";
+    std::string outData;
+    SplitStringBySubstring(inData, outData, subBegin, subEnd);
+    EXPECT_TRUE(outData.length() == 0);
+}
+
+HWTEST_F(WifiGlobalFuncTest, SplitStringBySubstringTest3, TestSize.Level1)
+{
+    const std::string inData = "testbegin hello world testend";
+    const std::string subBegin = "test123";
+    const std::string subEnd = "test456";
+    std::string outData;
+    SplitStringBySubstring(inData, outData, subBegin, subEnd);
+    EXPECT_TRUE(outData.length() == 0);
+}
 }  // namespace Wifi
 }  // namespace OHOS

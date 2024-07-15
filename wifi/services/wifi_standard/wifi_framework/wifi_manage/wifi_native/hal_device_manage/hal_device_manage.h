@@ -45,6 +45,7 @@ using OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo;
 using OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams;
 using OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult;
 using IfaceDestoryCallback = std::function<void(std::string&, int)>;
+using RssiReportCallback = std::function<void(int, int)>;
 
 constexpr IfaceType IFACE_TYPE_DEFAULT = (IfaceType)255;
 const std::vector<IfaceType> IFACE_TYPES_BY_PRIORITY = {IfaceType::AP, IfaceType::STA, IfaceType::P2P};
@@ -159,6 +160,7 @@ public:
     virtual ~ChipIfaceCallback() = default;
 
     virtual int32_t OnScanResultsCallback(uint32_t event) override;
+    virtual int32_t OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi) override;
 };
 
 class HalDeviceManager {
@@ -189,7 +191,8 @@ public:
      * @param ifaceName: [out] iface name
      * @return bool
      */
-    bool CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback, std::string &ifaceName);
+    bool CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback,
+                        const RssiReportCallback &rssiReportCallback, std::string &ifaceName);
 
     /**
      * @Description create ap iface
@@ -350,6 +353,15 @@ public:
      * @return bool
      */
     bool SetPowerModel(const std::string &ifaceName, int model);
+
+    /**
+     * @Description set wifi tx power for sar.
+     *
+     * @param ifaceName: [in] iface name
+     * @param power: [in] power
+     * @return bool
+     */
+    bool SetTxPower(const std::string &ifaceName, int power);
 
     /**
      * @Description get the power mode.

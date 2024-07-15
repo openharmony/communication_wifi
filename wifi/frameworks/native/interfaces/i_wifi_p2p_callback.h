@@ -57,6 +57,14 @@ public:
     virtual void OnP2pPeersChanged(const std::vector<WifiP2pDevice> &device) = 0;
 
     /**
+     * @Description If the discover P2P device information is updated, all the
+     *        latest WifiP2P private devices are reported.
+     *
+     * @param priWfdInfo - std::string &priWfdInfo object
+     */
+    virtual void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) = 0;
+
+    /**
      * @Description This event is triggered when the discovered services are updated.
      *
      * @param srvInfo - std::vector<WifiP2pServiceInfo> object

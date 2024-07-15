@@ -26,7 +26,6 @@ declare_args() {
   wifi_feature_with_auth_disable = false
   wifi_feature_with_dhcp_disable = false
   wifi_feature_with_encryption = true
-  wifi_feature_with_wifi_hdi = false
   wifi_feature_with_ap_extension = false
   wifi_feature_with_app_frozen = false
   wifi_feature_non_seperate_p2p = false
@@ -47,8 +46,26 @@ declare_args() {
   wifi_feature_with_scan_control = true
   wifi_feature_network_selection = false
   wifi_feature_p2p_random_mac_addr = true
+  wifi_feature_powermgr_support = false
   if (defined(global_parts_info) &&
       defined(global_parts_info.hdf_drivers_interface_wlan)) {
     wifi_feature_with_hdi_chip_supported = true
   }
 }
+
+memory_optimization_cflags = [
+  "-fdata-sections",
+  "-ffunction-sections",
+]
+
+memory_optimization_cflags_cc = [
+  "-fvisibility-inlines-hidden",
+  "-fdata-sections",
+  "-ffunction-sections",
+  "-Os",
+]
+
+memory_optimization_ldflags = [
+  "-Wl,--exclude-libs=ALL",
+  "-Wl,--gc-sections",
+]

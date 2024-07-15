@@ -15,7 +15,14 @@
 
 #include "securec.h"
 #include "wifi_hdi_common.h"
+
+#ifndef UT_TEST
 #include "wifi_log.h"
+#else
+#define static
+#define LOGI(...)
+#define LOGE(...)
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiCommon"
@@ -344,9 +351,9 @@ const uint8_t *HdiBssGetVendorIe(const uint8_t *ies, size_t len, uint32_t vendor
 {
     const struct HdiElem *elem;
     HDI_CHECK_ELEMENT_BY_ID(elem, HDI_EID_VENDOR_SPECIFIC, ies, len) {
-        if (elem->datalen >= HDI_POS_FOURTH &&
-            vendorType == HdiGetBe32(elem->data))
+        if (elem->datalen >= HDI_POS_FOURTH && vendorType == HdiGetBe32(elem->data)) {
             return &elem->id;
+        }
     }
 
     return NULL;
@@ -356,15 +363,16 @@ const uint8_t* HdiBssGetVendorBeacon(const uint8_t *ies, size_t len, size_t beac
 {
     const struct HdiElem *elem;
 
-    if (beaconIeLen == 0)
+    if (beaconIeLen == 0) {
         return NULL;
+    }
 
     ies += len;
 
     HDI_CHECK_ELEMENT_BY_ID(elem, HDI_EID_VENDOR_SPECIFIC, ies, beaconIeLen) {
-        if (elem->datalen >= HDI_POS_FOURTH &&
-            vendorType == HdiGetBe32(elem->data))
+        if (elem->datalen >= HDI_POS_FOURTH && vendorType == HdiGetBe32(elem->data)) {
             return &elem->id;
+        }
     }
 
     return NULL;
@@ -646,6 +654,7 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_PSK, ret, pos, end, "+", "%sPSK");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_HDI_NONE, ret, pos, end, "+", "%sNone");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_SAE, ret, pos, end, "+", "%sSAE");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_SUITE_B_192, ret, pos, end, "+", "%sEAP-SUITE-B-192");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_OSEN, ret, pos, end, "+", "%sOSEN");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_OWE, ret, pos, end, "+", "%sOWE");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_PSK_SHA256, ret, pos, end, "+", "%sPSK");
@@ -654,8 +663,9 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
 
     if (data.capabilities & HDI_CAPABILITY_PREAUTH) {
         ret = HdiTxtPrintf(pos, end - pos, "-preauth");
-        if (HdiCheckError(end - pos, ret))
+        if (HdiCheckError(end - pos, ret)) {
             return pos;
+        }
         pos += ret;
     }
 
@@ -692,8 +702,9 @@ void HdiBufEncode(char *txt, size_t maxlen, const uint8_t *data, size_t len)
     size_t i;
 
     for (i = 0; i < len; i++) {
-        if (txt + HDI_POS_FOURTH >= end)
+        if (txt + HDI_POS_FOURTH >= end) {
             break;
+        }
 
         switch (data[i]) {
             case '\"':
@@ -798,4 +809,33 @@ void StrSafeCopy(char *dst, unsigned len, const char *src)
     }
     dst[i] = '\0';
     return;
+}
+
+char* HdiGetWapiTxt(char *pos, char *end, const uint8_t *ie)
+{
+    if (ie[HDI_POS_FIRST] < HDI_CAP_WAPI_BIT_OFFSET - HDI_POS_SECOND) {
+        return pos;
+    }
+
+    char *start;
+    int ret;
+
+    ret = HdiTxtPrintf(pos, end - pos, "[WAPI-");
+    if (HdiCheckError(end - pos, ret)) {
+        return pos;
+    }
+    pos += ret;
+
+    start = pos;
+    uint8_t akm = ie[HDI_CAP_WAPI_BIT_OFFSET];
+    HDI_HANDLE_CIPHER_POS_INFO(akm & HDI_KEY_MGMT_WAPI_CERT_AKM, ret, pos, end, "+", "%sCERT");
+    HDI_HANDLE_CIPHER_POS_INFO(akm & HDI_KEY_MGMT_WAPI_PSK_AKM, ret, pos, end, "+", "%sPSK");
+
+    ret = HdiTxtPrintf(pos, end - pos, "]");
+    if (HdiCheckError(end - pos, ret)) {
+        return pos;
+    }
+    pos += ret;
+
+    return pos;
 }

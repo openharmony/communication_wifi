@@ -16,7 +16,8 @@
 #define OHOS_IENHANCE_SERVICE_H
 
 #include "wifi_errcode.h"
-#include "wifi_scan_msg.h"
+#include "wifi_scan_control_msg.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -70,7 +71,30 @@ public:
      * @return 1: DEFAULT, 2: WIFI6, 3: WIFI6_PLUS
      */
     virtual WifiCategory GetWifiCategory(
-        std::vector<WifiInfoElem> infoElems, int chipsetCategory, int chipsetFeatrureCapability);
+        std::vector<WifiInfoElem> infoElems, int chipsetCategory, int chipsetFeatrureCapability) = 0;
+
+    /**
+     * @Description set low tx power
+     *
+     * @param wifiLowPowerParam - wifi low power param
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
+    
+    /**
+     * @Description Check Chba conncted
+     *
+     * @return true: conncted, false: not conncted
+     */
+    virtual bool CheckChbaConncted() = 0;
+
+    /**
+     * @Description Is external scan allowed.
+     *
+     * @param scanDeviceInfo - scan device info
+     * @return true: allowed, false: not allowed
+     */
+    virtual bool IsScanAllowed(WifiScanDeviceInfo &scanDeviceInfo) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -46,6 +46,10 @@ const std::string KEY_MGMT_WEP = "WEP";
 const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
 const std::string KEY_MGMT_EAP = "WPA-EAP";
+const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
+const std::string KEY_MGMT_WAPI_CERT = "WAPI-CERT";
+const std::string KEY_MGMT_WAPI_PSK = "WAPI-PSK";
+const std::string KEY_MGMT_WAPI = "WAPI";
 
 const std::string EAP_METHOD_NONE = "NONE";
 const std::string EAP_METHOD_PEAP = "PEAP";
@@ -165,13 +169,19 @@ enum class WifiOperateState {
     STA_DISCONNECT,
     STA_DHCP_FAIL,
     STA_CLOSING,
+    STA_CLOSED,
 };
 
 enum class DisconnectDetailReason {
     UNUSED = 0,
     UNSPECIFIED = 1,
+    PREV_AUTH_NOT_VALID = 2,
     DEAUTH_STA_IS_LEFING = 3,
-    DISASSOC_STA_HAS_LEFT = 8
+    DISASSOC_DUE_TO_INACTIVITY = 4,
+    DISASSOC_AP_BUSY = 5,
+    DISASSOC_STA_HAS_LEFT = 8,
+    DISASSOC_IEEE_802_1X_AUTH_FAILED = 23,
+    DISASSOC_LOW_ACK = 34
 };
 
 struct WifiLinkedInfo {
@@ -207,6 +217,8 @@ struct WifiLinkedInfo {
     bool isAncoConnected;
     WifiCategory supportedWifiCategory;
     bool isHiLinkNetwork;
+    int c0Rssi;
+    int c1Rssi;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -236,6 +248,8 @@ struct WifiLinkedInfo {
         isAncoConnected = false;
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
+        c0Rssi = 0;
+        c1Rssi = 0;
     }
 };
 
@@ -263,6 +277,7 @@ struct WpsConfig {
 enum class WifiDeviceConfigStatus {
     ENABLED, /* enable */
     DISABLED, /* disabled */
+    PERMEMANTLY_DISABLED, /* permanently disabled */
     UNKNOWN
 };
 
@@ -492,12 +507,68 @@ public:
 
 enum class WifiPrivacyConfig { RANDOMMAC, DEVICEMAC };
 
+enum class DisabledReason {
+    DISABLED_UNKNOWN_REASON = -1,
+    DISABLED_NONE = 0,
+    DISABLED_ASSOCIATION_REJECTION = 1,
+    DISABLED_AUTHENTICATION_FAILURE = 2,
+    DISABLED_DHCP_FAILURE = 3,
+    DISABLED_NO_INTERNET_TEMPORARY = 4,
+    DISABLED_AUTHENTICATION_NO_CREDENTIALS = 5,
+    DISABLED_NO_INTERNET_PERMANENT = 6,
+    DISABLED_BY_WIFI_MANAGER = 7,
+    DISABLED_BY_WRONG_PASSWORD = 8,
+    DISABLED_AUTHENTICATION_NO_SUBSCRIPTION = 9,
+    DISABLED_AUTHENTICATION_PRIVATE_EAP_ERROR = 10,
+    DISABLED_NETWORK_NOT_FOUND = 1,
+    DISABLED_CONSECUTIVE_FAILURES = 12,
+    DISABLED_BY_SYSTEM = 13,
+    DISABLED_EAP_AKA_FAILURE = 14,
+    DISABLED_DISASSOC_REASON = 15,
+    NETWORK_SELECTION_DISABLED_MAX = 16
+};
+
+struct NetworkSelectionStatus {
+    WifiDeviceConfigStatus status;
+    DisabledReason networkSelectionDisableReason;
+    int64_t networkDisableTimeStamp;
+    int networkDisableCount;
+    NetworkSelectionStatus()
+    {
+        status = WifiDeviceConfigStatus::ENABLED;
+        networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
+        networkDisableTimeStamp = -1;
+        networkDisableCount = 0;
+    }
+};
+
+class WifiWapiConfig {
+public:
+    int wapiPskType;
+    std::string wapiAsCertData;
+    std::string wapiUserCertData;
+    std::string encryptedAsCertData;
+    std::string asCertDataIV;
+    std::string encryptedUserCertData;
+    std::string userCertDataIV;
+
+    WifiWapiConfig()
+    {
+        wapiPskType = -1;
+    }
+
+    ~WifiWapiConfig()
+    {}
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
     int networkId;
     /* 0: CURRENT, using 1: DISABLED 2: ENABLED */
     int status;
+    /*  network selection status*/
+    NetworkSelectionStatus networkSelectionStatus;
     /* mac address */
     std::string bssid;
     /* bssid type. */
@@ -547,6 +618,7 @@ struct WifiDeviceConfig {
     int connFailedCount;
     unsigned int networkStatusHistory;
     bool isPortal;
+    time_t portalAuthTime;
     time_t lastHasInternetTime;
     bool noInternetAccess;
     /* save select mac address */
@@ -561,6 +633,8 @@ struct WifiDeviceConfig {
     int isReassocSelfCureWithFactoryMacAddress;
     int version;
     bool randomizedMacSuccessEver;
+    WifiWapiConfig wifiWapiConfig;
+
     WifiDeviceConfig()
     {
         instanceId = 0;
@@ -585,6 +659,7 @@ struct WifiDeviceConfig {
         connFailedCount = 0;
         networkStatusHistory = 0;
         isPortal = false;
+        portalAuthTime = -1;
         lastHasInternetTime = -1;
         noInternetAccess = false;
         callProcessName = "";
@@ -597,6 +672,16 @@ struct WifiDeviceConfig {
 };
 
 enum class WifiState { DISABLING = 0, DISABLED = 1, ENABLING = 2, ENABLED = 3, UNKNOWN = 4 };
+
+enum class WifiDetailState {
+    STATE_UNKNOWN = -1,
+    STATE_INACTIVE = 0,
+    STATE_ACTIVATED = 1,
+    STATE_ACTIVATING = 2,
+    STATE_DEACTIVATING = 3,
+    STATE_SEMI_ACTIVATING = 4,
+    STATE_SEMI_ACTIVE = 5
+};
 
 /* wps state */
 enum class WpsStartState {
@@ -741,6 +826,20 @@ typedef enum {
     BG_LIMIT_LEVEL_10,
     BG_LIMIT_LEVEL_11,
 } BgLimitLevel;
+
+enum class WapiPskType {
+    WAPI_PSK_ASCII = 0,
+    WAPI_PSK_HEX = 1,
+};
+
+typedef struct {
+    std::string ifName;
+    int scene;
+    int rssiThreshold;
+    std::string peerMacaddr;
+    std::string powerParam;
+    int powerParamLen;
+} WifiLowPowerParam;
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

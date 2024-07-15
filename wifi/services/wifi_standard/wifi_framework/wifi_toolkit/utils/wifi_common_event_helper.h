@@ -24,6 +24,7 @@ const std::string COMMON_EVENT_WIFI_POWER_STATE = "usual.event.wifi.POWER_STATE"
 const std::string COMMON_EVENT_WIFI_SCAN_FINISHED = "usual.event.wifi.SCAN_FINISHED";
 const std::string COMMON_EVENT_WIFI_SCAN_STATE = "usual.event.wifi.SCAN_STATE";
 const std::string COMMON_EVENT_WIFI_RSSI_VALUE = "usual.event.wifi.RSSI_VALUE";
+const std::string COMMON_EVENT_WITAS_RSSI_VALUE = "usual.event.wifi.WITAS_RSSI_VALUE";
 const std::string COMMON_EVENT_WIFI_CONN_STATE = "usual.event.wifi.CONN_STATE";
 const std::string COMMON_EVENT_WIFI_HOTSPOT_STATE = "usual.event.wifi.HOTSPOT_STATE";
 const std::string COMMON_EVENT_WIFI_AP_STA_JOIN = "usual.event.wifi.WIFI_HS_STA_JOIN";
@@ -46,6 +47,7 @@ public:
     static bool PublishScanFinishedEvent(const int &code, const std::string &data);
     static bool PublishScanStateChangedEvent(const int &code, const std::string &data);
     static bool PublishRssiValueChangedEvent(const int &code, const std::string &data);
+    static bool PublishWiTasRssiValueChangedEvent(const int &code, const std::string &data);
     static bool PublishConnStateChangedEvent(const int &code, const std::string &data);
     static bool PublishHotspotStateChangedEvent(const int &code, const std::string &data);
     static bool PublishApStaJoinEvent(const int &code, const std::string &data);

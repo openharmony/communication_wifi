@@ -20,6 +20,7 @@
 #include <functional>
 #include "wifi_errcode.h"
 #include "iscan_service_callbacks.h"
+#include "sta_service_callback.h"
 #include "wifi_internal_msg.h"
 
 namespace OHOS {
@@ -30,11 +31,14 @@ public:
     ~WifiScanManager() = default;
 
     IScanSerivceCallbacks& GetScanCallback(void);
+    StaServiceCallback GetStaCallback() const;
     void StopUnloadScanSaTimer(void);
     void StartUnloadScanSaTimer(void);
     void CheckAndStartScanService(int instId = 0);
+    ErrCode TryToStartScanService(int instId = 0);
     void CheckAndStopScanService(int instId = 0);
     void CloseScanService(int instId = 0);
+    void DealStaOpened(int instId = 0);
 
 private:
     void InitScanCallback(void);
@@ -48,6 +52,7 @@ private:
     IScanSerivceCallbacks mScanCallback;
     uint32_t unloadScanSaTimerId{0};
     std::mutex unloadScanSaTimerMutex;
+    StaServiceCallback mStaCallback;
 };
 
 }  // namespace Wifi

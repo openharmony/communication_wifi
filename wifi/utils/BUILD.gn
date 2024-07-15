@@ -34,6 +34,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [ "bounds_checking_function:libsec_shared" ]
 
+    configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",
@@ -52,9 +53,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true
@@ -99,12 +102,16 @@ if (defined(ohos_lite)) {
       defines += [ "WIFI_FFRT_ENABLE" ]
     }
 
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]

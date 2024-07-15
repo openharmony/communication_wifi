@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_chip_hal_interface.h"
 #include <mutex>
 #include "wifi_log.h"
@@ -39,86 +41,87 @@ WifiChipHalInterface &WifiChipHalInterface::GetInstance(void)
 
 WifiErrorNo WifiChipHalInterface::GetWifiChipObject(int id, IWifiChip &chip)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->GetWifiChipObject(id, chip);
 }
 
 WifiErrorNo WifiChipHalInterface::GetChipIds(std::vector<int> &ids)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->GetChipIds(ids);
 }
 
 WifiErrorNo WifiChipHalInterface::GetUsedChipId(int &id)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->GetUsedChipId(id);
 }
 
 WifiErrorNo WifiChipHalInterface::GetChipCapabilities(int &capabilities)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->GetChipCapabilities(capabilities);
 }
 
 WifiErrorNo WifiChipHalInterface::GetSupportedModes(std::vector<int> &modes)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->GetSupportedModes(modes);
 }
 
 WifiErrorNo WifiChipHalInterface::ConfigRunModes(int mode)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ConfigRunModes(mode);
 }
 
 WifiErrorNo WifiChipHalInterface::GetCurrentMode(int &mode)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->GetCurrentMode(mode);
 }
 
 WifiErrorNo WifiChipHalInterface::RegisterChipEventCallback(WifiChipEventCallback &callback)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->RegisterChipEventCallback(callback);
 }
 
 WifiErrorNo WifiChipHalInterface::RequestFirmwareDebugInfo(std::string &debugInfo)
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->RequestFirmwareDebugInfo(debugInfo);
 }
 
 WifiErrorNo WifiChipHalInterface::IsSupportDbdc(bool &isSupport) const
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqIsSupportDbdc(isSupport);
 }
 
 WifiErrorNo WifiChipHalInterface::IsSupportCsa(bool &isSupport) const
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqIsSupportCsa(isSupport);
 }
 
 WifiErrorNo WifiChipHalInterface::IsSupportRadarDetect(bool &isSupport) const
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqIsSupportRadarDetect(isSupport);
 }
 
 WifiErrorNo WifiChipHalInterface::IsSupportDfsChannel(bool &isSupport) const
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqIsSupportDfsChannel(isSupport);
 }
 
 WifiErrorNo WifiChipHalInterface::IsSupportIndoorChannel(bool &isSupport) const
 {
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_IDL_OPT_FAILED);
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqIsSupportIndoorChannel(isSupport);
 }
 }  // namespace Wifi
 }  // namespace OHOS
+#endif

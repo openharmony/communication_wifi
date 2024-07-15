@@ -20,8 +20,7 @@
 #include <vector>
 #include "wifi_base_hal_interface.h"
 #include "wifi_event_callback.h"
-#include "wifi_idl_struct.h"
-#include "wifi_scan_param.h"
+#include "wifi_native_struct.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -92,6 +91,14 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo GetStaDeviceMacAddress(std::string &mac);
+    
+    /**
+     * @Description Sets the Wi-Fi country code.
+     *
+     * @param code
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetWifiCountryCode(const std::string &ifaceName, const std::string &code);
 
     /**
      * @Description Obtains the frequencies supported by a specified frequency band.
@@ -100,7 +107,7 @@ public:
      * @param frequencies
      * @return WifiErrorNo
      */
-    WifiErrorNo GetSupportFrequencies(int band, std::vector<int> &frequencies);
+    WifiErrorNo GetSupportFrequencies(const std::string &ifaceName, int band, std::vector<int> &frequencies);
 
     /**
      * @Description Sets the MAC address of the Wi-Fi connection.
@@ -136,20 +143,12 @@ public:
     WifiErrorNo GetSupportFeature(long &feature);
 
     /**
-     * @Description Send instructions to the Wi-Fi driver or chip.
-     *
-     * @param request
-     * @return WifiErrorNo
-     */
-    WifiErrorNo SendRequest(const WifiStaRequest &request);
-
-    /**
      * @Description Set the Wi-Fi transmit power.
      *
      * @param power
      * @return WifiErrorNo
      */
-    WifiErrorNo SetTxPower(int power);
+    WifiErrorNo SetTxPower(const std::string &ifaceName, int power);
 
     /**
      * @Description Scan by specified parameter.
@@ -157,7 +156,7 @@ public:
      * @param scanParam
      * @return WifiErrorNo
      */
-    WifiErrorNo Scan(const std::string &ifaceName, const WifiScanParam &scanParam);
+    WifiErrorNo Scan(const std::string &ifaceName, const WifiHalScanParam &scanParam);
 
     /**
      * @Description Obtain the scanning result.
@@ -173,7 +172,7 @@ public:
      * @param scanParam
      * @return WifiErrorNo
      */
-    WifiErrorNo StartPnoScan(const std::string &ifaceName, const WifiPnoScanParam &scanParam);
+    WifiErrorNo StartPnoScan(const std::string &ifaceName, const WifiHalPnoScanParam &scanParam);
 
     /**
      * @Description Stop PNO Scanning.
@@ -228,7 +227,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo SetDeviceConfig(int networkId, const WifiIdlDeviceConfig &config);
+    WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config);
 
     /**
      * @Description Obtaining Network Configurations.
@@ -236,7 +235,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo GetDeviceConfig(WifiIdlGetDeviceConfig &config);
+    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config);
 
     /**
      * @Description Save network config.
@@ -259,7 +258,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWpsPbcMode(const WifiIdlWpsConfig &config);
+    WifiErrorNo StartWpsPbcMode(const WifiHalWpsConfig &config);
 
     /**
      * @Description Enable PIN mode WPS.
@@ -268,7 +267,7 @@ public:
      * @param pinCode
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWpsPinMode(const WifiIdlWpsConfig &config, int &pinCode);
+    WifiErrorNo StartWpsPinMode(const WifiHalWpsConfig &config, int &pinCode);
 
     /**
      * @Description Close wps.
@@ -283,7 +282,7 @@ public:
      * @param capability
      * @return WifiErrorNo
      */
-    WifiErrorNo GetRoamingCapabilities(WifiIdlRoamCapability &capability);
+    WifiErrorNo GetRoamingCapabilities(WifiHalRoamCapability &capability);
 
     /**
      * @Description Set bssid to supplicant.
@@ -300,7 +299,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo SetRoamConfig(const WifiIdlRoamConfig &config);
+    WifiErrorNo SetRoamConfig(const WifiHalRoamConfig &config);
 
     /**
      * @Description Wpa_s disable/enable(0/1) automatic reconnection.
@@ -323,7 +322,7 @@ public:
      * @param networkList
      * @return WifiErrorNo
      */
-    WifiErrorNo GetNetworkList(std::vector<WifiWpaNetworkInfo> &networkList);
+    WifiErrorNo GetNetworkList(std::vector<WifiHalWpaNetworkInfo> &networkList);
 
     /**
      * @Description Get current connect signal info, rssi, linkspeed, noise ...
@@ -333,7 +332,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,
-        WifiWpaSignalInfo &info);
+        WifiHalWpaSignalInfo &info);
 
     /**
      * @Description set power save mode

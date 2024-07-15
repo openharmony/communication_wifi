@@ -269,14 +269,16 @@ public:
     /**
      * @Description Increase the reference count of the hid2d service.
      *
+     * @param callingUid - the UID of caller
      */
-    virtual void IncreaseSharedLink(void) override;
+    virtual void IncreaseSharedLink(int callingUid) override;
 
     /**
      * @Description Decrease the reference count of the hid2d service.
      *
+     * @param callingUid - the UID of caller
      */
-    virtual void DecreaseSharedLink(void) override;
+    virtual void DecreaseSharedLink(int callingUid) override;
 
     /**
      * @Description Get the reference count of the hid2d service.
@@ -284,6 +286,14 @@ public:
      * @return int - reference count
      */
     virtual int GetSharedLinkCount(void) override;
+
+    /**
+     * @Description Handle the exception of upper-layer business.
+     *
+     * @param systemAbilityId - systemAbilityId of upper-layer business.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode HandleBusinessSAException(int systemAbilityId) override;
 
     /**
      * @Description - Get P2P recommended channel.
@@ -308,6 +318,26 @@ public:
      */
     virtual ErrCode MonitorCfgChange(void) override;
 
+    /**
+     * @Description Discover p2p device
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Disable random mac
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Set gc ip information
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) override;
 private:
     /**
      * @Description - P2P state machine deregistration event callback.

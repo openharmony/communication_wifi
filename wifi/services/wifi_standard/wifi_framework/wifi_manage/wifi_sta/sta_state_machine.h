@@ -30,7 +30,7 @@
 #include "dhcp_c_api.h"
 #include "sta_define.h"
 #include "network_status_history_manager.h"
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"
@@ -61,7 +61,6 @@ constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
-constexpr int CMD_START_RENEWAL_TIMEOUT = 0X05;
 constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
@@ -104,6 +103,7 @@ constexpr int MAC_AUTH_RSP4_TIMEOUT = 5202;
 constexpr int MAC_ASSOC_RSP_TIMEOUT = 5203;
 constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
+constexpr int DHCP_LEASE_EXPIRED = 6;
 
 enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,
@@ -122,8 +122,21 @@ typedef enum EnumDhcpReturnCode {
     DHCP_RESULT,
     DHCP_JUMP,
     DHCP_RENEW_FAIL,
+    DHCP_IP_EXPIRED,
     DHCP_FAIL,
 } DhcpReturnCode;
+
+const int DETECT_TYPE_DEFAULT = 0;
+const int DETECT_TYPE_PERIODIC = 1;
+const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
+const int PORTAL_EXPERIED_DETECT_MAX_COUNT = 2;
+enum PortalState {
+    UNCHECKED = 0,
+    NOT_PORTAL,
+    UNAUTHED,
+    AUTHED,
+    EXPERIED
+};
 
 /* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
 constexpr int MAX_LEVEL = 4;
@@ -294,6 +307,7 @@ public:
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
+        bool IsPublicESS();
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -355,25 +369,7 @@ public:
          *
          */
         void DealDhcpResult(int ipType);
-#ifndef OHOS_ARCH_LITE
-        /**
-         * @Description : start renew timeout timer
-         *
-         */
-        void StartRenewTimeout(int64_t interval);
 
-        /**
-         * @Description : stop renew timeout timer
-         *
-         */
-        static void StopRenewTimeout();
-
-        /**
-         * @Description : deal renew timeout
-         *
-         */
-        static void DealRenewTimeout();
-#endif
         /**
          * @Description : Get dhcp result of specified interface failed notify asynchronously
          *
@@ -398,9 +394,6 @@ public:
         static StaStateMachine *pStaStateMachine;
         static DhcpResult DhcpIpv4Result;
         static DhcpResult DhcpIpv6Result;
-#ifndef OHOS_ARCH_LITE
-        static uint64_t renewTimerId_;
-#endif
     };
 
 public:
@@ -476,10 +469,10 @@ public:
      * @Description  Convert the deviceConfig structure and set it to idl structure
      *
      * @param config -The Network info(in)
-     * @param idlConfig -The Network info(in)
+     * @param halDeviceConfig -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode FillEapCfg(const WifiDeviceConfig &config, WifiIdlDeviceConfig &idlConfig) const;
+    ErrCode FillEapCfg(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
 
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
@@ -507,17 +500,11 @@ public:
      */
     void OnNetManagerRestart(void);
 
-     /**
-     * @Description start dhcp renewal.
-     *
-     */
-    void StartDhcpRenewal();
-
     /**
-     * @Description : Deal renewal timeout.
-     *
+     * @Description : start detect timer.
+     * @param detectType - type of detect
      */
-    void DealRenewalTimeout(InternalMessage *msg);
+    void StartDetectTimer(int detectType);
 
     /**
      * @Description  start browser to login portal
@@ -526,14 +513,10 @@ public:
     void HandlePortalNetworkPorcess();
     
     void SetPortalBrowserFlag(bool flag);
-    /**
-     * @Description renew dhcp.
-     *
-     */
-    void RenewDhcp();
     int GetInstanceId();
     void DealApRoamingStateTimeout(InternalMessage *msg);
     void DealHiLinkDataToWpa(InternalMessage *msg);
+    void HilinkSetMacAddress(std::string &cmd);
 private:
     /**
      * @Description  Destruct state.
@@ -651,7 +634,6 @@ private:
      *
      */
     void StopWifiProcess();
-
     /**
      * @Description  Setting statemachine status during the process of enable or disable wifi.
      *
@@ -676,6 +658,19 @@ private:
      * @param portalUrl portal network redirection address
      */
     void HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl);
+
+    /**
+     * @Description  update portalState
+     *
+     * @param netState the state of connecting network(in)
+     * @param updatePortalAuthTime need update portalAuthTime or not [out]
+     */
+    void UpdatePortalState(SystemNetWorkState netState, bool &updatePortalAuthTime);
+
+    /**
+     * @Description  start detection if portalState is expired
+     */
+    void PortalExpiredDetect();
 
     /**
      * @Description implementation of the network detection callback function
@@ -716,6 +711,13 @@ private:
      *
      */
     int InitStaSMHandleMap();
+
+    /**
+     * @Description : Update RSSI to LinkedInfo.
+     *
+     * @param  inRssi - Rssi get from SignalPoll Result
+     */
+    int UpdateLinkInfoRssi(int inRssi);
 
     /**
      * @Description : Deal SignalPoll Result.
@@ -997,6 +999,12 @@ private:
      */
     bool CurrentIsRandomizedMac();
 
+    /**
+     * @Description : Hilink Save Data To Device Config.
+     *
+     */
+    void HilinkSaveConfig(void);
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.
@@ -1134,6 +1142,8 @@ private:
     StaSmHandleFuncMap staSmHandleFuncMap;
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
+    bool m_hilinkFlag = false;
+    WifiDeviceConfig m_hilinkDeviceConfig;
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
@@ -1154,6 +1164,10 @@ private:
     bool isRoam;
     int64_t lastTimestamp;
     bool portalFlag;
+    PortalState portalState;
+    int detectNum;
+    int portalExpiredDetectCount;
+    bool mIsWifiInternetCHRFlag;
     bool networkStatusHistoryInserted;
     WifiLinkedInfo linkedInfo;
     WifiLinkedInfo lastLinkedInfo;
@@ -1183,21 +1197,21 @@ private:
      * @Description Replace empty dns
      */
     void ReplaceEmptyDns(DhcpResult *result);
-    void InvokeOnStaOpenRes(OperateResState state);
-    void InvokeOnStaCloseRes(OperateResState state);
     void InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
     void InvokeOnWpsChanged(WpsStartState state, const int code);
     void InvokeOnStaStreamChanged(StreamDirection direction);
     void InvokeOnStaRssiLevelChanged(int level);
     WifiDeviceConfig getCurrentWifiDeviceConfig();
-    void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus);
+    void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus, bool updatePortalAuthTime);
     bool CanArpReachable();
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
-    int32_t StaStartAbility(OHOS::AAFwk::Want& want);
     void ShowPortalNitification();
 #endif
     void SetConnectMethod(int connectMethod);
+    void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
+    void FillWapiCfg(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

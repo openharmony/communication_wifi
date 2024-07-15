@@ -76,7 +76,9 @@ std::string XmlParser::GetNameValue(xmlNodePtr node)
     }
     xmlChar *value = xmlGetProp(node, BAD_CAST"name");
     if (value != nullptr) {
-        return std::string(reinterpret_cast<char *>(value));
+        std::string result = std::string(reinterpret_cast<char *>(value));
+        xmlFree(value);
+        return result;
     } else {
         return "";
     }
@@ -100,7 +102,9 @@ std::string XmlParser::GetStringValue(xmlNodePtr node)
         return "";
     }
     xmlChar *value = xmlNodeGetContent(node);
-    return std::string(reinterpret_cast<char *>(value));
+    std::string result = std::string(reinterpret_cast<char *>(value));
+    xmlFree(value);
+    return result;
 }
 
 std::vector<std::string> XmlParser::GetStringArrValue(xmlNodePtr innode)
@@ -111,6 +115,7 @@ std::vector<std::string> XmlParser::GetStringArrValue(xmlNodePtr innode)
     }
     xmlChar* numChar = xmlGetProp(innode, BAD_CAST"num");
     int num = std::stoi(std::string(reinterpret_cast<char *>(numChar)));
+    xmlFree(numChar);
     if (num == 0) {
         return stringArr;
     }
@@ -118,6 +123,7 @@ std::vector<std::string> XmlParser::GetStringArrValue(xmlNodePtr innode)
         if (xmlStrcmp(node->name, BAD_CAST"item") == 0) {
             xmlChar* value = xmlGetProp(node, BAD_CAST"value");
             stringArr.push_back(std::string(reinterpret_cast<char *>(value)));
+            xmlFree(value);
         }
     }
     return stringArr;
@@ -133,6 +139,8 @@ std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
     int num = std::stoi(std::string(reinterpret_cast<char *>(numChar)));
     xmlChar *value = xmlNodeGetContent(node);
     std::string valueStr = std::string(reinterpret_cast<char *>(value));
+    xmlFree(numChar);
+    xmlFree(value);
     if (valueStr.length() != 2 * static_cast<size_t>(num)) { // byte length check
         return byteArr;
     }
@@ -159,6 +167,8 @@ std::map<std::string, std::string> XmlParser::GetStringMapValue(xmlNodePtr innod
             name = std::string(reinterpret_cast<char *>(xname));
             value = std::string(reinterpret_cast<char *>(xvalue));
             strMap[name] = value;
+            xmlFree(xname);
+            xmlFree(xvalue);
         }
     }
     return strMap;

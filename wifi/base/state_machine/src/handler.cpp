@@ -16,7 +16,8 @@
 #include <iostream>
 #include <sys/time.h>
 #include "wifi_log.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
+#include "wifi_watchdog_utils.h"
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_HANDLER"
 
@@ -59,7 +60,10 @@ bool Handler::InitialHandler(const std::string &name)
     pthread_setname_np(handleThread, name.c_str());
 #else
     if (pMyTaskQueue == nullptr) {
-        pMyTaskQueue = std::make_unique<WifiEventHandler>(name);
+        std::function<void()> func = std::bind([&name]() {
+            WifiWatchDogUtils::GetInstance()->ResetProcess(true, name);
+        });
+        pMyTaskQueue = std::make_unique<WifiEventHandler>(name, func);
         if (pMyTaskQueue == nullptr) {
             LOGE("pMyTaskQueue alloc failed.\n");
             return false;
@@ -87,6 +91,11 @@ void Handler::StopHandlerThread()
 #else
     if (pMyTaskQueue != nullptr) {
         pMyTaskQueue.reset();
+    }
+    for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
+        InternalMessage *msg = *iter;
+        iter = mMessageQueue.erase(iter);
+        MessageManage::GetInstance().ReclaimMsg(msg);
     }
 #endif
     LOGI("Leave StopHandlerThread %{public}s", mThreadName.c_str());
@@ -122,10 +131,10 @@ void Handler::GetAndDistributeMessage()
             continue;
         }
         LOGD("Handler get message: %{public}d\n", msg->GetMessageName());
-        WifiSettings::GetInstance().SetThreadStatusFlag(true);
+        WifiConfigCenter::GetInstance().SetThreadStatusFlag(true);
         DistributeMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);
-        WifiSettings::GetInstance().SetThreadStatusFlag(false);
+        WifiConfigCenter::GetInstance().SetThreadStatusFlag(false);
     }
 
     return;
@@ -139,16 +148,7 @@ void Handler::SendMessage(InternalMessage *msg)
         return;
     }
     LOGD("%{public}s SendMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
-#ifdef OHOS_ARCH_LITE
     MessageExecutedLater(msg, 0);
-#else
-    std::function<void()> func = std::bind([this, msg]() {
-        LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
-        ExecuteMessage(msg);
-        MessageManage::GetInstance().ReclaimMsg(msg);
-        });
-    pMyTaskQueue->PostAsyncTask(func, std::to_string(msg->GetMessageName()), 0);
-#endif
     return;
 }
 
@@ -159,7 +159,7 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
         return;
     }
 
-    LOGD("%{public}s MessageExecutedLater msg:%{public}d %{public}lld",
+    LOGD("%{public}s MessageExecutedLater msg:%{public}d %{public}" PRId64,
         mThreadName.c_str(), msg->GetMessageName(), delayTimeMs);
     int64_t delayTime = delayTimeMs;
     if (delayTime < 0) {
@@ -183,11 +183,20 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;
     }
+    mMessageQueue.push_back(msg);
     std::function<void()> func = std::bind([this, msg]() {
         LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
         ExecuteMessage(msg);
+        for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
+            if (*iter == msg) {
+                iter = mMessageQueue.erase(iter);
+                break;
+            } else {
+                iter++;
+            }
+        }
         MessageManage::GetInstance().ReclaimMsg(msg);
-        });
+    });
     pMyTaskQueue->PostAsyncTask(func, std::to_string(msg->GetMessageName()), delayTime);
 #endif
     return;
@@ -266,6 +275,15 @@ void Handler::DeleteMessageFromQueue(int messageName)
         return;
     }
 #else
+    for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
+        InternalMessage *msg = *iter;
+        if (msg->GetMessageName() == messageName) {
+            iter = mMessageQueue.erase(iter);
+            MessageManage::GetInstance().ReclaimMsg(msg);
+        } else {
+            iter++;
+        }
+    }
     if (pMyTaskQueue == nullptr) {
         LOGE("%{public}s pMyQueue is null.\n", mThreadName.c_str());
         return;

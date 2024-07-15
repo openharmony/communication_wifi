@@ -28,10 +28,6 @@ namespace OHOS {
 namespace Wifi {
 using namespace NetManagerStandard;
 
-#define NETWORK 1
-#define NO_NETWORK 0
-#define ARP_OPT 0
-
 NetStateObserver::NetStateObserver(): m_callback(nullptr)
 {
     WIFI_LOGD("construct NetStateObserver");
@@ -74,20 +70,17 @@ void NetStateObserver::StopNetStateObserver(sptr<NetStateObserver> &netStateObse
 int32_t NetStateObserver::OnNetDetectionResultChanged(
     NetManagerStandard::NetDetectionResultCode detectionResult, const std::string &urlRedirect)
 {
-    WIFI_LOGI("OnNetDetectionResultChanged nettype:%{public}d, url:%{public}s", detectionResult, urlRedirect.c_str());
+    WIFI_LOGD("OnNetDetectionResultChanged nettype:%{public}d, url:%{private}s", detectionResult, urlRedirect.c_str());
     switch (detectionResult) {
         case NetManagerStandard::NET_DETECTION_CAPTIVE_PORTAL: {
             m_callback(SystemNetWorkState::NETWORK_IS_PORTAL, urlRedirect);
             break;
         }
         case NetManagerStandard::NET_DETECTION_FAIL: {
-            WriteWifiAccessIntFailedHiSysEvent(ARP_OPT, StaArpState::ARP_STATE_UNREACHABLE);
-            WriteIsInternetHiSysEvent(NO_NETWORK);
             m_callback(SystemNetWorkState::NETWORK_NOTWORKING, "");
             break;
         }
         case NetManagerStandard::NET_DETECTION_SUCCESS: {
-            WriteIsInternetHiSysEvent(NETWORK);
             m_callback(SystemNetWorkState::NETWORK_IS_WORKING, "");
             break;
         }
@@ -100,6 +93,7 @@ int32_t NetStateObserver::OnNetDetectionResultChanged(
 
 sptr<NetHandle> NetStateObserver::GetWifiNetworkHandle()
 {
+#ifndef DTFUZZ_TEST
     std::list<sptr<NetHandle>> netList;
     int32_t ret = NetConnClient::GetInstance().GetAllNets(netList);
     if (ret != NETMANAGER_SUCCESS) {
@@ -114,6 +108,7 @@ sptr<NetHandle> NetStateObserver::GetWifiNetworkHandle()
         }
     }
     WIFI_LOGE("GetWifiNetworkHandle not find wifi network");
+#endif
     return nullptr;
 }
  

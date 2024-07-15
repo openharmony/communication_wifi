@@ -2698,6 +2698,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
             break;
         }
         case CMD_SIGNAL_POLL:
+            ret = EXECUTED;
             pStaStateMachine->DealSignalPollResult();
             break;
         default:

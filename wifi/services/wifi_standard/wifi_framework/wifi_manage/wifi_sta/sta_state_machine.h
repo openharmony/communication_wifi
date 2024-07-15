@@ -1167,7 +1167,7 @@ private:
     int targetNetworkId;
     int pinCode;
     SetupMethod wpsState;
-    int lastSignalLevel;
+    int lastSignalLevel_;
     std::string targetRoamBssid;
     int currentTpType;
     IsWpsConnected isWpsConnect;

@@ -569,4 +569,32 @@ NO_SANITIZE("cfi") WifiErrorCode EnableHiLinkHandshake(bool uiFlag, std::string 
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiDevicePtr->EnableHiLinkHandshake(uiFlag, bssid, deviceConfig));
 }
+
+NO_SANITIZE("cfi") WifiErrorCode EnableSemiWifi()
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiDevicePtr->EnableSemiWifi());
+}
+
+NO_SANITIZE("cfi") WifiErrorCode GetWifiDetailState(WifiDetailState *state)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    OHOS::Wifi::WifiDetailState detailState;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetWifiDetailState(detailState);
+    *state = (WifiDetailState)detailState;
+    return GetCErrorCode(ret);
+}
+
+NO_SANITIZE("cfi") WifiErrorCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    OHOS::Wifi::WifiLowPowerParam tempParam;
+    tempParam.ifName = wifiLowPowerParam.ifName;
+    tempParam.scene = wifiLowPowerParam.scene;
+    tempParam.rssiThreshold = wifiLowPowerParam.rssiThreshold;
+    tempParam.peerMacaddr = wifiLowPowerParam.peerMacaddr;
+    tempParam.powerParam = wifiLowPowerParam.powerParam;
+    tempParam.powerParamLen = wifiLowPowerParam.powerParamLen;
+    return GetCErrorCode(wifiDevicePtr->SetLowTxPower(tempParam));
+}
 #endif

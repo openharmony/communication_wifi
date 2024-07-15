@@ -14,7 +14,7 @@
  */
 #include "wifi_p2p_group_manager.h"
 #include <algorithm>
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_logger.h"
 
     DEFINE_WIFILOG_P2P_LABEL("WifiP2pGroupManager");
@@ -28,7 +28,7 @@ void WifiP2pGroupManager::Initialize()
 {
     std::unique_lock<std::mutex> lock(groupMutex);
     WifiSettings::GetInstance().GetWifiP2pGroupInfo(groupsInfo);
-    WifiSettings::GetInstance().GetP2pInfo(p2pConnInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pConnInfo);
 }
 
 void WifiP2pGroupManager::StashGroups()
@@ -244,6 +244,7 @@ void WifiP2pGroupManager::RefreshCurrentGroupFromGroups()
 
 void WifiP2pGroupManager::SaveP2pInfo(const WifiP2pLinkedInfo &linkedInfo)
 {
+    std::unique_lock<std::mutex> lock(groupMutex);
     p2pConnInfo = linkedInfo;
 }
 
@@ -284,8 +285,9 @@ void WifiP2pGroupManager::UpdateGroupsNetwork(std::map<int, WifiP2pGroupInfo> wp
 
 void WifiP2pGroupManager::SetCurrentGroup(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group)
 {
+    std::unique_lock<std::mutex> lock(groupMutex);
     currentGroup = group;
-    WifiSettings::GetInstance().SetCurrentP2pGroupInfo(group);
+    WifiConfigCenter::GetInstance().SetCurrentP2pGroupInfo(group);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     AddMacAddrPairInfo(type, group);
 #endif
@@ -300,38 +302,40 @@ void WifiP2pGroupManager::AddMacAddrPairInfo(WifiMacAddrInfoType type, const Wif
         __func__, type, owner.GetDeviceName().c_str(),
         owner.GetDeviceAddress().c_str(), owner.GetDeviceAddressType());
     if (type == WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO) {
-        std::string goRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+        std::string goRandomMacAddr = WifiConfigCenter::GetInstance().GetRandomMacAddr(
             WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, owner.GetDeviceAddress());
-        WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
+        WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
         std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
         std::string gcRandomMacAddr;
         for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
-            gcRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+            gcRandomMacAddr = WifiConfigCenter::GetInstance().GetRandomMacAddr(
                 WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, iter->GetDeviceAddress());
-            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(), gcRandomMacAddr);
+            WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(), gcRandomMacAddr);
         }
     } else if (type == WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO) {
-        std::string goRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+        std::string goRandomMacAddr = WifiConfigCenter::GetInstance().GetRandomMacAddr(
             WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, owner.GetDeviceAddress());
         if (!goRandomMacAddr.empty()) {
-            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
+            WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
             std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
             std::string gcRandomMacAddr;
             for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
-                gcRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+                gcRandomMacAddr = WifiConfigCenter::GetInstance().GetRandomMacAddr(
                     WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, iter->GetDeviceAddress());
-                WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(), gcRandomMacAddr);
+                WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(),
+                    gcRandomMacAddr);
             }
         } else {
-            goRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+            goRandomMacAddr = WifiConfigCenter::GetInstance().GetRandomMacAddr(
                 WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, owner.GetDeviceAddress());
-            WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
+            WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(type, owner.GetDeviceAddress(), goRandomMacAddr);
             std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
             std::string gcRandomMacAddr;
             for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
-                gcRandomMacAddr = WifiSettings::GetInstance().GetRandomMacAddr(
+                gcRandomMacAddr = WifiConfigCenter::GetInstance().GetRandomMacAddr(
                     WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, iter->GetDeviceAddress());
-                WifiSettings::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(), gcRandomMacAddr);
+                WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(type, iter->GetDeviceAddress(),
+                    gcRandomMacAddr);
             }
         }
     } else {
@@ -348,14 +352,14 @@ void WifiP2pGroupManager::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, const 
     WifiMacAddrInfo macAddrInfo;
     macAddrInfo.bssid = owner.GetDeviceAddress();
     macAddrInfo.bssidType = owner.GetDeviceAddressType();
-    WifiSettings::GetInstance().RemoveMacAddrPairs(type, macAddrInfo);
+    WifiConfigCenter::GetInstance().RemoveMacAddrPairs(type, macAddrInfo);
 
     std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
     for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
         WifiMacAddrInfo clientMacAddrInfo;
         clientMacAddrInfo.bssid = iter->GetDeviceAddress();
         clientMacAddrInfo.bssidType = iter->GetDeviceAddressType();
-        WifiSettings::GetInstance().RemoveMacAddrPairs(type, clientMacAddrInfo);
+        WifiConfigCenter::GetInstance().RemoveMacAddrPairs(type, clientMacAddrInfo);
     }
 }
 #endif

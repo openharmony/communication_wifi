@@ -110,6 +110,8 @@ enum class P2P_STATE_MACHINE_CMD {
     CMD_HID2D_CREATE_GROUP, /* hid2d create group */
     CMD_HID2D_CONNECT,
     CMD_REMOVE_GROUP_CLIENT,
+    CMD_DISCOVER_PEERS,
+    CMD_DISABLE_RANDOM_MAC,
 
     /* monitor to state machine */
     WPA_CONNECTED_EVENT = 100,  // result of connect
@@ -139,6 +141,8 @@ enum class P2P_STATE_MACHINE_CMD {
     P2P_REMOVE_DEVICE,
     P2P_RETRY_CONNECT,
     P2P_EVENT_CH_SWITCH,
+    P2P_EVENT_PRI_DEVICE_FOUND,
+    P2P_EVENT_IP_ADDRESS,
 
     /* if the requests to WPA is not synchronization need protected by a timeout mechanism */
     ENABLE_P2P_TIMED_OUT = 200,
@@ -157,6 +161,7 @@ enum class DHCPTYPE {
     NO_DHCP = 0,
     DHCP_P2P,
     DHCP_LEGACEGO,
+    DHCP_INVALID,
 };
 
 enum class P2P_ERROR_RES {

@@ -237,3 +237,10 @@ DSM_WIFI_PCIE_LINKDOWN:
   NFF_THRESHOLD_DAYNFF: {type: INT32, desc: nff_threshold_day}
   NFF_THRESHOLD_MONTHNFF: {type: INT32, desc: nff_threshold_month}
   RUNNING_TEST_SWITCH: {type: INT32, desc: running_test_switch}
+
+WIFIENCRY_OR_DECRY_FAIL:
+  __BASE: {type: FAULT, level: MINOR, desc: WIFIENCRY OR DECRY FAIL, preserve: true}
+  ENCRY_OR_DECRY_EVENT: {type: INT32, desc: ENCRY OR DECRY EVENT}
+  SSID: {type: STRING, desc: network name}
+  ENCRYKEYMANAGEMENT: {type: STRING, desc: ENCRY type}
+  ENCRYEVENTMODULE: {type: INT32, desc: moudle name}

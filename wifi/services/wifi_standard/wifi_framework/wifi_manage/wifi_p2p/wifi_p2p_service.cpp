@@ -15,11 +15,13 @@
 
 #include "wifi_p2p_service.h"
 #include "abstract_ui.h"
+#include "ipc_skeleton.h"
 #include "p2p_define.h"
+#include "wifi_channel_helper.h"
 #include "wifi_common_util.h"
 #include "wifi_errcode.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_p2p_hal_interface.h"
 
@@ -29,6 +31,7 @@ namespace OHOS {
 namespace Wifi {
 #define COUNTRY_CODE_JAPAN_L "jp"
 #define COUNTRY_CODE_JAPAN_C "JP"
+#define SOFT_BUS_UID 1024
 WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pGroupManager &setGroupMgr, WifiP2pServiceManager &setSvrMgr)
     : p2pStateMachine(p2pStateMachine),
@@ -124,6 +127,7 @@ ErrCode WifiP2pService::StopP2pListen()
 
 ErrCode WifiP2pService::CreateGroup(const WifiP2pConfig &config)
 {
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     WIFI_LOGI("CreateGroup name: %{private}s, address:%{private}s, addressType:%{public}d",
         config.GetGroupName().c_str(), config.GetDeviceAddress().c_str(), config.GetDeviceAddressType());
     WifiP2pConfigInternal configInternal(config);
@@ -161,6 +165,7 @@ ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 {
     WIFI_LOGI("P2pConnect");
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     WifiP2pConfigInternal configInternal(config);
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
@@ -213,7 +218,7 @@ ErrCode WifiP2pService::GetCurrentGroup(WifiP2pGroupInfo &group)
 {
     WIFI_LOGD("GetCurrentGroup");
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     if (p2pInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -225,14 +230,14 @@ ErrCode WifiP2pService::GetCurrentGroup(WifiP2pGroupInfo &group)
 ErrCode WifiP2pService::GetP2pEnableStatus(int &status)
 {
     WIFI_LOGI("GetP2pEnableStatus");
-    status = WifiSettings::GetInstance().GetP2pState();
+    status = WifiConfigCenter::GetInstance().GetP2pState();
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pService::GetP2pDiscoverStatus(int &status)
 {
     WIFI_LOGI("GetP2pDiscoverStatus");
-    status = WifiSettings::GetInstance().GetP2pDiscoverState();
+    status = WifiConfigCenter::GetInstance().GetP2pDiscoverState();
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -240,7 +245,7 @@ ErrCode WifiP2pService::GetP2pConnectedStatus(int &status)
 {
     WIFI_LOGI("GetP2pConnectedStatus");
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     status = static_cast<int>(p2pInfo.GetConnectState());
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -295,6 +300,7 @@ void WifiP2pService::ClearAllP2pServiceCallbacks()
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
 {
     WIFI_LOGI("Create hid2d group");
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     const std::any info = std::pair<int, FreqType>(frequency, type);
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP), info);
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -303,7 +309,7 @@ ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
 ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
 {
     WIFI_LOGI("Hid2dConnect");
-
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
     DHCPTYPE dhcpType = DHCPTYPE::DHCP_LEGACEGO;
     if (config.GetDhcpMode() == DhcpMode::CONNECT_GO_NODHCP ||
         config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
@@ -344,22 +350,42 @@ ErrCode WifiP2pService::Hid2dRequestGcIp(const std::string& gcMac, std::string& 
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiP2pService::IncreaseSharedLink(void)
+void WifiP2pService::IncreaseSharedLink(int callingUid)
 {
-    WIFI_LOGI("IncreaseSharedLink");
-    SharedLinkManager::IncreaseSharedLink();
+    WIFI_LOGI("Uid %{public}d increaseSharedLink", callingUid);
+    SharedLinkManager::IncreaseSharedLink(callingUid);
 }
 
-void WifiP2pService::DecreaseSharedLink(void)
+void WifiP2pService::DecreaseSharedLink(int callingUid)
 {
-    WIFI_LOGI("DecreaseSharedLink");
-    SharedLinkManager::DecreaseSharedLink();
+    WIFI_LOGI("Uid %{public}d decreaseSharedLink", callingUid);
+    SharedLinkManager::DecreaseSharedLink(callingUid);
 }
 
 int WifiP2pService::GetSharedLinkCount(void)
 {
     WIFI_LOGI("GetSharedLinkCount");
     return SharedLinkManager::GetSharedLinkCount();
+}
+
+ErrCode WifiP2pService::HandleBusinessSAException(int systemAbilityId)
+{
+    WIFI_LOGI("HandleBusinessSAException");
+    if (SharedLinkManager::GetSharedLinkCount() == 0) {
+        return WIFI_OPT_SUCCESS;
+    }
+    int callingUid = -1;
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        callingUid = SOFT_BUS_UID;
+    } else {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    SharedLinkManager::DecreaseSharedLink(callingUid);
+    if (SharedLinkManager::GetSharedLinkCount() == 0) {
+        RemoveGroup();
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 int WifiP2pService::GetP2pRecommendChannel(void)
@@ -374,7 +400,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     int channel = 0; // 0 is invalid channel
     int COMMON_USING_5G_CHANNEL = 149;
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (linkedInfo.connState == CONNECTED) {
         channel = FrequencyToChannel(linkedInfo.frequency);
         if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ)) {
@@ -391,7 +417,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
 
     ChannelsTable channels;
     std::vector<int32_t> vec5GChannels;
-    WifiSettings::GetInstance().GetValidChannels(channels);
+    WifiChannelHelper::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
         vec5GChannels = channels[BandType::BAND_5GHZ];
     }
@@ -423,6 +449,25 @@ ErrCode WifiP2pService::Hid2dSetUpperScene(const std::string& ifName, const Hid2
 ErrCode WifiP2pService::MonitorCfgChange(void)
 {
     WIFI_LOGI("MonitorCfgChange");
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::DiscoverPeers(int32_t channelid)
+{
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_PEERS), channelid);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::DisableRandomMac(int setmode)
+{
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISABLE_RANDOM_MAC), setmode);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::SetGcIpAddress(const IpAddrInfo& ipInfo)
+{
+    WIFI_LOGI("SetGcIpAddress");
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_IP_ADDRESS), ipInfo);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

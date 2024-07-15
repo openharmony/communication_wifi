@@ -26,55 +26,55 @@ struct WifiSelfCureHistoryInfo {
     int dnsSelfCureFailedCnt;
 
     /* record last dns failed milliseconds */
-    uint64_t lastDnsSelfCureFailedTs;
+    int64_t lastDnsSelfCureFailedTs;
 
     /* record renew dhcp failed count */
     int renewDhcpSelfCureFailedCnt;
 
     /* record last renew dhcp failed milliseconds */
-    uint64_t lastRenewDhcpSelfCureFailedTs;
+    int64_t lastRenewDhcpSelfCureFailedTs;
 
     /* record static ip failed count */
     int staticIpSelfCureFailedCnt;
 
     /* record last static ip failed milliseconds */
-    uint64_t lastStaticIpSelfCureFailedTs;
+    int64_t lastStaticIpSelfCureFailedTs;
 
     /* record reassoc failed count */
     int reassocSelfCureFailedCnt;
 
     /* record last reassoc failed milliseconds */
-    uint64_t lastReassocSelfCureFailedTs;
+    int64_t lastReassocSelfCureFailedTs;
 
     /* record rand mac selfcure fail cnt */
     int randMacSelfCureFailedCnt;
 
     /* record rand mac selfcure fail time */
-    uint64_t lastRandMacSelfCureFailedCntTs;
+    int64_t lastRandMacSelfCureFailedCntTs;
 
     /* record reset failed count */
     int resetSelfCureFailedCnt;
 
     /* record last reset failed milliseconds */
-    uint64_t lastResetSelfCureFailedTs;
+    int64_t lastResetSelfCureFailedTs;
 
     /* record reassoc connect failed count */
     int reassocSelfCureConnectFailedCnt;
 
     /* record last reassoc connect failed milliseconds */
-    uint64_t lastReassocSelfCureConnectFailedTs;
+    int64_t lastReassocSelfCureConnectFailedTs;
 
     /* record rand mac selfcure connect fail cnt */
     int randMacSelfCureConnectFailedCnt;
 
     /* record rand mac selfcure connect fail time */
-    uint64_t lastRandMacSelfCureConnectFailedCntTs;
+    int64_t lastRandMacSelfCureConnectFailedCntTs;
 
     /* record reset connect failed count */
     int resetSelfCureConnectFailedCnt;
 
     /* record last reset connect failed milliseconds */
-    uint64_t lastResetSelfCureConnectFailedTs;
+    int64_t lastResetSelfCureConnectFailedTs;
     WifiSelfCureHistoryInfo()
     {
         dnsSelfCureFailedCnt = 0;

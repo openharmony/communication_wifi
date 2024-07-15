@@ -59,12 +59,15 @@ if (defined(ohos_lite)) {
     external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
     defines = [ "OHOS_ARCH_LITE" ]
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -94,10 +97,14 @@ if (defined(ohos_lite)) {
   config("wifi_sdk_config") {
     visibility = [ ":*" ]
     include_dirs = [ ":wifi_fw_common_header" ]
-
     cflags = [
       "-std=c++17",
       "-fno-rtti",
+    ]
+    cflags_cc = [
+      "-std=c++17",
+      "-fno-rtti",
+      "-Os",
     ]
 
     if (target_cpu == "arm") {
@@ -108,9 +115,11 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_device_proxy_impl") {
     branch_protector_ret = "pac_ret"
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     part_name = "wifi"
@@ -131,6 +140,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
@@ -140,9 +150,11 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_hotspot_proxy_impl") {
     branch_protector_ret = "pac_ret"
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     part_name = "wifi"
@@ -163,6 +175,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
@@ -172,9 +185,11 @@ if (defined(ohos_lite)) {
   ohos_source_set("wifi_scan_proxy_impl") {
     branch_protector_ret = "pac_ret"
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     part_name = "wifi"
@@ -195,6 +210,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
@@ -205,9 +221,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     part_name = "wifi"
@@ -227,6 +245,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
@@ -237,9 +256,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
-      cfi = true
-      boundary_sanitize = true
-      cfi_cross_dso = true
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = true  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = true  # Enable integer overflow detection
+      ubsan = true  # Enable some Ubsan options
       debug = false
     }
     install_enable = true
@@ -290,13 +311,15 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]

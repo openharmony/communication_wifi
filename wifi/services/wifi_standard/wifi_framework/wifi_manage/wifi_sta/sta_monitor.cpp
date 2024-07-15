@@ -12,18 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cstring>
 #include "sta_monitor.h"
-#include "wifi_idl_define.h"
 #include "sta_define.h"
 #include "wifi_logger.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
+#include "wifi_hisysevent.h"
+#include "wifi_event_callback.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_LABEL("StaMonitor");
 
 namespace OHOS {
 namespace Wifi {
+constexpr int WLAN_STATUS_UNSPECIFIED_FAILURE = 1;
+constexpr int WEP_WRONG_PASSWORD_STATUS_CODE = 5202;
+
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {}
 
@@ -43,13 +50,13 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnWpaSsidWrongKeyCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
-        std::bind(&StaMonitor::onWpaConnectionFullCallBack, this, _1),
-        std::bind(&StaMonitor::onWpaConnectionRejectCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpaConnectionFullCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpaConnectionRejectCallBack, this, _1, _2),
         std::bind(&StaMonitor::OnWpaStaNotifyCallBack, this, _1),
         std::bind(&StaMonitor::OnReportDisConnectReasonCallBack, this, _1, _2),
     };
 
-    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("InitStaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
@@ -60,7 +67,7 @@ NO_SANITIZE("cfi") ErrCode StaMonitor::UnInitStaMonitor() const
 {
     WIFI_LOGI("Enter UnInitStaMonitor.\n");
     WifiEventCallback callBack;
-    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("~StaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
@@ -107,31 +114,28 @@ void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
-    if (status == WPA_CB_ASSOCIATING || status == WPA_CB_ASSOCIATED) {
+    if (status == HAL_WPA_CB_ASSOCIATING || status == HAL_WPA_CB_ASSOCIATED) {
         pStaStateMachine->OnNetworkHiviewEvent(status);
     }
 
     switch (status) {
-        case WPA_CB_CONNECTED: {
+        case HAL_WPA_CB_CONNECTED: {
             pStaStateMachine->OnNetworkConnectionEvent(networkId, bssid);
             break;
         }
-        case WPA_CB_DISCONNECTED: {
+        case HAL_WPA_CB_DISCONNECTED: {
             pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT, bssid);
             pStaStateMachine->OnNetworkDisconnectEvent(networkId);
             break;
         }
-        case WPA_CB_ASSOCIATING:
-        case WPA_CB_ASSOCIATED:
+        case HAL_WPA_CB_ASSOCIATING:
+        case HAL_WPA_CB_ASSOCIATED:
             pStaStateMachine->OnNetworkAssocEvent(status, bssid, pStaStateMachine);
             break;
         default:
             break;
     }
 }
-
-constexpr int HILINK_NUM = 0X01;
-constexpr int EAP_SIM_NUM = 0X02;
 
 void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
 {
@@ -154,10 +158,10 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         return;
     }
     switch (num) {
-        case HILINK_NUM:
+        case static_cast<int>(WpaEventCallback::HILINK_NUM):
             OnWpaHilinkCallBack(data);
             break;
-        case EAP_SIM_NUM:
+        case static_cast<int>(WpaEventCallback::EAP_SIM_NUM):
             OnWpaEapSimAuthCallBack(data);
             break;
         default:
@@ -199,6 +203,7 @@ void StaMonitor::OnWpaStateChangedCallBack(int status)
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
+    WriteWifiWpaStateHiSysEvent(status);
     /* Notification state machine wpa state changed event. */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT, status);
 }
@@ -219,7 +224,7 @@ void StaMonitor::OnWpaSsidWrongKeyCallBack(int status)
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
 }
 
-void StaMonitor::onWpaConnectionFullCallBack(int status)
+void StaMonitor::OnWpaConnectionFullCallBack(int status)
 {
     LOGI("onWpaConnectionFullCallBack() status:%d.\n", status);
     if (pStaStateMachine == nullptr) {
@@ -231,11 +236,38 @@ void StaMonitor::onWpaConnectionFullCallBack(int status)
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
 }
 
-void StaMonitor::onWpaConnectionRejectCallBack(int status)
+void StaMonitor::OnWpaConnectionRejectCallBack(int status, const std::string &bssid)
 {
     LOGI("onWpsConnectionRejectCallBack() status:%d.\n", status);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
+
+    /* Special handling for WPA3-Personal networks. If the password is
+       incorrect, the AP will send association rejection, with status code 1
+       (unspecified failure). In SAE networks, the password authentication
+       is not related to the 4-way handshake. In this case, we will send an
+       authentication failure event up. */
+    bool isWrongPwd = false;
+    std::vector<WifiScanInfo> scanResults;
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    for (WifiScanInfo &item : scanResults) {
+        if (strcasecmp(item.bssid.c_str(), bssid.c_str()) == 0) {
+            if (status == WLAN_STATUS_UNSPECIFIED_FAILURE &&
+                (item.capabilities.find("SAE") != std::string::npos)) {
+                isWrongPwd = true;
+                break;
+            } else if (status == WEP_WRONG_PASSWORD_STATUS_CODE &&
+                item.capabilities.find("WEP") != std::string::npos) {
+                isWrongPwd = true;
+                break;
+            }
+        }
+    }
+    if (isWrongPwd) {
+        WIFI_LOGI("onWpaConnectionRejectCallBack wrong password");
+        OnWpaSsidWrongKeyCallBack(1);
         return;
     }
 

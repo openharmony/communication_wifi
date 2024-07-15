@@ -45,7 +45,7 @@ int WriteFunc(Context *context, const char *funcName)
         return -1;
     }
 
-    int len = strlen(funcName) + 1;
+    int len = (int)strlen(funcName) + 1;
     if (len <= 0) {
         return -1;
     }
@@ -135,7 +135,7 @@ int WriteStr(Context *context, const char *pStr)
         return -1;
     }
 
-    int len = strlen(pStr) + 1;
+    int len = (int)strlen(pStr) + 1;
     if (len <= 0) {
         return -1;
     }
@@ -227,7 +227,7 @@ int ReadFunc(Context *context, char *funcName, int count)
     if (strncpy_s(funcName, count, context->oneProcess + context->nPos, len) != EOK) {
         return -1;
     }
-    context->nPos += len + 1;
+    context->nPos += (uint32_t)(len + 1);
     return 0;
 }
 
@@ -281,7 +281,7 @@ int ReadInt(Context *context, int *iData)
         return len;
     }
     *iData = atoi(szTmp);
-    context->nPos += len + 1;
+    context->nPos += (uint32_t)(len + 1);
     return 0;
 }
 
@@ -297,7 +297,7 @@ int ReadLong(Context *context, long *pLong)
         return len;
     }
     *pLong = atol(szTmp);
-    context->nPos += len + 1;
+    context->nPos += (uint32_t)(len + 1);
     return 0;
 }
 
@@ -313,7 +313,7 @@ int ReadInt64(Context *context, int64_t *pInt64)
         return len;
     }
     *pInt64 = atoll(szTmp);
-    context->nPos += len + 1;
+    context->nPos += (uint32_t)(len + 1);
     return 0;
 }
 
@@ -329,7 +329,7 @@ int ReadDouble(Context *context, double *dData)
         return len;
     }
     *dData = atof(szTmp);
-    context->nPos += len + 1;
+    context->nPos += (uint32_t)(len + 1);
     return 0;
 }
 
@@ -347,7 +347,7 @@ int ReadChar(Context *context, char *cData)
         return SERIAL_READ_TOO_LONG;
     }
     *cData = *(context->oneProcess + context->nPos);
-    context->nPos += len + 1;
+    context->nPos += (uint32_t)(len + 1);
     return 0;
 }
 
@@ -367,7 +367,7 @@ int ReadStr(Context *context, char *str, int count)
     if (strncpy_s(str, count, context->oneProcess + context->nPos, len) != EOK) {
         return -1;
     }
-    context->nPos += len + 1;
+    context->nPos += (uint32_t)(len + 1);
     return 0;
 }
 
@@ -406,6 +406,6 @@ int ReadUStr(Context *context, unsigned char *uStr, int count)
         uStr[j++] = byte;
     }
     uStr[j] = 0;
-    context->nPos += len + 1;
+    context->nPos += (uint32_t)(len + 1);
     return 0;
 }

@@ -66,7 +66,14 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_ENABLE_AUTO_JOIN = 0x103A,          /* enable auto join */
     WIFI_SVR_CMD_LIMIT_SPEED = 0x103B,               /* limit app speed */
     WIFI_SVR_CMD_IS_HILINK_CONNECT = 0x103C,          /* hilink connect */
+    WIFI_SVR_CMD_SET_SATELLITE_STATE = 0x103D,        /* set satellite state */
+    WIFI_SVR_CMD_ENABLE_SEMI_WIFI = 0x103E,          /* enable semi-wifi */
+    WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE = 0x103F,     /* get wifi detail state */
+    WIFI_SVR_CMD_START_ROAM_TO_NETWORK = 0x1040,     /* roam to target bssid */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
+    WIFI_SVR_CMD_SET_TX_POWER = 0x1041,              /* set tx power */
+    WIFI_SVR_CMD_SET_LOW_TX_POWER = 0x1042,          /* set low tx power */
+    WIFI_SVR_CMD_START_CONNECT_TO_USER_SELECT_NETWORK = 0x1043,     /* connect to user select target bssid */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */
@@ -152,6 +159,10 @@ enum class  P2PInterfaceCode {
     WIFI_SVR_CMD_SET_PEER_WIFI_CFG = 0x2026,    /* set peer wifi configuration */
     WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE = 0x2027, /* query the information about the local device */
     WIFI_SVR_CMD_SET_UPPER_SCENE = 0x2028,    /* set the scene of upper layer */
+    WIFI_SVR_CMD_P2P_DISCOVER_PEERS = 0x2029,
+    WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC = 0x202A,
+    WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P = 0x202B,    /* check can use p2p */
+
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
     WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT = 0x3000,
     /* 以下CALL BACK类code，不需要进行权限校验 */
@@ -166,6 +177,7 @@ enum class  P2PInterfaceCode {
     WIFI_CBK_CMD_CFG_CHANGE = 0x3208,
     WIFI_CBK_CMD_P2P_GC_JOIN_GROUP = 0x3209,    /* Gc joined group and obtained IP */
     WIFI_CBK_CMD_P2P_GC_LEAVE_GROUP = 0x3210,    /* Gc disconnected */
+    WIFI_CBK_CMD_PRIVATE_PEER_CHANGE = 0x3211,
 };
 
 /* SAID: 1124 */

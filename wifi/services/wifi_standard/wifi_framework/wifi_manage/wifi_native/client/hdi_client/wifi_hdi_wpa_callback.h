@@ -42,8 +42,7 @@ int32_t OnEventScanResult(struct IWpaCallback *self,
     const struct HdiWpaRecvScanResultParam *recvScanResultParam, const char* ifName);
 int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName);
 int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName);
-int32_t OnEventP2pStateChanged(struct IWpaCallback *self,
-    const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName);
+int32_t OnEventP2pStateChanged(int status);
 int32_t OnEventDeviceFound(struct IWpaCallback *self,
     const struct HdiP2pDeviceInfoParam *deviceInfoParam, const char* ifName);
 int32_t OnEventDeviceLost(struct IWpaCallback *self,
@@ -60,6 +59,8 @@ int32_t OnEventGroupFormationSuccess(struct IWpaCallback *self, const char *ifNa
 int32_t OnEventGroupFormationFailure(struct IWpaCallback *self, const char *reason, const char *ifName);
 int32_t OnEventGroupStarted(struct IWpaCallback *self,
     const struct HdiP2pGroupStartedParam *groupStartedParam, const char* ifName);
+int32_t OnEventGroupInfoStarted(struct IWpaCallback *self,
+    const struct HdiP2pGroupInfoStartedParam *groupStartedParam, const char* ifName);
 int32_t OnEventGroupRemoved(struct IWpaCallback *self,
     const struct HdiP2pGroupRemovedParam *groupRemovedParam, const char* ifName);
 int32_t OnEventProvisionDiscoveryCompleted(struct IWpaCallback *self,

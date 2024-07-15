@@ -18,9 +18,11 @@ ohos_shared_library("wifi_ap_service") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    cfi = true
-    boundary_sanitize = true
-    cfi_cross_dso = true
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = true  # Enable integer overflow detection
+    ubsan = true  # Enable some Ubsan options
     debug = false
   }
   install_enable = true
@@ -59,13 +61,15 @@ ohos_shared_library("wifi_ap_service") {
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
   ]
-
-  cflags_cc = [
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
+  cflags_cc += [
     "-std=c++17",
     "-Wall",
   ]
 
-  ldflags = [
+  ldflags += [
     "-fPIC",
     "-Wl,-E",
   ]

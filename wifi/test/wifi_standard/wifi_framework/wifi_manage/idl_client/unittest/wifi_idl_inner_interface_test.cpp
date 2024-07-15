@@ -69,12 +69,12 @@ static void OnWpaConnectionFullMock(int status)
     LOGI("OnWpaConnectionFullMock");
 }
 
-static void OnWpaConnectionRejectMock(int status)
+static void OnWpaConnectionRejectMock(int status, const std::string &bssid)
 {
     LOGI("OnWpaConnectionRejectMock");
 }
 
-static void OnStaJoinOrLeaveMock(const WifiApConnectionNofify &info)
+static void OnStaJoinOrLeaveMock(const WifiHalApConnectionNofify &info)
 {
     LOGI("OnStaJoinOrLeaveMock");
 }
@@ -89,7 +89,7 @@ static void OnConnectSupplicantMock(int status)
     LOGI("OnConnectSupplicantMock");
 }
 
-static void OnDeviceFoundMock(const IdlP2pDeviceFound &info)
+static void OnDeviceFoundMock(const HalP2pDeviceFound &info)
 {
     LOGI("OnDeviceFoundMock");
 }
@@ -114,7 +114,7 @@ static void OnGoNegotiationFailureMock(int status)
     LOGI("OnGoNegotiationFailureMock");
 }
 
-static void OnInvitationReceivedMock(const IdlP2pInvitationInfo &info)
+static void OnInvitationReceivedMock(const HalP2pInvitationInfo &info)
 {
     LOGI("OnInvitationReceivedMock");
 }
@@ -180,7 +180,7 @@ static void ConnectSupplicantFailedMock()
     LOGI("ConnectSupplicantFailedMock");
 }
 
-static void OnP2pServDiscReqMock(const IdlP2pServDiscReqInfo &info)
+static void OnP2pServDiscReqMock(const HalP2pServDiscReqInfo &info)
 {
     LOGI("OnP2pServDiscReqMock");
 }
@@ -352,6 +352,29 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnConnectChangedTest, TestSize.Level1)
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
     OnConnectChanged(status, networkId, mac1);
 }
+
+/**
+ * @tc.name: OnDisConnectReasonCallbackTest
+ * @tc.desc: Sta OnDisConnectReasonCallbackTest
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(WifiIdlInnerInterfaceTest, OnDisConnectReasonCallbackTest, TestSize.Level1)
+{
+    LOGI("OnDisConnectReasonCallbackTest enter");
+    int reason = 1;
+    char *mac = nullptr;
+    OnDisConnectReasonCallback(reason, mac);
+    char mac1[] = "00:00:AA:BB:CC:DD";
+    WifiEventCallback callback;
+    RegisterStaCallbackMock(&callback);
+    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
+    OnDisConnectReasonCallback(reason, mac1);
+    UnRegisterStaCallbackMock(&callback);
+    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
+    OnDisConnectReasonCallback(reason, mac1);
+}
+
 /**
  * @tc.name: OnBssidChangedTest
  * @tc.desc: OnBssidChangedTest

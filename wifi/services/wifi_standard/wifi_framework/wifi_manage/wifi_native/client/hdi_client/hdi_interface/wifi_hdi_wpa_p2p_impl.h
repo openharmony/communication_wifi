@@ -19,7 +19,6 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_proxy.h"
 #include "i_wifi_struct.h"
-#include "wifi_idl_define.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,6 +113,8 @@ WifiErrorNo HdiP2pGetGroupCapability(const char *bssid, int cap);
 WifiErrorNo HdiP2pListNetworks(struct HdiP2pNetworkList *infoList);
 
 WifiErrorNo HdiP2pSaveConfig();
+
+WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData);
 
 #ifdef __cplusplus
 }

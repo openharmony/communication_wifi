@@ -434,6 +434,54 @@ bool IsFreqDbac(int freqA, int freqB);
  * @return false - not dbac
  */
 bool IsChannelDbac(int channelA, int channelB);
+
+/**
+ * @Description check the keyMgmnt is Psk
+ *
+ * @param keyMgmt - in data
+ * @return true - isPsk
+ */
+bool IsPskEncryption(const std::string &keyMgmt);
+
+/**
+ * @Description is factory mode
+ *
+ * @return true - factory mode
+ * @return false - not factory mode
+ */
+bool IsFactoryMode();
+
+#ifndef OHOS_ARCH_LITE
+/**
+ * @Description Parse json string, find key by type, get value by key
+ *
+ * @param jsonString - json string
+ * @param type - key at group named type
+ * @param key - key
+ * @param value - value
+ * @return true - parse json success
+ */
+bool ParseJson(const std::string &jsonString, const std::string &type, const std::string &key, std::string &value);
+
+/**
+ * @Description used for string(1,2,3,...,255) to hexstring
+ *
+ * @param inData - string(1,2,3,...,255)
+ * @param outData - hexstring
+ */
+void ConvertDecStrToHexStr(const std::string &inData, std::string &outData);
+
+/**
+ * @Description Split string by substrings
+ *
+ * @param inData - in data
+ * @param outData - out data
+ * @param subBegin - find substring begin
+ * @param subEnd - find substring end
+ */
+void SplitStringBySubstring(const std::string &inData, std::string &outData, const std::string &subBegin,
+    const std::string &subEnd);
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

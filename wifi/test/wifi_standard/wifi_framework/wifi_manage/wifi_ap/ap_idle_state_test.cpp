@@ -18,6 +18,7 @@
 #include "ap_define.h"
 #include "ap_idle_state.h"
 #include "mock_pendant.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_ap_hal_interface.h"
 
@@ -36,7 +37,7 @@ public:
     virtual void SetUp()
     {
         const int SLEEP_TIEM = 20;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThreadStatusFlag(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetThreadStatusFlag(_)).Times(AtLeast(0));
 
         pMockPendant = new MockPendant();
 
@@ -73,7 +74,7 @@ HWTEST_F(ApIdleState_test, GoOutState, TestSize.Level1)
 HWTEST_F(ApIdleState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-        .WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
 
     InternalMessage msg;
 

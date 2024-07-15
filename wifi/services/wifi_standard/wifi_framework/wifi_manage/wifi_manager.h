@@ -34,6 +34,7 @@
 #ifndef OHOS_ARCH_LITE
 #include "wifi_event_subscriber_manager.h"
 #include "wifi_app_state_aware.h"
+#include "wifi_multi_vap_manager.h"
 #endif
 
 namespace OHOS {
@@ -56,6 +57,8 @@ enum class WifiCloseServiceCode {
     AP_SERVICE_CLOSE,
     P2P_SERVICE_CLOSE,
     SERVICE_THREAD_EXIT,
+    STA_MSG_OPENED,
+    STA_MSG_STOPED,
 };
 
 struct WifiCloseServiceMsg
@@ -117,6 +120,7 @@ public:
 #endif
 #ifndef OHOS_ARCH_LITE
     std::unique_ptr<WifiEventSubscriberManager>& GetWifiEventSubscriberManager();
+    std::unique_ptr<WifiMultiVapManager>& GetWifiMultiVapManager();
 #endif
 #ifdef FEATURE_HPF_SUPPORT
     void InstallPacketFilterProgram(int screenState, int instId);
@@ -146,6 +150,7 @@ private:
 #endif
 #ifndef OHOS_ARCH_LITE
     std::unique_ptr<WifiEventSubscriberManager> wifiEventSubscriberManager = nullptr;
+    std::unique_ptr<WifiMultiVapManager> wifiMultiVapManager = nullptr;
 #endif
 };
 } // namespace Wifi

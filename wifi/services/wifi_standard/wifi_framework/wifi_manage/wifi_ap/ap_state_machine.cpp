@@ -18,7 +18,7 @@
 #include "ipv6_address.h"
 #include "ap_stations_manager.h"
 #include "ap_monitor.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_net_agent.h"
 
@@ -61,13 +61,13 @@ void ApStateMachine::Init()
     StatePlus(&m_ApIdleState, &m_ApRootState);
     StatePlus(&m_ApStartedState, &m_ApRootState);
     SetFirstState(&m_ApIdleState);
-    m_iface = WifiSettings::GetInstance().GetApIfaceName();
+    m_iface = WifiConfigCenter::GetInstance().GetApIfaceName();
     StartStateMachine();
 }
 
 void ApStateMachine::OnApStateChange(ApState state)
 {
-    if (WifiSettings::GetInstance().SetHotspotState(static_cast<int>(state), m_id)) {
+    if (WifiConfigCenter::GetInstance().SetHotspotState(static_cast<int>(state), m_id)) {
         WIFI_LOGE("WifiSetting change state fail.");
     }
 
@@ -121,12 +121,12 @@ bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t
 #ifndef WIFI_DHCP_DISABLED
     Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
-    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
     if (!m_DhcpdInterface.StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, true, leaseTime)) {
         WIFI_LOGE("start dhcpd fail.");
         return false;
     }
-    WifiNetAgent::GetInstance().AddRoute(ifaceName, ipAddress, ipv4.GetAddressPrefixLength());
+    WifiNetAgent::GetInstance().AddRoute(ifaceName, ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
     WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
 #else
@@ -138,7 +138,7 @@ bool ApStateMachine::StopDhcpServer()
 {
 #ifndef WIFI_DHCP_DISABLED
     WIFI_LOGI("Enter:StopDhcpServer");
-    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
     if (!m_DhcpdInterface.StopDhcp(ifaceName)) {
         WIFI_LOGE("Close dhcpd fail.");
         return false;
@@ -152,7 +152,7 @@ bool ApStateMachine::StopDhcpServer()
 bool ApStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo> &result)
 {
 #ifndef WIFI_DHCP_DISABLED
-    std::string ifaceName = WifiSettings::GetInstance().GetApIfaceName();
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
     return m_DhcpdInterface.GetConnectedStationInfo(ifaceName, result);
 #else
     return true;

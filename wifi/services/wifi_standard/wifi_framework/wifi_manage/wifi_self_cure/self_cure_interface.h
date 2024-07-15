@@ -52,7 +52,21 @@ public:
      *
      * @return StaServiceCallback - sta callback
      */
-    virtual StaServiceCallback GetStaCallback() override;
+    virtual StaServiceCallback GetStaCallback() const override;
+
+    /**
+     * @Description Notify Internet Failure Detected
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+    */
+    virtual ErrCode NotifyInternetFailureDetected(int forceNoHttpCheck) override;
+
+    /**
+     * @Description Is SelfCure On Going
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+    */
+    virtual ErrCode IsSelfCureOnGoing() override;
 
     /**
     * @Description  init callback function.
@@ -83,6 +97,12 @@ public:
      */
     void DealP2pConnChanged(const WifiP2pLinkedInfo &info);
 
+    /**
+     * @Description deal sta open result
+     *
+     * @param instId - instance Id
+     */
+    void DealStaOpened(int instId) override;
 private:
     std::mutex mutex;
     std::vector<SelfCureServiceCallback> mSelfCureCallback;

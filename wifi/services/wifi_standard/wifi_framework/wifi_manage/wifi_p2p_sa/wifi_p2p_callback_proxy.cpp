@@ -122,7 +122,7 @@ void WifiP2pCallbackProxy::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &d
         return;
     }
     data.WriteInt32(0);
-    int size = devices.size();
+    int size = static_cast<int>(devices.size());
     data.WriteInt32(size);
     for (int i = 0; i < size; ++i) {
         WriteWifiP2pDeviceData(data, devices[i]);
@@ -132,6 +132,28 @@ void WifiP2pCallbackProxy::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &d
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PEER_CHANGE), error);
+        return;
+    }
+    return;
+}
+
+void WifiP2pCallbackProxy::OnP2pPrivatePeersChanged(const std::string &priWfdInfo)
+{
+    WIFI_LOGD("WifiP2pCallbackProxy::OnP2pPrivatePeersChanged");
+    MessageOption option = {MessageOption::TF_ASYNC};
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    data.WriteInt32(0);
+    data.WriteString(priWfdInfo);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PRIVATE_PEER_CHANGE),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PRIVATE_PEER_CHANGE), error);
         return;
     }
     return;
@@ -148,7 +170,7 @@ void WifiP2pCallbackProxy::OnP2pServicesChanged(const std::vector<WifiP2pService
         return;
     }
     data.WriteInt32(0);
-    int size = srvInfo.size();
+    int size = static_cast<int>(srvInfo.size());
     data.WriteInt32(size);
     for (int i = 0; i < size; ++i) {
         data.WriteCString(srvInfo[i].GetServiceName().c_str());

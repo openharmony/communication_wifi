@@ -177,6 +177,7 @@ private:
 
     virtual bool RetryConnect(InternalMessage &msg) const;
 
+    virtual bool ProcessCmdDisableRandomMac(InternalMessage &msg) const;
 private:
     using ProcessFun = bool (P2pIdleState::*)(InternalMessage &msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
@@ -184,6 +185,7 @@ private:
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;
     static int retryConnectCnt;
+    static bool hasConnect;
 };
 } // namespace Wifi
 } // namespace OHOS

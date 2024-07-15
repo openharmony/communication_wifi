@@ -51,7 +51,10 @@ bool WifiHotspotImpl::Init(int systemAbilityId, int id)
 
 bool WifiHotspotImpl::GetWifiHotspotProxy()
 {
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+    if (WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("failed to load hotspot sa !");
+        return false;
+    }
     if (IsRemoteDied() == false) {
         return true;
     }
@@ -71,7 +74,7 @@ bool WifiHotspotImpl::GetWifiHotspotProxy()
         hotspotMgr = new (std::nothrow) WifiHotspotMgrProxy(object);
     }
     if (hotspotMgr == nullptr) {
-        WIFI_LOGE("wifi hotspot init failed, %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi hotspot init failed, %{public}d", systemAbilityId_.load());
         return false;
     }
 
@@ -83,7 +86,7 @@ bool WifiHotspotImpl::GetWifiHotspotProxy()
 
     client_ = new (std::nothrow) WifiHotspotProxy(service);
     if (client_ == nullptr) {
-        WIFI_LOGE("wifi device id init failed., %{public}d", systemAbilityId_);
+        WIFI_LOGE("wifi device id init failed., %{public}d", systemAbilityId_.load());
         return false;
     }
     return true;

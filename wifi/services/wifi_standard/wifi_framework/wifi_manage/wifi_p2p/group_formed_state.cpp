@@ -78,6 +78,8 @@ void GroupFormedState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &GroupFormedState::ProcessCmdCancelConnect));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, &GroupFormedState::ProcessCmdChSwitch));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IP_ADDRESS, &GroupFormedState::ProcessCmdSetIpAddress));
 }
 
 bool GroupFormedState::ProcessCmdConnect(const InternalMessage &msg) const
@@ -269,7 +271,7 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
     }
     WIFI_LOGI("GroupFormedState ProcessConnectEvt deviceAddr: %{private}s, groupAddr: %{private}s",
         device.GetDeviceAddress().c_str(), device.GetGroupAddress().c_str());
-    if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
         WIFI_LOGE("fail to set GO Idle time.");
     }
@@ -279,7 +281,10 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
     WifiP2pDevice memberPeer = deviceManager.GetDevices(device.GetDeviceAddress());
     if (memberPeer.IsValid()) {
         memberPeer.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
+        memberPeer.SetRandomDeviceAddress(device.GetRandomDeviceAddress());
         groupManager.UpdateCurrGroupClient(memberPeer);
+        WIFI_LOGI("ProcessConnectEvt memberPeer:%{private}s %{private}s", memberPeer.GetDeviceAddress().c_str(),
+            memberPeer.GetRandomDeviceAddress().c_str());
     } else {
         groupManager.UpdateCurrGroupClient(device);
     }
@@ -311,7 +316,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
 
     WifiErrorNo retCode =
         WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(device.GetDeviceAddress(), request.GetTlv(), reqId);
-    if (WifiErrorNo::WIFI_IDL_OPT_OK != retCode) {
+    if (WifiErrorNo::WIFI_HAL_OPT_OK != retCode) {
         WIFI_LOGI("Failed to schedule the P2P service discovery request.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -319,7 +324,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
     p2pStateMachine.serviceManager.SetQueryId(reqId);
 
     retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFind failed, ErrorCode: %{public}d", static_cast<int>(retCode));
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -387,6 +392,20 @@ bool GroupFormedState::ProcessCmdChSwitch(const InternalMessage &msg) const
     int freq = group.GetFrequency();
     WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
     currGroup.SetFrequency(freq);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
+    return EXECUTED;
+}
+
+bool GroupFormedState::ProcessCmdSetIpAddress(const InternalMessage &msg) const
+{
+    IpAddrInfo ipInfo;
+    if (!msg.GetMessageObj(ipInfo)) {
+        WIFI_LOGE("Failed to obtain the group information.");
+        return EXECUTED;
+    }
+    WIFI_LOGI("set ip address");
+    WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
+    currGroup.SetGcIpAddress(ipInfo.ip);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
     return EXECUTED;
 }

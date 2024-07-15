@@ -53,8 +53,13 @@ WifiScanMgrServiceImpl::~WifiScanMgrServiceImpl()
 
 void WifiScanMgrServiceImpl::OnStart()
 {
+    WIFI_LOGI("Start scan service!");
     if (mState == ServiceRunningState::STATE_RUNNING) {
         WIFI_LOGW("Service has already started.");
+        return;
+    }
+    if (WifiManager::GetInstance().Init() < 0) {
+        WIFI_LOGE("WifiManager init failed!");
         return;
     }
     if (!Init()) {
@@ -63,11 +68,6 @@ void WifiScanMgrServiceImpl::OnStart()
         return;
     }
     mState = ServiceRunningState::STATE_RUNNING;
-    WIFI_LOGI("Start scan service!");
-    if (WifiManager::GetInstance().Init() < 0) {
-        WIFI_LOGE("WifiManager init failed!");
-        return;
-    }
     WifiOprMidState scanState = WifiConfigCenter::GetInstance().GetScanMidState();
     auto &pWifiScanManager = WifiManager::GetInstance().GetWifiScanManager();
     if (scanState == WifiOprMidState::CLOSED && pWifiScanManager) {

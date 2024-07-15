@@ -23,6 +23,9 @@
 #include "wifi_p2p_msg.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
+#ifndef OHOS_ARCH_LITE
+#include "wifi_backup_config.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -134,6 +137,49 @@ std::string GetTClassName<WifiDeviceConfig>();
  */
 template <>
 std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item);
+
+#ifndef OHOS_ARCH_LITE
+/**
+ * @Description Clear and init WifiBackupConfig
+ *
+ * @tparam
+ * @param item - WifiBackupConfig item
+ */
+template <>
+void ClearTClass<WifiBackupConfig>(WifiBackupConfig &item);
+
+/**
+ * @Description Set WifiBackupConfig item data
+ *
+ * @tparam
+ * @param item - WifiBackupConfig &item
+ * @param key - WifiBackupConfig struct member name
+ * @param value - the WifiBackupConfig item member value
+ * @return int - parse error: 0 Success, >0 parse failed
+ */
+template <>
+int SetTClassKeyValue<WifiBackupConfig>(WifiBackupConfig &item, const std::string &key, const std::string &value);
+
+/**
+ * @Description Output WifiBackupConfig class name
+ *
+ * @tparam
+ * @param item - WifiBackupConfig &item
+ * @return std::string - Class name
+ */
+template <>
+std::string GetTClassName<WifiBackupConfig>();
+
+/**
+ * @Description Output the WifiBackupConfig item, format: item's member = the member value
+ *
+ * @tparam
+ * @param item - WifiBackupConfig &item
+ * @return std::string - output total member=value string about the WifiBackupConfig item
+ */
+template <>
+std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item);
+#endif
 
 /**
  * @Description Clear and init HotspotConfig
@@ -462,47 +508,6 @@ std::string GetTClassName<WifiStoreRandomMac>();
  */
 template <>
 std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item);
-
-/**
- * @Description Clear and init SoftApRandomMac
- *
- * @tparam
- * @param item - SoftApRandomMac &item
- */
-template <>
-void ClearTClass<SoftApRandomMac>(SoftApRandomMac &item);
-
-/**
- * @Description Set SoftApRandomMac item data
- *
- * @tparam
- * @param item - SoftApRandomMac &item
- * @param key - SoftApRandomMac struct member name
- * @param value - the SoftApRandomMac item member value
- * @return int - parse error: 0 Success, >0 parse failed
- */
-template <>
-int SetTClassKeyValue<SoftApRandomMac>(SoftApRandomMac &item, const std::string &key, const std::string &value);
-
-/**
- * @Description Output SoftApRandomMac class name
- *
- * @tparam
- * @param item - SoftApRandomMac &item
- * @return std::string - Class name
- */
-template <>
-std::string GetTClassName<SoftApRandomMac>();
-
-/**
- * @Description Output the SoftApRandomMac item, format: item's member = the member value
- *
- * @tparam
- * @param item - SoftApRandomMac &item
- * @return std::string - output total member=value string about the SoftApRandomMac item
- */
-template <>
-std::string OutTClassString<SoftApRandomMac>(SoftApRandomMac &item);
 
 /**
  * @Description Clear and init WifiPortalConf

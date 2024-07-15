@@ -28,10 +28,13 @@ namespace Wifi {
 WifiP2pStub::WifiP2pStub() : mSingleCallback(false)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiP2pStub::~WifiP2pStub()
-{}
+{
+    deathRecipient_ = nullptr;
+}
 
 void WifiP2pStub::InitHandleMapEx()
 {
@@ -71,6 +74,12 @@ void WifiP2pStub::InitHandleMapEx()
         &WifiP2pStub::OnQueryP2pLocalDevice;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE)] =
         &WifiP2pStub::OnHid2dSetUpperScene;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_PEERS)] =
+        &WifiP2pStub::OnDiscoverPeers;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC)] =
+        &WifiP2pStub::OnDisableRandomMac;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P)] =
+        &WifiP2pStub::OnCheckCanUseP2p;
     return;
 }
 
@@ -429,7 +438,7 @@ void WifiP2pStub::OnQueryP2pDevices(uint32_t code, MessageParcel &data, MessageP
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = devices.size();
+        int size = static_cast<int>(devices.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
             WriteWifiP2pDeviceData(reply, devices[i]);
@@ -461,7 +470,7 @@ void WifiP2pStub::OnQueryP2pGroups(uint32_t code, MessageParcel &data, MessagePa
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = groups.size();
+        int size = static_cast<int>(groups.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
             WriteWifiP2pGroupData(reply, groups[i]);
@@ -479,12 +488,41 @@ void WifiP2pStub::OnQueryP2pServices(uint32_t code, MessageParcel &data, Message
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = services.size();
+        int size = static_cast<int>(services.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
             WriteWifiP2pServiceInfo(reply, services[i]);
         }
     }
+    return;
+}
+
+void WifiP2pStub::OnDiscoverPeers(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int channelid = data.ReadInt32();
+    ErrCode ret = DiscoverPeers(channelid);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiP2pStub::OnDisableRandomMac(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int setmode = data.ReadInt32();
+    ErrCode ret = DisableRandomMac(setmode);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiP2pStub::OnCheckCanUseP2p(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = CheckCanUseP2p();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 
@@ -566,6 +604,7 @@ void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevi
 {
     reply.WriteString(device.GetDeviceName());
     reply.WriteString(device.GetDeviceAddress());
+    reply.WriteString(device.GetRandomDeviceAddress());
     reply.WriteInt32(device.GetDeviceAddressType());
     reply.WriteString(device.GetPrimaryDeviceType());
     reply.WriteString(device.GetSecondaryDeviceType());
@@ -668,8 +707,11 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiP2pDeathRecipient();
+            {
+                std::unique_lock<std::mutex> lock(deathRecipientMutex);
+                if (deathRecipient_ == nullptr) {
+                    deathRecipient_ = new (std::nothrow) WifiP2pDeathRecipient();
+                }
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");

@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef FEATURE_ENCRYPTION_SUPPORT
 #ifndef OHOS_WIFI_CONFIG_HKS_H
 #define OHOS_WIFI_CONFIG_HKS_H
+#if defined(FEATURE_ENCRYPTION_SUPPORT) || defined(SUPPORT_LOCAL_RANDOM_MAC)
 #include <string>
 #include <vector>
 #include "hks_api.h"
@@ -23,9 +23,12 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr uint32_t AES_COMMON_SIZE = 256;
+constexpr uint32_t AES_COMMON_SIZE = 2048 + 16;
 constexpr uint32_t AAD_SIZE = 16;
 constexpr uint32_t NONCE_SIZE = 16;
+constexpr uint32_t AEAD_SIZE = 16;
+constexpr uint32_t AES_256_NONCE_SIZE = 32;
+constexpr uint32_t MAX_UPDATE_SIZE = 64 * 1024;
 
 const uint8_t AAD[AAD_SIZE] = {0};
 
@@ -67,11 +70,11 @@ int32_t SetUpHks();
 
 /**
  * @Description  Generate new or get existed GCM-AES key based on input encryptionInfo and genParamSet
- * @param wifiEncryptionInfo  - keyAlias info
+ * @param keyAlias  - keyAlias info
  * @param genParamSet - generate params
  * @return HKS_SUCCESS - find key, others - find key failed
  */
-int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksParamSet *genParamSet);
+int32_t GetKeyByAlias(struct HksBlob *keyAlias, const struct HksParamSet *genParamSet);
 
 /**
  * @Description  Encrypt inputString using GCM-AES based on input encryptionInfo
@@ -83,7 +86,6 @@ int32_t GetKey(const WifiEncryptionInfo &wifiEncryptionInfo, const struct HksPar
 int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &inputString,
     EncryptedData &encryptedData);
 
-
 /**
  * @Description  Decrypt encryptedData using GCM-AES based on input encryptionInfo
  * @param wifiEncryptionInfo  - keyAlias info
@@ -93,6 +95,53 @@ int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::
  */
 int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const EncryptedData &encryptedData,
     std::string &decryptedData);
+
+/**
+ * @Description  Import GCM-AES key based on input encryptionInfo and default genParamSet
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param key - GCM-AES key(Hex string)
+ * @return HKS_SUCCESS - Import key success, others - Import key failed
+ */
+int32_t ImportKey(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &key);
+
+/**
+ * @Description  Delete existed GCM-AES key based on input encryptionInfo and default genParamSet
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @return HKS_SUCCESS - Delete key success, others - Delete key failed
+ */
+int32_t DeleteKey(const WifiEncryptionInfo &wifiEncryptionInfo);
+
+/**
+ * @Description  Encrypt inputString using GCM-AES based on input encryptionInfo
+ * Used for encryptedData is biger than 100k
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param inputString - plaint string that needs to be encrypted
+ * @param encryptedData - encrypted result with encrypted string and IV value
+ * @return HKS_SUCCESS - encryption success, others - encryption failed
+ */
+int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std::string &inputString,
+    EncryptedData &encryptedData);
+
+/**
+ * @Description  Decrypt encryptedData using GCM-AES based on input encryptionInfo
+ * Used for encryptedData is biger than 100k
+ * @param wifiEncryptionInfo  - keyAlias info
+ * @param encryptedData - encrypted result with encrypted string and IV value
+ * @param decryptedData - string after decryption
+ * @return HKS_SUCCESS - decryption success, others - decryption failed
+ */
+int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const EncryptedData &encryptedData,
+    std::string &decryptedData);
+
+/**
+ * @Description  Generate MacRandomization Secret
+ * @param keyName - keyAlias name
+ * @param data  - data for hmac sha256
+ * @param outPlant - hashed vector
+ * @return HKS_SUCCESS - hmac sha256 success, others - failed
+ */
+int32_t WifiGenerateMacRandomizationSecret(const std::string &keyName,
+    const std::string &data, std::vector<uint8_t> &outPlant);
 }
 }
 #endif

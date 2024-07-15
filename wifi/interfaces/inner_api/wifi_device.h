@@ -293,6 +293,14 @@ public:
     virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) = 0;
 
     /**
+     * @Description Set wifi tx power for sar.
+     *
+     * @param power - 1001,1002,1003......
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetWifiTxPower(int power) = 0;
+
+    /**
      * @Description Disable Wi-Fi device configuration.
      *
      * @param networkId - device config's network id
@@ -459,11 +467,60 @@ public:
     virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
 
     /**
+     * @Description set low tx power
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
+
+    /**
      * @Description hilink connect
      *
      * @return ErrCode - hilink connect result
      */
     virtual ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) = 0;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableSemiWifi() = 0;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiDetailState(WifiDetailState &state) = 0;
+
+    /**
+     * @Description set satellite state
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetSatelliteState(const int state) = 0;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) = 0;
+
+    /**
+     * @Description connect to user select ssid and bssid network
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

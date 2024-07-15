@@ -149,6 +149,14 @@ public:
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     /**
+     * @Description set wifi tx power for sar
+     *
+     * @param power - txpower
+     * @return ErrCode - operation result
+     */
+    ErrCode SetTxPower(int power) override;
+
+    /**
      * @Description Enable device config, when set attemptEnable, disable other device config
      *
      * @param networkId - need enable device config's network id
@@ -181,6 +189,26 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
+
+    /**
+     * @Description roam to target bssid
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
+
+    /**
+     * @Description connect to user select ssid and bssid network
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate) override;
 
     /**
      * @Description Check whether Wi-Fi is connected.
@@ -468,6 +496,35 @@ public:
      * @return ErrCode - hilink connect result
      */
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
+
+    /**
+     * @Description set low tx power
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
+
+    /**
+     * @Description Enable semi-Wifi
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableSemiWifi() override;
+
+    /**
+     * @Description Obtains the wifi detail state
+     *
+     * @param state - WifiDetailState object
+     * @return ErrCode - operation result
+     */
+    ErrCode GetWifiDetailState(WifiDetailState &state) override;
+
+    /**
+     * @Description set satellite state
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetSatelliteState(const int state) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.
@@ -504,11 +561,15 @@ private:
     void WriteIpAddress(MessageParcel &data, const WifiIpAddress &address);
     void WriteEapConfig(MessageParcel &data, const WifiEapConfig &wifiEapConfig);
     void ReadIpAddress(MessageParcel &reply, WifiIpAddress &address);
+    void BigDataReadIpAddress(WifiIpAddress &address, std::vector<std::string> &tokens);
     void ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEapConfig);
+    void BigDataReadEapConfig(WifiEapConfig &wifiEapConfig, std::vector<std::string> &tokens);
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
     void RemoveDeathRecipient(void);
+    void ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize, long len);
+    void ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
     sptr<IRemoteObject> remote_ = nullptr;
     bool mRemoteDied;

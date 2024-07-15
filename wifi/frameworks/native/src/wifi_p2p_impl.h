@@ -391,9 +391,30 @@ public:
      */
     bool IsRemoteDied(void);
 
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    ErrCode DiscoverPeers(int32_t channelid) override;
+
+    /**
+     * @Description Check whether service is died.
+     *
+     * @return bool - true: service is died, false: service is not died.
+     */
+    ErrCode DisableRandomMac(int setmode) override;
+
+    /**
+     * @Description Check can use P2P
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode CheckCanUseP2p() override;
+
 private:
     bool GetWifiP2pProxy();
-    int systemAbilityId_;
+    std::atomic<int> systemAbilityId_;
     sptr<IWifiP2p> client_;
     std::mutex mutex_;
 };

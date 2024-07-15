@@ -258,6 +258,7 @@ namespace OHOS {
 namespace Wifi {
     bool WifiCP2PFuzzerTest(const uint8_t* data, size_t size)
     {
+        (void)CheckCanUseP2p();
         (void)EnableP2p();
         (void)DisableP2p();
         (void)DiscoverDevices();

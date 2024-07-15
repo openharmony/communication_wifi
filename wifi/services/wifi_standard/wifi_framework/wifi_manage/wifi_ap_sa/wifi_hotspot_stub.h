@@ -62,9 +62,11 @@ private:
     void OnIsHotspotDualBandSupported(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetApIfaceName(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     bool CheckHotspot160MParam(BandType band, int bandwidth, int channel);
+    bool CheckHostspot160MCountryCode();
 
 private:
     HandleFuncMap handleFuncMap;
+    std::mutex deathRecipientMutex;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
 protected:

@@ -15,7 +15,7 @@
 #include <iostream>
 #include "wifi_idl_client_test.h"
 #include "securec.h"
-#include "wifi_scan_param.h"
+#include "wifi_native_struct.h"
 #include "wifi_log.h"
 
 #undef LOG_TAG
@@ -36,9 +36,9 @@ constexpr int MAX_TIME = 65546;
 HWTEST_F(WifiIdlClientTest, StartWifiTest, TestSize.Level1)
 {
     WifiErrorNo err = mClient.StartWifi();
-    EXPECT_TRUE(err == WIFI_IDL_OPT_CONN_SUPPLICANT_FAILED || err == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_CONN_SUPPLICANT_FAILED || err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.StartWifi() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.StartWifi() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -46,9 +46,9 @@ HWTEST_F(WifiIdlClientTest, GetStaDeviceMacAddressTest, TestSize.Level1)
 {
     std::string mac;
     WifiErrorNo err = mClient.GetStaDeviceMacAddress(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_FAILED || err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.GetStaDeviceMacAddress(mac) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.GetStaDeviceMacAddress(mac) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -56,9 +56,9 @@ HWTEST_F(WifiIdlClientTest, GetStaCapabilitiesTest, TestSize.Level1)
 {
     unsigned int capabilities = 0;
     WifiErrorNo err = mClient.GetStaCapabilities(capabilities);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.GetStaCapabilities(capabilities) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.GetStaCapabilities(capabilities) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -66,24 +66,24 @@ HWTEST_F(WifiIdlClientTest, GetSupportFrequenciesTest, TestSize.Level1)
 {
     std::vector<int> freqs;
     WifiErrorNo err = mClient.GetSupportFrequencies(1, freqs);
-    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_OK);
     for (auto iter = freqs.begin(); iter != freqs.end(); ++iter) {
         LOGD("Get frequency: %{public}d", *iter);
     }
     freqs.clear();
     err = mClient.GetSupportFrequencies(2, freqs);
-    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_OK);
     for (auto iter = freqs.begin(); iter != freqs.end(); ++iter) {
         LOGD("Get frequency: %{public}d", *iter);
     }
     freqs.clear();
     err = mClient.GetSupportFrequencies(4, freqs);
-    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_OK);
     for (auto iter = freqs.begin(); iter != freqs.end(); ++iter) {
         LOGD("Get frequency: %{public}d", *iter);
     }
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.GetSupportFrequencies(1, freqs) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.GetSupportFrequencies(1, freqs) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -91,12 +91,12 @@ HWTEST_F(WifiIdlClientTest, SetConnectMacAddrTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo err = mClient.SetConnectMacAddr(mac, 0);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.SetConnectMacAddr(mac, 0);
-    EXPECT_GE(err, WIFI_IDL_OPT_OK);
+    EXPECT_GE(err, WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.SetConnectMacAddr(mac, 1) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetConnectMacAddr(mac, 1) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -104,12 +104,12 @@ HWTEST_F(WifiIdlClientTest, SetScanMacAddressTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo err = mClient.SetScanMacAddress(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.SetScanMacAddress(mac);
-    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.SetScanMacAddress(mac) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetScanMacAddress(mac) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -117,12 +117,12 @@ HWTEST_F(WifiIdlClientTest, DisconnectLastRoamingBssidTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo err = mClient.DisconnectLastRoamingBssid(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.DisconnectLastRoamingBssid(mac);
-    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.DisconnectLastRoamingBssid(mac) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.DisconnectLastRoamingBssid(mac) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -130,9 +130,9 @@ HWTEST_F(WifiIdlClientTest, ReqGetSupportFeatureTest, TestSize.Level1)
 {
     long feature = 0;
     WifiErrorNo err = mClient.ReqGetSupportFeature(feature);
-    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqGetSupportFeature(feature) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqGetSupportFeature(feature) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -140,9 +140,9 @@ HWTEST_F(WifiIdlClientTest, SetTxPowerTest, TestSize.Level1)
 {
     int power = 1;
     WifiErrorNo err = mClient.SetTxPower(power);
-    EXPECT_FALSE(err == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.SetTxPower(power) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetTxPower(power) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -197,7 +197,7 @@ HWTEST_F(WifiIdlClientTest, MockConVectorToCArrayStringTest, TestSize.Level1)
     free(list);
 }
 
-static bool MockScanTest(const WifiScanParam &scanParam)
+static bool MockScanTest(const WifiHalScanParam &scanParam)
 {
     ScanSettings settings;
     if (memset_s(&settings, sizeof(settings), 0, sizeof(settings)) != EOK) {
@@ -242,7 +242,7 @@ static bool MockScanTest(const WifiScanParam &scanParam)
 
 HWTEST_F(WifiIdlClientTest, ScanTest, TestSize.Level1)
 {
-    WifiScanParam param;
+    WifiHalScanParam param;
     param.hiddenNetworkSsid.push_back("abcd");
     param.hiddenNetworkSsid.push_back("efgh");
     ASSERT_TRUE(MockScanTest(param));
@@ -254,11 +254,11 @@ HWTEST_F(WifiIdlClientTest, ScanTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqGetNetworkListTest, TestSize.Level1)
 {
-    std::vector<WifiWpaNetworkInfo> infos;
+    std::vector<WifiHalWpaNetworkInfo> infos;
     WifiErrorNo err = mClient.ReqGetNetworkList(infos);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_FAILED || err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqGetNetworkList(infos) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqGetNetworkList(infos) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -281,7 +281,7 @@ static void FreePnoScanPstr(PnoScanSettings &settings)
     }
 }
 
-static bool MockPnoScanTest(const WifiPnoScanParam &scanParam)
+static bool MockPnoScanTest(const WifiHalPnoScanParam &scanParam)
 {
     PnoScanSettings settings;
     if (memset_s(&settings, sizeof(settings), 0, sizeof(settings)) != EOK) {
@@ -314,7 +314,7 @@ static bool MockPnoScanTest(const WifiPnoScanParam &scanParam)
             settings.freqSize = scanParam.scanFreqs.size();
             settings.freqs = (int *)calloc(settings.freqSize, sizeof(int));
             if (settings.freqs == nullptr) {
-                return WIFI_IDL_OPT_FAILED;
+                return WIFI_HAL_OPT_FAILED;
             }
             for (int i = 0; i < settings.freqSize; ++i) {
                 settings.freqs[i] = scanParam.scanFreqs[i];
@@ -327,7 +327,7 @@ static bool MockPnoScanTest(const WifiPnoScanParam &scanParam)
 
 HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest, TestSize.Level1)
 {
-    WifiPnoScanParam param;
+    WifiHalPnoScanParam param;
     param.hiddenSsid.push_back("abcd");
     param.hiddenSsid.push_back("efgh");
     ASSERT_TRUE(MockPnoScanTest(param));
@@ -341,9 +341,9 @@ HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, StopWifiTest, TestSize.Level1)
 {
     WifiErrorNo err = mClient.StopWifi();
-    EXPECT_TRUE(err == WIFI_IDL_OPT_FAILED || err == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_FAILED || err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.StopWifi() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.StopWifi() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -351,12 +351,12 @@ HWTEST_F(WifiIdlClientTest, AddBlockByMacTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo err = mClient.AddBlockByMac(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.AddBlockByMac(mac);
-    EXPECT_GE(err, WIFI_IDL_OPT_OK);
+    EXPECT_GE(err, WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.AddBlockByMac(mac) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.AddBlockByMac(mac) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -364,12 +364,12 @@ HWTEST_F(WifiIdlClientTest, DelBlockByMacTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo err = mClient.DelBlockByMac(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.DelBlockByMac(mac);
-    EXPECT_GE(err, WIFI_IDL_OPT_OK);
+    EXPECT_GE(err, WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.DelBlockByMac(mac) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.DelBlockByMac(mac) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -377,12 +377,12 @@ HWTEST_F(WifiIdlClientTest, RemoveStationTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo err = mClient.RemoveStation(mac);
-    EXPECT_TRUE(err == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(err == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     err = mClient.RemoveStation(mac);
-    EXPECT_GE(err, WIFI_IDL_OPT_OK);
+    EXPECT_GE(err, WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.RemoveStation(mac) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.RemoveStation(mac) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -397,136 +397,130 @@ HWTEST_F(WifiIdlClientTest, ExitAllClientTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqConnectTest, TestSize.Level1)
 {
     int networkId = 1;
-    EXPECT_FALSE(mClient.ReqConnect(networkId) == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqConnect(networkId) == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqConnect(networkId) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqConnect(networkId) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqReconnectTest, TestSize.Level1)
 {
-    EXPECT_FALSE(mClient.ReqReconnect() == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqReconnect() == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqReconnect() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqReconnect() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqReassociateTest, TestSize.Level1)
 {
-    EXPECT_FALSE(mClient.ReqReassociate() == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqReassociate() == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqReassociate() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqReassociate() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqDisconnectTest, TestSize.Level1)
 {
-    EXPECT_FALSE(mClient.ReqDisconnect() == WIFI_IDL_OPT_OK);
-    EXPECT_FALSE(mClient.ReqReassociate() == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqDisconnect() == WIFI_HAL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqReassociate() == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqReassociate() == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqDisconnect() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqReassociate() == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqDisconnect() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
-}
-
-HWTEST_F(WifiIdlClientTest, SendRequestTest1, TestSize.Level1)
-{
-    WifiStaRequest request;
-    EXPECT_TRUE(mClient.SendRequest(request) == WIFI_IDL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, ScanTest1, TestSize.Level1)
 {
-    WifiScanParam scanParam;
+    WifiHalScanParam scanParam;
     scanParam.hiddenNetworkSsid.push_back("abcd");
     scanParam.hiddenNetworkSsid.push_back("efgh");
     scanParam.scanFreqs.push_back(FREQUENCY1);
     scanParam.scanFreqs.push_back(FREQUENCY2);
     scanParam.scanStyle = 1;
-    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ScanTest2, TestSize.Level1)
 {
-    WifiScanParam scanParam;
+    WifiHalScanParam scanParam;
     scanParam.scanFreqs.push_back(FREQUENCY1);
     scanParam.scanFreqs.push_back(FREQUENCY2);
     scanParam.scanStyle = 1;
-    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ScanTest3, TestSize.Level1)
 {
-    WifiScanParam scanParam;
+    WifiHalScanParam scanParam;
     scanParam.hiddenNetworkSsid.push_back("abcd");
     scanParam.hiddenNetworkSsid.push_back("efgh");
     scanParam.scanStyle = 1;
-    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ScanTest4, TestSize.Level1)
 {
-    WifiScanParam scanParam;
+    WifiHalScanParam scanParam;
     scanParam.scanStyle = 1;
-    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.Scan(scanParam) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest1, TestSize.Level1)
 {
-    WifiPnoScanParam scanParam;
+    WifiHalPnoScanParam scanParam;
     scanParam.scanInterval = 1;
     scanParam.scanFreqs.push_back(SCANFRENQUE);
     scanParam.hiddenSsid.push_back("abcd");
     scanParam.savedSsid.push_back("honor");
-    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqStartPnoScan(scanParam) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqStartPnoScan(scanParam) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest2, TestSize.Level1)
 {
-    WifiPnoScanParam scanParam;
+    WifiHalPnoScanParam scanParam;
     scanParam.scanFreqs.push_back(SCANFRENQUE);
     scanParam.hiddenSsid.push_back("abcd");
     scanParam.savedSsid.push_back("honor");
-    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest3, TestSize.Level1)
 {
-    WifiPnoScanParam scanParam;
+    WifiHalPnoScanParam scanParam;
     scanParam.scanInterval = 1;
     scanParam.scanFreqs.push_back(SCANFRENQUE);
     scanParam.savedSsid.push_back("honor");
-    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest4, TestSize.Level1)
 {
-    WifiPnoScanParam scanParam;
+    WifiHalPnoScanParam scanParam;
     scanParam.scanInterval = 1;
     scanParam.scanFreqs.push_back(SCANFRENQUE);
     scanParam.hiddenSsid.push_back("abcd");
-    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqStartPnoScanTest5, TestSize.Level1)
 {
-    WifiPnoScanParam scanParam;
+    WifiHalPnoScanParam scanParam;
     scanParam.scanInterval = 1;
     scanParam.hiddenSsid.push_back("abcd");
     scanParam.savedSsid.push_back("honor");
-    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(mClient.ReqStartPnoScan(scanParam) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, RemoveDeviceTest1, TestSize.Level1)
 {
     int networkId = INVALIDNET;
-    EXPECT_EQ(WIFI_IDL_OPT_INVALID_PARAM, mClient.RemoveDevice(networkId));
+    EXPECT_EQ(WIFI_HAL_OPT_INVALID_PARAM, mClient.RemoveDevice(networkId));
 }
 
 HWTEST_F(WifiIdlClientTest, RemoveDeviceTest2, TestSize.Level1)
@@ -534,7 +528,7 @@ HWTEST_F(WifiIdlClientTest, RemoveDeviceTest2, TestSize.Level1)
     int networkId = 1;
     mClient.RemoveDevice(networkId);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.RemoveDevice(networkId) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.RemoveDevice(networkId) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -543,9 +537,9 @@ HWTEST_F(WifiIdlClientTest, GetNextNetworkIdTest1, TestSize.Level1)
     int networkId = 1;
     mClient.GetNextNetworkId(networkId);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.GetNextNetworkId(networkId) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqEnableNetwork(networkId) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqDisableNetwork(networkId) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.GetNextNetworkId(networkId) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqEnableNetwork(networkId) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqDisableNetwork(networkId) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -563,44 +557,44 @@ HWTEST_F(WifiIdlClientTest, ReqDisableNetworkTest1, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, GetDeviceConfigTest1, TestSize.Level1)
 {
-    WifiIdlGetDeviceConfig config;
+    WifiHalGetDeviceConfig config;
     config.networkId = 1;
     config.param = "abcd";
     config.value = "1234";
     mClient.GetDeviceConfig(config);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.GetDeviceConfig(config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.GetDeviceConfig(config) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest1, TestSize.Level1)
 {
-    WifiIdlDeviceConfig config;
+    WifiHalDeviceConfig config;
     int networkId = 1;
     config.psk = "123456";
-    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest2, TestSize.Level1)
 {
-    WifiIdlDeviceConfig config;
+    WifiHalDeviceConfig config;
     int networkId = 1;
     config.psk = "ADFJKLAJFKLFAJDKLJAFKLDSJGJRIOJIESAJRFNESAGIASEJDGJASDKDGJKALSDJASASDF";
-    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest3, TestSize.Level1)
 {
-    WifiIdlDeviceConfig config;
+    WifiHalDeviceConfig config;
     int networkId = 1;
     config.psk = "123456";
     config.authAlgorithms = TEN;
-    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest4, TestSize.Level1)
 {
-    WifiIdlDeviceConfig config;
+    WifiHalDeviceConfig config;
     int networkId = 1;
     config.ssid = "abcd";
     config.psk = "123456789";
@@ -641,8 +635,10 @@ HWTEST_F(WifiIdlClientTest, SetDeviceConfigTest4, TestSize.Level1)
     mClient.SetDeviceConfig(networkId, config);
     config.allowedGroupCiphers = 1;
     mClient.SetDeviceConfig(networkId, config);
+    config.allowedGroupMgmtCiphers = 1;
+    mClient.SetDeviceConfig(networkId, config);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetDeviceConfig(networkId, config) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -650,9 +646,9 @@ HWTEST_F(WifiIdlClientTest, SetWpsBssidTest1, TestSize.Level1)
 {
     int networkId = 1;
     std::string bssid = "";
-    EXPECT_TRUE(mClient.SetBssid(networkId, bssid) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetBssid(networkId, bssid) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.SetBssid(networkId, bssid) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetBssid(networkId, bssid) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -670,25 +666,25 @@ HWTEST_F(WifiIdlClientTest, SaveDeviceConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqStartWpsPbcModeTest, TestSize.Level1)
 {
-    WifiIdlWpsConfig config;
+    WifiHalWpsConfig config;
     config.anyFlag = 1;
     config.multiAp = 1;
     mClient.ReqStartWpsPbcMode(config);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqStartWpsPbcMode(config) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.SaveDeviceConfig() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqStartWpsPbcMode(config) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SaveDeviceConfig() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqStartWpsPinModeTest, TestSize.Level1)
 {
-    WifiIdlWpsConfig config;
+    WifiHalWpsConfig config;
     int pinCode = 1;
     config.anyFlag = 1;
     config.multiAp = 1;
     mClient.ReqStartWpsPinMode(config, pinCode);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqStartWpsPinMode(config, pinCode) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqStartWpsPinMode(config, pinCode) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -699,26 +695,26 @@ HWTEST_F(WifiIdlClientTest, ReqStopWpsTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqGetRoamingCapabilitiesTest, TestSize.Level1)
 {
-    WifiIdlRoamCapability capability;
+    WifiHalRoamCapability capability;
     mClient.ReqGetRoamingCapabilities(capability);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqGetRoamingCapabilities(capability) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqStopWps() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqGetRoamingCapabilities(capability) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqStopWps() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqSetRoamConfigTest1, TestSize.Level1)
 {
-    WifiIdlRoamConfig config;
-    EXPECT_TRUE(mClient.ReqSetRoamConfig(config) == WIFI_IDL_OPT_FAILED);
+    WifiHalRoamConfig config;
+    EXPECT_TRUE(mClient.ReqSetRoamConfig(config) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqSetRoamConfig(config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqSetRoamConfig(config) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqSetRoamConfigTest2, TestSize.Level1)
 {
-    WifiIdlRoamConfig config;
+    WifiHalRoamConfig config;
     config.blocklistBssids.push_back("abcd");
     config.blocklistBssids.push_back("1234");
     config.trustlistBssids.push_back("abcd");
@@ -728,7 +724,7 @@ HWTEST_F(WifiIdlClientTest, ReqSetRoamConfigTest2, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqSetRoamConfigTest3, TestSize.Level1)
 {
-    WifiIdlRoamConfig config;
+    WifiHalRoamConfig config;
     config.blocklistBssids.push_back("abcd");
     config.blocklistBssids.push_back("1234");
     mClient.ReqSetRoamConfig(config);
@@ -736,19 +732,19 @@ HWTEST_F(WifiIdlClientTest, ReqSetRoamConfigTest3, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqSetRoamConfigTest4, TestSize.Level1)
 {
-    WifiIdlRoamConfig config;
+    WifiHalRoamConfig config;
     config.trustlistBssids.push_back("abcd");
     config.trustlistBssids.push_back("56789");
-    EXPECT_TRUE(mClient.ReqSetRoamConfig(config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqSetRoamConfig(config) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqGetConnectSignalInfoTest2, TestSize.Level1)
 {
     std::string endBssid = "aa::bb::cc:dd::ee:ff";
-    WifiWpaSignalInfo info;
+    WifiHalWpaSignalInfo info;
     mClient.ReqGetConnectSignalInfo(endBssid, info);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqGetConnectSignalInfo(endBssid, info) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqGetConnectSignalInfo(endBssid, info) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -763,8 +759,8 @@ HWTEST_F(WifiIdlClientTest, StopApTest, TestSize.Level1)
     int id = 1;
     mClient.StopAp(id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.StartAp(id, "wlan0") == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.StopAp(id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.StartAp(id, "wlan0") == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.StopAp(id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -776,7 +772,7 @@ HWTEST_F(WifiIdlClientTest, SetSoftApConfigTest, TestSize.Level1)
     config.SetPreSharedKey("123456789");
     mClient.SetSoftApConfig(config, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.SetSoftApConfig(config, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetSoftApConfig(config, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -786,7 +782,7 @@ HWTEST_F(WifiIdlClientTest, GetStationListTest, TestSize.Level1)
     std::vector<std::string> result;
     mClient.GetStationList(result, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.GetStationList(result, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.GetStationList(result, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -794,7 +790,7 @@ HWTEST_F(WifiIdlClientTest, AddBlockByMacTest1, TestSize.Level1)
 {
     int id = 1;
     std::string mac = "123456";
-    EXPECT_TRUE(mClient.AddBlockByMac(mac, id) == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(mClient.AddBlockByMac(mac, id) == WIFI_HAL_OPT_INPUT_MAC_INVALID);
 }
 
 HWTEST_F(WifiIdlClientTest, AddBlockByMacTest2, TestSize.Level1)
@@ -803,7 +799,7 @@ HWTEST_F(WifiIdlClientTest, AddBlockByMacTest2, TestSize.Level1)
     std::string mac = "00:00:11:22:33:44";
     mClient.AddBlockByMac(mac, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.AddBlockByMac(mac, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.AddBlockByMac(mac, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -811,7 +807,7 @@ HWTEST_F(WifiIdlClientTest, DelBlockByMacTest1, TestSize.Level1)
 {
     int id = 1;
     std::string mac = "00:00:11";
-    EXPECT_TRUE(mClient.DelBlockByMac(mac, id) == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(mClient.DelBlockByMac(mac, id) == WIFI_HAL_OPT_INPUT_MAC_INVALID);
 }
 
 HWTEST_F(WifiIdlClientTest, DelBlockByMacTest2, TestSize.Level1)
@@ -820,7 +816,7 @@ HWTEST_F(WifiIdlClientTest, DelBlockByMacTest2, TestSize.Level1)
     std::string mac = "00:00:11:22:33:44";
     mClient.DelBlockByMac(mac, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.DelBlockByMac(mac, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.DelBlockByMac(mac, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -828,7 +824,7 @@ HWTEST_F(WifiIdlClientTest, RemoveStationTest1, TestSize.Level1)
 {
     int id = 1;
     std::string mac = "00:00:11";
-    EXPECT_TRUE(mClient.RemoveStation(mac, id) == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(mClient.RemoveStation(mac, id) == WIFI_HAL_OPT_INPUT_MAC_INVALID);
 }
 
 HWTEST_F(WifiIdlClientTest, RemoveStationTest2, TestSize.Level1)
@@ -837,7 +833,7 @@ HWTEST_F(WifiIdlClientTest, RemoveStationTest2, TestSize.Level1)
     std::string mac = "00:00:11:22:33:44";
     mClient.RemoveStation(mac, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.RemoveStation(mac, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.RemoveStation(mac, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -848,7 +844,7 @@ HWTEST_F(WifiIdlClientTest, GetFrequenciesByBandTest1, TestSize.Level1)
     std::vector<int> frequencies;
     mClient.GetFrequenciesByBand(band, frequencies, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.GetFrequenciesByBand(band, frequencies, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.GetFrequenciesByBand(band, frequencies, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -856,7 +852,7 @@ HWTEST_F(WifiIdlClientTest, SetWifiCountryCodeTest1, TestSize.Level1)
 {
     std::string code = "abcde";
     int id = 1;
-    EXPECT_TRUE(mClient.SetWifiCountryCode(code, id) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.SetWifiCountryCode(code, id) == WIFI_HAL_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiIdlClientTest, SetWifiCountryCodeTest2, TestSize.Level1)
@@ -865,7 +861,7 @@ HWTEST_F(WifiIdlClientTest, SetWifiCountryCodeTest2, TestSize.Level1)
     int id = 1;
     mClient.SetWifiCountryCode(code, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.SetWifiCountryCode(code, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.SetWifiCountryCode(code, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -873,7 +869,7 @@ HWTEST_F(WifiIdlClientTest, ReqDisconnectStaByMacTest1, TestSize.Level1)
 {
     int id = 1;
     std::string mac = "00:00:11";
-    EXPECT_TRUE(mClient.ReqDisconnectStaByMac(mac, id) == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(mClient.ReqDisconnectStaByMac(mac, id) == WIFI_HAL_OPT_INPUT_MAC_INVALID);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqDisconnectStaByMacTest2, TestSize.Level1)
@@ -882,7 +878,7 @@ HWTEST_F(WifiIdlClientTest, ReqDisconnectStaByMacTest2, TestSize.Level1)
     std::string mac = "00:00:11:22:33:44";
     mClient.ReqDisconnectStaByMac(mac, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqDisconnectStaByMac(mac, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqDisconnectStaByMac(mac, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -892,7 +888,7 @@ HWTEST_F(WifiIdlClientTest, ReqGetPowerModelTest, TestSize.Level1)
     int model = 1;
     mClient.ReqGetPowerModel(model, id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqGetPowerModel(model, id) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqGetPowerModel(model, id) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -907,25 +903,25 @@ HWTEST_F(WifiIdlClientTest, GetWifiChipObjectTest, TestSize.Level1)
 {
     int id = 1;
     IWifiChip chip;
-    EXPECT_TRUE(mClient.GetWifiChipObject(id, chip) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.GetWifiChipObject(id, chip) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetChipIdsTest, TestSize.Level1)
 {
     std::vector<int> ids;
-    EXPECT_TRUE(mClient.GetChipIds(ids) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.GetChipIds(ids) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetUsedChipIdTest, TestSize.Level1)
 {
     int id = 1;
-    EXPECT_TRUE(mClient.GetUsedChipId(id) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.GetUsedChipId(id) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetChipCapabilitiesTest, TestSize.Level1)
 {
     int capabilities = 1;
-    EXPECT_TRUE(mClient.GetChipCapabilities(capabilities) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.GetChipCapabilities(capabilities) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetSupportedModesTest, TestSize.Level1)
@@ -933,20 +929,20 @@ HWTEST_F(WifiIdlClientTest, GetSupportedModesTest, TestSize.Level1)
     std::vector<int> modes;
     mClient.GetSupportedModes(modes);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.GetSupportedModes(modes) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.GetSupportedModes(modes) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ConfigRunModesTest, TestSize.Level1)
 {
     int mode = 1;
-    EXPECT_TRUE(mClient.ConfigRunModes(mode) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.ConfigRunModes(mode) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, GetCurrentModeTest, TestSize.Level1)
 {
     int mode = 1;
-    EXPECT_TRUE(mClient.GetCurrentMode(mode) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.GetCurrentMode(mode) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, RegisterChipEventCallbackTest, TestSize.Level1)
@@ -954,24 +950,24 @@ HWTEST_F(WifiIdlClientTest, RegisterChipEventCallbackTest, TestSize.Level1)
     WifiChipEventCallback callback;
     mClient.RegisterChipEventCallback(callback);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.RegisterChipEventCallback(callback) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.RegisterChipEventCallback(callback) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, RequestFirmwareDebugInfoTest, TestSize.Level1)
 {
     std::string debugInfo = "debug";
-    EXPECT_TRUE(mClient.RequestFirmwareDebugInfo(debugInfo) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.RequestFirmwareDebugInfo(debugInfo) == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqStartSupplicantTest, TestSize.Level1)
 {
     mClient.ReqStartSupplicant();
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqStartSupplicant() == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqStopSupplicant() == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqConnectSupplicant() == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqDisconnectSupplicant() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqStartSupplicant() == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqStopSupplicant() == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqConnectSupplicant() == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqDisconnectSupplicant() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -995,8 +991,8 @@ HWTEST_F(WifiIdlClientTest, ReqRequestToSupplicantTest, TestSize.Level1)
     std::string request = "request";
     mClient.ReqRequestToSupplicant(request);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqRequestToSupplicant(request) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqSetPowerSave(true) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqRequestToSupplicant(request) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqSetPowerSave(true) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1015,12 +1011,12 @@ HWTEST_F(WifiIdlClientTest, ReqSetPowerSaveTest2, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqWpaSetCountryCodeTest1, TestSize.Level1)
 {
     std::string countryCode = "adaf";
-    EXPECT_TRUE(mClient.ReqWpaSetCountryCode(countryCode) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqWpaSetCountryCode(countryCode) == WIFI_HAL_OPT_INVALID_PARAM);
     countryCode = "af";
     mClient.ReqWpaSetCountryCode(countryCode);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqWpaSetCountryCode(countryCode) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqWpaGetCountryCode(countryCode) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqWpaSetCountryCode(countryCode) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqWpaGetCountryCode(countryCode) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1040,9 +1036,9 @@ HWTEST_F(WifiIdlClientTest, ReqWpaBlocklistClearTest, TestSize.Level1)
 {
     mClient.ReqWpaBlocklistClear();
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqWpaBlocklistClear() == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pStop() == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pSaveConfig() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqWpaBlocklistClear() == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pStop() == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSaveConfig() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1062,8 +1058,8 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1
     std::string type = "tv";
     mClient.ReqP2pSetWpsSecondaryDeviceType(type);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetWpsSecondaryDeviceType(type) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pSetWpsDeviceType(type) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetWpsSecondaryDeviceType(type) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetWpsDeviceType(type) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1078,7 +1074,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetupWpsPbcTest, TestSize.Level1)
     std::string bssid = "honor";
     mClient.ReqP2pSetupWpsPbc(groupInterface, bssid);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetupWpsPbc(groupInterface, bssid) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetupWpsPbc(groupInterface, bssid) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1088,7 +1084,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetupWpsPinTest1, TestSize.Level1)
     std::string address = "aa:bb:cc:dd:ee:ff";
     std::string pin = "123";
     std::string result = "none";
-    EXPECT_TRUE(mClient.ReqP2pSetupWpsPin(groupInterface, address, pin, result) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pSetupWpsPin(groupInterface, address, pin, result) == WIFI_HAL_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetupWpsPinTest2, TestSize.Level1)
@@ -1099,7 +1095,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetupWpsPinTest2, TestSize.Level1)
     std::string result = "none";
     mClient.ReqP2pSetupWpsPin(groupInterface, address, pin, result);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetupWpsPin(groupInterface, address, pin, result) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetupWpsPin(groupInterface, address, pin, result) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1108,7 +1104,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pRemoveNetworkTest, TestSize.Level1)
     int networkId = 1;
     mClient.ReqP2pRemoveNetwork(networkId);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pRemoveNetwork(networkId) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pRemoveNetwork(networkId) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1118,7 +1114,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetGroupMaxIdleTest, TestSize.Level1)
     size_t time = 1;
     mClient.ReqP2pSetGroupMaxIdle(groupInterface, time);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetGroupMaxIdle(groupInterface, time) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetGroupMaxIdle(groupInterface, time) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1128,9 +1124,9 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetPowerSaveTest, TestSize.Level1)
     bool enable = true;
     mClient.ReqP2pSetPowerSave(groupInterface, enable);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetPowerSave(groupInterface, enable) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pSetWfdDeviceConfig(groupInterface) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pSetWfdEnable(enable) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetPowerSave(groupInterface, enable) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetWfdDeviceConfig(groupInterface) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetWfdEnable(enable) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1151,8 +1147,8 @@ HWTEST_F(WifiIdlClientTest, ReqP2pStartFindTest, TestSize.Level1)
     size_t timeout = 1;
     mClient.ReqP2pStartFind(timeout);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pStartFind(timeout) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pStopFind() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pStartFind(timeout) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pStopFind() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1166,22 +1162,22 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetExtListenTest, TestSize.Level1)
     bool enable = true;
     size_t period = 0;
     size_t interval = 0;
-    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_HAL_OPT_INVALID_PARAM);
     period = MAX_TIME;
-    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_HAL_OPT_INVALID_PARAM);
     period = 1;
-    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_HAL_OPT_INVALID_PARAM);
     interval = MAX_TIME;
-    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_HAL_OPT_INVALID_PARAM);
     interval = 1;
     period = BIT2;
-    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_HAL_OPT_INVALID_PARAM);
     interval = BIT2;
     period = 1;
     enable = false;
     mClient.ReqP2pSetExtListen(enable, period, interval);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetExtListen(enable, period, interval) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1191,7 +1187,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetListenChannelTest, TestSize.Level1)
     unsigned char regClass = BIT1;
     mClient.ReqP2pSetListenChannel(channel, regClass);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetListenChannel(channel, regClass) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetListenChannel(channel, regClass) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1207,20 +1203,20 @@ HWTEST_F(WifiIdlClientTest, ReqP2pConnectTest, TestSize.Level1)
     config.SetGroupOwnerIntent(1);
     config.SetDeviceAddress("aa:bb::cc:dd");
     config.SetWpsInfo(info);
-    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_HAL_OPT_INVALID_PARAM);
     isJoinExistingGroup = false;
     config.SetGroupOwnerIntent(INVALIDNET);
-    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_HAL_OPT_INVALID_PARAM);
     config.SetGroupOwnerIntent(SCANFRENQUE);
-    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_HAL_OPT_INVALID_PARAM);
     config.SetDeviceAddress("aa:bb::cc:dd:ee:ff");
-    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_HAL_OPT_INVALID_PARAM);
     info.SetWpsMethod(WpsMethod::WPS_METHOD_LABEL);
     config.SetWpsInfo(info);
     mClient.ReqP2pConnect(config, isJoinExistingGroup, pin);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pCancelConnect() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pConnect(config, isJoinExistingGroup, pin) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pCancelConnect() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1244,9 +1240,9 @@ HWTEST_F(WifiIdlClientTest, ReqP2pProvisionDiscoveryTest, TestSize.Level1)
     mClient.ReqP2pProvisionDiscovery(config);
     info.SetWpsMethod(WpsMethod::WPS_METHOD_INVALID);
     config.SetWpsInfo(info);
-    EXPECT_TRUE(mClient.ReqP2pProvisionDiscovery(config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pProvisionDiscovery(config) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pProvisionDiscovery(config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pProvisionDiscovery(config) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1257,7 +1253,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pAddGroupTest, TestSize.Level1)
     int freq = 1;
     mClient.ReqP2pAddGroup(isPersistent, networkId, freq);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pAddGroup(isPersistent, networkId, freq) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pAddGroup(isPersistent, networkId, freq) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1266,7 +1262,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pRemoveGroupTest, TestSize.Level1)
     std::string groupInterface = "Interface";
     mClient.ReqP2pRemoveGroup(groupInterface);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pRemoveGroup(groupInterface) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pRemoveGroup(groupInterface) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1277,9 +1273,9 @@ HWTEST_F(WifiIdlClientTest, ReqP2pInviteTest, TestSize.Level1)
     std::string deviceAddr = "aa:bb:cc:dd:ee:ff";
     mClient.ReqP2pInvite(group, deviceAddr);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pInvite(group, deviceAddr) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pReinvoke(1, deviceAddr) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pGetGroupCapability(deviceAddr, cap) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pInvite(group, deviceAddr) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pReinvoke(1, deviceAddr) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pGetGroupCapability(deviceAddr, cap) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1301,14 +1297,14 @@ HWTEST_F(WifiIdlClientTest, ReqP2pAddServiceTest, TestSize.Level1)
 {
     WifiP2pServiceInfo info;
     std::vector<std::string> queryList;
-    EXPECT_TRUE(mClient.ReqP2pAddService(info) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.ReqP2pAddService(info) == WIFI_HAL_OPT_OK);
     queryList.push_back("a b");
     info.SetQueryList(queryList);
-    EXPECT_TRUE(mClient.ReqP2pAddService(info) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pAddService(info) == WIFI_HAL_OPT_FAILED);
     queryList.clear();
     queryList.push_back("aa bb cc");
     info.SetQueryList(queryList);
-    EXPECT_TRUE(mClient.ReqP2pAddService(info) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pAddService(info) == WIFI_HAL_OPT_FAILED);
     queryList.clear();
     queryList.push_back("upnp bb cc");
     info.SetQueryList(queryList);
@@ -1318,7 +1314,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pAddServiceTest, TestSize.Level1)
     info.SetQueryList(queryList);
     mClient.ReqP2pAddService(info);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pAddService(info) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pAddService(info) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1326,14 +1322,14 @@ HWTEST_F(WifiIdlClientTest, ReqP2pRemoveServiceTest, TestSize.Level1)
 {
     WifiP2pServiceInfo info;
     std::vector<std::string> queryList;
-    EXPECT_TRUE(mClient.ReqP2pRemoveService(info) == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(mClient.ReqP2pRemoveService(info) == WIFI_HAL_OPT_OK);
     queryList.push_back("a b");
     info.SetQueryList(queryList);
-    EXPECT_TRUE(mClient.ReqP2pRemoveService(info) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pRemoveService(info) == WIFI_HAL_OPT_FAILED);
     queryList.clear();
     queryList.push_back("aa bb cc");
     info.SetQueryList(queryList);
-    EXPECT_TRUE(mClient.ReqP2pRemoveService(info) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pRemoveService(info) == WIFI_HAL_OPT_FAILED);
     queryList.clear();
     queryList.push_back("upnp bb cc");
     info.SetQueryList(queryList);
@@ -1343,7 +1339,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pRemoveServiceTest, TestSize.Level1)
     info.SetQueryList(queryList);
     mClient.ReqP2pRemoveService(info);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pRemoveService(info) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pRemoveService(info) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1352,13 +1348,13 @@ HWTEST_F(WifiIdlClientTest, ReqP2pReqServiceDiscoveryTest, TestSize.Level1)
     std::string reqID;
     std::vector<unsigned char> tlvs;
     std::string deviceAddress = "aa:bb:cc:dd";
-    EXPECT_TRUE(mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID) == WIFI_HAL_OPT_INVALID_PARAM);
     deviceAddress = "aa:bb:cc:dd:ee:ff";
-    EXPECT_TRUE(mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID) == WIFI_HAL_OPT_INVALID_PARAM);
     tlvs.push_back(1);
     mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pReqServiceDiscovery(deviceAddress, tlvs, reqID) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1367,8 +1363,8 @@ HWTEST_F(WifiIdlClientTest, ReqP2pCancelServiceDiscoveryTest, TestSize.Level1)
     std::string id = "tv";
     mClient.ReqP2pCancelServiceDiscovery(id);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pCancelServiceDiscovery(id) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pSetMiracastType(1) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pCancelServiceDiscovery(id) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetMiracastType(1) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1384,11 +1380,11 @@ HWTEST_F(WifiIdlClientTest, ReqRespServiceDiscoveryTest, TestSize.Level1)
     int frequency = 1;
     int dialogToken = 1;
     std::vector<unsigned char> tlvs;
-    EXPECT_TRUE(mClient.ReqRespServiceDiscovery(device, frequency, dialogToken, tlvs) == WIFI_IDL_OPT_INVALID_PARAM);
+    EXPECT_TRUE(mClient.ReqRespServiceDiscovery(device, frequency, dialogToken, tlvs) == WIFI_HAL_OPT_INVALID_PARAM);
     tlvs.push_back(1);
     mClient.ReqRespServiceDiscovery(device, frequency, dialogToken, tlvs);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqRespServiceDiscovery(device, frequency, dialogToken, tlvs) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqRespServiceDiscovery(device, frequency, dialogToken, tlvs) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1398,7 +1394,7 @@ HWTEST_F(WifiIdlClientTest, ReqGetP2pPeerTest, TestSize.Level1)
     std::string deviceAddress = "aa:bb:cc:00:00:00";
     mClient.ReqGetP2pPeer(deviceAddress, device);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqGetP2pPeer(deviceAddress, device) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqGetP2pPeer(deviceAddress, device) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1408,30 +1404,30 @@ HWTEST_F(WifiIdlClientTest, ReqP2pGetSupportFrequenciesTest, TestSize.Level1)
     std::vector<int> frequencies;
     mClient.ReqP2pGetSupportFrequencies(band, frequencies);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pGetSupportFrequencies(band, frequencies) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pGetSupportFrequencies(band, frequencies) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetGroupConfigTest, TestSize.Level1)
 {
     int networkId = 1;
-    IdlP2pGroupConfig config;
+    HalP2pGroupConfig config;
     config.ssid = "abcd";
     config.bssid = "00:00:00:00:00:00";
     config.psk = "132456789";
     mClient.ReqP2pSetGroupConfig(networkId, config);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetGroupConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetGroupConfig(networkId, config) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pGetGroupConfigTest, TestSize.Level1)
 {
     int networkId = 1;
-    IdlP2pGroupConfig config;
+    HalP2pGroupConfig config;
     mClient.ReqP2pGetGroupConfig(networkId, config);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pGetGroupConfig(networkId, config) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pGetGroupConfig(networkId, config) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1440,7 +1436,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pAddNetworkTest, TestSize.Level1)
     int networkId = 1;
     mClient.ReqP2pAddNetwork(networkId);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pAddNetwork(networkId) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pAddNetwork(networkId) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1452,8 +1448,8 @@ HWTEST_F(WifiIdlClientTest, ReqP2pHid2dConnectTest, TestSize.Level1)
     config.SetPreSharedKey("123456789");
     mClient.ReqP2pHid2dConnect(config);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pHid2dConnect(config) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqWpaSetSuspendMode(true) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pHid2dConnect(config) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqWpaSetSuspendMode(true) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1468,7 +1464,7 @@ HWTEST_F(WifiIdlClientTest, QueryScanInfosTest, TestSize.Level1)
     std::vector<InterScanInfo> scanInfos;
     mClient.QueryScanInfos(scanInfos);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.QueryScanInfos(scanInfos) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.QueryScanInfos(scanInfos) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1477,8 +1473,8 @@ HWTEST_F(WifiIdlClientTest, ReqRegisterSupplicantEventCallbackTest, TestSize.Lev
     SupplicantEventCallback callback;
     mClient.ReqRegisterSupplicantEventCallback(callback);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqRegisterSupplicantEventCallback(callback) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqUnRegisterSupplicantEventCallback() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqRegisterSupplicantEventCallback(callback) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqUnRegisterSupplicantEventCallback() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1492,8 +1488,8 @@ HWTEST_F(WifiIdlClientTest, ReqP2pGetDeviceAddressTest, TestSize.Level1)
     std::string deviceAddress = "10.26.120.74";
     mClient.ReqP2pGetDeviceAddress(deviceAddress);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pGetDeviceAddress(deviceAddress) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqWpaAutoConnect(0) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pGetDeviceAddress(deviceAddress) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqWpaAutoConnect(0) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1502,8 +1498,8 @@ HWTEST_F(WifiIdlClientTest, ReqP2pListNetworksTest, TestSize.Level1)
     std::map<int, WifiP2pGroupInfo> mapGroups;
     mClient.ReqP2pListNetworks(mapGroups);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pListNetworks(mapGroups) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pStart() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pListNetworks(mapGroups) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pStart() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1522,9 +1518,9 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetDeviceNameTest, TestSize.Level1)
     std::string name = "10.26.120.74";
     mClient.ReqP2pSetDeviceName(name);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pSetSsidPostfixName(name) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pSetDeviceName(name) == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pSetWpsConfigMethods(name) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetSsidPostfixName(name) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetDeviceName(name) == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pSetWpsConfigMethods(name) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1549,9 +1545,9 @@ HWTEST_F(WifiIdlClientTest, ReqP2pFlushServiceTest, TestSize.Level1)
 {
     mClient.ReqP2pFlushService();
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pFlush() == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqP2pFlushService() == WIFI_IDL_OPT_FAILED);
-    EXPECT_TRUE(mClient.ReqWpaSetPowerMode(true) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pFlush() == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pFlushService() == WIFI_HAL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqWpaSetPowerMode(true) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1564,7 +1560,7 @@ HWTEST_F(WifiIdlClientTest, ReqStopPnoScanTest, TestSize.Level1)
 {
     mClient.ReqStopPnoScan();
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqStopPnoScan() == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqStopPnoScan() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1573,7 +1569,7 @@ HWTEST_F(WifiIdlClientTest, ReqRegisterStaEventCallbackt, TestSize.Level1)
     WifiEventCallback callback;
     mClient.ReqRegisterStaEventCallback(callback);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqRegisterStaEventCallback(callback) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqRegisterStaEventCallback(callback) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 
@@ -1582,7 +1578,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pGetChba0FreqTest, TestSize.Level1)
     int chba0Freq = 0;
     mClient.ReqP2pGetChba0Freq(chba0Freq);
     MockWifiPublic::SetMockFlag(true);
-    EXPECT_TRUE(mClient.ReqP2pGetChba0Freq(chba0Freq) == WIFI_IDL_OPT_FAILED);
+    EXPECT_TRUE(mClient.ReqP2pGetChba0Freq(chba0Freq) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
 }
 

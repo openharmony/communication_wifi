@@ -27,6 +27,9 @@
 
 namespace OHOS {
 namespace Wifi {
+#ifdef HAS_POWERMGR_PART
+const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_MANAGER_STATE_CHANGED";
+#endif
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -39,8 +42,18 @@ public:
     void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
+private:
     bool lastSleepState = false;
 };
+
+#ifdef HAS_POWERMGR_PART
+class PowermgrEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit PowermgrEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~PowermgrEventSubscriber();
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+#endif
 
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
@@ -49,6 +62,7 @@ public:
 
     void OnSystemAbilityChanged(int systemAbilityId, bool add) override;
     void GetAirplaneModeByDatashare();
+    void GetWifiAllowSemiActiveByDatashare();
     bool GetLocationModeByDatashare();
     void DealLocationModeChangeEvent();
     void DealCloneDataChangeEvent();
@@ -56,13 +70,12 @@ public:
     bool IsMdmForbidden(void);
 
 private:
+    void DelayedAccessDataShare();
     void InitSubscribeListener();
     bool IsDataMgrServiceActive();
+    void HandleAppMgrServiceChange(bool add);
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
     void HandleCommonEventServiceChange(int systemAbilityId, bool add);
-#ifdef HAS_POWERMGR_PART
-    void HandlePowerManagerServiceChange(int systemAbilityId, bool add);
-#endif
 #ifdef HAS_MOVEMENT_PART
     void HandleHasMovementPartChange(int systemAbilityId, bool add);
 #endif
@@ -73,6 +86,12 @@ private:
     void RegisterCloneEvent();
     void UnRegisterCloneEvent();
     void RegisterCesEvent();
+#ifdef HAS_POWERMGR_PART
+    void RegisterPowermgrEvent();
+    void UnRegisterPowermgrEvent();
+    std::shared_ptr<PowermgrEventSubscriber> wifiPowermgrEventSubsciber_ = nullptr;
+    std::mutex powermgrEventMutex;
+#endif
     void UnRegisterCesEvent();
     void RegisterLocationEvent();
     void UnRegisterLocationEvent();
@@ -80,28 +99,22 @@ private:
     void GetChipProp();
     void RegisterMdmPropListener();
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);
-    void RegisterPowerStateListener();
-    void UnRegisterPowerStateListener();
 #ifdef HAS_MOVEMENT_PART
     void RegisterMovementCallBack();
     void UnRegisterMovementCallBack();
 #endif
-
+    void HandlP2pBusinessChange(int systemAbilityId, bool add);
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
-    uint32_t migrateTimerId{0};
+    uint32_t accessDatashareTimerId{0};
     std::mutex cesEventMutex;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
-#ifdef HAS_POWERMGR_PART
-    std::mutex powerStateEventMutex;
-#endif
 #ifdef HAS_MOVEMENT_PART
     std::mutex deviceMovementEventMutex;
 #endif
     static bool mIsMdmForbidden;
-    bool isPowerStateListenerSubscribered = false;
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;
     std::unique_ptr<WifiEventHandler> mWifiEventSubsThread = nullptr;

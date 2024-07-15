@@ -63,6 +63,7 @@ enum class P2pActionCallback : unsigned char {
     CreateHid2dGroup,
     Hid2dConnect,
     RemoveGroupClient,
+    DiscoverPeers,
     UNKNOWN
 };
 
@@ -190,7 +191,9 @@ public:
     void SetNetworkName(const std::string &name);
     const std::string &GetNetworkName() const;
     void SetDeviceAddress(const std::string &deviceAddress);
+    void SetRandomDeviceAddress(const std::string &deviceAddress);
     const std::string &GetDeviceAddress() const;
+    const std::string &GetRandomDeviceAddress() const;
     void SetDeviceAddressType(int devAddressType);
     int GetDeviceAddressType() const;
     void SetPrimaryDeviceType(const std::string &setPrimaryDeviceType);
@@ -225,6 +228,7 @@ private:
     std::string networkName; /* oper_ssid of peer device */
     std::string mDeviceAddress; /* the device MAC address, the length is 17 characters. */
     std::string mGroupAddress; /* the group MAC address, the length is 17 characters. */
+    std::string mRandomDeviceAddress; /* the device random MAC address, the length is 17 characters. */
     int deviceAddressType; /* the device MAC address type */
     std::string primaryDeviceType;
     std::string secondaryDeviceType;
@@ -272,6 +276,8 @@ public:
     const int &GetNetworkId() const;
     void SetGoIpAddress(const std::string &ipAddr);
     const std::string &GetGoIpAddress() const;
+    void SetGcIpAddress(const std::string &ipAddr);
+    const std::string &GetGcIpAddress() const;
     void AddClientDevice(const WifiP2pDevice &clientDevice);
     void RemoveClientDevice(const WifiP2pDevice &clientDevice);
     bool IsContainsDevice(const WifiP2pDevice &clientDevice) const;
@@ -281,6 +287,8 @@ public:
     void ClearClientDevices();
     bool IsExplicitGroup(void) const;
     void SetExplicitGroup(bool isExplicit);
+    void SetCreatorUid(int uid);
+    int GetCreatorUid();
 
 private:
     WifiP2pDevice owner;
@@ -294,7 +302,9 @@ private:
     P2pGroupStatus groupStatus;
     std::vector<WifiP2pDevice> clientDevices;
     std::string goIpAddress;
+    std::string gcIpAddress;
     bool explicitGroup;
+    int creatorUid = -1;
 };
 
 class WpsInfo {

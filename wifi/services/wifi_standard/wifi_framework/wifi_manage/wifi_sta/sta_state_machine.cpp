@@ -2663,38 +2663,12 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             ret = EXECUTED;
-            std::string bssid = msg->GetStringFromMessage();
-            if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
-                WIFI_LOGE("ApLinkedState inconsistent bssid in connecter");
-                return false;
-            }
-            pStaStateMachine->StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
-            WIFI_LOGI("Stop clearing wpa block list");
-            /* Save linkedinfo */
-            pStaStateMachine->linkedInfo.networkId = pStaStateMachine->targetNetworkId;
-            pStaStateMachine->linkedInfo.bssid = bssid;
-            WifiConfigCenter::GetInstance().SaveLinkedInfo(
-                pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
-
+            HandleNetWorkConnectionEvent(msg);
             break;
         }
         case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {
             ret = EXECUTED;
-            std::string reason = msg->GetStringFromMessage();
-            std::string bssid = msg->GetStringFromMessage();
-            WIFI_LOGI("ApLinkedState reveived bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
-                reason.c_str(), MacAnonymize(bssid).c_str());
-            if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
-                WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
-                return false;
-            }
-            pStaStateMachine->linkedInfo.bssid = bssid;
-            WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
-            /* BSSID change is not received during roaming, only set BSSID */
-            if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid) != WIFI_HAL_OPT_OK) {
-                WIFI_LOGE("SetBssid return fail.");
-                return false;
-            }
+            HandleStaBssidChangedEvent(msg);
             break;
         }
         case CMD_SIGNAL_POLL:
@@ -2705,6 +2679,40 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
             break;
     }
     return ret;
+}
+
+void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessage *msg)
+{
+    std::string bssid = msg->GetStringFromMessage();
+    if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
+        WIFI_LOGE("ApLinkedState inconsistent bssid in connecter");
+        return;
+    }
+    pStaStateMachine->StopTimer(static_cast<int>(WPA_BLOCK_LIST_CLEAR_EVENT));
+    WIFI_LOGI("Stop clearing wpa block list");
+    /* Save linkedinfo */
+    pStaStateMachine->linkedInfo.networkId = pStaStateMachine->targetNetworkId;
+    pStaStateMachine->linkedInfo.bssid = bssid;
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(
+        pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
+}
+
+void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessage *msg)
+{
+    std::string reason = msg->GetStringFromMessage();
+    std::string bssid = msg->GetStringFromMessage();
+    WIFI_LOGI("ApLinkedState reveived bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
+        reason.c_str(), MacAnonymize(bssid).c_str());
+    if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
+        WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
+        return;
+    }
+    pStaStateMachine->linkedInfo.bssid = bssid;
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
+    /* BSSID change is not received during roaming, only set BSSID */
+    if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("SetBssid return fail.");
+    }
 }
 
 void StaStateMachine::DisConnectProcess()

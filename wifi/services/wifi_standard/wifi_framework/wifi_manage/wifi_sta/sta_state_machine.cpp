@@ -115,7 +115,7 @@ StaStateMachine::StaStateMachine(int instId)
       targetNetworkId(INVALID_NETWORK_ID),
       pinCode(0),
       wpsState(SetupMethod::INVALID),
-      lastSignalLevel(INVALID_SIGNAL_LEVEL),
+      lastSignalLevel_(INVALID_SIGNAL_LEVEL),
       targetRoamBssid(WPA_BSSID_ANY),
       currentTpType(IPTYPE_IPV4),
       isWpsConnect(IsWpsConnected::WPS_INVALID),
@@ -969,9 +969,9 @@ void StaStateMachine::DealSignalPollResult()
         signalInfo.ulDelay, signalInfo.txrate, signalInfo.rxrate, signalInfo.txBytes, signalInfo.rxBytes,
         signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets, linkedInfo.wifiStandard,
         linkedInfo.maxSupportedRxLinkSpeed, linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.connState,
-        linkedInfo.detailedState, lastSignalLevel, signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
+        linkedInfo.detailedState, lastSignalLevel_, signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
 
-    WriteLinkInfoHiSysEvent(lastSignalLevel, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
+    WriteLinkInfoHiSysEvent(lastSignalLevel_, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
 
@@ -991,10 +991,10 @@ void StaStateMachine::UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo)
             linkedInfo.rssi = setRssi(signalInfo.signal);
         }
         currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
-        if (currentSignalLevel != lastSignalLevel) {
+        if (currentSignalLevel != lastSignalLevel_) {
             WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
             InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
-            lastSignalLevel = currentSignalLevel;
+            lastSignalLevel_ = currentSignalLevel;
         }
     } else {
         linkedInfo.rssi = INVALID_RSSI_VALUE;
@@ -3666,7 +3666,7 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     lastLinkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
     SetWifiLinkedInfo(targetNetworkId);
 
-    lastSignalLevel = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
+    lastSignalLevel_ = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
     DealSignalPollResult();
     SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
 }
@@ -3791,7 +3791,7 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessage *msg)
     WIFI_LOGI("DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
     if (screenState == MODE_STATE_OPEN) {
         enableSignalPoll = true;
-        lastSignalLevel = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
+        lastSignalLevel_ = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
     }
 

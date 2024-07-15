@@ -33,6 +33,7 @@
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4

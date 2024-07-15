@@ -196,6 +196,12 @@ SelfCureStateMachine::ConnectedMonitorState::~ConnectedMonitorState() {}
 void SelfCureStateMachine::ConnectedMonitorState::GoInState()
 {
     WIFI_LOGI("ConnectedMonitorState GoInState function.");
+    if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
+        WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD,
+                                                    SELF_CURE_MONITOR_DELAYED_MS);
+    }
+    pSelfCureStateMachine->StopTimer(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD);
     IpQosMonitor::GetInstance().StartMonitor();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
@@ -209,11 +215,13 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     wifiSwitchAllowed = false;
     mobileHotspot = linkedInfo.isDataRestricted == 1 ? true : false;
     pSelfCureStateMachine->connectNetworkRetryCnt = 0;
+    WifiConfigCenter::GetInstance().SetLastNetworkId(linkedInfo.networkId);
     WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
+    pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
     lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
         pSelfCureStateMachine->m_instId);
     if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing == true) {
-        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE, HTTP_DETECT_TIMEOUT);
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE, SELF_CURE_DELAYED_MS);
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pInternetSelfCureState);
         return;
     }
@@ -447,6 +455,10 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessage *msg)
 {
     WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
+    if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
+        WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
+        return;
+    }
     if (mobileHotspot && !pSelfCureStateMachine->IsWifi6Network(lastConnectedBssid)) {
         WIFI_LOGI("don't support selfcure, do nothing, mobileHotspot = %{public}d", mobileHotspot);
         return;
@@ -560,11 +572,46 @@ bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMes
             ret = EXECUTED;
             HandleResetConnectNetwork(msg);
             break;
+        case WIFI_CURE_CMD_CONN_FAILED_TIMEOUT:
+            ret = EXECUTED;
+            HandleConnectFailed(msg);
+            break;
         default:
             WIFI_LOGD("DisconnectedMonitorState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;
+}
+
+void SelfCureStateMachine::DisconnectedMonitorState::HandleConnectFailed(InternalMessage *msg)
+{
+    WIFI_LOGI("enter HandleConnectFailed");
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s: msg is nullptr.", __FUNCTION__);
+        return;
+    }
+    if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing) {
+        pSelfCureStateMachine->useWithRandMacAddress = 0;
+        pSelfCureStateMachine->selfCureOnGoing = false;
+        WifiDeviceConfig config;
+        int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
+        if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+            WIFI_LOGE("%{public}s: GetDeviceConfig failed!.", __FUNCTION__);
+            return;
+        }
+        // Connect failed, updateSelfcureConnectHistoryInfo
+        WifiSelfCureHistoryInfo selfCureHistoryInfo;
+        std::string internetSelfCureHistory = config.internetSelfCureHistory;
+        pSelfCureStateMachine->String2InternetSelfCureHistoryInfo(internetSelfCureHistory, selfCureHistoryInfo);
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+        pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
+        config.internetSelfCureHistory = selfCureHistoryInfo.GetSelfCureHistory();
+
+        config.isReassocSelfCureWithFactoryMacAddress = 0;
+        config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+        WifiSettings::GetInstance().AddDeviceConfig(config);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
 }
 
 void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(InternalMessage *msg)
@@ -749,7 +796,6 @@ void SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete(
     WIFI_LOGI("rand mac selfcure complete, check if network is enable.");
     if (pSelfCureStateMachine->IsHttpReachable()) {
         if (pSelfCureStateMachine->IsUseFactoryMac()) {
-            pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(FAC_MAC_REASSOC);
             HandleHttpReachableAfterSelfCure(WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC);
         } else {
             pSelfCureStateMachine->selfCureOnGoing = false;
@@ -1180,6 +1226,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
+    WifiConfigCenter::GetInstance().SetLastNetworkId(networkId);
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
     if (pStaService == nullptr) {
         WIFI_LOGE("Get pStaService failed!");
@@ -1190,6 +1237,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
     }
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
+    pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_CONN_FAILED_TIMEOUT, SELF_CURE_CONN_FAILED_TIMEOUT_MS);
 }
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCureLevel)
@@ -1324,11 +1372,6 @@ bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int cu
         if (currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS && pSelfCureStateMachine->internetUnknown) {
             WIFI_LOGI("RequestUpdateDnsServers");
         }
-        if (currentCureLevel == WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC &&
-            pSelfCureStateMachine->useWithRandMacAddress == FAC_MAC_REASSOC &&
-            pSelfCureStateMachine->IsUseFactoryMac()) {
-            pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(FAC_MAC_REASSOC);
-        }
         HandleHttpReachableAfterSelfCure(currentCureLevel);
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
         return true;
@@ -1391,6 +1434,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
         int networkId = linkedInfo.networkId;
+        WifiConfigCenter::GetInstance().SetLastNetworkId(networkId);
         IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
         if (pStaService == nullptr) {
             WIFI_LOGE("Get pStaService failed!");
@@ -2620,6 +2664,7 @@ bool SelfCureStateMachine::UpdateConnSelfCureFailedHistory()
 void SelfCureStateMachine::HandleNetworkConnected()
 {
     StopTimer(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
+    StopTimer(WIFI_CURE_CMD_CONN_FAILED_TIMEOUT);
     if (!UpdateConnSelfCureFailedHistory()) {
         WIFI_LOGD("Config is null for update, delay 2s to update again.");
         MessageExecutedLater(WIFI_CURE_CMD_UPDATE_CONN_SELF_CURE_HISTORY, SELF_CURE_MONITOR_DELAYED_MS);

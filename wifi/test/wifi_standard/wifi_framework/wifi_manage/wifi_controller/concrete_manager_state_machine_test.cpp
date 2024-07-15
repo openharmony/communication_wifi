@@ -144,8 +144,8 @@ public:
     void HandleSwitchToScanOnlyModeTest()
     {
         InternalMessage msg;
-        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
-        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
         msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
@@ -154,22 +154,24 @@ public:
     void HandleStartInIdleStateTest()
     {
         InternalMessage msg;
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
         msg.SetMessageName(CONCRETE_CMD_START);
-        msg.SetParam1(static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY));
-        msg.SetParam2(0);
+        pConcereteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
+        msg.SetParam1(0);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        msg.SetParam1(static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW));
+        pConcereteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        msg.SetParam1(static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA));
+        pConcereteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
         staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
-        msg.SetParam1(static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE));
+        pConcereteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
     }
 
@@ -381,6 +383,8 @@ public:
     void HandleStaSemiActiveTest1()
     {
         InternalMessage msg;
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE);
         msg.SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
@@ -399,6 +403,8 @@ public:
     void HandleStaSemiActiveTest2()
     {
         InternalMessage msg;
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         msg.SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);

@@ -108,6 +108,16 @@ void SelfCureService::HandleStaOpened()
     pSelfCureStateMachine->SendMessage(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
 }
 
+void SelfCureService::HandleDhcpOfferReport(const IpInfo &ipInfo)
+{
+    WIFI_LOGD("Enter HandleDhcpOfferReport.");
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return;
+    }
+    pSelfCureStateMachine->SendMessage(WIFI_CURE_DHCP_OFFER_PKT_RCV, ipInfo);
+}
+
 void SelfCureService::NotifyInternetFailureDetected(int forceNoHttpCheck)
 {
     WIFI_LOGI("Enter NotifyInternetFailureDetected.");

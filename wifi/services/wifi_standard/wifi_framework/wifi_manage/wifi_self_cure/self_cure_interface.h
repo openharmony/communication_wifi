@@ -98,6 +98,13 @@ public:
     void DealP2pConnChanged(const WifiP2pLinkedInfo &info);
 
     /**
+     * @Description deal dhcp offer report
+     *
+     * @param info -  IpInfo
+     */
+    void DealDhcpOfferReport(const IpInfo &ipInfo, int instId = 0);
+
+    /**
      * @Description deal sta open result
      *
      * @param instId - instance Id

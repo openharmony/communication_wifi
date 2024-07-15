@@ -277,7 +277,8 @@ public:
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
-        bool HandleNetWorkConnectionEvent(InternalMessage *msg);
+        void HandleNetWorkConnectionEvent(InternalMessage *msg);
+        void HandleStaBssidChangedEvent(InternalMessage *msg);
     private:
         StaStateMachine *pStaStateMachine;
     };

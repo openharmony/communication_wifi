@@ -443,7 +443,8 @@ ErrCode WifiScanProxy::GetSupportedFeatures(long &features)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -524,7 +525,8 @@ ErrCode WifiScanProxy::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("GetScanOnlyAvailable Write interface token error!");
         return WIFI_OPT_FAILED;
@@ -558,7 +560,8 @@ ErrCode WifiScanProxy::StartWifiPnoScan(bool isStartAction, int periodMs, int su
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("StartWifiPnoScan Write interface token error!");
         return WIFI_OPT_FAILED;

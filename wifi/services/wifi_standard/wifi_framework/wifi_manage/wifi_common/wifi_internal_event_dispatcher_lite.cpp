@@ -19,6 +19,7 @@
 #include "wifi_errcode.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_common_util.h"
+#include "wifi_config_center.h"
 #include "wifi_settings.h"
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");

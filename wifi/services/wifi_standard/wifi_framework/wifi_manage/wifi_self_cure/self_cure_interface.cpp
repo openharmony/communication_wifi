@@ -95,15 +95,14 @@ ErrCode SelfCureInterface::NotifyInternetFailureDetected(int forceNoHttpCheck)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode SelfCureInterface::IsSelfCureOnGoing()
+bool SelfCureInterface::IsSelfCureOnGoing()
 {
     std::lock_guard<std::mutex> lock(mutex);
     if (pSelfCureService == nullptr) {
         WIFI_LOGI("pSelfCureService is null");
-        return WIFI_OPT_FAILED;
+        return false;
     }
-    pSelfCureService->IsSelfCureOnGoing();
-    return WIFI_OPT_SUCCESS;
+    return pSelfCureService->IsSelfCureOnGoing();
 }
 
 void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)

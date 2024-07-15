@@ -386,11 +386,11 @@ ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
     }
 
     WifiP2pLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetP2pInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
     std::string gcDeviceAddr = device.GetDeviceAddress();
     std::string gcHostName = device.GetDeviceName();
     linkedInfo.AddClientInfoList(gcDeviceAddr, gcInfo.ip, gcHostName);
-    if (WifiSettings::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
+    if (WifiConfigCenter::GetInstance().SaveP2pInfo(linkedInfo) == 0) {
         groupManager.SaveP2pInfo(linkedInfo);
         GcInfo joinGc;
         joinGc.ip = gcInfo.ip;

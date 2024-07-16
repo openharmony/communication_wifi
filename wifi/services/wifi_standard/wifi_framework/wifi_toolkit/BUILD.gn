@@ -120,8 +120,8 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/utils:wifi_utils",
       "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
     defines = [

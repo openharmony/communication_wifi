@@ -1906,28 +1906,23 @@ bool StaStateMachine::ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig)
 void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, WifiDeviceConfig &deviceConfig,
     std::string &currentMac)
 {
-    WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-    if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
-        currentMac = randomMacInfo.randomMac;
-    } else {
-        std::string macAddress;
-        std::string deviceConfigKey = deviceConfig.ssid + deviceConfig.keyMgmt;
-        int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
-        if (ret != 0) {
-            ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
-        }
-        if (ret != 0) {
-            WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
-                "Using locally generated MAC address instead.", __func__);
-            WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
-        }
-        randomMacInfo.randomMac = macAddress;
-        currentMac = randomMacInfo.randomMac;
-        LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
-            __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
-            MacAnonymize(randomMacInfo.peerBssid).c_str());
-        WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+    std::string macAddress;
+    std::string deviceConfigKey = deviceConfig.ssid + deviceConfig.keyMgmt;
+    int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+    if (ret != 0) {
+        ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
     }
+    if (ret != 0) {
+        WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
+            "Using locally generated MAC address instead.", __func__);
+        WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+    }
+    randomMacInfo.randomMac = macAddress;
+    currentMac = randomMacInfo.randomMac;
+    LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+        __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+        MacAnonymize(randomMacInfo.peerBssid).c_str());
+    WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
 }
 
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
@@ -1956,7 +1951,12 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             __func__, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
             MacAnonymize(deviceConfig.macAddress).c_str());
         if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
-            SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac);
+            WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+            if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
+                currentMac = randomMacInfo.randomMac;
+            } else {
+                 SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac);
+            }
         } else if (IsPskEncryption(deviceConfig.keyMgmt)) {
             randomMacInfo.randomMac = deviceConfig.macAddress;
             currentMac = randomMacInfo.randomMac;

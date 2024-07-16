@@ -578,6 +578,13 @@ private:
      */
     void InitLastWifiLinkedInfo();
     /**
+     * @Description  Get device config information.
+     *
+     * @param bassid - the mac address of wifi(in).
+     * @param deviceConfig - the device config(out).
+     */
+    void GetDeviceCfgInfo(const std::string& bssid, WifiDeviceConfig &deviceConfig);
+    /**
      * @Description  Setting linkedInfo in case of when wpa connects
                      automatically there isn't any connection information.
      *

@@ -802,7 +802,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pSetWpsConfigMethods(const std::string &confi
 WifiErrorNo WifiHdiWpaClient::ReqP2pGetDeviceAddress(std::string &deviceAddress) const
 {
     char address[HAL_P2P_DEV_ADDRESS_LEN] = {0};
-    WifiErrorNo ret = HdiP2pGetDeviceAddress(address);
+    WifiErrorNo ret = HdiP2pGetDeviceAddress(address, HAL_P2P_DEV_ADDRESS_LEN);
     if (ret == WIFI_HAL_OPT_OK) {
         deviceAddress = address;
     }
@@ -997,7 +997,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pConnect(const WifiP2pConfigInternal &config,
         return WIFI_HAL_OPT_FAILED;
     }
     char resPin[HAL_PIN_CODE_LENGTH + 1] = {0};
-    WifiErrorNo ret = HdiP2pConnect(&info, resPin);
+    WifiErrorNo ret = HdiP2pConnect(&info, resPin, HAL_PIN_CODE_LENGTH + 1);
     if (ret == WIFI_HAL_OPT_OK) {
         pin = resPin;
     }
@@ -1151,7 +1151,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pReqServiceDiscovery(
     wpsParam.bssid = (unsigned char *)deviceAddress.c_str();
     wpsParam.msg = (unsigned char *)pTlvs;
     char retBuf[HAL_P2P_TMP_BUFFER_SIZE_128] = {0};
-    WifiErrorNo ret = HdiP2pReqServiceDiscovery(&wpsParam, retBuf);
+    WifiErrorNo ret = HdiP2pReqServiceDiscovery(&wpsParam, retBuf, HAL_P2P_TMP_BUFFER_SIZE_128);
     if (ret == WIFI_HAL_OPT_OK) {
         reqID = retBuf;
     }

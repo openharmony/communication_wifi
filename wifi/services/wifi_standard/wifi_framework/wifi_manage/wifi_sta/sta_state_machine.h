@@ -105,6 +105,10 @@ constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
 constexpr int DHCP_LEASE_EXPIRED = 6;
 
+#define DNS_IP_ADDR_LEN 15
+#define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
+#define WIFI_SECOND_DNS_NAME "const.wifi.wifi_second_dns"
+
 enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,
     WPA3_ASSOC_TIMEOUT,

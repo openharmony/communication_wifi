@@ -53,8 +53,6 @@ constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
-#define FIRST_DNS "8.8.8.8"
-#define SECOND_DNS "180.76.76.76"
 #define PORTAL_ACTION "ohos.want.action.viewData"
 #define PORTAL_ENTITY "entity.browser.hbct"
 #define BROWSER_BUNDLE "com.huawei.hmos.browser"
@@ -3026,27 +3024,38 @@ void StaStateMachine::ReplaceEmptyDns(DhcpResult *result)
     }
     std::string strDns1 = result->strOptDns1;
     std::string strDns2 = result->strOptDns2;
+    char wifiFirstDns[DNS_IP_ADDR_LEN + 1] = { 0 };
+    char wifiSecondDns[DNS_IP_ADDR_LEN + 1] = { 0 };
+    if (GetParamValue(WIFI_FIRST_DNS_NAME, 0, wifiFirstDns, DNS_IP_ADDR_LEN) <= 0) {
+        WIFI_LOGE("ReplaceEmptyDns Get wifiFirstDns error");
+        return;
+    }
+    if (GetParamValue(WIFI_SECOND_DNS_NAME, 0, wifiSecondDns, DNS_IP_ADDR_LEN) <= 0) {
+        WIFI_LOGE("ReplaceEmptyDns Get wifiSecondDns error");
+        return;
+    }
+    std::string strWifiFirstDns(wifiFirstDns);
     if (strDns1.empty()) {
         WIFI_LOGI("Enter ReplaceEmptyDns::dns1 is null");
-        if (strDns2 == FIRST_DNS) {
-            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, SECOND_DNS) != EOK) {
-                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s SECOND_DNS failed!");
+        if (strDns2 == strWifiFirstDns) {
+            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, wifiSecondDns) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s wifiSecondDns failed!");
             }
         } else {
-            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, FIRST_DNS) != EOK) {
-                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s FIRST_DNS failed!");
+            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, wifiFirstDns) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s wifiFirstDns failed!");
             }
         }
     }
     if (strDns2.empty()) {
         WIFI_LOGI("Enter ReplaceEmptyDns::dns2 is null");
-        if (strDns1 == FIRST_DNS) {
-            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, SECOND_DNS) != EOK) {
-                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s SECOND_DNS failed!");
+        if (strDns1 == strWifiFirstDns) {
+            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, wifiSecondDns) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s wifiSecondDns failed!");
             }
         } else {
-            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, FIRST_DNS) != EOK) {
-                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s SECOND_DNS failed!");
+            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, wifiFirstDns) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s wifiFirstDns failed!");
             }
         }
     }

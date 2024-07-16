@@ -48,17 +48,23 @@ uint8_t plainText[PLAIN_TEXT_LEN] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0
 const uint8_t key[KEY_LEN] = {0xa8, 0x2b, 0xce, 0x21, 0xa8, 0x2b, 0xce, 0x21, 0xa8, 0x2b, 0xce,
     0x21, 0xa8, 0x2b, 0xce, 0x21};
 const uint8_t iv[AES_IV_LEN] = {0xa8, 0x2b, 0xce, 0x21, 0xa8, 0x2b, 0xce, 0x21, 0xa8, 0x2b, 0xce, 0x21};
-uint8_t cipherText[CIPHER_TEXT_MAX_LEN];
-int cipherTextLen = 0;
+uint8_t cipherText[CIPHER_TEXT_MAX_LEN] = {0x40, 0x16, 0x28, 0x3e, 0x96, 0xd9, 0x43, 0x29, 0x4d, 0x2c,
+    0x0a, 0xca, 0x38, 0xcc};
 
 HWTEST_F(WifiOpensslUtilsTest, OpensslAesEncryptTest1, TestSize.Level1)
 {
+    int cipherTextLen = 0;
+    uint8_t newCipherText[CIPHER_TEXT_MAX_LEN];
     AesCipherInfo info;
     info.aesType = AES_TYPE;
     memcpy_s(info.key, MAX_KEY_LEN, key, KEY_LEN);
     memcpy_s(info.iv, AES_IV_LEN, iv, AES_IV_LEN);
     EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesEncrypt(plainText, PLAIN_TEXT_LEN,
-        &info, cipherText, &cipherTextLen), 0);
+        &info, newCipherText, &cipherTextLen), 0);
+    EXPECT_EQ(cipherTextLen, CIPHER_TEXT_MAX_LEN);
+    for (int i = 0; i < cipherTextLen; i++) {
+        EXPECT_EQ(newCipherText[i], cipherText[i]);
+    }
 }
 
 HWTEST_F(WifiOpensslUtilsTest, OpensslAesDecryptTest2, TestSize.Level1)
@@ -69,8 +75,12 @@ HWTEST_F(WifiOpensslUtilsTest, OpensslAesDecryptTest2, TestSize.Level1)
     info.aesType = AES_TYPE;
     memcpy_s(info.key, MAX_KEY_LEN, key, KEY_LEN);
     memcpy_s(info.iv, AES_IV_LEN, iv, AES_IV_LEN);
-    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(cipherText, cipherTextLen,
-    &info, decryptText, &decryptTextLen), 0);
+    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(cipherText, CIPHER_TEXT_MAX_LEN,
+        &info, decryptText, &decryptTextLen), 0);
+    EXPECT_EQ(decryptTextLen, PLAIN_TEXT_LEN);
+    for (int i = 0; i < decryptTextLen; i++) {
+        EXPECT_EQ(decryptText[i], plainText[i]);
+    }
 }
 
 }  // namespace Wifi

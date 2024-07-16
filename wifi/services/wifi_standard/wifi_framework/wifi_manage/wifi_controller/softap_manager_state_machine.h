@@ -39,11 +39,11 @@ public:
         ~IdleState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         SoftapManagerMachine *pSoftapManagerMachine;
-        void HandleStartInIdleState(InternalMessage *msg);
+        void HandleStartInIdleState(InternalMessagePtr msg);
     };
 
     class DefaultState : public State {
@@ -52,7 +52,7 @@ public:
         ~DefaultState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         SoftapManagerMachine *pSoftapManagerMachine;
@@ -64,7 +64,7 @@ public:
         ~StartedState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         SoftapManagerMachine *pSoftapManagerMachine;

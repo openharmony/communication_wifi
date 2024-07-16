@@ -93,7 +93,7 @@ void StaMonitor::OnReportDisConnectReasonCallBack(int reason, const std::string 
         return;
     }
 
-    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     if (msg == nullptr) {
         WIFI_LOGE("OnReportDisConnectReasonCallBack CreateMessage failed");
         return;

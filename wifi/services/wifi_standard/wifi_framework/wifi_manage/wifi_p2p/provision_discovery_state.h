@@ -61,7 +61,7 @@ public:
      * @param msg - Message object pointer
      * @return - bool true:success   false:fail
      */
-    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
 private:
     /**
@@ -76,59 +76,59 @@ private:
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDiscoverPeer(InternalMessage &msg) const;
+    virtual bool ProcessCmdDiscoverPeer(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the discover services command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDiscServices(InternalMessage &msg) const;
+    virtual bool ProcessCmdDiscServices(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the start listen command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdStartListen(InternalMessage &msg) const;
+    virtual bool ProcessCmdStartListen(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the provision discover pbc response message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessProvDiscPbcRspEvt(InternalMessage &msg) const;
+    virtual bool ProcessProvDiscPbcRspEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the provision discover enter pin message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessProvDiscEnterPinEvt(InternalMessage &msg) const;
+    virtual bool ProcessProvDiscEnterPinEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the provision discover show pin message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessProvDiscShowPinEvt(InternalMessage &msg) const;
+    virtual bool ProcessProvDiscShowPinEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the provision discover failure message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessProvDiscFailEvt(InternalMessage &msg) const;
+    virtual bool ProcessProvDiscFailEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the cancel connect message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdCancelConnect(InternalMessage &msg) const;
+    virtual bool ProcessCmdCancelConnect(InternalMessagePtr msg) const;
 
 private:
-    using ProcessFun = bool (ProvisionDiscoveryState::*)(InternalMessage &msg) const;
+    using ProcessFun = bool (ProvisionDiscoveryState::*)(InternalMessagePtr msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

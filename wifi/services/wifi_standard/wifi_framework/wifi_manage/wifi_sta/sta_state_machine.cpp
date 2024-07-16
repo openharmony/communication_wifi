@@ -409,7 +409,7 @@ void StaStateMachine::RootState::GoOutState()
     return;
 }
 
-bool StaStateMachine::RootState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::RootState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -462,7 +462,7 @@ void StaStateMachine::InitState::GoOutState()
     return;
 }
 
-bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -703,7 +703,7 @@ void StaStateMachine::WpaStartingState::GoOutState()
     return;
 }
 
-bool StaStateMachine::WpaStartingState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::WpaStartingState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -746,7 +746,7 @@ void StaStateMachine::WpaStartedState::GoOutState()
     return;
 }
 
-bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::WpaStartedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         LOGI("msg is nullptr");
@@ -834,7 +834,7 @@ void StaStateMachine::WpaStoppingState::GoOutState()
     return;
 }
 
-bool StaStateMachine::WpaStoppingState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::WpaStoppingState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -865,7 +865,7 @@ void StaStateMachine::LinkState::GoOutState()
     return;
 }
 
-bool StaStateMachine::LinkState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::LinkState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -1066,7 +1066,7 @@ void StaStateMachine::OnConnectFailed(int networkId)
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
 }
 
-void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
+void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
 {
     LOGD("enter DealConnectToUserSelectedNetwork.\n");
     if (msg == nullptr) {
@@ -1124,7 +1124,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessage *msg)
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
 }
 
-void StaStateMachine::DealConnectTimeOutCmd(InternalMessage *msg)
+void StaStateMachine::DealConnectTimeOutCmd(InternalMessagePtr msg)
 {
     LOGW("enter DealConnectTimeOutCmd.\n");
     if (msg == nullptr) {
@@ -1206,7 +1206,7 @@ void StaStateMachine::HilinkSaveConfig(void)
     m_hilinkFlag = false;
 }
 
-void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
+void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("DealConnectionEvent, msg is nullptr.\n");
@@ -1257,7 +1257,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessage *msg)
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
 }
 
-void StaStateMachine::DealDisconnectEvent(InternalMessage *msg)
+void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
 {
     LOGI("Enter DealDisconnectEvent.\n");
     if (msg == nullptr) {
@@ -1325,7 +1325,7 @@ bool StaStateMachine::IsStaDisConnectReasonShouldRetryEvent(int eventName)
         eventName == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT;
 }
 
-void StaStateMachine::DealWpaLinkFailEvent(InternalMessage *msg)
+void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
 {
     LOGW("enter DealWpaLinkFailEvent.\n");
     if (msg == nullptr) {
@@ -1429,7 +1429,7 @@ void StaStateMachine::DealSetStaConnectFailedCount(int count, bool set)
     }
 }
 
-void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
+void StaStateMachine::DealReConnectCmd(InternalMessagePtr msg)
 {
     LOGI("enter DealReConnectCmd.\n");
     if (msg == nullptr) {
@@ -1455,7 +1455,7 @@ void StaStateMachine::DealReConnectCmd(InternalMessage *msg)
     }
 }
 
-void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
+void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
 {
     LOGI("enter DealReassociateCmd.\n");
     if (msg == nullptr) {
@@ -1473,7 +1473,7 @@ void StaStateMachine::DealReassociateCmd(InternalMessage *msg)
     }
 }
 
-void StaStateMachine::DealStartWpsCmd(InternalMessage *msg)
+void StaStateMachine::DealStartWpsCmd(InternalMessagePtr msg)
 {
     WIFI_LOGI("enter DealStartWpsCmd\n");
     if (msg == nullptr) {
@@ -1492,7 +1492,7 @@ void StaStateMachine::DealStartWpsCmd(InternalMessage *msg)
     }
 }
 
-void StaStateMachine::StartWpsMode(InternalMessage *msg)
+void StaStateMachine::StartWpsMode(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;
@@ -1560,7 +1560,7 @@ void StaStateMachine::StartWpsMode(InternalMessage *msg)
     }
 }
 
-void StaStateMachine::DealWpaBlockListClearEvent(InternalMessage *msg)
+void StaStateMachine::DealWpaBlockListClearEvent(InternalMessagePtr msg)
 {
     if (msg != nullptr) {
         WIFI_LOGE("enter DealWpaBlockListClearEvent\n");
@@ -1572,7 +1572,7 @@ void StaStateMachine::DealWpaBlockListClearEvent(InternalMessage *msg)
     WIFI_LOGI("Clearing the Wpa_blocklist.\n");
 }
 
-void StaStateMachine::DealWpsConnectTimeOutEvent(InternalMessage *msg)
+void StaStateMachine::DealWpsConnectTimeOutEvent(InternalMessagePtr msg)
 {
     WIFI_LOGW("enter DealWpsConnectTimeOutEvent\n");
     if (msg == nullptr) {
@@ -1591,7 +1591,7 @@ void StaStateMachine::DealWpsConnectTimeOutEvent(InternalMessage *msg)
     SwitchState(pSeparatedState);
 }
 
-void StaStateMachine::DealCancelWpsCmd(InternalMessage *msg)
+void StaStateMachine::DealCancelWpsCmd(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
@@ -1631,7 +1631,7 @@ void StaStateMachine::DealCancelWpsCmd(InternalMessage *msg)
     SwitchState(pSeparatedState);
 }
 
-void StaStateMachine::DealStartRoamCmd(InternalMessage *msg)
+void StaStateMachine::DealStartRoamCmd(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is null", __FUNCTION__);
@@ -1988,7 +1988,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 
 void StaStateMachine::StartRoamToNetwork(std::string bssid)
 {
-    InternalMessage *msg = CreateMessage();
+    InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {
         return;
     }
@@ -2005,7 +2005,7 @@ bool StaStateMachine::IsRoaming(void)
 
 void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 {
-    InternalMessage *msg = CreateMessage();
+    InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {
         LOGE("msg is nullptr.\n");
         return;
@@ -2050,7 +2050,7 @@ void StaStateMachine::OnNetworkHiviewEvent(int state)
 
 void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)
 {
-    InternalMessage *msg = CreateMessage();
+    InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {
         LOGE("msg is nullptr.\n");
         return;
@@ -2064,7 +2064,7 @@ void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)
 
 void StaStateMachine::OnDhcpResultNotifyEvent(DhcpReturnCode result, int ipType)
 {
-    InternalMessage *msg = CreateMessage();
+    InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {
         LOGE("msg is nullptr.\n");
         return;
@@ -2463,7 +2463,7 @@ std::string StaStateMachine::GetUmtsAuthResponse(EapSimUmtsAuthParam &param)
     return SimAkaAuth(challenge, SIM_AUTH_EAP_AKA_TYPE);
 }
 
-void StaStateMachine::DealWpaEapSimAuthEvent(InternalMessage *msg)
+void StaStateMachine::DealWpaEapSimAuthEvent(InternalMessagePtr msg)
 {
     if (msg == NULL) {
         LOGE("%{public}s: msg is null", __func__);
@@ -2497,7 +2497,7 @@ void StaStateMachine::DealWpaEapSimAuthEvent(InternalMessage *msg)
     LOGD("%{public}s: success to send the message, authReq: %{private}s", __func__, cmd.c_str());
 }
 
-void StaStateMachine::DealWpaEapUmtsAuthEvent(InternalMessage *msg)
+void StaStateMachine::DealWpaEapUmtsAuthEvent(InternalMessagePtr msg)
 {
     if (msg == NULL) {
         LOGE("%{public}s: msg is null", __func__);
@@ -2568,7 +2568,7 @@ void StaStateMachine::SeparatingState::GoOutState()
     WIFI_LOGI("SeparatingState GoOutState function.");
 }
 
-bool StaStateMachine::SeparatingState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::SeparatingState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -2602,7 +2602,7 @@ void StaStateMachine::SeparatedState::GoOutState()
     return;
 }
 
-bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -2654,7 +2654,7 @@ void StaStateMachine::ApLinkedState::GoOutState()
     return;
 }
 
-bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -2691,7 +2691,7 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessage *msg)
     return ret;
 }
 
-void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessage *msg)
+void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessagePtr msg)
 {
     std::string bssid = msg->GetStringFromMessage();
     if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
@@ -2707,7 +2707,7 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
         pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
 }
 
-void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessage *msg)
+void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessagePtr msg)
 {
     std::string reason = msg->GetStringFromMessage();
     std::string bssid = msg->GetStringFromMessage();
@@ -2772,7 +2772,7 @@ void StaStateMachine::StaWpsState::GoOutState()
     WIFI_LOGI("WpsState GoOutState function.");
 }
 
-bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -2935,7 +2935,7 @@ void StaStateMachine::GetIpState::GoOutState()
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
 }
 
-bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -3383,7 +3383,7 @@ void StaStateMachine::LinkedState::GoOutState()
     WIFI_LOGI("LinkedState GoOutState function.");
 }
 
-bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGI("msg is nullptr.");
@@ -3452,7 +3452,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessage *msg)
     return ret;
 }
 
-void StaStateMachine::DealApRoamingStateTimeout(InternalMessage *msg)
+void StaStateMachine::DealApRoamingStateTimeout(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         LOGE("DealApRoamingStateTimeout InternalMessage msg is null.");
@@ -3489,7 +3489,7 @@ void StaStateMachine::HilinkSetMacAddress(std::string &cmd)
     return;
 }
 
-void StaStateMachine::DealHiLinkDataToWpa(InternalMessage *msg)
+void StaStateMachine::DealHiLinkDataToWpa(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         LOGE("DealHiLinkDataToWpa InternalMessage msg is null.");
@@ -3558,7 +3558,7 @@ void StaStateMachine::ApRoamingState::GoOutState()
     pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
 }
 
-bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessage *msg)
+bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -3781,7 +3781,7 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
     }
 }
 
-void StaStateMachine::DealNetworkCheck(InternalMessage *msg)
+void StaStateMachine::DealNetworkCheck(InternalMessagePtr msg)
 {
     LOGD("enter DealNetworkCheck.\n");
     if (msg == nullptr || enableSignalPoll == false) {
@@ -3793,7 +3793,7 @@ void StaStateMachine::DealNetworkCheck(InternalMessage *msg)
 #endif
 }
 
-void StaStateMachine::DealGetDhcpIpTimeout(InternalMessage *msg)
+void StaStateMachine::DealGetDhcpIpTimeout(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         LOGE("DealGetDhcpIpTimeout InternalMessage msg is null.");
@@ -3804,7 +3804,7 @@ void StaStateMachine::DealGetDhcpIpTimeout(InternalMessage *msg)
     DisConnectProcess();
 }
 
-void StaStateMachine::DealScreenStateChangedEvent(InternalMessage *msg)
+void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");

@@ -920,7 +920,6 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin)
     wpsParam.peerDevAddrLen = strlen(info->peerDevAddr);
     wpsParam.pin = (uint8_t *)info->pin;
     wpsParam.pinLen = HDI_PIN_LEN;
-    LOGI("HdiP2pConnect wpsParam.pin=%{public}s wpsParam.pinLen=%{public}d", wpsParam.pin, wpsParam.pinLen);
 
     int32_t result = wpaObj->P2pConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam, replyPin, HAL_PIN_CODE_LENGTH);
     if (result != HDF_SUCCESS) {

@@ -33,6 +33,7 @@ namespace Wifi {
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
 #define WIFI_INVALID_UID (-1)
+#define INVALID_SIGNAL_LEVEL (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
 #define WIFI_INVALID_SIM_ID (0)

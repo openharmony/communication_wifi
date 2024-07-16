@@ -3660,6 +3660,24 @@ ErrCode StaStateMachine::ConfigRandMacSelfCure(const int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
+void  StaStateMachine::GetDeviceCfgInfo(const std::string& bssid, WifiDeviceConfig &deviceConfig)
+{
+    WifiHalGetDeviceConfig config;
+    config.networkId = WPA_DEFAULT_NETWORKID;
+    config.param = "ssid";
+    if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("GetDeviceConfig failed!");
+    }
+    deviceConfig.networkId = WPA_DEFAULT_NETWORKID;
+    deviceConfig.bssid = bssid;
+    deviceConfig.ssid = config.value;
+    /* Remove the double quotation marks at the head and tail. */
+    deviceConfig.ssid.erase(0, 1);
+    if (!deviceConfig.ssid.empty()) {
+        deviceConfig.ssid.erase(deviceConfig.ssid.length() - 1, 1);
+    }
+}
+
 void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
 {
     WIFI_LOGI("ConnectToNetworkProcess, Receive bssid=%{public}s", MacAnonymize(bssid).c_str());
@@ -3703,18 +3721,7 @@ void StaStateMachine::UpdateDeviceConfigAfterWifiConnected(WifiDeviceConfig &dev
         deviceConfig.bssid = bssid;
         if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::PBC) || (wpsState == SetupMethod::KEYPAD)) {
             /* Save connection information. */
-            WifiHalGetDeviceConfig config;
-            config.networkId = WPA_DEFAULT_NETWORKID;
-            config.param = "ssid";
-            if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config) != WIFI_HAL_OPT_OK) {
-                LOGE("GetDeviceConfig failed!");
-            }
-            deviceConfig.networkId = WPA_DEFAULT_NETWORKID;
-            deviceConfig.bssid = bssid;
-            deviceConfig.ssid = config.value;
-            /* Remove the double quotation marks at the head and tail. */
-            deviceConfig.ssid.erase(0, 1);
-            deviceConfig.ssid.erase(deviceConfig.ssid.length() - 1, 1);
+            GetDeviceCfgInfo(bssid, deviceConfig);
             WifiSettings::GetInstance().AddWpsDeviceConfig(deviceConfig);
             isWpsConnect = IsWpsConnected::WPS_CONNECTED;
         } else {

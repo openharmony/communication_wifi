@@ -773,7 +773,7 @@ WifiErrorNo HdiP2pReinvoke(int networkId, const char *bssid)
     return WIFI_HAL_OPT_OK;
 }
 
-WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress)
+WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress, int size)
 {
     LOGI("HdiP2pGetDeviceAddress enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
@@ -782,8 +782,7 @@ WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress)
         return WIFI_HAL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->P2pGetDeviceAddress(wpaObj, GetHdiP2pIfaceName(), deviceAddress,
-        HAL_P2P_DEV_ADDRESS_LEN);
+    int32_t result = wpaObj->P2pGetDeviceAddress(wpaObj, GetHdiP2pIfaceName(), deviceAddress, size);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetDeviceAddress: P2pGetDeviceAddress failed result:%{public}d", result);
         return WIFI_HAL_OPT_FAILED;
@@ -793,7 +792,7 @@ WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress)
     return WIFI_HAL_OPT_OK;
 }
 
-WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char *replyDisc)
+WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char *replyDisc, int size)
 {
     LOGI("HdiP2pReqServiceDiscovery enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
@@ -803,7 +802,7 @@ WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char 
     }
 
     int32_t result = wpaObj->P2pReqServiceDiscovery(wpaObj, GetHdiP2pIfaceName(), reqService,
-        replyDisc, HAL_P2P_TMP_BUFFER_SIZE_128);
+        replyDisc, size);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pReqServiceDiscovery: P2pReqServiceDiscovery failed result:%{public}d", result);
         return WIFI_HAL_OPT_FAILED;
@@ -901,7 +900,7 @@ static int hwaddr_aton(char *txt, uint8_t *addr)
     return hwaddr_parse(txt, addr) ? 0 : -1;
 }
 
-WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin)
+WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin, int size)
 {
     LOGI("HdiP2pConnect enter");
     struct IWpaInterface *wpaObj = GetWpaInterface();
@@ -922,7 +921,7 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin)
     wpsParam.pinLen = HDI_PIN_LEN;
     LOGI("HdiP2pConnect wpsParam.pin=%{public}s wpsParam.pinLen=%{public}d", wpsParam.pin, wpsParam.pinLen);
 
-    int32_t result = wpaObj->P2pConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam, replyPin, HAL_PIN_CODE_LENGTH);
+    int32_t result = wpaObj->P2pConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam, replyPin, size - 1);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pConnect: P2pConnect failed result:%{public}d", result);
         return WIFI_HAL_OPT_FAILED;

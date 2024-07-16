@@ -158,7 +158,7 @@ std::string IpTools::ConvertIpv6Mask(int prefixLength)
 int IpTools::GetMaskLength(std::string mask)
 {
     int netMask = 0;
-    const int constMask = 0x80000000;
+    const unsigned int constMask = 0x80000000;
     unsigned int maskTmp = ntohl(static_cast<int>(inet_addr(mask.c_str())));
     while (maskTmp & constMask) {
         netMask++;

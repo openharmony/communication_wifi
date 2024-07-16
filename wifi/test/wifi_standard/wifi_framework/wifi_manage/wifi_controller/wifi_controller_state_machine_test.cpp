@@ -84,16 +84,16 @@ public:
 
     void WifiToggledTest1()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiToggledState(false);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
-        msg.SetMessageName(CMD_WIFI_TOGGLED);
-        msg.SetParam1(1);
-        msg.SetParam2(0);
+        msg->SetMessageName(CMD_WIFI_TOGGLED);
+        msg->SetParam1(1);
+        msg->SetParam2(0);
         sleep(1);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
         EXPECT_FALSE(pWifiControllerMachine->pDefaultState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(nullptr));
@@ -101,43 +101,43 @@ public:
 
     void WifiToggledTest2()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiToggledState(false);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
-        msg.SetMessageName(CMD_WIFI_TOGGLED);
-        msg.SetParam1(0);
-        msg.SetParam2(0);
+        msg->SetMessageName(CMD_WIFI_TOGGLED);
+        msg->SetParam1(0);
+        msg->SetParam2(0);
         sleep(1);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(CMD_AIRPLANE_TOGGLED);
-        msg.SetParam1(0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pWifiControllerMachine->pDefaultState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+        msg->SetMessageName(CMD_AIRPLANE_TOGGLED);
+        msg->SetParam1(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->pDefaultState->ExecuteStateMsg(msg));
     }
 
     void HandleStaStartFail()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiToggledState(false);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
-        msg.SetMessageName(CMD_STA_START_FAILURE);
-        msg.SetParam1(0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        msg->SetMessageName(CMD_STA_START_FAILURE);
+        msg->SetParam1(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(1);
-        msg.SetMessageName(CMD_CONCRETE_STOPPED);
-        msg.SetParam1(0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(CMD_STA_REMOVED);
-        msg.SetParam1(0);
-        msg.SetParam2(0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(CMD_CONCRETECLIENT_REMOVED);
-        msg.SetParam1(0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        msg->SetMessageName(CMD_CONCRETE_STOPPED);
+        msg->SetParam1(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        msg->SetMessageName(CMD_STA_REMOVED);
+        msg->SetParam1(0);
+        msg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        msg->SetMessageName(CMD_CONCRETECLIENT_REMOVED);
+        msg->SetParam1(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
     void RemoveConcreteManagerTest()
@@ -188,55 +188,55 @@ public:
 
     void SoftapToggledTest1()
     {
-        InternalMessage msg;
-        msg.SetMessageName(CMD_SOFTAP_TOGGLED);
-        msg.SetParam1(0);
-        msg.SetParam2(0);
-        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_SOFTAP_TOGGLED);
+        msg->SetParam1(0);
+        msg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, 0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         SoftApManager *softapmode = new (std::nothrow) SoftApManager(SoftApManager::Role::ROLE_SOFTAP, 0);
         softapmode->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
         pWifiControllerMachine->softapManagers.push_back(softapmode);
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::RUNNING, 0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        msg.SetParam1(1);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        msg->SetParam1(1);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         ConcreteClientModeManager *clientmode =
             new (std::nothrow) ConcreteClientModeManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
         pWifiControllerMachine->concreteManagers.push_back(clientmode);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
     void HandleAirplaneOpenTest()
     {
-        InternalMessage msg;
-        msg.SetMessageName(CMD_AIRPLANE_TOGGLED);
-        msg.SetParam1(1);
-        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_AIRPLANE_TOGGLED);
+        msg->SetParam1(1);
+        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, 0);
-        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(INVILAD_MSG);
-        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        msg->SetMessageName(INVILAD_MSG);
+        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
     void ApStartFailureTest()
     {
-        InternalMessage msg;
-        msg.SetMessageName(CMD_AP_STOPPED);
-        msg.SetParam1(0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(CMD_AP_START_FAILURE);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_AP_STOPPED);
+        msg->SetParam1(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        msg->SetMessageName(CMD_AP_START_FAILURE);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         SoftApManager *softapmode = new (std::nothrow) SoftApManager(SoftApManager::Role::ROLE_HAS_REMOVED, 0);
         softapmode->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
         pWifiControllerMachine->softapManagers.push_back(softapmode);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         SoftApManager *softapmodeBack = new (std::nothrow) SoftApManager(SoftApManager::Role::ROLE_HAS_REMOVED, 0);
         softapmodeBack->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
         pWifiControllerMachine->softapManagers.push_back(softapmodeBack);
@@ -244,41 +244,41 @@ public:
             new (std::nothrow) ConcreteClientModeManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
         pWifiControllerMachine->concreteManagers.push_back(clientmode);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(CMD_AP_SERVICE_START_FAILURE);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        msg->SetMessageName(CMD_AP_SERVICE_START_FAILURE);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         pWifiControllerMachine->mSoftapStartFailCount = AP_OPEN_RETRY_MAX_COUNT;
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
     void ApStartTest()
     {
-        InternalMessage msg;
-        msg.SetMessageName(CMD_AP_START);
-        msg.SetParam1(0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(CMD_AP_START_TIME);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(CMD_AP_STOP_TIME);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_AP_START);
+        msg->SetParam1(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        msg->SetMessageName(CMD_AP_START_TIME);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        msg->SetMessageName(CMD_AP_STOP_TIME);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetSoftapToggledState(true);
         EXPECT_TRUE(pWifiControllerMachine->ShouldEnableSoftap());
     }
 
     void RetryTest()
     {
-        InternalMessage msg;
-        msg.SetMessageName(CMD_OPEN_WIFI_RETRY);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_OPEN_WIFI_RETRY);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
     void ApRemoveTest()
     {
-        InternalMessage msg;
-        msg.SetMessageName(CMD_AP_REMOVED);
-        msg.SetParam1(0);
-        msg.SetParam2(0);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(&msg));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_AP_REMOVED);
+        msg->SetParam1(0);
+        msg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
     void SoftApIdExistTest()
@@ -465,12 +465,12 @@ HWTEST_F(WifiControllerMachineTest, GetWifiRoleTest, TestSize.Level1)
 
 HWTEST_F(WifiControllerMachineTest, HandleApStopTest, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(CMD_AP_STOPPED);
-    msg.SetParam1(0);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_AP_STOPPED);
+    msg->SetParam1(0);
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
-    pWifiControllerMachine->pEnableState->HandleApStop(&msg);
+    pWifiControllerMachine->pEnableState->HandleApStop(msg);
 }
 }
 }

@@ -63,7 +63,7 @@ void SelfCureService::HandleRssiLevelChanged(int rssi)
         WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;
     }
-    InternalMessage *msg = pSelfCureStateMachine->CreateMessage();
+    InternalMessagePtr msg = pSelfCureStateMachine->CreateMessage();
     if (msg == nullptr) {
         WIFI_LOGE("msg is null.\n");
         return;

@@ -113,7 +113,7 @@ void WifiControllerMachine::DisableState::GoOutState()
     WIFI_LOGE("DisableState GoOutState function.");
 }
 
-bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessage *msg)
+bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -172,7 +172,7 @@ void WifiControllerMachine::EnableState::GoOutState()
     WIFI_LOGE("EnableState GoOutState function.");
 }
 
-bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessage *msg)
+bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -259,7 +259,7 @@ void WifiControllerMachine::DefaultState::GoOutState()
     WIFI_LOGE("DefaultState GoOutState function.");
 }
 
-bool WifiControllerMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
+bool WifiControllerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr || pWifiControllerMachine == nullptr) {
         return false;
@@ -602,7 +602,7 @@ void WifiControllerMachine::SwitchRole(ConcreteManagerRole role)
     }
 }
 
-void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessage *msg)
+void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg)
 {
     ConcreteManagerRole presentRole;
     if (!(pWifiControllerMachine->ShouldEnableWifi())) {
@@ -641,7 +641,7 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 }
 
 #ifdef FEATURE_AP_SUPPORT
-void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(InternalMessage *msg)
+void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(InternalMessagePtr msg)
 {
     int id = msg->GetParam2();
     WIFI_LOGE("handleSoftapToggleChangeInEnabledState");
@@ -691,12 +691,12 @@ void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
     }
 }
 
-void WifiControllerMachine::EnableState::HandleStaRemoved(InternalMessage *msg)
+void WifiControllerMachine::EnableState::HandleStaRemoved(InternalMessagePtr msg)
 {
     pWifiControllerMachine->StopConcreteManager(msg->GetParam2());
 }
 
-void WifiControllerMachine::EnableState::HandleConcreteClientRemoved(InternalMessage *msg)
+void WifiControllerMachine::EnableState::HandleConcreteClientRemoved(InternalMessagePtr msg)
 {
     int id = msg->GetParam1();
     pWifiControllerMachine->RemoveConcreteManager(id);
@@ -758,7 +758,7 @@ void WifiControllerMachine::EnableState::HandleApStart(int id)
     pWifiControllerMachine->StartSoftapCloseTimer();
 }
 
-void WifiControllerMachine::EnableState::HandleApRemoved(InternalMessage *msg)
+void WifiControllerMachine::EnableState::HandleApRemoved(InternalMessagePtr msg)
 {
     pWifiControllerMachine->StopSoftapManager(msg->GetParam2());
     SoftApManager *softap = pWifiControllerMachine->GetSoftApManager(msg->GetParam2());
@@ -767,7 +767,7 @@ void WifiControllerMachine::EnableState::HandleApRemoved(InternalMessage *msg)
     }
 }
 
-void WifiControllerMachine::EnableState::HandleApStop(InternalMessage *msg)
+void WifiControllerMachine::EnableState::HandleApStop(InternalMessagePtr msg)
 {
     pWifiControllerMachine->StopTimer(CMD_AP_STOP_TIME);
     pWifiControllerMachine->StopSoftapCloseTimer();

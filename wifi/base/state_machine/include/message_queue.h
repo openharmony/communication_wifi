@@ -47,7 +47,7 @@ public:
      * @param handleTime - Message execution time.[in]
      * @return true : success, false : failed.
      */
-    bool AddMessageToQueue(InternalMessage *message, int64_t handleTime);
+    bool AddMessageToQueue(InternalMessagePtr message, int64_t handleTime);
 
     /**
      * @Description : Delete messages from the queue.
@@ -62,7 +62,7 @@ public:
      * If no message is found, the system blocks the messages.
      *
      */
-    InternalMessage *GetNextMessage();
+    InternalMessagePtr GetNextMessage();
 
     /**
      * @Description : Obtain messages from the queue for processing.
@@ -74,7 +74,7 @@ private:
     /* Thread lock of operation queue */
     std::mutex mMtxQueue;
     /* Message Queuing */
-    InternalMessage *pMessageQueue;
+    InternalMessagePtr pMessageQueue;
     /* No messages to be executed, blocking */
     std::atomic<bool> mIsBlocked;
     /* Exit Loop */

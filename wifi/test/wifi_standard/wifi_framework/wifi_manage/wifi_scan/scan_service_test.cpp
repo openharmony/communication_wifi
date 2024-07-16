@@ -367,11 +367,11 @@ public:
 
     void AddScanMessageBodySuccess()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         InterScanConfig interConfig;
         interConfig.hiddenNetworkSsid.push_back("hmwifi");
         interConfig.scanFreqs.push_back(FREQ_2_DOT_4_GHZ);
-        EXPECT_EQ(true, pScanService->AddScanMessageBody(&msg, interConfig));
+        EXPECT_EQ(true, pScanService->AddScanMessageBody(msg, interConfig));
     }
 
     void AddScanMessageBodyFail()
@@ -568,9 +568,9 @@ public:
 
     void AddPnoScanMessageBodySuccess()
     {
-        InternalMessage interMessage;
+        InternalMessagePtr interMessage = std::make_shared<InternalMessage>();
         PnoScanConfig pnoScanConfig;
-        EXPECT_EQ(true, pScanService->AddPnoScanMessageBody(&interMessage, pnoScanConfig));
+        EXPECT_EQ(true, pScanService->AddPnoScanMessageBody(interMessage, pnoScanConfig));
     }
 
     void AddPnoScanMessageBodyFail()

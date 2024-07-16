@@ -121,7 +121,7 @@ void InternalMessage::CopyMessageBody(const MessageBody &origBody)
     return;
 }
 
-InternalMessage *InternalMessage::GetNextMsg() const
+InternalMessagePtr InternalMessage::GetNextMsg() const
 {
     return pNextMsg;
 }
@@ -173,7 +173,7 @@ void InternalMessage::ClearMessageBody()
     return;
 }
 
-void InternalMessage::SetNextMsg(InternalMessage *nextMsg)
+void InternalMessage::SetNextMsg(InternalMessagePtr nextMsg)
 {
     pNextMsg = nextMsg;
     return;
@@ -195,7 +195,7 @@ MessageManage &MessageManage::GetInstance()
     return *msgManage;
 }
 
-MessageManage::MessageManage() : pMsgPool(nullptr), mMsgPoolSize(0)
+MessageManage::MessageManage()
 {}
 
 MessageManage::~MessageManage()
@@ -204,26 +204,15 @@ MessageManage::~MessageManage()
     return;
 }
 
-InternalMessage *MessageManage::CreateMessage()
+InternalMessagePtr MessageManage::CreateMessage()
 {
-    {
-        std::unique_lock<std::mutex> lock(mPoolMutex);
-        if (pMsgPool != nullptr) {
-            InternalMessage *m = pMsgPool;
-            pMsgPool = m->GetNextMsg();
-            m->SetNextMsg(nullptr);
-            mMsgPoolSize--;
-            return m;
-        }
-    }
-
-    auto pMessage = new (std::nothrow) InternalMessage();
+    auto pMessage = std::make_shared<InternalMessage>();
     return pMessage;
 }
 
-InternalMessage *MessageManage::CreateMessage(const InternalMessage *orig)
+InternalMessagePtr MessageManage::CreateMessage(const InternalMessagePtr orig)
 {
-    InternalMessage *m = CreateMessage();
+    InternalMessagePtr m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
@@ -237,9 +226,9 @@ InternalMessage *MessageManage::CreateMessage(const InternalMessage *orig)
     return m;
 }
 
-InternalMessage *MessageManage::CreateMessage(int messageName)
+InternalMessagePtr MessageManage::CreateMessage(int messageName)
 {
-    InternalMessage *m = CreateMessage();
+    InternalMessagePtr m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
@@ -248,9 +237,9 @@ InternalMessage *MessageManage::CreateMessage(int messageName)
     return m;
 }
 
-InternalMessage *MessageManage::CreateMessage(int messageName, const std::any &messageObj)
+InternalMessagePtr MessageManage::CreateMessage(int messageName, const std::any &messageObj)
 {
-    InternalMessage *m = CreateMessage();
+    InternalMessagePtr m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
@@ -261,9 +250,9 @@ InternalMessage *MessageManage::CreateMessage(int messageName, const std::any &m
     return m;
 }
 
-InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int param2)
+InternalMessagePtr MessageManage::CreateMessage(int messageName, int param1, int param2)
 {
-    InternalMessage *m = CreateMessage();
+    InternalMessagePtr m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
@@ -274,9 +263,9 @@ InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int p
     return m;
 }
 
-InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int param2, const std::any &messageObj)
+InternalMessagePtr MessageManage::CreateMessage(int messageName, int param1, int param2, const std::any &messageObj)
 {
-    InternalMessage *m = CreateMessage();
+    InternalMessagePtr m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
@@ -288,7 +277,7 @@ InternalMessage *MessageManage::CreateMessage(int messageName, int param1, int p
     return m;
 }
 
-void MessageManage::ReclaimMsg(InternalMessage *m)
+void MessageManage::ReclaimMsg(InternalMessagePtr m)
 {
     if (m == nullptr) {
         return;
@@ -299,33 +288,7 @@ void MessageManage::ReclaimMsg(InternalMessage *m)
     m->SetParam2(0);
     m->ReleaseMessageObj();
     m->ClearMessageBody();
-
-    {
-        std::unique_lock<std::mutex> lock(mPoolMutex);
-        if (mMsgPoolSize < MAX_MSG_NUM_IN_POOL) {
-            m->SetNextMsg(pMsgPool);
-            pMsgPool = m;
-            mMsgPoolSize++;
-            return;
-        }
-    }
-
-    delete m;
     m = nullptr;
-    return;
-}
-
-void MessageManage::ReleasePool()
-{
-    std::unique_lock<std::mutex> lock(mPoolMutex);
-    InternalMessage *current = pMsgPool;
-    InternalMessage *next = nullptr;
-    while (current != nullptr) {
-        next = current->GetNextMsg();
-        delete current;
-        current = next;
-    }
-
     return;
 }
 }  // namespace Wifi

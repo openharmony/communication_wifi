@@ -92,11 +92,6 @@ void Handler::StopHandlerThread()
     if (pMyTaskQueue != nullptr) {
         pMyTaskQueue.reset();
     }
-    for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
-        InternalMessage *msg = *iter;
-        iter = mMessageQueue.erase(iter);
-        MessageManage::GetInstance().ReclaimMsg(msg);
-    }
 #endif
     LOGI("Leave StopHandlerThread %{public}s", mThreadName.c_str());
     return;
@@ -125,7 +120,7 @@ void Handler::GetAndDistributeMessage()
     }
 
     while (isRunning) {
-        InternalMessage *msg = pMyQueue->GetNextMessage();
+        InternalMessagePtr msg = pMyQueue->GetNextMessage();
         if (msg == nullptr) {
             LOGE("GetNextMessage null.\n");
             continue;
@@ -141,7 +136,7 @@ void Handler::GetAndDistributeMessage()
 }
 #endif
 
-void Handler::SendMessage(InternalMessage *msg)
+void Handler::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         LOGE("%{public}s SendMessage: msg is null.", mThreadName.c_str());
@@ -152,7 +147,7 @@ void Handler::SendMessage(InternalMessage *msg)
     return;
 }
 
-void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
+void Handler::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
 {
     if (msg == nullptr) {
         LOGE("%{public}s MessageExecutedLater: msg is null.", mThreadName.c_str());
@@ -183,18 +178,9 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;
     }
-    mMessageQueue.push_back(msg);
     std::function<void()> func = std::bind([this, msg]() {
         LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
         ExecuteMessage(msg);
-        for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
-            if (*iter == msg) {
-                iter = mMessageQueue.erase(iter);
-                break;
-            } else {
-                iter++;
-            }
-        }
         MessageManage::GetInstance().ReclaimMsg(msg);
     });
     pMyTaskQueue->PostAsyncTask(func, std::to_string(msg->GetMessageName()), delayTime);
@@ -202,7 +188,7 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
     return;
 }
 
-void Handler::MessageExecutedAtTime(InternalMessage *msg, int64_t execTime)
+void Handler::MessageExecutedAtTime(InternalMessagePtr msg, int64_t execTime)
 {
     if (msg == nullptr) {
         LOGE("%{public}s MessageExecutedAtTime: msg is null.", mThreadName.c_str());
@@ -236,7 +222,7 @@ void Handler::MessageExecutedAtTime(InternalMessage *msg, int64_t execTime)
     return;
 }
 
-void Handler::PlaceMessageTopOfQueue(InternalMessage *msg)
+void Handler::PlaceMessageTopOfQueue(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         LOGE("%{public}s PlaceMessageTopOfQueue: msg is null.", mThreadName.c_str());
@@ -275,15 +261,6 @@ void Handler::DeleteMessageFromQueue(int messageName)
         return;
     }
 #else
-    for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
-        InternalMessage *msg = *iter;
-        if (msg->GetMessageName() == messageName) {
-            iter = mMessageQueue.erase(iter);
-            MessageManage::GetInstance().ReclaimMsg(msg);
-        } else {
-            iter++;
-        }
-    }
     if (pMyTaskQueue == nullptr) {
         LOGE("%{public}s pMyQueue is null.\n", mThreadName.c_str());
         return;
@@ -293,7 +270,7 @@ void Handler::DeleteMessageFromQueue(int messageName)
     return;
 }
 #ifdef OHOS_ARCH_LITE
-void Handler::DistributeMessage(InternalMessage *msg)
+void Handler::DistributeMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;

@@ -144,7 +144,7 @@ void ApStartedState::Init()
         std::make_pair(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE, &ApStartedState::ProcessCmdUpdateCountryCode));
 }
 
-bool ApStartedState::ExecuteStateMsg(InternalMessage *msg)
+bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("fatal error!");
@@ -157,7 +157,7 @@ bool ApStartedState::ExecuteStateMsg(InternalMessage *msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    ((*this).*(iter->second))(*msg);
+    ((*this).*(iter->second))(msg);
 
     return EXECUTED;
 }
@@ -325,52 +325,52 @@ bool ApStartedState::DisableInterfaceNat() const
     return true;
 }
 
-void ApStartedState::ProcessCmdFail(InternalMessage &msg) const
+void ApStartedState::ProcessCmdFail(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("Instance %{public}d State Machine message: %{public}d.", m_id, msg.GetMessageName());
+    WIFI_LOGI("Instance %{public}d State Machine message: %{public}d.", m_id, msg->GetMessageName());
     m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
 }
 
-void ApStartedState::ProcessCmdStationJoin(InternalMessage &msg)
+void ApStartedState::ProcessCmdStationJoin(InternalMessagePtr msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
-    if (msg.GetMessageObj(staInfo)) {
+    if (msg->GetMessageObj(staInfo)) {
         m_ApStateMachine.m_ApStationsManager.StationJoin(staInfo);
     } else {
         WIFI_LOGE("failed to get station info.");
     }
 }
 
-void ApStartedState::ProcessCmdStationLeave(InternalMessage &msg)
+void ApStartedState::ProcessCmdStationLeave(InternalMessagePtr msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
     WriteSoftApAbDisconnectHiSysEvent(AP_ERR_CODE);
-    if (msg.GetMessageObj(staInfo)) {
+    if (msg->GetMessageObj(staInfo)) {
         m_ApStateMachine.m_ApStationsManager.StationLeave(staInfo.bssid);
     } else {
         WIFI_LOGE("failed to get station info.");
     }
 }
 
-void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessage &msg)
+void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessagePtr msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    std::string ssid = msg.GetStringFromMessage();
-    KeyMgmt securityType = static_cast<KeyMgmt>(msg.GetIntFromMessage());
+    std::string ssid = msg->GetStringFromMessage();
+    KeyMgmt securityType = static_cast<KeyMgmt>(msg->GetIntFromMessage());
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     UpdatMacAddress(ssid, securityType);
 #endif
     m_hotspotConfig.SetSsid(ssid);
-    m_hotspotConfig.SetPreSharedKey(msg.GetStringFromMessage());
+    m_hotspotConfig.SetPreSharedKey(msg->GetStringFromMessage());
     m_hotspotConfig.SetSecurityType(securityType);
-    m_hotspotConfig.SetBand(static_cast<BandType>(msg.GetIntFromMessage()));
-    m_hotspotConfig.SetChannel(msg.GetIntFromMessage());
-    m_hotspotConfig.SetBandWidth(msg.GetIntFromMessage());
-    m_hotspotConfig.SetMaxConn(msg.GetIntFromMessage());
-    m_hotspotConfig.SetIpAddress(msg.GetStringFromMessage());
-    m_hotspotConfig.SetLeaseTime(msg.GetIntFromMessage());
+    m_hotspotConfig.SetBand(static_cast<BandType>(msg->GetIntFromMessage()));
+    m_hotspotConfig.SetChannel(msg->GetIntFromMessage());
+    m_hotspotConfig.SetBandWidth(msg->GetIntFromMessage());
+    m_hotspotConfig.SetMaxConn(msg->GetIntFromMessage());
+    m_hotspotConfig.SetIpAddress(msg->GetStringFromMessage());
+    m_hotspotConfig.SetLeaseTime(msg->GetIntFromMessage());
     if (SetConfig(m_hotspotConfig)) {
         WIFI_LOGI("SetSoftApConfig success.");
     } else {
@@ -378,10 +378,10 @@ void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessage &msg)
     }
 }
 
-void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessage &msg) const
+void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    if (msg.GetParam1() == 1) {
+    if (msg->GetParam1() == 1) {
         WIFI_LOGI("Hot update HotspotConfig succeeded.");
         if (WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id)) {
             WIFI_LOGE("set apConfig to settings failed.");
@@ -395,49 +395,49 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessage &msg) const
     }
 }
 
-void ApStartedState::ProcessCmdAddBlockList(InternalMessage &msg) const
+void ApStartedState::ProcessCmdAddBlockList(InternalMessagePtr msg) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
-    staInfo.deviceName = msg.GetStringFromMessage();
-    staInfo.bssid = msg.GetStringFromMessage();
-    staInfo.ipAddr = msg.GetStringFromMessage();
+    staInfo.deviceName = msg->GetStringFromMessage();
+    staInfo.bssid = msg->GetStringFromMessage();
+    staInfo.ipAddr = msg->GetStringFromMessage();
     WIFI_LOGI("staInfo:%{private}s, %{public}s, %{public}s.",
         staInfo.deviceName.c_str(), MacAnonymize(staInfo.bssid).c_str(), IpAnonymize(staInfo.ipAddr).c_str());
     m_ApStateMachine.m_ApStationsManager.AddBlockList(staInfo);
 }
 
-void ApStartedState::ProcessCmdDelBlockList(InternalMessage &msg) const
+void ApStartedState::ProcessCmdDelBlockList(InternalMessagePtr msg) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
-    staInfo.deviceName = msg.GetStringFromMessage();
-    staInfo.bssid = msg.GetStringFromMessage();
-    staInfo.ipAddr = msg.GetStringFromMessage();
+    staInfo.deviceName = msg->GetStringFromMessage();
+    staInfo.bssid = msg->GetStringFromMessage();
+    staInfo.ipAddr = msg->GetStringFromMessage();
     WIFI_LOGI("staInfo:%{private}s, %{public}s, %{public}s.", staInfo.deviceName.c_str(),
         MacAnonymize(staInfo.bssid).c_str(), IpAnonymize(staInfo.ipAddr).c_str());
     m_ApStateMachine.m_ApStationsManager.DelBlockList(staInfo);
 }
 
-void ApStartedState::ProcessCmdStopHotspot(InternalMessage &msg) const
+void ApStartedState::ProcessCmdStopHotspot(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("Instance %{public}d Disable hotspot: %{public}d.", m_id, msg.GetMessageName());
+    WIFI_LOGI("Instance %{public}d Disable hotspot: %{public}d.", m_id, msg->GetMessageName());
     m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
 }
 
-void ApStartedState::ProcessCmdDisconnectStation(InternalMessage &msg) const
+void ApStartedState::ProcessCmdDisconnectStation(InternalMessagePtr msg) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
-    staInfo.deviceName = msg.GetStringFromMessage();
-    staInfo.bssid = msg.GetStringFromMessage();
-    staInfo.ipAddr = msg.GetStringFromMessage();
+    staInfo.deviceName = msg->GetStringFromMessage();
+    staInfo.bssid = msg->GetStringFromMessage();
+    staInfo.ipAddr = msg->GetStringFromMessage();
     m_ApStateMachine.m_ApStationsManager.DisConnectStation(staInfo);
 }
 
-void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessage &msg) const
+void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessagePtr msg) const
 {
-    std::string wifiCountryCode = msg.GetStringFromMessage();
+    std::string wifiCountryCode = msg->GetStringFromMessage();
     if (wifiCountryCode.empty() ||
         strncasecmp(wifiCountryCode.c_str(), m_wifiCountryCode.c_str(), WIFI_COUNTRY_CODE_LEN) == 0) {
         WIFI_LOGI("wifi country code is same or empty, code=%{public}s", wifiCountryCode.c_str());
@@ -469,9 +469,9 @@ void ApStartedState::UpdatePowerMode() const
     WifiConfigCenter::GetInstance().SetPowerModel(PowerModel(model));
 }
 
-void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg)
+void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessagePtr msg)
 {
-    int mTimeoutDelay = msg.GetIntFromMessage();
+    int mTimeoutDelay = msg->GetIntFromMessage();
     WIFI_LOGI("Set hotspot idle time is %{public}d", mTimeoutDelay);
     if (mTimeoutDelay == WifiConfigCenter::GetInstance().GetHotspotIdleTimeout()) {
         return;

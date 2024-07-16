@@ -86,25 +86,25 @@ HWTEST_F(GroupNegotiationStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg1, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_FORMATION_SUCCESS));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_FORMATION_SUCCESS));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt1, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pGroupInfo group;
     group.SetIsGroupOwner(true);
     group.SetIsPersistent(false);
-    msg.SetMessageObj(group);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(group);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt2, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pGroupInfo group;
     WifiP2pDevice device;
     group.SetIsGroupOwner(true);
@@ -112,113 +112,113 @@ HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt2, TestSize.Level1)
     device.SetDeviceName("device");
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     group.SetOwner(device);
-    msg.SetMessageObj(group);
+    msg->SetMessageObj(group);
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return());
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pGroupIdle(_, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     AddDeviceManager();
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessGroupStartedEvt3, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pGroupInfo group;
     group.SetIsGroupOwner(false);
     group.SetIsPersistent(true);
-    msg.SetMessageObj(group);
+    msg->SetMessageObj(group);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pGroupIdle(_, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return());
     AddDeviceManager();
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg5, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GO_NEG_FAILURE));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GO_NEG_FAILURE));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt1, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(1);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(1);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(0);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(0);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt3, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(8);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(8);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt4, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(1);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(1);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt5, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(7);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(7);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessInvitationResultEvt6, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(3);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(3);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessNegotSucessEvt, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(0);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GO_NEG_SUCCESS));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(0);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GO_NEG_SUCCESS));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
     EXPECT_FALSE(pGroupNegotiationState->ExecuteStateMsg(nullptr));
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
-    EXPECT_FALSE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
+    EXPECT_FALSE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessGroupFormationFailEvt, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(0);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_FORMATION_FAILURE));
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
-    EXPECT_FALSE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(0);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_FORMATION_FAILURE));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
+    EXPECT_FALSE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(GroupNegotiationStateTest, ProcessGroupRemovedEvt, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
-    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pGroupNegotiationState->ExecuteStateMsg(msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

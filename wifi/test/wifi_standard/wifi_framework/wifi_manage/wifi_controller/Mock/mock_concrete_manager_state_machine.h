@@ -27,7 +27,7 @@ public:
     void SendMessage(int msgName);
     void SendMessage(int msgName, int param1);
     void SendMessage(int msgName, int param1, int param2);
-    void SendMessage(InternalMessage *msg);
+    void SendMessage(InternalMessagePtr msg);
     void SendMessage(int msgName, const std::any &messageObj);
     void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
 };

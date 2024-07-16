@@ -27,7 +27,7 @@ public:
     void SendMessage(int what);
     void SendMessage(int what, int arg1);
     void SendMessage(int what, int arg1, int arg2);
-    void SendMessage(InternalMessage *msg);
+    void SendMessage(InternalMessagePtr msg);
     void StartTimer(int timerName, int64_t interval);
     void StopTimer(int timerName);
 };

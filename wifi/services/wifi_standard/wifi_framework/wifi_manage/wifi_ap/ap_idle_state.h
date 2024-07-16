@@ -57,7 +57,7 @@ public:
      * @param msg - message to be processed
      * @return HANDLED：Processed successfully    NOT_EXECUTED: Processed failed
      */
-    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 private:
     ApStateMachine &m_ApStateMachine;
     int m_id;

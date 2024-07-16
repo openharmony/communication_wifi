@@ -39,7 +39,7 @@ public:
 public:
     virtual void GoInState() = 0;
     virtual void GoOutState() = 0;
-    virtual bool ExecuteStateMsg(InternalMessage *msg) = 0;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) = 0;
 
     /**
      * @Description : Obtains state name.

@@ -355,7 +355,7 @@ private:
      * @param interConfig - Scan Configuration[in]
      * @return success: true, failed: false
      */
-    bool AddScanMessageBody(InternalMessage *interMessage, const InterScanConfig &interConfig);
+    bool AddScanMessageBody(InternalMessagePtr interMessage, const InterScanConfig &interConfig);
     /**
      * @Description Save Request Configuration
      *
@@ -411,7 +411,7 @@ private:
      * @param pnoScanConfig - PNO Scanning Configuration[in]
      * @return success: true, failed: false
      */
-    bool AddPnoScanMessageBody(InternalMessage *interMessage, const PnoScanConfig &pnoScanConfig);
+    bool AddPnoScanMessageBody(InternalMessagePtr interMessage, const PnoScanConfig &pnoScanConfig);
     /**
      * @Description Stopping System Scanning
      *

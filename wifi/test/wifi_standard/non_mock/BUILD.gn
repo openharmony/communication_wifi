@@ -28,6 +28,7 @@ ohos_unittest("wifi_non_mock_unittest") {
   sources = [ "block_connect_service_test.cpp" ]
 
   include_dirs = [
+    "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",

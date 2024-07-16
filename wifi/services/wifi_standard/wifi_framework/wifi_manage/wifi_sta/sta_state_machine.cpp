@@ -1903,7 +1903,8 @@ bool StaStateMachine::ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig)
     return false;
 }
 
-void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &macInfo, WifiDeviceConfig &config, const std::string &nonce);
+void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, WifiDeviceConfig &deviceConfig,
+    std::string &currentMac)
 {
     WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
     if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {

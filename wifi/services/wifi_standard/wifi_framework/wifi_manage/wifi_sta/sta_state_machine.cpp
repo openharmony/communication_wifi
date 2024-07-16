@@ -1956,7 +1956,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             __func__, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
             MacAnonymize(deviceConfig.macAddress).c_str());
         if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
-            SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac)
+            SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac);
         } else if (IsPskEncryption(deviceConfig.keyMgmt)) {
             randomMacInfo.randomMac = deviceConfig.macAddress;
             currentMac = randomMacInfo.randomMac;

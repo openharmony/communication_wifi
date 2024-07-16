@@ -19,6 +19,8 @@
 #include "wifi_errcode.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_common_util.h"
+#include "wifi_config_center.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
@@ -237,7 +239,11 @@ void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, const 
 
 void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state)
 {
-    if (!WifiCommonEventHelper::PublishRssiValueChangedEvent(state, "OnRssiValueChanged")) {
+    WifiLinkedInfo likedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(likedInfo);
+    int signalLevel = WifiSettings::GetInstance().GetSignalLevel(state, likedInfo.band);
+    if (!WifiCommonEventHelper::PublishRssiValueChangedEvent("wifiSignalLevel", signalLevel,
+        state, "OnRssiValueChanged")) {
         WIFI_LOGE("failed to publish rssi value changed event!");
         return;
     }

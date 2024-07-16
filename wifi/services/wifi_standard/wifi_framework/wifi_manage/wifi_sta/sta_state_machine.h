@@ -278,6 +278,9 @@ public:
         bool ExecuteStateMsg(InternalMessage *msg) override;
 
     private:
+        void HandleNetWorkConnectionEvent(InternalMessage *msg);
+        void HandleStaBssidChangedEvent(InternalMessage *msg);
+    private:
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -620,6 +623,14 @@ private:
     void ConnectToNetworkProcess(std::string bssid);
 
     /**
+     * @Description  Update wifi device config after wifi connected.
+     *
+     * @param deviceConfig - deviceConfig
+     * @param bssid - the mac address of wifi(in)
+     */
+    void UpdateDeviceConfigAfterWifiConnected(WifiDeviceConfig &deviceConfig, const std::string &bssid);
+
+    /**
      * @Description On connect fail.
      *
      * @param networkId - the networkId of network which is going to be connected.(in)
@@ -733,10 +744,15 @@ private:
 
     /**
      * @Description : Deal SignalPoll Result.
-     *
-     * @param  msg - Message body received by the state machine[in]
      */
-    void DealSignalPollResult(InternalMessage *msg);
+    void DealSignalPollResult();
+
+    /**
+     * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
+     *
+     * @param  signalInfo - SignalPoll Result
+     */
+    void UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo);
 
     /**
      * @Description : Converting frequencies to channels.
@@ -1166,7 +1182,7 @@ private:
     int targetNetworkId;
     int pinCode;
     SetupMethod wpsState;
-    int lastSignalLevel;
+    int lastSignalLevel_;
     std::string targetRoamBssid;
     int currentTpType;
     IsWpsConnected isWpsConnect;

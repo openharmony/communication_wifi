@@ -147,7 +147,6 @@ if (defined(ohos_lite)) {
       "libxml2:libxml2",
       "openssl:libcrypto_shared",
       "openssl:libssl_shared",
-
     ]
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc

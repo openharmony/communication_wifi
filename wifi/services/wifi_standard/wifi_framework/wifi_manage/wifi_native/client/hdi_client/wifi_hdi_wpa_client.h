@@ -816,6 +816,14 @@ public:
      */
     WifiErrorNo EnableAp(int id = 0);
 
+    /**
+     * @Description register callback for death recipient of native process
+     *
+     * @param id
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqRegisterNativeProcessCallback(const std::function<void(int)> &callback) const;
+
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

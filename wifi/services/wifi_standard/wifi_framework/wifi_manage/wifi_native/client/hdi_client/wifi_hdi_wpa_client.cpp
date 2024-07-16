@@ -1337,6 +1337,14 @@ WifiErrorNo WifiHdiWpaClient::DeliverP2pData(int32_t cmdType, int32_t dataType, 
 {
     return HdiDeliverP2pData(cmdType, dataType, carryData.c_str());
 }
+
+WifiErrorNo WifiHdiWpaClient::ReqRegisterNativeProcessCallback(const std::function<void(int)> &callback) const
+{
+    if (callback) {
+        return HdiSetNativeProcessCallback(OnNativeProcessDeath);
+    }
+    return WIFI_HAL_OPT_FAILED;
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

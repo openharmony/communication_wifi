@@ -60,27 +60,7 @@ bool P2pGroupJoinState::ExecuteStateMsg(InternalMessage *msg)
             if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
                 WIFI_LOGE("Failed to stop find.");
             }
-            const WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
-            std::string pin = wps.GetPin();
-            std::string result;
-            std::string address;
-            if (wps.GetWpsMethod() == WpsMethod::WPS_METHOD_PBC) {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
-                if (WifiErrorNo::WIFI_HAL_OPT_OK !=
-                    WifiP2PHalInterface::GetInstance().StartWpsPbc(group.GetInterface(),
-                        p2pStateMachine.savedP2pConfig.GetDeviceAddress())) {
-#else
-                if (WifiErrorNo::WIFI_HAL_OPT_OK !=
-                    WifiP2PHalInterface::GetInstance().StartWpsPbc(group.GetInterface(), pin)) {
-#endif
-                    WIFI_LOGE("WpsPbc operation failed.");
-                }
-            } else {
-                if (WifiErrorNo::WIFI_HAL_OPT_OK !=
-                    WifiP2PHalInterface::GetInstance().StartWpsPin(group.GetInterface(), address, pin, result)) {
-                    WIFI_LOGE("WpsPin operation failed.");
-                }
-            }
+            InternalConnectLogic(wps);
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
             break;
         }
@@ -102,6 +82,31 @@ bool P2pGroupJoinState::ExecuteStateMsg(InternalMessage *msg)
             return NOT_EXECUTED;
     }
     return EXECUTED;
+}
+
+void P2pGroupJoinState::InternalConnectLogic(const WpsInfo &wps)
+{
+    const WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
+    std::string pin = wps.GetPin();
+    std::string result;
+    std::string address;
+    if (wps.GetWpsMethod() == WpsMethod::WPS_METHOD_PBC) {
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+        if (WifiErrorNo::WIFI_HAL_OPT_OK !=
+            WifiP2PHalInterface::GetInstance().StartWpsPbc(group.GetInterface(),
+                p2pStateMachine.savedP2pConfig.GetDeviceAddress())) {
+#else
+            if (WifiErrorNo::WIFI_HAL_OPT_OK !=
+                WifiP2PHalInterface::GetInstance().StartWpsPbc(group.GetInterface(), pin)) {
+#endif
+                    WIFI_LOGE("WpsPbc operation failed.");
+                }
+    } else {
+        if (WifiErrorNo::WIFI_HAL_OPT_OK !=
+            WifiP2PHalInterface::GetInstance().StartWpsPin(group.GetInterface(), address, pin, result)) {
+            WIFI_LOGE("WpsPin operation failed.");
+        }
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

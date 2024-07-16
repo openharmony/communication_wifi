@@ -23,6 +23,7 @@ ohos_fuzztest("WifiIdlClientFuzzTest") {
       "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifiidlclient_fuzzer"
 
   include_dirs = [
+    "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",

@@ -46,6 +46,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$WIFI_ROOT_DIR/base/state_machine/include",
       "$WIFI_ROOT_DIR/base/cRPC/include",
+      "$WIFI_ROOT_DIR/base/utils",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
@@ -116,6 +117,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$WIFI_ROOT_DIR/base/state_machine/include",
       "$WIFI_ROOT_DIR/base/cRPC/include",
+      "$WIFI_ROOT_DIR/base/utils",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
@@ -164,6 +166,7 @@ if (defined(ohos_lite)) {
 } else {
   config("wifi_manager_service_header") {
     include_dirs = [
+      "$WIFI_ROOT_DIR/base/utils",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",

@@ -24,6 +24,7 @@ config("wifi_fw_common_header") {
     "$WIFI_ROOT_DIR/base/state_machine/include",
     "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/base/shared_util",
+    "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",

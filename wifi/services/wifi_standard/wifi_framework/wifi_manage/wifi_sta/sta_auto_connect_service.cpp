@@ -97,6 +97,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, networkSelectionResult.wifiDeviceConfig.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_FOUND);
+            return;
         }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
         std::string &bssid = networkSelectionResult.interScanInfo.bssid;

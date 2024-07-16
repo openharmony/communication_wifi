@@ -17,11 +17,18 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import router from '@ohos.router';
 import ConfigData from '../../Utils/ConfigData';
-import { TestData } from '../../entryability/model/testData'
+import { TestData } from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
 import fs from '@ohos.file.fs';
+import common from '@ohos.app.ability.common';
+import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
+import { BusinessError } from '@ohos.base';
+import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
+import notificationManager from '@ohos.notificationManager';
+
 interface myParams extends Object {
   testItem: TestData
 }
@@ -29,7 +36,8 @@ interface myParams extends Object {
 /**
  * Custom button style.
  */
-@Extend(Button) function operateButtonStyle(color: Resource) {
+@Extend(Button)
+function operateButtonStyle(color: Resource) {
   .width($r('app.float.button_width'))
   .height($r('app.float.button_height'))
   .fontSize($r('app.float.font_16'))
@@ -85,6 +93,71 @@ struct WiFiSwitchStabilityTest {
   }
 
   aboutToAppear() {
+    // 请求发送通知的许可
+    notificationManager.requestEnableNotification().then(() => {
+      console.info(`[EntryAbility] requestEnableNotification success`);
+      // 申请WiFi相关权限
+      let atManager = abilityAccessCtrl.createAtManager();
+      try {
+        atManager.requestPermissionsFromUser(getContext(this) , [
+          'ohos.permission.INTERNET',
+          'ohos.permission.SET_WIFI_INFO',
+          'ohos.permission.GET_WIFI_INFO',
+          'ohos.permission.MANAGE_WIFI_CONNECTION',
+          'ohos.permission.GET_WIFI_PEERS_MAC',
+          'ohos.permission.MANAGE_WIFI_CONNECTION',
+          'ohos.permission.SET_WIFI_CONFIG',
+          "ohos.permission.GET_WIFI_CONFIG",
+          "ohos.permission.GET_WIFI_LOCAL_MAC",
+          "ohos.permission.MANAGE_WIFI_HOTSPOT",
+          "ohos.permission.GET_WIFI_INFO_INTERNAL"
+        ])
+          .then((data) => {
+            console.info(`[EntryAbility], data: ${ JSON.stringify(data) }`);
+          })
+          .catch((err: BusinessError) => {
+            console.info(`[EntryAbility], err: ${ JSON.stringify(err) }`);
+          })
+      } catch( err ) {
+        console.info(`[EntryAbility], catch err->${ JSON.stringify(err) }`);
+      }
+    }).catch((err: BusinessError) => {
+      console.error(`[EntryAbility] requestEnableNotification failed, code is ${ err.code }, message is ${ err.message }`);
+    });
+  }
+
+  // 开始长时任务
+  startContinuousTask() {
+    let context: Context = getContext(this);
+    // 通知参数，指定点击长时任务通知后跳转的应用
+    let wantAgentInfo: wantAgent.WantAgentInfo = {
+      wants : [
+        {
+          bundleName : (context as common.UIAbilityContext).abilityInfo.bundleName ,
+          abilityName : (context as common.UIAbilityContext).abilityInfo.name
+        }
+      ] ,
+      operationType : wantAgent.OperationType.START_ABILITY ,
+      requestCode : 0 ,
+      wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
+    };
+    wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
+      backgroundTaskManager.startBackgroundRunning(context ,
+        backgroundTaskManager.BackgroundMode.WIFI_INTERACTION , wantAgentObj).then(() => {
+        console.info(`Succeeded in operationing startBackgroundRunning.`);
+      }).catch((err: BusinessError) => {
+        console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+      });
+    });
+  }
+
+  // 停止长时任务
+  stopContinuousTask() {
+    backgroundTaskManager.stopBackgroundRunning(getContext()).then(() => {
+      console.info(`Succeeded in operationing stopBackgroundRunning.`);
+    }).catch((err: BusinessError) => {
+      console.error(`Failed to operation stopBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+    });
   }
 
   build() {
@@ -184,6 +257,7 @@ struct WiFiSwitchStabilityTest {
             .padding({ right : "10vp" })
             .onClick(async(event: ClickEvent) => {
               console.log(TAG , "start WiFiSwitch test-------------")
+              this.startContinuousTask();
               await this.openLogFile()
               await this.forLoop()
             })
@@ -200,6 +274,7 @@ struct WiFiSwitchStabilityTest {
               this.openWifiNumber = 0
               AppStorage.setOrCreate("openWifiNumber" , this.openWifiNumber)
               fs.closeSync(this.file);
+              this.stopContinuousTask();
             })
         }
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_25_100).backgroundColor($r("app.color.lead"))
@@ -284,7 +359,7 @@ struct WiFiSwitchStabilityTest {
         this.stateMessageLog += "第" + (this.openWifiNumber + 1) + "次WIFI使能接口的调用结果：" + funcMessage + "\n"
         console.log(TAG , "第" + (this.openWifiNumber + 1) + "次WIFI使能接口的调用结果：" + funcMessage)
         await sleep(15)
-        this.stateMessage = AppStorage.get("stateMessage") ! //非空断言操作符
+        this.stateMessage = AppStorage.get("stateMessage")! //非空断言操作符
         if ( this.stateMessage == "active" ) {
           this.open_SpendTime = this.open_EndTime - this.open_StartTime
           this.stateMessageLog += "第" + (this.openWifiNumber + 1) + "次WIFI使能耗时: " + this.open_SpendTime + "ms" + "\n"
@@ -301,7 +376,7 @@ struct WiFiSwitchStabilityTest {
           console.log(TAG , "第" + this.closeWifiNumber + "次WIFI去使能接口的调用结果：" + funcMessage)
           console.log(TAG , "closeWifiNumber: " + this.closeWifiNumber)
           await sleep(15)
-          this.stateMessage = AppStorage.get("stateMessage") ! //非空断言操作符
+          this.stateMessage = AppStorage.get("stateMessage")! //非空断言操作符
           if ( this.stateMessage == "inactive" ) {
             this.close_SpendTime = this.close_EndTime - this.close_StartTime
             this.stateMessageLog += "第" + this.closeWifiNumber + "次WIFI去使能耗时: " + this.close_SpendTime + "ms" + "\n"
@@ -319,14 +394,13 @@ struct WiFiSwitchStabilityTest {
           this.openFailNumber = this.openFailNumber + 1
           console.log(TAG , "使能失败的次数：" + this.openFailNumber)
           console.log(TAG , "第" + (this.openWifiNumber + 1) + "次WIFI使能失败")
-          break;
         } else {
           console.log("第" + (this.openWifiNumber + 1) + "次开wifi后状态不清楚");
-          break;
         }
       }
     }
     console.log(TAG , "测试结束 -------------")
+    this.stopContinuousTask();
   }
 }
 

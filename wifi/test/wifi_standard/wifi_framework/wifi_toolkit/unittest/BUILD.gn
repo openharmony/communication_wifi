@@ -114,6 +114,7 @@ ohos_unittest("toolkit_unittest") {
   ]
 
   deps = [
+    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",

@@ -365,7 +365,7 @@ public:
 
 private:
     /* Maximum number of messages in the message resource pool */
-    const int MAX_MSG_NUM_IN_POOL = 50;
+    const int MAX_MSG_NUM_IN_POOL = 240;
     /* Message resource pool */
     InternalMessage *pMsgPool;
     /* Number of messages in the message resource pool */

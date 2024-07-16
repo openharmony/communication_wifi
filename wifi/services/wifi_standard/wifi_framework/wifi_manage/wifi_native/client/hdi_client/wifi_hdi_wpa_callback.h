@@ -74,7 +74,7 @@ int32_t OnEventStaConnectState(struct IWpaCallback *self,
     const struct HdiP2pStaConnectStateParam *staConnectStateParam, const char* ifName);
 int32_t OnEventIfaceCreated(struct IWpaCallback *self,
     const struct HdiP2pIfaceCreatedParam *ifaceCreatedParam, const char* ifName);
-
+void OnNativeProcessDeath(int status);
 size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str);
 #ifdef __cplusplus
 }

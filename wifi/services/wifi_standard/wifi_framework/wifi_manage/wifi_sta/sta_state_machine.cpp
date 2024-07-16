@@ -1906,6 +1906,7 @@ bool StaStateMachine::ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig)
 void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, WifiDeviceConfig &deviceConfig,
     std::string &currentMac)
 {
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
     std::string macAddress;
     std::string deviceConfigKey = deviceConfig.ssid + deviceConfig.keyMgmt;
     int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
@@ -1923,6 +1924,7 @@ void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, Wifi
         __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
         MacAnonymize(randomMacInfo.peerBssid).c_str());
     WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+#endif
 }
 
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)

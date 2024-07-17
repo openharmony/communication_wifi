@@ -62,13 +62,6 @@ public:
     virtual ErrCode NotifyInternetFailureDetected(int forceNoHttpCheck) override;
 
     /**
-     * @Description Is SelfCure On Going
-     *
-     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-    */
-    virtual ErrCode IsSelfCureOnGoing() override;
-
-    /**
     * @Description  init callback function.
     *
     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
@@ -110,6 +103,13 @@ public:
      * @param instId - instance Id
      */
     void DealStaOpened(int instId) override;
+
+    /**
+     * @Description Is SelfCure On Going
+     *
+     * @return bool - true: selfcure is ongoing, false: selfcure is not ongoing
+    */
+    bool IsSelfCureOnGoing() override;
 private:
     std::mutex mutex;
     std::vector<SelfCureServiceCallback> mSelfCureCallback;

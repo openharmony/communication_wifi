@@ -196,7 +196,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->StartPortalCertification();
     pStaService->EnableHiLinkHandshake(config, conditionName);
     pStaService->DeliverStaIfaceData(conditionName);
-    pStaService->GetDataSlotId();
+    pStaService->GetDataSlotId(index);
     pStaService->AddDeviceConfig(config);
 }
 

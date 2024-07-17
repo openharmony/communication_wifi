@@ -611,6 +611,15 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleConnectFailed(Interna
         config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
         WifiSettings::GetInstance().AddDeviceConfig(config);
         WifiSettings::GetInstance().SyncDeviceConfig();
+        // Connect failed, add broadcast: DISCONNECTED
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        WifiEventCallbackMsg cbMsg;
+        cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
+        cbMsg.msgData = ConnState::DISCONNECTED;
+        cbMsg.linkInfo = linkedInfo;
+        cbMsg.id = pSelfCureStateMachine->m_instId;
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
 }
 

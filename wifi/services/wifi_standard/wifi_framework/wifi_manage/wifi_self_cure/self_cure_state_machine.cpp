@@ -504,7 +504,9 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(Internal
         return;
     }
     pSelfCureStateMachine->StopTimer(CMD_INTERNET_STATUS_DETECT_INTERVAL);
-    IpQosMonitor::GetInstance().QueryPackets();
+    if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_CLOSE) {
+        IpQosMonitor::GetInstance().QueryPackets();
+    }
     pSelfCureStateMachine->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
         INTERNET_STATUS_DETECT_INTERVAL_MS);
 }
@@ -1764,9 +1766,9 @@ bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessage *msg
             pSelfCureStateMachine->StopTimer(CMD_INTERNET_STATUS_DETECT_INTERVAL);
             if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_CLOSE) {
                 IpQosMonitor::GetInstance().QueryPackets();
-                pSelfCureStateMachine->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
-                    NO_INTERNET_DETECT_INTERVAL_MS);
             }
+            pSelfCureStateMachine->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
+                NO_INTERNET_DETECT_INTERVAL_MS);
             break;
         case WIFI_CURE_CMD_HTTP_REACHABLE_RCV:
             ret = EXECUTED;

@@ -26,6 +26,10 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
+enum CmdWord {
+    CMD_START_MONITOR = 10,
+};
+
 class WifiNetLinkTest : public testing::Test {
 protected:
     void SetUp() override

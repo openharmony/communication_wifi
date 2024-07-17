@@ -1252,6 +1252,8 @@ private:
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
     void FillWapiCfg(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
     void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
+    void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
+    std::string &currentMac);
 };
 }  // namespace Wifi
 }  // namespace OHOS

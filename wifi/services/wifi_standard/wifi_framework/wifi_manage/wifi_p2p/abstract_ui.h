@@ -35,15 +35,15 @@ public:
     }
     virtual void SetMessage(const std::string msg)
     {
-        LOGI("value:%{public}s", msg.c_str());
+        LOGI("value:%{private}s", msg.c_str());
     }
     virtual void SetInputBox(const std::string txt)
     {
-        LOGI("value:%{public}s", txt.c_str());
+        LOGI("value:%{private}s", txt.c_str());
     }
     virtual std::string GetInputBox(const std::string txt)
     {
-        LOGI("value:%{public}s", txt.c_str());
+        LOGI("value:%{private}s", txt.c_str());
         return "";
     }
     virtual void SetButton(

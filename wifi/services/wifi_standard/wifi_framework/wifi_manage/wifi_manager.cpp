@@ -31,6 +31,8 @@
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
 #include "wifi_common_service_manager.h"
+#include "wifi_native_define.h"
+#include "wifi_sta_hal_interface.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -78,6 +80,8 @@ int WifiManager::Init()
         return -1;
     }
 
+    WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(
+        std::bind(&WifiManager::OnNativeProcessStatusChange, this, std::placeholders::_1));
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
@@ -161,6 +165,29 @@ void WifiManager::Exit()
     }
 #endif
     return;
+}
+
+void WifiManager::OnNativeProcessStatusChange(int status)
+{
+    WIFI_LOGI("OnNativeProcessStatusChange status:%{public}d", status);
+    switch (status) {
+        case WPA_DEATH:
+            WIFI_LOGE("wpa_supplicant process is dead!");
+            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
+                wifiTogglerManager->AirplaneToggled(1);
+                wifiTogglerManager->AirplaneToggled(0);
+            }
+            break;
+        case AP_DEATH:
+            WIFI_LOGE("hostapd process is dead!");
+            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
+                wifiTogglerManager->SoftapToggled(0, 0);
+                wifiTogglerManager->SoftapToggled(1, 0);
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 int WifiManager::GetSupportedFeatures(long &features) const

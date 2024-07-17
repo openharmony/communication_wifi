@@ -361,5 +361,25 @@ HWTEST_F(WifiStaHalInterfaceTest, StopWifiTest, TestSize.Level1)
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().StopWifi();
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
+
+HWTEST_F(WifiStaHalInterfaceTest, RegisterNativeProcessCallbackTest, TestSize.Level1)
+{
+    bool callbackCalled = false;
+    std::function<void(int)> callback = [&](int pid) {
+        callbackCalled = true;
+        // Perform any necessary assertions or actions based on the callback
+    };
+
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(callback);
+
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
+    // Perform any necessary assertions or actions after registering the callback
+
+    // Simulate the callback being called
+    int pid = 12345;
+    WifiStaHalInterface::GetInstance().GetDeathCallbackInst()(pid);
+
+    EXPECT_TRUE(callbackCalled);
+}
 }  // namespace Wifi
 }  // namespace OHOS

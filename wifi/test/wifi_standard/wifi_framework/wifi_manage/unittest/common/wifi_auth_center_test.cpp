@@ -112,4 +112,105 @@ HWTEST_F(WifiAuthCenterTest, VerifyManageWifiHotspotExtPermission, TestSize.Leve
               WifiAuthCenter::GetInstance().VerifyManageWifiHotspotExtPermission(123, 456));
 }
 
+HWTEST_F(WifiAuthCenterTest, IsSystemAppByTokenTest001, TestSize.Level1)
+{
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.IsSystemAppByToken(), true);
+}
 
+HWTEST_F(WifiAuthCenterTest, IsNativeProcessTest001, TestSize.Level1)
+{
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.IsNativeProcess(), false);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifySetWifiInfoPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifySetWifiInfoPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyGetWifiInfoPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyGetWifiInfoPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyGetScanInfosPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyGetScanInfosPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyGetWifiLocalMacPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyGetWifiLocalMacPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyWifiConnectionPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyWifiConnectionPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifySetWifiConfigPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifySetWifiConfigPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyGetWifiConfigPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyGetWifiConfigPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyGetWifiDirectDevicePermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyGetWifiDirectDevicePermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyManageWifiHotspotPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyManageWifiHotspotPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyGetWifiPeersMacPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyGetWifiPeersMacPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyGetWifiPeersMacPermissionExTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyGetWifiPeersMacPermissionEx(123, 456, 0), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyGetWifiInfoInternalPermissionExTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyGetWifiInfoInternalPermission(123, 456), PERMISSION_GRANTED);
+}
+
+HWTEST_F(WifiAuthCenterTest, VerifyManageWifiHotspotExtPermissionTest001, TestSize.Level1)
+{
+    #undef PERMISSION_ALWAYS_GRANT
+    WifiAuthCenter wifiAuthCenter;
+    EXPECT_EQ(wifiAuthCenter.VerifyManageWifiHotspotExtPermission(123, 456), PERMISSION_GRANTED);
+}

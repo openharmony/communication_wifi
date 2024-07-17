@@ -231,7 +231,7 @@ unsigned long long WifiRandomMacHelper::LongAddrFromByteAddr(std::vector<uint8_t
     }
     unsigned long long longAddr = 0;
     for (auto &b : addr) {
-        int uint8Byte = b & 0xff;
+        uint32_t uint8Byte = b & 0xff;
         longAddr = (longAddr << OFFSET_VALUE_8) + uint8Byte;
     }
     return longAddr;

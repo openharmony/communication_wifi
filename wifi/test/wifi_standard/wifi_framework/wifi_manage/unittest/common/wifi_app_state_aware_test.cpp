@@ -177,3 +177,4 @@ HWTEST_F(WifiAppStateAwareTest, IsForegroundApp_False, TestSize.Level1)
     bool ret = WifiAppStateAware::GetInstance().IsForegroundApp(2);
     EXPECT_FALSE(ret);
 }
+

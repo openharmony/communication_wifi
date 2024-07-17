@@ -1921,7 +1921,6 @@ void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, cons
     LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
         __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
         MacAnonymize(randomMacInfo.peerBssid).c_str());
-    WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
 #endif
 }
 

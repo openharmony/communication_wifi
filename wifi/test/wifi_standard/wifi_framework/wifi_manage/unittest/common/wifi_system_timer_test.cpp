@@ -82,3 +82,4 @@ HWTEST_F(WifiSysTimerTest, SetWantAgent_SetsWantAgent, TestSize.Level1)
 
     EXPECT_EQ(timer_->wantAgent, wantAgent);
 }
+

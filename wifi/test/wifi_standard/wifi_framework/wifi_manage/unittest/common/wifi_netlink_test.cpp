@@ -75,3 +75,4 @@ HWTEST_F(WifiNetLinkTest, TestProcessReportMsg, TestSize.Level1)
     int32_t cmd = 456;
     WifiNetLink::GetInstance().ProcessReportMsg(sockFd, cmd);
 }
+

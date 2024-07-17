@@ -111,3 +111,5 @@ HWTEST_F(WifiAuthCenterTest, VerifyManageWifiHotspotExtPermission, TestSize.Leve
     EXPECT_EQ(PERMISSION_GRANTED,
               WifiAuthCenter::GetInstance().VerifyManageWifiHotspotExtPermission(123, 456));
 }
+
+

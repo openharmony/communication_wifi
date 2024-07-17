@@ -61,7 +61,7 @@ public:
      */
     virtual bool ExecuteStateMsg(InternalMessage *msg) override;
 
-    void InternalConnectLogic(const WpsInfo &wps);
+    void StartPbc(const WpsInfo &wps);
 
 private:
     P2pStateMachine &p2pStateMachine;

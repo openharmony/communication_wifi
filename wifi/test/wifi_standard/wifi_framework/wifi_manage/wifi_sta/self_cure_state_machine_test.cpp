@@ -3073,7 +3073,7 @@ HWTEST_F(SelfCureStateMachineTest, IsSoftApSsidSameWithWifiTest, TestSize.Level1
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::CONNECTED;
     linkedInfo.ssid = "test1";
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_,_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
     EXPECT_TRUE(pSelfCureStateMachine->IsSoftApSsidSameWithWifi(curApConfig) == false);

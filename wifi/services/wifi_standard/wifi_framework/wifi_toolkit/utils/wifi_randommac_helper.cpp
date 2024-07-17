@@ -88,8 +88,14 @@ void WifiRandomMacHelper::GenerateRandomMacAddressByBssid(std::string peerBssid,
     constexpr int octBase = 8;
     int ret = 0;
     char strMacTmp[arraySize] = {0};
-    std::mt19937_64 gen(std::chrono::high_resolution_clock::now().time_since_epoch().count()
-        + std::hash<std::string>{}(peerBssid));
+    unsigned long long hashSeed = std::hash<std::string>{}(peerBssid);
+    unsigned long long genSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    if (std::numeric_limits<unsigned long long>::max() - genSeed > hashSeed) {
+        genSeed += hashSeed;
+    } else {
+        WIFI_LOGW("%{public}s hashSeed Value beyond max limit!", __func__);
+    }
+    std::mt19937_64 gen(genSeed);
     for (int i = 0; i < macBitSize; i++) {
         if (i != firstBit) {
             std::uniform_int_distribution<> distribution(0, hexBase - 1);
@@ -192,7 +198,7 @@ std::string WifiRandomMacHelper::BytesArrayToString(const std::vector<uint8_t> &
 
 int WifiRandomMacHelper::StringAddrFromLongAddr(unsigned long long addr, std::string &randomMacAddr)
 {
-    WIFI_LOGD("%{public}s %{public}lld 0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx"
+    WIFI_LOGD("%{public}s %{public}llu 0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx"
         ":0x%{public}02llx:0x%{public}02llx", __func__, addr,
         (addr >> OFFSET_VALUE_40) & 0XFF,
         (addr >> OFFSET_VALUE_32) & 0XFF,
@@ -235,17 +241,17 @@ unsigned long long WifiRandomMacHelper::LongAddrFromByteAddr(std::vector<uint8_t
 int WifiRandomMacHelper::GenerateRandomMacAddressByLong(unsigned long long random, std::string &randomMacAddr)
 {
     if (random == 0) {
-        WIFI_LOGI("%{public}s: random is invalid :%{public}lld!", __func__, random);
+        WIFI_LOGI("%{public}s: random is invalid :%{public}llu!", __func__, random);
         return -1;
     }
 
-    WIFI_LOGD("%{public}s: calculate start is 0x%{public}llx==%{public}lld", __func__, random, random);
+    WIFI_LOGD("%{public}s: calculate start is 0x%{public}llx==%{public}llu", __func__, random, random);
     random &= MAC_ADDRESS_VALID_LONG_MASK;
     random &= ~MAC_ADDRESSS_AIASSIGNED_MASK;
     random &= ~MAC_ADDRESS_ELIASSIGNED_MASK;
     random |= MAC_ADDRESS_LOCALLY_ASSIGNED_MASK;
     random &= ~MAC_ADDRESS_MULTICAST_MASK;
-    WIFI_LOGD("%{public}s: calculate end is 0x%{public}llx==%{public}lld", __func__, random, random);
+    WIFI_LOGD("%{public}s: calculate end is 0x%{public}llx==%{public}llu", __func__, random, random);
 
     std::vector<uint8_t> bytes = {};
     WifiRandomMacHelper::LongLongToBytes(random, bytes);
@@ -258,7 +264,7 @@ int WifiRandomMacHelper::GenerateRandomMacAddressByLong(unsigned long long rando
     unsigned long long lngAddr = WifiRandomMacHelper::LongAddrFromByteAddr(addrBytes);
 
     int ret = StringAddrFromLongAddr(lngAddr, randomMacAddr);
-    WIFI_LOGD("%{public}s: StringAddrFromLongAddr: %{public}lld -> %{public}s", __func__,
+    WIFI_LOGD("%{public}s: StringAddrFromLongAddr: %{public}llu -> %{public}s", __func__,
         lngAddr, MacAnonymize(randomMacAddr).c_str());
     return ret;
 }

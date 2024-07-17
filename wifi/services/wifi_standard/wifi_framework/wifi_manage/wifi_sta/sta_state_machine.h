@@ -1049,7 +1049,7 @@ private:
      * @Description Get slot id.
      * @Return int32_t - 0:success, other value:failed
      */
-    int32_t GetDataSlotId();
+    int32_t GetDataSlotId(int32_t slotId);
 
     /**
      * @Description Get card type.

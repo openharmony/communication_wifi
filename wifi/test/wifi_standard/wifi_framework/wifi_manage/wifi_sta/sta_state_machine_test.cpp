@@ -1946,7 +1946,8 @@ public:
     }
     void GetDataSlotIdTest()
     {
-        pStaStateMachine->GetDataSlotId();
+        pStaStateMachine->GetDataSlotId(0);
+        pStaStateMachine->GetDataSlotId(-1);
     }
     void GetCardTypeTest()
     {

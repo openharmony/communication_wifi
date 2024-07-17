@@ -69,7 +69,15 @@ AppParser::~AppParser()
 
 AppParser &AppParser::GetInstance()
 {
-    static AppParser instance;
+    static std::mutex xmlMutex;
+    static bool initFlag = false;
+    if (!initFlag) {
+        std::unique_lock<std::mutex> lock(xmlMutex);
+        if (!initFlag) {
+            static AppParser instance;
+            initFlag = true;
+        }
+    }
     return instance;
 }
 

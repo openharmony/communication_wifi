@@ -76,3 +76,9 @@ HWTEST_F(WifiNetLinkTest, TestProcessReportMsg, TestSize.Level1)
     WifiNetLink::GetInstance().ProcessReportMsg(sockFd, cmd);
 }
 
+HWTEST_F(WifiNetLinkTest, SendQoeCmdTest001, TestSize.Level1)
+{
+    int32_t cmd = CMD_START_MONITOR;
+    int32_t arg = 456;
+    WifiNetLink::GetInstance().SendQoeCmd(cmd, arg);
+}

@@ -567,6 +567,7 @@ bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMes
         case WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD:
             ret = EXECUTED;
             pSelfCureStateMachine->HandleNetworkConnected();
+            pSelfCureStateMachine->CheckConflictIpForSoftAp();
             break;
         case WIFI_CURE_OPEN_WIFI_SUCCEED_RESET:
             ret = EXECUTED;
@@ -2807,6 +2808,57 @@ void SelfCureStateMachine::UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryI
             historyInfo.resetSelfCureFailedCnt += 1;
             historyInfo.lastResetSelfCureFailedTs = currentMs;
         }
+    }
+}
+
+void SelfCureStateMachine::RecoverySoftAp()
+{
+    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+        WIFI_LOGI("GetWifiTogglerManager is nullptr!!");
+        return;
+    }
+    WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+    WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, 0);
+}
+ 
+bool SelfCureStateMachine::IsSoftApSsidSameWithWifi(HotspotConfig curApConfig)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiDeviceConfig config;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
+    bool isSameSsid = (curApConfig.GetSsid() == linkedInfo.ssid);
+    bool isSamePassword = (curApConfig.GetPreSharedKey() == config.preSharedKey);
+    bool isSameSecurityType = ("WPA2-PSK" == config.keyMgmt || "WPA-PSK" == config.keyMgmt);
+    if (isSameSsid && isSameSecurityType && !isSamePassword) {
+        return true;
+    }
+    return false;
+}
+ 
+void SelfCureStateMachine::CheckConflictIpForSoftAp()
+{
+    IpInfo ipInfo;
+    HotspotConfig curApConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, 0);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo);
+    WIFI_LOGI("CheckConflictIpForSoftAp enter!");
+    if (!WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
+        WIFI_LOGI("softap not started, return!");
+        return;
+    }
+    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+        WIFI_LOGI("GetWifiTogglerManager is nullptr!!");
+        return;
+    }
+    if (IsSoftApSsidSameWithWifi(curApConfig)) {
+        WIFI_LOGI("sta and sofap have same ssid and PSK, close softap!");
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+        return;
+    }
+    if (IpTools::ConvertIpv4Address(ipInfo.gateway) == curApConfig.GetIpAddress()) {
+        WIFI_LOGI("sta and sofap gateway conflict, recovery softap!");
+        RecoverySoftAp();
     }
 }
 

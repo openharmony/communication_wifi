@@ -25,11 +25,11 @@ static const std::string STA_RANDOMMAC_KEY_ALIAS = "WiFiRandMacSecret";
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiRandomMacHelper");
-const long long MAC_ADDRESS_VALID_LONG_MASK = (1ULL << 48) - 1;
-const long long MAC_ADDRESSS_AIASSIGNED_MASK = 1ULL << 43;
-const long long MAC_ADDRESS_ELIASSIGNED_MASK = 1ULL << 42;
-const long long MAC_ADDRESS_LOCALLY_ASSIGNED_MASK = 1ULL << 41;
-const long long MAC_ADDRESS_MULTICAST_MASK = 1ULL << 40;
+const unsigned long long MAC_ADDRESS_VALID_LONG_MASK = (1ULL << 48) - 1;
+const unsigned long long MAC_ADDRESSS_AIASSIGNED_MASK = 1ULL << 43;
+const unsigned long long MAC_ADDRESS_ELIASSIGNED_MASK = 1ULL << 42;
+const unsigned long long MAC_ADDRESS_LOCALLY_ASSIGNED_MASK = 1ULL << 41;
+const unsigned long long MAC_ADDRESS_MULTICAST_MASK = 1ULL << 40;
 constexpr int MAX_MAC_SIZE = 18;
 constexpr int LONG_TO_BYTE_SIZE = 8;
 constexpr int MAC_ADDRESS_ETHER_ADDR_LEN = 6;
@@ -66,7 +66,7 @@ int WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(const std::string
     }
     std::vector<uint8_t> bytesToLong = {};
     bytesToLong.assign(outPlant.begin(), outPlant.begin() + LONG_TO_BYTE_SIZE);
-    long long data = WifiRandomMacHelper::BytesToLonglong(bytesToLong);
+    unsigned long long data = WifiRandomMacHelper::BytesToLonglong(bytesToLong);
     ret = GenerateRandomMacAddressByLong(data, randomMacAddr);
     if (ret != 0) {
         WIFI_LOGE("%{public}s GenerateRandomMacAddressByLong failed:%{public}d", __func__, ret);
@@ -140,7 +140,7 @@ void WifiRandomMacHelper::GenerateRandomMacAddress(std::string &randomMacAddr)
     return;
 }
 
-void WifiRandomMacHelper::LongLongToBytes(long long value, std::vector<uint8_t> &outPlant)
+void WifiRandomMacHelper::LongLongToBytes(unsigned long long value, std::vector<uint8_t> &outPlant)
 {
     outPlant.clear();
     outPlant.emplace_back((value >> OFFSET_VALUE_56) & 0xFF);
@@ -154,22 +154,22 @@ void WifiRandomMacHelper::LongLongToBytes(long long value, std::vector<uint8_t> 
     return;
 }
 
-long long WifiRandomMacHelper::BytesToLonglong(const std::vector<uint8_t> &byte)
+unsigned long long WifiRandomMacHelper::BytesToLonglong(const std::vector<uint8_t> &byte)
 {
     if (byte.size() != LONG_TO_BYTE_SIZE) {
         WIFI_LOGI("%{public}s byte size is invalid :%{public}zu", __func__, byte.size());
         return 0;
     }
-    long long value = 0;
+    unsigned long long value = 0;
     value = (
-        (((long long)byte[OFFSET_VALUE_0] << OFFSET_VALUE_56) & 0xFF00000000000000L) |
-        (((long long)byte[OFFSET_VALUE_1] << OFFSET_VALUE_48) & 0xFF000000000000L) |
-        (((long long)byte[OFFSET_VALUE_2] << OFFSET_VALUE_40) & 0xFF0000000000L) |
-        (((long long)byte[OFFSET_VALUE_3] << OFFSET_VALUE_32) & 0xFF00000000L) |
-        (((long long)byte[OFFSET_VALUE_4] << OFFSET_VALUE_24) & 0xFF000000L)|
-        (((long long)byte[OFFSET_VALUE_5] << OFFSET_VALUE_16) & 0xFF0000L)|
-        (((long long)byte[OFFSET_VALUE_6] << OFFSET_VALUE_8) & 0xFF00L)|
-        ((long long)byte[OFFSET_VALUE_7] & 0xFFL));
+        (((unsigned long long)byte[OFFSET_VALUE_0] << OFFSET_VALUE_56) & 0xFF00000000000000L) |
+        (((unsigned long long)byte[OFFSET_VALUE_1] << OFFSET_VALUE_48) & 0xFF000000000000L) |
+        (((unsigned long long)byte[OFFSET_VALUE_2] << OFFSET_VALUE_40) & 0xFF0000000000L) |
+        (((unsigned long long)byte[OFFSET_VALUE_3] << OFFSET_VALUE_32) & 0xFF00000000L) |
+        (((unsigned long long)byte[OFFSET_VALUE_4] << OFFSET_VALUE_24) & 0xFF000000L)|
+        (((unsigned long long)byte[OFFSET_VALUE_5] << OFFSET_VALUE_16) & 0xFF0000L)|
+        (((unsigned long long)byte[OFFSET_VALUE_6] << OFFSET_VALUE_8) & 0xFF00L)|
+        ((unsigned long long)byte[OFFSET_VALUE_7] & 0xFFL));
     return value;
 }
 
@@ -190,7 +190,7 @@ std::string WifiRandomMacHelper::BytesArrayToString(const std::vector<uint8_t> &
     return str;
 }
 
-int WifiRandomMacHelper::StringAddrFromLongAddr(long long addr, std::string &randomMacAddr)
+int WifiRandomMacHelper::StringAddrFromLongAddr(unsigned long long addr, std::string &randomMacAddr)
 {
     WIFI_LOGD("%{public}s %{public}lld 0x%{public}02llx:0x%{public}02llx:0x%{public}02llx:0x%{public}02llx"
         ":0x%{public}02llx:0x%{public}02llx", __func__, addr,
@@ -216,14 +216,14 @@ int WifiRandomMacHelper::StringAddrFromLongAddr(long long addr, std::string &ran
     return 0;
 }
 
-long long WifiRandomMacHelper::LongAddrFromByteAddr(std::vector<uint8_t> &addr)
+unsigned long long WifiRandomMacHelper::LongAddrFromByteAddr(std::vector<uint8_t> &addr)
 {
     if (addr.size() != MAC_ADDRESS_ETHER_ADDR_LEN) {
         WIFI_LOGE("%{public}s %{public}s is not a valid MAC address", __func__,
             BytesArrayToString(addr).c_str());
         return 0;
     }
-    long long longAddr = 0;
+    unsigned long long longAddr = 0;
     for (auto &b : addr) {
         int uint8Byte = b & 0xff;
         longAddr = (longAddr << OFFSET_VALUE_8) + uint8Byte;
@@ -232,7 +232,7 @@ long long WifiRandomMacHelper::LongAddrFromByteAddr(std::vector<uint8_t> &addr)
 }
 
 
-int WifiRandomMacHelper::GenerateRandomMacAddressByLong(long long random, std::string &randomMacAddr)
+int WifiRandomMacHelper::GenerateRandomMacAddressByLong(unsigned long long random, std::string &randomMacAddr)
 {
     if (random == 0) {
         WIFI_LOGI("%{public}s: random is invalid :%{public}lld!", __func__, random);
@@ -255,7 +255,7 @@ int WifiRandomMacHelper::GenerateRandomMacAddressByLong(long long random, std::s
     }
     std::vector<uint8_t> addrBytes = {};
     addrBytes.assign(bytes.begin() + OFFSET_VALUE_2, bytes.end());
-    long long lngAddr = WifiRandomMacHelper::LongAddrFromByteAddr(addrBytes);
+    unsigned long long lngAddr = WifiRandomMacHelper::LongAddrFromByteAddr(addrBytes);
 
     int ret = StringAddrFromLongAddr(lngAddr, randomMacAddr);
     WIFI_LOGD("%{public}s: StringAddrFromLongAddr: %{public}lld -> %{public}s", __func__,

@@ -2075,27 +2075,35 @@ void StaStateMachine::OnDhcpResultNotifyEvent(DhcpReturnCode result, int ipType)
 }
 
 #ifndef OHOS_ARCH_LITE
-int32_t StaStateMachine::GetDataSlotId()
+int32_t StaStateMachine::GetDataSlotId(int32_t slotId)
 {
-    auto slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
-    if (slotId < 0 || slotId >= CoreServiceClient::GetInstance().GetMaxSimCount()) {
-        LOGE("failed to get default slotId, slotId:%{public}d", slotId);
+    int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
+    if (slotId >= 0 && slotId < simCount) {
+        LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
+        return slotId;
+    }
+    auto slotDefaultID = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if (slotDefaultID < 0 || slotDefaultID >= simCount) {
+        LOGE("failed to get default slotId, slotId:%{public}d", slotDefaultID);
         return -1;
     }
-    LOGI("slotId: %{public}d", slotId);
-    return slotId;
+    LOGI("slotId: %{public}d", slotDefaultID);
+    return slotDefaultID;
 }
 
 int32_t StaStateMachine::GetCardType(CardType &cardType)
 {
-    return CoreServiceClient::GetInstance().GetCardType(GetDataSlotId(), cardType);
+    WifiDeviceConfig deviceConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig);
+    return CoreServiceClient::GetInstance().GetCardType(GetDataSlotId(deviceConfig.wifiEapConfig.eapSubId),
+        cardType);
 }
 
 int32_t StaStateMachine::GetDefaultId(int32_t slotId)
 {
     LOGI("StaStateMachine::GetDefaultId in, slotId: %{public}d", slotId);
     if (slotId == WIFI_INVALID_SIM_ID) {
-        return GetDataSlotId();
+        return GetDataSlotId(slotId);
     }
     return slotId;
 }
@@ -2136,7 +2144,9 @@ bool StaStateMachine::IsMultiSimEnabled()
 std::string StaStateMachine::SimAkaAuth(const std::string &nonce, AuthType authType)
 {
     LOGD("StaStateMachine::SimAkaAuth in, authType:%{public}d, nonce:%{private}s", authType, nonce.c_str());
-    auto slotId = GetDataSlotId();
+    WifiDeviceConfig deviceConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig);
+    auto slotId = GetDataSlotId(deviceConfig.wifiEapConfig.eapSubId);
     SimAuthenticationResponse response;
     int32_t result = CoreServiceClient::GetInstance().SimAuthentication(slotId, authType, nonce, response);
     if (result != WIFI_OPT_SUCCESS) {

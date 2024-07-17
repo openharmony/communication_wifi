@@ -909,4 +909,11 @@ WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t ps
     LOGI("GetPskPassphrase success.");
     return WIFI_HAL_OPT_OK;
 }
+
+WifiErrorNo HdiSetNativeProcessCallback(void (*callback)(int))
+{
+    LOGI("%{public}s enter", __func__);
+    return SetNativeProcessCallback(callback);
+}
+
 #endif

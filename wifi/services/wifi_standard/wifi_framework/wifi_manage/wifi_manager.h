@@ -125,6 +125,7 @@ public:
 #ifdef FEATURE_HPF_SUPPORT
     void InstallPacketFilterProgram(int screenState, int instId);
 #endif
+    void OnNativeProcessStatusChange(int status);
 
 private:
     WifiManager();

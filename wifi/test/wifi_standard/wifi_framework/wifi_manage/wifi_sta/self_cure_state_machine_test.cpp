@@ -320,12 +320,12 @@ public:
     {
         LOGI("Enter HandleTcpQualityQueryTest");
         pSelfCureStateMachine->pConnectedMonitorState->HandleTcpQualityQuery(nullptr);
-        InternalMessage msg;
-        msg.SetMessageName(CMD_INTERNET_STATUS_DETECT_INTERVAL);
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_INTERNET_STATUS_DETECT_INTERVAL);
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
-        pSelfCureStateMachine->pConnectedMonitorState->HandleTcpQualityQuery(&msg);
+        pSelfCureStateMachine->pConnectedMonitorState->HandleTcpQualityQuery(msg);
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_CLOSE));
-        pSelfCureStateMachine->pConnectedMonitorState->HandleTcpQualityQuery(&msg);
+        pSelfCureStateMachine->pConnectedMonitorState->HandleTcpQualityQuery(msg);
     }
 
     void DisconnectedMonitorGoInStateSuccess()

@@ -199,10 +199,7 @@ MessageManage::MessageManage()
 {}
 
 MessageManage::~MessageManage()
-{
-    ReleasePool();
-    return;
-}
+{}
 
 InternalMessagePtr MessageManage::CreateMessage()
 {

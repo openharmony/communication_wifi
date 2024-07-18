@@ -850,7 +850,7 @@ void CesEventSubscriber::OnReceiveNotificationEvent(const OHOS::EventFwk::Common
             }
             IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
             if (pService != nullptr) {
-                pService->connectToNetwork(candidateNetworkId);
+                pService->ConnectToNetwork(candidateNetworkId);
             }
         }
     } else {

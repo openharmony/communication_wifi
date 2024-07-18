@@ -126,7 +126,7 @@ ErrCode WifiP2pProxy::DisableP2p(void)
     }
     return ErrCode(reply.ReadInt32());
 }
-
+  
 ErrCode WifiP2pProxy::DiscoverDevices(void)
 {
     if (mRemoteDied) {

@@ -40,7 +40,7 @@ public:
     explicit WifiDeviceProxy(const sptr<IRemoteObject> &impl);
 #endif
     ~WifiDeviceProxy();
-
+ 
     /**
      * @Description Turn on Wi-Fi
      *

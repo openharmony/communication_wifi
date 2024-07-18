@@ -116,7 +116,7 @@ public:
             WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue, threadName:%{public}s", threadName.c_str());
         } else {
             eventQueue = std::make_shared<ffrt::queue>(threadName.c_str(),
-            ffrt::queue_attr().timeout(WIFI_THREAD_TIMEOUT_LIMIT).callback(timeOutFunc));
+            ffrt::queue_attr().callback(timeOutFunc));
             WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue with callback,"
                 "threadName:%{public}s", threadName.c_str());
         }

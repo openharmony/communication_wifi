@@ -762,7 +762,8 @@ void StaServiceTest::DeliverStaIfaceDataSuccessTest()
 
 void StaServiceTest::GetDataSlotIdTest()
 {
-    pStaService->GetDataSlotId();
+    pStaService->GetDataSlotId(0);
+    pStaService->GetDataSlotId(-1);
 }
 
 void StaServiceTest::GetImsiTest()

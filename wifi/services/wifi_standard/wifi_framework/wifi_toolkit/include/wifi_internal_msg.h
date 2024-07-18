@@ -52,6 +52,8 @@ constexpr int RSSI_LEVEL_3_5G = -72;
 constexpr int RSSI_LEVEL_4_5G = -65;
 constexpr int AIRPLANE_MODE_OPEN = 1;
 constexpr int AIRPLANE_MODE_CLOSE = 2;
+#define DNS_IP_ADDR_LEN 15
+#define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
 
 constexpr int FUZZY_BSSID_MAX_MATCH_CNT = 30;
 
@@ -293,7 +295,7 @@ struct WifiConfig {
         secondRssiLevel5G = RSSI_LEVEL_2_5G;
         thirdRssiLevel5G = RSSI_LEVEL_3_5G;
         fourthRssiLevel5G = RSSI_LEVEL_4_5G;
-        strDnsBak = "8.8.8.8";
+        strDnsBak = "0.0.0.0";
         isLoadStabak = true;
         preLoadEnhance = false;
         scanOnlySwitch = true;

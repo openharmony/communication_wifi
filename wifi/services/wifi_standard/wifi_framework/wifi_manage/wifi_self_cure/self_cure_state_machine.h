@@ -388,6 +388,9 @@ private:
     bool SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel);
     void HandleNetworkConnected();
     bool UpdateConnSelfCureFailedHistory();
+    void RecoverySoftAp();
+    bool IsSoftApSsidSameWithWifi(HotspotConfig curApConfig);
+    void CheckConflictIpForSoftAp();
     static bool IsEncryptedAuthType(const std::string authType);
     std::string GetCurrentGateway();
     bool DoArpTest(std::string ipAddress, std::string gateway);

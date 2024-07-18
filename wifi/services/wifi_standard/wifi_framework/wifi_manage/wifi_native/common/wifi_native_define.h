@@ -38,6 +38,11 @@
 #define HAL_P2P_SERVICE_TYPE_MIN_SIZE 3
 #define HAL_P2P_SERVICE_TYPE_2_POS 2
 
+typedef enum DeathType {
+    WPA_DEATH = 0,
+    AP_DEATH = 1
+} DeathType;
+
 typedef enum HalScanResult {
     HAL_SINGLE_SCAN_FAILED = 1,     /* Scan failure notification */
     HAL_SINGLE_SCAN_OVER_OK = 2,    /* Scan success notification */

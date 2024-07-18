@@ -53,8 +53,6 @@ constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
-#define FIRST_DNS "8.8.8.8"
-#define SECOND_DNS "180.76.76.76"
 #define PORTAL_ACTION "ohos.want.action.awc"
 #define PORTAL_ENTITY "entity.browser.hbct"
 #define BROWSER_BUNDLE "com.huawei.hmos.browser"
@@ -1903,6 +1901,29 @@ bool StaStateMachine::ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig)
     return false;
 }
 
+void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
+    std::string &currentMac)
+{
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    std::string macAddress;
+    std::string deviceConfigKey = deviceConfig.ssid + deviceConfig.keyMgmt;
+    int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+    if (ret != 0) {
+        ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+    }
+    if (ret != 0) {
+        WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
+            "Using locally generated MAC address instead.", __func__);
+        WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+    }
+    randomMacInfo.randomMac = macAddress;
+    currentMac = randomMacInfo.randomMac;
+    LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
+        __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
+        MacAnonymize(randomMacInfo.peerBssid).c_str());
+#endif
+}
+
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
     LOGD("enter SetRandomMac.");
@@ -1933,22 +1954,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
                 currentMac = randomMacInfo.randomMac;
             } else {
-                std::string macAddress;
-                std::string deviceConfigKey = deviceConfig.ssid + deviceConfig.keyMgmt;
-                int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
-                if (ret != 0) {
-                    ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
-                }
-                if (ret != 0) {
-                    WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
-                        "Using locally generated MAC address instead.", __func__);
-                    WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
-                }
-                randomMacInfo.randomMac = macAddress;
-                currentMac = randomMacInfo.randomMac;
-                LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
-                    __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
-                    MacAnonymize(randomMacInfo.peerBssid).c_str());
+                SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac);
                 WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
             }
         } else if (IsPskEncryption(deviceConfig.keyMgmt)) {
@@ -2077,27 +2083,35 @@ void StaStateMachine::OnDhcpResultNotifyEvent(DhcpReturnCode result, int ipType)
 }
 
 #ifndef OHOS_ARCH_LITE
-int32_t StaStateMachine::GetDataSlotId()
+int32_t StaStateMachine::GetDataSlotId(int32_t slotId)
 {
-    auto slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
-    if (slotId < 0 || slotId >= CoreServiceClient::GetInstance().GetMaxSimCount()) {
-        LOGE("failed to get default slotId, slotId:%{public}d", slotId);
+    int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
+    if (slotId >= 0 && slotId < simCount) {
+        LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
+        return slotId;
+    }
+    auto slotDefaultID = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if (slotDefaultID < 0 || slotDefaultID >= simCount) {
+        LOGE("failed to get default slotId, slotId:%{public}d", slotDefaultID);
         return -1;
     }
-    LOGI("slotId: %{public}d", slotId);
-    return slotId;
+    LOGI("slotId: %{public}d", slotDefaultID);
+    return slotDefaultID;
 }
 
 int32_t StaStateMachine::GetCardType(CardType &cardType)
 {
-    return CoreServiceClient::GetInstance().GetCardType(GetDataSlotId(), cardType);
+    WifiDeviceConfig deviceConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig);
+    return CoreServiceClient::GetInstance().GetCardType(GetDataSlotId(deviceConfig.wifiEapConfig.eapSubId),
+        cardType);
 }
 
 int32_t StaStateMachine::GetDefaultId(int32_t slotId)
 {
     LOGI("StaStateMachine::GetDefaultId in, slotId: %{public}d", slotId);
     if (slotId == WIFI_INVALID_SIM_ID) {
-        return GetDataSlotId();
+        return GetDataSlotId(slotId);
     }
     return slotId;
 }
@@ -2138,7 +2152,9 @@ bool StaStateMachine::IsMultiSimEnabled()
 std::string StaStateMachine::SimAkaAuth(const std::string &nonce, AuthType authType)
 {
     LOGD("StaStateMachine::SimAkaAuth in, authType:%{public}d, nonce:%{private}s", authType, nonce.c_str());
-    auto slotId = GetDataSlotId();
+    WifiDeviceConfig deviceConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig);
+    auto slotId = GetDataSlotId(deviceConfig.wifiEapConfig.eapSubId);
     SimAuthenticationResponse response;
     int32_t result = CoreServiceClient::GetInstance().SimAuthentication(slotId, authType, nonce, response);
     if (result != WIFI_OPT_SUCCESS) {
@@ -3026,27 +3042,38 @@ void StaStateMachine::ReplaceEmptyDns(DhcpResult *result)
     }
     std::string strDns1 = result->strOptDns1;
     std::string strDns2 = result->strOptDns2;
+    char wifiFirstDns[DNS_IP_ADDR_LEN + 1] = { 0 };
+    char wifiSecondDns[DNS_IP_ADDR_LEN + 1] = { 0 };
+    if (GetParamValue(WIFI_FIRST_DNS_NAME, 0, wifiFirstDns, DNS_IP_ADDR_LEN) <= 0) {
+        WIFI_LOGE("ReplaceEmptyDns Get wifiFirstDns error");
+        return;
+    }
+    if (GetParamValue(WIFI_SECOND_DNS_NAME, 0, wifiSecondDns, DNS_IP_ADDR_LEN) <= 0) {
+        WIFI_LOGE("ReplaceEmptyDns Get wifiSecondDns error");
+        return;
+    }
+    std::string strWifiFirstDns(wifiFirstDns);
     if (strDns1.empty()) {
         WIFI_LOGI("Enter ReplaceEmptyDns::dns1 is null");
-        if (strDns2 == FIRST_DNS) {
-            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, SECOND_DNS) != EOK) {
-                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s SECOND_DNS failed!");
+        if (strDns2 == strWifiFirstDns) {
+            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, wifiSecondDns) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s wifiSecondDns failed!");
             }
         } else {
-            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, FIRST_DNS) != EOK) {
-                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s FIRST_DNS failed!");
+            if (strcpy_s(result->strOptDns1, INET_ADDRSTRLEN, wifiFirstDns) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns1 strcpy_s wifiFirstDns failed!");
             }
         }
     }
     if (strDns2.empty()) {
         WIFI_LOGI("Enter ReplaceEmptyDns::dns2 is null");
-        if (strDns1 == FIRST_DNS) {
-            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, SECOND_DNS) != EOK) {
-                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s SECOND_DNS failed!");
+        if (strDns1 == strWifiFirstDns) {
+            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, wifiSecondDns) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s wifiSecondDns failed!");
             }
         } else {
-            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, FIRST_DNS) != EOK) {
-                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s SECOND_DNS failed!");
+            if (strcpy_s(result->strOptDns2, INET_ADDRSTRLEN, wifiFirstDns) != EOK) {
+                WIFI_LOGE("ReplaceEmptyDns strDns2 strcpy_s wifiFirstDns failed!");
             }
         }
     }
@@ -3659,6 +3686,24 @@ ErrCode StaStateMachine::ConfigRandMacSelfCure(const int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
+void  StaStateMachine::GetDeviceCfgInfo(const std::string& bssid, WifiDeviceConfig &deviceConfig)
+{
+    WifiHalGetDeviceConfig config;
+    config.networkId = WPA_DEFAULT_NETWORKID;
+    config.param = "ssid";
+    if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("GetDeviceConfig failed!");
+    }
+    deviceConfig.networkId = WPA_DEFAULT_NETWORKID;
+    deviceConfig.bssid = bssid;
+    deviceConfig.ssid = config.value;
+    /* Remove the double quotation marks at the head and tail. */
+    deviceConfig.ssid.erase(0, 1);
+    if (!deviceConfig.ssid.empty()) {
+        deviceConfig.ssid.erase(deviceConfig.ssid.length() - 1, 1);
+    }
+}
+
 void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
 {
     WIFI_LOGI("ConnectToNetworkProcess, Receive bssid=%{public}s", MacAnonymize(bssid).c_str());
@@ -3702,18 +3747,7 @@ void StaStateMachine::UpdateDeviceConfigAfterWifiConnected(WifiDeviceConfig &dev
         deviceConfig.bssid = bssid;
         if ((wpsState == SetupMethod::DISPLAY) || (wpsState == SetupMethod::PBC) || (wpsState == SetupMethod::KEYPAD)) {
             /* Save connection information. */
-            WifiHalGetDeviceConfig config;
-            config.networkId = WPA_DEFAULT_NETWORKID;
-            config.param = "ssid";
-            if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config) != WIFI_HAL_OPT_OK) {
-                LOGE("GetDeviceConfig failed!");
-            }
-            deviceConfig.networkId = WPA_DEFAULT_NETWORKID;
-            deviceConfig.bssid = bssid;
-            deviceConfig.ssid = config.value;
-            /* Remove the double quotation marks at the head and tail. */
-            deviceConfig.ssid.erase(0, 1);
-            deviceConfig.ssid.erase(deviceConfig.ssid.length() - 1, 1);
+            GetDeviceCfgInfo(bssid, deviceConfig);
             WifiSettings::GetInstance().AddWpsDeviceConfig(deviceConfig);
             isWpsConnect = IsWpsConnected::WPS_CONNECTED;
         } else {

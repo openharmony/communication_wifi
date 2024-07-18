@@ -235,7 +235,7 @@ void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
         wifiProxyConfig.manualProxyConfig.GetExclusionObjectList(exclusionList);
         std::list<std::string> tmpExclusionList;
         std::copy_if(exclusionList.begin(), exclusionList.end(), std::back_inserter(tmpExclusionList),
-            [](const std::string &str) { return !str.empty(); } );
+            [](const std::string &str) { return !str.empty(); });
         netLinkInfo->httpProxy_.SetHost(std::move(wifiProxyConfig.manualProxyConfig.serverHostName));
         netLinkInfo->httpProxy_.SetPort(wifiProxyConfig.manualProxyConfig.serverPort);
         netLinkInfo->httpProxy_.SetExclusionList(tmpExclusionList);

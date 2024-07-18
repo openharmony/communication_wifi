@@ -707,7 +707,7 @@ void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<Wifi
         return;
     }
     for (auto iter = result.begin(); iter != result.end(); iter++) {
-        if (iter->ssid == wifiConfig.ssid && iter.keyMgmt == wifiConfig.keyMgmt) {
+        if (iter->ssid == wifiConfig.ssid && iter->keyMgmt == wifiConfig.keyMgmt) {
             WIFI_LOGI("ReplaceConfigWhenCandidateConnected networkid: %{public}d!", iter->networkId);
             result.erase(iter);
             break;

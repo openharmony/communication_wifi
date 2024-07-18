@@ -50,6 +50,8 @@ public:
     virtual int GetScoretacticsLastSelectionScore(int instId = 0) = 0;
     virtual int GetScoretacticsSecurityScore(int instId = 0) = 0;
     virtual int SetDeviceAfterConnect(int networkId) = 0;
+    virtual int GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
+        WifiDeviceConfig &config) = 0;
     virtual int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config) = 0;
     virtual int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs) = 0;
     virtual int SetDeviceConnFailedCount(const std::string &index, const int &indexType, int count) = 0;
@@ -121,6 +123,8 @@ public:
     MOCK_METHOD1(GetScoretacticsLastSelectionScore, int(int));
     MOCK_METHOD1(GetScoretacticsSecurityScore, int(int));
     MOCK_METHOD1(SetDeviceAfterConnect, int(int networkId));
+    MOCK_METHOD4(GetCandidateConfig, int(const int uid, const std::string &ssid, const std::string &keymgmt,
+        WifiDeviceConfig &config));
     MOCK_METHOD3(GetCandidateConfig, int(const int uid, const int &networkId, WifiDeviceConfig &config));
     MOCK_METHOD2(GetAllCandidateConfig, int(const int uid, std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD3(SetDeviceConnFailedCount, int(const std::string &index, const int &indexType, int count));

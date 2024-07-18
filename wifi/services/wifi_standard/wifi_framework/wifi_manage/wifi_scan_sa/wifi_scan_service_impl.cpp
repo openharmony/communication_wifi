@@ -363,6 +363,15 @@ ErrCode WifiScanServiceImpl::StartWifiPnoScan(bool isStartAction, int periodMs, 
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartWifiPnoScan:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("StartWifiPnoScan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+    }
+
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;

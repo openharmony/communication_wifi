@@ -723,7 +723,7 @@ const std::function<void(int)> &WifiStaHalInterface::GetDeathCallbackInst(void) 
 WifiErrorNo WifiStaHalInterface::RegisterNativeProcessCallback(const std::function<void(int)> &callback)
 {
     mDeathCallback = callback;
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
+#ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->ReqRegisterNativeProcessCallback(callback);
 #endif

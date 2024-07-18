@@ -18,6 +18,7 @@
 #include "network_status_history_manager.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#include "wifi_app_state_aware.h"
 
 namespace OHOS::Wifi::NetworkSelection {
 DEFINE_WIFILOG_LABEL("WifiFilter")
@@ -272,8 +273,29 @@ NoInternetWifiFilter::~NoInternetWifiFilter()
 bool NoInternetWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    return wifiDeviceConfig.noInternetAccess
-        && !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory);
+    InterScanInfo interScanInfo = networkCandidate.interScanInfo;
+    if (!wifiDeviceConfig.noInternetAccess ||
+        NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory)) {
+        WIFI_LOGI("NoInternetWifiFilter, has internet or not allow recovery, skip candidate, "
+            "noInternetAccess=%{public}d bssid=%{public}s",
+            wifiDeviceConfig.noInternetAccess, MacAnonymize(interScanInfo.bssid).c_str());
+        return false;
+    }
+    std::map<std::string, std::vector<std::string>> filterMap;
+    WifiSettings::GetInstance().GetPackageFilterMap(filterMap);
+    std::vector<std::string> settings_module_name = filterMap["settings_module_name"];
+    std::string name = settings_module_name.empty() ? "" : settings_module_name.front();
+    if (!name.empty() && WifiAppStateAware::GetInstance().IsForegroundApp(name)) {
+        WIFI_LOGI("NoInternetWifiFilter, settings in foreground, skip candidate, bssid=%{public}s",
+            MacAnonymize(interScanInfo.bssid).c_str());
+        return false;
+    }
+    if (!NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory)) {
+        WIFI_LOGI("NoInternetWifiFilter, never has internet, skip candidate, bssid=%{public}s",
+            MacAnonymize(interScanInfo.bssid).c_str());
+        return false;
+    }
+    return true;
 }
 
 

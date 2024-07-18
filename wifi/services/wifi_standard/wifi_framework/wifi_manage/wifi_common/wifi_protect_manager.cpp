@@ -27,6 +27,7 @@
 #include "define.h"
 #endif
 #include "wifi_config_center.h"
+#include "wifi_app_state_aware.h"
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MANAGER_LOCK_MANAGER"
@@ -249,7 +250,7 @@ bool WifiProtectManager::AddProtect(
     }
 #ifndef OHOS_ARCH_LITE
     int state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_END);
-    if (IsForegroundApplication(name)) {
+    if (WifiAppStateAware::GetInstance().IsForegroundApp(name)) {
         state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
     }
     LOGD("%{public}s bundle name: %{public}s state: %{public}d",
@@ -395,25 +396,6 @@ bool WifiProtectManager::SetLowLatencyMode(bool enabled)
     return true;
 }
 #ifndef OHOS_ARCH_LITE
-bool WifiProtectManager::IsForegroundApplication(const std::string &BundleName)
-{
-    bool isForegroud = false;
-    std::vector<AppExecFwk::AppStateData> fgList;
-    if (mAppObject &&
-        mAppObject->GetForegroundApplications(fgList) == static_cast<int32_t>(WIFI_OPT_SUCCESS)) {
-        std::vector<AppExecFwk::AppStateData>::iterator itor = fgList.begin();
-        while (itor != fgList.end()) {
-            LOGD("Match foreground bundle name = %{public}s", (*itor).bundleName.c_str());
-            if ((*itor).bundleName == BundleName) {
-                isForegroud = true;
-                break;
-            }
-            itor++;
-        }
-    }
-    return isForegroud;
-}
-
 int WifiProtectManager::GetFgLowlatyProtectCount()
 {
     int count = 0;

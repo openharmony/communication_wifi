@@ -18,8 +18,9 @@
 #include "network_status_history_manager.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#ifndef OHOS_ARCH_LITE
 #include "wifi_app_state_aware.h"
-
+#endif
 namespace OHOS::Wifi::NetworkSelection {
 DEFINE_WIFILOG_LABEL("WifiFilter")
 

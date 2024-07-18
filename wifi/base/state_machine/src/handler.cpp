@@ -92,11 +92,6 @@ void Handler::StopHandlerThread()
     if (pMyTaskQueue != nullptr) {
         pMyTaskQueue.reset();
     }
-    for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
-        InternalMessage *msg = *iter;
-        iter = mMessageQueue.erase(iter);
-        MessageManage::GetInstance().ReclaimMsg(msg);
-    }
 #endif
     LOGI("Leave StopHandlerThread %{public}s", mThreadName.c_str());
     return;
@@ -183,18 +178,9 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;
     }
-    mMessageQueue.push_back(msg);
     std::function<void()> func = std::bind([this, msg]() {
         LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
         ExecuteMessage(msg);
-        for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
-            if (*iter == msg) {
-                iter = mMessageQueue.erase(iter);
-                break;
-            } else {
-                iter++;
-            }
-        }
         MessageManage::GetInstance().ReclaimMsg(msg);
     });
     pMyTaskQueue->PostAsyncTask(func, std::to_string(msg->GetMessageName()), delayTime);
@@ -275,15 +261,6 @@ void Handler::DeleteMessageFromQueue(int messageName)
         return;
     }
 #else
-    for (auto iter = mMessageQueue.begin(); iter != mMessageQueue.end();) {
-        InternalMessage *msg = *iter;
-        if (msg->GetMessageName() == messageName) {
-            iter = mMessageQueue.erase(iter);
-            MessageManage::GetInstance().ReclaimMsg(msg);
-        } else {
-            iter++;
-        }
-    }
     if (pMyTaskQueue == nullptr) {
         LOGE("%{public}s pMyQueue is null.\n", mThreadName.c_str());
         return;

@@ -703,4 +703,12 @@ int32_t OnEventIfaceCreated(struct IWpaCallback *self,
     return 0;
 }
 
+void OnNativeProcessDeath(int status)
+{
+    LOGI("OnNativeProcessDeath status=%{public}d", status);
+    const std::function<void(int)> &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetDeathCallbackInst();
+    if (cbk) {
+        cbk(status);
+    }
+}
 #endif

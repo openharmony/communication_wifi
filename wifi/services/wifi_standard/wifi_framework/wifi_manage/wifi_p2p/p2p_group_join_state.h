@@ -61,6 +61,8 @@ public:
      */
     virtual bool ExecuteStateMsg(InternalMessage *msg) override;
 
+    void StartPbc(const WpsInfo &wps);
+
 private:
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

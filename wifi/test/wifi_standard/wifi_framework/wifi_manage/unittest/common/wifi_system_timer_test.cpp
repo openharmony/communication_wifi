@@ -82,3 +82,14 @@ HWTEST_F(WifiSysTimerTest, SetWantAgent_SetsWantAgent, TestSize.Level1)
 
     EXPECT_EQ(timer_->wantAgent, wantAgent);
 }
+
+HWTEST_F(WifiSysTimerTest, WifiSysTimerTest001, TestSize.Level1)
+{
+    bool repeat = true;
+    uint64_t interval = 5000;
+    bool isNoWakeUp = false;
+    bool isIdle = true;
+    WifiSysTimer WifiSysTimer(repeat, interval, isNoWakeUp, isIdle);
+
+    EXPECT_EQ(WifiSysTimer.interval, interval);
+}

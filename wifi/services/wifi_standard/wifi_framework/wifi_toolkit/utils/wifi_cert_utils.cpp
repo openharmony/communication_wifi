@@ -48,8 +48,16 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
         free(data);
         return -1;
     }
-    (void)memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size());
-    (void)memcpy_s(certAliasBuf, sizeof(certAliasBuf), alias.c_str(), alias.size());
+    if (memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size()) != EOK) {
+        LOGE("memcpy_s pwd.c_str() error.");
+        free(data);
+        return -1;
+    }
+    if (memcpy_s(certAliasBuf, sizeof(certAliasBuf), alias.c_str(), alias.size()) != EOK) {
+        LOGE("memcpy_s alias.c_str() error.");
+        free(data);
+        return -1;
+    }
 
     appCert.size = certEntry.size();
     appCert.data = data;

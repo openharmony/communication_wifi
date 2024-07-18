@@ -50,6 +50,7 @@ public:
 
 protected:
     std::shared_ptr<MockWifiAppStateAwareCallbacks> callbacks_;
+    std::shared_ptr<WifiAppStateAware> wifiAppStateAware_;
 };
 
 HWTEST_F(WifiAppStateAwareTest, Connect_ReturnsTrueWhenAppMgrProxyIsNotNull, TestSize.Level1)
@@ -176,4 +177,88 @@ HWTEST_F(WifiAppStateAwareTest, IsForegroundApp_False, TestSize.Level1)
 
     bool ret = WifiAppStateAware::GetInstance().IsForegroundApp(2);
     EXPECT_FALSE(ret);
+}
+
+HWTEST_F(WifiAppStateAwareTest, OnForegroundAppChangedTest001, TestSize.Level1)
+{
+    WifiAppStateAware wifiAppStateAware;
+    AppExecFwk::AppStateData appStateData;
+    appStateData.bundleName = "";
+    appStateData.isFocused = true;
+    appStateData.state = static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
+    appStateData.uid = -1;
+    wifiAppStateAware.OnForegroundAppChanged(appStateData, 0);
+}
+
+HWTEST_F(WifiAppStateAwareTest, GetProcessRunningInfosTest001, TestSize.Level1)
+{
+    WifiAppStateAware wifiAppStateAware;
+    std::vector<AppExecFwk::RunningProcessInfo> info;
+    AppExecFwk::RunningProcessInfo runningProcessInfo;
+    info.push_back(runningProcessInfo);
+    EXPECT_EQ(wifiAppStateAware.GetProcessRunningInfos(info), WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiAppStateAwareTest, IsForegroundAppTest001, TestSize.Level1)
+{
+    WifiAppStateAware wifiAppStateAware;
+    std::string test = "TEST";
+    EXPECT_EQ(wifiAppStateAware.IsForegroundApp(test), false);
+}
+
+HWTEST_F(WifiAppStateAwareTest, GetRunningProcessNameByPidTest001, TestSize.Level1)
+{
+    WifiAppStateAware wifiAppStateAware;
+    std::string test = "TEST";
+    int uid = 1;
+    int pid = 1;
+    EXPECT_EQ(wifiAppStateAware.GetRunningProcessNameByPid(uid, pid), "");
+}
+
+HWTEST_F(WifiAppStateAwareTest, OnAppStartedTest001, TestSize.Level1)
+{
+    AppStateObserver appStateObserver;
+    AppExecFwk::AppStateData *appStateData = new (std::nothrow) AppExecFwk::AppStateData();
+    ASSERT_NE(appStateData, nullptr);
+    appStateData->bundleName = "";
+    appStateData->isFocused = true;
+    appStateData->state = static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
+    appStateData->uid = -1;
+    appStateObserver.OnAppStarted(*appStateData);
+}
+
+HWTEST_F(WifiAppStateAwareTest, OnAppStoppedTest001, TestSize.Level1)
+{
+    AppStateObserver appStateObserver;
+    AppExecFwk::AppStateData *appStateData = new (std::nothrow) AppExecFwk::AppStateData();
+    ASSERT_NE(appStateData, nullptr);
+    appStateData->bundleName = "";
+    appStateData->isFocused = true;
+    appStateData->state = static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
+    appStateData->uid = -1;
+    appStateObserver.OnAppStopped(*appStateData);
+}
+
+HWTEST_F(WifiAppStateAwareTest, OnAppStoppedTest002, TestSize.Level1)
+{
+    AppStateObserver appStateObserver;
+    AppExecFwk::AppStateData *appStateData = new (std::nothrow) AppExecFwk::AppStateData();
+    ASSERT_NE(appStateData, nullptr);
+    appStateData->bundleName = "TEST";
+    appStateData->isFocused = true;
+    appStateData->state = static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
+    appStateData->uid = -1;
+    appStateObserver.OnAppStopped(*appStateData);
+}
+
+HWTEST_F(WifiAppStateAwareTest, OnForegroundApplicationChangedTest001, TestSize.Level1)
+{
+    AppStateObserver appStateObserver;
+    AppExecFwk::AppStateData *appStateData = new (std::nothrow) AppExecFwk::AppStateData();
+    ASSERT_NE(appStateData, nullptr);
+    appStateData->bundleName = "";
+    appStateData->isFocused = true;
+    appStateData->state = static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
+    appStateData->uid = -1;
+    appStateObserver.OnForegroundApplicationChanged(*appStateData);
 }

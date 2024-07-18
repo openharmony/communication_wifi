@@ -322,6 +322,9 @@ public:
         pSelfCureStateMachine->pConnectedMonitorState->HandleTcpQualityQuery(nullptr);
         InternalMessage msg;
         msg.SetMessageName(CMD_INTERNET_STATUS_DETECT_INTERVAL);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
+        pSelfCureStateMachine->pConnectedMonitorState->HandleTcpQualityQuery(&msg);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_CLOSE));
         pSelfCureStateMachine->pConnectedMonitorState->HandleTcpQualityQuery(&msg);
     }
 
@@ -3064,6 +3067,29 @@ HWTEST_F(SelfCureStateMachineTest, IsEncryptedAuthTypeTest, TestSize.Level1)
 
     authType = "KEY_MGMT_SAE";
     pSelfCureStateMachine->IsEncryptedAuthType(authType);
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsSoftApSsidSameWithWifiTest, TestSize.Level1)
+{
+    HotspotConfig curApConfig;
+    curApConfig.SetSsid("test");
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState = ConnState::CONNECTED;
+    linkedInfo.ssid = "test1";
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+    EXPECT_TRUE(pSelfCureStateMachine->IsSoftApSsidSameWithWifi(curApConfig) == false);
+}
+ 
+HWTEST_F(SelfCureStateMachineTest, CheckConflictIpForSoftApTest, TestSize.Level1)
+{
+    pSelfCureStateMachine->CheckConflictIpForSoftAp();
+}
+ 
+HWTEST_F(SelfCureStateMachineTest, RecoverySoftApTest, TestSize.Level1)
+{
+    pSelfCureStateMachine->RecoverySoftAp();
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsHttpReachableTest, TestSize.Level1)

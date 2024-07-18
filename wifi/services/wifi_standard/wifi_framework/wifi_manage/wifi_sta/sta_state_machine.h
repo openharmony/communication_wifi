@@ -105,6 +105,10 @@ constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
 constexpr int DHCP_LEASE_EXPIRED = 6;
 
+#define DNS_IP_ADDR_LEN 15
+#define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
+#define WIFI_SECOND_DNS_NAME "const.wifi.wifi_second_dns"
+
 enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,
     WPA3_ASSOC_TIMEOUT,
@@ -578,6 +582,13 @@ private:
      */
     void InitLastWifiLinkedInfo();
     /**
+     * @Description  Get device config information.
+     *
+     * @param bassid - the mac address of wifi(in).
+     * @param deviceConfig - the device config(out).
+     */
+    void GetDeviceCfgInfo(const std::string& bssid, WifiDeviceConfig &deviceConfig);
+    /**
      * @Description  Setting linkedInfo in case of when wpa connects
                      automatically there isn't any connection information.
      *
@@ -1038,7 +1049,7 @@ private:
      * @Description Get slot id.
      * @Return int32_t - 0:success, other value:failed
      */
-    int32_t GetDataSlotId();
+    int32_t GetDataSlotId(int32_t slotId);
 
     /**
      * @Description Get card type.
@@ -1241,6 +1252,8 @@ private:
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
     void FillWapiCfg(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
     void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
+    void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
+    std::string &currentMac);
 };
 }  // namespace Wifi
 }  // namespace OHOS

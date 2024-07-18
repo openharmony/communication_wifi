@@ -84,6 +84,8 @@ WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t ps
 
 int ConvertMacToStr(char *mac, int macSize, char *macStr, int strLen);
 
+WifiErrorNo HdiSetNativeProcessCallback(void (*callback)(int));
+
 #ifdef __cplusplus
 }
 #endif

@@ -25,6 +25,7 @@
 #include "wifi_msg.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
+#include "wifi_sta_hal_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -97,6 +98,12 @@ HWTEST_F(WifiManagerTest, ResetSelfcureOpenWifiTest, TestSize.Level1)
 {
     WIFI_LOGI("ResetSelfcureOpenWifiTest enter!");
     wifiManager.wifiStaManager->ResetSelfcureOpenWifi();
+}
+
+HWTEST_F(WifiManagerTest, IgnoreConnStateChangeTest, TestSize.Level1)
+{
+    WIFI_LOGI("IgnoreConnStateChangeTest enter!");
+    wifiManager.wifiStaManager->IgnoreConnStateChange(0);
 }
 
 HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)
@@ -515,6 +522,16 @@ HWTEST_F(WifiManagerTest, IsInterfaceUpTest, TestSize.Level1)
     WIFI_LOGI("IsInterfaceUpTest enter!");
     std::string iface = "wlan0";
     wifiManager.wifiTogglerManager->IsInterfaceUp(iface);
+}
+
+HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_WpaDeath, TestSize.Level1)
+{
+    wifiManager.OnNativeProcessStatusChange(WPA_DEATH);
+}
+
+HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_ApDeath, TestSize.Level1)
+{
+    wifiManager.OnNativeProcessStatusChange(AP_DEATH);
 }
 }  // namespace Wifi
 }  // namespace OHOS

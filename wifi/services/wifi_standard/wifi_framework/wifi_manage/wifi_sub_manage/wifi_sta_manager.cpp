@@ -189,13 +189,39 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
     return;
 }
 
+bool WifiStaManager::IgnoreConnStateChange(int instId)
+{
+    WIFI_LOGI("enter IgnoreConnStateChange");
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGE("%{public}s: pSelfCureService is null.", __FUNCTION__);
+        return false;
+    }
+    if (WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+        WIFI_LOGI("reset selfcure ignore network state changed");
+        return true;
+    }
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(WifiConfigCenter::GetInstance().GetLastNetworkId(), config) != 0) {
+        WIFI_LOGE("%{public}s: Get device config failed!", __FUNCTION__);
+        return false;
+    }
+    if (pSelfCureService->IsSelfCureOnGoing() && config.isReassocSelfCureWithFactoryMacAddress != 0) {
+        WIFI_LOGI("random mac reassoc selfcure ignore network state changed");
+        return true;
+    }
+#endif
+    return false;
+}
+
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     WIFI_LOGD("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
         magic_enum::Enum2Name(state).c_str());
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
-    if (isReport && !WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+    if (isReport && !IgnoreConnStateChange(instId)) {
         WifiEventCallbackMsg cbMsg;
         cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
         cbMsg.msgData = reportStateNum;
@@ -203,7 +229,6 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         cbMsg.id = instId;
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
-
     if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||
         state == OperateResState::DISCONNECT_DISCONNECTING || state == OperateResState::DISCONNECT_DISCONNECTED ||
         state == OperateResState::CONNECT_OBTAINING_IP || state == OperateResState::CONNECT_ASSOCIATING ||

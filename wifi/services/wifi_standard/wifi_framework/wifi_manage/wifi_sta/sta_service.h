@@ -357,7 +357,7 @@ private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
     std::string ConvertString(const std::u16string &wideText) const;
-    int32_t GetDataSlotId() const;
+    int32_t GetDataSlotId(int32_t slotId) const;
     std::string GetImsi(int32_t slotId) const;
     std::string GetPlmn(int32_t slotId) const;
     std::string GetMcc(const std::string &imsi) const;

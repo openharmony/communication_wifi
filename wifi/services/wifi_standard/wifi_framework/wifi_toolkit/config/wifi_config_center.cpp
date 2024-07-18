@@ -109,6 +109,16 @@ int WifiConfigCenter::GetLastNetworkId() const
     return mLastNetworkId.load();
 }
 
+void WifiConfigCenter::SetSelectedCandidateNetworkId(const int networkId)
+{
+    mSelectedCandidateNetworkId = networkId;
+}
+
+int WifiConfigCenter::GetSelectedCandidateNetworkId() const
+{
+    return mSelectedCandidateNetworkId.load();
+}
+
 void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)
 {
     mWifiAllowSemiActive = isAllowed;

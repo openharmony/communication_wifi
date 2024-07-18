@@ -194,6 +194,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
 #endif
+    void ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result);
 
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;

@@ -512,8 +512,6 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
     config.wifiEapConfig.clientCert = "//twifitest";
     WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, config);
     WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, configs);
-    int result = WifiSettings::GetInstance().GetDeviceConfig(ancoCallProcessName, ssid, keymgmt, config);
-    EXPECT_EQ(result, -1);
     result = WifiSettings::GetInstance().GetDeviceConfig(ssid, keymgmt, config);
     EXPECT_EQ(result, -1);
     WifiSettings::GetInstance().ClearDeviceConfig();

@@ -123,14 +123,14 @@ public:
 
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config);
 
-    int GetDeviceConfig(const std::string &ancoCallProcessName, const std::string &ssid,
-            const std::string &keymgmt, WifiDeviceConfig &config);
-
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
     int SetDeviceAfterConnect(int networkId);
 
     int SetDeviceRandomizedMacSuccessEver(int networkId);
+
+    int GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
+        WifiDeviceConfig &config);
 
     int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config);
 

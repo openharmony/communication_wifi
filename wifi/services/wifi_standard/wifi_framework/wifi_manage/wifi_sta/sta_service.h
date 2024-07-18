@@ -363,6 +363,8 @@ private:
     std::string GetMcc(const std::string &imsi) const;
     std::string GetMnc(const std::string &imsi, const int mncLen) const;
     void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;
+    void GetStaControlInfo();
+    bool IsAppInCandidateFilterList(int uid) const;
 private:
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
@@ -382,6 +384,7 @@ private:
     StaAppAcceleration *pStaAppAcceleration;
 #endif
     int m_instId;
+    std::vector<std::string> sta_candidate_trust_list;
 };
 }  // namespace Wifi
 }  // namespace OHOS

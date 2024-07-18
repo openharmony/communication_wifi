@@ -66,7 +66,7 @@ public:
     bool GetLocationModeByDatashare();
     void DealLocationModeChangeEvent();
     void DealCloneDataChangeEvent();
-    void CheckAndStartStaByDatashare();
+    int CheckAndStartStaByDatashare();
     bool IsMdmForbidden(void);
 
 private:

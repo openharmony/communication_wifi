@@ -388,7 +388,7 @@ void WifiEventSubscriberManager::DealCloneDataChangeEvent()
     });
 }
 
-void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
+int WifiEventSubscriberManager::CheckAndStartStaByDatashare()
 {
     constexpr int openWifi = 1;
     constexpr int openWifiInAirplanemode = 2;
@@ -398,13 +398,17 @@ void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
     if (lastStaState == openWifi) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
+        return 0;
     } else if (lastStaState == openWifiInAirplanemode) {
         WifiSettings::GetInstance().SetWifiFlagOnAirplaneMode(true);
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
+        return 0;
     } else if (lastStaState == closeWifiByAirplanemodeOpen) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        return 0;
     }
+    return -1;
 }
 
 bool WifiEventSubscriberManager::IsMdmForbidden()
@@ -416,7 +420,14 @@ void WifiEventSubscriberManager::DelayedAccessDataShare()
 {
     WIFI_LOGI("DelayedAccessDataShare enter!");
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH)) {
-        CheckAndStartStaByDatashare();
+        int res = CheckAndStartStaByDatashare();
+        if (res == -1) {
+            LOGI("wifi config not exits, and check start sta result is null");
+            if (IsStartUpWifiEnableSupport()) {
+                WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+                WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
+            }
+        }
     }
     GetAirplaneModeByDatashare();
 

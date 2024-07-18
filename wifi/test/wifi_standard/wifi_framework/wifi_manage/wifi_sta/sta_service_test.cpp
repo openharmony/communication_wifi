@@ -97,9 +97,9 @@ public:
     void StaServiceRemoveCandidateConfigTestSucc();
     void StaServiceRemoveCandidateConfigTestFail();
     void StaServiceRemoveAllCandidateConfigTestSucc();
-    void StaServiceConnectToCandidateConfigTestSucc();
-    void StaServiceConnectToCandidateConfigTestFail0();
-    void StaServiceConnectToCandidateConfigTestFail1();
+    void StaServiceConnectToCandidateConfigTestSucc0();
+    void StaServiceConnectToCandidateConfigTestSucc1();
+    void StaServiceConnectToCandidateConfigTestFail();
     void StaServiceRemoveAllDeviceTestSucc();
     void StaServiceRemoveAllDeviceTestFail0();
     void StaServiceRemoveAllDeviceTestFail1();
@@ -525,9 +525,12 @@ void StaServiceTest::StaServiceAddCandidateConfigTestSucc()
     config.keyMgmt = "123456";
     int uid = UID;
     int netWorkId = NETWORK_ID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
+    std::vector<WifiDeviceConfig> configs;
+    configs.push_back(config);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(configs), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(config), Return(0)));
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = true;
     EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
 }
@@ -539,7 +542,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestFail0()
     config.band = BAND;
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
-    config.keyMgmt = "NONE";
+    config.keyMgmt = "WEP";
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
@@ -557,8 +560,8 @@ void StaServiceTest::StaServiceAddCandidateConfigTestFail1()
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(1)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(config), Return(0)));
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = false;
     pStaService->AddCandidateConfig(uid, config, netWorkId);
 }
@@ -594,7 +597,7 @@ void StaServiceTest::StaServiceRemoveAllCandidateConfigTestSucc()
     EXPECT_TRUE(pStaService->RemoveAllCandidateConfig(uid) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc()
+void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc0()
 {
     WifiDeviceConfig config;
     config.bssid = "01:23:45:67:89:AB";
@@ -609,7 +612,7 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc()
     EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceConnectToCandidateConfigTestFail0()
+void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc1()
 {
     WifiDeviceConfig config;
     config.bssid = "01:23:45:67:89:AB";
@@ -617,14 +620,15 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestFail0()
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
     config.keyMgmt = "NONE";
+    config.lastConnectTime = 1;
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
-    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_NOT_SUPPORTED);
+    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceConnectToCandidateConfigTestFail1()
+void StaServiceTest::StaServiceConnectToCandidateConfigTestFail()
 {
     WifiDeviceConfig config;
     config.bssid = "01:23:45:67:89:AB";
@@ -1053,19 +1057,19 @@ HWTEST_F(StaServiceTest, StaServiceRemoveAllCandidateConfigTestSucc, TestSize.Le
     StaServiceRemoveAllCandidateConfigTestSucc();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc0, TestSize.Level1)
 {
-    StaServiceConnectToCandidateConfigTestSucc();
+    StaServiceConnectToCandidateConfigTestSucc0();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail0, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc1, TestSize.Level1)
 {
-    StaServiceConnectToCandidateConfigTestFail0();
+    StaServiceConnectToCandidateConfigTestSucc1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail, TestSize.Level1)
 {
-    StaServiceConnectToCandidateConfigTestFail1();
+    StaServiceConnectToCandidateConfigTestFail();
 }
 
 HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestSucc, TestSize.Level1)

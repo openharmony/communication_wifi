@@ -30,6 +30,7 @@
 #include "network_selection_manager.h"
 #include "wifi_config_center.h"
 #include "external_wifi_filter_builder_manager.h"
+#include "wifi_notification_util.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -144,8 +145,32 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
     RegisterStaServiceCallback(appAccelerationStaCallBacks);
 #endif
+    GetStaControlInfo();
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;
+}
+
+void StaService::GetStaControlInfo()
+{
+    WIFI_LOGI("Enter GetStaControlInfo.");
+    std::map<std::string, std::vector<std::string>> filterMap;
+    if (WifiSettings::GetInstance().GetPackageFilterMap(filterMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetPackageFilterMap failed");
+    }
+    sta_candidate_trust_list = filterMap["sta_candidate_filter"];
+    return;
+}
+
+bool StaService::IsAppInCandidateFilterList(int uid) const
+{
+    std::string packageName;
+    GetBundleNameByUid(uid, packageName);
+    if (std::find(sta_candidate_trust_list.begin(), sta_candidate_trust_list.end(), packageName)
+        != sta_candidate_trust_list.end()) {
+        WIFI_LOGI("App is in Candidate filter list.");
+        return true;
+    }
+    return false;
 }
 
 ErrCode StaService::EnableStaService()
@@ -191,7 +216,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         return WIFI_OPT_FAILED;
     }
 
-    if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
+    if (config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
         const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
@@ -206,6 +231,10 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     }
     WifiDeviceConfig tempDeviceConfig = config;
     tempDeviceConfig.uid = uid;
+    tempDeviceConfig.isShared = false;
+    if (IsAppInCandidateFilterList(uid)) {
+        tempDeviceConfig.isShared = true;
+    }
     netWorkId = AddDeviceConfig(tempDeviceConfig);
     return (netWorkId == INVALID_NETWORK_ID) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
 }
@@ -245,9 +274,10 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
         return WIFI_OPT_FAILED;
     }
 
-    if (config.keyMgmt == KEY_MGMT_NONE) {
-        LOGE("ConnectToCandidateConfig unsupport open or wep key!");
-        return WIFI_OPT_NOT_SUPPORTED;
+    if (config.lastConnectTime <= 0) {
+        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
+        return WIFI_OPT_SUCCESS;
     }
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
@@ -727,21 +757,15 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 
 int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const
 {
-    if (WifiSettings::GetInstance().GetDeviceConfig(config.ancoCallProcessName, config.ssid, config.keyMgmt,
-        outConfig) == 0 && (!config.ancoCallProcessName.empty())) {
-        LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s,"
-            "ancoCallProcessName:%{public}s.", outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
-            outConfig.ancoCallProcessName.c_str());
-    } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
-        outConfig) == 0) {
-        LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
-            "ancoCallProcessName:%{public}s,OancoCallProcessName%{public}s", outConfig.networkId,
-            SsidAnonymize(outConfig.ssid).c_str(),
-            config.ancoCallProcessName.c_str(), outConfig.ancoCallProcessName.c_str());
+    int ret = -1;
+    if (config.uid > WIFI_INVALID_UID) {
+        ret = WifiSettings::GetInstance().GetCandidateConfig(config.uid, config.ssid, config.keyMgmt, outConfig);
     } else {
-        return WIFI_OPT_FAILED;
+        ret = WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, outConfig);
     }
-    return WIFI_OPT_SUCCESS;
+    LOGI("FindDeviceConfig uid:%{public}d, ssid:%{public}s, ret:%{public}d.", config.uid,
+        SsidAnonymize(outConfig.ssid).c_str(), ret);
+    return (ret < 0) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)

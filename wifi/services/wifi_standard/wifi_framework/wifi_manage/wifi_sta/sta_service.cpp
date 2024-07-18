@@ -21,6 +21,7 @@
 #include "wifi_country_code_manager.h"
 #include "core_service_client.h"
 #include "cellular_data_client.h"
+#include "wifi_notification_util.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
@@ -30,7 +31,6 @@
 #include "network_selection_manager.h"
 #include "wifi_config_center.h"
 #include "external_wifi_filter_builder_manager.h"
-#include "wifi_notification_util.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -144,12 +144,13 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     std::vector<StaServiceCallback> appAccelerationStaCallBacks;
     appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
     RegisterStaServiceCallback(appAccelerationStaCallBacks);
-#endif
     GetStaControlInfo();
+#endif
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;
 }
 
+#ifndef OHOS_ARCH_LITE
 void StaService::GetStaControlInfo()
 {
     WIFI_LOGI("Enter GetStaControlInfo.");
@@ -172,6 +173,7 @@ bool StaService::IsAppInCandidateFilterList(int uid) const
     }
     return false;
 }
+#endif
 
 ErrCode StaService::EnableStaService()
 {
@@ -221,20 +223,21 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
         if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
-            LOGE("AddCandidateConfig unsupport open or wep key!");
+            LOGE("AddCandidateConfig unsupport wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
         }
 #else
-        LOGE("AddCandidateConfig unsupport open or wep key!");
+        LOGE("AddCandidateConfig unsupport wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
 #endif
     }
     WifiDeviceConfig tempDeviceConfig = config;
     tempDeviceConfig.uid = uid;
-    tempDeviceConfig.isShared = false;
+#ifndef OHOS_ARCH_LITE
     if (IsAppInCandidateFilterList(uid)) {
         tempDeviceConfig.isShared = true;
     }
+#endif
     netWorkId = AddDeviceConfig(tempDeviceConfig);
     return (netWorkId == INVALID_NETWORK_ID) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
 }
@@ -274,11 +277,13 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
         return WIFI_OPT_FAILED;
     }
 
+#ifndef OHOS_ARCH_LITE
     if (config.lastConnectTime <= 0) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
         WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
         return WIFI_OPT_SUCCESS;
     }
+#endif
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);

@@ -363,8 +363,11 @@ private:
     std::string GetMcc(const std::string &imsi) const;
     std::string GetMnc(const std::string &imsi, const int mncLen) const;
     void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;
+#ifndef OHOS_ARCH_LITE
     void GetStaControlInfo();
     bool IsAppInCandidateFilterList(int uid) const;
+#endif
+
 private:
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {

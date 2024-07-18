@@ -123,7 +123,8 @@ public:
         WIFI_LOGI("OnP2pGcLeaveGroup Mock");
     }
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override{
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
+    {
         return nullptr;
     }
 };

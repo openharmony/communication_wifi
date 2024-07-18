@@ -86,8 +86,8 @@ const int TWO_DB = 3;
 const int SNR_BIT_PER_TONE_HIGH_SNR_SCALE = BIT_PER_TONE_SCALE / TWO_DB;
 const int SNR_BIT_PER_TONE_LUT_MIN = -10; // minimum snrDb supported by LUT
 const int SNR_BIT_PER_TONE_LUT_MAX = 9;   // maximum snrDb supported by LUT
-const int SNR_BIT_PER_TONE_LUT[] = {0, 171, 212, 262, 323, 396, 484, 586,
-                                          706, 844, 1000, 1176, 1370, 1583, 1812, 2058, 2317, 2588, 2870, 3161};
+const int SNR_BIT_PER_TONE_LUT[] = {0, 171, 212, 262, 323, 396, 484, 586, 706, 844, 1000, 1176, 1370, 1583, 1812,
+    2058, 2317, 2588, 2870, 3161};
 const int NOISE_FLOOR_20MHZ_DBM = -96;
 
 const int SNR_MARGIN_DB = 16;

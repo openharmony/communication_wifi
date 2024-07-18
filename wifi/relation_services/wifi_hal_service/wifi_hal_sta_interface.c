@@ -535,7 +535,7 @@ WifiErrorNo GetSupportFeature(long *feature)
 
 WifiErrorNo RunCmd(const char *ifname, int32_t cmdid, const unsigned char *buf, int32_t bufSize)
 {
-    if (ifname == NULL|| buf == NULL) {
+    if (ifname == NULL || buf == NULL) {
         LOGE("RunCmd() ifname or buf is NULL");
         return WIFI_HAL_FAILED;
     }

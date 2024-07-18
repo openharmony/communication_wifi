@@ -262,16 +262,20 @@ std::string StaService::ConvertString(const std::u16string &wideText) const
 }
 
 #ifndef OHOS_ARCH_LITE
-int32_t StaService::GetDataSlotId() const
+int32_t StaService::GetDataSlotId(int32_t slotId) const
 {
-    auto slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
     int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
-    if ((slotId < 0) || (slotId >= simCount)) {
-        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotId, simCount);
+    if (slotId >= 0 && slotId < simCount) {
+        LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
+        return slotId;
+    }
+    auto slotDefaultID = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if ((slotDefaultID < 0) || (slotDefaultID >= simCount)) {
+        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotDefaultID, simCount);
         return -1;
     }
-    LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
-    return slotId;
+    LOGI("slotDefaultID: %{public}d, simCount:%{public}d", slotDefaultID, simCount);
+    return slotDefaultID;
 }
 
 std::string StaService::GetImsi(int32_t slotId) const
@@ -323,7 +327,7 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
         return;
     }
 
-    int32_t slotId = GetDataSlotId();
+    int32_t slotId = GetDataSlotId(config.wifiEapConfig.eapSubId);
     if (slotId == -1) {
         return;
     }

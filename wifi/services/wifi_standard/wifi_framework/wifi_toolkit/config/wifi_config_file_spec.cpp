@@ -977,7 +977,11 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.secondRssiLevel5G = RSSI_LEVEL_2_5G;
     item.thirdRssiLevel5G = RSSI_LEVEL_3_5G;
     item.fourthRssiLevel5G = RSSI_LEVEL_4_5G;
-    item.strDnsBak = "8.8.8.8";
+    char dns[DNS_IP_ADDR_LEN + 1] = { 0 };
+    if (GetParamValue(WIFI_FIRST_DNS_NAME, 0, dns, DNS_IP_ADDR_LEN) <= 0) {
+        LOGE("get WIFI_FIRST_DNS_NAME error");
+    }
+    item.strDnsBak = dns;
     item.isLoadStabak = true;
     item.scanOnlySwitch = true;
     item.realMacAddress = "";

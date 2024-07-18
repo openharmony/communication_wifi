@@ -143,10 +143,15 @@ public:
         DhcpResult *result = nullptr;
         pStaStateMachine->ReplaceEmptyDns(result);
         DhcpResult resultO;
-        std::string bssid = "11:22:33:44";
-        std::string bssid1 = "11:22:33:45";
-        memcpy_s(resultO.strOptDns1, NAPI_MAX_STR_LENT, bssid.c_str(), bssid.length());
-        memcpy_s(resultO.strOptDns2, NAPI_MAX_STR_LENT,  bssid1.c_str(), bssid1.length());
+        std::string dns = "0.0.0.0";
+        pStaStateMachine->ReplaceEmptyDns(&resultO);
+        memcpy_s(resultO.strOptDns2, NAPI_MAX_STR_LENT, dns.c_str(), dns.length());
+        pStaStateMachine->ReplaceEmptyDns(&resultO);
+        memcpy_s(resultO.strOptDns1, NAPI_MAX_STR_LENT, dns.c_str(), dns.length());
+        memset_s(resultO.strOptDns2, NAPI_MAX_STR_LENT, 0x0, NAPI_MAX_STR_LENT);
+        pStaStateMachine->ReplaceEmptyDns(&resultO);
+        memcpy_s(resultO.strOptDns1, NAPI_MAX_STR_LENT, dns.c_str(), dns.length());
+        memcpy_s(resultO.strOptDns2, NAPI_MAX_STR_LENT, dns.c_str(), dns.length());
         pStaStateMachine->ReplaceEmptyDns(&resultO);
     }
 

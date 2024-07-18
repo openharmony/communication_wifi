@@ -86,7 +86,7 @@ static WifiErrorNo RegisterEventCallback()
         return WIFI_HAL_OPT_FAILED;
     }
 
-    int32_t result = wpaObj->RegisterEventCallback(wpaObj, g_hdiWpaStaCallbackObj, GetHdiStaIfaceName());
+    int32_t result = wpaObj->RegisterWpaEventCallback(wpaObj, g_hdiWpaStaCallbackObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterEventCallback: RegisterEventCallback failed result:%{public}d", result);
@@ -110,7 +110,7 @@ static WifiErrorNo UnRegisterEventCallback()
             return WIFI_HAL_OPT_FAILED;
         }
 
-        int32_t result = wpaObj->UnregisterEventCallback(wpaObj, g_hdiWpaStaCallbackObj, GetHdiStaIfaceName());
+        int32_t result = wpaObj->UnregisterWpaEventCallback(wpaObj, g_hdiWpaStaCallbackObj, GetHdiStaIfaceName());
         if (result != HDF_SUCCESS) {
             pthread_mutex_unlock(&g_hdiCallbackMutex);
             LOGE("UnRegisterEventCallback: UnregisterEventCallback failed result:%{public}d", result);
@@ -616,13 +616,16 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
         return WIFI_HAL_OPT_OK;
     }
 
-    g_hdiWpaStaCallbackObj = (struct IWpaCallback *)malloc(sizeof(struct IWpaCallback ));
+    g_hdiWpaStaCallbackObj = (struct IWpaCallback *)malloc(sizeof(struct IWpaCallback));
     if (g_hdiWpaStaCallbackObj == NULL) {
         pthread_mutex_unlock(&g_hdiCallbackMutex);
         LOGE("RegisterHdiWpaStaEventCallback: IWpaCallback malloc failed!");
         return WIFI_HAL_OPT_FAILED;
     }
-
+    if (memset_s(g_hdiWpaStaCallbackObj, sizeof(struct IWpaCallback),
+        0, sizeof(struct IWpaCallback)) != EOK) {
+        return WIFI_HAL_OPT_FAILED;
+    }
     g_hdiWpaStaCallbackObj->OnEventDisconnected = callback->OnEventDisconnected;
     g_hdiWpaStaCallbackObj->OnEventConnected = callback->OnEventConnected;
     g_hdiWpaStaCallbackObj->OnEventBssidChanged = callback->OnEventBssidChanged;
@@ -631,32 +634,10 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->OnEventAssociateReject = callback->OnEventAssociateReject;
     g_hdiWpaStaCallbackObj->OnEventWpsOverlap = callback->OnEventWpsOverlap;
     g_hdiWpaStaCallbackObj->OnEventWpsTimeout = callback->OnEventWpsTimeout;
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
-    g_hdiWpaStaCallbackObj->OnEventScanResult = NULL;
-#else
+#ifndef HDI_CHIP_INTERFACE_SUPPORT
     g_hdiWpaStaCallbackObj->OnEventScanResult = callback->OnEventScanResult;
 #endif
-    g_hdiWpaStaCallbackObj->OnEventDeviceFound = NULL;
-    g_hdiWpaStaCallbackObj->OnEventDeviceLost = NULL;
-    g_hdiWpaStaCallbackObj->OnEventGoNegotiationRequest = NULL;
-    g_hdiWpaStaCallbackObj->OnEventGoNegotiationCompleted = NULL;
-    g_hdiWpaStaCallbackObj->OnEventInvitationReceived = NULL;
-    g_hdiWpaStaCallbackObj->OnEventInvitationResult = NULL;
-    g_hdiWpaStaCallbackObj->OnEventGroupFormationSuccess = NULL;
-    g_hdiWpaStaCallbackObj->OnEventGroupFormationFailure = NULL;
-    g_hdiWpaStaCallbackObj->OnEventGroupStarted = NULL;
-    g_hdiWpaStaCallbackObj->OnEventGroupRemoved = NULL;
-    g_hdiWpaStaCallbackObj->OnEventProvisionDiscoveryCompleted = NULL;
-    g_hdiWpaStaCallbackObj->OnEventFindStopped = NULL;
-    g_hdiWpaStaCallbackObj->OnEventServDiscReq = NULL;
-    g_hdiWpaStaCallbackObj->OnEventServDiscResp = NULL;
-    g_hdiWpaStaCallbackObj->OnEventStaConnectState = NULL;
-    g_hdiWpaStaCallbackObj->OnEventIfaceCreated = NULL;
-    g_hdiWpaStaCallbackObj->GetVersion = NULL;
-    g_hdiWpaStaCallbackObj->AsObject = NULL;
     g_hdiWpaStaCallbackObj->OnEventStaNotify = callback->OnEventStaNotify;
-    g_hdiWpaStaCallbackObj->OnEventVendorCb = NULL;
-
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaStaEventCallback3 success.");
     return WIFI_HAL_OPT_OK;
@@ -928,4 +909,11 @@ WifiErrorNo HdiWpaStaGetPskPassphrase(const char *ifName, char *psk, uint32_t ps
     LOGI("GetPskPassphrase success.");
     return WIFI_HAL_OPT_OK;
 }
+
+WifiErrorNo HdiSetNativeProcessCallback(void (*callback)(int))
+{
+    LOGI("%{public}s enter", __func__);
+    return SetNativeProcessCallback(callback);
+}
+
 #endif

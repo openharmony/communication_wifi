@@ -53,7 +53,7 @@ constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
-#define PORTAL_ACTION "ohos.want.action.viewData"
+#define PORTAL_ACTION "ohos.want.action.awc"
 #define PORTAL_ENTITY "entity.browser.hbct"
 #define BROWSER_BUNDLE "com.huawei.hmos.browser"
 #define SETTINGS_BUNDLE "com.huawei.hmos.settings"
@@ -3199,7 +3199,6 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     want.AddEntity(PORTAL_ENTITY);
     want.SetBundle(BROWSER_BUNDLE);
     want.SetParam("netId", netId);
-    want.SetParam("ohos.ability.params.showDefaultPicker", true);
     WIFI_LOGI("wifi netId is %{public}d", netId);
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
     if (err != ERR_OK) {

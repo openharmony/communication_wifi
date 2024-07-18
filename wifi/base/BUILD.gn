@@ -140,6 +140,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
+    defines = []
 
     external_deps = [
       "c_utils:utils",
@@ -148,6 +149,10 @@ if (defined(ohos_lite)) {
       "openssl:libcrypto_shared",
       "openssl:libssl_shared",
     ]
+    if (wifi_ffrt_enable) {
+      external_deps += [ "ffrt:libffrt" ]
+      defines += [ "WIFI_FFRT_ENABLE" ]
+    }
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
     ldflags = memory_optimization_ldflags
@@ -189,6 +194,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
+    defines = []
 
     external_deps = [
       "c_utils:utils",
@@ -197,6 +203,10 @@ if (defined(ohos_lite)) {
       "openssl:libcrypto_shared",
       "openssl:libssl_shared",
     ]
+    if (wifi_ffrt_enable) {
+      external_deps += [ "ffrt:libffrt" ]
+      defines += [ "WIFI_FFRT_ENABLE" ]
+    }
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
     ldflags = memory_optimization_ldflags

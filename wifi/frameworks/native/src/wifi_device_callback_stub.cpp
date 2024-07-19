@@ -20,7 +20,7 @@
 #include "wifi_msg.h"
 #include "wifi_errcode.h"
 #include "wifi_common_util.h"
-
+ 
 DEFINE_WIFILOG_LABEL("WifiDeviceCallBackStub");
 namespace OHOS {
 namespace Wifi {

@@ -119,7 +119,7 @@ void SoftapManagerMachine::DefaultState::GoOutState()
     WIFI_LOGE("DefaultState GoOutState function.\n");
 }
 
-bool SoftapManagerMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
+bool SoftapManagerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr || pSoftapManagerMachine == nullptr) {
         return false;
@@ -145,7 +145,7 @@ void SoftapManagerMachine::IdleState::GoOutState()
     WIFI_LOGE("IdleState GoOutState function.\n");
 }
 
-bool SoftapManagerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg)
+bool SoftapManagerMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -164,7 +164,7 @@ bool SoftapManagerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg)
     return true;
 }
 
-void SoftapManagerMachine::IdleState::HandleStartInIdleState(InternalMessage *msg)
+void SoftapManagerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr msg)
 {
     mid = msg->GetParam2();
     ErrCode ret = pSoftapManagerMachine->AutoStartApService(mid);
@@ -192,7 +192,7 @@ void SoftapManagerMachine::StartedState::GoOutState()
     WIFI_LOGE("StartedState GoOutState function.\n");
 }
 
-bool SoftapManagerMachine::StartedState::ExecuteStateMsg(InternalMessage *msg)
+bool SoftapManagerMachine::StartedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;

@@ -148,7 +148,7 @@ void SelfCureStateMachine::DefaultState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -242,7 +242,7 @@ void SelfCureStateMachine::ConnectedMonitorState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::ConnectedMonitorState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::ConnectedMonitorState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -306,7 +306,7 @@ void SelfCureStateMachine::ConnectedMonitorState::TransitionToSelfCureState(int 
     pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pInternetSelfCureState);
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleResetupSelfCure(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleResetupSelfCure(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleResetupSelfCure.");
     if (msg == nullptr) {
@@ -317,7 +317,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleResetupSelfCure(Internal
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandlePeriodicArpDetection(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandlePeriodicArpDetection(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandlePeriodicArpDetection.");
     if (msg == nullptr) {
@@ -328,7 +328,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandlePeriodicArpDetection(Int
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkConnect(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkConnect(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleNetworkConnect.");
     if (msg == nullptr) {
@@ -339,7 +339,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkConnect(InternalM
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkDisconnect(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkDisconnect(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleNetworkDisconnect.");
     if (msg == nullptr) {
@@ -352,7 +352,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkDisconnect(Intern
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleRssiLevelChange(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleRssiLevelChange(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleRssiLevelChange.");
     if (msg == nullptr) {
@@ -363,7 +363,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleRssiLevelChange(Internal
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleArpDetectionFailed(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleArpDetectionFailed(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleArpDetectionFailed.");
     if (pSelfCureStateMachine->ShouldTransToWifi6SelfCure(msg, lastConnectedBssid)) {
@@ -437,7 +437,7 @@ void SelfCureStateMachine::ConnectedMonitorState::RequestReassocWithFactoryMac()
     TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_RAND_MAC);
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessagePtr msg)
 {
     pSelfCureStateMachine->selfCureOnGoing = true;
     if (pSelfCureStateMachine->IsHttpReachable()) {
@@ -452,7 +452,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
     }
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
     WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
     if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
@@ -497,7 +497,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
     TransitionToSelfCureState(pSelfCureStateMachine->selfCureReason);
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("msg is nullptr.");
@@ -511,7 +511,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(Internal
         INTERNET_STATUS_DETECT_INTERVAL_MS);
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleGatewayChanged(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleGatewayChanged(InternalMessagePtr msg)
 {
     WIFI_LOGI("enter HandleGatewayChanged");
     if (msg == nullptr) {
@@ -558,7 +558,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -586,7 +586,7 @@ bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMes
     return ret;
 }
 
-void SelfCureStateMachine::DisconnectedMonitorState::HandleConnectFailed(InternalMessage *msg)
+void SelfCureStateMachine::DisconnectedMonitorState::HandleConnectFailed(InternalMessagePtr msg)
 {
     WIFI_LOGI("enter HandleConnectFailed");
     if (msg == nullptr) {
@@ -626,7 +626,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleConnectFailed(Interna
     }
 }
 
-void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(InternalMessage *msg)
+void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("msg is nullptr.");
@@ -677,7 +677,7 @@ void SelfCureStateMachine::ConnectionSelfCureState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::ConnectionSelfCureState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::ConnectionSelfCureState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -757,7 +757,7 @@ void SelfCureStateMachine::InternetSelfCureState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::InternetSelfCureState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::InternetSelfCureState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -798,7 +798,7 @@ int SelfCureStateMachine::InternetSelfCureState::InitSelfCureIssHandleMap()
     return WIFI_OPT_SUCCESS;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete(InternalMessagePtr msg)
 {
     WIFI_LOGI("enter HandleRandMacSelfCureComplete.");
     if (msg == nullptr) {
@@ -819,7 +819,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete(
     HandleSelfCureFailedForRandMacReassoc();
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleInternetFailedSelfCure(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleInternetFailedSelfCure(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleInternetFailedSelfCure.");
     if (msg == nullptr) {
@@ -833,7 +833,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleInternetFailedSelfCure(I
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureWifiLink(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureWifiLink(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleSelfCureWifiLink.");
     if (msg == nullptr) {
@@ -847,7 +847,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureWifiLink(Interna
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleNetworkDisconnected(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleNetworkDisconnected(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleNetworkDisconnected.");
     if (msg == nullptr) {
@@ -859,7 +859,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleNetworkDisconnected(Inte
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecovery(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecovery(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleInternetRecovery.");
     if (msg == nullptr) {
@@ -872,7 +872,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecovery(Interna
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleRssiChangedEvent(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleRssiChangedEvent(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleRssiChangedEvent.");
     if (msg == nullptr) {
@@ -884,7 +884,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleRssiChangedEvent(Interna
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleP2pDisconnected(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleP2pDisconnected(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleP2pDisconnected.");
     if (msg == nullptr) {
@@ -895,7 +895,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleP2pDisconnected(Internal
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandlePeriodicArpDetecte(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandlePeriodicArpDetecte(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandlePeriodicArpDetecte.");
     if (msg == nullptr) {
@@ -906,7 +906,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandlePeriodicArpDetecte(Inter
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableRecv(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableRecv(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleHttpReachableRecv.");
     if (msg == nullptr) {
@@ -919,7 +919,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableRecv(Intern
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleArpFailedDetected(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleArpFailedDetected(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleArpFailedDetected.");
     if (pSelfCureStateMachine->ShouldTransToWifi6SelfCure(msg, currentBssid)) {
@@ -1185,7 +1185,7 @@ bool SelfCureStateMachine::InternetSelfCureState::IsNeedMultiGatewaySelfcure()
     return pSelfCureStateMachine->IfMultiGateway();
 }
 
-void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(InternalMessagePtr msg)
 {
     WIFI_LOGI("begin to self cure for internet access: multi gateway");
     if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
@@ -1572,7 +1572,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::Wifi6SelfCureState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::Wifi6SelfCureState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -1612,7 +1612,7 @@ bool SelfCureStateMachine::Wifi6SelfCureState::ExecuteStateMsg(InternalMessage *
     return ret;
 }
 
-void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithHtcArpDetect(InternalMessage *msg)
+void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithHtcArpDetect(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
@@ -1640,7 +1640,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithHtcArpDetect(Int
     }
 }
 
-void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithoutHtcArpDetect(InternalMessage *msg)
+void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithoutHtcArpDetect(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
@@ -1672,7 +1672,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithoutHtcArpDetect(
     }
 }
 
-void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(InternalMessage *msg)
+void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
@@ -1698,7 +1698,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(Interna
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_PERIODIC_ARP_DETECTED);
 }
 
-void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(InternalMessage *msg)
+void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
@@ -1754,7 +1754,7 @@ void SelfCureStateMachine::NoInternetState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -2353,7 +2353,7 @@ void SelfCureStateMachine::PeriodicArpDetection()
     MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
 }
 
-bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessage *msg, std::string currConnectedBssid)
+bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessagePtr msg, std::string currConnectedBssid)
 {
     WIFI_LOGI("enter ShouldTransToWifi6SelfCure");
     if (currConnectedBssid.empty()) {

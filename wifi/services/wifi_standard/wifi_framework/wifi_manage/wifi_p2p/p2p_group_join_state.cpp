@@ -40,7 +40,7 @@ void P2pGroupJoinState::GoOutState()
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT));
 }
 
-bool P2pGroupJoinState::ExecuteStateMsg(InternalMessage *msg)
+bool P2pGroupJoinState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT: {

@@ -35,7 +35,7 @@ void MockScanStateMachine::SendMessage(int what, int arg1, int arg2)
         arg1, arg2);
 }
 
-void MockScanStateMachine::SendMessage(InternalMessage *msg)
+void MockScanStateMachine::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;
@@ -56,13 +56,13 @@ void MockScanStateMachine::StopTimer(int timerName)
     WIFI_LOGD("Enter MockScanStateMachine::StopTimer");
 }
 
-InternalMessage *MockScanStateMachine::CreateMessage(int msgName)
+InternalMessagePtr MockScanStateMachine::CreateMessage(int msgName)
 {
     WIFI_LOGD("Enter MockScanStateMachine::CreateMessage");
     return nullptr;
 }
 
-InternalMessage *MockScanStateMachine::CreateMessage(int msgName, int param1)
+InternalMessagePtr MockScanStateMachine::CreateMessage(int msgName, int param1)
 {
     WIFI_LOGD("Enter MockScanStateMachine::CreateMessage");
     return nullptr;

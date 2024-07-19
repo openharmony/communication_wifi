@@ -40,14 +40,14 @@ public:
         ~IdleState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
-        void HandleSwitchToConnectMode(InternalMessage *msg);
-        void HandleSwitchToScanOnlyMode(InternalMessage *msg);
-        void HandleStartInIdleState(InternalMessage *msg);
-        void HandleSwitchToSemiActiveMode(InternalMessage *msg);
+        void HandleSwitchToConnectMode(InternalMessagePtr msg);
+        void HandleSwitchToScanOnlyMode(InternalMessagePtr msg);
+        void HandleStartInIdleState(InternalMessagePtr msg);
+        void HandleSwitchToSemiActiveMode(InternalMessagePtr msg);
     };
 
     class DefaultState : public State {
@@ -56,7 +56,7 @@ public:
         ~DefaultState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
@@ -68,7 +68,7 @@ public:
         ~ConnectState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
@@ -82,7 +82,7 @@ public:
         ~ScanonlyState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
@@ -96,7 +96,7 @@ public:
         ~SemiActiveState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         ConcreteMangerMachine *pConcreteMangerMachine;
@@ -142,8 +142,8 @@ private:
 #ifdef FEATURE_SELF_CURE_SUPPORT
     static ErrCode StartSelfCureService(int instId);
 #endif
-    bool HandleCommonMessage(InternalMessage *msg);
-    void checkAndContinueToStopWifi(InternalMessage *msg);
+    bool HandleCommonMessage(InternalMessagePtr msg);
+    void checkAndContinueToStopWifi(InternalMessagePtr msg);
     void HandleStaStop();
     void HandleStaStart();
     void HandleStaSemiActive();

@@ -205,7 +205,7 @@ public:
 
     void DealApRoamingStateTimeoutTest()
     {
-        InternalMessage *msg = nullptr;
+        InternalMessagePtr msg = nullptr;
         pStaStateMachine->DealApRoamingStateTimeout(msg);
     }
 

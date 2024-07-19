@@ -37,7 +37,7 @@ void ApRootState::GoOutState()
     WIFI_LOGI("Instance %{public}d %{public}s  GoOutState.", m_id, GetStateName().c_str());
 }
 
-bool ApRootState::ExecuteStateMsg(InternalMessage *msg)
+bool ApRootState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("fatal error!");

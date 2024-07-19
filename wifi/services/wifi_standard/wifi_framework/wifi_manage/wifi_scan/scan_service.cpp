@@ -400,7 +400,7 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
         return false;
     }
     /* Construct a message. */
-    InternalMessage *interMessage =
+    InternalMessagePtr interMessage =
         pScanStateMachine->CreateMessage(static_cast<int>(CMD_START_COMMON_SCAN), requestIndex);
     if (interMessage == nullptr) {
         std::unique_lock<std::mutex> lock(scanConfigMapMutex);
@@ -466,7 +466,7 @@ bool ScanService::GetBandFreqs(ScanBandType band, std::vector<int> &freqs)
     }
 }
 
-bool ScanService::AddScanMessageBody(InternalMessage *interMessage, const InterScanConfig &interConfig)
+bool ScanService::AddScanMessageBody(InternalMessagePtr interMessage, const InterScanConfig &interConfig)
 {
     WIFI_LOGI("Enter AddScanMessageBody.\n");
 
@@ -864,7 +864,7 @@ bool ScanService::PnoScan(const PnoScanConfig &pnoScanConfig, const InterScanCon
         return false;
     }
     /* Construct a message. */
-    InternalMessage *interMessage = pScanStateMachine->CreateMessage(CMD_START_PNO_SCAN);
+    InternalMessagePtr interMessage = pScanStateMachine->CreateMessage(CMD_START_PNO_SCAN);
     if (interMessage == nullptr) {
         WIFI_LOGE("CreateMessage failed.\n");
         return false;
@@ -894,7 +894,7 @@ bool ScanService::PnoScan(const PnoScanConfig &pnoScanConfig, const InterScanCon
     return true;
 }
 
-bool ScanService::AddPnoScanMessageBody(InternalMessage *interMessage, const PnoScanConfig &pnoScanConfig)
+bool ScanService::AddPnoScanMessageBody(InternalMessagePtr interMessage, const PnoScanConfig &pnoScanConfig)
 {
     WIFI_LOGI("Enter AddPnoScanMessageBody.\n");
 
@@ -2391,7 +2391,7 @@ ErrCode ScanService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(con
         return WIFI_OPT_SUCCESS;
     }
     WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
-    InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    InternalMessagePtr msg = m_stateMachineObj.CreateMessage();
     CHECK_NULL_AND_RETURN(msg, WIFI_OPT_FAILED);
     msg->SetMessageName(static_cast<int>(SCAN_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(wifiCountryCode);

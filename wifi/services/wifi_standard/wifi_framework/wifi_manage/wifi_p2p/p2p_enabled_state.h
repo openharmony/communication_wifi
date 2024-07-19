@@ -61,7 +61,7 @@ public:
      * @param msg - Message object pointer
      * @return - bool true:success   false:fail
      */
-    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
 private:
     /**
@@ -90,118 +90,118 @@ private:
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDisable(InternalMessage &msg) const;
+    virtual bool ProcessCmdDisable(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the start listen command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdStartListen(InternalMessage &msg) const;
+    virtual bool ProcessCmdStartListen(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the stop listen command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdStopListen(InternalMessage &msg) const;
+    virtual bool ProcessCmdStopListen(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the discover peer command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDiscPeer(InternalMessage &msg) const;
+    virtual bool ProcessCmdDiscPeer(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the stop discover peer command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdStopDiscPeer(InternalMessage &msg) const;
+    virtual bool ProcessCmdStopDiscPeer(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the device found message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessDeviceFoundEvt(InternalMessage &msg) const;
+    virtual bool ProcessDeviceFoundEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the device found message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessPriDeviceFoundEvt(InternalMessage &msg) const;
+    virtual bool ProcessPriDeviceFoundEvt(InternalMessagePtr msg) const;
     /**
      * @Description Process the device lost message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessDeviceLostEvt(InternalMessage &msg) const;
+    virtual bool ProcessDeviceLostEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the find stopped message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessFindStoppedEvt(InternalMessage &msg) const;
+    virtual bool ProcessFindStoppedEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the delete group command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDeleteGroup(InternalMessage &msg) const;
+    virtual bool ProcessCmdDeleteGroup(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the add local service command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdAddLocalService(InternalMessage &msg) const;
+    virtual bool ProcessCmdAddLocalService(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the delete local service command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDelLocalService(InternalMessage &msg) const;
+    virtual bool ProcessCmdDelLocalService(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the discover services command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDiscServices(InternalMessage &msg) const;
+    virtual bool ProcessCmdDiscServices(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the stop discover services command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdStopDiscServices(InternalMessage &msg) const;
+    virtual bool ProcessCmdStopDiscServices(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the request service command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdRequestService(InternalMessage &msg) const;
+    virtual bool ProcessCmdRequestService(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the service discover request message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessServiceDiscReqEvt(InternalMessage &msg) const;
+    virtual bool ProcessServiceDiscReqEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the service discover response message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessServiceDiscRspEvt(InternalMessage &msg) const;
+    virtual bool ProcessServiceDiscRspEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the exception timeout message received by the state machine.
@@ -209,7 +209,7 @@ private:
      * @return true - handle
      * @return false - not handle
      */
-    virtual bool ProcessExceptionTimeOut(InternalMessage &msg) const;
+    virtual bool ProcessExceptionTimeOut(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the set device name command received by the state machine.
@@ -218,7 +218,7 @@ private:
      * @return true - handle
      * @return false - not handle
      */
-    virtual bool ProcessCmdSetDeviceName(InternalMessage &msg) const;
+    virtual bool ProcessCmdSetDeviceName(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the set WFD Info command received by the state machine.
@@ -227,30 +227,30 @@ private:
      * @return true - handle
      * @return false - not handle
      */
-    virtual bool ProcessCmdSetWfdInfo(InternalMessage &msg) const;
+    virtual bool ProcessCmdSetWfdInfo(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the cancel connect command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdCancelConnect(InternalMessage &msg) const;
+    virtual bool ProcessCmdCancelConnect(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the p2p connect failed command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdConnectFailed(InternalMessage &msg) const;
+    virtual bool ProcessCmdConnectFailed(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the p2p discover device command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDiscoverPeers(InternalMessage &msg) const;
+    virtual bool ProcessCmdDiscoverPeers(InternalMessagePtr msg) const;
 private:
-    using ProcessFun = bool (P2pEnabledState::*)(InternalMessage &msg) const;
+    using ProcessFun = bool (P2pEnabledState::*)(InternalMessagePtr msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

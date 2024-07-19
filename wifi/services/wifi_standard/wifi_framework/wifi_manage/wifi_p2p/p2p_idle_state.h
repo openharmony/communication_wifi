@@ -65,7 +65,7 @@ public:
      * @param msg - Message object pointer
      * @return - bool true:success   false:fail
      */
-    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
 private:
     /**
@@ -80,106 +80,106 @@ private:
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdStopDiscPeer(InternalMessage &msg) const;
+    virtual bool ProcessCmdStopDiscPeer(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the connect command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdConnect(InternalMessage &msg) const;
+    virtual bool ProcessCmdConnect(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the provision discover pbc request message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessProvDiscPbcReqEvt(InternalMessage &msg) const;
+    virtual bool ProcessProvDiscPbcReqEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the provision discover enter pin message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessProvDiscEnterPinEvt(InternalMessage &msg) const;
+    virtual bool ProcessProvDiscEnterPinEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the negotiation request message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessNegotReqEvt(InternalMessage &msg) const;
+    virtual bool ProcessNegotReqEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the provision discover show pin message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessProvDiscShowPinEvt(InternalMessage &msg) const;
+    virtual bool ProcessProvDiscShowPinEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the create group command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdCreateGroup(InternalMessage &msg) const;
+    virtual bool ProcessCmdCreateGroup(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the remove group command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdRemoveGroup(InternalMessage &msg) const;
+    virtual bool ProcessCmdRemoveGroup(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the delete group command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDeleteGroup(InternalMessage &msg) const;
+    virtual bool ProcessCmdDeleteGroup(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the group started message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessGroupStartedEvt(InternalMessage &msg) const;
+    virtual bool ProcessGroupStartedEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the invitation received message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessInvitationReceivedEvt(InternalMessage &msg) const;
+    virtual bool ProcessInvitationReceivedEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the hid2d create group command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdHid2dCreateGroup(InternalMessage &msg) const;
+    virtual bool ProcessCmdHid2dCreateGroup(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the hid2d connect command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdHid2dConnect(InternalMessage &msg) const;
+    virtual bool ProcessCmdHid2dConnect(InternalMessagePtr msg) const;
 
     /**
      * @Description Process p2p interface created event received by the state machine
      * @param msg - Message body sent by the state machine
      * @param @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessP2pIfaceCreatedEvt(InternalMessage &msg) const;
+    virtual bool ProcessP2pIfaceCreatedEvt(InternalMessagePtr msg) const;
 
-    virtual bool ProcessRemoveDevice(InternalMessage &msg) const;
+    virtual bool ProcessRemoveDevice(InternalMessagePtr msg) const;
 
-    virtual bool RetryConnect(InternalMessage &msg) const;
+    virtual bool RetryConnect(InternalMessagePtr msg) const;
 
-    virtual bool ProcessCmdDisableRandomMac(InternalMessage &msg) const;
+    virtual bool ProcessCmdDisableRandomMac(InternalMessagePtr msg) const;
 private:
-    using ProcessFun = bool (P2pIdleState::*)(InternalMessage &msg) const;
+    using ProcessFun = bool (P2pIdleState::*)(InternalMessagePtr msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

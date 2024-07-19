@@ -120,7 +120,7 @@ void Handler::GetAndDistributeMessage()
     }
 
     while (isRunning) {
-        InternalMessage *msg = pMyQueue->GetNextMessage();
+        InternalMessagePtr msg = pMyQueue->GetNextMessage();
         if (msg == nullptr) {
             LOGE("GetNextMessage null.\n");
             continue;
@@ -136,7 +136,7 @@ void Handler::GetAndDistributeMessage()
 }
 #endif
 
-void Handler::SendMessage(InternalMessage *msg)
+void Handler::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         LOGE("%{public}s SendMessage: msg is null.", mThreadName.c_str());
@@ -147,7 +147,7 @@ void Handler::SendMessage(InternalMessage *msg)
     return;
 }
 
-void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
+void Handler::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
 {
     if (msg == nullptr) {
         LOGE("%{public}s MessageExecutedLater: msg is null.", mThreadName.c_str());
@@ -188,7 +188,7 @@ void Handler::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
     return;
 }
 
-void Handler::MessageExecutedAtTime(InternalMessage *msg, int64_t execTime)
+void Handler::MessageExecutedAtTime(InternalMessagePtr msg, int64_t execTime)
 {
     if (msg == nullptr) {
         LOGE("%{public}s MessageExecutedAtTime: msg is null.", mThreadName.c_str());
@@ -222,7 +222,7 @@ void Handler::MessageExecutedAtTime(InternalMessage *msg, int64_t execTime)
     return;
 }
 
-void Handler::PlaceMessageTopOfQueue(InternalMessage *msg)
+void Handler::PlaceMessageTopOfQueue(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         LOGE("%{public}s PlaceMessageTopOfQueue: msg is null.", mThreadName.c_str());
@@ -270,7 +270,7 @@ void Handler::DeleteMessageFromQueue(int messageName)
     return;
 }
 #ifdef OHOS_ARCH_LITE
-void Handler::DistributeMessage(InternalMessage *msg)
+void Handler::DistributeMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;

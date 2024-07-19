@@ -55,7 +55,7 @@ public:
      * @param msg - message to be processed
      * @return HANDLED：Processed successfully
      */
-    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
 private:
     int m_id;

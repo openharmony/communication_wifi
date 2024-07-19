@@ -35,7 +35,7 @@ void MockStaStateMachine::SendMessage(int msgName, int param1, int param2)
         msgName, param1, param2);
 }
 
-void MockStaStateMachine::SendMessage(InternalMessage *msg)
+void MockStaStateMachine::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;

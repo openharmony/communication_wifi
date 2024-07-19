@@ -73,12 +73,12 @@ void P2pGroupOperatingState::Init()
         &P2pGroupOperatingState::ProcessCmdHid2dCreateGroup));
 }
 
-bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) const
+bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg) const
 {
     WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     const int minValidNetworkid = 0;
     WifiP2pConfigInternal config;
-    msg.GetMessageObj(config);
+    msg->GetMessageObj(config);
     int freq = p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
     int netId = config.GetNetId();
     if (netId >= minValidNetworkid) {
@@ -130,11 +130,11 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessage &msg) c
     return EXECUTED;
 }
 
-bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) const
+bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg) const
 {
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
     WifiP2pGroupInfo group;
-    msg.GetMessageObj(group);
+    msg->GetMessageObj(group);
     WIFI_LOGI("P2P_EVENT_GROUP_STARTED create group interface name : %{private}s, network name : %{private}s, owner "
               "address : %{private}s",
         group.GetInterface().c_str(), group.GetGroupName().c_str(), group.GetOwner().GetDeviceAddress().c_str());
@@ -188,16 +188,16 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessage &msg) 
     return EXECUTED;
 }
 
-bool P2pGroupOperatingState::ProcessCreateGroupTimeOut(const InternalMessage &msg) const
+bool P2pGroupOperatingState::ProcessCreateGroupTimeOut(const InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv event: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv event: %{public}d", msg->GetMessageName());
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }
 
-bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) const
+bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv group remove event: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv group remove event: %{public}d", msg->GetMessageName());
     if (groupManager.GetCurrentGroup().IsPersistent()) {
         groupManager.StashGroups();
         WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
@@ -231,21 +231,21 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessage &msg) 
     return EXECUTED;
 }
 
-bool P2pGroupOperatingState::ProcessCmdDisable(const InternalMessage &msg) const
+bool P2pGroupOperatingState::ProcessCmdDisable(const InternalMessagePtr msg) const
 {
     /**
      * Before disabling P2P, you need to remove the group.
      */
-    p2pStateMachine.DelayMessage(&msg);
+    p2pStateMachine.DelayMessage(msg);
     return ProcessCmdRemoveGroup(msg);
 }
 
-bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) const
+bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg) const
 {
     /**
      * Removes a current setup group.
      */
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
     auto dhcpFunc = [=]() {
@@ -298,7 +298,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessage &msg) c
     return EXECUTED;
 }
 
-bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessage &msg) const
+bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessagePtr msg) const
 {
     /**
      * Delete a group from the group list.
@@ -307,7 +307,7 @@ bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessage &msg) c
     WifiErrorNo ret;
     WifiP2pGroupInfo group;
     WifiP2pGroupInfo currentGroup = groupManager.GetCurrentGroup();
-    msg.GetMessageObj(group);
+    msg->GetMessageObj(group);
     int networkId = group.GetNetworkId();
     /**
      * If the current group is to be deleted, remove the current group first.
@@ -336,14 +336,14 @@ bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessage &msg) c
     return EXECUTED;
 }
 
-bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessage &msg) const
+bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr msg) const
 {
     WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     int freq = 0;
     int freqEnhance = 0;
     bool isFreqEnhance = false;
     std::pair<int, FreqType> info;
-    msg.GetMessageObj(info);
+    msg->GetMessageObj(info);
     freq = info.first;
     isFreqEnhance = (info.second == FreqType::FREQUENCY_160M);
     WIFI_LOGI("Create a hid2d group, frequency: %{public}d, isFreqEnhance: %{public}d.", freq, isFreqEnhance);
@@ -388,7 +388,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessage &m
     return EXECUTED;
 }
 
-bool P2pGroupOperatingState::ExecuteStateMsg(InternalMessage *msg)
+bool P2pGroupOperatingState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("fatal error!");
@@ -399,7 +399,7 @@ bool P2pGroupOperatingState::ExecuteStateMsg(InternalMessage *msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(*msg)) {
+    if ((this->*(iter->second))(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;

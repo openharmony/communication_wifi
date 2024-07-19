@@ -35,7 +35,7 @@ void P2pGroupFormationState::GoOutState()
     WIFI_LOGI("             GoOutState");
 }
 
-bool P2pGroupFormationState::ExecuteStateMsg(InternalMessage *msg)
+bool P2pGroupFormationState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS: {

@@ -294,7 +294,6 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         info.SetDeviceAddress((readStr != nullptr) ? readStr : "");
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
         std::vector<std::string> queryList;
-        readStr = data.ReadCString();
         while ((readStr = data.ReadCString()) != nullptr) {
             std::string queryStr = readStr;
             queryList.push_back(queryStr);

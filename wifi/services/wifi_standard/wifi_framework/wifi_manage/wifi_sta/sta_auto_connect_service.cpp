@@ -18,7 +18,6 @@
 #include "wifi_config_center.h"
 #include "wifi_common_util.h"
 #include "block_connect_service.h"
-#include "wifi_notification_util.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -94,9 +93,6 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         if (networkSelectionResult.wifiDeviceConfig.isPortal &&
             networkSelectionResult.wifiDeviceConfig.noInternetAccess) {
             WIFI_LOGE("this netwrok is portal, AutoSelectDevice return fail.");
-            WifiNotificationUtil::GetInstance().PublishWifiNotification(
-                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, networkSelectionResult.wifiDeviceConfig.ssid,
-                WifiNotificationStatus::WIFI_PORTAL_FOUND);
             return;
         }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;

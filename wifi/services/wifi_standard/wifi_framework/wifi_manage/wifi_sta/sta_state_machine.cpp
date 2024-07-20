@@ -2855,7 +2855,6 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessagePtr msg)
 
 int StaStateMachine::RegisterCallBack()
 {
-    clientCallBack.OnDhcpOfferReport = DhcpResultNotify::OnDhcpOfferResult;
     clientCallBack.OnIpSuccessChanged = DhcpResultNotify::OnSuccess;
     clientCallBack.OnIpFailChanged = DhcpResultNotify::OnFailed;
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName();
@@ -2864,6 +2863,8 @@ int StaStateMachine::RegisterCallBack()
         WIFI_LOGE("RegisterDhcpClientCallBack failed. dhcpRet=%{public}d", dhcpRet);
         return DHCP_FAILED;
     }
+    dhcpClientReport_.OnDhcpClientReport = DhcpResultNotify::OnDhcpOfferResult;
+    RegisterDhcpClientReportCallBack(ifname.c_str(), &dhcpClientReport_);
     LOGI("RegisterDhcpClientCallBack ok");
     return DHCP_SUCCESS;
 }

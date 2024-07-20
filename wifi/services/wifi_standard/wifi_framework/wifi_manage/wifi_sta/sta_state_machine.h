@@ -1212,6 +1212,7 @@ private:
     WifiLinkedInfo lastLinkedInfo;
     DhcpResultNotify *pDhcpResultNotify;
     ClientCallBack clientCallBack;
+    DhcpClientReport dhcpClientReport_;
     WifiPortalConf mUrlInfo;
     RootState *pRootState;
     InitState *pInitState;

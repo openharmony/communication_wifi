@@ -99,7 +99,23 @@ public:
     virtual void SetWifiToggledState(bool state) = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual void SetThreadStatusFlag(bool state) = 0;
-    
+    virtual WifiOprMidState GetScanMidState(int instId = 0) = 0;
+    virtual void SetScanMidState(WifiOprMidState state, int instId = 0) = 0;
+    virtual bool SetScanMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0) = 0;
+    virtual WifiOprMidState GetWifiMidState(int instId = 0) = 0;
+    virtual void SetWifiMidState(WifiOprMidState state, int instId = 0) = 0;
+    virtual bool SetWifiMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0) = 0;
+    virtual WifiOprMidState GetP2pMidState() = 0;
+    virtual void SetP2pMidState(WifiOprMidState state) = 0;
+    virtual bool SetP2pMidState(WifiOprMidState expState, WifiOprMidState state) = 0;
+    virtual WifiOprMidState GetWifiScanOnlyMidState(int instId = 0) = 0;
+    virtual bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0) = 0;
+    virtual void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0) = 0;
+    virtual WifiOprMidState GetApMidState(int id = 0) = 0;
+    virtual bool SetApMidState(WifiOprMidState expState, WifiOprMidState state, int id = 0) = 0;
+    virtual void SetApMidState(WifiOprMidState state, int id = 0) = 0;
+    virtual int GetAirplaneModeState() const = 0;
+    virtual int GetHotspotState(int id = 0) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -179,6 +195,23 @@ public:
     MOCK_METHOD1(SetWifiToggledState, void(bool state));
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_METHOD1(SetThreadStatusFlag, void(bool state));
+    MOCK_METHOD1(GetScanMidState, WifiOprMidState(int instId));
+    MOCK_METHOD2(SetScanMidState, void(WifiOprMidState state, int instId));
+    MOCK_METHOD3(SetScanMidState, bool(WifiOprMidState expState, WifiOprMidState state, int instId));
+    MOCK_METHOD1(GetWifiMidState, WifiOprMidState(int instId));
+    MOCK_METHOD2(SetWifiMidState, void(WifiOprMidState state, int instId));
+    MOCK_METHOD3(SetWifiMidState, bool(WifiOprMidState expState, WifiOprMidState state, int instId));
+    MOCK_METHOD0(GetP2pMidState, WifiOprMidState(void));
+    MOCK_METHOD1(SetP2pMidState, void(WifiOprMidState state));
+    MOCK_METHOD2(SetP2pMidState, bool(WifiOprMidState expState, WifiOprMidState state));
+    MOCK_METHOD1(GetWifiScanOnlyMidState, WifiOprMidState(int instId));
+    MOCK_METHOD3(SetWifiScanOnlyMidState, bool(WifiOprMidState expState, WifiOprMidState state, int instId));
+    MOCK_METHOD2(SetWifiScanOnlyMidState, void(WifiOprMidState state, int instId));
+    MOCK_METHOD1(GetApMidState, WifiOprMidState(int id));
+    MOCK_METHOD3(SetApMidState, bool(WifiOprMidState expState, WifiOprMidState state, int id));
+    MOCK_METHOD2(SetApMidState, void(WifiOprMidState state, int id));
+    MOCK_CONST_METHOD0(GetAirplaneModeState, int(void));
+    MOCK_METHOD1(GetHotspotState, int(int id));
 };
 }  // namespace OHOS
 }  // namespace Wifi

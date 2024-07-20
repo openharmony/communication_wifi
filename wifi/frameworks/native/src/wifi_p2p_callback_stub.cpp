@@ -379,7 +379,7 @@ void WifiP2pCallbackStub::RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &d
     OnP2pGcJoinGroup(info);
 }
 
-bool BluetoothAvrcpCtStub::IsInvalidAttributesSize(int32_t attributesSize)
+bool WifiP2pCallbackStub::IsInvalidAttributesSize(int32_t attributesSize)
 {
     bool ret = false;
     const int32_t COUNT_OF_AVRC_PLAYER_ATTRIBUTE = 255;

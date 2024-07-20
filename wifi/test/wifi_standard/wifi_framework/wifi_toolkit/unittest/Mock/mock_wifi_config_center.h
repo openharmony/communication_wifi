@@ -99,6 +99,7 @@ public:
     virtual void SetWifiToggledState(bool state) = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual void SetThreadStatusFlag(bool state) = 0;
+    
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {

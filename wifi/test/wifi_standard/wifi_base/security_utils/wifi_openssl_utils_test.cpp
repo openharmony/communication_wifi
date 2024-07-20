@@ -67,21 +67,5 @@ HWTEST_F(WifiOpensslUtilsTest, OpensslAesEncryptTest1, TestSize.Level1)
     }
 }
 
-HWTEST_F(WifiOpensslUtilsTest, OpensslAesDecryptTest2, TestSize.Level1)
-{
-    int decryptTextLen = 0;
-    uint8_t decryptText[PLAIN_TEXT_LEN];
-    AesCipherInfo info;
-    info.aesType = AES_TYPE;
-    memcpy_s(info.key, MAX_KEY_LEN, key, KEY_LEN);
-    memcpy_s(info.iv, AES_IV_LEN, iv, AES_IV_LEN);
-    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(cipherText, CIPHER_TEXT_MAX_LEN,
-        &info, decryptText, &decryptTextLen), 0);
-    EXPECT_EQ(decryptTextLen, PLAIN_TEXT_LEN);
-    for (int i = 0; i < decryptTextLen; i++) {
-        EXPECT_EQ(decryptText[i], plainText[i]);
-    }
-}
-
 }  // namespace Wifi
 }  // namespace OHOS

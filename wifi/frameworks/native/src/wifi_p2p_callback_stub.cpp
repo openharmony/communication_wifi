@@ -293,9 +293,15 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         readStr = data.ReadCString();
         info.SetDeviceAddress((readStr != nullptr) ? readStr : "");
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
+        int length = data.ReadInt32();
+        if (length > MAX_SIZE) {
+            WIFI_LOGE("Data was incompletes. Service info length error: %{public}d", length);
+            break;
+        }
         std::vector<std::string> queryList;
-        while ((readStr = data.ReadCString()) != nullptr) {
-            std::string queryStr = readStr;
+        for (int j = 0; j < length; j++) {
+            readStr = data.ReadCString();
+            std::string queryStr = (readStr != nullptr) ? readStr : "";
             queryList.push_back(queryStr);
         }
         info.SetQueryList(queryList);

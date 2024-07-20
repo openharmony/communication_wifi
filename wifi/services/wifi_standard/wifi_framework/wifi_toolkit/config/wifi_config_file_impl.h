@@ -318,6 +318,7 @@ int WifiConfigFileImpl<T>::SaveConfig()
     std::string content;
     {
         std::ostringstream ss;
+        LOGI("Save config:%{public}s size:%{public}d", GetTClassName<T>().c_str(), static_cast<int>(mValues.size()));
         for (std::size_t i = 0; i < mValues.size(); ++i) {
             T &item = mValues[i];
             /*

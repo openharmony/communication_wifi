@@ -48,6 +48,11 @@ constexpr int PROP_FACTORY_RUN_MODE_LEN = 10;
 constexpr int FACTORY_MODE_LEN = 7;
 constexpr const char* FACTORY_RUN_MODE = "const.runmode";
 constexpr const char* FACTORY_MODE = "factory";
+constexpr int PROP_STARTUP_WIFI_ENABLE_LEN = 16;
+constexpr int STARTUP_WIFI_ENABLE_LEN = 4;
+constexpr const char* PROP_STARTUP_WIFI_ENABLE = "const.wifi.startup_wifi_enable";
+constexpr const char* DEFAULT_STARTUP_WIFI_ENABLE = "false";
+constexpr const char* STARTUP_WIFI_ENABLE = "true";
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
@@ -543,6 +548,21 @@ bool IsFactoryMode()
     int errCode = GetParamValue(FACTORY_RUN_MODE, 0, preValue, PROP_FACTORY_RUN_MODE_LEN);
     if (errCode > 0) {
         if (strncmp(preValue, FACTORY_MODE, FACTORY_MODE_LEN) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsStartUpWifiEnableSupport()
+{
+    LOGI("Enter IsStartUpWifiEnableSupport");
+    char preValue[PROP_STARTUP_WIFI_ENABLE_LEN] = {0};
+    int errCode = GetParamValue(PROP_STARTUP_WIFI_ENABLE, DEFAULT_STARTUP_WIFI_ENABLE,
+        preValue, PROP_STARTUP_WIFI_ENABLE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, STARTUP_WIFI_ENABLE, STARTUP_WIFI_ENABLE_LEN) == 0) {
+            LOGI("param startup_wifi_enable is true.");
             return true;
         }
     }

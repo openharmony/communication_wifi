@@ -25,13 +25,9 @@
 #include "wifi_native_define.h"
 #include "wifi_msg.h"
 #include "wifi_config_center.h"
-
-#ifndef UT_TEST
 #include "wifi_log.h"
-#else
+#ifdef UT_TEST
 #define static
-#define LOGI(...)
-#define LOGE(...)
 #endif
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;

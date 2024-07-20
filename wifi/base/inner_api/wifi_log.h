@@ -28,11 +28,19 @@
 #undef LOG_DOMAIN
 #define  LOG_DOMAIN    0xD001560
 
+#ifndef UT_TEST
 #define LOGD(...) HILOG_DEBUG(LOG_CORE, ##__VA_ARGS__)
 #define LOGI(...) HILOG_INFO(LOG_CORE, ##__VA_ARGS__)
 #define LOGW(...) HILOG_WARN(LOG_CORE, ##__VA_ARGS__)
 #define LOGE(...) HILOG_ERROR(LOG_CORE, ##__VA_ARGS__)
 #define LOGF(...) HILOG_FATAL(LOG_CORE, ##__VA_ARGS__)
+#else
+#define LOGD(...)
+#define LOGI(...)
+#define LOGW(...)
+#define LOGE(...)
+#define LOGF(...)
+#endif
 
 #ifndef CHECK_NULL_AND_RETURN
 #define CHECK_NULL_AND_RETURN(ptr, retValue) \

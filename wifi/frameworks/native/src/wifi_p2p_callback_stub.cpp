@@ -86,6 +86,16 @@ int WifiP2pCallbackStub::OnRemoteRequest(
     return 0;
 }
 
+bool WifiP2pCallbackStub::IsInvalidAttributesSize(int32_t attributesSize)
+{
+    bool ret = false;
+    const int32_t COUNT_OF_AVRC_PLAYER_ATTRIBUTE = 255;
+    if (attributesSize > COUNT_OF_AVRC_PLAYER_ATTRIBUTE) {
+        ret =  true;
+    }
+    return ret;
+}
+
 void WifiP2pCallbackStub::RegisterCallBack(const sptr<IWifiP2pCallback> &userCallback)
 {
     std::unique_lock<std::mutex> lock(callBackEventMutex);
@@ -379,15 +389,6 @@ void WifiP2pCallbackStub::RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &d
     OnP2pGcJoinGroup(info);
 }
 
-bool WifiP2pCallbackStub::IsInvalidAttributesSize(int32_t attributesSize)
-{
-    bool ret = false;
-    const int32_t COUNT_OF_AVRC_PLAYER_ATTRIBUTE = 255;
-    if (attributesSize > COUNT_OF_AVRC_PLAYER_ATTRIBUTE) {
-        ret =  true;
-    }
-    return ret;
-}
 
 void WifiP2pCallbackStub::RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {

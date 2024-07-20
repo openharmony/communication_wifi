@@ -379,6 +379,16 @@ void WifiP2pCallbackStub::RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &d
     OnP2pGcJoinGroup(info);
 }
 
+bool BluetoothAvrcpCtStub::IsInvalidAttributesSize(int32_t attributesSize)
+{
+    bool ret = false;
+    const int32_t COUNT_OF_AVRC_PLAYER_ATTRIBUTE = 255;
+    if (attributesSize > COUNT_OF_AVRC_PLAYER_ATTRIBUTE) {
+        ret =  true;
+    }
+    return ret;
+}
+
 void WifiP2pCallbackStub::RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());

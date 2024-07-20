@@ -142,7 +142,7 @@ private:
     void RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pPrivatePeersChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    bool WifiP2pCallbackStub::IsInvalidAttributesSize(int32_t attributesSize);
+    bool IsInvalidAttributesSize(int32_t attributesSize);
 
 private:
     HandleFuncMap handleFuncMap;

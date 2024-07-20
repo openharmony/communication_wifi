@@ -280,6 +280,7 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     const char *readStr = nullptr;
     constexpr int MAX_SIZE = 512;
+    constexpr int MAX_INFO_SIZE = 100;
     std::vector<WifiP2pServiceInfo> srvInfo;
     int size = data.ReadInt32();
     if (size > MAX_SIZE) {
@@ -294,7 +295,7 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         info.SetDeviceAddress((readStr != nullptr) ? readStr : "");
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
         int length = data.ReadInt32();
-        if (length > MAX_SIZE) {
+        if (length > MAX_INFO_SIZE) {
             WIFI_LOGE("Data was incompletes. Service info length error: %{public}d", length);
             break;
         }

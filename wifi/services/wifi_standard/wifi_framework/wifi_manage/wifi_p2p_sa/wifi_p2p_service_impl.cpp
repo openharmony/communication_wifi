@@ -302,8 +302,8 @@ ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
         WIFI_LOGE("StopDiscoverServices:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("StopDiscoverServices:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StopDiscoverServices:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!IsP2pServiceRunning()) {

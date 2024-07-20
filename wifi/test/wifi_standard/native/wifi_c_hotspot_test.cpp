@@ -109,7 +109,7 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsNormal, TestSize.Level1)
 {
     HotspotConfig config;
     config.band = g_mode;
-    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, WIFI_MAX_KEY_LEN-5);
+    memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, WIFI_MAX_KEY_LEN - 5);
     memcpy_s(config.ipAddress, WIFI_MAX_IPV4_LEN, "192.168.1.12", 12);
     config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
     SetHotspotConfig(&config);

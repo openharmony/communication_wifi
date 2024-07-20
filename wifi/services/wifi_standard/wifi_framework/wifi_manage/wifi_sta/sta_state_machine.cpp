@@ -4073,8 +4073,8 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
             /* If not phone hotspot, set .isDataRestricted = 0. */
             std::string strVendor = result->strOptVendor;
             std::string ipAddress = result->strOptClientId;
-            pStaStateMachine->linkedInfo.isDataRestricted = 
-                (strVendor.find("ANDROID_METERED") == std::string::npos && 
+            pStaStateMachine->linkedInfo.isDataRestricted =
+                (strVendor.find("ANDROID_METERED") == std::string::npos &&
                 strVendor.find("OPEN_HARMONY") == std::string::npos) ? 0 : 1;
             if (!pStaStateMachine->linkedInfo.isDataRestricted) {
                 pStaStateMachine->linkedInfo.isDataRestricted =

@@ -61,8 +61,7 @@ enum class WifiCloseServiceCode {
     STA_MSG_STOPED,
 };
 
-struct WifiCloseServiceMsg
-{
+struct WifiCloseServiceMsg {
     WifiCloseServiceCode code;
     int instId;
 };

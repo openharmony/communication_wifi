@@ -402,7 +402,8 @@ void WifiManager::AutoStartServiceThread()
 void WifiManager::InitPidfile()
 {
     char pidFile[DIR_MAX_LENGTH] = {0, };
-    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid", CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
+    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid",
+        CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
     if (n < 0) {
         LOGE("InitPidfile: construct pidFile name failed.");
         return;

@@ -302,6 +302,10 @@ ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
         WIFI_LOGE("StopDiscoverServices:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StopDiscoverServices:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -733,6 +737,10 @@ ErrCode WifiP2pServiceImpl::GetP2pEnableStatus(int &status)
         WIFI_LOGE("GetP2pEnableStatus:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetP2pEnableStatus:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     status = WifiConfigCenter::GetInstance().GetP2pState();
     return WIFI_OPT_SUCCESS;
 }
@@ -762,6 +770,10 @@ ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
     WIFI_LOGI("GetP2pConnectedStatus");
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("GetP2pConnectedStatus:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetP2pConnectedStatus:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!IsP2pServiceRunning()) {

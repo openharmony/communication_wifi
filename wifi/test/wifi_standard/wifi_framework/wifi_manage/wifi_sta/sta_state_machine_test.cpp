@@ -1659,20 +1659,6 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _));
         pStaStateMachine->OnConnectFailed(networkId);
     }
-    void ComparedKeymgmtTest()
-    {
-        std::string scanInfoKeymgmt;
-        std::string deviceKeymgmt;
-        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
-        deviceKeymgmt = "WPA-PSK";
-        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
-        deviceKeymgmt = "WPA-EAP";
-        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
-        deviceKeymgmt = "SAE";
-        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
-        deviceKeymgmt = "NONE";
-        pStaStateMachine->ComparedKeymgmt(scanInfoKeymgmt, deviceKeymgmt);
-    }
 
     void ReUpdateNetLinkInfoTest()
     {
@@ -2995,11 +2981,6 @@ HWTEST_F(StaStateMachineTest, DealConnectionEventSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, OnConnectFailedTest, TestSize.Level1)
 {
     OnConnectFailed();
-}
-
-HWTEST_F(StaStateMachineTest, ComparedKeymgmtTest, TestSize.Level1)
-{
-    ComparedKeymgmtTest();
 }
 
 HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest, TestSize.Level1)

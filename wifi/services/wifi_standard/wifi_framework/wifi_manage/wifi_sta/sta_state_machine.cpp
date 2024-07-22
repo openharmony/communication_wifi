@@ -1844,22 +1844,6 @@ bool StaStateMachine::IsWpa3Transition(std::string ssid) const
     return false;
 }
 
-bool StaStateMachine::ComparedKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt)
-{
-    if (deviceKeymgmt == "WPA-PSK") {
-        return scanInfoKeymgmt.find("PSK") != std::string::npos;
-    } else if (deviceKeymgmt == "WPA-EAP") {
-        return scanInfoKeymgmt.find("EAP") != std::string::npos;
-    } else if (deviceKeymgmt == "SAE") {
-        return scanInfoKeymgmt.find("SAE") != std::string::npos;
-    } else if (deviceKeymgmt == "NONE") {
-        return (scanInfoKeymgmt.find("PSK") == std::string::npos) &&
-               (scanInfoKeymgmt.find("EAP") == std::string::npos) && (scanInfoKeymgmt.find("SAE") == std::string::npos);
-    } else {
-        return false;
-    }
-}
-
 void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, const std::string &bssid,
     WifiStoreRandomMac &randomMacInfo)
 {
@@ -1873,8 +1857,9 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
         std::vector<WifiScanInfo> scanInfoList;
         WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
         for (auto scanInfo : scanInfoList) {
-            if ((deviceConfig.ssid == scanInfo.ssid) &&
-                (ComparedKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
+            std::string deviceKeyMgmt;
+            scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+            if ((deviceConfig.ssid == scanInfo.ssid) && (deviceKeyMgmt == deviceConfig.keyMgmt)) {
                 randomMacInfo.peerBssid = scanInfo.bssid;
                 break;
             }

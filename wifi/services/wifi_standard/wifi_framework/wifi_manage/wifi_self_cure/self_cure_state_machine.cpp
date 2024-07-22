@@ -1258,10 +1258,16 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
     if ((pSelfCureStateMachine->internetUnknown) || (!hasInternetRecently) ||
         (pSelfCureStateMachine->IsSettingsPage())) {
+        pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pNoInternetState);
         return;
     }
-    if ((currentRssi < MIN_VAL_LEVEL_3_5) || pSelfCureStateMachine->IfP2pConnected() ||
-        pSelfCureStateMachine->notAllowSelfcure) {
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService && pEnhanceService->CheckChbaConncted()) {
+        WIFI_LOGE("no need reset");
+        pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pNoInternetState);
+        return;
+    }
+    if ((currentRssi < MIN_VAL_LEVEL_3_5) || pSelfCureStateMachine->IfP2pConnected()) {
         delayedResetSelfCure = true;
         return;
     }
@@ -1498,8 +1504,12 @@ bool SelfCureStateMachine::InternetSelfCureState::HasBeenTested(int cureLevel)
 
 void SelfCureStateMachine::InternetSelfCureState::HandleRssiChanged()
 {
-    if ((currentRssi < MIN_VAL_LEVEL_3_5) && (!pSelfCureStateMachine->IfP2pConnected()) &&
-        (!pSelfCureStateMachine->notAllowSelfcure)) {
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService && pEnhanceService->CheckChbaConncted()) {
+        WIFI_LOGE("no need deal rssi change");
+        return;
+    }
+    if ((currentRssi < MIN_VAL_LEVEL_3_5) && (!pSelfCureStateMachine->IfP2pConnected())) {
         return;
     }
     if (delayedResetSelfCure) {
@@ -1775,6 +1785,10 @@ bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessagePtr m
             ret = EXECUTED;
             pSelfCureStateMachine->SetSelfCureHistoryInfo(INIT_SELFCURE_HISTORY);
             pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
+            break;
+        case WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD:
+            ret = EXECUTED;
+            pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pDisconnectedMonitorState);
             break;
         default:
             WIFI_LOGD("NoInternetState-msgCode=%{public}d not handled.\n", msg->GetMessageName());

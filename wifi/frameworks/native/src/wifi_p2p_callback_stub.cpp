@@ -305,7 +305,7 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
         int length = data.ReadInt32();
         std::vector<std::string> queryList;
-        if(!IsInvalidAttributesSize(length)) {
+        if (!IsInvalidAttributesSize(length)) {
             return;
         }
         for (int j = 0; j < length; j++) {
@@ -362,7 +362,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         WIFI_LOGE("read buffer error!");
         return;
     }
-    if(!IsInvalidAttributesSize(cfgLen)) {
+    if (!IsInvalidAttributesSize(cfgLen)) {
         return;
     }
     char* cfgData = new (std::nothrow) char[cfgLen];

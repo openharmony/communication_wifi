@@ -295,7 +295,8 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
         int length = data.ReadInt32();
         std::vector<std::string> queryList;
-        if (length > LENGTH_MAX_LEN) {
+        if (length > MAX_LEN) {
+            WIFI_LOGE("Service change size invalid: %{public}d", length);
             return;
         }
         for (int j = 0; j < length; j++) {
@@ -353,7 +354,8 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         return;
     }
 
-    if (length > LENGTH_MAX_LEN) {
+    if (cfgLen > MAX_LEN) {
+        WIFI_LOGE("Config change size invalid : %{public}d", cfgLen);
         return;
     }
     char* cfgData = new (std::nothrow) char[cfgLen];

@@ -362,7 +362,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         WIFI_LOGE("read buffer error!");
         return;
     }
-    if(!IsInvalidAttributesSize(cfgLen)){
+    if(!IsInvalidAttributesSize(cfgLen)) {
         return;
     }
     char* cfgData = new (std::nothrow) char[cfgLen];

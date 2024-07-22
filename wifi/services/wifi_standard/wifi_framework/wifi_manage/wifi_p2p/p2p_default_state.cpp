@@ -44,7 +44,7 @@ bool P2pDefaultState::ExecuteStateMsg(InternalMessagePtr msg)
                 return EXECUTED;
             }
             if (msg == nullptr) {
-                return;
+                return 0;
             }	
             p2pStateMachine.serviceManager.RemoveRequestRecord(deviceAddress, msg->GetParam1());
             break;

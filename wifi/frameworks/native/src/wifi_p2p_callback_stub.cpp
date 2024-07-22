@@ -350,7 +350,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         return;
     }
 
-	if (cfgLen > MAX_LEN) {
+    if (cfgLen > MAX_LEN) {
         WIFI_LOGE("cfgLen size error!");
         return;
     }

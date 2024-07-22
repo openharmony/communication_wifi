@@ -43,9 +43,6 @@ bool P2pDefaultState::ExecuteStateMsg(InternalMessagePtr msg)
                 WIFI_LOGE("Failed to obtain device address.");
                 return EXECUTED;
             }
-            if (msg == nullptr) {
-                return 0;
-            }	
             p2pStateMachine.serviceManager.RemoveRequestRecord(deviceAddress, msg->GetParam1());
             break;
         }

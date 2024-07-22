@@ -14,7 +14,6 @@
  */
 #ifndef OHOS_WIFI_P2P_CALLBACK_STUB_H
 #define OHOS_WIFI_P2P_CALLBACK_STUB_H
-#define LENGTH_MAX_LEN 255
 
 #include <mutex>
 #include <map>
@@ -143,7 +142,6 @@ private:
     void RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pPrivatePeersChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    bool IsInvalidAttributesSize(int32_t attributesSize);
 
 private:
     HandleFuncMap handleFuncMap;

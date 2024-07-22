@@ -89,7 +89,7 @@ int WifiP2pCallbackStub::OnRemoteRequest(
 bool WifiP2pCallbackStub::IsInvalidAttributesSize(int32_t attributesSize)
 {
     bool ret = false;
-    const int32_t COUNT_OF_AVRC_PLAYER_ATTRIBUTE = 255;
+    const int32_t COUNT_OF_AVRC_PLAYER_ATTRIBUTE = LENGTH_MAX_LEN;
     if (attributesSize > COUNT_OF_AVRC_PLAYER_ATTRIBUTE) {
         ret =  true;
     }

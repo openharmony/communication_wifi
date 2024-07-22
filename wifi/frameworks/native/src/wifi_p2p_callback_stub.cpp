@@ -350,7 +350,10 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         return;
     }
 
-    cfgLen = cfgLen > strlen(dataBuffer) + 1 ? strlen(dataBuffer) + 1 : strlen(dataBuffer) + 1;
+	if (cfgLen > MAX_LEN) {
+        WIFI_LOGE("cfgLen size error");
+        return;
+    }
     char* cfgData = new (std::nothrow) char[cfgLen];
     if (cfgData == nullptr) {
         WIFI_LOGE("new buffer error!");

@@ -21,9 +21,14 @@
 #include "wifi_hdi_wpa_p2p_impl.h"
 #include "wifi_hdi_util.h"
 #include "wifi_common_util.h"
+#include "wifi_common_def.h"
 #include "hdi_struct_toolkit.h"
 #include <securec.h>
 #include <unistd.h>
+#include <locale>
+#include <codecvt>
+#include <iostream>
+#include <fstream>
 
 #ifndef UT_TEST
 #include "wifi_log.h"
@@ -37,6 +42,7 @@
 #define LOG_TAG "WifiHdiWpaClient"
 
 #define HOSTAPD_CFG_VALUE_ON 1
+#define DEFAULT_HOSTAPD_CONF_PATH CONFIG_ROOR_DIR"/wpa_supplicant/hostapd.conf"
 
 namespace OHOS {
 namespace Wifi {
@@ -51,6 +57,8 @@ constexpr int WIFI_HDI_MAX_STR_LENGTH = 512;
 constexpr int WIFI_MAX_SCAN_COUNT = 256;
 constexpr int P2P_SUPPLICANT_DISCONNECTED = 0;
 constexpr int P2P_SUPPLICANT_CONNECTED = 1;
+constexpr int SSID_ASSIC_WIDTH = 2;
+constexpr int BAND_WIDTH_OFFSET = 16;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName)
 {
@@ -662,38 +670,160 @@ WifiErrorNo WifiHdiWpaClient::RegisterApEvent(IWifiApMonitorEventCallback callba
     return HdiRegisterApEventCallback(&cEventCallback);
 }
 
-WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const HotspotConfig &config, int id)
+void WifiHdiWpaClient::AppendStr(std::string* dst, const char* format, va_list args)
 {
-    if (HdiSetApPasswd(config.GetPreSharedKey().c_str(), id) != WIFI_HAL_OPT_OK) {
+    char space[MAX_CMD_BUFFER_SIZE] __attribute__((__uninitialized__));
+    va_list argsTmp;
+
+    va_copy(argsTmp, args);
+    int result = vsnprintf_s(space, sizeof(space), sizeof(space) - 1, format, argsTmp);
+    va_end(argsTmp);
+    if (result < static_cast<int>(sizeof(space))) {
+        if (result >= 0) {
+            dst->append(space, result);
+            return;
+        }
+        if (result < 0) {
+            return;
+        }
+    }
+    int length = result + 1;
+    char* buf = new char[length];
+    va_copy(argsTmp, args);
+    result = vsnprintf_s(buf, length, length - 1, format, argsTmp);
+    va_end(argsTmp);
+    if (result >= 0 && result < length) {
+        dst->append(buf, result);
+    }
+    delete[] buf;
+}
+
+std::string WifiHdiWpaClient::StringCombination(const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    std::string result;
+    AppendStr(&result, fmt, args);
+    va_end(args);
+    return result;
+}
+
+void WifiHdiWpaClient::ConvertToUtf8(const std::string ssid, std::vector<uint8_t> &ssidUtf8)
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+    std::wstring wideStr = conv.from_bytes(ssid);
+    std::string utf8Str = conv.to_bytes(wideStr);
+    std::vector<uint8_t> utf8U8(utf8Str.begin(), utf8Str.end());
+    ssidUtf8 = utf8U8;
+}
+
+void WifiHdiWpaClient::GetSsidString(std::string &ssidString, std::vector<uint8_t> &ssidUtf8)
+{
+    std::stringstream ss;
+    ss << std::hex;
+    ss << std::setfill('0');
+    for (uint8_t b : ssidUtf8) {
+        ss << std::setw(SSID_ASSIC_WIDTH) << static_cast<unsigned int>(b);
+    }
+    ssidString = ss.str();
+}
+
+bool WifiHdiWpaClient::GetEncryptionString(const HotspotConfig &config, std::string &encryptionString)
+{
+    switch (config.GetSecurityType()) {
+        case KeyMgmt::WPA_PSK:
+            encryptionString = StringCombination(
+                "wpa=3\n"
+                "wpa_pairwise=TKIP CCMP\n"
+                "wpa_passphrase=%s",
+                config.GetPreSharedKey().c_str());
+            break;
+        case KeyMgmt::WPA2_PSK:
+            encryptionString = StringCombination(
+                "wpa=2\n"
+                "rsn_pairwise=CCMP\n"
+                "wpa_passphrase=%s\n"
+                "ieee80211w=1",
+                config.GetPreSharedKey().c_str());
+            break;
+        default:
+            LOGE("unsupport security type");
+            encryptionString = "";
+            return false;
+    }
+    return true;
+}
+
+void WifiHdiWpaClient::GetChannelString(const HotspotConfig &config, std::string &channelString)
+{
+    int channel = (config.GetChannel() | (config.GetBandWidth() << BAND_WIDTH_OFFSET));
+    LOGI("set ap channel is %{public}d", channel);
+    channelString = StringCombination(
+        "channel=%d\n"
+        "op_class=0",
+        channel);
+}
+
+void WifiHdiWpaClient::GetModeString(const HotspotConfig &config, std::string &modeString)
+{
+    /* configure hardware mode */
+    if (config.GetBand() == BandType::BAND_2GHZ) {
+        modeString = "hw_mode=g";
+    } else if (config.GetBand() == BandType::BAND_5GHZ) {
+        modeString = "hw_mode=a";
+    } else {
+        LOGE("unsupport band");
+        modeString = "";
+    }
+}
+
+bool WifiHdiWpaClient::WriteConfigToFile(const std::string &fileContext)
+{
+    std::string destPath = DEFAULT_HOSTAPD_CONF_PATH;
+    std::ofstream file;
+    file.open(destPath, std::ios::out);
+    if (!file.is_open()) {
+        LOGE("hostapd file open failed");
+        return false;
+    }
+    file << fileContext << std::endl;
+    file.close();
+    return true;
+}
+
+WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const HotspotConfig &config, int id)
+{
+    std::string ssid2String;
+    std::string encryptionString;
+    std::string channelString;
+    std::vector<uint8_t> ssidUtf8;
+    std::string modeString;
+    std::string fileContext;
+    ConvertToUtf8(config.GetSsid(), ssidUtf8);
+    GetSsidString(ssid2String, ssidUtf8);
+    if (!GetEncryptionString(config, encryptionString)) {
+        LOGE("set psk failed");
         return WIFI_HAL_OPT_FAILED;
     }
-    if (HdiSetApName(config.GetSsid().c_str(), id) != WIFI_HAL_OPT_OK) {
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (HdiSetApWpaValue(static_cast<int>(config.GetSecurityType()), id) != WIFI_HAL_OPT_OK) {
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (HdiSetApBand(static_cast<int>(config.GetBand()), id) != WIFI_HAL_OPT_OK) {
-        return WIFI_HAL_OPT_FAILED;
-    }
-    int channel = config.GetChannel() | (config.GetBandWidth() << 16);
-    LOGI("WifiHdiWpaClient::%{public}s enter, channel=%{public}d", __func__, channel);
-    if (HdiSetApChannel(channel, id) != WIFI_HAL_OPT_OK) {
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (HdiSetApMaxConn(config.GetMaxConn(), id) != WIFI_HAL_OPT_OK) {
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (HdiSetAp80211n(HOSTAPD_CFG_VALUE_ON, id) != WIFI_HAL_OPT_OK) {
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (HdiSetApWmm(HOSTAPD_CFG_VALUE_ON, id) != WIFI_HAL_OPT_OK) {
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (HdiReloadApConfigInfo(id) != WIFI_HAL_OPT_OK) {
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (HdiDisableAp(id) != WIFI_HAL_OPT_OK) {
+    GetChannelString(config, channelString);
+    GetModeString(config, modeString);
+    fileContext = StringCombination(
+        "interface=%s\n"
+        "driver=nl80211\n"
+        "ctrl_interface=/data/service/el1/public/wifi/sockets/wpa\n"
+        "ssid2=%s\n"
+        "%s\n"
+        "ieee80211n=1\n"
+        "%s\n"
+        "ignore_broadcast_ssid=0\n"
+        "wowlan_triggers=any\n"
+        "%s\n",
+        ifName.c_str(), ssid2String.c_str(),
+        channelString.c_str(),
+        modeString.c_str(),
+        encryptionString.c_str());
+    if (!WriteConfigToFile(fileContext)) {
+        LOGE("write config failed");
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;

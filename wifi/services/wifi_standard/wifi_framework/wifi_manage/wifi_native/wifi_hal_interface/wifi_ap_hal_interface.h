@@ -61,7 +61,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo SetSoftApConfig(const HotspotConfig &config, int id = 0);
+    WifiErrorNo SetSoftApConfig(const std::string &ifName, const HotspotConfig &config, int id = 0);
 
     /**
      * @Description Obtains information about all connected STAs.

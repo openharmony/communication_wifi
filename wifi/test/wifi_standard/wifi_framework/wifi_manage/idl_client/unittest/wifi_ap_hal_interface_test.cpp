@@ -61,7 +61,7 @@ HWTEST_F(WifiApHalInterfaceTest, SetSoftApConfigTest, TestSize.Level1)
     config.SetBand(BandType::BAND_2GHZ);
     config.SetChannel(0);
     config.SetMaxConn(1);
-    WifiErrorNo ret = WifiApHalInterface::GetInstance().SetSoftApConfig(config);
+    WifiErrorNo ret = WifiApHalInterface::GetInstance().SetSoftApConfig("wlan0", config);
     EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
 }
 

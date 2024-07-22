@@ -667,12 +667,12 @@ WifiErrorNo HdiApStart(int id, const char *ifaceName)
         }
         result = CopyConfigFile(WIFI_2G_CFG);
 #else
-        result = CopyConfigFile(g_apCfgName);
+        result = CopyConfigFile(WIFI_DEFAULT_CFG);
 #endif
         if (result != WIFI_HAL_OPT_OK) {
             break;
         }
-            result = GetApInstance();
+        result = GetApInstance();
         if (result != WIFI_HAL_OPT_OK) {
             break;
         }

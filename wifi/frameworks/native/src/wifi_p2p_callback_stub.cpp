@@ -295,7 +295,7 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
         int length = data.ReadInt32();
         std::vector<std::string> queryList;
-        if (length > 255) {
+        if (length > LENGTH_MAX_LEN) {
             return;
         }
         for (int j = 0; j < length; j++) {
@@ -353,7 +353,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         return;
     }
 
-    if (length > 255) {
+    if (length > LENGTH_MAX_LEN) {
         return;
     }
     char* cfgData = new (std::nothrow) char[cfgLen];

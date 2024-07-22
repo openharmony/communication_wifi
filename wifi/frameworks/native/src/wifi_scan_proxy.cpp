@@ -260,7 +260,7 @@ static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, in
     size_t numInfoElems = std::stoul(tokens[dataRecvLen++]);
     for (size_t i = 0; i < numInfoElems; i++) {
         WifiInfoElem elem;
-        elem.id = std::stoi(tokens[dataRecvLen++]);
+        elem.id = static_cast<unsigned int>(std::stoi(tokens[dataRecvLen++]));
         size_t ieLen = std::stoul(tokens[dataRecvLen++]);
         for (size_t j = 0; j < ieLen; j++) {
             elem.content.push_back(static_cast<char>(std::stoi(tokens[dataRecvLen++])));

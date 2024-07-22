@@ -362,6 +362,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         WIFI_LOGE("read buffer error!");
         return;
     }
+
     if (!IsInvalidAttributesSize(cfgLen)) {
         return;
     }
@@ -388,7 +389,6 @@ void WifiP2pCallbackStub::RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &d
     info.host = data.ReadString();
     OnP2pGcJoinGroup(info);
 }
-
 
 void WifiP2pCallbackStub::RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {

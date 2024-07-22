@@ -86,16 +86,6 @@ int WifiP2pCallbackStub::OnRemoteRequest(
     return 0;
 }
 
-bool WifiP2pCallbackStub::IsInvalidAttributesSize(int32_t attributesSize)
-{
-    bool ret = false;
-    const int32_t countOfAvrcPlayerAttribute = LENGTH_MAX_LEN;
-    if (attributesSize > countOfAvrcPlayerAttribute) {
-        ret =  true;
-    }
-    return ret;
-}
-
 void WifiP2pCallbackStub::RegisterCallBack(const sptr<IWifiP2pCallback> &userCallback)
 {
     std::unique_lock<std::mutex> lock(callBackEventMutex);
@@ -305,7 +295,7 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
         int length = data.ReadInt32();
         std::vector<std::string> queryList;
-        if (!IsInvalidAttributesSize(length)) {
+        if (length > 255) {
             return;
         }
         for (int j = 0; j < length; j++) {
@@ -363,7 +353,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         return;
     }
 
-    if (!IsInvalidAttributesSize(cfgLen)) {
+    if (length > 255) {
         return;
     }
     char* cfgData = new (std::nothrow) char[cfgLen];

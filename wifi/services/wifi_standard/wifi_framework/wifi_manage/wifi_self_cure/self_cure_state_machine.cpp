@@ -2089,7 +2089,8 @@ bool SelfCureStateMachine::IsIpAddressInvalid()
         currAddr = TransIpAddressToVec(addr);
         if ((currAddr.size() == IP_ADDR_SIZE)) {
             uint32_t intCurrAddr3 = (currAddr[VEC_POS_3] & 0xFF);
-            uint32_t netmaskLenth = IpTools::GetMaskLength(IpTools::ConvertIpv4Address(dhcpInfo.netmask));
+            uint32_t netmaskLenth =
+                static_cast<uint32_t>(IpTools::GetMaskLength(IpTools::ConvertIpv4Address(dhcpInfo.netmask)));
             bool ipEqualsGw = (dhcpInfo.ipAddress == dhcpInfo.gateway);
             bool invalidIp = (intCurrAddr3 == 0 || intCurrAddr3 == 1 || intCurrAddr3 == IP_ADDR_LIMIT);
             if ((ipEqualsGw) || ((netmaskLenth == NET_MASK_LENGTH) && (invalidIp))) {

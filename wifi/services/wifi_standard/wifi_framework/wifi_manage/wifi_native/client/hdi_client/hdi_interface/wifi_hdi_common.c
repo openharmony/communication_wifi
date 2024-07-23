@@ -427,7 +427,7 @@ int HdiConvertIe(const uint8_t *hdiIe, size_t wpaIeLen,
     }
 
     pos = (const uint8_t *) (hdr + 1);
-    left = wpaIeLen - sizeof(*hdr);
+    left = (int)(wpaIeLen - sizeof(*hdr));
 
     if (left >= HDI_SELECTOR_LEN) {
         data->groupCipher = HdiRsnIdToCipher(pos);
@@ -659,7 +659,7 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto, const uint8_t *ie, si
 
     pos = HdiGetCipherTxt(pos, end, data.pairwiseCipher);
 
-    if (data.capabilities & HDI_CAPABILITY_PREAUTH) {
+    if ((unsigned int)data.capabilities & HDI_CAPABILITY_PREAUTH) {
         ret = HdiTxtPrintf(pos, end - pos, "-preauth");
         if (HdiCheckError(end - pos, ret)) {
             return pos;

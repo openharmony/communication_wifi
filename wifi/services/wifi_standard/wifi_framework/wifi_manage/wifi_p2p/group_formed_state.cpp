@@ -353,8 +353,8 @@ bool GroupFormedState::ProcessCmdStartListen(const InternalMessagePtr msg) const
         return EXECUTED;
     }
 
-    size_t period = msg->GetParam1();
-    size_t interval = msg->GetParam2();
+    size_t period = static_cast<size_t>(msg->GetParam1());
+    size_t interval = static_cast<size_t>(msg->GetParam2());
     if (WifiP2PHalInterface::GetInstance().P2pConfigureListen(true, period, interval)) {
         WIFI_LOGE("p2p configure to start listen failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StartP2pListen, WIFI_OPT_FAILED);

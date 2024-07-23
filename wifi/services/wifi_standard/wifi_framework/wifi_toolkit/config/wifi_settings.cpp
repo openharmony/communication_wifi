@@ -1378,7 +1378,7 @@ void WifiSettings::InitPackageFilterConfig()
         std::vector<PackageFilterConf> tmp;
         mPackageFilterConfig.GetValue(tmp);
         std::unique_lock<std::mutex> lock(mScanMutex);
-        for (int i = 0; i < tmp.size(); i++) {
+        for (unsigned int i = 0; i < tmp.size(); i++) {
             mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
         }
     }

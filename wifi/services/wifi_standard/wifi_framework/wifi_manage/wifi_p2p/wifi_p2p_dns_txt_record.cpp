@@ -36,7 +36,7 @@ void WifiP2PDnsTxtRecord::InsertData(
     const int mapLengthSize = 1;
     const int equalSeparatorSize = 1;
     for (int i = 0; i < index && insertIndex < data.size(); ++i) {
-        insertIndex += (data[insertIndex] + mapLengthSize) & 0xff;
+        insertIndex += (data[insertIndex] + static_cast<size_t>(mapLengthSize)) & 0xff;
     }
 
     int addLength = (int)keyBytes.size() + (int)valBytes.size() + ((valBytes.size() == 0) ? 0 : mapLengthSize);
@@ -45,7 +45,7 @@ void WifiP2PDnsTxtRecord::InsertData(
     data.clear();
 
     data.insert(data.begin(), oldData.begin(), oldData.begin() + insertIndex);
-    int secondHalfLength = oldData.size() - insertIndex;
+    int secondHalfLength = static_cast<int>(oldData.size() - insertIndex);
     data.insert(data.begin() + newDataLength - secondHalfLength,
         oldData.begin() + insertIndex,
         oldData.begin() + insertIndex + secondHalfLength);

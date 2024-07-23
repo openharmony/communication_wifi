@@ -60,10 +60,7 @@ bool Handler::InitialHandler(const std::string &name)
     pthread_setname_np(handleThread, name.c_str());
 #else
     if (pMyTaskQueue == nullptr) {
-        std::function<void()> func = std::bind([&name]() {
-            WifiWatchDogUtils::GetInstance()->ResetProcess(true, name);
-        });
-        pMyTaskQueue = std::make_unique<WifiEventHandler>(name, func);
+        pMyTaskQueue = std::make_unique<WifiEventHandler>(name);
         if (pMyTaskQueue == nullptr) {
             LOGE("pMyTaskQueue alloc failed.\n");
             return false;

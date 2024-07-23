@@ -28,7 +28,6 @@ namespace Wifi {
 #define AES_GCM_128 2
 #define AES_GCM_256 3
 #define AES_GCM_TAG_LEN 4
-#define OPENSSL_EVP_PADDING_FUNC_CLOSE 0
 
 WifiOpensslUtils &WifiOpensslUtils::GetInstance()
 {
@@ -82,7 +81,6 @@ int WifiOpensslUtils::OpensslAesEncrypt(const uint8_t *plainText, int plainTextL
         goto err;
     }
 
-    EVP_CIPHER_CTX_set_padding(ctx, OPENSSL_EVP_PADDING_FUNC_CLOSE);
     if (EVP_EncryptInit_ex(ctx, cipher, nullptr, nullptr, nullptr) != 1) {
         goto err;
     }
@@ -144,7 +142,6 @@ int WifiOpensslUtils::OpensslAesDecrypt(const uint8_t *cipherText, int cipherTex
         goto err;
     }
 
-    EVP_CIPHER_CTX_set_padding(ctx, OPENSSL_EVP_PADDING_FUNC_CLOSE);
     if (EVP_DecryptInit_ex(ctx, cipher, nullptr, nullptr, nullptr) != 1) {
         LOGI("%{public}s: Aes decrypt init fail!", __func__);
         goto err;

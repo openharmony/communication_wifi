@@ -4265,10 +4265,6 @@ void StaStateMachine::SetOperationalMode(int mode)
 void StaStateMachine::OnNetManagerRestart(void)
 {
     LOGI("OnNetManagerRestart()");
-    int state = WifiConfigCenter::GetInstance().GetWifiState(m_instId);
-    if (state != static_cast<int>(WifiState::ENABLED)) {
-        return;
-    }
     WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo, m_instId);
 }
 

@@ -172,7 +172,7 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, Message
     info.frequency = data.ReadInt32();
     info.linkSpeed = data.ReadInt32();
     info.macAddress = data.ReadString();
-    info.ipAddress = data.ReadInt32();
+    info.ipAddress = static_cast<unsigned int>(data.ReadInt32());
     int tmpConnState = data.ReadInt32();
     if (tmpConnState >= 0 && tmpConnState <= int(ConnState::UNKNOWN)) {
         info.connState = ConnState(tmpConnState);

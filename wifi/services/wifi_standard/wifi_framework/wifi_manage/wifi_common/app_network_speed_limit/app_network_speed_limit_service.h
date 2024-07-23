@@ -52,7 +52,7 @@ private:
     StaServiceCallback m_staCallback;
     std::atomic<bool> m_isWifiConnected = false;
     std::map<int, int> m_bgLimitRecordMap;
-    int m_currentLimitMode;
+    int m_currentLimitMode{0};
     std::unordered_set<int> m_bgUidSet;
     std::unordered_set<int> m_bgPidSet;
     std::unordered_set<int> m_fgUidSet;

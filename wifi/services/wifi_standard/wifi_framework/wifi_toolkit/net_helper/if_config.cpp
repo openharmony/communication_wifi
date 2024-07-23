@@ -61,7 +61,7 @@ IfConfig::~IfConfig()
  */
 bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
 {
-    int argvSize = vecCommandArg.size();
+    int argvSize = static_cast<int>(vecCommandArg.size());
     if (argvSize > MAX_COMMAND_ARG) {
         LOGE("IfConfig ExecCommand vecCommandArg size invalid.");
         return false;

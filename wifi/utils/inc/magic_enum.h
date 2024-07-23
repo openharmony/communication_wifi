@@ -63,7 +63,7 @@ constexpr bool IsValid()
 template <int... Is>
 constexpr auto MakeIntegerListWrapper(std::integer_sequence<int, Is...>)
 {
-    constexpr int halfSize = sizeof...(Is) / 2;
+    constexpr int halfSize = static_cast<int>(sizeof...(Is) / 2);
     return std::integer_sequence<int, (Is - halfSize)...>();
 }
 

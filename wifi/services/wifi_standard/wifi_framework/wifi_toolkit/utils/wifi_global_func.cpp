@@ -290,8 +290,8 @@ int HexStringToVec(const std::string &str, std::vector<char> &vec)
     }
     const int hexShiftNum = 4;
     for (unsigned i = 0; i + 1 < len; ++i) {
-        int8_t high = IsValidHexCharAndConvert(str[i]);
-        int8_t low = IsValidHexCharAndConvert(str[++i]);
+        uint8_t high = static_cast<uint8_t>(IsValidHexCharAndConvert(str[i]));
+        uint8_t low = static_cast<uint8_t>(IsValidHexCharAndConvert(str[++i]));
         if (high < 0 || low < 0) {
             return -1;
         }
@@ -440,7 +440,7 @@ bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
         return false;
     }
     while (left < right) {
-        int mid = (left + right) >> 1;
+        unsigned int mid = static_cast<size_t>(left + right) >> 1;
         if (MCC_TABLE[mid].mnc < mnc) {
             left = mid + 1;
         } else if (MCC_TABLE[mid].mnc > mnc) {

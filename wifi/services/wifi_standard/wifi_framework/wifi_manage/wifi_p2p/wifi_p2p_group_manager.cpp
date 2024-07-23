@@ -92,7 +92,7 @@ bool WifiP2pGroupManager::RemoveGroup(const WifiP2pGroupInfo &group)
 int WifiP2pGroupManager::ClearAll()
 {
     std::unique_lock<std::mutex> lock(groupMutex);
-    int groupSize = groupsInfo.size();
+    int groupSize = static_cast<int>(groupsInfo.size());
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     WIFI_LOGD("%{public}s: clear all group, size:%{public}d", __func__, groupSize);
     for (auto iter = groupsInfo.begin(); iter != groupsInfo.end(); ++iter) {

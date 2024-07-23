@@ -208,7 +208,7 @@ bool DnsChecker::checkDnsValid(std::string host, std::string dnsAddress, int tim
         LOGE("send dns data failed.");
         return false;
     }
-    uint64_t elapsed = 0;
+    int64_t elapsed = 0;
     int leftMillis = timeoutMillis;
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     while (leftMillis > 0 && isRunning) {

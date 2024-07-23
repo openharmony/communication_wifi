@@ -206,15 +206,16 @@ static int HexStringToString(const char *str, char *out)
         return -1;
     }
     const int hexShiftNum = 4;
-    for (unsigned i = 0, j = 0; i + 1 < len; ++i) {
-        int8_t high = IsValidHexCharAndConvert(str[i]);
-        int8_t low = IsValidHexCharAndConvert(str[++i]);
+    for (unsigned i = 0, j = 0; i < len - 1;) {
+        uint8_t  high = IsValidHexCharAndConvert(str[i]);
+        uint8_t  low = IsValidHexCharAndConvert(str[i + 1]);
         if (high < 0 || low < 0) {
             return -1;
         }
         char tmp = ((high << hexShiftNum) | (low & 0x0F));
         out[j] = tmp;
         ++j;
+        i += 2; //2:每次循环分别获取char的高四位和第四位
     }
     return 0;
 }
@@ -294,7 +295,7 @@ static bool GetChanWidthCenterFreqHt(ScanInfo *pcmd, ScanInfoElem* infoElem)
     if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < HT_INFO_SIZE)) {
         return false;
     }
-    int secondOffsetChannel = infoElem->content[1] & offsetBit;
+    int secondOffsetChannel = infoElem->content[1] & (unsigned int)offsetBit;
     pcmd->channelWidth = GetHtChanWidth(secondOffsetChannel);
     pcmd->centerFrequency0 = GetHtCentFreq0(pcmd->freq, secondOffsetChannel);
     pcmd->isHtInfoExist = 1;
@@ -417,7 +418,7 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
     while (remainingLength > 1 && start < length) {
         if (srcBuf[start] == '[') {
             ++start;
-            infoElemsTemp[infoElemsSize].id = atoi(srcBuf + start);
+            infoElemsTemp[infoElemsSize].id = (unsigned int)atoi(srcBuf + start);
         }
         if (srcBuf[start] != ' ') {
             ++start;

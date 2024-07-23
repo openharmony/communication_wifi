@@ -402,7 +402,7 @@ bool P2pIdleState::ProcessInvitationReceivedEvt(InternalMessagePtr msg) const
         return EXECUTED;
     }
     // update the group capabilitys.
-    deviceManager.UpdateDeviceGroupCap(peer.GetDeviceAddress(), peer.GetGroupCapabilitys() | 0x01);
+    deviceManager.UpdateDeviceGroupCap(peer.GetDeviceAddress(), static_cast<size_t>(peer.GetGroupCapabilitys()) | 0x01);
 
     WpsInfo wps;
     if (peer.WpsPbcSupported()) {

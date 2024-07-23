@@ -127,7 +127,7 @@ std::string IpTools::ConvertIpv4Mask(int prefixLength)
 
     int mask[IPV4_BYTE_NUM] = {0, 0, 0, 0};
     int quot = prefixLength / BIT_NUM_PER_BYTE;
-    unsigned int remain = prefixLength % BIT_NUM_PER_BYTE;
+    int remain = prefixLength % BIT_NUM_PER_BYTE;
     for (int i = 0; i < quot; i++) {
         mask[i] = MAX_IPV4_MASK_BYTE;
     }

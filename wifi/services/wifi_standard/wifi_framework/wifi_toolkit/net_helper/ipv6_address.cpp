@@ -64,7 +64,7 @@ Ipv6Address Ipv6Address::Create(std::string ipv6)
         prefixLength = MAX_IPV6_PREFIX_LENGTH;
     } else {
         ip = std::string(ipv6.begin(), ipv6.begin() + index);
-        prefixLength = std::stoi(ipv6.substr(index + 1));
+        prefixLength = static_cast<size_t>(std::stoi(ipv6.substr(index + 1)));
     }
 
     if (!IsValidIPv6(ip)) {
@@ -252,7 +252,7 @@ struct in6_addr Ipv6Address::GetIpv6Mask(size_t prefixLength)
         addr.s6_addr[count] = UCHAR_MAX;
     }
     addr.s6_addr[count] = 0;
-    for (int n = CHAR_BIT - prefixLength % CHAR_BIT; n < CHAR_BIT; ++n) {
+    for (unsigned int n = CHAR_BIT - prefixLength % CHAR_BIT; n < CHAR_BIT; ++n) {
         addr.s6_addr[count] |= (0x01 << n);
     }
     ++count;

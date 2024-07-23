@@ -404,7 +404,7 @@ std::string WifiConfigCenter::GetConnectTimeoutBssid(int instId)
 int WifiConfigCenter::SetConnectTimeoutBssid(std::string &bssid, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     if (now == static_cast<time_t>(-1)) {
         LOGE("SetConnectTimeoutBssid: call time failed!");
         return -1;

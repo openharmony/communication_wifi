@@ -405,7 +405,8 @@ ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
     if (ret != WIFI_OPT_SUCCESS) {
         return ret;
     }
-    isSupported = ((tmpFeatures & feature) == feature);
+    isSupported = ((static_cast<unsigned long>(tmpFeatures) & static_cast<unsigned long>(feature)) ==
+        static_cast<unsigned long>(feature));
     return WIFI_OPT_SUCCESS;
 }
 

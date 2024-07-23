@@ -106,7 +106,7 @@ NO_SANITIZE("cfi") WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned 
         result->timestamp = vecScanInfos[i].timestamp;
         ++result;
     }
-    *size = (vecSize < WIFI_SCAN_HOTSPOT_LIMIT) ? vecSize : WIFI_SCAN_HOTSPOT_LIMIT;
+    *size = static_cast<size_t>((vecSize < WIFI_SCAN_HOTSPOT_LIMIT) ? vecSize : WIFI_SCAN_HOTSPOT_LIMIT);
     return GetCErrorCode(ret);
 }
 

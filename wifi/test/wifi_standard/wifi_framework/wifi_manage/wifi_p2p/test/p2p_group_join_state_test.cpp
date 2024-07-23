@@ -52,29 +52,29 @@ public:
 public:
     void AddSaveP2pConfig1()
     {
-        InternalMessage msg;
-        msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
 
         WifiP2pTempDiscEvent procDisc;
 
         WifiP2pDevice device;
         device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
         procDisc.SetDevice(device);
-        msg.SetMessageObj(procDisc);
-        pGroupFormedState->ExecuteStateMsg(&msg);
+        msg->SetMessageObj(procDisc);
+        pGroupFormedState->ExecuteStateMsg(msg);
     }
     void AddSaveP2pConfig2()
     {
-        InternalMessage msg;
-        msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
 
         WifiP2pTempDiscEvent procDisc;
 
         WifiP2pDevice device;
         device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
         procDisc.SetDevice(device);
-        msg.SetMessageObj(procDisc);
-        pGroupFormedState->ExecuteStateMsg(&msg);
+        msg->SetMessageObj(procDisc);
+        pGroupFormedState->ExecuteStateMsg(msg);
     }
     std::unique_ptr<P2pGroupJoinState> pP2pGroupJoinState;
     std::unique_ptr<MockP2pPendant> pMockP2pPendant;
@@ -95,14 +95,14 @@ HWTEST_F(P2pGroupJoinStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(P2pGroupJoinStateTest, ExecuteStateMsg, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
-    pP2pGroupJoinState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
+    pP2pGroupJoinState->ExecuteStateMsg(msg);
 
     AddSaveP2pConfig2();
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
     std::string inputPin;
-    msg.SetMessageObj(inputPin);
+    msg->SetMessageObj(inputPin);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind())
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
@@ -110,18 +110,18 @@ HWTEST_F(P2pGroupJoinStateTest, ExecuteStateMsg, TestSize.Level1)
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), StartWpsPbc(_, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    pP2pGroupJoinState->ExecuteStateMsg(&msg);
+    pP2pGroupJoinState->ExecuteStateMsg(msg);
     AddSaveP2pConfig1();
-    pP2pGroupJoinState->ExecuteStateMsg(&msg);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
-    pP2pGroupJoinState->ExecuteStateMsg(&msg);
+    pP2pGroupJoinState->ExecuteStateMsg(msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
+    pP2pGroupJoinState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pGroupJoinStateTest, ProcessCmdP2pDisable, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    pP2pGroupJoinState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    pP2pGroupJoinState->ExecuteStateMsg(msg);
 }
 }  // namespace Wifi
 }  // namespace OHOS

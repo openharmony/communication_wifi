@@ -74,18 +74,18 @@ HWTEST_F(InvitationRequestStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(InvitationRequestStateTest, ProcessInvitationResultEvt1, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(0);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
-    EXPECT_TRUE(pInvitationRequestState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(0);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    EXPECT_TRUE(pInvitationRequestState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(InvitationRequestStateTest, ProcessInvitationResultEvt2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
-    msg.SetParam1(8);
-    EXPECT_TRUE(pInvitationRequestState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    msg->SetParam1(8);
+    EXPECT_TRUE(pInvitationRequestState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(InvitationRequestStateTest, ProcessInvitationResultEvt3, TestSize.Level1)
@@ -93,24 +93,24 @@ HWTEST_F(InvitationRequestStateTest, ProcessInvitationResultEvt3, TestSize.Level
     WifiP2pGroupInfo group;
     group.SetNetworkId(0);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
-    msg.SetParam1(8);
-    EXPECT_TRUE(pInvitationRequestState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT));
+    msg->SetParam1(8);
+    EXPECT_TRUE(pInvitationRequestState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(InvitationRequestStateTest, ProcessCmdP2pDisable, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    EXPECT_TRUE(pInvitationRequestState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    EXPECT_TRUE(pInvitationRequestState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(InvitationRequestStateTest, ExecuteStateMsgFailed, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_FORMATION_SUCCESS));
-    EXPECT_FALSE(pInvitationRequestState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_FORMATION_SUCCESS));
+    EXPECT_FALSE(pInvitationRequestState->ExecuteStateMsg(msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

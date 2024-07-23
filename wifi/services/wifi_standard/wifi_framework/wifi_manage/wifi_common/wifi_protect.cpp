@@ -86,11 +86,11 @@ long WifiProtect::GetAcqTimestamp() const
     return mAcqTimestamp;
 }
 #ifndef OHOS_ARCH_LITE
- void WifiProtect::SetAppState(int state)
- {
+void WifiProtect::SetAppState(int state)
+{
     std::unique_lock<std::mutex> lock(mMutex);
     mAppState = state;
- }
+}
 
 int WifiProtect::GetAppState() const
 {

@@ -35,7 +35,7 @@ void MockConcreteMangerMachine::SendMessage(int msgName, int param1, int param2)
         msgName, param1, param2);
 }
 
-void MockConcreteMangerMachine::SendMessage(InternalMessage *msg)
+void MockConcreteMangerMachine::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;

@@ -53,40 +53,40 @@ public:
 public:
     void AddSaveP2pConfig1()
     {
-        InternalMessage msg;
-        msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
 
         WifiP2pTempDiscEvent procDisc;
 
         WifiP2pDevice device;
         device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
         procDisc.SetDevice(device);
-        msg.SetMessageObj(procDisc);
-        pGroupFormedState->ExecuteStateMsg(&msg);
+        msg->SetMessageObj(procDisc);
+        pGroupFormedState->ExecuteStateMsg(msg);
     }
     void AddSaveP2pConfig2()
     {
-        InternalMessage msg;
-        msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
         WifiP2pTempDiscEvent procDisc;
 
         WifiP2pDevice device;
         device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
         procDisc.SetDevice(device);
-        msg.SetMessageObj(procDisc);
-        pGroupFormedState->ExecuteStateMsg(&msg);
+        msg->SetMessageObj(procDisc);
+        pGroupFormedState->ExecuteStateMsg(msg);
     }
     void AddSaveP2pConfig3()
     {
-        InternalMessage msg;
-        msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN));
 
         WifiP2pTempDiscEvent procDisc;
         WifiP2pDevice device;
         device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
         procDisc.SetDevice(device);
-        msg.SetMessageObj(procDisc);
-        pGroupFormedState->ExecuteStateMsg(&msg);
+        msg->SetMessageObj(procDisc);
+        pGroupFormedState->ExecuteStateMsg(msg);
     }
     std::unique_ptr<ProvisionDiscoveryState> pProvisionDiscoveryState;
     std::unique_ptr<GroupFormedState> pGroupFormedState;
@@ -109,98 +109,98 @@ HWTEST_F(ProvisionDiscoveryStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsg1, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_RESP));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_RESP));
 
     WifiP2pTempDiscEvent provDisc;
     WifiP2pDevice device;
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     provDisc.SetDevice(device);
-    msg.SetMessageObj(provDisc);
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(provDisc);
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 
     AddSaveP2pConfig1();
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
 
     WifiP2pTempDiscEvent provDisc;
-    msg.SetMessageObj(provDisc);
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(provDisc);
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 
     WifiP2pDevice device;
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     provDisc.SetDevice(device);
-    msg.SetMessageObj(provDisc);
+    msg->SetMessageObj(provDisc);
     AddSaveP2pConfig2();
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FA");
     provDisc.SetDevice(device);
-    msg.SetMessageObj(provDisc);
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(provDisc);
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsg3, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN));
 
     WifiP2pTempDiscEvent provDisc;
-    msg.SetMessageObj(provDisc);
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(provDisc);
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
     WifiP2pDevice device;
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     provDisc.SetDevice(device);
-    msg.SetMessageObj(provDisc);
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(provDisc);
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 
     AddSaveP2pConfig3();
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 
     provDisc.SetPin(std::string("12345678"));
-    msg.SetMessageObj(provDisc);
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(provDisc);
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsg4, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::AP_STA_CONNECTED));
-    EXPECT_FALSE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::AP_STA_CONNECTED));
+    EXPECT_FALSE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
     EXPECT_FALSE(pProvisionDiscoveryState->ExecuteStateMsg(nullptr));
 }
 
 HWTEST_F(ProvisionDiscoveryStateTest, ExecuteStateMsgFailed, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
-    EXPECT_FALSE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
+    EXPECT_FALSE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(ProvisionDiscoveryStateTest, ProcessProvDiscFailEvt, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(ProvisionDiscoveryStateTest, ProcessCmdCancelConnect, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), CancelConnect()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pProvisionDiscoveryState->ExecuteStateMsg(msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

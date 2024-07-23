@@ -26,6 +26,10 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
+enum CmdWord {
+    CMD_START_MONITOR = 10,
+};
+
 class WifiNetLinkTest : public testing::Test {
 protected:
     void SetUp() override
@@ -74,4 +78,11 @@ HWTEST_F(WifiNetLinkTest, TestProcessReportMsg, TestSize.Level1)
     int32_t sockFd = 123;
     int32_t cmd = 456;
     WifiNetLink::GetInstance().ProcessReportMsg(sockFd, cmd);
+}
+
+HWTEST_F(WifiNetLinkTest, SendQoeCmdTest001, TestSize.Level1)
+{
+    int32_t cmd = CMD_START_MONITOR;
+    int32_t arg = 456;
+    WifiNetLink::GetInstance().SendQoeCmd(cmd, arg);
 }

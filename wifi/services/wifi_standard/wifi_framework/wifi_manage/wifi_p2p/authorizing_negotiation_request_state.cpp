@@ -42,7 +42,7 @@ void AuthorizingNegotiationRequestState::GoOutState()
     WIFI_LOGI("             GoOutState");
 }
 
-bool AuthorizingNegotiationRequestState::ExecuteStateMsg(InternalMessage *msg)
+bool AuthorizingNegotiationRequestState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT: {

@@ -65,19 +65,19 @@ HWTEST_F(P2pGroupFormationStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(P2pGroupFormationStateTest, ExecuteStateMsg, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
-    pP2pGroupFormationState->ExecuteStateMsg(&msg);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST));
-    pP2pGroupFormationState->ExecuteStateMsg(&msg);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RECEIVED));
-    pP2pGroupFormationState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
+    pP2pGroupFormationState->ExecuteStateMsg(msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST));
+    pP2pGroupFormationState->ExecuteStateMsg(msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RECEIVED));
+    pP2pGroupFormationState->ExecuteStateMsg(msg);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), CancelConnect()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
-    pP2pGroupFormationState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
+    pP2pGroupFormationState->ExecuteStateMsg(msg);
 }
 }  // namespace Wifi
 }  // namespace OHOS

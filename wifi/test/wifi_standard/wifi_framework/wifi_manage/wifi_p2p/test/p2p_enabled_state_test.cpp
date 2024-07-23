@@ -113,19 +113,19 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg, TestSize.Level1)
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg1, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), StopP2p()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetParam1(1);
-    msg.SetParam2(1);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(1);
+    msg->SetParam2(1);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
@@ -137,203 +137,203 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg2, TestSize.Level1)
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pConfigureListen(_, _, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg3, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_LISTEN));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_LISTEN));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pConfigureListen(_, _, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg4, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg5, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind())
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessDeviceFoundEvt1, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pDevice device;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
-    msg.SetMessageObj(device);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
+    msg->SetMessageObj(device);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessDeviceFoundEvt2, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pDevice device;
     device.SetDeviceAddress(std::string("aa:bb:cc:dd:ee:22"));
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
-    msg.SetMessageObj(device);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
+    msg->SetMessageObj(device);
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastP2pPeersChanged()).WillOnce(Return());
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg7, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pDevice device;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST));
-    msg.SetMessageObj(device);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST));
+    msg->SetMessageObj(device);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 
     AddDevice();
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
-    msg.SetMessageObj(device);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageObj(device);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg8, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_FIND_STOPPED));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_FIND_STOPPED));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg9, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg10, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE));
     WifiP2pServiceInfo service;
-    msg.SetMessageObj(service);
+    msg->SetMessageObj(service);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceAdd(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg11, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE));
     WifiP2pServiceInfo service;
-    msg.SetMessageObj(service);
+    msg->SetMessageObj(service);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceRemove(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg12, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind())
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg13, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REQUEST_SERVICE));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REQUEST_SERVICE));
     std::pair<WifiP2pDevice, WifiP2pServiceRequest> info;
-    msg.SetMessageObj(info);
+    msg->SetMessageObj(info);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ReqServiceDiscovery(_, _, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg14, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_REQ));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_REQ));
     WifiP2pServiceRequestList reqList;
     const WifiP2pServiceRequest req;
     reqList.AddServiceRequest(req);
     WifiP2pDevice device;
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     reqList.SetDevice(device);
-    msg.SetMessageObj(reqList);
+    msg->SetMessageObj(reqList);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RespServiceDiscovery(_, _, _, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg15, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_RESP));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_RESP));
 
     WifiP2pServiceResponseList respList;
     std::vector<unsigned char> data;
     WifiP2pServiceResponse resp(
         P2pServicerProtocolType::SERVICE_TYPE_BONJOUR, P2pServiceStatus::PSRS_SERVICE_PROTOCOL_NOT_AVAILABLE, 0, data);
     respList.AddServiceResponse(resp);
-    msg.SetMessageObj(respList);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageObj(respList);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg16, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg17, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pServiceInfo service;
-    msg.SetMessageObj(service);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageObj(service);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg18, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pServiceInfo service;
-    msg.SetMessageObj(service);
+    msg->SetMessageObj(service);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pServiceRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE));
+    pP2pEnabledState->ExecuteStateMsg(msg);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ReqServiceDiscovery(_, _, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
@@ -341,29 +341,29 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg18, TestSize.Level1)
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES));
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg19, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind())
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES));
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg20, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::pair<WifiP2pDevice, WifiP2pServiceRequest> info;
-    msg.SetMessageObj(info);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REQUEST_SERVICE));
+    msg->SetMessageObj(info);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REQUEST_SERVICE));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), ReqServiceDiscovery(_, _, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK))
@@ -371,132 +371,132 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg20, TestSize.Level1)
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg21, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pServiceRequestList reqList;
-    msg.SetMessageObj(reqList);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_REQ));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageObj(reqList);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_REQ));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg22, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pServiceResponseList respList;
-    msg.SetMessageObj(respList);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_RESP));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageObj(respList);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_RESP));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg23, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessCmdSetDeviceName1, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::string devAddr;
-    msg.SetMessageObj(devAddr);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME));
+    msg->SetMessageObj(devAddr);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pDeviceName(Eq(devAddr)))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessCmdSetDeviceName2, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::string devAddr;
-    msg.SetMessageObj(devAddr);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME));
+    msg->SetMessageObj(devAddr);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pDeviceName(Eq(devAddr)))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastThisDeviceChanaged(_)).WillOnce(Return());
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pSsidPostfix(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessCmdSetWfdInfo1, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pWfdInfo wfdInfo;
-    msg.SetMessageObj(wfdInfo);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
+    msg->SetMessageObj(wfdInfo);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdDeviceConfig(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessCmdSetWfdInfo2, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pWfdInfo wfdInfo;
-    msg.SetMessageObj(wfdInfo);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
+    msg->SetMessageObj(wfdInfo);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdDeviceConfig(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdEnable(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessCmdSetWfdInfo3, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pWfdInfo wfdInfo;
-    msg.SetMessageObj(wfdInfo);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
+    msg->SetMessageObj(wfdInfo);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdDeviceConfig(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetWfdEnable(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessCmdCancelConnect, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessCmdConnectFailed, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pDevice device;
     constexpr int connectFailed = 2;
     constexpr int connectTimeout = 15;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED));
-    msg.SetMessageObj(device);
-    msg.SetParam1(connectFailed);
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
-    msg.SetParam1(connectTimeout);
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
-    msg.SetParam1(0);
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(&msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED));
+    msg->SetMessageObj(device);
+    msg->SetParam1(connectFailed);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
+    msg->SetParam1(connectTimeout);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
+    msg->SetParam1(0);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessPriDeviceFoundEvtTest001, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     WifiP2pDevice device;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
-    msg.SetMessageObj(device);
-    pP2pEnabledState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
+    msg->SetMessageObj(device);
+    pP2pEnabledState->ExecuteStateMsg(msg);
 }
 } // namespace Wifi
 } // namespace OHOS

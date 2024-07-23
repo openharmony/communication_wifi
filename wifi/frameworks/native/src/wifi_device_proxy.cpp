@@ -569,7 +569,7 @@ void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address
 void WifiDeviceProxy::BigDataReadIpAddress(WifiIpAddress &address, std::vector<std::string> &tokens)
 {
     address.family = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-    address.addressIpv4 = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+    address.addressIpv4 = static_cast<size_t>(CheckDataLegal(tokens[g_bigDataRecvLen++]));
     int size = CheckDataLegal(tokens[g_bigDataRecvLen++]);
     if (size > MAX_SIZE) {
         WIFI_LOGE("Read IP address size error: %{public}d", size);
@@ -1873,7 +1873,7 @@ ErrCode WifiDeviceProxy::SetAppFrozen(std::set<int> pidList, bool isFrozen)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int size = pidList.size() < MAX_PID_LIST_SIZE ? pidList.size() : MAX_PID_LIST_SIZE;
+    int size = static_cast<int>(pidList.size() < MAX_PID_LIST_SIZE ? pidList.size() : MAX_PID_LIST_SIZE);
     int count = 0;
     data.WriteInt32(size);
     for (std::set<int>::iterator it = pidList.begin(); it != pidList.end() && count < size; it++, count++) {

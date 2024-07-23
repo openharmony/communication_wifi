@@ -175,7 +175,7 @@ private:
     void SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
         IpV6Info &wifiIpV6Info);
 private:
-    uint32_t supplierId;
+    uint32_t supplierId{0};;
 };
 } // namespace Wifi
 } // namespace OHOS

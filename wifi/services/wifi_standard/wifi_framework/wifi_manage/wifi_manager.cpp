@@ -213,7 +213,8 @@ int WifiManager::GetSupportedFeatures(long &features) const
 
 void WifiManager::AddSupportedFeatures(WifiFeatures feature)
 {
-    mSupportedFeatures |= static_cast<long>(feature);
+    mSupportedFeatures = static_cast<long>(static_cast<unsigned long>(mSupportedFeatures) |
+        static_cast<unsigned long>(feature));
 }
 
 void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)

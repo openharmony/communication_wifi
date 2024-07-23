@@ -252,6 +252,10 @@ struct WifiHalScanParam {
     std::vector<std::string> hiddenNetworkSsid; /* Hiding Network SSIDs */
     std::vector<int> scanFreqs;                 /* Scan frequency */
     int scanStyle;
+    WifiHalScanParam()
+    {
+        scanStyle = 0;
+    }
 };
 
 struct WifiHalPnoScanParam {

@@ -62,7 +62,7 @@ public:
      * @param msg - Message object pointer
      * @return - bool true:success   false:fail
      */
-    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
 private:
     /**
@@ -70,56 +70,56 @@ private:
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessNegotSucessEvt(InternalMessage &msg) const;
+    virtual bool ProcessNegotSucessEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the group formation success message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessGroupFormationSuccessEvt(InternalMessage &msg) const;
+    virtual bool ProcessGroupFormationSuccessEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the group started message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessGroupStartedEvt(InternalMessage &msg) const;
+    virtual bool ProcessGroupStartedEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the group formation fail message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessGroupFormationFailEvt(InternalMessage &msg) const;
+    virtual bool ProcessGroupFormationFailEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the negotiation fail message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessNegotFailEvt(InternalMessage &msg) const;
+    virtual bool ProcessNegotFailEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the invitation result message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessInvitationResultEvt(InternalMessage &msg) const;
+    virtual bool ProcessInvitationResultEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process the group removed message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessGroupRemovedEvt(InternalMessage &msg) const;
+    virtual bool ProcessGroupRemovedEvt(InternalMessagePtr msg) const;
 
     /**
      * @Description Process remvoe group message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdRemoveGroup(InternalMessage &msg) const;
+    virtual bool ProcessCmdRemoveGroup(InternalMessagePtr msg) const;
 
     /**
      * @Description Initialization
@@ -129,7 +129,7 @@ private:
     virtual void Init();
 
 private:
-    using ProcessFun = bool (GroupNegotiationState::*)(InternalMessage &msg) const;
+    using ProcessFun = bool (GroupNegotiationState::*)(InternalMessagePtr msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

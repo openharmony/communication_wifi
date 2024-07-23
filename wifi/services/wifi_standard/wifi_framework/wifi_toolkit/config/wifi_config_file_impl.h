@@ -318,6 +318,7 @@ int WifiConfigFileImpl<T>::SaveConfig()
     std::string content;
     {
         std::ostringstream ss;
+        LOGI("Save config:%{public}s size:%{public}d", GetTClassName<T>().c_str(), static_cast<int>(mValues.size()));
         for (std::size_t i = 0; i < mValues.size(); ++i) {
             T &item = mValues[i];
             /*
@@ -337,8 +338,8 @@ int WifiConfigFileImpl<T>::SaveConfig()
         content = mEncry.encryptedPassword;
     }
 #endif
-    int ret = fwrite(content.c_str(), 1, content.length(), fp);
-    if (ret != (int)content.length()) {
+    size_t ret = fwrite(content.c_str(), 1, content.length(), fp);
+    if (ret != content.length()) {
         LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());
     }
     (void)fflush(fp);

@@ -62,18 +62,18 @@ HWTEST_F(P2pDefaultStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(P2pDefaultStateTest, ExecuteStateMsg1, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::string deviceAddress;
-    msg.SetMessageObj(deviceAddress);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::REMOVE_SERVICE_REQUEST_RECORD));
-    EXPECT_TRUE(pDefaultState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(deviceAddress);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::REMOVE_SERVICE_REQUEST_RECORD));
+    EXPECT_TRUE(pDefaultState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pDefaultStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
-    EXPECT_FALSE(pDefaultState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
+    EXPECT_FALSE(pDefaultState->ExecuteStateMsg(msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -28,7 +28,7 @@ public:
     ~MockP2pInvitingState() = default;
     MOCK_METHOD0(GoInState, void());
     MOCK_METHOD0(GoOutState, void());
-    MOCK_METHOD1(ExecuteStateMsg, bool(InternalMessage *msg));
+    MOCK_METHOD1(ExecuteStateMsg, bool(InternalMessagePtr msg));
 };
 }  // namespace Wifi
 }  // namespace OHOS

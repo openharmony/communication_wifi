@@ -51,7 +51,7 @@ bool WifiCodeConvertUtil::IsUtf8Char(unsigned char chr, int32_t &nBytes)
         if ((chr & MASK_80) == 0) {
             return true;
         }
-        while ((chr & MASK_80)) {
+        while ((chr & MASK_80) == MASK_80) {
             chr <<= 1;
             nBytes++;
         }
@@ -99,7 +99,7 @@ std::string WifiCodeConvertUtil::Convert(const std::string &str, const std::stri
     }
 
     char *outbufbak = outbuf;
-    if (iconv(cd, &inbuf, &inlen, &outbuf, &outlen)) {
+    if (iconv(cd, &inbuf, &inlen, &outbuf, &outlen) == static_cast<size_t>(-1)) {
         delete[] outbufbak;
         iconv_close(cd);
         return "";

@@ -27,7 +27,7 @@ class MockApRootState : public ApRootState {
 public:
     MOCK_METHOD0(GoInState, void());
     MOCK_METHOD0(GoOutState, void());
-    MOCK_METHOD1(ExecuteStateMsg, bool(InternalMessage *msg));
+    MOCK_METHOD1(ExecuteStateMsg, bool(InternalMessagePtr msg));
 }; /* ApRootState */
 } // namespace Wifi
 } // namespace OHOS

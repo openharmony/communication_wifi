@@ -33,16 +33,13 @@ const int GENE_V6_ADDR_LEN = 64; /* Generally, the prefix length cannot exceed 6
 const int IP_V6_ADDR_LEN = 128;
 const std::string IP_V4_MASK("255.255.255.0");
 const std::string IP_V4_DEFAULT("192.168.62.1");
-static bool g_startDhcpServerFlag = false;
 
 DhcpdInterface::DhcpdInterface()
     : mBindIpv4(Ipv4Address::invalidInetAddress), mBindIpv6(Ipv6Address::INVALID_INET6_ADDRESS)
 {}
 
 DhcpdInterface::~DhcpdInterface()
-{
-    g_startDhcpServerFlag = false;
-}
+{}
 
 bool DhcpdInterface::RegisterDhcpCallBack(const std::string &ifaceName, ServerCallBack &event)
 {
@@ -56,7 +53,7 @@ bool DhcpdInterface::RegisterDhcpCallBack(const std::string &ifaceName, ServerCa
 bool DhcpdInterface::StartDhcpServerFromInterface(const std::string &ifaceName, Ipv4Address &ipv4, Ipv6Address &ipv6,
     const std::string &ipAddress, bool isIpV4, const int32_t &leaseTime)
 {
-    g_startDhcpServerFlag = true;
+    mStartDhcpServerFlag = true;
     std::vector<Ipv4Address> vecIpv4Addr;
     std::vector<Ipv6Address> vecIpv6Addr;
     if (!NetworkInterface::FetchApOrP2pIpAddress(ifaceName, vecIpv4Addr, vecIpv6Addr)) {
@@ -135,12 +132,12 @@ bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::
 
 bool DhcpdInterface::StopDhcp(const std::string &ifaceName)
 {
-    WIFI_LOGI("StopDhcp ifaceName:%{public}s, flag:%{public}d", ifaceName.c_str(), g_startDhcpServerFlag);
-    if (ifaceName.empty() || g_startDhcpServerFlag == false) {
+    WIFI_LOGI("StopDhcp ifaceName:%{public}s, flag:%{public}d", ifaceName.c_str(), mStartDhcpServerFlag);
+    if (ifaceName.empty() || mStartDhcpServerFlag == false) {
         WIFI_LOGE("StopDhcp return!");
         return false;
     }
-    g_startDhcpServerFlag = false;
+    mStartDhcpServerFlag = false;
     std::string rangeName;
     std::string tagName = ifaceName;
     transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);

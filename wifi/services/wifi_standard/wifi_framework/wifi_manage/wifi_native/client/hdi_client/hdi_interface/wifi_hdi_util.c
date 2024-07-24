@@ -206,15 +206,16 @@ static int HexStringToString(const char *str, char *out)
         return -1;
     }
     const int hexShiftNum = 4;
-    for (unsigned i = 0, j = 0; i + 1 < len; ++i) {
-        int8_t high = IsValidHexCharAndConvert(str[i]);
-        int8_t low = IsValidHexCharAndConvert(str[++i]);
+    for (unsigned i = 0, j = 0; i < len - 1;) {
+        uint8_t  high = IsValidHexCharAndConvert(str[i]);
+        uint8_t  low = IsValidHexCharAndConvert(str[i + 1]);
         if (high < 0 || low < 0) {
             return -1;
         }
         char tmp = ((high << hexShiftNum) | (low & 0x0F));
         out[j] = tmp;
         ++j;
+        i += 2; //2:每次循环分别获取char的高四位和第四位
     }
     return 0;
 }
@@ -294,7 +295,7 @@ static bool GetChanWidthCenterFreqHt(ScanInfo *pcmd, ScanInfoElem* infoElem)
     if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < HT_INFO_SIZE)) {
         return false;
     }
-    int secondOffsetChannel = infoElem->content[1] & offsetBit;
+    int secondOffsetChannel = infoElem->content[1] & (unsigned int)offsetBit;
     pcmd->channelWidth = GetHtChanWidth(secondOffsetChannel);
     pcmd->centerFrequency0 = GetHtCentFreq0(pcmd->freq, secondOffsetChannel);
     pcmd->isHtInfoExist = 1;
@@ -417,7 +418,7 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
     while (remainingLength > 1 && start < length) {
         if (srcBuf[start] == '[') {
             ++start;
-            infoElemsTemp[infoElemsSize].id = atoi(srcBuf + start);
+            infoElemsTemp[infoElemsSize].id = (unsigned int)atoi(srcBuf + start);
         }
         if (srcBuf[start] != ' ') {
             ++start;
@@ -463,8 +464,8 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
 #endif
 
 static int HdiParseExtensionInfo(const uint8_t *pos, size_t elen,
-                      struct HdiElems *elems,
-                      int show_errors)
+    struct HdiElems *elems,
+    int show_errors)
 {
     uint8_t ext_id;
 
@@ -570,8 +571,8 @@ static int HdiParseExtensionInfo(const uint8_t *pos, size_t elen,
 }
 
 static int HdiParseVendorSpec(const uint8_t *pos, size_t elen,
-                        struct HdiElems *elems,
-                        int show_errors)
+    struct HdiElems *elems,
+    int show_errors)
 {
     unsigned int oui;
 
@@ -582,7 +583,7 @@ static int HdiParseVendorSpec(const uint8_t *pos, size_t elen,
         if (show_errors) {
             LOGI("short vendor specific "
                    "information HdiElem ignored (len=%{public}lu)",
-                   (unsigned long) elen);
+                (unsigned long) elen);
         }
         return -1;
     }
@@ -729,11 +730,10 @@ static int HdiCheckExtCap(const uint8_t *ie, unsigned int capab)
 static int HdiCheckBssExtCap(const uint8_t *ies, size_t len, unsigned int capab)
 {
     return HdiCheckExtCap(HdiBssGetIe(ies, len, HDI_EID_EXT_CAPAB),
-                    capab);
+        capab);
 }
 
-static bool HdiGetRsnCapabLen(const uint8_t *rsnxe, size_t rsnxe_len,
-                   unsigned int capab)
+static bool HdiGetRsnCapabLen(const uint8_t *rsnxe, size_t rsnxe_len, unsigned int capab)
 {
     const uint8_t *end;
     size_t flen, i;
@@ -760,7 +760,7 @@ static bool HdiGetRsnCapabLen(const uint8_t *rsnxe, size_t rsnxe_len,
 static bool HdiGetRsnCapab(const uint8_t *rsnxe, unsigned int capab)
 {
     return HdiGetRsnCapabLen(rsnxe ? rsnxe + HDI_POS_SECOND : NULL,
-                     rsnxe ? rsnxe[1] : 0, capab);
+        rsnxe ? rsnxe[1] : 0, capab);
 }
 
 static inline int HdiCheckIsDmg(const int freq)
@@ -1007,7 +1007,7 @@ int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems
     if (!HdiCheckCompleted(elem, start, len)) {
         if (show) {
             LOGI("IEEE 802.11 HdiElem parse failed @%{public}d",
-                   (int) (start + len - (const uint8_t *) elem));
+                (int) (start + len - (const uint8_t *) elem));
         }
         return -1;
     }
@@ -1030,7 +1030,7 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
     if (!p2p)
         p2p = HdiBssGetVendorBeacon(scanResult->ie, scanResult->ieLen,
             scanResult->beaconIeLen, HDI_P2P_IE_VENDOR_TYPE);
-    if (p2p && elems->ssidLen == HDI_P2P_CARD_SSID_LEN && 
+    if (p2p && elems->ssidLen == HDI_P2P_CARD_SSID_LEN &&
         memcmp(elems->ssid, HDI_P2P_CARD_SSID, HDI_P2P_CARD_SSID_LEN) == 0) {
         return 0;
     }

@@ -37,8 +37,8 @@ public:
     static WifiOpensslUtils& GetInstance();
 
 public:
-    int OpensslAesEncrypt(const uint8_t *plainText, int plaintextLen, struct AesCipherInfo *info,
-        uint8_t *cipherText, int *ciphertextLen);
+    int OpensslAesEncrypt(const uint8_t *plainText, int plainTextLen, struct AesCipherInfo *info,
+        uint8_t *cipherText, int *cipherTextLen);
     
     int OpensslAesDecrypt(const uint8_t *cipherText, int cipherTextLen, struct AesCipherInfo *info,
         uint8_t *plainText, int *plainTextLen);

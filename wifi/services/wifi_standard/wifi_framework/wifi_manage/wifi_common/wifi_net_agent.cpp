@@ -235,7 +235,7 @@ void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
         wifiProxyConfig.manualProxyConfig.GetExclusionObjectList(exclusionList);
         std::list<std::string> tmpExclusionList;
         std::copy_if(exclusionList.begin(), exclusionList.end(), std::back_inserter(tmpExclusionList),
-            [](const std::string &str) { return !str.empty(); } );
+            [](const std::string &str) { return !str.empty(); });
         netLinkInfo->httpProxy_.SetHost(std::move(wifiProxyConfig.manualProxyConfig.serverHostName));
         netLinkInfo->httpProxy_.SetPort(wifiProxyConfig.manualProxyConfig.serverPort);
         netLinkInfo->httpProxy_.SetExclusionList(tmpExclusionList);
@@ -250,7 +250,8 @@ void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
 void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
     IpV6Info &wifiIpV6Info)
 {
-    unsigned int prefixLength = IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask));
+    unsigned int prefixLength =
+        static_cast<unsigned int>(IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask)));
     sptr<NetManagerStandard::INetAddr> netAddr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     netAddr->type_ = NetManagerStandard::INetAddr::IPV4;
     netAddr->family_ = NetManagerStandard::INetAddr::IPV4;
@@ -260,41 +261,29 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netLinkInfo->netAddrList_.push_back(*netAddr);
 
     LOGD("SetNetLinkIPInfo %{public}s", wifiIpV6Info.globalIpV6Address.c_str());
+    sptr<NetManagerStandard::INetAddr> netIpv6Addr = nullptr;
     if (!wifiIpV6Info.globalIpV6Address.empty()) {
-        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->address_ = wifiIpV6Info.globalIpV6Address;
-        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-        netIpv6Addr->prefixlen_ = 0;
-        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
     }
     LOGD("SetNetLinkIPInfo randGlobalIpV6Address:%{public}s", wifiIpV6Info.randGlobalIpV6Address.c_str());
     if (!wifiIpV6Info.randGlobalIpV6Address.empty()) {
-        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->address_ = wifiIpV6Info.randGlobalIpV6Address;
-        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-        netIpv6Addr->prefixlen_ = 0;
-        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
     }
     LOGD("SetNetLinkIPInfo uniqueLocalAddress1:%{public}s", wifiIpV6Info.uniqueLocalAddress1.c_str());
     if (!wifiIpV6Info.uniqueLocalAddress1.empty()) {
-        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
+        netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress1;
-        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-        netIpv6Addr->prefixlen_ = 0;
-        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
     }
     LOGD("SetNetLinkIPInfo uniqueLocalAddress2:%{public}s", wifiIpV6Info.uniqueLocalAddress2.c_str());
     if (!wifiIpV6Info.uniqueLocalAddress2.empty()) {
-        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+        netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress2;
+    }
+    if (netIpv6Addr != nullptr) {
         netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
         netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress2;
         netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
         netIpv6Addr->prefixlen_ = 0;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
@@ -353,7 +342,8 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
 void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
     IpV6Info &wifiIpV6Info)
 {
-    unsigned int prefixLength = IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask));
+    unsigned int prefixLength =
+        static_cast<unsigned int>(IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask)));
     sptr<NetManagerStandard::Route> localRoute = (std::make_unique<NetManagerStandard::Route>()).release();
     std::string strLocalRoute = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress & wifiIpInfo.netmask);
     localRoute->iface_ = netLinkInfo->ifaceName_;

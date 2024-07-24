@@ -103,7 +103,7 @@ void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppState
 void WifiCommonServiceManager::OnTcpReportMsgComplete(const std::vector<int64_t> &elems, const int32_t cmd,
     const int32_t mInstId)
 {
-    WIFI_LOGI("enter %{public}s", __FUNCTION__);
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
     IpQosMonitor::GetInstance().HandleTcpReportMsgComplete(elems, cmd);
 }
 #endif

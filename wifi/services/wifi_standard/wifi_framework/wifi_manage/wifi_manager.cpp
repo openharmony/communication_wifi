@@ -104,6 +104,13 @@ int WifiManager::Init()
     }
     mInitStatus = INIT_OK;
 
+    if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && !std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH) &&
+        !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
+        if (IsStartUpWifiEnableSupport()) {
+            WIFI_LOGI("It's first start up, need open wifi before oobe");
+            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED);
+        }
+    }
     int lastState = WifiSettings::GetInstance().GetStaLastRunState();
     if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
@@ -206,7 +213,8 @@ int WifiManager::GetSupportedFeatures(long &features) const
 
 void WifiManager::AddSupportedFeatures(WifiFeatures feature)
 {
-    mSupportedFeatures |= static_cast<long>(feature);
+    mSupportedFeatures = static_cast<long>(static_cast<unsigned long>(mSupportedFeatures) |
+        static_cast<unsigned long>(feature));
 }
 
 void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
@@ -402,7 +410,8 @@ void WifiManager::AutoStartServiceThread()
 void WifiManager::InitPidfile()
 {
     char pidFile[DIR_MAX_LENGTH] = {0, };
-    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid", CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
+    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid",
+        CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
     if (n < 0) {
         LOGE("InitPidfile: construct pidFile name failed.");
         return;

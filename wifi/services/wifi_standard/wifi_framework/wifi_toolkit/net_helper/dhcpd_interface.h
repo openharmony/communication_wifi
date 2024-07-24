@@ -94,6 +94,7 @@ private:
 private:
     Ipv4Address mBindIpv4;
     Ipv6Address mBindIpv6;
+    bool mStartDhcpServerFlag = false;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -34,7 +34,8 @@ struct stWifiWpaChbaInterface {
     ChbaSupplicantErrCode (*wpaChbaCliCmdRemoveGroup)(WifiWpaChbaInterface *p, const char *ifname);
     ChbaSupplicantErrCode (*wpaChbaCliCmdConnect)(WifiWpaChbaInterface *p, const ChbaConnectInfo *connect);
     ChbaSupplicantErrCode (*wpaChbaCliCmdDisConnect)(WifiWpaChbaInterface *p, const char *ifname, const char *address);
-    ChbaSupplicantErrCode (*wpaChbaCliCmdConnectNotify)(WifiWpaChbaInterface *p, const ChbaConnNotifyInfo *connectNotify);
+    ChbaSupplicantErrCode (*wpaChbaCliCmdConnectNotify)(WifiWpaChbaInterface *p,
+        const ChbaConnNotifyInfo *connectNotify);
 };
 
 

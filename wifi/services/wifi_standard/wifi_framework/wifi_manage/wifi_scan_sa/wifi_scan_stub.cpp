@@ -211,10 +211,10 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
     }
     std::stringstream scanInfoStream;
     for (int32_t i = 0; i < contentSize; ++i) {
-        scanInfoStream << result[i].bssid << ";";
+        scanInfoStream << StringToHex(result[i].bssid) << ";";
         scanInfoStream << StringToHex(result[i].ssid) << ";";
         scanInfoStream << result[i].bssidType << ";";
-        scanInfoStream << result[i].capabilities << ";";
+        scanInfoStream << StringToHex(result[i].capabilities) << ";";
         scanInfoStream << result[i].frequency << ";";
         scanInfoStream << result[i].band << ";";
         scanInfoStream << static_cast<int>(result[i].channelWidth) << ";";

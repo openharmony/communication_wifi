@@ -246,35 +246,35 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
 
 static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, int &dataRecvLen)
 {
-    info.bssid = tokens[dataRecvLen++];
+    info.bssid = HexToString(tokens[dataRecvLen++]);
     info.ssid = HexToString(tokens[dataRecvLen++]);
-    info.bssidType = std::stoi(tokens[dataRecvLen++]);
-    info.capabilities = tokens[dataRecvLen++];
-    info.frequency = std::stoi(tokens[dataRecvLen++]);
-    info.band = std::stoi(tokens[dataRecvLen++]);
-    info.channelWidth = static_cast<WifiChannelWidth>(std::stoi(tokens[dataRecvLen++]));
-    info.centerFrequency0 = std::stoi(tokens[dataRecvLen++]);
-    info.centerFrequency1 = std::stoi(tokens[dataRecvLen++]);
-    info.rssi = std::stoi(tokens[dataRecvLen++]);
-    info.securityType = static_cast<WifiSecurity>(std::stoi(tokens[dataRecvLen++]));
-    size_t numInfoElems = std::stoul(tokens[dataRecvLen++]);
+    info.bssidType = CheckDataLegal(tokens([dataRecvLen++]));
+    info.capabilities = HexToString(tokens[dataRecvLen++]);
+    info.frequency = CheckDataLegal(tokens[dataRecvLen++]);
+    info.band = CheckDataLegal(tokens[dataRecvLen++]);
+    info.channelWidth = static_cast<WifiChannelWidth>(CheckDataLegal(tokens[dataRecvLen++]));
+    info.centerFrequency0 = CheckDataLegal(tokens[dataRecvLen++]);
+    info.centerFrequency1 = CheckDataLegal(tokens[dataRecvLen++]);
+    info.rssi = CheckDataLegal(tokens[dataRecvLen++]);
+    info.securityType = static_cast<WifiSecurity>(CheckDataLegal(tokens[dataRecvLen++]));
+    size_t numInfoElems = CheckDataLegal(tokens[dataRecvLen++]);
     for (size_t i = 0; i < numInfoElems; i++) {
         WifiInfoElem elem;
-        elem.id = static_cast<unsigned int>(std::stoi(tokens[dataRecvLen++]));
-        size_t ieLen = std::stoul(tokens[dataRecvLen++]);
+        elem.id = static_cast<unsigned int>(CheckDataLegal(tokens[dataRecvLen++]));
+        size_t ieLen = CheckDataLegal(tokens[dataRecvLen++]);
         for (size_t j = 0; j < ieLen; j++) {
-            elem.content.push_back(static_cast<char>(std::stoi(tokens[dataRecvLen++])));
+            elem.content.push_back(static_cast<char>(CheckDataLegal(tokens[dataRecvLen++])));
         }
         info.infoElems.push_back(elem);
     }
-    info.features = std::stoll(tokens[dataRecvLen++]);
-    info.timestamp = std::stoll(tokens[dataRecvLen++]);
-    info.wifiStandard = std::stoi(tokens[dataRecvLen++]);
-    info.maxSupportedRxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
-    info.maxSupportedTxLinkSpeed = std::stoi(tokens[dataRecvLen++]);
-    info.disappearCount = std::stoi(tokens[dataRecvLen++]);
-    info.isHiLinkNetwork = std::stoi(tokens[dataRecvLen++]);
-    info.supportedWifiCategory = static_cast<WifiCategory>(std::stoi(tokens[dataRecvLen++]));
+    info.features = CheckDataLegall(tokens[dataRecvLen++]);
+    info.timestamp = CheckDataLegall(tokens[dataRecvLen++]);
+    info.wifiStandard = CheckDataLegal(tokens[dataRecvLen++]);
+    info.maxSupportedRxLinkSpeed = CheckDataLegal(tokens[dataRecvLen++]);
+    info.maxSupportedTxLinkSpeed = CheckDataLegal(tokens[dataRecvLen++]);
+    info.disappearCount = CheckDataLegal(tokens[dataRecvLen++]);
+    info.isHiLinkNetwork = CheckDataLegal(tokens[dataRecvLen++]);
+    info.supportedWifiCategory = static_cast<WifiCategory>(CheckDataLegal(tokens[dataRecvLen++]));
 }
 
 ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScanInfo> &result, int contentSize)

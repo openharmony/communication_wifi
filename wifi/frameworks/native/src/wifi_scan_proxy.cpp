@@ -244,11 +244,11 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
     return WIFI_OPT_SUCCESS;
 }
 
-static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, int &dataRecvLen)
+static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, int32_t &dataRecvLen)
 {
     info.bssid = HexToString(tokens[dataRecvLen++]);
     info.ssid = HexToString(tokens[dataRecvLen++]);
-    info.bssidType = CheckDataLegal(tokens([dataRecvLen++]));
+    info.bssidType = CheckDataLegal(tokens[dataRecvLen++]);
     info.capabilities = HexToString(tokens[dataRecvLen++]);
     info.frequency = CheckDataLegal(tokens[dataRecvLen++]);
     info.band = CheckDataLegal(tokens[dataRecvLen++]);
@@ -260,7 +260,7 @@ static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, in
     size_t numInfoElems = CheckDataLegal(tokens[dataRecvLen++]);
     for (size_t i = 0; i < numInfoElems; i++) {
         WifiInfoElem elem;
-        elem.id = static_cast<unsigned int>(CheckDataLegal(tokens[dataRecvLen++]));
+        elem.id = static_cast<uint32_t>(CheckDataLegal(tokens[dataRecvLen++]));
         size_t ieLen = CheckDataLegal(tokens[dataRecvLen++]);
         for (size_t j = 0; j < ieLen; j++) {
             elem.content.push_back(static_cast<char>(CheckDataLegal(tokens[dataRecvLen++])));
@@ -290,7 +290,7 @@ ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScan
     std::vector<std::string> tokens;
     SplitStr(net, ";", tokens, true, true);
     int dataRecvLen = 0;
-    for (int i = 0; i < contentSize; ++i) {
+    for (int i = 0; i < contentSize && dataRecvLen < tokens.size(); ++i) {
         WifiScanInfo info;
         GetScanInfo(info, tokens, dataRecvLen);
         result.emplace_back(info);

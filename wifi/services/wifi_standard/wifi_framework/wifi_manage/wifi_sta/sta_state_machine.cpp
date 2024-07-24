@@ -985,6 +985,7 @@ void StaStateMachine::DealSignalPollResult()
 
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
+        StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
     }
 }

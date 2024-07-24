@@ -142,6 +142,8 @@ void ApStartedState::Init()
     (ProcessFun)&ApStartedState::ProcessCmdSetHotspotIdleTimeout));
     mProcessFunMap.insert(
         std::make_pair(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE, &ApStartedState::ProcessCmdUpdateCountryCode));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_INFO,
+    (ProcessFun)&ApStartedState::ProcessCmdUpdateConfigInfo));
 }
 
 bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -492,5 +494,16 @@ void ApStartedState::SetRandomMac() const
         LOGE("%{public}s: macAddress is invalid", __func__);
     }
 }
+
+void ApStartedState::ProcessCmdUpdateConfigInfo(InternalMessage &msg)
+{
+    int freq = msg.GetParam1();
+    int channel = TransformFrequencyIntoChannel(freq);
+    WIFI_LOGI("%{public}s: update channel to %{public}d", __func__, channel);
+    WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id);
+    m_hotspotConfig.SetChannel(channel);
+    WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

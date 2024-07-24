@@ -73,6 +73,8 @@ constexpr int POS_RANDMAC_CONNECT_FAILED_CNT = 14;
 constexpr int POS_RANDMAC_CONNECT_FAILED_TS = 15;
 constexpr int POS_RESET_CONNECT_FAILED_CNT = 16;
 constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
+constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
+constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
 
 class SelfCureStateMachine : public StateMachine {
     FRIEND_GTEST(SelfCureStateMachine);
@@ -222,6 +224,7 @@ public:
         std::string currentGateway = "";
         int selfCureForInvalidIpCnt = 0;
         SelfCureIssHandleFuncMap selfCureIssHandleFuncMap;
+        std::vector<std::string> AssignedDnses;
         int InitSelfCureIssHandleMap();
         void HandleRandMacSelfCureComplete(InternalMessagePtr msg);
         void HandleInternetFailedSelfCure(InternalMessagePtr msg);
@@ -253,6 +256,11 @@ public:
         void HandleSelfCureFailedForRandMacReassoc();
         void HandleRssiChanged();
         void HandleDelayedResetSelfCure();
+        void GetPublicDnsServers(std::vector<std::string>& publicDnsServers);
+        void GetReplacedDnsServers(std::vector<std::string>& curDnses, std::vector<std::string>& replacedDnses);
+        void UpdateDnsServers(std::vector<std::string>& dnsServers);
+        void SelfCureForDns();
+        void resetDnses(std::vector<std::string>& dnses);
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);
         void SelfcureForMultiGateway(InternalMessagePtr msg);
@@ -402,6 +410,7 @@ private:
                                                  bool success);
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     bool IfMultiGateway();
+    void InitDnsServer();
     bool IsSettingsPage();
     bool IsMultiDhcpOffer();
     void ClearDhcpOffer();

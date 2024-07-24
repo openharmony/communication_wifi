@@ -190,15 +190,6 @@ WifiErrorNo HdiWpaP2pStop()
 
 static void InitHdiWpaP2pCallbackObj(struct IWpaCallback *callback)
 {
-    g_hdiWpaP2pCallbackObj->OnEventDisconnected = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventConnected = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventBssidChanged = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventStateChanged = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventTempDisabled = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventAssociateReject = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventWpsOverlap = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventWpsTimeout = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventScanResult = NULL;
     g_hdiWpaP2pCallbackObj->OnEventDeviceFound = callback->OnEventDeviceFound;
     g_hdiWpaP2pCallbackObj->OnEventDeviceLost = callback->OnEventDeviceLost;
     g_hdiWpaP2pCallbackObj->OnEventGoNegotiationRequest = callback->OnEventGoNegotiationRequest;
@@ -216,9 +207,6 @@ static void InitHdiWpaP2pCallbackObj(struct IWpaCallback *callback)
     g_hdiWpaP2pCallbackObj->OnEventServDiscResp = callback->OnEventServDiscResp;
     g_hdiWpaP2pCallbackObj->OnEventStaConnectState = callback->OnEventStaConnectState;
     g_hdiWpaP2pCallbackObj->OnEventIfaceCreated = callback->OnEventIfaceCreated;
-    g_hdiWpaP2pCallbackObj->GetVersion = NULL;
-    g_hdiWpaP2pCallbackObj->AsObject = NULL;
-    g_hdiWpaP2pCallbackObj->OnEventVendorCb = NULL;
 }
 
 WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
@@ -243,7 +231,10 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
         LOGE("RegisterHdiWpaP2pEventCallback: IWpaCallback malloc failed!");
         return WIFI_HAL_OPT_FAILED;
     }
-
+    if (memset_s(g_hdiWpaP2pCallbackObj, sizeof(struct IWpaCallback),
+        0, sizeof(struct IWpaCallback)) != EOK) {
+        return WIFI_HAL_OPT_FAILED;
+    }
     InitHdiWpaP2pCallbackObj(callback);
     pthread_mutex_unlock(&g_hdiCallbackMutex);
     LOGI("RegisterHdiWpaP2pEventCallback success.");

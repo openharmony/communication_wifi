@@ -37,6 +37,7 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr int SELF_CURE_DNS_SIZE = 2;
 constexpr int CURRENT_RSSI_INIT = -200;
 constexpr int MAX_SELF_CURE_CNT_INVALID_IP = 3;
 constexpr int VEC_POS_0 = 0;

@@ -48,6 +48,7 @@ enum class ApStatemachineEvent {
     CMD_UPDATE_HOTSPOTCONFIG_RESULT, /* Update hotspot configuration result */
     CMD_SET_IDLE_TIMEOUT,            /* Set ap idle timeout */
     CMD_UPDATE_COUNTRY_CODE,         /* update wifi conuntry code */
+    CMD_UPDATE_HOTSPOTCONFIG_INFO,   /* update hotspot config info */
                                      /* (asynchronous result) */
 };
 

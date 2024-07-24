@@ -184,17 +184,17 @@ bool GroupNegotiationState::ProcessInvitationResultEvt(InternalMessagePtr msg) c
         return EXECUTED;
     }
 
-    if (P2pStatus::UNKNOWN_P2P_GROUP == status) {
+    if (status == P2pStatus::UNKNOWN_P2P_GROUP) {
         int networkId = p2pStateMachine.savedP2pConfig.GetNetId();
         if (networkId >= 0) {
             groupManager.RemoveClientFromGroup(networkId, p2pStateMachine.savedP2pConfig.GetDeviceAddress());
         }
         p2pStateMachine.savedP2pConfig.SetNetId(-1);
         p2pStateMachine.P2pConnectByShowingPin(p2pStateMachine.savedP2pConfig);
-    } else if (P2pStatus::INFORMATION_IS_CURRENTLY_UNAVAILABLE == status) {
+    } else if (status == P2pStatus::INFORMATION_IS_CURRENTLY_UNAVAILABLE) {
         p2pStateMachine.savedP2pConfig.SetNetId(-1);
         p2pStateMachine.P2pConnectByShowingPin(p2pStateMachine.savedP2pConfig);
-    } else if (P2pStatus::NO_COMMON_CHANNELS == status) {
+    } else if (status == P2pStatus::NO_COMMON_CHANNELS) {
         WIFI_LOGE("fail:There is no common channel.");
     } else {
         p2pStateMachine.DealGroupCreationFailed();

@@ -347,9 +347,9 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
     freq = info.first;
     isFreqEnhance = (info.second == FreqType::FREQUENCY_160M);
     WIFI_LOGI("Create a hid2d group, frequency: %{public}d, isFreqEnhance: %{public}d.", freq, isFreqEnhance);
+    void *handle;
     do {
         const char *so = "libwifi_enhance_service.z.so";
-        void *handle;
         int (*FreqEnhance)(int, bool);
         handle = dlopen(so, RTLD_LAZY);
         if ((handle == nullptr) || (!isFreqEnhance)) {
@@ -358,21 +358,20 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
         }
         FreqEnhance = (int(*)(int, bool))dlsym(handle, "FreqEnhance");
         if (FreqEnhance == nullptr) {
-            dlclose(handle);
-            handle = nullptr;
             WIFI_LOGE("wifi_enhance_service:Invalid method '%s' - no FreqEnhance()", so);
             break;
         }
         freqEnhance = FreqEnhance(freq, isFreqEnhance);
-        if ((!(freqEnhance & P2P_ENHANCE_MASK)) && (freqEnhance % BAND_MASK != 0)) {
+        if (!(static_cast<unsigned int>(freqEnhance) & (static_cast<unsigned int>(P2P_ENHANCE_MASK))) &&
+            (static_cast<unsigned int>(freqEnhance) % static_cast<unsigned int>(BAND_MASK != 0))) {
             WIFI_LOGE("FreqEnhance Error :freq = %d, freqEnhance = %d.", freq, freqEnhance);
         } else {
             freq = freqEnhance;
         }
-        dlclose(handle);
-        handle = nullptr;
         FreqEnhance = nullptr;
     } while (0);
+    dlclose(handle);
+    handle = nullptr;
     ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, PERSISTENT_NET_ID, freq);
     if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
         WIFI_LOGE("p2p configure to CreateGroup failed.");

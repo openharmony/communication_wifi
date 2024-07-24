@@ -985,6 +985,7 @@ void StaStateMachine::DealSignalPollResult()
 
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
+        StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
     }
 }
@@ -2855,7 +2856,6 @@ bool StaStateMachine::StaWpsState::ExecuteStateMsg(InternalMessagePtr msg)
 
 int StaStateMachine::RegisterCallBack()
 {
-    clientCallBack.OnDhcpOfferReport = DhcpResultNotify::OnDhcpOfferResult;
     clientCallBack.OnIpSuccessChanged = DhcpResultNotify::OnSuccess;
     clientCallBack.OnIpFailChanged = DhcpResultNotify::OnFailed;
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName();
@@ -2864,6 +2864,8 @@ int StaStateMachine::RegisterCallBack()
         WIFI_LOGE("RegisterDhcpClientCallBack failed. dhcpRet=%{public}d", dhcpRet);
         return DHCP_FAILED;
     }
+    dhcpClientReport_.OnDhcpClientReport = DhcpResultNotify::OnDhcpOfferResult;
+    RegisterDhcpClientReportCallBack(ifname.c_str(), &dhcpClientReport_);
     LOGI("RegisterDhcpClientCallBack ok");
     return DHCP_SUCCESS;
 }
@@ -4073,8 +4075,8 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
             /* If not phone hotspot, set .isDataRestricted = 0. */
             std::string strVendor = result->strOptVendor;
             std::string ipAddress = result->strOptClientId;
-            pStaStateMachine->linkedInfo.isDataRestricted = 
-                (strVendor.find("ANDROID_METERED") == std::string::npos && 
+            pStaStateMachine->linkedInfo.isDataRestricted =
+                (strVendor.find("ANDROID_METERED") == std::string::npos &&
                 strVendor.find("OPEN_HARMONY") == std::string::npos) ? 0 : 1;
             if (!pStaStateMachine->linkedInfo.isDataRestricted) {
                 pStaStateMachine->linkedInfo.isDataRestricted =

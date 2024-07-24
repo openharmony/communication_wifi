@@ -242,8 +242,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         }
     }
     PublishWifiOperateStateHiSysEvent(state);
-    if (info.connState == ConnState::AUTHENTICATING)
-    {
+    if (info.connState == ConnState::AUTHENTICATING) {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
             static_cast<int>(WifiOperateState::STA_AUTHING));
     }
@@ -271,7 +270,7 @@ void WifiStaManager::DealWpsChanged(WpsStartState state, const int pinCode, int 
     cbMsg.msgData = static_cast<int>(state);
     cbMsg.id = instId;
     cbMsg.pinCode = std::to_string(pinCode);
-    int len = cbMsg.pinCode.length();
+    unsigned int len = cbMsg.pinCode.length();
     if (len < 8) { /* Fill in 8 digits. */
         cbMsg.pinCode = std::string(8 - len, '0') + cbMsg.pinCode;
     }

@@ -30,8 +30,9 @@ public:
     int StartWatchDogForFunc(const std::string &funcName);
     bool StopWatchDogForFunc(const std::string &funcName, int id);
 private:
-    bool ReportResetEvent(const std::string &threadName);
     void StartAllWatchDog();
+    bool ReportResetEvent(const std::string &threadName);
+    static void FfrtCallback(uint64_t taskId, const char *taskInfo, uint32_t delayedTaskCount);
 };
 }  // namespace Wifi
 }  // namespace OHOS

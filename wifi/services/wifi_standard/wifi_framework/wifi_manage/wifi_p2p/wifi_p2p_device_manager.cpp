@@ -70,7 +70,7 @@ bool WifiP2pDeviceManager::RemoveDevice(const WifiP2pDevice &device)
 int WifiP2pDeviceManager::ClearAll()
 {
     std::unique_lock<std::mutex> lock(deviceMutex);
-    int num = p2pDevices.size();
+    int num = static_cast<int>(p2pDevices.size());
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     WifiConfigCenter::GetInstance().ClearMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO);
 #endif

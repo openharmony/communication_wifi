@@ -248,6 +248,8 @@ private:
 
     void SetRandomMac() const;
     bool SetCountry();
+    void ProcessCmdUpdateConfigInfo(InternalMessage &msg);
+
 private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result
     HotspotConfig m_hotspotConfig;

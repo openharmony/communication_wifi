@@ -461,6 +461,14 @@ HWTEST_F(ApStartedState_test, StartAp_001, TestSize.Level1)
     EXPECT_TRUE(pApStartedState->StartAp());
 }
 
+HWTEST_F(ApStartedState_test, UpdateConfigInfoTest, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_INFO));
+    msg.SetParam1(1);
+    pApStartedState->ProcessCmdUpdateConfigInfo(msg);
+}
+
 HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))

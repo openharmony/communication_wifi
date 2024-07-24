@@ -84,7 +84,7 @@ int RawSocket::CreateSocket(const char *iface, uint16_t protocol)
     }
 
     struct sockaddr_ll rawAddr;
-    rawAddr.sll_ifindex = ifaceIndex;
+    rawAddr.sll_ifindex = static_cast<int>(ifaceIndex);
     rawAddr.sll_protocol = htons(protocol);
     rawAddr.sll_family = AF_PACKET;
 

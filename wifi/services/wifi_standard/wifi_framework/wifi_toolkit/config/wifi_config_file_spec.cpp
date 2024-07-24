@@ -1382,8 +1382,8 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
     ss << "    " <<"groupStatus=" << static_cast<int>(item.GetP2pGroupStatus()) << std::endl;
     ss << "    " <<"goIpAddress=" << item.GetGoIpAddress() << std::endl;
     ss << OutWifiP2pDeviceClassString(item.GetOwner(), "ownerDev.");
-    int size = item.GetClientDevices().size();
-    for (int i = 0; i < size; i++) {
+    unsigned int size = item.GetClientDevices().size();
+    for (unsigned int i = 0; i < size; i++) {
         std::string prefix = "vecDev_" + std::to_string(i) + ".";
         ss << "    " <<"vecDev_=" << i << std::endl;
         const WifiP2pDevice &tmp = item.GetClientDevices().at(i);

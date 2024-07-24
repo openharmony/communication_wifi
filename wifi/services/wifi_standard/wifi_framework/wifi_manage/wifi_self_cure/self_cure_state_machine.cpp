@@ -36,9 +36,10 @@
  
 namespace OHOS {
 namespace Wifi {
-const std::string CLASS_NAME = "WifiSelfCure";
 std::vector<std::string> chinaPublicDnses(SELF_CURE_DNS_SIZE);
 std::vector<std::string> overseaPublicDnses(SELF_CURE_DNS_SIZE);
+const std::string CLASS_NAME = "WifiSelfCure";
+
 DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 
 const uint32_t CONNECT_NETWORK_RETRY = 1;

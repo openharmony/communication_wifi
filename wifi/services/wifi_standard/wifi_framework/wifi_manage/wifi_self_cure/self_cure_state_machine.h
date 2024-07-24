@@ -74,7 +74,6 @@ constexpr int POS_RANDMAC_CONNECT_FAILED_CNT = 14;
 constexpr int POS_RANDMAC_CONNECT_FAILED_TS = 15;
 constexpr int POS_RESET_CONNECT_FAILED_CNT = 16;
 constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
-constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
 constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
 
 class SelfCureStateMachine : public StateMachine {

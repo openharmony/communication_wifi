@@ -114,7 +114,10 @@ bool AppParser::InitAppParser(const char *appXmlFilePath)
         WIFI_LOGE("%{public}s appXmlFilePath is null", __FUNCTION__);
         return false;
     }
-    if (!std::filesystem::exists(appXmlFilePath)) {
+    std::string xmlPath(appXmlFilePath);
+    std::filesystem::path pathName = xmlPath;
+    std::error_code code;
+    if (!std::filesystem::exists(pathName, code)) {
         WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlFilePath);
         return false;
     }
@@ -333,7 +336,10 @@ std::string AppParser::GetLocalFileVersion(const char *appXmlVersionFilePath)
         WIFI_LOGE("%{public}s appXmlVersionFilePath null!", __FUNCTION__);
         return strFileVersion;
     }
-    if (!std::filesystem::exists(appXmlVersionFilePath)) {
+    std::string xmlPath(appXmlVersionFilePath);
+    std::filesystem::path pathName = xmlPath;
+    std::error_code code;
+    if (!std::filesystem::exists(xmlPath, code)) {
         WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlVersionFilePath);
         return strFileVersion;
     }

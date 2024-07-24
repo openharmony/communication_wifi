@@ -415,7 +415,9 @@ bool WifiEventSubscriberManager::IsMdmForbidden()
 void WifiEventSubscriberManager::DelayedAccessDataShare()
 {
     WIFI_LOGI("DelayedAccessDataShare enter!");
-    if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH)) {
+    std::filesystem::path pathName = WIFI_CONFIG_FILE_PATH;
+    std::error_code code;
+    if (!std::filesystem::exists(pathName, code)) {
         CheckAndStartStaByDatashare();
     }
     GetAirplaneModeByDatashare();

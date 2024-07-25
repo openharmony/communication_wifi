@@ -72,13 +72,16 @@ void ApStartedState::GoInState()
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     SetRandomMac();
 #endif
+    if (!SetCountry()) {
+        m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
+        return;
+    }
     if (StartAp() == false) {
         WIFI_LOGE("enter ApstartedState is failed.");
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
         return;
     }
     WIFI_LOGI("StartAP is ok.");
-
     if (SetConfig() == false) {
         WIFI_LOGE("wifi_settings.hotspotconfig is error.");
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
@@ -87,7 +90,6 @@ void ApStartedState::GoInState()
     if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
         WIFI_LOGE("Set Blocklist failed.");
     }
-
     WIFI_LOGE("Singleton version has not nat and use %{public}s.", AP_INTF);
 
     if (EnableInterfaceNat() == false) {
@@ -193,42 +195,16 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 {
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
     m_ApConfigUse.UpdateApChannelConfig(apConfig);
-    if (WifiApHalInterface::GetInstance().SetSoftApConfig(apConfig, m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
+    std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
+    if (WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, apConfig, m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("set hostapd config failed.");
         return false;
     }
-
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-    HotspotConfig curApConfig;
-    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, m_id);
-
-    LOGD("%{public}s: [ssid:%{private}s, securityType:%{public}d] ==> [ssid:%{private}s, securityType:%{public}d]",
-        __func__, curApConfig.GetSsid().c_str(), curApConfig.GetSecurityType(),
-        apConfig.GetSsid().c_str(), apConfig.GetSecurityType());
-    if ((curApConfig.GetSsid() != apConfig.GetSsid()) ||
-        (curApConfig.GetSecurityType() != apConfig.GetSecurityType())) {
-        std::string macAddress;
-        WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
-        if (MacAddress::IsValidMac(macAddress.c_str())) {
-            if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
-                WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {
-                LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
-                return false;
-            }
-        } else {
-            LOGW("%{public}s: macAddress is invalid", __func__);
-        }
-    }
-#endif
-
-    WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(
-        WifiConfigCenter::GetInstance().GetApIfaceName(), true);
 #ifdef HAS_BATTERY_MANAGER_PART
     if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
         HotspotConfig hotspotConfig;
         WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
         if (hotspotConfig.GetBand() == BandType::BAND_2GHZ) {
-            std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
             WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_SOFTAP_2G_MSS, CMD_SET_SOFTAP_MIMOMODE);
         }
     }
@@ -255,14 +231,6 @@ bool ApStartedState::SetConfig()
         WIFI_LOGE("get config failed");
         return false;
     }
-    std::string countryCode;
-    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
-    if (countryCode.empty() || !IsValidCountryCode(countryCode) || WifiApHalInterface::GetInstance().SetWifiCountryCode(
-        WifiConfigCenter::GetInstance().GetApIfaceName(), countryCode) != WifiErrorNo::WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("set countryCode=%{public}s failed", countryCode.c_str());
-        return false;
-    }
-    m_wifiCountryCode = std::move(countryCode);
     return SetConfig(m_hotspotConfig);
 }
 
@@ -493,6 +461,20 @@ void ApStartedState::SetRandomMac() const
     } else {
         LOGE("%{public}s: macAddress is invalid", __func__);
     }
+}
+
+bool ApStartedState::SetCountry()
+{
+    std::string countryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
+    if (countryCode.empty() || !IsValidCountryCode(countryCode) ||
+        WifiApHalInterface::GetInstance().SetWifiCountryCode(WifiConfigCenter::GetInstance().GetApIfaceName(),
+            countryCode) != WifiErrorNo::WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("set countryCode=%{public}s failed", countryCode.c_str());
+        return false;
+    }
+    m_wifiCountryCode = std::move(countryCode);
+    return true;
 }
 
 void ApStartedState::ProcessCmdUpdateConfigInfo(InternalMessage &msg)

@@ -126,6 +126,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
 
         /* GC start DHCP Client. */
         if (p2pStateMachine.GetIsNeedDhcp() == DHCPTYPE::NO_DHCP) {
+            WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GC, P2P_ON);
             p2pStateMachine.BroadcastP2pConnectionChanged();
         } else {
             p2pStateMachine.StartDhcpClientInterface();

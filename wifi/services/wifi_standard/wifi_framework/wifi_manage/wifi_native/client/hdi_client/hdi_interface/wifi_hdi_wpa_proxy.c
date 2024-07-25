@@ -386,7 +386,7 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
     if (g_wpaObj == NULL || g_wpaStartSucceed == 0) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or wpa hdi already stopped", __func__);
-        return WIFI_HAL_OPT_FAILED;
+        return WIFI_HAL_OPT_OK;
     }
     
     LOGI("HdiRemoveWpaIface ifName:%{public}s", ifName);

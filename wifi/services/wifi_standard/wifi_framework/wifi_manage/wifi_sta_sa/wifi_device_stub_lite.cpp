@@ -1,3 +1,4 @@
+ (ipv6Info.gateway != result->strOptRouter1) || (ipv6Info.linkIpV6Address != result->strOptLinkIpv6Addr)) {
 /*
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");

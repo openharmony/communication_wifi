@@ -18,6 +18,7 @@
 #include "p2p_state_machine.h"
 #include "wifi_p2p_temp_disc_event.h"
 #include "wifi_logger.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupFormedState");
 
@@ -32,6 +33,9 @@ GroupFormedState::GroupFormedState(
 void GroupFormedState::GoInState()
 {
     WIFI_LOGI("             GoInState");
+    if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
+        WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GC, P2P_ON);
+    }
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
 }
 

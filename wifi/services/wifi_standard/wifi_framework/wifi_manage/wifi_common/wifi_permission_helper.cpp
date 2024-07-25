@@ -41,9 +41,22 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
         callerToken = (Security::AccessToken::AccessTokenID)tokenId;
     }
 
-    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
-    if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
         return PERMISSION_GRANTED;
+    }
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        return PERMISSION_GRANTED;
+    }
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+        if (result == Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+            return PERMISSION_GRANTED;
+        }
+ 
+        LOGE("callerToken=0x%{public}x has no permission_name=%{public}s, pid=0x%{public}x, type=%{public}d",
+            callerToken, permissionName.c_str(), pid, tokenType);
+        return PERMISSION_DENIED;
     }
  
     LOGE("callerToken=0x%{public}x has no permission_name=%{public}s, pid=%{public}d, uid=%{public}d",

@@ -234,7 +234,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pScanService->ScanWithParam(params));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pScanService->ScanWithParam(params, false));
     }
 
     void ScanWithParamFail1()
@@ -242,7 +242,7 @@ public:
         pScanService->scanStartedFlag = false;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params));
+        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, false));
     }
 
     void ScanWithParamFail2()
@@ -250,7 +250,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = -1;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params));
+        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, false));
     }
 
     void ScanWithParamFail3()
@@ -258,7 +258,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_UNSPECIFIED;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params));
+        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, false));
     }
 
     void ScanWithParamFail4()
@@ -267,7 +267,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_UNSPECIFIED;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params));
+        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, false));
     }
 
     void SingleScanSuccess1()

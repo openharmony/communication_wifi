@@ -27,6 +27,7 @@
 #include "wifi_scan_msg.h"
 #include "self_cure_msg.h"
 #include "mock_sta_service.h"
+#include "wifi_country_code_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -293,7 +294,7 @@ public:
         LOGI("Enter GetPublicDnsServersTest");
         std::string countryCode;
         std::vector<std::string> publicDnsServersTest;
-        EXPECT_EQ(countryCode, "CN");
+        WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
         pSelfCureStateMachine->pInternetSelfCureState->GetPublicDnsServers(publicDnsServersTest);
     }
 

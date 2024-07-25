@@ -39,7 +39,8 @@ public:
     virtual ~MockWifiApHalInterface() = default;
     virtual WifiErrorNo StartAp(int id = 0) = 0;
     virtual WifiErrorNo StopAp(int id = 0) = 0;
-    virtual WifiErrorNo SetSoftApConfig(const HotspotConfig &config, int id = 0) = 0;
+    virtual WifiErrorNo SetSoftApConfig(const std::string &ifName,
+        const HotspotConfig &config, int id = 0) = 0;
     virtual WifiErrorNo GetStationList(std::vector<std::string> &result, int id = 0) = 0;
     virtual WifiErrorNo AddBlockByMac(const std::string &mac, int id = 0) = 0;
     virtual WifiErrorNo DelBlockByMac(const std::string &mac, int id = 0) = 0;
@@ -60,7 +61,6 @@ public:
     static WifiApHalInterface &GetInstance(void);
     MOCK_METHOD1(StartAp, WifiErrorNo(int id));
     MOCK_METHOD1(StopAp, WifiErrorNo(int id));
-    MOCK_METHOD2(SetSoftApConfig, WifiErrorNo(const HotspotConfig &config, int id));
     MOCK_METHOD2(GetStationList, WifiErrorNo(std::vector<std::string> &result, int id));
     MOCK_METHOD2(AddBlockByMac, WifiErrorNo(const std::string &mac, int id));
     MOCK_METHOD2(DelBlockByMac, WifiErrorNo(const std::string &mac, int id));
@@ -73,6 +73,8 @@ public:
     MOCK_CONST_METHOD2(SetPowerModel, WifiErrorNo(const int& model, int id));
     MOCK_METHOD3(GetFrequenciesByBand, WifiErrorNo(const std::string &ifaceName,
     int band, std::vector<int> &frequencies));
+    MOCK_METHOD3(SetSoftApConfig, WifiErrorNo(const std::string &ifName,
+        const HotspotConfig &config, int id));
     MOCK_METHOD1(EnableAp, WifiErrorNo(int id));
 };
 } // namespace Wifi

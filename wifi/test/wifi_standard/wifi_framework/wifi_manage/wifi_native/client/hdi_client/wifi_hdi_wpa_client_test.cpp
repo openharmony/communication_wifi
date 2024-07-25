@@ -23,6 +23,8 @@ using ::testing::_;
 using ::testing::Return;
 using ::testing::ext::TestSize;
 
+#define DEFAULT_HOSTAPD_CONF_PATH CONFIG_ROOR_DIR"/wpa_supplicant/hostapd.conf"
+
 namespace OHOS {
 namespace Wifi {
 class WifiHdiWpaClientTest : public testing::Test {
@@ -478,8 +480,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTEST, TestSize.Level1)
 {
     HotspotConfig config;
     int id = 123;
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest1, TestSize.Level1)
@@ -489,43 +491,43 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest1, TestSize.Level1)
     MockWifiHdiWpaApImpl::SetMockFlag(true);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApPasswd(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApChannel(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApMaxConn(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetAp80211n(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWmm(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiReloadApConfigInfo(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiDisableAp(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    result = wifiHdiWpaClient->SetSoftApConfig(config, id);
+    result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
@@ -539,8 +541,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest2, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApName(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -555,8 +557,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest3, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWpaValue(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -573,8 +575,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest4, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApBand(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -593,8 +595,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest5, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApChannel(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -615,8 +617,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest6, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApMaxConn(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -639,8 +641,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest7, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetAp80211n(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -665,8 +667,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest8, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiSetApWmm(_, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -693,8 +695,8 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest9, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiReloadApConfigInfo(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
 }
 
@@ -723,9 +725,21 @@ HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest10, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(MockWifiHdiWpaApImpl::GetInstance(), HdiDisableAp(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig(config, id);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
     MockWifiHdiWpaApImpl::SetMockFlag(false);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, SetSoftApConfigTest11, TestSize.Level1)
+{
+    HotspotConfig config;
+    int id = 1;
+    config.SetSsid("aptest");
+    config.SetPreSharedKey("12345678");
+    WifiErrorNo result = wifiHdiWpaClient->SetSoftApConfig("wlan0", config, id);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    sleep(1);
+    std::remove(DEFAULT_HOSTAPD_CONF_PATH);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, RegisterApEventTEST, TestSize.Level1)

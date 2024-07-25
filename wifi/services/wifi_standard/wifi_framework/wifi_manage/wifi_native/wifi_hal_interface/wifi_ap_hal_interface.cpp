@@ -71,11 +71,11 @@ WifiErrorNo WifiApHalInterface::StopAp(int id)
     return ret;
 }
 
-WifiErrorNo WifiApHalInterface::SetSoftApConfig(const HotspotConfig &config, int id)
+WifiErrorNo WifiApHalInterface::SetSoftApConfig(const std::string &ifName, const HotspotConfig &config, int id)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->SetSoftApConfig(config, id);
+    return mHdiWpaClient->SetSoftApConfig(ifName, config, id);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->SetSoftApConfig(config, id);

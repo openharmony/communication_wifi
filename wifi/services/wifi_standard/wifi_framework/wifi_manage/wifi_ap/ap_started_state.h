@@ -247,7 +247,7 @@ private:
     bool UpdatMacAddress(const std::string ssid, KeyMgmt securityType);
 
     void SetRandomMac() const;
-
+    bool SetCountry();
     void ProcessCmdUpdateConfigInfo(InternalMessage &msg);
 
 private:

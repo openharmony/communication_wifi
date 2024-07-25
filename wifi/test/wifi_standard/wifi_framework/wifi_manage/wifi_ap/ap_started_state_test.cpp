@@ -388,7 +388,7 @@ HWTEST_F(ApStartedState_test, SetConfig_001, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetSoftApConfig(_, _))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetSoftApConfig(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncHotspotConfig()).Times(AtLeast(0));
@@ -406,7 +406,7 @@ HWTEST_F(ApStartedState_test, SetConfig_003, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetSoftApConfig(_, _))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetSoftApConfig(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_FALSE(pApStartedState->SetConfig(apcfg));
 }

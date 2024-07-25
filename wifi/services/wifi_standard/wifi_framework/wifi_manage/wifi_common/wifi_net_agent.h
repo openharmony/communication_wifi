@@ -137,7 +137,7 @@ public:
          */
         int32_t RequestNetwork(
             const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps,
-            const int32_t registerType = NetManagerStandard::REGISTER) override;
+            const NetManagerStandard::NetRequest &netrequest) override;
         /**
          * @Description : Connection Management triggers the close automatic connection feature.
          *

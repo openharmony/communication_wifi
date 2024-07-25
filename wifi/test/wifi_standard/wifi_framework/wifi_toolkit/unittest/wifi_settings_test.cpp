@@ -571,6 +571,8 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     config.wifiWapiConfig.wapiAsCertData = "abcdefg";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
+    WifiEncryptionInfo wifiEncryptionInfo;
+    WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)

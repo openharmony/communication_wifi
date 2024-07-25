@@ -36,7 +36,7 @@ public:
     int mid;
 private:
     ConcreteManagerRole curRole;
-    ConcreteMangerMachine *pConcreteMangerMachine;
+    ConcreteMangerMachine *pConcreteMangerMachine{nullptr};
     ConcreteModeCallback mcb;
 };
 } // namespace Wifi

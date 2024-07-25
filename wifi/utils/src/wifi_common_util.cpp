@@ -225,7 +225,8 @@ unsigned int Ip2Number(const std::string& strIp)
 
     std::string ip(strIp + '.');
     while ((back = ip.find_first_of('.', back)) != (std::string::size_type)std::string::npos) {
-        number |= std::stol(ip.substr(front, back - front).c_str()) << (size -= sectionSize);
+        number |= static_cast<unsigned long>(std::stol(ip.substr(front, back - front).c_str()) <<
+            (size -= sectionSize));
         front = ++back;
     }
     return number;
@@ -609,6 +610,26 @@ std::string StringToHex(const std::string &data)
         ss << HEX_TABLE[temp] << HEX_TABLE[static_cast<unsigned char>(data[i]) & 0xf];
     }
     return ss.str();
+}
+
+int CheckDataLegal(std::string &data)
+{
+    std::regex hex("^[0-9]+$");
+    if (std::regex_search(data, hex)) {
+        return std::stoi(data);
+    }
+ 
+    return 0;
+}
+
+long long CheckDataLegall(std::string &data)
+{
+    std::regex hex("^[0-9]+$");
+    if (std::regex_search(data, hex)) {
+        return std::stoll(data);
+    }
+ 
+    return 0;
 }
 }  // namespace Wifi
 }  // namespace OHOS

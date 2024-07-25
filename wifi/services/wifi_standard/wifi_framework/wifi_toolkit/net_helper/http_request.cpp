@@ -125,7 +125,7 @@ int HttpRequest::HttpConnect(std::string &strResponse)
 
     /* Set non-blocking */
     flags = fcntl(mISocketFd, F_GETFL, 0);
-    if (fcntl(mISocketFd, F_SETFL, flags | O_NONBLOCK) == -1) {
+    if (fcntl(mISocketFd, F_SETFL, static_cast<size_t>(flags) | O_NONBLOCK) == -1) {
         LOGE("HttpConnect fcntl error! Error code: %{public}d", errno);
         return -1;
     }

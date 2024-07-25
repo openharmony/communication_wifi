@@ -28,6 +28,8 @@
 #include "wifi_config_center.h"
 #include "wifi_app_state_aware.h"
 #include "ip_qos_monitor.h"
+#include "wifi_net_agent.h"
+#include "wifi_internal_event_dispatcher.h"
  
 namespace OHOS {
 namespace Wifi {
@@ -40,6 +42,7 @@ const uint32_t WIFI6_SINGLE_ITEM_BYTE_LEN = 8;
 const uint32_t WIFI6_SINGLE_MAC_LEN = 6;
 const uint32_t HEXADECIMAL = 16;
 const uint32_t WIFI6_MAX_BLA_LIST_NUM = 16;
+const uint32_t DHCP_OFFER_COUNT = 2;
 const int CMD_WIFI_CONNECT_TIMEOUT_SCREEN = 8 * 1000;
 const int CMD_WIFI_CONNECT_TIMEOUT = 16 * 1000;
 const std::string SETTINGS_PAGE = "com.huawei.hmos.settings";
@@ -145,7 +148,7 @@ void SelfCureStateMachine::DefaultState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -153,7 +156,10 @@ bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
     WIFI_LOGD("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case 0: {
+        case WIFI_CURE_DHCP_OFFER_PKT_RCV: {
+            IpInfo info;
+            msg->GetMessageObj(info);
+            HandleDhcpOfferPacketRcv(info);
             ret = EXECUTED;
             break;
         }
@@ -162,6 +168,18 @@ bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
             break;
     }
     return ret;
+}
+
+void SelfCureStateMachine::DefaultState::HandleDhcpOfferPacketRcv(const IpInfo &info)
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("HandleDhcpOfferPacketRcv get pEnhanceService service failed!");
+        return;
+    }
+    uint32_t retSize = 0;
+    pEnhanceService->DealDhcpOfferResult(OperationCmd::DHCP_OFFER_ADD, info, retSize);
+    WIFI_LOGI("dhcpOfferPackets size: %{public}u", retSize);
 }
 
 /* --------------------------- state machine connected monitor state ------------------------------ */
@@ -178,6 +196,12 @@ SelfCureStateMachine::ConnectedMonitorState::~ConnectedMonitorState() {}
 void SelfCureStateMachine::ConnectedMonitorState::GoInState()
 {
     WIFI_LOGI("ConnectedMonitorState GoInState function.");
+    if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
+        WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD,
+                                                    SELF_CURE_MONITOR_DELAYED_MS);
+    }
+    pSelfCureStateMachine->StopTimer(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD);
     IpQosMonitor::GetInstance().StartMonitor();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
@@ -191,11 +215,13 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     wifiSwitchAllowed = false;
     mobileHotspot = linkedInfo.isDataRestricted == 1 ? true : false;
     pSelfCureStateMachine->connectNetworkRetryCnt = 0;
+    WifiConfigCenter::GetInstance().SetLastNetworkId(linkedInfo.networkId);
     WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
+    pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
     lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
         pSelfCureStateMachine->m_instId);
     if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing == true) {
-        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE, HTTP_DETECT_TIMEOUT);
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE, SELF_CURE_DELAYED_MS);
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pInternetSelfCureState);
         return;
     }
@@ -216,7 +242,7 @@ void SelfCureStateMachine::ConnectedMonitorState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::ConnectedMonitorState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::ConnectedMonitorState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -250,6 +276,8 @@ int SelfCureStateMachine::ConnectedMonitorState::InitSelfCureCmsHandleMap()
     &SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected;
     selfCureCmsHandleFuncMap[CMD_INTERNET_STATUS_DETECT_INTERVAL] =
     &SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery;
+    selfCureCmsHandleFuncMap[WIFI_CURE_CMD_GATEWAY_CHANGED_DETECT] =
+    &SelfCureStateMachine::ConnectedMonitorState::HandleGatewayChanged;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -278,7 +306,7 @@ void SelfCureStateMachine::ConnectedMonitorState::TransitionToSelfCureState(int 
     pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pInternetSelfCureState);
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleResetupSelfCure(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleResetupSelfCure(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleResetupSelfCure.");
     if (msg == nullptr) {
@@ -289,7 +317,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleResetupSelfCure(Internal
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandlePeriodicArpDetection(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandlePeriodicArpDetection(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandlePeriodicArpDetection.");
     if (msg == nullptr) {
@@ -300,7 +328,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandlePeriodicArpDetection(Int
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkConnect(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkConnect(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleNetworkConnect.");
     if (msg == nullptr) {
@@ -311,7 +339,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkConnect(InternalM
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkDisconnect(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkDisconnect(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleNetworkDisconnect.");
     if (msg == nullptr) {
@@ -324,7 +352,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleNetworkDisconnect(Intern
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleRssiLevelChange(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleRssiLevelChange(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleRssiLevelChange.");
     if (msg == nullptr) {
@@ -335,7 +363,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleRssiLevelChange(Internal
     return;
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleArpDetectionFailed(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleArpDetectionFailed(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleArpDetectionFailed.");
     if (pSelfCureStateMachine->ShouldTransToWifi6SelfCure(msg, lastConnectedBssid)) {
@@ -373,6 +401,12 @@ bool SelfCureStateMachine::ConnectedMonitorState::SetupSelfCureMonitor()
                     SELF_CURE_MONITOR_DELAYED_MS);
                 return true;
             }
+            if (IsGatewayChanged()) {
+                WIFI_LOGI("current gateway is different with history gateway that has internet.");
+                pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_GATEWAY_CHANGED_DETECT,
+                    GATEWAY_CHANGED_DETECT_DELAYED_MS);
+                return true;
+            }
         }
         /** setup dns failed monitor when connected (the router's dns server maybe disabled). */
         if ((!mobileHotspot) && (!pSelfCureStateMachine->staticIpCureSuccess) && hasInternetRecently) {
@@ -383,6 +417,19 @@ bool SelfCureStateMachine::ConnectedMonitorState::SetupSelfCureMonitor()
     return false;
 }
 
+bool SelfCureStateMachine::ConnectedMonitorState::IsGatewayChanged()
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("IsGatewayChanged get pEnhanceService service failed!");
+        return false;
+    }
+    bool isChanged = false;
+    pEnhanceService->IsGatewayChanged(isChanged);
+    WIFI_LOGI("IsGatewayChanged, isChanged: %{public}d", isChanged);
+    return isChanged;
+}
+
 void SelfCureStateMachine::ConnectedMonitorState::RequestReassocWithFactoryMac()
 {
     pSelfCureStateMachine->useWithRandMacAddress = FAC_MAC_REASSOC;
@@ -390,14 +437,14 @@ void SelfCureStateMachine::ConnectedMonitorState::RequestReassocWithFactoryMac()
     TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_RAND_MAC);
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessagePtr msg)
 {
     pSelfCureStateMachine->selfCureOnGoing = true;
     if (pSelfCureStateMachine->IsHttpReachable()) {
         pSelfCureStateMachine->selfCureOnGoing = false;
         pSelfCureStateMachine->noTcpRxCounter = 0;
     } else {
-        int selfCureType = (pSelfCureStateMachine->dhcpOfferPackets.size() >= 2) ?
+        int selfCureType = pSelfCureStateMachine->IsMultiDhcpOffer() ?
                             WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY :
                             WIFI_CURE_INTERNET_FAILED_INVALID_IP;
         pSelfCureStateMachine->selfCureReason = selfCureType;
@@ -405,9 +452,13 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
     }
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
     WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
+    if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
+        WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
+        return;
+    }
     if (mobileHotspot && !pSelfCureStateMachine->IsWifi6Network(lastConnectedBssid)) {
         WIFI_LOGI("don't support selfcure, do nothing, mobileHotspot = %{public}d", mobileHotspot);
         return;
@@ -446,16 +497,35 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
     TransitionToSelfCureState(pSelfCureStateMachine->selfCureReason);
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(InternalMessage *msg)
+void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("msg is nullptr.");
         return;
     }
     pSelfCureStateMachine->StopTimer(CMD_INTERNET_STATUS_DETECT_INTERVAL);
-    IpQosMonitor::GetInstance().QueryPackets();
+    if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_CLOSE) {
+        IpQosMonitor::GetInstance().QueryPackets();
+    }
     pSelfCureStateMachine->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
         INTERNET_STATUS_DETECT_INTERVAL_MS);
+}
+
+void SelfCureStateMachine::ConnectedMonitorState::HandleGatewayChanged(InternalMessagePtr msg)
+{
+    WIFI_LOGI("enter HandleGatewayChanged");
+    if (msg == nullptr) {
+        WIFI_LOGE("msg is nullptr.");
+        return;
+    }
+    if (pSelfCureStateMachine->IsMultiDhcpOffer() ||
+        (hasInternetRecently && pSelfCureStateMachine->IsEncryptedAuthType(configAuthType))) {
+        if (pSelfCureStateMachine->IsHttpReachable()) {
+            pSelfCureStateMachine->selfCureOnGoing = false;
+            return;
+        }
+        TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY);
+    }
 }
 
 /* --------------------------- state machine disconnect monitor state ------------------------------ */
@@ -477,8 +547,8 @@ void SelfCureStateMachine::DisconnectedMonitorState::GoInState()
     pSelfCureStateMachine->hasTestWifi6Reassoc = false;
     pSelfCureStateMachine->noAutoConnCounter = 0;
     pSelfCureStateMachine->noAutoConnReason = -1;
-    pSelfCureStateMachine->connectedTimeMills = 0;
-    pSelfCureStateMachine->dhcpOfferPackets.clear();
+    pSelfCureStateMachine->connectedTime = 0;
+    pSelfCureStateMachine->ClearDhcpOffer();
     return;
 }
 
@@ -488,7 +558,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -499,10 +569,15 @@ bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMes
         case WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD:
             ret = EXECUTED;
             pSelfCureStateMachine->HandleNetworkConnected();
+            pSelfCureStateMachine->CheckConflictIpForSoftAp();
             break;
         case WIFI_CURE_OPEN_WIFI_SUCCEED_RESET:
             ret = EXECUTED;
             HandleResetConnectNetwork(msg);
+            break;
+        case WIFI_CURE_CMD_CONN_FAILED_TIMEOUT:
+            ret = EXECUTED;
+            HandleConnectFailed(msg);
             break;
         default:
             WIFI_LOGD("DisconnectedMonitorState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
@@ -511,7 +586,47 @@ bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMes
     return ret;
 }
 
-void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(InternalMessage *msg)
+void SelfCureStateMachine::DisconnectedMonitorState::HandleConnectFailed(InternalMessagePtr msg)
+{
+    WIFI_LOGI("enter HandleConnectFailed");
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s: msg is nullptr.", __FUNCTION__);
+        return;
+    }
+    if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing) {
+        pSelfCureStateMachine->useWithRandMacAddress = 0;
+        pSelfCureStateMachine->selfCureOnGoing = false;
+        WifiDeviceConfig config;
+        int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
+        if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+            WIFI_LOGE("%{public}s: GetDeviceConfig failed!.", __FUNCTION__);
+            return;
+        }
+        // Connect failed, updateSelfcureConnectHistoryInfo
+        WifiSelfCureHistoryInfo selfCureHistoryInfo;
+        std::string internetSelfCureHistory = config.internetSelfCureHistory;
+        pSelfCureStateMachine->String2InternetSelfCureHistoryInfo(internetSelfCureHistory, selfCureHistoryInfo);
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+        pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
+        config.internetSelfCureHistory = selfCureHistoryInfo.GetSelfCureHistory();
+
+        config.isReassocSelfCureWithFactoryMacAddress = 0;
+        config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+        WifiSettings::GetInstance().AddDeviceConfig(config);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+        // Connect failed, add broadcast: DISCONNECTED
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        WifiEventCallbackMsg cbMsg;
+        cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
+        cbMsg.msgData = ConnState::DISCONNECTED;
+        cbMsg.linkInfo = linkedInfo;
+        cbMsg.id = pSelfCureStateMachine->m_instId;
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    }
+}
+
+void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("msg is nullptr.");
@@ -562,7 +677,7 @@ void SelfCureStateMachine::ConnectionSelfCureState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::ConnectionSelfCureState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::ConnectionSelfCureState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -631,7 +746,7 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     AssignIpMethod ipAssignment;
     pSelfCureStateMachine->GetIpAssignment(ipAssignment);
     userSetStaticIpConfig = ipAssignment == AssignIpMethod::STATIC;
-    lastHasInetTimeMillis = pSelfCureStateMachine->GetLastHasInternetTime();
+    lastHasInetTime = pSelfCureStateMachine->GetLastHasInternetTime();
     configAuthType = pSelfCureStateMachine->GetAuthType();
     return;
 }
@@ -642,7 +757,7 @@ void SelfCureStateMachine::InternetSelfCureState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::InternetSelfCureState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::InternetSelfCureState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -683,7 +798,7 @@ int SelfCureStateMachine::InternetSelfCureState::InitSelfCureIssHandleMap()
     return WIFI_OPT_SUCCESS;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete(InternalMessagePtr msg)
 {
     WIFI_LOGI("enter HandleRandMacSelfCureComplete.");
     if (msg == nullptr) {
@@ -693,7 +808,6 @@ void SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete(
     WIFI_LOGI("rand mac selfcure complete, check if network is enable.");
     if (pSelfCureStateMachine->IsHttpReachable()) {
         if (pSelfCureStateMachine->IsUseFactoryMac()) {
-            pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(FAC_MAC_REASSOC);
             HandleHttpReachableAfterSelfCure(WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC);
         } else {
             pSelfCureStateMachine->selfCureOnGoing = false;
@@ -705,7 +819,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleRandMacSelfCureComplete(
     HandleSelfCureFailedForRandMacReassoc();
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleInternetFailedSelfCure(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleInternetFailedSelfCure(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleInternetFailedSelfCure.");
     if (msg == nullptr) {
@@ -719,7 +833,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleInternetFailedSelfCure(I
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureWifiLink(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureWifiLink(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleSelfCureWifiLink.");
     if (msg == nullptr) {
@@ -733,7 +847,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureWifiLink(Interna
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleNetworkDisconnected(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleNetworkDisconnected(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleNetworkDisconnected.");
     if (msg == nullptr) {
@@ -745,7 +859,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleNetworkDisconnected(Inte
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecovery(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecovery(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleInternetRecovery.");
     if (msg == nullptr) {
@@ -758,7 +872,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecovery(Interna
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleRssiChangedEvent(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleRssiChangedEvent(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleRssiChangedEvent.");
     if (msg == nullptr) {
@@ -770,7 +884,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleRssiChangedEvent(Interna
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleP2pDisconnected(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleP2pDisconnected(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleP2pDisconnected.");
     if (msg == nullptr) {
@@ -781,7 +895,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleP2pDisconnected(Internal
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandlePeriodicArpDetecte(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandlePeriodicArpDetecte(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandlePeriodicArpDetecte.");
     if (msg == nullptr) {
@@ -792,7 +906,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandlePeriodicArpDetecte(Inter
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableRecv(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableRecv(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleHttpReachableRecv.");
     if (msg == nullptr) {
@@ -805,7 +919,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableRecv(Intern
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleArpFailedDetected(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleArpFailedDetected(InternalMessagePtr msg)
 {
     WIFI_LOGD("enter HandleArpFailedDetected.");
     if (pSelfCureStateMachine->ShouldTransToWifi6SelfCure(msg, currentBssid)) {
@@ -868,11 +982,38 @@ void SelfCureStateMachine::InternetSelfCureState::SelectSelfCureByFailedReason(i
 int SelfCureStateMachine::InternetSelfCureState::SelectBestSelfCureSolution(int internetFailedType)
 {
     int bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_IDLE;
-    bool multipleDhcpServer = pSelfCureStateMachine->dhcpOfferPackets.size() >= 2;
+    bool multipleDhcpServer = pSelfCureStateMachine->IsMultiDhcpOffer();
     bool noInternetWhenConnected =
-        (lastHasInetTimeMillis <= 0 || lastHasInetTimeMillis < pSelfCureStateMachine->connectedTimeMills);
+        (lastHasInetTime <= 0 || lastHasInetTime < pSelfCureStateMachine->connectedTime);
     WIFI_LOGD("SelectBestSelfCureSolution, multipleDhcpServer = %{public}d, noInternetWhenConnected = %{public}d",
               multipleDhcpServer, noInternetWhenConnected);
+
+    if ((multipleDhcpServer) && (noInternetWhenConnected) && (GetNextTestDhcpResults().ipAddress != 0) &&
+        (pSelfCureStateMachine->SelfCureAcceptable(selfCureHistoryInfo, WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP)) &&
+        ((internetFailedType == WIFI_CURE_INTERNET_FAILED_TYPE_DNS) ||
+        (internetFailedType == WIFI_CURE_INTERNET_FAILED_TYPE_TCP))) {
+        bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP;
+        configStaticIp4MultiDhcpServer = true;
+    } else if ((internetFailedType == WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY) &&
+        (multipleDhcpServer) && (GetNextTestDhcpResults().ipAddress != 0) &&
+        (pSelfCureStateMachine->SelfCureAcceptable(selfCureHistoryInfo, WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP))) {
+        bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP;
+        configStaticIp4MultiDhcpServer = true;
+    } else if ((internetFailedType == WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY) &&
+        pSelfCureStateMachine->IsEncryptedAuthType(configAuthType) &&
+        (pSelfCureStateMachine->SelfCureAcceptable(selfCureHistoryInfo, WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP))) {
+        bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP;
+    } else {
+        bestSelfCureLevel = SelectBestSelfCureSolutionExt(internetFailedType);
+    }
+    WIFI_LOGI("SelectBestSelfCureSolution, internetFailedType = %{public}d, bestSelfCureLevel = %{public}d",
+              internetFailedType, bestSelfCureLevel);
+    return bestSelfCureLevel;
+}
+
+int SelfCureStateMachine::InternetSelfCureState::SelectBestSelfCureSolutionExt(int internetFailedType)
+{
+    int bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_IDLE;
     if (internetFailedType == WIFI_CURE_INTERNET_FAILED_INVALID_IP) {
         bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_RECONNECT_4_INVALID_IP;
     } else if (internetFailedType == WIFI_CURE_INTERNET_FAILED_TYPE_ROAMING &&
@@ -888,8 +1029,6 @@ int SelfCureStateMachine::InternetSelfCureState::SelectBestSelfCureSolution(int 
                pSelfCureStateMachine->SelfCureAcceptable(selfCureHistoryInfo, WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC)) {
         bestSelfCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
     }
-    WIFI_LOGI("SelectBestSelfCureSolution, internetFailedType = %{public}d, bestSelfCureLevel = %{public}d",
-              internetFailedType, bestSelfCureLevel);
     return bestSelfCureLevel;
 }
 
@@ -899,6 +1038,8 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureWifiLink(int requestCu
               requestCureLevel, currentRssi);
     if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS) {
         WIFI_LOGI("SelfCureForDns");
+    } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP) {
+        SelfCureForStaticIp(requestCureLevel);
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_RECONNECT_4_INVALID_IP) {
         SelfCureForInvalidIp();
     } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
@@ -927,6 +1068,88 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForInvalidIp()
         }
         selfCureForInvalidIpCnt++;
     }
+}
+
+IpInfo SelfCureStateMachine::InternetSelfCureState::GetNextTestDhcpResults()
+{
+    IpInfo ipInfo;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("GetNextTestDhcpResults get pEnhanceService service failed!");
+        return ipInfo;
+    }
+    bool isMultiDhcpServer = true;
+    bool startSelfcure = false;
+    pEnhanceService->GetStaticIpConfig(isMultiDhcpServer, startSelfcure, ipInfo);
+    return ipInfo;
+}
+
+IpInfo SelfCureStateMachine::InternetSelfCureState::GetRecordDhcpResults()
+{
+    IpInfo ipInfo;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("GetRecordDhcpResults get pEnhanceService service failed!");
+        return ipInfo;
+    }
+    bool isMultiDhcpServer = false;
+    bool startSelfcure = false;
+    pEnhanceService->GetStaticIpConfig(isMultiDhcpServer, startSelfcure, ipInfo);
+    std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
+    if (!pSelfCureStateMachine->DoSlowArpTest(gateway)) {
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM,
+            DHCP_CONFIRM_DELAYED_MS);
+        IpInfo dhcpResult;
+        return dhcpResult;
+    }
+    return ipInfo;
+}
+
+void SelfCureStateMachine::InternetSelfCureState::SelfCureForStaticIp(int requestCureLevel)
+{
+    IpInfo dhcpResult;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("SelfCureForStaticIp get pEnhanceService service failed!");
+        return;
+    }
+    bool isMultiDhcpServer = configStaticIp4MultiDhcpServer ? true : false;
+    bool startSelfcure = true;
+    pEnhanceService->GetStaticIpConfig(isMultiDhcpServer, startSelfcure, dhcpResult);
+    if (dhcpResult.gateway == 0 || dhcpResult.ipAddress == 0) {
+        WIFI_LOGE("%{public}s: dhcpResult is null", __FUNCTION__);
+        return;
+    }
+    std::string gatewayKey = IpTools::ConvertIpv4Address(dhcpResult.gateway);
+    WIFI_LOGI("begin to self cure for internet access: TRY_NEXT_DHCP_OFFER");
+    pSelfCureStateMachine->selfCureOnGoing = true;
+    RequestUseStaticIpConfig(dhcpResult);
+}
+
+void SelfCureStateMachine::InternetSelfCureState::RequestUseStaticIpConfig(IpInfo &dhcpResult)
+{
+    WIFI_LOGI("enter %{public}s", __FUNCTION__);
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, pSelfCureStateMachine->m_instId);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        return;
+    }
+    IpV6Info wifiIpV6Info;
+    WifiConfigCenter::GetInstance().GetIpv6Info(wifiIpV6Info, pSelfCureStateMachine->m_instId);
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
+    WifiNetAgent::GetInstance().UpdateNetLinkInfo(dhcpResult, wifiIpV6Info, config.wifiProxyconfig,
+        pSelfCureStateMachine->m_instId);
+    linkedInfo.ipAddress = dhcpResult.ipAddress;
+    WifiConfigCenter::GetInstance().SaveIpInfo(dhcpResult);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, pSelfCureStateMachine->m_instId);
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
+    cbMsg.msgData = ConnState::CONNECTED;
+    cbMsg.linkInfo = linkedInfo;
+    cbMsg.id = pSelfCureStateMachine->m_instId;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, HTTP_DETECT_TIMEOUT);
 }
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForReassoc(int requestCureLevel)
@@ -962,7 +1185,7 @@ bool SelfCureStateMachine::InternetSelfCureState::IsNeedMultiGatewaySelfcure()
     return pSelfCureStateMachine->IfMultiGateway();
 }
 
-void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(InternalMessage *msg)
+void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(InternalMessagePtr msg)
 {
     WIFI_LOGI("begin to self cure for internet access: multi gateway");
     if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
@@ -992,8 +1215,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     pMultiGateway->SetStaticArp(ifaceName, ipAddr, macString);
     if (!pSelfCureStateMachine->IsHttpReachable()) {
-        std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
-        std::string ipAddr = pMultiGateway->GetGatewayIp();
         pMultiGateway->DelStaticArp(ifaceName, ipAddr);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_MULTI_GATEWAY);
     } else {
@@ -1017,6 +1238,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
+    WifiConfigCenter::GetInstance().SetLastNetworkId(networkId);
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
     if (pStaService == nullptr) {
         WIFI_LOGE("Get pStaService failed!");
@@ -1027,6 +1249,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
     }
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
+    pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_CONN_FAILED_TIMEOUT, SELF_CURE_CONN_FAILED_TIMEOUT_MS);
 }
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCureLevel)
@@ -1151,10 +1374,9 @@ void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecoveryConfirm(
 
 bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int currentCureLevel)
 {
-    int curCureLevel = currentCureLevel;
     WIFI_LOGI("ConfirmInternetSelfCure, cureLevel = %{public}d ,last failed counter = %{public}d,"
               "finally = %{public}d",
-              curCureLevel, selfCureFailedCounter, finalSelfCureUsed);
+              currentCureLevel, selfCureFailedCounter, finalSelfCureUsed);
     if (currentCureLevel == WIFI_CURE_RESET_LEVEL_IDLE) {
         return false;
     }
@@ -1162,18 +1384,19 @@ bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int cu
         if (currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS && pSelfCureStateMachine->internetUnknown) {
             WIFI_LOGI("RequestUpdateDnsServers");
         }
-        if (currentCureLevel == WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC &&
-            pSelfCureStateMachine->useWithRandMacAddress == FAC_MAC_REASSOC &&
-            pSelfCureStateMachine->IsUseFactoryMac()) {
-            pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(FAC_MAC_REASSOC);
-        }
         HandleHttpReachableAfterSelfCure(currentCureLevel);
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
         return true;
     }
+    HandleConfirmInternetSelfCureFailed(currentCureLevel);
+    return false;
+}
+
+void SelfCureStateMachine::InternetSelfCureState::HandleConfirmInternetSelfCureFailed(int currentCureLevel)
+{
     if (currentCureLevel == WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC && pSelfCureStateMachine->internetUnknown) {
         HandleSelfCureFailedForRandMacReassoc();
-        return false;
+        return;
     }
     selfCureFailedCounter++;
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, currentCureLevel, false);
@@ -1183,21 +1406,34 @@ bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int cu
     pSelfCureStateMachine->selfCureOnGoing = false;
     if (finalSelfCureUsed) {
         HandleHttpUnreachableFinally();
-        return false;
+        return;
     }
     if (currentCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC && pSelfCureStateMachine->hasTestWifi6Reassoc &&
         pSelfCureStateMachine->IsNeedWifiReassocUseDeviceMac()) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE, WIFI_CURE_INTERNET_FAILED_RAND_MAC);
-        return false;
+        return;
+    }
+    if (currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP) {
+        if (GetNextTestDhcpResults().ipAddress != 0) {
+            lastSelfCureLevel = currentCureLevel;
+            WIFI_LOGI("HTTP unreachable, and has next dhcp results, try next one.");
+            pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK,
+                WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP, 0);
+            return;
+        }
+        configStaticIp4MultiDhcpServer = false;
+        if (SelectedSelfCureAcceptable()) {
+            return;
+        }
     }
     if (!HasBeenTested(WIFI_CURE_RESET_LEVEL_HIGH_RESET) &&
         pSelfCureStateMachine->SelfCureAcceptable(selfCureHistoryInfo, WIFI_CURE_RESET_LEVEL_HIGH_RESET)) {
-        lastSelfCureLevel = curCureLevel;
+        lastSelfCureLevel = currentCureLevel;
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE, WIFI_CURE_RESET_LEVEL_HIGH_RESET);
     } else {
         HandleHttpUnreachableFinally();
     }
-    return false;
+    return;
 }
 
 void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMacReassoc()
@@ -1210,6 +1446,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
         int networkId = linkedInfo.networkId;
+        WifiConfigCenter::GetInstance().SetLastNetworkId(networkId);
         IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
         if (pStaService == nullptr) {
             WIFI_LOGE("Get pStaService failed!");
@@ -1237,9 +1474,9 @@ void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableAfterSelfCu
     pSelfCureStateMachine->selfCureOnGoing = false;
     if (!setStaticIp4InvalidIp && currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP) {
         currentAbnormalType = WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY;
+        pSelfCureStateMachine->RequestArpConflictTest();
+        pSelfCureStateMachine->staticIpCureSuccess = true;
     }
-    pSelfCureStateMachine->RequestArpConflictTest();
-    pSelfCureStateMachine->staticIpCureSuccess = true;
 }
 
 void SelfCureStateMachine::InternetSelfCureState::HandleHttpUnreachableFinally()
@@ -1335,7 +1572,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::Wifi6SelfCureState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::Wifi6SelfCureState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -1375,7 +1612,7 @@ bool SelfCureStateMachine::Wifi6SelfCureState::ExecuteStateMsg(InternalMessage *
     return ret;
 }
 
-void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithHtcArpDetect(InternalMessage *msg)
+void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithHtcArpDetect(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
@@ -1403,7 +1640,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithHtcArpDetect(Int
     }
 }
 
-void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithoutHtcArpDetect(InternalMessage *msg)
+void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithoutHtcArpDetect(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
@@ -1435,7 +1672,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::PeriodicWifi6WithoutHtcArpDetect(
     }
 }
 
-void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(InternalMessage *msg)
+void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
@@ -1461,7 +1698,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithHtcArpFail(Interna
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_PERIODIC_ARP_DETECTED);
 }
 
-void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(InternalMessage *msg)
+void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("%{public}s msg is nullptr", __FUNCTION__);
@@ -1517,7 +1754,7 @@ void SelfCureStateMachine::NoInternetState::GoOutState()
     return;
 }
 
-bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessage *msg)
+bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -1530,9 +1767,9 @@ bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessage *msg
             pSelfCureStateMachine->StopTimer(CMD_INTERNET_STATUS_DETECT_INTERVAL);
             if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_CLOSE) {
                 IpQosMonitor::GetInstance().QueryPackets();
-                pSelfCureStateMachine->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
-                    NO_INTERNET_DETECT_INTERVAL_MS);
             }
+            pSelfCureStateMachine->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
+                NO_INTERNET_DETECT_INTERVAL_MS);
             break;
         case WIFI_CURE_CMD_HTTP_REACHABLE_RCV:
             ret = EXECUTED;
@@ -1852,7 +2089,8 @@ bool SelfCureStateMachine::IsIpAddressInvalid()
         currAddr = TransIpAddressToVec(addr);
         if ((currAddr.size() == IP_ADDR_SIZE)) {
             uint32_t intCurrAddr3 = (currAddr[VEC_POS_3] & 0xFF);
-            uint32_t netmaskLenth = IpTools::GetMaskLength(IpTools::ConvertIpv4Address(dhcpInfo.netmask));
+            uint32_t netmaskLenth =
+                static_cast<uint32_t>(IpTools::GetMaskLength(IpTools::ConvertIpv4Address(dhcpInfo.netmask)));
             bool ipEqualsGw = (dhcpInfo.ipAddress == dhcpInfo.gateway);
             bool invalidIp = (intCurrAddr3 == 0 || intCurrAddr3 == 1 || intCurrAddr3 == IP_ADDR_LIMIT);
             if ((ipEqualsGw) || ((netmaskLenth == NET_MASK_LENGTH) && (invalidIp))) {
@@ -2116,7 +2354,7 @@ void SelfCureStateMachine::PeriodicArpDetection()
     MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED, DEFAULT_ARP_DETECTED_MS);
 }
 
-bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessage *msg, std::string currConnectedBssid)
+bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessagePtr msg, std::string currConnectedBssid)
 {
     WIFI_LOGI("enter ShouldTransToWifi6SelfCure");
     if (currConnectedBssid.empty()) {
@@ -2439,13 +2677,14 @@ bool SelfCureStateMachine::UpdateConnSelfCureFailedHistory()
 void SelfCureStateMachine::HandleNetworkConnected()
 {
     StopTimer(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
+    StopTimer(WIFI_CURE_CMD_CONN_FAILED_TIMEOUT);
     if (!UpdateConnSelfCureFailedHistory()) {
         WIFI_LOGD("Config is null for update, delay 2s to update again.");
         MessageExecutedLater(WIFI_CURE_CMD_UPDATE_CONN_SELF_CURE_HISTORY, SELF_CURE_MONITOR_DELAYED_MS);
     }
     noAutoConnCounter = 0;
     autoConnectFailedNetworksRssi.clear();
-    connectedTimeMills = clock();
+    connectedTime = static_cast<int64_t>(time(nullptr));
     {
         std::lock_guard<std::mutex> lock(dhcpFailedBssidLock);
         dhcpFailedBssids.clear();
@@ -2456,7 +2695,7 @@ void SelfCureStateMachine::HandleNetworkConnected()
 
 bool SelfCureStateMachine::IsEncryptedAuthType(const std::string authType)
 {
-    if (authType == KEY_MGMT_WPA_PSK || authType == KEY_MGMT_SAE) {
+    if (authType == KEY_MGMT_WPA_PSK || authType == KEY_MGMT_WAPI_PSK || authType == KEY_MGMT_SAE) {
         return true;
     }
     return false;
@@ -2575,6 +2814,57 @@ void SelfCureStateMachine::UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryI
     }
 }
 
+void SelfCureStateMachine::RecoverySoftAp()
+{
+    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+        WIFI_LOGI("GetWifiTogglerManager is nullptr!!");
+        return;
+    }
+    WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+    WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, 0);
+}
+ 
+bool SelfCureStateMachine::IsSoftApSsidSameWithWifi(HotspotConfig curApConfig)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiDeviceConfig config;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
+    bool isSameSsid = (curApConfig.GetSsid() == linkedInfo.ssid);
+    bool isSamePassword = (curApConfig.GetPreSharedKey() == config.preSharedKey);
+    bool isSameSecurityType = ("WPA2-PSK" == config.keyMgmt || "WPA-PSK" == config.keyMgmt);
+    if (isSameSsid && isSameSecurityType && !isSamePassword) {
+        return true;
+    }
+    return false;
+}
+ 
+void SelfCureStateMachine::CheckConflictIpForSoftAp()
+{
+    IpInfo ipInfo;
+    HotspotConfig curApConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, 0);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo);
+    WIFI_LOGI("CheckConflictIpForSoftAp enter!");
+    if (!WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
+        WIFI_LOGI("softap not started, return!");
+        return;
+    }
+    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+        WIFI_LOGI("GetWifiTogglerManager is nullptr!!");
+        return;
+    }
+    if (IsSoftApSsidSameWithWifi(curApConfig)) {
+        WIFI_LOGI("sta and sofap have same ssid and PSK, close softap!");
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+        return;
+    }
+    if (IpTools::ConvertIpv4Address(ipInfo.gateway) == curApConfig.GetIpAddress()) {
+        WIFI_LOGI("sta and sofap gateway conflict, recovery softap!");
+        RecoverySoftAp();
+    }
+}
+
 void SelfCureStateMachine::RequestArpConflictTest()
 {
     IpInfo ipInfo;
@@ -2620,6 +2910,31 @@ bool SelfCureStateMachine::IsSettingsPage()
 bool SelfCureStateMachine::IsSelfCureOnGoing()
 {
     return selfCureOnGoing;
+}
+
+bool SelfCureStateMachine::IsMultiDhcpOffer()
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("IsMultiDhcpOffer get pEnhanceService service failed!");
+        return false;
+    }
+    uint32_t retSize = 0;
+    IpInfo info;
+    pEnhanceService->DealDhcpOfferResult(OperationCmd::DHCP_OFFER_SIZE_GET, info, retSize);
+    return retSize >= DHCP_OFFER_COUNT;
+}
+
+void SelfCureStateMachine::ClearDhcpOffer()
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("ClearDhcpOffer get pEnhanceService service failed!");
+        return;
+    }
+    uint32_t retSize = 0;
+    IpInfo info;
+    pEnhanceService->DealDhcpOfferResult(OperationCmd::DHCP_OFFER_CLEAR, info, retSize);
 }
 } // namespace Wifi
 } // namespace OHOS

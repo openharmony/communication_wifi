@@ -126,7 +126,7 @@ static ErrCode NativeInfoElemsToJsObj(const napi_env& env,
         SetValueInt32(env, "eid", infoElems[i].id, ieObj);
         const char *uStr = &infoElems[i].content[0];
         size_t len = infoElems[i].content.size();
-        size_t inLen = (infoElems[i].content.size()) * valueStep + 1;
+        size_t inLen = static_cast<size_t>(infoElems[i].content.size() * valueStep + 1);
         char *buf = (char *)calloc(inLen + 1, sizeof(char));
         if (buf == NULL) {
             return WIFI_OPT_FAILED;

@@ -48,7 +48,7 @@ void MockApStateMachine::SendMessage(int what, int arg1, int arg2)
         arg1, arg2);
 }
 
-void MockApStateMachine::SendMessage(InternalMessage *msg)
+void MockApStateMachine::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;

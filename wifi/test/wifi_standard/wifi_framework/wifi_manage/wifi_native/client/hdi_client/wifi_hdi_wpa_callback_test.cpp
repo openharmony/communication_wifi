@@ -511,5 +511,11 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventInvitationReceivedTest, TestSize.Level1)
     result = OnEventInvitationReceived(nullptr, nullptr, "wlan0");
     EXPECT_EQ(result, 1);
 }
+
+HWTEST(WifiHdiWpaCallbackTest, OnNativeProcessDeathTest, TestSize.Level1)
+{
+    int status = 0;
+    OnNativeProcessDeath(status);
+}
 } // namespace Wifi
 } // namespace OHOS

@@ -66,7 +66,7 @@ public:
 
         pApStartedState = std::make_unique<ApStartedState>(*pMockApStateMachine, *pMockApConfigUse, *pMockApMonitor);
 
-        msg = new InternalMessage();
+        msg = std::make_shared<InternalMessage>();
 
         apcfg.SetSsid(std::string("UnitTestAp"));
 
@@ -138,13 +138,11 @@ public:
 
         pMockApNatManager = nullptr;
 
-        delete msg;
-
         msg = nullptr;
     }
 
 public:
-    InternalMessage *msg;
+    InternalMessagePtr msg;
 
     std::unique_ptr<ApStartedState> pApStartedState;
 
@@ -463,6 +461,14 @@ HWTEST_F(ApStartedState_test, StartAp_001, TestSize.Level1)
     EXPECT_TRUE(pApStartedState->StartAp());
 }
 
+HWTEST_F(ApStartedState_test, UpdateConfigInfoTest, TestSize.Level1)
+{
+    InternalMessage msg;
+    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_INFO));
+    msg.SetParam1(1);
+    pApStartedState->ProcessCmdUpdateConfigInfo(msg);
+}
+
 HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))
@@ -487,7 +493,7 @@ HWTEST_F(ApStartedState_test, ProcessCmdUpdateCountryCodeTest, TestSize.Level1)
     msg->ClearMessageBody();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(countryCode);
-    pApStartedState->ProcessCmdUpdateCountryCode(*msg);
+    pApStartedState->ProcessCmdUpdateCountryCode(msg);
 }
 
 HWTEST_F(ApStartedState_test, UpdatMacAddressTest, TestSize.Level1)
@@ -504,7 +510,7 @@ HWTEST_F(ApStartedState_test, UpdatMacAddressTest, TestSize.Level1)
 
 HWTEST_F(ApStartedState_test, ProcessCmdSetHotspotIdleTimeout, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     pApStartedState->ProcessCmdSetHotspotIdleTimeout(msg);
 }
 

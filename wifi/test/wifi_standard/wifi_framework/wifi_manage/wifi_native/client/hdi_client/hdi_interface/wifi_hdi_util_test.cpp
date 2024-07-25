@@ -41,6 +41,20 @@ HWTEST_F(WifiHdiUtilTest, Get80211ElemsFromIETest, TestSize.Level1)
     EXPECT_EQ(result, 0);
 }
 
+HWTEST_F(WifiHdiUtilTest, Get80211ElemsFromIETest1, TestSize.Level1)
+{
+    struct HdiElem *elem = nullptr;
+    elem->id = 0;
+    elem->datalen = 5;
+    elem->data[0] = 0x01;
+    elem->data[1] = 0x02;
+    struct HdiElems elems;
+    int ret = Get80211ElemsFromIE((const uint8_t*)&elem, sizeof(elem), &elems, 1);
+    ASSERT_EQ(ret, -1);
+    EXPECT_EQ(elems.ssidLen, 5);
+    EXPECT_EQ(elems.ratesLen, 5);
+}
+
 HWTEST_F(WifiHdiUtilTest, DelScanInfoLineTest, TestSize.Level1)
 {
     ScanInfo pcmd;
@@ -553,6 +567,28 @@ HWTEST_F(WifiHdiUtilTest, HdiParseExtensionInfoTest13, TestSize.Level1)
     EXPECT_EQ(ret, -1);
 }
 
+HWTEST_F(WifiHdiUtilTest, HdiParseExtensionInfoTest14, TestSize.Level1)
+{
+    struct HdiElems elems;
+    int show = 1;
+    uint8_t pos[10];
+    pos[0] = HDI_EID_EXT_HE_CAPABILITIES;
+    size_t elen = 2;
+    int ret = HdiParseExtensionInfo(pos, elen, &elems, show);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(WifiHdiUtilTest, HdiParseExtensionInfoTest15, TestSize.Level1)
+{
+    struct HdiElems elems;
+    int show = 1;
+    uint8_t pos[10];
+    pos[0] = HDI_EID_EXT_HE_OPERATION;
+    size_t elen = 2;
+    int ret = HdiParseExtensionInfo(pos, elen, &elems, show);
+    EXPECT_EQ(ret, 0);
+}
+
 extern "C" bool HdiGetRsnCapabLen(const uint8_t *rsnxe, size_t rsnxe_len, unsigned int capab);
 HWTEST_F(WifiHdiUtilTest, HdiGetRsnCapabLenTest, TestSize.Level1)
 {
@@ -612,7 +648,7 @@ HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest, TestSize.Level1)
 HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest1, TestSize.Level1)
 {
     struct HdiElems elems;
-    uint8_t pos[5] = {1, 1, 1, 0, 0};
+    uint8_t pos[5] = {0x00, 0x50, 0xF2, 0, 0};
     size_t elen = 5;
     int show = 1;
     int ret = HdiParseVendorSpec(pos, elen, &elems, show);
@@ -620,40 +656,40 @@ HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest1, TestSize.Level1)
 
     pos[3] = 1;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 2;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     elen = 4;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
     EXPECT_EQ(ret, -1);
     elen = 8;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[4] = 0;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[4] = 1;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[4] = 2;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[4] = 3;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
     EXPECT_EQ(ret, -1);
     pos[3] = 4;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest2, TestSize.Level1)
 {
     struct HdiElems elems;
     uint8_t pos[10] = {0};
-    pos[0] = 2;
-    pos[1] = 2;
-    pos[2] = HDI_P2P_OUI_TYPE;
+    pos[0] = 0x50;
+    pos[1] = 0x6f;
+    pos[2] = 0x9a;
     size_t elen = 4;
     int show = 1;
     int ret = HdiParseVendorSpec(pos, elen, &elems, show);
@@ -661,34 +697,34 @@ HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest2, TestSize.Level1)
 
     pos[3] = 9;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 10;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 16;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 18;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 18;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 18;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 0x1B;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest3, TestSize.Level1)
 {
     struct HdiElems elems;
     uint8_t pos[10] = {0};
-    pos[0] = 3;
-    pos[1] = 3;
-    pos[2] = HDI_HT_CAPAB_OUI_TYPE;
+    pos[0] = 0x00;
+    pos[1] = 0x90;
+    pos[2] = 0x4c;
     size_t elen = 4;
     int show = 1;
     int ret = HdiParseVendorSpec(pos, elen, &elems, show);
@@ -696,7 +732,7 @@ HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest3, TestSize.Level1)
 
     pos[3] = 0x33;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 0x04;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
     EXPECT_EQ(ret, -1);
@@ -706,17 +742,17 @@ HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest4, TestSize.Level1)
 {
     struct HdiElems elems;
     uint8_t pos[10] = {0};
-    pos[0] = 4;
-    pos[1] = 4;
-    pos[2] = HDI_VENDOR_ELEM_P2P_PREF_CHAN_LIST;
+    pos[0] = 0x00;
+    pos[1] = 0x13;
+    pos[2] = 0x74;
     size_t elen = 4;
     int show = 1;
     int ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
 
     pos[3] = 0;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
-    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(ret, 0);
     pos[3] = 1;
     ret = HdiParseVendorSpec(pos, elen, &elems, show);
     EXPECT_EQ(ret, -1);
@@ -760,6 +796,289 @@ HWTEST_F(WifiHdiUtilTest, RecordIeNeedParseTest, TestSize.Level1)
 
     RecordIeNeedParse(50, &ie, &iesNeedParse);
     ASSERT_EQ(iesNeedParse.ieExtMaxRate, &ie);
+}
+
+extern "C" bool CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len);
+HWTEST_F(WifiHdiUtilTest, CheckHiLinkOUISectionTest, TestSize.Level1)
+{
+    EXPECT_EQ(CheckHiLinkOUISection(nullptr, 8), false);
+    EXPECT_EQ(CheckHiLinkOUISection(nullptr, 10), false);
+}
+
+HWTEST_F(WifiHdiUtilTest, CheckHiLinkOUISectionTest1, TestSize.Level1)
+{
+    uint8_t bytes[] = {0, 0xE0, 0XFC, 0X81, 0, 0, 0, 0X01, 0};
+    EXPECT_EQ(CheckHiLinkOUISection(bytes, 8), false);
+}
+
+HWTEST_F(WifiHdiUtilTest, CheckHiLinkOUISectionTest2, TestSize.Level1)
+{
+    uint8_t bytes[] = {0, 0xE0, 0XFC, 0X80, 0, 0, 0, 0X01, 0};
+    EXPECT_EQ(CheckHiLinkOUISection(bytes, 10), true);
+}
+
+extern "C" int HdiCheckExtCap(const uint8_t *ie, unsigned int capab);
+HWTEST_F(WifiHdiUtilTest, HdiCheckExtCapTest, TestSize.Level1)
+{
+    uint8_t ie = 0;
+    unsigned int capab = 1;
+    EXPECT_EQ(HdiCheckExtCap(nullptr, capab), 0);
+
+    ie = 1;
+    EXPECT_EQ(HdiCheckExtCap(&ie, capab), 0);
+
+    ie = 2;
+    capab = 32;
+    EXPECT_EQ(HdiCheckExtCap(&ie, capab), 0);
+}
+
+extern "C" bool GetChanWidthCenterFreqHt(ScanInfo *pcmd, ScanInfoElem* infoElem);
+HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqHtTest, TestSize.Level1)
+{
+    ScanInfo pcmd;
+    ScanInfoElem infoElem;
+    bool ret = GetChanWidthCenterFreqHt(nullptr, nullptr);
+    EXPECT_EQ(ret, false);
+    ret = GetChanWidthCenterFreqHt(nullptr, &infoElem);
+    EXPECT_EQ(ret, false);
+    ret = GetChanWidthCenterFreqHt(&pcmd, nullptr);
+    EXPECT_EQ(ret, false);
+    ret = GetChanWidthCenterFreqHt(&pcmd, &infoElem);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqHtTest1, TestSize.Level1)
+{
+    ScanInfo pcmd;
+    ScanInfoElem infoElem;
+    infoElem.content = nullptr;
+    infoElem.size = 10;
+    bool ret = GetChanWidthCenterFreqHt(&pcmd, &infoElem);
+    EXPECT_EQ(ret, false);
+    infoElem.size = 2;
+    ret = GetChanWidthCenterFreqHt(&pcmd, &infoElem);
+    EXPECT_EQ(ret, false);
+
+    infoElem.content = (char *)malloc(10);
+    ret = GetChanWidthCenterFreqHt(&pcmd, &infoElem);
+    EXPECT_EQ(ret, false);
+
+    infoElem.size = 10;
+    ret = GetChanWidthCenterFreqHt(&pcmd, &infoElem);
+    EXPECT_EQ(ret, true);
+    free(infoElem.content);
+}
+
+extern "C" bool GetChanWidthCenterFreqVht(ScanInfo *pcmd, ScanInfoElem* infoElem);
+HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqVhtTest, TestSize.Level1)
+{
+    ScanInfo pcmd;
+    ScanInfoElem infoElem;
+    bool ret = GetChanWidthCenterFreqVht(nullptr, nullptr);
+    EXPECT_EQ(ret, false);
+    ret = GetChanWidthCenterFreqVht(nullptr, &infoElem);
+    EXPECT_EQ(ret, false);
+    ret = GetChanWidthCenterFreqVht(&pcmd, nullptr);
+    EXPECT_EQ(ret, false);
+    ret = GetChanWidthCenterFreqVht(&pcmd, &infoElem);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqVhtTest1, TestSize.Level1)
+{
+    ScanInfo pcmd;
+    ScanInfoElem infoElem;
+    infoElem.content = nullptr;
+    infoElem.size = 10;
+    bool ret = GetChanWidthCenterFreqVht(&pcmd, &infoElem);
+    EXPECT_EQ(ret, false);
+    infoElem.size = 2;
+    ret = GetChanWidthCenterFreqVht(&pcmd, &infoElem);
+    EXPECT_EQ(ret, false);
+
+    infoElem.content = (char *)malloc(10);
+    ret = GetChanWidthCenterFreqVht(&pcmd, &infoElem);
+    EXPECT_EQ(ret, false);
+
+    infoElem.size = 10;
+    ret = GetChanWidthCenterFreqVht(&pcmd, &infoElem);
+    EXPECT_EQ(ret, true);
+    free(infoElem.content);
+}
+
+extern "C" int GetHtChanWidth(int secondOffsetChannel);
+HWTEST_F(WifiHdiUtilTest, GetHtChanWidthTest, TestSize.Level1)
+{
+    int secondOffsetChannel = 0;
+    int result = GetHtChanWidth(secondOffsetChannel);
+    EXPECT_EQ(result, 0);
+
+    secondOffsetChannel = 1;
+    result = GetHtChanWidth(secondOffsetChannel);
+    EXPECT_EQ(result, 1);
+}
+
+extern "C" int GetHtCentFreq0(int primaryFrequency, int secondOffsetChannel);
+HWTEST_F(WifiHdiUtilTest, GetHtCentFreq0Test, TestSize.Level1)
+{
+    int primaryFrequency = -2;
+    int secondOffsetChannel = 0;
+    int result = GetHtCentFreq0(primaryFrequency, secondOffsetChannel);
+    EXPECT_EQ(result, -2);
+
+    secondOffsetChannel = 1;
+    result = GetHtCentFreq0(primaryFrequency, secondOffsetChannel);
+    EXPECT_EQ(result, 8);
+
+    secondOffsetChannel = 2;
+    result = GetHtCentFreq0(primaryFrequency, secondOffsetChannel);
+    EXPECT_EQ(result, 0);
+
+    secondOffsetChannel = 3;
+    result = GetHtCentFreq0(primaryFrequency, secondOffsetChannel);
+    EXPECT_EQ(result, -12);
+}
+
+extern "C" int GetVhtChanWidth(int channelType, int centerFrequencyIndex1, int centerFrequencyIndex2);
+HWTEST_F(WifiHdiUtilTest, GetVhtChanWidthTest, TestSize.Level1)
+{
+    int channelType = 0;
+    int centerFrequencyIndex1 = 9;
+    int centerFrequencyIndex2 = 0;
+    int result = GetVhtChanWidth(channelType, centerFrequencyIndex1, centerFrequencyIndex2);
+    EXPECT_EQ(result, -1);
+
+    channelType = 1;
+    result = GetVhtChanWidth(channelType, centerFrequencyIndex1, centerFrequencyIndex2);
+    EXPECT_EQ(result, 2);
+
+    centerFrequencyIndex2 = 1;
+    result = GetVhtChanWidth(channelType, centerFrequencyIndex1, centerFrequencyIndex2);
+    EXPECT_EQ(result, 3);
+
+    centerFrequencyIndex2 = -1;
+    result = GetVhtChanWidth(channelType, centerFrequencyIndex1, centerFrequencyIndex2);
+    EXPECT_EQ(result, 4);
+}
+
+extern "C" int GetVhtCentFreq(int channelType, int centerFrequencyIndex);
+HWTEST_F(WifiHdiUtilTest, GetVhtCentFreqTest, TestSize.Level1)
+{
+    int result = GetVhtCentFreq(0, 0);
+    EXPECT_EQ(result, 0);
+
+    result = GetVhtCentFreq(0, 1);
+    EXPECT_EQ(result, 0);
+
+    result = GetVhtCentFreq(1, 0);
+    EXPECT_EQ(result, 0);
+
+    result = GetVhtCentFreq(1, 1);
+    EXPECT_EQ(result, -1);
+}
+
+extern "C" int HexStringToString(const char *str, char *out);
+HWTEST_F(WifiHdiUtilTest, HexStringToStringTest, TestSize.Level1)
+{
+    char out[100];
+    EXPECT_EQ(HexStringToString("", out), 0);
+    EXPECT_EQ(HexStringToString("1", out), -1);
+    EXPECT_EQ(HexStringToString("12", out), 0);
+    EXPECT_EQ(HexStringToString("1g", out), -1);
+    EXPECT_EQ(HexStringToString("g1", out), -1);
+    EXPECT_EQ(HexStringToString("gg", out), -1);
+    EXPECT_EQ(HexStringToString("1234567890abcdef", out), 0);
+}
+
+extern "C" void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedParse);
+HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqTest, TestSize.Level1)
+{
+    ScanInfo pcmd;
+    struct NeedParseIe iesNeedParse;
+    GetChanWidthCenterFreq(nullptr, nullptr);
+    GetChanWidthCenterFreq(&pcmd, nullptr);
+    GetChanWidthCenterFreq(nullptr, &iesNeedParse);
+    GetChanWidthCenterFreq(&pcmd, &iesNeedParse);
+}
+
+extern "C" void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd);
+HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest, TestSize.Level1)
+{
+    char srcBuf[10] = "";
+    GetInfoElems(0, 0, srcBuf, nullptr);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest1, TestSize.Level1)
+{
+    int length = 10;
+    int end = 5;
+    char srcBuf[10] = "[123";
+    ScanInfo pcmd;
+    GetInfoElems(length, end, srcBuf, &pcmd);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest2, TestSize.Level1)
+{
+    int length = 10;
+    int end = 5;
+    char srcBuf[10] = "123";
+    ScanInfo pcmd;
+    GetInfoElems(length, end, srcBuf, &pcmd);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest3, TestSize.Level1)
+{
+    int length = 10;
+    int end = 5;
+    char srcBuf[10] = "123[";
+    ScanInfo pcmd;
+    GetInfoElems(length, end, srcBuf, &pcmd);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest4, TestSize.Level1)
+{
+    int length = 10;
+    int end = 5;
+    char srcBuf[10] = "123[]";
+    ScanInfo pcmd;
+    GetInfoElems(length, end, srcBuf, &pcmd);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest5, TestSize.Level1)
+{
+    int length = 10;
+    int end = 5;
+    char srcBuf[10] = "123[]";
+    ScanInfo pcmd;
+    pcmd.infoElems = (ScanInfoElem *)calloc(256, sizeof(ScanInfoElem));
+    GetInfoElems(length, end, srcBuf, &pcmd);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetScanResultInfoElemTest, TestSize.Level1)
+{
+    ScanInfo scanInfo;
+    uint8_t *start = NULL;
+    size_t len = 0;
+    GetScanResultInfoElem(&scanInfo, start, len);
+}
+
+HWTEST_F(WifiHdiUtilTest, GetScanResultInfoElemTest1, TestSize.Level1)
+{
+    ScanInfo scanInfo;
+    uint8_t start[] = {0x01, 0x02, 0x03};
+    size_t len = sizeof(start);
+    GetScanResultInfoElem(&scanInfo, start, len);
+}
+
+HWTEST_F(WifiHdiUtilTest, RouterSupportHiLinkByWifiInfoTest, TestSize.Level1)
+{
+    uint8_t start[10] = {0};
+    size_t len = 10;
+    bool result = RouterSupportHiLinkByWifiInfo(nullptr, len);
+    EXPECT_FALSE(result);
+
+    result = RouterSupportHiLinkByWifiInfo(start, len);
+    EXPECT_FALSE(result);
 }
 }
 }

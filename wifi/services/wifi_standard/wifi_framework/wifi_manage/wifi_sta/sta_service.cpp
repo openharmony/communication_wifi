@@ -262,16 +262,20 @@ std::string StaService::ConvertString(const std::u16string &wideText) const
 }
 
 #ifndef OHOS_ARCH_LITE
-int32_t StaService::GetDataSlotId() const
+int32_t StaService::GetDataSlotId(int32_t slotId) const
 {
-    auto slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
     int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
-    if ((slotId < 0) || (slotId >= simCount)) {
-        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotId, simCount);
+    if (slotId >= 0 && slotId < simCount) {
+        LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
+        return slotId;
+    }
+    auto slotDefaultID = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if ((slotDefaultID < 0) || (slotDefaultID >= simCount)) {
+        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotDefaultID, simCount);
         return -1;
     }
-    LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
-    return slotId;
+    LOGI("slotDefaultID: %{public}d, simCount:%{public}d", slotDefaultID, simCount);
+    return slotDefaultID;
 }
 
 std::string StaService::GetImsi(int32_t slotId) const
@@ -323,7 +327,7 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
         return;
     }
 
-    int32_t slotId = GetDataSlotId();
+    int32_t slotId = GetDataSlotId(config.wifiEapConfig.eapSubId);
     if (slotId == -1) {
         return;
     }
@@ -622,7 +626,7 @@ ErrCode StaService::StartWps(const WpsConfig &config) const
 {
     WIFI_LOGI("Enter StartWps.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     msg->SetMessageName(WIFI_SVR_CMD_STA_STARTWPS);
     msg->SetParam1(static_cast<int>(config.setup));
     msg->AddStringMessageBody(config.pin);
@@ -764,7 +768,7 @@ ErrCode StaService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(cons
         return WIFI_OPT_SUCCESS;
     }
     WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
-    InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    InternalMessagePtr msg = m_stateMachineObj.CreateMessage();
     CHECK_NULL_AND_RETURN(msg, WIFI_OPT_FAILED);
     msg->SetMessageName(static_cast<int>(WIFI_SVR_CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(wifiCountryCode);
@@ -869,7 +873,7 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
 ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd)
 {
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     msg->SetMessageName(WIFI_SVR_COM_STA_ENABLE_HILINK);
     msg->SetParam1(config.bssidType);
     msg->AddStringMessageBody(config.ssid);

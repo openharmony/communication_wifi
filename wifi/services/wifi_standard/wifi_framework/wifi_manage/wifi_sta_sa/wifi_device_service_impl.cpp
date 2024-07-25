@@ -1671,7 +1671,6 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
 {
 #ifndef SUPPORT_LOCAL_RANDOM_MAC
     WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
-    return WIFI_OPT_SUCCESS;
 #else
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
@@ -1704,8 +1703,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
                 ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
             }
             if (ret != 0) {
-                WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
-                    "Using locally generated MAC address instead.", __func__);
+                WIFI_LOGI("HilinkGetMacAddress Failed to generate MAC address, Using locally generated MAC.");
                 WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
             }
             randomMacInfo.randomMac = macAddress;
@@ -1721,9 +1719,8 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
         currentMac = randomMacInfo.randomMac;
     }
     WIFI_LOGI("EnableHiLinkHandshake mac address get success, mac = %{public}s", MacAnonymize(currentMac).c_str());
-
-    return WIFI_OPT_SUCCESS;
 #endif
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
@@ -1893,6 +1890,10 @@ ErrCode WifiDeviceServiceImpl::RegisterAutoJoinCondition(const std::string &cond
         WIFI_LOGE("RegisterAutoJoinCondition:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RegisterAutoJoinCondition:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("pService is nullptr!");
@@ -1905,6 +1906,10 @@ ErrCode WifiDeviceServiceImpl::DeregisterAutoJoinCondition(const std::string &co
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("DeregisterAutoJoinCondition:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DeregisterAutoJoinCondition:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
@@ -1923,6 +1928,10 @@ ErrCode WifiDeviceServiceImpl::RegisterFilterBuilder(const FilterTag &filterTag,
         WIFI_LOGE("RegisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RegisterFilterBuilder:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("pService is nullptr!");
@@ -1936,6 +1945,10 @@ ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTa
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("DeregisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DeregisterFilterBuilder:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);

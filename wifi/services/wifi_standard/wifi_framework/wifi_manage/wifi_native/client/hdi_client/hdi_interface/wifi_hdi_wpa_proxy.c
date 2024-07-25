@@ -27,7 +27,7 @@
 #include "devmgr_hdi.h"
 #include "hdf_remote_service.h"
 #include "osal_mem.h"
-
+#include "wifi_native_define.h"
 #ifndef UT_TEST
 #include "wifi_log.h"
 #else
@@ -83,7 +83,6 @@ static char g_apCfgName[CFGNAME_LEN] = {0};
 static int g_id;
 static int g_execDisable;
 static bool g_apIsRunning = false;
-
 struct IfaceNameInfo {
     char ifName[BUFF_SIZE];
     struct IfaceNameInfo* next;
@@ -192,7 +191,14 @@ static void HdiWpaResetGlobalObj()
     g_devMgr = NULL;
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGE("%{public}s reset wpa g_wpaObj", __func__);
-    HdiWpaStart();
+}
+
+static void (*mNativeProcessCallback)(int) = NULL;
+WifiErrorNo SetNativeProcessCallback(void (*callback)(int))
+{
+    LOGI("%{public}s enter", __func__);
+    mNativeProcessCallback = callback;
+    return WIFI_HAL_OPT_OK;
 }
 
 static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
@@ -212,6 +218,9 @@ static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRem
     }
     OsalMemFree(recipient);
     recipient = NULL;
+    if (mNativeProcessCallback != NULL) {
+        mNativeProcessCallback(WPA_DEATH);
+    }
     HdiWpaResetGlobalObj();
 }
 
@@ -551,7 +560,6 @@ static void HdiApResetGlobalObj()
     g_apObj = NULL;
     g_apDevMgr = NULL;
     pthread_mutex_unlock(&g_apObjMutex);
-    HdiApStart(g_id, g_apIfaceName);
 }
 
 static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
@@ -571,6 +579,9 @@ static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfR
     }
     OsalMemFree(recipient);
     recipient = NULL;
+    if (mNativeProcessCallback != NULL) {
+        mNativeProcessCallback(AP_DEATH);
+    }
     HdiApResetGlobalObj();
 }
 

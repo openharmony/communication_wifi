@@ -1046,7 +1046,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         return 0;
     }
     std::random_device rd;
-    int randomIndex = std::abs(static_cast<int>(rd())) % freqList.size();
+    int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % freqList.size());
     int retFreq = freqList.at(randomIndex);
     return retFreq;
 }

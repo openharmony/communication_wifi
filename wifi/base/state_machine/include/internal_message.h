@@ -142,9 +142,9 @@ public:
     /**
      * @Description : Get next message.
      *
-     * @return InternalMessage*
+     * @return InternalMessagePtr
      */
-    InternalMessage *GetNextMsg() const;
+    std::shared_ptr<InternalMessage> GetNextMsg() const;
 
     /**
      * @Description : Obtains time.
@@ -250,7 +250,7 @@ public:
      *
      * @param next - The next message.[in]
      */
-    void SetNextMsg(InternalMessage *nextMsg);
+    void SetNextMsg(std::shared_ptr<InternalMessage> nextMsg);
 
     /**
      * @Description : Set the time.
@@ -271,10 +271,11 @@ private:
     /* Message bodies that cannot be directly copied */
     MessageBody mMessageBody;
     /* Next message in the resource pool or message queue */
-    InternalMessage *pNextMsg;
+    std::shared_ptr<InternalMessage> pNextMsg;
     /* Message execution time */
     int64_t mHandleTime;
 };
+using InternalMessagePtr = std::shared_ptr<InternalMessage>;
 class MessageManage {
 public:
     /**
@@ -287,34 +288,34 @@ public:
     /**
      * @Description : Message obtaining function.
      *
-     * @return InternalMessage*
+     * @return InternalMessagePtr
      */
-    InternalMessage *CreateMessage();
+    InternalMessagePtr CreateMessage();
 
     /**
      * @Description : Obtain original messages.
      *
      * @param orig - Original messages.[in]
-     * @return InternalMessage*
+     * @return InternalMessagePtr
      */
-    InternalMessage *CreateMessage(const InternalMessage *orig);
+    InternalMessagePtr CreateMessage(const InternalMessagePtr orig);
 
     /**
      * @Description : Obtains the message name.
      *
      * @param messageName - Message name.[in]
-     * @return InternalMessage*
+     * @return InternalMessagePtr
      */
-    InternalMessage *CreateMessage(int messageName);
+    InternalMessagePtr CreateMessage(int messageName);
 
     /**
      * @Description :Obtaining Message Information.
      *
      * @param messageName - Message name.[in]
      * @param messageObj - Message pointer.[in]
-     * @return InternalMessage*
+     * @return InternalMessagePtr
      */
-    InternalMessage *CreateMessage(int messageName, const std::any &messageObj);
+    InternalMessagePtr CreateMessage(int messageName, const std::any &messageObj);
 
     /**
      * @Description : Obtaining Message Information.
@@ -322,9 +323,9 @@ public:
      * @param messageName - Message name.[in]
      * @param param1 - param1.[in]
      * @param param2 - param2.[in]
-     * @return InternalMessage*
+     * @return InternalMessagePtr
      */
-    InternalMessage *CreateMessage(int messageName, int param1, int param2);
+    InternalMessagePtr CreateMessage(int messageName, int param1, int param2);
 
     /**
      * @Description : Obtaining Message Information.
@@ -333,23 +334,16 @@ public:
      * @param param1 - param1.[in]
      * @param param2 - param2.[in]
      * @param messageObj - Message pointer.[in]
-     * @return InternalMessage*
+     * @return InternalMessagePtr
      */
-    InternalMessage *CreateMessage(int messageName, int param1, int param2, const std::any &messageObj);
+    InternalMessagePtr CreateMessage(int messageName, int param1, int param2, const std::any &messageObj);
 
     /**
      * @Description :Recycle message.
      *
      * @param m - message.[in]
      */
-    void ReclaimMsg(InternalMessage *m);
-
-    /**
-     * @Description : Release pool.
-     *
-     */
-
-    void ReleasePool();
+    void ReclaimMsg(InternalMessagePtr m);
 
     /**
      * @Description : Construct a new Message Manage object.
@@ -364,14 +358,6 @@ public:
     ~MessageManage();
 
 private:
-    /* Maximum number of messages in the message resource pool */
-    const int MAX_MSG_NUM_IN_POOL = 50;
-    /* Message resource pool */
-    InternalMessage *pMsgPool;
-    /* Number of messages in the message resource pool */
-    int mMsgPoolSize;
-    /* Mutex for operating the message resource pool */
-    std::mutex mPoolMutex;
     static std::unique_ptr<MessageManage> msgManage;
 };
 }  // namespace Wifi

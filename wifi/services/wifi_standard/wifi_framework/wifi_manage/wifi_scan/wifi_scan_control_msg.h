@@ -72,6 +72,12 @@ struct WifiScanDeviceInfo {
         freezeState = MODE_STATE_CLOSE;
         noChargerState = MODE_STATE_CLOSE;
         scanMode = ScanMode::SCAN_MODE_MAX;
+        isAbsFreezeScaned = false;
+        staSceneForbidCount = 0;
+        externScan = false;
+        staCurrentTime = 0;
+        gnssFixState = 0;
+        packageName = "";
     }
 };
 }  // namespace Wifi

@@ -60,7 +60,7 @@ ErrCode ApService::DisableHotspot() const
 ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    InternalMessagePtr msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -81,7 +81,7 @@ ErrCode ApService::SetHotspotConfig(const HotspotConfig &cfg) const
 ErrCode ApService::SetHotspotIdleTimeout(int time) const
 {
     WIFI_LOGI("SetHotspotIdleTimeout");
-    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    InternalMessagePtr msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -94,7 +94,7 @@ ErrCode ApService::SetHotspotIdleTimeout(int time) const
 ErrCode ApService::AddBlockList(const StationInfo &stationInfo) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    InternalMessagePtr msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -109,7 +109,7 @@ ErrCode ApService::AddBlockList(const StationInfo &stationInfo) const
 ErrCode ApService::DelBlockList(const StationInfo &stationInfo) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    InternalMessagePtr msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -124,7 +124,7 @@ ErrCode ApService::DelBlockList(const StationInfo &stationInfo) const
 ErrCode ApService::DisconnetStation(const StationInfo &stationInfo) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    InternalMessage *msg = m_ApStateMachine.CreateMessage();
+    InternalMessagePtr msg = m_ApStateMachine.CreateMessage();
     if (msg == nullptr) {
         return ErrCode::WIFI_OPT_FAILED;
     }
@@ -295,7 +295,7 @@ ErrCode ApService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const
         return WIFI_OPT_SUCCESS;
     }
     WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
-    InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    InternalMessagePtr msg = m_stateMachineObj.CreateMessage();
     CHECK_NULL_AND_RETURN(msg, WIFI_OPT_FAILED);
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(wifiCountryCode);

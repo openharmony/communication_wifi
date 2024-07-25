@@ -1123,6 +1123,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForStaticIp(int reques
     std::string gatewayKey = IpTools::ConvertIpv4Address(dhcpResult.gateway);
     WIFI_LOGI("begin to self cure for internet access: TRY_NEXT_DHCP_OFFER");
     pSelfCureStateMachine->selfCureOnGoing = true;
+    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::GATEWAY_ABNORMAL));
     RequestUseStaticIpConfig(dhcpResult);
 }
 
@@ -1160,6 +1161,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReassoc(int request
         return;
     }
     WIFI_LOGI("begin to self cure for internet access: Reassoc");
+    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::TCP_RX_ABNORMAL));
     pSelfCureStateMachine->selfCureOnGoing = true;
     testedSelfCureLevel.push_back(requestCureLevel);
     delayedReassocSelfCure = false;
@@ -1476,6 +1478,16 @@ void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableAfterSelfCu
         currentAbnormalType = WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY;
         pSelfCureStateMachine->RequestArpConflictTest();
         pSelfCureStateMachine->staticIpCureSuccess = true;
+    }
+
+    if (currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS) {
+        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::DNS_SELFCURE_SUCC));
+    } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP) {
+        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::STATIC_IP_SELFCURE_SUCC));
+    } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
+        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::REASSOC_SELFCURE_SUCC));
+    } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_HIGH_RESET) {
+        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RESET_SELFCURE_SUCC));
     }
 }
 

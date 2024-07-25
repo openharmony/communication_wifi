@@ -80,7 +80,7 @@ HWTEST_F(ScanInterfaceTest, ScanWithParamSuccess, TestSize.Level1)
     WifiScanParams wifiScanParams;
     wifiScanParams.ssid = "hmwifi";
     wifiScanParams.bssid = "a3:b1:d7:f2:d2:c2";
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams));
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams, false));
 }
 
 HWTEST_F(ScanInterfaceTest, OnScreenStateChangedSuccess1, TestSize.Level1)
@@ -155,7 +155,7 @@ HWTEST_F(ScanInterfaceTest, ScanWithParamTest, TestSize.Level1)
     WifiScanParams wifiScanParams;
     wifiScanParams.ssid = "HMWIFI_G2_03";
     wifiScanParams.bssid = "2a:76:93:47:e2:8a";
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams));
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams, false));
 }
 
 HWTEST_F(ScanInterfaceTest, StartWifiPnoScanTest, TestSize.Level1)

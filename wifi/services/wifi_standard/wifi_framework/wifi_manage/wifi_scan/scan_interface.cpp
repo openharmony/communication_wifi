@@ -82,12 +82,12 @@ ErrCode ScanInterface::Scan(bool externFlag)
     return pScanService->Scan(externFlag);
 }
 
-ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams)
+ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag)
 {
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    return pScanService->ScanWithParam(wifiScanParams);
+    return pScanService->ScanWithParam(wifiScanParams, externFlag);
 }
 
 ErrCode ScanInterface::DisableScan(bool disable)

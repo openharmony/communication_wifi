@@ -621,5 +621,15 @@ int CheckDataLegal(std::string &data)
  
     return 0;
 }
+
+long long CheckDataLegall(std::string &data)
+{
+    std::regex hex("^[0-9]+$");
+    if (std::regex_search(data, hex)) {
+        return std::stoll(data);
+    }
+ 
+    return 0;
+}
 }  // namespace Wifi
 }  // namespace OHOS

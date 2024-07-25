@@ -58,6 +58,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.macAddress.clear();
     item.internetSelfCureHistory.clear();
     item.isReassocSelfCureWithFactoryMacAddress = 0;
+    item.isShared = true;
     return;
 }
 
@@ -186,6 +187,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.internetSelfCureHistory = value;
     } else if (key == "isReassocSelfCureWithFactoryMacAddress") {
         item.isReassocSelfCureWithFactoryMacAddress = std::stoi(value);
+    } else if (key == "isShared") {
+        item.isShared = std::stoi(value);
     } else {
         return -1;
     }
@@ -561,6 +564,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;
     ss << "    " <<"isReassocSelfCureWithFactoryMacAddress=" << item.isReassocSelfCureWithFactoryMacAddress
        << std::endl;
+    ss << "    " <<"isShared=" << item.isShared << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else

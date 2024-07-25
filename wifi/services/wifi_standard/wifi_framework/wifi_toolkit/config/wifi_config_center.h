@@ -48,6 +48,10 @@ public:
 
     int GetLastNetworkId() const;
 
+    void SetSelectedCandidateNetworkId(const int networkId);
+
+    int GetSelectedCandidateNetworkId() const;
+
     void SetWifiAllowSemiActive(bool isAllowed);
 
     bool GetWifiAllowSemiActive() const;
@@ -324,6 +328,7 @@ private:
     std::atomic<bool> mWifiSelfcureReset {false};
     std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
+    std::atomic<int> mSelectedCandidateNetworkId {INVALID_NETWORK_ID};
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
     std::string mStaIfaceName {"wlan0"};

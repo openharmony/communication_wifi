@@ -164,7 +164,10 @@ int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        results.push_back(iter->second);
+        // -1: Connect by system, use default uid.
+        if (iter->second.uid == -1 || iter->second.isShared) {
+            results.push_back(iter->second);
+        }
     }
     return 0;
 }
@@ -227,32 +230,8 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)) {
-            config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-            DecryptionDeviceConfig(config);
-#endif
-            return 0;
-        }
-    }
-    return -1;
-}
-
-int WifiSettings::GetDeviceConfig(const std::string &ancoCallProcessName, const std::string &ssid,
-    const std::string &keymgmt, WifiDeviceConfig &config)
-{
-    if (!deviceConfigLoadFlag.test_and_set()) {
-        LOGD("Reload wifi config");
-        ReloadDeviceConfig();
-    }
-    if (ancoCallProcessName.empty()) {
-        LOGD("anco do not deal with");
-        return -1;
-    }
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt) &&
-            iter->second.ancoCallProcessName == ancoCallProcessName) {
+            (iter->second.uid == -1 || iter->second.isShared)) {
             config = iter->second;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
             DecryptionDeviceConfig(config);
@@ -307,6 +286,23 @@ int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
     }
     iter->second.randomizedMacSuccessEver = true;
     return 0;
+}
+
+int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
+    WifiDeviceConfig &config)
+{
+    std::vector<WifiDeviceConfig> configs;
+    if (GetAllCandidateConfig(uid, configs) != 0) {
+        return -1;
+    }
+
+    for (const auto &it : configs) {
+        if (it.ssid == ssid && it.keyMgmt == keymgmt) {
+            config = it;
+            return it.networkId;
+        }
+    }
+    return -1;
 }
 
 int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config)

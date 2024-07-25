@@ -68,7 +68,7 @@ void StateMachine::SetHandler(StateMachineHandler *handler)
     pStateMachineHandler = handler;
 }
 
-void StateMachine::NotExecutedMessage(const InternalMessage *msg)
+void StateMachine::NotExecutedMessage(const InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;
@@ -116,7 +116,7 @@ void StateMachine::SwitchState(State *targetState)
     pStateMachineHandler->SwitchState(targetState);
 }
 
-void StateMachine::DelayMessage(const InternalMessage *msg)
+void StateMachine::DelayMessage(const InternalMessagePtr msg)
 {
     if (pStateMachineHandler == nullptr) {
         LOGE("DelayMessage failed, pStateMachineHandler is nullptr!");
@@ -135,12 +135,12 @@ void StateMachine::StopHandlerThread()
     pStateMachineHandler->StopHandlerThread();
 }
 
-InternalMessage *StateMachine::CreateMessage()
+InternalMessagePtr StateMachine::CreateMessage()
 {
     return MessageManage::GetInstance().CreateMessage();
 }
 
-InternalMessage *StateMachine::CreateMessage(const InternalMessage *orig)
+InternalMessagePtr StateMachine::CreateMessage(const InternalMessagePtr orig)
 {
     if (orig == nullptr) {
         return nullptr;
@@ -148,27 +148,27 @@ InternalMessage *StateMachine::CreateMessage(const InternalMessage *orig)
     return MessageManage::GetInstance().CreateMessage(orig);
 }
 
-InternalMessage *StateMachine::CreateMessage(int msgName)
+InternalMessagePtr StateMachine::CreateMessage(int msgName)
 {
     return MessageManage::GetInstance().CreateMessage(msgName);
 }
 
-InternalMessage *StateMachine::CreateMessage(int msgName, int param1)
+InternalMessagePtr StateMachine::CreateMessage(int msgName, int param1)
 {
     return MessageManage::GetInstance().CreateMessage(msgName, param1, 0);
 }
 
-InternalMessage *StateMachine::CreateMessage(int msgName, int param1, int param2)
+InternalMessagePtr StateMachine::CreateMessage(int msgName, int param1, int param2)
 {
     return MessageManage::GetInstance().CreateMessage(msgName, param1, param2);
 }
 
-InternalMessage *StateMachine::CreateMessage(int msgName, const std::any &messageObj)
+InternalMessagePtr StateMachine::CreateMessage(int msgName, const std::any &messageObj)
 {
     return MessageManage::GetInstance().CreateMessage(msgName, messageObj);
 }
 
-InternalMessage *StateMachine::CreateMessage(int msgName, int param1, int param2, const std::any &messageObj)
+InternalMessagePtr StateMachine::CreateMessage(int msgName, int param1, int param2, const std::any &messageObj)
 {
     return MessageManage::GetInstance().CreateMessage(msgName, param1, param2, messageObj);
 }
@@ -191,7 +191,7 @@ void StateMachine::SendMessage(int msgName, int param1, int param2)
     return;
 }
 
-void StateMachine::SendMessage(InternalMessage *msg)
+void StateMachine::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;
@@ -232,7 +232,7 @@ void StateMachine::MessageExecutedLater(int msgName, int param1, int param2, int
     return;
 }
 
-void StateMachine::MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs)
+void StateMachine::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
 {
     pStateMachineHandler->MessageExecutedLater(msg, delayTimeMs);
     return;
@@ -481,7 +481,7 @@ void StateMachineHandler::PlaceDelayedMsgQueueTop()
         return;
     }
     for (int i = mDelayedMessages.size() - 1; i >= 0; i--) {
-        InternalMessage *curMsg = mDelayedMessages[i];
+        InternalMessagePtr curMsg = mDelayedMessages[i];
         if (curMsg == nullptr) {
             LOGE("StateMachineHandler::PlaceDelayedMsgQueueTop: curMsg is null.");
             continue;
@@ -500,9 +500,8 @@ void StateMachineHandler::ReleaseDelayedMessages()
         return;
     }
     for (int i = mDelayedMessages.size() - 1; i >= 0; i--) {
-        InternalMessage *curMsg = mDelayedMessages[i];
+        InternalMessagePtr curMsg = mDelayedMessages[i];
         if (curMsg != nullptr) {
-            delete curMsg;
             curMsg = nullptr;
         }
     }
@@ -560,7 +559,7 @@ void StateMachineHandler::ClearWhenQuit()
     mStateInfoMap.clear();
 }
 
-void StateMachineHandler::PerformSwitchState(State *msgProcessedState, InternalMessage *msg)
+void StateMachineHandler::PerformSwitchState(State *msgProcessedState, InternalMessagePtr msg)
 {
     if (msgProcessedState == nullptr || msg == nullptr) {
         LOGE("pointer is null.");
@@ -594,7 +593,7 @@ void StateMachineHandler::PerformSwitchState(State *msgProcessedState, InternalM
     return;
 }
 
-void StateMachineHandler::ExecuteMessage(InternalMessage *msg)
+void StateMachineHandler::ExecuteMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;
@@ -630,14 +629,14 @@ void StateMachineHandler::ExecuteMessage(InternalMessage *msg)
     return;
 }
 
-void StateMachineHandler::DelayMessage(const InternalMessage *msg)
+void StateMachineHandler::DelayMessage(const InternalMessagePtr msg)
 {
     LOGD("Enter StateMachineHandler::DelayMessage.");
     if (msg == nullptr) {
         return;
     }
 
-    InternalMessage *newMsg = pStateMachine->CreateMessage(msg);
+    InternalMessagePtr newMsg = pStateMachine->CreateMessage(msg);
     if (newMsg == nullptr) {
         LOGE("StateMachineHandler::DelayMessage: newMsg is null.");
         return;
@@ -646,7 +645,7 @@ void StateMachineHandler::DelayMessage(const InternalMessage *msg)
     return;
 }
 
-State *StateMachineHandler::ExecuteTreeStateMsg(InternalMessage *msg)
+State *StateMachineHandler::ExecuteTreeStateMsg(InternalMessagePtr msg)
 {
     LOGD("StateMachineHandler::ExecuteTreeStateMsg mStateVectorTopIndex:%{public}d", mStateVectorTopIndex);
     if (msg == nullptr) {

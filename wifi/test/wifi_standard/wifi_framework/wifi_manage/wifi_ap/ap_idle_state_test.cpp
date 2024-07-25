@@ -76,28 +76,28 @@ HWTEST_F(ApIdleState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
 
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
 
-    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
 
-    EXPECT_TRUE(pApIdleState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pApIdleState->ExecuteStateMsg(msg));
 
-    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
 
-    EXPECT_TRUE(pApIdleState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pApIdleState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(ApIdleState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
 
-    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
 
-    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(&msg));
+    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(msg));
 
-    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DISCONNECT_STATION));
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_DISCONNECT_STATION));
 
-    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(&msg));
+    EXPECT_FALSE(pApIdleState->ExecuteStateMsg(msg));
 
     EXPECT_FALSE(pApIdleState->ExecuteStateMsg(nullptr));
 }

@@ -142,7 +142,7 @@ void ConcreteMangerMachine::DefaultState::GoOutState()
     WIFI_LOGE("DefaultState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr || pConcreteMangerMachine == nullptr) {
         return false;
@@ -168,7 +168,7 @@ void ConcreteMangerMachine::IdleState::GoOutState()
     WIFI_LOGE("IdleState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __attribute__((no_sanitize("cfi")))
+bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg) __attribute__((no_sanitize("cfi")))
 {
     if (msg == nullptr) {
         return false;
@@ -196,7 +196,7 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __a
     return true;
 }
 
-void ConcreteMangerMachine::IdleState::HandleSwitchToConnectMode(InternalMessage *msg)
+void ConcreteMangerMachine::IdleState::HandleSwitchToConnectMode(InternalMessagePtr msg)
 {
     ErrCode ret = pConcreteMangerMachine->AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -206,7 +206,7 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToConnectMode(InternalMessage
     }
 }
 
-void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessage *msg)
+void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessagePtr msg)
 {
     ErrCode ret = AutoStartScanOnly(mid);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -217,7 +217,7 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessag
     pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
-void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMessage *msg)
+void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMessagePtr msg)
 {
     ErrCode ret = pConcreteMangerMachine->AutoStartSemiStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -227,7 +227,7 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMess
     }
 }
 
-void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *msg)
+void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr msg)
 {
     mid = msg->GetParam1();
     WIFI_LOGI("HandleStartInIdleState targetRole:%{public}d mid:%{public}d", mTargetRole, mid);
@@ -277,7 +277,7 @@ void ConcreteMangerMachine::ConnectState::GoOutState()
     WIFI_LOGE("ConnectState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -332,7 +332,7 @@ void ConcreteMangerMachine::ScanonlyState::GoOutState()
     WIFI_LOGE("ScanonlyState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -389,7 +389,7 @@ void ConcreteMangerMachine::SemiActiveState::GoOutState()
     WIFI_LOGI("SemiActiveState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -441,7 +441,7 @@ void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
     }
 }
 
-bool ConcreteMangerMachine::HandleCommonMessage(InternalMessage *msg)
+bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)
 {
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_STA_STOP:
@@ -922,7 +922,7 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
     return WIFI_OPT_SUCCESS;
 }
 
-void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessage *msg)
+void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessagePtr msg)
 {
     if (WifiConfigCenter::GetInstance().GetWifiStopState()) {
         WIFI_LOGE("checkAndContinueToStopWifi: wifi is stoping");

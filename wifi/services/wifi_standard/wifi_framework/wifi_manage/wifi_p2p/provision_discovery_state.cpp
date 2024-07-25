@@ -66,33 +66,33 @@ void ProvisionDiscoveryState::Init()
         P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &ProvisionDiscoveryState::ProcessCmdCancelConnect));
 }
 
-bool ProvisionDiscoveryState::ProcessCmdDiscoverPeer(InternalMessage &msg) const
+bool ProvisionDiscoveryState::ProcessCmdDiscoverPeer(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverDevices, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 
-bool ProvisionDiscoveryState::ProcessCmdDiscServices(InternalMessage &msg) const
+bool ProvisionDiscoveryState::ProcessCmdDiscServices(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 
-bool ProvisionDiscoveryState::ProcessCmdStartListen(InternalMessage &msg) const
+bool ProvisionDiscoveryState::ProcessCmdStartListen(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::StartP2pListen, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 
-bool ProvisionDiscoveryState::ProcessProvDiscPbcRspEvt(InternalMessage &msg) const
+bool ProvisionDiscoveryState::ProcessProvDiscPbcRspEvt(InternalMessagePtr msg) const
 {
     WifiP2pTempDiscEvent provDisc;
     WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::PROV_SCAN_ERROR),
         static_cast<int>(P2P_ERROR_RES::PROV_SCAN_FAILURE));
-    if (!msg.GetMessageObj(provDisc)) {
+    if (!msg->GetMessageObj(provDisc)) {
         WIFI_LOGD("Invalid argument provDisc");
         return EXECUTED;
     }
@@ -110,11 +110,11 @@ bool ProvisionDiscoveryState::ProcessProvDiscPbcRspEvt(InternalMessage &msg) con
     return EXECUTED;
 }
 
-bool ProvisionDiscoveryState::ProcessProvDiscEnterPinEvt(InternalMessage &msg) const
+bool ProvisionDiscoveryState::ProcessProvDiscEnterPinEvt(InternalMessagePtr msg) const
 {
     WifiP2pTempDiscEvent provDisc;
 
-    if (!msg.GetMessageObj(provDisc)) {
+    if (!msg->GetMessageObj(provDisc)) {
         WIFI_LOGD("Invalid argument provDisc");
         return EXECUTED;
     }
@@ -136,11 +136,11 @@ bool ProvisionDiscoveryState::ProcessProvDiscEnterPinEvt(InternalMessage &msg) c
     return EXECUTED;
 }
 
-bool ProvisionDiscoveryState::ProcessProvDiscShowPinEvt(InternalMessage &msg) const
+bool ProvisionDiscoveryState::ProcessProvDiscShowPinEvt(InternalMessagePtr msg) const
 {
     WifiP2pTempDiscEvent provDisc;
 
-    if (!msg.GetMessageObj(provDisc)) {
+    if (!msg->GetMessageObj(provDisc)) {
         WIFI_LOGD("Invalid argument provDisc");
         return EXECUTED;
     }
@@ -162,17 +162,17 @@ bool ProvisionDiscoveryState::ProcessProvDiscShowPinEvt(InternalMessage &msg) co
     return EXECUTED;
 }
 
-bool ProvisionDiscoveryState::ProcessProvDiscFailEvt(InternalMessage &msg) const
+bool ProvisionDiscoveryState::ProcessProvDiscFailEvt(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv event: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv event: %{public}d", msg->GetMessageName());
     p2pStateMachine.DealGroupCreationFailed();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }
 
-bool ProvisionDiscoveryState::ProcessCmdCancelConnect(InternalMessage &msg) const
+bool ProvisionDiscoveryState::ProcessCmdCancelConnect(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv event: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv event: %{public}d", msg->GetMessageName());
     WifiP2PHalInterface::GetInstance().CancelConnect();
     p2pStateMachine.DealGroupCreationFailed();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
@@ -180,7 +180,7 @@ bool ProvisionDiscoveryState::ProcessCmdCancelConnect(InternalMessage &msg) cons
     return EXECUTED;
 }
 
-bool ProvisionDiscoveryState::ExecuteStateMsg(InternalMessage *msg)
+bool ProvisionDiscoveryState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("fatal error!");
@@ -191,7 +191,7 @@ bool ProvisionDiscoveryState::ExecuteStateMsg(InternalMessage *msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(*msg)) {
+    if ((this->*(iter->second))(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;

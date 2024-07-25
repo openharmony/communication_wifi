@@ -127,155 +127,157 @@ public:
 
     void HandleSwitchToConnectOrMixModeTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(INVILAD_MSG);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        msg->SetMessageName(INVILAD_MSG);
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void HandleSwitchToScanOnlyModeTest()
     {
-        InternalMessage msg;
-        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
-        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
     }
 
     void HandleStartInIdleStateTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
-        msg.SetMessageName(CONCRETE_CMD_START);
-        msg.SetParam1(static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY));
-        msg.SetParam2(0);
+        msg->SetMessageName(CONCRETE_CMD_START);
+        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
+        msg->SetParam1(0);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        msg.SetParam1(static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
         staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        msg.SetParam1(static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
         staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
-        msg.SetParam1(static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
     }
 
     void HandleSwitchToSemiActiveModeTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
     }
 
     void SwitchScanOnlyInConnectStateTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
     }
 
     void SwitchSemiFromEnableTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
     }
 
     void SwitchConnectInScanOnlyStateTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
     }
 
     void SwitchSemiActiveInScanOnlyStateTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
     }
 
     void SwitchConnectInSemiActiveStateTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void SwitchScanOnlyInSemiActiveStateTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
+        msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         pConcreteManagerMachine->mTargetRole =
             static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         pConcreteManagerMachine->StartSelfCureService(0);
     }
 
     void HandleStaStopTest1()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
-        msg.SetMessageName(CONCRETE_CMD_STA_STOP);
+        msg->SetMessageName(CONCRETE_CMD_STA_STOP);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         pConcreteManagerMachine->mTargetRole =
             static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
         pConcreteManagerMachine->HandleStaStop();
@@ -283,25 +285,25 @@ public:
 
     void HandleStaStopTest2()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSED, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
-        msg.SetMessageName(CONCRETE_CMD_STA_STOP);
+        msg->SetMessageName(CONCRETE_CMD_STA_STOP);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetWifiStopState(false);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         EXPECT_FALSE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(nullptr));
@@ -311,124 +313,128 @@ public:
 
     void HandleStaStartTest1()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
-        msg.SetMessageName(CONCRETE_CMD_STA_START);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        msg->SetMessageName(CONCRETE_CMD_STA_START);
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void HandleStaStartTest2()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
-        msg.SetMessageName(CONCRETE_CMD_STA_START);
+        msg->SetMessageName(CONCRETE_CMD_STA_START);
         sleep(1);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void HandleStaStartTest3()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
-        msg.SetMessageName(CONCRETE_CMD_STA_START);
+        msg->SetMessageName(CONCRETE_CMD_STA_START);
         sleep(1);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         pConcreteManagerMachine->SwitchEnableFromSemi();
     }
 
     void CheckAndContinueToStopWifiTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
-        msg.SetMessageName(CONCRETE_CMD_STOP);
+        msg->SetMessageName(CONCRETE_CMD_STOP);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetWifiStopState(false);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSING, 0);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void HandleStaSemiActiveTest1()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE);
-        msg.SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        msg->SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void HandleStaSemiActiveTest2()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
+        WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
-        msg.SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
+        msg->SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void HandleStaSemiActiveTest3()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSED, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
-        msg.SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
+        msg->SetMessageName(CONCRETE_CMD_STA_SEMI_ACTIVE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
     void PreStartWifiTest()
     {

@@ -83,10 +83,8 @@ void ApMonitor::OnHotspotStateEvent(int state) const
 
 void ApMonitor::WpaEventApChannelSwitch(int freq) const
 {
-    HotspotConfig hostapdConfig;
-    WifiSettings::GetInstance().GetHotspotConfig(hostapdConfig, m_id);
-    hostapdConfig.SetChannel(freq);
-    WifiSettings::GetInstance().SetHotspotConfig(hostapdConfig, m_id);
+    WIFI_LOGI("%{public}s, freq = %{public}d", __func__, freq);
+    SendMessage(m_selectIfacName, ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_INFO, freq, 0, 0);
 }
 
 void ApMonitor::WpaEventApNotifyCallBack(const std::string &notifyParam) const

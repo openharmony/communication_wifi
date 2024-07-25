@@ -96,45 +96,45 @@ public:
 
     void HandleStartInIdleStateTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::RUNNING, 0);
-        msg.SetMessageName(SOFTAP_CMD_START);
+        msg->SetMessageName(SOFTAP_CMD_START);
         sleep(1);
-        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(msg));
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
-        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(msg));
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSED, 0);
-        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(msg));
     }
 
     void StopSoftapTest()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSED, 0);
-        msg.SetMessageName(SOFTAP_CMD_STOP);
+        msg->SetMessageName(SOFTAP_CMD_STOP);
         sleep(1);
-        EXPECT_TRUE(pSoftapManagerMachine->pDefaultState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(msg));
         EXPECT_FALSE(pSoftapManagerMachine->pDefaultState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(nullptr));
         EXPECT_FALSE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(nullptr));
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
-        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(msg));
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0);
         pSoftapManagerMachine->AutoStopApService(0);
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::RUNNING, 0);
-        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(&msg));
-        msg.SetMessageName(INVILAD_MSG);
-        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(&msg));
-        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(&msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(msg));
+        msg->SetMessageName(INVILAD_MSG);
+        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(msg));
     }
 };
 

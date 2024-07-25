@@ -36,7 +36,7 @@ void P2pDisablingState::GoOutState()
     WIFI_LOGI("             GoOutState");
 }
 
-bool P2pDisablingState::ExecuteStateMsg(InternalMessage *msg)
+bool P2pDisablingState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::WPA_CONNECTED_EVENT: {

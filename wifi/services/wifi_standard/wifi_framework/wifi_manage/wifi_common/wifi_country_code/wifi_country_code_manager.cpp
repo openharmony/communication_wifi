@@ -171,7 +171,7 @@ ErrCode WifiCountryCodeManager::UnregisterWifiCountryCodeChangeListener(const st
         WIFI_LOGE("unregister fail, listener module name is null");
         return WIFI_OPT_FAILED;
     }
-    int ret = m_codeChangeListeners.erase(moduleName);
+    int ret = static_cast<int>(m_codeChangeListeners.erase(moduleName));
     WIFI_LOGI("unregister ret=%{public}d, listener module name: %{public}s", ret, moduleName.c_str());
     return ret > 0 ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
 }

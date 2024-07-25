@@ -33,6 +33,7 @@ namespace Wifi {
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
 #define WIFI_INVALID_UID (-1)
+#define INVALID_SIGNAL_LEVEL (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
 #define WIFI_INVALID_SIM_ID (0)
@@ -561,6 +562,30 @@ public:
     {}
 };
 
+/* DHCP info */
+struct IpInfo {
+    unsigned int ipAddress;     /* ip address */
+    unsigned int gateway;       /* gate */
+    unsigned int netmask;       /* mask */
+    unsigned int primaryDns;          /* main dns */
+    unsigned int secondDns;          /* backup dns */
+    unsigned int serverIp; /* DHCP server's address */
+    unsigned int leaseDuration;
+    std::vector<unsigned int> dnsAddr;
+
+    IpInfo()
+    {
+        ipAddress = 0;
+        gateway = 0;
+        netmask = 0;
+        primaryDns = 0;
+        secondDns = 0;
+        serverIp = 0;
+        leaseDuration = 0;
+        dnsAddr.clear();
+    }
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
@@ -634,6 +659,7 @@ struct WifiDeviceConfig {
     int version;
     bool randomizedMacSuccessEver;
     WifiWapiConfig wifiWapiConfig;
+    IpInfo lastDhcpResult;
 
     WifiDeviceConfig()
     {
@@ -726,30 +752,6 @@ enum class WifiProtectMode {
     WIFI_PROTECT_NO_HELD = 4
 };
 
-/* DHCP info */
-struct IpInfo {
-    unsigned int ipAddress;     /* ip address */
-    unsigned int gateway;       /* gate */
-    unsigned int netmask;       /* mask */
-    unsigned int primaryDns;          /* main dns */
-    unsigned int secondDns;          /* backup dns */
-    unsigned int serverIp; /* DHCP server's address */
-    unsigned int leaseDuration;
-    std::vector<unsigned int> dnsAddr;
-
-    IpInfo()
-    {
-        ipAddress = 0;
-        gateway = 0;
-        netmask = 0;
-        primaryDns = 0;
-        secondDns = 0;
-        serverIp = 0;
-        leaseDuration = 0;
-        dnsAddr.clear();
-    }
-};
-
 /* DHCP IpV6Info */
 struct IpV6Info {
     std::string linkIpV6Address;
@@ -840,6 +842,12 @@ typedef struct {
     std::string powerParam;
     int powerParamLen;
 } WifiLowPowerParam;
+
+enum class OperationCmd {
+    DHCP_OFFER_ADD,
+    DHCP_OFFER_SIZE_GET,
+    DHCP_OFFER_CLEAR,
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

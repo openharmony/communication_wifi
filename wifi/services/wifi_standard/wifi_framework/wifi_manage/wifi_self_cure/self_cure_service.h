@@ -37,6 +37,7 @@ public:
     void HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
     void HandleStaOpened();
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
+    void HandleDhcpOfferReport(const IpInfo &ipInfo);
     void NotifyInternetFailureDetected(int forceNoHttpCheck);
     bool IsSelfCureOnGoing();
 private:

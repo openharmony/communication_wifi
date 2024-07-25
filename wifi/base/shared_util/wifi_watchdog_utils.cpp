@@ -18,6 +18,9 @@
 #include "securec.h"
 #include <unistd.h>
 #ifndef OHOS_ARCH_LITE
+#ifdef WIFI_FFRT_ENABLE
+#include "c/ffrt_dump.h"
+#endif
 #include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
@@ -31,11 +34,14 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiWatchDogUtils");
 constexpr int RESET_NOW = 1; //1s
 constexpr int TIME_OUT_WATCHDOG = 10; // 10s
+constexpr uint32_t FFRT_CALLBACK_TIME = 30 * 1000; // 30s
+constexpr uint32_t TIME_MS_TO_S = 1000;
 std::shared_ptr<WifiWatchDogUtils> WifiWatchDogUtils::GetInstance()
 {
     static std::shared_ptr<WifiWatchDogUtils> instance = nullptr;
     if (instance == nullptr) {
         instance = std::make_shared<WifiWatchDogUtils>();
+        instance->StartAllWatchDog();
     }
     return instance;
 }
@@ -89,11 +95,26 @@ bool WifiWatchDogUtils::StopWatchDogForFunc(const std::string &funcName, int id)
     return true;
 }
 
+void WifiWatchDogUtils::FfrtCallback(uint64_t taskId, const char *taskInfo, uint32_t delayedTaskCount)
+{
+    std::string description = "FfrtCallback: task(";
+    description += taskInfo;
+    description += ") blocked " + std::to_string(FFRT_CALLBACK_TIME / TIME_MS_TO_S) + "s";
+    WIFI_LOGI("%{public}s", description.c_str());
+#ifndef OHOS_ARCH_LITE
+    HiviewDFX::XCollie::GetInstance().SetTimer("WifiResetTimer", RESET_NOW,
+        nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG|HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+#endif
+}
+
 void WifiWatchDogUtils::StartAllWatchDog()
 {
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("StartAllWatchDog enter");
-    //unsupported for process other than foundation
+#ifdef WIFI_FFRT_ENABLE
+    ffrt_task_timeout_set_cb(FfrtCallback);
+    ffrt_task_timeout_set_threshold(FFRT_CALLBACK_TIME);
+#endif
 #endif
 }
 

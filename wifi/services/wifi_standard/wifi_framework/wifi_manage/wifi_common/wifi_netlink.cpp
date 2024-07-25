@@ -137,7 +137,8 @@ int32_t WifiNetLink::SendQoeCmd(int32_t cmd, int32_t arg)
     int32_t ret = -1;
     sockFd = socket(PF_NETLINK, SOCK_RAW, NETLINK_WIFIPRO_EVENT_NL);
     if (sockFd < 0) {
-        WIFI_LOGE("%{public}s: open monitor_fd error, sockFd: %{public}d", __FUNCTION__, sockFd);
+        WIFI_LOGE("%{public}s: open monitor_fd error, sockFd: %{public}d, errno: %{public}d",
+            __FUNCTION__, sockFd, errno);
         return ret;
     }
     switch (cmd) {

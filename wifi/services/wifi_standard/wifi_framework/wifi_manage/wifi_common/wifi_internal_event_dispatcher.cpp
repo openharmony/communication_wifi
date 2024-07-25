@@ -24,6 +24,7 @@
 #include "wifi_p2p_msg.h"
 #include "wifi_common_msg.h"
 #include "wifi_config_center.h"
+#include "wifi_settings.h"
 #endif
 
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
@@ -885,7 +886,8 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 std::vector<WifiP2pDevice> deviceVec = msg.device;
                 if ((pid != 0) && (uid != 0)) {
-                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) ==
+                        PERMISSION_DENIED) {
                         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
                             __func__, pid, uid);
                         updateP2pDeviceMacAddress(deviceVec);
@@ -971,7 +973,11 @@ void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, const 
 
 void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state)
 {
-    if (!WifiCommonEventHelper::PublishRssiValueChangedEvent(state, "OnRssiValueChanged")) {
+    WifiLinkedInfo likedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(likedInfo);
+    int signalLevel = WifiSettings::GetInstance().GetSignalLevel(state, likedInfo.band);
+    if (!WifiCommonEventHelper::PublishRssiValueChangedEvent("wifiSignalLevel", signalLevel,
+        state, "OnRssiValueChanged")) {
         WIFI_LOGE("failed to publish rssi value changed event!");
         return;
     }

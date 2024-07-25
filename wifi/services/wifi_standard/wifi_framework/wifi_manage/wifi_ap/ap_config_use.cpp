@@ -246,7 +246,9 @@ ApConfigUse::SoftapChannelPolicyParser::~SoftapChannelPolicyParser()
 
 bool ApConfigUse::SoftapChannelPolicyParser::InitParser()
 {
-    if (!std::filesystem::exists(SOFTAP_CHANNELS_POLICY_FILE_PATH)) {
+    std::filesystem::path pathName = SOFTAP_CHANNELS_POLICY_FILE_PATH;
+    std::error_code code;
+    if (!std::filesystem::exists(pathName, code)) {
         LOGI("softap_channels_policy_file.xml not exists, filtering indoor channels is not required");
         return false;
     }

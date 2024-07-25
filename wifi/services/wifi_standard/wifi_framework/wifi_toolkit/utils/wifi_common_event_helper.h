@@ -43,10 +43,15 @@ public:
         const std::vector<std::string> &permissions);
 
     static bool PublishEvent(const std::string &eventAction, const int &code, const std::string &data);
+
+    template <typename T>
+    static bool PublishEvent(const std::string &eventAction, const std::string &paramKey, T paramValue,
+        const int &code, const std::string &data);
     static bool PublishPowerStateChangeEvent(const int &code, const std::string &data);
     static bool PublishScanFinishedEvent(const int &code, const std::string &data);
     static bool PublishScanStateChangedEvent(const int &code, const std::string &data);
-    static bool PublishRssiValueChangedEvent(const int &code, const std::string &data);
+    static bool PublishRssiValueChangedEvent(const std::string &pramKey, int paramValue,
+        const int &code, const std::string &data);
     static bool PublishWiTasRssiValueChangedEvent(const int &code, const std::string &data);
     static bool PublishConnStateChangedEvent(const int &code, const std::string &data);
     static bool PublishHotspotStateChangedEvent(const int &code, const std::string &data);

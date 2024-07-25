@@ -196,7 +196,7 @@ int WifiScanStub::OnIsWifiClosedScan(uint32_t code, MessageParcel &data, Message
     return ret;
 }
 
-constexpr int ASH_MEM_SIZE = 1024 * 200;
+constexpr int32_t ASH_MEM_SIZE = 1024 * 300;
 void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result, MessageParcel &reply)
 {
     WIFI_LOGI("WifiScanStub SendScanInfo");
@@ -211,23 +211,23 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
     }
     std::stringstream scanInfoStream;
     for (int32_t i = 0; i < contentSize; ++i) {
-        scanInfoStream << result[i].bssid << ";";
+        scanInfoStream << StringToHex(result[i].bssid) << ";";
         scanInfoStream << StringToHex(result[i].ssid) << ";";
         scanInfoStream << result[i].bssidType << ";";
-        scanInfoStream << result[i].capabilities << ";";
+        scanInfoStream << StringToHex(result[i].capabilities) << ";";
         scanInfoStream << result[i].frequency << ";";
         scanInfoStream << result[i].band << ";";
-        scanInfoStream << static_cast<int>(result[i].channelWidth) << ";";
+        scanInfoStream << static_cast<int32_t>(result[i].channelWidth) << ";";
         scanInfoStream << result[i].centerFrequency0 << ";";
         scanInfoStream << result[i].centerFrequency1 << ";";
         scanInfoStream << result[i].rssi << ";";
-        scanInfoStream << static_cast<int>(result[i].securityType) << ";";
+        scanInfoStream << static_cast<int32_t>(result[i].securityType) << ";";
         scanInfoStream << result[i].infoElems.size() << ";";
         for (const auto &elem : result[i].infoElems) {
             scanInfoStream << elem.id << ";";
             scanInfoStream << elem.content.size() << ";";
             for (const auto &byte : elem.content) {
-                scanInfoStream << static_cast<int>(byte) << ";";
+                scanInfoStream << static_cast<int32_t>(byte) << ";";
             }
         }
         scanInfoStream << result[i].features << ";";
@@ -237,9 +237,9 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         scanInfoStream << result[i].maxSupportedTxLinkSpeed << ";";
         scanInfoStream << result[i].disappearCount << ";";
         scanInfoStream << result[i].isHiLinkNetwork << ";";
-        scanInfoStream << static_cast<int>(result[i].supportedWifiCategory) << ";";
+        scanInfoStream << static_cast<int32_t>(result[i].supportedWifiCategory) << ";";
     }
-    int32_t scanInfoSize = static_cast<int>(scanInfoStream.str().length());
+    int32_t scanInfoSize = static_cast<int32_t>(scanInfoStream.str().length());
     ashmem->WriteToAshmem(scanInfoStream.str().c_str(), scanInfoStream.str().length(), 0);
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteInt32(contentSize);

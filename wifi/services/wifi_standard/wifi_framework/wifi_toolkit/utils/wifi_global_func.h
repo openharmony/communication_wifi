@@ -451,6 +451,14 @@ bool IsPskEncryption(const std::string &keyMgmt);
  */
 bool IsFactoryMode();
 
+/**
+ * @Description is wifi support opening automatically when first start up
+ *
+ * @return true - open
+ * @return false - close
+ */
+bool IsStartUpWifiEnableSupport();
+
 #ifndef OHOS_ARCH_LITE
 /**
  * @Description Parse json string, find key by type, get value by key

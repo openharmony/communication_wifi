@@ -809,7 +809,9 @@ int WifiSettings::RemoveWifiP2pGroupInfo()
 
 int WifiSettings::RemoveWifiP2pSupplicantGroupInfo()
 {
-    if (!std::filesystem::exists(P2P_SUPPLICANT_CONFIG_FILE)) {
+    std::filesystem::path pathName = P2P_SUPPLICANT_CONFIG_FILE;
+    std::error_code code;
+    if (!std::filesystem::exists(pathName, code)) {
         LOGE("p2p_supplicant file do not exists!, file:%{public}s", P2P_SUPPLICANT_CONFIG_FILE);
         return -1;
     }
@@ -1378,7 +1380,7 @@ void WifiSettings::InitPackageFilterConfig()
         std::vector<PackageFilterConf> tmp;
         mPackageFilterConfig.GetValue(tmp);
         std::unique_lock<std::mutex> lock(mScanMutex);
-        for (int i = 0; i < tmp.size(); i++) {
+        for (unsigned int i = 0; i < tmp.size(); i++) {
             mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
         }
     }
@@ -1568,12 +1570,21 @@ std::string WifiSettings::FuzzyBssid(const std::string bssid)
 #ifndef OHOS_ARCH_LITE
 void WifiSettings::MergeWifiConfig()
 {
-    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(DEVICE_CONFIG_FILE_PATH)
-        || std::filesystem::exists(WIFI_STA_RANDOM_MAC_FILE_PATH)) {
+    std::filesystem::path wifiPathNmae = WIFI_CONFIG_FILE_PATH;
+    std::filesystem::path devicePathName = DEVICE_CONFIG_FILE_PATH;
+    std::filesystem::path randomMacPathName = WIFI_STA_RANDOM_MAC_FILE_PATH;
+    std::filesystem::path dualWifiPathName = DUAL_WIFI_CONFIG_FILE_PATH;
+    std::error_code wifiConfigCode;
+    std::error_code deviceConfigCode;
+    std::error_code randomMacCode;
+    std::error_code dualWifiCode;
+    if (std::filesystem::exists(wifiPathNmae, wifiConfigCode)
+        || std::filesystem::exists(devicePathName, deviceConfigCode)
+        || std::filesystem::exists(randomMacPathName, randomMacCode)) {
         LOGI("file exists don't need to merge");
         return;
     }
-    if (!std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH)) {
+    if (!std::filesystem::exists(dualWifiPathName, dualWifiCode)) {
         LOGI("dual frame file do not exists, don't need to merge");
         return;
     }
@@ -1603,11 +1614,18 @@ void WifiSettings::MergeWifiConfig()
 
 void WifiSettings::MergeSoftapConfig()
 {
-    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(HOTSPOT_CONFIG_FILE_PATH)) {
+    std::filesystem::path wifiPathNmae = WIFI_CONFIG_FILE_PATH;
+    std::filesystem::path hostapdPathName = HOTSPOT_CONFIG_FILE_PATH;
+    std::filesystem::path dualApPathName = DUAL_SOFTAP_CONFIG_FILE_PATH;
+    std::error_code wifiConfigCode;
+    std::error_code hotspotConfigCode;
+    std::error_code dualApCode;
+    if (std::filesystem::exists(wifiPathNmae, wifiConfigCode)
+        || std::filesystem::exists(hostapdPathName, hotspotConfigCode)) {
         LOGI("MergeSoftapConfig file exists don't need to merge");
         return;
     }
-    if (!std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
+    if (!std::filesystem::exists(dualApPathName, dualApCode)) {
         LOGI("MergeSoftapConfig dual frame file do not exists, don't need to merge");
         return;
     }

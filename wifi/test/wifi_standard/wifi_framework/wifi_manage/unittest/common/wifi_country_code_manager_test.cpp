@@ -66,7 +66,7 @@ public:
     MOCK_METHOD1(SendMessage, void(int));
     MOCK_METHOD2(SendMessage, void(int, int));
     MOCK_METHOD3(SendMessage, void(int, int, int));
-    MOCK_METHOD1(SendMessage, void(InternalMessage*));
+    MOCK_METHOD1(SendMessage, void(InternalMessagePtr));
     MOCK_METHOD2(SendMessage, void(int, const std::any&));
     MOCK_METHOD4(SendMessage, void(int, int, int, const std::any&));
 };

@@ -901,9 +901,23 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
     } else if (action == WIFI_EVENT_DIALOG_ACCEPT) {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);
+        if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
+            int candidateNetworkId = WifiConfigCenter::GetInstance().GetSelectedCandidateNetworkId();
+            if (candidateNetworkId == INVALID_NETWORK_ID) {
+                WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");
+                return;
+            }
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+            if (pService != nullptr) {
+                pService->ConnectToNetwork(candidateNetworkId);
+            }
+        }
     } else {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);
+        if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
+            WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(INVALID_NETWORK_ID);
+        }
     }
 }
 

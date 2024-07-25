@@ -691,6 +691,31 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
     return pService->SetTxPower(power);
 }
 
+void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        return;
+    }
+    WifiDeviceConfig wifiConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wifiConfig) != 0) {
+        return;
+    }
+    // -1: Connect by system, use default uid.
+    if (wifiConfig.uid == -1 || wifiConfig.isShared) {
+        return;
+    }
+    for (auto iter = result.begin(); iter != result.end(); iter++) {
+        if (iter->ssid == wifiConfig.ssid && iter->keyMgmt == wifiConfig.keyMgmt) {
+            WIFI_LOGI("ReplaceConfigWhenCandidateConnected networkid: %{public}d!", iter->networkId);
+            result.erase(iter);
+            break;
+        }
+    }
+    result.push_back(wifiConfig);
+}
+
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     if (!isCandidate && !WifiAuthCenter::IsSystemAppByToken()) {
@@ -731,6 +756,7 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
         WifiSettings::GetInstance().GetAllCandidateConfig(uid, result);
     } else {
         WifiSettings::GetInstance().GetDeviceConfig(result);
+        ReplaceConfigWhenCandidateConnected(result);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -844,7 +870,9 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
         if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
             bool isSame = linkedInfo.networkId == networkId;
             WIFI_LOGE("ConnectToNetwork isCandidate isConnected isSame:%{public}s!", isSame ? "true" : "false");
-            return isSame ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
+            if (isSame) {
+                return WIFI_OPT_SUCCESS;
+            }
         }
         return pService->ConnectToCandidateConfig(uid, networkId);
     }

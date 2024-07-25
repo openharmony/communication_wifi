@@ -128,6 +128,7 @@ void WriteWifiWpaStateHiSysEvent(int state);
 void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, int connTime,
     int portalAuthTime, bool isNotificationClicked);
 
+void WriteWifiSelfcureHisysevent(int type);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

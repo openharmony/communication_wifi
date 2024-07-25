@@ -51,6 +51,11 @@ constexpr int UMTS_AUTH_TYPE_TAG = 0xdb;
 constexpr int UMTS_AUTS_TYPE_TAG = 0xdc;
 constexpr int WPA3_BLACKMAP_MAX_NUM = 20;
 constexpr int TWO = 2;
+constexpr int INVALID_RSSI1 = -128;
+constexpr int INVALID_RSSI2 = 200;
+constexpr int VALID_RSSI3 = -80;
+constexpr int VALID_RSSI4 = 156;
+constexpr int INVALID_RSSI5 = 100;
 static constexpr int MAX_STR_LENT = 127;
 
 class StaStateMachineTest : public testing::Test {
@@ -1690,6 +1695,45 @@ public:
         pStaStateMachine->ReUpdateNetLinkInfo(config);
     }
 
+    void UpdateLinkInfoRssiTest()
+    {
+        int rssi = INVALID_RSSI1;
+        int outRssi = pStaStateMachine->UpdateLinkInfoRssi(rssi);
+        EXPECT_EQ(outRssi, INVALID_RSSI_VALUE);
+
+        rssi = INVALID_RSSI2;
+        outRssi = pStaStateMachine->UpdateLinkInfoRssi(rssi);
+        EXPECT_EQ(outRssi, INVALID_RSSI_VALUE);
+
+        rssi = VALID_RSSI3;
+        outRssi = pStaStateMachine->UpdateLinkInfoRssi(rssi);
+        EXPECT_EQ(outRssi, VALID_RSSI3);
+
+        rssi = VALID_RSSI4;
+        outRssi = pStaStateMachine->UpdateLinkInfoRssi(rssi);
+        EXPECT_EQ(outRssi, (VALID_RSSI4 - SIGNAL_INFO));
+
+        rssi = INVALID_RSSI5;
+        outRssi = pStaStateMachine->UpdateLinkInfoRssi(rssi);
+        EXPECT_EQ(outRssi, INVALID_RSSI_VALUE);
+    }
+
+    void UpdateLinkRssiTest()
+    {
+        WifiHalWpaSignalInfo signalInfo;
+        signalInfo.signal = INVALID_RSSI1;
+        pStaStateMachine->UpdateLinkRssi(signalInfo);
+
+        signalInfo.signal = INVALID_RSSI2;
+        pStaStateMachine->UpdateLinkRssi(signalInfo);
+
+        signalInfo.signal = VALID_RSSI3;
+        pStaStateMachine->UpdateLinkRssi(signalInfo);
+
+        signalInfo.signal = VALID_RSSI4;
+        pStaStateMachine->UpdateLinkRssi(signalInfo);
+    }
+
     void DealSignalPollResultTest()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiLinkedStandardAndMaxSpeed(_)).Times(testing::AtLeast(0));
@@ -2997,6 +3041,17 @@ HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest1, TestSize.Level1)
 {
     ReUpdateNetLinkInfoTest1();
 }
+
+HWTEST_F(StaStateMachineTest, UpdateLinkInfoRssiTest, TestSize.Level1)
+{
+    UpdateLinkInfoRssiTest();
+}
+
+HWTEST_F(StaStateMachineTest, UpdateLinkRssiTest, TestSize.Level1)
+{
+    UpdateLinkRssiTest();
+}
+
 /**
  * @tc.name: DealSignalPollResultTest
  * @tc.desc: DealSignalPollResult()

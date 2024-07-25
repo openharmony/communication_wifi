@@ -3975,7 +3975,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         (ipv6Info.randGlobalIpV6Address != result->strOptRandIpv6Addr) ||
         (ipv6Info.uniqueLocalAddress1 != result->strOptLocalAddr1) ||
         (ipv6Info.uniqueLocalAddress2 != result->strOptLocalAddr2) ||
-        (ipv6Info.gateway != result->strOptRouter1)) {
+        (ipv6Info.gateway != result->strOptRouter1) || (ipv6Info.linkIpV6Address != result->strOptLinkIpv6Addr)) {
         ipv6Info.linkIpV6Address = result->strOptLinkIpv6Addr;
         ipv6Info.globalIpV6Address = result->strOptClientId;
         ipv6Info.randGlobalIpV6Address = result->strOptRandIpv6Addr;

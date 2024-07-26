@@ -15,6 +15,7 @@
 #include "scan_service.h"
 #include <gtest/gtest.h>
 #include "mock_wifi_manager.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_scan_state_machine.h"
 #include "mock_wifi_scan_interface.h"
@@ -50,9 +51,9 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetHid2dUpperScene(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetP2pBusinessType(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetHid2dUpperScene(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pBusinessType(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         pScanService = std::make_unique<ScanService>();
         pScanService->pScanStateMachine = new MockScanStateMachine();
         pScanService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
@@ -73,12 +74,12 @@ public:
         std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
             .WillRepeatedly(Return(defaultValue));
-        EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
+        pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback());
     }
 
     void InitScanServiceSuccess2()
@@ -88,19 +89,21 @@ public:
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFre = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).Times(AtLeast(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
             .WillRepeatedly(Return(refVecTrustList));
-        EXPECT_EQ(pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()), true);
+        pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback());
     }
 
     void UnInitScanServiceSuccess()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
-        pScanService->UnInitScanService();
+        if (pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()) == true) {
+            MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
+            pScanService->UnInitScanService();
+        }
     }
 
     void HandleScanStatusReportSuccess1()
@@ -126,7 +129,7 @@ public:
     void HandleScanStatusReportSuccess3()
     {
         EXPECT_CALL(WifiManager::GetInstance(), DealScanFinished(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanInfoNotify(_, _)).Times(AtLeast(1));
         ScanStatusReport scanStatusReport;
         scanStatusReport.status = COMMON_SCAN_SUCCESS;
@@ -213,7 +216,7 @@ public:
 
     void ScanFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
             .WillOnce(Return(1))
             .WillOnce(Return(0));
@@ -227,7 +230,7 @@ public:
     void ScanWithParamSuccess()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(true));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(1));
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;
@@ -364,11 +367,11 @@ public:
 
     void AddScanMessageBodySuccess()
     {
-        InternalMessage msg;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
         InterScanConfig interConfig;
         interConfig.hiddenNetworkSsid.push_back("hmwifi");
         interConfig.scanFreqs.push_back(FREQ_2_DOT_4_GHZ);
-        EXPECT_EQ(true, pScanService->AddScanMessageBody(&msg, interConfig));
+        EXPECT_EQ(true, pScanService->AddScanMessageBody(msg, interConfig));
     }
 
     void AddScanMessageBodyFail()
@@ -444,7 +447,7 @@ public:
 
     void HandleCommonScanInfoSuccess2()
     {
-        ON_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillByDefault(Return(0));
+        ON_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillByDefault(Return(0));
         StoreScanConfig storeScanConfig0;
         storeScanConfig0.fullScanFlag = true;
         StoreScanConfig storeScanConfig1;
@@ -458,7 +461,7 @@ public:
 
     void HandleCommonScanInfoSuccess3()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).Times(AtLeast(0));
         StoreScanConfig storeScanConfig;
         storeScanConfig.fullScanFlag = false;
         pScanService->scanConfigMap.emplace(0, storeScanConfig);
@@ -469,7 +472,7 @@ public:
 
     void StoreFullScanInfoSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
         StoreScanConfig scanConfig;
         std::vector<InterScanInfo> scanInfoList { InterScanInfo() };
         EXPECT_EQ(true, pScanService->StoreFullScanInfo(scanConfig, scanInfoList));
@@ -477,7 +480,7 @@ public:
 
     void StoreFullScanInfoFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(-1));
         StoreScanConfig scanConfig;
         std::vector<InterScanInfo> scanInfoList { InterScanInfo() };
         EXPECT_EQ(false, pScanService->StoreFullScanInfo(scanConfig, scanInfoList));
@@ -519,17 +522,17 @@ public:
         results.push_back(cfg);
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(results), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_));
         EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_));
-        EXPECT_EQ(true, pScanService->BeginPnoScan());
+        pScanService->BeginPnoScan();
     }
 
     void BeginPnoScanFail1()
     {
         pScanService->isPnoScanBegined = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         EXPECT_EQ(false, pScanService->BeginPnoScan());
     }
@@ -538,7 +541,7 @@ public:
     {
         pScanService->isPnoScanBegined = false;
         pScanService->staStatus = static_cast<int>(OperateResState::OPEN_WIFI_OPENING);
-        EXPECT_CALL(WifiSettings::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
         EXPECT_EQ(false, pScanService->BeginPnoScan());
     }
 
@@ -565,9 +568,9 @@ public:
 
     void AddPnoScanMessageBodySuccess()
     {
-        InternalMessage interMessage;
+        InternalMessagePtr interMessage = std::make_shared<InternalMessage>();
         PnoScanConfig pnoScanConfig;
-        EXPECT_EQ(true, pScanService->AddPnoScanMessageBody(&interMessage, pnoScanConfig));
+        EXPECT_EQ(true, pScanService->AddPnoScanMessageBody(interMessage, pnoScanConfig));
     }
 
     void AddPnoScanMessageBodyFail()
@@ -608,21 +611,21 @@ public:
 
     void HandleScreenStatusChangedSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         pScanService->HandleScreenStatusChanged();
     }
 
     void HandleStaStatusChangedSuccess1()
     {
         int status = static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         pScanService->HandleStaStatusChanged(status);
     }
 
     void HandleStaStatusChangedSuccess2()
     {
         int status = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         pScanService->HandleStaStatusChanged(status);
     }
 
@@ -656,7 +659,7 @@ public:
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).WillRepeatedly(Return(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(1));
         pScanService->SystemScanProcess(true);
     }
 
@@ -675,7 +678,7 @@ public:
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScreenState()).WillRepeatedly(Return(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(1));
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->SystemScanProcess(true);
     }
@@ -689,7 +692,7 @@ public:
 
     void StartSystemTimerScanFail1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         pScanService->staStatus = 0;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->StartSystemTimerScan(true);
@@ -721,7 +724,7 @@ public:
 
     void StartSystemTimerScanSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
         pScanService->lastSystemScanTime = 0;
         pScanService->systemScanIntervalMode.scanIntervalMode.interval = MAX_SCAN_CONFIG;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
@@ -777,13 +780,13 @@ public:
 
     void GetScanControlInfoSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(0));
         pScanService->GetScanControlInfo();
     }
 
     void GetScanControlInfoFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(-1));
         pScanService->GetScanControlInfo();
     }
     
@@ -810,9 +813,9 @@ public:
 
     void AllowExternScanFail2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppRunningState())
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
@@ -826,16 +829,16 @@ public:
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         pScanService->staStatus = STATUS;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppRunningState())
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
     void AllowExternScanFail4()
     {
         pScanService->disableScanFlag = true;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 
@@ -890,142 +893,6 @@ public:
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         pScanService->AllowPnoScan();
-    }
-
-    void AllowExternScanByThermal()
-    {
-        pScanService->AllowExternScanByThermal();
-    }
-
-    void AllowExternScanByForbidSuccess1()
-    {
-        int staScene = 0;
-        StoreScanConfig cfg;
-        cfg.externFlag = true;
-        pScanService->scanConfigMap.emplace(staScene, cfg);
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), true);
-    }
-
-    void AllowExternScanByForbidFail1()
-    {
-        int staScene = 0;
-        StoreScanConfig cfg;
-        cfg.externFlag = true;
-        pScanService->scanConfigMap.emplace(staScene, cfg);
-
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCANNING;
-        forbidMode.scanMode = scanMode;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail2()
-    {
-        int staScene = 0;
-        StoreScanConfig cfg;
-        cfg.externFlag = true;
-        pScanService->scanConfigMap.emplace(staScene, cfg);
-
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCANNING;
-        forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail3()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = scanMode;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail4()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail5()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = staScene;
-        scanForbidMode.scanMode = scanMode;
-        scanForbidMode.forbidTime = 0;
-        scanForbidMode.forbidCount = 0;
-        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail6()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = staScene;
-        scanForbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-        scanForbidMode.forbidTime = 0;
-        scanForbidMode.forbidCount = 0;
-        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail7()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        time_t now = time(nullptr);
-        if (now < 0) {
-            return;
-        }
-        pScanService->customSceneTimeMap.emplace(staScene, now);
-        ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = staScene;
-        scanForbidMode.scanMode = scanMode;
-        scanForbidMode.forbidTime = 0;
-        scanForbidMode.forbidCount = 0;
-        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByForbidFail8()
-    {
-        int staScene = 0;
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        time_t now = time(nullptr);
-        if (now < 0) {
-            return;
-        }
-        pScanService->customSceneTimeMap.emplace(staScene, now);
-        ScanForbidMode scanForbidMode;
-        scanForbidMode.scanScene = staScene;
-        scanForbidMode.scanMode = ScanMode::ALL_EXTERN_SCAN;
-        scanForbidMode.forbidTime = 0;
-        scanForbidMode.forbidCount = 0;
-        pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowExternScanByForbid(staScene, scanMode), false);
-    }
-
-    void AllowExternScanByIntervaluccess()
-    {
-        pScanService->AllowExternScanByInterval(0, 0, ScanMode::SYS_FOREGROUND_SCAN);
     }
 
     void GetStaSceneSuccess1()
@@ -1244,7 +1111,7 @@ public:
 
     void SetStaCurrentTimeSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetScreenState(TWO));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetScreenState(TWO));
         pScanService->ClearScanControlValue();
         pScanService->SetStaCurrentTime();
     }
@@ -1265,55 +1132,6 @@ public:
         EXPECT_EQ(pScanService->AllowScanDuringScanning(scanMode), false);
     }
 
-    void AllowScanDuringScreenOffSuccess()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
-    }
-
-    void AllowScanDuringScreenOffSuccess1()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        pScanService->SetScanTrustMode();
-        pScanService->scanTrustSceneIds.emplace(0);
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
-    }
-
-    void AllowScanDuringScreenOffSuccess2()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        pScanService->SetScanTrustMode();
-        pScanService->scanTrustSceneIds.emplace(1);
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCANNING;
-        forbidMode.scanMode = scanMode;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
-    }
-
-    void AllowScanDuringScreenOffSuccess3()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        pScanService->ResetToNonTrustMode();
-        pScanService->scanTrustSceneIds.emplace(1);
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = ScanMode::APP_FOREGROUND_SCAN;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), true);
-    }
-
-    void AllowScanDuringScreenOffFail1()
-    {
-        ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
-        ScanForbidMode forbidMode;
-        forbidMode.scanScene = SCAN_SCENE_SCREEN_OFF;
-        forbidMode.scanMode = scanMode;
-        pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
-
-        EXPECT_EQ(pScanService->AllowScanDuringScreenOff(scanMode), false);
-    }
-
     void AllowScanDuringStaSceneSuccess1()
     {
         const int staScene = 0;
@@ -1323,10 +1141,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        pScanService->staSceneForbidCount = 1;
-        time_t nowTime = time(nullptr);
-        const int timeForTest = 2;
-        pScanService->staCurrentTime = nowTime - timeForTest;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), true);
     }
@@ -1353,7 +1167,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        pScanService->staSceneForbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), false);
     }
@@ -1367,11 +1180,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        pScanService->staSceneForbidCount = 1;
-        pScanService->staSceneForbidCount = 1;
-        time_t nowTime = time(nullptr);
-        const int timeForTest = 2;
-        pScanService->staCurrentTime = nowTime + timeForTest;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), false);
     }
@@ -1442,7 +1250,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        pScanService->staSceneForbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), false);
     }
@@ -1461,9 +1268,6 @@ public:
         scanForbidMode.scanMode = scanMode;
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
-        time_t nowTime = time(nullptr);
-        const int timeForTest = 2;
-        pScanService->staCurrentTime = nowTime + timeForTest;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
         EXPECT_EQ(pScanService->AllowScanDuringCustomScene(scanMode), false);
     }
@@ -1521,22 +1325,6 @@ public:
         pScanService->scanTrustMode = false;
         pScanService->scanTrustSceneIds.emplace(0);
         EXPECT_EQ(pScanService->AllowExternScanByIntervalMode(0, 0, ScanMode::SYSTEM_TIMER_SCAN), true);
-    }
-
-    void AllowExternScanByCustomSceneSuccess()
-    {
-        pScanService->customSceneTimeMap.emplace(1, 0);
-        pScanService->scanTrustMode = true;
-        pScanService->scanTrustSceneIds.emplace(1);
-        EXPECT_EQ(pScanService->AllowExternScanByCustomScene(0, ScanMode::SYS_FOREGROUND_SCAN), true);
-    }
-
-    void AllowExternScanByCustomSceneSuccess1()
-    {
-        pScanService->customSceneTimeMap.emplace(1, 0);
-        pScanService->scanTrustMode = false;
-        pScanService->scanTrustSceneIds.emplace(1);
-        EXPECT_EQ(pScanService->AllowExternScanByCustomScene(0, ScanMode::SYS_FOREGROUND_SCAN), true);
     }
 
     void PnoScanByIntervalSuccess1()
@@ -1877,8 +1665,8 @@ public:
 
     void HandleMovingFreezeChangedTest()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppRunningState()).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetFreezeModeState()).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState()).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetFreezeModeState()).Times(AtLeast(0));
         std::map<int, time_t> sceneMap;
         pScanService->HandleGetCustomSceneState(sceneMap);
         pScanService->HandleMovingFreezeChanged();
@@ -1929,9 +1717,9 @@ public:
     {
         std::vector<std::string> packageFilter;
         packageFilter.push_back("com.test.test");
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test"));
         EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == true);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test1"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test1"));
         EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == false);
     }
 
@@ -1958,53 +1746,17 @@ public:
     {
         pScanService->lastFreezeState = true;
         pScanService->isAbsFreezeScaned = false;
-        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == true);
+        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
         pScanService->isAbsFreezeScaned = true;
         EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
     }
 
     void AllowScanByHid2dStateTest()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D));
         EXPECT_TRUE(pScanService->AllowScanByHid2dState() == true);
-        EXPECT_CALL(WifiSettings::GetInstance(), SetP2pBusinessType(P2pBusinessType::P2P_TYPE_CLASSIC));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetP2pBusinessType(P2pBusinessType::P2P_TYPE_CLASSIC));
         EXPECT_TRUE(pScanService->AllowScanByHid2dState() == true);
-    }
-
-    void AllowExternCustomSceneCheckTest1()
-    {
-        std::map<int, time_t> customIter;
-        customIter.insert(std::pair<int, int>(SCAN_SCENE_ALL, 0));
-        auto customIters = customIter.begin();
-        ScanIntervalMode mode;
-        mode.scanScene = SCAN_SCENE_ALL;
-        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
-        mode.isSingle = true;
-        mode.interval = 1;
-        mode.count = 0;
-        mode.intervalMode = IntervalMode::INTERVAL_FIXED;
-        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);
-        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
-    }
-
-    void AllowExternCustomSceneCheckTest2()
-    {
-        std::map<int, time_t> customIter;
-        customIter.insert(std::pair<int, int>(SCAN_SCENE_ALL, 0));
-        auto customIters = customIter.begin();
-        ScanIntervalMode mode;
-        mode.scanScene = SCAN_SCENE_ALL;
-        mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
-        mode.isSingle = false;
-        mode.interval = 1;
-        mode.count = 0;
-        mode.intervalMode = IntervalMode::INTERVAL_FIXED;
-        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == true);
-        pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        EXPECT_TRUE(pScanService->AllowExternCustomSceneCheck(customIters, 0, ScanMode::SYSTEM_TIMER_SCAN) == false);
     }
 
     void AllowCustomSceneCheckTest1()
@@ -2063,14 +1815,58 @@ public:
         auto customIters = customIter.begin();
         EXPECT_TRUE(pScanService->AllowCustomSceneCheck(customIters, ScanMode::SYS_FOREGROUND_SCAN) == false);
     }
+
+    void GetScanControlInfoTest()
+    {
+        pScanService->GetScanControlInfo();
+    }
+
+    void ClearScanTrustSceneIdsTest()
+    {
+        pScanService->ClearScanTrustSceneIds();
+    }
+
+    void ApplyTrustListPolicyTest()
+    {
+        ScanService::ScanType scanType = ScanService::ScanType::SCAN_TYPE_EXTERN;
+        pScanService->ApplyTrustListPolicy(scanType);
+    }
+
+    void SetNetworkInterfaceUpDownTest()
+    {
+        pScanService->SetNetworkInterfaceUpDown(false);
+    }
+
+    void SystemScanConnectedPolicyTest()
+    {
+        int interval = 0;
+        pScanService->SystemScanConnectedPolicy(interval);
+    }
+
+    void SystemScanDisconnectedPolicyTest()
+    {
+        int interval = 0;
+        int count = 0;
+        pScanService->SystemScanDisconnectedPolicy(interval, count);
+    }
+
+    void OnWifiCountryCodeChangedTest()
+    {
+        std::string countryCode = "CN";
+        if (pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()) == true) {
+            EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pScanService->m_scanObserver->OnWifiCountryCodeChanged(countryCode));
+        }
+    }
 };
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess1, TestSize.Level1)
 {
+    InitScanServiceSuccess1();
 }
 
 HWTEST_F(ScanServiceTest, InitScanServiceSuccess2, TestSize.Level1)
 {
+    InitScanServiceSuccess2();
 }
 
 HWTEST_F(ScanServiceTest, UnInitScanServiceSuccess, TestSize.Level1)
@@ -2500,10 +2296,12 @@ HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutFail, TestSize.Level1)
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoSuccess, TestSize.Level1)
 {
+    GetScanControlInfoSuccess();
 }
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoFail, TestSize.Level1)
 {
+    GetScanControlInfoFail();
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanSuccess, TestSize.Level1)
@@ -2554,61 +2352,6 @@ HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail5, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowPnoScanSuccess, TestSize.Level1)
 {
     AllowPnoScanSuccess();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByThermal, TestSize.Level1)
-{
-    AllowExternScanByThermal();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidSuccess1, TestSize.Level1)
-{
-    AllowExternScanByForbidSuccess1();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail1, TestSize.Level1)
-{
-    AllowExternScanByForbidFail1();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail2, TestSize.Level1)
-{
-    AllowExternScanByForbidFail2();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail3, TestSize.Level1)
-{
-    AllowExternScanByForbidFail3();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail4, TestSize.Level1)
-{
-    AllowExternScanByForbidFail4();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail5, TestSize.Level1)
-{
-    AllowExternScanByForbidFail5();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail6, TestSize.Level1)
-{
-    AllowExternScanByForbidFail6();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail7, TestSize.Level1)
-{
-    AllowExternScanByForbidFail7();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByForbidFail8, TestSize.Level1)
-{
-    AllowExternScanByForbidFail8();
-}
-
-HWTEST_F(ScanServiceTest, AllowExternScanByIntervaluccess, TestSize.Level1)
-{
-    AllowExternScanByIntervaluccess();
 }
 
 HWTEST_F(ScanServiceTest, GetStaSceneSuccess1, TestSize.Level1)
@@ -2746,16 +2489,6 @@ HWTEST_F(ScanServiceTest, AllowScanDuringScanningFail, TestSize.Level1)
     AllowScanDuringScanningFail();
 }
 
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess, TestSize.Level1)
-{
-    AllowScanDuringScreenOffSuccess();
-}
-
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffFail1, TestSize.Level1)
-{
-    AllowScanDuringScreenOffFail1();
-}
-
 HWTEST_F(ScanServiceTest, AllowScanDuringStaSceneSuccess, TestSize.Level1)
 {
     AllowScanDuringStaSceneSuccess1();
@@ -2844,26 +2577,6 @@ HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_004, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowExternScanByIntervalMode_005, TestSize.Level1)
 {
     AllowExternScanByIntervalModeSuccess1();
-}
-/**
- * @tc.name: AllowExternScanByCustomScene_001
- * @tc.desc: AllowExternScanByCustomScene()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowExternScanByCustomScene_001, TestSize.Level1)
-{
-    AllowExternScanByCustomSceneSuccess();
-}
-/**
- * @tc.name: AllowExternScanByCustomScene_002
- * @tc.desc: AllowExternScanByCustomScene()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowExternScanByCustomScene_002, TestSize.Level1)
-{
-    AllowExternScanByCustomSceneSuccess1();
 }
 
 HWTEST_F(ScanServiceTest, PnoScanByIntervalSuccess1, TestSize.Level1)
@@ -3090,26 +2803,6 @@ HWTEST_F(ScanServiceTest, AllowScanByMovingFreeze_002, TestSize.Level1)
 {
     AllowScanByMovingFreezeTest2();
 }
-/**
- * @tc.name: AllowExternCustomSceneCheck_001
- * @tc.desc: WifiMaxThroughputTest()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_001, TestSize.Level1)
-{
-    AllowExternCustomSceneCheckTest1();
-}
-/**
- * @tc.name: AllowExternCustomSceneCheck_002
- * @tc.desc: AllowExternCustomSceneCheck()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowExternCustomSceneCheck_002, TestSize.Level1)
-{
-    AllowExternCustomSceneCheckTest2();
-}
 
 HWTEST_F(ScanServiceTest, SetScanTrustMode_001, TestSize.Level1)
 {
@@ -3165,6 +2858,7 @@ HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_004, TestSize.Level1)
 {
     AllowCustomSceneCheckTest4();
 }
+
 /**
  * @tc.name: GetAllowBandFreqsControlInfoSuccess1
  * @tc.desc: GetAllowBandFreqsControlInfo()
@@ -3186,36 +2880,6 @@ HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess2, TestSize.Level1)
     GetAllowBandFreqsControlInfoSuccess2();
 }
 /**
- * @tc.name: GetAllowBandFreqsControlInfoSuccess2
- * @tc.desc: GetAllowBandFreqsControlInfo()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess1, TestSize.Level1)
-{
-    AllowScanDuringScreenOffSuccess1();
-}
-/**
- * @tc.name: GetAllowBandFreqsControlInfoSuccess2
- * @tc.desc: GetAllowBandFreqsControlInfo()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess2, TestSize.Level1)
-{
-    AllowScanDuringScreenOffSuccess2();
-}
-/**
- * @tc.name: GetAllowBandFreqsControlInfoSuccess2
- * @tc.desc: GetAllowBandFreqsControlInfo()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, AllowScanDuringScreenOffSuccess3, TestSize.Level1)
-{
-    AllowScanDuringScreenOffSuccess3();
-}
-/**
  * @tc.name: AllowScanDuringCustomSceneSuccess2
  * @tc.desc: AllowScanDuringCustomScene()
  * @tc.type: FUNC
@@ -3235,5 +2899,41 @@ HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneSuccess2, TestSize.Level1)
 {
     AllowScanDuringCustomSceneSuccess2();
 }
+
+HWTEST_F(ScanServiceTest, GetScanControlInfoTest, TestSize.Level1)
+{
+    GetScanControlInfoTest();
+}
+
+HWTEST_F(ScanServiceTest, ClearScanTrustSceneIdsTest, TestSize.Level1)
+{
+    ClearScanTrustSceneIdsTest();
+}
+
+HWTEST_F(ScanServiceTest, ApplyTrustListPolicyTest, TestSize.Level1)
+{
+    ApplyTrustListPolicyTest();
+}
+
+HWTEST_F(ScanServiceTest, SetNetworkInterfaceUpDownTest, TestSize.Level1)
+{
+    SetNetworkInterfaceUpDownTest();
+}
+
+HWTEST_F(ScanServiceTest, SystemScanConnectedPolicyTest, TestSize.Level1)
+{
+    SystemScanConnectedPolicyTest();
+}
+
+HWTEST_F(ScanServiceTest, SystemScanDisconnectedPolicyTest, TestSize.Level1)
+{
+    SystemScanDisconnectedPolicyTest();
+}
+
+HWTEST_F(ScanServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level1)
+{
+    OnWifiCountryCodeChangedTest();
+}
+
 } // namespace Wifi
 } // namespace OHOS

@@ -68,41 +68,27 @@ public:
     void EnableWifiSuccess()
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->EnableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_CALL(*pMockStaService, EnableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->EnableStaService() == WIFI_OPT_SUCCESS);
     }
 
     void EnableWifiFail1()
     {
         EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_CALL(*pMockStaService, EnableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        pStaInterface->EnableWifi();
-    }
-
-    void EnableSemiWifiSuccess()
-    {
-        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_CALL(*pMockStaService, EnableSemiWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->EnableSemiWifi() == WIFI_OPT_SUCCESS);
-    }
-
-    void EnableSemiWifiFail()
-    {
-        EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_CALL(*pMockStaService, EnableSemiWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->EnableSemiWifi() == WIFI_OPT_FAILED);
+        EXPECT_CALL(*pMockStaService, EnableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        pStaInterface->EnableStaService();
     }
 
     void DisableWifiSuceess()
     {
-        EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_SUCCESS);
+        EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_SUCCESS);
     }
 
     void DisableWifiFail()
     {
-        EXPECT_CALL(*pMockStaService, DisableWifi()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->DisableWifi() == WIFI_OPT_FAILED);
+        EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_FAILED);
     }
 
     void ConnectToNetworkIdSuceess()
@@ -375,18 +361,6 @@ public:
         EXPECT_CALL(*pMockStaService, ReConnect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->ReConnect() == WIFI_OPT_FAILED);
     }
-
-    void StartHttpDetectSucc()
-    {
-        EXPECT_CALL(*pMockStaService, StartHttpDetect()).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->StartHttpDetect() == WIFI_OPT_SUCCESS);
-    }
-
-    void StartHttpDetectFail()
-    {
-        EXPECT_CALL(*pMockStaService, StartHttpDetect()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->StartHttpDetect() == WIFI_OPT_SUCCESS);
-    }
     
     void EnableHiLinkHandshakeSuceess()
     {
@@ -399,6 +373,44 @@ public:
     {
         std::string mac = "01:23:45:67:89:ab";
         pStaInterface->DeliverStaIfaceData(mac);
+    }
+
+    void StartRoamToNetwork()
+    {
+        std::string bssid = "01:23:45:67:89:ab";
+        WifiDeviceConfig deviceConfig;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+            .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
+        pStaInterface->StartRoamToNetwork(0, bssid);
+    }
+
+    void StartConnectToUserSelectNetwork()
+    {
+        std::string bssid = "01:23:45:67:89:ab";
+        WifiDeviceConfig deviceConfig;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+            .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
+        pStaInterface->StartConnectToUserSelectNetwork(0, bssid);
+    }
+
+    void SetPowerMode()
+    {
+        pStaInterface->SetPowerMode(0);
+    }
+
+    void SetTxPower()
+    {
+        pStaInterface->SetTxPower(0);
+    }
+
+    void OnSystemAbilityChanged()
+    {
+        pStaInterface->OnSystemAbilityChanged(0, 0);
+    }
+
+    void StartPortalCertification()
+    {
+        pStaInterface->StartPortalCertification();
     }
 };
 
@@ -418,16 +430,6 @@ HWTEST_F(StaInterfaceTest, EnableWifiSuccess, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, EnableWifiFail1, TestSize.Level1)
 {
     EnableWifiFail1();
-}
-
-HWTEST_F(StaInterfaceTest, EnableSemiWifiSuccess, TestSize.Level1)
-{
-    EnableSemiWifiSuccess();
-}
-
-HWTEST_F(StaInterfaceTest, EnableSemiWifiFail, TestSize.Level1)
-{
-    EnableSemiWifiFail();
 }
 
 HWTEST_F(StaInterfaceTest, DisableWifiSuceess, TestSize.Level1)
@@ -641,16 +643,6 @@ HWTEST_F(StaInterfaceTest, ReConnectFail, TestSize.Level1)
     ReConnectFail();
 }
 
-HWTEST_F(StaInterfaceTest, StartHttpDetectSucc, TestSize.Level1)
-{
-    StartHttpDetectSucc();
-}
-
-HWTEST_F(StaInterfaceTest, StartHttpDetectFail, TestSize.Level1)
-{
-    StartHttpDetectFail();
-}
-
 HWTEST_F(StaInterfaceTest, OnScreenStateChangedSuccess1, TestSize.Level1)
 {
     int screenState = MODE_STATE_OPEN;
@@ -732,5 +724,30 @@ HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
 {
     DeliverStaIfaceDataSuceess();
 }
+
+HWTEST_F(StaInterfaceTest, StartRoamToNetwork, TestSize.Level1)
+{
+    StartRoamToNetwork();
+}
+
+HWTEST_F(StaInterfaceTest, StartConnectToUserSelectNetwork, TestSize.Level1)
+{
+    StartConnectToUserSelectNetwork();
+}
+
+HWTEST_F(StaInterfaceTest, SetPowerMode, TestSize.Level1)
+{
+    SetPowerMode();
+}
+HWTEST_F(StaInterfaceTest, SetTxPower, TestSize.Level1)
+{
+    SetTxPower();
+}
+
+HWTEST_F(StaInterfaceTest, OnSystemAbilityChanged, TestSize.Level1)
+{
+    OnSystemAbilityChanged();
+}
+
 } // namespace Wifi
 } // namespace OHOS

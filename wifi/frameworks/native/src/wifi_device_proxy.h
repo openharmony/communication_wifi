@@ -201,6 +201,16 @@ public:
     ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) override;
 
     /**
+     * @Description connect to user select ssid and bssid network
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate) override;
+
+    /**
      * @Description Check whether Wi-Fi is connected.
      *
      * @param bool - true: connected, false: not connected
@@ -488,6 +498,13 @@ public:
     ErrCode EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig) override;
 
     /**
+     * @Description set low tx power
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
+
+    /**
      * @Description Enable semi-Wifi
      *
      * @return ErrCode - operation result
@@ -544,11 +561,15 @@ private:
     void WriteIpAddress(MessageParcel &data, const WifiIpAddress &address);
     void WriteEapConfig(MessageParcel &data, const WifiEapConfig &wifiEapConfig);
     void ReadIpAddress(MessageParcel &reply, WifiIpAddress &address);
+    void BigDataReadIpAddress(WifiIpAddress &address, std::vector<std::string> &tokens);
     void ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEapConfig);
+    void BigDataReadEapConfig(WifiEapConfig &wifiEapConfig, std::vector<std::string> &tokens);
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
     void RemoveDeathRecipient(void);
+    void ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize, long len);
+    void ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
     sptr<IRemoteObject> remote_ = nullptr;
     bool mRemoteDied;

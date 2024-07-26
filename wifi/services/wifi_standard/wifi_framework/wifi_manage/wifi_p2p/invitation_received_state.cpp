@@ -38,7 +38,7 @@ void InvitationReceivedState::GoOutState()
     WIFI_LOGI("             GoOutState");
 }
 
-bool InvitationReceivedState::ExecuteStateMsg(InternalMessage *msg)
+bool InvitationReceivedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT: {
@@ -56,7 +56,7 @@ bool InvitationReceivedState::ExecuteStateMsg(InternalMessage *msg)
                 p2pStateMachine.savedP2pConfig.SetWpsInfo(wpsPin);
             }
 
-            if (WifiErrorNo::WIFI_IDL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
+            if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
                 WIFI_LOGE("Failed to stop find.");
             }
 

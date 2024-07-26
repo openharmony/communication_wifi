@@ -22,8 +22,7 @@
 #include <string>
 #include <vector>
 #include "wifi_msg.h"
-#include "wifi_idl_struct.h"
-#include "wifi_sta_request.h"
+#include "wifi_native_struct.h"
 #include "wifi_event_callback.h"
 
 namespace OHOS {

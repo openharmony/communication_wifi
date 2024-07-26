@@ -18,22 +18,22 @@
 
 #include <functional>
 #include <string>
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 
 namespace OHOS {
 namespace Wifi {
 struct P2pHalCallback {
     std::function<void(int)> onConnectSupplicant;
-    std::function<void(const IdlP2pDeviceFound &)> onDeviceFound;
+    std::function<void(const HalP2pDeviceFound &)> onDeviceFound;
     std::function<void(const std::string &)> onDeviceLost;
     std::function<void(const std::string &, short)> onGoNegotiationRequest;
     std::function<void(void)> onGoNegotiationSuccess;
     std::function<void(int)> onGoNegotiationFailure;
-    std::function<void(const IdlP2pInvitationInfo &)> onInvitationReceived;
+    std::function<void(const HalP2pInvitationInfo &)> onInvitationReceived;
     std::function<void(const std::string &, int)> onInvitationResult;
     std::function<void(void)> onGroupFormationSuccess;
     std::function<void(const std::string &)> onGroupFormationFailure;
-    std::function<void(const IdlP2pGroupInfo &)> onGroupStarted;
+    std::function<void(const HalP2pGroupInfo &)> onGroupStarted;
     std::function<void(const std::string &, bool)> onGroupRemoved;
     std::function<void(const std::string &)> onProvisionDiscoveryPbcRequest;
     std::function<void(const std::string &)> onProvisionDiscoveryPbcResponse;
@@ -45,7 +45,7 @@ struct P2pHalCallback {
     std::function<void(const std::string &)> onStaDeauthorized;
     std::function<void(const std::string &, const std::string &)> onStaAuthorized;
     std::function<void(void)> connectSupplicantFailed;
-    std::function<void(const IdlP2pServDiscReqInfo &)> onP2pServDiscReq;
+    std::function<void(const HalP2pServDiscReqInfo &)> onP2pServDiscReq;
     std::function<void(const std::string &, int)> onP2pIfaceCreated;
     std::function<void(const std::string &, int)> onP2pConnectFailed;
     std::function<void(int)> onP2pChannelSwitch;

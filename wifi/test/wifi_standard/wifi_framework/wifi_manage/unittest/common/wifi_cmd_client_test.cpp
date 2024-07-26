@@ -42,6 +42,7 @@ public:
 
 protected:
     static const int maxPrivCmdSize = 4096;
+    static const int ifNameSize = 16;
     std::shared_ptr<WifiCmdClient> wifiCmdClient_;
 };
 
@@ -92,5 +93,113 @@ HWTEST_F(WifiCmdClientTest, SendCmdToDriver_ReturnsNegativeOneWhenCommandIdIsNot
     std::string param = "param";
 
     int result = wifiCmdClient_->SendCmdToDriver(ifName, 100, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SendCmdToDriverTest001, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param = "param";
+    int result1 = wifiCmdClient_->Set2gSoftapMss(ifName, param);
+    int result = wifiCmdClient_->SendCmdToDriver(ifName, CMD_AX_BLA_LIST, param);
+    EXPECT_EQ(result, result1);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SendCmdToDriverTest002, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param = "param";
+    int result1 = wifiCmdClient_->Set2gSoftapMss(ifName, param);
+    int result = wifiCmdClient_->SendCmdToDriver(ifName, CMD_AX_SELFCURE, param);
+    EXPECT_EQ(result, result1);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SendCommandToDriverByInterfaceNameTest001, TestSize.Level1)
+{
+    std::string ifName(ifNameSize, 'a');
+    std::string param = "param";
+    int result = wifiCmdClient_->SendCommandToDriverByInterfaceName(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SendCommandToDriverByInterfaceNameTest002, TestSize.Level1)
+{
+    std::string ifName(maxPrivCmdSize, 'a');
+    std::string param = "param";
+    int result = wifiCmdClient_->SendCommandToDriverByInterfaceName(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SetRxListenTest001, TestSize.Level1)
+{
+    std::string ifName(ifNameSize, 'a');
+    std::string param = "Y";
+    int result = wifiCmdClient_->SetRxListen(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SetRxListenTest002, TestSize.Level1)
+{
+    std::string ifName(ifNameSize, 'a');
+    std::string param = "N";
+    int result = wifiCmdClient_->SetRxListen(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, Set2gSoftapMssTest001, TestSize.Level1)
+{
+    std::string ifName = "";
+    std::string param = "param";
+    int result = wifiCmdClient_->Set2gSoftapMss(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, Set2gSoftapMssTest002, TestSize.Level1)
+{
+    std::string ifName(maxPrivCmdSize, 'a');
+    std::string param = "param";
+    int result = wifiCmdClient_->Set2gSoftapMss(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, Set2gSoftapMssTest003, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param = "param";
+    int result = wifiCmdClient_->Set2gSoftapMss(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SetAxBlaListTest001, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param(maxPrivCmdSize, 'a');
+    int result = wifiCmdClient_->SetAxBlaList(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SetAxBlaListTest002, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param = "param";
+    int result = wifiCmdClient_->SetAxBlaList(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, AxSelfcureTest001, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param = "";
+    int result = wifiCmdClient_->AxSelfcure(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, AxSelfcureTest002, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param = "param";
+    int result = wifiCmdClient_->AxSelfcure(ifName, param);
     EXPECT_EQ(result, -1);
 }

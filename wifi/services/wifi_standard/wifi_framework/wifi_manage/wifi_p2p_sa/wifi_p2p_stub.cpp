@@ -28,10 +28,13 @@ namespace Wifi {
 WifiP2pStub::WifiP2pStub() : mSingleCallback(false)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiP2pStub::~WifiP2pStub()
-{}
+{
+    deathRecipient_ = nullptr;
+}
 
 void WifiP2pStub::InitHandleMapEx()
 {
@@ -435,7 +438,7 @@ void WifiP2pStub::OnQueryP2pDevices(uint32_t code, MessageParcel &data, MessageP
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = devices.size();
+        int size = static_cast<int>(devices.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
             WriteWifiP2pDeviceData(reply, devices[i]);
@@ -467,7 +470,7 @@ void WifiP2pStub::OnQueryP2pGroups(uint32_t code, MessageParcel &data, MessagePa
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = groups.size();
+        int size = static_cast<int>(groups.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
             WriteWifiP2pGroupData(reply, groups[i]);
@@ -485,7 +488,7 @@ void WifiP2pStub::OnQueryP2pServices(uint32_t code, MessageParcel &data, Message
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = services.size();
+        int size = static_cast<int>(services.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
             WriteWifiP2pServiceInfo(reply, services[i]);
@@ -703,15 +706,19 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiP2pDeathRecipient();
+            {
+                std::unique_lock<std::mutex> lock(deathRecipientMutex);
+                if (deathRecipient_ == nullptr) {
+                    deathRecipient_ = new (std::nothrow) WifiP2pDeathRecipient();
+                }
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");
             }
             if (callback_ != nullptr) {
                 for (const auto &eventName : event) {
-                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, pid, eventName, tokenId);
+                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, pid,
+                        eventName, tokenId);
                 }
             }
         }

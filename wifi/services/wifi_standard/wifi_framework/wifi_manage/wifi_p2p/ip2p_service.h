@@ -347,6 +347,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode DisableRandomMac(int setmode) = 0;
+
+    /**
+     * @Description Set gc ip infomation
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

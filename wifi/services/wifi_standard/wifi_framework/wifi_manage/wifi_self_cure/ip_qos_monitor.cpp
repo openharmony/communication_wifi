@@ -15,10 +15,7 @@
 
 #include "ip_qos_monitor.h"
 #include "wifi_logger.h"
-#include "ista_service.h"
-#include "wifi_settings.h"
-
-DEFINE_WIFILOG_LABEL("IpQosMonitor");
+#include "wifi_config_center.h"
 
 static const int32_t MIN_DELTA_TCP_TX = 3;
 static const int32_t QOS_TCP_TX_PKTS = 6;
@@ -30,6 +27,8 @@ static const int32_t CMD_QUERY_PKTS = 15;
 
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_LABEL("IpQosMonitor");
+
 IpQosMonitor &IpQosMonitor::GetInstance()
 {
     static IpQosMonitor gIpQosMonitor;
@@ -38,19 +37,19 @@ IpQosMonitor &IpQosMonitor::GetInstance()
 
 void IpQosMonitor::StartMonitor(int32_t arg)
 {
-    WIFI_LOGI("enter %{public}s", __FUNCTION__);
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
     WifiNetLink::GetInstance().SendQoeCmd(CMD_START_MONITOR, arg);
 }
 
 void IpQosMonitor::QueryPackets(int32_t arg)
 {
-    WIFI_LOGI("enter %{public}s", __FUNCTION__);
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
     WifiNetLink::GetInstance().SendQoeCmd(CMD_QUERY_PKTS, arg);
 }
 
 void IpQosMonitor::HandleTcpReportMsgComplete(const std::vector<int64_t> &elems, int32_t cmd)
 {
-    WIFI_LOGI("enter %{public}s", __FUNCTION__);
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
     ParseTcpReportMsg(elems, cmd);
 }
 
@@ -67,7 +66,7 @@ void IpQosMonitor::ParseTcpReportMsg(const std::vector<int64_t> &elems, int32_t 
 
 void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
 {
-    WIFI_LOGI("enter %{public}s", __FUNCTION__);
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
     bool internetGood = ParseNetworkInternetGood(elems);
     if (internetGood) {
         mInternetFailedCounter = 0;
@@ -78,9 +77,9 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     mInternetFailedCounter++;
     WIFI_LOGI("%{public}s: mInternetFailedCounter = %{public}d", __FUNCTION__, mInternetFailedCounter);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t currentRssi = linkedInfo.rssi;
-    int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.frequency);
+    int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, mInstId);
     if ((mInternetFailedCounter >= 1) && (linkedInfo.connState == ConnState::CONNECTED)) {
         ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
         if (pSelfCureService == nullptr) {
@@ -88,13 +87,11 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
             return;
         }
         if (mHttpDetectedAllowed && signalLevel >= SIGNAL_LEVEL_2) {
-            IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(mInstId);
-            if (pStaService == nullptr) {
-                WIFI_LOGE("%{public}s: pStaService is null", __FUNCTION__);
-                return;
-            }
             WIFI_LOGI("%{public}s: start http detect", __FUNCTION__);
-            pStaService->StartHttpDetect();
+            if (mNetWorkDetect == nullptr) {
+                mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
+            }
+            mNetWorkDetect->StartWifiDetection();
             mHttpDetectedAllowed = false;
             return;
         }
@@ -123,11 +120,11 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
 {
     WIFI_LOGI("enter %{public}s", __FUNCTION__);
     bool queryResp = (elems[QOS_MSG_FROM] == 0);
-    int32_t packetsLength = elems.size();
+    int32_t packetsLength = static_cast<int32_t>(elems.size());
     if ((queryResp) && (packetsLength > MIN_PACKET_LEN)) {
         int64_t tcpTxPkts = elems[QOS_TCP_TX_PKTS];
         int64_t tcpRxPkts = elems[QOS_TCP_RX_PKTS];
-        WIFI_LOGI("tcpTxPkts = %{public}" PRId64 ", tcpRxPkts = %{public}" PRId64, tcpTxPkts, tcpRxPkts);
+        WIFI_LOGD("tcpTxPkts = %{public}" PRId64 ", tcpRxPkts = %{public}" PRId64, tcpTxPkts, tcpRxPkts);
         if ((mLastTcpTxCounter == 0) || (mLastTcpRxCounter == 0)) {
             mLastTcpTxCounter = tcpTxPkts;
             mLastTcpRxCounter = tcpRxPkts;

@@ -64,22 +64,22 @@ public:
 
     void ProcessReceiveScanEventTest1()
     {
-        pScanMonitor->ProcessReceiveScanEvent(SINGLE_SCAN_OVER_OK);
+        pScanMonitor->ProcessReceiveScanEvent(HAL_SINGLE_SCAN_OVER_OK);
     }
 
     void ProcessReceiveScanEventTest2()
     {
-        pScanMonitor->ProcessReceiveScanEvent(SINGLE_SCAN_FAILED);
+        pScanMonitor->ProcessReceiveScanEvent(HAL_SINGLE_SCAN_FAILED);
     }
 
     void ProcessReceiveScanEventTest3()
     {
-        pScanMonitor->ProcessReceiveScanEvent(PNO_SCAN_OVER_OK);
+        pScanMonitor->ProcessReceiveScanEvent(HAL_PNO_SCAN_OVER_OK);
     }
 
     void ProcessReceiveScanEventTest4()
     {
-        pScanMonitor->ProcessReceiveScanEvent(WPA_CB_CONNECTED);
+        pScanMonitor->ProcessReceiveScanEvent(HAL_WPA_CB_CONNECTED);
     }
 
     void SendScanInfoEventTest()

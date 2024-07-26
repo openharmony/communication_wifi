@@ -278,5 +278,10 @@ ErrCode P2pInterface::DisableRandomMac(int setmode)
 {
     return p2pService.DisableRandomMac(setmode);
 }
+
+ErrCode P2pInterface::SetGcIpAddress(const IpAddrInfo& ipInfo)
+{
+    return p2pService.SetGcIpAddress(ipInfo);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -30,6 +30,7 @@ ohos_unittest("wifi_sta_unittest") {
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure/multi_gateway.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure/self_cure_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/external_wifi_filter_builder_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selection_manager.cpp",
@@ -47,6 +48,8 @@ ohos_unittest("wifi_sta_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_saved_device_appraisal.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_state_machine.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
+    "Mock/mock_block_connect_service.cpp",
     "Mock/mock_dhcp_service.cpp",
     "Mock/mock_if_config.cpp",
     "Mock/mock_mac_address.cpp",
@@ -59,6 +62,7 @@ ohos_unittest("wifi_sta_unittest") {
     "Mock/mock_wifi_supplicant_hal_interface.cpp",
     "global_test.cpp",
     "ip_qos_monitor_test.cpp",
+    "multi_gateway_test.cpp",
     "network_selection_test.cpp",
     "self_cure_interface_test.cpp",
     "self_cure_service_test.cpp",
@@ -74,6 +78,7 @@ ohos_unittest("wifi_sta_unittest") {
   include_dirs = [
     "./",
     "./Mock",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
@@ -102,7 +107,6 @@ ohos_unittest("wifi_sta_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
-    "$WIFI_ROOT_DIR/base/cRPC/include",
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
     "//base/notification/ces_standard/cesfwk/kits/native/include",
@@ -173,6 +177,7 @@ ohos_unittest("wifi_sta_unittest") {
   defines += [
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     "private=public",
+    "SUPPORT_RANDOM_MAC_ADDR",
   ]
   part_name = "wifi"
   subsystem_name = "communication"

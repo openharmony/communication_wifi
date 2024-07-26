@@ -93,19 +93,13 @@ struct ScanServiceHandle {
 
 #ifdef FEATURE_AP_SUPPORT
 struct ApServiceHandle {
-    void *handle;
-    IApService *(*create)(int id);
-    void *(*destroy)(IApService *);
     std::map<int, IApService *> pService;
-    ApServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr)
+    ApServiceHandle()
     {}
     ~ApServiceHandle()
     {}
     void Clear()
     {
-        handle = nullptr;
-        create = nullptr;
-        destroy = nullptr;
         pService.clear();
     }
 };

@@ -27,7 +27,6 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_utils.cpp",
       "block_connect_service.cpp",
       "wifi_auth_center.cpp",
-      "wifi_config_center.cpp",
       "wifi_dumper.cpp",
       "wifi_internal_event_dispatcher_lite.cpp",
       "wifi_protect.cpp",
@@ -147,8 +146,8 @@ if (defined(ohos_lite)) {
       "block_connect_service.cpp",
       "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",
+      "wifi_channel_helper.cpp",
       "wifi_cmd_client.cpp",
-      "wifi_config_center.cpp",
       "wifi_country_code/wifi_country_code_manager.cpp",
       "wifi_country_code/wifi_country_code_policy.cpp",
       "wifi_datashare_utils.cpp",
@@ -214,7 +213,7 @@ if (defined(ohos_lite)) {
       "FEATURE_SELF_CURE_SUPPORT",
     ]
 
-    if (is_asan) {
+    if (is_asan || use_clang_coverage) {
       defines += [ "DTFUZZ_TEST" ]
     }
 
@@ -283,7 +282,9 @@ if (defined(ohos_lite)) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
     }
-
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
     part_name = "wifi"
     subsystem_name = "communication"
   }

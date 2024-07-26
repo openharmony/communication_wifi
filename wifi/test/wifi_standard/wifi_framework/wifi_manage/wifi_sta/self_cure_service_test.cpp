@@ -78,6 +78,11 @@ public:
         pSelfCureService->HandleStaConnChanged(state, info);
     }
 
+    void HandleStaOpenResTest()
+    {
+        pSelfCureService->HandleStaOpened();
+    }
+
     void HandleStaConnChangedTest2()
     {
         OperateResState state = OperateResState::DISCONNECT_DISCONNECTED;
@@ -130,6 +135,11 @@ HWTEST_F(SelfCureServiceTest, HandleP2pConnChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest, TestSize.Level1)
 {
     HandleStaConnChangedTest();
+}
+
+HWTEST_F(SelfCureServiceTest, HandleStaOpenResTest, TestSize.Level1)
+{
+    HandleStaOpenResTest();
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest2, TestSize.Level1)

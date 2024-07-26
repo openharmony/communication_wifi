@@ -35,13 +35,12 @@ public:
     void CloseStaService(int instId = 0);
     void StartSatelliteTimer(void);
     void StopSatelliteTimer(void);
+    void DealStaOpened(int instId);
+    void DealStaStopped(int instId);
 
 private:
     void InitStaCallback(void);
-    void ForceStopWifi(int instId = 0);
-    void DealStaOpenRes(OperateResState state, int instId = 0);
-    void DealStaCloseRes(OperateResState state, int instId = 0);
-    void DealStaSemiActiveRes(OperateResState state, int instId = 0);
+    bool IgnoreConnStateChange(int instId = 0);
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
     void DealStreamChanged(StreamDirection direction, int instId = 0);
@@ -52,7 +51,6 @@ private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
-    int mLastWifiOpenState = -1;
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
 };

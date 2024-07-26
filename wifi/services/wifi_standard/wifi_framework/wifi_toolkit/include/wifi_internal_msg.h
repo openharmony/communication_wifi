@@ -52,6 +52,10 @@ constexpr int RSSI_LEVEL_3_5G = -72;
 constexpr int RSSI_LEVEL_4_5G = -65;
 constexpr int AIRPLANE_MODE_OPEN = 1;
 constexpr int AIRPLANE_MODE_CLOSE = 2;
+#define DNS_IP_ADDR_LEN 15
+#define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
+
+constexpr int FUZZY_BSSID_MAX_MATCH_CNT = 30;
 
 enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, SEMI_ACTIVE, UNKNOWN };
 
@@ -209,6 +213,7 @@ struct WifiConfig {
     int staAirplaneMode; /* operator wifi type */
     bool canOpenStaWhenAirplane; /* if airplane is opened, whether can open sta */
     bool openWifiWhenAirplane;
+    bool wifiDisabledByAirplane;
     /**
      * last sta service state, when service started, power
      * saving off, airplane mode off we use this saved state to
@@ -259,6 +264,7 @@ struct WifiConfig {
         staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
         canOpenStaWhenAirplane = true;
         openWifiWhenAirplane = false;
+        wifiDisabledByAirplane = false;
         staLastState = 0;
         lastAirplaneMode = AIRPLANE_MODE_CLOSE;
         savedDeviceAppraisalPriority = PRIORITY_1;
@@ -289,7 +295,7 @@ struct WifiConfig {
         secondRssiLevel5G = RSSI_LEVEL_2_5G;
         thirdRssiLevel5G = RSSI_LEVEL_3_5G;
         fourthRssiLevel5G = RSSI_LEVEL_4_5G;
-        strDnsBak = "8.8.8.8";
+        strDnsBak = "0.0.0.0";
         isLoadStabak = true;
         preLoadEnhance = false;
         scanOnlySwitch = true;
@@ -322,12 +328,13 @@ struct MovingFreezePolicy {
 
 /* wifi RandomMac store */
 struct WifiStoreRandomMac {
+    int version = 0;
     std::string ssid;
     std::string keyMgmt;
     std::string peerBssid;
     std::string randomMac;
     std::string preSharedKey;
-    std::vector<std::string> fuzzyBssids;
+    std::unordered_set<std::string> fuzzyBssids;
 };
 
 struct WifiPortalConf {

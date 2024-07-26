@@ -51,14 +51,14 @@ public:
 public:
     void AddSaveP2pConfig()
     {
-        InternalMessage msg;
-        msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
         WifiP2pTempDiscEvent procDisc;
         WifiP2pDevice device;
         device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
         procDisc.SetDevice(device);
-        msg.SetMessageObj(procDisc);
-        pGroupFormedState->ExecuteStateMsg(&msg);
+        msg->SetMessageObj(procDisc);
+        pGroupFormedState->ExecuteStateMsg(msg);
     }
     std::unique_ptr<GroupFormedState> pGroupFormedState;
     std::unique_ptr<AuthorizingNegotiationRequestState> pAuthorizingNegotlationRequestState;
@@ -82,46 +82,46 @@ HWTEST_F(AuthorizingNegotiationRequestStateTest, GoOutState, TestSize.Level1)
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg, TestSize.Level1)
 {
     AddSaveP2pConfig();
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::string inputPin;
-    msg.SetMessageObj(inputPin);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
+    msg->SetMessageObj(inputPin);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    pAuthorizingNegotlationRequestState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg1, TestSize.Level1)
 {
     AddSaveP2pConfig();
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::string b = "std::any";
-    msg.SetMessageObj(b);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
+    msg->SetMessageObj(b);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    pAuthorizingNegotlationRequestState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
-    pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
+    pAuthorizingNegotlationRequestState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg3, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_CONFIRM));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_CONFIRM));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), Connect(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    pAuthorizingNegotlationRequestState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(AuthorizingNegotiationRequestStateTest, ExecuteStateMsg4, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::REMOVE_SERVICE_REQUEST_RECORD));
-    pAuthorizingNegotlationRequestState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::REMOVE_SERVICE_REQUEST_RECORD));
+    pAuthorizingNegotlationRequestState->ExecuteStateMsg(msg);
 }
 }  // namespace Wifi
 }  // namespace OHOS

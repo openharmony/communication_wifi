@@ -22,25 +22,32 @@
 #include "wifi_hotspot_death_recipient.h"
 #include "wifi_common_def.h"
 #include "wifi_manager_service_ipc_interface_code.h"
+#include <algorithm>
+#include "wifi_device.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
 namespace OHOS {
 namespace Wifi {
 const std::string DHCP_IP_V4_DEFAULT = "192.168.62.1";
+std::shared_ptr<WifiDevice> wifiDeviceSharedPtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 
 WifiHotspotStub::WifiHotspotStub():mSingleCallback(false), m_id(0)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiHotspotStub::WifiHotspotStub(int id):mSingleCallback(false), m_id(id)
 {
     InitHandleMap();
+    deathRecipient_ = nullptr;
 }
 
 WifiHotspotStub::~WifiHotspotStub()
-{}
+{
+    deathRecipient_ = nullptr;
+}
 
 void WifiHotspotStub::InitHandleMap()
 {
@@ -190,6 +197,24 @@ bool WifiHotspotStub::CheckHotspot160MParam(BandType band, int bandwidth, int ch
     }
 }
 
+bool WifiHotspotStub::CheckHostspot160MCountryCode()
+{
+    std::string countryCode;
+    ErrCode ret = wifiDeviceSharedPtr->GetCountryCode(countryCode);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("CheckHostspot160MCountryCode GetcountryCode fail");
+        return false;
+    }
+    transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
+    if (countryCode == "CN" || countryCode == "TW" || countryCode == "SG" || countryCode == "KR") {
+        WIFI_LOGD("CheckHostspot160MCountryCode countryCode %{public}s", countryCode.c_str());
+        return true;
+    } else {
+        WIFI_LOGE("CheckHostspot160MCountryCode Error countryCode %{public}s", countryCode.c_str());
+        return false;
+    }
+}
+
 void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -205,13 +230,15 @@ void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, Mess
     BandType band = config.GetBand();
     config.SetBandWidth(bandwidth);
     config.SetChannel(channel);
-    WIFI_LOGD("run %{public}s channel %{public}d bandwidth %{public}d band %{public}d",
+    WIFI_LOGI("run %{public}s channel %{public}d bandwidth %{public}d band %{public}d",
         __func__, config.GetChannel(), config.GetBandWidth(), config.GetBand());
     const char *preSharedKeyRead = data.ReadCString();
     config.SetMaxConn(data.ReadInt32());
     config.SetIpAddress(data.ReadString());
     config.SetLeaseTime(data.ReadInt32());
     if (ssidRead == nullptr || preSharedKeyRead == nullptr || !CheckHotspot160MParam(band, bandwidth, channel)) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else if ((!CheckHostspot160MCountryCode()) && bandwidth == AP_BANDWIDTH_160) {
         ret = WIFI_OPT_INVALID_PARAM;
     } else {
         config.SetSsid(ssidRead);
@@ -233,7 +260,7 @@ void WifiHotspotStub::OnGetStationList(uint32_t code, MessageParcel &data, Messa
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = result.size();
+        int size = static_cast<int>(result.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; i++) {
             reply.WriteCString(result[i].deviceName.c_str());
@@ -279,7 +306,7 @@ void WifiHotspotStub::OnGetValidBands(uint32_t code, MessageParcel &data, Messag
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int count = bands.size();
+        int count = static_cast<int>(bands.size());
         reply.WriteInt32(count);
         for (int i = 0; i < count; i++) {
             reply.WriteInt32((int)bands[i]);
@@ -299,7 +326,7 @@ void WifiHotspotStub::OnGetValidChannels(
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int count = channels.size();
+        int count = static_cast<int>(channels.size());
         reply.WriteInt32(count);
         for (int i = 0; i < count; i++) {
             reply.WriteInt32(channels[i]);
@@ -388,7 +415,7 @@ void WifiHotspotStub::OnGetBlockLists(uint32_t code, MessageParcel &data, Messag
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        int size = infos.size();
+        int size = static_cast<int>(infos.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; i++) {
             reply.WriteCString(infos[i].deviceName.c_str());
@@ -429,8 +456,11 @@ void WifiHotspotStub::OnRegisterCallBack(
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiHotspotDeathRecipient();
+            {
+                std::unique_lock<std::mutex> lock(deathRecipientMutex);
+                if (deathRecipient_ == nullptr) {
+                    deathRecipient_ = new (std::nothrow) WifiHotspotDeathRecipient();
+                }
             }
             if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
                 WIFI_LOGD("AddDeathRecipient!");

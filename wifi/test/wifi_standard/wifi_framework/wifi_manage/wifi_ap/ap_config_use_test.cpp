@@ -18,13 +18,14 @@
 #include "operator_overload.h"
 #include "ap_config_use.h"
 #include "mock_wifi_ap_hal_interface.h"
-#include "mock_wifi_country_code_manager.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "wifi_ap_msg.h"
 #include "wifi_logger.h"
 #include "wifi_global_func.h"
 #include "wifi_msg.h"
 #include "wifi_p2p_msg.h"
+#include "wifi_country_code_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -61,12 +62,12 @@ HWTEST_F(ApConfigUse_Test, UpdateApChannelConfigTest, TestSize.Level1)
     apConfig.SetChannel(1);
     WifiLinkedInfo wifiLinkedInfo;
     wifiLinkedInfo.connState = ConnState::DISCONNECTED;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, 0))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, 0))
         .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
 
     WifiP2pLinkedInfo p2pLinkedInfo;
     p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pInfo(_))
         .WillRepeatedly(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)));
 
     m_apConfigUse->UpdateApChannelConfig(apConfig);
@@ -76,9 +77,10 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
 {
     WIFI_LOGI("GetChannelFromDrvOrXmlByBandTest enter");
     std::vector<int> freq2G = {2412, 2417, 2422};
-    EXPECT_CALL(WifiSettings::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, 1, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(freq2G), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(freq2G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     std::vector<int> channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_2GHZ);
     for (int c : channels) {
         EXPECT_TRUE(IsValid24GChannel(c));
@@ -86,7 +88,7 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
 
     std::vector<int> freq5G = {5180, 5200, 5220};
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, 2, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(freq5G), Return(WifiErrorNo::WIFI_IDL_OPT_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<2>(freq5G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_5GHZ);
     for (int c : channels) {
         EXPECT_TRUE(IsValid5GChannel(c));
@@ -101,6 +103,41 @@ HWTEST_F(ApConfigUse_Test, GetBestChannelFor2GTest, TestSize.Level1)
     EXPECT_TRUE(IsValid24GChannel(channel));
 }
 
+HWTEST_F(ApConfigUse_Test, GetBestChannelFor5GTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetBestChannelFor5GTest enter");
+    std::vector<int> frequencies = {5180, 5200, 5220};
+    HotspotConfig apConfig;
+    apConfig.SetBandWidth(AP_BANDWIDTH_DEFAULT);
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(frequencies), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+    int channel = m_apConfigUse->GetBestChannelFor5G(apConfig);
+    WIFI_LOGI("GetBestChannelFor5GTest channel=%{public}d", channel);
+}
+
+HWTEST_F(ApConfigUse_Test, GetBestChannelFor5G160MTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetBestChannelFor5G160MTest enter");
+    std::vector<int> frequencies = {5180, 5200, 5220};
+    HotspotConfig apConfig;
+    apConfig.SetBandWidth(AP_BANDWIDTH_160);
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(frequencies), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+    int channel = m_apConfigUse->GetBestChannelFor5G(apConfig);
+    WIFI_LOGI("GetBestChannelFor5GTest channel=%{public}d", channel);
+    EXPECT_EQ(channel, AP_BANDWIDTH_5G_160M_DEFAULT);
+}
+
+HWTEST_F(ApConfigUse_Test, FilterIndoorChannelTest, TestSize.Level1)
+{
+    WIFI_LOGI("FilterIndoorChannelTest enter");
+    std::vector<int> channels = {36, 40, 44, 48, 52, 56};
+    WifiCountryCodeManager::GetInstance().m_wifiCountryCode = "CN";
+    m_apConfigUse->FilterIndoorChannel(channels);
+    std::vector<int> channels1 = {};
+    m_apConfigUse->FilterIndoorChannel(channels1);
+}
+
 HWTEST_F(ApConfigUse_Test, Filter165ChannelTest, TestSize.Level1)
 {
     WIFI_LOGI("Filter165ChannelTest enter");
@@ -110,6 +147,8 @@ HWTEST_F(ApConfigUse_Test, Filter165ChannelTest, TestSize.Level1)
     // 165 need to be filtered
     EXPECT_TRUE(channels.size() == 1);
     EXPECT_TRUE(channels[0] == 36);
+    std::vector<int> channels1 = {36, 165};
+    m_apConfigUse->Filter165Channel(channels1);
 }
 
 HWTEST_F(ApConfigUse_Test, JudgeDbacWithP2pTest, TestSize.Level1)
@@ -120,13 +159,12 @@ HWTEST_F(ApConfigUse_Test, JudgeDbacWithP2pTest, TestSize.Level1)
 
     WifiP2pLinkedInfo p2pLinkedInfo;
     p2pLinkedInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetP2pInfo(_))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pInfo(_))
         .WillOnce(DoAll(SetArgReferee<0>(p2pLinkedInfo), Return(0)))
         .WillRepeatedly(Return(0));
     WifiP2pGroupInfo wifiP2pGroupInfo;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCurrentP2pGroupInfo())
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetCurrentP2pGroupInfo())
         .WillOnce(DoAll(Return(wifiP2pGroupInfo)));
-
     m_apConfigUse->JudgeDbacWithP2p(apConfig);
 }
 } // namespace Wifi

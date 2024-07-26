@@ -15,7 +15,7 @@
 
 #include "wifi_msdp_state_listener.h"
 #include "wifi_logger.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include "define.h"
 #include "wifi_service_manager.h"
 
@@ -29,9 +29,9 @@ void DeviceMovementCallback::OnMovementChanged(const Msdp::MovementDataUtils::Mo
         movementData.type, movementData.value);
     if (movementData.type == Msdp::MovementDataUtils::MovementType::TYPE_STILL) {
         if (movementData.value == Msdp::MovementDataUtils::MovementValue::VALUE_ENTER) {
-            WifiSettings::GetInstance().SetFreezeModeState(MODE_STATE_OPEN);
+            WifiConfigCenter::GetInstance().SetFreezeModeState(MODE_STATE_OPEN);
         } else {
-            WifiSettings::GetInstance().SetFreezeModeState(MODE_STATE_CLOSE);
+            WifiConfigCenter::GetInstance().SetFreezeModeState(MODE_STATE_CLOSE);
         }
     }
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {

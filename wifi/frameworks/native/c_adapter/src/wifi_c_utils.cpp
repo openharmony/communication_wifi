@@ -50,7 +50,7 @@ WifiErrorCode IpStrToArray(const std::string& str, unsigned int ipAddr[IPV4_ARRA
         return ERROR_WIFI_INVALID_ARGS;
     }
     for (int i = 0; i != IPV4_ARRAY_LEN && i != (int)vec.size(); ++i) {
-        ipAddr[i] = std::stoi(vec[i]);
+        ipAddr[i] = static_cast<size_t>(std::stoi(vec[i]));
     }
     return WIFI_SUCCESS;
 }

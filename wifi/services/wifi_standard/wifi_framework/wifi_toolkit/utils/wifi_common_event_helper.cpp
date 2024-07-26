@@ -74,6 +74,28 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
     return true;
 }
 
+template <typename T>
+bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const std::string &paramKey, T paramValue,
+    const int &code, const std::string &data)
+{
+    WIFI_LOGD("publish event[%{public}s], paramKey:%{public}s,code:%{public}d",
+        eventAction.c_str(), paramKey.c_str(), code);
+#ifndef OHOS_ARCH_LITE
+    Want want;
+    want.SetAction(eventAction);
+    want.SetParam(paramKey, paramValue);
+    CommonEventData commonData;
+    commonData.SetWant(want);
+    commonData.SetCode(code);
+    commonData.SetData(data);
+    if (!CommonEventManager::PublishCommonEvent(commonData)) {
+        WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
+        return false;
+    }
+#endif
+    return true;
+}
+
 bool WifiCommonEventHelper::PublishPowerStateChangeEvent(const int &code, const std::string &data)
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_POWER_STATE, code, data);
@@ -89,9 +111,15 @@ bool WifiCommonEventHelper::PublishScanStateChangedEvent(const int &code, const 
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_SCAN_STATE, code, data);
 }
 
-bool WifiCommonEventHelper::PublishRssiValueChangedEvent(const int &code, const std::string &data)
+bool WifiCommonEventHelper::PublishRssiValueChangedEvent(const std::string &pramKey, int paramValue,
+    const int &code, const std::string &data)
 {
-    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_RSSI_VALUE, code, data);
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_RSSI_VALUE, pramKey, paramValue, code, data);
+}
+
+bool WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(const int &code, const std::string &data)
+{
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WITAS_RSSI_VALUE, code, data);
 }
 
 bool WifiCommonEventHelper::PublishConnStateChangedEvent(const int &code, const std::string &data)

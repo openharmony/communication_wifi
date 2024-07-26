@@ -18,6 +18,9 @@
 #include "wifi_net_agent.h"
 #include "wifi_log.h"
 #include "wifi_logger.h"
+#include "mock_wifi_settings.h"
+#include "mock_wifi_config_center.h"
+
 using namespace testing;
 using ::testing::_;
 using ::testing::DoAll;
@@ -30,6 +33,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
 class WifiNetAgentTest : public Test {
 public:
     void SetUp() override
@@ -71,6 +75,149 @@ HWTEST_F(WifiNetAgentTest, UpdateNetLinkInfo_CallsUpdateNetLinkInfo, TestSize.Le
     IpV6Info wifiIpV6Info;
     WifiDeviceConfig config;
     WifiNetAgent::GetInstance().UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, instId);
+}
+
+HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetLinkInfoTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    WifiProxyConfig wifiProxyConfig;
+    int instId = 0;
+    wifiNetAgent.OnStaMachineUpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
+}
+
+HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetSupplierInfoTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo;
+    wifiNetAgent. OnStaMachineUpdateNetSupplierInfo(netSupplierInfo);
+}
+
+HWTEST_F(WifiNetAgentTest, OnStaMachineWifiStartTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    wifiNetAgent.OnStaMachineWifiStart();
+}
+
+HWTEST_F(WifiNetAgentTest, OnStaMachineNetManagerRestartTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    int instId = 0;
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState == ConnState::CONNECTED;
+    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
+    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo;
+    wifiNetAgent.OnStaMachineNetManagerRestart(netSupplierInfo, instId);
+}
+
+HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    WifiProxyConfig wifiProxyConfig;
+    int instId = 0;
+    wifiProxyConfig.configureMethod = ConfigureProxyMethod::AUTOCONFIGUE;
+
+    wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
+}
+
+HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest002, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    WifiProxyConfig wifiProxyConfig;
+    int instId = 0;
+    wifiProxyConfig.configureMethod = ConfigureProxyMethod::MANUALCONFIGUE;
+
+    wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
+}
+
+HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest003, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    WifiProxyConfig wifiProxyConfig;
+    int instId = 0;
+    wifiProxyConfig.configureMethod = ConfigureProxyMethod::CLOSED;
+
+    wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
+}
+
+HWTEST_F(WifiNetAgentTest, SetNetLinkIPInfoTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    wifiIpV6Info.globalIpV6Address = "TEST";
+    wifiIpV6Info.netmask = "TEST2";
+    wifiIpV6Info.randGlobalIpV6Address = "TEST3";
+    wifiIpV6Info.uniqueLocalAddress1 = "TEST4";
+    wifiIpV6Info.uniqueLocalAddress2 = "TEST5";
+    wifiNetAgent.SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+}
+
+HWTEST_F(WifiNetAgentTest, SetNetLinkDnsInfoTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    wifiIpV6Info.dnsAddr.push_back("TEST1");
+    wifiIpV6Info.dnsAddr.push_back("TEST2");
+    wifiNetAgent.SetNetLinkDnsInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+}
+
+HWTEST_F(WifiNetAgentTest, SetNetLinkRouteInfoTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    wifiIpV6Info.gateway = "TEST";
+    wifiNetAgent.SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+}
+
+HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteInfoTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    wifiIpV6Info.netmask = "TEST";
+    wifiNetAgent.SetNetLinkLocalRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+}
+
+HWTEST_F(WifiNetAgentTest, RequestNetworkTest001, TestSize.Level1)
+{
+    WifiNetAgent::NetConnCallback netConnCallback;
+    std::string ident = "";
+    std::set<NetManagerStandard::NetCap> netCaps;
+    int32_t registerType = 0;
+    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, registerType), 0);
+}
+
+HWTEST_F(WifiNetAgentTest, ReleaseNetworkTest001, TestSize.Level1)
+{
+    WifiNetAgent::NetConnCallback netConnCallback;
+    std::string ident = "";
+    std::set<NetManagerStandard::NetCap> netCaps;
+    EXPECT_EQ(netConnCallback.ReleaseNetwork(ident, netCaps), 0);
+}
+
+HWTEST_F(WifiNetAgentTest, LogNetCapsTest001, TestSize.Level1)
+{
+    WifiNetAgent::NetConnCallback netConnCallback;
+    std::string ident = "";
+    std::set<NetManagerStandard::NetCap> netCaps;
+    netConnCallback.LogNetCaps(ident, netCaps);
 }
 }
 }

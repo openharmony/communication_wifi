@@ -155,7 +155,8 @@ private:
     private:
         WifiScanProxy &client_;
     };
-
+    ErrCode ParseScanInfos(MessageParcel &reply, std::vector<WifiScanInfo> &result, int contentSize);
+    ErrCode ParseScanInfosSmall(MessageParcel &reply, std::vector<WifiScanInfo> &result, int contentSize);
     void RemoveDeathRecipient(void);
     static BrokerDelegator<WifiScanProxy> g_delegator;
     bool mRemoteDied;

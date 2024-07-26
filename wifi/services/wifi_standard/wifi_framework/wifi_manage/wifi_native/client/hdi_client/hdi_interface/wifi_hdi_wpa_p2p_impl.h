@@ -19,7 +19,6 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_proxy.h"
 #include "i_wifi_struct.h"
-#include "wifi_idl_define.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,15 +84,15 @@ WifiErrorNo HdiP2pInvite(const char *peerBssid, const char *goBssid, const char 
 
 WifiErrorNo HdiP2pReinvoke(int networkId, const char *bssid);
 
-WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress);
+WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress, int size);
 
-WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char *replyDisc);
+WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char *replyDisc, int size);
 
 WifiErrorNo HdiP2pCancelServiceDiscovery(const char *id);
 
 WifiErrorNo HdiP2pRespServerDiscovery(struct HdiP2pServDiscReqInfo *info);
 
-WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin);
+WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin, int size);
 
 WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info);
 

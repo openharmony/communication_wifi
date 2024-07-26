@@ -16,13 +16,17 @@
 #include "concrete_manager_state_machine.h"
 #include "wifi_controller_define.h"
 #include "wifi_manager.h"
-#include "wifi_service_manager.h"
 #include "wifi_config_center.h"
 #include "wifi_internal_msg.h"
+#include "wifi_sta_hal_interface.h"
+#include "wifi_common_event_helper.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_country_code_manager.h"
 #include "wifi_common_util.h"
 #include "app_network_speed_limit_service.h"
+#include "wifi_internal_event_dispatcher.h"
+#else
+#include "wifi_internal_event_dispatcher_lite.h"
 #endif
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
@@ -38,7 +42,7 @@ std::string ConcreteMangerMachine::ifaceName{""};
 
 ConcreteMangerMachine::ConcreteMangerMachine()
     : StateMachine("ConcreteMangerMachine"), pDefaultState(nullptr), pIdleState(nullptr), pConnectState(nullptr),
-      pScanonlyState(nullptr), pMixState(nullptr), pSemiActiveState(nullptr)
+      pScanonlyState(nullptr), pSemiActiveState(nullptr)
 {}
 
 ConcreteMangerMachine::~ConcreteMangerMachine()
@@ -49,15 +53,14 @@ ConcreteMangerMachine::~ConcreteMangerMachine()
     ParsePointer(pIdleState);
     ParsePointer(pConnectState);
     ParsePointer(pScanonlyState);
-    ParsePointer(pMixState);
     ParsePointer(pSemiActiveState);
     WIFI_LOGE("set wifi stoping state is false");
-    WifiSettings::GetInstance().SetWifiStopState(false);
+    WifiConfigCenter::GetInstance().SetWifiStopState(false);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
         ifaceName.clear();
-        WifiSettings::GetInstance().SetStaIfaceName("");
+        WifiConfigCenter::GetInstance().SetStaIfaceName("");
     }
 #endif
 }
@@ -70,7 +73,7 @@ ErrCode ConcreteMangerMachine::InitConcreteMangerMachine()
         WIFI_LOGE("Initial StateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }
-    WifiSettings::GetInstance().SetWifiStopState(false);
+    WifiConfigCenter::GetInstance().SetWifiStopState(false);
     if (InitConcreteMangerStates() == WIFI_OPT_FAILED) {
         return WIFI_OPT_FAILED;
     }
@@ -86,7 +89,6 @@ void ConcreteMangerMachine::BuildStateTree()
     StatePlus(pIdleState, pDefaultState);
     StatePlus(pConnectState, pDefaultState);
     StatePlus(pScanonlyState, pDefaultState);
-    StatePlus(pMixState, pDefaultState);
     StatePlus(pSemiActiveState, pDefaultState);
 }
 
@@ -103,8 +105,6 @@ ErrCode ConcreteMangerMachine::InitConcreteMangerStates()
     tmpErrNumber += JudgmentEmpty(pConnectState);
     pScanonlyState = new (std::nothrow) ScanonlyState(this);
     tmpErrNumber += JudgmentEmpty(pScanonlyState);
-    pMixState = new (std::nothrow) MixState(this);
-    tmpErrNumber += JudgmentEmpty(pMixState);
     pSemiActiveState = new (std::nothrow) SemiActiveState(this);
     tmpErrNumber += JudgmentEmpty(pSemiActiveState);
     if (tmpErrNumber != 0) {
@@ -121,6 +121,7 @@ void ConcreteMangerMachine::RegisterCallback(ConcreteModeCallback &callback)
 
 void ConcreteMangerMachine::SetTargetRole(ConcreteManagerRole role)
 {
+    WIFI_LOGI("SetTargetRole:%{public}d", static_cast<int>(role));
     mTargetRole = static_cast<int>(role);
 }
 
@@ -141,7 +142,7 @@ void ConcreteMangerMachine::DefaultState::GoOutState()
     WIFI_LOGE("DefaultState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr || pConcreteMangerMachine == nullptr) {
         return false;
@@ -167,7 +168,7 @@ void ConcreteMangerMachine::IdleState::GoOutState()
     WIFI_LOGE("IdleState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __attribute__((no_sanitize("cfi")))
+bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg) __attribute__((no_sanitize("cfi")))
 {
     if (msg == nullptr) {
         return false;
@@ -178,12 +179,10 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __a
     }
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_START:
-            pConcreteMangerMachine->mTargetRole = msg->GetParam1();
             HandleStartInIdleState(msg);
             break;
         case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
-        case CONCRETE_CMD_SWITCH_TO_MIX_MODE:
-            HandleSwitchToConnectOrMixMode(msg);
+            HandleSwitchToConnectMode(msg);
             break;
         case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
             HandleSwitchToScanOnlyMode(msg);
@@ -197,69 +196,65 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessage *msg) __a
     return true;
 }
 
-void ConcreteMangerMachine::IdleState::HandleSwitchToConnectOrMixMode(InternalMessage *msg)
+void ConcreteMangerMachine::IdleState::HandleSwitchToConnectMode(InternalMessagePtr msg)
 {
-    ErrCode ret = AutoStartStaService(mid, false);
+    ErrCode ret = pConcreteMangerMachine->AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
-void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessage *msg)
+void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessagePtr msg)
 {
     ErrCode ret = AutoStartScanOnly(mid);
     if (ret != WIFI_OPT_SUCCESS) {
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
     pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
-void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMessage *msg)
+void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMessagePtr msg)
 {
-    ErrCode ret = AutoStartStaService(mid, true);
+    ErrCode ret = pConcreteMangerMachine->AutoStartSemiStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
 }
 
-void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessage *msg)
+void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr msg)
 {
-    mTargetRole = msg->GetParam1();
-    mid = msg->GetParam2();
+    mid = msg->GetParam1();
+    WIFI_LOGI("HandleStartInIdleState targetRole:%{public}d mid:%{public}d", mTargetRole, mid);
     ErrCode res = AutoStartScanOnly(mid);
     if (res != WIFI_OPT_SUCCESS) {
-        WifiSettings::GetInstance().SetWifiStopState(true);
+        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX) ||
-        mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
-        ErrCode ret = AutoStartStaService(mid, false);
+    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
+        ErrCode ret = pConcreteMangerMachine->AutoStartStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
-            WifiSettings::GetInstance().SetWifiStopState(true);
+            WifiConfigCenter::GetInstance().SetWifiStopState(true);
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }
-        pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
+        WIFI_LOGI("HandleStartInIdleState, current role is %{public}d, start scan only success.", mTargetRole);
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
-        ErrCode ret = AutoStartStaService(mid, true);
+        ErrCode ret = pConcreteMangerMachine->AutoStartSemiStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
-            WifiSettings::GetInstance().SetWifiStopState(true);
+            WifiConfigCenter::GetInstance().SetWifiStopState(true);
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }
-        pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
     } else {
         WIFI_LOGE("idlestate start role is error");
     }
@@ -282,7 +277,7 @@ void ConcreteMangerMachine::ConnectState::GoOutState()
     WIFI_LOGE("ConnectState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -295,9 +290,6 @@ bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessage *msg)
         case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
             SwitchScanOnlyInConnectState();
             break;
-        case CONCRETE_CMD_SWITCH_TO_MIX_MODE:
-            SwitchMixInConnectState();
-            break;
         case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
             SwitchSemiActiveInConnectState();
             break;
@@ -309,11 +301,10 @@ bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessage *msg)
 
 void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
 {
-    ErrCode ret = AutoStopStaService(mid);
+    ErrCode ret = pConcreteMangerMachine->AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
 void ConcreteMangerMachine::ConnectState::SwitchSemiActiveInConnectState()
@@ -322,11 +313,6 @@ void ConcreteMangerMachine::ConnectState::SwitchSemiActiveInConnectState()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("switch semi wifi failed ret =%{public}d \n", ret);
     }
-}
-
-void ConcreteMangerMachine::ConnectState::SwitchMixInConnectState()
-{
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pMixState);
 }
 
 ConcreteMangerMachine::ScanonlyState::ScanonlyState(ConcreteMangerMachine *concreteMangerMachine)
@@ -346,7 +332,7 @@ void ConcreteMangerMachine::ScanonlyState::GoOutState()
     WIFI_LOGE("ScanonlyState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -359,9 +345,6 @@ bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessage *msg)
         case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
             SwitchConnectInScanOnlyState();
             break;
-        case CONCRETE_CMD_SWITCH_TO_MIX_MODE:
-            SwitchMixInScanOnlyState();
-            break;
         case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
             SwitchSemiActiveInScanOnlyState();
             break;
@@ -373,94 +356,19 @@ bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessage *msg)
 
 void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
 {
-    ErrCode ret = AutoStartStaService(mid, false);
+    ErrCode ret = pConcreteMangerMachine->AutoStartStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
-}
-
-void ConcreteMangerMachine::ScanonlyState::SwitchMixInScanOnlyState()
-{
-    ErrCode ret = AutoStartStaService(mid, false);
-    if (ret != WIFI_OPT_SUCCESS) {
-        pConcreteMangerMachine->mcb.onStartFailure(mid);
-        return;
-    }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pMixState);
 }
 
 void ConcreteMangerMachine::ScanonlyState::SwitchSemiActiveInScanOnlyState()
 {
-    ErrCode ret = AutoStartStaService(mid, true);
+    ErrCode ret = pConcreteMangerMachine->AutoStartSemiStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
-    }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
-}
-
-ConcreteMangerMachine::MixState::MixState(ConcreteMangerMachine *concreteMangerMachine)
-    : State("MixState"), pConcreteMangerMachine(concreteMangerMachine)
-{}
-
-ConcreteMangerMachine::MixState::~MixState()
-{}
-
-void ConcreteMangerMachine::MixState::GoInState()
-{
-    WIFI_LOGE("MixState  GoInState function.\n");
-}
-
-void ConcreteMangerMachine::MixState::GoOutState()
-{
-    WIFI_LOGE("MixState  GoOutState function.\n");
-}
-
-bool ConcreteMangerMachine::MixState::ExecuteStateMsg(InternalMessage *msg)
-{
-    if (msg == nullptr) {
-        return false;
-    }
-    WIFI_LOGE("MixState-msgCode=%{public}d is received.\n", msg->GetMessageName());
-    if (pConcreteMangerMachine->HandleCommonMessage(msg)) {
-        return true;
-    }
-    switch (msg->GetMessageName()) {
-        case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
-            SwitchConnectInMixState();
-            break;
-        case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
-            SwitchScanOnlyInMixState();
-            break;
-        case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
-            SwitchSemiActiveInMixState();
-            break;
-        default:
-            break;
-    }
-    return true;
-}
-
-void ConcreteMangerMachine::MixState::SwitchConnectInMixState()
-{
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
-}
-
-void ConcreteMangerMachine::MixState::SwitchScanOnlyInMixState()
-{
-    ErrCode ret = AutoStopStaService(mid);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
-    }
-}
-
-void ConcreteMangerMachine::MixState::SwitchSemiActiveInMixState()
-{
-    ErrCode ret = pConcreteMangerMachine->SwitchSemiFromEnable();
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("switch semi wifi failed ret =%{public}d \n", ret);
     }
 }
 
@@ -481,7 +389,7 @@ void ConcreteMangerMachine::SemiActiveState::GoOutState()
     WIFI_LOGI("SemiActiveState  GoOutState function.\n");
 }
 
-bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessage *msg)
+bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return false;
@@ -494,17 +402,16 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessage *ms
         case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
             SwitchConnectInSemiActiveState();
             break;
-        case CONCRETE_CMD_SWITCH_TO_MIX_MODE:
-            SwitchMixInSemiActiveState();
-            break;
         case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
             SwitchScanOnlyInSemiActiveState();
             break;
         case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
             if (pConcreteMangerMachine->mTargetRole ==
                 static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
-                AutoStopScanOnly(mid, true);
+                WIFI_LOGI("switch ROLE_CLIENT_STA_SEMI_ACTIVE");
+                AutoStopScanOnly(mid, false);
             } else {
+                WIFI_LOGI("switch ROLE_CLIENT_MIX_SEMI_ACTIVE");
                 AutoStartScanOnly(mid);
             }
             break;
@@ -512,18 +419,6 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessage *ms
             break;
     }
     return true;
-}
-
-void ConcreteMangerMachine::SemiActiveState::SwitchMixInSemiActiveState()
-{
-    AutoStartScanOnly(mid);
-    ErrCode ret = pConcreteMangerMachine->SwitchEnableFromSemi();
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("SemiActiveState SwitchEnableFromSemi failed");
-        pConcreteMangerMachine->mcb.onStartFailure(mid);
-        return;
-    }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pMixState);
 }
 
 void ConcreteMangerMachine::SemiActiveState::SwitchConnectInSemiActiveState()
@@ -535,20 +430,18 @@ void ConcreteMangerMachine::SemiActiveState::SwitchConnectInSemiActiveState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
 void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
 {
-    AutoStartScanOnly(mid);
-    ErrCode ret = AutoStopStaService(mid);
+    WIFI_LOGI("SwitchScanOnlyInSemiActiveState");
+    ErrCode ret = pConcreteMangerMachine->AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
-bool ConcreteMangerMachine::HandleCommonMessage(InternalMessage *msg)
+bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)
 {
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_STA_STOP:
@@ -599,28 +492,63 @@ ErrCode ConcreteMangerMachine::StartSelfCureService(int instId)
 }
 #endif
 
-ErrCode ConcreteMangerMachine::AutoStartStaService(int instId, bool isSemiWifi)
+ErrCode ConcreteMangerMachine::InitStaService(IStaService *pService)
 {
-    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-    WIFI_LOGI("AutoStartStaService, current sta state:%{public}d isSemiWifi:%{public}d", staState, isSemiWifi);
-    if (staState == WifiOprMidState::RUNNING) {
-        return WIFI_OPT_SUCCESS;
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr");
+        return WIFI_OPT_FAILED;
+    }
+    ErrCode errCode = pService->RegisterStaServiceCallback(
+        WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register sta service callback failed!");
+        return WIFI_OPT_FAILED;
+    }
+    errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiScanManager()->GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("WifiScanManager register sta service callback failed!");
+        return WIFI_OPT_FAILED;
+    }
+#ifndef OHOS_ARCH_LITE
+    errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+            static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
     }
 
+    errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
+            static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+#endif
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ConcreteMangerMachine::PreStartWifi(int instId)
+{
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(ConcreteMangerMachine::IfaceDestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        std::bind(ConcreteMangerMachine::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName)) {
-        WIFI_LOGE("AutoStartStaService, create iface failed!");
+        WIFI_LOGE("PreStartWifi, create iface failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiSettings::GetInstance().SetStaIfaceName(ifaceName);
+    WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName);
 #endif
-
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING, instId)) {
-        WIFI_LOGE("AutoStartStaService, set wifi mid state opening failed!");
+        WIFI_LOGE("PreStartWifi, set wifi mid state opening failed!");
         return WIFI_OPT_FAILED;
     }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ConcreteMangerMachine::PostStartWifi(int instId)
+{
     ErrCode errCode = WIFI_OPT_FAILED;
     do {
         if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
@@ -632,15 +560,8 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId, bool isSemiWifi)
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
             break;
         }
-        errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register sta service callback failed!");
-            break;
-        }
-        errCode = pService->RegisterStaServiceCallback(
-            WifiManager::GetInstance().GetWifiScanManager()->GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("WifiScanManager register sta service callback failed!");
+        if (InitStaService(pService) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("InitStaService failed!");
             break;
         }
 #ifdef FEATURE_SELF_CURE_SUPPORT
@@ -649,39 +570,12 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId, bool isSemiWifi)
             break;
         }
 #endif
-#ifndef OHOS_ARCH_LITE
-        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
-            break;
-        }
-
-        errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
-            break;
-        }
-#endif
-        if (isSemiWifi) {
-            errCode = pService->EnableSemiWifi();
-        } else {
-            errCode = pService->EnableWifi();
-        }
+        errCode = pService->EnableStaService();
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Service enable sta failed ,ret %{public}d!", static_cast<int>(errCode));
             break;
         }
     } while (0);
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA);
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE);
-#endif
-        return errCode;
-    }
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 #ifdef FEATURE_P2P_SUPPORT
     errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
@@ -689,6 +583,62 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId, bool isSemiWifi)
         WIFI_LOGE("AutoStartStaService, AutoStartP2pService failed!");
     }
 #endif
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ConcreteMangerMachine::AutoStartSemiStaService(int instId)
+{
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+    WIFI_LOGI("AutoStartSemiStaService, current sta state:%{public}d", staState);
+    if (staState == WifiOprMidState::SEMI_ACTIVE) {
+        return WIFI_OPT_SUCCESS;
+    }
+    if (PreStartWifi(instId) != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_FAILED;
+    }
+    DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_OPENING, instId);
+    int ret = WifiStaHalInterface::GetInstance().StartWifi(WifiConfigCenter::GetInstance().GetStaIfaceName());
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AutoStartSemiStaService start wifi fail.");
+        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED), "TIME_OUT",
+            static_cast<int>(staState));
+        return WIFI_OPT_FAILED;
+    }
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
+    DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED, instId);
+    if (PostStartWifi(instId) != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_FAILED;
+    }
+    HandleStaSemiActive();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
+{
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+    WIFI_LOGI("AutoStartStaService, current sta state:%{public}d", staState);
+    if (staState == WifiOprMidState::RUNNING) {
+        return WIFI_OPT_SUCCESS;
+    }
+    if (PreStartWifi(instId) != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_FAILED;
+    }
+    DispatchWifiOpenRes(OperateResState::OPEN_WIFI_OPENING, instId);
+    int ret = WifiStaHalInterface::GetInstance().StartWifi(WifiConfigCenter::GetInstance().GetStaIfaceName());
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AutoStartStaService start wifi fail.");
+        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED), "TIME_OUT",
+            static_cast<int>(staState));
+        return WIFI_OPT_FAILED;
+    }
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
+    DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
+    if (PostStartWifi(instId) != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_FAILED;
+    }
+    HandleStaStart();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -722,14 +672,21 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
 #endif
         return WIFI_OPT_SUCCESS;
     }
-    ret = pService->DisableWifi();
+    DispatchWifiCloseRes(OperateResState::CLOSE_WIFI_CLOSING, instId);
+    ret = pService->DisableStaService();
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("service disable sta failed, ret %{public}d!", static_cast<int>(ret));
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING, instId);
-        return ret;
     }
-
-    WifiConfigCenter::GetInstance().SetStaLastRunState(WIFI_STATE_CLOSED);
+    if (WifiStaHalInterface::GetInstance().StopWifi() != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("stop wifi failed.");
+        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
+            static_cast<int>(staState));
+        return WIFI_OPT_FAILED;
+    }
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
+    DispatchWifiCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
+    HandleStaStop();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -751,11 +708,12 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(ConcreteMangerMachine::IfaceDestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        std::bind(ConcreteMangerMachine::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiSettings::GetInstance().SetStaIfaceName(ifaceName);
+    WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName);
 #endif
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, instId);
     WifiManager::GetInstance().AutoStartEnhanceService();
@@ -764,7 +722,7 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId, bool isSemiWifiEnable)
+ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId, bool setIfaceDown)
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId);
     WIFI_LOGI("AutoStopScanOnly, current wifi scan only state is %{public}d", static_cast<int>(curState));
@@ -783,13 +741,11 @@ ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId, bool isSemiWifiEnabl
         return WIFI_OPT_FAILED;
     }
 
-    if (!isSemiWifiEnable) {
-        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
-        if (pService == nullptr) {
-            WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
-            return WIFI_OPT_FAILED;
-        }
-        pService->SetNetworkInterfaceUpDown(false);
+    if (setIfaceDown) {
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+        DelayedSingleton<HalDeviceManager>::GetInstance()->SetNetworkUpDown(
+            WifiConfigCenter::GetInstance().GetStaIfaceName(), false);
+#endif
     }
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(instId);
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
@@ -798,30 +754,22 @@ ErrCode ConcreteMangerMachine::AutoStopScanOnly(int instId, bool isSemiWifiEnabl
 
 void ConcreteMangerMachine::HandleStaStop()
 {
-    if (WifiSettings::GetInstance().GetWifiStopState()) {
+    if (WifiConfigCenter::GetInstance().GetWifiStopState()) {
         WIFI_LOGE("Sta stoped remove manager.");
-        ErrCode ret = AutoStopScanOnly(mid, false);
+        ErrCode ret = AutoStopScanOnly(mid, true);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
         }
         return ReportClose();
     }
-    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX)) {
-        ErrCode ret = AutoStartStaService(mid, false);
-        if (ret != WIFI_OPT_SUCCESS) {
-            mcb.onStartFailure(mid);
-            return;
-        }
-    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
-        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(mid);
-        if (pService == nullptr) {
-            WIFI_LOGE("HandleStaStop scan service is null");
-            return ReportClose();
-        }
-        pService->SetNetworkInterfaceUpDown(true);
+    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+        DelayedSingleton<HalDeviceManager>::GetInstance()->SetNetworkUpDown(
+            WifiConfigCenter::GetInstance().GetStaIfaceName(), true);
+#endif
         SwitchState(pScanonlyState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
-        ErrCode ret = AutoStartStaService(mid, false);
+        ErrCode ret = AutoStartStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             mcb.onStartFailure(mid);
             return;
@@ -829,7 +777,7 @@ void ConcreteMangerMachine::HandleStaStop()
         SwitchState(pConnectState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
-        ErrCode ret = AutoStartStaService(mid, true);
+        ErrCode ret = AutoStartSemiStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             mcb.onStartFailure(mid);
             return;
@@ -837,7 +785,7 @@ void ConcreteMangerMachine::HandleStaStop()
         SwitchState(pSemiActiveState);
     } else {
         WIFI_LOGE("Now targetrole is unknow, stop concrete.");
-        ErrCode ret = AutoStopScanOnly(mid, false);
+        ErrCode ret = AutoStopScanOnly(mid, true);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
         }
@@ -862,9 +810,7 @@ void ConcreteMangerMachine::HandleStaStart()
 {
     ErrCode ret;
 
-    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX)) {
-        SwitchState(pMixState);
-    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
+    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
         ret = AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
@@ -890,8 +836,7 @@ void ConcreteMangerMachine::HandleStaSemiActive()
 {
     ErrCode ret;
 
-    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX) ||
-        mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
+    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
         ret = SwitchEnableFromSemi();
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("switch enable failed ret = %{public}d", ret);
@@ -908,7 +853,7 @@ void ConcreteMangerMachine::HandleStaSemiActive()
         AutoStartScanOnly(mid);
         SwitchState(pSemiActiveState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
-        AutoStopScanOnly(mid, true);
+        AutoStopScanOnly(mid, false);
         SwitchState(pSemiActiveState);
     } else {
         WIFI_LOGE("Now targetrole is unknow.");
@@ -936,12 +881,14 @@ ErrCode ConcreteMangerMachine::SwitchSemiFromEnable()
 #endif
         return WIFI_OPT_FAILED;
     }
-    ErrCode ret = pService->EnableSemiWifi();
+    DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_OPENING, mid);
+    ErrCode ret = pService->DisableStaService();
     if (ret != static_cast<int>(WIFI_OPT_SUCCESS)) {
-        WIFI_LOGE("EnableSemiWifi failed!");
+        WIFI_LOGE("DisableStaService failed!");
         return WIFI_OPT_FAILED;
     }
-    SwitchState(pSemiActiveState);
+    DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED, mid);
+    HandleStaSemiActive();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -963,17 +910,21 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
         WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
         return WIFI_OPT_FAILED;
     }
-    errCode = pService->EnableWifi();
+    DispatchWifiOpenRes(OperateResState::OPEN_WIFI_OPENING, mid);
+    errCode = pService->EnableStaService();
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Service enable sta failed ,ret %{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
+    DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, mid);
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, mid);
+    HandleStaStart();
     return WIFI_OPT_SUCCESS;
 }
 
-void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessage *msg)
+void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessagePtr msg)
 {
-    if (WifiSettings::GetInstance().GetWifiStopState()) {
+    if (WifiConfigCenter::GetInstance().GetWifiStopState()) {
         WIFI_LOGE("checkAndContinueToStopWifi: wifi is stoping");
         return;
     }
@@ -988,20 +939,18 @@ void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessage *msg)
         return;
     }
 
-    WifiSettings::GetInstance().SetWifiStopState(true);
+    WifiConfigCenter::GetInstance().SetWifiStopState(true);
     WIFI_LOGI("Set WifiStopState is true.");
     if (staState == WifiOprMidState::RUNNING || detailState == WifiDetailState::STATE_SEMI_ACTIVE ||
         detailState == WifiDetailState::STATE_SEMI_ACTIVATING) {
         ErrCode ret = AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("stop sta failed in timer ret = %{public}d", ret);
-            WifiSettings::GetInstance().SetWifiStopState(false);
-            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-            ins->HandleStaClose(mid);
+            WifiConfigCenter::GetInstance().SetWifiStopState(false);
+            HandleStaStop();
         }
     } else {
-        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-        ins->HandleStaClose(mid);
+        HandleStaStop();
     }
 }
 
@@ -1011,7 +960,7 @@ void ConcreteMangerMachine::IfaceDestoryCallback(std::string &destoryIfaceName, 
         destoryIfaceName.c_str(), createIfaceType);
     if (destoryIfaceName == ifaceName) {
         ifaceName.clear();
-        WifiSettings::GetInstance().SetStaIfaceName("");
+        WifiConfigCenter::GetInstance().SetStaIfaceName("");
     }
 
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
@@ -1019,5 +968,101 @@ void ConcreteMangerMachine::IfaceDestoryCallback(std::string &destoryIfaceName, 
     return;
 }
 
+void ConcreteMangerMachine::OnRssiReportCallback(int index, int antRssi)
+{
+    WIFI_LOGI("HwWiTas OnRssiReportCallback, index:%{public}d, antRssi:%{public}d", index, antRssi);
+
+    std::string data = std::to_string(antRssi);
+    WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(index, data);
+}
+
+void ConcreteMangerMachine::DispatchWifiOpenRes(OperateResState state, int instId)
+{
+    WIFI_LOGI("DispatchWifiOpenRes, state:%{public}d", static_cast<int>(state));
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+    cbMsg.id = instId;
+    if (state == OperateResState::OPEN_WIFI_OPENING) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATING, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::ENABLING);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
+            static_cast<int>(WifiOperateState::STA_OPENING));
+        return;
+    }
+    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, instId);
+        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED, instId);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
+            static_cast<int>(WifiOperateState::STA_OPENED));
+        WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
+        return;
+    }
+}
+
+void ConcreteMangerMachine::DispatchWifiSemiActiveRes(OperateResState state, int instId)
+{
+    WIFI_LOGI("DispatchWifiSemiActiveRes, state:%{public}d", static_cast<int>(state));
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+    cbMsg.id = instId;
+    if (state == OperateResState::ENABLE_SEMI_WIFI_OPENING) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVATING, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::DISABLING);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
+            static_cast<int>(WifiOperateState::STA_CLOSING));
+        return;
+    }
+    if (state == OperateResState::ENABLE_SEMI_WIFI_SUCCEED) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, instId);
+        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_SEMI_ENABLED, instId);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::SEMI_ACTIVE, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
+            static_cast<int>(WifiOperateState::STA_CLOSED));
+        WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::SEMI_ENABLE);
+        return;
+    }
+}
+
+void ConcreteMangerMachine::DispatchWifiCloseRes(OperateResState state, int instId)
+{
+    WIFI_LOGI("DispatchWifiCloseRes, state:%{public}d", static_cast<int>(state));
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+    cbMsg.id = instId;
+    if (state == OperateResState::CLOSE_WIFI_CLOSING) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_DEACTIVATING, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::DISABLING);
+        if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        }
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
+            static_cast<int>(WifiOperateState::STA_CLOSING));
+        return;
+    }
+    if (state == OperateResState::CLOSE_WIFI_SUCCEED) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
+        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
+            static_cast<int>(WifiOperateState::STA_CLOSED));
+        WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
+        return;
+    }
+}
 } // namespace Wifi
 } // namespace OHOS

@@ -26,7 +26,8 @@
 #include "app_mgr_constants.h"
 #include "define.h"
 #endif
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
+#include "wifi_app_state_aware.h"
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_MANAGER_LOCK_MANAGER"
@@ -92,10 +93,10 @@ WifiProtectMode WifiProtectManager::GetNearlyProtectMode()
 {
 #ifndef OHOS_ARCH_LITE
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     mWifiConnected = (linkedInfo.connState == ConnState::CONNECTED) ? true : false;
 
-    int screenState = WifiSettings::GetInstance().GetScreenState();
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     mScreenOn = (screenState == MODE_STATE_OPEN || screenState == MODE_STATE_DEFAULT) ? true : false;
     int foregroudCount = GetFgLowlatyProtectCount();
     LOGD("%{public}s mWifiConnected: %{public}d, mScreenOn: %{public}d,"
@@ -249,7 +250,7 @@ bool WifiProtectManager::AddProtect(
     }
 #ifndef OHOS_ARCH_LITE
     int state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_END);
-    if (IsForegroundApplication(name)) {
+    if (WifiAppStateAware::GetInstance().IsForegroundApp(name)) {
         state = static_cast<int>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
     }
     LOGD("%{public}s bundle name: %{public}s state: %{public}d",
@@ -332,7 +333,7 @@ bool WifiProtectManager::ChangeWifiPowerMode()
     /* Otherwise, we need to change current mode, first reset it to normal */
     switch (mCurrentOpMode) {
         case WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF:
-            if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(true) != WIFI_IDL_OPT_OK) {
+            if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(true) != WIFI_HAL_OPT_OK) {
                 LOGE("%{public}s Failed to reset the OpMode from hi-perf to Normal", __func__);
                 return false;
             }
@@ -355,7 +356,7 @@ bool WifiProtectManager::ChangeWifiPowerMode()
     /* Now switch to the new opMode */
     switch (newProtectMode) {
         case WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF:
-            if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(false) != WIFI_IDL_OPT_OK) {
+            if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(false) != WIFI_HAL_OPT_OK) {
                 LOGE("%{public}s Failed to set the OpMode to hi-perf", __func__);
                 return false;
             }
@@ -387,7 +388,7 @@ bool WifiProtectManager::ChangeWifiPowerMode()
 bool WifiProtectManager::SetLowLatencyMode(bool enabled)
 {
     /* Only set power save mode */
-    if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(!enabled) != WIFI_IDL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().SetPowerSave(!enabled) != WIFI_HAL_OPT_OK) {
         LOGE("Failed to set power save mode");
         return false;
     }
@@ -395,25 +396,6 @@ bool WifiProtectManager::SetLowLatencyMode(bool enabled)
     return true;
 }
 #ifndef OHOS_ARCH_LITE
-bool WifiProtectManager::IsForegroundApplication(const std::string &BundleName)
-{
-    bool isForegroud = false;
-    std::vector<AppExecFwk::AppStateData> fgList;
-    if (mAppObject &&
-        mAppObject->GetForegroundApplications(fgList) == static_cast<int32_t>(WIFI_OPT_SUCCESS)) {
-        std::vector<AppExecFwk::AppStateData>::iterator itor = fgList.begin();
-        while (itor != fgList.end()) {
-            LOGD("Match foreground bundle name = %{public}s", (*itor).bundleName.c_str());
-            if ((*itor).bundleName == BundleName) {
-                isForegroud = true;
-                break;
-            }
-            itor++;
-        }
-    }
-    return isForegroud;
-}
-
 int WifiProtectManager::GetFgLowlatyProtectCount()
 {
     int count = 0;
@@ -433,7 +415,7 @@ int WifiProtectManager::GetFgLowlatyProtectCount()
 
 void WifiProtectManager::OnAppDied(const std::string bundlename)
 {
-    LOGI("Enter %{public}s, remove app bundlename %{public}s.",
+    LOGD("Enter %{public}s, remove app bundlename %{public}s.",
         __func__, bundlename.c_str());
     std::unique_lock<std::mutex> lock(mMutex);
     bool needUpdate = false;

@@ -22,7 +22,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-void ApHalTestStationCbk(const WifiApConnectionNofify &info)
+void ApHalTestStationCbk(const WifiHalApConnectionNofify &info)
 {
     LOGD("apHalTestStationCbk");
     LOGD("station : %s, %s", info.mac.c_str(), ((info.type == 105) ? "join" : "leave"));
@@ -50,7 +50,7 @@ void WifiApHalInterfaceTest::TearDownTestCase()
 HWTEST_F(WifiApHalInterfaceTest, StartApTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiApHalInterface::GetInstance().StartAp();
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, SetSoftApConfigTest, TestSize.Level1)
@@ -61,75 +61,75 @@ HWTEST_F(WifiApHalInterfaceTest, SetSoftApConfigTest, TestSize.Level1)
     config.SetBand(BandType::BAND_2GHZ);
     config.SetChannel(0);
     config.SetMaxConn(1);
-    WifiErrorNo ret = WifiApHalInterface::GetInstance().SetSoftApConfig(config);
-    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
+    WifiErrorNo ret = WifiApHalInterface::GetInstance().SetSoftApConfig("wlan0", config);
+    EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, GetStationListTest, TestSize.Level1)
 {
     std::vector<std::string> vec;
     WifiErrorNo ret = WifiApHalInterface::GetInstance().GetStationList(vec);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, AddBlockByMacTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo ret = WifiApHalInterface::GetInstance().AddBlockByMac(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     ret = WifiApHalInterface::GetInstance().AddBlockByMac(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, DelBlockByMacTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo ret = WifiApHalInterface::GetInstance().DelBlockByMac(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     ret = WifiApHalInterface::GetInstance().DelBlockByMac(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, RemoveStationTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo ret = WifiApHalInterface::GetInstance().RemoveStation(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     ret = WifiApHalInterface::GetInstance().RemoveStation(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, DisconnectStaByMacTest, TestSize.Level1)
 {
     std::string mac = "abcdefghijklmn";
     WifiErrorNo ret = WifiApHalInterface::GetInstance().DisconnectStaByMac(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_INPUT_MAC_INVALID);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     mac = "00:00:00:00:00:00";
     ret = WifiApHalInterface::GetInstance().DisconnectStaByMac(mac);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, GetFrequenciesByBandTest, TestSize.Level1)
 {
     std::vector<int> freq;
     WifiErrorNo ret = WifiApHalInterface::GetInstance().GetFrequenciesByBand("wlan0", 1, freq);
-    EXPECT_FALSE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, SetWifiCountryCodeTest, TestSize.Level1)
 {
     std::string code = "CN";
     WifiErrorNo ret = WifiApHalInterface::GetInstance().SetWifiCountryCode("wlan0", code);
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiApHalInterfaceTest, StopApTest, TestSize.Level1)
 {
     WifiErrorNo ret = WifiApHalInterface::GetInstance().StopAp();
-    EXPECT_TRUE(ret == WIFI_IDL_OPT_OK);
+    EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 }  // namespace Wifi
 }  // namespace OHOS

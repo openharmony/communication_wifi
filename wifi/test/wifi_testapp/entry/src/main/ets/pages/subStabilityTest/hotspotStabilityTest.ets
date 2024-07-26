@@ -21,6 +21,12 @@ import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import prompt from '@system.prompt';
+import common from '@ohos.app.ability.common';
+import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
+import { BusinessError } from '@ohos.base';
+import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
+import notificationManager from '@ohos.notificationManager';
 
 interface myParams extends Object {
   testItem: TestData
@@ -55,6 +61,74 @@ struct HotspotStabilityTest {
   @State hotspotMessage: string = ""
   @State hotspotMessageLog: string = ""
   @State hotspotLoopState: Boolean = true
+
+  aboutToAppear() {
+    // 请求发送通知的许可
+    notificationManager.requestEnableNotification().then(() => {
+      console.info(`[EntryAbility] requestEnableNotification success`);
+      // 申请WiFi相关权限
+      let atManager = abilityAccessCtrl.createAtManager();
+      try {
+        atManager.requestPermissionsFromUser(getContext(this) , [
+          'ohos.permission.INTERNET',
+          'ohos.permission.SET_WIFI_INFO',
+          'ohos.permission.GET_WIFI_INFO',
+          'ohos.permission.MANAGE_WIFI_CONNECTION',
+          'ohos.permission.GET_WIFI_PEERS_MAC',
+          'ohos.permission.MANAGE_WIFI_CONNECTION',
+          'ohos.permission.SET_WIFI_CONFIG',
+          "ohos.permission.GET_WIFI_CONFIG",
+          "ohos.permission.GET_WIFI_LOCAL_MAC",
+          "ohos.permission.MANAGE_WIFI_HOTSPOT",
+          "ohos.permission.GET_WIFI_INFO_INTERNAL"
+        ])
+          .then((data) => {
+            console.info(`[EntryAbility], data: ${ JSON.stringify(data) }`);
+          })
+          .catch((err: BusinessError) => {
+            console.info(`[EntryAbility], err: ${ JSON.stringify(err) }`);
+          })
+      } catch( err ) {
+        console.info(`[EntryAbility], catch err->${ JSON.stringify(err) }`);
+      }
+    }).catch((err: BusinessError) => {
+      console.error(`[EntryAbility] requestEnableNotification failed, code is ${ err.code }, message is ${ err.message }`);
+    });
+  }
+
+  // 开始长时任务
+  startContinuousTask() {
+    let context: Context = getContext(this);
+    // 通知参数，指定点击长时任务通知后跳转的应用
+    let wantAgentInfo: wantAgent.WantAgentInfo = {
+      wants : [
+        {
+          bundleName : (context as common.UIAbilityContext).abilityInfo.bundleName ,
+          abilityName : (context as common.UIAbilityContext).abilityInfo.name
+        }
+      ] ,
+      operationType : wantAgent.OperationType.START_ABILITY ,
+      requestCode : 0 ,
+      wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
+    };
+    wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
+      backgroundTaskManager.startBackgroundRunning(context ,
+        backgroundTaskManager.BackgroundMode.WIFI_INTERACTION , wantAgentObj).then(() => {
+        console.info(`Succeeded in operationing startBackgroundRunning.`);
+      }).catch((err: BusinessError) => {
+        console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+      });
+    });
+  }
+
+  // 停止长时任务
+  stopContinuousTask() {
+    backgroundTaskManager.stopBackgroundRunning(getContext()).then(() => {
+      console.info(`Succeeded in operationing stopBackgroundRunning.`);
+    }).catch((err: BusinessError) => {
+      console.error(`Failed to operation stopBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+    });
+  }
 
   build() {
     Column() {
@@ -153,6 +227,7 @@ struct HotspotStabilityTest {
             .padding({ right : "10vp" })
             .onClick(async(event: ClickEvent) => {
               console.log(TAG , "start HotspotSwitch test-------------")
+              this.startContinuousTask();
               await this.forLoop()
             })
 
@@ -166,6 +241,7 @@ struct HotspotStabilityTest {
               console.log(TAG , "准备测试停止 -------------")
               this.hotspotMessageLog = ""
               this.openHotspotNumber = 0
+              this.stopContinuousTask();
             })
         }
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_25_100).backgroundColor($r("app.color.lead"))
@@ -287,14 +363,13 @@ struct HotspotStabilityTest {
           this.openFailNumber = this.openFailNumber + 1
           console.log(TAG , "热点使能失败的次数：" + this.openFailNumber)
           console.log(TAG , "第" + (this.openHotspotNumber + 1) + "次热点使能失败")
-          break;
         } else {
           console.log("第" + (this.openHotspotNumber + 1) + "次开热点后状态不清楚");
-          break;
         }
       }
     }
     console.log(TAG , "测试结束 -------------")
+    this.stopContinuousTask();
   }
 }
 

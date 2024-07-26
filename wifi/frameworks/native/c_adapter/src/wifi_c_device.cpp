@@ -106,7 +106,7 @@ NO_SANITIZE("cfi") WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned 
         result->timestamp = vecScanInfos[i].timestamp;
         ++result;
     }
-    *size = (vecSize < WIFI_SCAN_HOTSPOT_LIMIT) ? vecSize : WIFI_SCAN_HOTSPOT_LIMIT;
+    *size = static_cast<size_t>((vecSize < WIFI_SCAN_HOTSPOT_LIMIT) ? vecSize : WIFI_SCAN_HOTSPOT_LIMIT);
     return GetCErrorCode(ret);
 }
 
@@ -583,5 +583,18 @@ NO_SANITIZE("cfi") WifiErrorCode GetWifiDetailState(WifiDetailState *state)
     OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetWifiDetailState(detailState);
     *state = (WifiDetailState)detailState;
     return GetCErrorCode(ret);
+}
+
+NO_SANITIZE("cfi") WifiErrorCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    OHOS::Wifi::WifiLowPowerParam tempParam;
+    tempParam.ifName = wifiLowPowerParam.ifName;
+    tempParam.scene = wifiLowPowerParam.scene;
+    tempParam.rssiThreshold = wifiLowPowerParam.rssiThreshold;
+    tempParam.peerMacaddr = wifiLowPowerParam.peerMacaddr;
+    tempParam.powerParam = wifiLowPowerParam.powerParam;
+    tempParam.powerParamLen = wifiLowPowerParam.powerParamLen;
+    return GetCErrorCode(wifiDevicePtr->SetLowTxPower(tempParam));
 }
 #endif

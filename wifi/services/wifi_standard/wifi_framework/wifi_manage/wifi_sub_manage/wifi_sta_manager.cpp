@@ -23,6 +23,9 @@
 #include "wifi_hisysevent.h"
 #include "wifi_protect_manager.h"
 #include "wifi_system_timer.h"
+#ifdef FEATURE_STA_SUPPORT
+#include "wifi_country_code_manager.h"
+#endif
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
@@ -93,28 +96,6 @@ void WifiStaManager::StartUnloadStaSaTimer(void)
 void WifiStaManager::CloseStaService(int instId)
 {
     WIFI_LOGI("close sta service");
-    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
-#ifdef FEATURE_SELF_CURE_SUPPORT
-    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
-#endif
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
-    auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaClose(instId);
-    WifiConfigCenter::GetInstance().SetWifiStaCloseTime(instId);
-    if (!WifiSettings::GetInstance().GetWifiSelfcureReset()) {
-        WifiEventCallbackMsg cbMsg;
-        cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-        cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
-        cbMsg.id = instId;
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    }
-#ifdef FEATURE_P2P_SUPPORT
-    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    WIFI_LOGI("CloseStaService, current p2p state: %{public}d", p2pState);
-    if (p2pState == WifiOprMidState::RUNNING) {
-        WifiManager::GetInstance().GetWifiP2pManager()->AutoStopP2pService();
-    }
-#endif
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close sta SA!");
@@ -129,9 +110,6 @@ void WifiStaManager::InitStaCallback(void)
 {
     using namespace std::placeholders;
     mStaCallback.callbackModuleName = "WifiStaManager";
-    mStaCallback.OnStaOpenRes = std::bind(&WifiStaManager::DealStaOpenRes, this, _1, _2);
-    mStaCallback.OnStaCloseRes = std::bind(&WifiStaManager::DealStaCloseRes, this, _1, _2);
-    mStaCallback.OnStaSemiActiveRes = std::bind(&WifiStaManager::DealStaSemiActiveRes, this, _1, _2);
     mStaCallback.OnStaConnChanged = std::bind(&WifiStaManager::DealStaConnChanged, this, _1, _2, _3);
     mStaCallback.OnWpsChanged = std::bind(&WifiStaManager::DealWpsChanged, this, _1, _2, _3);
     mStaCallback.OnStaStreamChanged = std::bind(&WifiStaManager::DealStreamChanged, this, _1, _2);
@@ -139,123 +117,34 @@ void WifiStaManager::InitStaCallback(void)
     return;
 }
 
-void WifiStaManager::ForceStopWifi(int instId)
+void WifiStaManager::DealStaOpened(int instId)
 {
-    WIFI_LOGI("Enter ForceStopWifi");
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
-    if (pService == nullptr || (pService->DisableWifi() != WIFI_OPT_SUCCESS)) {
-        WIFI_LOGE("service is null or disable wifi failed.");
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
-        if (!WifiSettings::GetInstance().GetWifiSelfcureReset()) {
-            WifiEventCallbackMsg cbMsg;
-            cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-            cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
-            cbMsg.id = instId;
-            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        }
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+#ifdef FEATURE_STA_SUPPORT
+    WifiCountryCodeManager::GetInstance().DealStaOpened(instId);
 #endif
-        return;
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+    if (pSelfCureService != nullptr) {
+        pSelfCureService->DealStaOpened(instId);
     }
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-    WIFI_LOGI("In force stop wifi, state: %{public}d", static_cast<int>(curState));
-    WifiConfigCenter::GetInstance().SetWifiMidState(curState, WifiOprMidState::CLOSED, instId);
-}
-
-void WifiStaManager::DealStaOpenRes(OperateResState state, int instId)
-{
-    WIFI_LOGD("Enter DealStaOpenRes: %{public}d", static_cast<int>(state));
-    WifiEventCallbackMsg cbMsg;
-    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-    cbMsg.id = instId;
-    if (state == OperateResState::OPEN_WIFI_OPENING) {
-        cbMsg.msgData = static_cast<int>(WifiState::ENABLING);
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
-            static_cast<int>(WifiOperateState::STA_OPENING));
-        mLastWifiOpenState = static_cast<int>(state);
-        return;
-    }
-    if ((state == OperateResState::OPEN_WIFI_FAILED) || (state == OperateResState::OPEN_WIFI_DISABLED)) {
-        WIFI_LOGE("DealStaOpenRes:wifi open failed!");
-        WifiOprMidState apstate = WifiConfigCenter::GetInstance().GetApMidState(instId);
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED), "TIME_OUT",
-            static_cast<int>(apstate));
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
-        DealStaCloseRes(state, instId);
-        return;
-    }
-    WIFI_LOGI("DealStaOpenRes:wifi open successfully!");
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
-    WifiConfigCenter::GetInstance().SetStaLastRunState(WIFI_STATE_OPENED, instId);
-    auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaStart(instId);
-    cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
-    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    if ((state == OperateResState::OPEN_WIFI_SUCCEED) &&
-        (mLastWifiOpenState == static_cast<int>(WifiOperateState::STA_OPENING))) {
-        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
-            static_cast<int>(WifiOperateState::STA_OPENED));
-        mLastWifiOpenState = static_cast<int>(state);
-    }
+#endif
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId)) {
         WIFI_LOGI("DealStaOpenRes: wifi scan only state notify scan result!");
         IScanSerivceCallbacks &scanCallback = WifiManager::GetInstance().GetWifiScanManager()->GetScanCallback();
         scanCallback.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), instId);
     }
-#ifdef FEATURE_P2P_SUPPORT
-    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    WIFI_LOGI("DealStaOpenRes, current p2p state:%{public}d", p2pState);
-    if (p2pState == WifiOprMidState::CLOSED) {
-        WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
-    }
-#endif
-    return;
 }
 
-void WifiStaManager::DealStaCloseRes(OperateResState state, int instId)
+void WifiStaManager::DealStaStopped(int instId)
 {
-    WIFI_LOGD("Enter DealStaCloseRes: %{public}d", static_cast<int>(state));
-#ifndef OHOS_ARCH_LITE
-    WifiProtectManager::GetInstance().UpdateWifiClientConnected(false);
+#ifdef FEATURE_STA_SUPPORT
+    WifiCountryCodeManager::GetInstance().DealStaStopped(instId);
 #endif
-    WifiEventCallbackMsg cbMsg;
-    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-    cbMsg.id = instId;
-    if (state == OperateResState::CLOSE_WIFI_CLOSING) {
-        cbMsg.msgData = static_cast<int>(WifiState::DISABLING);
-        if (!WifiSettings::GetInstance().GetWifiSelfcureReset()) {
-            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        }
-        WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_CLOSING));
-        return;
-    }
-    if (state == OperateResState::CLOSE_WIFI_SUCCEED) {
-        ResetSelfcureOpenWifi(instId);
-    }
-    if (state == OperateResState::CLOSE_WIFI_FAILED) {
-        WIFI_LOGI("DealStaCloseRes: broadcast wifi close failed event!");
-        WifiOprMidState apstate = WifiConfigCenter::GetInstance().GetApMidState(instId);
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
-            static_cast<int>(apstate));
-        ForceStopWifi(instId);
-        cbMsg.msgData = static_cast<int>(WifiState::UNKNOWN);
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        if (WifiSettings::GetInstance().GetWifiSelfcureReset()) {
-            WIFI_LOGI("After CLOSE_WIFI_FAILED, reset selfcure wifi off->open!");
-            WifiSettings::GetInstance().SetWifiToggledState(true);
-            WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
-        }
-    }
-    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE, instId);
-    return;
 }
 
 void WifiStaManager::ResetSelfcureOpenWifi(int instId)
 {
-    if (!WifiSettings::GetInstance().GetWifiSelfcureReset()) {
+    if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         return;
     }
     WIFI_LOGI("reset selfcure wifi off->open!");
@@ -264,7 +153,7 @@ void WifiStaManager::ResetSelfcureOpenWifi(int instId)
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
     auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaClose(instId);
-    WifiSettings::GetInstance().SetWifiToggledState(true);
+    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     return;
 }
@@ -300,55 +189,39 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
     return;
 }
 
-void WifiStaManager::DealStaSemiActiveRes(OperateResState state, int instId)
+bool WifiStaManager::IgnoreConnStateChange(int instId)
 {
-    WIFI_LOGD("Enter DealStaSemiActiveRes: %{public}d", static_cast<int>(state));
-#ifndef OHOS_ARCH_LITE
-    WifiProtectManager::GetInstance().UpdateWifiClientConnected(false);
-#endif
-    WifiEventCallbackMsg cbMsg;
-    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-    cbMsg.id = instId;
-    if (state == OperateResState::ENABLE_SEMI_WIFI_OPENING) {
-        cbMsg.msgData = static_cast<int>(WifiState::DISABLING);
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_CLOSING));
-        return;
+    WIFI_LOGI("enter IgnoreConnStateChange");
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGE("%{public}s: pSelfCureService is null.", __FUNCTION__);
+        return false;
     }
-    if (state == OperateResState::ENABLE_SEMI_WIFI_FAILED) {
-        WIFI_LOGI("DealStaSemiActiveRes: broadcast enable wifi semi active failed event!");
-        WifiOprMidState apstate = WifiConfigCenter::GetInstance().GetApMidState(instId);
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(state), "TIME_OUT", static_cast<int>(apstate));
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
-        DealStaCloseRes(state, instId);
-        return;
+    if (WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+        WIFI_LOGI("reset selfcure ignore network state changed");
+        return true;
     }
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::SEMI_ACTIVE, instId);
-    WifiConfigCenter::GetInstance().SetWifiStaCloseTime(instId);
-    WifiConfigCenter::GetInstance().SetStaLastRunState(WIFI_STATE_SEMI_ACTIVE);
-    auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaSemiActive(instId);
-    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-    cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
-    cbMsg.id = instId;
-    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-#ifdef FEATURE_P2P_SUPPORT
-    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    WIFI_LOGI("DealStaSemiActiveRes, current p2p state: %{public}d", p2pState);
-    if (p2pState == WifiOprMidState::CLOSED) {
-        WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(WifiConfigCenter::GetInstance().GetLastNetworkId(), config) != 0) {
+        WIFI_LOGE("%{public}s: Get device config failed!", __FUNCTION__);
+        return false;
+    }
+    if (pSelfCureService->IsSelfCureOnGoing() && config.isReassocSelfCureWithFactoryMacAddress != 0) {
+        WIFI_LOGI("random mac reassoc selfcure ignore network state changed");
+        return true;
     }
 #endif
-    return;
+    return false;
 }
 
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    WIFI_LOGI("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
+    WIFI_LOGD("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
         magic_enum::Enum2Name(state).c_str());
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
-    if (isReport && !WifiSettings::GetInstance().GetWifiSelfcureReset()) {
+    if (isReport && !IgnoreConnStateChange(instId)) {
         WifiEventCallbackMsg cbMsg;
         cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
         cbMsg.msgData = reportStateNum;
@@ -356,7 +229,6 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         cbMsg.id = instId;
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
-
     if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||
         state == OperateResState::DISCONNECT_DISCONNECTING || state == OperateResState::DISCONNECT_DISCONNECTED ||
         state == OperateResState::CONNECT_OBTAINING_IP || state == OperateResState::CONNECT_ASSOCIATING ||
@@ -370,14 +242,13 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         }
     }
     PublishWifiOperateStateHiSysEvent(state);
-    if (info.connState == ConnState::AUTHENTICATING)
-    {
+    if (info.connState == ConnState::AUTHENTICATING) {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
             static_cast<int>(WifiOperateState::STA_AUTHING));
     }
 #ifdef FEATURE_HPF_SUPPORT
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
-        int screenState = WifiSettings::GetInstance().GetScreenState();
+        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
         WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
     }
 #endif
@@ -399,7 +270,7 @@ void WifiStaManager::DealWpsChanged(WpsStartState state, const int pinCode, int 
     cbMsg.msgData = static_cast<int>(state);
     cbMsg.id = instId;
     cbMsg.pinCode = std::to_string(pinCode);
-    int len = cbMsg.pinCode.length();
+    unsigned int len = cbMsg.pinCode.length();
     if (len < 8) { /* Fill in 8 digits. */
         cbMsg.pinCode = std::string(8 - len, '0') + cbMsg.pinCode;
     }

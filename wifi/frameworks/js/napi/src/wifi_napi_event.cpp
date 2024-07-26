@@ -70,6 +70,9 @@ std::map<std::string, std::int32_t> g_EventSysCapMap = {
 
 void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
 {
+    if (asyncEvent == nullptr) {
+        return;
+    }
     WIFI_LOGD("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
     uv_loop_s* loop = nullptr;
     napi_get_uv_event_loop(asyncEvent->env, &loop);
@@ -89,7 +92,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         [](uv_work_t* work) {},
         [](uv_work_t* work, int status) {
             AsyncEventData *asyncData = static_cast<AsyncEventData*>(work->data);
-            WIFI_LOGI("uv_queue_work, env: %{private}p, status: %{public}d, eventType: %{public}s",
+            WIFI_LOGD("uv_queue_work, env: %{private}p, status: %{public}d, eventType: %{public}s",
                 asyncData->env, status, asyncData->eventType.c_str());
             napi_value handler = nullptr;
             napi_handle_scope scope = nullptr;
@@ -807,7 +810,7 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
     if (iter == g_eventRegisterInfo.end()) {
         WIFI_LOGE("Unregister type not registered!");
 #ifdef ENABLE_NAPI_WIFI_MANAGER
-        HandleSyncErrCode(env, WIFI_OPT_NOT_SUPPORTED, sysCap);
+        HandleSyncErrCode(env, WIFI_OPT_INVALID_CONFIG, sysCap);
 #endif
         return;
     }

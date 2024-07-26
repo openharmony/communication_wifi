@@ -58,7 +58,7 @@ public:
      *
      * @param msg - Message to be sent.[in]
      */
-    void SendMessage(InternalMessage *msg);
+    void SendMessage(InternalMessagePtr msg);
 
     /**
      * @Description : Send a message, place the message in the message queue, and
@@ -67,7 +67,7 @@ public:
      * @param msg - Message to be sent.[in]
      * @param delayTimeMs - Delay Time.[in]
      */
-    void MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs);
+    void MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs);
 
     /**
      * @Description : Send a message, place the message in the message queue, and
@@ -76,14 +76,14 @@ public:
      * @param msg - Message to be sent.[in]
      * @param execTime - Time when a message is processed.[in]
      */
-    void MessageExecutedAtTime(InternalMessage *msg, int64_t execTime);
+    void MessageExecutedAtTime(InternalMessagePtr msg, int64_t execTime);
 
     /**
      * @Description : Send a message and place the message at the top of the message queue.
      *
      * @param msg - Message to be sent.[in]
      */
-    void PlaceMessageTopOfQueue(InternalMessage *msg);
+    void PlaceMessageTopOfQueue(InternalMessagePtr msg);
 
     /**
      * @Description : Delete messages from the queue.
@@ -100,7 +100,7 @@ public:
     *
     * @param msg - Messages.[in]
     */
-    virtual void ExecuteMessage(InternalMessage *msg) = 0;
+    virtual void ExecuteMessage(InternalMessagePtr msg) = 0;
 private:
 #ifdef OHOS_ARCH_LITE
     /**
@@ -115,7 +115,7 @@ private:
      *
      * @param msg - Messages to be processed.[in]
      */
-    void DistributeMessage(InternalMessage *msg);
+    void DistributeMessage(InternalMessagePtr msg);
 
     /**
      * @Description : Obtains messages from the message queue, distributes the
@@ -133,7 +133,6 @@ private:
 #else
     /* task queue. */
     std::unique_ptr<WifiEventHandler> pMyTaskQueue;
-    std::vector<InternalMessage *> mMessageQueue;
 #endif
     std::string mThreadName = "";
 };

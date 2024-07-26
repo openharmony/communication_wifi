@@ -46,7 +46,8 @@ int WifiAuthCenter::Init()
 }
 
 #ifndef OHOS_ARCH_LITE
-bool WifiAuthCenter::IsSystemAppByToken() {
+bool WifiAuthCenter::IsSystemAppByToken()
+{
     uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
     bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();

@@ -32,7 +32,7 @@ void P2pDefaultState::GoOutState()
     WIFI_LOGI("             GoOutState");
 }
 
-bool P2pDefaultState::ExecuteStateMsg(InternalMessage *msg)
+bool P2pDefaultState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     int msgName = msg->GetMessageName();
 

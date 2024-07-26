@@ -62,7 +62,7 @@ public:
      * @param msg - Message object pointer
      * @return - bool true:success   false:fail
      */
-    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
 private:
     /**
@@ -77,59 +77,59 @@ private:
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdCreateGroup(const InternalMessage &msg) const;
+    virtual bool ProcessCmdCreateGroup(const InternalMessagePtr msg) const;
 
     /**
      * @Description Process the group started message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessGroupStartedEvt(const InternalMessage &msg) const;
+    virtual bool ProcessGroupStartedEvt(const InternalMessagePtr msg) const;
 
     /**
      * @Description Process the create group timeout message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCreateGroupTimeOut(const InternalMessage &msg) const;
+    virtual bool ProcessCreateGroupTimeOut(const InternalMessagePtr msg) const;
 
     /**
      * @Description Process the group removed message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessGroupRemovedEvt(const InternalMessage &msg) const;
+    virtual bool ProcessGroupRemovedEvt(const InternalMessagePtr msg) const;
 
     /**
      * @Description Process the disable command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDisable(const InternalMessage &msg) const;
+    virtual bool ProcessCmdDisable(const InternalMessagePtr msg) const;
 
     /**
      * @Description Process the remove group command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdRemoveGroup(const InternalMessage &msg) const;
+    virtual bool ProcessCmdRemoveGroup(const InternalMessagePtr msg) const;
 
     /**
      * @Description Process the delete group command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdDeleteGroup(const InternalMessage &msg) const;
+    virtual bool ProcessCmdDeleteGroup(const InternalMessagePtr msg) const;
 
     /**
      * @Description Process the hid2d create group command received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdHid2dCreateGroup(const InternalMessage &msg) const;
+    virtual bool ProcessCmdHid2dCreateGroup(const InternalMessagePtr msg) const;
 
 private:
-    using ProcessFun = bool (P2pGroupOperatingState::*)(const InternalMessage &msg) const;
+    using ProcessFun = bool (P2pGroupOperatingState::*)(const InternalMessagePtr msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

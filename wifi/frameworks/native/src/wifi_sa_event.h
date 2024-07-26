@@ -168,8 +168,6 @@ public:
 
     ~EventManager();
 
-    bool AddEventCallback(WifiEvent *cb);
-
     void RemoveEventCallback(WifiEvent *cb);
 
     WifiErrorCode RegisterDeviceEvent(const std::vector<std::string> &event);
@@ -182,8 +180,6 @@ public:
 
     void SetIsEventRegistrated(bool isEventRegistered);
 
-    std::set<WifiEvent*>& GetEventCallBacks();
-
     void Init();
 
     void SetP2PCallbackEvent(OHOS::sptr<WifiP2pCEventCallback> &sptr, const std::string &eventName);
@@ -194,22 +190,16 @@ public:
 
     OHOS::sptr<WifiP2pCEventCallback> GetP2PCallbackPtr();
 
-    std::unique_ptr<OHOS::Wifi::WifiEventHandler>& GetWifiCEventHandler();
-    
-    std::unique_ptr<OHOS::Wifi::WifiEventHandler>& GetWifiP2pCEventHandler();
-
     static EventManager& GetInstance();
 
+    void SaveWifiCallbackInfo(WifiEvent* event);
 public:
     static std::mutex callbackMutex;
-
+    static WifiEvent g_wifiEvent;
 private:
-    static std::set<WifiEvent*> m_setEventCallback;
     static bool m_isEventRegistered;
     std::set<std::string> p2pRegisteredCallbackEvent;
     OHOS::sptr<WifiP2pCEventCallback> sptrP2PCallback = nullptr;
     OHOS::sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
-    std::unique_ptr<OHOS::Wifi::WifiEventHandler> wifiCEventHandler = nullptr;
-    std::unique_ptr<OHOS::Wifi::WifiEventHandler> wifiP2pCEventHandler = nullptr;
 };
 #endif

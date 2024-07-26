@@ -29,6 +29,7 @@ extern "C" {
 #define HDI_BIT(x) (1U << (x))
 #endif
 
+#define MAC_UINT_SIZE 6
 #define MAC_STRING_SIZE 17
 #define HDI_CHECK_ELEMENT(e, input, len)    \
     for ((e) = (const struct HdiElem *) (input);    \
@@ -123,6 +124,8 @@ int8_t IsValidHexCharAndConvert(char c);
 int CheckMacIsValid(const char *macStr);
 
 void StrSafeCopy(char *dst, unsigned len, const char *src);
+
+char* HdiGetWapiTxt(char *pos, char *end, const uint8_t *ie);
 
 #ifdef __cplusplus
 }

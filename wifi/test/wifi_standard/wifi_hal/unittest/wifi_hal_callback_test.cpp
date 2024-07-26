@@ -210,7 +210,7 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbGroupStartedTest, TestSize.Level1)
 
 HWTEST_F(WifiHalCallbackTest, P2pHalCbGroupRemovedTest, TestSize.Level1)
 {
-    char groupIfName[] = "P2P_GROUP_REMOVED_EVENT"; 
+    char groupIfName[] = "P2P_GROUP_REMOVED_EVENT";
     int isGo = NET_WORK;
     P2pHalCbGroupRemoved(NULL, isGo);
     P2pHalCbGroupRemoved(groupIfName, isGo);

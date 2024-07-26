@@ -14,6 +14,7 @@
  */
 #ifndef OHOS_WIFI_P2P_CALLBACK_STUB_H
 #define OHOS_WIFI_P2P_CALLBACK_STUB_H
+#define MAX_LEN 1024
 
 #include <mutex>
 #include <map>

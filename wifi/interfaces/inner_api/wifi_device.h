@@ -467,6 +467,13 @@ public:
     virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
 
     /**
+     * @Description set low tx power
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
+
+    /**
      * @Description hilink connect
      *
      * @return ErrCode - hilink connect result
@@ -504,6 +511,16 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid, const bool isCandidate) = 0;
+
+    /**
+     * @Description connect to user select ssid and bssid network
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @param isCandidate - Whether is candidate
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

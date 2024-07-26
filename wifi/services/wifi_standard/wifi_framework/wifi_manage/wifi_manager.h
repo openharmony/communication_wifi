@@ -57,10 +57,11 @@ enum class WifiCloseServiceCode {
     AP_SERVICE_CLOSE,
     P2P_SERVICE_CLOSE,
     SERVICE_THREAD_EXIT,
+    STA_MSG_OPENED,
+    STA_MSG_STOPED,
 };
 
-struct WifiCloseServiceMsg
-{
+struct WifiCloseServiceMsg {
     WifiCloseServiceCode code;
     int instId;
 };
@@ -123,6 +124,7 @@ public:
 #ifdef FEATURE_HPF_SUPPORT
     void InstallPacketFilterProgram(int screenState, int instId);
 #endif
+    void OnNativeProcessStatusChange(int status);
 
 private:
     WifiManager();

@@ -116,17 +116,16 @@ void P2pEnabledState::Init()
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_PEERS, &P2pEnabledState::ProcessCmdDiscoverPeers));
 }
-bool P2pEnabledState::ProcessCmdDisable(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdDisable recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdDisable recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.BroadcastP2pStatusChanged(P2pState::P2P_STATE_CLOSING);
-    WifiP2PHalInterface::GetInstance().P2pStopFind();
     p2pStateMachine.BroadcastP2pDiscoveryChanged(false);
     WifiP2PHalInterface::GetInstance().StopP2p();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pDisablingState);
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessCmdStartListen(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdStartListen(InternalMessagePtr msg) const
 {
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
 
@@ -143,8 +142,8 @@ bool P2pEnabledState::ProcessCmdStartListen(InternalMessage &msg) const
         return EXECUTED;
     }
 
-    size_t period = msg.GetParam1();
-    size_t interval = msg.GetParam2();
+    size_t period = static_cast<size_t>(msg->GetParam1());
+    size_t interval = static_cast<size_t>(msg->GetParam2());
     if (WifiP2PHalInterface::GetInstance().P2pConfigureListen(true, period, interval)) {
         WIFI_LOGE("p2p configure to start listen failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StartP2pListen, WIFI_OPT_FAILED);
@@ -154,9 +153,9 @@ bool P2pEnabledState::ProcessCmdStartListen(InternalMessage &msg) const
     }
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessCmdStopListen(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdStopListen(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdStopListen recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdStopListen recv CMD: %{public}d", msg->GetMessageName());
     if (WifiP2PHalInterface::GetInstance().P2pConfigureListen(false, 0, 0)) {
         WIFI_LOGE("p2p configure to stop listen failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StopP2pListen, WIFI_OPT_FAILED);
@@ -170,29 +169,29 @@ bool P2pEnabledState::ProcessCmdStopListen(InternalMessage &msg) const
     }
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessCmdDiscPeer(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdDiscPeer(InternalMessagePtr msg) const
 {
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
-    WIFI_LOGI("P2P ProcessCmdDiscPeer recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdDiscPeer recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.HandlerDiscoverPeers();
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessCmdStopDiscPeer(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdStopDiscPeer(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdStopDiscPeer recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdStopDiscPeer recv CMD: %{public}d", msg->GetMessageName());
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pStopFind();
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_OK) {
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StopDiscoverDevices, ErrCode::WIFI_OPT_SUCCESS);
     } else {
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StopDiscoverDevices, ErrCode::WIFI_OPT_FAILED);
     }
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessDeviceFoundEvt(InternalMessage &msg) const
+bool P2pEnabledState::ProcessDeviceFoundEvt(InternalMessagePtr msg) const
 {
     WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_DEVICE_FOUND");
     WifiP2pDevice device;
-    if (!msg.GetMessageObj(device)) {
+    if (!msg->GetMessageObj(device)) {
         WIFI_LOGE("Failed to obtain device information.");
         return EXECUTED;
     }
@@ -206,22 +205,22 @@ bool P2pEnabledState::ProcessDeviceFoundEvt(InternalMessage &msg) const
     p2pStateMachine.BroadcastP2pPeersChanged();
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessPriDeviceFoundEvt(InternalMessage &msg) const
+bool P2pEnabledState::ProcessPriDeviceFoundEvt(InternalMessagePtr msg) const
 {
     WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_PRI_DEVICE_FOUND");
     std::string privateInfo;
-    if (!msg.GetMessageObj(privateInfo)) {
+    if (!msg->GetMessageObj(privateInfo)) {
         WIFI_LOGE("Failed to obtain device information.");
         return EXECUTED;
     }
     p2pStateMachine.BroadcastP2pPrivatePeersChanged(privateInfo);
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessDeviceLostEvt(InternalMessage &msg) const
+bool P2pEnabledState::ProcessDeviceLostEvt(InternalMessagePtr msg) const
 {
     WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_DEVICE_LOST");
     WifiP2pDevice device;
-    if (!msg.GetMessageObj(device)) {
+    if (!msg->GetMessageObj(device)) {
         WIFI_LOGE("Failed to obtain device information.");
         return EXECUTED;
     }
@@ -240,20 +239,20 @@ bool P2pEnabledState::ProcessDeviceLostEvt(InternalMessage &msg) const
     }
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessFindStoppedEvt(InternalMessage &msg) const
+bool P2pEnabledState::ProcessFindStoppedEvt(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessFindStoppedEvt recv event: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessFindStoppedEvt recv event: %{public}d", msg->GetMessageName());
     p2pStateMachine.BroadcastP2pDiscoveryChanged(false);
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessCmdDeleteGroup(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdDeleteGroup(InternalMessagePtr msg) const
 {
-    p2pStateMachine.DelayMessage(&msg);
+    p2pStateMachine.DelayMessage(msg);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
     return EXECUTED;
 }
 
-bool P2pEnabledState::ExecuteStateMsg(InternalMessage *msg)
+bool P2pEnabledState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("fatal error!");
@@ -264,7 +263,7 @@ bool P2pEnabledState::ExecuteStateMsg(InternalMessage *msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(*msg)) {
+    if ((this->*(iter->second))(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;
@@ -280,20 +279,20 @@ bool P2pEnabledState::P2pConfigInitialization()
     const std::string ssidPostfixName = std::string("-") + deviceName;
 
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().SetP2pDeviceName(deviceName);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set the device name.");
         result = false;
     }
 
     retCode = WifiP2PHalInterface::GetInstance().SetP2pSsidPostfix(ssidPostfixName);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set the SSID prefix");
     }
 
     std::string primaryDeviceType = deviceManager.GetThisDevice().GetPrimaryDeviceType();
     if (!primaryDeviceType.empty()) {
         retCode = WifiP2PHalInterface::GetInstance().SetP2pDeviceType(primaryDeviceType);
-        if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+        if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
             WIFI_LOGE("Failed to set the device type.");
             result = false;
         }
@@ -304,27 +303,27 @@ bool P2pEnabledState::P2pConfigInitialization()
     std::string secDeviceType = deviceManager.GetThisDevice().GetSecondaryDeviceType();
     if (!secDeviceType.empty()) {
         retCode = WifiP2PHalInterface::GetInstance().SetP2pSecondaryDeviceType(secDeviceType);
-        if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+        if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
             WIFI_LOGE("Failed to set the secondary device type.");
         }
     }
 
     retCode = WifiP2PHalInterface::GetInstance().SetP2pConfigMethods(
         std::string("virtual_push_button physical_display keypad"));
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set the wps config methods.");
         result = false;
     }
 
     retCode = WifiP2PHalInterface::GetInstance().SetPersistentReconnect(1);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set persistent reconnect.");
         result = false;
     }
 
     std::string deviceAddr;
     WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddr);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to obtain the device address.");
         result = false;
     }
@@ -342,20 +341,20 @@ bool P2pEnabledState::P2pSettingsInitialization()
     p2pStateMachine.UpdateOwnDevice(P2pDeviceStatus::PDS_AVAILABLE);
 
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pFlush();
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to flush p2p.");
         result = false;
     }
 
     retCode = WifiP2PHalInterface::GetInstance().FlushService();
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to flush p2p service.");
         result = false;
     }
 
     WIFI_LOGI("service discovery external is default.");
     retCode = WifiP2PHalInterface::GetInstance().SetServiceDiscoveryExternal(false);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set service discovery external.");
         result = false;
     }
@@ -365,11 +364,11 @@ bool P2pEnabledState::P2pSettingsInitialization()
     return result;
 }
 
-bool P2pEnabledState::ProcessCmdAddLocalService(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdAddLocalService(InternalMessagePtr msg) const
 {
     WIFI_LOGI("p2p_enabled_state recv CMD_PUT_LOCAL_SERVICE");
     WifiP2pServiceInfo service;
-    if (!msg.GetMessageObj(service)) {
+    if (!msg->GetMessageObj(service)) {
         WIFI_LOGE("Failed to obtain WifiP2pServiceInfo information.");
         return EXECUTED;
     }
@@ -378,7 +377,7 @@ bool P2pEnabledState::ProcessCmdAddLocalService(InternalMessage &msg) const
         return EXECUTED;
     }
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pServiceAdd(service);
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         p2pStateMachine.serviceManager.RemoveLocalService(service);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::PutLocalP2pService, ErrCode::WIFI_OPT_FAILED);
     } else {
@@ -386,18 +385,18 @@ bool P2pEnabledState::ProcessCmdAddLocalService(InternalMessage &msg) const
     }
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessCmdDelLocalService(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdDelLocalService(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     WifiP2pServiceInfo service;
-    if (!msg.GetMessageObj(service)) {
+    if (!msg->GetMessageObj(service)) {
         WIFI_LOGE("Failed to obtain WifiP2pServiceInfo information.");
         return EXECUTED;
     }
     p2pStateMachine.serviceManager.RemoveLocalService(service);
 
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pServiceRemove(service);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_OK) {
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DeleteLocalP2pService, ErrCode::WIFI_OPT_SUCCESS);
     } else {
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DeleteLocalP2pService, ErrCode::WIFI_OPT_FAILED);
@@ -405,9 +404,9 @@ bool P2pEnabledState::ProcessCmdDelLocalService(InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool P2pEnabledState::ProcessCmdDiscServices(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdDiscServices(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdDiscServices recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdDiscServices recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.CancelSupplicantSrvDiscReq();
     std::string reqId;
     WifiP2pServiceRequest request;
@@ -419,7 +418,7 @@ bool P2pEnabledState::ProcessCmdDiscServices(InternalMessage &msg) const
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
     WifiErrorNo retCode =
         WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(device.GetDeviceAddress(), request.GetTlv(), reqId);
-    if (WifiErrorNo::WIFI_IDL_OPT_OK != retCode) {
+    if (WifiErrorNo::WIFI_HAL_OPT_OK != retCode) {
         WIFI_LOGI("Failed to schedule the P2P service discovery request.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -427,7 +426,7 @@ bool P2pEnabledState::ProcessCmdDiscServices(InternalMessage &msg) const
     p2pStateMachine.serviceManager.SetQueryId(reqId);
 
     retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFind failed, ErrorCode: %{public}d", static_cast<int>(retCode));
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -439,11 +438,11 @@ bool P2pEnabledState::ProcessCmdDiscServices(InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool P2pEnabledState::ProcessCmdStopDiscServices(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdStopDiscServices(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdStopDiscServices recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdStopDiscServices recv CMD: %{public}d", msg->GetMessageName());
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().P2pStopFind();
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_OK) {
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StopDiscoverServices, ErrCode::WIFI_OPT_SUCCESS);
     } else {
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StopDiscoverServices, ErrCode::WIFI_OPT_FAILED);
@@ -451,10 +450,10 @@ bool P2pEnabledState::ProcessCmdStopDiscServices(InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool P2pEnabledState::ProcessCmdRequestService(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdRequestService(InternalMessagePtr msg) const
 {
     std::pair<WifiP2pDevice, WifiP2pServiceRequest> info;
-    if (!msg.GetMessageObj(info)) {
+    if (!msg->GetMessageObj(info)) {
         WIFI_LOGE("Failed to obtain WifiP2pServiceRequest information.");
         return EXECUTED;
     }
@@ -466,7 +465,7 @@ bool P2pEnabledState::ProcessCmdRequestService(InternalMessage &msg) const
     std::string reqId;
     WifiErrorNo retCode =
         WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(device.GetDeviceAddress(), request.GetTlv(), reqId);
-    if (WifiErrorNo::WIFI_IDL_OPT_OK != retCode) {
+    if (WifiErrorNo::WIFI_HAL_OPT_OK != retCode) {
         WIFI_LOGI("Failed to schedule the P2P service discovery request.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RequestService, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -474,7 +473,7 @@ bool P2pEnabledState::ProcessCmdRequestService(InternalMessage &msg) const
     p2pStateMachine.serviceManager.SetQueryId(reqId);
 
     retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFind failed, ErrorCode: %{public}d", static_cast<int>(retCode));
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RequestService, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -484,11 +483,11 @@ bool P2pEnabledState::ProcessCmdRequestService(InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool P2pEnabledState::ProcessServiceDiscReqEvt(InternalMessage &msg) const
+bool P2pEnabledState::ProcessServiceDiscReqEvt(InternalMessagePtr msg) const
 {
     WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_SERV_DISC_REQ");
     WifiP2pServiceRequestList reqList;
-    if (!msg.GetMessageObj(reqList)) {
+    if (!msg->GetMessageObj(reqList)) {
         WIFI_LOGE("Failed to obtain WifiP2pServiceRequestList information.");
         return EXECUTED;
     }
@@ -503,7 +502,7 @@ bool P2pEnabledState::ProcessServiceDiscReqEvt(InternalMessage &msg) const
 
     WifiP2pServiceResponseList respList = p2pStateMachine.serviceManager.ProcessServiceRequestList(reqList);
     if (respList.GetServiceResponseList().size() > 0) {
-        if (WifiErrorNo::WIFI_IDL_OPT_OK != WifiP2PHalInterface::GetInstance().RespServiceDiscovery(
+        if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().RespServiceDiscovery(
             respList.GetDevice(), respList.GetFrequency(), respList.GetDialogToken(), respList.GetTlvs())) {
             WIFI_LOGE("Failed to reply to the service response. deviceAddress: %{private}s, frequency "
                 "%{public}d,dialogToken %{public}d",
@@ -523,11 +522,11 @@ bool P2pEnabledState::ProcessServiceDiscReqEvt(InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool P2pEnabledState::ProcessServiceDiscRspEvt(InternalMessage &msg) const
+bool P2pEnabledState::ProcessServiceDiscRspEvt(InternalMessagePtr msg) const
 {
     WIFI_LOGI("p2p_enabled_state recv P2P_EVENT_SERV_DISC_RESP");
     WifiP2pServiceResponseList respList;
-    if (!msg.GetMessageObj(respList)) {
+    if (!msg->GetMessageObj(respList)) {
         WIFI_LOGE("Failed to obtain WifiP2pServiceResponseList information.");
         return EXECUTED;
     }
@@ -540,24 +539,24 @@ bool P2pEnabledState::ProcessServiceDiscRspEvt(InternalMessage &msg) const
     }
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessExceptionTimeOut(InternalMessage &msg) const
+bool P2pEnabledState::ProcessExceptionTimeOut(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv exception timeout event: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv exception timeout event: %{public}d", msg->GetMessageName());
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }
 
-bool P2pEnabledState::ProcessCmdSetDeviceName(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdSetDeviceName(InternalMessagePtr msg) const
 {
     WIFI_LOGI("p2p_enabled_state CMD: set device name.");
     std::string deviceName;
-    if (!msg.GetMessageObj(deviceName)) {
+    if (!msg->GetMessageObj(deviceName)) {
         LOGE("Failed to obtain string information.");
         return EXECUTED;
     }
 
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().SetP2pDeviceName(deviceName);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set the device name.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pSetDeviceName, WIFI_OPT_FAILED);
         return EXECUTED;
@@ -570,16 +569,16 @@ bool P2pEnabledState::ProcessCmdSetDeviceName(InternalMessage &msg) const
 
     const std::string ssidPostfixName = std::string("-") + deviceName;
     retCode = WifiP2PHalInterface::GetInstance().SetP2pSsidPostfix(ssidPostfixName);
-    if (retCode == WifiErrorNo::WIFI_IDL_OPT_FAILED) {
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set the SSID prefix");
     }
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessCmdSetWfdInfo(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdSetWfdInfo(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdSetWfdInfo recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdSetWfdInfo recv CMD: %{public}d", msg->GetMessageName());
     WifiP2pWfdInfo wfdInfo;
-    if (!msg.GetMessageObj(wfdInfo)) {
+    if (!msg->GetMessageObj(wfdInfo)) {
         WIFI_LOGE("Failed to obtain wfd information.");
         return EXECUTED;
     }
@@ -587,35 +586,35 @@ bool P2pEnabledState::ProcessCmdSetWfdInfo(InternalMessage &msg) const
     std::string subelement;
     wfdInfo.GetDeviceInfoElement(subelement);
     subelement = "0 " + subelement;
-    if (WifiP2PHalInterface::GetInstance().SetWfdDeviceConfig(subelement) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (WifiP2PHalInterface::GetInstance().SetWfdDeviceConfig(subelement) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Failed to set wfd config:%{public}s.", subelement.c_str());
         return EXECUTED;
     }
-    if (WifiP2PHalInterface::GetInstance().SetWfdEnable(wfdInfo.GetWfdEnabled()) != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (WifiP2PHalInterface::GetInstance().SetWfdEnable(wfdInfo.GetWfdEnabled()) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Set wifidisplay enabled failed.");
         return EXECUTED;
     }
     return EXECUTED;
 }
 
-bool P2pEnabledState::ProcessCmdCancelConnect(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdCancelConnect(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdCancelConnect recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdCancelConnect recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pCancelConnect, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
-bool P2pEnabledState::ProcessCmdConnectFailed(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdConnectFailed(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdConnectFailed recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("P2P ProcessCmdConnectFailed recv CMD: %{public}d", msg->GetMessageName());
     constexpr int connectFailed = 2;
     constexpr int connectTimeout = 15;
     WifiP2pDevice device;
-    if (!msg.GetMessageObj(device)) {
+    if (!msg->GetMessageObj(device)) {
         WIFI_LOGE("Failed to obtain device information.");
         return EXECUTED;
     }
-    if (msg.GetParam1() == connectFailed || msg.GetParam1() == connectTimeout) {
-        WIFI_LOGD("P2P ProcessCmdConnectFailed: filed reason = %{public}d", msg.GetParam1());
+    if (msg->GetParam1() == connectFailed || msg->GetParam1() == connectTimeout) {
+        WIFI_LOGD("P2P ProcessCmdConnectFailed: filed reason = %{public}d", msg->GetParam1());
         p2pStateMachine.RemoveGroupByDevice(device);
     }
     return EXECUTED;
@@ -628,15 +627,15 @@ static int AddScanChannelInTimeout(uint32_t channelid, uint32_t timeout)
     return ret;
 }
 
-bool P2pEnabledState::ProcessCmdDiscoverPeers(InternalMessage &msg) const
+bool P2pEnabledState::ProcessCmdDiscoverPeers(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("P2P ProcessCmdDiscoverPeers recv CMD: %{public}d", msg.GetMessageName());
-    const int channelid = msg.GetParam1();
+    WIFI_LOGI("P2P ProcessCmdDiscoverPeers recv CMD: %{public}d", msg->GetMessageName());
+    const int channelid = msg->GetParam1();
     WifiP2PHalInterface::GetInstance().DeliverP2pData(CMD_TYPE_SET, DATA_TYPE_SET_LISTEN_MODE, ONEHOP_LISTEN_MODE);
     p2pStateMachine.CancelSupplicantSrvDiscReq();
     int ret = AddScanChannelInTimeout(channelid, DISCOVER_TIMEOUT_S);
     int retCode = WifiP2PHalInterface::GetInstance().P2pFind(ret);
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call ProcessCmdDiscoverPeers failed, ErrorCode: %{public}d", static_cast<int>(retCode));
         WifiP2PHalInterface::GetInstance().P2pStopFind();
         return NOT_EXECUTED;

@@ -15,7 +15,14 @@
 
 #include "securec.h"
 #include "wifi_hdi_common.h"
+
+#ifndef UT_TEST
 #include "wifi_log.h"
+#else
+#define static
+#define LOGI(...)
+#define LOGE(...)
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiCommon"
@@ -344,9 +351,9 @@ const uint8_t *HdiBssGetVendorIe(const uint8_t *ies, size_t len, uint32_t vendor
 {
     const struct HdiElem *elem;
     HDI_CHECK_ELEMENT_BY_ID(elem, HDI_EID_VENDOR_SPECIFIC, ies, len) {
-        if (elem->datalen >= HDI_POS_FOURTH &&
-            vendorType == HdiGetBe32(elem->data))
+        if (elem->datalen >= HDI_POS_FOURTH && vendorType == HdiGetBe32(elem->data)) {
             return &elem->id;
+        }
     }
 
     return NULL;
@@ -356,15 +363,16 @@ const uint8_t* HdiBssGetVendorBeacon(const uint8_t *ies, size_t len, size_t beac
 {
     const struct HdiElem *elem;
 
-    if (beaconIeLen == 0)
+    if (beaconIeLen == 0) {
         return NULL;
+    }
 
     ies += len;
 
     HDI_CHECK_ELEMENT_BY_ID(elem, HDI_EID_VENDOR_SPECIFIC, ies, beaconIeLen) {
-        if (elem->datalen >= HDI_POS_FOURTH &&
-            vendorType == HdiGetBe32(elem->data))
+        if (elem->datalen >= HDI_POS_FOURTH && vendorType == HdiGetBe32(elem->data)) {
             return &elem->id;
+        }
     }
 
     return NULL;
@@ -419,7 +427,7 @@ int HdiConvertIe(const uint8_t *hdiIe, size_t wpaIeLen,
     }
 
     pos = (const uint8_t *) (hdr + 1);
-    left = wpaIeLen - sizeof(*hdr);
+    left = (int)(wpaIeLen - sizeof(*hdr));
 
     if (left >= HDI_SELECTOR_LEN) {
         data->groupCipher = HdiRsnIdToCipher(pos);
@@ -531,7 +539,7 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
         data->hasGroup = 1;
         if (!HdiCheckValidGroup(data->groupCipher)) {
             LOGI("invalid group cipher 0x%{public}x (%08x)", data->groupCipher,
-                   HdiGetBe32(pos));
+            HdiGetBe32(pos));
             return -1;
         }
         pos += HDI_SELECTOR_LEN;
@@ -608,18 +616,16 @@ int HdiParseIe(const uint8_t *hdiIe, size_t wpaIeLen,
 {
     if (wpaIeLen >= HDI_POS_FIRST && hdiIe[0] == HDI_EID_RSN) {
         return HdiConvertIeRsn(hdiIe, wpaIeLen, data);
-    }        
+    }
     if (wpaIeLen >= HDI_POS_SIX && hdiIe[0] == HDI_EID_VENDOR_SPECIFIC &&
         hdiIe[1] >= HDI_POS_FOURTH && HdiGetBe32(&hdiIe[HDI_POS_SECOND]) == HDI_OSEN_IE_VENDOR_TYPE) {
         return HdiConvertIeRsn(hdiIe, wpaIeLen, data);
-    }
-    else {
+    } else {
         return HdiConvertIe(hdiIe, wpaIeLen, data);
     }
 }
 
-char* HdiGetIeTxt(char *pos, char *end, const char *proto,
-                    const uint8_t *ie, size_t ieLen)
+char* HdiGetIeTxt(char *pos, char *end, const char *proto, const uint8_t *ie, size_t ieLen)
 {
     struct HdiIeData data;
     char *start;
@@ -653,10 +659,11 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
 
     pos = HdiGetCipherTxt(pos, end, data.pairwiseCipher);
 
-    if (data.capabilities & HDI_CAPABILITY_PREAUTH) {
+    if ((unsigned int)data.capabilities & HDI_CAPABILITY_PREAUTH) {
         ret = HdiTxtPrintf(pos, end - pos, "-preauth");
-        if (HdiCheckError(end - pos, ret))
+        if (HdiCheckError(end - pos, ret)) {
             return pos;
+        }
         pos += ret;
     }
 
@@ -693,8 +700,9 @@ void HdiBufEncode(char *txt, size_t maxlen, const uint8_t *data, size_t len)
     size_t i;
 
     for (i = 0; i < len; i++) {
-        if (txt + HDI_POS_FOURTH >= end)
+        if (txt + HDI_POS_FOURTH >= end) {
             break;
+        }
 
         switch (data[i]) {
             case '\"':
@@ -799,4 +807,33 @@ void StrSafeCopy(char *dst, unsigned len, const char *src)
     }
     dst[i] = '\0';
     return;
+}
+
+char* HdiGetWapiTxt(char *pos, char *end, const uint8_t *ie)
+{
+    if (ie[HDI_POS_FIRST] < HDI_CAP_WAPI_BIT_OFFSET - HDI_POS_SECOND) {
+        return pos;
+    }
+
+    char *start;
+    int ret;
+
+    ret = HdiTxtPrintf(pos, end - pos, "[WAPI-");
+    if (HdiCheckError(end - pos, ret)) {
+        return pos;
+    }
+    pos += ret;
+
+    start = pos;
+    uint8_t akm = ie[HDI_CAP_WAPI_BIT_OFFSET];
+    HDI_HANDLE_CIPHER_POS_INFO(akm & HDI_KEY_MGMT_WAPI_CERT_AKM, ret, pos, end, "+", "%sCERT");
+    HDI_HANDLE_CIPHER_POS_INFO(akm & HDI_KEY_MGMT_WAPI_PSK_AKM, ret, pos, end, "+", "%sPSK");
+
+    ret = HdiTxtPrintf(pos, end - pos, "]");
+    if (HdiCheckError(end - pos, ret)) {
+        return pos;
+    }
+    pos += ret;
+
+    return pos;
 }

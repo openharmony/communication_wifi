@@ -33,6 +33,7 @@ namespace Wifi {
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
 #define WIFI_INVALID_UID (-1)
+#define INVALID_SIGNAL_LEVEL (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
 #define WIFI_INVALID_SIM_ID (0)
@@ -47,6 +48,9 @@ const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
 const std::string KEY_MGMT_SAE = "SAE";
 const std::string KEY_MGMT_EAP = "WPA-EAP";
 const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
+const std::string KEY_MGMT_WAPI_CERT = "WAPI-CERT";
+const std::string KEY_MGMT_WAPI_PSK = "WAPI-PSK";
+const std::string KEY_MGMT_WAPI = "WAPI";
 
 const std::string EAP_METHOD_NONE = "NONE";
 const std::string EAP_METHOD_PEAP = "PEAP";
@@ -166,6 +170,7 @@ enum class WifiOperateState {
     STA_DISCONNECT,
     STA_DHCP_FAIL,
     STA_CLOSING,
+    STA_CLOSED,
 };
 
 enum class DisconnectDetailReason {
@@ -213,6 +218,8 @@ struct WifiLinkedInfo {
     bool isAncoConnected;
     WifiCategory supportedWifiCategory;
     bool isHiLinkNetwork;
+    int c0Rssi;
+    int c1Rssi;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -242,6 +249,8 @@ struct WifiLinkedInfo {
         isAncoConnected = false;
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
+        c0Rssi = 0;
+        c1Rssi = 0;
     }
 };
 
@@ -534,6 +543,49 @@ struct NetworkSelectionStatus {
     }
 };
 
+class WifiWapiConfig {
+public:
+    int wapiPskType;
+    std::string wapiAsCertData;
+    std::string wapiUserCertData;
+    std::string encryptedAsCertData;
+    std::string asCertDataIV;
+    std::string encryptedUserCertData;
+    std::string userCertDataIV;
+
+    WifiWapiConfig()
+    {
+        wapiPskType = -1;
+    }
+
+    ~WifiWapiConfig()
+    {}
+};
+
+/* DHCP info */
+struct IpInfo {
+    unsigned int ipAddress;     /* ip address */
+    unsigned int gateway;       /* gate */
+    unsigned int netmask;       /* mask */
+    unsigned int primaryDns;          /* main dns */
+    unsigned int secondDns;          /* backup dns */
+    unsigned int serverIp; /* DHCP server's address */
+    unsigned int leaseDuration;
+    std::vector<unsigned int> dnsAddr;
+
+    IpInfo()
+    {
+        ipAddress = 0;
+        gateway = 0;
+        netmask = 0;
+        primaryDns = 0;
+        secondDns = 0;
+        serverIp = 0;
+        leaseDuration = 0;
+        dnsAddr.clear();
+    }
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
@@ -606,6 +658,9 @@ struct WifiDeviceConfig {
     int isReassocSelfCureWithFactoryMacAddress;
     int version;
     bool randomizedMacSuccessEver;
+    WifiWapiConfig wifiWapiConfig;
+    IpInfo lastDhcpResult;
+    bool isShared;
 
     WifiDeviceConfig()
     {
@@ -640,6 +695,7 @@ struct WifiDeviceConfig {
         isReassocSelfCureWithFactoryMacAddress = 0;
         version = -1;
         randomizedMacSuccessEver = false;
+        isShared = false;
     }
 };
 
@@ -696,30 +752,6 @@ enum class WifiProtectMode {
     WIFI_PROTECT_FULL_HIGH_PERF = 2,
     WIFI_PROTECT_FULL_LOW_LATENCY = 3,
     WIFI_PROTECT_NO_HELD = 4
-};
-
-/* DHCP info */
-struct IpInfo {
-    unsigned int ipAddress;     /* ip address */
-    unsigned int gateway;       /* gate */
-    unsigned int netmask;       /* mask */
-    unsigned int primaryDns;          /* main dns */
-    unsigned int secondDns;          /* backup dns */
-    unsigned int serverIp; /* DHCP server's address */
-    unsigned int leaseDuration;
-    std::vector<unsigned int> dnsAddr;
-
-    IpInfo()
-    {
-        ipAddress = 0;
-        gateway = 0;
-        netmask = 0;
-        primaryDns = 0;
-        secondDns = 0;
-        serverIp = 0;
-        leaseDuration = 0;
-        dnsAddr.clear();
-    }
 };
 
 /* DHCP IpV6Info */
@@ -798,6 +830,26 @@ typedef enum {
     BG_LIMIT_LEVEL_10,
     BG_LIMIT_LEVEL_11,
 } BgLimitLevel;
+
+enum class WapiPskType {
+    WAPI_PSK_ASCII = 0,
+    WAPI_PSK_HEX = 1,
+};
+
+typedef struct {
+    std::string ifName;
+    int scene;
+    int rssiThreshold;
+    std::string peerMacaddr;
+    std::string powerParam;
+    int powerParamLen;
+} WifiLowPowerParam;
+
+enum class OperationCmd {
+    DHCP_OFFER_ADD,
+    DHCP_OFFER_SIZE_GET,
+    DHCP_OFFER_CLEAR,
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

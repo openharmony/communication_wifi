@@ -96,13 +96,16 @@ if (defined(ohos_lite)) {
     ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
     defines = [ "OHOS_ARCH_LITE" ]
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -124,13 +127,15 @@ if (defined(ohos_lite)) {
     sources += [ "sta_app_acceleration.cpp" ]
 
     include_dirs = local_base_include_dirs
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -176,6 +181,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_core",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
+      "netmanager_base:net_stats_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",

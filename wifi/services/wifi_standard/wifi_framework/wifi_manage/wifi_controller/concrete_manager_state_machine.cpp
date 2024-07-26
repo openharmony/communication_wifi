@@ -986,7 +986,9 @@ void ConcreteMangerMachine::DispatchWifiOpenRes(OperateResState state, int instI
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATING, instId);
         cbMsg.msgData = static_cast<int>(WifiState::ENABLING);
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        }
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENING));
         return;
@@ -997,7 +999,9 @@ void ConcreteMangerMachine::DispatchWifiOpenRes(OperateResState state, int instI
         WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
         cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        }
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENED));
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
@@ -1054,10 +1058,19 @@ void ConcreteMangerMachine::DispatchWifiCloseRes(OperateResState state, int inst
     if (state == OperateResState::CLOSE_WIFI_SUCCEED) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
-        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
         cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
-        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
+            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        } else {
+            WIFI_LOGI("reset selfcure wifi off->open!");
+            int state = WifiSettings::GetInstance().GetStaLastRunState();
+            state = (state == WIFI_STATE_SEMI_ENABLED) ? WIFI_STATE_SEMI_ENABLED : WIFI_STATE_ENABLED;
+            WifiConfigCenter::GetInstance().SetWifiToggledState(state);
+            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
+            WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
+        }
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
             static_cast<int>(WifiOperateState::STA_CLOSED));
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);

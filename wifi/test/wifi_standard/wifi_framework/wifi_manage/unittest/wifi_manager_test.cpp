@@ -94,12 +94,6 @@ HWTEST_F(WifiManagerTest, DealStaCloseResTest_001, TestSize.Level1)
     wifiManager.wifiStaManager->DealStaStopped(0);
 }
 
-HWTEST_F(WifiManagerTest, ResetSelfcureOpenWifiTest, TestSize.Level1)
-{
-    WIFI_LOGI("ResetSelfcureOpenWifiTest enter!");
-    wifiManager.wifiStaManager->ResetSelfcureOpenWifi();
-}
-
 HWTEST_F(WifiManagerTest, IgnoreConnStateChangeTest, TestSize.Level1)
 {
     WIFI_LOGI("IgnoreConnStateChangeTest enter!");

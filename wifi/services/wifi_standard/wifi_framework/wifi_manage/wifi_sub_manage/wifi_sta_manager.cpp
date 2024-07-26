@@ -142,22 +142,6 @@ void WifiStaManager::DealStaStopped(int instId)
 #endif
 }
 
-void WifiStaManager::ResetSelfcureOpenWifi(int instId)
-{
-    if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
-        return;
-    }
-    WIFI_LOGI("reset selfcure wifi off->open!");
-    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-    WIFI_LOGI("reset selfcure: current sta state: %{public}d", staState);
-    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
-    auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaClose(instId);
-    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
-    WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
-    return;
-}
-
 void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
 {
     switch (state) {
@@ -191,7 +175,7 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
 
 bool WifiStaManager::IgnoreConnStateChange(int instId)
 {
-    WIFI_LOGI("enter IgnoreConnStateChange");
+    WIFI_LOGD("enter IgnoreConnStateChange");
 #ifdef FEATURE_SELF_CURE_SUPPORT
     ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
     if (pSelfCureService == nullptr) {

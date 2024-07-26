@@ -850,6 +850,18 @@ enum class OperationCmd {
     DHCP_OFFER_SIZE_GET,
     DHCP_OFFER_CLEAR,
 };
+
+enum class WifiSelfcureType {
+    DNS_ABNORMAL,
+    TCP_RX_ABNORMAL,
+    ROAMING_ABNORMAL,
+    GATEWAY_ABNORMAL,
+    DNS_SELFCURE_SUCC,
+    STATIC_IP_SELFCURE_SUCC,
+    REASSOC_SELFCURE_SUCC,
+    RESET_SELFCURE_SUCC,
+    REDHCP_SELFCURE_SUCC,
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

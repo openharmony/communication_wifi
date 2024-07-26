@@ -1070,6 +1070,13 @@ public:
 
         pSelfCureStateMachine->pInternetSelfCureState->setStaticIp4InvalidIp = true;
         pSelfCureStateMachine->pInternetSelfCureState->HandleHttpReachableAfterSelfCure(currentCureLevel);
+
+        currentCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleHttpReachableAfterSelfCure(currentCureLevel);
+        currentCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleHttpReachableAfterSelfCure(currentCureLevel);
+        currentCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
+        pSelfCureStateMachine->pInternetSelfCureState->HandleHttpReachableAfterSelfCure(currentCureLevel);
     }
 
     void HandleHttpUnreachableFinallyTest()

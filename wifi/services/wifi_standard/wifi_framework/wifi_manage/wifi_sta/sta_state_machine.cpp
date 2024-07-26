@@ -3597,6 +3597,7 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessagePtr msg)
                 pStaStateMachine->linkedInfo);
             if (!pStaStateMachine->CanArpReachable()) {
                 WIFI_LOGI("Arp is not reachable");
+                WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));
                 pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
                     pStaStateMachine->linkedInfo);
                 /* The current state of StaStateMachine transfers to GetIpState. */

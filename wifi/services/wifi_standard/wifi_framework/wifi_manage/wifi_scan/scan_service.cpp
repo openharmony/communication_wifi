@@ -1371,9 +1371,6 @@ ErrCode ScanService::AllowPnoScan()
         WIFI_LOGD("pnoScan is not allowed for forbid map");
         return WIFI_OPT_FAILED;
     }
-    if (!AllowScanByMovingFreeze(ScanMode::PNO_SCAN)) {
-        return WIFI_OPT_MOVING_FREEZE_CTRL;
-    }
 
 #ifndef SUPPORT_SCAN_CONTROL
     {

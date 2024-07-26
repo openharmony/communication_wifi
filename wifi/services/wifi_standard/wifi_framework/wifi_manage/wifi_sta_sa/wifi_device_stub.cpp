@@ -952,6 +952,8 @@ void WifiDeviceStub::OnGetIpV6Info(uint32_t code, MessageParcel &data, MessagePa
         reply.WriteString(info.linkIpV6Address);
         reply.WriteString(info.globalIpV6Address);
         reply.WriteString(info.randGlobalIpV6Address);
+        reply.WriteString(info.uniqueLocalAddress1);
+        reply.WriteString(info.uniqueLocalAddress2);
         reply.WriteString(info.gateway);
         reply.WriteString(info.netmask);
         reply.WriteString(info.primaryDns);

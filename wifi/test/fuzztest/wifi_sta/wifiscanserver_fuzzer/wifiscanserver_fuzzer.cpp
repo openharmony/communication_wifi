@@ -78,7 +78,7 @@ void ScanInterfaceFuzzTest(const uint8_t* data, size_t size)
     wifiScanParams.band = static_cast<ScanBandType>(static_cast<int>(data[0]) % SIZE);
     wifiScanParams.freqs.push_back(period);
     pScanInterface->Scan(state);
-    pScanInterface->ScanWithParam(wifiScanParams);
+    pScanInterface->ScanWithParam(wifiScanParams, false);
     pScanInterface->DisableScan(state);
     pScanInterface->OnScreenStateChanged(period);
     pScanInterface->OnStandbyStateChanged(state);
@@ -89,7 +89,7 @@ void ScanInterfaceFuzzTest(const uint8_t* data, size_t size)
     pScanInterface->OnControlStrategyChanged();
     ScanInnerEventType innerEvent = static_cast<ScanInnerEventType>(static_cast<int>(data[0]) % THREE + 200);
     pScanService->HandleInnerEventReport(innerEvent);
-    pScanService->ScanWithParam(wifiScanParams);
+    pScanService->ScanWithParam(wifiScanParams, false);
     pScanService->StartWifiPnoScan(state, period, interval);
     pScanService->StopPnoScan();
     pScanInterface->StartWifiPnoScan(state, period, interval);

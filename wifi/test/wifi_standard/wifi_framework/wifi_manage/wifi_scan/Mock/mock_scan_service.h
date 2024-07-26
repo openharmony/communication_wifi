@@ -28,7 +28,7 @@ public:
     void UnInitScanService();
     void RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSerivceCallbacks);
     ErrCode Scan(bool externFlag);
-    ErrCode ScanWithParam(const WifiScanParams &params);
+    ErrCode ScanWithParam(const WifiScanParams &params, bool externFlag);
     void SystemScanProcess(bool scanAtOnce);
     void HandleScreenStatusChanged();
     void HandleStaStatusChanged(int status);

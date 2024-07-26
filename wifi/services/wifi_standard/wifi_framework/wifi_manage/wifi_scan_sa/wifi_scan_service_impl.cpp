@@ -214,10 +214,15 @@ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
+    bool externFlag = true;
 #ifndef OHOS_ARCH_LITE
     UpdateScanMode();
+    if (WifiAuthCenter::IsNativeProcess()) {
+        externFlag = false;
+        WIFI_LOGI("Scan: native process start scan !");
+    }
 #endif
-    if (!IsWifiScanAllowed()) {
+    if (!IsWifiScanAllowed(externFlag)) {
         WIFI_LOGE("Scan not allowed!");
         return WIFI_OPT_FAILED;
     }
@@ -225,7 +230,7 @@ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
-    return pService->ScanWithParam(params);
+    return pService->ScanWithParam(params, externFlag);
 }
 
 bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)

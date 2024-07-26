@@ -46,7 +46,7 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
         return PERMISSION_GRANTED;
     }
  
-    LOGE("callerToken=0x%{public}x has no permission_name=%{public}s, pid=%{public}d, uid=%{public}d",
+    LOGE("callerToken=0x%{private}x has no permission_name=%{public}s, pid=%{public}d, uid=%{public}d",
         callerToken, permissionName.c_str(), pid, uid);
     return PERMISSION_DENIED;
 #endif

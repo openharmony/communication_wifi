@@ -53,7 +53,7 @@ bool WifiAuthCenter::IsSystemAppByToken()
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
     Security::AccessToken::ATokenTypeEnum callingType =
         Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    WIFI_LOGI("fullTokenId:%" PRIu64 ", isSystemApp:%{public}d, tokenId:%{public}d, callingType:%{public}d.",
+    WIFI_LOGI("fullTokenId:%" PRIu64 ", isSystemApp:%{public}d, tokenId:%{private}d, callingType:%{public}d.",
         fullTokenId, isSystemApp, tokenId, callingType);
     if (callingType == Security::AccessToken::TOKEN_HAP && !isSystemApp) {
         WIFI_LOGE("The caller is not a system app.");
@@ -69,7 +69,7 @@ bool WifiAuthCenter::IsNativeProcess()
     if (callingType == Security::AccessToken::TOKEN_NATIVE) {
         return true;
     }
-    WIFI_LOGE("The caller tokenId:%{public}d, callingType:%{public}d is not a native process.", tokenId, callingType);
+    WIFI_LOGE("The caller tokenId:%{private}d, callingType:%{public}d is not a native process.", tokenId, callingType);
     return false;
 }
 #endif

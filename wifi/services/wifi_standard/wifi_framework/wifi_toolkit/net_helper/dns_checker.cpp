@@ -23,7 +23,7 @@
 
 #include "securec.h"
 #include "wifi_log.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 #ifdef LOG_TAG
 #undef LOG_TAG
@@ -81,7 +81,7 @@ void DnsChecker::Start(std::string priDns, std::string secondDns)
         dnsSocket = 0;
         return;
     }
-    std::string ifaceName = WifiSettings::GetInstance().GetStaIfaceName();
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     struct ifreq ifaceReq;
     if (strncpy_s(ifaceReq.ifr_name, sizeof(ifaceReq.ifr_name), ifaceName.c_str(), ifaceName.size()) != EOK) {
         LOGE("DnsChecker copy ifaceReq failed.");
@@ -208,7 +208,7 @@ bool DnsChecker::checkDnsValid(std::string host, std::string dnsAddress, int tim
         LOGE("send dns data failed.");
         return false;
     }
-    uint64_t elapsed = 0;
+    int64_t elapsed = 0;
     int leftMillis = timeoutMillis;
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     while (leftMillis > 0 && isRunning) {

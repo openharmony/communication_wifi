@@ -25,6 +25,11 @@ DEFINE_WIFILOG_LABEL("WifiDeviceProxy");
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int MAX_SIZE = 256;
+constexpr int MAX_ASHMEM_SIZE = 300;
+int g_bigDataRecvLen = 0;
+
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
     sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());
 
@@ -52,7 +57,7 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
 
 WifiDeviceProxy::~WifiDeviceProxy()
 {
-    WIFI_LOGI("enter ~WifiDeviceProxy!");
+    WIFI_LOGD("enter ~WifiDeviceProxy!");
     RemoveDeathRecipient();
 }
 
@@ -97,7 +102,6 @@ ErrCode WifiDeviceProxy::EnableWifi()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
     return ErrCode(reply.ReadInt32());
 }
 
@@ -108,7 +112,8 @@ ErrCode WifiDeviceProxy::DisableWifi()
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -125,7 +130,6 @@ ErrCode WifiDeviceProxy::DisableWifi()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
     return ErrCode(reply.ReadInt32());
 }
 
@@ -136,7 +140,8 @@ ErrCode WifiDeviceProxy::InitWifiProtect(const WifiProtectType &protectType, con
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -170,7 +175,8 @@ ErrCode WifiDeviceProxy::GetWifiProtectRef(const WifiProtectMode &protectMode, c
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -204,7 +210,8 @@ ErrCode WifiDeviceProxy::PutWifiProtectRef(const std::string &protectName)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -238,7 +245,8 @@ ErrCode WifiDeviceProxy::IsHeldWifiProtectRef(
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -270,7 +278,7 @@ void WifiDeviceProxy::WriteIpAddress(MessageParcel &data, const WifiIpAddress &a
 {
     data.WriteInt32(address.family);
     data.WriteInt32(address.addressIpv4);
-    int size = address.addressIpv6.size();
+    int size = static_cast<int>(address.addressIpv6.size());
     data.WriteInt32(size);
     for (int i = 0; i < size; i++) {
         data.WriteInt8(address.addressIpv6[i]);
@@ -341,6 +349,9 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteString(config.callProcessName);
     data.WriteString(config.ancoCallProcessName);
     data.WriteInt32(config.uid);
+    data.WriteInt32(config.wifiWapiConfig.wapiPskType);
+    data.WriteString(config.wifiWapiConfig.wapiAsCertData);
+    data.WriteString(config.wifiWapiConfig.wapiUserCertData);
 }
 
 ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)
@@ -350,7 +361,8 @@ ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -385,7 +397,8 @@ ErrCode WifiDeviceProxy::RemoveCandidateConfig(int networkId)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -415,7 +428,8 @@ ErrCode WifiDeviceProxy::AddDeviceConfig(const WifiDeviceConfig &config, int &re
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -452,7 +466,8 @@ ErrCode WifiDeviceProxy::UpdateDeviceConfig(const WifiDeviceConfig &config, int 
     }
 
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -485,7 +500,8 @@ ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -537,9 +553,8 @@ ErrCode WifiDeviceProxy::RemoveAllDevice()
 
 void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address)
 {
-    constexpr int MAX_SIZE = 256;
     address.family = reply.ReadInt32();
-    address.addressIpv4 = reply.ReadInt32();
+    address.addressIpv4 = static_cast<uint32_t>(reply.ReadInt32());
     int size = reply.ReadInt32();
     if (size > MAX_SIZE) {
         WIFI_LOGE("Read IP address size error: %{public}d", size);
@@ -547,6 +562,21 @@ void WifiDeviceProxy::ReadIpAddress(MessageParcel &reply, WifiIpAddress &address
     }
     for (int i = 0; i < size; i++) {
         address.addressIpv6.push_back(reply.ReadInt8());
+    }
+    return;
+}
+
+void WifiDeviceProxy::BigDataReadIpAddress(WifiIpAddress &address, std::vector<std::string> &tokens)
+{
+    address.family = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+    address.addressIpv4 = static_cast<size_t>(CheckDataLegal(tokens[g_bigDataRecvLen++]));
+    int size = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+    if (size > MAX_SIZE) {
+        WIFI_LOGE("Read IP address size error: %{public}d", size);
+        return;
+    }
+    for (int i = 0; i < size; i++) {
+        address.addressIpv6[i] = CheckDataLegal(tokens[g_bigDataRecvLen++]);
     }
     return;
 }
@@ -574,14 +604,101 @@ void WifiDeviceProxy::ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEap
     wifiEapConfig.eapSubId = reply.ReadInt32();
 }
 
-void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
+void WifiDeviceProxy::BigDataReadEapConfig(WifiEapConfig &wifiEapConfig, std::vector<std::string> &tokens)
 {
-    constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
-    int retSize = reply.ReadInt32();
-    if (retSize > MAX_DEVICE_CONFIG_SIZE) {
-        WIFI_LOGE("Parse device config size error: %{public}d", retSize);
+    wifiEapConfig.eap = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.phase2Method = Phase2Method(CheckDataLegal(tokens[g_bigDataRecvLen++]));
+    wifiEapConfig.identity = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.anonymousIdentity = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.password = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.caCertPath = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.caCertAlias = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.clientCert = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.privateKey = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.altSubjectMatch = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.domainSuffixMatch = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.realm = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.plmn = HexToString(tokens[g_bigDataRecvLen++]);
+    wifiEapConfig.eapSubId = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+}
+
+std::vector<std::string> splitString(std::string str, char delimiter)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    size_t pos = 0;
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+        token = str.substr(0, pos);
+        tokens.push_back(token);
+        str.erase(0, pos + 1);
+    }
+    tokens.push_back(str);
+    return tokens;
+}
+
+void WifiDeviceProxy::ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize,
+    long len)
+{
+    WIFI_LOGI("WifiDeviceProxy ParseBigConfig");
+    sptr<Ashmem> ashmem = reply.ReadAshmem();
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        WIFI_LOGE("ParseDeviceConfigs ReadAshmem error");
         return;
     }
+ 
+    std::string net = (char *)ashmem->ReadFromAshmem(len, 0);
+    std::vector<std::string> tokens = splitString(net, ';');
+    for (int m = 0; m < retSize; ++m) {
+        WifiDeviceConfig config;
+        config.networkId = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.status = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.bssid = HexToString(tokens[g_bigDataRecvLen++]);
+        config.bssidType = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.ssid = HexToString(tokens[g_bigDataRecvLen++]);
+        config.band = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.channel = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.frequency = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.level = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.isPasspoint = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.isEphemeral = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.preSharedKey = HexToString(tokens[g_bigDataRecvLen++]);
+        config.keyMgmt = HexToString(tokens[g_bigDataRecvLen++]);
+        for (int j = 0; j < WEPKEYS_SIZE; j++) {
+            config.wepKeys[j] = HexToString(tokens[g_bigDataRecvLen++]);
+        }
+        config.wepTxKeyIndex = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.priority = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.hiddenSSID = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.wifiIpConfig.assignMethod = AssignIpMethod(CheckDataLegal(tokens[g_bigDataRecvLen++]));
+        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.ipAddress.address, tokens);
+        config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.wifiIpConfig.staticIpAddress.ipAddress.flags = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.wifiIpConfig.staticIpAddress.ipAddress.scope = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.gateway, tokens);
+        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.dnsServer1, tokens);
+        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.dnsServer2, tokens);
+        config.wifiIpConfig.staticIpAddress.domains = HexToString(tokens[g_bigDataRecvLen++]);
+        BigDataReadEapConfig(config.wifiEapConfig, tokens);
+        config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(CheckDataLegal(tokens[g_bigDataRecvLen++]));
+        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = HexToString(tokens[g_bigDataRecvLen++]);
+        config.wifiProxyconfig.manualProxyConfig.serverHostName = HexToString(tokens[g_bigDataRecvLen++]);
+        config.wifiProxyconfig.manualProxyConfig.serverPort = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = HexToString(tokens[g_bigDataRecvLen++]);
+        config.wifiPrivacySetting = WifiPrivacyConfig(CheckDataLegal(tokens[g_bigDataRecvLen++]));
+        config.uid = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        config.callProcessName = HexToString(tokens[g_bigDataRecvLen++]);
+        config.ancoCallProcessName = HexToString(tokens[g_bigDataRecvLen++]);
+        result.emplace_back(config);
+    }
+    g_bigDataRecvLen = 0;
+    ashmem->UnmapAshmem();
+    ashmem->CloseAshmem();
+ 
+    return;
+}
+ 
+void WifiDeviceProxy::ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize)
+{
     for (int i = 0; i < retSize; ++i) {
         WifiDeviceConfig config;
         config.networkId = reply.ReadInt32();
@@ -622,8 +739,29 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         config.uid = reply.ReadInt32();
         config.callProcessName = reply.ReadString();
         config.ancoCallProcessName = reply.ReadString();
+        config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
         result.emplace_back(config);
     }
+}
+
+void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
+{
+    WIFI_LOGI("ParseDeviceConfigs");
+    constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
+    int retSize = reply.ReadInt32();
+    if (retSize > MAX_DEVICE_CONFIG_SIZE || retSize == 0) {
+        WIFI_LOGE("Parse device config size error: %{public}d", retSize);
+        return;
+    }
+    if (retSize > MAX_ASHMEM_SIZE) {
+        long len = reply.ReadInt64();
+        ParseBigConfig(reply, result, retSize, len);
+        return;
+    }
+ 
+    ParseSmallConfig(reply, result, retSize);
+ 
+    return;
 }
 
 ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
@@ -698,7 +836,8 @@ ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -727,7 +866,8 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -755,7 +895,8 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -785,7 +926,8 @@ ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -843,6 +985,44 @@ ErrCode WifiDeviceProxy::StartRoamToNetwork(const int networkId, const std::stri
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::StartConnectToUserSelectNetwork(const int networkId,
+    const std::string bssid, const bool isCandidate)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to StartConnectToUserSelectNetwork, remote service is died!");
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token has error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(networkId);
+    data.WriteString(bssid);
+    data.WriteInt32(isCandidate);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(
+        DevInterfaceCode::WIFI_SVR_CMD_START_CONNECT_TO_USER_SELECT_NETWORK), data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("StartConnectToUserSelectNetwork %{public}d failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("StartConnectToUserSelectNetwork Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartConnectToUserSelectNetwork Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
 {
     if (mRemoteDied) {
@@ -850,7 +1030,8 @@ ErrCode WifiDeviceProxy::IsConnected(bool &isConnected)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -882,7 +1063,8 @@ ErrCode WifiDeviceProxy::ReConnect()
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -909,7 +1091,8 @@ ErrCode WifiDeviceProxy::ReAssociate(void)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -936,7 +1119,8 @@ ErrCode WifiDeviceProxy::Disconnect(void)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -963,7 +1147,8 @@ ErrCode WifiDeviceProxy::StartWps(const WpsConfig &config)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -993,7 +1178,8 @@ ErrCode WifiDeviceProxy::CancelWps(void)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1020,7 +1206,8 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1053,7 +1240,8 @@ ErrCode WifiDeviceProxy::GetWifiState(int &state)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1090,7 +1278,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.linkSpeed = reply.ReadInt32();
     info.macAddress = reply.ReadString();
     info.macType = reply.ReadInt32();
-    info.ipAddress = reply.ReadInt32();
+    info.ipAddress = static_cast<uint32_t>(reply.ReadInt32());
     int tmpConnState = reply.ReadInt32();
     if ((tmpConnState >= 0) && (tmpConnState <= (int)ConnState::UNKNOWN)) {
         info.connState = ConnState(tmpConnState);
@@ -1139,7 +1327,8 @@ ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1177,7 +1366,8 @@ ErrCode WifiDeviceProxy::IsMeteredHotspot(bool &bMeteredHotspot)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1210,7 +1400,8 @@ ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1244,7 +1435,8 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1266,13 +1458,13 @@ ErrCode WifiDeviceProxy::GetIpInfo(IpInfo &info)
         return ErrCode(ret);
     }
 
-    info.ipAddress = reply.ReadInt32();
-    info.gateway = reply.ReadInt32();
-    info.netmask = reply.ReadInt32();
-    info.primaryDns = reply.ReadInt32();
-    info.secondDns = reply.ReadInt32();
-    info.serverIp = reply.ReadInt32();
-    info.leaseDuration = reply.ReadInt32();
+    info.ipAddress = static_cast<uint32_t>(reply.ReadInt32());
+    info.gateway = static_cast<uint32_t>(reply.ReadInt32());
+    info.netmask = static_cast<uint32_t>(reply.ReadInt32());
+    info.primaryDns = static_cast<uint32_t>(reply.ReadInt32());
+    info.secondDns = static_cast<uint32_t>(reply.ReadInt32());
+    info.serverIp = static_cast<uint32_t>(reply.ReadInt32());
+    info.leaseDuration = static_cast<uint32_t>(reply.ReadInt32());
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1283,7 +1475,8 @@ ErrCode WifiDeviceProxy::GetIpv6Info(IpV6Info &info)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1321,7 +1514,8 @@ ErrCode WifiDeviceProxy::SetCountryCode(const std::string &countryCode)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1349,7 +1543,8 @@ ErrCode WifiDeviceProxy::GetCountryCode(std::string &countryCode)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1381,8 +1576,9 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
-    MessageParcel data, reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1404,7 +1600,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
     data.WriteInt32(pid);
     int tokenId = GetCallingTokenId();
     data.WriteInt32(tokenId);
-    int eventNum = event.size();
+    int eventNum = static_cast<int>(event.size());
     data.WriteInt32(eventNum);
     if (eventNum > 0) {
         for (auto &eventName : event) {
@@ -1435,7 +1631,8 @@ ErrCode WifiDeviceProxy::GetSignalLevel(const int &rssi, const int &band, int &l
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1471,7 +1668,8 @@ ErrCode WifiDeviceProxy::GetSupportedFeatures(long &features)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1591,7 +1789,8 @@ ErrCode WifiDeviceProxy::IsBandTypeSupported(int bandType, bool &supported)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1626,7 +1825,8 @@ ErrCode WifiDeviceProxy::Get5GHzChannelList(std::vector<int> &result)
     }
     constexpr int MAX_CHANNEL_SIZE = 36;
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1666,13 +1866,14 @@ ErrCode WifiDeviceProxy::SetAppFrozen(std::set<int> pidList, bool isFrozen)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int size = pidList.size() < MAX_PID_LIST_SIZE ? pidList.size() : MAX_PID_LIST_SIZE;
+    int size = static_cast<int>(pidList.size() < MAX_PID_LIST_SIZE ? pidList.size() : MAX_PID_LIST_SIZE);
     int count = 0;
     data.WriteInt32(size);
     for (std::set<int>::iterator it = pidList.begin(); it != pidList.end() && count < size; it++, count++) {
@@ -1700,7 +1901,8 @@ ErrCode WifiDeviceProxy::ResetAllFrozenApp()
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1727,7 +1929,8 @@ ErrCode WifiDeviceProxy::DisableAutoJoin(const std::string &conditionName)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1755,7 +1958,8 @@ ErrCode WifiDeviceProxy::EnableAutoJoin(const std::string &conditionName)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1806,7 +2010,8 @@ ErrCode WifiDeviceProxy::StartPortalCertification()
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1839,7 +2044,8 @@ ErrCode WifiDeviceProxy::GetChangeDeviceConfig(ConfigChange &value, WifiDeviceCo
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1876,7 +2082,8 @@ ErrCode WifiDeviceProxy::FactoryReset()
         WIFI_LOGE("failed to `%{public}s`, remote service is died.", __func__);
         return WIFI_OPT_FAILED;
     }
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error, func:%{public}s", __func__);
@@ -1941,13 +2148,54 @@ ErrCode WifiDeviceProxy::LimitSpeed(const int controlId, const int limitMode)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to %{public}s,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteString(wifiLowPowerParam.ifName);
+    data.WriteInt32(wifiLowPowerParam.scene);
+    data.WriteInt32(wifiLowPowerParam.rssiThreshold);
+    data.WriteString(wifiLowPowerParam.peerMacaddr);
+    data.WriteString(wifiLowPowerParam.powerParam);
+    data.WriteInt32(wifiLowPowerParam.powerParamLen);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("SetLowTxPower(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("SetLowTxPower Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetLowTxPower Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceProxy::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`, remote service is died.", __func__);
         return WIFI_OPT_FAILED;
     }
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error, func:%{public}s", __func__);
@@ -2041,7 +2289,6 @@ ErrCode WifiDeviceProxy::EnableSemiWifi()
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::SEMI_ENABLE);
     return ErrCode(reply.ReadInt32());
 }
 

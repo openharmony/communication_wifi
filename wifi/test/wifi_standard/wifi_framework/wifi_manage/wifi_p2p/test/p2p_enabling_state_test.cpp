@@ -65,15 +65,15 @@ HWTEST_F(P2pEnablingStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(P2pEnablingStateTest, ExecuteStateMsg, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::WPA_CONNECTED_EVENT));
-    pP2pEnablingState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::WPA_CONNECTED_EVENT));
+    pP2pEnablingState->ExecuteStateMsg(msg);
 
     EXPECT_CALL(pMockP2pPendant->GetMockP2pMonitor(), MonitorEnds(_)).WillOnce(Return());
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    pP2pEnablingState->ExecuteStateMsg(&msg);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS));
-    pP2pEnablingState->ExecuteStateMsg(&msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    pP2pEnablingState->ExecuteStateMsg(msg);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS));
+    pP2pEnablingState->ExecuteStateMsg(msg);
 }
 }  // namespace Wifi
 }  // namespace OHOS

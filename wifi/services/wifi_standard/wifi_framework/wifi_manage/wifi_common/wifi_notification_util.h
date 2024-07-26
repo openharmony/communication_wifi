@@ -19,6 +19,7 @@
 #include "ipc_skeleton.h"
 #include "want.h"
 #include "want_params_wrapper.h"
+#include <atomic>
 #include <string>
 
 namespace OHOS {
@@ -46,7 +47,8 @@ enum WifiNotificationOpetationType {
 
 enum WifiDialogType {
     CDD = 0,
-    THREE_VAP = 1
+    THREE_VAP = 1,
+    CANDIDATE_CONNECT = 2
 };
 
 class WifiNotificationUtil {
@@ -62,6 +64,8 @@ public:
     void ShowDialog(WifiDialogType type);
 
 private:
+    std::atomic<bool> isNtfPublished {false};
+
     WifiNotificationUtil();
     ~WifiNotificationUtil();
 };

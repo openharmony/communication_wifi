@@ -274,6 +274,14 @@ int GetSignalLevel(int rssi, int band);
 WifiErrorCode SetLowLatencyMode(int enabled);
 
 /**
+* @Description set low tx power
+*
+* @param wifiLowPowerParam
+* @return ErrCode - operation result
+*/
+WifiErrorCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam);
+
+/**
 * @Description check wifi-band type is supported
 *
 * @param bandType - wifi band type

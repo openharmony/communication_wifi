@@ -84,169 +84,169 @@ HWTEST_F(P2pGroupOperatingStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(P2pGroupOperatingStateTest, ProcessCmdCreateGroup1, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP));
     WifiP2pConfigInternal config;
     config.SetNetId(0);
     config.SetPassphrase(std::string("12345679"));
-    msg.SetMessageObj(config);
+    msg->SetMessageObj(config);
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), SetGroupConfig(_, _)).WillOnce(Return(false));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ProcessCmdCreateGroup2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP));
     WifiP2pConfigInternal config;
     config.SetNetId(-1);
-    msg.SetMessageObj(config);
+    msg->SetMessageObj(config);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ProcessCmdCreateGroup3, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP));
     WifiP2pConfigInternal config;
     config.SetNetId(-1);
     config.SetPassphrase(std::string("12345679"));
     config.SetGroupName(std::string("groupName"));
-    msg.SetMessageObj(config);
+    msg->SetMessageObj(config);
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealCreateNewGroupWithConfig(_, _)).WillOnce(Return(true));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ProcessCmdCreateGroup4, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP));
     WifiP2pConfigInternal config;
     const int invalidId = -999;
     config.SetNetId(invalidId);
-    msg.SetMessageObj(config);
+    msg->SetMessageObj(config);
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
 
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ProcessGroupStartedEvt1, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
     WifiP2pGroupInfo groupInfo;
     groupInfo.SetIsPersistent(true);
     groupInfo.SetIsGroupOwner(true);
-    msg.SetMessageObj(groupInfo);
+    msg->SetMessageObj(groupInfo);
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return());
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ProcessGroupStartedEvt2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED));
     WifiP2pGroupInfo groupInfo;
     groupInfo.SetIsPersistent(false);
     groupInfo.SetIsGroupOwner(false);
     WifiP2pDevice device;
     device.SetDeviceAddress(std::string("11:22:33:44:55:66"));
     groupInfo.SetOwner(device);
-    msg.SetMessageObj(groupInfo);
+    msg->SetMessageObj(groupInfo);
     AddDeviceManager();
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ExecuteStateMsg3, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 
     AddGroupManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
     AddGroupManager();
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ExecuteStateMsg4, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
     AddGroupManager();
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return());
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WifiP2pGroupInfo group;
     group.SetNetworkId(1);
-    msg.SetMessageObj(group);
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(group);
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ExecuteStateMsg5, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
     AddGroupManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupRemove(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WifiP2pGroupInfo group;
     group.SetNetworkId(1);
-    msg.SetMessageObj(group);
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(group);
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ExecuteStateMsg6, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCONNECT));
-    EXPECT_FALSE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DISCONNECT));
+    EXPECT_FALSE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
     AddGroupManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RemoveNetwork(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     WifiP2pGroupInfo group;
     group.SetNetworkId(2);
-    msg.SetMessageObj(group);
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    msg->SetMessageObj(group);
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
     EXPECT_FALSE(pP2pGroupOperatingState->ExecuteStateMsg(nullptr));
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ProcessGroupRemovedEvt, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED));
     AddGroupManager();
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFlush())
-        .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
-    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
     EXPECT_FALSE(pP2pGroupOperatingState->ExecuteStateMsg(nullptr));
 
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
-    EXPECT_FALSE(pP2pGroupOperatingState->ExecuteStateMsg(&msg));
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
+    EXPECT_FALSE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

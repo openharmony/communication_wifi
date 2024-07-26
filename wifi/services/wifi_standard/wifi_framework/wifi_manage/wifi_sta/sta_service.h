@@ -49,7 +49,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableWifi();
+    virtual ErrCode EnableStaService();
     /**
      * @Description  Disable wifi
      *
@@ -58,16 +58,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode DisableWifi() const;
-    /**
-     * @Description  Enable semi-wifi
-     *
-     * @Output: Return operating results to Interface Service after enable semi-wifi
-               successfully through callback function instead of returning
-               result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode EnableSemiWifi();
+    virtual ErrCode DisableStaService() const;
     /**
      * @Description  Connect to a new network
      *
@@ -97,6 +88,15 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) const;
+
+    /**
+     * @Description connect to user select ssid and bssid network
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid) const;
 
     /**
      * @Description  Disconnect to the network
@@ -345,7 +345,7 @@ public:
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid);
+    virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd);
  
     /**
      * @Description deliver mac
@@ -353,24 +353,21 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac);
-
-    /**
-     * @Description start http detect.
-     *
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode StartHttpDetect();
-
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
     std::string ConvertString(const std::u16string &wideText) const;
-    int32_t GetDataSlotId() const;
+    int32_t GetDataSlotId(int32_t slotId) const;
     std::string GetImsi(int32_t slotId) const;
     std::string GetPlmn(int32_t slotId) const;
     std::string GetMcc(const std::string &imsi) const;
     std::string GetMnc(const std::string &imsi, const int mncLen) const;
     void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;
+#ifndef OHOS_ARCH_LITE
+    void GetStaControlInfo();
+    bool IsAppInCandidateFilterList(int uid) const;
+#endif
+
 private:
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
@@ -390,6 +387,7 @@ private:
     StaAppAcceleration *pStaAppAcceleration;
 #endif
     int m_instId;
+    std::vector<std::string> sta_candidate_trust_list;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -266,7 +266,7 @@ static int BeforeLoop(RpcServer *server)
     pthread_mutex_lock(&server->mutex);
     for (int i = 0; i < server->nEvents; ++i) {
         int event = server->events[i];
-        int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
+        uint32_t num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
         int pos = event % num;
         struct Node *p = server->eventNode[pos].head;
         while (p != NULL) {
@@ -309,7 +309,7 @@ int RegisterCallback(RpcServer *server, int event, Context *context)
         return -1;
     }
 
-    int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
+    uint32_t num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     int pos = event % num;
     if (pos >= MAX_EVENT_NODE_COUNT) {
         return -1;
@@ -336,7 +336,7 @@ int UnRegisterCallback(RpcServer *server, int event, const Context *context)
         return -1;
     }
 
-    int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
+    uint32_t num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     int pos = event % num;
     if (pos >= MAX_EVENT_NODE_COUNT) {
         return -1;
@@ -366,7 +366,7 @@ static int RemoveCallback(RpcServer *server, const Context *context)
         return -1;
     }
 
-    int num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
+    uint32_t num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     for (int i = 0; i < num; ++i) {
         struct Node *p = server->eventNode[i].head;
         if (p == NULL) {

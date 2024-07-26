@@ -73,7 +73,6 @@ void WifiDeviceMgrServiceImpl::OnStart()
     if (pWifiStaManager) {
         pWifiStaManager->StartUnloadStaSaTimer();
     }
-    WifiDeviceServiceImpl::StartWatchdog();
 }
 
 void WifiDeviceMgrServiceImpl::OnStop()

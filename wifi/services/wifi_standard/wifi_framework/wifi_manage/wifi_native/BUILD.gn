@@ -23,6 +23,7 @@ config("wifi_fw_common_header") {
   include_dirs = [
     "$WIFI_ROOT_DIR/base/state_machine/include",
     "$WIFI_ROOT_DIR/base/cRPC/include",
+    "$WIFI_ROOT_DIR/base/shared_util",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
@@ -109,6 +110,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     ]
@@ -127,16 +129,18 @@ if (defined(ohos_lite)) {
       "//build/lite/config:language_cpp",
       "//build/lite/config:language_c",
     ]
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
     cflags_c = [
       "-std=c99",
       "-fPIC",
     ]
-    cflags_cc = [
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
       "-fPIC",
     ]
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -184,6 +188,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       ":wifi_utils",
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -214,17 +219,19 @@ if (defined(ohos_lite)) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
     }
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
-
+    version_script = "libwifi_native.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

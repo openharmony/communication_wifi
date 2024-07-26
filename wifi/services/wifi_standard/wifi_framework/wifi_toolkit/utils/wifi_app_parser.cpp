@@ -114,7 +114,10 @@ bool AppParser::InitAppParser(const char *appXmlFilePath)
         WIFI_LOGE("%{public}s appXmlFilePath is null", __FUNCTION__);
         return false;
     }
-    if (!std::filesystem::exists(appXmlFilePath)) {
+    std::string xmlPath(appXmlFilePath);
+    std::filesystem::path pathName = xmlPath;
+    std::error_code code;
+    if (!std::filesystem::exists(pathName, code)) {
         WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlFilePath);
         return false;
     }
@@ -182,41 +185,50 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
 LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
 {
     LowLatencyAppInfo appInfo;
-    std::string gameName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME));
+    std::string gameName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = gameName;
+    xmlFree(value);
     return appInfo;
 }
 
 WhiteListAppInfo AppParser::ParseWhiteAppInfo(const xmlNodePtr &innode)
 {
     WhiteListAppInfo appInfo;
-    appInfo.packageName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
     return appInfo;
 }
 
 BlackListAppInfo AppParser::ParseBlackAppInfo(const xmlNodePtr &innode)
 {
     BlackListAppInfo appInfo;
-    appInfo.packageName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
     return appInfo;
 }
 
 ChariotAppInfo AppParser::ParseChariotAppInfo(const xmlNodePtr &innode)
 {
     ChariotAppInfo appInfo;
-    appInfo.packageName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
     return appInfo;
 }
 
 HighTempLimitSpeedAppInfo AppParser::ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode)
 {
     HighTempLimitSpeedAppInfo appInfo;
-    appInfo.packageName =
-        std::string(reinterpret_cast<char *>(xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME))));
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
     return appInfo;
 }
 
@@ -324,7 +336,10 @@ std::string AppParser::GetLocalFileVersion(const char *appXmlVersionFilePath)
         WIFI_LOGE("%{public}s appXmlVersionFilePath null!", __FUNCTION__);
         return strFileVersion;
     }
-    if (!std::filesystem::exists(appXmlVersionFilePath)) {
+    std::string xmlPath(appXmlVersionFilePath);
+    std::filesystem::path pathName = xmlPath;
+    std::error_code code;
+    if (!std::filesystem::exists(xmlPath, code)) {
         WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlVersionFilePath);
         return strFileVersion;
     }

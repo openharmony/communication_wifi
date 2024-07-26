@@ -26,6 +26,8 @@ group("fuzztest") {
     "../frameworks/native/c_adapter/wifip2pcbkstub_fuzzer:WifiP2pCbkStubFuzzTest",
     "../frameworks/native/c_adapter/wifiscancbkstub_fuzzer:WifiScanCbkStubFuzzTest",
     "../frameworks/native/src/wifip2pimpl_fuzzer:WifiP2pImplFuzzTest",
+    "../wifi_p2p/wifip2p_fuzzer:WifiP2pFuzzTest",
+    "../wifi_p2p/wifip2phid2d_fuzzer:WifiP2pHid2dFuzzTest",
     "adddeviceconfig_fuzzer:AddDeviceConfigFuzzTest",
     "connecttodevice_fuzzer:ConnectToDeviceFuzzTest",
     "disablewifi_fuzzer:DisableWifiFuzzTest",
@@ -36,8 +38,13 @@ group("fuzztest") {
     "reassociate_fuzzer:ReAssociateFuzzTest",
     "reconnect_fuzzer:ReConnectFuzzTest",
     "wifidevicestub_fuzzer:WifiDeviceStubFuzzTest",
+    "wifihotspotimpl_fuzzer:WifiHotspotImplFuzzTest",
     "wifihotspotstub_fuzzer:WifiHotSpotStubFuzzTest",
+    "wifip2pserver_fuzzer:WifiP2pServerFuzzTest",
     "wifip2pstub_fuzzer:WifiP2pStubFuzzTest",
+    "wifiscansa_fuzzer:WifiScansaFuzzTest",
+    "wifiscanserver_fuzzer:WifiScanServerFuzzTest",
     "wifiscanstub_fuzzer:WifiScanStubFuzzTest",
+    "wifistaserver_fuzzer:WifiStaServerFuzzTest",
   ]
 }

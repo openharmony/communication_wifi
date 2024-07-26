@@ -20,14 +20,13 @@
 #include "wifi_permission_utils.h"
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
+#include "wifi_channel_helper.h"
 #include "wifi_config_center.h"
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
-#include "xcollie/watchdog.h"
 #include "wifi_sa_manager.h"
-#include "wifi_settings.h"
 #include "mac_address.h"
 #include "wifi_p2p_service_impl.h"
 #include "wifi_country_code_manager.h"
@@ -41,6 +40,7 @@
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
+#include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -122,8 +122,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(true);
-        WifiSettings::GetInstance().SetSemiWifiEnable(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
@@ -150,9 +149,8 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     }
 
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(false);
-        WifiSettings::GetInstance().SetWifiAllowSemiActive(false);
-        WifiSettings::GetInstance().SetSemiWifiEnable(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+        WifiConfigCenter::GetInstance().SetWifiAllowSemiActive(false);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
@@ -188,8 +186,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
     }
 #endif
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(false);
-        WifiSettings::GetInstance().SetSemiWifiEnable(true);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
 
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
@@ -284,6 +281,25 @@ bool WifiDeviceServiceImpl::CheckConfigEap(const WifiDeviceConfig &config)
     return true;
 }
 
+bool WifiDeviceServiceImpl::CheckConfigWapi(const WifiDeviceConfig &config)
+{
+    if (config.keyMgmt == KEY_MGMT_WAPI_PSK) {
+        if (config.wifiWapiConfig.wapiPskType < static_cast<int>(WapiPskType::WAPI_PSK_ASCII) ||
+            config.wifiWapiConfig.wapiPskType > static_cast<int>(WapiPskType::WAPI_PSK_HEX)) {
+            WIFI_LOGE("CheckConfigWapi: with invalid wapiPskType!");
+            return false;
+        }
+        return true;
+    }
+
+    if (config.wifiWapiConfig.wapiAsCertData.empty() || config.wifiWapiConfig.wapiUserCertData.empty()) {
+        WIFI_LOGE("CheckConfigWapi: with cert data empty!");
+        return false;
+    }
+
+    return true;
+}
+
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
     if ((config.ssid.length() <= 0) || (config.ssid.length() > DEVICE_NAME_LENGTH) || (config.keyMgmt.length()) <= 0) {
@@ -296,6 +312,10 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return CheckConfigEap(config);
     }
 
+    if (config.keyMgmt == KEY_MGMT_WAPI_CERT || config.keyMgmt == KEY_MGMT_WAPI_PSK) {
+        return CheckConfigWapi(config);
+    }
+
     if (config.keyMgmt == KEY_MGMT_NONE) {
         return config.preSharedKey.empty();
     }
@@ -305,13 +325,13 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         return false;
     }
 
-    int len = config.preSharedKey.length();
+    int len = static_cast<int>(config.preSharedKey.length());
     bool isAllHex = std::all_of(config.preSharedKey.begin(), config.preSharedKey.end(), isxdigit);
     WIFI_LOGI("CheckConfigPwd, ssid: %{public}s, psk len: %{public}d", SsidAnonymize(config.ssid).c_str(), len);
     if (config.keyMgmt == KEY_MGMT_WEP) {
         for (int i = 0; i != WEPKEYS_SIZE; ++i) {
             if (!config.wepKeys[i].empty()) { // wep
-                int wepLen = config.wepKeys[i].size();
+                uint32_t wepLen = config.wepKeys[i].size();
                 if (wepLen == WEP_KEY_LEN1 || wepLen == WEP_KEY_LEN2 || wepLen == WEP_KEY_LEN3) {
                     return true;
                 }
@@ -429,7 +449,7 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(const WifiDeviceConfig &con
     }
     /* get all candidate configs */
     std::vector<WifiDeviceConfig> configs;
-    if (WifiConfigCenter::GetInstance().GetCandidateConfigs(uid, configs) != 0) {
+    if (WifiSettings::GetInstance().GetAllCandidateConfig(uid, configs) != 0) {
         WIFI_LOGE("NOT find the caller's configs!");
         return WIFI_OPT_INVALID_CONFIG;
     }
@@ -516,7 +536,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     macAddrInfo.bssid = config.bssid;
     macAddrInfo.bssidType = config.bssidType;
     std::string macAddr =
-        WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+        WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
             macAddrInfo);
     if (macAddr.empty()) {
         WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
@@ -671,6 +691,31 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
     return pService->SetTxPower(power);
 }
 
+void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        return;
+    }
+    WifiDeviceConfig wifiConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wifiConfig) != 0) {
+        return;
+    }
+    // -1: Connect by system, use default uid.
+    if (wifiConfig.uid == -1 || wifiConfig.isShared) {
+        return;
+    }
+    for (auto iter = result.begin(); iter != result.end(); iter++) {
+        if (iter->ssid == wifiConfig.ssid && iter->keyMgmt == wifiConfig.keyMgmt) {
+            WIFI_LOGI("ReplaceConfigWhenCandidateConnected networkid: %{public}d!", iter->networkId);
+            result.erase(iter);
+            break;
+        }
+    }
+    result.push_back(wifiConfig);
+}
+
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     if (!isCandidate && !WifiAuthCenter::IsSystemAppByToken()) {
@@ -708,9 +753,10 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
                 return WIFI_OPT_INVALID_PARAM;
             }
         }
-        WifiConfigCenter::GetInstance().GetCandidateConfigs(uid, result);
+        WifiSettings::GetInstance().GetAllCandidateConfig(uid, result);
     } else {
-        WifiConfigCenter::GetInstance().GetDeviceConfig(result);
+        WifiSettings::GetInstance().GetDeviceConfig(result);
+        ReplaceConfigWhenCandidateConnected(result);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -824,7 +870,9 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
         if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
             bool isSame = linkedInfo.networkId == networkId;
             WIFI_LOGE("ConnectToNetwork isCandidate isConnected isSame:%{public}s!", isSame ? "true" : "false");
-            return isSame ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
+            if (isSame) {
+                return WIFI_OPT_SUCCESS;
+            }
         }
         return pService->ConnectToCandidateConfig(uid, networkId);
     }
@@ -873,7 +921,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         macAddrInfo.bssid = config.bssid;
         macAddrInfo.bssidType = config.bssidType;
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
@@ -911,10 +959,6 @@ ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std
         WIFI_LOGE("%{public}s: don't support roam to candidate network", __FUNCTION__);
         return WIFI_OPT_NOT_SUPPORTED;
     }
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
-        WIFI_LOGE("%{public}s:NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("%{public}s:VerifyWifiConnectionPermission PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_PERMISSION_DENIED;
@@ -934,6 +978,38 @@ ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std
         return WIFI_OPT_STA_NOT_OPENED;
     }
     return pService->StartRoamToNetwork(networkId, bssid);
+}
+
+
+ErrCode WifiDeviceServiceImpl::StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate)
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
+    if (isCandidate) {
+        WIFI_LOGE("%{public}s: do not support connect to user select candidate network", __FUNCTION__);
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s:VerifyWifiConnectionPermission PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsStaServiceRunning()) {
+        WIFI_LOGE("%{public}s: sta service is not running", __FUNCTION__);
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    if (networkId < 0 || (!bssid.empty() && CheckMacIsValid(bssid) != 0)) {
+        WIFI_LOGE("%{public}s: invalid param, networkId: %{public}d, bssid:%{public}s",
+            __FUNCTION__, networkId, MacAnonymize(bssid).c_str());
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("%{public}s: pService is nullptr", __FUNCTION__);
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->StartConnectToUserSelectNetwork(networkId, bssid);
 }
 
 ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)
@@ -1280,7 +1356,7 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    level = WifiConfigCenter::GetInstance().GetSignalLevel(rssi, band, m_instId);
+    level = WifiSettings::GetInstance().GetSignalLevel(rssi, band, m_instId);
     WIFI_LOGI("GetSignalLevel device impl end...");
     return WIFI_OPT_SUCCESS;
 }
@@ -1359,7 +1435,7 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
     WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
 #endif
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
-        !WifiConfigCenter::GetInstance().GetCanOpenStaWhenAirplaneMode(m_instId)) {
+        !WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(m_instId)) {
         WIFI_LOGI("current airplane mode and can not use sta, open failed!");
         return WIFI_OPT_FORBID_AIRPLANE;
     }
@@ -1459,7 +1535,7 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
         ss << "  Connection.macAddress: " << MacAnonymize(linkedInfo.macAddress) << "\n";
         ss << "  Connection.isHiddenSSID: " << (linkedInfo.ifHiddenSSID ? "true" : "false") << "\n";
 
-        int level = WifiConfigCenter::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
+        int level = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
         ss << "  Connection.signalLevel: " << level << "\n";
         result += ss.str();
     }
@@ -1501,7 +1577,7 @@ ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported
         return WIFI_OPT_INVALID_PARAM;
     } else {
         ChannelsTable channels;
-        WifiSettings::GetInstance().GetValidChannels(channels);
+        WifiChannelHelper::GetInstance().GetValidChannels(channels);
         supported = channels.find((BandType)bandType) != channels.end();
     }
     return WIFI_OPT_SUCCESS;
@@ -1526,7 +1602,7 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
 
     ChannelsTable channels;
-    WifiSettings::GetInstance().GetValidChannels(channels);
+    WifiChannelHelper::GetInstance().GetValidChannels(channels);
     if (channels.find(BandType::BAND_5GHZ) != channels.end()) {
         result = channels[BandType::BAND_5GHZ];
     }
@@ -1581,8 +1657,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
     if (m_instId == 0) {
-        WifiSettings::GetInstance().SetWifiToggledState(false);
-        WifiSettings::GetInstance().SetSemiWifiEnable(true);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);
@@ -1622,12 +1697,15 @@ bool ComparedHinlinkKeymgmt(const std::string scanInfoKeymgmt, const std::string
 
 ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfig, std::string &currentMac)
 {
+#ifndef SUPPORT_LOCAL_RANDOM_MAC
+    WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
+#else
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
     } else {
         WifiStoreRandomMac randomMacInfo;
         std::vector<WifiScanInfo> scanInfoList;
-        WifiSettings::GetInstance().GetScanInfoList(scanInfoList);
+        WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
         for (auto scanInfo : scanInfoList) {
             if ((deviceConfig.ssid == scanInfo.ssid) &&
                 (ComparedHinlinkKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {
@@ -1647,7 +1725,15 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
         if (randomMacInfo.randomMac.empty()) {
             /* Sets the MAC address of WifiSettings. */
             std::string macAddress;
-            WifiSettings::GetInstance().GenerateRandomMacAddress(macAddress);
+            std::string deviceConfigKey = randomMacInfo.ssid + randomMacInfo.keyMgmt;
+            int ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+            if (ret != 0) {
+                ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
+            }
+            if (ret != 0) {
+                WIFI_LOGI("HilinkGetMacAddress Failed to generate MAC address, Using locally generated MAC.");
+                WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+            }
             randomMacInfo.randomMac = macAddress;
             LOGI("%{public}s: generate a random mac, randomMac:%{public}s, ssid:%{public}s, peerbssid:%{public}s",
                 __func__, MacAnonymize(randomMacInfo.randomMac).c_str(), SsidAnonymize(randomMacInfo.ssid).c_str(),
@@ -1661,7 +1747,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
         currentMac = randomMacInfo.randomMac;
     }
     WIFI_LOGI("EnableHiLinkHandshake mac address get success, mac = %{public}s", MacAnonymize(currentMac).c_str());
-
+#endif
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1741,22 +1827,24 @@ ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMo
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiDeviceServiceImpl::StartWatchdog(void)
+ErrCode WifiDeviceServiceImpl::SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam)
 {
-    constexpr int32_t WATCHDOG_INTERVAL_MS = 10000;
-    constexpr int32_t WATCHDOG_DELAY_MS = 15000;
-    auto taskFunc = []() {
-        uint64_t now = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()).count());
-        uint64_t interval = now - WifiSettings::GetInstance().GetThreadStartTime();
-        if ((WifiSettings::GetInstance().GetThreadStatusFlag()) && (interval > WATCHDOG_INTERVAL_MS)) {
-            WIFI_LOGE("watchdog happened, thread need restart");
-        } else {
-            WIFI_LOGD("thread work normally");
-        }
-    };
-    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("WifiDeviceServiceImpl", taskFunc,
-        WATCHDOG_INTERVAL_MS, WATCHDOG_DELAY_MS);
+    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d",
+        __FUNCTION__, GetCallingPid(), GetCallingUid());
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    if (pEnhanceService->SetLowTxPower(wifiLowPowerParam)) {
+        WIFI_LOGE("%{public}s set low tx power fail!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::SetAppFrozen(std::set<int> pidList, bool isFrozen)
@@ -1830,6 +1918,10 @@ ErrCode WifiDeviceServiceImpl::RegisterAutoJoinCondition(const std::string &cond
         WIFI_LOGE("RegisterAutoJoinCondition:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RegisterAutoJoinCondition:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("pService is nullptr!");
@@ -1842,6 +1934,10 @@ ErrCode WifiDeviceServiceImpl::DeregisterAutoJoinCondition(const std::string &co
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("DeregisterAutoJoinCondition:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DeregisterAutoJoinCondition:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
@@ -1860,6 +1956,10 @@ ErrCode WifiDeviceServiceImpl::RegisterFilterBuilder(const FilterTag &filterTag,
         WIFI_LOGE("RegisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RegisterFilterBuilder:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("pService is nullptr!");
@@ -1873,6 +1973,10 @@ ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTa
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("DeregisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DeregisterFilterBuilder:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
@@ -1907,7 +2011,9 @@ ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& repl
 {
     UniqueFd fd(-1);
     std::string replyCode = EXTENSION_SUCCESS;
-    int ret = WifiSettings::GetInstance().OnBackup(fd, "");
+    std::string backupInfo = data.ReadString();
+    int ret = WifiSettings::GetInstance().OnBackup(fd, backupInfo);
+    std::fill(backupInfo.begin(), backupInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnBackup fail: backup data fail!");
         replyCode = EXTENSION_FAIL;
@@ -1927,7 +2033,9 @@ ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& rep
 {
     UniqueFd fd(data.ReadFileDescriptor());
     std::string replyCode = EXTENSION_SUCCESS;
-    int ret = WifiSettings::GetInstance().OnRestore(fd, "");
+    std::string restoreInfo = data.ReadString();
+    int ret = WifiSettings::GetInstance().OnRestore(fd, restoreInfo);
+    std::fill(restoreInfo.begin(), restoreInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnRestore fail: restore data fail!");
         replyCode = EXTENSION_FAIL;

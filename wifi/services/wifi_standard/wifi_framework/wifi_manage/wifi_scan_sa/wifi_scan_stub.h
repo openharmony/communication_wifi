@@ -49,7 +49,9 @@ private:
     int OnSetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnGetScanOnlyAvailable(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int OnStartWifiPnoScan(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-
+    void SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result, MessageParcel &reply);
+    void SendScanInfoSmall(int32_t contentSize, std::vector<WifiScanInfo> &result, MessageParcel &reply);
+    std::mutex deathRecipientMutex;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     HandleFuncMap handleFuncMap;
     bool mSingleCallback;

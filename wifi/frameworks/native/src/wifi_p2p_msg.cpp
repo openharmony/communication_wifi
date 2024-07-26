@@ -59,7 +59,7 @@ int WifiP2pWfdInfo::GetMaxThroughput() const
 
 bool WifiP2pWfdInfo::isSessionAvailable()
 {
-    return (deviceInfo & static_cast<int>(P2pDeviceType::SESSION_AVAILABLE)) != 0;
+    return (static_cast<size_t>(deviceInfo) & static_cast<size_t>(P2pDeviceType::SESSION_AVAILABLE)) != 0;
 }
 
 void WifiP2pWfdInfo::setSessionAvailable(bool enabled)
@@ -244,7 +244,7 @@ int WifiP2pDevice::GetGroupCapabilitys() const
 
 bool WifiP2pDevice::IsGroupOwner() const
 {
-    return (groupCapabilitys & static_cast<int>(P2pGroupCapability::PGC_GROUP_OWNER));
+    return (static_cast<size_t>(groupCapabilitys) & static_cast<size_t>(P2pGroupCapability::PGC_GROUP_OWNER));
 }
 
 bool WifiP2pDevice::IsGroupLimit() const
@@ -254,12 +254,13 @@ bool WifiP2pDevice::IsGroupLimit() const
 
 bool WifiP2pDevice::IsDeviceLimit() const
 {
-    return (deviceCapabilitys & static_cast<int>(P2pDeviceCapability::PDC_DEVICE_LIMIT));
+    return (static_cast<size_t>(deviceCapabilitys) & static_cast<size_t>(P2pDeviceCapability::PDC_DEVICE_LIMIT));
 }
 
 bool WifiP2pDevice::Isinviteable() const
 {
-    return (deviceCapabilitys & static_cast<int>(P2pDeviceCapability::PDC_INVITATION_PROCEDURE));
+    return (static_cast<size_t>(deviceCapabilitys) &
+        static_cast<size_t>(P2pDeviceCapability::PDC_INVITATION_PROCEDURE));
 }
 
 bool WifiP2pDevice::IsValid() const
@@ -403,6 +404,16 @@ void WifiP2pGroupInfo::SetGoIpAddress(const std::string &ipAddr)
 const std::string &WifiP2pGroupInfo::GetGoIpAddress() const
 {
     return goIpAddress;
+}
+
+void WifiP2pGroupInfo::SetGcIpAddress(const std::string &ipAddr)
+{
+    gcIpAddress = ipAddr;
+}
+
+const std::string &WifiP2pGroupInfo::GetGcIpAddress() const
+{
+    return gcIpAddress;
 }
 
 void WifiP2pGroupInfo::AddClientDevice(const WifiP2pDevice &clientDevice)

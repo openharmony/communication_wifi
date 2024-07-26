@@ -87,7 +87,6 @@
                 "dhcp",
                 "distributed_notification_service",
                 "drivers_interface_wlan",
-                "drivers_interface_wpa",
                 "eventhandler",
                 "ffrt",
                 "hdf_core",

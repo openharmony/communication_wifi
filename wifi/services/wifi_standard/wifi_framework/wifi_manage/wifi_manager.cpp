@@ -23,12 +23,16 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
+#endif
+#ifdef FEATURE_STA_SUPPORT
 #include "wifi_country_code_manager.h"
 #endif
 #include "wifi_service_manager.h"
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
 #include "wifi_common_service_manager.h"
+#include "wifi_native_define.h"
+#include "wifi_sta_hal_interface.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -76,6 +80,8 @@ int WifiManager::Init()
         return -1;
     }
 
+    WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(
+        std::bind(&WifiManager::OnNativeProcessStatusChange, this, std::placeholders::_1));
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
@@ -98,14 +104,17 @@ int WifiManager::Init()
     }
     mInitStatus = INIT_OK;
 
-    int lastState = WifiConfigCenter::GetInstance().GetStaLastRunState();
-    if (lastState != WIFI_STATE_CLOSED) { /* Automatic startup upon startup */
-        WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
-        if (lastState == WIFI_STATE_SEMI_ACTIVE) {
-            WifiSettings::GetInstance().SetSemiWifiEnable(true);
-        } else {
-            WifiSettings::GetInstance().SetWifiToggledState(true);
+    if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && !std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH) &&
+        !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
+        if (IsStartUpWifiEnableSupport()) {
+            WIFI_LOGI("It's first start up, need open wifi before oobe");
+            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED);
         }
+    }
+    int lastState = WifiSettings::GetInstance().GetStaLastRunState();
+    if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
+        WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(lastState);
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();
@@ -165,6 +174,29 @@ void WifiManager::Exit()
     return;
 }
 
+void WifiManager::OnNativeProcessStatusChange(int status)
+{
+    WIFI_LOGI("OnNativeProcessStatusChange status:%{public}d", status);
+    switch (status) {
+        case WPA_DEATH:
+            WIFI_LOGE("wpa_supplicant process is dead!");
+            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
+                wifiTogglerManager->AirplaneToggled(1);
+                wifiTogglerManager->AirplaneToggled(0);
+            }
+            break;
+        case AP_DEATH:
+            WIFI_LOGE("hostapd process is dead!");
+            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
+                wifiTogglerManager->SoftapToggled(0, 0);
+                wifiTogglerManager->SoftapToggled(1, 0);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 int WifiManager::GetSupportedFeatures(long &features) const
 {
     long supportedFeatures = mSupportedFeatures;
@@ -181,7 +213,8 @@ int WifiManager::GetSupportedFeatures(long &features) const
 
 void WifiManager::AddSupportedFeatures(WifiFeatures feature)
 {
-    mSupportedFeatures |= static_cast<long>(feature);
+    mSupportedFeatures = static_cast<long>(static_cast<unsigned long>(mSupportedFeatures) |
+        static_cast<unsigned long>(feature));
 }
 
 void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
@@ -211,6 +244,17 @@ void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
             });
             break;
 #endif
+        case WifiCloseServiceCode::STA_MSG_OPENED:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiStaManager->DealStaOpened(instId);
+                wifiScanManager->DealStaOpened(instId);
+            });
+            break;
+        case WifiCloseServiceCode::STA_MSG_STOPED:
+            mCloseServiceThread->PostAsyncTask([this, instId]() {
+                wifiStaManager->DealStaStopped(instId);
+            });
+            break;
         case WifiCloseServiceCode::SERVICE_THREAD_EXIT:
             WIFI_LOGI("DealCloseServiceMsg exit!");
             return;
@@ -308,7 +352,7 @@ void WifiManager::InstallPacketFilterProgram(int event, int instId)
     }
     // get number ip and net mask
     IpInfo ipInfo;
-    WifiSettings::GetInstance().GetIpInfo(ipInfo, instId);
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, instId);
     if (ipInfo.ipAddress == 0 || ipInfo.netmask == 0) {
         WIFI_LOGW("%{public}s cannot get device ip address", __FUNCTION__);
     }
@@ -366,7 +410,8 @@ void WifiManager::AutoStartServiceThread()
 void WifiManager::InitPidfile()
 {
     char pidFile[DIR_MAX_LENGTH] = {0, };
-    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid", CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
+    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid",
+        CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
     if (n < 0) {
         LOGE("InitPidfile: construct pidFile name failed.");
         return;

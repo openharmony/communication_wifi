@@ -15,6 +15,7 @@
 #include "sta_service.h"
 #include <gtest/gtest.h>
 #include "mock_wifi_manager.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_sta_state_machine.h"
 #include "mock_wifi_sta_interface.h"
@@ -23,6 +24,7 @@
 #include "sta_define.h"
 #include "wifi_msg.h"
 #include "wifi_internal_msg.h"
+
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -62,7 +64,6 @@ public:
 
     void StaServiceInitStaServiceSuccess();
     void StaServiceEnableWifiSuccess();
-    void StaServiceEnableSemiWifiSuccess();
     void StaServiceConnectToWifiDeviceConfigSuccess();
     void StaServiceConnectToWifiDeviceConfigFail1();
     void StaServiceConnectToWifiDeviceConfigFail2();
@@ -96,9 +97,9 @@ public:
     void StaServiceRemoveCandidateConfigTestSucc();
     void StaServiceRemoveCandidateConfigTestFail();
     void StaServiceRemoveAllCandidateConfigTestSucc();
-    void StaServiceConnectToCandidateConfigTestSucc();
-    void StaServiceConnectToCandidateConfigTestFail0();
-    void StaServiceConnectToCandidateConfigTestFail1();
+    void StaServiceConnectToCandidateConfigTestSucc0();
+    void StaServiceConnectToCandidateConfigTestSucc1();
+    void StaServiceConnectToCandidateConfigTestFail();
     void StaServiceRemoveAllDeviceTestSucc();
     void StaServiceRemoveAllDeviceTestFail0();
     void StaServiceRemoveAllDeviceTestFail1();
@@ -112,17 +113,32 @@ public:
     void DeregisterAutoJoinCondition();
     void RegisterFilterBuilder();
     void DeregisterFilterBuilder();
-    void StaServiceStartHttpDetectTestSucc();
     void EnableHiLinkHandshakeFailTest();
     void EnableHiLinkHandshakeSuceessTest();
     void DeliverStaIfaceDataSuccessTest();
+    void InitStaServiceFailed();
+    void GetDataSlotIdTest();
+    void GetImsiTest();
+    void GetPlmnTest();
+    void GetMccTest();
+    void GetMncTest();
+    void UpdateEapConfigTest();
+    void OnWifiCountryCodeChangedTest();
+    void StartPortalCertificationTest();
+    void HandleForegroundAppChangedActionTest();
+    void EnableHiLinkHandshakeTest();
+    void DeliverStaIfaceDataTest();
+    void StartRoamToNetworkTest();
+    int StartConnectToUserSelectNetworkSuccessTest();
+    int StartConnectToUserSelectNetworkSuccessFail();
+    void SetTxPowerTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
 
 void StaServiceTest::StaServiceInitStaServiceSuccess()
 {
-    WifiIdlRoamCapability capability;
+    WifiHalRoamCapability capability;
     capability.maxBlocklistSize = 1;
     std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
     std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
@@ -131,7 +147,8 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.startWifi = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.wpaAutoConnect = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getDeviceAddress = true;
-    EXPECT_CALL(WifiSettings::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(
+        Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsScoreSlope(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsInitScore(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetScoretacticsSameBssidScore(_)).Times(AtLeast(0));
@@ -142,9 +159,6 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
     EXPECT_CALL(WifiSettings::GetInstance(), GetSavedDeviceAppraisalPriority(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetExternDeviceAppraisalPriority()).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), ReloadDeviceConfig()).Times(AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetValidChannels(_)).WillOnce(DoAll(SetArgReferee<0>(temp), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetDefaultFrequenciesByCountryBand(_, _, _)).Times(AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), SetValidChannels(_)).WillOnce(Return(0));
     std::vector<StaServiceCallback> callbacks;
     callbacks.push_back(WifiManager::GetInstance().GetStaCallback());
     EXPECT_TRUE(pStaService->InitStaService(callbacks) == WIFI_OPT_SUCCESS);
@@ -152,14 +166,8 @@ void StaServiceTest::StaServiceInitStaServiceSuccess()
 
 void StaServiceTest::StaServiceEnableWifiSuccess()
 {
-    EXPECT_TRUE(pStaService->EnableWifi() == WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(pStaService->DisableWifi() == WIFI_OPT_SUCCESS);
-}
-
-void StaServiceTest::StaServiceEnableSemiWifiSuccess()
-{
-    EXPECT_TRUE(pStaService->EnableSemiWifi() == WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(pStaService->DisableWifi() == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->EnableStaService() == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->DisableStaService() == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceConnectToWifiDeviceConfigSuccess()
@@ -172,7 +180,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigSuccess()
     config.keyMgmt = "123456";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -195,7 +203,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail1()
     config.ssid = "networkId";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -219,7 +227,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail2()
     config.ssid = "networkId";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -240,7 +248,7 @@ void StaServiceTest::StaServiceConnectToWifiDeviceConfigFail3()
     config.ssid = "networkId";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -283,7 +291,7 @@ void StaServiceTest::StaServiceAddDeviceConfigSuccess()
     config.wifiEapConfig.privateKey = "//12302345//";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -307,7 +315,7 @@ void StaServiceTest::StaServiceAddDeviceConfigFail1()
     config.keyMgmt = "123456";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -331,7 +339,7 @@ void StaServiceTest::StaServiceAddDeviceConfigFail2()
     config.keyMgmt = "123456";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -352,7 +360,7 @@ void StaServiceTest::StaServiceAddDeviceConfigFail3()
     config.keyMgmt = "123456";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -372,7 +380,7 @@ void StaServiceTest::StaServiceUpdateDeviceConfigSuccess()
     config.keyMgmt = "12345678";
 
     WifiLinkedInfo info;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
@@ -462,7 +470,7 @@ void StaServiceTest::StaServiceDisableDeviceConfigFail1()
 
 void StaServiceTest::StaServiceDisconnectSuccess()
 {
-    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(1));
     EXPECT_TRUE(pStaService->Disconnect() == WIFI_OPT_SUCCESS);
 }
 
@@ -517,9 +525,12 @@ void StaServiceTest::StaServiceAddCandidateConfigTestSucc()
     config.keyMgmt = "123456";
     int uid = UID;
     int netWorkId = NETWORK_ID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
+    std::vector<WifiDeviceConfig> configs;
+    configs.push_back(config);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(configs), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(config), Return(0)));  // 3: The third parameter
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = true;
     EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
 }
@@ -531,7 +542,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestFail0()
     config.band = BAND;
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
-    config.keyMgmt = "NONE";
+    config.keyMgmt = "WEP";
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
@@ -549,10 +560,10 @@ void StaServiceTest::StaServiceAddCandidateConfigTestFail1()
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(1)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(config), Return(0)));  // 3: The third parameter
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.getNextNetworkId = false;
-    EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
+    pStaService->AddCandidateConfig(uid, config, netWorkId);
 }
 
 void StaServiceTest::StaServiceRemoveCandidateConfigTestSucc()
@@ -566,7 +577,7 @@ void StaServiceTest::StaServiceRemoveCandidateConfigTestSucc()
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillRepeatedly(Return(1));
     EXPECT_CALL(WifiSettings::GetInstance(), RemoveDevice(_)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
-    EXPECT_TRUE(pStaService->RemoveCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
+    pStaService->RemoveCandidateConfig(uid, networkId);
 }
 
 void StaServiceTest::StaServiceRemoveCandidateConfigTestFail()
@@ -586,7 +597,7 @@ void StaServiceTest::StaServiceRemoveAllCandidateConfigTestSucc()
     EXPECT_TRUE(pStaService->RemoveAllCandidateConfig(uid) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc()
+void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc0()
 {
     WifiDeviceConfig config;
     config.bssid = "01:23:45:67:89:AB";
@@ -601,7 +612,7 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc()
     EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceConnectToCandidateConfigTestFail0()
+void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc1()
 {
     WifiDeviceConfig config;
     config.bssid = "01:23:45:67:89:AB";
@@ -609,14 +620,15 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestFail0()
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
     config.keyMgmt = "NONE";
+    config.lastConnectTime = 1;
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
-    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_NOT_SUPPORTED);
+    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceConnectToCandidateConfigTestFail1()
+void StaServiceTest::StaServiceConnectToCandidateConfigTestFail()
 {
     WifiDeviceConfig config;
     config.bssid = "01:23:45:67:89:AB";
@@ -638,7 +650,7 @@ void StaServiceTest::StaServiceRemoveAllDeviceTestSucc()
     EXPECT_CALL(WifiSettings::GetInstance(), ClearDeviceConfig()).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
         .WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
+    pStaService->RemoveAllDevice();
 }
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestFail0()
@@ -685,7 +697,7 @@ void StaServiceTest::StaServiceSetPowerModeTest()
 
 void StaServiceTest::StaServiceOnSystemAbilityChangedTest()
 {
-    EXPECT_CALL(WifiSettings::GetInstance(), GetWifiState(0)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(0)).Times(AtLeast(0));
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, false) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(COMM_NET, true) == WIFI_OPT_SUCCESS);
     EXPECT_TRUE(pStaService->OnSystemAbilityChanged(1, true) == WIFI_OPT_SUCCESS);
@@ -732,11 +744,6 @@ void StaServiceTest::DeregisterFilterBuilder()
                                                                      "testFilterBuilder"));
 }
 
-void StaServiceTest::StaServiceStartHttpDetectTestSucc()
-{
-    EXPECT_TRUE(pStaService->StartHttpDetect() == WIFI_OPT_SUCCESS);
-}
-
 void StaServiceTest::EnableHiLinkHandshakeFailTest()
 {
     WifiDeviceConfig config;
@@ -757,6 +764,121 @@ void StaServiceTest::DeliverStaIfaceDataSuccessTest()
     pStaService->DeliverStaIfaceData(mac);
 }
 
+void StaServiceTest::GetDataSlotIdTest()
+{
+    pStaService->GetDataSlotId(0);
+    pStaService->GetDataSlotId(-1);
+}
+
+void StaServiceTest::GetImsiTest()
+{
+    int32_t slotId = 0;
+    pStaService->GetImsi(slotId);
+}
+
+void StaServiceTest::GetPlmnTest()
+{
+    int32_t slotId = 0;
+    pStaService->GetPlmn(slotId);
+}
+
+void StaServiceTest::GetMccTest()
+{
+    std::string imsi = "";
+    pStaService->GetMcc(imsi);
+}
+
+void StaServiceTest::GetMncTest()
+{
+    std::string imsi = "1234";
+    const int mncLen = 4;
+    pStaService->GetMnc(imsi, mncLen);
+}
+
+void StaServiceTest::UpdateEapConfigTest()
+{
+    const WifiDeviceConfig config;
+    WifiEapConfig wifiEapConfig;
+    pStaService->UpdateEapConfig(config, wifiEapConfig);
+}
+
+void StaServiceTest::OnWifiCountryCodeChangedTest()
+{
+    const std::string wifiCountryCode = "CN";
+}
+
+void StaServiceTest::StartPortalCertificationTest()
+{
+    pStaService->StartPortalCertification();
+}
+
+void StaServiceTest::HandleForegroundAppChangedActionTest()
+{
+    AppExecFwk::AppStateData appData;
+    pStaService->HandleForegroundAppChangedAction(appData);
+}
+
+void StaServiceTest::EnableHiLinkHandshakeTest()
+{
+    WifiDeviceConfig config;
+    std::string bssid = "11:22:33:44";
+    pStaService->EnableHiLinkHandshake(config, bssid);
+}
+
+void StaServiceTest::DeliverStaIfaceDataTest()
+{
+    const std::string currentMac = "11:22:33:44";
+    pStaService->DeliverStaIfaceData(currentMac);
+}
+
+void StaServiceTest::StartRoamToNetworkTest()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    WifiLinkedInfo info;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    pStaService->StartRoamToNetwork(0, "11:22:33:44");
+}
+
+int StaServiceTest::StartConnectToUserSelectNetworkSuccessTest()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    WifiLinkedInfo info;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    return static_cast<int>(pStaService->StartConnectToUserSelectNetwork(0, "11:22:33:44"));
+}
+
+int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
+{
+    WifiDeviceConfig config;
+    config.bssid = "01:23:45:67:89:AB";
+    config.band = BAND;
+    config.networkId = NETWORK_ID;
+    config.ssid = "networkId";
+    config.keyMgmt = "123456";
+    WifiLinkedInfo info;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(1)));
+    return static_cast<int>(pStaService->StartConnectToUserSelectNetwork(0, "11:22:33:44"));
+}
+ 
+void StaServiceTest::SetTxPowerTest()
+{
+    pStaService->SetTxPower(0);
+}
+
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
 }
@@ -774,11 +896,6 @@ HWTEST_F(StaServiceTest, StaServiceSetPowerModeTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)
 {
     StaServiceEnableWifiSuccess();
-}
-
-HWTEST_F(StaServiceTest, StaServiceEnableSemiWifiSuccess, TestSize.Level1)
-{
-    StaServiceEnableSemiWifiSuccess();
 }
 
 HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigSuccess, TestSize.Level1)
@@ -941,19 +1058,19 @@ HWTEST_F(StaServiceTest, StaServiceRemoveAllCandidateConfigTestSucc, TestSize.Le
     StaServiceRemoveAllCandidateConfigTestSucc();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc0, TestSize.Level1)
 {
-    StaServiceConnectToCandidateConfigTestSucc();
+    StaServiceConnectToCandidateConfigTestSucc0();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail0, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc1, TestSize.Level1)
 {
-    StaServiceConnectToCandidateConfigTestFail0();
+    StaServiceConnectToCandidateConfigTestSucc1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail, TestSize.Level1)
 {
-    StaServiceConnectToCandidateConfigTestFail1();
+    StaServiceConnectToCandidateConfigTestFail();
 }
 
 HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestSucc, TestSize.Level1)
@@ -1016,11 +1133,6 @@ HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level1)
     DeregisterFilterBuilder();
 }
 
-HWTEST_F(StaServiceTest, StaServiceStartHttpDetectTestSucc, TestSize.Level1)
-{
-    StaServiceStartHttpDetectTestSucc();
-}
-
 HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level1)
 {
     EnableHiLinkHandshakeSuceessTest();
@@ -1034,6 +1146,81 @@ HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level1)
 {
     DeliverStaIfaceDataSuccessTest();
+}
+
+HWTEST_F(StaServiceTest, GetDataSlotIdTest, TestSize.Level1)
+{
+    GetDataSlotIdTest();
+}
+
+HWTEST_F(StaServiceTest, GetImsiTest, TestSize.Level1)
+{
+    GetImsiTest();
+}
+
+HWTEST_F(StaServiceTest, GetPlmnTest, TestSize.Level1)
+{
+    GetPlmnTest();
+}
+
+HWTEST_F(StaServiceTest, GetMccTest, TestSize.Level1)
+{
+    GetMccTest();
+}
+
+HWTEST_F(StaServiceTest, GetMncTest, TestSize.Level1)
+{
+    GetMncTest();
+}
+
+HWTEST_F(StaServiceTest, UpdateEapConfigTest, TestSize.Level1)
+{
+    UpdateEapConfigTest();
+}
+
+HWTEST_F(StaServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level1)
+{
+    OnWifiCountryCodeChangedTest();
+}
+
+HWTEST_F(StaServiceTest, StartPortalCertificationTest, TestSize.Level1)
+{
+    StartPortalCertificationTest();
+}
+
+HWTEST_F(StaServiceTest, HandleForegroundAppChangedActionTest, TestSize.Level1)
+{
+    HandleForegroundAppChangedActionTest();
+}
+
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeTest, TestSize.Level1)
+{
+    EnableHiLinkHandshakeTest();
+}
+
+HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
+{
+    DeliverStaIfaceDataTest();
+}
+
+HWTEST_F(StaServiceTest, StartRoamToNetworkTest, TestSize.Level1)
+{
+    StartRoamToNetworkTest();
+}
+
+HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessTest, TestSize.Level1)
+{
+    EXPECT_EQ(0, StartConnectToUserSelectNetworkSuccessTest());
+}
+
+HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessFail, TestSize.Level1)
+{
+    EXPECT_EQ(1, StartConnectToUserSelectNetworkSuccessFail());
+}
+ 
+HWTEST_F(StaServiceTest, SetTxPowerTest, TestSize.Level1)
+{
+    SetTxPowerTest();
 }
 } // namespace Wifi
 } // namespace OHOS

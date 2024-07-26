@@ -69,6 +69,7 @@ ohos_unittest("wifi_hal_unittest") {
     "wifi_hal_wpa_p2p_test.cpp",
     "wifi_hal_wpa_sta_test.cpp",
     "wifi_wpa_common_test.cpp",
+    "wifi_wpa_hal_test.cpp",
   ]
 
   include_dirs = [
@@ -103,7 +104,10 @@ ohos_unittest("wifi_hal_unittest") {
     "hilog:libhilog",
   ]
 
-  defines = [ "AP_INTF=\"$wifi_feature_with_ap_intf\"" ]
+  defines = [
+    "AP_INTF=\"$wifi_feature_with_ap_intf\"",
+    "__UT__",
+  ]
 
   if (wifi_feature_with_local_random_mac) {
     defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]

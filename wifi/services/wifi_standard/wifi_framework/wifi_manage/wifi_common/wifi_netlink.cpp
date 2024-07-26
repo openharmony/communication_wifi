@@ -101,10 +101,10 @@ int32_t WifiNetLink::SendCmdKernel(int32_t sockFd, int32_t cmd, int32_t flag)
         WIFI_LOGE("SendCmdKernel memset_s failed stMessage.");
         return ret;
     }
-    stMessage.hdr.nlmsg_len = NLMSG_LENGTH(0);
+    stMessage.hdr.nlmsg_len = static_cast<unsigned int>(NLMSG_LENGTH(0));
     stMessage.hdr.nlmsg_flags = flag;
     stMessage.hdr.nlmsg_type = cmd;
-    stMessage.hdr.nlmsg_pid = getpid();
+    stMessage.hdr.nlmsg_pid = static_cast<unsigned int>(getpid());
     tv.tv_sec = 1;
     tv.tv_usec = 0;
     if (setsockopt(sockFd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) < 0) {
@@ -137,7 +137,8 @@ int32_t WifiNetLink::SendQoeCmd(int32_t cmd, int32_t arg)
     int32_t ret = -1;
     sockFd = socket(PF_NETLINK, SOCK_RAW, NETLINK_WIFIPRO_EVENT_NL);
     if (sockFd < 0) {
-        WIFI_LOGE("%{public}s: open monitor_fd error, sockFd: %{public}d", __FUNCTION__, sockFd);
+        WIFI_LOGE("%{public}s: open monitor_fd error, sockFd: %{public}d, errno: %{public}d",
+            __FUNCTION__, sockFd, errno);
         return ret;
     }
     switch (cmd) {

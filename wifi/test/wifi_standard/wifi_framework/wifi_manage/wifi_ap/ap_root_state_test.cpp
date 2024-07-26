@@ -51,7 +51,7 @@ public:
 
 HWTEST_F(ApRootState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 {
-    InternalMessage *msg = new InternalMessage();
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
 
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT));
     EXPECT_TRUE(pApRootState->ExecuteStateMsg(msg));
@@ -61,7 +61,6 @@ HWTEST_F(ApRootState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
     EXPECT_TRUE(pApRootState->ExecuteStateMsg(msg));
-    delete msg;
     msg = nullptr;
 }
 

@@ -19,6 +19,8 @@
 #include "securec.h"
 #include "wifi_protect_manager.h"
 #include "wifi_logger.h"
+#include "wifi_msg.h"
+#include "mock_wifi_settings.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -52,6 +54,14 @@ HWTEST_F(WifiProtectTest, InitWifiProtectTest, TestSize.Level1)
 HWTEST_F(WifiProtectTest, OnAppDiedTest, TestSize.Level1)
 {
     WIFI_LOGI("OnAppDiedTest enter!");
+
+    // Add simulated wifi connection results
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = OHOS::Wifi::ConnState::CONNECTED;
+    wifiLinkedInfo.bssid = "11:22:33:44:55:66";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
     std::shared_ptr<WifiProtect> pProtect = std::make_shared<WifiProtect>(WifiProtectType::WIFI_PROTECT_COMMON,
     WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF, "wifiprotect");
     WifiProtectManager::GetInstance().mWifiProtects.push_back(pProtect);

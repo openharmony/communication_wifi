@@ -122,7 +122,7 @@ void WifiP2pCallbackProxy::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &d
         return;
     }
     data.WriteInt32(0);
-    int size = devices.size();
+    int size = static_cast<int>(devices.size());
     data.WriteInt32(size);
     for (int i = 0; i < size; ++i) {
         WriteWifiP2pDeviceData(data, devices[i]);
@@ -170,7 +170,7 @@ void WifiP2pCallbackProxy::OnP2pServicesChanged(const std::vector<WifiP2pService
         return;
     }
     data.WriteInt32(0);
-    int size = srvInfo.size();
+    int size = static_cast<int>(srvInfo.size());
     data.WriteInt32(size);
     for (int i = 0; i < size; ++i) {
         data.WriteCString(srvInfo[i].GetServiceName().c_str());

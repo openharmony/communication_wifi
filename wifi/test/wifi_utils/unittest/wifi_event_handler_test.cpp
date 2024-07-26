@@ -41,5 +41,11 @@ HWTEST_F(WifiEventHandlerTest, RemoveAsyncTaskTest, TestSize.Level1)
 {
     testEventHandler->RemoveAsyncTask("callback");
 }
+
+HWTEST_F(WifiEventHandlerTest, PostSyncTimeOutTaskTest, TestSize.Level1)
+{
+    std::function<void()> callback = EventHandlerCallback;
+    WifiEventHandler::PostSyncTimeOutTask(EventHandlerCallback);
+}
 }  // namespace Wifi
 }  // namespace OHOS

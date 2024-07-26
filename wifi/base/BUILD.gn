@@ -20,6 +20,8 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
+  "security_utils/src/wifi_openssl_utils.cpp",
+  "shared_util/wifi_watchdog_utils.cpp",
   "state_machine/src/handler.cpp",
   "state_machine/src/internal_message.cpp",
   "state_machine/src/message_queue.cpp",
@@ -29,8 +31,10 @@ local_base_sources = [
 
 local_base_include_dirs = [
   "$WIFI_ROOT_DIR/base/cRPC/include",
+  "$WIFI_ROOT_DIR/base/security_utils/include",
   "$WIFI_ROOT_DIR/base/state_machine/include",
   "$WIFI_ROOT_DIR/base/inner_api",
+  "$WIFI_ROOT_DIR/base/shared_util",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/frameworks/native/c_adapter/inc",
@@ -53,16 +57,23 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     ]
 
-    external_deps = [ "hilog_lite:hilog_shared" ]
+    external_deps = [
+      "hilog_lite:hilog_shared",
+      "openssl:libcrypto_shared",
+      "openssl:libssl_shared",
+    ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
 
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -79,16 +90,22 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     ]
 
-    external_deps = [ "hilog_lite:hilog_shared" ]
+    external_deps = [
+      "hilog_lite:hilog_shared",
+      "openssl:libcrypto_shared",
+      "openssl:libssl_shared",
+    ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
-
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -123,18 +140,28 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
+    defines = []
 
     external_deps = [
       "c_utils:utils",
+      "hicollie:libhicollie",
       "hilog:libhilog",
+      "openssl:libcrypto_shared",
+      "openssl:libssl_shared",
     ]
-
-    cflags_cc = [
+    if (wifi_ffrt_enable) {
+      external_deps += [ "ffrt:libffrt" ]
+      defines += [ "WIFI_FFRT_ENABLE" ]
+    }
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]
@@ -167,18 +194,28 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
+    defines = []
 
     external_deps = [
       "c_utils:utils",
+      "hicollie:libhicollie",
       "hilog:libhilog",
+      "openssl:libcrypto_shared",
+      "openssl:libssl_shared",
     ]
-
-    cflags_cc = [
+    if (wifi_ffrt_enable) {
+      external_deps += [ "ffrt:libffrt" ]
+      defines += [ "WIFI_FFRT_ENABLE" ]
+    }
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]

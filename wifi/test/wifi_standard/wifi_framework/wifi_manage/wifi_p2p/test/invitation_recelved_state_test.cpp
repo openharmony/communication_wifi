@@ -50,14 +50,14 @@ public:
 public:
     void AddSaveP2pConfig()
     {
-        InternalMessage msg;
-        msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN));
         WifiP2pTempDiscEvent procDisc;
         WifiP2pDevice device;
         device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
         procDisc.SetDevice(device);
-        msg.SetMessageObj(procDisc);
-        pGroupFormedState->ExecuteStateMsg(&msg);
+        msg->SetMessageObj(procDisc);
+        pGroupFormedState->ExecuteStateMsg(msg);
     }
     std::unique_ptr<GroupFormedState> pGroupFormedState;
     std::unique_ptr<InvitationReceivedState> pInvitationReceivedState;
@@ -78,27 +78,27 @@ HWTEST_F(InvitationReceivedStateTest, GoOutState, TestSize.Level1)
 
 HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg1, TestSize.Level1)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     AddSaveP2pConfig();
     std::string inputPin;
-    msg.SetMessageObj(inputPin);
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_FAILED));
-    pInvitationReceivedState->ExecuteStateMsg(&msg);
+    msg->SetMessageObj(inputPin);
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pStopFind()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    pInvitationReceivedState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
-    pInvitationReceivedState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
+    pInvitationReceivedState->ExecuteStateMsg(msg);
 }
 
 HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg3, TestSize.Level1)
 {
-    InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
-    pInvitationReceivedState->ExecuteStateMsg(&msg);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
+    pInvitationReceivedState->ExecuteStateMsg(msg);
 }
 }  // namespace Wifi
 }  // namespace OHOS

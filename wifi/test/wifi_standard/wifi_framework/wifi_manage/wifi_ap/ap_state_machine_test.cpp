@@ -18,6 +18,7 @@
 #include "ap_define.h"
 #include "ap_state_machine.h"
 #include "wifi_log.h"
+#include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_pendant.h"
 #include "mock_wifi_ap_hal_interface.h"
@@ -36,7 +37,7 @@ public:
     virtual void SetUp()
     {
         const int SLEEP_TIME = 20;
-        EXPECT_CALL(WifiSettings::GetInstance(), SetThreadStatusFlag(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetThreadStatusFlag(_)).Times(AtLeast(0));
         pMockPendant = new MockPendant();
         pMockApStationsManager = &(pMockPendant->GetMockApStationsManager());
         pMockApRootState = &(pMockPendant->GetMockApRootState());
@@ -49,7 +50,7 @@ public:
 
         RegisterApServiceCallbacks();
         EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
-            .WillOnce(Return(WifiErrorNo::WIFI_IDL_OPT_OK));
+            .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
         usleep(SLEEP_TIME);
     }
     virtual void TearDown()
@@ -84,12 +85,14 @@ public:
 public:
     void WrapOnApStateChange(ApState state)
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)), 0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)), 0)).WillOnce(
+            Return(0));
         pApStateMachine->OnApStateChange(state);
     }
     void WrapOnApStateChangeFail(ApState state)
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)), 0)).WillOnce(Return(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)), 0)).WillOnce(
+            Return(1));
         pApStateMachine->OnApStateChange(state);
     }
 

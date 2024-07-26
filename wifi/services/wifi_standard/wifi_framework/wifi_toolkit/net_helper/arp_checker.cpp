@@ -50,5 +50,10 @@ bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp, uint64_t &ti
 {
     return m_dhcpArpChecker.DoArpCheck(timeoutMillis, isFillSenderIp, timeCost);
 }
+
+void ArpChecker::GetGwMacAddrList(int32_t timeoutMillis, bool isFillSenderIp, std::vector<std::string>& gwMacLists)
+{
+    m_dhcpArpChecker.GetGwMacAddrList(timeoutMillis, isFillSenderIp, gwMacLists);
+}
 }
 }

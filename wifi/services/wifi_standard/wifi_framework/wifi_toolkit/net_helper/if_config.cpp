@@ -29,7 +29,7 @@
 #include "ip_tools.h"
 #include "ipv4_address.h"
 #include "ipv6_address.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -61,7 +61,7 @@ IfConfig::~IfConfig()
  */
 bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
 {
-    int argvSize = vecCommandArg.size();
+    int argvSize = static_cast<int>(vecCommandArg.size());
     if (argvSize > MAX_COMMAND_ARG) {
         LOGE("IfConfig ExecCommand vecCommandArg size invalid.");
         return false;
@@ -311,8 +311,8 @@ int IfConfig::SetIfDnsAndRoute(const DhcpResult *dhcpResult, int ipType, int ins
         dhcpResult->strOptRouter1,
         dhcpResult->strOptDns1,
         dhcpResult->strOptDns2);
-    SetNetDns(WifiSettings::GetInstance().GetStaIfaceName(), dhcpResult->strOptDns1, dhcpResult->strOptDns2);
-    AddIfRoute(WifiSettings::GetInstance().GetStaIfaceName(), dhcpResult->strOptClientId, dhcpResult->strOptSubnet,
+    SetNetDns(WifiConfigCenter::GetInstance().GetStaIfaceName(), dhcpResult->strOptDns1, dhcpResult->strOptDns2);
+    AddIfRoute(WifiConfigCenter::GetInstance().GetStaIfaceName(), dhcpResult->strOptClientId, dhcpResult->strOptSubnet,
         dhcpResult->strOptRouter1, ipType);
     LOGI("set dns and route finished!");
     return 0;

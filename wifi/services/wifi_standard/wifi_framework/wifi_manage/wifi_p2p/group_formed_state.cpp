@@ -18,6 +18,7 @@
 #include "p2p_state_machine.h"
 #include "wifi_p2p_temp_disc_event.h"
 #include "wifi_logger.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupFormedState");
 
@@ -32,6 +33,9 @@ GroupFormedState::GroupFormedState(
 void GroupFormedState::GoInState()
 {
     WIFI_LOGI("             GoInState");
+    if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
+        WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GC, P2P_ON);
+    }
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
 }
 
@@ -78,12 +82,14 @@ void GroupFormedState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &GroupFormedState::ProcessCmdCancelConnect));
     mProcessFunMap.insert(
         std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, &GroupFormedState::ProcessCmdChSwitch));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IP_ADDRESS, &GroupFormedState::ProcessCmdSetIpAddress));
 }
 
-bool GroupFormedState::ProcessCmdConnect(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdConnect(const InternalMessagePtr msg) const
 {
     WifiP2pConfigInternal config;
-    if (!msg.GetMessageObj(config)) {
+    if (!msg->GetMessageObj(config)) {
         WIFI_LOGE("Connect:Failed to obtain config info.");
         return EXECUTED;
     }
@@ -106,10 +112,10 @@ bool GroupFormedState::ProcessCmdConnect(const InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessProvDiscEvt(const InternalMessage &msg) const
+bool GroupFormedState::ProcessProvDiscEvt(const InternalMessagePtr msg) const
 {
     WifiP2pTempDiscEvent procDisc;
-    if (!msg.GetMessageObj(procDisc) || !procDisc.GetDevice().IsValid()) {
+    if (!msg->GetMessageObj(procDisc) || !procDisc.GetDevice().IsValid()) {
         WIFI_LOGE("Prov disc :Failed to obtain config info.");
         return EXECUTED;
     }
@@ -118,7 +124,7 @@ bool GroupFormedState::ProcessProvDiscEvt(const InternalMessage &msg) const
     p2pStateMachine.savedP2pConfig.SetDeviceAddress(procDisc.GetDevice().GetDeviceAddress());
 
     WpsInfo wps;
-    switch (static_cast<P2P_STATE_MACHINE_CMD>(msg.GetMessageName())) {
+    switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN: {
             wps.SetWpsMethod(WpsMethod::WPS_METHOD_KEYPAD);
             break;
@@ -143,34 +149,34 @@ bool GroupFormedState::ProcessProvDiscEvt(const InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessGroupStartedEvt(const InternalMessage &msg) const
+bool GroupFormedState::ProcessGroupStartedEvt(const InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessCmdDiscoverPeer(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdDiscoverPeer(const InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.HandlerDiscoverPeers();
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessGroupRemovedEvt(const InternalMessage &msg) const
+bool GroupFormedState::ProcessGroupRemovedEvt(const InternalMessagePtr msg) const
 {
     /**
      * The group has been removed. The possible cause is that an exception occurs during the connection.
      */
     WIFI_LOGI("The group has been removed.");
-    p2pStateMachine.DelayMessage(&msg);
+    p2pStateMachine.DelayMessage(msg);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessCmdRemoveGroupClient(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdRemoveGroupClient(const InternalMessagePtr msg) const
 {
     GcInfo info;
-    if (!msg.GetMessageObj(info)) {
+    if (!msg->GetMessageObj(info)) {
         return EXECUTED;
     }
     std::string deviceMac = info.mac;
@@ -195,30 +201,30 @@ bool GroupFormedState::ProcessCmdRemoveGroupClient(const InternalMessage &msg) c
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessCmdRemoveGroup(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdRemoveGroup(const InternalMessagePtr msg) const
 {
-    p2pStateMachine.DelayMessage(&msg);
+    p2pStateMachine.DelayMessage(msg);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessCmdDeleteGroup(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdDeleteGroup(const InternalMessagePtr msg) const
 {
-    p2pStateMachine.DelayMessage(&msg);
+    p2pStateMachine.DelayMessage(msg);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
     return EXECUTED;
 }
-bool GroupFormedState::ProcessCmdDisable(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdDisable(const InternalMessagePtr msg) const
 {
-    p2pStateMachine.DelayMessage(&msg);
+    p2pStateMachine.DelayMessage(msg);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessDeviceLostEvt(const InternalMessage &msg) const
+bool GroupFormedState::ProcessDeviceLostEvt(const InternalMessagePtr msg) const
 {
     WifiP2pDevice device;
-    if (!msg.GetMessageObj(device) || !device.IsValid()) {
+    if (!msg->GetMessageObj(device) || !device.IsValid()) {
         WIFI_LOGE("Device lost:Failed to obtain client information.");
         return EXECUTED;
     }
@@ -230,10 +236,10 @@ bool GroupFormedState::ProcessDeviceLostEvt(const InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessDisconnectEvt(const InternalMessage &msg) const
+bool GroupFormedState::ProcessDisconnectEvt(const InternalMessagePtr msg) const
 {
     WifiP2pDevice device;
-    if (!msg.GetMessageObj(device) || !device.IsValid()) {
+    if (!msg->GetMessageObj(device) || !device.IsValid()) {
         WIFI_LOGE("Disconnect:Failed to obtain client information.");
         return EXECUTED;
     }
@@ -264,15 +270,15 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
+bool GroupFormedState::ProcessConnectEvt(const InternalMessagePtr msg) const
 {
     WifiP2pDevice device;
-    if (!msg.GetMessageObj(device) || !device.IsValid()) {
+    if (!msg->GetMessageObj(device) || !device.IsValid()) {
         WIFI_LOGE("Connect:Failed to obtain client information.");
         return EXECUTED;
     }
 
-    if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
         WIFI_LOGE("fail to set GO Idle time.");
     }
@@ -294,16 +300,16 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessCmdCancelConnect(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdCancelConnect(const InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pCancelConnect, ErrCode::WIFI_OPT_FAILED);
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdDiscServices(const InternalMessagePtr msg) const
 {
-    WIFI_LOGI("recv CMD: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
     WIFI_LOGD("p2p_enabled_state recv CMD_DISCOVER_SERVICES");
 
     p2pStateMachine.CancelSupplicantSrvDiscReq();
@@ -316,7 +322,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
 
     WifiErrorNo retCode =
         WifiP2PHalInterface::GetInstance().ReqServiceDiscovery(device.GetDeviceAddress(), request.GetTlv(), reqId);
-    if (WifiErrorNo::WIFI_IDL_OPT_OK != retCode) {
+    if (WifiErrorNo::WIFI_HAL_OPT_OK != retCode) {
         WIFI_LOGI("Failed to schedule the P2P service discovery request.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -324,7 +330,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
     p2pStateMachine.serviceManager.SetQueryId(reqId);
 
     retCode = WifiP2PHalInterface::GetInstance().P2pFind(DISC_TIMEOUT_S);
-    if (retCode != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFind failed, ErrorCode: %{public}d", static_cast<int>(retCode));
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverServices, ErrCode::WIFI_OPT_FAILED);
         return EXECUTED;
@@ -336,7 +342,7 @@ bool GroupFormedState::ProcessCmdDiscServices(const InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool GroupFormedState::ProcessCmdStartListen(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdStartListen(const InternalMessagePtr msg) const
 {
     if (WifiP2PHalInterface::GetInstance().P2pFlush()) {
         WIFI_LOGW("Unexpected results in p2p flush.");
@@ -351,8 +357,8 @@ bool GroupFormedState::ProcessCmdStartListen(const InternalMessage &msg) const
         return EXECUTED;
     }
 
-    size_t period = msg.GetParam1();
-    size_t interval = msg.GetParam2();
+    size_t period = static_cast<size_t>(msg->GetParam1());
+    size_t interval = static_cast<size_t>(msg->GetParam2());
     if (WifiP2PHalInterface::GetInstance().P2pConfigureListen(true, period, interval)) {
         WIFI_LOGE("p2p configure to start listen failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::StartP2pListen, WIFI_OPT_FAILED);
@@ -363,7 +369,7 @@ bool GroupFormedState::ProcessCmdStartListen(const InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool GroupFormedState::ExecuteStateMsg(InternalMessage *msg)
+bool GroupFormedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("fatal error!");
@@ -374,17 +380,17 @@ bool GroupFormedState::ExecuteStateMsg(InternalMessage *msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(*msg)) {
+    if ((this->*(iter->second))(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;
     }
 }
 
-bool GroupFormedState::ProcessCmdChSwitch(const InternalMessage &msg) const
+bool GroupFormedState::ProcessCmdChSwitch(const InternalMessagePtr msg) const
 {
     WifiP2pGroupInfo group;
-    if (!msg.GetMessageObj(group)) {
+    if (!msg->GetMessageObj(group)) {
         WIFI_LOGE("Failed to obtain the group information.");
         return EXECUTED;
     }
@@ -392,6 +398,20 @@ bool GroupFormedState::ProcessCmdChSwitch(const InternalMessage &msg) const
     int freq = group.GetFrequency();
     WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
     currGroup.SetFrequency(freq);
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
+    return EXECUTED;
+}
+
+bool GroupFormedState::ProcessCmdSetIpAddress(const InternalMessagePtr msg) const
+{
+    IpAddrInfo ipInfo;
+    if (!msg->GetMessageObj(ipInfo)) {
+        WIFI_LOGE("Failed to obtain the group information.");
+        return EXECUTED;
+    }
+    WIFI_LOGI("set ip address");
+    WifiP2pGroupInfo currGroup = groupManager.GetCurrentGroup();
+    currGroup.SetGcIpAddress(ipInfo.ip);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGroup);
     return EXECUTED;
 }

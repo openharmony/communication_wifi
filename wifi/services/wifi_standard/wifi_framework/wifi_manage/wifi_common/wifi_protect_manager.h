@@ -134,7 +134,6 @@ private:
     std::shared_ptr<WifiProtect> RemoveProtect(const std::string &name);
 #ifndef OHOS_ARCH_LITE
     int GetFgLowlatyProtectCount();
-    bool IsForegroundApplication(const std::string &BundleName);
 #endif
 private:
     std::vector<std::shared_ptr<WifiProtect>> mWifiProtects;

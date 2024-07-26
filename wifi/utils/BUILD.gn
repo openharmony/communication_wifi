@@ -34,6 +34,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [ "bounds_checking_function:libsec_shared" ]
 
+    configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
       "-std=c++17",
       "-fno-rtti",
@@ -101,12 +102,16 @@ if (defined(ohos_lite)) {
       defines += [ "WIFI_FFRT_ENABLE" ]
     }
 
-    cflags_cc = [
+    cflags = memory_optimization_cflags
+    cflags_cc = memory_optimization_cflags_cc
+    ldflags = memory_optimization_ldflags
+
+    cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags = [
+    ldflags += [
       "-fPIC",
       "-Wl,-E",
     ]

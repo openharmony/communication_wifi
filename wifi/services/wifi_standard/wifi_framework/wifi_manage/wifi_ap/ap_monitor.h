@@ -21,7 +21,7 @@
 
 #include "wifi_ap_msg.h"
 #include "ap_define.h"
-#include "wifi_idl_struct.h"
+#include "wifi_native_struct.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -37,7 +37,7 @@ public:
      * @param cbInfo - structure stored STA infos, only MAC and action.
      * @return None
      */
-    virtual void OnStaJoinOrLeave(const WifiApConnectionNofify &cbInfo);
+    virtual void OnStaJoinOrLeave(const WifiHalApConnectionNofify &cbInfo);
 
     /* @Description  IDL called this interface when STA connected or
                      disconnected, report to state machine.
@@ -71,7 +71,7 @@ public:
      * @param handler - handler callback list
      * @return None
      */
-    virtual void RegisterHandler(const std::string &iface, const std::function<HandlerMethod> &handler);
+    virtual void RegisterHandler(const std::string &iface, const std::function<HandlerApMethod> &handler);
 
     /**
      * @Description  Unregister monitor callback handler.
@@ -92,11 +92,23 @@ public:
     virtual void SendMessage(const std::string &iface, ApStatemachineEvent msgName, int param1, int param2,
         const std::any &messageObj) const;
 
+    /**
+     * @Decription Regsit the callback function for Ap channel switch
+     * @param freq - data param
+     */
+    virtual void WpaEventApChannelSwitch(int freq) const;
+
+    /**
+     * @Decription Regsit the callback function for Ap event notify
+     * @param freq - data param
+     */
+    virtual void WpaEventApNotifyCallBack(const std::string &notifyParam) const;
+
 private:
     DISALLOW_COPY_AND_ASSIGN(ApMonitor)
 
 private:
-    std::map<std::string, std::function<HandlerMethod>> m_mapHandler;
+    std::map<std::string, std::function<HandlerApMethod>> m_mapHandler;
     std::string m_selectIfacName;
     std::set<std::string> m_setMonitorIface;
     int m_id;

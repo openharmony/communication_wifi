@@ -27,7 +27,7 @@ InvitationRequestState::InvitationRequestState(
 void InvitationRequestState::GoInState()
 {
     WIFI_LOGI("             GoInState");
-    if (WifiErrorNo::WIFI_IDL_OPT_OK == WifiP2PHalInterface::GetInstance().Invite(groupManager.GetCurrentGroup(),
+    if (WifiErrorNo::WIFI_HAL_OPT_OK == WifiP2PHalInterface::GetInstance().Invite(groupManager.GetCurrentGroup(),
         p2pStateMachine.savedP2pConfig.GetDeviceAddress())) {
         deviceManager.UpdateDeviceStatus(
             p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED);
@@ -46,7 +46,7 @@ void InvitationRequestState::GoOutState()
     WIFI_LOGI("             GoOutState");
 }
 
-bool InvitationRequestState::ExecuteStateMsg(InternalMessage *msg)
+bool InvitationRequestState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msg->GetMessageName())) {
         case P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RESULT: {

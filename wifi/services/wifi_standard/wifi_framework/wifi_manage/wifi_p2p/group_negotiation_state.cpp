@@ -19,7 +19,7 @@
 #include "wifi_logger.h"
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
-#include "wifi_settings.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupNegotiationState");
 
@@ -60,32 +60,32 @@ void GroupNegotiationState::Init()
         std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP, &GroupNegotiationState::ProcessCmdRemoveGroup));
 }
 
-bool GroupNegotiationState::ProcessNegotSucessEvt(InternalMessage &msg) const
+bool GroupNegotiationState::ProcessNegotSucessEvt(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("Negotiation success: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("Negotiation success: %{public}d", msg->GetMessageName());
     return EXECUTED;
 }
 
-bool GroupNegotiationState::ProcessGroupFormationSuccessEvt(InternalMessage &msg) const
+bool GroupNegotiationState::ProcessGroupFormationSuccessEvt(InternalMessagePtr msg) const
 {
-    WIFI_LOGI("Group formation success: %{public}d", msg.GetMessageName());
+    WIFI_LOGI("Group formation success: %{public}d", msg->GetMessageName());
     return EXECUTED;
 }
 
-bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
+bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
 {
     WifiP2pGroupInfo group;
-    if (!msg.GetMessageObj(group)) {
+    if (!msg->GetMessageObj(group)) {
         WIFI_LOGE("Failed to obtain the group information.");
         return EXECUTED;
     }
     WifiP2pLinkedInfo p2pInfo;
-    WifiSettings::GetInstance().GetP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     p2pInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
-    WifiSettings::GetInstance().SaveP2pInfo(p2pInfo);
+    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
-    group.SetCreatorUid(WifiSettings::GetInstance().GetP2pCreatorUid());
-    WifiSettings::GetInstance().SaveP2pCreatorUid(-1);
+    group.SetCreatorUid(WifiConfigCenter::GetInstance().GetP2pCreatorUid());
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(-1);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
 
     if (groupManager.GetCurrentGroup().IsGroupOwner() &&
@@ -114,12 +114,12 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
             WIFI_LOGE("failed to startup Dhcp server.");
             p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
         }
-        if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+        if (WifiErrorNo::WIFI_HAL_OPT_OK !=
             WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
             WIFI_LOGE("failed to set GO Idle time.");
         }
     } else {
-        if (WifiErrorNo::WIFI_IDL_OPT_OK !=
+        if (WifiErrorNo::WIFI_HAL_OPT_OK !=
             WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
             WIFI_LOGE("failed to set GC Idle time.");
         }
@@ -148,53 +148,53 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessage &msg) const
         }
     }
     SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
-    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_IDL_OPT_OK) {
+    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
 }
 
-bool GroupNegotiationState::ProcessGroupFormationFailEvt(InternalMessage &msg) const
+bool GroupNegotiationState::ProcessGroupFormationFailEvt(InternalMessagePtr msg) const
 {
-    int status = msg.GetParam1();
+    int status = msg->GetParam1();
     WIFI_LOGW("Group formation failure. Error code: %{public}d", status);
     return EXECUTED;
 }
 
-bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessage &msg) const
+bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessagePtr msg) const
 {
-    int status = msg.GetParam1();
+    int status = msg->GetParam1();
     WIFI_LOGE("Negotiation failure. Error code: %{public}d", status);
     WriteP2pConnectFailedHiSysEvent(status, static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-    if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+    if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
     }
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }
 
-bool GroupNegotiationState::ProcessInvitationResultEvt(InternalMessage &msg) const
+bool GroupNegotiationState::ProcessInvitationResultEvt(InternalMessagePtr msg) const
 {
-    P2pStatus status = static_cast<P2pStatus>(msg.GetParam1());
-    WIFI_LOGI("Invitation result is %{public}d", msg.GetParam1());
+    P2pStatus status = static_cast<P2pStatus>(msg->GetParam1());
+    WIFI_LOGI("Invitation result is %{public}d", msg->GetParam1());
     if (status == P2pStatus::SUCCESS) {
         WIFI_LOGI("Invitation is succeeded.");
         return EXECUTED;
     }
 
-    if (P2pStatus::UNKNOWN_P2P_GROUP == status) {
+    if (status == P2pStatus::UNKNOWN_P2P_GROUP) {
         int networkId = p2pStateMachine.savedP2pConfig.GetNetId();
         if (networkId >= 0) {
             groupManager.RemoveClientFromGroup(networkId, p2pStateMachine.savedP2pConfig.GetDeviceAddress());
         }
         p2pStateMachine.savedP2pConfig.SetNetId(-1);
         p2pStateMachine.P2pConnectByShowingPin(p2pStateMachine.savedP2pConfig);
-    } else if (P2pStatus::INFORMATION_IS_CURRENTLY_UNAVAILABLE == status) {
+    } else if (status == P2pStatus::INFORMATION_IS_CURRENTLY_UNAVAILABLE) {
         p2pStateMachine.savedP2pConfig.SetNetId(-1);
         p2pStateMachine.P2pConnectByShowingPin(p2pStateMachine.savedP2pConfig);
-    } else if (P2pStatus::NO_COMMON_CHANNELS == status) {
+    } else if (status == P2pStatus::NO_COMMON_CHANNELS) {
         WIFI_LOGE("fail:There is no common channel.");
     } else {
         p2pStateMachine.DealGroupCreationFailed();
@@ -202,18 +202,18 @@ bool GroupNegotiationState::ProcessInvitationResultEvt(InternalMessage &msg) con
     }
     return EXECUTED;
 }
-bool GroupNegotiationState::ProcessGroupRemovedEvt(InternalMessage &msg) const
+bool GroupNegotiationState::ProcessGroupRemovedEvt(InternalMessagePtr msg) const
 {
     /**
      * The group has been removed. The possible cause is that an exception occurs during the connection.
      */
-    WIFI_LOGI("Recv event: %{public}d. The group has been removed.", msg.GetMessageName());
+    WIFI_LOGI("Recv event: %{public}d. The group has been removed.", msg->GetMessageName());
     p2pStateMachine.DealGroupCreationFailed();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
 }
 
-bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
+bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessagePtr msg) const
 {
     std::string ifName = p2pStateMachine.p2pDevIface;
     if (ifName.empty()) {
@@ -231,7 +231,7 @@ bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
         p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
         ret = WifiP2PHalInterface::GetInstance().P2pFlush();
-        if (ret != WifiErrorNo::WIFI_IDL_OPT_OK) {
+        if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
             WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
         }
     }
@@ -239,7 +239,7 @@ bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessage &msg) const
     return EXECUTED;
 }
 
-bool GroupNegotiationState::ExecuteStateMsg(InternalMessage *msg)
+bool GroupNegotiationState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("fatal error!");
@@ -250,7 +250,7 @@ bool GroupNegotiationState::ExecuteStateMsg(InternalMessage *msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(*msg)) {
+    if ((this->*(iter->second))(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;

@@ -39,6 +39,7 @@ public:
 private:
     void InitHandleMap();
     void InitHandleMapEx(void);
+    void InitHandleMapEx2();
     void OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnInitWifiProtect(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -56,6 +57,7 @@ private:
     void OnConnectTo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnect2To(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnStartRoamToNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnStartConnectToUserSelectNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReConnect(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReAssociate(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisconnect(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -90,6 +92,7 @@ private:
     void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiDetailState(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetLowTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
@@ -97,8 +100,13 @@ private:
     void ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config);
     void ReadIpAddress(MessageParcel &data, WifiIpAddress &address);
     void WriteEapConfig(MessageParcel &reply, const WifiEapConfig &wifiEapConfig);
+    void BigDataWriteEapConfig(const WifiEapConfig &wifiEapConfig, std::stringstream &bigDataStream);
     void WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config);
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
+    void BigDataWriteIpAddress(const WifiIpAddress &address, std::stringstream &bigDataStream);
+    void SendBigConfig(int32_t ashmemSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
+    void SendBigConfigEx(int contentSize, std::vector<WifiDeviceConfig> &result, std::stringstream &bigDataStream);
+    void SendSmallConfig(int32_t size, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
 
 #ifndef OHOS_ARCH_LITE
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -124,6 +132,7 @@ private:
 
 private:
     HandleFuncMap handleFuncMap;
+    std::mutex deathRecipientMutex;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
     bool mSingleCallback;
 

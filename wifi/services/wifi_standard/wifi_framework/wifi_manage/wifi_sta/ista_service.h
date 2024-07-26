@@ -37,7 +37,7 @@ public:
                result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode EnableWifi() = 0;
+    virtual ErrCode EnableStaService() = 0;
     /**
      * @Description  Disable wifi
      *
@@ -46,16 +46,7 @@ public:
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode DisableWifi() = 0;
-    /**
-     * @Description  Enable semi-wifi
-     *
-     * @Output: Return operating results to Interface Service after enable semi-wifi
-               successfully through callback function instead of returning
-               result immediately.
-     * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-     */
-    virtual ErrCode EnableSemiWifi() = 0;
+    virtual ErrCode DisableStaService() = 0;
     /**
      * @Description  Connect to a new network
      *
@@ -85,6 +76,15 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) = 0;
+
+    /**
+     * @Description connect to user select ssid and bssid network
+     *
+     * @param networkId - target networkId
+     * @param bssid - target bssid
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid) = 0;
 
     /**
      * @Description  Disconnect to the network
@@ -346,13 +346,6 @@ public:
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac) = 0;
-
-    /**
-     * @Description start http detect
-     *
-	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode StartHttpDetect() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

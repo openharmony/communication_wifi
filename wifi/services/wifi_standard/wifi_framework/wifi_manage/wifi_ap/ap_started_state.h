@@ -69,7 +69,7 @@ public:
      * @param msg - processed message
      * @return HANDLED：Processed successfully    NOT_EXECUTED: Processed failed
      */
-    virtual bool ExecuteStateMsg(InternalMessage *msg) override;
+    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
 private:
     /**
@@ -145,21 +145,21 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdFail(InternalMessage &msg) const;
+    void ProcessCmdFail(InternalMessagePtr msg) const;
 
     /**
      * @Description  Process the STA connection message received by the state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdStationJoin(InternalMessage &msg);
+    void ProcessCmdStationJoin(InternalMessagePtr msg);
 
     /**
      * @Description  Process the STA disconnect message received by the state machine.
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdStationLeave(InternalMessage &msg);
+    void ProcessCmdStationLeave(InternalMessagePtr msg);
 
     /**
      * @Description  Process the hotspot configuration message of the APP
@@ -167,7 +167,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdSetHotspotConfig(InternalMessage &msg);
+    void ProcessCmdSetHotspotConfig(InternalMessagePtr msg);
 
     /**
      * @Description  Process the hotspot idle timeout message of the APP
@@ -175,7 +175,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdSetHotspotIdleTimeout(InternalMessage &msg);
+    void ProcessCmdSetHotspotIdleTimeout(InternalMessagePtr msg);
 
     /**
      * @Description  Process the hotspot configuration update result
@@ -183,7 +183,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdUpdateConfigResult(InternalMessage &msg) const;
+    void ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const;
 
     /**
      * @Description  Process the add blocklist message received by the
@@ -191,7 +191,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdAddBlockList(InternalMessage &msg) const;
+    void ProcessCmdAddBlockList(InternalMessagePtr msg) const;
 
     /**
      * @Description  Process the delete blocklist message received by the
@@ -199,7 +199,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdDelBlockList(InternalMessage &msg) const;
+    void ProcessCmdDelBlockList(InternalMessagePtr msg) const;
 
     /**
      * @Description  Process the close hotspot message received by the
@@ -207,7 +207,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdStopHotspot(InternalMessage &msg) const;
+    void ProcessCmdStopHotspot(InternalMessagePtr msg) const;
 
     /**
      * @Description  Process the disconnected STA message received by the
@@ -215,7 +215,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdDisconnectStation(InternalMessage &msg) const;
+    void ProcessCmdDisconnectStation(InternalMessagePtr msg) const;
 
     /**
      * @Description  Process the update wifi country code received by the
@@ -223,7 +223,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return None
      */
-    void ProcessCmdUpdateCountryCode(InternalMessage &msg) const;
+    void ProcessCmdUpdateCountryCode(InternalMessagePtr msg) const;
 
     /**
      * @Description update the power mode.
@@ -247,11 +247,14 @@ private:
     bool UpdatMacAddress(const std::string ssid, KeyMgmt securityType);
 
     void SetRandomMac() const;
+    bool SetCountry();
+    void ProcessCmdUpdateConfigInfo(InternalMessage &msg);
+
 private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result
     HotspotConfig m_hotspotConfig;
     WifiApNatManager mApNatManager;
-    typedef void (ApStartedState::*ProcessFun)(InternalMessage &msg) const;
+    typedef void (ApStartedState::*ProcessFun)(InternalMessagePtr msg) const;
 
     // Message processing function map of the state machine
     std::map<ApStatemachineEvent, ProcessFun> mProcessFunMap;

@@ -405,7 +405,8 @@ ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
     if (ret != WIFI_OPT_SUCCESS) {
         return ret;
     }
-    isSupported = ((tmpFeatures & feature) == feature);
+    isSupported = ((static_cast<unsigned long>(tmpFeatures) & static_cast<unsigned long>(feature)) ==
+        static_cast<unsigned long>(feature));
     return WIFI_OPT_SUCCESS;
 }
 
@@ -537,6 +538,13 @@ ErrCode WifiDeviceImpl::LimitSpeed(const int controlId, const int limitMode)
     return client_->LimitSpeed(controlId, limitMode);
 }
 
+ErrCode WifiDeviceImpl::SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetLowTxPower(wifiLowPowerParam);
+}
+
 ErrCode WifiDeviceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -570,6 +578,13 @@ ErrCode WifiDeviceImpl::StartRoamToNetwork(const int networkId, const std::strin
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->StartRoamToNetwork(networkId, bssid, isCandidate);
+}
+
+ErrCode WifiDeviceImpl::StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->StartConnectToUserSelectNetwork(networkId, bssid, isCandidate);
 }
 }  // namespace Wifi
 }  // namespace OHOS

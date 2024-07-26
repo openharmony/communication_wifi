@@ -21,9 +21,9 @@
 #include "wifi_country_code_manager.h"
 #include "core_service_client.h"
 #include "cellular_data_client.h"
+#include "wifi_notification_util.h"
 #endif
 #include "wifi_logger.h"
-#include "wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_cert_utils.h"
@@ -123,44 +123,6 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
 
     pStaMonitor->SetStateMachine(pStaStateMachine);
 
-    ChannelsTable chanTbs;
-    (void)WifiSettings::GetInstance().GetValidChannels(chanTbs);
-    if (chanTbs[BandType::BAND_2GHZ].size() == 0) {
-        std::vector<int> freqs2G;
-        std::vector<int> freqs5G;
-        int band = static_cast<int>(BandType::BAND_2GHZ);
-        WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs2G);
-        if (ret != WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("get 2g frequencies failed.");
-            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G, m_instId);
-        }
-        band = static_cast<int>(BandType::BAND_5GHZ);
-        ret = WifiStaHalInterface::GetInstance().GetSupportFrequencies(band, freqs5G);
-        if (ret != WIFI_IDL_OPT_OK) {
-            WIFI_LOGE("get 5g frequencies failed.");
-            WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, freqs5G, m_instId);
-        }
-        std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
-        std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
-        for (auto iter = supp2Gfreqs.begin(); iter != supp2Gfreqs.end(); iter++) {
-            int32_t channel = FrequencyToChannel(*iter);
-            if (channel == INVALID_FREQ_OR_CHANNEL) {
-                continue;
-            }
-            chanTbs[BandType::BAND_2GHZ].push_back(channel);
-        }
-        for (auto iter = supp5Gfreqs.begin(); iter != supp5Gfreqs.end(); iter++) {
-            int32_t channel = FrequencyToChannel(*iter);
-            if (channel == INVALID_FREQ_OR_CHANNEL) {
-                continue;
-            }
-            chanTbs[BandType::BAND_5GHZ].push_back(channel);
-        }
-        if (WifiSettings::GetInstance().SetValidChannels(chanTbs)) {
-            WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
-        }
-    }
-
     pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine, m_instId);
     if (pStaAutoConnectService == nullptr) {
         WIFI_LOGE("Alloc pStaAutoConnectService failed.\n");
@@ -182,14 +144,40 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     std::vector<StaServiceCallback> appAccelerationStaCallBacks;
     appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
     RegisterStaServiceCallback(appAccelerationStaCallBacks);
+    GetStaControlInfo();
 #endif
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::EnableWifi()
+#ifndef OHOS_ARCH_LITE
+void StaService::GetStaControlInfo()
 {
-    WIFI_LOGI("Enter EnableWifi.\n");
+    WIFI_LOGI("Enter GetStaControlInfo.");
+    std::map<std::string, std::vector<std::string>> filterMap;
+    if (WifiSettings::GetInstance().GetPackageFilterMap(filterMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetPackageFilterMap failed");
+    }
+    sta_candidate_trust_list = filterMap["sta_candidate_filter"];
+    return;
+}
+
+bool StaService::IsAppInCandidateFilterList(int uid) const
+{
+    std::string packageName;
+    GetBundleNameByUid(uid, packageName);
+    if (std::find(sta_candidate_trust_list.begin(), sta_candidate_trust_list.end(), packageName)
+        != sta_candidate_trust_list.end()) {
+        WIFI_LOGI("App is in Candidate filter list.");
+        return true;
+    }
+    return false;
+}
+#endif
+
+ErrCode StaService::EnableStaService()
+{
+    WIFI_LOGI("Enter EnableStaService.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 #ifndef OHOS_ARCH_LITE
     // notification of registration country code change
@@ -201,37 +189,19 @@ ErrCode StaService::EnableWifi()
     }
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
 #endif
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_WIFI, STA_CONNECT_MODE);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::DisableWifi() const
+ErrCode StaService::DisableStaService() const
 {
-    WIFI_LOGI("Enter DisableWifi.\n");
+    WIFI_LOGI("Enter DisableStaService.\n");
 #ifndef OHOS_ARCH_LITE
     // deregistration country code change notification
     WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_staObserver);
 #endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_WIFI);
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaService::EnableSemiWifi()
-{
-    WIFI_LOGI("Enter EnableSemiWifi.\n");
-    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-#ifndef OHOS_ARCH_LITE
-    // notification of registration country code change
-    std::string moduleName = "StaService_" + std::to_string(m_instId);
-    m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
-    if (m_staObserver == nullptr) {
-        WIFI_LOGI("m_staObserver is null\n");
-        return WIFI_OPT_FAILED;
-    }
-    WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
-#endif
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_SEMI_WIFI, STA_CONNECT_MODE);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_STA);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -248,21 +218,26 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         return WIFI_OPT_FAILED;
     }
 
-    if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
+    if (config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
         const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
         if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
-            LOGE("AddCandidateConfig unsupport open or wep key!");
+            LOGE("AddCandidateConfig unsupport wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
         }
 #else
-        LOGE("AddCandidateConfig unsupport open or wep key!");
+        LOGE("AddCandidateConfig unsupport wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
 #endif
     }
     WifiDeviceConfig tempDeviceConfig = config;
     tempDeviceConfig.uid = uid;
+#ifndef OHOS_ARCH_LITE
+    if (IsAppInCandidateFilterList(uid)) {
+        tempDeviceConfig.isShared = true;
+    }
+#endif
     netWorkId = AddDeviceConfig(tempDeviceConfig);
     return (netWorkId == INVALID_NETWORK_ID) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
 }
@@ -302,10 +277,13 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
         return WIFI_OPT_FAILED;
     }
 
-    if (config.keyMgmt == KEY_MGMT_NONE) {
-        LOGE("ConnectToCandidateConfig unsupport open or wep key!");
-        return WIFI_OPT_NOT_SUPPORTED;
+#ifndef OHOS_ARCH_LITE
+    if (config.lastConnectTime <= 0) {
+        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
+        return WIFI_OPT_SUCCESS;
     }
+#endif
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
@@ -319,16 +297,20 @@ std::string StaService::ConvertString(const std::u16string &wideText) const
 }
 
 #ifndef OHOS_ARCH_LITE
-int32_t StaService::GetDataSlotId() const
+int32_t StaService::GetDataSlotId(int32_t slotId) const
 {
-    auto slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
     int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
-    if ((slotId < 0) || (slotId >= simCount)) {
-        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotId, simCount);
+    if (slotId >= 0 && slotId < simCount) {
+        LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
+        return slotId;
+    }
+    auto slotDefaultID = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if ((slotDefaultID < 0) || (slotDefaultID >= simCount)) {
+        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotDefaultID, simCount);
         return -1;
     }
-    LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
-    return slotId;
+    LOGI("slotDefaultID: %{public}d, simCount:%{public}d", slotDefaultID, simCount);
+    return slotDefaultID;
 }
 
 std::string StaService::GetImsi(int32_t slotId) const
@@ -380,7 +362,7 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
         return;
     }
 
-    int32_t slotId = GetDataSlotId();
+    int32_t slotId = GetDataSlotId(config.wifiEapConfig.eapSubId);
     if (slotId == -1) {
         return;
     }
@@ -432,6 +414,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
     }
     tempDeviceConfig = config;
+    tempDeviceConfig.numAssociation = 0;
     tempDeviceConfig.instanceId = m_instId;
     tempDeviceConfig.networkId = netWorkId;
     tempDeviceConfig.status = status;
@@ -485,7 +468,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
 {
     LOGI("Enter RemoveDevice, networkId = %{public}d.\n", networkId);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (linkedInfo.networkId == networkId) {
         WifiStaHalInterface::GetInstance().ClearDeviceConfig();
     }
@@ -518,7 +501,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
 ErrCode StaService::RemoveAllDevice() const
 {
     LOGI("Enter RemoveAllDevice.\n");
-    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_HAL_OPT_OK) {
         LOGD("Remove all device config successfully!");
     } else {
         LOGE("WifiStaHalInterface:RemoveAllDevice failed!");
@@ -588,7 +571,7 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (networkId == linkedInfo.networkId) {
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
@@ -605,6 +588,24 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
         message->AddStringMessageBody(bssid);
         pStaStateMachine->SendMessage(message);
     }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::StartConnectToUserSelectNetwork(int networkId, std::string bssid) const
+{
+    LOGI("Enter StartConnectToUserSelectNetwork, networkId: %{public}d, bssid: %{public}s",
+        networkId, MacAnonymize(bssid).c_str());
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+    message->SetParam1(networkId);
+    message->SetParam2(NETWORK_SELECTED_BY_USER);
+    message->AddStringMessageBody(bssid);
+    pStaStateMachine->SendMessage(message);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -648,7 +649,7 @@ ErrCode StaService::Disconnect() const
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     WifiLinkedInfo linkedInfo;
-    WifiSettings::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
         WIFI_LOGI("The blocklist is updated.\n");
     }
@@ -660,7 +661,7 @@ ErrCode StaService::StartWps(const WpsConfig &config) const
 {
     WIFI_LOGI("Enter StartWps.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     msg->SetMessageName(WIFI_SVR_CMD_STA_STARTWPS);
     msg->SetParam1(static_cast<int>(config.setup));
     msg->AddStringMessageBody(config.pin);
@@ -723,7 +724,7 @@ ErrCode StaService::ReConnect() const
 ErrCode StaService::SetSuspendMode(bool mode) const
 {
     LOGI("Enter SetSuspendMode, mode=[%{public}d]!", mode);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(mode) != WIFI_IDL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(mode) != WIFI_HAL_OPT_OK) {
         LOGE("WpaSetSuspendMode() failed!");
         return WIFI_OPT_FAILED;
     }
@@ -733,7 +734,7 @@ ErrCode StaService::SetSuspendMode(bool mode) const
 ErrCode StaService::SetPowerMode(bool mode) const
 {
     LOGI("Enter SetPowerMode, mode=[%{public}d]!", mode);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(mode) != WIFI_IDL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(mode) != WIFI_HAL_OPT_OK) {
         LOGE("SetPowerMode() failed!");
         return WIFI_OPT_FAILED;
     }
@@ -743,8 +744,8 @@ ErrCode StaService::SetPowerMode(bool mode) const
 ErrCode StaService::SetTxPower(int power) const
 {
     LOGD("Enter SetTxPower, power=[%{public}d]!", power);
-    if (WifiStaHalInterface::GetInstance().SetTxPower(WifiSettings::GetInstance().GetStaIfaceName(), power)
-        != WIFI_IDL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().SetTxPower(WifiConfigCenter::GetInstance().GetStaIfaceName(), power)
+        != WIFI_HAL_OPT_OK) {
         LOGE("SetTxPower() failed!");
         return WIFI_OPT_FAILED;
     }
@@ -765,21 +766,15 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 
 int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const
 {
-    if (WifiSettings::GetInstance().GetDeviceConfig(config.ancoCallProcessName, config.ssid, config.keyMgmt,
-        outConfig) == 0 && (!config.ancoCallProcessName.empty())) {
-        LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s,"
-            "ancoCallProcessName:%{public}s.", outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
-            outConfig.ancoCallProcessName.c_str());
-    } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
-        outConfig) == 0) {
-        LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
-            "ancoCallProcessName:%{public}s,OancoCallProcessName%{public}s", outConfig.networkId,
-            SsidAnonymize(outConfig.ssid).c_str(),
-            config.ancoCallProcessName.c_str(), outConfig.ancoCallProcessName.c_str());
+    int ret = -1;
+    if (config.uid > WIFI_INVALID_UID) {
+        ret = WifiSettings::GetInstance().GetCandidateConfig(config.uid, config.ssid, config.keyMgmt, outConfig);
     } else {
-        return WIFI_OPT_FAILED;
+        ret = WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, outConfig);
     }
-    return WIFI_OPT_SUCCESS;
+    LOGI("FindDeviceConfig uid:%{public}d, ssid:%{public}s, ret:%{public}d.", config.uid,
+        SsidAnonymize(outConfig.ssid).c_str(), ret);
+    return (ret < 0) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
@@ -802,7 +797,7 @@ ErrCode StaService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(cons
         return WIFI_OPT_SUCCESS;
     }
     WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
-    InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    InternalMessagePtr msg = m_stateMachineObj.CreateMessage();
     CHECK_NULL_AND_RETURN(msg, WIFI_OPT_FAILED);
     msg->SetMessageName(static_cast<int>(WIFI_SVR_CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(wifiCountryCode);
@@ -825,6 +820,7 @@ void StaService::HandleScreenStatusChanged(int screenState)
         WIFI_LOGE("pStaStateMachine is null!");
         return;
     }
+    pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
     if (screenState == MODE_STATE_OPEN) {
         pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
     } else {
@@ -833,7 +829,6 @@ void StaService::HandleScreenStatusChanged(int screenState)
     if (pStaAppAcceleration != nullptr) {
         pStaAppAcceleration->HandleScreenStatusChanged(screenState);
     }
-    pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
 #endif
     return;
 }
@@ -904,20 +899,18 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
 }
 #endif
 
-ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
+ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd)
 {
-    int netWorkId = INVALID_NETWORK_ID;
-    if (bssid.find("ENABLE=1") != INVALID_NETWORK_ID) {
-        netWorkId = AddDeviceConfig(config);
-        if (netWorkId == INVALID_NETWORK_ID) {
-            WIFI_LOGE("EnableHiLinkHandshake, AddDeviceConfig failed!");
-            return WIFI_OPT_FAILED;
-        }
-    }
-    WIFI_LOGI("EnableHiLinkHandshake, netWorkId: %{public}d", netWorkId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_ENABLE_HILINK, netWorkId, 0, bssid);
- 
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
+    msg->SetMessageName(WIFI_SVR_COM_STA_ENABLE_HILINK);
+    msg->SetParam1(config.bssidType);
+    msg->AddStringMessageBody(config.ssid);
+    msg->AddStringMessageBody(config.bssid);
+    msg->AddStringMessageBody(config.keyMgmt);
+    msg->AddStringMessageBody(cmd);
+    pStaStateMachine->SendMessage(msg);
+
     return WIFI_OPT_SUCCESS;
 }
  
@@ -926,16 +919,6 @@ ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_DELIVER_MAC, currentMac);
  
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaService::StartHttpDetect()
-{
-    if (pStaStateMachine == nullptr) {
-        WIFI_LOGE("pStaStateMachine is null!");
-        return WIFI_OPT_FAILED;
-    }
-    pStaStateMachine->SendMessage(CMD_START_NETCHECK);
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

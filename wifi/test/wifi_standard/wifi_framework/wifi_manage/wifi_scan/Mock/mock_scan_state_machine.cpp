@@ -35,7 +35,7 @@ void MockScanStateMachine::SendMessage(int what, int arg1, int arg2)
         arg1, arg2);
 }
 
-void MockScanStateMachine::SendMessage(InternalMessage *msg)
+void MockScanStateMachine::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;

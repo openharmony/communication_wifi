@@ -37,6 +37,163 @@ public:
     }
 
     static void DestoryCallback(std::string &destoryIfaceName, int createIfaceType);
+    static void OnRssiReportCallback(int index, int antRssi);
+};
+
+class IChipIfaceTest : public IChipIface {
+public:
+    IChipIfaceTest() = default;
+    ~IChipIfaceTest() = default;
+    virtual int32_t GetIfaceType(IfaceType& type)
+    {
+        return 0;
+    }
+    virtual int32_t GetIfaceName(std::string& name)
+    {
+        return 0;
+    }
+    virtual int32_t GetIfaceCap(uint32_t& capabilities)
+    {
+        return 0;
+    }
+    virtual int32_t GetSupportFreqs(int32_t band, std::vector<uint32_t>& frequencies)
+    {
+        return 0;
+    }
+    virtual int32_t SetMacAddress(const std::string& mac)
+    {
+        return 0;
+    }
+    virtual int32_t SetCountryCode(const std::string& code)
+    {
+        return 0;
+    }
+    virtual int32_t GetPowerMode(int32_t& powerMode)
+    {
+        return 0;
+    }
+    virtual int32_t RegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
+    {
+        return 0;
+    }
+    virtual int32_t UnRegisterChipIfaceCallBack(const sptr<IChipIfaceCallback>& chipIfaceCallback)
+    {
+        return 0;
+    }
+    virtual int32_t StartScan(const ScanParams& scanParam)
+    {
+        return 0;
+    }
+    virtual int32_t GetScanInfos(std::vector<ScanResultsInfo>& scanResultsInfo)
+    {
+        return 0;
+    }
+    virtual int32_t StartPnoScan(const PnoScanParams& pnoParams)
+    {
+        return 0;
+    }
+    virtual int32_t StopPnoScan()
+    {
+        return 0;
+    }
+    virtual int32_t GetSignalPollInfo(SignalPollResult& signalPollresult)
+    {
+        return 0;
+    }
+    virtual int32_t EnablePowerMode(int32_t mode)
+    {
+        return 0;
+    }
+    virtual int32_t SetDpiMarkRule(int32_t uid, int32_t protocol, int32_t enable)
+    {
+        return 0;
+    }
+    virtual int32_t SetTxPower(int32_t power)
+    {
+        return 0;
+    }
+    virtual int32_t SetPowerMode(int32_t powerMode)
+    {
+        return 0;
+    }
+};
+
+class IConcreteChipTest : public IConcreteChip {
+public:
+    IConcreteChipTest() = default;
+    ~IConcreteChipTest() = default;
+    virtual int32_t GetChipId(int32_t& id)
+    {
+        return 0;
+    }
+    virtual int32_t RegisterChipEventCallback(const sptr<IConcreteChipCallback>& chipEventcallback)
+    {
+        return 0;
+    }
+    virtual int32_t GetChipModes(std::vector<UsableMode>& modes)
+    {
+        return 0;
+    }
+    virtual int32_t GetChipCaps(uint32_t& capabilities)
+    {
+        return 0;
+    }
+    virtual int32_t GetCurrentMode(uint32_t& modeId)
+    {
+        return 0;
+    }
+    virtual int32_t CreateApService(sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t GetApServiceIfNames(std::vector<std::string>& ifnames)
+    {
+        return 0;
+    }
+    virtual int32_t GetApService(const std::string& ifname, sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t RemoveApService(const std::string& ifname)
+    {
+        return 0;
+    }
+    virtual int32_t CreateP2pService(sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t GetP2pServiceIfNames(std::vector<std::string>& ifnames)
+    {
+        return 0;
+    }
+    virtual int32_t GetP2pService(const std::string& ifname, sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t RemoveP2pService(const std::string& ifname)
+    {
+        return 0;
+    }
+    virtual int32_t CreateStaService(sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t GetStaServiceIfNames(std::vector<std::string>& ifnames)
+    {
+        return 0;
+    }
+    virtual int32_t GetStaService(const std::string& ifname, sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t RemoveStaService(const std::string& ifname)
+    {
+        return 0;
+    }
+    virtual int32_t SetChipMode(uint32_t modeId)
+    {
+        return 0;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

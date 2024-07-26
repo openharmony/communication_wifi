@@ -23,6 +23,7 @@
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 #include "wifi_p2p_msg.h"
 #include "wifi_common_msg.h"
+#include "wifi_config_center.h"
 #include "wifi_settings.h"
 #endif
 
@@ -842,7 +843,7 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
         macAddrInfo.bssid = iter->GetDeviceAddress();
         macAddrInfo.bssidType = iter->GetDeviceAddressType();
         std::string randomMacAddr =
-            WifiSettings::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
         if (randomMacAddr.empty()) {
             WIFI_LOGW("%{public}s: no record found, bssid:%{private}s, bssidType:%{public}d",
                 __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
@@ -885,7 +886,8 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 if ((pid != 0) && (uid != 0)) {
                     std::vector<WifiP2pDevice> deviceVec = msg.device;
-                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) ==
+                        PERMISSION_DENIED) {
                         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
                             __func__, pid, uid);
                         updateP2pDeviceMacAddress(deviceVec);
@@ -971,7 +973,11 @@ void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, const 
 
 void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state)
 {
-    if (!WifiCommonEventHelper::PublishRssiValueChangedEvent(state, "OnRssiValueChanged")) {
+    WifiLinkedInfo likedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(likedInfo);
+    int signalLevel = WifiSettings::GetInstance().GetSignalLevel(state, likedInfo.band);
+    if (!WifiCommonEventHelper::PublishRssiValueChangedEvent("wifiSignalLevel", signalLevel,
+        state, "OnRssiValueChanged")) {
         WIFI_LOGE("failed to publish rssi value changed event!");
         return;
     }
@@ -1021,7 +1027,7 @@ bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackE
 void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFrozen)
 {
     std::unique_lock<std::mutex> lock(mPidFrozenMutex);
-    WIFI_LOGI("%{public}s, list size:%{public}zu, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
+    WIFI_LOGD("%{public}s, list size:%{public}zu, isFrozen:%{public}d", __func__, pidList.size(), isFrozen);
     for (auto itr : pidList) {
         if (isFrozen) {
             frozenPidList.insert(itr);
@@ -1029,7 +1035,7 @@ void WifiInternalEventDispatcher::SetAppFrozen(std::set<int> pidList, bool isFro
             frozenPidList.erase(itr);
         }
     }
-    WIFI_LOGI("%{public}s finish, size:%{public}zu", __func__, frozenPidList.size());
+    WIFI_LOGD("%{public}s finish, size:%{public}zu", __func__, frozenPidList.size());
 }
 
 void WifiInternalEventDispatcher::ResetAllFrozenApp()

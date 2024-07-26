@@ -20,9 +20,9 @@
 #include "context.h"
 #include "i_wifi_public_func.h"
 #include "serial.h"
-#include "wifi_idl_define.h"
 #include "wifi_idl_inner_interface.h"
 #include "wifi_log.h"
+#include "wifi_native_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiIdlP2pIface"
@@ -49,10 +49,10 @@ WifiErrorNo P2pStart(void)
     WriteBegin(context, 0);
     WriteFunc(context, "P2pStart");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pStart") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pStart") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -67,10 +67,10 @@ WifiErrorNo P2pStop(void)
     WriteBegin(context, 0);
     WriteFunc(context, "P2pStop");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pStop") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pStop") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -86,10 +86,10 @@ WifiErrorNo P2pSetRandomMac(int enable)
     WriteFunc(context, "P2pSetRandomMac");
     WriteInt(context, enable);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetRandomMac") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetRandomMac") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -105,10 +105,10 @@ WifiErrorNo P2pSetDeviceName(const char *name)
     WriteFunc(context, "P2pSetDeviceName");
     WriteStr(context, name);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetDeviceName") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetDeviceName") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -124,10 +124,10 @@ WifiErrorNo P2pSetSsidPostfixName(const char *postfixName)
     WriteFunc(context, "P2pSetSsidPostfixName");
     WriteStr(context, postfixName);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetSsidPostfixName") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetSsidPostfixName") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -143,10 +143,10 @@ WifiErrorNo P2pSetWpsDeviceType(const char *type)
     WriteFunc(context, "P2pSetWpsDeviceType");
     WriteStr(context, type);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetWpsDeviceType") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetWpsDeviceType") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -162,10 +162,10 @@ WifiErrorNo P2pSetWpsSecondaryDeviceType(const char *type)
     WriteFunc(context, "P2pSetWpsSecondaryDeviceType");
     WriteStr(context, type);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetWpsSecondaryDeviceType") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetWpsSecondaryDeviceType") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -181,10 +181,10 @@ WifiErrorNo P2pSetWpsConfigMethods(const char *config)
     WriteFunc(context, "P2pSetWpsConfigMethods");
     WriteStr(context, config);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetWpsConfigMethods") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetWpsConfigMethods") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -200,12 +200,12 @@ WifiErrorNo P2pGetDeviceAddress(char *deviceAddress, int size)
     WriteFunc(context, "P2pGetDeviceAddress");
     WriteInt(context, size);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pGetDeviceAddress") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pGetDeviceAddress") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("P2pGetDeviceAddress failed!");
     } else {
         ReadStr(context, deviceAddress, size);
@@ -223,10 +223,10 @@ WifiErrorNo P2pFlush()
     WriteBegin(context, 0);
     WriteFunc(context, "P2pFlush");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pFlush") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pFlush") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -241,10 +241,10 @@ WifiErrorNo P2pFlushService()
     WriteBegin(context, 0);
     WriteFunc(context, "P2pFlushService");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pFlushService") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pFlushService") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -259,10 +259,10 @@ WifiErrorNo P2pSaveConfig()
     WriteBegin(context, 0);
     WriteFunc(context, "P2pSaveConfig");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSaveConfig") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSaveConfig") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -272,32 +272,32 @@ WifiErrorNo P2pSaveConfig()
 static int GetP2pCallbackEvents(int *events, int size)
 {
     int p2pEvents[] = {
-        WIFI_IDL_CBK_CMD_P2P_SUPPLICANT_CONNECT,
-        WIFI_IDL_CBK_CMD_P2P_DEVICE_FOUND_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_DEVICE_LOST_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_GO_NEGOTIATION_REQUEST_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_GO_NEGOTIATION_SUCCESS_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_GO_NEGOTIATION_FAILURE_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_INVITATION_RECEIVED_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_INVITATION_RESULT_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_GROUP_FORMATION_SUCCESS_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_GROUP_FORMATION_FAILURE_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_GROUP_STARTED_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_GROUP_REMOVED_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_PROV_DISC_PBC_REQ_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_PROV_DISC_PBC_RSP_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_PROV_DISC_ENTER_PIN_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_PROV_DISC_SHOW_PIN_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_PROV_DISC_FAILURE_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_FIND_STOPPED_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_SERV_DISC_RESP_EVENT,
-        WIFI_IDL_CBK_CMD_AP_STA_DISCONNECTED_EVENT,
-        WIFI_IDL_CBK_CMD_AP_STA_CONNECTED_EVENT,
-        WIFI_IDL_CBK_CMD_SUP_CONN_FAILED_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_IFACE_CREATED_EVENT,
-        WIFI_IDL_CBK_CMD_P2P_CONNECT_FAILED,
-        WIFI_IDL_CBK_CMD_P2P_CHANNEL_SWITCH_EVENT
+        HAL_CBK_CMD_P2P_SUPPLICANT_CONNECT,
+        HAL_CBK_CMD_P2P_DEVICE_FOUND_EVENT,
+        HAL_CBK_CMD_P2P_DEVICE_LOST_EVENT,
+        HAL_CBK_CMD_P2P_GO_NEGOTIATION_REQUEST_EVENT,
+        HAL_CBK_CMD_P2P_GO_NEGOTIATION_SUCCESS_EVENT,
+        HAL_CBK_CMD_P2P_GO_NEGOTIATION_FAILURE_EVENT,
+        HAL_CBK_CMD_P2P_INVITATION_RECEIVED_EVENT,
+        HAL_CBK_CMD_P2P_INVITATION_RESULT_EVENT,
+        HAL_CBK_CMD_P2P_GROUP_FORMATION_SUCCESS_EVENT,
+        HAL_CBK_CMD_P2P_GROUP_FORMATION_FAILURE_EVENT,
+        HAL_CBK_CMD_P2P_GROUP_STARTED_EVENT,
+        HAL_CBK_CMD_P2P_GROUP_REMOVED_EVENT,
+        HAL_CBK_CMD_P2P_PROV_DISC_PBC_REQ_EVENT,
+        HAL_CBK_CMD_P2P_PROV_DISC_PBC_RSP_EVENT,
+        HAL_CBK_CMD_P2P_PROV_DISC_ENTER_PIN_EVENT,
+        HAL_CBK_CMD_P2P_PROV_DISC_SHOW_PIN_EVENT,
+        HAL_CBK_CMD_P2P_PROV_DISC_FAILURE_EVENT,
+        HAL_CBK_CMD_P2P_FIND_STOPPED_EVENT,
+        HAL_CBK_CMD_P2P_SERV_DISC_RESP_EVENT,
+        HAL_CBK_CMD_AP_STA_DISCONNECTED_EVENT,
+        HAL_CBK_CMD_AP_STA_CONNECTED_EVENT,
+        HAL_CBK_CMD_SUP_CONN_FAILED_EVENT,
+        HAL_CBK_CMD_P2P_SERV_DISC_REQ_EVENT,
+        HAL_CBK_CMD_P2P_IFACE_CREATED_EVENT,
+        HAL_CBK_CMD_P2P_CONNECT_FAILED,
+        HAL_CBK_CMD_P2P_CHANNEL_SWITCH_EVENT
     };
     int max = sizeof(p2pEvents) / sizeof(p2pEvents[0]);
     int num = 0;
@@ -325,15 +325,15 @@ WifiErrorNo RegisterP2pEventCallback(IWifiEventP2pCallback callback)
         WriteInt(context, events[i]);
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "RegisterP2pEventCallback") != WIFI_IDL_OPT_OK) {
+    if (RpcClientCall(client, "RegisterP2pEventCallback") != WIFI_HAL_OPT_OK) {
         if (callback.onP2pSupplicantConnect == NULL) {
             SetWifiP2pEventCallback(callback);
         }
-        return WIFI_IDL_OPT_FAILED;
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK || callback.onP2pSupplicantConnect == NULL) {
+    if (result == WIFI_HAL_OPT_OK || callback.onP2pSupplicantConnect == NULL) {
         SetWifiP2pEventCallback(callback);
     }
     ReadClientEnd(client);
@@ -351,10 +351,10 @@ WifiErrorNo P2pSetupWpsPbc(const char *groupIfc, const char *address)
     WriteStr(context, groupIfc);
     WriteStr(context, address);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetupWpsPbc") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetupWpsPbc") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -373,12 +373,12 @@ WifiErrorNo P2pSetupWpsPin(const char *groupIfc, const char *address, const char
     WriteStr(context, pin);
     WriteInt(context, resultLen);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetupWpsPin") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetupWpsPin") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int retCode = WIFI_IDL_OPT_FAILED;
+    int retCode = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &retCode);
-    if (retCode == WIFI_IDL_OPT_OK) {
+    if (retCode == WIFI_HAL_OPT_OK) {
         ReadStr(context, result, resultLen);
     }
     ReadClientEnd(client);
@@ -395,10 +395,10 @@ WifiErrorNo P2pRemoveNetwork(int networkId)
     WriteFunc(context, "P2pRemoveNetwork");
     WriteInt(context, networkId);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pRemoveNetwork") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pRemoveNetwork") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -413,13 +413,13 @@ WifiErrorNo P2pListNetworks(P2pNetworkList *infoList)
     WriteBegin(context, 0);
     WriteFunc(context, "P2pListNetworks");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pListNetworks") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pListNetworks") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     do {
-        if (result != WIFI_IDL_OPT_OK) {
+        if (result != WIFI_HAL_OPT_OK) {
             LOGE("P2pListNetworks failed!");
             break;
         }
@@ -431,7 +431,7 @@ WifiErrorNo P2pListNetworks(P2pNetworkList *infoList)
         }
         infoList->infos = (P2pNetworkInfo *)calloc(infoNum, sizeof(P2pNetworkInfo));
         if (infoList->infos == NULL) {
-            result = WIFI_IDL_OPT_FAILED;
+            result = WIFI_HAL_OPT_FAILED;
             break;
         }
         for (int i = 0; i < infoNum; i++) {
@@ -456,10 +456,10 @@ WifiErrorNo P2pSetGroupMaxIdle(const char *groupIfc, int time)
     WriteStr(context, groupIfc);
     WriteInt(context, time);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetGroupMaxIdle") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetGroupMaxIdle") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -476,10 +476,10 @@ WifiErrorNo P2pSetPowerSave(const char *groupIfc, int enable)
     WriteStr(context, groupIfc);
     WriteInt(context, enable);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetPowerSave") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetPowerSave") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -495,10 +495,10 @@ WifiErrorNo P2pSetWfdEnable(int enable)
     WriteFunc(context, "P2pSetWfdEnable");
     WriteInt(context, enable);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetWfdEnable") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetWfdEnable") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -514,10 +514,10 @@ WifiErrorNo P2pSetWfdDeviceConfig(const char *config)
     WriteFunc(context, "P2pSetWfdDeviceConfig");
     WriteStr(context, config);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetWfdDeviceConfig") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetWfdDeviceConfig") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -533,10 +533,10 @@ WifiErrorNo P2pStartFind(int timeout)
     WriteFunc(context, "P2pStartFind");
     WriteInt(context, timeout);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pStartFind") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pStartFind") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -551,10 +551,10 @@ WifiErrorNo P2pStopFind()
     WriteBegin(context, 0);
     WriteFunc(context, "P2pStopFind");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pStopFind") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pStopFind") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -572,10 +572,10 @@ WifiErrorNo P2pSetExtListen(int enable, int period, int interval)
     WriteInt(context, period);
     WriteInt(context, interval);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetExtListen") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetExtListen") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -592,10 +592,10 @@ WifiErrorNo P2pSetListenChannel(int channel, int regClass)
     WriteInt(context, channel);
     WriteInt(context, regClass);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetListenChannel") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetListenChannel") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -616,14 +616,14 @@ WifiErrorNo P2pConnect(P2pConnectInfo *info)
     WriteStr(context, info->peerDevAddr);
     WriteStr(context, info->pin);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pConnect") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pConnect") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         if (memset_s(info->pin, sizeof(info->pin), 0, sizeof(info->pin)) != EOK) {
-            result = WIFI_IDL_OPT_FAILED;
+            result = WIFI_HAL_OPT_FAILED;
         } else {
             ReadStr(context, info->pin, sizeof(info->pin));
         }
@@ -641,10 +641,10 @@ WifiErrorNo P2pCancelConnect()
     WriteBegin(context, 0);
     WriteFunc(context, "P2pCancelConnect");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pCancelConnect") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pCancelConnect") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -662,10 +662,10 @@ WifiErrorNo P2pProvisionDiscovery(const char *peerBssid, int mode)
     WriteStr(context, peerBssid);
     WriteInt(context, mode);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pProvisionDiscovery") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pProvisionDiscovery") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -683,10 +683,10 @@ WifiErrorNo P2pAddGroup(int isPersistent, int networkId, int freq)
     WriteInt(context, networkId);
     WriteInt(context, freq);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pAddGroup") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pAddGroup") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -702,10 +702,10 @@ WifiErrorNo P2pRemoveGroup(const char *interface)
     WriteFunc(context, "P2pRemoveGroup");
     WriteStr(context, interface);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pRemoveGroup") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pRemoveGroup") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -721,10 +721,10 @@ WifiErrorNo P2pRemoveGroupClient(const char *deviceMac)
     WriteFunc(context, "P2pRemoveGroupClient");
     WriteStr(context, deviceMac);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pRemoveGroupClient") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pRemoveGroupClient") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -743,10 +743,10 @@ WifiErrorNo P2pInvite(int persisitent, const char *peerBssid, const char *goBssi
     WriteStr(context, goBssid);
     WriteStr(context, ifname);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pInvite") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pInvite") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -763,10 +763,10 @@ WifiErrorNo P2pReinvoke(int networkId, const char *bssid)
     WriteInt(context, networkId);
     WriteStr(context, bssid);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pReinvoke") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pReinvoke") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -782,12 +782,12 @@ WifiErrorNo P2pGetGroupCapability(const char *bssid, int *cap)
     WriteFunc(context, "P2pGetGroupCapability");
     WriteStr(context, bssid);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pGetGroupCapability") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pGetGroupCapability") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("P2pGetGroupCapability failed!");
     } else {
         ReadInt(context, cap);
@@ -813,10 +813,10 @@ WifiErrorNo P2pAddService(const P2pServiceInfo *info)
         WriteStr(context, info->resp);
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pAddService") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pAddService") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -838,10 +838,10 @@ WifiErrorNo P2pRemoveService(const P2pServiceInfo *info)
         WriteStr(context, info->query);
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pRemoveService") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pRemoveService") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -859,12 +859,12 @@ WifiErrorNo P2pReqServiceDiscovery(const char *bssid, const char *msg, char *ret
     WriteStr(context, msg);
     WriteInt(context, size);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pReqServiceDiscovery") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pReqServiceDiscovery") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result == WIFI_IDL_OPT_OK) {
+    if (result == WIFI_HAL_OPT_OK) {
         ReadStr(context, retMsg, size);
     }
     ReadClientEnd(client);
@@ -881,10 +881,10 @@ WifiErrorNo P2pCancelServiceDiscovery(const char *id)
     WriteFunc(context, "P2pCancelServiceDiscovery");
     WriteStr(context, id);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pCancelServiceDiscovery") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pCancelServiceDiscovery") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -900,10 +900,10 @@ WifiErrorNo P2pSetMiracastType(int type)
     WriteFunc(context, "P2pSetMiracastType");
     WriteInt(context, type);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetMiracastType") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetMiracastType") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -919,10 +919,10 @@ WifiErrorNo P2pSetPersistentReconnect(int mode)
     WriteFunc(context, "P2pSetPersistentReconnect");
     WriteInt(context, mode);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetPersistentReconnect") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetPersistentReconnect") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -941,10 +941,10 @@ WifiErrorNo P2pRespServerDiscovery(const char *deviceAddress, int frequency, int
     WriteStr(context, deviceAddress);
     WriteStr(context, tlvs);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pRespServerDiscovery") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pRespServerDiscovery") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -960,10 +960,10 @@ WifiErrorNo P2pSetServDiscExternal(int mode)
     WriteFunc(context, "P2pSetServDiscExternal");
     WriteInt(context, mode);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetServDiscExternal") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetServDiscExternal") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);
@@ -979,12 +979,12 @@ WifiErrorNo P2pGetPeer(const char *deviceAddress, P2pDeviceInfo *peerInfo)
     WriteFunc(context, "P2pGetPeer");
     WriteStr(context, deviceAddress);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pGetPeer") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pGetPeer") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("P2pGetPeer failed!");
     } else {
         ReadStr(context, peerInfo->p2pDeviceAddress, sizeof(peerInfo->p2pDeviceAddress));
@@ -1008,12 +1008,12 @@ WifiErrorNo P2pGetChba0Freq(int *chba0Freq)
     WriteBegin(context, 0);
     WriteFunc(context, "P2pGetChba0Freq");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pGetChba0Freq") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pGetChba0Freq") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("P2pGetChba0Freq failed!");
     } else {
         ReadInt(context, chba0Freq);
@@ -1033,13 +1033,13 @@ WifiErrorNo P2pGetFrequencies(int32_t band, int *frequencies, int32_t *size)
     WriteInt(context, band);
     WriteInt(context, *size);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pGetFrequencies") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pGetFrequencies") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
 
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server P2pGetFrequencies deal failed!");
     } else {
         ReadInt(context, size);
@@ -1066,12 +1066,12 @@ WifiErrorNo P2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
         WriteStr(context, pConfig[i].cfgValue);
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pSetGroupConfig") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pSetGroupConfig") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server P2pSetGroupConfig deal failed!");
     }
     ReadClientEnd(client);
@@ -1092,12 +1092,12 @@ WifiErrorNo P2pGetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
         WriteInt(context, pConfig[i].cfgParam);
     }
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pGetGroupConfig") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pGetGroupConfig") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server P2pGetGroupConfig deal failed!");
     } else {
         for (int i = 0; i < size; i++) {
@@ -1117,12 +1117,12 @@ WifiErrorNo P2pAddNetwork(int *networkId)
     WriteBegin(context, 0);
     WriteFunc(context, "P2pAddNetwork");
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pAddNetwork") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pAddNetwork") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
-    if (result != WIFI_IDL_OPT_OK) {
+    if (result != WIFI_HAL_OPT_OK) {
         LOGE("server P2pAddNetwork deal failed!");
     } else {
         ReadInt(context, networkId);
@@ -1145,10 +1145,10 @@ WifiErrorNo Hid2dConnect(Hid2dConnectInfo *info)
     WriteInt(context, info->frequency);
     WriteInt(context, info->isLegacyGo);
     WriteEnd(context);
-    if (RpcClientCall(client, "P2pHid2dConnect") != WIFI_IDL_OPT_OK) {
-        return WIFI_IDL_OPT_FAILED;
+    if (RpcClientCall(client, "P2pHid2dConnect") != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
     }
-    int result = WIFI_IDL_OPT_FAILED;
+    int result = WIFI_HAL_OPT_FAILED;
     ReadInt(context, &result);
     ReadClientEnd(client);
     UnlockRpcClient(client);

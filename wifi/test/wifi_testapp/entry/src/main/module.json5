@@ -13,86 +13,99 @@
  * limitations under the License.
  */
 {
-    "module": {
-        "name": "entry",
-        "type": "entry",
-        "description": "$string:module_desc",
-        "mainElement": "EntryAbility",
-        "deviceTypes": [
-            "default",
-            "tablet"
+  "module": {
+    "name": "entry",
+    "type": "entry",
+    "description": "$string:module_desc",
+    "mainElement": "EntryAbility",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "abilities": [
+      {
+        "name": "EntryAbility",
+        "srcEntry": "./ets/entryability/EntryAbility.ets",
+        "description": "$string:EntryAbility_desc",
+        "icon": "$media:app_icon",
+        "label": "$string:EntryAbility_label",
+        "startWindowIcon": "$media:app_icon",
+        "startWindowBackground": "$color:start_window_background",
+        "visible": true,
+        "backgroundModes": [
+          "wifiInteraction",
+          "location"
         ],
-        "deliveryWithInstall": true,
-        "installationFree": false,
-        "pages": "$profile:main_pages",
-        "abilities": [
-            {
-                "name": "EntryAbility",
-                "srcEntrance": "./ets/entryability/EntryAbility.ets",
-                "description": "$string:EntryAbility_desc",
-                "icon": "$media:app_icon",
-                "label": "$string:EntryAbility_label",
-                "startWindowIcon": "$media:app_icon",
-                "startWindowBackground": "$color:start_window_background",
-                "visible": true,
-                "skills": [
-                    {
-                        "entities": [
-                            "entity.system.home"
-                        ],
-                        "actions": [
-                            "action.system.home"
-                        ]
-                    }
-                ]
-            }
-        ],
-        "requestPermissions": [
-            {
-                "name": "ohos.permission.CAPTURE_SCREEN"
-            },
-            {
-                "name": "ohos.permission.WRITE_MEDIA"
-            },
-            {
-                "name": "ohos.permission.READ_MEDIA"
-            },
-            {
-                "name": "ohos.permission.MEDIA_LOCATION"
-            },
-            {
-                "name": "ohos.permission.SET_WIFI_INFO"
-            },
-            {
-                "name": "ohos.permission.GET_WIFI_INFO"
-            },
-            {
-                "name": "ohos.permission.LOCATION"
-            },
-            {
-                "name": "ohos.permission.GET_WIFI_PEERS_MAC"
-            },
-            {
-                "name": "ohos.permission.MANAGE_WIFI_CONNECTION"
-            },
-            {
-                "name": "ohos.permission.SET_WIFI_CONFIG"
-            },
-            {
-                "name": "ohos.permission.GET_WIFI_CONFIG"
-            },
-            {
-                "name": "ohos.permission.GET_WIFI_LOCAL_MAC"
-            },
-            {
-                "name": "ohos.permission.MANAGE_WIFI_HOTSPOT"
-            },
-            {
-                "name": "ohos.permission.GET_WIFI_INFO_INTERNAL"
-            },
-            {
-                "name": "ohos.permission.INTERNET"
-            }
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home"
+            ]
+          }
         ]
-    }
+      }
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.CAPTURE_SCREEN"
+      },
+      {
+        "name": "ohos.permission.WRITE_MEDIA"
+      },
+      {
+        "name": "ohos.permission.READ_MEDIA"
+      },
+      {
+        "name": "ohos.permission.MEDIA_LOCATION"
+      },
+      {
+        "name": "ohos.permission.SET_WIFI_INFO"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO"
+      },
+      {
+        "name": "ohos.permission.LOCATION"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_PEERS_MAC"
+      },
+      {
+        "name": "ohos.permission.MANAGE_WIFI_CONNECTION"
+      },
+      {
+        "name": "ohos.permission.SET_WIFI_CONFIG"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_CONFIG"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_LOCAL_MAC"
+      },
+      {
+        "name": "ohos.permission.MANAGE_WIFI_HOTSPOT"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO_INTERNAL"
+      },
+      {
+        "name": "ohos.permission.INTERNET"
+      },
+      {
+        "name": "ohos.permission.LOCATION_IN_BACKGROUND"
+      },
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION"
+      },
+      {
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
+      }
+    ]
+  }
 }

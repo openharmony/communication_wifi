@@ -257,7 +257,7 @@ export function testRemoveP2pGroupManager(): string {
 export function testP2pConnectManager(): string {
   try {
     let message = "P2pConnect test"
-    let wifiP2pConfigManager = AppStorage.get("wifiP2pConfigManager") ! //非空断言操作符
+    let wifiP2pConfigManager:wifiManager.WifiP2PConfig = AppStorage.get("wifiP2pConfigManager") ! //非空断言操作符
     let ret = wifiManager.p2pConnect(wifiP2pConfigManager as wifiManager.WifiP2PConfig) // p2pConnect的返回值为void
     message = "p2pConnect 调用成功"
     prompt.showToast({ message : message })

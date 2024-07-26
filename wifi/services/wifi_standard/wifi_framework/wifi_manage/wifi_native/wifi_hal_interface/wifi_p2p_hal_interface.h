@@ -454,8 +454,7 @@ public:
     WifiErrorNo Hid2dConnect(const Hid2dConnectConfig &config) const;
 
     /**
-     * @Description Set the MAC address of the P2P
-     *
+     * @Description Set the P2P DATA
      * @param cmdType
      * @param dataType
      * @param carryData

@@ -27,6 +27,7 @@
 #include "wifi_scan_msg.h"
 #include "self_cure_msg.h"
 #include "mock_sta_service.h"
+#include "wifi_country_code_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -271,6 +272,64 @@ public:
     {
         LOGI("Enter RequestReassocWithFactoryMacTest");
         pSelfCureStateMachine->pConnectedMonitorState->RequestReassocWithFactoryMac();
+    }
+
+    void InitDnsServerTest()
+    {
+        LOGI("Enter InitDnsServerTest");
+        pSelfCureStateMachine->InitDnsServer();
+    }
+
+    void SelfCureForDnsTest()
+    {
+        LOGI("Enter SelfCureForDnsTest");
+        pSelfCureStateMachine->internetUnknown = true;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForDns();
+        pSelfCureStateMachine->internetUnknown = false;
+        pSelfCureStateMachine->pInternetSelfCureState->SelfCureForDns();
+    }
+
+    void GetPublicDnsServersTest()
+    {
+        LOGI("Enter GetPublicDnsServersTest");
+        std::string countryCode;
+        std::vector<std::string> publicDnsServersTest;
+        WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
+        pSelfCureStateMachine->pInternetSelfCureState->GetPublicDnsServers(publicDnsServersTest);
+    }
+
+    void GetReplacedDnsServersTest()
+    {
+        LOGI("Enter GetReplacedDnsServersTest");
+        std::vector<std::string> serverTest = {"180.76.76.76", "223.5.5.5"};
+        std::vector<std::string> ReplacedDnsServersTest;
+        pSelfCureStateMachine->pInternetSelfCureState->GetReplacedDnsServers(serverTest, ReplacedDnsServersTest);
+        std::vector<std::string> serverDnsTest = {"", ""};
+        pSelfCureStateMachine->pInternetSelfCureState->GetReplacedDnsServers(serverDnsTest, ReplacedDnsServersTest);
+    }
+
+    void UpdateDnsServersTest()
+    {
+        LOGI("Enter UpdateDnsServersTest");
+        IpInfo ipInfo;
+        IpV6Info ipV6Info;
+        WifiDeviceConfig config;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _)).Times(AtLeast(0));
+        WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipV6Info, config.wifiProxyconfig, 0);
+        std::vector<std::string> dnsServerTest = {"180.76.76.76", "223.5.5.5"};
+        pSelfCureStateMachine->pInternetSelfCureState->UpdateDnsServers(dnsServerTest);
+        std::vector<std::string> dnsesServerTest = {"", ""};
+        pSelfCureStateMachine->pInternetSelfCureState->UpdateDnsServers(dnsesServerTest);
+    }
+
+    void ResetDnsesTest()
+    {
+        LOGI("Enter resetDnsesTest");
+        std::vector<std::string> dnsesTest = {"180.76.76.76", "223.5.5.5"};
+        pSelfCureStateMachine->pInternetSelfCureState->resetDnses(dnsesTest);
+        std::vector<std::string> dnsesServerTest = {"", ""};
+        pSelfCureStateMachine->pInternetSelfCureState->resetDnses(dnsesServerTest);
     }
 
     void HandleInvalidIpTest()
@@ -1720,6 +1779,36 @@ HWTEST_F(SelfCureStateMachineTest, IsGatewayChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, HandleGatewayChangedTest, TestSize.Level1)
 {
     HandleGatewayChangedTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, InitDnsServerTest, TestSize.Level1)
+{
+    InitDnsServerTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, SelfCureForDnsTest, TestSize.Level1)
+{
+    SelfCureForDnsTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetPublicDnsServersTest, TestSize.Level1)
+{
+    GetPublicDnsServersTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, GetReplacedDnsServersTest, TestSize.Level1)
+{
+    GetReplacedDnsServersTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateDnsServersTest, TestSize.Level1)
+{
+    UpdateDnsServersTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, ResetDnsesTest, TestSize.Level1)
+{
+    ResetDnsesTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, HandleInvalidIpTest, TestSize.Level1)

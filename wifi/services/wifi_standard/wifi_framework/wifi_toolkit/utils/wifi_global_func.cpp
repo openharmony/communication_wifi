@@ -436,7 +436,7 @@ bool IsValidCountryCode(const std::string &wifiCountryCode)
 bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
 {
     unsigned int left = 0;
-    unsigned int right = std::size(MCC_TABLE) - 1;
+    unsigned int right = static_cast<size_t>(std::size(MCC_TABLE) - 1);
     if (MCC_TABLE[left].mnc > mnc || MCC_TABLE[right].mnc < mnc) {
         return false;
     }

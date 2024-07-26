@@ -279,6 +279,8 @@ typedef struct {
     char linkIpV6Address[DEVICE_IPV6_MAX_LEN];
     char globalIpV6Address[DEVICE_IPV6_MAX_LEN];
     char randGlobalIpV6Address[DEVICE_IPV6_MAX_LEN];
+    char uniqueIpv6Address[DEVICE_IPV6_MAX_LEN];
+    char randUniqueIpv6Address[DEVICE_IPV6_MAX_LEN];
     char gateway[DEVICE_IPV6_MAX_LEN];
     char netmask[DEVICE_IPV6_MAX_LEN];
     char primaryDns[DEVICE_IPV6_MAX_LEN];

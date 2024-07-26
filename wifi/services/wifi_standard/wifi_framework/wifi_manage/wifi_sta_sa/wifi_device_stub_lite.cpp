@@ -519,6 +519,8 @@ void WifiDeviceStub::OnGetIpV6Info(uint32_t code, IpcIo *req, IpcIo *reply)
         (void)WriteString(reply, info.linkIpV6Address.c_str());
         (void)WriteString(reply, info.globalIpV6Address.c_str());
         (void)WriteString(reply, info.randGlobalIpV6Address.c_str());
+        (void)WriteString(reply, info.uniqueLocalAddress1.c_str());
+        (void)WriteString(reply, info.uniqueLocalAddress2.c_str());
         (void)WriteString(reply, info.gateway.c_str());
         (void)WriteString(reply, info.netmask.c_str());
         (void)WriteString(reply, info.primaryDns.c_str());

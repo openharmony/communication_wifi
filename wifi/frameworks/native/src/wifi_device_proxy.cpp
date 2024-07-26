@@ -1500,6 +1500,8 @@ ErrCode WifiDeviceProxy::GetIpv6Info(IpV6Info &info)
     info.linkIpV6Address = reply.ReadString();
     info.globalIpV6Address = reply.ReadString();
     info.randGlobalIpV6Address = reply.ReadString();
+    info.uniqueLocalAddress1 = reply.ReadString();
+    info.uniqueLocalAddress2 = reply.ReadString();
     info.gateway = reply.ReadString();
     info.netmask = reply.ReadString();
     info.primaryDns = reply.ReadString();

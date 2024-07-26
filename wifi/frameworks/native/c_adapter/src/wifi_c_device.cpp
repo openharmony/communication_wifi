@@ -443,6 +443,14 @@ static OHOS::Wifi::ErrCode GetIpV6InfoFromCpp(const OHOS::Wifi::IpV6Info& ipInfo
         ipInfo.randGlobalIpV6Address.size() + 1) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
+    if (memcpy_s(result->uniqueIpv6Address, DEVICE_IPV6_MAX_LEN, ipInfo.uniqueLocalAddress1.c_str(),
+        ipInfo.uniqueLocalAddress1.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->randUniqueIpv6Address, DEVICE_IPV6_MAX_LEN, ipInfo.uniqueLocalAddress2.c_str(),
+        ipInfo.uniqueLocalAddress2.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
     if (memcpy_s(result->gateway, DEVICE_IPV6_MAX_LEN, ipInfo.gateway.c_str(),
         ipInfo.gateway.size() + 1) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;

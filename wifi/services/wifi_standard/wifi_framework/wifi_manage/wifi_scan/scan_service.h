@@ -142,7 +142,7 @@ public:
      * @param params - Scan specified parameters[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode ScanWithParam(const WifiScanParams &params);
+    virtual ErrCode ScanWithParam(const WifiScanParams &params, bool externFlag);
     /**
      * @Description Disable/Restore the scanning operation.
      *
@@ -366,6 +366,24 @@ private:
     int StoreRequestScanConfig(const ScanConfig &scanConfig, const InterScanConfig &interConfig);
 
     int GetWifiMaxSupportedMaxSpeed(const InterScanInfo &scanInfo, const int &maxNumberSpatialStreams);
+    /**
+     * @Description Convert InterScanInfo to WifiScanInfo
+     *
+     * @param scanInfo - Scanning Result[in]
+     * @param interConfig - Internal Scanning Result[in]
+     */
+    void ConvertScanInfo(WifiScanInfo &scanInfo, const InterScanInfo &interInfo);
+    /**
+     * @Description Merge scan result
+     *
+     * @param results - Scanning Result Cache[in]
+     * @param storeInfoList - New Scanning Result[in]
+     */
+    void MergeScanResult(std::vector<WifiScanInfo> &results, std::vector<WifiScanInfo> &storeInfoList);
+    /**
+     * @Description Try to restore saved network
+     */
+    void TryToRestoreSavedNetwork();
     /**
      * @Description Save the scanning result in the configuration center.
      *

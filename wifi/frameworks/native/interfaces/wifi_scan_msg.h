@@ -87,6 +87,16 @@ enum class WifiCategory {
     WIFI6_PLUS = 3
 };
 
+enum ScanBandType {
+    SCAN_BAND_UNSPECIFIED = 0,    /* not specified */
+    SCAN_BAND_24_GHZ = 1,         /* 2.4 GHz band */
+    SCAN_BAND_5_GHZ = 2,          /* 5 GHz band without DFS channels */
+    SCAN_BAND_BOTH = 3,           /* both bands without DFS channels */
+    SCAN_BAND_5_GHZ_DFS_ONLY = 4, /* 5 GHz band with DFS channels */
+    SCAN_BAND_5_GHZ_WITH_DFS = 6, /* 5 GHz band with DFS channels */
+    SCAN_BAND_BOTH_WITH_DFS = 7,  /* both bands with DFS channels */
+};
+
 struct WifiInfoElem {
     unsigned int id;
     std::vector<char> content;

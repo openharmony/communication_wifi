@@ -38,7 +38,7 @@ constexpr int PD_STATUS_CODE_PBC_REQ = 2;
 constexpr int PD_STATUS_CODE_PBC_RSP = 3;
 constexpr int PD_STATUS_CODE_FAIL = 4;
 constexpr int WEP_WRONG_PASSWORD_STATUS_CODE = 5202;
-int currentWpaStatus_ = static_cast<int>(OHOS::Wifi::SupplicantState::UNKNOWN);
+int currentWpaStatus = static_cast<int>(OHOS::Wifi::SupplicantState::UNKNOWN);
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaCallback"
 
@@ -129,11 +129,11 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
     }
 
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    currentWpaStatus_ = statechangedParam->status;
+    currentWpaStatus = statechangedParam->status;
     if (cbk.onWpaStateChanged) {
-        cbk.onWpaStateChanged(currentWpaStatus_);
+        cbk.onWpaStateChanged(currentWpaStatus);
     }
-    LOGI("OnEventStateChanged:callback out status = %{public}d", currentWpaStatus_);
+    LOGI("OnEventStateChanged:callback out status = %{public}d", currentWpaStatus);
     return 0;
 }
 
@@ -263,7 +263,7 @@ int32_t OnEventAuthTimeout(struct IWpaCallback *self, const char *ifName)
 {
     LOGI("OnEventAuthTimeout: callback enter!");
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    if (currentWpaStatus_ == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
+    if (currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
         cbk.onWpaSsidWrongKey) {
         LOGI("OnEventAuthTimeout, wrong password");
         cbk.onWpaSsidWrongKey(1);

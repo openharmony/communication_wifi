@@ -31,6 +31,7 @@
 
 namespace OHOS {
 namespace Wifi {
+
 constexpr int ASCALL_NUM_START_INDEX = 48;  // the range of numbers in the ascll table
 constexpr int ASCALL_NUM_END_INDEX = 57;
 constexpr int FREP_2G_MIN = 2412;

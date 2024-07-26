@@ -31,7 +31,6 @@
 
 namespace OHOS {
 namespace Wifi {
-
 constexpr int ASCALL_NUM_START_INDEX = 48;  // the range of numbers in the ascll table
 constexpr int ASCALL_NUM_END_INDEX = 57;
 constexpr int FREP_2G_MIN = 2412;
@@ -290,14 +289,15 @@ int HexStringToVec(const std::string &str, std::vector<char> &vec)
         return -1;
     }
     const int hexShiftNum = 4;
-    for (unsigned i = 0; i + 1 < len; ++i) {
+    for (unsigned i = 0; i + 1 < len;) {
         uint8_t high = static_cast<uint8_t>(IsValidHexCharAndConvert(str[i]));
-        uint8_t low = static_cast<uint8_t>(IsValidHexCharAndConvert(str[++i]));
+        uint8_t low = static_cast<uint8_t>(IsValidHexCharAndConvert(str[i + 1]));
         if (high < 0 || low < 0) {
             return -1;
         }
         char tmp = ((high << hexShiftNum) | (low & 0x0F));
         vec.push_back(tmp);
+        i += 2; //2:拼接char类型的高四位和第四位
     }
     return 0;
 }
@@ -435,8 +435,8 @@ bool IsValidCountryCode(const std::string &wifiCountryCode)
 
 bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
 {
-    int left = 0;
-    int right = std::size(MCC_TABLE) - 1;
+    unsigned int left = 0;
+    unsigned int right = std::size(MCC_TABLE) - 1;
     if (MCC_TABLE[left].mnc > mnc || MCC_TABLE[right].mnc < mnc) {
         return false;
     }

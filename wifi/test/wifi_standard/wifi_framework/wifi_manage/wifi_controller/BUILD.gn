@@ -25,6 +25,7 @@ config("module_private_config") {
 ohos_unittest("wifi_controller_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",

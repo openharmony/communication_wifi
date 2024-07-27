@@ -346,6 +346,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        bool HandleNetworkConnectionEvent(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
 

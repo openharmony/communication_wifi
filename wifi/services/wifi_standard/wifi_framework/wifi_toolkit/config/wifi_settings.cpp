@@ -228,17 +228,32 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
         LOGD("Reload wifi config");
         ReloadDeviceConfig();
     }
+
     std::unique_lock<std::mutex> lock(mStaMutex);
-    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt) &&
-            (iter->second.uid == -1 || iter->second.isShared)) {
-            config = iter->second;
+    if (keymgmt.compare("WPA-PSK+SAE") == 0) {
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
+                && (iter->second.uid == -1 || iter->second.isShared)) {
+                config = iter->second;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-            DecryptionDeviceConfig(config);
+                DecryptionDeviceConfig(config);
 #endif
-            return 0;
+                return 0;
+            }
+        }
+    } else {
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
+                && (iter->second.uid == -1 || iter->second.isShared)) {
+                config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+                DecryptionDeviceConfig(config);
+#endif
+                return 0;
+            }
         }
     }
+
     return -1;
 }
 

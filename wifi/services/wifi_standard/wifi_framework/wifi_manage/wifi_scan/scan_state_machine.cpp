@@ -1154,6 +1154,10 @@ void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanIn
         }
         SetWifiMode(*iter);
         iter->securityType = WifiSecurity::OPEN;
+        if (iter->capabilities.find("PSK+SAE") != std::string::npos) {
+            iter->securityType = WifiSecurity::PSK_SAE;
+            continue;
+        }
         if (iter->capabilities.find("WAPI-PSK") != std::string::npos) {
             iter->securityType = WifiSecurity::WAPI_PSK;
             continue;

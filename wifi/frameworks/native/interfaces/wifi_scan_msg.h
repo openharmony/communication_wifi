@@ -69,6 +69,7 @@ enum class WifiSecurity {
     OWE = 6,
     WAPI_CERT = 7,
     WAPI_PSK = 8,
+    PSK_SAE = 9,
     INVALID = -1
 };
 
@@ -201,6 +202,9 @@ struct WifiScanInfo {
                 break;
             case WifiSecurity::WAPI_PSK:
                 mgmt = "WAPI-PSK";
+                break;
+            case WifiSecurity::PSK_SAE:
+                mgmt = "WPA-PSK+SAE";
                 break;
             default:
                 mgmt = "NONE";

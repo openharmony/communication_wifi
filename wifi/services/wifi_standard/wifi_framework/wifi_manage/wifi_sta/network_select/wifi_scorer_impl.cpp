@@ -35,6 +35,7 @@ constexpr int WIFI_2G_BAND_SCORE = 20;
 constexpr int SECURITY_BONUS_SCORE = 5;
 constexpr int RSSI_LEVEL_FOUR_SCORE = 80;
 constexpr int RSSI_LEVEL_THREE_SCORE = 60;
+constexpr int RSSI_LEVEL_TWO_SCORE_5G = 59;
 constexpr int RSSI_LEVEL_TWO_SCORE_2G = 20;
 constexpr int SIGNAL_LEVEL_TWO = 2;
 constexpr int SIGNAL_LEVEL_THREE = 3;
@@ -203,7 +204,11 @@ double RssiLevelBonusScorer::Score(NetworkCandidate &networkCandidate)
         return RSSI_LEVEL_THREE_SCORE;
     }
     if (currentSignalLevel == SIGNAL_LEVEL_TWO) {
-        return RSSI_LEVEL_TWO_SCORE;
+        if (frequency >= MIN_5G_FREQUENCY && frequency <= MAX_5G_FREQUENCY) {
+            return RSSI_LEVEL_TWO_SCORE_5G;
+        } else {
+            return RSSI_LEVEL_TWO_SCORE_2G;
+        }
     }
     return 0;
 }

@@ -69,8 +69,15 @@ AppParser::~AppParser()
 
 AppParser &AppParser::GetInstance()
 {
-    static AppParser instance;
-    return instance;
+    static std::mutex xmlMutex;
+    static AppParser *instance;
+    if (instance == nullptr) {
+        std::unique_lock<std::mutex> lock(xmlMutex);
+        if (instance == nullptr) {
+            instance = new (std::nothrow) AppParser();
+        }
+    }
+    return *instance;
 }
 
 bool AppParser::IsLowLatencyApp(const std::string &bundleName) const

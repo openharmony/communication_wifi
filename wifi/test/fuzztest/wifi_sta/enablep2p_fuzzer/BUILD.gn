@@ -22,6 +22,7 @@ ohos_fuzztest("EnableP2pFuzzTest") {
   fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/enablep2p_fuzzer"
 
   include_dirs = [
+    "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",

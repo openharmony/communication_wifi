@@ -1804,11 +1804,20 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
         WIFI_LOGE("WifiSettings::GetInstance().GetDeviceConfig failed");
         return false;
     }
-
-    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
-        if (iter->hiddenSSID) {
-            hiddenNetworkSsid.push_back(iter->ssid);
+    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end();) {
+        if (!iter->hiddenSSID) {
+            iter = deviceConfigs.erase(iter);
+        } else {
+            ++iter;
         }
+    }
+    std::sort(deviceConfigs.begin(), deviceConfigs.end(), [](WifiDeviceConfig deviceA, WifiDeviceConfig deviceB) {
+        time_t aTime = deviceA.lastHasInternetTime == -1 ? deviceA.lastConnectTime : deviceA.lastHasInternetTime;
+        time_t bTime = deviceB.lastHasInternetTime == -1 ? deviceB.lastConnectTime : deviceB.lastHasInternetTime;
+        return aTime > bTime;
+    });
+    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
+        hiddenNetworkSsid.push_back(iter->ssid);
     }
 
     WIFI_LOGI("Find %{public}d hidden NetworkSsid.\n", (int)hiddenNetworkSsid.size());

@@ -409,7 +409,7 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessagePtr 
             if (pConcreteMangerMachine->mTargetRole ==
                 static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
                 WIFI_LOGI("switch ROLE_CLIENT_STA_SEMI_ACTIVE");
-                AutoStopScanOnly(mid, false);
+                WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(mid);
             } else {
                 WIFI_LOGI("switch ROLE_CLIENT_MIX_SEMI_ACTIVE");
                 AutoStartScanOnly(mid);
@@ -850,10 +850,10 @@ void ConcreteMangerMachine::HandleStaSemiActive()
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
         }
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE)) {
-        AutoStartScanOnly(mid);
+        WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(mid);
         SwitchState(pSemiActiveState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
-        AutoStopScanOnly(mid, false);
+        WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(mid);
         SwitchState(pSemiActiveState);
     } else {
         WIFI_LOGE("Now targetrole is unknow.");

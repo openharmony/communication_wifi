@@ -22,8 +22,10 @@ namespace OHOS {
 namespace Wifi {
 class MockScanStateMachine : public ScanStateMachine {
 public:
-    MockScanStateMachine(){}
-    ~MockScanStateMachine(){}
+    MockScanStateMachine()
+    {}
+    ~MockScanStateMachine()
+    {}
     void SendMessage(int what);
     void SendMessage(int what, int arg1);
     void SendMessage(int what, int arg1, int arg2);

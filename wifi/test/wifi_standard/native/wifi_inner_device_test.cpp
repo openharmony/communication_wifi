@@ -239,5 +239,6 @@ HWTEST_F(WifiInnerDeviceTest, ResetAllFrozenAppTest, TestSize.Level1)
     WIFI_LOGE("ResetAllFrozenAppTest result(0x%{public}x)", result);
     EXPECT_GE(result, WIFI_OPT_SUCCESS);
 }
+
 } // namespace Wifi
 } // namespace OHOS

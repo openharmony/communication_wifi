@@ -151,5 +151,6 @@ HWTEST_F(WifiWatchDogUtilsTest, ReportResetEventTest, TestSize.Level1)
     // Check that the function returns true
     EXPECT_TRUE(result);
 }
+
 }
 }

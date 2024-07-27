@@ -176,3 +176,4 @@ ohos_unittest("mock_wifi_hal_service") {
   subsystem_name = "communication"
   testonly = true
 }
+

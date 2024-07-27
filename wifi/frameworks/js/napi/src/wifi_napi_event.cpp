@@ -136,6 +136,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
     };
     if (napi_status::napi_ok != napi_send_event(asyncEvent->env, task, napi_eprio_immediate)) {
         WIFI_LOGE("napi_send_event: Failed to SendEvent");
+        delete asyncEvent;
     } else {
         WIFI_LOGI("napi_send_event: Successed to SendEvent");
     }

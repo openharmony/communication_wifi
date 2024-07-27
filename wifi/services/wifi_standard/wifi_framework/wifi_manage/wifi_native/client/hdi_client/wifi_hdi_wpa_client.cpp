@@ -387,6 +387,7 @@ WifiErrorNo WifiHdiWpaClient::ReqRegisterStaEventCallback(const WifiEventCallbac
         cWifiHdiWpaCallback.OnEventAssociateReject = OnEventAssociateReject;
         cWifiHdiWpaCallback.OnEventWpsOverlap = OnEventWpsOverlap;
         cWifiHdiWpaCallback.OnEventWpsTimeout = OnEventWpsTimeout;
+        cWifiHdiWpaCallback.OnEventAuthTimeout = OnEventAuthTimeout;
         cWifiHdiWpaCallback.OnEventScanResult = OnEventScanResult;
         cWifiHdiWpaCallback.OnEventStaNotify = OnEventStaNotify;
     }

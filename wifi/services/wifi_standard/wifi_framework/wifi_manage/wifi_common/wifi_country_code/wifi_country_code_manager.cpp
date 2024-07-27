@@ -30,9 +30,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCountryCodeManager");
 const std::string CLASS_NAME = "WifiCountryCodeManager";
-#ifdef DTFUZZ_TEST
-static WifiCountryCodeManager* instance = nullptr;
-#endif
+
 WifiCountryCodeManager::~WifiCountryCodeManager()
 {
     std::lock_guard<std::mutex> lock(m_countryCodeMutex);
@@ -41,15 +39,8 @@ WifiCountryCodeManager::~WifiCountryCodeManager()
 
 WifiCountryCodeManager &WifiCountryCodeManager::GetInstance()
 {
-#ifndef DTFUZZ_TEST
     static WifiCountryCodeManager instance;
     return instance;
-#else
-    if (instance == nullptr) {
-        instance = new (std::nothrow) WifiCountryCodeManager();
-    }
-    return *instance;
-#endif
 }
 
 ErrCode WifiCountryCodeManager::Init()

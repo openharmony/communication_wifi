@@ -1459,6 +1459,13 @@ public:
         pStaStateMachine->SetWifiLinkedInfo(0);
     }
 
+    void GetDeviceCfgInfoSuccessTest()
+    {
+        const std::string bssid = "wifitest";
+        WifiDeviceConfig deviceConfig;
+        pStaStateMachine->GetDeviceCfgInfo(bssid, deviceConfig);
+    }
+
     void DhcpResultNotifyOnSuccessTest()
     {
         pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
@@ -2910,6 +2917,11 @@ HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess2, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess3, TestSize.Level1)
 {
     ConnectToNetworkProcessSuccess3();
+}
+
+HWTEST_F(StaStateMachineTest, GetDeviceCfgInfoSuccessTest, TestSize.Level1)
+{
+    GetDeviceCfgInfoSuccessTest();
 }
 
 HWTEST_F(StaStateMachineTest, SetWifiLinkedInfoSuccess1, TestSize.Level1)

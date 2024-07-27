@@ -61,12 +61,12 @@ void MockStaStateMachine::StartRoamToNetwork(std::string bssid)
     WIFI_LOGD("MockStaStateMachine::StartRoamToNetwork, bssid is %{private}s.", bssid.c_str());
 }
 
-void MockStaStateMachine::StopTimer(int timerName)
+void MockStaStateMachine::StopTimer(int timeName)
 {
-    WIFI_LOGD("MockStaStateMachine::StartRoamToNetwork, bssid is %{private}d.", timerName);
+    WIFI_LOGD("MockStaStateMachine::StartRoamToNetwork, bssid is %{private}d.", timeName);
 }
 
-void MessageExecutedLater(int msgName, int64_t delayTimeMs)
+void MockStaStateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs)
 {}
 }  // namespace Wifi
 }  // namespace OHOS

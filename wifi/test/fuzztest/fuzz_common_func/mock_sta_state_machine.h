@@ -30,7 +30,7 @@ public:
     void SendMessage(int msgName, const std::any &messageObj);
     void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
     void StartRoamToNetwork(std::string bssid);
-    void StopTimer(int timerName);
+    void StopTimer(int timeName);
     void MessageExecutedLater(int msgName, int64_t delayTimeMs);
 };
 }  // namespace OHOS

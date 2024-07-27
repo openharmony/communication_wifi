@@ -180,17 +180,9 @@ void WifiManager::OnNativeProcessStatusChange(int status)
     switch (status) {
         case WPA_DEATH:
             WIFI_LOGE("wpa_supplicant process is dead!");
-            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
-                wifiTogglerManager->AirplaneToggled(1);
-                wifiTogglerManager->AirplaneToggled(0);
-            }
             break;
         case AP_DEATH:
             WIFI_LOGE("hostapd process is dead!");
-            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
-                wifiTogglerManager->SoftapToggled(0, 0);
-                wifiTogglerManager->SoftapToggled(1, 0);
-            }
             break;
         default:
             break;

@@ -430,5 +430,6 @@ HWTEST_F(WifiP2pCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)
     pWifiP2pCallbackStub->SetRemoteDied(val);
     EXPECT_TRUE(pWifiP2pCallbackStub->IsRemoteDied() == false);
 }
+
 } // namespace Wifi
 } // namespace OHOS

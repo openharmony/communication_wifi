@@ -77,3 +77,4 @@ ohos_unittest("base_unittest") {
   subsystem_name = "communication"
   testonly = true
 }
+

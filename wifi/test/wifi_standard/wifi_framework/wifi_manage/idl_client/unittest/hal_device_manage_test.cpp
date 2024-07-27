@@ -611,6 +611,7 @@ HWTEST_F(WifiHalDeviceManagerTest, OnRssiReportCallbackTest_01, TestSize.Level1)
     EXPECT_EQ(result, 0);
 }
 
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -842,5 +842,6 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pIfaceCreatedTest, TestSize.Level1)
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pIfaceCreated(ifName, isGo);
 }
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -67,5 +67,6 @@ HWTEST_F(WifiOpensslUtilsTest, OpensslAesEncryptTest1, TestSize.Level1)
     }
 }
 
+
 }  // namespace Wifi
 }  // namespace OHOS

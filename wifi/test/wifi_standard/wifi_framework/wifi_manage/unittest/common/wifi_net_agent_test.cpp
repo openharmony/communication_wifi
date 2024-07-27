@@ -18,6 +18,7 @@
 #include "wifi_net_agent.h"
 #include "wifi_log.h"
 #include "wifi_logger.h"
+#include "net_supplier_callback_base.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_config_center.h"
 
@@ -200,8 +201,8 @@ HWTEST_F(WifiNetAgentTest, RequestNetworkTest001, TestSize.Level1)
     WifiNetAgent::NetConnCallback netConnCallback;
     std::string ident = "";
     std::set<NetManagerStandard::NetCap> netCaps;
-    int32_t registerType = 0;
-    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, registerType), 0);
+    NetManagerStandard::NetRequest netrequest;
+    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), 0);
 }
 
 HWTEST_F(WifiNetAgentTest, ReleaseNetworkTest001, TestSize.Level1)

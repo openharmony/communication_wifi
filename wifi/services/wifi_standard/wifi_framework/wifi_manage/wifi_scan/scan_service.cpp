@@ -583,39 +583,7 @@ void ScanService::HandleCommonScanInfo(
     bool fullScanStored = false;
     {
         std::unique_lock<std::mutex> lock(scanConfigMapMutex);
-        for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end();
-            ++reqIter) {
-            ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
-            /* No configuration found. */
-            if (configIter == scanConfigMap.end()) {
-                continue;
-            }
-
-            /* Full Scan Info. */
-            if (configIter->second.fullScanFlag) {
-                if (fullScanStored) {
-                    scanConfigMap.erase(*reqIter);
-                    continue;
-                }
-
-                if (StoreFullScanInfo(configIter->second, scanInfoList)) {
-                    fullScanStored = true;
-                    ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
-                    scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
-                } else {
-                    WIFI_LOGE("StoreFullScanInfo failed.\n");
-                }
-                /* Specify Scan Info. */
-            } else {
-                if (!StoreUserScanInfo(configIter->second, scanInfoList)) {
-                    WIFI_LOGE("StoreUserScanInfo failed.\n");
-                }
-                ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
-                scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
-            }
-
-            scanConfigMap.erase(*reqIter);
-        }
+        HandleScanResults(requestIndexList, scanInfoList, fullScanStored);
     }
     if (fullScanStored) {
         TryToRestoreSavedNetwork();
@@ -639,6 +607,40 @@ void ScanService::HandleCommonScanInfo(
     ReportScanInfos(scanInfoList);
 
     return;
+}
+
+void ScanService::HandleScanResults(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList,
+    bool &fullScanStored)
+{
+    for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
+        ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
+        /* No configuration found. */
+        if (configIter == scanConfigMap.end()) {
+            continue;
+        }
+        /* Full Scan Info. */
+        if (configIter->second.fullScanFlag) {
+            if (fullScanStored) {
+                scanConfigMap.erase(*reqIter);
+                continue;
+            }
+            if (StoreFullScanInfo(configIter->second, scanInfoList)) {
+                fullScanStored = true;
+                ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
+                scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
+            } else {
+                WIFI_LOGE("StoreFullScanInfo failed.\n");
+            }
+            /* Specify Scan Info. */
+        } else {
+            if (!StoreUserScanInfo(configIter->second, scanInfoList)) {
+                WIFI_LOGE("StoreUserScanInfo failed.\n");
+            }
+            ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
+            scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
+        }
+        scanConfigMap.erase(*reqIter);
+    }
 }
 
 int ScanService::GetWifiMaxSupportedMaxSpeed(const InterScanInfo &scanInfo, const int &maxNumberSpatialStreams)
@@ -1079,6 +1081,9 @@ void ScanService::HandleNetworkQualityChanged(int status)
         }
         case static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED): {
             SystemScanProcess(false);
+            break;
+        }
+        default: {
             break;
         }
     }
@@ -2359,7 +2364,7 @@ bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId
 
 ErrCode ScanService::SetNetworkInterfaceUpDown(bool upDown)
 {
-    WIFI_LOGI("Enter SetNetworkInterfaceUpDown.\n");
+    WIFI_LOGI("Enter ScanService::SetNetworkInterfaceUpDown.\n");
     int res = WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), upDown);
     if (res != static_cast<int>(WIFI_HAL_OPT_OK)) {
@@ -2432,6 +2437,9 @@ void ScanService::SystemScanDisconnectedPolicy(int &interval, int &count)
 void ScanService::InitChipsetInfo()
 {
     WIFI_LOGI("Enter InitChipsetInfo");
+    if (isChipsetInfoObtained) {
+        return;
+    }
     if (WifiStaHalInterface::GetInstance().GetChipsetCategory(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), chipsetCategory) != WIFI_HAL_OPT_OK
         || WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(

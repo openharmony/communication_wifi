@@ -294,16 +294,14 @@ void StaMonitorTest::OnWpaConnectionFullCallBackFail()
 void StaMonitorTest::OnWpaConnectionRejectCallBackSuccess()
 {
     int status = 1;
-    std::string bssid = "11:22:33:44:55:66";
-    pStaMonitor->OnWpaConnectionRejectCallBack(status, bssid);
+    pStaMonitor->OnWpaConnectionRejectCallBack(status);
 }
 
 void StaMonitorTest::OnWpaConnectionRejectCallBackFail()
 {
     int status = 1;
-    std::string bssid = "11:22:33:44:55:66";
     pStaMonitor->pStaStateMachine = nullptr;
-    pStaMonitor->OnWpaConnectionRejectCallBack(status, bssid);
+    pStaMonitor->OnWpaConnectionRejectCallBack(status);
 }
 
 void StaMonitorTest::OnWpaHilinkCallBackSuccess()

@@ -3582,33 +3582,7 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessagePtr msg)
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
             WIFI_LOGI("ApRoamingState, receive WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT event.");
-            ret = EXECUTED;
-            std::string bssid = msg->GetStringFromMessage();
-            if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
-                WIFI_LOGE("ApRoamingState inconsistent bssid in connecter");
-                return false;
-            }
-            pStaStateMachine->isRoam = true;
-            pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
-            pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
-            pStaStateMachine->ConnectToNetworkProcess(bssid);
-            /* Notify result to InterfaceService. */
-            pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED,
-                pStaStateMachine->linkedInfo);
-            if (!pStaStateMachine->CanArpReachable()) {
-                WIFI_LOGI("Arp is not reachable");
-                WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));
-                pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
-                    pStaStateMachine->linkedInfo);
-                /* The current state of StaStateMachine transfers to GetIpState. */
-                pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
-            } else {
-                WIFI_LOGI("Arp is reachable");
-                pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-                pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED,
-                    pStaStateMachine->linkedInfo);
-                pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
-            }
+            ret = HandleNetworkConnectionEvent(msg);
             break;
         }
         case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT: {
@@ -3627,7 +3601,38 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessagePtr msg)
             WIFI_LOGI("ApRoamingState-msgCode=%d not handled.", msg->GetMessageName());
             break;
     }
+    return ret;
+}
 
+bool StaStateMachine::ApRoamingState::HandleNetworkConnectionEvent(InternalMessagePtr msg)
+{
+    bool ret = EXECUTED;
+    std::string bssid = msg->GetStringFromMessage();
+    if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
+        WIFI_LOGE("ApRoamingState inconsistent bssid in connecter");
+        ret = NOT_EXECUTED;
+    }
+    pStaStateMachine->isRoam = true;
+    pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
+    pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+    pStaStateMachine->ConnectToNetworkProcess(bssid);
+    /* Notify result to InterfaceService. */
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED,
+        pStaStateMachine->linkedInfo);
+    if (!pStaStateMachine->CanArpReachable()) {
+        WIFI_LOGI("Arp is not reachable");
+        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));
+        pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP,
+            pStaStateMachine->linkedInfo);
+        /* The current state of StaStateMachine transfers to GetIpState. */
+        pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+    } else {
+        WIFI_LOGI("Arp is reachable");
+        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+        pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED,
+            pStaStateMachine->linkedInfo);
+        pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+    }
     return ret;
 }
 

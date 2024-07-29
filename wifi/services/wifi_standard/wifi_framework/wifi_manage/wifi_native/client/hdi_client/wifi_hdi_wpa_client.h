@@ -838,7 +838,7 @@ private:
     void GetModeString(const HotspotConfig &config, std::string &modeString);
     void ConvertToUtf8(const std::string ssid, std::vector<uint8_t> &ssidUtf8);
     std::string StringCombination(const char* fmt, ...);
-    void AppendStr(std::string* dst, const char* format, va_list args);
+    void AppendStr(std::string &dst, const char* format, va_list args);
     bool WriteConfigToFile(const std::string &fileContext);
 };
 }  // namespace Wifi

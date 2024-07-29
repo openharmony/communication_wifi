@@ -3320,6 +3320,5 @@ HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest5, TestSize.Level1)
 {
     DealHiLinkDataToWpaSuccessTest5();
 }
-
 } // namespace Wifi
 } // namespace OHOS

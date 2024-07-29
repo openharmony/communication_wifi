@@ -63,7 +63,7 @@ void MockStaStateMachine::StartRoamToNetwork(std::string bssid)
 
 void MockStaStateMachine::StopTimer(int timeName)
 {
-    WIFI_LOGD("MockStaStateMachine::StopTimer, timeName is %{private}d.", timeName);
+    WIFI_LOGD("MockStaStateMachine::StartRoamToNetwork, bssid is %{private}d.", timeName);
 }
 
 void MockStaStateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs)

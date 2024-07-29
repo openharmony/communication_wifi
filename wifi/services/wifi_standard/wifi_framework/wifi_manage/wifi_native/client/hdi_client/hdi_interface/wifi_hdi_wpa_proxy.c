@@ -191,6 +191,7 @@ static void HdiWpaResetGlobalObj()
     g_devMgr = NULL;
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGE("%{public}s reset wpa g_wpaObj", __func__);
+    HdiWpaStart();
 }
 
 static void (*mNativeProcessCallback)(int) = NULL;
@@ -560,6 +561,7 @@ static void HdiApResetGlobalObj()
     g_apObj = NULL;
     g_apDevMgr = NULL;
     pthread_mutex_unlock(&g_apObjMutex);
+    HdiApStart(g_id, g_apIfaceName);
 }
 
 static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)

@@ -234,7 +234,7 @@ HWTEST_F(WifiHalDeviceManagerTest, CreateTheNeedChangeChipModeIfaceDataTest, Tes
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateTheNeedChangeChipModeIfaceData(
         wifiChipInfo, createIfaceType, chipMode, ifaceCreationData);
     
-    IfaceType createIfaceType = IfaceType::STA;
+    createIfaceType = IfaceType::STA;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateTheNeedChangeChipModeIfaceData(
         wifiChipInfo, createIfaceType, chipMode, ifaceCreationData);
 }
@@ -610,7 +610,6 @@ HWTEST_F(WifiHalDeviceManagerTest, OnRssiReportCallbackTest_01, TestSize.Level1)
     int result = data.OnRssiReport(index, c0Rssi, c1Rssi);
     EXPECT_EQ(result, 0);
 }
-
 
 }  // namespace Wifi
 }  // namespace OHOS

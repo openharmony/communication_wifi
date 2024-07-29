@@ -124,4 +124,10 @@ typedef enum HalCallbackEvent {
     HAL_CBK_CMD_STA_DISCONNECT_REASON_EVENT,       /* sta disconnect reason report */
 } HalCallbackEvent;
 
+typedef enum Wifi80211StatusCode {
+    WLAN_STATUS_UNSPECIFIED_FAILURE = 1,
+    WLAN_STATUS_AP_UNABLE_TO_HANDLE_NEW_STA = 17,
+    WLAN_STATUS_ASSOC_REJECTED_TEMPORARILY = 30,
+    WLAN_STATUS_DENIED_INSUFFICIENT_BANDWIDTH = 33,
+} Wifi80211StatusCode;
 #endif

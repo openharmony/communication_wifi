@@ -138,8 +138,8 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
             WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
             copy.SetOwner(device);
             groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
-            WIFI_LOGI("GetGcDeviceAddress %{private}s %{private}s", device.GetDeviceAddress().c_str(),
-                device.GetRandomDeviceAddress().c_str());
+            WIFI_LOGI("ProcessGroupStartedEvt %{private}s %{private}s",
+				device.GetDeviceAddress().c_str(), device.GetRandomDeviceAddress().c_str());
             deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
 
             p2pStateMachine.BroadcastP2pPeersChanged();

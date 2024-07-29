@@ -1209,6 +1209,12 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         }
     }
 
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
+        /* Clear mac addr */
+        info.bssid = "";
+    }
+
     WIFI_LOGD("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
               info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
     WIFI_LOGD("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d,\
@@ -1428,12 +1434,12 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
         WIFI_LOGE("EnableWifi: Mdm forbidden PERMISSION_DENIED!");
         return WIFI_OPT_ENTERPRISE_DENIED;
     }
+#endif
+
     /**
      * when airplane mode opened, if the config "can_open_sta_when_airplanemode"
      * opened, then can open sta; other, return forbid.
      */
-    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
-#endif
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
         !WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(m_instId)) {
         WIFI_LOGI("current airplane mode and can not use sta, open failed!");

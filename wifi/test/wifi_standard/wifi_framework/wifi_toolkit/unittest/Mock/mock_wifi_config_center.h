@@ -27,7 +27,7 @@ class MockWifiConfigCenter {
 public:
     virtual ~MockWifiConfigCenter() = default;
     virtual void SetWifiSelfcureReset(const bool isReset) = 0;
-    virtual bool GetWifiSelfcureReset() = 0;
+    virtual bool GetWifiSelfcureReset() const = 0;
     virtual void SetWifiSelfcureResetEntered(const bool isReset) = 0;
     virtual bool GetWifiSelfcureResetEntered() = 0;
     virtual void SetLastNetworkId(const int networkId) = 0;
@@ -96,9 +96,12 @@ public:
     virtual void SetThermalLevel(const int &level) = 0;
     virtual int GetThermalLevel() const = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
-    virtual void SetWifiToggledState(bool state) = 0;
+    virtual void SetWifiToggledState(int state) = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual void SetThreadStatusFlag(bool state) = 0;
+    virtual int SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config) = 0;
+    virtual void SetWifiConnectedMode(bool isContainerConnected, int instId = 0) = 0;
+    virtual bool GetWifiConnectedMode(int instId = 0) = 0;
     virtual WifiOprMidState GetScanMidState(int instId = 0) = 0;
     virtual void SetScanMidState(WifiOprMidState state, int instId = 0) = 0;
     virtual bool SetScanMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0) = 0;
@@ -123,7 +126,7 @@ public:
     static WifiConfigCenter &GetInstance();
 
     MOCK_METHOD1(SetWifiSelfcureReset, void(const bool isReset));
-    MOCK_METHOD0(GetWifiSelfcureReset, bool());
+    MOCK_CONST_METHOD0(GetWifiSelfcureReset, bool());
     MOCK_METHOD1(SetWifiSelfcureResetEntered, void(const bool isReset));
     MOCK_METHOD0(GetWifiSelfcureResetEntered, bool());
     MOCK_METHOD1(SetLastNetworkId, void(const int networkId));
@@ -192,9 +195,12 @@ public:
     MOCK_METHOD1(SetThermalLevel, void(const int &level));
     MOCK_CONST_METHOD0(GetThermalLevel, int());
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
-    MOCK_METHOD1(SetWifiToggledState, void(bool state));
+    MOCK_METHOD1(SetWifiToggledState, void(int state));
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_METHOD1(SetThreadStatusFlag, void(bool state));
+    MOCK_METHOD2(SetChangeDeviceConfig, int(ConfigChange value, const WifiDeviceConfig &config));
+    MOCK_METHOD2(SetWifiConnectedMode, void(bool isContainerConnected, int instId));
+    MOCK_METHOD1(GetWifiConnectedMode, bool(int instId));
     MOCK_METHOD1(GetScanMidState, WifiOprMidState(int instId));
     MOCK_METHOD2(SetScanMidState, void(WifiOprMidState state, int instId));
     MOCK_METHOD3(SetScanMidState, bool(WifiOprMidState expState, WifiOprMidState state, int instId));

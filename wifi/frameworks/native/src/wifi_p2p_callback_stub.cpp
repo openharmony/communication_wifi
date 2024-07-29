@@ -88,7 +88,6 @@ int WifiP2pCallbackStub::OnRemoteRequest(
 
 void WifiP2pCallbackStub::RegisterCallBack(const sptr<IWifiP2pCallback> &userCallback)
 {
-    std::unique_lock<std::mutex> lock(callBackEventMutex);
     if (userCallback_ != nullptr) {
         WIFI_LOGD("Callback has registered!");
         return;

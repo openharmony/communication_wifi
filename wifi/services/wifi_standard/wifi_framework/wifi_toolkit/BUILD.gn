@@ -47,6 +47,7 @@ local_base_sources = [
 ]
 
 local_base_include_dirs = [
+  "$WIFI_ROOT_DIR/base/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
@@ -109,9 +110,7 @@ if (defined(ohos_lite)) {
       "config/wifi_backup_config.cpp",
       "utils/network_parser.cpp",
       "utils/softap_parser.cpp",
-      "utils/wifi_app_parser.cpp",
       "utils/wifi_cert_utils.cpp",
-      "utils/xml_parser.cpp",
     ]
 
     include_dirs = local_base_include_dirs
@@ -120,7 +119,10 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/inc",
     ]
 
-    deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
+    deps = [
+      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/utils:wifi_utils",
+    ]
 
     defines = [
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
@@ -129,10 +131,6 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_encryption) {
       defines += [ "FEATURE_ENCRYPTION_SUPPORT" ]
-    }
-
-    if (is_asan || use_clang_coverage) {
-      defines += [ "DTFUZZ_TEST" ]
     }
 
     if (wifi_feature_with_random_mac_addr) {
@@ -147,6 +145,9 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_hdi_chip_supported) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
+    }
+    if (is_asan || use_clang_coverage) {
+      defines += [ "DTFUZZ_TEST" ]
     }
 
     external_deps = [

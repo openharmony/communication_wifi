@@ -37,20 +37,11 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiManager");
-#ifdef DTFUZZ_TEST
-static WifiManager* gWifiManager = nullptr;
-#endif
+
 WifiManager &WifiManager::GetInstance()
 {
-#ifndef DTFUZZ_TEST
     static WifiManager gWifiManager;
     return gWifiManager;
-#else
-    if (gWifiManager == nullptr) {
-        gWifiManager = new (std::nothrow) WifiManager();
-    }
-    return *gWifiManager;
-#endif
 }
 
 WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0)
@@ -125,9 +116,7 @@ int WifiManager::Init()
             wifiTogglerManager->ScanOnlyToggled(1);
         }
     }
-#ifndef DTFUZZ_TEST
     InitPidfile();
-#endif
     return 0;
 }
 
@@ -180,17 +169,9 @@ void WifiManager::OnNativeProcessStatusChange(int status)
     switch (status) {
         case WPA_DEATH:
             WIFI_LOGE("wpa_supplicant process is dead!");
-            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
-                wifiTogglerManager->AirplaneToggled(1);
-                wifiTogglerManager->AirplaneToggled(0);
-            }
             break;
         case AP_DEATH:
             WIFI_LOGE("hostapd process is dead!");
-            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
-                wifiTogglerManager->SoftapToggled(0, 0);
-                wifiTogglerManager->SoftapToggled(1, 0);
-            }
             break;
         default:
             break;

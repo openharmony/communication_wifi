@@ -27,7 +27,7 @@ public:
     WifiCodeConvertUtil() = default;
     ~WifiCodeConvertUtil() = default;
 
-    static bool isUtf8(const std::string &stf);
+    static bool IsUtf8(const std::string &stf);
     static std::string GbkToUtf8(const std::string &strGbk);
 private:
     static std::string Convert(const std::string &str, const std::string &fromCharset,

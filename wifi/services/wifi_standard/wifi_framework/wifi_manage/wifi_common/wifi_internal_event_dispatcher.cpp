@@ -536,6 +536,9 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance, con
 int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddBroadCastMsg, msgcode %{public}d", msg.msgCode);
+    if (!mBroadcastThread) {
+        return 0;
+    }
     std::function<void()> func = std::bind([this, msg]() {
         Run(std::ref(*this), msg);
     });

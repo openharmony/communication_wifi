@@ -55,6 +55,7 @@ const int SYSTEM_SCAN_INTERVAL_10_SECOND = 10;
 const int SYSTEM_SCAN_INTERVAL_30_SECOND = 30;
 const int SYSTEM_SCAN_INTERVAL_60_SECOND = 60;
 const int SYSTEM_SCAN_COUNT_3_TIMES = 3;
+const int DEFAULT_PNO_SCAN_INTERVAL = 300;
 
 const int TONE_PER_SYM_11ABG = 48;
 const int TONE_PER_SYM_11N_20MHZ = 52;
@@ -86,8 +87,8 @@ const int TWO_DB = 3;
 const int SNR_BIT_PER_TONE_HIGH_SNR_SCALE = BIT_PER_TONE_SCALE / TWO_DB;
 const int SNR_BIT_PER_TONE_LUT_MIN = -10; // minimum snrDb supported by LUT
 const int SNR_BIT_PER_TONE_LUT_MAX = 9;   // maximum snrDb supported by LUT
-const int SNR_BIT_PER_TONE_LUT[] = {0, 171, 212, 262, 323, 396, 484, 586, 706, 844, 1000, 1176, 1370, 1583, 1812,
-    2058, 2317, 2588, 2870, 3161};
+const int SNR_BIT_PER_TONE_LUT[] = {0, 171, 212, 262, 323, 396, 484, 586,
+                                          706, 844, 1000, 1176, 1370, 1583, 1812, 2058, 2317, 2588, 2870, 3161};
 const int NOISE_FLOOR_20MHZ_DBM = -96;
 
 const int SNR_MARGIN_DB = 16;
@@ -463,6 +464,15 @@ private:
      * @param scanInfoList - Scan Info List[in]
      */
     void HandleCommonScanInfo(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList);
+    /**
+     * @Description Handle scanning result
+     *
+     * @param requestIndexList - Request Index List[in]
+     * @param scanInfoList - Scan Info List[in]
+     * @param fullScanStored - Full scan stored [in]
+     */
+    void HandleScanResults(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList,
+        bool &fullScanStored);
     /**
      * @Description Common scanning failure processing
      *

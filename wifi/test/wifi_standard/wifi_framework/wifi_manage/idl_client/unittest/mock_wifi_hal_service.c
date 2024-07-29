@@ -758,5 +758,4 @@ WifiErrorNo P2pHid2dConnect(Hid2dConnectInfo *info)
 {
     return WIFI_HAL_SUCCESS;
 }
-
 /*--------------- wifi_hal_p2p_interface.h end---------------------------*/

@@ -1209,6 +1209,12 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         }
     }
 
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
+        /* Clear mac addr */
+        info.bssid = "";
+    }
+
     WIFI_LOGD("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
               info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
     WIFI_LOGD("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d,\
@@ -1350,14 +1356,12 @@ ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> 
 
 ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, int &level)
 {
-    WIFI_LOGI("GetSignalLevel device impl start...");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSignalLevel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     level = WifiSettings::GetInstance().GetSignalLevel(rssi, band, m_instId);
-    WIFI_LOGI("GetSignalLevel device impl end...");
     return WIFI_OPT_SUCCESS;
 }
 

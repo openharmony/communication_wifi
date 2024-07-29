@@ -29,7 +29,6 @@
 #include "i_wifi_p2p_callback.h"
 #include "kits/c/wifi_p2p.h"
 #include "kits/c/wifi_hid2d.h"
-#include "wifi_event_handler.h"
 
 class WifiCDeviceEventCallback : public OHOS::Wifi::IWifiDeviceCallBack {
 public:

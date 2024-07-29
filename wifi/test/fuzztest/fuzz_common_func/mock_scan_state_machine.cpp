@@ -21,17 +21,17 @@ namespace OHOS {
 namespace Wifi {
 void MockScanStateMachine::SendMessage(int what)
 {
-    WIFI_LOGD("MockScanStateMachine::SendMessage, what is %{public}d.", what);
+    WIFI_LOGE("MockScanStateMachine::SendMessage, what is %{public}d.", what);
 }
 
 void MockScanStateMachine::SendMessage(int what, int arg1)
 {
-    WIFI_LOGD("MockScanStateMachine::SendMessage, what is %{public}d, arg1 is %{public}d.", what, arg1);
+    WIFI_LOGE("MockScanStateMachine::SendMessage, what is %{public}d, arg1 is %{public}d.", what, arg1);
 }
 
 void MockScanStateMachine::SendMessage(int what, int arg1, int arg2)
 {
-    WIFI_LOGD("MockScanStateMachine::SendMessage, what is %{public}d, arg1 is %{public}d, arg2 is %{public}d.", what,
+    WIFI_LOGE("MockScanStateMachine::SendMessage, what is %{public}d, arg1 is %{public}d, arg2 is %{public}d.", what,
         arg1, arg2);
 }
 
@@ -40,31 +40,31 @@ void MockScanStateMachine::SendMessage(InternalMessagePtr msg)
     if (msg == nullptr) {
         return;
     }
-    WIFI_LOGD("MockScanStateMachine::SendMessage, msg is %{public}d.", msg->GetMessageName());
+    WIFI_LOGE("MockScanStateMachine::SendMessage, msg is %{public}d.", msg->GetMessageName());
 }
 
 void MockScanStateMachine::StartTimer(int timerName, int64_t interval)
 {
     (void)timerName;
     (void)interval;
-    WIFI_LOGD("Enter MockScanStateMachine::StartTimer");
+    WIFI_LOGE("Enter MockScanStateMachine::StartTimer");
 }
 
 void MockScanStateMachine::StopTimer(int timerName)
 {
     (void)timerName;
-    WIFI_LOGD("Enter MockScanStateMachine::StopTimer");
+    WIFI_LOGE("Enter MockScanStateMachine::StopTimer");
 }
 
 InternalMessagePtr MockScanStateMachine::CreateMessage(int msgName)
 {
-    WIFI_LOGD("Enter MockScanStateMachine::CreateMessage");
+    WIFI_LOGE("Enter MockScanStateMachine::CreateMessage");
     return nullptr;
 }
 
 InternalMessagePtr MockScanStateMachine::CreateMessage(int msgName, int param1)
 {
-    WIFI_LOGD("Enter MockScanStateMachine::CreateMessage");
+    WIFI_LOGE("Enter MockScanStateMachine::CreateMessage");
     return nullptr;
 }
 

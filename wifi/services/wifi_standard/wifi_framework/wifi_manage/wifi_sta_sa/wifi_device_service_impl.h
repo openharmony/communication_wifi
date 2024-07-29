@@ -157,10 +157,10 @@ public:
     ErrCode IsBandTypeSupported(int bandType, bool &supported) override;
 
     ErrCode Get5GHzChannelList(std::vector<int> &result) override;
-
-    static void SaBasicDump(std::string& result);
     
     ErrCode StartPortalCertification() override;
+    
+    static void SaBasicDump(std::string& result);
 
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
 

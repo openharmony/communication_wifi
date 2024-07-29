@@ -612,6 +612,10 @@ ErrCode WifiHotspotServiceImpl::RegisterCallBack(const sptr<IWifiHotspotCallback
 ErrCode WifiHotspotServiceImpl::GetSupportedFeatures(long &features)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
+    if (!WifiAuthCenter::IsSystemAppByToken()) {
+        WIFI_LOGE("GetSupportedFeatures:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

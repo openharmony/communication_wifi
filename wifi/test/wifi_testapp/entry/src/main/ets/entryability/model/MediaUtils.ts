@@ -15,8 +15,9 @@
 
 import image from '@ohos.multimedia.image'
 import fileio from '@ohos.fileio'
+import fs from '@ohos.file.fs';
 import prompt from '@ohos.prompt'
-import mediaLibrary from '@ohos.multimedia.mediaLibrary'
+import photoAccessHelper from '@ohos.file.photoAccessHelper'
 import DateTimeUtil from './DateTimeUtil'
 
 
@@ -28,16 +29,18 @@ const TAG = "[MediaUtils]"
 
 class MediaUtils {
   async createAndGetFile(context: any) {
-    let mediaTest = mediaLibrary.getMediaLibrary(context)
+    let mediaTest = photoAccessHelper.getPhotoAccessHelper(context)
     let info = {
-      prefix: 'IMG_', suffix: '.jpg', directory: mediaLibrary.DirectoryType.DIR_IMAGE
+      prefix: 'IMG_', suffix: '.jpg', directory: photoAccessHelper.PhotoType.IMAGE
     }
     let dateTimeUtil = new DateTimeUtil()
     let name = `${dateTimeUtil.getDate()}_${dateTimeUtil.getTime()}`
     let displayName = `${info.prefix}${name}${info.suffix}`
-    let publicPath = await mediaTest.getPublicDirectory(info.directory)
-    console.log(TAG, `publicPath = ${publicPath}`)
-    return await mediaTest.createAsset(mediaLibrary.MediaType.IMAGE, displayName, publicPath)
+    let photoType: photoAccessHelper.PhotoType = photoAccessHelper.PhotoType.IMAGE;
+    let options: photoAccessHelper.CreateOptions = {
+      title: displayName
+    }
+    return await mediaTest.createAsset(photoType, '.jpg', options)
   }
 
   async savePicture(data: image.PixelMap, context: any) {
@@ -48,14 +51,14 @@ class MediaUtils {
     let imagePackerApi = image.createImagePacker()
     let arrayBuffer = await imagePackerApi.packing(data, packOpts)
     let fileAsset = await this.createAndGetFile(context)
-    let fd = await fileAsset.open('Rw')
+    let file = await fs.open(fileAsset,  fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
     imagePackerApi.release()
     try {
-      await fileio.write(fd, arrayBuffer)
+      await fs.write(file.fd, arrayBuffer);
     } catch (err) {
       console.log(`write failed, code is ${err.code}, message is ${err.message}`)
     }
-    await fileAsset.close(fd)
+    await fs.close(file.fd);
     console.log(TAG, `write done`)
     prompt.showToast({
       message: '图片保存成功', duration: 1000

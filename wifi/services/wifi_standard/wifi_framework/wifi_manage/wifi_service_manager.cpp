@@ -34,21 +34,10 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiServiceManager");
-
-#ifdef DTFUZZ_TEST
-static WifiServiceManager* gWifiServiceManager = nullptr;
-#endif
 WifiServiceManager &WifiServiceManager::GetInstance()
 {
-#ifndef DTFUZZ_TEST
     static WifiServiceManager gWifiServiceManager;
     return gWifiServiceManager;
-#else
-    if (gWifiServiceManager == nullptr) {
-        gWifiServiceManager = new (std::nothrow) WifiServiceManager();
-    }
-    return *gWifiServiceManager;
-#endif
 }
 
 WifiServiceManager::WifiServiceManager()
@@ -265,6 +254,7 @@ IStaService *WifiServiceManager::GetStaServiceInst(int instId)
         WIFI_LOGD("find a new sta service instance, instId: %{public}d", instId);
         return iter->second;
     }
+
     return nullptr;
 }
 
@@ -279,6 +269,7 @@ ISelfCureService *WifiServiceManager::GetSelfCureServiceInst(int instId)
         WIFI_LOGD("find a new self cure service instance, instId: %{public}d", instId);
         return iter->second;
     }
+    
     return nullptr;
 }
 #endif
@@ -293,6 +284,7 @@ IScanService *WifiServiceManager::GetScanServiceInst(int instId)
         WIFI_LOGD("find a new scan service instance, instId: %{public}d", instId);
         return iter->second;
     }
+    
     return nullptr;
 }
 

@@ -252,10 +252,7 @@ IStaService *WifiServiceManager::GetStaServiceInst(int instId)
         return iter->second;
     }
 
-    WIFI_LOGD("create a new sta service instance, instId: %{public}d", instId);
-    IStaService *service = new StaInterface();
-    mStaServiceHandle.pService[instId] = service;
-    return service;
+    return nullptr;
 }
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
@@ -269,11 +266,8 @@ ISelfCureService *WifiServiceManager::GetSelfCureServiceInst(int instId)
         WIFI_LOGD("find a new self cure service instance, instId: %{public}d", instId);
         return iter->second;
     }
-
-    WIFI_LOGD("create a new self cure service instance, instId: %{public}d", instId);
-    ISelfCureService *service = new SelfCureInterface();
-    mSelfCureServiceHandle.pService[instId] = service;
-    return service;
+    
+    return nullptr;
 }
 #endif
 
@@ -287,11 +281,8 @@ IScanService *WifiServiceManager::GetScanServiceInst(int instId)
         WIFI_LOGD("find a new scan service instance, instId: %{public}d", instId);
         return iter->second;
     }
-
-    WIFI_LOGD("create a new scan service instance, instId: %{public}d", instId);
-    IScanService *service = new ScanInterface();
-    mScanServiceHandle.pService[instId] = service;
-    return service;
+    
+    return nullptr;
 }
 
 #ifdef FEATURE_AP_SUPPORT

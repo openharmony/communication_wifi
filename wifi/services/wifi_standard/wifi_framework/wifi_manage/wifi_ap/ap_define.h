@@ -26,7 +26,7 @@ const int MAX_SSID_LENGTH = 32;
 const int MAX_PSK_LENGTH = 63;
 const int MAC_LENGTH = 17;
 const int MAX_IP_LENGTH = 39;
-const std::string GETTING_INFO = "Obtaining...";
+const std::string GETTING_INFO = "Unknown";
 
 /* *****************************ApService********************************** */
 
@@ -48,7 +48,8 @@ enum class ApStatemachineEvent {
     CMD_UPDATE_HOTSPOTCONFIG_RESULT, /* Update hotspot configuration result */
     CMD_SET_IDLE_TIMEOUT,            /* Set ap idle timeout */
     CMD_UPDATE_COUNTRY_CODE,         /* update wifi conuntry code */
-    CMD_UPDATE_HOTSPOTCONFIG_INFO,   /* update hotspot config info */
+    CMD_HOTSPOT_CHANNEL_CHANGED,     /* hotspot channel changed */
+    CMD_ASSOCIATED_STATIONS_CHANGED, /* associated stations changed */
                                      /* (asynchronous result) */
 };
 

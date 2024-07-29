@@ -671,7 +671,7 @@ WifiErrorNo WifiHdiWpaClient::RegisterApEvent(IWifiApMonitorEventCallback callba
     return HdiRegisterApEventCallback(&cEventCallback);
 }
 
-void WifiHdiWpaClient::AppendStr(std::string* dst, const char* format, va_list args)
+void WifiHdiWpaClient::AppendStr(std::string &dst, const char* format, va_list args)
 {
     char space[MAX_CMD_BUFFER_SIZE] __attribute__((__uninitialized__));
     va_list argsTmp;
@@ -679,24 +679,14 @@ void WifiHdiWpaClient::AppendStr(std::string* dst, const char* format, va_list a
     va_copy(argsTmp, args);
     int result = vsnprintf_s(space, sizeof(space), sizeof(space) - 1, format, argsTmp);
     va_end(argsTmp);
-    if (result < static_cast<int>(sizeof(space))) {
-        if (result >= 0) {
-            dst->append(space, result);
-            return;
-        }
-        if (result < 0) {
-            return;
-        }
+    if (result >= 0) {
+        dst.append(space, result);
+        return;
     }
-    int length = result + 1;
-    char* buf = new char[length];
-    va_copy(argsTmp, args);
-    result = vsnprintf_s(buf, length, length - 1, format, argsTmp);
-    va_end(argsTmp);
-    if (result >= 0 && result < length) {
-        dst->append(buf, result);
+    if (result < 0) {
+        LOGE("AppendStr failed");
+        return;
     }
-    delete[] buf;
 }
 
 std::string WifiHdiWpaClient::StringCombination(const char* fmt, ...)
@@ -704,7 +694,7 @@ std::string WifiHdiWpaClient::StringCombination(const char* fmt, ...)
     va_list args;
     va_start(args, fmt);
     std::string result;
-    AppendStr(&result, fmt, args);
+    AppendStr(result, fmt, args);
     va_end(args);
     return result;
 }

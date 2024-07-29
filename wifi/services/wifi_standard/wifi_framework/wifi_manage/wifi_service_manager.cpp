@@ -128,10 +128,11 @@ int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
 {
     WIFI_LOGI("LoadStaService");
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (bCreate) {
-        IStaService *service = new StaInterface();
-        mStaServiceHandle.pService[0] = service;
+    if (mStaServiceHandle.pService[0]) {
+        return 0;
     }
+    IStaService *service = new StaInterface();
+    mStaServiceHandle.pService[0] = service;
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
     return 0;
 }
@@ -141,10 +142,11 @@ int WifiServiceManager::LoadSelfCureService(const std::string &dlname, bool bCre
 {
     WIFI_LOGI("WifiServiceManager::LoadSelfCureService");
     std::unique_lock<std::mutex> lock(mSelfCureMutex);
-    if (bCreate) {
-        ISelfCureService *service = new SelfCureInterface();
-        mSelfCureServiceHandle.pService[0] = service;
+    if (mSelfCureServiceHandle.pService[0]) {
+        return 0;
     }
+    ISelfCureService *service = new SelfCureInterface();
+    mSelfCureServiceHandle.pService[0] = service;
     return 0;
 }
 #endif
@@ -153,10 +155,11 @@ int WifiServiceManager::LoadScanService(const std::string &dlname, bool bCreate)
 {
     WIFI_LOGI("WifiServiceManager::LoadScanService");
     std::unique_lock<std::mutex> lock(mScanMutex);
-    if (bCreate) {
-        IScanService *service = new ScanInterface();
-        mScanServiceHandle.pService[0] = service;
+    if (mScanServiceHandle.pService[0]) {
+        return 0;
     }
+    IScanService *service = new ScanInterface();
+    mScanServiceHandle.pService[0] = service;
     WifiManager::GetInstance().GetWifiScanManager()->StopUnloadScanSaTimer();
     return 0;
 }
@@ -181,9 +184,10 @@ int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
 {
     WIFI_LOGI("WifiServiceManager::LoadP2pService");
     std::unique_lock<std::mutex> lock(mP2pMutex);
-    if (bCreate) {
-        mP2pServiceHandle.pService = new P2pInterface();
+    if (mP2pServiceHandle.pService) {
+        return 0;
     }
+    mP2pServiceHandle.pService = new P2pInterface();
     WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
     return 0;
 }
@@ -256,17 +260,12 @@ IStaService *WifiServiceManager::GetStaServiceInst(int instId)
 {
     WIFI_LOGD("WifiServiceManager::GetStaServiceInst, instId: %{public}d", instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
-
     auto iter = mStaServiceHandle.pService.find(instId);
     if (iter != mStaServiceHandle.pService.end()) {
         WIFI_LOGD("find a new sta service instance, instId: %{public}d", instId);
         return iter->second;
     }
-
-    WIFI_LOGD("create a new sta service instance, instId: %{public}d", instId);
-    IStaService *service = new StaInterface();
-    mStaServiceHandle.pService[instId] = service;
-    return service;
+    return nullptr;
 }
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
@@ -280,11 +279,7 @@ ISelfCureService *WifiServiceManager::GetSelfCureServiceInst(int instId)
         WIFI_LOGD("find a new self cure service instance, instId: %{public}d", instId);
         return iter->second;
     }
-
-    WIFI_LOGD("create a new self cure service instance, instId: %{public}d", instId);
-    ISelfCureService *service = new SelfCureInterface();
-    mSelfCureServiceHandle.pService[instId] = service;
-    return service;
+    return nullptr;
 }
 #endif
 
@@ -298,11 +293,7 @@ IScanService *WifiServiceManager::GetScanServiceInst(int instId)
         WIFI_LOGD("find a new scan service instance, instId: %{public}d", instId);
         return iter->second;
     }
-
-    WIFI_LOGD("create a new scan service instance, instId: %{public}d", instId);
-    IScanService *service = new ScanInterface();
-    mScanServiceHandle.pService[instId] = service;
-    return service;
+    return nullptr;
 }
 
 #ifdef FEATURE_AP_SUPPORT
@@ -336,9 +327,6 @@ IP2pService *WifiServiceManager::GetP2pServiceInst()
 {
     WIFI_LOGD("WifiServiceManager::GetP2pServiceInst");
     std::unique_lock<std::mutex> lock(mP2pMutex);
-    if (mP2pServiceHandle.pService == nullptr) {
-        mP2pServiceHandle.pService = new P2pInterface();
-    }
     return mP2pServiceHandle.pService;
 }
 #endif

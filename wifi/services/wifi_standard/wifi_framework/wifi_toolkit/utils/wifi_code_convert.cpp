@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
-bool WifiCodeConvertUtil::isUtf8(const std::string &stf)
+bool WifiCodeConvertUtil::IsUtf8(const std::string &stf)
 {
     return Utf8Check(stf.c_str(), stf.length());
 }
@@ -71,7 +71,7 @@ bool WifiCodeConvertUtil::IsUtf8Char(unsigned char chr, int32_t &nBytes)
 
 std::string WifiCodeConvertUtil::GbkToUtf8(const std::string &strGbk)
 {
-    if (strGbk.length() == 0 || isUtf8(strGbk)) {
+    if (strGbk.length() == 0 || IsUtf8(strGbk)) {
         return strGbk;
     }
     std::string result = Convert(strGbk, "gb2312", "utf-8");

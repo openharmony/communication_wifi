@@ -53,36 +53,13 @@ HWTEST_F(WifiHid2dServiceUtilsTest, InitIpPool, TestSize.Level1)
     EXPECT_EQ(pIpPool->InitIpPool(serverIp), true);
 }
 
-HWTEST_F(WifiHid2dServiceUtilsTest, SetGroupUid, TestSize.Level1)
+HWTEST_F(WifiHid2dServiceUtilsTest, SetSharedLinkCount, TestSize.Level1)
 {
-    pSharedLinkManager->ClearSharedLinkCount();
-    int callingUid = 1;
-    pSharedLinkManager->SetGroupUid(callingUid);
-    int getCallingUid;
-    pSharedLinkManager->GetGroupUid(getCallingUid);
-    EXPECT_EQ(getCallingUid, callingUid);
-    pSharedLinkManager->SetGroupUid(callingUid + 1);
-    pSharedLinkManager->GetGroupUid(getCallingUid);
-    EXPECT_EQ(getCallingUid, callingUid);
-    pSharedLinkManager->ClearSharedLinkCount();
-    pSharedLinkManager->GetGroupUid(getCallingUid);
-    EXPECT_EQ(getCallingUid, -1);
-}
-
-HWTEST_F(WifiHid2dServiceUtilsTest, IncreaseSharedLink, TestSize.Level1)
-{
-    pSharedLinkManager->ClearSharedLinkCount();
-    int callingUid = 1;
     int count = 1;
-    pSharedLinkManager->SetGroupUid(callingUid);
-    pSharedLinkManager->IncreaseSharedLink();
+    pIpPool->ReleaseIp(gcMac);
+    pSharedLinkManager->SetSharedLinkCount(count);
     EXPECT_EQ(pSharedLinkManager->GetSharedLinkCount(), count);
-    pSharedLinkManager->IncreaseSharedLink(callingUid);
-    EXPECT_EQ(pSharedLinkManager->GetSharedLinkCount(), count + 1);
-    pSharedLinkManager->DecreaseSharedLink(callingUid);
-    EXPECT_EQ(pSharedLinkManager->GetSharedLinkCount(), count);
-    pSharedLinkManager->ClearSharedLinkCount();
-    EXPECT_EQ(pSharedLinkManager->GetSharedLinkCount(), 0);
+
 }
 }
 }

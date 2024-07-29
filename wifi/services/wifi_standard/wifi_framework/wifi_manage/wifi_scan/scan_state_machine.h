@@ -385,6 +385,12 @@ private:
      */
     void CommonScanInfoProcess();
     /**
+     * @Description Parse security type.
+     * 
+     * @param scanInfo - scan result[inout]
+     */
+    void ParseSecurityType(InterScanInfo &scanInfo);
+    /**
      * @Description The band and security type are parsed from the scanning result obtained by the IDL.
      * 
      * @param scanInfo - scan result[inout]

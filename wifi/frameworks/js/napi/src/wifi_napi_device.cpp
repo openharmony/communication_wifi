@@ -91,6 +91,7 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
             jsSecurityType = SecTypeJs::SEC_TYPE_PSK;
             break;
         case WifiSecurity::SAE:
+        case WifiSecurity::PSK_SAE:
             jsSecurityType = SecTypeJs::SEC_TYPE_SAE;
             break;
         case WifiSecurity::EAP:

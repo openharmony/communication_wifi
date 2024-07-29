@@ -1139,58 +1139,69 @@ void ScanStateMachine::SetWifiMode(InterScanInfo &scanInfo)
     return;
 }
 
+void ScanStateMachine::ParseSecurityType(InterScanInfo &scanInfo)
+{
+    scanInfo.securityType = WifiSecurity::OPEN;
+    if (scanInfo.capabilities.find("PSK+SAE") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::PSK_SAE;
+        return;
+    }
+    if (scanInfo.capabilities.find("WAPI-PSK") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WAPI_PSK;
+        return;
+    }
+    if (scanInfo.capabilities.find("PSK") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::PSK;
+        return;
+    }
+    if (scanInfo.capabilities.find("WEP") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WEP;
+        return;
+    }
+    if (scanInfo.capabilities.find("EAP-SUITE-B-192") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::EAP_SUITE_B;
+        return;
+    }
+    if (scanInfo.capabilities.find("EAP") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::EAP;
+        return;
+    }
+    if (scanInfo.capabilities.find("SAE") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::SAE;
+        return;
+    }
+    if (scanInfo.capabilities.find("OWE-TRANS-OPEN") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::OPEN;
+        return;
+    }
+    if (scanInfo.capabilities.find("OWE") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::OWE;
+        return;
+    }
+    if (scanInfo.capabilities.find("CERT") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WAPI_CERT;
+        return;
+    }
+}
+
 void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter GetSecurityTypeAndBand.\n");
 
-    for (auto iter = scanInfos.begin(); iter != scanInfos.end(); ++iter) {
-        if (iter->frequency < SCAN_24GHZ_MAX_FREQUENCY) {
-            iter->band = SCAN_24GHZ_BAND;
-        } else if (iter->frequency > SCAN_5GHZ_MIN_FREQUENCY) {
-            iter->band = SCAN_5GHZ_BAND;
+    for (auto &scanInfo : scanInfos) {
+        if (scanInfo.frequency < SCAN_24GHZ_MAX_FREQUENCY) {
+            scanInfo.band = SCAN_24GHZ_BAND;
+        } else if (scanInfo.frequency > SCAN_5GHZ_MIN_FREQUENCY) {
+            scanInfo.band = SCAN_5GHZ_BAND;
         } else {
-            WIFI_LOGE("invalid frequency value: %{public}d", iter->frequency);
-            iter->band = 0;
+            WIFI_LOGE("invalid frequency value: %{public}d", scanInfo.frequency);
+            scanInfo.band = 0;
         }
-        SetWifiMode(*iter);
-        iter->securityType = WifiSecurity::OPEN;
-        if (iter->capabilities.find("WAPI-PSK") != std::string::npos) {
-            iter->securityType = WifiSecurity::WAPI_PSK;
-            continue;
-        }
-        if (iter->capabilities.find("PSK") != std::string::npos) {
-            iter->securityType = WifiSecurity::PSK;
-            continue;
-        }
-        if (iter->capabilities.find("WEP") != std::string::npos) {
-            iter->securityType = WifiSecurity::WEP;
-            continue;
-        }
-        if (iter->capabilities.find("EAP-SUITE-B-192") != std::string::npos) {
-            iter->securityType = WifiSecurity::EAP_SUITE_B;
-            continue;
-        }
-        if (iter->capabilities.find("EAP") != std::string::npos) {
-            iter->securityType = WifiSecurity::EAP;
-            continue;
-        }
-        if (iter->capabilities.find("SAE") != std::string::npos) {
-            iter->securityType = WifiSecurity::SAE;
-            continue;
-        }
-        if (iter->capabilities.find("OWE-TRANS-OPEN") != std::string::npos) {
-            iter->securityType = WifiSecurity::OPEN;
-            continue;
-        }
-        if (iter->capabilities.find("OWE") != std::string::npos) {
-            iter->securityType = WifiSecurity::OWE;
-            continue;
-        }
-        if (iter->capabilities.find("CERT") != std::string::npos) {
-            iter->securityType = WifiSecurity::WAPI_CERT;
-            continue;
-        }
+
+        SetWifiMode(scanInfo);
+        ParseSecurityType(scanInfo);
     }
+
     return;
 }
 

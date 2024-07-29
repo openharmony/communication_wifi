@@ -59,7 +59,6 @@ HWTEST_F(WifiHid2dServiceUtilsTest, SetSharedLinkCount, TestSize.Level1)
     pIpPool->ReleaseIp(gcMac);
     pSharedLinkManager->SetSharedLinkCount(count);
     EXPECT_EQ(pSharedLinkManager->GetSharedLinkCount(), count);
-
 }
 }
 }

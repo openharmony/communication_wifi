@@ -104,9 +104,8 @@ void WifiMultiVapManager::ForceStopSoftAp()
 {
     for (int i = 0; i < AP_INSTANCE_MAX_NUM; ++i) {
         WifiApHalInterface::GetInstance().StopAp(i);
-        auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
-        if (wifiTogglerManager) {
-            wifiTogglerManager->SoftapToggled(0, i);
+        if (WifiManager::GetInstance().GetWifiTogglerManager()) {
+            WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, i);
         }
     }
 }

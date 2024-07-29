@@ -381,6 +381,5 @@ HWTEST_F(WifiStaHalInterfaceTest, RegisterNativeProcessCallbackTest, TestSize.Le
 
     EXPECT_TRUE(callbackCalled);
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1391,7 +1391,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
             break;
         default:
             LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);
-            break;
+            return;
     }
     linkedInfo.ssid = "";
 }

@@ -182,8 +182,8 @@ HWTEST_F(AppParserTest, GetCloudPushFileVersion, TestSize.Level1)
 HWTEST_F(AppParserTest, GetLocalFileVersion, TestSize.Level1)
 {
     WIFI_LOGI("GetLocalFileVersion enter");
-    std::string WIFI_MONITOR_APP_FILE_PATH = "/system/etc/wifi/wifi_monitor_apps.xml";
-    m_appXmlParser->GetLocalFileVersion(WIFI_MONITOR_APP_FILE_PATH.c_str());
+    std::string wifiMonitorAppFilePath = "/system/etc/wifi/wifi_monitor_apps.xml";
+    m_appXmlParser->GetLocalFileVersion(wifiMonitorAppFilePath.c_str());
 }
  
 HWTEST_F(AppParserTest, GetCloudPushVersionFilePath, TestSize.Level1)

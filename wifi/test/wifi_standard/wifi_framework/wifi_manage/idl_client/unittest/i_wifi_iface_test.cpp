@@ -29,6 +29,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
 constexpr int LENTH = 5;
 constexpr int LENMAC = 17;
 const std::string IFACENAME = "wlan0";

@@ -37,20 +37,11 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiManager");
-#ifdef DTFUZZ_TEST
-static WifiManager* gWifiManager = nullptr;
-#endif
+
 WifiManager &WifiManager::GetInstance()
 {
-#ifndef DTFUZZ_TEST
     static WifiManager gWifiManager;
     return gWifiManager;
-#else
-    if (gWifiManager == nullptr) {
-        gWifiManager = new (std::nothrow) WifiManager();
-    }
-    return *gWifiManager;
-#endif
 }
 
 WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0)
@@ -125,9 +116,7 @@ int WifiManager::Init()
             wifiTogglerManager->ScanOnlyToggled(1);
         }
     }
-#ifndef DTFUZZ_TEST
     InitPidfile();
-#endif
     return 0;
 }
 

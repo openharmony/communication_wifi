@@ -31,9 +31,6 @@ DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
 namespace OHOS {
 namespace Wifi {
-#ifdef DTFUZZ_TEST
-static WifiInternalEventDispatcher* gWifiEventBroadcast = nullptr;
-#endif
 std::set<std::int32_t> g_CallbackEventChkSysAppList = {
     WIFI_CBK_MSG_HOTSPOT_STATE_JOIN,
     WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE,
@@ -109,15 +106,8 @@ CallbackEventPermissionMap g_CallbackEventPermissionMap = {
 
 WifiInternalEventDispatcher &WifiInternalEventDispatcher::GetInstance()
 {
-#ifndef DTFUZZ_TEST
     static WifiInternalEventDispatcher gWifiEventBroadcast;
     return gWifiEventBroadcast;
-#else
-    if (gWifiEventBroadcast == nullptr) {
-        gWifiEventBroadcast = new (std::nothrow) WifiInternalEventDispatcher();
-    }
-    return *gWifiEventBroadcast;
-#endif
 }
 
 WifiInternalEventDispatcher::WifiInternalEventDispatcher()

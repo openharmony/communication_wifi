@@ -461,13 +461,46 @@ HWTEST_F(ApStartedState_test, StartAp_001, TestSize.Level1)
     EXPECT_TRUE(pApStartedState->StartAp());
 }
 
-HWTEST_F(ApStartedState_test, UpdateConfigInfoTest, TestSize.Level1)
+HWTEST_F(ApStartedState_test, UpdateChannelChangedTest, TestSize.Level1)
 {
     InternalMessage msg;
-    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_INFO));
+    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_HOTSPOT_CHANNEL_CHANGED));
     msg.SetParam1(1);
-    pApStartedState->ProcessCmdUpdateConfigInfo(msg);
+    pApStartedState->ProcessCmdHotspotChannelChanged(msg);
 }
+
+HWTEST_F(ApStartedState_test, AssociatedStaEmptyTest, TestSize.Level1)
+{
+    InternalMessage msg;
+    StationInfo staInfo;
+    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_ASSOCIATED_STATIONS_CHANGED));
+    msg.SetParam1(HAL_CBK_CMD_STA_JOIN);
+    msg.SetMessageObj(staInfo);
+    pApStartedState->ProcessCmdAssociatedStaChanged(msg);
+}
+
+HWTEST_F(ApStartedState_test, AssociatedStaJoinTest, TestSize.Level1)
+{
+    InternalMessage msg;
+    StationInfo staInfo;
+    staInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_ASSOCIATED_STATIONS_CHANGED));
+    msg.SetParam1(HAL_CBK_CMD_STA_JOIN);
+    msg.SetMessageObj(staInfo);
+    pApStartedState->ProcessCmdAssociatedStaChanged(msg);
+}
+
+HWTEST_F(ApStartedState_test, AssociatedStaLeaveTest, TestSize.Level1)
+{
+    InternalMessage msg;
+    StationInfo staInfo;
+    staInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    msg.SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_ASSOCIATED_STATIONS_CHANGED));
+    msg.SetParam1(HAL_CBK_CMD_STA_LEAVE);
+    msg.SetMessageObj(staInfo);
+    pApStartedState->ProcessCmdAssociatedStaChanged(msg);
+}
+
 
 HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
 {

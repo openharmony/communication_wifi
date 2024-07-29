@@ -508,6 +508,5 @@ HWTEST_F(WifiP2pHalInterfaceTest, P2pStop_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().StopP2p());
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

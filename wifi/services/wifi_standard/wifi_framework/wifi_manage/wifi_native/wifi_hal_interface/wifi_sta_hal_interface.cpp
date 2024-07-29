@@ -646,19 +646,6 @@ WifiErrorNo WifiStaHalInterface::SetDpiMarkRule(const std::string &ifaceName, in
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::ShellCmd(const std::string &ifName, const std::string &cmd)
-{
-    if ((ifName.length() <= 0) || (cmd.length() <= 0)) {
-        return WIFI_HAL_OPT_INVALID_PARAM;
-    }
-#ifdef HDI_WPA_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqWpaShellCmd(ifName, cmd);
-#else
-    return WIFI_HAL_OPT_OK;
-#endif
-}
-
 WifiErrorNo WifiStaHalInterface::GetPskPassphrase(const std::string &ifName, std::string &psk)
 {
     if (ifName.length() <= 0) {
@@ -695,6 +682,19 @@ WifiErrorNo WifiStaHalInterface::GetChipsetWifiFeatrureCapability(
     return WIFI_HAL_OPT_OK;
 #else
     return WIFI_HAL_OPT_OK;
+#endif
+}
+
+WifiErrorNo WifiStaHalInterface::ShellCmd(const std::string &ifName, const std::string &cmd)
+{
+    if ((ifName.length() <= 0) || (cmd.length() <= 0)) {
+        return WIFI_HAL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->ReqWpaShellCmd(ifName, cmd);
+#else
+    return WIFI_HAL_OPT_FAILED;
 #endif
 }
 

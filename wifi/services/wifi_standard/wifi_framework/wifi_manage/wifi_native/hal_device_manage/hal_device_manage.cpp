@@ -1463,11 +1463,7 @@ void HalDeviceManager::RemoveChipHdiDeathRecipient()
 int32_t ChipIfaceCallback::OnScanResultsCallback(uint32_t event)
 {
     LOGI("OnScanResultsCallback, event:%{public}d", event);
-    const OHOS::Wifi::SupplicantEventCallback &cbk =
-        OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().GetCallbackInst();
-    if (cbk.onScanNotify) {
-        cbk.onScanNotify(HAL_SINGLE_SCAN_OVER_OK);
-    }
+    OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().NotifyScanResultEvent();
     return 0;
 }
 

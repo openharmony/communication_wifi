@@ -14,6 +14,7 @@
  */
 
 #include "wifi_common_util.h"
+#include <fstream>
 #include <sstream>
 #include <iterator>
 #include <regex>

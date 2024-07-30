@@ -39,7 +39,7 @@ void P2pIdleState::GoInState()
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
     p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE), P2P_REMOVE_DEVICE_TIMEOUT);
     p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_INVALID);
-    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
+    SharedLinkManager::ClearSharedLinkCount();
 }
 
 void P2pIdleState::GoOutState()
@@ -353,7 +353,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
             return EXECUTED;
         }
     }
-    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
+    SharedLinkManager::IncreaseSharedLink();
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }

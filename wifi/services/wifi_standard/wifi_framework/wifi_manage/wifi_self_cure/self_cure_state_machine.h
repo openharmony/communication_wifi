@@ -360,22 +360,22 @@ private:
     void AgeOutWifi6Black(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache);
     int GetCurSignalLevel();
     bool IsHttpReachable();
-    std::string TransVecToIpAddress(std::vector<uint32_t> vec);
+    std::string TransVecToIpAddress(const std::vector<uint32_t>& vec);
     std::vector<uint32_t> TransIpAddressToVec(std::string addr);
     int GetLegalIpConfiguration(IpInfo &dhcpResults);
     bool CanArpReachable();
-    bool DoSlowArpTest(std::string testIpAddr);
-    std::string GetNextIpAddr(const std::string gateway, const std::string currentAddr,
-                              std::vector<std::string> testedAddr);
+    bool DoSlowArpTest(const std::string& testIpAddr);
+    std::string GetNextIpAddr(const std::string& gateway, const std::string& currentAddr,
+                              const std::vector<std::string>& testedAddr);
     bool IsIpAddressInvalid();
     std::vector<std::string> TransStrToVec(std::string str, char c);
     bool IsUseFactoryMac();
-    bool IsSameEncryptType(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt);
+    bool IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& deviceKeymgmt);
     int GetBssidCounter(const std::vector<WifiScanInfo> &scanResults);
     bool IsNeedWifiReassocUseDeviceMac();
     int String2InternetSelfCureHistoryInfo(const std::string selfCureHistory, WifiSelfCureHistoryInfo &info);
-    int SetSelfCureFailInfo(OHOS::Wifi::WifiSelfCureHistoryInfo &info, std::vector<std::string> histories, int cnt);
-    int SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string> histories, int cnt);
+    int SetSelfCureFailInfo(OHOS::Wifi::WifiSelfCureHistoryInfo &info, std::vector<std::string>& histories, int cnt);
+    int SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string>& histories, int cnt);
     bool IfP2pConnected();
     bool ShouldTransToWifi6SelfCure(InternalMessagePtr msg, std::string currConnectedBssid);
     int GetCurrentRssi();
@@ -397,11 +397,11 @@ private:
     void HandleNetworkConnected();
     bool UpdateConnSelfCureFailedHistory();
     void RecoverySoftAp();
-    bool IsSoftApSsidSameWithWifi(HotspotConfig curApConfig);
+    bool IsSoftApSsidSameWithWifi(const HotspotConfig& curApConfig);
     void CheckConflictIpForSoftAp();
     static bool IsEncryptedAuthType(const std::string authType);
     std::string GetCurrentGateway();
-    bool DoArpTest(std::string ipAddress, std::string gateway);
+    bool DoArpTest(std::string& ipAddress, std::string& gateway);
     void RequestArpConflictTest();
     static void UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel,
                                                  bool success);
@@ -418,7 +418,6 @@ private:
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;
     std::map<std::string, SelfCureServiceCallback> mSelfCureCallback;
-    std::mutex mMutex;
     DefaultState *pDefaultState;
     ConnectedMonitorState *pConnectedMonitorState;
     DisconnectedMonitorState *pDisconnectedMonitorState;

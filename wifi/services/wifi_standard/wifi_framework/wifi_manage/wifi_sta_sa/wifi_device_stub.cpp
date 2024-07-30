@@ -1012,7 +1012,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
         }
         WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
 
-               if (mSingleCallback) {
+                if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
             {

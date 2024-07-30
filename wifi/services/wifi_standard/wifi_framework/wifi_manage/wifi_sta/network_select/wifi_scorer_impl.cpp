@@ -196,6 +196,7 @@ RssiLevelBonusScorer::RssiLevelBonusScorer() : SimpleWifiScorer("rssiLevelScore"
 double RssiLevelBonusScorer::Score(NetworkCandidate &networkCandidate)
 {
     auto &scanInfo = networkCandidate.interScanInfo;
+    int frequency = networkCandidate.interScanInfo.frequency;
     int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(scanInfo.rssi, scanInfo.band);
     if (currentSignalLevel == SIGNAL_LEVEL_FOUR) {
         return RSSI_LEVEL_FOUR_SCORE;

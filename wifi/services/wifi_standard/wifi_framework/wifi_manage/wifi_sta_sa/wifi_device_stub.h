@@ -89,9 +89,9 @@ private:
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiDetailState(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetLowTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
 

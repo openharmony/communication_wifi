@@ -591,6 +591,7 @@ ErrCode ConcreteMangerMachine::AutoStartSemiStaService(int instId)
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     WIFI_LOGI("AutoStartSemiStaService, current sta state:%{public}d", staState);
     if (staState == WifiOprMidState::SEMI_ACTIVE) {
+        HandleStaSemiActive();
         return WIFI_OPT_SUCCESS;
     }
     if (PreStartWifi(instId) != WIFI_OPT_SUCCESS) {
@@ -619,6 +620,7 @@ ErrCode ConcreteMangerMachine::AutoStartStaService(int instId)
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     WIFI_LOGI("AutoStartStaService, current sta state:%{public}d", staState);
     if (staState == WifiOprMidState::RUNNING) {
+        HandleStaStart();
         return WIFI_OPT_SUCCESS;
     }
     if (PreStartWifi(instId) != WIFI_OPT_SUCCESS) {
@@ -647,6 +649,7 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     WIFI_LOGI("AutoStopStaService, current sta state:%{public}d", staState);
     if (staState == WifiOprMidState::CLOSED) {
+        HandleStaStop();
         return WIFI_OPT_SUCCESS;
     }
     ErrCode ret = WIFI_OPT_FAILED;
@@ -670,6 +673,7 @@ ErrCode ConcreteMangerMachine::AutoStopStaService(int instId)
 #ifdef FEATURE_SELF_CURE_SUPPORT
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
 #endif
+        HandleStaStop();
         return WIFI_OPT_SUCCESS;
     }
     DispatchWifiCloseRes(OperateResState::CLOSE_WIFI_CLOSING, instId);
@@ -897,6 +901,7 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
     auto detailState = WifiConfigCenter::GetInstance().GetWifiDetailState(mid);
     WIFI_LOGI("SwitchEnableFromSemi, current sta detailState:%{public}d", detailState);
     if (detailState == WifiDetailState::STATE_ACTIVATED) {
+        HandleStaStart();
         return WIFI_OPT_SUCCESS;
     }
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);

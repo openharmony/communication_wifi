@@ -451,7 +451,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    pService->IncreaseSharedLink(callingUid);
+    pService->SetGroupUid(callingUid);
     return pService->CreateGroup(config);
 }
 
@@ -607,6 +607,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
+    pService->SetGroupUid(GetCallingUid());
     return pService->P2pConnect(updateConfig);
 }
 
@@ -1172,7 +1173,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
-    pService->IncreaseSharedLink(callingUid);
+    pService->SetGroupUid(callingUid);
     return pService->Hid2dCreateGroup(frequency, type);
 }
 
@@ -1190,8 +1191,8 @@ ErrCode WifiP2pServiceImpl::Hid2dRemoveGcGroup(const std::string& gcIfName)
 
 ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
 {
-    WIFI_LOGI("Hid2dConnect");
     int callingUid = GetCallingUid();
+    WIFI_LOGI("Uid %{public}d Hid2dConnect", callingUid);
     if (callingUid != SOFT_BUS_SERVICE_UID) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1213,6 +1214,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
     }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));
+    pService->SetGroupUid(callingUid);
     return pService->Hid2dConnect(config);
 }
 

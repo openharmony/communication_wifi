@@ -179,7 +179,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg
     } else {
         p2pStateMachine.StartDhcpClientInterface();
     }
-    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
+    SharedLinkManager::IncreaseSharedLink();
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
@@ -209,7 +209,7 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessagePtr msg
     if (groupManager.GetCurrentGroup().GetInterface() == p2pStateMachine.p2pDevIface) {
         p2pStateMachine.p2pDevIface = "";
     }
-    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_DISCONNECTED);
+    SharedLinkManager::ClearSharedLinkCount();
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
     IpPool::ReleaseIpPool();
     IfConfig::GetInstance().FlushIpAddr(groupManager.GetCurrentGroup().GetInterface(), IpType::IPTYPE_IPV4);

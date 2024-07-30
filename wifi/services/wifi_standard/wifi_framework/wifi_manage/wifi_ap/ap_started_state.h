@@ -248,8 +248,8 @@ private:
 
     void SetRandomMac() const;
     bool SetCountry();
-    void ProcessCmdHotspotChannelChanged(InternalMessage &msg);
-    void ProcessCmdAssociatedStaChanged(InternalMessage &msg);
+    void ProcessCmdHotspotChannelChanged(InternalMessagePtr msg);
+    void ProcessCmdAssociatedStaChanged(InternalMessagePtr msg);
 
 private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result

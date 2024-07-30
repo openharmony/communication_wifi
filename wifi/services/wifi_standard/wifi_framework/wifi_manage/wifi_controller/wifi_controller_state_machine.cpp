@@ -781,8 +781,8 @@ void WifiControllerMachine::HandleConcreteStop(int id)
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
     if (!WifiConfigCenter::GetInstance().GetCoexSupport()) {
 #ifdef FEATURE_AP_SUPPORT
-        int airplanestate = WifiConfigCenter::GetInstance().GetAirplaneModeState();
-        if (ShouldEnableSoftap() && airplanestate != MODE_STATE_OPEN &&
+        int airplanstate = WifiConfigCenter::GetInstance().GetAirplaneModeState();
+        if (ShouldEnableSoftap() && airplanstate != MODE_STATE_OPEN &&
             !SoftApIdExist(mApidStopWifi)) {
             MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, mApidStopWifi);
             return;

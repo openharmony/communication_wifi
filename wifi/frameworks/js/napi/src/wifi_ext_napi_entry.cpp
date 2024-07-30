@@ -47,15 +47,9 @@ static napi_value Init(napi_env env, napi_value exports)
 #ifdef FEATURE_AP_EXTENSION
         DECLARE_NAPI_FUNCTION("enableHotspot", EnableHotspot),
         DECLARE_NAPI_FUNCTION("disableHotspot", DisableHotspot),
-#ifdef ENABLE_NAPI_WIFI_MANAGER
-        DECLARE_NAPI_FUNCTION("getSupportedPowerMode", GetSupportedPowerModel),
-        DECLARE_NAPI_FUNCTION("getPowerMode", GetPowerModel),
-        DECLARE_NAPI_FUNCTION("setPowerMode", SetPowerModel),
-#else
         DECLARE_NAPI_FUNCTION("getSupportedPowerModel", GetSupportedPowerModel),
         DECLARE_NAPI_FUNCTION("getPowerModel", GetPowerModel),
         DECLARE_NAPI_FUNCTION("setPowerModel", SetPowerModel),
-#endif
 #endif
     };
 

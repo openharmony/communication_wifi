@@ -17,15 +17,17 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "wifi_watchdog_utils.h"
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::Eq;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+using ::testing::StrEq;
+using ::testing::TypedEq;
+using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
-// Mock class for HiviewDFX
-class MockHiviewDFX {
-public:
-    MOCK_METHOD5(SetTimer, void(const std::string &, int, void *, void *, int));
-    MOCK_METHOD1(CancelTimer, void(int));
-    MOCK_METHOD0(InitFfrtWatchdog, void());
-};
 // Test fixture for WifiWatchDogUtils
 class WifiWatchDogUtilsTest : public testing::Test {
 protected:
@@ -56,19 +58,8 @@ HWTEST_F(WifiWatchDogUtilsTest, ResetProcessTest, TestSize.Level1)
     // Create an instance of WifiWatchDogUtils
     std::shared_ptr<WifiWatchDogUtils> wifiWatchDogUtils = WifiWatchDogUtils::GetInstance();
 
-    // Create a mock of HiviewDFX
-    MockHiviewDFX mockHiviewDFX;
-
-    // Set expectations on the mock object
-    EXPECT_CALL(mockHiviewDFX,
-        SetTimer("WifiResetTimer", 0, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_RECOVERY))
-        .Times(1);
-
-    // Set the mock object as the instance of HiviewDFX
-    HiviewDFX::XCollie::GetInstance = [&mockHiviewDFX]() -> MockHiviewDFX & { return mockHiviewDFX; };
-
     // Call the ResetProcess function with usingHiviewDfx set to true and a thread name
-    bool result = wifiWatchDogUtils->ResetProcess(true, "TestThread");
+    bool result = wifiWatchDogUtils->ResetProcess(true, "TestThread", true);
 
     // Check that the function returns true
     EXPECT_TRUE(result);
@@ -80,41 +71,14 @@ HWTEST_F(WifiWatchDogUtilsTest, StartWatchDogForFuncTest, TestSize.Level1)
     // Create an instance of WifiWatchDogUtils
     std::shared_ptr<WifiWatchDogUtils> wifiWatchDogUtils = WifiWatchDogUtils::GetInstance();
 
-    // Create a mock of HiviewDFX
-    MockHiviewDFX mockHiviewDFX;
-
-    // Set expectations on the mock object
-    EXPECT_CALL(mockHiviewDFX, SetTimer("TestFunction", 10, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG))
-        .Times(1)
-        .WillOnce(testing::Return(123));
-
-    // Set the mock object as the instance of HiviewDFX
-    HiviewDFX::XCollie::GetInstance = [&mockHiviewDFX]() -> MockHiviewDFX & { return mockHiviewDFX; };
-
     // Call the StartWatchDogForFunc function with a function name
     int id = wifiWatchDogUtils->StartWatchDogForFunc("TestFunction");
 
     // Check that the returned ID is not -1
     EXPECT_NE(id, -1);
-}
-
-// Test case for WifiWatchDogUtils::StopWatchDogForFunc()
-HWTEST_F(WifiWatchDogUtilsTest, StopWatchDogForFuncTest, TestSize.Level1)
-{
-    // Create an instance of WifiWatchDogUtils
-    std::shared_ptr<WifiWatchDogUtils> wifiWatchDogUtils = WifiWatchDogUtils::GetInstance();
-
-    // Create a mock of HiviewDFX
-    MockHiviewDFX mockHiviewDFX;
-
-    // Set expectations on the mock object
-    EXPECT_CALL(mockHiviewDFX, CancelTimer(123)).Times(1);
-
-    // Set the mock object as the instance of HiviewDFX
-    HiviewDFX::XCollie::GetInstance = [&mockHiviewDFX]() -> MockHiviewDFX & { return mockHiviewDFX; };
 
     // Call the StopWatchDogForFunc function with a function name and an ID
-    bool result = wifiWatchDogUtils->StopWatchDogForFunc("TestFunction", 123);
+    bool result = wifiWatchDogUtils->StopWatchDogForFunc("TestFunction", id);
 
     // Check that the function returns true
     EXPECT_TRUE(result);
@@ -125,15 +89,6 @@ HWTEST_F(WifiWatchDogUtilsTest, StartAllWatchDogTest, TestSize.Level1)
 {
     // Create an instance of WifiWatchDogUtils
     std::shared_ptr<WifiWatchDogUtils> wifiWatchDogUtils = WifiWatchDogUtils::GetInstance();
-
-    // Create a mock of HiviewDFX
-    MockHiviewDFX mockHiviewDFX;
-
-    // Set expectations on the mock object
-    EXPECT_CALL(mockHiviewDFX, InitFfrtWatchdog()).Times(1);
-
-    // Set the mock object as the instance of HiviewDFX
-    HiviewDFX::Watchdog::GetInstance = [&mockHiviewDFX]() -> MockHiviewDFX & { return mockHiviewDFX; };
 
     // Call the StartAllWatchDog function
     wifiWatchDogUtils->StartAllWatchDog();

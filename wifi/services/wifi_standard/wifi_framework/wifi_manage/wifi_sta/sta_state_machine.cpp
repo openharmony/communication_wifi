@@ -2904,7 +2904,7 @@ void StaStateMachine::GetIpState::GoInState()
         RouterConfig config;
         if (strncpy_s(config.bssid, sizeof(config.bssid),
             pStaStateMachine->linkedInfo.bssid.c_str(), pStaStateMachine->linkedInfo.bssid.size()) == EOK) {
-            config.isPublicESS = IsPublicESS();
+            config.prohibitUseCacheIp = IsProhibitUseCacheIp();
             SetConfiguration(ifname.c_str(), config);
         }
 
@@ -3019,6 +3019,28 @@ bool StaStateMachine::GetIpState::IsPublicESS()
     }
     WIFI_LOGI("IsPublicESS counter is %{public}d", counter);
     return counter >= BSS_NUM_MIN;
+}
+
+bool StaStateMachine::GetIpState::IsProhibitUseCacheIp()
+{
+    if (IsPublicESS()) {
+        return true;
+    }
+
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
+    if (config.keyMgmt == KEY_MGMT_WEP) {
+        WIFI_LOGE("current keyMgmt is WEP, not use cache ip if dhcp timeout");
+        return true;
+    }
+
+    int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(
+        pStaStateMachine->linkedInfo.rssi, pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId);
+    if (currentSignalLevel < RSSI_LEVEL_3) {
+        WIFI_LOGE("current rssi level is less than 3");
+        return true;
+    }
+    return false;
 }
 
 void StaStateMachine::ReplaceEmptyDns(DhcpResult *result)

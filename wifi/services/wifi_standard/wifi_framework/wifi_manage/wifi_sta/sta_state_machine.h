@@ -76,6 +76,7 @@ constexpr int DHCP_TIME = 15;
 constexpr int INVALID_RSSI_VALUE = -127;
 constexpr int MAX_RSSI_VALUE = 200;
 constexpr int SIGNAL_INFO = 256;
+constexpr int RSSI_LEVEL_3 = 3;
 
 /* 2.4g and 5g frequency thresholds */
 constexpr int FREQ_2G_MIN = 2412;
@@ -316,6 +317,7 @@ public:
 
     private:
         bool IsPublicESS();
+        bool IsProhibitUseCacheIp();
         StaStateMachine *pStaStateMachine;
     };
     /**

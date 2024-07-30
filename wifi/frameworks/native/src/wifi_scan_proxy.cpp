@@ -257,11 +257,11 @@ static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, in
     info.centerFrequency1 = CheckDataLegal(tokens[dataRecvLen++]);
     info.rssi = CheckDataLegal(tokens[dataRecvLen++]);
     info.securityType = static_cast<WifiSecurity>(CheckDataLegal(tokens[dataRecvLen++]));
-    size_t numInfoElems = CheckDataLegal(tokens[dataRecvLen++]);
+    size_t numInfoElems = static_cast<uint32_t>(CheckDataLegal(tokens[dataRecvLen++]));
     for (size_t i = 0; i < numInfoElems; i++) {
         WifiInfoElem elem;
         elem.id = static_cast<uint32_t>(CheckDataLegal(tokens[dataRecvLen++]));
-        size_t ieLen = CheckDataLegal(tokens[dataRecvLen++]);
+        size_t ieLen = static_cast<uint32_t>(CheckDataLegal(tokens[dataRecvLen++]));
         for (size_t j = 0; j < ieLen; j++) {
             elem.content.push_back(static_cast<char>(CheckDataLegal(tokens[dataRecvLen++])));
         }
@@ -317,13 +317,13 @@ ErrCode WifiScanProxy::ParseScanInfosSmall(MessageParcel &reply, std::vector<Wif
         info.securityType = static_cast<WifiSecurity>(reply.ReadInt32());
         // Parse infoElems vector
         size_t numInfoElems = reply.ReadUint32();
-        for (size_t i = 0; i < numInfoElems; i++) {
+        for (size_t m = 0; m < numInfoElems; m++) {
             WifiInfoElem elem;
             elem.id = reply.ReadInt32();
             size_t ieLen = reply.ReadUint32();
             elem.content.resize(ieLen);
-            for (size_t j = 0; j < ieLen; j++) {
-                elem.content[j] = static_cast<char>(reply.ReadInt32());
+            for (size_t n = 0; n < ieLen; n++) {
+                elem.content[n] = static_cast<char>(reply.ReadInt32());
             }
             info.infoElems.push_back(elem);
         }

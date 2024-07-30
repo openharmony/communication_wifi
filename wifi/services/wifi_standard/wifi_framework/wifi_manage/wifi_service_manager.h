@@ -36,57 +36,39 @@
 namespace OHOS {
 namespace Wifi {
 struct StaServiceHandle {
-    void *handle;
-    IStaService *(*create)(int instId);
-    void *(*destroy)(IStaService *);
     std::map<int, IStaService *> pService;
-    StaServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr)
+    StaServiceHandle()
     {}
     ~StaServiceHandle()
     {}
     void Clear()
     {
-        handle = nullptr;
-        create = nullptr;
-        destroy = nullptr;
         pService.clear();
     }
 };
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 struct SelfCureServiceHandle {
-    void *handle;
-    ISelfCureService *(*create)(int instId);
-    void *(*destroy)(ISelfCureService *);
     std::map<int, ISelfCureService *> pService;
-    SelfCureServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr)
+    SelfCureServiceHandle()
     {}
     ~SelfCureServiceHandle()
     {}
     void Clear()
     {
-        handle = nullptr;
-        create = nullptr;
-        destroy = nullptr;
         pService.clear();
     }
 };
 #endif
 
 struct ScanServiceHandle {
-    void *handle;
-    IScanService *(*create)(int instId);
-    void *(*destroy)(IScanService *);
     std::map<int, IScanService *> pService;
-    ScanServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr)
+    ScanServiceHandle()
     {}
     ~ScanServiceHandle()
     {}
     void Clear()
     {
-        handle = nullptr;
-        create = nullptr;
-        destroy = nullptr;
         pService.clear();
     }
 };
@@ -107,19 +89,13 @@ struct ApServiceHandle {
 
 #ifdef FEATURE_P2P_SUPPORT
 struct P2pServiceHandle {
-    void *handle;
-    IP2pService *(*create)();
-    void *(*destroy)(IP2pService *);
     IP2pService *pService;
-    P2pServiceHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pService(nullptr)
+    P2pServiceHandle() : pService(nullptr)
     {}
     ~P2pServiceHandle()
     {}
     void Clear()
     {
-        handle = nullptr;
-        create = nullptr;
-        destroy = nullptr;
         pService = nullptr;
     }
 };

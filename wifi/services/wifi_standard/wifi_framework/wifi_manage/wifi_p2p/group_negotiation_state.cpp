@@ -148,7 +148,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
             WIFI_LOGE("fail:No GO device information is found.");
         }
     }
-    SharedLinkManager::SetSharedLinkCount(SHARED_LINKE_COUNT_ON_CONNECTED);
+    SharedLinkManager::IncreaseSharedLink();
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }

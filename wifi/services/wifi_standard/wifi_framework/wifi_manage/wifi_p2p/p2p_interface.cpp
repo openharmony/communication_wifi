@@ -234,6 +234,11 @@ ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ip
     return p2pService.Hid2dRequestGcIp(gcMac, ipAddr);
 }
 
+void P2pInterface::SetGroupUid(int callingUid)
+{
+    p2pService.SetGroupUid(callingUid);
+}
+
 void P2pInterface::IncreaseSharedLink(int callingUid)
 {
     p2pService.IncreaseSharedLink(callingUid);

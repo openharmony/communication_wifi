@@ -48,9 +48,6 @@ WifiDeviceStub::WifiDeviceStub(int instId) : mSingleCallback(false), m_instId(in
 WifiDeviceStub::~WifiDeviceStub()
 {
     WIFI_LOGI("enter ~WifiDeviceStub!");
-#ifndef OHOS_ARCH_LITE
-    RemoveDeviceCbDeathRecipient();
-#endif
     deathRecipient_ = nullptr;
 }
 
@@ -1013,36 +1010,25 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
                 event.emplace_back(data.ReadString());
             }
         }
-        WIFI_LOGI("%{public}s, get pid: %{public}d, tokenId: %{private}d, eventNum: %{public}d",
-            __func__, pid, tokenId, eventNum);
+        WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
 
-        if (mSingleCallback) {
+               if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
             {
                 std::unique_lock<std::mutex> lock(deathRecipientMutex);
                 if (deathRecipient_ == nullptr) {
-#ifdef OHOS_ARCH_LITE
                     deathRecipient_ = new (std::nothrow) WifiDeviceDeathRecipient();
-#else
-                    deathRecipient_ = new (std::nothrow) WifiDeathRecipient(*this);
-#endif
                 }
             }
-            RemoteDeathMap::iterator iter = remoteDeathMap.find(remote);
-            if (iter == remoteDeathMap.end()) {
-                std::lock_guard<std::mutex> lock(mutex_);
-                remoteDeathMap.insert(std::make_pair(remote, deathRecipient_));
-                WIFI_LOGI("OnRegisterCallBack, AddDeathRecipient, remote: %{public}p, remoteDeathMap.size: %{public}zu",
-                    static_cast<void*>(remote), remoteDeathMap.size());
-                if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
-                    WIFI_LOGI("AddDeathRecipient!");
-                }
+            if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
+                WIFI_LOGD("AddDeathRecipient!");
             }
-
-            for (const auto &eventName : event) {
-                ret = WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid, eventName,
-                    tokenId, m_instId);
+            if (callback_ != nullptr) {
+                for (const auto &eventName : event) {
+                    ret = WifiInternalEventDispatcher::GetInstance().AddStaCallback(remote, callback_, pid, eventName,
+                        tokenId, m_instId);
+                }
             }
         }
     } while (0);

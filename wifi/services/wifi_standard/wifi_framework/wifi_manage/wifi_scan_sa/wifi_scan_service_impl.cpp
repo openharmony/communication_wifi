@@ -253,6 +253,7 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
         return false;
     }
     scanInfo.externScan = externFlag;
+    scanInfo.isSystemApp = WifiAuthCenter::IsSystemAppByToken();
     bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
     WifiScanConfig::GetInstance().SaveScanDeviceInfo(scanInfo);
     return allowScan;

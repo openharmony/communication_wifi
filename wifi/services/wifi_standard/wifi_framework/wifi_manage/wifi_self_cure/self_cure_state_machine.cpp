@@ -2993,8 +2993,10 @@ bool SelfCureStateMachine::IsSoftApSsidSameWithWifi(HotspotConfig curApConfig)
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
     bool isSameSsid = (curApConfig.GetSsid() == linkedInfo.ssid);
     bool isSamePassword = (curApConfig.GetPreSharedKey() == config.preSharedKey);
+    std::string().swap(config.preSharedKey);
     bool isSameSecurityType = ("WPA2-PSK" == config.keyMgmt || "WPA-PSK" == config.keyMgmt);
     if (isSameSsid && isSameSecurityType && !isSamePassword) {
+        std::string().swap(config.preSharedKey);
         return true;
     }
     return false;

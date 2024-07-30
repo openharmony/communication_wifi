@@ -1862,6 +1862,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
             SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
         config.preSharedKey = "";
+        std::string().swap(config.preSharedKey);
     }
     delete encry;
 

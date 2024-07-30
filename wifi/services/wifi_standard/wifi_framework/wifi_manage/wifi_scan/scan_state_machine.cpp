@@ -174,8 +174,7 @@ void ScanStateMachine::InitState::GoInState()
     }
 
     if (pScanStateMachine->quitFlag) {
-        WIFI_LOGI("Notify finish ScanStateMachine.\n");
-        pScanStateMachine->ReportStatusChange(SCAN_FINISHED_STATUS);
+        WIFI_LOGI("Scan finished.\n");
     }
     return;
 }

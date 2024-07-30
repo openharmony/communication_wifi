@@ -483,21 +483,24 @@ bool ApStartedState::SetCountry()
     return true;
 }
 
-void ApStartedState::ProcessCmdHotspotChannelChanged(InternalMessage &msg)
+void ApStartedState::ProcessCmdHotspotChannelChanged(InternalMessagePtr msg)
 {
-    int freq = msg.GetParam1();
+    int freq = msg->GetParam1();
     int channel = TransformFrequencyIntoChannel(freq);
     WIFI_LOGI("%{public}s: update channel to %{public}d", __func__, channel);
+    if (channel == -1) {
+        return;
+    }
     WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id);
     m_hotspotConfig.SetChannel(channel);
     WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id);
 }
 
-void ApStartedState::ProcessCmdAssociatedStaChanged(InternalMessage &msg)
+void ApStartedState::ProcessCmdAssociatedStaChanged(InternalMessagePtr msg)
 {
-    int event = msg.GetParam1();
+    int event = msg->GetParam1();
     StationInfo staInfo;
-    if (!msg.GetMessageObj(staInfo)) {
+    if (!msg->GetMessageObj(staInfo)) {
         WIFI_LOGE("%{public}s:failed to get station info.", __func__);
         return;
     }

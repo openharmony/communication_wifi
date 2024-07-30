@@ -29,6 +29,8 @@ const std::string PATTERN_IP = "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\
 std::shared_mutex g_ipPoolMutex;
 static std::mutex g_sharedLinkMutex;
 std::map<int, int> SharedLinkManager::sharedLinkCountMap;
+int SharedLinkManager::firstGroupUid = -1;
+#define DEFAULT_UID 0
 
 bool IpPool::InitIpPool(const std::string& serverIp)
 {
@@ -105,6 +107,37 @@ bool IpPool::IsValidIp(const std::string& ip)
     return std::regex_match(ip, std::regex(PATTERN_IP));
 }
 
+void SharedLinkManager::SetGroupUid(int callingUid)
+{
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    WIFI_LOGI("Set Group UID: %{public}d -> %{public}d", firstGroupUid, callingUid);
+    if (firstGroupUid != -1) {
+        return;
+    }
+    firstGroupUid = callingUid;
+}
+
+void SharedLinkManager::GetGroupUid(int &callingUid)
+{
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    WIFI_LOGI("Get Group UID: %{public}d", firstGroupUid);
+    callingUid = firstGroupUid;
+}
+
+void SharedLinkManager::IncreaseSharedLink()
+{
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    WIFI_LOGI("IncreaseSharedLink, current GO UID: %{public}d", firstGroupUid);
+    if (!sharedLinkCountMap.empty()) {
+        WIFI_LOGE("IncreaseSharedLink, Current count is not zeros");
+        sharedLinkCountMap.clear();
+    }
+    if (firstGroupUid == -1) {
+        firstGroupUid = DEFAULT_UID;
+    }
+    sharedLinkCountMap[firstGroupUid]++;
+}
+
 void SharedLinkManager::IncreaseSharedLink(int callingUid)
 {
     std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
@@ -125,23 +158,16 @@ void SharedLinkManager::DecreaseSharedLink(int callingUid)
         return;
     }
     sharedLinkCountMap[callingUid]--;
-    WIFI_LOGI("CallingUid %{public}d increase shared link to %{public}d", callingUid,
+    WIFI_LOGI("CallingUid %{public}d decrease shared link to %{public}d", callingUid,
         sharedLinkCountMap[callingUid]);
 }
 
-void SharedLinkManager::SetSharedLinkCount(int count)
+void SharedLinkManager::ClearSharedLinkCount()
 {
+    WIFI_LOGI("ClearSharedLinkCount");
     std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
-    WIFI_LOGI("Set sharedLinkCount: %{public}d", count);
-    if (count == 0) {
-        sharedLinkCountMap.clear();
-    } else if (count == 1) {
-        if (!sharedLinkCountMap.empty()) {
-            return;
-        }
-        int callingUid = 0;
-        sharedLinkCountMap[callingUid] = count;
-    }
+    firstGroupUid = -1;
+    sharedLinkCountMap.clear();
 }
 
 int SharedLinkManager::GetSharedLinkCount()

@@ -15,6 +15,14 @@
 
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_client.h"
+
+#include <codecvt>
+#include <fstream>
+#include <iostream>
+#include <locale>
+#include <securec.h>
+#include <unistd.h>
+
 #include "wifi_hdi_wpa_sta_impl.h"
 #include "wifi_hdi_wpa_callback.h"
 #include "wifi_hdi_wpa_ap_impl.h"
@@ -23,12 +31,6 @@
 #include "wifi_common_util.h"
 #include "wifi_common_def.h"
 #include "hdi_struct_toolkit.h"
-#include <securec.h>
-#include <unistd.h>
-#include <locale>
-#include <codecvt>
-#include <iostream>
-#include <fstream>
 
 #ifndef UT_TEST
 #include "wifi_log.h"

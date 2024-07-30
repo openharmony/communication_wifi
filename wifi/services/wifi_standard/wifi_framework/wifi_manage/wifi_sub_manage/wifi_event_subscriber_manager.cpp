@@ -215,9 +215,10 @@ void WifiEventSubscriberManager::HandleDistributedKvDataServiceChange(bool add)
     RegisterCloneEvent();
 }
 
-void WifiEventSubscriberManager::HandlP2pBusinessChange(int systemAbilityId, bool add)
+#ifdef FEATURE_P2P_SUPPORT
+void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
-    WIFI_LOGI("HandlP2pBusinessChange, id[%{public}d], mode=[%{public}d]!", systemAbilityId, add);
+    WIFI_LOGI("HandleP2pBusinessChange, id[%{public}d], mode=[%{public}d]!", systemAbilityId, add);
     if (add) {
         return;
     }
@@ -229,6 +230,7 @@ void WifiEventSubscriberManager::HandlP2pBusinessChange(int systemAbilityId, boo
     pService->HandleBusinessSAException(systemAbilityId);
     return;
 }
+#endif
 
 void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, bool add)
 {
@@ -251,9 +253,11 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
             HandleDistributedKvDataServiceChange(add);
             break;
+#ifdef FEATURE_P2P_SUPPORT
         case SOFTBUS_SERVER_SA_ID:
-            HandlP2pBusinessChange(systemAbilityId, add);
+            HandleP2pBusinessChange(systemAbilityId, add);
             break;
+#endif
         default:
             break;
     }

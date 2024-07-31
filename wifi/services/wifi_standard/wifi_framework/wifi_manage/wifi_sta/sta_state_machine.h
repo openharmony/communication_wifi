@@ -1011,6 +1011,21 @@ private:
     ErrCode SetExternalSim(const std::string ifName, const std::string &eap, int value) const;
 
     /**
+     * @Description : should sta connect use factory mac address.
+     *
+     * @param networkId - networkId.
+     */
+    bool ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig);
+
+    /**
+     * @Description : Check Current Connect is used randomized mac or not.
+     *
+     * @param networkId - networkId.
+     * @Return true: used randomized mac address.
+     */
+    bool CurrentIsRandomizedMac();
+
+    /**
      * @Description : Check Current DisConnect event is should retry.
      *
      * @param eventName - eventName.
@@ -1025,21 +1040,6 @@ private:
      * @Return true: need stop timer.
      */
     bool IsDisConnectReasonShouldStopTimer(int reason);
-
-    /**
-     * @Description : should sta connect use factory mac address.
-     *
-     * @param networkId - networkId.
-     */
-    bool ShouldUseFactoryMac(const WifiDeviceConfig &deviceConfig);
-
-    /**
-     * @Description : Check Current Connect is used randomized mac or not.
-     *
-     * @param networkId - networkId.
-     * @Return true: used randomized mac address.
-     */
-    bool CurrentIsRandomizedMac();
 
     /**
      * @Description : Hilink Save Data To Device Config.

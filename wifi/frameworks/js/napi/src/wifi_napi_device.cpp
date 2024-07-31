@@ -348,6 +348,7 @@ static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& c
         cppConfig.wepKeys[0] = cppConfig.preSharedKey;
         cppConfig.wepTxKeyIndex = 0;
         cppConfig.preSharedKey = "";
+        std::string().swap(cppConfig.preSharedKey);
     }
 }
 

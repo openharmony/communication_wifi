@@ -92,7 +92,7 @@ SOFTAP_ABNORMAL_DISCONNECT:
   ERROR_CODE: {type: INT32, desc: error code}
 
 SOFTAP_CONNECT_FAILED:
-  __BASE: {type: FAULT, level: MINOR, desc: soft ap connect failed}
+  __BASE: {type: FAULT, level: MINOR, desc: soft ap connect failed event}
   ERROR_CODE: {type: INT32, desc: error code}
 
 WIFI_CHR_EVENT:

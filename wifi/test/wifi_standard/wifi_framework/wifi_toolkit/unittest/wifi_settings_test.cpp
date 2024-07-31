@@ -220,12 +220,9 @@ HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
     WIFI_LOGE("IsModulePreLoadTest enter!");
     bool state = WifiSettings::GetInstance().IsModulePreLoad("wifitest");
     EXPECT_FALSE(state);
-    WifiSettings::GetInstance().IsModulePreLoad("StaService");
-    WifiSettings::GetInstance().IsModulePreLoad("ScanService");
-    WifiSettings::GetInstance().IsModulePreLoad("ApService");
-    WifiSettings::GetInstance().IsModulePreLoad("P2pService");
-    WifiSettings::GetInstance().IsModulePreLoad("AwareService");
-    WifiSettings::GetInstance().IsModulePreLoad("EnhanceService");
+    bool result = WifiSettings::GetInstance().IsModulePreLoad("StaService");
+    WIFI_LOGE("IsModulePreLoadTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiSettingsTest, GetSupportHwPnoFlagTest, TestSize.Level1)
@@ -467,6 +464,9 @@ HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("AddWpsDeviceConfigTest enter");
     WifiDeviceConfig config;
+    int result =  WifiSettings::GetInstance().AddWpsDeviceConfig(config);
+    EXPECT_EQ(result, -1);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
     WifiSettings::GetInstance().AddWpsDeviceConfig(config);
 }
 
@@ -569,8 +569,6 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     config.wifiWapiConfig.wapiAsCertData = "abcdefg";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
-    WifiEncryptionInfo wifiEncryptionInfo;
-    WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)

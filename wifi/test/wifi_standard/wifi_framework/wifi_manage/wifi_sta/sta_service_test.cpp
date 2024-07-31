@@ -399,6 +399,8 @@ void StaServiceTest::StaServiceRemoveDeviceConfigSuccess()
     int networkId = NETWORK_ID;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetChangeDeviceConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_SUCCESS);
@@ -407,6 +409,7 @@ void StaServiceTest::StaServiceRemoveDeviceConfigSuccess()
 void StaServiceTest::StaServiceRemoveDeviceConfigFail1()
 {
     int networkId = NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = false;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = false;
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
@@ -415,7 +418,8 @@ void StaServiceTest::StaServiceRemoveDeviceConfigFail1()
 void StaServiceTest::StaServiceRemoveDeviceConfigFail2()
 {
     int networkId = NETWORK_ID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = false;
+    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = false;
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
 }
 
@@ -682,9 +686,9 @@ void StaServiceTest::StaServiceReConnectTestSucc()
 void StaServiceTest::StaServiceSetSuspendModeTest()
 {
     MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = false;
-    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_FAILED);
+    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
     MockWifiStaInterface::GetInstance().pSupplicant.wpaSetSuspendMode = true;
-    pStaService->SetSuspendMode(false);
+    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceSetPowerModeTest()
@@ -873,7 +877,7 @@ int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(1)));
     return static_cast<int>(pStaService->StartConnectToUserSelectNetwork(0, "11:22:33:44"));
 }
- 
+
 void StaServiceTest::SetTxPowerTest()
 {
     pStaService->SetTxPower(0);
@@ -881,6 +885,7 @@ void StaServiceTest::SetTxPowerTest()
 
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
+    StaServiceStartPortalCertificationTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level1)

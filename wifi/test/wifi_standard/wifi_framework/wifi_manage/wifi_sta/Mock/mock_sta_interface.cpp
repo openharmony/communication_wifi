@@ -132,13 +132,13 @@ ErrCode StaInterface::RemoveAllDevice()
 ErrCode StaInterface::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
     LOGI("Enter EnableDeviceConfig.\n");
-       return WIFI_OPT_SUCCESS;
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaInterface::DisableDeviceConfig(int networkId)
 {
     LOGI("Enter DisableDeviceConfig.\n");
-      return WIFI_OPT_SUCCESS;
+    return WIFI_OPT_SUCCESS;
 }
 ErrCode StaInterface::StartWps(const WpsConfig &config)
 {
@@ -223,7 +223,7 @@ ErrCode StaInterface::RegisterFilterBuilder(const FilterTag &filterTag,
                                             const FilterBuilder &filterBuilder)
 {
     LOGI("Enter RegisterFilterBuilder");
-       return WIFI_OPT_SUCCESS;
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName)

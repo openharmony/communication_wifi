@@ -21,8 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
-class StateMachine 
-{
+class StateMachine {
 public:
     explicit StateMachine(const std::string &name);
     virtual ~StateMachine();
@@ -58,8 +57,7 @@ public:
     void StateDelete(State *state);
     void SetFirstState(State *firstState);
     void SwitchState(State *targetState);
-    void DelayMessage(const InternalMessagePtr msg);
-    
+    void DelayMessage(const InternalMessagePtr msg); 
 };
 }  // namespace OHOS
 }  // namespace Wifi

@@ -44,7 +44,7 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp() override
     {
-        pStaInterface.reset(new StaInterface);
+        pStaInterface.reset(new StaInterface(0));
         pStaInterface->pStaService = new MockWifiStaService();
         pMockStaService = (MockWifiStaService *)pStaInterface->pStaService;
     }

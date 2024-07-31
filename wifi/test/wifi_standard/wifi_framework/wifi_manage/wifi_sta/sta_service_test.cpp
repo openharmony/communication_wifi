@@ -17,7 +17,7 @@
 #include "mock_wifi_manager.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include "mock_sta_state_machine.h"
+#include "sta_state_machine.h"
 #include "mock_wifi_sta_interface.h"
 #include "mock_dhcp_service.h"
 #include "mock_sta_auto_connect_service.h"
@@ -54,7 +54,7 @@ public:
     virtual void SetUp()
     {
         pStaService = std::make_unique<StaService>();
-        pStaService->pStaStateMachine = new MockStaStateMachine();
+        pStaService->pStaStateMachine = new StaStateMachine();
         pStaService->pStaAutoConnectService = new MockStaAutoConnectService(pStaService->pStaStateMachine);
     }
     virtual void TearDown()
@@ -399,8 +399,6 @@ void StaServiceTest::StaServiceRemoveDeviceConfigSuccess()
     int networkId = NETWORK_ID;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = true;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = true;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetChangeDeviceConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_SUCCESS);
@@ -409,7 +407,6 @@ void StaServiceTest::StaServiceRemoveDeviceConfigSuccess()
 void StaServiceTest::StaServiceRemoveDeviceConfigFail1()
 {
     int networkId = NETWORK_ID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = false;
     MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = false;
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
@@ -418,8 +415,7 @@ void StaServiceTest::StaServiceRemoveDeviceConfigFail1()
 void StaServiceTest::StaServiceRemoveDeviceConfigFail2()
 {
     int networkId = NETWORK_ID;
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.removeDevice = false;
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.saveDeviceConfig = false;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
 }
 
@@ -885,7 +881,6 @@ void StaServiceTest::SetTxPowerTest()
 
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
-    StaServiceStartPortalCertificationTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level1)

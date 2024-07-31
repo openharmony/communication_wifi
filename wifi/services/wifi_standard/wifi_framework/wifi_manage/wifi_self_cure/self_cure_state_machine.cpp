@@ -2996,7 +2996,6 @@ bool SelfCureStateMachine::IsSoftApSsidSameWithWifi(HotspotConfig curApConfig)
     std::string().swap(config.preSharedKey);
     bool isSameSecurityType = ("WPA2-PSK" == config.keyMgmt || "WPA-PSK" == config.keyMgmt);
     if (isSameSsid && isSameSecurityType && !isSamePassword) {
-        std::string().swap(config.preSharedKey);
         return true;
     }
     return false;

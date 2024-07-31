@@ -38,6 +38,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isEphemeral = false;
     item.preSharedKey.clear();
     item.keyMgmt.clear();
+    std::string().swap(item.preSharedKey);
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         item.wepKeys[i].clear();
     }
@@ -262,6 +263,7 @@ static int SetWifiDeviceConfigEncrypt(WifiDeviceConfig &item, const std::string 
     int errorKeyValue = 0;
     if (key == "encryptedData") {
         item.preSharedKey = "";
+        std::string().swap(item.preSharedKey);
         item.encryptedData = value;
     } else if (key == "IV") {
         item.IV = value;
@@ -1481,6 +1483,7 @@ template <> void ClearTClass<WifiStoreRandomMac>(WifiStoreRandomMac &item)
     item.peerBssid.clear();
     item.randomMac.clear();
     item.preSharedKey.clear();
+    std::string().swap(item.preSharedKey);
     item.fuzzyBssids.clear();
     return;
 }
@@ -1706,6 +1709,7 @@ static void ClearWifiBackupConfig(WifiBackupConfig &item)
     item.lastHasInternetTime = -1;
     item.noInternetAccess = false;
     item.preSharedKey.clear();
+    std::string().swap(item.preSharedKey);
     item.wepTxKeyIndex = 0;
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         item.wepKeys[i].clear();

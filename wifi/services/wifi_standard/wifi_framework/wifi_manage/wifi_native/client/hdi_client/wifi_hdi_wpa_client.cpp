@@ -749,10 +749,11 @@ bool WifiHdiWpaClient::GetEncryptionString(const HotspotConfig &config, std::str
 
 void WifiHdiWpaClient::GetChannelString(const HotspotConfig &config, std::string &channelString)
 {
-    int channel = (config.GetChannel() | (config.GetBandWidth() << BAND_WIDTH_OFFSET));
-    LOGI("set ap channel is %{public}d", channel);
+    uint32_t channel = (static_cast<uint32_t>(config.GetChannel()) |
+        (static_cast<uint32_t>(config.GetBandWidth()) << BAND_WIDTH_OFFSET));
+    LOGI("set ap channel mix info is %{public}u", channel);
     channelString = StringCombination(
-        "channel=%d\n"
+        "channel=%u\n"
         "op_class=0",
         channel);
 }

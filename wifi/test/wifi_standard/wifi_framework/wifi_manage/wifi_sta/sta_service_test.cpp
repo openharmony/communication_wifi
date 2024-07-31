@@ -17,7 +17,7 @@
 #include "mock_wifi_manager.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include "mock_sta_state_machine.h"
+#include "sta_state_machine.h"
 #include "mock_wifi_sta_interface.h"
 #include "mock_dhcp_service.h"
 #include "mock_sta_auto_connect_service.h"
@@ -54,7 +54,7 @@ public:
     virtual void SetUp()
     {
         pStaService = std::make_unique<StaService>();
-        pStaService->pStaStateMachine = new MockStaStateMachine();
+        pStaService->pStaStateMachine = new StaStateMachine();
         pStaService->pStaAutoConnectService = new MockStaAutoConnectService(pStaService->pStaStateMachine);
     }
     virtual void TearDown()

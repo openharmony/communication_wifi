@@ -13,7 +13,7 @@
   * limitations under the License.
   */
  
- #include "net_supplier_info.h"
+#include "net_supplier_info.h"
 namespace OHOS {
 namespace NetManagerStandard {
 bool NetSupplierInfo::Marshalling(Parcel &parcel) const

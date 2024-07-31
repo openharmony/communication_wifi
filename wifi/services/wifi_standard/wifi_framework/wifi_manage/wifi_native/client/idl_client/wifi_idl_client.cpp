@@ -879,7 +879,7 @@ WifiErrorNo WifiIdlClient::SetSoftApConfig(const HotspotConfig &config, int id)
         std::string().swap(preSharedKey);
         return WIFI_HAL_OPT_FAILED;
     }
-    std::string().swap(config.preSharedKey);
+    std::string().swap(preSharedKey);
     tmp.securityType = static_cast<int>(config.GetSecurityType());
     tmp.band = static_cast<int>(config.GetBand());
     tmp.channel = config.GetChannel();

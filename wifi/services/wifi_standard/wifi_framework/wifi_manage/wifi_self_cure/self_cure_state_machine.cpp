@@ -1091,12 +1091,12 @@ void SelfCureStateMachine::InitDnsServer()
         WIFI_LOGE("Get number of public ipaddr failed");
         return;
     }
-    for (int i = 0; i < overseaPublicDnses.size(); i++) {
+    for (uint32_t i = 0; i < overseaPublicDnses.size(); i++) {
         overseaPublicDnses[i] = strPublicIpAddr[i];
     }
-    int spaceSize = chinaPublicDnses.size();
+    uint32_t spaceSize = chinaPublicDnses.size();
     strPublicIpAddr.erase(strPublicIpAddr.begin(), strPublicIpAddr.begin() + spaceSize);
-    for (int i = 0; i < chinaPublicDnses.size(); i++) {
+    for (uint32_t i = 0; i < chinaPublicDnses.size(); i++) {
         chinaPublicDnses[i] = strPublicIpAddr[i];
     }
     WIFI_LOGI("InitDnsServer Success");

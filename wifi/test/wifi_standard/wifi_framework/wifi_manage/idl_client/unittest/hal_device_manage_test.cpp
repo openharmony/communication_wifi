@@ -234,7 +234,7 @@ HWTEST_F(WifiHalDeviceManagerTest, CreateTheNeedChangeChipModeIfaceDataTest, Tes
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateTheNeedChangeChipModeIfaceData(
         wifiChipInfo, createIfaceType, chipMode, ifaceCreationData);
     
-    IfaceType createIfaceType = IfaceType::STA;
+    createIfaceType = IfaceType::STA;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateTheNeedChangeChipModeIfaceData(
         wifiChipInfo, createIfaceType, chipMode, ifaceCreationData);
 }

@@ -15,6 +15,7 @@
 #ifndef OHOS_MOCK_STASTATEMACHINE_H
 #define OHOS_MOCK_STASTATEMACHINE_H
 
+#include <gmock/gmock.h>
 #include "sta_state_machine.h"
 
 namespace OHOS {

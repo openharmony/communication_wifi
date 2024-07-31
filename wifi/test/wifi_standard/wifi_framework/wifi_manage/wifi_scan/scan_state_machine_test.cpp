@@ -779,7 +779,7 @@ public:
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        pScanStateMachine->StartPnoScanHardware();
+        EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
     }
 
     void StartPnoScanHardwareSuccess2()
@@ -1074,7 +1074,7 @@ public:
         interScanInfo.securityType = WifiSecurity::WEP;
         records.RecordFilteredScanResult(interScanInfo);
     }
- 
+
     void GetScanInfoMsgTest()
     {
         InterScanInfo interScanInfo;
@@ -1082,20 +1082,20 @@ public:
         ScanStateMachine::FilterScanResultRecord records;
         records.GetScanInfoMsg(interScanInfo);
     }
- 
+
     void GetFilteredScanResultMsgTest()
     {
         ScanStateMachine::FilterScanResultRecord records;
         records.GetFilteredScanResultMsg();
     }
- 
+
     void FilterScanResultTest()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetConnectedBssid(_)).Times(AtLeast(1));
         std::vector<InterScanInfo> scanInfoList;
         pScanStateMachine->FilterScanResult(scanInfoList);
     }
- 
+
     void SetWifiModeTest()
     {
         InterScanInfo scanInfo;
@@ -1766,10 +1766,12 @@ HWTEST_F(ScanStateMachineTest, PnoScanSoftwareProcessTest3, TestSize.Level1)
 
 HWTEST_F(ScanStateMachineTest, SoftwareScanInfoProcessTest1, TestSize.Level1)
 {
+    SoftwareScanInfoProcessTest1();
 }
 
 HWTEST_F(ScanStateMachineTest, SoftwareScanInfoProcessTest2, TestSize.Level1)
 {
+    SoftwareScanInfoProcessTest2();
 }
 
 HWTEST_F(ScanStateMachineTest, InitCommonScanStateTest, TestSize.Level1)
@@ -1796,17 +1798,17 @@ HWTEST_F(ScanStateMachineTest, RecordFilteredScanResultTest, TestSize.Level1)
 {
     RecordFilteredScanResultTest();
 }
- 
+
 HWTEST_F(ScanStateMachineTest, GetFilteredScanResultMsgTest, TestSize.Level1)
 {
     GetFilteredScanResultMsgTest();
 }
- 
+
 HWTEST_F(ScanStateMachineTest, FilterScanResultTest, TestSize.Level1)
 {
     FilterScanResultTest();
 }
- 
+
 HWTEST_F(ScanStateMachineTest, SetWifiModeTest, TestSize.Level1)
 {
     SetWifiModeTest();

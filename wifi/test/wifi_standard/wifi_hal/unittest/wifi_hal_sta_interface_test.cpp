@@ -24,7 +24,6 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-
 static int g_lenth = 180;
 void WifiHalStaInterfaceTest::SetUpTestCase()
 {

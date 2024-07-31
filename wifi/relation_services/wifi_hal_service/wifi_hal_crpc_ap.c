@@ -75,14 +75,12 @@ int RpcSetHostapdConfig(RpcServer *server, Context *context)
         ReadInt(context, &config.preSharedKeyLen) < 0 || ReadInt(context, &config.securityType) < 0 ||
         ReadInt(context, &config.band) < 0 || ReadInt(context, &config.channel) < 0 ||
         ReadInt(context, &config.maxConn) < 0 || ReadInt(context, &id) < 0 || id < 0) {
-        std::string().swap(config.preSharedKey);
         return HAL_FAILURE;
     }
     WifiErrorNo err = SetHostapdConfig(&config, id);
     WriteBegin(context, 0);
     WriteInt(context, err);
     WriteEnd(context);
-    std::string().swap(config.preSharedKey);
     return HAL_SUCCESS;
 }
 

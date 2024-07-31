@@ -130,7 +130,6 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest2, TestSize.Level1)
         return;
     }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
-    delete callBack;
 }
 
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest3, TestSize.Level1)
@@ -150,7 +149,6 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest3, TestSize.Level1)
         return;
     }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
-    delete callBack;
 }
 
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest4, TestSize.Level1)
@@ -170,7 +168,6 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest4, TestSize.Level1)
         return;
     }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
-    delete callBack;
 }
 
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest5, TestSize.Level1)
@@ -190,7 +187,6 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest5, TestSize.Level1)
         return;
     }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
-    delete callBack;
 }
 
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest6, TestSize.Level1)
@@ -210,7 +206,6 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest6, TestSize.Level1)
         return;
     }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
-    delete callBack;
 }
 
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest7, TestSize.Level1)
@@ -230,7 +225,6 @@ HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest7, TestSize.Level1)
         return;
     }
     pWifiDeviceCallBackStub->OnRemoteRequest(code, data, reply, option);
-    delete callBack;
 }
 
 HWTEST_F(WifiDeviceCallBackStubTest, OnRemoteRequestTest8, TestSize.Level1)

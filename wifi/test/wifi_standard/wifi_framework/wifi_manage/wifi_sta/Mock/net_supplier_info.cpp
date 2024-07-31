@@ -14,34 +14,34 @@
   */
  
  #include "net_supplier_info.h"
- namespace OHOS {
- namespace NetManagerStandard {
- bool NetSupplierInfo::Marshalling(Parcel &parcel) const
- {
-     return true;
- }
+namespace OHOS {
+namespace NetManagerStandard {
+bool NetSupplierInfo::Marshalling(Parcel &parcel) const
+{
+    return true;
+}
  
- sptr<NetSupplierInfo> NetSupplierInfo::Unmarshalling(Parcel &parcel)
- {
-     sptr<NetSupplierInfo> ptr = new (std::nothrow) NetSupplierInfo();
-     if (ptr == nullptr) {
-         return nullptr;
-     }
-     return ptr;
- }
+sptr<NetSupplierInfo> NetSupplierInfo::Unmarshalling(Parcel &parcel)
+{
+    sptr<NetSupplierInfo> ptr = new (std::nothrow) NetSupplierInfo();
+    if (ptr == nullptr) {
+        return nullptr;
+    }
+    return ptr;
+}
  
- bool NetSupplierInfo::Marshalling(Parcel &parcel, const sptr<NetSupplierInfo> &object)
- {
-     if (object == nullptr) {
-         return false;
-     }
-     return true;
- }
+bool NetSupplierInfo::Marshalling(Parcel &parcel, const sptr<NetSupplierInfo> &object)
+{
+    if (object == nullptr) {
+        return false;
+    }
+    return true;
+}
  
- std::string NetSupplierInfo::ToString(const std::string &tab) const
- {
-     std::string str;
-     return str;
- }
- } // namespace NetManagerStandard
- } // namespace OHOS
+std::string NetSupplierInfo::ToString(const std::string &tab) const
+{
+    std::string str;
+    return str;
+}
+} // namespace NetManagerStandard
+} // namespace OHOS

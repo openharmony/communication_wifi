@@ -84,7 +84,6 @@ ErrCode ScanInterface::OnAppRunningModeChanged(ScanMode appRunMode)
 
 ErrCode ScanInterface::OnMovingFreezeStateChange()
 {
-
     return WIFI_OPT_SUCCESS;
 }
 

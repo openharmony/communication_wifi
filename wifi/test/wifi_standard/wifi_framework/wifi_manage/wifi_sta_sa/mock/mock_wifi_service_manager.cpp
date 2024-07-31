@@ -132,7 +132,7 @@ IScanService *WifiServiceManager::GetScanServiceInst(int instId)
 bool WifiServiceManager::ApServiceSetHotspotConfig(const HotspotConfig &config, int id)
 {
     WIFI_LOGD("WifiServiceManager::GetApServiceInst");
-   return true;
+    return true;
 }
 
 IApService *WifiServiceManager::GetApServiceInst(int id)

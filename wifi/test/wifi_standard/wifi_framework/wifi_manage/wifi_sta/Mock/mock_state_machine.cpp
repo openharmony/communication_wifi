@@ -86,7 +86,7 @@ bool StateMachine::InitialStateMachine(const std::string &name)
     return true;
 }
 void StateMachine::StartStateMachine()
-{   
+{
 }
 
 void StateMachine::NotExecutedMessage(const InternalMessagePtr msg)
@@ -110,8 +110,9 @@ InternalMessagePtr StateMachine::CreateMessage(const InternalMessagePtr orig)
     m->CopyMessageBody(orig->GetMessageBody());
     return m;
 }
-InternalMessagePtr StateMachine::CreateMessage(int msgName){
-   InternalMessagePtr m = CreateMessage();
+InternalMessagePtr StateMachine::CreateMessage(int msgName)
+{
+    InternalMessagePtr m = CreateMessage();
     if (m == nullptr) {
         return nullptr;
     }
@@ -176,7 +177,8 @@ void StateMachine::MessageExecutedLater(int msgName, int param1, int param2, int
 {}
 void StateMachine::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
 {}
-void StateMachine::MessageExecutedLater(int msgName, const std::any &messageObj, int64_t delayTimeMs)
+void StateMachine::MessageExecutedLater(int msgName, const std::any &messageObj,
+                                        int64_t delayTimeMs)
 {}
 void StateMachine::MessageExecutedLater(int msgName, int param1, int param2, const std::any &messageObj, int64_t delayTimeMs)
 {}

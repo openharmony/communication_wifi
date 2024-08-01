@@ -248,15 +248,14 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
         }
     }
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService == nullptr) {
-        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
-        return false;
+    if (pEnhanceService != nullptr) {
+        scanInfo.externScan = externFlag;
+        scanInfo.isSystemApp = WifiAuthCenter::IsSystemAppByToken();
+        bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
+        WifiScanConfig::GetInstance().SaveScanDeviceInfo(scanInfo);
+        return allowScan;
     }
-    scanInfo.externScan = externFlag;
-    scanInfo.isSystemApp = WifiAuthCenter::IsSystemAppByToken();
-    bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
-    WifiScanConfig::GetInstance().SaveScanDeviceInfo(scanInfo);
-    return allowScan;
+    return true;
 }
 
 ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)

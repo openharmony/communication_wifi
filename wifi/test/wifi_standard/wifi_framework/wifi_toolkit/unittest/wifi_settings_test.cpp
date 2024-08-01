@@ -565,10 +565,11 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)
 {
     WIFI_LOGI("DecryptionWapiConfigTest_001 enter");
     WifiDeviceConfig config;
-    config.keyMgmt = KEY_MGMT_NONE;
+    WifiEncryptionInfo wifiEncryptionInfo;
+    config.keyMgmt = KEY_MGMT_WAPI_CERT;
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     config.wifiWapiConfig.wapiAsCertData = "abcdefg";
-    WifiSettings::GetInstance().DecryptionDeviceConfig(config);
+    WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)

@@ -2088,7 +2088,7 @@ std::vector<uint32_t> SelfCureStateMachine::TransIpAddressToVec(std::string addr
     return currAddr;
 }
 
-std::string SelfCureStateMachine::TransVecToIpAddress(std::vector<uint32_t> vec)
+std::string SelfCureStateMachine::TransVecToIpAddress(const std::vector<uint32_t>& vec)
 {
     std::string address = "";
     if (vec.size() != IP_ADDR_SIZE) {
@@ -2162,7 +2162,7 @@ bool SelfCureStateMachine::CanArpReachable()
     return false;
 }
 
-bool SelfCureStateMachine::DoSlowArpTest(std::string testIpAddr)
+bool SelfCureStateMachine::DoSlowArpTest(const std::string& testIpAddr)
 {
     ArpChecker arpChecker;
     std::string macAddress;
@@ -2180,7 +2180,7 @@ bool SelfCureStateMachine::DoSlowArpTest(std::string testIpAddr)
     return false;
 }
 
-bool SelfCureStateMachine::DoArpTest(std::string ipAddress, std::string gateway)
+bool SelfCureStateMachine::DoArpTest(std::string& ipAddress, std::string& gateway)
 {
     ArpChecker arpChecker;
     std::string macAddress;
@@ -2190,8 +2190,8 @@ bool SelfCureStateMachine::DoArpTest(std::string ipAddress, std::string gateway)
     return arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true);
 }
 
-std::string SelfCureStateMachine::GetNextIpAddr(const std::string gateway, const std::string currentAddr,
-                                                std::vector<std::string> testedAddr)
+std::string SelfCureStateMachine::GetNextIpAddr(const std::string& gateway, const std::string& currentAddr,
+                                                const std::vector<std::string>& testedAddr)
 {
     std::vector<uint32_t> ipAddr;
     if (gateway.empty() || currentAddr.empty() || testedAddr.size() ==0) {
@@ -2290,7 +2290,7 @@ bool SelfCureStateMachine::IsUseFactoryMac()
     return false;
 }
 
-bool SelfCureStateMachine::IsSameEncryptType(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt)
+bool SelfCureStateMachine::IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& deviceKeymgmt)
 {
     if (deviceKeymgmt == "WPA-PSK") {
         return scanInfoKeymgmt.find("PSK") != std::string::npos;
@@ -2404,8 +2404,8 @@ int SelfCureStateMachine::String2InternetSelfCureHistoryInfo(const std::string s
     return 0;
 }
 
-int SelfCureStateMachine::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string> histories,
-                                              int cnt)
+int SelfCureStateMachine::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info,
+                                              std::vector<std::string>& histories, int cnt)
 {
     if (histories.empty() || histories.size() != SELFCURE_HISTORY_LENGTH || cnt != SELFCURE_FAIL_LENGTH) {
         WIFI_LOGE("SetSelfCureFailInfo return");
@@ -2444,8 +2444,8 @@ int SelfCureStateMachine::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info, std
     return 0;
 }
 
-int SelfCureStateMachine::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string> histories,
-                                                     int cnt)
+int SelfCureStateMachine::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info,
+                                                     std::vector<std::string>& histories, int cnt)
 {
     if (histories.empty() || histories.size() != SELFCURE_HISTORY_LENGTH || cnt != SELFCURE_FAIL_LENGTH) {
         WIFI_LOGE("SetSelfCureFailInfo return");
@@ -2985,7 +2985,7 @@ void SelfCureStateMachine::RecoverySoftAp()
     WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, 0);
 }
  
-bool SelfCureStateMachine::IsSoftApSsidSameWithWifi(HotspotConfig curApConfig)
+bool SelfCureStateMachine::IsSoftApSsidSameWithWifi(const HotspotConfig& curApConfig)
 {
     WifiLinkedInfo linkedInfo;
     WifiDeviceConfig config;

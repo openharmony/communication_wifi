@@ -28,8 +28,8 @@ public:
     bool IsMultiGateway();
     std::string GetGatewayIp();
     void GetNextGatewayMac(std::string& mac);
-    int32_t SetStaticArp(std::string iface, std::string ipAddr, std::string macAddr);
-    int32_t DelStaticArp(std::string iface, std::string ipAddr);
+    int32_t SetStaticArp(const std::string& iface, const std::string& ipAddr, const std::string& macAddr);
+    int32_t DelStaticArp(const std::string& iface, const std::string& ipAddr);
 
 private:
     int32_t GetMacAddr(char *buff, const char *macAddr);

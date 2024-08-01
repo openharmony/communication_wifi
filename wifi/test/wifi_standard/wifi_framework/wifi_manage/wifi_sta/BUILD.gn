@@ -53,7 +53,7 @@ ohos_unittest("wifi_sta_unittest") {
     "Mock/mock_if_config.cpp",
     "Mock/mock_mac_address.cpp",
     "Mock/mock_sta_auto_connect_service.cpp",
-    "Mock/mock_sta_state_machine.cpp",
+    "Mock/mock_state_machine.cpp",
     "Mock/mock_wifi_chip_hal_interface.cpp",
     "Mock/mock_wifi_manager.cpp",
     "Mock/mock_wifi_settings.cpp",

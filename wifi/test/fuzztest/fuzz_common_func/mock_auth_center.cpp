@@ -135,7 +135,7 @@ bool WifiAppStateAware::IsForegroundApp(int32_t uid)
     return true;
 }
 
-bool IsForegroundApp(const std::string &bundleName)
+bool WifiAppStateAware::IsForegroundApp(const std::string &bundleName)
 {
     return true;  
 }

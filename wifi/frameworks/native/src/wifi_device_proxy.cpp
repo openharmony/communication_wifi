@@ -576,7 +576,7 @@ void WifiDeviceProxy::BigDataReadIpAddress(WifiIpAddress &address, std::vector<s
         return;
     }
     for (int i = 0; i < size; i++) {
-        address.addressIpv6[i] = CheckDataLegal(tokens[g_bigDataRecvLen++]);
+        address.addressIpv6.push_back(CheckDataLegal(tokens[g_bigDataRecvLen++]));
     }
     return;
 }

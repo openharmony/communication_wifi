@@ -37,6 +37,7 @@
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <netdb.h>
+#include <cerrno>
 
 namespace OHOS {
 namespace Wifi {
@@ -68,6 +69,8 @@ const uint32_t BASE64_UNIT_ONE_PADDING = 1;
 const uint32_t BASE64_UNIT_TWO_PADDING = 2;
 const uint32_t BASE64_SRC_UNIT_SIZE = 3;
 const uint32_t BASE64_DEST_UNIT_SIZE = 4;
+
+const uint32_t DECIMAL_NOTATION = 10;
 
 static std::pair<std::string, int> g_brokerProcessInfo;
 static constexpr uint8_t STEP_2BIT = 2;
@@ -615,22 +618,35 @@ std::string StringToHex(const std::string &data)
 
 int CheckDataLegal(std::string &data)
 {
-    std::regex hex("^[0-9]+$");
-    if (std::regex_search(data, hex)) {
-        return std::stoi(data);
+    std::regex pattern("\\d+");
+    if (!std::regex_search(data, pattern)) {
+        return 0;
     }
- 
-    return 0;
+    errno = 0;
+    char *endptr = nullptr;
+    long int num = std::strtol(data.c_str(), &endptr, DECIMAL_NOTATION);
+    if (errno == ERANGE) {
+        WIFI_LOGE("CheckDataLegal errno == ERANGE, data:%{private}s", data.c_str());
+        return 0;
+    }
+
+    return static_cast<int>(num);
 }
 
 long long CheckDataLegall(std::string &data)
 {
-    std::regex hex("^[0-9]+$");
-    if (std::regex_search(data, hex)) {
-        return std::stoll(data);
+    std::regex pattern("\\d+");
+    if (!std::regex_search(data, pattern)) {
+        return 0;
     }
- 
-    return 0;
+    errno = 0;
+    char *endptr = nullptr;
+    long long int num = std::strtoll(data.c_str(), &endptr, DECIMAL_NOTATION);
+    if (errno == ERANGE) {
+        WIFI_LOGE("CheckDataLegall errno == ERANGE, data:%{private}s", data.c_str());
+        return 0;
+    }
+    return num;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -344,6 +344,11 @@ ErrCode ScanService::DisableScan(bool disable)
     LOGI("Enter DisableScan");
     std::unique_lock<std::mutex> lock(scanControlInfoMutex);
     disableScanFlag = disable;
+    if (disableScanFlag) {
+        pScanStateMachine->SendMessage(static_cast<int>(CMD_DISABLE_SCAN));
+    } else {
+        pScanStateMachine->SendMessage(static_cast<int>(CMD_SCAN_PREPARE));
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1318,6 +1323,11 @@ ErrCode ScanService::AllowExternScan()
 
     if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_ORIGIN, scanMode)) {
         WIFI_LOGW("extern scan not allow by origin interval mode");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (!AllowScanByDisableScanCtrl()) {
+        WIFI_LOGW("extern scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
 

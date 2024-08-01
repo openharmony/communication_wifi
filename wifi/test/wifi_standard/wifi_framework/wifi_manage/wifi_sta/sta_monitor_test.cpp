@@ -14,7 +14,7 @@
  */
 #include "sta_monitor.h"
 #include <gtest/gtest.h>
-#include "mock_sta_state_machine.h"
+#include "sta_state_machine.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_sta_interface.h"
@@ -39,7 +39,7 @@ public:
     virtual void SetUp()
     {
         pStaMonitor = std::make_unique<StaMonitor>();
-        pStaMonitor->pStaStateMachine = new MockStaStateMachine();
+        pStaMonitor->pStaStateMachine = new StaStateMachine();
         InitStaMonitorSuccess();
     }
     virtual void TearDown()

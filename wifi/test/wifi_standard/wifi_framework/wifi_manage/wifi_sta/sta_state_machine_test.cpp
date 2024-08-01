@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 #include "internal_message.h"
-#include "mock_block_connect_service.h"
 #include "mock_dhcp_service.h"
 #include "mock_if_config.h"
 #include "mock_wifi_chip_hal_interface.h"
@@ -440,9 +439,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillOnce(Return(1))
             .WillRepeatedly(Return(0));
-        EXPECT_CALL(BlockConnectService::GetInstance(), EnableNetworkSelectStatus(_))
-            .WillOnce(Return(1))
-            .WillRepeatedly(Return(0));
         pStaStateMachine->linkedInfo.networkId = 0;
         pStaStateMachine->DealConnectToUserSelectedNetwork(msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(msg);
@@ -521,12 +517,6 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
-            .WillOnce(Return(1))
-            .WillRepeatedly(Return(0));
-        EXPECT_CALL(BlockConnectService::GetInstance(), IsWrongPassword(_))
-            .WillOnce(Return(1))
-            .WillRepeatedly(Return(0));
-        EXPECT_CALL(BlockConnectService::GetInstance(), UpdateNetworkSelectStatus(_, _))
             .WillOnce(Return(1))
             .WillRepeatedly(Return(0));
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
@@ -1208,6 +1198,8 @@ public:
         ;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1222,6 +1214,8 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1236,6 +1230,8 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         EXPECT_TRUE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1247,6 +1243,8 @@ public:
         pStaStateMachine->isRoam = false;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         EXPECT_FALSE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
@@ -1485,6 +1483,8 @@ public:
     {
         std::string ifname = "wlan0";
         DhcpResult result;
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         pStaStateMachine->pDhcpResultNotify->OnSuccess(0, nullptr, &result);
         pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), nullptr);
         pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), &result);
@@ -1501,6 +1501,8 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
         std::string ifname = "wlan0";
         std::string reason = "test";
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname.c_str(), reason.c_str());
     }
 
@@ -1513,6 +1515,8 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
         std::string ifname = "wlan1";
         std::string reason = "test";
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname.c_str(), reason.c_str());
     }
 
@@ -1523,6 +1527,8 @@ public:
         pStaStateMachine->isRoam = true;
         std::string ifname = "wlan1";
         std::string reason = "test";
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname.c_str(), reason.c_str());
     }
 
@@ -1689,13 +1695,16 @@ public:
     {
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
         WifiLinkedInfo linkedInfo;
         linkedInfo.connState = ConnState::CONNECTED;
         linkedInfo.ssid = "111111";
         linkedInfo.bssid = "222222";
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).
             WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
         WifiDeviceConfig config;
         config.ssid = "111111";
         config.bssid = "222222";

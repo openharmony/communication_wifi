@@ -88,6 +88,7 @@ public:
          *
          */
         void UnLoadDriver();
+        void DisableScan();
         void HandleUpdateCountryCode(InternalMessagePtr msg);
     };
 

@@ -129,6 +129,7 @@ enum ScanCommond {
     CMD_STOP_PNO_SCAN = 4,     /* Stop PNO Scanning */
     CMD_RESTART_PNO_SCAN = 5,  /* Restart PNO Scanning */
     CMD_SCAN_FINISH = 6,       /* Stop PNO scanning and uninstall the driver */
+    CMD_DISABLE_SCAN = 7,
 };
 
 /* Monitored scanning events */

@@ -174,7 +174,8 @@ void ScanStateMachine::InitState::GoInState()
     }
 
     if (pScanStateMachine->quitFlag) {
-        WIFI_LOGI("Scan finished.\n");
+        WIFI_LOGI("Notify finish ScanStateMachine.\n");
+        pScanStateMachine->ReportStatusChange(SCAN_FINISHED_STATUS);
     }
     return;
 }
@@ -187,7 +188,6 @@ void ScanStateMachine::InitState::GoOutState()
 
 bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
 {
-    WIFI_LOGI("Enter InitState::ExecuteStateMsg.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null.\n");
         return true;
@@ -200,6 +200,10 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
 
         case CMD_SCAN_FINISH:
             UnLoadDriver();
+            return true;
+
+        case CMD_DISABLE_SCAN:
+            DisableScan();
             return true;
 
         case CMD_START_COMMON_SCAN:
@@ -229,7 +233,6 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
         case SCAN_RESULT_EVENT:
         case PNO_SCAN_RESULT_EVENT:
         case SCAN_FAILED_EVENT:
-            WIFI_LOGE("ignored scan results event.\n");
             return true;
 
         case SYSTEM_SCAN_TIMER:
@@ -1844,6 +1847,13 @@ void ScanStateMachine::InitState::UnLoadDriver()
     pScanStateMachine->SwitchState(pScanStateMachine->initState);
     pScanStateMachine->quitFlag = true;
     WIFI_LOGI("Stop Scan Service Success.\n");
+}
+
+void ScanStateMachine::InitState::DisableScan()
+{
+    WIFI_LOGI("Enter DisableScan.\n");
+    pScanStateMachine->SwitchState(pScanStateMachine->initState);
+    WIFI_LOGI("Disable Scan Success.\n");
 }
 }  // namespace Wifi
 }  // namespace OHOS

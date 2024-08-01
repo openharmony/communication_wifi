@@ -137,7 +137,7 @@ bool WifiAppStateAware::IsForegroundApp(int32_t uid)
 
 bool WifiAppStateAware::IsForegroundApp(const std::string &bundleName)
 {
-    return true;  
+    return true;
 }
 
 WifiNetAgent &WifiNetAgent::GetInstance()

@@ -18,6 +18,7 @@
 #include "concrete_manager_state_machine.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
+#include "wifi_country_code_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -33,6 +34,9 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int SLEEP_TIME = 2;
+
 class ConcreteManagerMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -191,7 +195,7 @@ public:
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
         msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
-        sleep(1);
+        sleep(SLEEP_TIME);
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
     }
 
@@ -253,12 +257,13 @@ public:
 
     void HandleStaStopTest1()
     {
+        WifiCountryCodeManager::GetInstance().Init();
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         msg->SetMessageName(CONCRETE_CMD_STA_STOP);
-        sleep(1);
+        sleep(SLEEP_TIME);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
@@ -382,6 +387,7 @@ public:
 
     void HandleStaSemiActiveTest1()
     {
+        WifiCountryCodeManager::GetInstance().Init();
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);

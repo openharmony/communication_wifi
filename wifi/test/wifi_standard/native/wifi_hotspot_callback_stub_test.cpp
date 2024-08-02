@@ -100,7 +100,6 @@ HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBack_002, TestSize.Level1)
     WIFI_LOGI("RegisterCallBack_002 enter");
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
     pWifiHotspot->RegisterCallBack(userCallback);
-    delete userCallback;
 }
 /**
  * @tc.name: OnRemoteRequest_001
@@ -194,9 +193,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1
     if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
         return;
     }
-
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 /**
  * @tc.name: OnHotspotStaJoin_001
@@ -221,7 +218,6 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 /**
  * @tc.name: OnHotspotStaLeave_001
@@ -246,7 +242,6 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 }  // namespace Wifi

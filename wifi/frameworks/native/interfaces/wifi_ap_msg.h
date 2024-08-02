@@ -24,6 +24,7 @@ namespace OHOS {
 namespace Wifi {
 #define AP_CHANNEL_INVALID (-1)
 #define AP_CHANNEL_DEFAULT 6
+#define AP_MAX_CONN_DEFAULT (-1)
 #define AP_CHANNEL_5G_DEFAULT 149
 #define AP_CHANNEL_5G_NOT_RECOMMEND (165)  // cannot group bandwidth of 40M or above
 #define WIFI_BSSID_LENGTH 18
@@ -31,6 +32,8 @@ namespace Wifi {
 #define DHCP_LEASE_TIME 21600
 #define WIFI_SSID_MAX_LEN 32
 #define WIFI_IP_MAX_LEN 15
+#define AP_BANDWIDTH_DEFAULT 0
+
 enum class ApState {
     AP_STATE_NONE = 0,
     AP_STATE_IDLE,
@@ -73,8 +76,9 @@ struct HotspotConfig {
         securityType = KeyMgmt::WPA2_PSK;
         band = BandType::BAND_2GHZ;
         channel = AP_CHANNEL_DEFAULT;
-        maxConn = -1;
+        maxConn = AP_MAX_CONN_DEFAULT;
         leaseTime = DHCP_LEASE_TIME;
+        apBandWidth = AP_BANDWIDTH_DEFAULT;
     }
 
     inline void SetSsid(const std::string &newSsid)
@@ -113,6 +117,14 @@ struct HotspotConfig {
         return band;
     }
 
+    inline void SetBandWidth(int32_t bandWidth)
+    {
+        apBandWidth = bandWidth;
+    }
+    inline int32_t GetBandWidth() const
+    {
+        return apBandWidth;
+    }
     inline void SetChannel(int32_t newchannel)
     {
         channel = newchannel;
@@ -159,6 +171,7 @@ private:
     int32_t maxConn;
     std::string ipAddress;    /* Hotspot IP address of the dhcp server */
     int32_t leaseTime;
+    int32_t apBandWidth;
 };
 
 struct StationInfo {

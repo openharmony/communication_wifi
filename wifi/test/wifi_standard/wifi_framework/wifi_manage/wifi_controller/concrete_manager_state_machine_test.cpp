@@ -34,6 +34,9 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int SLEEP_TIME = 2;
+
 class ConcreteManagerMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -192,7 +195,7 @@ public:
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
         msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
-        sleep(2);
+        sleep(SLEEP_TIME);
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
     }
 
@@ -260,7 +263,7 @@ public:
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_CLIENT_STA);
         msg->SetMessageName(CONCRETE_CMD_STA_STOP);
-        sleep(2);
+        sleep(SLEEP_TIME);
         EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));

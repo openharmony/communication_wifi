@@ -24,6 +24,7 @@ namespace OHOS {
 namespace Wifi {
 #define AP_CHANNEL_INVALID (-1)
 #define AP_CHANNEL_DEFAULT 6
+#define AP_MAX_CONN_DEFAULT (-1)
 #define AP_CHANNEL_5G_DEFAULT 149
 #define AP_CHANNEL_5G_NOT_RECOMMEND (165)  // cannot group bandwidth of 40M or above
 #define WIFI_BSSID_LENGTH 18
@@ -78,7 +79,7 @@ struct HotspotConfig {
         securityType = KeyMgmt::WPA2_PSK;
         band = BandType::BAND_2GHZ;
         channel = AP_CHANNEL_DEFAULT;
-        maxConn = -1;
+        maxConn = AP_MAX_CONN_DEFAULT;
         leaseTime = DHCP_LEASE_TIME;
         apBandWidth = AP_BANDWIDTH_DEFAULT;
     }

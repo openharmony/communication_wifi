@@ -1322,7 +1322,9 @@ void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
 {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     std::unique_lock<std::mutex> lock(mConfigOnBootMutex);
-    mSavedDeviceConfig.LoadConfig();
+    if (mSavedDeviceConfig.LoadConfig() < 0) {
+        return;
+    }
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
     int count = 0;

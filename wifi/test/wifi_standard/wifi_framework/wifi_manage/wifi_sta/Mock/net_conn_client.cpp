@@ -80,5 +80,6 @@ int32_t NetConnClient::RegisterNetSupplier(NetBearType bearerType, const std::st
 {
     return NETMANAGER;
 }
+
 } // namespace Wifi
 } // namespace OHOS

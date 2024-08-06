@@ -1147,7 +1147,7 @@ void SelfCureStateMachine::InternetSelfCureState::UpdateDnsServers(std::vector<s
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
 {
-    WIFI_LOGI("begin to SelfCureForDns");
+    WIFI_LOGI("begin to self cure for internet access: dns");
     pSelfCureStateMachine->selfCureOnGoing = true;
     testedSelfCureLevel.push_back(WIFI_CURE_RESET_LEVEL_LOW_1_DNS);
     if (pSelfCureStateMachine->internetUnknown) {

@@ -14,6 +14,7 @@
  */
 #include "mock_wifi_manager.h"
 
+
 namespace OHOS {
 namespace Wifi {
 WifiManager &WifiManager::GetInstance()

@@ -80,5 +80,10 @@ int32_t NetConnClient::RegisterNetSupplier(NetBearType bearerType, const std::st
 {
     return NETMANAGER;
 }
+
+int32_t NetConnClient::DelInterfaceAddress(const std::string &ifName, const std::string &ipAddr, int32_t prefixLength)
+{
+    return NETMANAGER;
+}
 } // namespace Wifi
 } // namespace OHOS

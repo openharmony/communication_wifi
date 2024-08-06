@@ -18,6 +18,7 @@
 #include <gmock/gmock.h>
 #include "iscan_service_callbacks.h"
 
+
 namespace OHOS {
 namespace Wifi {
 class MockWifiManager {

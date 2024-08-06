@@ -110,6 +110,7 @@ ohos_unittest("wifi_controller_unittest") {
     "time_service:time_client",
   ]
 
+
   if (wifi_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
     defines += [ "WIFI_FFRT_ENABLE" ]

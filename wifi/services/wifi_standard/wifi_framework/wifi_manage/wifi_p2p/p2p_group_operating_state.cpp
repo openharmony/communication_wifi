@@ -218,7 +218,7 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessagePtr msg
             WIFI_LOGW("failed to stop Dhcp server.");
         }
     } else {
-        StopDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
+        p2pStateMachine.StopP2pDhcpClient();
         WriteWifiP2pStateHiSysEvent(groupManager.GetCurrentGroup().GetInterface(), P2P_GC, P2P_OFF);
     }
     WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
@@ -250,7 +250,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg)
     WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
     auto dhcpFunc = [=]() {
         if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
-            StopDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
+            p2pStateMachine.StopP2pDhcpClient();
         } else {
             if (!p2pStateMachine.StopDhcpServer()) {
                 WIFI_LOGW("failed to stop Dhcp server.");

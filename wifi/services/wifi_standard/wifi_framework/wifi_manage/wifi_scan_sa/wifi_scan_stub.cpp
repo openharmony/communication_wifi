@@ -25,6 +25,8 @@
 #include "wifi_scan_config.h"
 #include "wifi_common_util.h"
 
+
+
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 
 namespace OHOS {
@@ -68,6 +70,8 @@ void WifiScanStub::InitHandleMap()
     handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN)] =
         &WifiScanStub::OnStartWifiPnoScan;
 }
+
+
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {

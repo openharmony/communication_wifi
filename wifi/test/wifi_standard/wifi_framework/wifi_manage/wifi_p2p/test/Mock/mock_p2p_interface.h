@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_P2P_INTERFACE_H
-#define OHOS_P2P_INTERFACE_H
+#ifndef OHOS_MOCK_P2P_INTERFACE_H
+#define OHOS_MOCK_P2P_INTERFACE_H
 #include "ip2p_service.h"
 
 namespace OHOS {

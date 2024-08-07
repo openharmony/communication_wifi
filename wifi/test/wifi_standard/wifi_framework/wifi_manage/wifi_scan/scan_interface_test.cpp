@@ -169,7 +169,7 @@ HWTEST_F(ScanInterfaceTest, StartWifiPnoScanTest, TestSize.Level1)
 HWTEST_F(ScanInterfaceTest, DisableScanTest, TestSize.Level1)
 {
     bool disable = false;
-    
+    pScanInterface->pScanService->pScanStateMachine = new (std::nothrow) ScanStateMachine(0);
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->DisableScan(disable));
 }
 

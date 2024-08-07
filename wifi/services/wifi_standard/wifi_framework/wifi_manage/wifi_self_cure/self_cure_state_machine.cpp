@@ -2691,6 +2691,7 @@ bool SelfCureStateMachine::IsCustNetworkSelfCure()
         WIFI_LOGI("dns-selfcure is not triggered on the network.");
         return true;
     }
+    return false;
 }
 
 int SelfCureStateMachine::SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress)

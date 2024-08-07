@@ -227,6 +227,7 @@ ohos_unittest("manager_unittest") {
     "HDI_CHIP_INTERFACE_SUPPORT",
     "private = public",
     "protected = public",
+    "UT_TEST",
   ]
 
   if (wifi_feature_with_p2p) {

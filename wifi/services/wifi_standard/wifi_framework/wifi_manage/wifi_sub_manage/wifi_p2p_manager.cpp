@@ -23,6 +23,7 @@
 #include "wifi_system_timer.h"
 #include "wifi_hisysevent.h"
 #include "p2p_define.h"
+#include "wifi_service_scheduler.h"
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
@@ -46,102 +47,6 @@ WifiP2pManager::WifiP2pManager()
 IP2pServiceCallbacks& WifiP2pManager::GetP2pCallback(void)
 {
     return mP2pCallback;
-}
-
-ErrCode WifiP2pManager::AutoStartP2pService()
-{
-    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    WIFI_LOGI("AutoStartP2pService, current p2p state:%{public}d", p2pState);
-    if (p2pState != WifiOprMidState::CLOSED) {
-        if (p2pState == WifiOprMidState::CLOSING) {
-            return WIFI_OPT_OPEN_FAIL_WHEN_CLOSING;
-        } else {
-            return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
-        }
-    }
-
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface(
-        std::bind(&WifiP2pManager::IfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
-        ifaceName)) {
-        WIFI_LOGE("AutoStartP2pService, create iface failed!");
-        return WIFI_OPT_FAILED;
-    }
-    WifiConfigCenter::GetInstance().SetP2pIfaceName(ifaceName);
-#endif
-
-    if (!WifiConfigCenter::GetInstance().SetP2pMidState(p2pState, WifiOprMidState::OPENING)) {
-        WIFI_LOGE("AutoStartP2pService, set p2p mid state opening failed!");
-        return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
-    }
-
-    ErrCode ret = WIFI_OPT_FAILED;
-    do {
-        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_P2P) < 0) {
-            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_P2P);
-            break;
-        }
-        IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-        if (pService == nullptr) {
-            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_P2P);
-            break;
-        }
-        ret = pService->RegisterP2pServiceCallbacks(mP2pCallback);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register p2p service callback failed!");
-            break;
-        }
-
-        ret = pService->EnableP2p();
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("service EnableP2p failed, ret %{public}d!", static_cast<int>(ret));
-            break;
-        }
-    } while (false);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
-        return ret;
-    }
-#ifndef OHOS_ARCH_LITE
-    StopUnloadP2PSaTimer();
-#endif
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode WifiP2pManager::AutoStopP2pService()
-{
-    WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    WIFI_LOGI("AutoStopP2pService, current p2p state:%{public}d", p2pState);
-    if (p2pState != WifiOprMidState::RUNNING) {
-        if (p2pState == WifiOprMidState::OPENING) {
-            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
-        } else {
-            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-        }
-    }
-
-    if (!WifiConfigCenter::GetInstance().SetP2pMidState(p2pState, WifiOprMidState::CLOSING)) {
-        WIFI_LOGE("AutoStopP2pService, set p2p mid state opening failed!");
-        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-    }
-
-    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-    if (pService == nullptr) {
-        WIFI_LOGE("AutoStopP2pService, Instance get p2p service is null!");
-        WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
-        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-    }
-
-    ErrCode ret = pService->DisableP2p();
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("service disable p2p failed, ret %{public}d!", static_cast<int>(ret));
-        WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
-        return ret;
-    }
-
-    return WIFI_OPT_SUCCESS;
 }
 
 #ifndef OHOS_ARCH_LITE
@@ -195,12 +100,13 @@ void WifiP2pManager::CloseP2pService(void)
     if (!ifaceName.empty()) {
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveP2pIface(ifaceName);
         ifaceName.clear();
+        WifiServiceScheduler::GetInstance().ClearP2pIfaceNameMap();
         WifiConfigCenter::GetInstance().SetP2pIfaceName("");
     }
 #endif
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (staState == WifiOprMidState::RUNNING || staState == WifiOprMidState::SEMI_ACTIVE) {
-        AutoStartP2pService();
+        WifiServiceScheduler::GetInstance().AutoStartP2pService(0);
         return;
     }
 #ifndef OHOS_ARCH_LITE
@@ -248,14 +154,14 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
         WIFI_LOGI("DealP2pStateChanged, current sta state:%{public}d", staState);
         if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::CLOSED) {
-            AutoStopP2pService();
+            WifiServiceScheduler::GetInstance().AutoStopP2pService();
         }
     }
     if (state == P2pState::P2P_STATE_CLOSED) {
         bool ret = WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         if (ret) {
             WIFI_LOGE("P2p start failed, stop wifi!");
-            AutoStopP2pService();
+            WifiServiceScheduler::GetInstance().AutoStopP2pService();
         }
     }
     WifiCommonEventHelper::PublishP2pStateChangedEvent((int)state, "OnP2pStateChanged");
@@ -404,17 +310,10 @@ void WifiP2pManager::DealConfigChanged(CfgType type, char* data, int dataLen)
     return;
 }
 
-void WifiP2pManager::IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType)
+void WifiP2pManager::SetP2pIfName(const std::string &p2pIfName)
 {
-    WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
-        destoryIfaceName.c_str(), createIfaceType);
-    if (destoryIfaceName == ifaceName) {
-        ifaceName.clear();
-        WifiConfigCenter::GetInstance().SetP2pIfaceName("");
-    }
-    return;
+    ifaceName = p2pIfName;
 }
-
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

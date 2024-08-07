@@ -31,12 +31,10 @@ public:
     ~WifiP2pManager() = default;
 
     IP2pServiceCallbacks& GetP2pCallback(void);
-    ErrCode AutoStartP2pService();
-    ErrCode AutoStopP2pService();
     void StopUnloadP2PSaTimer(void);
     void StartUnloadP2PSaTimer(void);
     void CloseP2pService(void);
-
+    void SetP2pIfName(const std::string &p2pIfName);
 private:
     void InitP2pCallback(void);
     void DealP2pStateChanged(P2pState bState);
@@ -50,7 +48,6 @@ private:
     void DealConfigChanged(CfgType type, char* data, int dataLen);
     void DealP2pGcJoinGroup(const GcInfo &info);
     void DealP2pGcLeaveGroup(const GcInfo &info);
-    void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void DealP2pPrivatePeersChanged(const std::string &privateInfo);
 
 private:

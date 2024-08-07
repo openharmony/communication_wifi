@@ -2687,6 +2687,10 @@ bool SelfCureStateMachine::IsCustNetworkSelfCure()
     if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
         return false;
     }
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("IsCustNetworkSelfCure get pEnhanceService service failed!");
+        return false;
+    }
     if (pEnhanceService->IsHwItCustNetwork(config)) {
         WIFI_LOGI("dns-selfcure is not triggered on the network.");
         return true;

@@ -27,6 +27,7 @@ config("module_private_config") {
   ]
 }
 
+
 ohos_unittest("manager_unittest") {
   module_out_path = module_output_path
   sources = [

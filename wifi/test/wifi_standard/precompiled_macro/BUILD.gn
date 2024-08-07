@@ -23,6 +23,7 @@ config("module_private_config") {
   include_dirs = []
 }
 
+
 ohos_unittest("precompiled_macro_unittest") {
   module_out_path = module_output_path
   sources = [

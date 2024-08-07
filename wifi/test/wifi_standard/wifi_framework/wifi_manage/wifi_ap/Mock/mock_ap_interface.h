@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_AP_INTERFACE_H
-#define OHOS_AP_INTERFACE_H
+#ifndef OHOS_MOCK_AP_INTERFACE_H
+#define OHOS_MOCK_AP_INTERFACE_H
 #include "wifi_errcode.h"
 #include "station_info.h"
 #include "wifi_ap_msg.h"

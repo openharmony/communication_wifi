@@ -60,6 +60,7 @@ void WifiNetStatsManager::StopNetStats()
         MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(m_netStatsTimerId);
         m_netStatsTimerId = 0;
     }
+    std::lock_guard<std::mutex> lock(lastStatsMapMutex_);
     m_lastStatsMap.clear();
     m_hasLastStats = false;
     WIFI_LOGI("%{public}s, succuss", __FUNCTION__);
@@ -72,6 +73,7 @@ void WifiNetStatsManager::PerformPollAndLog()
         WIFI_LOGE("%{public}s, get network stats failed", __FUNCTION__);
         return;
     }
+    std::lock_guard<std::mutex> lock(lastStatsMapMutex_);
     if (!m_hasLastStats) {
         WIFI_LOGE("%{public}s, get base network stats", __FUNCTION__);
         m_hasLastStats = true;

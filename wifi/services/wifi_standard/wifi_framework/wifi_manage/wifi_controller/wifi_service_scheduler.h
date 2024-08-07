@@ -53,12 +53,12 @@ public:
     void DispatchWifiCloseRes(OperateResState state, int instId);
     void ClearStaIfaceNameMap(int instId);
     void ClearP2pIfaceNameMap(int instId);
-    void ClearSoftApIfaceNameMap(int instId)
+    void ClearSoftApIfaceNameMap(int instId);
 private:
     ErrCode PreStartWifi(int instId, std::string &staIfName);
     ErrCode PostStartWifi(int instId);
     ErrCode InitStaService(IStaService *pService);
-    
+
 #ifdef FEATURE_P2P_SUPPORT
     ErrCode InitP2pService();
 #endif
@@ -79,9 +79,6 @@ private:
     IP2pServiceCallbacks mP2pCallback;
 #endif
     std::mutex mutex;
-    std::mutex staIfaceNameMapMutex;
-    std::mutex p2pIfaceNameMapMutex;
-    std::mutex softApIfaceNameMapMutex;
 };
 }
 }

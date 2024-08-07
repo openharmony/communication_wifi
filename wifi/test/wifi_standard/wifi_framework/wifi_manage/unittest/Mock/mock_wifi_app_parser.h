@@ -16,7 +16,6 @@
 #ifndef OHOS_MOCK_WIFI_APP_PARSER_H
 #define OHOS_MOCK_WIFI_APP_PARSER_H
 
-
 #include <gmock/gmock.h>
 #include <vector>
 #include <string>
@@ -25,21 +24,21 @@ namespace OHOS {
 namespace Wifi {
 class MockWifiAppParser {
 public:
-    virtual bool IsLowLatencyApp(const std::string &bundleName);
-    virtual bool IsWhiteListApp(const std::string &bundleName);
-    virtual bool IsBlackListApp(const std::string &bundleName);
-    virtual bool IsChariotApp(const std::string &bundleName);
-    virtual bool IsHighTempLimitSpeedApp(const std::string &bundleName);
+    virtual bool IsLowLatencyApp(const std::string &bundleName) const = 0;
+    virtual bool IsWhiteListApp(const std::string &bundleName) const = 0;
+    virtual bool IsBlackListApp(const std::string &bundleName) const = 0;
+    virtual bool IsChariotApp(const std::string &bundleName) const = 0;
+    virtual bool IsHighTempLimitSpeedApp(const std::string &bundleName) const = 0;
 };
 
 class AppParser : public MockWifiAppParser {
 public:
     static AppParser &GetInstance(void);
-    MOCK_METHOD1(IsLowLatencyApp, bool(const std::string &bundleName));
-    MOCK_METHOD1(IsWhiteListApp, bool(const std::string &bundleName));
-    MOCK_METHOD1(IsBlackListApp, bool(const std::string &bundleName));
-    MOCK_METHOD1(IsChariotApp, bool(const std::string &bundleName));
-    MOCK_METHOD1(IsHighTempLimitSpeedApp, bool(const std::string &bundleName));
+    MOCK_CONST_METHOD1(IsLowLatencyApp, bool(const std::string &bundleName));
+    MOCK_CONST_METHOD1(IsWhiteListApp, bool(const std::string &bundleName));
+    MOCK_CONST_METHOD1(IsBlackListApp, bool(const std::string &bundleName));
+    MOCK_CONST_METHOD1(IsChariotApp, bool(const std::string &bundleName));
+    MOCK_CONST_METHOD1(IsHighTempLimitSpeedApp, bool(const std::string &bundleName));
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

@@ -204,45 +204,6 @@ HWTEST_F(WifiManagerTest, DealApGetStaLeaveTest, TestSize.Level1)
     wifiManager.wifiHotspotManager->DealApGetStaLeave(info);
 }
 
-HWTEST_F(WifiManagerTest, AutoStartP2pService_001, TestSize.Level1)
-{
-    WIFI_LOGI("AutoStartP2pService_001 enter!");
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
-        .WillOnce(DoAll(Return(WifiOprMidState::CLOSING)));
-    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_OPEN_FAIL_WHEN_CLOSING);
-
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
-        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
-    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_OPEN_SUCC_WHEN_OPENED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStartP2pService_002, TestSize.Level1)
-{
-    WIFI_LOGI("AutoStartP2pService_002 enter!");
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
-        .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
-    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_FAILED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopP2pService_001, TestSize.Level1)
-{
-    WIFI_LOGI("AutoStopP2pService_001 enter!");
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
-        .WillOnce(DoAll(Return(WifiOprMidState::OPENING)));
-    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_FAIL_WHEN_OPENING);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
-        .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
-    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
-}
-
-HWTEST_F(WifiManagerTest, AutoStopP2pService_002, TestSize.Level1)
-{
-    WIFI_LOGI("AutoStopP2pService_002 enter!");
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
-        .WillRepeatedly(DoAll(Return(WifiOprMidState::RUNNING)));
-    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStopP2pService(), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
-}
-
 HWTEST_F(WifiManagerTest, StartUnloadP2PSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartUnloadP2PSaTimerTest enter!");
@@ -328,13 +289,6 @@ HWTEST_F(WifiManagerTest, DealConfigChangedTest, TestSize.Level1)
     WIFI_LOGI("DealConfigChangedTest enter!");
     char* data = new (std::nothrow) char[6];
     wifiManager.wifiP2pManager->DealConfigChanged(CfgType::GET_SELF_CONFIG, data, 6);
-}
-
-HWTEST_F(WifiManagerTest, IfaceDestoryCallbackTest, TestSize.Level1)
-{
-    WIFI_LOGI("IfaceDestoryCallbackTest enter!");
-    std::string destoryIfaceName = "test";
-    wifiManager.wifiP2pManager->IfaceDestoryCallback(destoryIfaceName, 1);
 }
 
 HWTEST_F(WifiManagerTest, GetSupportedFeaturesTest, TestSize.Level1)

@@ -81,7 +81,7 @@ public:
     virtual WifiErrorNo SetPersistentReconnect(int mode) const = 0;
     virtual WifiErrorNo SetP2pSecondaryDeviceType(const std::string &type) = 0;
     virtual WifiErrorNo Hid2dConnect(const Hid2dConnectConfig &config) const = 0;
-
+    virtual const P2pHalCallback &GetP2pCallbackInst(void) const = 0;
 };
 
 class WifiP2PHalInterface : public MockWifiP2PHalInterface {
@@ -140,6 +140,7 @@ public:
     MOCK_CONST_METHOD1(SetPersistentReconnect, WifiErrorNo(int mode));
     MOCK_METHOD1(SetP2pSecondaryDeviceType, WifiErrorNo(const std::string &type));
     MOCK_CONST_METHOD1(Hid2dConnect, WifiErrorNo(const Hid2dConnectConfig &config));
+    MOCK_CONST_METHOD0(GetP2pCallbackInst, const P2pHalCallback &());
 };
 }  // namespace Wifi
 }  // namespace OHOS

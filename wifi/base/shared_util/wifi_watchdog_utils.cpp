@@ -33,7 +33,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiWatchDogUtils");
 constexpr int RESET_NOW = 1; //1s
-constexpr int TIME_OUT_WATCHDOG = 10; // 10s
+constexpr int TIME_OUT_WATCHDOG = 5; // 5s
 constexpr uint32_t FFRT_CALLBACK_TIME = 30 * 1000; // 30s
 constexpr uint32_t TIME_MS_TO_S = 1000;
 std::shared_ptr<WifiWatchDogUtils> WifiWatchDogUtils::GetInstance()

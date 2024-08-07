@@ -23,6 +23,7 @@
 #include "wifi_common_util.h"
 #include "wifi_common_def.h"
 #include "wifi_manager_service_ipc_interface_code.h"
+#include "wifi_watchdog_utils.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 

@@ -16,6 +16,7 @@
 #ifndef OHOS_MOCK_WIFI_APP_PARSER_H
 #define OHOS_MOCK_WIFI_APP_PARSER_H
 
+
 #include <gmock/gmock.h>
 #include <vector>
 #include <string>

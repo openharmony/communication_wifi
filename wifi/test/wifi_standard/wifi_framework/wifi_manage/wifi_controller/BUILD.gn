@@ -111,6 +111,7 @@ ohos_unittest("wifi_controller_unittest") {
   ]
 
 
+
   if (wifi_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
     defines += [ "WIFI_FFRT_ENABLE" ]

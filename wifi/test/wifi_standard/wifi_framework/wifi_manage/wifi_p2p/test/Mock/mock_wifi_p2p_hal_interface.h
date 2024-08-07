@@ -81,6 +81,7 @@ public:
     virtual WifiErrorNo SetPersistentReconnect(int mode) const = 0;
     virtual WifiErrorNo SetP2pSecondaryDeviceType(const std::string &type) = 0;
     virtual WifiErrorNo Hid2dConnect(const Hid2dConnectConfig &config) const = 0;
+
 };
 
 class WifiP2PHalInterface : public MockWifiP2PHalInterface {

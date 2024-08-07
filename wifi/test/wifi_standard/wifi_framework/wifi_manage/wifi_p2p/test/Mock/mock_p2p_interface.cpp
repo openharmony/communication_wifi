@@ -237,12 +237,12 @@ ErrCode P2pInterface::MonitorCfgChange(void)
 
 ErrCode P2pInterface::DiscoverPeers(int32_t channelid)
 {
-     return WIFI_OPT_SUCCESS;
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode P2pInterface::DisableRandomMac(int setmode)
 {
-     return WIFI_OPT_SUCCESS;
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

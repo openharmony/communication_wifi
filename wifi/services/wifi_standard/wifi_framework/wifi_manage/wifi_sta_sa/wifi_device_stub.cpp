@@ -183,6 +183,9 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         if (exception) {
             return WIFI_OPT_FAILED;
         }
+
+
+
         (this->*(iter->second))(code, data, reply);
     }
 

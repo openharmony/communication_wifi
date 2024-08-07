@@ -71,10 +71,10 @@ private:
     void P2pIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void SoftApIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void OnRssiReportCallback(int index, int antRssi);
+#endif
     std::map<int, std::string> staIfaceNameMap;
     std::map<int, std::string> p2pIfaceNameMap;
     std::map<int, std::string> softApIfaceNameMap;
-#endif
 #ifdef FEATURE_P2P_SUPPORT
     IP2pServiceCallbacks mP2pCallback;
 #endif

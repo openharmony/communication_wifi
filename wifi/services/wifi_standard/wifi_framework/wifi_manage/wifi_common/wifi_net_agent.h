@@ -131,7 +131,7 @@ public:
      *
      * @param WifiNetAgentCallbacks WifiNetAgent callback
      */
-    void InitWifiNetAgent(const WifiNetAgentCallbacks &WifiNetAgentCallbacks);
+    void InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCallbacks);
 
     /**
      * Add RequestNetwork

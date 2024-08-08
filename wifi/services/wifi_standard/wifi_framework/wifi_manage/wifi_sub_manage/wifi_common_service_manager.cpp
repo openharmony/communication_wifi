@@ -104,12 +104,12 @@ void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppState
 bool WifiCommonServiceManager::OnRequestNetwork(const int uid, const int networkId)
 {
     if (IsOtherVapConnect()) {
-        LOGI("OnRquestNetwork: p2p or hml connected, and hotspot is enable");
+        WIFI_LOGI("OnRequestNetwork: p2p or hml connected, and hotspot is enable");
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
     }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
     if (pService == nullptr) {
-        WIFI_LOGE("OnRquestNetwork: pService is nullptr!");
+        WIFI_LOGE("OnRequestNetwork: pService is nullptr!");
         return false;
     }
     if (pService->ConnectToCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {

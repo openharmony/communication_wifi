@@ -87,6 +87,11 @@ InitStatus WifiCommonServiceManager::Init()
         WIFI_LOGE("WifiInternalEventDispatcher Init failed!");
         return EVENT_BROADCAST_INIT_FAILED;
     }
+
+    if (!AppParser::GetInstance().Init()) {
+        WIFI_LOGE("AppParser Init failed!");
+        return APP_PARSER_INIT_FAILED;
+    }
     return INIT_OK;
 }
 #ifndef OHOS_ARCH_LITE

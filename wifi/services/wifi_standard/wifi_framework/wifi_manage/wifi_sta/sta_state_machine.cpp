@@ -1260,12 +1260,8 @@ void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
 void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
 {
     LOGI("Enter DealDisconnectEvent.\n");
-    if (msg == nullptr) {
-        WIFI_LOGE("msg is null\n");
-        return;
-    }
-    if (wpsState != SetupMethod::INVALID) {
-        WIFI_LOGE("wpsState is INVALID\n");
+    if (msg == nullptr || wpsState != SetupMethod::INVALID) {
+        WIFI_LOGE("msg is null or wpsState is INVALID, wpsState:%{public}d", static_cast<int>(wpsState));
         return;
     }
     std::string bssid;

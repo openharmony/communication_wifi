@@ -14,7 +14,6 @@
  */
 
 #include "wifi_common_service_manager.h"
-#include "wifi_app_parser.h"
 #include <dirent.h>
 #include <iconv.h>
 #include "wifi_auth_center.h"
@@ -26,6 +25,7 @@
 #else
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_app_parser.h"
 #endif
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
@@ -87,11 +87,6 @@ InitStatus WifiCommonServiceManager::Init()
     if (WifiInternalEventDispatcher::GetInstance().Init() < 0) {
         WIFI_LOGE("WifiInternalEventDispatcher Init failed!");
         return EVENT_BROADCAST_INIT_FAILED;
-    }
-
-    if (!AppParser::GetInstance().Init()) {
-        WIFI_LOGE("AppParser Init failed!");
-        return APP_PARSER_INIT_FAILED;
     }
     return INIT_OK;
 }

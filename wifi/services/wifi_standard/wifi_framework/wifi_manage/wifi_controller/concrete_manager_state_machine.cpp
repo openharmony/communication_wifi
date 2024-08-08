@@ -61,7 +61,7 @@ ConcreteMangerMachine::~ConcreteMangerMachine()
     if (!ifaceName.empty()) {
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
         ifaceName.clear();
-        WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap();
+        WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(mid);
         WifiConfigCenter::GetInstance().SetStaIfaceName("");
     }
 #endif

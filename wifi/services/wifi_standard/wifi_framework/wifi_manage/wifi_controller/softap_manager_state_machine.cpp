@@ -49,7 +49,7 @@ SoftapManagerMachine::~SoftapManagerMachine()
     if (!ifaceName.empty()) {
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveApIface(ifaceName);
         ifaceName.clear();
-        WifiServiceScheduler::GetInstance().ClearSoftApIfaceNameMap();
+        WifiServiceScheduler::GetInstance().ClearSoftApIfaceNameMap(mid);
         WifiConfigCenter::GetInstance().SetApIfaceName("");
     }
 #endif

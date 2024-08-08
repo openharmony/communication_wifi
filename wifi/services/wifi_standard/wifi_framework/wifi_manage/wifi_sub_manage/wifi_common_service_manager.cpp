@@ -101,7 +101,7 @@ void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppState
 }
 #endif
 
-bool WifiCommonServiceManager::OnRquestNetwork(const int uid, const int networkId)
+bool WifiCommonServiceManager::OnRequestNetwork(const int uid, const int networkId)
 {
     if (IsOtherVapConnect()) {
         LOGI("OnRquestNetwork: p2p or hml connected, and hotspot is enable");

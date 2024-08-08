@@ -63,7 +63,7 @@ public:
 #ifndef OHOS_ARCH_LITE
     void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);
 #endif
-    bool OnRquestNetwork(const int uid, const int networkId);
+    bool OnRequestNetwork(const int uid, const int networkId);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     void OnTcpReportMsgComplete(const std::vector<int64_t> &elems, const int32_t cmd, const int32_t mInstId = 0);
 #endif

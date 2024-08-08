@@ -36,7 +36,6 @@ struct WifiNetAgentCallbacks {
     std::function<bool(const int uid, const int networkId)> OnRequestNetwork;
 };
 
-
 class WifiNetAgent {
 public:
     ~WifiNetAgent();
@@ -132,7 +131,7 @@ public:
      *
      * @param WifiNetAgentCallbacks WifiNetAgent callback
      */
-    void InitWifiAgent(const WifiNetAgentCallbacks &WifiNetAgentCallbacks);
+    void InitWifiNetAgent(const WifiNetAgentCallbacks &WifiNetAgentCallbacks);
 
     /**
      * Add RequestNetwork

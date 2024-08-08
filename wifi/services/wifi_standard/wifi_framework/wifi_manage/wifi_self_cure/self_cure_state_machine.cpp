@@ -2683,12 +2683,12 @@ int SelfCureStateMachine::GetIsReassocWithFactoryMacAddress()
 bool SelfCureStateMachine::IsCustNetworkSelfCure()
 {
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    WifiDeviceConfig config;
-    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
-        return false;
-    }
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("IsCustNetworkSelfCure get pEnhanceService service failed!");
+        return false;
+    }
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
         return false;
     }
     if (pEnhanceService->IsHwItCustNetwork(config)) {

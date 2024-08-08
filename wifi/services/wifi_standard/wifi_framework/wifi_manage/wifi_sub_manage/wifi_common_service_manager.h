@@ -75,7 +75,6 @@ private:
     WifiAppStateAwareCallbacks mWifiAppStateAwareCallbacks;
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
 #endif
-
 #ifdef FEATURE_SELF_CURE_SUPPORT
     WifiNetLinkCallbacks mWifiNetLinkCallbacks;
 #endif

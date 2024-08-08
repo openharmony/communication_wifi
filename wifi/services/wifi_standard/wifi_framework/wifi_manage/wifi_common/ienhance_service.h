@@ -97,6 +97,14 @@ public:
     virtual bool IsScanAllowed(WifiScanDeviceInfo &scanDeviceInfo) = 0;
 
     /**
+     * @Description Is customer network.
+     *
+     * @param scanDeviceInfo - scan device info
+     * @return true: allowed, false: not allowed
+     */
+    virtual bool IsHwItCustNetwork(WifiDeviceConfig &config) = 0;
+
+    /**
      * @Description selfcure for multi dhcp server.
      *
      * @param cmd - add、get size、clear

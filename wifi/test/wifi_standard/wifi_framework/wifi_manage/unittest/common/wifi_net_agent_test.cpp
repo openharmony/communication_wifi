@@ -219,19 +219,19 @@ HWTEST_F(WifiNetAgentTest, RequestNetworkTest002, TestSize.Level1)
     NetManagerStandard::NetRequest netrequest;
     EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
 
-    std::string ident = "1";
+    ident = "1";
     EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
 
-    std::string ident = "1";
-    netrequest.requestId = 1;
+    ident = "2";
+    netrequest.requestId++;
     EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
 
-    std::string ident = "wifi";
-    netrequest.requestId = 2;
+    ident = "wifi";
+    netrequest.requestId++;
     EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
 
-    std::string ident = "test123";
-    netrequest.requestId = 3;
+    ident = "test123";
+    netrequest.requestId++;
     EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
 }
 

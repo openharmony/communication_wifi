@@ -360,7 +360,7 @@ void WifiNetAgent::InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCal
 bool WifiNetAgent::RequestNetwork(const int uid, const int networkId)
 {
     if (!wifiNetAgentCallbacks_.OnRequestNetwork) {
-        WIFI_LOGE("OnRequestNetwork is nullptr");
+        WIFI_LOGE("OnRequestNetwork is nullptr.");
         return false;
     }
     if (wifiNetAgentCallbacks_.OnRequestNetwork(uid, networkId)) {
@@ -394,7 +394,7 @@ int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
     }
 
     WIFI_LOGI("RequestNetwork uid[%{public}d], networkId[%{public}d].", netrequest.uid, networkId);
-    if (!WifiAppStateAware::GetInstance.IsForegroundApp(netrequest.uid)) {
+    if (!WifiAppStateAware::GetInstance().IsForegroundApp(netrequest.uid)) {
         WIFI_LOGE("App is not in foreground.");
         return -1;
     }
@@ -404,12 +404,12 @@ int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
     if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
         if (linkedInfo.networkId == networkId) {
             WIFI_LOGI("RequestNetwork networkId is connecting or connected.");
-            return -1;
+            return 0;
         }
     }
 
     if (!WifiNetAgent::GetInstance().RequestNetwork(netrequest.uid, networkId)) {
-        WIFI_LOGI("RequestNetwork fail.");
+        WIFI_LOGE("RequestNetwork fail.");
         return -1;
     }
     return 0;

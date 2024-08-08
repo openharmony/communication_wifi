@@ -49,6 +49,7 @@ enum InitStatus {
     EVENT_BROADCAST_INIT_FAILED = 4,
     TASK_THREAD_INIT_FAILED = 5,
     WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED = 6,
+    APP_PARSER_INIT_FAILED = 7,
 };
 
 enum class WifiCloseServiceCode {

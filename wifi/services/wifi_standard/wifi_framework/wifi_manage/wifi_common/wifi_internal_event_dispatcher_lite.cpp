@@ -124,7 +124,7 @@ void WifiInternalEventDispatcher::Exit()
 void WifiInternalEventDispatcher::DealStaCallbackMsg(
     WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
 {
-    WIFI_LOGI("Deal Sta Event Callback Msg: %{public}d", msg.msgCode);
+    WIFI_LOGD("Deal Sta Event Callback Msg: %{public}d", msg.msgCode);
 
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_STATE_CHANGE:

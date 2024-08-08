@@ -35,7 +35,7 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int syste
         return device;
     }
 
-    WIFI_LOGE("new wifi device failed!");
+    WIFI_LOGE("new wifi device failed");
     return nullptr;
 }
 

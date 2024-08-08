@@ -704,9 +704,9 @@ WifiErrorNo HdiApStop(int id)
 
     int32_t ret;
     if (g_apObj == NULL) {
-        LOGE("%{public}s, g_apObj is NULL", __func__);
+        LOGI("%{public}s, g_apObj is NULL", __func__);
         pthread_mutex_unlock(&g_apObjMutex);
-        return WIFI_HAL_OPT_FAILED;
+        return WIFI_HAL_OPT_OK;
     }
     ret = g_apObj->DisableAp(g_apObj, g_apIfaceName, id);
     ret = g_apObj->StopAp(g_apObj);

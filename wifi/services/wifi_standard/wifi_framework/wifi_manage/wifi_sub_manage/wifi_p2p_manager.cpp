@@ -407,7 +407,6 @@ void WifiP2pManager::DealConfigChanged(CfgType type, char* data, int dataLen)
 void WifiP2pManager::IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType)
 {
     WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
-    ifaceName = p2pIfName;
         destoryIfaceName.c_str(), createIfaceType);
     if (destoryIfaceName == ifaceName) {
         ifaceName.clear();

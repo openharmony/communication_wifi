@@ -1513,5 +1513,26 @@ bool WifiP2pServiceImpl::IsRemoteDied(void)
 {
     return false;
 }
+
+ErrCode WifiP2pServiceImpl::Hid2dIsWideBandwidthSupported(bool &isSupport)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("Hid2dIsWideBandwidthSupported:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("Hid2dIsWideBandwidthSupported get pEnhanceService service failed!");
+        return WIFI_OPT_FAILED;
+    }
+
+    isSupport = pEnhanceService->IsWideBandwidthSupported();
+    if (!isSupport) {
+        WIFI_LOGE("Hid2dIsWideBandwidthSupported IsWideBandwidthSupported is false");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

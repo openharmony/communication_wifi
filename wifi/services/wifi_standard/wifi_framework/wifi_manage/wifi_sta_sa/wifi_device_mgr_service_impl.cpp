@@ -26,10 +26,10 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiDeviceMgrServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
-    
 const std::string EXTENSION_BACKUP = "backup";
 const std::string EXTENSION_RESTORE = "restore";
 std::mutex WifiDeviceMgrServiceImpl::g_instanceLock;
+std::mutex WifiDeviceMgrServiceImpl::g_initMutex;
 sptr<WifiDeviceMgrServiceImpl> WifiDeviceMgrServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(
     WifiDeviceMgrServiceImpl::GetInstance().GetRefPtr());
@@ -85,6 +85,7 @@ void WifiDeviceMgrServiceImpl::OnStop()
 
 bool WifiDeviceMgrServiceImpl::Init()
 {
+    std::lock_guard<std::mutex> lock(g_initMutex);
     if (!mPublishFlag) {
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; i++) {
             sptr<WifiDeviceServiceImpl> wifi = new WifiDeviceServiceImpl(i);

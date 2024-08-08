@@ -44,8 +44,6 @@ public:
     ErrCode AutoStartScanOnly(int instId, std::string &staIfName);
     ErrCode AutoStopScanOnly(int instId, bool setIfaceDown);
     ErrCode AutoStartSemiStaService(int instId, std::string &staIfName);
-    ErrCode AutoStartP2pService(int instId);
-    ErrCode AutoStopP2pService();
     ErrCode AutoStartApService(int instId, std::string &softApIfName);
     ErrCode AutoStopApService(int instId);
     void DispatchWifiOpenRes(OperateResState state, int instId);
@@ -58,10 +56,6 @@ private:
     ErrCode PreStartWifi(int instId, std::string &staIfName);
     ErrCode PostStartWifi(int instId);
     ErrCode InitStaService(IStaService *pService);
-
-#ifdef FEATURE_P2P_SUPPORT
-    ErrCode InitP2pService();
-#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     ErrCode StartSelfCureService(int instId);
 #endif
@@ -73,11 +67,7 @@ private:
     void OnRssiReportCallback(int index, int antRssi);
 #endif
     std::map<int, std::string> staIfaceNameMap;
-    std::map<int, std::string> p2pIfaceNameMap;
     std::map<int, std::string> softApIfaceNameMap;
-#ifdef FEATURE_P2P_SUPPORT
-    IP2pServiceCallbacks mP2pCallback;
-#endif
     std::mutex mutex;
 };
 }

@@ -428,6 +428,14 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode CheckCanUseP2p() override;
+
+    /**
+     * @Description Hid2d Is Wide Bandwidth Supported
+     *
+     * @param isSupport - is support 160M
+     * @return ErrCode - operation result
+     */
+    ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) override;
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);

@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 constexpr int WIFI_CONFIG_FILE_LINE_MAX_LENGTH = 4096;
 /**
  * @Description Remove head and tail space

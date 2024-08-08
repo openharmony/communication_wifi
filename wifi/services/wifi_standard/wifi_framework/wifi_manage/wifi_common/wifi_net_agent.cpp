@@ -382,6 +382,7 @@ int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
 {
     WIFI_LOGD("Enter NetConnCallback::RequestNetwork");
     LogNetCaps(ident, netCaps);
+#ifndef OHOS_ARCH_LITE
     if (requestIds_.find(netrequest.requestId) != requestIds_.end()) {
         return -1;
     }
@@ -412,6 +413,7 @@ int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
         WIFI_LOGE("RequestNetwork fail.");
         return -1;
     }
+#endif
     return 0;
 }
 

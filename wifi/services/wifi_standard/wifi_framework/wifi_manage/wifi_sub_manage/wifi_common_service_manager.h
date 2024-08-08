@@ -24,9 +24,9 @@
 #include "wifi_manager.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_app_state_aware.h"
+#include "wifi_net_agent.h"
 #include "wifi_event_subscriber_manager.h"
 #endif
-#include "wifi_net_agent.h"
 #include "wifi_netlink.h"
 #ifdef FEATURE_SELF_CURE_SUPPORT
 #include "ip_qos_monitor.h"
@@ -73,8 +73,9 @@ private:
 private:
 #ifndef OHOS_ARCH_LITE
     WifiAppStateAwareCallbacks mWifiAppStateAwareCallbacks;
-#endif
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
+#endif
+
 #ifdef FEATURE_SELF_CURE_SUPPORT
     WifiNetLinkCallbacks mWifiNetLinkCallbacks;
 #endif

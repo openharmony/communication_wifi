@@ -120,6 +120,8 @@ ohos_shared_library("wifi_p2p_service") {
   }
 
   external_deps = [
+    "ability_base:base",
+    "ability_base:want",
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",

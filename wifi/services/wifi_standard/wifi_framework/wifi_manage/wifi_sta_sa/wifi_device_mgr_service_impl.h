@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 enum ServiceRunningState {
     STATE_NOT_START,
     STATE_RUNNING
@@ -49,6 +48,7 @@ private:
     static sptr<WifiDeviceMgrServiceImpl> g_instance;
     std::map<int, sptr<IRemoteObject>> mWifiService;
     static std::mutex g_instanceLock;
+    static std::mutex g_initMutex;
     bool mPublishFlag;
     ServiceRunningState mState;
 };

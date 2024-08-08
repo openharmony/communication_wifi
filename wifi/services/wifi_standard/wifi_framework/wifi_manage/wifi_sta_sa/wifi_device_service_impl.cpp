@@ -567,6 +567,9 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
                 return WIFI_OPT_INVALID_PARAM;
             }
         }
+        if (!IsWifiBrokerProcess(uid)) {
+            updateConfig.isEphemeral = true;
+        }
         return pService->AddCandidateConfig(uid, updateConfig, result);
     }
 
@@ -874,6 +877,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
                 return WIFI_OPT_SUCCESS;
             }
         }
+        WifiSettings::GetInstance().SetDeviceEphemeral(networkId, false);
         return pService->ConnectToCandidateConfig(uid, networkId);
     }
     return pService->ConnectToNetwork(networkId);

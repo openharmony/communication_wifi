@@ -32,6 +32,11 @@
 #include "net_manager_constants.h"
 namespace OHOS {
 namespace Wifi {
+struct WifiNetAgentCallbacks {
+    std::function<bool(const int uid, const int networkId)> OnRequestNetwork;
+};
+
+
 class WifiNetAgent {
 public:
     ~WifiNetAgent();
@@ -122,6 +127,21 @@ public:
     void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
         int instId = 0);
 
+    /**
+     * Init WifiNetAgentCallbacks
+     *
+     * @param WifiNetAgentCallbacks WifiNetAgent callback
+     */
+    void InitWifiAgent(const WifiNetAgentCallbacks &WifiNetAgentCallbacks);
+
+    /**
+     * Add RequestNetwork
+     *
+     * @param uid uid
+     * @param networkId deviceconfig networkId
+     */
+    bool RequestNetwork(const int uid, const int networkId);
+
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {
     public:
@@ -157,6 +177,8 @@ public:
         int32_t ReleaseNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) override;
     private:
         void LogNetCaps(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) const;
+
+        std::unordered_set<int> requestIds_;
     };
 private:
     WifiNetAgent();
@@ -175,7 +197,8 @@ private:
     void SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
         IpV6Info &wifiIpV6Info);
 private:
-    uint32_t supplierId{0};;
+    uint32_t supplierId{0};
+    WifiNetAgentCallbacks wifiNetAgentCallbacks_;
 };
 } // namespace Wifi
 } // namespace OHOS

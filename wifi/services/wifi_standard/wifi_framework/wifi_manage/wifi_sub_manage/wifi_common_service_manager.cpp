@@ -69,6 +69,8 @@ InitStatus WifiCommonServiceManager::Init()
         WIFI_LOGE("WifiAppStateAware Init failed!");
     }
 #endif
+    wifiNetAgentCallbacks_.OnRequestNetwork = std::bind(&WifiCommonServiceManager::OnRquestNetwork, this, _1, _2);
+    WifiNetAgent::GetInstance().InitWifiNetAgent(wifiNetAgentCallbacks_);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     mWifiNetLinkCallbacks.OnTcpReportMsgComplete =
         std::bind(&WifiCommonServiceManager::OnTcpReportMsgComplete, this, _1, _2, _3);
@@ -98,6 +100,23 @@ void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppState
     }
 }
 #endif
+
+bool WifiCommonServiceManager::OnRquestNetwork(const int uid, const int networkId)
+{
+    if (IsOtherVapConnect()) {
+        LOGI("OnRquestNetwork: p2p or hml connected, and hotspot is enable");
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("OnRquestNetwork: pService is nullptr!");
+        return false;
+    }
+    if (pService->ConnectToCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {
+        return false;
+    }
+    return true;
+}
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 void WifiCommonServiceManager::OnTcpReportMsgComplete(const std::vector<int64_t> &elems, const int32_t cmd,

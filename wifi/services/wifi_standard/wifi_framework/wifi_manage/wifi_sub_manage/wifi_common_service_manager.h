@@ -24,6 +24,7 @@
 #include "wifi_manager.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_app_state_aware.h"
+#include "wifi_net_agent.h"
 #include "wifi_event_subscriber_manager.h"
 #endif
 #include "wifi_netlink.h"
@@ -62,7 +63,7 @@ public:
 #ifndef OHOS_ARCH_LITE
     void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);
 #endif
-
+    bool OnRquestNetwork(const int uid, const int networkId);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     void OnTcpReportMsgComplete(const std::vector<int64_t> &elems, const int32_t cmd, const int32_t mInstId = 0);
 #endif
@@ -73,6 +74,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     WifiAppStateAwareCallbacks mWifiAppStateAwareCallbacks;
 #endif
+    WifiNetAgentCallbacks wifiNetAgentCallbacks_;
 #ifdef FEATURE_SELF_CURE_SUPPORT
     WifiNetLinkCallbacks mWifiNetLinkCallbacks;
 #endif

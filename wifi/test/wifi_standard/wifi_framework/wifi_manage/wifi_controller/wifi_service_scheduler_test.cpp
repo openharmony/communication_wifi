@@ -31,7 +31,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-class WWifiServiceSchedulerTest : public testing::Test {
+class WifiServiceSchedulerTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
@@ -88,7 +88,7 @@ public:
     void AutoStartApServiceTest()
     {
         std::string ifName;
-        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
         EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0, ifName), WIFI_OPT_FAILED);
 
@@ -99,47 +99,47 @@ public:
     
     void AutoStopApServiceTest()
     {
-        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0);
         EXPECT_EQ(pWifiServiceScheduler->AutoStopApService(0), WIFI_OPT_CLOSE_FAIL_WHEN_OPENING);
 
-        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSED, 0);
         EXPECT_EQ(pWifiServiceScheduler->AutoStopApService(0), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
     }
 };
 
-HWTEST_F(WWifiServiceSchedulerTest, AutoStartStaServiceTest, TestSize.Level1)
+HWTEST_F(WifiServiceSchedulerTest, AutoStartStaServiceTest, TestSize.Level1)
 {
     AutoStartStaServiceTest();
 }
 
-HWTEST_F(WWifiServiceSchedulerTest, AutoStopStaServiceTest, TestSize.Level1)
+HWTEST_F(WifiServiceSchedulerTest, AutoStopStaServiceTest, TestSize.Level1)
 {
     AutoStopStaServiceTest();
 }
 
-HWTEST_F(WWifiServiceSchedulerTest, AutoStartScanOnlyTest, TestSize.Level1)
+HWTEST_F(WifiServiceSchedulerTest, AutoStartScanOnlyTest, TestSize.Level1)
 {
     AutoStartScanOnlyTest();
 }
 
-HWTEST_F(WWifiServiceSchedulerTest, AutoStopScanOnlyTest, TestSize.Level1)
+HWTEST_F(WifiServiceSchedulerTest, AutoStopScanOnlyTest, TestSize.Level1)
 {
     AutoStopScanOnlyTest();
 }
 
-HWTEST_F(WWifiServiceSchedulerTest, AutoStartSemiStaServiceTest, TestSize.Level1)
+HWTEST_F(WifiServiceSchedulerTest, AutoStartSemiStaServiceTest, TestSize.Level1)
 {
     AutoStartSemiStaServiceTest();
 }
 
-HWTEST_F(WWifiServiceSchedulerTest, AutoStartApServiceTest, TestSize.Level1)
+HWTEST_F(WifiServiceSchedulerTest, AutoStartApServiceTest, TestSize.Level1)
 {
     AutoStartApServiceTest();
 }
 
-HWTEST_F(WWifiServiceSchedulerTest, AutoStopApServiceTest, TestSize.Level1)
+HWTEST_F(WifiServiceSchedulerTest, AutoStopApServiceTest, TestSize.Level1)
 {
     AutoStopApServiceTest();
 }

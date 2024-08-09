@@ -103,7 +103,7 @@ public:
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0);
         EXPECT_EQ(pWifiServiceScheduler->AutoStopApService(0), WIFI_OPT_CLOSE_FAIL_WHEN_OPENING);
 
-        WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
+        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSED, 0);
         EXPECT_EQ(pWifiServiceScheduler->AutoStopApService(0), WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
     }

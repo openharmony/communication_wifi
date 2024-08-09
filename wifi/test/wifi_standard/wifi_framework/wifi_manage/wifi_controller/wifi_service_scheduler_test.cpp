@@ -74,7 +74,7 @@ public:
     {
         WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSED, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStopScanOnly(0), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStopScanOnly(0, true), WIFI_OPT_SUCCESS);
     }
 
     void AutoStartSemiStaServiceTest()

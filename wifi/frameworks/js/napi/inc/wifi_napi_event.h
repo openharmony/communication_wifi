@@ -26,11 +26,13 @@
 #include "wifi_hotspot.h"
 #include "wifi_logger.h"
 #include "wifi_sa_event.h"
+#include "wifi_watchdog_utils.h"
 
 DEFINE_WIFILOG_LABEL("WifiNapiEvent");
 
 namespace OHOS {
 namespace Wifi {
+const std::string CALL_TIMER = "samgrProxy_wifi";
 class RegObj {
 public:
     RegObj() : m_regEnv(0), m_regHanderRef(nullptr) {
@@ -133,10 +135,13 @@ public:
             WIFI_LOGI("mSaStatusListener is nullptr!");
             return;
         }
+        int idTimer = WifiWatchDogUtils::GetInstance()->StartWatchDogForFunc(CALL_TIMER);
+        WIFI_LOGI("SetTimer id: %{public}d, name: %{public}s.", idTimer, CALL_TIMER.c_str());
         ret = samgrProxy->SubscribeSystemAbility((int32_t)WIFI_DEVICE_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility((int32_t)WIFI_SCAN_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
+        WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(CALL_TIMER, idTimer);
         WIFI_LOGI("EventRegister, SubscribeSystemAbility return ret:%{public}d!", ret);
     }
     ~EventRegister() {

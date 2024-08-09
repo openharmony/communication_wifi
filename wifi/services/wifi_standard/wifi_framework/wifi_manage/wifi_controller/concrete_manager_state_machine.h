@@ -131,17 +131,6 @@ private:
     void BuildStateTree();
     ErrCode InitConcreteMangerStates();
 
-    static ErrCode AutoStopScanOnly(int instId, bool setIfaceDown);
-    static ErrCode AutoStartScanOnly(int instId);
-    ErrCode AutoStopStaService(int instId);
-    ErrCode AutoStartStaService(int instId);
-    ErrCode AutoStartSemiStaService(int instId);
-    ErrCode PreStartWifi(int instId);
-    ErrCode PostStartWifi(int instId);
-    ErrCode InitStaService(IStaService *pService);
-#ifdef FEATURE_SELF_CURE_SUPPORT
-    static ErrCode StartSelfCureService(int instId);
-#endif
     bool HandleCommonMessage(InternalMessagePtr msg);
     void checkAndContinueToStopWifi(InternalMessagePtr msg);
     void HandleStaStop();
@@ -150,11 +139,6 @@ private:
     ErrCode SwitchSemiFromEnable();
     ErrCode SwitchEnableFromSemi();
     void ReportClose();
-    static void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
-    static void OnRssiReportCallback(int index, int antRssi);
-    static void DispatchWifiOpenRes(OperateResState state, int instId);
-    static void DispatchWifiSemiActiveRes(OperateResState state, int instId);
-    static void DispatchWifiCloseRes(OperateResState state, int instId);
 
     DefaultState *pDefaultState;
     IdleState *pIdleState;

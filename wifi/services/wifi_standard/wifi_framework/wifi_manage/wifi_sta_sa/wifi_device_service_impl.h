@@ -195,6 +195,7 @@ private:
     bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
 #endif
     void ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result);
+    void updateStaDeviceMacAddress(WifiDeviceConfig &config);
 
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;

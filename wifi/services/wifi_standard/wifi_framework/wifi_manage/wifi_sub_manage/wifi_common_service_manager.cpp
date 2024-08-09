@@ -71,7 +71,6 @@ InitStatus WifiCommonServiceManager::Init()
     }
     if (!AppParser::GetInstance().Init()) {
         WIFI_LOGE("AppParser Init failed!");
-        return APP_PARSER_INIT_FAILED;
     }
 #endif
 #ifdef FEATURE_SELF_CURE_SUPPORT

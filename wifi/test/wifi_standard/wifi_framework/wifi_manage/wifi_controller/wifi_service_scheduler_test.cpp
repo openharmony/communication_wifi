@@ -49,9 +49,10 @@ public:
 
     void AutoStartStaServiceTest()
     {
+        std::string ifName;
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartStaService(0), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartStaService(0, ifName), WIFI_OPT_SUCCESS);
     }
 
     void AutoStopStaServiceTest()
@@ -63,9 +64,10 @@ public:
 
     void AutoStartScanOnlyTest()
     {
+        std::string ifName;
         WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartScanOnly(0), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartScanOnly(0, ifName), WIFI_OPT_SUCCESS);
     }
 
     void AutoStopScanOnlyTest()
@@ -77,20 +79,22 @@ public:
 
     void AutoStartSemiStaServiceTest()
     {
+        std::string ifName;
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartSemiStaService(0), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartSemiStaService(0, ifName), WIFI_OPT_SUCCESS);
     }
 
     void AutoStartApServiceTest()
     {
+        std::string ifName;
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0), WIFI_OPT_FAILED);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0, ifName), WIFI_OPT_FAILED);
 
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::RUNNING, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0, ifName), WIFI_OPT_SUCCESS);
     }
     
     void AutoStopApServiceTest()

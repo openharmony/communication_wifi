@@ -240,16 +240,9 @@ ErrCode ScanService::Scan(bool externFlag)
         return WIFI_OPT_FAILED;
     }
 
-    if (externFlag) {
-        ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_EXTERN);
-        if (rlt != WIFI_OPT_SUCCESS) {
-            return rlt;
-        }
-    } else {
-        if (!AllowScanByHid2dState()) {
-            WIFI_LOGW("internal scan not allow by hid2d state");
-            return WIFI_OPT_FAILED;
-        }
+    ErrCode rlt = ScanControlInner(externFlag);
+    if (rlt != WIFI_OPT_SUCCESS) {
+        return rlt;
     }
 
     ScanConfig scanConfig;
@@ -282,16 +275,9 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag
         return WIFI_OPT_FAILED;
     }
 
-    if (externFlag) {
-        ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_EXTERN);
-        if (rlt != WIFI_OPT_SUCCESS) {
-            return rlt;
-        }
-    } else {
-        if (!AllowScanByHid2dState()) {
-            WIFI_LOGW("internal scan not allow by hid2d state");
-            return WIFI_OPT_FAILED;
-        }
+    ErrCode rlt = ScanControlInner(externFlag);
+    if (rlt != WIFI_OPT_SUCCESS) {
+        return rlt;
     }
 
     if ((params.band < static_cast<int>(SCAN_BAND_UNSPECIFIED)) ||
@@ -336,6 +322,26 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag
         return WIFI_OPT_FAILED;
     }
 
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanService::ScanControlInner(bool externFlag)
+{
+    if (externFlag) {
+        ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_EXTERN);
+        if (rlt != WIFI_OPT_SUCCESS) {
+            return rlt;
+        }
+    } else {
+        if (!AllowScanByDisableScanCtrl()) {
+            WIFI_LOGW("internal scan not allow by disable scan control.");
+            return WIFI_OPT_FAILED;
+        }
+        if (!AllowScanByHid2dState()) {
+            WIFI_LOGW("internal scan not allow by hid2d state");
+            return WIFI_OPT_FAILED;
+        }
+    }
     return WIFI_OPT_SUCCESS;
 }
 

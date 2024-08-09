@@ -1590,26 +1590,6 @@ public:
         pStaStateMachine->OnNetManagerRestart();
     }
 
-    void ReUpdateNetSupplierInfoSuccess()
-    {
-        sptr<NetManagerStandard::NetSupplierInfo> supplierInfo;
-        pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
-        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        WifiLinkedInfo linkedInfo;
-        linkedInfo.connState = ConnState::CONNECTED;
-        linkedInfo.ssid = "111111";
-        linkedInfo.bssid = "222222";
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).
-            WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
-        pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
-    }
-
-    void ReUpdateNetSupplierInfoFail()
-    {
-        sptr<NetManagerStandard::NetSupplierInfo> supplierInfo;
-        pStaStateMachine->ReUpdateNetSupplierInfo(supplierInfo);
-    }
-
     void OnBssidChangedEventSuccess()
     {
         std::string reason;
@@ -3001,16 +2981,6 @@ HWTEST_F(StaStateMachineTest, OnNetManagerRestartSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, OnNetManagerRestartFail, TestSize.Level1)
 {
     OnNetManagerRestartFail();
-}
-
-HWTEST_F(StaStateMachineTest, ReUpdateNetSupplierInfoSuccess, TestSize.Level1)
-{
-    ReUpdateNetSupplierInfoSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, ReUpdateNetSupplierInfoFail, TestSize.Level1)
-{
-    ReUpdateNetSupplierInfoFail();
 }
 
 HWTEST_F(StaStateMachineTest, OnBssidChangedEventSuccess, TestSize.Level1)

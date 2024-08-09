@@ -483,6 +483,9 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
     }
     if (!pSelfCureStateMachine->staticIpCureSuccess && msg->GetParam2() == 1) {
         if (hasInternetRecently || portalUnthenEver || pSelfCureStateMachine->internetUnknown) {
+            if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
+                return;
+            }
             pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
             TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
             return;
@@ -1139,7 +1142,7 @@ void SelfCureStateMachine::InternetSelfCureState::UpdateDnsServers(std::vector<s
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
 {
-    WIFI_LOGI("begin to SelfCureForDns");
+    WIFI_LOGI("begin to self cure for internet access: dns");
     pSelfCureStateMachine->selfCureOnGoing = true;
     testedSelfCureLevel.push_back(WIFI_CURE_RESET_LEVEL_LOW_1_DNS);
     if (pSelfCureStateMachine->internetUnknown) {
@@ -1606,6 +1609,9 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
     pSelfCureStateMachine->selfCureOnGoing = false;
     pSelfCureStateMachine->useWithRandMacAddress = 0;
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
+    if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
+        return;
+    }
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE, WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
     return;
 }
@@ -2672,6 +2678,24 @@ int SelfCureStateMachine::GetIsReassocWithFactoryMacAddress()
     }
     int isReassocWithFactoryMacAddress = config.isReassocSelfCureWithFactoryMacAddress;
     return isReassocWithFactoryMacAddress;
+}
+
+bool SelfCureStateMachine::IsCustNetworkSelfCure()
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("IsCustNetworkSelfCure get pEnhanceService service failed!");
+        return false;
+    }
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        return false;
+    }
+    if (pEnhanceService->IsHwItCustNetwork(config)) {
+        WIFI_LOGI("dns-selfcure is not triggered on the network.");
+        return true;
+    }
+    return false;
 }
 
 int SelfCureStateMachine::SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress)

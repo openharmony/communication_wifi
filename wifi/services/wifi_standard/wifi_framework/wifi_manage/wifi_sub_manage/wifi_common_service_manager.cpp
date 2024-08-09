@@ -68,7 +68,9 @@ InitStatus WifiCommonServiceManager::Init()
     if (WifiAppStateAware::GetInstance().InitAppStateAware(mWifiAppStateAwareCallbacks) < 0) {
         WIFI_LOGE("WifiAppStateAware Init failed!");
     }
-    wifiNetAgentCallbacks_.OnRequestNetwork = std::bind(&WifiCommonServiceManager::OnRequestNetwork, this, _1, _2);
+    wifiNetAgentCallbacks_.OnRequestNetwork = [this](const int uid, const int networkId) {
+        return this->OnRequestNetwork(uid, networkId);
+    };
     WifiNetAgent::GetInstance().InitWifiNetAgent(wifiNetAgentCallbacks_);
 #endif
 #ifdef FEATURE_SELF_CURE_SUPPORT

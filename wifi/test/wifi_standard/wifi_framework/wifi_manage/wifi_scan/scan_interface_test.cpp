@@ -18,7 +18,6 @@
 #include "mock_scan_service.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_scan_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

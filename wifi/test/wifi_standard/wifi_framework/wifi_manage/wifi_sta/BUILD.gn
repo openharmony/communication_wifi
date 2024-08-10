@@ -74,8 +74,6 @@ local_base_sources = [
   "Mock/mock_state_machine.cpp",
   "Mock/mock_wifi_chip_hal_interface.cpp",
   "Mock/mock_wifi_settings.cpp",
-  "Mock/mock_wifi_sta_hal_interface.cpp",
-  "Mock/mock_wifi_supplicant_hal_interface.cpp",
 ]
 
 local_base_include_dirs = [

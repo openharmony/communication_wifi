@@ -1419,7 +1419,7 @@ public:
         std::string reason = "test";
         StaStateMachine staStateMachine;
         pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
-        pStaStateMachine->pDhcpResultNotify->OnFailed(DHCP_LEASE_EXPIRED, ifname.c_str(), reason.c_str());
+        pStaStateMachine->pDhcpResultNotify->OnFailed(DHCP_RENEW_FAILED, ifname.c_str(), reason.c_str());
     }
 
     void DhcpResultNotifyOnFailedTest3()
@@ -1430,7 +1430,7 @@ public:
         std::string reason = "test";
         StaStateMachine staStateMachine;
         pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
-        pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname.c_str(), reason.c_str());
+        pStaStateMachine->pDhcpResultNotify->OnFailed(DHCP_LEASE_EXPIRED, ifname.c_str(), reason.c_str());
     }
 
     void SaveLinkstateSuccess()
@@ -3190,6 +3190,11 @@ HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest4, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest5, TestSize.Level1)
 {
     DealHiLinkDataToWpaSuccessTest5();
+}
+
+HWTEST_F(StaStateMachineTest, DealGetDhcpIpTimeoutTest, TestSize.Level1)
+{
+    DealGetDhcpIpTimeoutTest();
 }
 } // namespace Wifi
 } // namespace OHOS

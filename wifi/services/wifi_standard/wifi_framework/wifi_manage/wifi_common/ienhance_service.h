@@ -131,6 +131,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetStaticIpConfig(const bool &isMultiDhcpServer, const bool &startSelfcure, IpInfo &ipInfo) = 0;
+
+    /**
+     * @Description Is Wide Bandwidth Supported.
+     *
+     * @return true: support, false: not support
+     */
+    virtual bool IsWideBandwidthSupported() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -167,7 +167,6 @@ ohos_shared_library("wifi_native_js") {
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
   ]
 
-
   defines = [ "ENABLE_NAPI_COMPATIBLE" ]
 
   if (wifi_feature_with_random_mac_addr) {

@@ -232,6 +232,7 @@ ohos_unittest("manager_unittest") {
     "UT_TEST",
   ]
 
+
   if (wifi_feature_with_p2p) {
     defines += [ "FEATURE_P2P_SUPPORT" ]
   }

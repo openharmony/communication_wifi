@@ -25,6 +25,8 @@
 #include "mock_wifi_settings.h"
 #include "mock_if_config.h"
 #include "mock_wifi_manager.h"
+#include "mock_wifi_sta_hal_interface.h"
+#include "wifi_error_no.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -51,6 +53,9 @@ static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 static constexpr int NAPI_MAX_STR_LENT = 127;
+static constexpr int MIN_5G_FREQUENCY = 5160;
+static constexpr int INVALID_RSSI1 = -128;
+constexpr int TWO = 2;
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -158,6 +163,7 @@ public:
     void SetExternalSimTest()
     {
         int value = 1;
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_FAILED);
         pStaStateMachine->SetExternalSim("wlan0", EAP_METHOD_NONE, value);
     }
 
@@ -178,6 +184,7 @@ public:
         scanInfoList.push_back(temp);
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
+        config.ssid = "123";
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
             .WillOnce(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
@@ -186,14 +193,14 @@ public:
     void GetGsmAuthResponseWithoutLengthTest()
     {
         EapSimGsmAuthParam param;
-        param.rands.push_back("aaaaa");
+        param.rands.push_back("30303a35353a44443a66663a4d4d");
         pStaStateMachine->GetGsmAuthResponseWithoutLength(param);
     }
 
     void GetGsmAuthResponseWithLengthTest()
     {
         EapSimGsmAuthParam param;
-        param.rands.push_back("aaaaa");
+        param.rands.push_back("30303a35353a44443a66663a4d4d");
         pStaStateMachine->GetGsmAuthResponseWithLength(param);
     }
 
@@ -266,7 +273,135 @@ public:
         connectMethod = NETWORK_SELECTED_BY_USER;
         pStaStateMachine->SetConnectMethod(connectMethod);
     }
-    
+    void InvokeOnDhcpOfferReportTest()
+    {
+        IpInfo ipInfo;
+        pStaStateMachine->InvokeOnDhcpOfferReport(ipInfo);
+    }
+
+    void FillSuiteB192CfgTest2()
+    {
+        WifiHalDeviceConfig  halDeviceConfig;
+        halDeviceConfig.keyMgmt = "WPA-EAP-SUITE-B-192";
+        pStaStateMachine->FillSuiteB192Cfg(halDeviceConfig);
+    }
+
+    void DealSignalPollResultTest()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiLinkedStandardAndMaxSpeed(_)).Times(testing::AtLeast(0));
+        pStaStateMachine->DealSignalPollResult();
+        pStaStateMachine->linkedInfo.lastTxPackets = 1;
+        pStaStateMachine->linkedInfo.lastRxPackets = 1;
+        pStaStateMachine->linkedInfo.lastPacketDirection = 1;
+        pStaStateMachine->DealSignalPacketChanged(0, 0);
+    }
+    void ConvertDeviceCfgSuccess1()
+    {
+        std::vector<WifiScanInfo> scanInfoList;
+        WifiScanInfo temp;
+        temp.ssid = "123";
+        temp.bssid ="456";
+        temp.capabilities = "PSK+SAE";
+        scanInfoList.push_back(temp);
+        WifiDeviceConfig config;
+        config.keyMgmt = "SAE";
+        config.ssid = "123";
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+    }
+
+    void SetExternalSimTest1()
+    {
+        int value = 1;
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->SetExternalSim("wlan0", EAP_METHOD_NONE, value);
+    }
+
+    void UpdateLinkInfoRssiTest()
+    {
+        WifiStaHalInterface::GetInstance().mInfo.frequency  = MIN_5G_FREQUENCY;
+        WifiStaHalInterface::GetInstance().mInfo.txrate = MIN_5G_FREQUENCY;
+        WifiStaHalInterface::GetInstance().mInfo.rxrate  = MIN_5G_FREQUENCY;
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        int rssi = INVALID_RSSI1;
+        int outRssi = pStaStateMachine->UpdateLinkInfoRssi(rssi);
+        EXPECT_EQ(outRssi, INVALID_RSSI_VALUE);
+    }
+    void CurrentIsRandomizedMacTest()
+    {
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->CurrentIsRandomizedMac();
+    }
+
+    void HilinkSaveConfigTest()
+    {
+        WifiDeviceConfig deviceConfig;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
+            .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(-1)));
+        pStaStateMachine->HilinkSaveConfig();
+    }
+
+    void DealConnectionEventSuccess()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetUserLastSelectedNetworkId(_, _)).Times(testing::AtLeast(0));
+        pStaStateMachine->wpsState = SetupMethod::INVALID;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        pStaStateMachine->m_hilinkFlag = true;
+        pStaStateMachine->DealConnectionEvent(msg);
+    }
+
+    void DealWpaWrongPskEventFail1()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        std::string bssid = "wifitest";
+        msg->SetMessageObj(bssid);
+        msg->SetMessageName(WIFI_SVR_CMD_STA_REPORT_DISCONNECT_REASON_EVENT);
+        pStaStateMachine->DealWpaLinkFailEvent(msg);
+    }
+
+    void DealWpaWrongPskEventFail2()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+            .WillOnce(Return(1))
+            .WillRepeatedly(Return(0));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        std::string bssid = "wifitest";
+        msg->SetMessageObj(bssid);
+        msg->SetMessageName(WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET);
+        pStaStateMachine->DealWpaLinkFailEvent(msg);
+    }
+
+    void DealStartWpsCmdSuccess()
+    {
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
+        pStaStateMachine->wpsState = SetupMethod::INVALID;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        std::string bssid = "wifitest";
+        msg->SetMessageObj(bssid);
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->DealStartWpsCmd(msg);
+    }
+
+    void DealScreenStateChangedEventTest()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetParam1(static_cast<int>(MODE_STATE_OPEN));
+        pStaStateMachine->DealScreenStateChangedEvent(msg);
+        msg->SetParam1(static_cast<int>(MODE_STATE_CLOSE));
+        pStaStateMachine->DealScreenStateChangedEvent(msg);
+    }
 };
 
 HWTEST_F(StaStateMachineTest, ConfigStaticIpAddressSuccess1, TestSize.Level1)
@@ -344,7 +479,6 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultExtTest, TestSize.Level1)
     TryToSaveIpV4ResultExtTest();
 }
 
-
 HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultTest, TestSize.Level1)
 {
     TryToSaveIpV4ResultTest();
@@ -358,6 +492,51 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, SetConnectMethodTest, TestSize.Level1)
 {
     SetConnectMethodTest();
+}
+
+HWTEST_F(StaStateMachineTest, SetExternalSimTest1, TestSize.Level1)
+{
+    SetExternalSimTest1();
+}
+
+HWTEST_F(StaStateMachineTest, UpdateLinkInfoRssiTest, TestSize.Level1)
+{
+    UpdateLinkInfoRssiTest();
+}
+
+HWTEST_F(StaStateMachineTest, CurrentIsRandomizedMacTest, TestSize.Level1)
+{
+    CurrentIsRandomizedMacTest();
+}
+
+HWTEST_F(StaStateMachineTest, HilinkSaveConfigTest, TestSize.Level1)
+{
+    HilinkSaveConfigTest();
+}
+
+HWTEST_F(StaStateMachineTest, DealConnectionEventSuccess, TestSize.Level1)
+{
+    DealConnectionEventSuccess();
+}
+
+HWTEST_F(StaStateMachineTest, DealWpaWrongPskEventFail1, TestSize.Level1)
+{
+    DealWpaWrongPskEventFail1();
+}
+
+HWTEST_F(StaStateMachineTest, DealWpaWrongPskEventFail2, TestSize.Level1)
+{
+    DealWpaWrongPskEventFail2();
+}
+
+HWTEST_F(StaStateMachineTest, DealStartWpsCmdSuccess, TestSize.Level1)
+{
+    DealStartWpsCmdSuccess();
+}
+
+HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest, TestSize.Level1)
+{
+    DealScreenStateChangedEventTest();
 }
 }
 }

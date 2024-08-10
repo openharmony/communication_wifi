@@ -1004,7 +1004,6 @@ public:
 
     void SoftwareScanInfoProcessTest2()
     {
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.queryScanInfos = false;
         pScanStateMachine->SoftwareScanInfoProcess();
     }
 

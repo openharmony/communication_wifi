@@ -266,6 +266,7 @@ public:
         connectMethod = NETWORK_SELECTED_BY_USER;
         pStaStateMachine->SetConnectMethod(connectMethod);
     }
+    
 };
 
 HWTEST_F(StaStateMachineTest, ConfigStaticIpAddressSuccess1, TestSize.Level1)
@@ -342,6 +343,7 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultExtTest, TestSize.Level1)
 {
     TryToSaveIpV4ResultExtTest();
 }
+
 
 HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultTest, TestSize.Level1)
 {

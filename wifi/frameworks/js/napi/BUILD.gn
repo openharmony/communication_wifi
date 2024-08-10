@@ -47,10 +47,7 @@ ohos_shared_library("wifi") {
     "src/wifi_napi_utils.cpp",
   ]
 
-  deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
   defines = []
   if (wifi_feature_with_random_mac_addr) {
@@ -101,10 +98,7 @@ ohos_shared_library("wifiext") {
     "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
   external_deps = [
     "ability_runtime:app_context",
@@ -162,10 +156,7 @@ ohos_shared_library("wifi_native_js") {
     "src/wifi_napi_p2p.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
   defines = [ "ENABLE_NAPI_COMPATIBLE" ]
 
@@ -222,11 +213,7 @@ ohos_shared_library("wifimanager") {
     "src/wifi_napi_p2p.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-  ]
-
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
 
   if (wifi_feature_with_random_mac_addr) {
@@ -277,11 +264,7 @@ ohos_shared_library("wifimanagerext") {
     "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-  ]
-
+  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
   if (wifi_feature_with_ap_extension) {
     defines += [ "FEATURE_AP_EXTENSION" ]

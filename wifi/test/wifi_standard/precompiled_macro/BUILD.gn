@@ -16,7 +16,6 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ################################################################################
 
-
 module_output_path = "wifi/precompiled_macro"
 
 config("module_private_config") {
@@ -27,12 +26,33 @@ config("module_private_config") {
 ohos_unittest("precompiled_macro_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
+    "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
+    "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
+    "$WIFI_ROOT_DIR/base/utils/xml_parser.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/app_network_speed_limit_service.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/speed_limit_configs_writer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/block_connect_service.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_app_state_aware.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_channel_helper.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_config_update.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code/wifi_country_code_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code/wifi_country_code_policy.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_net_agent.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_net_observer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats/wifi_net_stats_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_notification_util.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_system_timer.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_monitor.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_status_history_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_state_machine.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_supplicant_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock/mock_scan_service.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock/mock_scan_state_machine.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock/mock_wifi_manager.cpp",
@@ -41,6 +61,7 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
     "scan_service_test.cpp",
     "sta_state_machine_test.cpp",
+    "sta_state_machine_test1.cpp",
   ]
 
   include_dirs = [
@@ -48,6 +69,8 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
     "$WIFI_ROOT_DIR/base/cRPC/include",
+    "$WIFI_ROOT_DIR/base/utils",
+    "$WIFI_ROOT_DIR/base/state_machine/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
@@ -80,6 +103,8 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
@@ -89,8 +114,6 @@ ohos_unittest("precompiled_macro_unittest") {
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
@@ -108,17 +131,23 @@ ohos_unittest("precompiled_macro_unittest") {
     "ability_base:zuri",
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
+    "ability_runtime:extension_manager",
     "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "cellular_data:tel_cellular_data_api",
     "core_service:tel_core_service_api",
+    "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
+    "netmanager_base:net_native_manager_if",
+    "netmanager_base:net_stats_manager_if",
+    "samgr:samgr_proxy",
     "time_service:time_client",
   ]
 

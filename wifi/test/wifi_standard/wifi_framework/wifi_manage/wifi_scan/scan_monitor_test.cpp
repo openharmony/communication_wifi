@@ -14,7 +14,6 @@
  */
 #include "scan_monitor.h"
 #include "mock_scan_state_machine.h"
-#include "mock_wifi_scan_interface.h"
 #include <gtest/gtest.h>
 
 using ::testing::_;
@@ -51,13 +50,11 @@ public:
 
     void InitScanMonitorSuccessTest()
     {
-        MockWifiScanInterface::GetInstance().pSupplicant.callback = true;
         EXPECT_EQ(pScanMonitor->InitScanMonitor(), true);
     }
 
     void InitScanMonitorFailTest()
     {
-        MockWifiScanInterface::GetInstance().pSupplicant.callback = false;
         pScanMonitor->ReceiveScanEventFromIdl(0);
         EXPECT_EQ(pScanMonitor->InitScanMonitor(), false);
     }

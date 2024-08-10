@@ -39,8 +39,6 @@ ohos_unittest("wifi_scan_unittest") {
     "Mock/mock_scan_state_machine.cpp",
     "Mock/mock_wifi_manager.cpp",
     "Mock/mock_wifi_settings.cpp",
-    "Mock/mock_wifi_sta_hal_interface.cpp",
-    "Mock/mock_wifi_supplicant_hal_interface.cpp",
     "global_test.cpp",
     "scan_interface_test.cpp",
     "scan_monitor_test.cpp",

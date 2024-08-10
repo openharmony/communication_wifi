@@ -141,6 +141,14 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) = 0;
+
+    /**
+     * @Description Hid2d Is Wide Bandwidth Supported
+     *
+     * @param isSupport - is support 160M
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -17,7 +17,6 @@
 #include "sta_state_machine.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_sta_interface.h"
 #include <string>
 
 using ::testing::_;
@@ -92,25 +91,21 @@ public:
 
 void StaMonitorTest::InitStaMonitorSuccess()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::InitStaMonitorFail()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_FAILED);
 }
 
 void StaMonitorTest::UnInitStaMonitorSuccess()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::UnInitStaMonitorFail()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     pStaMonitor->SetStateMachine(pStaMonitor->pStaStateMachine);
     pStaMonitor->SetStateMachine(nullptr);
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);

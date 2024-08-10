@@ -16,6 +16,7 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ################################################################################
 
+
 module_output_path = "wifi/precompiled_macro"
 
 config("module_private_config") {

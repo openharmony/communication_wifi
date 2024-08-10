@@ -52,6 +52,7 @@ public:
         pScanService.reset();
     }
 
+
 public:
     std::unique_ptr<ScanService> pScanService;
  

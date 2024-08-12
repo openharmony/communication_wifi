@@ -19,7 +19,6 @@
 #include <sys/time.h>
 #include "mock_sta_service.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_sta_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

@@ -18,7 +18,6 @@
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_scan_state_machine.h"
-#include "mock_wifi_scan_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -87,7 +86,6 @@ public:
         std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
         std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.getSupportFre = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).Times(AtLeast(1));
@@ -101,7 +99,6 @@ public:
     void UnInitScanServiceSuccess()
     {
         if (pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback()) == true) {
-            MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
             pScanService->UnInitScanService();
         }
     }
@@ -533,7 +530,6 @@ public:
         pScanService->isPnoScanBegined = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
-        MockWifiScanInterface::GetInstance().pWifiStaHalInfo.stopPnoScan = true;
         EXPECT_EQ(false, pScanService->BeginPnoScan());
     }
 

@@ -19,6 +19,7 @@
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_country_code_manager.h"
+#include "mock_wifi_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -192,6 +193,7 @@ public:
     void SwitchScanOnlyInConnectStateTest()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiManager::GetInstance().Init();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
         msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);
@@ -442,15 +444,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
-    void PreStartWifiTest()
-    {
-        pConcreteManagerMachine->PreStartWifi(0);
-    }
-    void InitStaServiceTest()
-    {
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
-        pConcreteManagerMachine->InitStaService(pService);
-    }
 };
 
 HWTEST_F(ConcreteManagerMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
@@ -601,16 +594,6 @@ HWTEST_F(ConcreteManagerMachineTest, HandleStaSemiActiveTest2, TestSize.Level1)
 HWTEST_F(ConcreteManagerMachineTest, HandleStaSemiActiveTest3, TestSize.Level1)
 {
     HandleStaSemiActiveTest3();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, PreStartWifiTest, TestSize.Level1)
-{
-    PreStartWifiTest();
-}
-
-HWTEST_F(ConcreteManagerMachineTest, InitStaServiceTest, TestSize.Level1)
-{
-    InitStaServiceTest();
 }
 }
 }

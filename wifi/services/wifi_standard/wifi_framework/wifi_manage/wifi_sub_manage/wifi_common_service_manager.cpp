@@ -25,6 +25,7 @@
 #else
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_app_parser.h"
 #endif
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
@@ -68,6 +69,13 @@ InitStatus WifiCommonServiceManager::Init()
     if (WifiAppStateAware::GetInstance().InitAppStateAware(mWifiAppStateAwareCallbacks) < 0) {
         WIFI_LOGE("WifiAppStateAware Init failed!");
     }
+    if (!AppParser::GetInstance().Init()) {
+        WIFI_LOGE("AppParser Init failed!");
+    }
+    wifiNetAgentCallbacks_.OnRequestNetwork = [this](const int uid, const int networkId) {
+        return this->OnRequestNetwork(uid, networkId);
+    };
+    WifiNetAgent::GetInstance().InitWifiNetAgent(wifiNetAgentCallbacks_);
 #endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     mWifiNetLinkCallbacks.OnTcpReportMsgComplete =
@@ -96,6 +104,23 @@ void WifiCommonServiceManager::OnForegroundAppChanged(const AppExecFwk::AppState
     if (pService != nullptr) {
         pService->HandleForegroundAppChangedAction(appStateData);
     }
+}
+
+bool WifiCommonServiceManager::OnRequestNetwork(const int uid, const int networkId)
+{
+    if (IsOtherVapConnect()) {
+        WIFI_LOGI("OnRequestNetwork: p2p or hml connected, and hotspot is enable");
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pService == nullptr) {
+        WIFI_LOGE("OnRequestNetwork: pService is nullptr!");
+        return false;
+    }
+    if (pService->ConnectToCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {
+        return false;
+    }
+    return true;
 }
 #endif
 

@@ -278,6 +278,17 @@ int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
     return 0;
 }
 
+int WifiSettings::SetDeviceEphemeral(int networkId, bool isEphemeral)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.isEphemeral = isEphemeral;
+    return 0;
+}
+
 int WifiSettings::SetDeviceAfterConnect(int networkId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -417,6 +428,7 @@ int WifiSettings::SyncDeviceConfig()
 int WifiSettings::ReloadDeviceConfig()
 {
 #ifndef CONFIG_NO_CONFIG_WRITE
+    std::unique_lock<std::mutex> lock(mStaMutex);
     int ret = mSavedDeviceConfig.LoadConfig();
     if (ret < 0) {
         deviceConfigLoadFlag.clear();
@@ -426,7 +438,6 @@ int WifiSettings::ReloadDeviceConfig()
     deviceConfigLoadFlag.test_and_set();
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
-    std::unique_lock<std::mutex> lock(mStaMutex);
     mNetworkId = 0;
     mWifiDeviceConfig.clear();
     for (std::size_t i = 0; i < tmp.size(); ++i) {

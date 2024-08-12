@@ -490,6 +490,7 @@ private:
      *
      */
     void RestartPnoScanTimeOut();
+    ErrCode ScanControlInner(bool externFlag);
     /**
      * @Description Determines whether external scanning is allowed based on the scanning policy.
      *

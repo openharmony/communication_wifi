@@ -94,6 +94,16 @@ HWTEST_F(WifiSettingsTest, SetDeviceStateTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_OPT_RETURN);
 }
 
+HWTEST_F(WifiSettingsTest, SetDeviceEphemeralTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDeviceEphemeralTest enter!");
+    int result = WifiSettings::GetInstance().SetDeviceEphemeral(NETWORK_ID, false);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+    result = WifiSettings::GetInstance().SetDeviceEphemeral(NETWORK_ID, true);
+    WIFI_LOGE("SetDeviceEphemeralTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
 HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectTest, TestSize.Level1)
 {
     WIFI_LOGE("SetDeviceAfterConnectTest enter!");
@@ -220,12 +230,9 @@ HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
     WIFI_LOGE("IsModulePreLoadTest enter!");
     bool state = WifiSettings::GetInstance().IsModulePreLoad("wifitest");
     EXPECT_FALSE(state);
-    WifiSettings::GetInstance().IsModulePreLoad("StaService");
-    WifiSettings::GetInstance().IsModulePreLoad("ScanService");
-    WifiSettings::GetInstance().IsModulePreLoad("ApService");
-    WifiSettings::GetInstance().IsModulePreLoad("P2pService");
-    WifiSettings::GetInstance().IsModulePreLoad("AwareService");
-    WifiSettings::GetInstance().IsModulePreLoad("EnhanceService");
+    bool result = WifiSettings::GetInstance().IsModulePreLoad("StaService");
+    WIFI_LOGE("IsModulePreLoadTest result(%{public}d)", result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiSettingsTest, GetSupportHwPnoFlagTest, TestSize.Level1)
@@ -467,6 +474,9 @@ HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("AddWpsDeviceConfigTest enter");
     WifiDeviceConfig config;
+    int result =  WifiSettings::GetInstance().AddWpsDeviceConfig(config);
+    EXPECT_EQ(result, -1);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
     WifiSettings::GetInstance().AddWpsDeviceConfig(config);
 }
 
@@ -512,9 +522,7 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
     config.wifiEapConfig.clientCert = "//twifitest";
     WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, config);
     WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, configs);
-    int result = WifiSettings::GetInstance().GetDeviceConfig(ancoCallProcessName, ssid, keymgmt, config);
-    EXPECT_EQ(result, -1);
-    result = WifiSettings::GetInstance().GetDeviceConfig(ssid, keymgmt, config);
+    int result = WifiSettings::GetInstance().GetDeviceConfig(ssid, keymgmt, config);
     EXPECT_EQ(result, -1);
     WifiSettings::GetInstance().ClearDeviceConfig();
 }
@@ -561,6 +569,17 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest, TestSize.Level1)
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().EncryptionDeviceConfig(config);
+}
+
+HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)
+{
+    WIFI_LOGI("DecryptionWapiConfigTest_001 enter");
+    WifiDeviceConfig config;
+    WifiEncryptionInfo wifiEncryptionInfo;
+    config.keyMgmt = KEY_MGMT_WAPI_CERT;
+    config.wifiWapiConfig.wapiUserCertData = "12345678";
+    config.wifiWapiConfig.wapiAsCertData = "abcdefg";
+    WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)

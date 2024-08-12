@@ -55,6 +55,7 @@ const int SYSTEM_SCAN_INTERVAL_10_SECOND = 10;
 const int SYSTEM_SCAN_INTERVAL_30_SECOND = 30;
 const int SYSTEM_SCAN_INTERVAL_60_SECOND = 60;
 const int SYSTEM_SCAN_COUNT_3_TIMES = 3;
+const int DEFAULT_PNO_SCAN_INTERVAL = 300;
 
 const int TONE_PER_SYM_11ABG = 48;
 const int TONE_PER_SYM_11N_20MHZ = 52;
@@ -142,7 +143,7 @@ public:
      * @param params - Scan specified parameters[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode ScanWithParam(const WifiScanParams &params);
+    virtual ErrCode ScanWithParam(const WifiScanParams &params, bool externFlag);
     /**
      * @Description Disable/Restore the scanning operation.
      *
@@ -355,7 +356,7 @@ private:
      * @param interConfig - Scan Configuration[in]
      * @return success: true, failed: false
      */
-    bool AddScanMessageBody(InternalMessage *interMessage, const InterScanConfig &interConfig);
+    bool AddScanMessageBody(InternalMessagePtr interMessage, const InterScanConfig &interConfig);
     /**
      * @Description Save Request Configuration
      *
@@ -366,6 +367,24 @@ private:
     int StoreRequestScanConfig(const ScanConfig &scanConfig, const InterScanConfig &interConfig);
 
     int GetWifiMaxSupportedMaxSpeed(const InterScanInfo &scanInfo, const int &maxNumberSpatialStreams);
+    /**
+     * @Description Convert InterScanInfo to WifiScanInfo
+     *
+     * @param scanInfo - Scanning Result[in]
+     * @param interConfig - Internal Scanning Result[in]
+     */
+    void ConvertScanInfo(WifiScanInfo &scanInfo, const InterScanInfo &interInfo);
+    /**
+     * @Description Merge scan result
+     *
+     * @param results - Scanning Result Cache[in]
+     * @param storeInfoList - New Scanning Result[in]
+     */
+    void MergeScanResult(std::vector<WifiScanInfo> &results, std::vector<WifiScanInfo> &storeInfoList);
+    /**
+     * @Description Try to restore saved network
+     */
+    void TryToRestoreSavedNetwork();
     /**
      * @Description Save the scanning result in the configuration center.
      *
@@ -411,7 +430,7 @@ private:
      * @param pnoScanConfig - PNO Scanning Configuration[in]
      * @return success: true, failed: false
      */
-    bool AddPnoScanMessageBody(InternalMessage *interMessage, const PnoScanConfig &pnoScanConfig);
+    bool AddPnoScanMessageBody(InternalMessagePtr interMessage, const PnoScanConfig &pnoScanConfig);
     /**
      * @Description Stopping System Scanning
      *
@@ -446,6 +465,15 @@ private:
      */
     void HandleCommonScanInfo(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList);
     /**
+     * @Description Handle scanning result
+     *
+     * @param requestIndexList - Request Index List[in]
+     * @param scanInfoList - Scan Info List[in]
+     * @param fullScanStored - Full scan stored [in]
+     */
+    void HandleScanResults(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList,
+        bool &fullScanStored);
+    /**
      * @Description Common scanning failure processing
      *
      * @param requestIndexList - Request Index List[in]
@@ -462,6 +490,7 @@ private:
      *
      */
     void RestartPnoScanTimeOut();
+    ErrCode ScanControlInner(bool externFlag);
     /**
      * @Description Determines whether external scanning is allowed based on the scanning policy.
      *

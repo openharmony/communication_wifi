@@ -40,11 +40,11 @@ public:
 
 private:
     void InitStaCallback(void);
+    bool IgnoreConnStateChange(int instId = 0);
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
     void DealStreamChanged(StreamDirection direction, int instId = 0);
     void DealRssiChanged(int rssi, int instId = 0);
-    void ResetSelfcureOpenWifi(int instId = 0);
     void PublishWifiOperateStateHiSysEvent(OperateResState state);
 private:
     StaServiceCallback mStaCallback;

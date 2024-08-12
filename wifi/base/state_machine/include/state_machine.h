@@ -59,7 +59,7 @@ public:
      *
      * @param msg - Message object.[in]
      */
-    void NotExecutedMessage(const InternalMessage *msg);
+    void NotExecutedMessage(const InternalMessagePtr msg);
 
     /**
      * @Description Stop Handler Thread.
@@ -85,35 +85,35 @@ public:
     /**
      * @Description : Construct internal messages.
      *
-     * @return InternalMessage* : Pointer to the constructed internal message.
+     * @return InternalMessagePtr : Pointer to the constructed internal message.
      */
-    InternalMessage *CreateMessage();
+    InternalMessagePtr CreateMessage();
 
     /**
      * @Description : Construct an information message based on
      * the original message.
      *
      * @param orig - Original message.[in]
-     * @return InternalMessage* : Pointer to the constructed internal message.
+     * @return InternalMessagePtr : Pointer to the constructed internal message.
      */
-    InternalMessage *CreateMessage(const InternalMessage *orig);
+    InternalMessagePtr CreateMessage(const InternalMessagePtr orig);
 
     /**
      * @Description : Construct internal messages.
      *
      * @param msgName - Message Name.[in]
-     * @return InternalMessage* : Pointer to the constructed internal message.
+     * @return InternalMessagePtr : Pointer to the constructed internal message.
      */
-    InternalMessage *CreateMessage(int msgName);
+    InternalMessagePtr CreateMessage(int msgName);
 
     /**
      * @Description : Construct internal messages.
      *
      * @param msgName - Message Name.[in]
      * @param param1 - Message parameters.[in]
-     * @return InternalMessage* : Pointer to the constructed internal message.
+     * @return InternalMessagePtr : Pointer to the constructed internal message.
      */
-    InternalMessage *CreateMessage(int msgName, int param1);
+    InternalMessagePtr CreateMessage(int msgName, int param1);
 
     /**
      * @Description : Construct internal messages.
@@ -121,18 +121,18 @@ public:
      * @param msgName - Message Name.[in]
      * @param param1 - Message parameters.[in]
      * @param param2 - Message parameters.[in]
-     * @return InternalMessage* : Pointer to the constructed internal message.
+     * @return InternalMessagePtr : Pointer to the constructed internal message.
      */
-    InternalMessage *CreateMessage(int msgName, int param1, int param2);
+    InternalMessagePtr CreateMessage(int msgName, int param1, int param2);
     
     /**
      * @Description : Construct internal messages.
      *
      * @param msgName - Message Name.[in]
      * @param messageObj - User-defined data
-     * @return InternalMessage* : Pointer to the constructed internal message.
+     * @return InternalMessagePtr : Pointer to the constructed internal message.
      */
-    InternalMessage *CreateMessage(int msgName, const std::any &messageObj);
+    InternalMessagePtr CreateMessage(int msgName, const std::any &messageObj);
 
     /**
      * @Description : Constructs internal messages.
@@ -141,9 +141,9 @@ public:
      * @param param1 - First Message parameter.[in]
      * @param param2 - Second Message parameter.[in]
      * @param messageObj - User-defined data
-     * @return InternalMessage* : Pointer to the constructed internal message.
+     * @return InternalMessagePtr : Pointer to the constructed internal message.
      */
-    InternalMessage *CreateMessage(int msgName, int param1, int param2, const std::any &messageObj);
+    InternalMessagePtr CreateMessage(int msgName, int param1, int param2, const std::any &messageObj);
 
     /**
      * @Description : Constructs internal messages and places the
@@ -177,7 +177,7 @@ public:
      *
      * @param msg - Message to be sent.[in]
      */
-    virtual void SendMessage(InternalMessage *msg);
+    virtual void SendMessage(InternalMessagePtr msg);
 
     /**
      * @Description : Puts messages into the message queue of the state machine.
@@ -238,7 +238,7 @@ public:
      * @param msg - Message to be sent.[in]
      * @param delayTimeMs - Delay time, in milliseconds.[in]
      */
-    void MessageExecutedLater(InternalMessage *msg, int64_t delayTimeMs);
+    void MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs);
 
     /**
      * @Description : Constructs internal messages and places them in the
@@ -326,7 +326,7 @@ protected:
      *
      * @param msg - Message object.[in]
      */
-    void DelayMessage(const InternalMessage *msg);
+    void DelayMessage(const InternalMessagePtr msg);
 
 private:
     StateMachineHandler *pStateMachineHandler;
@@ -343,7 +343,7 @@ class StateMachineHandler : public Handler {
 public:
     using StateInfoMap = std::map<std::string, StateInfo *>;
     using StateVector = std::vector<StateInfo *>;
-    using DelayedMessage = std::vector<InternalMessage *>;
+    using DelayedMessage = std::vector<InternalMessagePtr >;
 
     /**
      * @Description : Construct a new state machine Handler:: StateMachine Handler object.
@@ -400,7 +400,7 @@ public:
      *
      * @param msg - Message body pointer.[in]
      */
-    void DelayMessage(const InternalMessage *msg);
+    void DelayMessage(const InternalMessagePtr msg);
 
     /**
      * @Description : The state machine is constructed.
@@ -457,7 +457,7 @@ private:
      *
      * @param msg - Messages.[in]
      */
-    void ExecuteMessage(InternalMessage *msg) override;
+    void ExecuteMessage(InternalMessagePtr msg) override;
 
     /**
      * @Description : Clean up After Quitting.
@@ -471,7 +471,7 @@ private:
      * @param msgProcessedState - Message processing status.[in]
      * @param msg - Messages.[in]
      */
-    void PerformSwitchState(State *msgProcessedState, InternalMessage *msg);
+    void PerformSwitchState(State *msgProcessedState, InternalMessagePtr msg);
 
     /**
      * @Description : Process messages. If the current state does not process it,
@@ -481,7 +481,7 @@ private:
      * @param msg - Message body pointer.[in]
      * @return State*
      */
-    State *ExecuteTreeStateMsg(InternalMessage *msg);
+    State *ExecuteTreeStateMsg(InternalMessagePtr msg);
 
     /**
      * @Description : Invoke GoOutState() for each state from the first
@@ -529,7 +529,7 @@ private:
      */
     bool mSwitchingStateFlag;
     /* Current Message */
-    InternalMessage *pCurrentMsg;
+    InternalMessagePtr pCurrentMsg;
 };
 }  // namespace Wifi
 }  // namespace OHOS

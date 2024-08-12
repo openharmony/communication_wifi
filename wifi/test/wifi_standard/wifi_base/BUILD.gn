@@ -29,13 +29,16 @@ ohos_unittest("base_unittest") {
     "$WIFI_ROOT_DIR/base/cRPC/src/net.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/serial.c",
     "$WIFI_ROOT_DIR/base/cRPC/src/server.c",
+    "$WIFI_ROOT_DIR/base/security_utils/src/wifi_openssl_utils.cpp",
     "$WIFI_ROOT_DIR/base/shared_util/wifi_watchdog_utils.cpp",
     "context_test.cpp",
     "hash_table_test.cpp",
     "net_test.cpp",
     "rpc_test_main.cpp",
+    "security_utils/wifi_openssl_utils_test.cpp",
     "serial_test.cpp",
     "server_test.cpp",
+    "wifi_watchdog_utils_test.cpp",
   ]
 
   defines = [
@@ -45,6 +48,7 @@ ohos_unittest("base_unittest") {
 
   include_dirs = [
     "$WIFI_ROOT_DIR/base/cRPC/include",
+    "$WIFI_ROOT_DIR/base/security_utils/include",
     "$WIFI_ROOT_DIR/base/shared_util",
   ]
 
@@ -56,7 +60,7 @@ ohos_unittest("base_unittest") {
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -65,6 +69,8 @@ ohos_unittest("base_unittest") {
     "c_utils:utils",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
   ]
   configs = [ ":module_private_config" ]
 

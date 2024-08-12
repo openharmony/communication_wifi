@@ -30,9 +30,9 @@ public:
     void HandleTcpReportMsgComplete(const std::vector<int64_t> &elems, int32_t cmd);
     void ParseTcpReportMsg(const std::vector<int64_t> &elems, int32_t cmd);
     void HandleTcpPktsResp(const std::vector<int64_t> &elems);
-    bool AllowSelfCureNetwork(int32_t currentRssi);
     bool ParseNetworkInternetGood(const std::vector<int64_t> &elems);
 private:
+    bool AllowSelfCureNetwork(int32_t currentRssi);
     int32_t mInstId = 0;
     bool mInternetSelfCureAllowed = true;
     bool mHttpDetectedAllowed = true;

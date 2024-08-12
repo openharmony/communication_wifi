@@ -35,7 +35,7 @@ void MockSoftapManagerStateMachine::SendMessage(int msgName, int param1, int par
         msgName, param1, param2);
 }
 
-void MockSoftapManagerStateMachine::SendMessage(InternalMessage *msg)
+void MockSoftapManagerStateMachine::SendMessage(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         return;

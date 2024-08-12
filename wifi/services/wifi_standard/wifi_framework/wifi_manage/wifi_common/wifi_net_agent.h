@@ -32,6 +32,10 @@
 #include "net_manager_constants.h"
 namespace OHOS {
 namespace Wifi {
+struct WifiNetAgentCallbacks {
+    std::function<bool(const int uid, const int networkId)> OnRequestNetwork;
+};
+
 class WifiNetAgent {
 public:
     ~WifiNetAgent();
@@ -69,7 +73,8 @@ public:
      * @param wifiIpV6Info wifi network link IPV6 data information
      * @param wifiProxyConfig wifi network link proxy information
      */
-    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId = 0);
+    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig,
+        int instId = 0);
 
     /**
      * Add route
@@ -121,6 +126,21 @@ public:
     void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
         int instId = 0);
 
+    /**
+     * Init WifiNetAgentCallbacks
+     *
+     * @param WifiNetAgentCallbacks WifiNetAgent callback
+     */
+    void InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCallbacks);
+
+    /**
+     * Add RequestNetwork
+     *
+     * @param uid uid
+     * @param networkId deviceconfig networkId
+     */
+    bool RequestNetwork(const int uid, const int networkId);
+
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {
     public:
@@ -146,7 +166,7 @@ public:
          */
         int32_t RequestNetwork(
             const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps,
-            const int32_t registerType = NetManagerStandard::REGISTER) override;
+            const NetManagerStandard::NetRequest &netrequest) override;
         /**
          * @Description : Connection Management triggers the close automatic connection feature.
          *
@@ -156,6 +176,8 @@ public:
         int32_t ReleaseNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) override;
     private:
         void LogNetCaps(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) const;
+
+        std::unordered_set<int> requestIds_;
     };
 private:
     WifiNetAgent();
@@ -174,7 +196,8 @@ private:
     void SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
         IpV6Info &wifiIpV6Info);
 private:
-    uint32_t supplierId;
+    uint32_t supplierId{0};
+    WifiNetAgentCallbacks wifiNetAgentCallbacks_;
 };
 } // namespace Wifi
 } // namespace OHOS

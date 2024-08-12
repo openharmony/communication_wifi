@@ -42,12 +42,12 @@ void WifiP2pDnsSdServiceResponse::Init()
 
 bool WifiP2pDnsSdServiceResponse::FetchTxtData(std::istringstream &istream)
 {
-    unsigned char t = istream.get();
+    unsigned char t = static_cast<unsigned char>(istream.get());
     while (!istream.eof()) {
         if (t == 0) {
             break;
         }
-        if (t > (istream.str().size() - istream.tellg())) {
+        if (t > (istream.str().size() - static_cast<unsigned char>(istream.tellg()))) {
             return false;
         }
         std::unique_ptr<char[]> ptr = std::make_unique<char[]>(t + 1);
@@ -70,7 +70,7 @@ bool WifiP2pDnsSdServiceResponse::FetchDnsName(std::istringstream &istream, std:
     }
     dnsName = "";
 
-    unsigned char t = istream.get();
+    unsigned char t = static_cast<unsigned char>(istream.get());
     while (!istream.eof()) {
         if (t == 0x00) {
             return true;
@@ -83,7 +83,7 @@ bool WifiP2pDnsSdServiceResponse::FetchDnsName(std::istringstream &istream, std:
             dnsName.append(it->second);
             return true;
         } else {
-            if (t > (istream.str().size() - istream.tellg())) {
+            if (t > (istream.str().size() - static_cast<unsigned char>(istream.tellg()))) {
                 return false;
             }
             std::unique_ptr<char[]> ptr = std::make_unique<char[]>(t);
@@ -112,10 +112,10 @@ bool WifiP2pDnsSdServiceResponse::ParseData()
     dnsQueryName = dnsName;
 
     const int typeAndVersionSize = 3;
-    if ((istream.str().size() - istream.tellg()) <= typeAndVersionSize) {
+    if ((static_cast<int>(istream.str().size()) - istream.tellg()) <= typeAndVersionSize) {
         return false;
     }
-    dnsType = istream.get() << CHAR_BIT; /* 2 Byte of high bit */
+    dnsType = static_cast<int>(static_cast<size_t>(istream.get()) << CHAR_BIT); /* 2 Byte of high bit */
     dnsType = istream.get();
     version = istream.get(); /* 1 Byte */
 
@@ -137,7 +137,7 @@ bool WifiP2pDnsSdServiceResponse::ParseData()
     }
     if (!istream.eof() && istream.get() == ';') {
         std::string svrName("");
-        unsigned char svrNameLength = istream.get();
+        unsigned char svrNameLength = static_cast<unsigned char>(istream.get());
         std::unique_ptr<char[]> ptr = std::make_unique<char[]>(svrNameLength);
         istream.read(ptr.get(), svrNameLength);
         svrName.append(ptr.get(), 0, svrNameLength);

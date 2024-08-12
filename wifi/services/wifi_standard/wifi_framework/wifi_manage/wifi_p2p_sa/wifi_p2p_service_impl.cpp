@@ -302,6 +302,10 @@ ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
         WIFI_LOGE("StopDiscoverServices:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StopDiscoverServices:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
@@ -447,7 +451,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    pService->IncreaseSharedLink(callingUid);
+    pService->SetGroupUid(callingUid);
     return pService->CreateGroup(config);
 }
 
@@ -603,6 +607,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
+    pService->SetGroupUid(GetCallingUid());
     return pService->P2pConnect(updateConfig);
 }
 
@@ -733,6 +738,10 @@ ErrCode WifiP2pServiceImpl::GetP2pEnableStatus(int &status)
         WIFI_LOGE("GetP2pEnableStatus:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetP2pEnableStatus:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     status = WifiConfigCenter::GetInstance().GetP2pState();
     return WIFI_OPT_SUCCESS;
 }
@@ -762,6 +771,10 @@ ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
     WIFI_LOGI("GetP2pConnectedStatus");
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("GetP2pConnectedStatus:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetP2pConnectedStatus:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!IsP2pServiceRunning()) {
@@ -1160,7 +1173,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
-    pService->IncreaseSharedLink(callingUid);
+    pService->SetGroupUid(callingUid);
     return pService->Hid2dCreateGroup(frequency, type);
 }
 
@@ -1178,8 +1191,8 @@ ErrCode WifiP2pServiceImpl::Hid2dRemoveGcGroup(const std::string& gcIfName)
 
 ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
 {
-    WIFI_LOGI("Hid2dConnect");
     int callingUid = GetCallingUid();
+    WIFI_LOGI("Uid %{public}d Hid2dConnect", callingUid);
     if (callingUid != SOFT_BUS_SERVICE_UID) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1201,6 +1214,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
     }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));
+    pService->SetGroupUid(callingUid);
     return pService->Hid2dConnect(config);
 }
 
@@ -1498,6 +1512,27 @@ ErrCode WifiP2pServiceImpl::CheckCanUseP2p()
 bool WifiP2pServiceImpl::IsRemoteDied(void)
 {
     return false;
+}
+
+ErrCode WifiP2pServiceImpl::Hid2dIsWideBandwidthSupported(bool &isSupport)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("Hid2dIsWideBandwidthSupported:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("Hid2dIsWideBandwidthSupported get pEnhanceService service failed!");
+        return WIFI_OPT_FAILED;
+    }
+
+    isSupport = pEnhanceService->IsWideBandwidthSupported();
+    if (!isSupport) {
+        WIFI_LOGE("Hid2dIsWideBandwidthSupported IsWideBandwidthSupported is false");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

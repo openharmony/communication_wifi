@@ -52,14 +52,6 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
 AppParser::AppParser()
 {
     WIFI_LOGI("%{public}s enter", __FUNCTION__);
-    if (IsReadCloudConfig()) {
-        ReadPackageCloudFilterConfig();
-    }
-    if (InitAppParser(WIFI_MONITOR_APP_FILE_PATH)) {
-        WIFI_LOGD("%{public}s InitAppParser successful", __FUNCTION__);
-    } else {
-        WIFI_LOGE("%{public}s InitAppParser fail", __FUNCTION__);
-    };
 }
 
 AppParser::~AppParser()
@@ -71,6 +63,22 @@ AppParser &AppParser::GetInstance()
 {
     static AppParser instance;
     return instance;
+}
+
+bool AppParser::Init()
+{
+    if (!initFlag_) {
+        if (IsReadCloudConfig()) {
+            ReadPackageCloudFilterConfig();
+        }
+        if (InitAppParser(WIFI_MONITOR_APP_FILE_PATH)) {
+            initFlag_ = true;
+            WIFI_LOGD("%{public}s InitAppParser successful", __FUNCTION__);
+        } else {
+            WIFI_LOGE("%{public}s InitAppParser fail", __FUNCTION__);
+        };
+    }
+    return initFlag_;
 }
 
 bool AppParser::IsLowLatencyApp(const std::string &bundleName) const
@@ -114,7 +122,10 @@ bool AppParser::InitAppParser(const char *appXmlFilePath)
         WIFI_LOGE("%{public}s appXmlFilePath is null", __FUNCTION__);
         return false;
     }
-    if (!std::filesystem::exists(appXmlFilePath)) {
+    std::string xmlPath(appXmlFilePath);
+    std::filesystem::path pathName = xmlPath;
+    std::error_code code;
+    if (!std::filesystem::exists(pathName, code)) {
         WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlFilePath);
         return false;
     }
@@ -333,7 +344,10 @@ std::string AppParser::GetLocalFileVersion(const char *appXmlVersionFilePath)
         WIFI_LOGE("%{public}s appXmlVersionFilePath null!", __FUNCTION__);
         return strFileVersion;
     }
-    if (!std::filesystem::exists(appXmlVersionFilePath)) {
+    std::string xmlPath(appXmlVersionFilePath);
+    std::filesystem::path pathName = xmlPath;
+    std::error_code code;
+    if (!std::filesystem::exists(xmlPath, code)) {
         WIFI_LOGE("%{public}s %{public}s not exists", __FUNCTION__, appXmlVersionFilePath);
         return strFileVersion;
     }

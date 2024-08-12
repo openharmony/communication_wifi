@@ -397,8 +397,24 @@ public:
      */
     const WifiEventCallback &GetCallbackInst(void) const;
 
+    /**
+     * @Description Get register callback objects for death receiver
+     *
+     * @return const std::function<void(int)>& - register death callback objects
+     */
+    const std::function<void(int)> &GetDeathCallbackInst(void) const;
+
+    /**
+     * @Description Register the native process callback.
+     *
+     * @param callback
+     * @return WifiErrorNo
+     */
+    WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
+
 private:
     WifiEventCallback mStaCallback;
+    std::function<void(int)> mDeathCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

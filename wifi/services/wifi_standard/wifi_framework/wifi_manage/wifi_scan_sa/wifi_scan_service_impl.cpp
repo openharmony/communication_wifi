@@ -214,10 +214,15 @@ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
 
+    bool externFlag = true;
 #ifndef OHOS_ARCH_LITE
     UpdateScanMode();
+    if (WifiAuthCenter::IsNativeProcess()) {
+        externFlag = false;
+        WIFI_LOGI("Scan: native process start scan !");
+    }
 #endif
-    if (!IsWifiScanAllowed()) {
+    if (!IsWifiScanAllowed(externFlag)) {
         WIFI_LOGE("Scan not allowed!");
         return WIFI_OPT_FAILED;
     }
@@ -225,7 +230,7 @@ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
-    return pService->ScanWithParam(params);
+    return pService->ScanWithParam(params, externFlag);
 }
 
 bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
@@ -243,14 +248,14 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
         }
     }
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService == nullptr) {
-        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
-        return false;
+    if (pEnhanceService != nullptr) {
+        scanInfo.externScan = externFlag;
+        scanInfo.isSystemApp = WifiAuthCenter::IsSystemAppByToken();
+        bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
+        WifiScanConfig::GetInstance().SaveScanDeviceInfo(scanInfo);
+        return allowScan;
     }
-    scanInfo.externScan = externFlag;
-    bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
-    WifiScanConfig::GetInstance().SaveScanDeviceInfo(scanInfo);
-    return allowScan;
+    return true;
 }
 
 ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)

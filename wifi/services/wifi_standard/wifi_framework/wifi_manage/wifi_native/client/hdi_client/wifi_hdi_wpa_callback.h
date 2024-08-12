@@ -38,10 +38,9 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
 int32_t OnEventStaNotify(struct IWpaCallback *self, const char *notifyParam, const char *ifName);
 int32_t OnEventWpsOverlap(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventWpsTimeout(struct IWpaCallback *self, const char *ifName);
+int32_t OnEventAuthTimeout(struct IWpaCallback *self, const char *ifName);
 int32_t OnEventScanResult(struct IWpaCallback *self,
     const struct HdiWpaRecvScanResultParam *recvScanResultParam, const char* ifName);
-int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName);
-int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName);
 int32_t OnEventP2pStateChanged(int status);
 int32_t OnEventDeviceFound(struct IWpaCallback *self,
     const struct HdiP2pDeviceInfoParam *deviceInfoParam, const char* ifName);
@@ -74,7 +73,9 @@ int32_t OnEventStaConnectState(struct IWpaCallback *self,
     const struct HdiP2pStaConnectStateParam *staConnectStateParam, const char* ifName);
 int32_t OnEventIfaceCreated(struct IWpaCallback *self,
     const struct HdiP2pIfaceCreatedParam *ifaceCreatedParam, const char* ifName);
-
+int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName);
+int32_t onEventApState(struct IHostapdCallback *self, const struct HdiApCbParm *apCbParm, const char* ifName);
+void OnNativeProcessDeath(int status);
 size_t PrintfDecode(u8 *buf, size_t maxlen, const char *str);
 #ifdef __cplusplus
 }

@@ -353,7 +353,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo SetSoftApConfig(const HotspotConfig &config, int id = 0);
+    WifiErrorNo SetSoftApConfig(const std::string &ifName, const HotspotConfig &config, int id = 0);
 
     /**
      * @Description Obtain information about all connected STAs.
@@ -816,6 +816,14 @@ public:
      */
     WifiErrorNo EnableAp(int id = 0);
 
+    /**
+     * @Description register callback for death recipient of native process
+     *
+     * @param id
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqRegisterNativeProcessCallback(const std::function<void(int)> &callback) const;
+
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;
@@ -824,6 +832,14 @@ private:
     int PushDeviceConfigParseMask(SetNetworkConfig *pConfig, DeviceConfigType type, unsigned int mask,
         const std::string parseStr[], int size) const;
     WifiErrorNo CheckValidDeviceConfig(const WifiHalDeviceConfig &config) const;
+    void GetSsidString(std::string &ssidString, std::vector<uint8_t> &ssidUtf8);
+    bool GetEncryptionString(const HotspotConfig &config, std::string &encryptionString);
+    void GetChannelString(const HotspotConfig &config, std::string &channelString);
+    void GetModeString(const HotspotConfig &config, std::string &modeString);
+    void ConvertToUtf8(const std::string ssid, std::vector<uint8_t> &ssidUtf8);
+    std::string StringCombination(const char* fmt, ...);
+    void AppendStr(std::string &dst, const char* format, va_list args);
+    bool WriteConfigToFile(const std::string &fileContext);
 };
 }  // namespace Wifi
 }  // namespace OHOS

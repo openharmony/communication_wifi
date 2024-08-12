@@ -357,12 +357,17 @@ private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
     std::string ConvertString(const std::u16string &wideText) const;
-    int32_t GetDataSlotId() const;
+    int32_t GetDataSlotId(int32_t slotId) const;
     std::string GetImsi(int32_t slotId) const;
     std::string GetPlmn(int32_t slotId) const;
     std::string GetMcc(const std::string &imsi) const;
     std::string GetMnc(const std::string &imsi, const int mncLen) const;
     void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;
+#ifndef OHOS_ARCH_LITE
+    void GetStaControlInfo();
+    bool IsAppInCandidateFilterList(int uid) const;
+#endif
+
 private:
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
@@ -382,6 +387,7 @@ private:
     StaAppAcceleration *pStaAppAcceleration;
 #endif
     int m_instId;
+    std::vector<std::string> sta_candidate_trust_list;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -28,9 +28,6 @@ DEFINE_WIFILOG_LABEL("StaMonitor");
 
 namespace OHOS {
 namespace Wifi {
-constexpr int WLAN_STATUS_UNSPECIFIED_FAILURE = 1;
-constexpr int WEP_WRONG_PASSWORD_STATUS_CODE = 5202;
-
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {}
 
@@ -50,8 +47,9 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnWpaSsidWrongKeyCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpaAuthTimeOutCallBack, this),
         std::bind(&StaMonitor::OnWpaConnectionFullCallBack, this, _1),
-        std::bind(&StaMonitor::OnWpaConnectionRejectCallBack, this, _1, _2),
+        std::bind(&StaMonitor::OnWpaConnectionRejectCallBack, this, _1),
         std::bind(&StaMonitor::OnWpaStaNotifyCallBack, this, _1),
         std::bind(&StaMonitor::OnReportDisConnectReasonCallBack, this, _1, _2),
     };
@@ -93,7 +91,7 @@ void StaMonitor::OnReportDisConnectReasonCallBack(int reason, const std::string 
         return;
     }
 
-    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     if (msg == nullptr) {
         WIFI_LOGE("OnReportDisConnectReasonCallBack CreateMessage failed");
         return;
@@ -226,7 +224,7 @@ void StaMonitor::OnWpaSsidWrongKeyCallBack(int status)
 
 void StaMonitor::OnWpaConnectionFullCallBack(int status)
 {
-    LOGI("onWpaConnectionFullCallBack() status:%d.\n", status);
+    LOGI("onWpaConnectionFullCallBack() status:%{public}d", status);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;
@@ -236,38 +234,11 @@ void StaMonitor::OnWpaConnectionFullCallBack(int status)
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
 }
 
-void StaMonitor::OnWpaConnectionRejectCallBack(int status, const std::string &bssid)
+void StaMonitor::OnWpaConnectionRejectCallBack(int status)
 {
-    LOGI("onWpsConnectionRejectCallBack() status:%d.\n", status);
+    LOGI("onWpsConnectionRejectCallBack() status:%{public}d", status);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
-        return;
-    }
-
-    /* Special handling for WPA3-Personal networks. If the password is
-       incorrect, the AP will send association rejection, with status code 1
-       (unspecified failure). In SAE networks, the password authentication
-       is not related to the 4-way handshake. In this case, we will send an
-       authentication failure event up. */
-    bool isWrongPwd = false;
-    std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
-    for (WifiScanInfo &item : scanResults) {
-        if (strcasecmp(item.bssid.c_str(), bssid.c_str()) == 0) {
-            if (status == WLAN_STATUS_UNSPECIFIED_FAILURE &&
-                (item.capabilities.find("SAE") != std::string::npos)) {
-                isWrongPwd = true;
-                break;
-            } else if (status == WEP_WRONG_PASSWORD_STATUS_CODE &&
-                item.capabilities.find("WEP") != std::string::npos) {
-                isWrongPwd = true;
-                break;
-            }
-        }
-    }
-    if (isWrongPwd) {
-        WIFI_LOGI("onWpaConnectionRejectCallBack wrong password");
-        OnWpaSsidWrongKeyCallBack(1);
         return;
     }
 
@@ -295,6 +266,11 @@ void StaMonitor::OnWpsTimeOutCallBack(int status)
     }
     /* Notification state machine WPS timeout event */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET, status);
+}
+
+void StaMonitor::OnWpaAuthTimeOutCallBack()
+{
+    WIFI_LOGI("OnWpaAuthTimeOutCallBack");
 }
 
 /* SIM authentication data format: [GSM-AUTH][:][Rand1][:][Rand2] or [GSM-AUTH][:][Rand1][:][Rand2][:][Rand3]

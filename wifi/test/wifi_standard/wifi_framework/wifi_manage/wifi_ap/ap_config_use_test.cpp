@@ -77,7 +77,6 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
 {
     WIFI_LOGI("GetChannelFromDrvOrXmlByBandTest enter");
     std::vector<int> freq2G = {2412, 2417, 2422};
-
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("wifitest"));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(freq2G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
@@ -87,7 +86,7 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
     }
 
     std::vector<int> freq5G = {5180, 5200, 5220};
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, 2, _))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(freq5G), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     channels = m_apConfigUse->GetChannelFromDrvOrXmlByBand(BandType::BAND_5GHZ);
     for (int c : channels) {
@@ -125,7 +124,7 @@ HWTEST_F(ApConfigUse_Test, GetBestChannelFor5G160MTest, TestSize.Level1)
         .WillRepeatedly(DoAll(SetArgReferee<2>(frequencies), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     int channel = m_apConfigUse->GetBestChannelFor5G(apConfig);
     WIFI_LOGI("GetBestChannelFor5GTest channel=%{public}d", channel);
-    EXPECT_EQ(channel, AP_BANDWIDTH_5G_160M_DEFAULT);
+    EXPECT_EQ(channel, AP_CHANNEL_5G_160M_DEFAULT);
 }
 
 HWTEST_F(ApConfigUse_Test, FilterIndoorChannelTest, TestSize.Level1)

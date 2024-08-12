@@ -190,7 +190,7 @@ bool WifiHotspotStub::CheckHotspot160MParam(BandType band, int bandwidth, int ch
     if ((band != BandType::BAND_5GHZ && bandwidth == AP_BANDWIDTH_160) ||
         (bandwidth != AP_BANDWIDTH_160 && bandwidth != AP_BANDWIDTH_DEFAULT) ||
         (band == BandType::BAND_5GHZ && bandwidth == AP_BANDWIDTH_160 &&
-        ((channel < AP_BANDWIDTH_5G_160M_SET_BEGIN) || (channel > AP_BANDWIDTH_5G_160M_SET_END)))) {
+        ((channel < AP_CHANNEL_5G_160M_SET_BEGIN) || (channel > AP_CHANNEL_5G_160M_SET_END)))) {
         return false;
     } else {
         return true;

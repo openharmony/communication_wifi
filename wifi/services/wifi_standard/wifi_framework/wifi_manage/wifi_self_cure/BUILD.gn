@@ -63,7 +63,7 @@ ohos_static_library("wifi_self_cure") {
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -74,6 +74,7 @@ ohos_static_library("wifi_self_cure") {
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "init:libbegetutil",
     "netmanager_base:net_conn_manager_if",
     "netstack:http_client",
   ]
@@ -85,13 +86,12 @@ ohos_static_library("wifi_self_cure") {
   }
   cflags = memory_optimization_cflags
   cflags_cc = memory_optimization_cflags_cc
-  ldflags = memory_optimization_ldflags
   cflags_cc += [
     "-std=c++17",
     "-Wall",
   ]
 
-  ldflags += [
+  ldflags = [
     "-fPIC",
     "-Wl,-E",
   ]

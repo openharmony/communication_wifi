@@ -69,6 +69,7 @@ enum class WifiSecurity {
     OWE = 6,
     WAPI_CERT = 7,
     WAPI_PSK = 8,
+    PSK_SAE = 9,
     INVALID = -1
 };
 
@@ -85,6 +86,16 @@ enum class WifiCategory {
     DEFAULT = 1,
     WIFI6 = 2,
     WIFI6_PLUS = 3
+};
+
+enum ScanBandType {
+    SCAN_BAND_UNSPECIFIED = 0,    /* not specified */
+    SCAN_BAND_24_GHZ = 1,         /* 2.4 GHz band */
+    SCAN_BAND_5_GHZ = 2,          /* 5 GHz band without DFS channels */
+    SCAN_BAND_BOTH = 3,           /* both bands without DFS channels */
+    SCAN_BAND_5_GHZ_DFS_ONLY = 4, /* 5 GHz band with DFS channels */
+    SCAN_BAND_5_GHZ_WITH_DFS = 6, /* 5 GHz band with DFS channels */
+    SCAN_BAND_BOTH_WITH_DFS = 7,  /* both bands with DFS channels */
 };
 
 struct WifiInfoElem {
@@ -191,6 +202,9 @@ struct WifiScanInfo {
                 break;
             case WifiSecurity::WAPI_PSK:
                 mgmt = "WAPI-PSK";
+                break;
+            case WifiSecurity::PSK_SAE:
+                mgmt = "WPA-PSK+SAE";
                 break;
             default:
                 mgmt = "NONE";

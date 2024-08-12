@@ -31,24 +31,17 @@
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
 #include "wifi_common_service_manager.h"
+#include "wifi_native_define.h"
+#include "wifi_sta_hal_interface.h"
 
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiManager");
-#ifdef DTFUZZ_TEST
-static WifiManager* gWifiManager = nullptr;
-#endif
+
 WifiManager &WifiManager::GetInstance()
 {
-#ifndef DTFUZZ_TEST
     static WifiManager gWifiManager;
     return gWifiManager;
-#else
-    if (gWifiManager == nullptr) {
-        gWifiManager = new (std::nothrow) WifiManager();
-    }
-    return *gWifiManager;
-#endif
 }
 
 WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0)
@@ -78,6 +71,8 @@ int WifiManager::Init()
         return -1;
     }
 
+    WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(
+        std::bind(&WifiManager::OnNativeProcessStatusChange, this, std::placeholders::_1));
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
@@ -100,6 +95,13 @@ int WifiManager::Init()
     }
     mInitStatus = INIT_OK;
 
+    if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && !std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH) &&
+        !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
+        if (IsStartUpWifiEnableSupport()) {
+            WIFI_LOGI("It's first start up, need open wifi before oobe");
+            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED);
+        }
+    }
     int lastState = WifiSettings::GetInstance().GetStaLastRunState();
     if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
@@ -114,9 +116,7 @@ int WifiManager::Init()
             wifiTogglerManager->ScanOnlyToggled(1);
         }
     }
-#ifndef DTFUZZ_TEST
     InitPidfile();
-#endif
     return 0;
 }
 
@@ -163,6 +163,21 @@ void WifiManager::Exit()
     return;
 }
 
+void WifiManager::OnNativeProcessStatusChange(int status)
+{
+    WIFI_LOGI("OnNativeProcessStatusChange status:%{public}d", status);
+    switch (status) {
+        case WPA_DEATH:
+            WIFI_LOGE("wpa_supplicant process is dead!");
+            break;
+        case AP_DEATH:
+            WIFI_LOGE("hostapd process is dead!");
+            break;
+        default:
+            break;
+    }
+}
+
 int WifiManager::GetSupportedFeatures(long &features) const
 {
     long supportedFeatures = mSupportedFeatures;
@@ -179,7 +194,8 @@ int WifiManager::GetSupportedFeatures(long &features) const
 
 void WifiManager::AddSupportedFeatures(WifiFeatures feature)
 {
-    mSupportedFeatures |= static_cast<long>(feature);
+    mSupportedFeatures = static_cast<long>(static_cast<unsigned long>(mSupportedFeatures) |
+        static_cast<unsigned long>(feature));
 }
 
 void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
@@ -375,7 +391,8 @@ void WifiManager::AutoStartServiceThread()
 void WifiManager::InitPidfile()
 {
     char pidFile[DIR_MAX_LENGTH] = {0, };
-    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid", CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
+    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid",
+        CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
     if (n < 0) {
         LOGE("InitPidfile: construct pidFile name failed.");
         return;

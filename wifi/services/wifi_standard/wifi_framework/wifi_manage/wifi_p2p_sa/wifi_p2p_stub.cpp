@@ -80,6 +80,8 @@ void WifiP2pStub::InitHandleMapEx()
         &WifiP2pStub::OnDisableRandomMac;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P)] =
         &WifiP2pStub::OnCheckCanUseP2p;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_WIDE_SUPPORTED)] =
+        &WifiP2pStub::OnHid2dIsWideBandwidthSupported;
     return;
 }
 
@@ -717,7 +719,8 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             }
             if (callback_ != nullptr) {
                 for (const auto &eventName : event) {
-                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, pid, eventName, tokenId);
+                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, pid,
+                        eventName, tokenId);
                 }
             }
         }
@@ -1027,6 +1030,19 @@ bool WifiP2pStub::IsSingleCallback() const
 void WifiP2pStub::SetSingleCallback(const bool isSingleCallback)
 {
     mSingleCallback = true;
+}
+
+void WifiP2pStub::OnHid2dIsWideBandwidthSupported(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isSupport = false;
+    ErrCode ret = Hid2dIsWideBandwidthSupported(isSupport);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(isSupport ? 1 : 0);
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

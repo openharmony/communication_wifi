@@ -186,9 +186,8 @@ void ScanStateMachine::InitState::GoOutState()
     return;
 }
 
-bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
 {
-    WIFI_LOGI("Enter InitState::ExecuteStateMsg.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is null.\n");
         return true;
@@ -201,6 +200,10 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
 
         case CMD_SCAN_FINISH:
             UnLoadDriver();
+            return true;
+
+        case CMD_DISABLE_SCAN:
+            DisableScan();
             return true;
 
         case CMD_START_COMMON_SCAN:
@@ -230,7 +233,6 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
         case SCAN_RESULT_EVENT:
         case PNO_SCAN_RESULT_EVENT:
         case SCAN_FAILED_EVENT:
-            WIFI_LOGE("ignored scan results event.\n");
             return true;
 
         case SYSTEM_SCAN_TIMER:
@@ -245,7 +247,7 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessage *msg)
             return false;
     }
 }
-void ScanStateMachine::InitState::HandleUpdateCountryCode(InternalMessage *msg)
+void ScanStateMachine::InitState::HandleUpdateCountryCode(InternalMessagePtr msg)
 {
     std::string wifiCountryCode = msg->GetStringFromMessage();
     if (wifiCountryCode.empty()) {
@@ -283,7 +285,7 @@ void ScanStateMachine::HardwareReady::GoOutState()
     return;
 }
 
-bool ScanStateMachine::HardwareReady::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::HardwareReady::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("HardwareReady::ExecuteStateMsg.\n");
     if (msg == nullptr) {
@@ -326,7 +328,7 @@ void ScanStateMachine::CommonScan::GoOutState()
     return;
 }
 
-bool ScanStateMachine::CommonScan::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::CommonScan::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("CommonScan::ExecuteStateMsg.\n");
     if (msg == nullptr) {
@@ -366,7 +368,7 @@ void ScanStateMachine::CommonScanUnworked::GoOutState()
     return;
 }
 
-bool ScanStateMachine::CommonScanUnworked::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::CommonScanUnworked::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGD("CommonScanUnworked::ExecuteStateMsg.\n");
     if (msg == nullptr) {
@@ -417,7 +419,7 @@ void ScanStateMachine::CommonScanning::GoOutState()
  * @param msg - Internal message class, which is used to send messages to the state machine.[in]
  * @return success: true, failed: false
  */
-bool ScanStateMachine::CommonScanning::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::CommonScanning::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("Enter CommonScanning::ExecuteStateMsg.\n");
     if (msg == nullptr) {
@@ -482,7 +484,7 @@ void ScanStateMachine::PnoScan::GoOutState()
     return;
 }
 
-bool ScanStateMachine::PnoScan::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::PnoScan::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("PnoScan::ExecuteStateMsg.\n");
     if (msg == nullptr) {
@@ -514,7 +516,7 @@ void ScanStateMachine::PnoScanHardware::GoOutState()
     WIFI_LOGI("Enter PnoScanHardware::GoOutState.\n");
 }
 
-bool ScanStateMachine::PnoScanHardware::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::PnoScanHardware::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGD("PnoScanHardware::ExecuteStateMsg.\n");
     if (msg == nullptr) {
@@ -576,7 +578,7 @@ void ScanStateMachine::CommonScanAfterPno::GoOutState()
     pScanStateMachine->remainWaitResultTimer = false;
 }
 
-bool ScanStateMachine::CommonScanAfterPno::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::CommonScanAfterPno::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("CommonScanAfterPno::ExecuteStateMsg.\n");
     if (msg == nullptr) {
@@ -644,7 +646,7 @@ void ScanStateMachine::PnoScanSoftware::GoOutState()
     pScanStateMachine->StopTimer(static_cast<int>(SOFTWARE_PNO_SCAN_TIMER));
 }
 
-bool ScanStateMachine::PnoScanSoftware::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::PnoScanSoftware::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("Enter PnoScanSoftware::ExecuteStateMsg.\n");
 
@@ -681,7 +683,7 @@ void ScanStateMachine::PnoSwScanFree::GoOutState()
     WIFI_LOGI("Enter PnoSwScanFree::GoOutState.\n");
 }
 
-bool ScanStateMachine::PnoSwScanFree::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::PnoSwScanFree::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("Enter PnoSwScanFree::ExecuteStateMsg.\n");
 
@@ -737,7 +739,7 @@ void ScanStateMachine::PnoSwScanning::GoOutState()
     pScanStateMachine->StopTimer(static_cast<int>(WAIT_SCAN_RESULT_TIMER));
 }
 
-bool ScanStateMachine::PnoSwScanning::ExecuteStateMsg(InternalMessage *msg)
+bool ScanStateMachine::PnoSwScanning::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("Enter PnoSwScanning::ExecuteStateMsg.\n");
     if (msg == nullptr) {
@@ -780,7 +782,7 @@ bool ScanStateMachine::PnoSwScanning::ExecuteStateMsg(InternalMessage *msg)
     }
 }
 
-void ScanStateMachine::CommonScanRequestProcess(InternalMessage *interMessage)
+void ScanStateMachine::CommonScanRequestProcess(InternalMessagePtr interMessage)
 {
     WIFI_LOGI("CommonScanRequestProcess.\n");
 
@@ -802,7 +804,7 @@ void ScanStateMachine::CommonScanRequestProcess(InternalMessage *interMessage)
 }
 
 bool ScanStateMachine::GetCommonScanRequestInfo(
-    InternalMessage *interMessage, int &requestIndex, InterScanConfig &scanConfig)
+    InternalMessagePtr interMessage, int &requestIndex, InterScanConfig &scanConfig)
 {
     WIFI_LOGI("Enter GetRequestMsgInfo.\n");
 
@@ -819,7 +821,7 @@ bool ScanStateMachine::GetCommonScanRequestInfo(
     return true;
 }
 
-bool ScanStateMachine::GetCommonScanConfig(InternalMessage *interMessage, InterScanConfig &scanConfig)
+bool ScanStateMachine::GetCommonScanConfig(InternalMessagePtr interMessage, InterScanConfig &scanConfig)
 {
     WIFI_LOGI("Enter GetCommonScanConfig.\n");
 
@@ -960,7 +962,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiHalScanParam &scanParam)
     return true;
 }
 
-void ScanStateMachine::CommonScanWhenRunning(InternalMessage *interMessage)
+void ScanStateMachine::CommonScanWhenRunning(InternalMessagePtr interMessage)
 {
     WIFI_LOGI("Enter CommonScanWhenRunning.\n");
 
@@ -1139,58 +1141,69 @@ void ScanStateMachine::SetWifiMode(InterScanInfo &scanInfo)
     return;
 }
 
+void ScanStateMachine::ParseSecurityType(InterScanInfo &scanInfo)
+{
+    scanInfo.securityType = WifiSecurity::OPEN;
+    if (scanInfo.capabilities.find("PSK+SAE") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::PSK_SAE;
+        return;
+    }
+    if (scanInfo.capabilities.find("WAPI-PSK") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WAPI_PSK;
+        return;
+    }
+    if (scanInfo.capabilities.find("PSK") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::PSK;
+        return;
+    }
+    if (scanInfo.capabilities.find("WEP") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WEP;
+        return;
+    }
+    if (scanInfo.capabilities.find("EAP-SUITE-B-192") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::EAP_SUITE_B;
+        return;
+    }
+    if (scanInfo.capabilities.find("EAP") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::EAP;
+        return;
+    }
+    if (scanInfo.capabilities.find("SAE") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::SAE;
+        return;
+    }
+    if (scanInfo.capabilities.find("OWE-TRANS-OPEN") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::OPEN;
+        return;
+    }
+    if (scanInfo.capabilities.find("OWE") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::OWE;
+        return;
+    }
+    if (scanInfo.capabilities.find("CERT") != std::string::npos) {
+        scanInfo.securityType = WifiSecurity::WAPI_CERT;
+        return;
+    }
+}
+
 void ScanStateMachine::GetSecurityTypeAndBand(std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter GetSecurityTypeAndBand.\n");
 
-    for (auto iter = scanInfos.begin(); iter != scanInfos.end(); ++iter) {
-        if (iter->frequency < SCAN_24GHZ_MAX_FREQUENCY) {
-            iter->band = SCAN_24GHZ_BAND;
-        } else if (iter->frequency > SCAN_5GHZ_MIN_FREQUENCY) {
-            iter->band = SCAN_5GHZ_BAND;
+    for (auto &scanInfo : scanInfos) {
+        if (scanInfo.frequency < SCAN_24GHZ_MAX_FREQUENCY) {
+            scanInfo.band = SCAN_24GHZ_BAND;
+        } else if (scanInfo.frequency > SCAN_5GHZ_MIN_FREQUENCY) {
+            scanInfo.band = SCAN_5GHZ_BAND;
         } else {
-            WIFI_LOGE("invalid frequency value: %{public}d", iter->frequency);
-            iter->band = 0;
+            WIFI_LOGE("invalid frequency value: %{public}d", scanInfo.frequency);
+            scanInfo.band = 0;
         }
-        SetWifiMode(*iter);
-        iter->securityType = WifiSecurity::OPEN;
-        if (iter->capabilities.find("WAPI-PSK") != std::string::npos) {
-            iter->securityType = WifiSecurity::WAPI_PSK;
-            continue;
-        }
-        if (iter->capabilities.find("PSK") != std::string::npos) {
-            iter->securityType = WifiSecurity::PSK;
-            continue;
-        }
-        if (iter->capabilities.find("WEP") != std::string::npos) {
-            iter->securityType = WifiSecurity::WEP;
-            continue;
-        }
-        if (iter->capabilities.find("EAP-SUITE-B-192") != std::string::npos) {
-            iter->securityType = WifiSecurity::EAP_SUITE_B;
-            continue;
-        }
-        if (iter->capabilities.find("EAP") != std::string::npos) {
-            iter->securityType = WifiSecurity::EAP;
-            continue;
-        }
-        if (iter->capabilities.find("SAE") != std::string::npos) {
-            iter->securityType = WifiSecurity::SAE;
-            continue;
-        }
-        if (iter->capabilities.find("OWE-TRANS-OPEN") != std::string::npos) {
-            iter->securityType = WifiSecurity::OPEN;
-            continue;
-        }
-        if (iter->capabilities.find("OWE") != std::string::npos) {
-            iter->securityType = WifiSecurity::OWE;
-            continue;
-        }
-        if (iter->capabilities.find("CERT") != std::string::npos) {
-            iter->securityType = WifiSecurity::WAPI_CERT;
-            continue;
-        }
+
+        SetWifiMode(scanInfo);
+        ParseSecurityType(scanInfo);
     }
+
     return;
 }
 
@@ -1323,7 +1336,7 @@ void ScanStateMachine::RemoveCommonScanRequest(int requestIndex)
     }
 }
 
-void ScanStateMachine::PnoScanRequestProcess(InternalMessage *interMessage)
+void ScanStateMachine::PnoScanRequestProcess(InternalMessagePtr interMessage)
 {
     WIFI_LOGI("ScanStateMachine::PnoScanRequestProcess.\n");
 
@@ -1356,7 +1369,7 @@ void ScanStateMachine::ContinuePnoScanProcess()
     return;
 }
 
-void ScanStateMachine::PnoScanHardwareProcess(InternalMessage *interMessage)
+void ScanStateMachine::PnoScanHardwareProcess(InternalMessagePtr interMessage)
 {
     WIFI_LOGI("ScanStateMachine::PnoScanHardwareProcess.\n");
     if (runningHwPnoFlag) {
@@ -1430,7 +1443,7 @@ void ScanStateMachine::StopPnoScanHardware()
     runningHwPnoFlag = false;
 }
 
-void ScanStateMachine::UpdatePnoScanRequest(InternalMessage *interMessage)
+void ScanStateMachine::UpdatePnoScanRequest(InternalMessagePtr interMessage)
 {
     WIFI_LOGI("Enter UpdatePnoScanRequest.\n");
 
@@ -1440,7 +1453,7 @@ void ScanStateMachine::UpdatePnoScanRequest(InternalMessage *interMessage)
     }
 }
 
-bool ScanStateMachine::GetPnoScanRequestInfo(InternalMessage *interMessage)
+bool ScanStateMachine::GetPnoScanRequestInfo(InternalMessagePtr interMessage)
 {
     WIFI_LOGI("Enter GetPnoScanRequestInfo.\n");
 
@@ -1473,7 +1486,7 @@ bool ScanStateMachine::GetPnoScanRequestInfo(InternalMessage *interMessage)
     return true;
 }
 
-bool ScanStateMachine::GetPnoScanConfig(InternalMessage *interMessage, PnoScanConfig &pnoScanConfig)
+bool ScanStateMachine::GetPnoScanConfig(InternalMessagePtr interMessage, PnoScanConfig &pnoScanConfig)
 {
     WIFI_LOGI("Enter GetPnoScanConfig.\n");
 
@@ -1693,7 +1706,7 @@ void ScanStateMachine::StopPnoScanSoftware()
     return;
 }
 
-void ScanStateMachine::PnoScanSoftwareProcess(InternalMessage *interMessage)
+void ScanStateMachine::PnoScanSoftwareProcess(InternalMessagePtr interMessage)
 {
     WIFI_LOGI("ScanStateMachine::PnoScanSoftwareProcess.\n");
 
@@ -1834,6 +1847,13 @@ void ScanStateMachine::InitState::UnLoadDriver()
     pScanStateMachine->SwitchState(pScanStateMachine->initState);
     pScanStateMachine->quitFlag = true;
     WIFI_LOGI("Stop Scan Service Success.\n");
+}
+
+void ScanStateMachine::InitState::DisableScan()
+{
+    WIFI_LOGI("Enter DisableScan.\n");
+    pScanStateMachine->SwitchState(pScanStateMachine->initState);
+    WIFI_LOGI("Disable Scan Success.\n");
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -85,7 +85,7 @@ void MultiGateway::GetNextGatewayMac(std::string& mac)
     m_currentIdx++;
 }
 
-int32_t MultiGateway::SetStaticArp(std::string iface, std::string ipAddr, std::string macAddr)
+int32_t MultiGateway::SetStaticArp(const std::string& iface, const std::string& ipAddr, const std::string& macAddr)
 {
     WIFI_LOGI("SetStaticArp enter");
     struct arpreq req;
@@ -113,7 +113,7 @@ int32_t MultiGateway::SetStaticArp(std::string iface, std::string ipAddr, std::s
     return DoArpItem(SIOCSARP, &req);
 }
 
-int32_t MultiGateway::DelStaticArp(std::string iface, std::string ipAddr)
+int32_t MultiGateway::DelStaticArp(const std::string& iface, const std::string& ipAddr)
 {
     WIFI_LOGI("DelStaticArp enter");
     struct arpreq req;

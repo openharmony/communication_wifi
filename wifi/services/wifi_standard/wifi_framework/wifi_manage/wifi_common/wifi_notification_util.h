@@ -47,7 +47,8 @@ enum WifiNotificationOpetationType {
 
 enum WifiDialogType {
     CDD = 0,
-    THREE_VAP = 1
+    THREE_VAP = 1,
+    CANDIDATE_CONNECT = 2
 };
 
 class WifiNotificationUtil {

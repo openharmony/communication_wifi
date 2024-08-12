@@ -19,7 +19,6 @@
 #include <sys/time.h>
 #include "mock_sta_service.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_sta_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -44,7 +43,7 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp() override
     {
-        pStaInterface.reset(new StaInterface);
+        pStaInterface.reset(new StaInterface(0));
         pStaInterface->pStaService = new MockWifiStaService();
         pMockStaService = (MockWifiStaService *)pStaInterface->pStaService;
     }

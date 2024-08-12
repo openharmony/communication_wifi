@@ -40,7 +40,7 @@ public:
         ~DisableState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         WifiControllerMachine *pWifiControllerMachine;
@@ -52,19 +52,19 @@ public:
         ~EnableState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void HandleStaStartFailure(int id);
-        void HandleStaRemoved(InternalMessage *msg);
+        void HandleStaRemoved(InternalMessagePtr msg);
         void HandleAPServiceStartFail(int id);
-        void HandleConcreteClientRemoved(InternalMessage *msg);
+        void HandleConcreteClientRemoved(InternalMessagePtr msg);
         
     private:
         void HandleApStart(int id);
-        void HandleWifiToggleChangeInEnabledState(InternalMessage *msg);
+        void HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg);
 #ifdef FEATURE_AP_SUPPORT
-        void HandleSoftapToggleChangeInEnabledState(InternalMessage *msg);
-        void HandleApRemoved(InternalMessage *msg);
-        void HandleApStop(InternalMessage *msg);
+        void HandleSoftapToggleChangeInEnabledState(InternalMessagePtr msg);
+        void HandleApRemoved(InternalMessagePtr msg);
+        void HandleApStop(InternalMessagePtr msg);
 #endif
         WifiControllerMachine *pWifiControllerMachine;
     };
@@ -75,7 +75,7 @@ public:
         ~DefaultState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         WifiControllerMachine *pWifiControllerMachine;

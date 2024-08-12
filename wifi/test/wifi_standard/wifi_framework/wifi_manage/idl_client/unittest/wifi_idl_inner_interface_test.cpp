@@ -69,7 +69,7 @@ static void OnWpaConnectionFullMock(int status)
     LOGI("OnWpaConnectionFullMock");
 }
 
-static void OnWpaConnectionRejectMock(int status, const std::string &bssid)
+static void OnWpaConnectionRejectMock(int status)
 {
     LOGI("OnWpaConnectionRejectMock");
 }

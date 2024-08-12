@@ -78,7 +78,7 @@ void ScanInterfaceFuzzTest(const uint8_t* data, size_t size)
     wifiScanParams.band = static_cast<ScanBandType>(static_cast<int>(data[0]) % SIZE);
     wifiScanParams.freqs.push_back(period);
     pScanInterface->Scan(state);
-    pScanInterface->ScanWithParam(wifiScanParams);
+    pScanInterface->ScanWithParam(wifiScanParams, false);
     pScanInterface->DisableScan(state);
     pScanInterface->OnScreenStateChanged(period);
     pScanInterface->OnStandbyStateChanged(state);
@@ -89,7 +89,7 @@ void ScanInterfaceFuzzTest(const uint8_t* data, size_t size)
     pScanInterface->OnControlStrategyChanged();
     ScanInnerEventType innerEvent = static_cast<ScanInnerEventType>(static_cast<int>(data[0]) % THREE + 200);
     pScanService->HandleInnerEventReport(innerEvent);
-    pScanService->ScanWithParam(wifiScanParams);
+    pScanService->ScanWithParam(wifiScanParams, false);
     pScanService->StartWifiPnoScan(state, period, interval);
     pScanService->StopPnoScan();
     pScanInterface->StartWifiPnoScan(state, period, interval);
@@ -123,7 +123,7 @@ void GetBandFreqsFuzzTest(const uint8_t* data, size_t size)
 
 void AddScanMessageBodyFuzzTest(const uint8_t* data, size_t size)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     int index = 0;
     InterScanConfig interConfig;
     interConfig.scanFreqs.push_back(static_cast<int>(data[0]));
@@ -132,12 +132,12 @@ void AddScanMessageBodyFuzzTest(const uint8_t* data, size_t size)
     interConfig.bssidsNumPerScan = static_cast<int>(data[index++]);
     interConfig.maxScansCache = static_cast<int>(data[index++]);
     interConfig.fullScanFlag = (static_cast<int>(data[0]) % TWO) ? true : false;
-    pScanService->AddScanMessageBody(&msg, interConfig);
+    pScanService->AddScanMessageBody(msg, interConfig);
 }
 
 void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
 {
-    InternalMessage msg;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     int index = 0;
     InterScanConfig interConfig;
     interConfig.scanFreqs.push_back(static_cast<int>(data[0]));
@@ -241,7 +241,7 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     pScanService->HandleDisconnectedScanTimeout();
     pScanService->EndPnoScan();
     pScanService->HandlePnoScanInfo(infoList);
-    pScanService->AddPnoScanMessageBody(&msg, pnoScanConfig);
+    pScanService->AddPnoScanMessageBody(msg, pnoScanConfig);
     pScanService->PnoScan(pnoScanConfig, interConfig);
     pScanService->ReportScanStartEvent();
     pScanService->ReportStoreScanInfos(infoList);

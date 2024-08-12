@@ -277,7 +277,8 @@ bool WifiP2pImpl::IsFeatureSupported(long feature)
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
         return false;
     }
-    return ((tmpFeatures & feature) == feature);
+    return ((static_cast<unsigned long>(tmpFeatures) & static_cast<unsigned long>(feature)) ==
+        static_cast<unsigned long>(feature));
 }
 
 ErrCode WifiP2pImpl::SetP2pDeviceName(const std::string &deviceName)
@@ -410,6 +411,13 @@ ErrCode WifiP2pImpl::CheckCanUseP2p()
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiP2pProxy());
     return client_->CheckCanUseP2p();
+}
+
+ErrCode WifiP2pImpl::Hid2dIsWideBandwidthSupported(bool &isSupport)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->Hid2dIsWideBandwidthSupported(isSupport);
 }
 }  // namespace Wifi
 }  // namespace OHOS

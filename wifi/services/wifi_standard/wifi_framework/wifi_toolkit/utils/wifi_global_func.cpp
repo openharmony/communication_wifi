@@ -48,6 +48,12 @@ constexpr int PROP_FACTORY_RUN_MODE_LEN = 10;
 constexpr int FACTORY_MODE_LEN = 7;
 constexpr const char* FACTORY_RUN_MODE = "const.runmode";
 constexpr const char* FACTORY_MODE = "factory";
+constexpr int PROP_STARTUP_WIFI_ENABLE_LEN = 16;
+constexpr const char* FACTORY_MODE_DEFAULT = "0";
+constexpr int STARTUP_WIFI_ENABLE_LEN = 4;
+constexpr const char* PROP_STARTUP_WIFI_ENABLE = "const.wifi.startup_wifi_enable";
+constexpr const char* DEFAULT_STARTUP_WIFI_ENABLE = "false";
+constexpr const char* STARTUP_WIFI_ENABLE = "true";
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
@@ -284,14 +290,15 @@ int HexStringToVec(const std::string &str, std::vector<char> &vec)
         return -1;
     }
     const int hexShiftNum = 4;
-    for (unsigned i = 0; i + 1 < len; ++i) {
-        int8_t high = IsValidHexCharAndConvert(str[i]);
-        int8_t low = IsValidHexCharAndConvert(str[++i]);
+    for (unsigned i = 0; i + 1 < len;) {
+        uint8_t high = static_cast<uint8_t>(IsValidHexCharAndConvert(str[i]));
+        uint8_t low = static_cast<uint8_t>(IsValidHexCharAndConvert(str[i + 1]));
         if (high < 0 || low < 0) {
             return -1;
         }
         char tmp = ((high << hexShiftNum) | (low & 0x0F));
         vec.push_back(tmp);
+        i += 2; //2:拼接char类型的高四位和第四位
     }
     return 0;
 }
@@ -429,13 +436,13 @@ bool IsValidCountryCode(const std::string &wifiCountryCode)
 
 bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
 {
-    int left = 0;
-    int right = std::size(MCC_TABLE) - 1;
+    unsigned int left = 0;
+    unsigned int right = static_cast<size_t>(std::size(MCC_TABLE) - 1);
     if (MCC_TABLE[left].mnc > mnc || MCC_TABLE[right].mnc < mnc) {
         return false;
     }
     while (left < right) {
-        int mid = (left + right) >> 1;
+        unsigned int mid = static_cast<size_t>(left + right) >> 1;
         if (MCC_TABLE[mid].mnc < mnc) {
             left = mid + 1;
         } else if (MCC_TABLE[mid].mnc > mnc) {
@@ -540,9 +547,24 @@ bool IsPskEncryption(const std::string &keyMgmt)
 bool IsFactoryMode()
 {
     char preValue[PROP_FACTORY_RUN_MODE_LEN] = {0};
-    int errCode = GetParamValue(FACTORY_RUN_MODE, 0, preValue, PROP_FACTORY_RUN_MODE_LEN);
+    int errCode = GetParamValue(FACTORY_RUN_MODE, FACTORY_MODE_DEFAULT, preValue, PROP_FACTORY_RUN_MODE_LEN);
     if (errCode > 0) {
         if (strncmp(preValue, FACTORY_MODE, FACTORY_MODE_LEN) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsStartUpWifiEnableSupport()
+{
+    LOGI("Enter IsStartUpWifiEnableSupport");
+    char preValue[PROP_STARTUP_WIFI_ENABLE_LEN] = {0};
+    int errCode = GetParamValue(PROP_STARTUP_WIFI_ENABLE, DEFAULT_STARTUP_WIFI_ENABLE,
+        preValue, PROP_STARTUP_WIFI_ENABLE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, STARTUP_WIFI_ENABLE, STARTUP_WIFI_ENABLE_LEN) == 0) {
+            LOGI("param startup_wifi_enable is true.");
             return true;
         }
     }

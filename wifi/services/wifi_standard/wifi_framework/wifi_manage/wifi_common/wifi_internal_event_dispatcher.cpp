@@ -31,9 +31,6 @@ DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
 namespace OHOS {
 namespace Wifi {
-#ifdef DTFUZZ_TEST
-static WifiInternalEventDispatcher* gWifiEventBroadcast = nullptr;
-#endif
 std::set<std::int32_t> g_CallbackEventChkSysAppList = {
     WIFI_CBK_MSG_HOTSPOT_STATE_JOIN,
     WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE,
@@ -109,15 +106,8 @@ CallbackEventPermissionMap g_CallbackEventPermissionMap = {
 
 WifiInternalEventDispatcher &WifiInternalEventDispatcher::GetInstance()
 {
-#ifndef DTFUZZ_TEST
     static WifiInternalEventDispatcher gWifiEventBroadcast;
     return gWifiEventBroadcast;
-#else
-    if (gWifiEventBroadcast == nullptr) {
-        gWifiEventBroadcast = new (std::nothrow) WifiInternalEventDispatcher();
-    }
-    return *gWifiEventBroadcast;
-#endif
 }
 
 WifiInternalEventDispatcher::WifiInternalEventDispatcher()
@@ -536,6 +526,9 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance, con
 int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddBroadCastMsg, msgcode %{public}d", msg.msgCode);
+    if (!mBroadcastThread) {
+        return 0;
+    }
     std::function<void()> func = std::bind([this, msg]() {
         Run(std::ref(*this), msg);
     });
@@ -660,7 +653,7 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
                 %{public}d", uid, pid, isFrozen);
 #endif
             if (mScanCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
-                WIFI_LOGI("Not registered callback event! msg.msgCode: %{public}d,"
+                WIFI_LOGD("Not registered callback event! msg.msgCode: %{public}d,"
                     "instId: %{public}d", msg.msgCode, msg.id);
                 continue;
             }
@@ -886,7 +879,8 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 if ((pid != 0) && (uid != 0)) {
                     std::vector<WifiP2pDevice> deviceVec = msg.device;
-                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) ==
+                        PERMISSION_DENIED) {
                         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
                             __func__, pid, uid);
                         updateP2pDeviceMacAddress(deviceVec);

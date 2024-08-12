@@ -106,7 +106,7 @@ NO_SANITIZE("cfi") WifiErrorCode GetScanInfoList(WifiScanInfo *result, unsigned 
         result->timestamp = vecScanInfos[i].timestamp;
         ++result;
     }
-    *size = (vecSize < WIFI_SCAN_HOTSPOT_LIMIT) ? vecSize : WIFI_SCAN_HOTSPOT_LIMIT;
+    *size = static_cast<size_t>((vecSize < WIFI_SCAN_HOTSPOT_LIMIT) ? vecSize : WIFI_SCAN_HOTSPOT_LIMIT);
     return GetCErrorCode(ret);
 }
 
@@ -441,6 +441,14 @@ static OHOS::Wifi::ErrCode GetIpV6InfoFromCpp(const OHOS::Wifi::IpV6Info& ipInfo
     }
     if (memcpy_s(result->randGlobalIpV6Address, DEVICE_IPV6_MAX_LEN, ipInfo.randGlobalIpV6Address.c_str(),
         ipInfo.randGlobalIpV6Address.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->uniqueIpv6Address, DEVICE_IPV6_MAX_LEN, ipInfo.uniqueLocalAddress1.c_str(),
+        ipInfo.uniqueLocalAddress1.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(result->randUniqueIpv6Address, DEVICE_IPV6_MAX_LEN, ipInfo.uniqueLocalAddress2.c_str(),
+        ipInfo.uniqueLocalAddress2.size() + 1) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
     if (memcpy_s(result->gateway, DEVICE_IPV6_MAX_LEN, ipInfo.gateway.c_str(),

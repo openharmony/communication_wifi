@@ -41,6 +41,7 @@ local_base_sources = [
 local_base_include_dirs = [
   "$WIFI_ROOT_DIR/base/state_machine/include",
   "$WIFI_ROOT_DIR/base/cRPC/include",
+  "$WIFI_ROOT_DIR/base/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
@@ -82,7 +83,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
@@ -141,7 +142,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
@@ -181,6 +182,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_core",
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
+      "netmanager_base:net_stats_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",

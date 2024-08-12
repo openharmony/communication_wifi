@@ -36,6 +36,7 @@
         "*IsPskEncryption*";
         "*IsExistAddressForInterface*";
         "*IsFreqDbac*";
+        "*IsStartUpWifiEnableSupport*";
         "*IsValid24GChannel*";
         "*IsValid24GHz*";
         "*IsValid5GChannel*";

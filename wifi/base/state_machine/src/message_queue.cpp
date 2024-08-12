@@ -34,17 +34,17 @@ MessageQueue::~MessageQueue()
     LOGI("~MessageQueue");
     /* Releasing Messages in a Queue */
     std::unique_lock<std::mutex> lock(mMtxQueue);
-    InternalMessage *current = pMessageQueue;
-    InternalMessage *next = nullptr;
+    InternalMessagePtr current = pMessageQueue;
+    InternalMessagePtr next = nullptr;
     while (current != nullptr) {
         next = current->GetNextMsg();
-        delete current;
+        current = nullptr;
         current = next;
     }
     return;
 }
 
-bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTime)
+bool MessageQueue::AddMessageToQueue(InternalMessagePtr message, int64_t handleTime)
 {
     if (message == nullptr) {
         LOGE("message is null.");
@@ -70,7 +70,7 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
      */
     {
         std::unique_lock<std::mutex> lck(mMtxQueue);
-        InternalMessage *pTop = pMessageQueue;
+        InternalMessagePtr pTop = pMessageQueue;
         if (pTop == nullptr || handleTime == 0 || handleTime <= pTop->GetHandleTime()) {
             LOGD("Add the message in the head of queue.");
             message->SetNextMsg(pTop);
@@ -78,8 +78,8 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
             mNeedWakeup = mIsBlocked;
         } else {
             LOGD("Insert the message in the middle of the queue.");
-            InternalMessage *pPrev = nullptr;
-            InternalMessage *pCurrent = pTop;
+            InternalMessagePtr pPrev = nullptr;
+            InternalMessagePtr pCurrent = pTop;
             /* Inserts messages in the middle of the queue based on the execution time. */
             while (pCurrent != nullptr) {
                 pPrev = pCurrent;
@@ -105,17 +105,17 @@ bool MessageQueue::AddMessageToQueue(InternalMessage *message, int64_t handleTim
 bool MessageQueue::DeleteMessageFromQueue(int messageName)
 {
     std::unique_lock<std::mutex> lck(mMtxQueue);
-    InternalMessage *pTop = pMessageQueue;
+    InternalMessagePtr pTop = pMessageQueue;
     if (pTop == nullptr) {
         return true;
     }
 
-    InternalMessage *pCurrent = pTop;
+    InternalMessagePtr pCurrent = pTop;
     while (pCurrent != nullptr) {
-        InternalMessage *pPrev = pCurrent;
+        InternalMessagePtr pPrev = pCurrent;
         pCurrent = pCurrent->GetNextMsg();
         if ((pCurrent != nullptr) && (pCurrent->GetMessageName() == messageName)) {
-            InternalMessage *pNextMsg = pCurrent->GetNextMsg();
+            InternalMessagePtr pNextMsg = pCurrent->GetNextMsg();
             pPrev->SetNextMsg(pNextMsg);
             MessageManage::GetInstance().ReclaimMsg(pCurrent);
             pCurrent = pNextMsg;
@@ -129,7 +129,7 @@ bool MessageQueue::DeleteMessageFromQueue(int messageName)
     return true;
 }
 
-InternalMessage *MessageQueue::GetNextMessage()
+InternalMessagePtr MessageQueue::GetNextMessage()
 {
     LOGD("GetNextMessage");
     int nextBlockTime = 0;
@@ -146,7 +146,7 @@ InternalMessage *MessageQueue::GetNextMessage()
             curTime.tv_nsec / (TIME_USEC_1000 * TIME_USEC_1000);
         {
             std::unique_lock<std::mutex> lck(mMtxQueue); // Data queue lock
-            InternalMessage *curMsg = pMessageQueue;
+            InternalMessagePtr curMsg = pMessageQueue;
             mIsBlocked = true;
             if (curMsg != nullptr) {
                 LOGD("Message queue is not empty.");

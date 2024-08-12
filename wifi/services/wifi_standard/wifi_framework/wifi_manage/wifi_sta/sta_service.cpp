@@ -21,6 +21,7 @@
 #include "wifi_country_code_manager.h"
 #include "core_service_client.h"
 #include "cellular_data_client.h"
+#include "wifi_notification_util.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
@@ -143,10 +144,36 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
     std::vector<StaServiceCallback> appAccelerationStaCallBacks;
     appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
     RegisterStaServiceCallback(appAccelerationStaCallBacks);
+    GetStaControlInfo();
 #endif
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaService::GetStaControlInfo()
+{
+    WIFI_LOGI("Enter GetStaControlInfo.");
+    std::map<std::string, std::vector<std::string>> filterMap;
+    if (WifiSettings::GetInstance().GetPackageFilterMap(filterMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetPackageFilterMap failed");
+    }
+    sta_candidate_trust_list = filterMap["sta_candidate_filter"];
+    return;
+}
+
+bool StaService::IsAppInCandidateFilterList(int uid) const
+{
+    std::string packageName;
+    GetBundleNameByUid(uid, packageName);
+    if (std::find(sta_candidate_trust_list.begin(), sta_candidate_trust_list.end(), packageName)
+        != sta_candidate_trust_list.end()) {
+        WIFI_LOGI("App is in Candidate filter list.");
+        return true;
+    }
+    return false;
+}
+#endif
 
 ErrCode StaService::EnableStaService()
 {
@@ -191,21 +218,26 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         return WIFI_OPT_FAILED;
     }
 
-    if (config.keyMgmt == KEY_MGMT_NONE || config.keyMgmt == KEY_MGMT_WEP) {
+    if (config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
         const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
         if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
-            LOGE("AddCandidateConfig unsupport open or wep key!");
+            LOGE("AddCandidateConfig unsupport wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
         }
 #else
-        LOGE("AddCandidateConfig unsupport open or wep key!");
+        LOGE("AddCandidateConfig unsupport wep key!");
         return WIFI_OPT_NOT_SUPPORTED;
 #endif
     }
     WifiDeviceConfig tempDeviceConfig = config;
     tempDeviceConfig.uid = uid;
+#ifndef OHOS_ARCH_LITE
+    if (IsAppInCandidateFilterList(uid)) {
+        tempDeviceConfig.isShared = true;
+    }
+#endif
     netWorkId = AddDeviceConfig(tempDeviceConfig);
     return (netWorkId == INVALID_NETWORK_ID) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
 }
@@ -245,10 +277,13 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
         return WIFI_OPT_FAILED;
     }
 
-    if (config.keyMgmt == KEY_MGMT_NONE) {
-        LOGE("ConnectToCandidateConfig unsupport open or wep key!");
-        return WIFI_OPT_NOT_SUPPORTED;
+#ifndef OHOS_ARCH_LITE
+    if (config.lastConnectTime <= 0) {
+        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
+        return WIFI_OPT_SUCCESS;
     }
+#endif
 
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
@@ -262,16 +297,20 @@ std::string StaService::ConvertString(const std::u16string &wideText) const
 }
 
 #ifndef OHOS_ARCH_LITE
-int32_t StaService::GetDataSlotId() const
+int32_t StaService::GetDataSlotId(int32_t slotId) const
 {
-    auto slotId = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
     int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
-    if ((slotId < 0) || (slotId >= simCount)) {
-        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotId, simCount);
+    if (slotId >= 0 && slotId < simCount) {
+        LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
+        return slotId;
+    }
+    auto slotDefaultID = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if ((slotDefaultID < 0) || (slotDefaultID >= simCount)) {
+        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotDefaultID, simCount);
         return -1;
     }
-    LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
-    return slotId;
+    LOGI("slotDefaultID: %{public}d, simCount:%{public}d", slotDefaultID, simCount);
+    return slotDefaultID;
 }
 
 std::string StaService::GetImsi(int32_t slotId) const
@@ -323,7 +362,7 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
         return;
     }
 
-    int32_t slotId = GetDataSlotId();
+    int32_t slotId = GetDataSlotId(config.wifiEapConfig.eapSubId);
     if (slotId == -1) {
         return;
     }
@@ -622,7 +661,7 @@ ErrCode StaService::StartWps(const WpsConfig &config) const
 {
     WIFI_LOGI("Enter StartWps.\n");
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     msg->SetMessageName(WIFI_SVR_CMD_STA_STARTWPS);
     msg->SetParam1(static_cast<int>(config.setup));
     msg->AddStringMessageBody(config.pin);
@@ -727,21 +766,15 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 
 int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const
 {
-    if (WifiSettings::GetInstance().GetDeviceConfig(config.ancoCallProcessName, config.ssid, config.keyMgmt,
-        outConfig) == 0 && (!config.ancoCallProcessName.empty())) {
-        LOGI("The anco same network name already exists in setting! networkId:%{public}d,ssid:%{public}s,"
-            "ancoCallProcessName:%{public}s.", outConfig.networkId, SsidAnonymize(outConfig.ssid).c_str(),
-            outConfig.ancoCallProcessName.c_str());
-    } else if (WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt,
-        outConfig) == 0) {
-        LOGI("The same network name already exists in setting! networkId:%{public}d,ssid:%{public}s"
-            "ancoCallProcessName:%{public}s,OancoCallProcessName%{public}s", outConfig.networkId,
-            SsidAnonymize(outConfig.ssid).c_str(),
-            config.ancoCallProcessName.c_str(), outConfig.ancoCallProcessName.c_str());
+    int ret = -1;
+    if (config.uid > WIFI_INVALID_UID) {
+        ret = WifiSettings::GetInstance().GetCandidateConfig(config.uid, config.ssid, config.keyMgmt, outConfig);
     } else {
-        return WIFI_OPT_FAILED;
+        ret = WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, outConfig);
     }
-    return WIFI_OPT_SUCCESS;
+    LOGI("FindDeviceConfig uid:%{public}d, ssid:%{public}s, ret:%{public}d.", config.uid,
+        SsidAnonymize(outConfig.ssid).c_str(), ret);
+    return (ret < 0) ? WIFI_OPT_FAILED : WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
@@ -764,7 +797,7 @@ ErrCode StaService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(cons
         return WIFI_OPT_SUCCESS;
     }
     WIFI_LOGI("deal wifi country code changed, code=%{public}s", wifiCountryCode.c_str());
-    InternalMessage *msg = m_stateMachineObj.CreateMessage();
+    InternalMessagePtr msg = m_stateMachineObj.CreateMessage();
     CHECK_NULL_AND_RETURN(msg, WIFI_OPT_FAILED);
     msg->SetMessageName(static_cast<int>(WIFI_SVR_CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(wifiCountryCode);
@@ -869,7 +902,7 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
 ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd)
 {
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    InternalMessage *msg = pStaStateMachine->CreateMessage();
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     msg->SetMessageName(WIFI_SVR_COM_STA_ENABLE_HILINK);
     msg->SetParam1(config.bssidType);
     msg->AddStringMessageBody(config.ssid);

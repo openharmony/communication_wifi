@@ -39,17 +39,19 @@ private:
     static constexpr int HID2D_IPPOOL_END = 75;
 };
 
-const int SHARED_LINKE_COUNT_ON_DISCONNECTED = 0;
-const int SHARED_LINKE_COUNT_ON_CONNECTED = 1;
 class SharedLinkManager {
 public:
+    static void SetGroupUid(int callingUid);
+    static void GetGroupUid(int &callingUid);
+    static void IncreaseSharedLink();
     static void IncreaseSharedLink(int callingUid);
     static void DecreaseSharedLink(int callingUid);
-    static void SetSharedLinkCount(int count);
+    static void ClearSharedLinkCount();
     static int GetSharedLinkCount();
 
 private:
     static std::map<int, int> sharedLinkCountMap;
+    static int firstGroupUid;
 };
 }  // namespace Wifi
 }  // namespace OHOS

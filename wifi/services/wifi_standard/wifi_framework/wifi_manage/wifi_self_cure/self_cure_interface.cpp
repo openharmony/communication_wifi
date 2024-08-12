@@ -73,6 +73,7 @@ ErrCode SelfCureInterface::InitCallback()
     mStaCallback.callbackModuleName = "SelfCureService";
     mStaCallback.OnStaConnChanged = std::bind(&SelfCureInterface::DealStaConnChanged, this, _1, _2, _3);
     mStaCallback.OnStaRssiLevelChanged = std::bind(&SelfCureInterface::DealRssiLevelChanged, this, _1, _2);
+    mStaCallback.OnDhcpOfferReport = std::bind(&SelfCureInterface::DealDhcpOfferReport, this, _1, _2);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -94,15 +95,14 @@ ErrCode SelfCureInterface::NotifyInternetFailureDetected(int forceNoHttpCheck)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode SelfCureInterface::IsSelfCureOnGoing()
+bool SelfCureInterface::IsSelfCureOnGoing()
 {
     std::lock_guard<std::mutex> lock(mutex);
     if (pSelfCureService == nullptr) {
         WIFI_LOGI("pSelfCureService is null");
-        return WIFI_OPT_FAILED;
+        return false;
     }
-    pSelfCureService->IsSelfCureOnGoing();
-    return WIFI_OPT_SUCCESS;
+    return pSelfCureService->IsSelfCureOnGoing();
 }
 
 void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
@@ -113,6 +113,16 @@ void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLink
         return;
     }
     pSelfCureService->HandleStaConnChanged(state, info);
+}
+
+void SelfCureInterface::DealDhcpOfferReport(const IpInfo &ipInfo, int instId)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return;
+    }
+    pSelfCureService->HandleDhcpOfferReport(ipInfo);
 }
 
 void SelfCureInterface::DealStaOpened(int instId)

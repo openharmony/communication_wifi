@@ -107,7 +107,6 @@ int WifiHotspotCallbackStub::RemoteOnHotspotStaLeave(uint32_t code, MessageParce
 
 void WifiHotspotCallbackStub::RegisterCallBack(const sptr<IWifiHotspotCallback> &callBack)
 {
-    std::unique_lock<std::mutex> lock(callBackEventMutex);
     if (callBack == nullptr) {
         WIFI_LOGD("RegisterCallBack:callBack is nullptr!");
         return;

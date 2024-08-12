@@ -521,7 +521,7 @@ enum class DisabledReason {
     DISABLED_BY_WRONG_PASSWORD = 8,
     DISABLED_AUTHENTICATION_NO_SUBSCRIPTION = 9,
     DISABLED_AUTHENTICATION_PRIVATE_EAP_ERROR = 10,
-    DISABLED_NETWORK_NOT_FOUND = 1,
+    DISABLED_NETWORK_NOT_FOUND = 11,
     DISABLED_CONSECUTIVE_FAILURES = 12,
     DISABLED_BY_SYSTEM = 13,
     DISABLED_EAP_AKA_FAILURE = 14,
@@ -560,6 +560,30 @@ public:
 
     ~WifiWapiConfig()
     {}
+};
+
+/* DHCP info */
+struct IpInfo {
+    unsigned int ipAddress;     /* ip address */
+    unsigned int gateway;       /* gate */
+    unsigned int netmask;       /* mask */
+    unsigned int primaryDns;          /* main dns */
+    unsigned int secondDns;          /* backup dns */
+    unsigned int serverIp; /* DHCP server's address */
+    unsigned int leaseDuration;
+    std::vector<unsigned int> dnsAddr;
+
+    IpInfo()
+    {
+        ipAddress = 0;
+        gateway = 0;
+        netmask = 0;
+        primaryDns = 0;
+        secondDns = 0;
+        serverIp = 0;
+        leaseDuration = 0;
+        dnsAddr.clear();
+    }
 };
 
 /* Network configuration information */
@@ -635,6 +659,8 @@ struct WifiDeviceConfig {
     int version;
     bool randomizedMacSuccessEver;
     WifiWapiConfig wifiWapiConfig;
+    IpInfo lastDhcpResult;
+    bool isShared;
 
     WifiDeviceConfig()
     {
@@ -669,6 +695,7 @@ struct WifiDeviceConfig {
         isReassocSelfCureWithFactoryMacAddress = 0;
         version = -1;
         randomizedMacSuccessEver = false;
+        isShared = false;
     }
 };
 
@@ -727,30 +754,6 @@ enum class WifiProtectMode {
     WIFI_PROTECT_NO_HELD = 4
 };
 
-/* DHCP info */
-struct IpInfo {
-    unsigned int ipAddress;     /* ip address */
-    unsigned int gateway;       /* gate */
-    unsigned int netmask;       /* mask */
-    unsigned int primaryDns;          /* main dns */
-    unsigned int secondDns;          /* backup dns */
-    unsigned int serverIp; /* DHCP server's address */
-    unsigned int leaseDuration;
-    std::vector<unsigned int> dnsAddr;
-
-    IpInfo()
-    {
-        ipAddress = 0;
-        gateway = 0;
-        netmask = 0;
-        primaryDns = 0;
-        secondDns = 0;
-        serverIp = 0;
-        leaseDuration = 0;
-        dnsAddr.clear();
-    }
-};
-
 /* DHCP IpV6Info */
 struct IpV6Info {
     std::string linkIpV6Address;
@@ -806,6 +809,7 @@ struct EapSimUmtsAuthParam {
         autn = "";
     }
 };
+
 typedef enum {
     BG_LIMIT_CONTROL_ID_GAME = 1,
     BG_LIMIT_CONTROL_ID_STREAM,
@@ -841,6 +845,24 @@ typedef struct {
     std::string powerParam;
     int powerParamLen;
 } WifiLowPowerParam;
+
+enum class OperationCmd {
+    DHCP_OFFER_ADD,
+    DHCP_OFFER_SIZE_GET,
+    DHCP_OFFER_CLEAR,
+};
+
+enum class WifiSelfcureType {
+    DNS_ABNORMAL,
+    TCP_RX_ABNORMAL,
+    ROAMING_ABNORMAL,
+    GATEWAY_ABNORMAL,
+    DNS_SELFCURE_SUCC,
+    STATIC_IP_SELFCURE_SUCC,
+    REASSOC_SELFCURE_SUCC,
+    RESET_SELFCURE_SUCC,
+    REDHCP_SELFCURE_SUCC,
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

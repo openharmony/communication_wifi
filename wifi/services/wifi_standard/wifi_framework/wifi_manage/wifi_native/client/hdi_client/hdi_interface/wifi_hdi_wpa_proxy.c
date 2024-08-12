@@ -27,7 +27,7 @@
 #include "devmgr_hdi.h"
 #include "hdf_remote_service.h"
 #include "osal_mem.h"
-
+#include "wifi_native_define.h"
 #ifndef UT_TEST
 #include "wifi_log.h"
 #else
@@ -83,7 +83,6 @@ static char g_apCfgName[CFGNAME_LEN] = {0};
 static int g_id;
 static int g_execDisable;
 static bool g_apIsRunning = false;
-
 struct IfaceNameInfo {
     char ifName[BUFF_SIZE];
     struct IfaceNameInfo* next;
@@ -195,6 +194,14 @@ static void HdiWpaResetGlobalObj()
     HdiWpaStart();
 }
 
+static void (*mNativeProcessCallback)(int) = NULL;
+WifiErrorNo SetNativeProcessCallback(void (*callback)(int))
+{
+    LOGI("%{public}s enter", __func__);
+    mNativeProcessCallback = callback;
+    return WIFI_HAL_OPT_OK;
+}
+
 static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
 {
     LOGI("%{public}s enter", __func__);
@@ -212,6 +219,9 @@ static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRem
     }
     OsalMemFree(recipient);
     recipient = NULL;
+    if (mNativeProcessCallback != NULL) {
+        mNativeProcessCallback(WPA_DEATH);
+    }
     HdiWpaResetGlobalObj();
 }
 
@@ -256,8 +266,10 @@ WifiErrorNo HdiWpaStart()
         LOGE("%{public}s HDIDeviceManagerGet failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
-
-    if (g_devMgr->LoadDevice(g_devMgr, HDI_WPA_SERVICE_NAME) != HDF_SUCCESS) {
+    HDF_STATUS retDevice = g_devMgr->LoadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
+    if (retDevice == HDF_ERR_DEVICE_BUSY) {
+        LOGE("%{public}s LoadDevice busy: %{public}d", __func__, retDevice);
+    } else if (retDevice != HDF_SUCCESS) {
         g_devMgr = NULL;
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s LoadDevice failed", __func__);
@@ -377,7 +389,7 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
     if (g_wpaObj == NULL || g_wpaStartSucceed == 0) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or wpa hdi already stopped", __func__);
-        return WIFI_HAL_OPT_FAILED;
+        return WIFI_HAL_OPT_OK;
     }
     
     LOGI("HdiRemoveWpaIface ifName:%{public}s", ifName);
@@ -571,6 +583,9 @@ static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfR
     }
     OsalMemFree(recipient);
     recipient = NULL;
+    if (mNativeProcessCallback != NULL) {
+        mNativeProcessCallback(AP_DEATH);
+    }
     HdiApResetGlobalObj();
 }
 
@@ -605,8 +620,10 @@ static WifiErrorNo GetApInstance()
         LOGE("%{public}s HDIDeviceManagerGet failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
-
-    if (g_apDevMgr->LoadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME) != HDF_SUCCESS) {
+    HDF_STATUS retDevice = g_apDevMgr->LoadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME) ;
+    if (retDevice == HDF_ERR_DEVICE_BUSY) {
+        LOGE("%{public}s LoadDevice busy: %{public}d", __func__, retDevice);
+    } else if (retDevice != HDF_SUCCESS) {
         g_apDevMgr = NULL;
         LOGE("%{public}s LoadDevice failed", __func__);
         return WIFI_HAL_OPT_FAILED;
@@ -656,12 +673,12 @@ WifiErrorNo HdiApStart(int id, const char *ifaceName)
         }
         result = CopyConfigFile(WIFI_2G_CFG);
 #else
-        result = CopyConfigFile(g_apCfgName);
+        result = CopyConfigFile(WIFI_DEFAULT_CFG);
 #endif
         if (result != WIFI_HAL_OPT_OK) {
             break;
         }
-            result = GetApInstance();
+        result = GetApInstance();
         if (result != WIFI_HAL_OPT_OK) {
             break;
         }
@@ -687,8 +704,9 @@ WifiErrorNo HdiApStop(int id)
 
     int32_t ret;
     if (g_apObj == NULL) {
-        LOGE("%{public}s, g_apObj is NULL", __func__);
-        return WIFI_HAL_OPT_FAILED;
+        LOGI("%{public}s, g_apObj is NULL", __func__);
+        pthread_mutex_unlock(&g_apObjMutex);
+        return WIFI_HAL_OPT_OK;
     }
     ret = g_apObj->DisableAp(g_apObj, g_apIfaceName, id);
     ret = g_apObj->StopAp(g_apObj);

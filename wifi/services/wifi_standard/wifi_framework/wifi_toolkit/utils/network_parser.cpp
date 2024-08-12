@@ -392,6 +392,7 @@ void NetworkXmlParser::ParsePreSharedKey(xmlNodePtr node, WifiDeviceConfig& wifi
     }
     // remove ""
     wifiConfig.preSharedKey = preSharedKey.substr(subStrBegin, preSharedKey.length() - quotesCount);
+    std::string().swap(preSharedKey);
 }
 
 void NetworkXmlParser::ParseInternetHistory(xmlNodePtr node, WifiDeviceConfig& wifiConfig)

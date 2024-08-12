@@ -52,6 +52,7 @@ struct WifiScanDeviceInfo {
     time_t staCurrentTime;
     bool isAbsFreezeScaned;
     bool externScan;
+    bool isSystemApp;
     ScanMode scanMode;
     Hid2dInfo hid2dInfo;
     ScanControlInfo scanControlInfo;
@@ -72,6 +73,13 @@ struct WifiScanDeviceInfo {
         freezeState = MODE_STATE_CLOSE;
         noChargerState = MODE_STATE_CLOSE;
         scanMode = ScanMode::SCAN_MODE_MAX;
+        isAbsFreezeScaned = false;
+        staSceneForbidCount = 0;
+        externScan = false;
+        isSystemApp = false;
+        staCurrentTime = 0;
+        gnssFixState = 0;
+        packageName = "";
     }
 };
 }  // namespace Wifi

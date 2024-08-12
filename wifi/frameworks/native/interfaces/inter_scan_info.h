@@ -125,6 +125,9 @@ struct InterScanInfo {
             case WifiSecurity::WAPI_PSK:
                 mgmt = "WAPI-PSK";
                 break;
+            case WifiSecurity::PSK_SAE:
+                mgmt = "WPA-PSK+SAE";
+                break;
             default:
                 mgmt = "NONE";
                 break;

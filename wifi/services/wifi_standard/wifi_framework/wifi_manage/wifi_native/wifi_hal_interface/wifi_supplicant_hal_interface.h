@@ -132,8 +132,11 @@ public:
      * @Return success: WIFI_OPT_SUCCESS, fail: WIFI_OPT_FAILED
      */
     WifiErrorNo WpaSetPowerMode(bool mode) const;
+
+    void NotifyScanResultEvent();
 private:
     SupplicantEventCallback mCallback;
+    static std::mutex mSupplicantHalMutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -350,6 +350,12 @@ ErrCode WifiP2pService::Hid2dRequestGcIp(const std::string& gcMac, std::string& 
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiP2pService::SetGroupUid(int callingUid)
+{
+    WIFI_LOGI("Uid %{public}d SetGroupUid", callingUid);
+    SharedLinkManager::SetGroupUid(callingUid);
+}
+
 void WifiP2pService::IncreaseSharedLink(int callingUid)
 {
     WIFI_LOGI("Uid %{public}d increaseSharedLink", callingUid);
@@ -375,12 +381,15 @@ ErrCode WifiP2pService::HandleBusinessSAException(int systemAbilityId)
         return WIFI_OPT_SUCCESS;
     }
     int callingUid = -1;
-    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
-        callingUid = SOFT_BUS_UID;
-    } else {
+    if (systemAbilityId != SOFTBUS_SERVER_SA_ID) {
         return WIFI_OPT_INVALID_PARAM;
     }
-
+    SharedLinkManager::GetGroupUid(callingUid);
+    if (callingUid == SOFT_BUS_UID) {
+        SharedLinkManager::DecreaseSharedLink(callingUid);
+        RemoveGroup();
+        return WIFI_OPT_SUCCESS;
+    }
     SharedLinkManager::DecreaseSharedLink(callingUid);
     if (SharedLinkManager::GetSharedLinkCount() == 0) {
         RemoveGroup();

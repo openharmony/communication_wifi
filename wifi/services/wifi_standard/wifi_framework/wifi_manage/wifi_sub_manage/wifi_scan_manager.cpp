@@ -95,7 +95,7 @@ void WifiScanManager::CheckAndStartScanService(int instId)
              scanning function immediately when the STA is enabled. */
         IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
         if (pService != nullptr) {
-            pService->OnClientModeStatusChanged(static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED));
+            pService->DisableScan(false);
         }
         return;
     }
@@ -171,20 +171,16 @@ void WifiScanManager::CheckAndStopScanService(int instId)
         WifiConfigCenter::GetInstance().GetPowerSavingModeState() == MODE_STATE_CLOSE) {
         return;
     }
-    /* After check condition over, begin unload SCAN service */
-    if (WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::CLOSING, instId)) {
-        IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
-        if (pService == nullptr) {
-            WIFI_LOGE("[CheckAndStopScanService] scan service is null.");
-            WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::SCAN_SERVICE_CLOSE, instId);
-            WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::CLOSED, instId);
-            return;
-        }
-        ErrCode ret = pService->UnInit();
-        if (ret != WIFI_OPT_SUCCESS) { // scan service is not exist
-            WIFI_LOGE("[CheckAndStopScanService] UnInit service failed!");
-        }
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("[CheckAndStopScanService] scan service is null.");
+        WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::SCAN_SERVICE_CLOSE, instId);
         WifiConfigCenter::GetInstance().SetScanMidState(scanState, WifiOprMidState::CLOSED, instId);
+        return;
+    }
+    ErrCode ret = pService->DisableScan(true);
+    if (ret != WIFI_OPT_SUCCESS) { // scan service is not exist
+        WIFI_LOGE("[CheckAndStopScanService] UnInit service failed!");
     }
 }
 
@@ -235,7 +231,7 @@ void WifiScanManager::DealScanFinished(int state, int instId)
     cbMsg.msgData = state;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    WifiCommonEventHelper::PublishScanFinishedEvent(state,"OnScanFinished");
+    WifiCommonEventHelper::PublishScanFinishedEvent(state, "OnScanFinished");
 }
 
 void WifiScanManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)

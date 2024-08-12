@@ -310,7 +310,6 @@ public:
         EXPECT_CALL(WifiManager::GetInstance(), DealStaCloseRes(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->StopWifiProcess();
     }

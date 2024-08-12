@@ -634,8 +634,8 @@ void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail1()
 {
     std::vector<std::string> blockedBssids;
     std::string bssid = "2a:76:93:47:e2:8a";
-    blockedBssids.push_back(bssid);
 
+    blockedBssids.push_back(bssid);
     EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
 }
 
@@ -1273,7 +1273,6 @@ void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareSuccess()
 void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareFail()
 {
     pStaAutoConnectService->ObtainRoamCapFromFirmware();
-
     pStaAutoConnectService->SyncBlockedSsidFirmware();
 }
 

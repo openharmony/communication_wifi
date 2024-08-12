@@ -173,7 +173,7 @@ static void ClearIfaceName(void)
     while(g_IfaceNameInfoHead != NULL) {
         struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
         g_IfaceNameInfoHead = g_IfaceNameInfoHead->next;
-        LOGI("hy test %{public}s", currernt->ifName);
+        LOGI("ClearIfaceName ifName:%{public}s", currernt->ifName);
         free(currernt);
         currernt = NULL;
     }

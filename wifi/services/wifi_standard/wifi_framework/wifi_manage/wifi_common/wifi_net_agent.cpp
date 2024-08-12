@@ -287,7 +287,8 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     netLinkInfo->dnsList_.push_back(*dns);
     dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
     netLinkInfo->dnsList_.push_back(*dns);
-
+    ///
+    ///
     sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     ipv6dns->type_ = NetManagerStandard::INetAddr::IPV6;
     ipv6dns->family_ = NetManagerStandard::INetAddr::IPV6;

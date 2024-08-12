@@ -299,12 +299,10 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     if (!wifiIpV6Info.primaryDns.empty()) {
         ipv6dns->address_ = wifiIpV6Info.primaryDns;
         netLinkInfo->dnsList_.push_back(*ipv6dns);
-        LOGI("SetNetLinkDnsInfo ipv6 dnsAddr:%{public}s", MacAnonymize(wifiIpV6Info.primaryDns).c_str());
     }
     if (!wifiIpV6Info.secondDns.empty()) {
         ipv6dns->address_ = wifiIpV6Info.secondDns;
         netLinkInfo->dnsList_.push_back(*ipv6dns);
-        LOGI("SetNetLinkDnsInfo ipv6 dnsAddr:%{public}s", MacAnonymize(wifiIpV6Info.secondDns).c_str());
     }
 }
 

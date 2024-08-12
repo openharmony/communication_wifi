@@ -170,7 +170,7 @@ static void RemoveIfaceName(const char* ifName)
 
 static void ClearIfaceName(void)
 {
-    while(g_IfaceNameInfoHead != NULL) {
+    while (g_IfaceNameInfoHead != NULL) {
         struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
         g_IfaceNameInfoHead = g_IfaceNameInfoHead->next;
         LOGI("ClearIfaceName ifName:%{public}s", currernt->ifName);

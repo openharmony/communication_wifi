@@ -29,7 +29,6 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp() {}
     virtual void TearDown() {}
-
 };
 
 HWTEST_F(NetworkStatusHistoryManagerTest, UpdateTest01, TestSize.Level1)

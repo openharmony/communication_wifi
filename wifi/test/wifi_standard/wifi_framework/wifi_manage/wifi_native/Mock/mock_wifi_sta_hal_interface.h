@@ -30,7 +30,7 @@ public:
     static MockWifiStaHalInterface &GetInstance(void);
     void SetRetResult(WifiErrorNo retResult);
     WifiErrorNo GetRetResult();
-    void SetStaCapabilities(WifiErrorNo retResult); 
+    void SetStaCapabilities(WifiErrorNo retResult);
 private:
     MockWifiStaHalInterface();
     WifiErrorNo mRetResult;

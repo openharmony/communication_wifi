@@ -30,9 +30,11 @@ public:
     static MockWifiStaHalInterface &GetInstance(void);
     void SetRetResult(WifiErrorNo retResult);
     WifiErrorNo GetRetResult();
+    void SetStaCapabilities(WifiErrorNo retResult); 
 private:
     MockWifiStaHalInterface();
     WifiErrorNo mRetResult;
+    WifiErrorNo mGetStaCapabilities;
 };
 
 class WifiStaHalInterface {
@@ -92,6 +94,7 @@ public:
 private:
     WifiEventCallback mStaCallback;
     std::function<void(int)> mDeathCallback;
+    WifiHalRoamCapability mCapability;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -26,11 +26,6 @@
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
 
-DEFINE_WIFILOG_SCAN_LABEL("ScanService");
-
-#define MIN(A, B) (((A) >= (B)) ? (B) : (A))
-#define MAX(A, B) (((A) >= (B)) ? (A) : (B))
-
 namespace OHOS {
 namespace Wifi {
 
@@ -93,7 +88,6 @@ ErrCode ScanService::StartWifiPnoScan(bool isStartAction, int periodMs, int susp
 
 void ScanService::StopPnoScan()
 {
-  
 }
 
 bool ScanService::SingleScan(ScanConfig &scanConfig)
@@ -103,9 +97,7 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
 
 bool ScanService::GetBandFreqs(ScanBandType band, std::vector<int> &freqs)
 {
-   
     return false;
-    
 }
 
 bool ScanService::AddScanMessageBody(InternalMessagePtr interMessage, const InterScanConfig &interConfig)
@@ -132,7 +124,6 @@ void ScanService::HandleCommonScanInfo(
 void ScanService::HandleScanResults(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList,
     bool &fullScanStored)
 {
-
 }
 
 int ScanService::GetWifiMaxSupportedMaxSpeed(const InterScanInfo &scanInfo, const int &maxNumberSpatialStreams)
@@ -142,7 +133,6 @@ int ScanService::GetWifiMaxSupportedMaxSpeed(const InterScanInfo &scanInfo, cons
 
 void ScanService::ConvertScanInfo(WifiScanInfo &scanInfo, const InterScanInfo &interInfo)
 {
-   
 }
 
 void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vector<WifiScanInfo> &storeInfoList)
@@ -166,7 +156,6 @@ bool ScanService::StoreUserScanInfo(const StoreScanConfig &scanConfig, std::vect
 
 void ScanService::ReportScanStartEvent()
 {
-
 }
 
 void ScanService::ReportScanStopEvent()
@@ -305,7 +294,6 @@ void ScanService::SetScanTrustMode()
 
 void ScanService::ResetToNonTrustMode()
 {
-
 }
 
 bool ScanService::IsScanTrustMode() const
@@ -518,12 +506,12 @@ bool ScanService::IsAppInFilterList(const std::vector<std::string> &packageFilte
 
 void ScanService::SystemScanConnectedPolicy(int &interval)
 {
-   return;
+    return;
 }
 
 void ScanService::SystemScanDisconnectedPolicy(int &interval, int &count)
 {
-   return;
+    return;
 }
 
 void ScanService::InitChipsetInfo()
@@ -544,12 +532,6 @@ std::string ScanService::WifiCountryCodeChangeObserver::GetListenerModuleName()
 #endif
 
 int CalculateBitPerTone(int snrDb)
-{
-    return 0;
-}
-
-int WifiMaxThroughput(int wifiStandard, bool is11bMode, WifiChannelWidth channelWidth, int rssiDbm,
-                      int maxNumSpatialStream, int channelUtilization)
 {
     return 0;
 }

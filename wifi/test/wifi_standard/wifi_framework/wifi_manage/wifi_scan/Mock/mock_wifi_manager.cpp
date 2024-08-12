@@ -42,5 +42,77 @@ void WifiManager::InitScanCallback(void)
     mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManager::DealStoreScanInfoEvent, this, _1, _2);
     return;
 }
+
+std::unique_ptr<WifiStaManager>& WifiManager::GetWifiStaManager()
+{
+    return wifiStaManager;
+}
+ 
+std::unique_ptr<WifiScanManager>& WifiManager::GetWifiScanManager()
+{
+    return wifiScanManager;
+}
+ 
+std::unique_ptr<WifiTogglerManager>& WifiManager::GetWifiTogglerManager()
+{
+    return wifiTogglerManager;
+}
+ 
+std::unique_ptr<WifiHotspotManager>& WifiManager::GetWifiHotspotManager()
+{
+    return wifiHotspotManager;
+}
+ 
+std::unique_ptr<WifiEventSubscriberManager>& WifiManager::GetWifiEventSubscriberManager()
+{
+    return wifiEventSubscriberManager;
+}
+ 
+std::unique_ptr<WifiMultiVapManager>& WifiManager::GetWifiMultiVapManager()
+{
+    return wifiMultiVapManager;
+}
+ 
+int WifiManager::Init()
+{
+    mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
+    wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
+    wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
+    wifiStaManager = std::make_unique<WifiStaManager>();
+    wifiScanManager = std::make_unique<WifiScanManager>();
+    wifiTogglerManager = std::make_unique<WifiTogglerManager>();
+    wifiHotspotManager = std::make_unique<WifiHotspotManager>();
+    return 0;
+}
+ 
+void WifiManager::Exit()
+{
+    if (mCloseServiceThread) {
+        mCloseServiceThread.reset();
+    }
+    if (mStartServiceThread) {
+        mStartServiceThread.reset();
+    }
+    if (wifiStaManager) {
+        wifiStaManager.reset();
+    }
+    if (wifiScanManager) {
+        wifiScanManager.reset();
+    }
+    if (wifiTogglerManager) {
+        wifiTogglerManager.reset();
+    }
+    if (wifiHotspotManager) {
+        wifiHotspotManager.reset();
+    }
+ 
+    if (wifiEventSubscriberManager) {
+        wifiEventSubscriberManager.reset();
+    }
+    if (wifiMultiVapManager) {
+        wifiMultiVapManager.reset();
+    }
+    return;
+}
 } // namespace Wifi
 } // namespace OHOS

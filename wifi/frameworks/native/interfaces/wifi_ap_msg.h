@@ -43,7 +43,6 @@ enum class ApState {
     AP_STATE_STARTED,
     AP_STATE_CLOSING,
     AP_STATE_CLOSED,
-    AP_STATE_DISABLED_AFTER_STARTED,
 };
 
 /* Encryption Mode */

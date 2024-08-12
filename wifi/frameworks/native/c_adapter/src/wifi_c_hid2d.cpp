@@ -175,10 +175,16 @@ NO_SANITIZE("cfi") WifiErrorCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
         OHOS::Wifi::PeerCfgType(static_cast<int>(cfgType)), cfgData, setDataValidLen));
 }
 
-int Hid2dIsWideBandwidthSupported(void)
+NO_SANITIZE("cfi") int Hid2dIsWideBandwidthSupported(void)
 {
-    constexpr int NOT_SUPPORT = 0; // false
-    return NOT_SUPPORT;
+    CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
+    bool isSupport = false;
+    OHOS::Wifi::ErrCode ret = wifiHid2dPtr->Hid2dIsWideBandwidthSupported(isSupport);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Hid2dIsWideBandwidthSupported return error: %{public}d", ret);
+        return 0;
+    }
+    return (isSupport ? 1 : 0);
 }
 
 NO_SANITIZE("cfi") WifiErrorCode Hid2dSetUpperScene(const char ifName[IF_NAME_LEN], const Hid2dUpperScene *scene)

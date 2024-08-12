@@ -414,7 +414,6 @@ void WifiP2pManager::IfaceDestoryCallback(std::string &destoryIfaceName, int cre
     }
     return;
 }
-
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

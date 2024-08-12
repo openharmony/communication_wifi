@@ -97,6 +97,14 @@ public:
     virtual bool IsScanAllowed(WifiScanDeviceInfo &scanDeviceInfo) = 0;
 
     /**
+     * @Description Is customer network.
+     *
+     * @param scanDeviceInfo - scan device info
+     * @return true: allowed, false: not allowed
+     */
+    virtual bool IsHwItCustNetwork(WifiDeviceConfig &config) = 0;
+
+    /**
      * @Description selfcure for multi dhcp server.
      *
      * @param cmd - add、get size、clear
@@ -123,6 +131,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetStaticIpConfig(const bool &isMultiDhcpServer, const bool &startSelfcure, IpInfo &ipInfo) = 0;
+
+    /**
+     * @Description Is Wide Bandwidth Supported.
+     *
+     * @return true: support, false: not support
+     */
+    virtual bool IsWideBandwidthSupported() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

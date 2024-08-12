@@ -37,6 +37,11 @@ WifiErrorNo MockWifiStaHalInterface::GetRetResult()
     return mRetResult;
 }
 
+void MockWifiStaHalInterface::SetStaCapabilities(WifiErrorNo retResult)
+{
+    mGetStaCapabilities = retResult;
+}
+
 WifiStaHalInterface &WifiStaHalInterface::GetInstance(void)
 {
     static WifiStaHalInterface inst;
@@ -81,7 +86,7 @@ WifiErrorNo WifiStaHalInterface::Disconnect(void)
 
 WifiErrorNo WifiStaHalInterface::GetStaCapabilities(unsigned int &capabilities)
 {
-    return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
+    return (MockWifiStaHalInterface::GetInstance().mGetStaCapabilities == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
@@ -238,6 +243,7 @@ WifiErrorNo WifiStaHalInterface::StopWps(void)
 
 WifiErrorNo WifiStaHalInterface::GetRoamingCapabilities(WifiHalRoamCapability &capability)
 {
+    capability = mCapability;
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }

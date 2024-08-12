@@ -173,6 +173,12 @@ bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             break;
         }
+        case WIFI_CURE_CMD_P2P_ENHANCE_STATE_CHANGED: {
+            int state = msg->GetParam1();
+            HandleP2pEnhanceStateChange(state);
+            ret = EXECUTED;
+            break;
+        }
         default:
             WIFI_LOGD("DefaultState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
@@ -192,6 +198,14 @@ void SelfCureStateMachine::DefaultState::HandleDhcpOfferPacketRcv(const IpInfo &
     WIFI_LOGI("dhcpOfferPackets size: %{public}u", retSize);
 }
 
+void SelfCureStateMachine::DefaultState::HandleP2pEnhanceStateChange(int state)
+{
+    pSelfCureStateMachine->p2pEnhanceConnected_ = (state == 1) ? true : false;
+    if ((!pSelfCureStateMachine->p2pEnhanceConnected_) &&
+       (pSelfCureStateMachine->GetCurStateName() == pSelfCureStateMachine->pInternetSelfCureState->GetStateName())) {
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_P2P_DISCONNECTED_EVENT);
+    }
+}
 /* --------------------------- state machine connected monitor state ------------------------------ */
 SelfCureStateMachine::ConnectedMonitorState::ConnectedMonitorState(SelfCureStateMachine *selfCureStateMachine)
     : State("ConnectedMonitorState"),
@@ -1377,14 +1391,12 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCureLevel)
 {
     WIFI_LOGI("enter SelfCureForReset");
-    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
     if ((pSelfCureStateMachine->internetUnknown) || (!hasInternetRecently) ||
         (pSelfCureStateMachine->IsSettingsPage())) {
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pNoInternetState);
         return;
     }
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService && pEnhanceService->CheckChbaConncted()) {
+    if (pSelfCureStateMachine->p2pEnhanceConnected_) {
         WIFI_LOGE("no need reset");
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pNoInternetState);
         return;
@@ -1394,6 +1406,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
         return;
     }
     WIFI_LOGI("begin to self cure for internet access: Reset");
+    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
     pSelfCureStateMachine->selfCureOnGoing = true;
     pSelfCureStateMachine->StopTimer(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK);
     delayedResetSelfCure = false;
@@ -1657,8 +1670,7 @@ bool SelfCureStateMachine::InternetSelfCureState::HasBeenTested(int cureLevel)
 
 void SelfCureStateMachine::InternetSelfCureState::HandleRssiChanged()
 {
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService && pEnhanceService->CheckChbaConncted()) {
+    if (pSelfCureStateMachine->p2pEnhanceConnected_) {
         WIFI_LOGE("no need deal rssi change");
         return;
     }

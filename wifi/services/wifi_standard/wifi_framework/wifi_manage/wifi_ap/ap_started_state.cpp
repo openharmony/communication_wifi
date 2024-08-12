@@ -367,6 +367,8 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
         m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress(), m_hotspotConfig.GetLeaseTime());
 #endif
     } else {
+        WIFI_LOGI("Hotspot disabled.");
+        m_ApStateMachine.OnApStateChange(ApState::AP_STATE_DISABLED_AFTER_STARTED);
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
     }
 }

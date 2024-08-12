@@ -118,6 +118,11 @@ void WifiHotspotManager::InitApCallback(void)
 void WifiHotspotManager::DealApStateChanged(ApState state, int id)
 {
     WIFI_LOGE("%{public}s, state: %{public}d!", __func__, state);
+    if (state == ApState::AP_STATE_DISABLED_AFTER_STARTED) {
+        auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        ins->SendMessage(CMD_AP_SERVICE_START_FAILURE, id);
+        return;
+    }
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(state);

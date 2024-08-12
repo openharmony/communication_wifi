@@ -88,7 +88,6 @@ int WifiP2pCallbackStub::OnRemoteRequest(
 
 void WifiP2pCallbackStub::RegisterCallBack(const sptr<IWifiP2pCallback> &userCallback)
 {
-    std::unique_lock<std::mutex> lock(callBackEventMutex);
     if (userCallback_ != nullptr) {
         WIFI_LOGD("Callback has registered!");
         return;
@@ -280,6 +279,7 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     const char *readStr = nullptr;
     constexpr int MAX_SIZE = 512;
+    constexpr int maxInfoSize = 100;
     std::vector<WifiP2pServiceInfo> srvInfo;
     int size = data.ReadInt32();
     if (size > MAX_SIZE) {
@@ -294,6 +294,10 @@ void WifiP2pCallbackStub::RemoteOnP2pServicesChanged(uint32_t code, MessageParce
         info.SetDeviceAddress((readStr != nullptr) ? readStr : "");
         info.SetServicerProtocolType(static_cast<P2pServicerProtocolType>(data.ReadInt32()));
         int length = data.ReadInt32();
+        if (length > maxInfoSize) {
+            WIFI_LOGE("Data was incompletes. Service info length error: %{public}d", length);
+            break;
+        }
         std::vector<std::string> queryList;
         for (int j = 0; j < length; j++) {
             readStr = data.ReadCString();
@@ -350,12 +354,17 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         return;
     }
 
+    if (cfgLen > MAX_LEN) {
+        WIFI_LOGE("cfgLen size error!");
+        return;
+    }
     char* cfgData = new (std::nothrow) char[cfgLen];
     if (cfgData == nullptr) {
         WIFI_LOGE("new buffer error!");
         return;
     }
     if (memcpy_s(cfgData, cfgLen, dataBuffer, cfgLen) != EOK) {
+        delete[] cfgData;
         WIFI_LOGE("memcpy_s failed!");
         return;
     }

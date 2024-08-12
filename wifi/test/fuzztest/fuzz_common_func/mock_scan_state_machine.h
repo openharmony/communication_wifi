@@ -22,16 +22,18 @@ namespace OHOS {
 namespace Wifi {
 class MockScanStateMachine : public ScanStateMachine {
 public:
-    MockScanStateMachine(){}
-    ~MockScanStateMachine(){}
+    MockScanStateMachine()
+    {}
+    ~MockScanStateMachine()
+    {}
     void SendMessage(int what);
     void SendMessage(int what, int arg1);
     void SendMessage(int what, int arg1, int arg2);
-    void SendMessage(InternalMessage *msg);
+    void SendMessage(InternalMessagePtr msg);
     void StartTimer(int timerName, int64_t interval);
     void StopTimer(int timerName);
-    InternalMessage *CreateMessage(int msgName, int param1);
-    InternalMessage *CreateMessage(int msgName);
+    InternalMessagePtr CreateMessage(int msgName, int param1);
+    InternalMessagePtr CreateMessage(int msgName);
 };
 
 class WifiManager {

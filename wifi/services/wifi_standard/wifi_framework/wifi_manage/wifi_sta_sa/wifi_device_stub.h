@@ -31,7 +31,6 @@ public:
 
     using handleFunc = void (WifiDeviceStub::*)(uint32_t code, MessageParcel &data, MessageParcel &reply);
     using HandleFuncMap = std::map<int, handleFunc>;
-    using RemoteDeathMap = std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>>;
 
     virtual int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
@@ -89,9 +88,9 @@ private:
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiDetailState(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetLowTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
@@ -105,29 +104,8 @@ private:
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
     void BigDataWriteIpAddress(const WifiIpAddress &address, std::stringstream &bigDataStream);
     void SendBigConfig(int32_t ashmemSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
+    void SendBigConfigEx(int contentSize, std::vector<WifiDeviceConfig> &result, std::stringstream &bigDataStream);
     void SendSmallConfig(int32_t size, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
-
-#ifndef OHOS_ARCH_LITE
-    class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
-    public:
-        explicit WifiDeathRecipient(WifiDeviceStub &client) : client_(client) {}
-        ~WifiDeathRecipient() override = default;
-        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
-        {
-            client_.OnRemoteDied(remote);
-        }
-
-    private:
-        WifiDeviceStub &client_;
-    };
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remoteObject);
-    void RemoveDeviceCbDeathRecipient(void);
-    void RemoveDeviceCbDeathRecipient(const wptr<IRemoteObject> &remoteObject);
-
-    RemoteDeathMap remoteDeathMap;
-    std::mutex mutex_;
-#endif
 
 private:
     HandleFuncMap handleFuncMap;

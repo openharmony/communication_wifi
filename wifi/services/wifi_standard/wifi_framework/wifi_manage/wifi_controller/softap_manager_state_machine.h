@@ -39,11 +39,11 @@ public:
         ~IdleState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         SoftapManagerMachine *pSoftapManagerMachine;
-        void HandleStartInIdleState(InternalMessage *msg);
+        void HandleStartInIdleState(InternalMessagePtr msg);
     };
 
     class DefaultState : public State {
@@ -52,7 +52,7 @@ public:
         ~DefaultState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         SoftapManagerMachine *pSoftapManagerMachine;
@@ -64,7 +64,7 @@ public:
         ~StartedState() override;
         void GoInState() override;
         void GoOutState() override;
-        bool ExecuteStateMsg(InternalMessage *msg) override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
         SoftapManagerMachine *pSoftapManagerMachine;
@@ -95,11 +95,7 @@ private:
 
     void BuildStateTree();
     ErrCode InitSoftapManagerStates();
-    ErrCode TryToStartApService(int id);
-    ErrCode AutoStartApService(int id);
-    ErrCode AutoStopApService(int id);
     void StopSoftap();
-    void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     DefaultState *pDefaultState;
     IdleState *pIdleState;
     StartedState *pStartedState;

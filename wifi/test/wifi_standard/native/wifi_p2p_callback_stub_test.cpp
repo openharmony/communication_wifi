@@ -123,7 +123,8 @@ public:
         WIFI_LOGI("OnP2pGcLeaveGroup Mock");
     }
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override{
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
+    {
         return nullptr;
     }
 };
@@ -170,7 +171,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pStateChangedTest, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPersistentGroupsChangedTest, TestSize.Level1)
@@ -190,7 +190,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPersistentGroupsChangedTest, TestSi
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pThisDeviceChangedTest, TestSize.Level1)
@@ -210,7 +209,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pThisDeviceChangedTest, TestSize.Lev
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest, TestSize.Level1)
@@ -232,7 +230,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest2, TestSize.Level1)
@@ -269,7 +266,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest, TestSize.Level
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest2, TestSize.Level1)
@@ -304,7 +300,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pConnectionChangedTest, TestSize.Lev
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pDiscoveryChangedTest, TestSize.Level1)
@@ -324,7 +319,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pDiscoveryChangedTest, TestSize.Leve
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pActionResultTest, TestSize.Level1)
@@ -344,7 +338,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pActionResultTest, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest, TestSize.Level1)
@@ -399,7 +392,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest2, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pGcJoinGroupTest, TestSize.Level1)
@@ -419,7 +411,6 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pGcJoinGroupTest, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    delete userCallback;
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)

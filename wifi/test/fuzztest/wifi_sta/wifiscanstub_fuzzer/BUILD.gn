@@ -22,6 +22,7 @@ ohos_fuzztest("WifiScanStubFuzzTest") {
   fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifiscanstub_fuzzer"
 
   include_dirs = [
+    "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
@@ -82,7 +83,7 @@ ohos_fuzztest("WifiScanStubFuzzTest") {
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_device_service_impl",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
@@ -114,7 +115,6 @@ ohos_fuzztest("WifiScanStubFuzzTest") {
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
-    "netmanager_base:net_stats_manager_if",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",

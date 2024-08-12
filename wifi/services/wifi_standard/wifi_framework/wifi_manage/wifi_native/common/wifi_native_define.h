@@ -38,6 +38,11 @@
 #define HAL_P2P_SERVICE_TYPE_MIN_SIZE 3
 #define HAL_P2P_SERVICE_TYPE_2_POS 2
 
+typedef enum DeathType {
+    WPA_DEATH = 0,
+    AP_DEATH = 1
+} DeathType;
+
 typedef enum HalScanResult {
     HAL_SINGLE_SCAN_FAILED = 1,     /* Scan failure notification */
     HAL_SINGLE_SCAN_OVER_OK = 2,    /* Scan success notification */
@@ -119,4 +124,10 @@ typedef enum HalCallbackEvent {
     HAL_CBK_CMD_STA_DISCONNECT_REASON_EVENT,       /* sta disconnect reason report */
 } HalCallbackEvent;
 
+typedef enum Wifi80211StatusCode {
+    WLAN_STATUS_UNSPECIFIED_FAILURE = 1,
+    WLAN_STATUS_AP_UNABLE_TO_HANDLE_NEW_STA = 17,
+    WLAN_STATUS_ASSOC_REJECTED_TEMPORARILY = 30,
+    WLAN_STATUS_DENIED_INSUFFICIENT_BANDWIDTH = 33,
+} Wifi80211StatusCode;
 #endif

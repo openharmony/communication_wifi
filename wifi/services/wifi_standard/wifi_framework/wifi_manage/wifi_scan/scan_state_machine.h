@@ -74,7 +74,7 @@ public:
         ~InitState();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -88,7 +88,8 @@ public:
          *
          */
         void UnLoadDriver();
-        void HandleUpdateCountryCode(InternalMessage *msg);
+        void DisableScan();
+        void HandleUpdateCountryCode(InternalMessagePtr msg);
     };
 
     class HardwareReady : public State {
@@ -101,7 +102,7 @@ public:
         ~HardwareReady();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -117,7 +118,7 @@ public:
         ~CommonScan();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -133,7 +134,7 @@ public:
         ~CommonScanUnworked();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -149,7 +150,7 @@ public:
         ~CommonScanning();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -165,7 +166,7 @@ public:
         ~PnoScan();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -181,7 +182,7 @@ public:
         ~PnoScanHardware();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -197,7 +198,7 @@ public:
         ~CommonScanAfterPno();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -213,7 +214,7 @@ public:
         ~PnoScanSoftware();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -229,7 +230,7 @@ public:
         ~PnoSwScanFree();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -245,7 +246,7 @@ public:
         ~PnoSwScanning();
         void GoInState();
         void GoOutState();
-        bool ExecuteStateMsg(InternalMessage *msg);
+        bool ExecuteStateMsg(InternalMessagePtr msg);
 
     private:
         ScanStateMachine *pScanStateMachine;
@@ -321,7 +322,7 @@ private:
      *
      * @param interMessage - internal message
      */
-    void CommonScanRequestProcess(InternalMessage *interMessage);
+    void CommonScanRequestProcess(InternalMessagePtr interMessage);
     /**
      * @Description  Obtains the scanning request parameters carried in an internal message.
      *
@@ -330,7 +331,7 @@ private:
      * @param scanConfig - Scan configuration carried in the message[out]
      * @return success - true, failed - false
      */
-    bool GetCommonScanRequestInfo(InternalMessage *interMessage, int &requestIndex, InterScanConfig &scanConfig);
+    bool GetCommonScanRequestInfo(InternalMessagePtr interMessage, int &requestIndex, InterScanConfig &scanConfig);
     /**
      * @Description  Obtains the scanning configuration carried in an internal message.
      *
@@ -338,7 +339,7 @@ private:
      * @param scanConfig - Scan configuration carried in the message[out]
      * @return success - true, failed - false
      */
-    bool GetCommonScanConfig(InternalMessage *interMessage, InterScanConfig &scanConfig);
+    bool GetCommonScanConfig(InternalMessagePtr interMessage, InterScanConfig &scanConfig);
     /**
      * @Description  Start a common scan.
      *
@@ -361,7 +362,7 @@ private:
      *
      * @param interMessage - internal Message[in]
      */
-    void CommonScanWhenRunning(InternalMessage *interMessage);
+    void CommonScanWhenRunning(InternalMessagePtr interMessage);
     /**
     * @Description  Compare the parameters of the current scan with those carried in
                     the new scan request. If the current scan can overwrite the new
@@ -384,6 +385,12 @@ private:
      *
      */
     void CommonScanInfoProcess();
+    /**
+     * @Description Parse security type.
+     * 
+     * @param scanInfo - scan result[inout]
+     */
+    void ParseSecurityType(InterScanInfo &scanInfo);
     /**
      * @Description The band and security type are parsed from the scanning result obtained by the IDL.
      * 
@@ -469,7 +476,7 @@ private:
      *
      * @param msg - internal message[in]
      */
-    void PnoScanRequestProcess(InternalMessage *interMessage);
+    void PnoScanRequestProcess(InternalMessagePtr interMessage);
     /**
     * @Description  If the PNO scanning is interrupted by a single scan,
                     resume the PNO scanning after the single scan is complete.
@@ -481,7 +488,7 @@ private:
      *
      * @param msg - internal message[in]
      */
-    void PnoScanHardwareProcess(InternalMessage *interMessage);
+    void PnoScanHardwareProcess(InternalMessagePtr interMessage);
     /**
      * @Description  Start hardware PNO scanning.
      *
@@ -499,7 +506,7 @@ private:
     *
     * @param interMessage - internal message[in]
     */
-    void UpdatePnoScanRequest(InternalMessage *interMessage);
+    void UpdatePnoScanRequest(InternalMessagePtr interMessage);
     /**
     * @Description  Obtain the PNO scanning request parameters carried in the internal message
                     and update the parameters to the saved configuration.
@@ -507,7 +514,7 @@ private:
     * @param interMessage - internal message[in]
     * @return success: true, failed: false
     */
-    bool GetPnoScanRequestInfo(InternalMessage *interMessage);
+    bool GetPnoScanRequestInfo(InternalMessagePtr interMessage);
     /**
      * @Description  Obtains the scanning configuration carried in an internal message.
      *
@@ -515,7 +522,7 @@ private:
      * @param pnoScanConfig - PNO scanning configuration carried in the message[out]
      * @return success: true, failed: false
      */
-    bool GetPnoScanConfig(InternalMessage *interMessage, PnoScanConfig &pnoScanConfig);
+    bool GetPnoScanConfig(InternalMessagePtr interMessage, PnoScanConfig &pnoScanConfig);
     /**
      * @Description  Processing after receiving a PNO scan success message from the ScanMonitor.
      *
@@ -584,7 +591,7 @@ private:
      *
      * @param interMessage - internal message
      */
-    void PnoScanSoftwareProcess(InternalMessage *interMessage);
+    void PnoScanSoftwareProcess(InternalMessagePtr interMessage);
     /**
      * @Description  Invoke the IDL client to obtain the software scanning result.
      *

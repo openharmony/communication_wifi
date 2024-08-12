@@ -164,7 +164,10 @@ int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        results.push_back(iter->second);
+        // -1: Connect by system, use default uid.
+        if (iter->second.uid == -1 || iter->second.isShared) {
+            results.push_back(iter->second);
+        }
     }
     return 0;
 }
@@ -225,41 +228,32 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
         LOGD("Reload wifi config");
         ReloadDeviceConfig();
     }
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)) {
-            config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-            DecryptionDeviceConfig(config);
-#endif
-            return 0;
-        }
-    }
-    return -1;
-}
 
-int WifiSettings::GetDeviceConfig(const std::string &ancoCallProcessName, const std::string &ssid,
-    const std::string &keymgmt, WifiDeviceConfig &config)
-{
-    if (!deviceConfigLoadFlag.test_and_set()) {
-        LOGD("Reload wifi config");
-        ReloadDeviceConfig();
-    }
-    if (ancoCallProcessName.empty()) {
-        LOGD("anco do not deal with");
-        return -1;
-    }
     std::unique_lock<std::mutex> lock(mStaMutex);
-    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt) &&
-            iter->second.ancoCallProcessName == ancoCallProcessName) {
-            config = iter->second;
+    if (keymgmt.compare("WPA-PSK+SAE") == 0) {
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
+                && (iter->second.uid == -1 || iter->second.isShared)) {
+                config = iter->second;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-            DecryptionDeviceConfig(config);
+                DecryptionDeviceConfig(config);
 #endif
-            return 0;
+                return 0;
+            }
+        }
+    } else {
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
+                && (iter->second.uid == -1 || iter->second.isShared)) {
+                config = iter->second;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+                DecryptionDeviceConfig(config);
+#endif
+                return 0;
+            }
         }
     }
+
     return -1;
 }
 
@@ -281,6 +275,17 @@ int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
             }
         }
     }
+    return 0;
+}
+
+int WifiSettings::SetDeviceEphemeral(int networkId, bool isEphemeral)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.isEphemeral = isEphemeral;
     return 0;
 }
 
@@ -307,6 +312,23 @@ int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
     }
     iter->second.randomizedMacSuccessEver = true;
     return 0;
+}
+
+int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
+    WifiDeviceConfig &config)
+{
+    std::vector<WifiDeviceConfig> configs;
+    if (GetAllCandidateConfig(uid, configs) != 0) {
+        return -1;
+    }
+
+    for (const auto &it : configs) {
+        if (it.ssid == ssid && it.keyMgmt == keymgmt) {
+            config = it;
+            return it.networkId;
+        }
+    }
+    return -1;
 }
 
 int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config)
@@ -406,6 +428,7 @@ int WifiSettings::SyncDeviceConfig()
 int WifiSettings::ReloadDeviceConfig()
 {
 #ifndef CONFIG_NO_CONFIG_WRITE
+    std::unique_lock<std::mutex> lock(mStaMutex);
     int ret = mSavedDeviceConfig.LoadConfig();
     if (ret < 0) {
         deviceConfigLoadFlag.clear();
@@ -415,7 +438,6 @@ int WifiSettings::ReloadDeviceConfig()
     deviceConfigLoadFlag.test_and_set();
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
-    std::unique_lock<std::mutex> lock(mStaMutex);
     mNetworkId = 0;
     mWifiDeviceConfig.clear();
     for (std::size_t i = 0; i < tmp.size(); ++i) {
@@ -809,7 +831,9 @@ int WifiSettings::RemoveWifiP2pGroupInfo()
 
 int WifiSettings::RemoveWifiP2pSupplicantGroupInfo()
 {
-    if (!std::filesystem::exists(P2P_SUPPLICANT_CONFIG_FILE)) {
+    std::filesystem::path pathName = P2P_SUPPLICANT_CONFIG_FILE;
+    std::error_code code;
+    if (!std::filesystem::exists(pathName, code)) {
         LOGE("p2p_supplicant file do not exists!, file:%{public}s", P2P_SUPPLICANT_CONFIG_FILE);
         return -1;
     }
@@ -1309,7 +1333,9 @@ void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
 {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     std::unique_lock<std::mutex> lock(mConfigOnBootMutex);
-    mSavedDeviceConfig.LoadConfig();
+    if (mSavedDeviceConfig.LoadConfig() < 0) {
+        return;
+    }
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
     int count = 0;
@@ -1378,7 +1404,7 @@ void WifiSettings::InitPackageFilterConfig()
         std::vector<PackageFilterConf> tmp;
         mPackageFilterConfig.GetValue(tmp);
         std::unique_lock<std::mutex> lock(mScanMutex);
-        for (int i = 0; i < tmp.size(); i++) {
+        for (unsigned int i = 0; i < tmp.size(); i++) {
             mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
         }
     }
@@ -1568,12 +1594,21 @@ std::string WifiSettings::FuzzyBssid(const std::string bssid)
 #ifndef OHOS_ARCH_LITE
 void WifiSettings::MergeWifiConfig()
 {
-    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(DEVICE_CONFIG_FILE_PATH)
-        || std::filesystem::exists(WIFI_STA_RANDOM_MAC_FILE_PATH)) {
+    std::filesystem::path wifiPathNmae = WIFI_CONFIG_FILE_PATH;
+    std::filesystem::path devicePathName = DEVICE_CONFIG_FILE_PATH;
+    std::filesystem::path randomMacPathName = WIFI_STA_RANDOM_MAC_FILE_PATH;
+    std::filesystem::path dualWifiPathName = DUAL_WIFI_CONFIG_FILE_PATH;
+    std::error_code wifiConfigCode;
+    std::error_code deviceConfigCode;
+    std::error_code randomMacCode;
+    std::error_code dualWifiCode;
+    if (std::filesystem::exists(wifiPathNmae, wifiConfigCode)
+        || std::filesystem::exists(devicePathName, deviceConfigCode)
+        || std::filesystem::exists(randomMacPathName, randomMacCode)) {
         LOGI("file exists don't need to merge");
         return;
     }
-    if (!std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH)) {
+    if (!std::filesystem::exists(dualWifiPathName, dualWifiCode)) {
         LOGI("dual frame file do not exists, don't need to merge");
         return;
     }
@@ -1603,11 +1638,18 @@ void WifiSettings::MergeWifiConfig()
 
 void WifiSettings::MergeSoftapConfig()
 {
-    if (std::filesystem::exists(WIFI_CONFIG_FILE_PATH) || std::filesystem::exists(HOTSPOT_CONFIG_FILE_PATH)) {
+    std::filesystem::path wifiPathNmae = WIFI_CONFIG_FILE_PATH;
+    std::filesystem::path hostapdPathName = HOTSPOT_CONFIG_FILE_PATH;
+    std::filesystem::path dualApPathName = DUAL_SOFTAP_CONFIG_FILE_PATH;
+    std::error_code wifiConfigCode;
+    std::error_code hotspotConfigCode;
+    std::error_code dualApCode;
+    if (std::filesystem::exists(wifiPathNmae, wifiConfigCode)
+        || std::filesystem::exists(hostapdPathName, hotspotConfigCode)) {
         LOGI("MergeSoftapConfig file exists don't need to merge");
         return;
     }
-    if (!std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
+    if (!std::filesystem::exists(dualApPathName, dualApCode)) {
         LOGI("MergeSoftapConfig dual frame file do not exists, don't need to merge");
         return;
     }
@@ -1833,6 +1875,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         WriteWifiEncryptionFailHiSysEvent(DECRYPTION_EVENT,
             SsidAnonymize(config.ssid), config.keyMgmt, STA_MOUDLE_EVENT);
         config.preSharedKey = "";
+        std::string().swap(config.preSharedKey);
     }
     delete encry;
 

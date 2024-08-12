@@ -55,7 +55,7 @@ public:
      * @param wifiScanParams Parameters in the scan request[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    ErrCode ScanWithParam(const WifiScanParams &wifiScanParams) override;
+    ErrCode ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag) override;
     /**
      * @Description Disable/Restore the scanning operation.
      *

@@ -35,9 +35,37 @@ public:
     int GetValidChannels(ChannelsTable &channelsInfo);
 
     void UpdateValidChannels(std::string ifaceName, int instId = 0);
+
+    bool GetAvailableScanFreqs(ScanBandType band, std::vector<int32_t>& freqs);
+
+    bool IsFreqDbac(int freqA, int freqB);
+
+    bool IsChannelDbac(int channelA, int channelB);
+
+    void TransformFrequencyIntoChannel(const std::vector<int> &freqVector, std::vector<int> &chanVector);
+
+    int TransformFrequencyIntoChannel(int freq);
+
+    int TransformChannelToFrequency(int channel);
+
+    BandType TransformFreqToBand(int freq);
+
+    BandType TransformChannelToBand(int channel);
+
+    bool IsValid5GHz(int freq);
+
+    bool IsValid24GHz(int freq);
+
+    bool IsValid24GChannel(int channel);
+
+    bool IsValid5GChannel(int channel);
+
 private:
+    WifiChannelHelper();
+    void UpdateValidFreqs();
     ChannelsTable mValidChannels {DEFAULT_VALID_CHANNEL};
     std::mutex mMutex;
+    std::map<ScanBandType, std::vector<int>> mValidFreqs;
 };
     
 }  // namespace Wifi

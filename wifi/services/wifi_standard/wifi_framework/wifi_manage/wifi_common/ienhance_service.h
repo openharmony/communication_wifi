@@ -95,6 +95,49 @@ public:
      * @return true: allowed, false: not allowed
      */
     virtual bool IsScanAllowed(WifiScanDeviceInfo &scanDeviceInfo) = 0;
+
+    /**
+     * @Description Is customer network.
+     *
+     * @param scanDeviceInfo - scan device info
+     * @return true: allowed, false: not allowed
+     */
+    virtual bool IsHwItCustNetwork(WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description selfcure for multi dhcp server.
+     *
+     * @param cmd - add、get size、clear
+     * @param ipInfo - ip information
+     * @param retSize - get dhcp offer size
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DealDhcpOfferResult(const OperationCmd &cmd, const IpInfo &ipInfo, uint32_t &retSize) = 0;
+
+    /**
+     * @Description selfcure for multi dhcp server.
+     *
+     * @param isChanged - is gateway changed situation
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsGatewayChanged(bool &isChanged) = 0;
+
+    /**
+     * @Description selfcure for multi dhcp server.
+     *
+     * @param isMultiDhcpServer - true、false
+     * @param startSelfcure - true、false
+     * @param ipInfo - get ipinfo
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetStaticIpConfig(const bool &isMultiDhcpServer, const bool &startSelfcure, IpInfo &ipInfo) = 0;
+
+    /**
+     * @Description Is Wide Bandwidth Supported.
+     *
+     * @return true: support, false: not support
+     */
+    virtual bool IsWideBandwidthSupported() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

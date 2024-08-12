@@ -646,19 +646,6 @@ WifiErrorNo WifiStaHalInterface::SetDpiMarkRule(const std::string &ifaceName, in
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::ShellCmd(const std::string &ifName, const std::string &cmd)
-{
-    if ((ifName.length() <= 0) || (cmd.length() <= 0)) {
-        return WIFI_HAL_OPT_INVALID_PARAM;
-    }
-#ifdef HDI_WPA_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqWpaShellCmd(ifName, cmd);
-#else
-    return WIFI_HAL_OPT_OK;
-#endif
-}
-
 WifiErrorNo WifiStaHalInterface::GetPskPassphrase(const std::string &ifName, std::string &psk)
 {
     if (ifName.length() <= 0) {
@@ -698,6 +685,19 @@ WifiErrorNo WifiStaHalInterface::GetChipsetWifiFeatrureCapability(
 #endif
 }
 
+WifiErrorNo WifiStaHalInterface::ShellCmd(const std::string &ifName, const std::string &cmd)
+{
+    if ((ifName.length() <= 0) || (cmd.length() <= 0)) {
+        return WIFI_HAL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->ReqWpaShellCmd(ifName, cmd);
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
+
 WifiErrorNo WifiStaHalInterface::SetNetworkInterfaceUpDown(const std::string &ifaceName, bool upDown)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
@@ -713,6 +713,21 @@ WifiErrorNo WifiStaHalInterface::SetNetworkInterfaceUpDown(const std::string &if
 const WifiEventCallback &WifiStaHalInterface::GetCallbackInst(void) const
 {
     return mStaCallback;
+}
+
+const std::function<void(int)> &WifiStaHalInterface::GetDeathCallbackInst(void) const
+{
+    return mDeathCallback;
+}
+
+WifiErrorNo WifiStaHalInterface::RegisterNativeProcessCallback(const std::function<void(int)> &callback)
+{
+    mDeathCallback = callback;
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->ReqRegisterNativeProcessCallback(callback);
+#endif
+    return WIFI_HAL_OPT_OK;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -495,6 +495,30 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
     }
 }
 
+void WifiDeviceServiceImpl::updateStaDeviceMacAddress(WifiDeviceConfig &config)
+{
+    WifiMacAddrInfo macAddrInfo;
+    macAddrInfo.bssid = config.bssid;
+    macAddrInfo.bssidType = config.bssidType;
+    std::string macAddr =
+        WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+            macAddrInfo);
+    if (macAddr.empty()) {
+        WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
+            __func__, config.bssid.c_str(), config.bssidType);
+    } else {
+        WIFI_LOGI("%{public}s: the record is exists, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
+            __func__, config.bssid.c_str(), config.bssidType, macAddr.c_str());
+        /* random MAC address are translated into real MAC address */
+        if (!config.bssid.empty() && config.bssidType == RANDOM_DEVICE_ADDRESS) {
+            config.bssid = macAddr;
+            config.bssidType = REAL_DEVICE_ADDRESS;
+            WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                __func__, config.bssid.c_str(), config.bssidType);
+        }
+    }
+}
+
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -532,27 +556,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     }
     WifiDeviceConfig updateConfig = config;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
-    WifiMacAddrInfo macAddrInfo;
-    macAddrInfo.bssid = config.bssid;
-    macAddrInfo.bssidType = config.bssidType;
-    std::string macAddr =
-        WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
-            macAddrInfo);
-    if (macAddr.empty()) {
-        WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
-            __func__, config.bssid.c_str(), config.bssidType);
-    } else {
-        WIFI_LOGI("%{public}s: the record is exists, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-            __func__, config.bssid.c_str(), config.bssidType, macAddr.c_str());
-        /* random MAC address are translated into real MAC address */
-        if (!config.bssid.empty() &&
-            config.bssidType == RANDOM_DEVICE_ADDRESS) {
-            updateConfig.bssid = macAddr;
-            updateConfig.bssidType = REAL_DEVICE_ADDRESS;
-            WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                __func__, updateConfig.bssid.c_str(), updateConfig.bssidType);
-        }
-    }
+    updateStaDeviceMacAddress(updateConfig);
 #endif
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
@@ -566,6 +570,9 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
                 WIFI_LOGE("CheckCallingUid IsWifiBrokerProcess failed!");
                 return WIFI_OPT_INVALID_PARAM;
             }
+        }
+        if (!IsWifiBrokerProcess(uid)) {
+            updateConfig.isEphemeral = true;
         }
         return pService->AddCandidateConfig(uid, updateConfig, result);
     }
@@ -691,6 +698,31 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
     return pService->SetTxPower(power);
 }
 
+void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        return;
+    }
+    WifiDeviceConfig wifiConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wifiConfig) != 0) {
+        return;
+    }
+    // -1: Connect by system, use default uid.
+    if (wifiConfig.uid == -1 || wifiConfig.isShared) {
+        return;
+    }
+    for (auto iter = result.begin(); iter != result.end(); iter++) {
+        if (iter->ssid == wifiConfig.ssid && iter->keyMgmt == wifiConfig.keyMgmt) {
+            WIFI_LOGI("ReplaceConfigWhenCandidateConnected networkid: %{public}d!", iter->networkId);
+            result.erase(iter);
+            break;
+        }
+    }
+    result.push_back(wifiConfig);
+}
+
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     if (!isCandidate && !WifiAuthCenter::IsSystemAppByToken()) {
@@ -731,6 +763,7 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
         WifiSettings::GetInstance().GetAllCandidateConfig(uid, result);
     } else {
         WifiSettings::GetInstance().GetDeviceConfig(result);
+        ReplaceConfigWhenCandidateConnected(result);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -844,8 +877,11 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
         if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
             bool isSame = linkedInfo.networkId == networkId;
             WIFI_LOGE("ConnectToNetwork isCandidate isConnected isSame:%{public}s!", isSame ? "true" : "false");
-            return isSame ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
+            if (isSame) {
+                return WIFI_OPT_SUCCESS;
+            }
         }
+        WifiSettings::GetInstance().SetDeviceEphemeral(networkId, false);
         return pService->ConnectToCandidateConfig(uid, networkId);
     }
     return pService->ConnectToNetwork(networkId);
@@ -1181,6 +1217,12 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         }
     }
 
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
+        /* Clear mac addr */
+        info.bssid = "";
+    }
+
     WIFI_LOGD("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
               info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
     WIFI_LOGD("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d,\
@@ -1322,14 +1364,12 @@ ErrCode WifiDeviceServiceImpl::RegisterCallBack(const sptr<IWifiDeviceCallBack> 
 
 ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, int &level)
 {
-    WIFI_LOGI("GetSignalLevel device impl start...");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSignalLevel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     level = WifiSettings::GetInstance().GetSignalLevel(rssi, band, m_instId);
-    WIFI_LOGI("GetSignalLevel device impl end...");
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1400,12 +1440,12 @@ ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
         WIFI_LOGE("EnableWifi: Mdm forbidden PERMISSION_DENIED!");
         return WIFI_OPT_ENTERPRISE_DENIED;
     }
+#endif
+
     /**
      * when airplane mode opened, if the config "can_open_sta_when_airplanemode"
      * opened, then can open sta; other, return forbid.
      */
-    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
-#endif
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN &&
         !WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(m_instId)) {
         WIFI_LOGI("current airplane mode and can not use sta, open failed!");
@@ -1671,7 +1711,6 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
 {
 #ifndef SUPPORT_LOCAL_RANDOM_MAC
     WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
-    return WIFI_OPT_SUCCESS;
 #else
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC) {
         WifiSettings::GetInstance().GetRealMacAddress(currentMac, m_instId);
@@ -1704,8 +1743,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
                 ret = WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(deviceConfigKey, macAddress);
             }
             if (ret != 0) {
-                WIFI_LOGI("%{public}s Failed to generate MAC address from huks even after retrying."
-                    "Using locally generated MAC address instead.", __func__);
+                WIFI_LOGI("HilinkGetMacAddress Failed to generate MAC address, Using locally generated MAC.");
                 WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
             }
             randomMacInfo.randomMac = macAddress;
@@ -1721,9 +1759,8 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
         currentMac = randomMacInfo.randomMac;
     }
     WIFI_LOGI("EnableHiLinkHandshake mac address get success, mac = %{public}s", MacAnonymize(currentMac).c_str());
-
-    return WIFI_OPT_SUCCESS;
 #endif
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
@@ -1893,6 +1930,10 @@ ErrCode WifiDeviceServiceImpl::RegisterAutoJoinCondition(const std::string &cond
         WIFI_LOGE("RegisterAutoJoinCondition:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RegisterAutoJoinCondition:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("pService is nullptr!");
@@ -1905,6 +1946,10 @@ ErrCode WifiDeviceServiceImpl::DeregisterAutoJoinCondition(const std::string &co
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("DeregisterAutoJoinCondition:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DeregisterAutoJoinCondition:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
@@ -1923,6 +1968,10 @@ ErrCode WifiDeviceServiceImpl::RegisterFilterBuilder(const FilterTag &filterTag,
         WIFI_LOGE("RegisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RegisterFilterBuilder:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         WIFI_LOGE("pService is nullptr!");
@@ -1936,6 +1985,10 @@ ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTa
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("DeregisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DeregisterFilterBuilder:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);

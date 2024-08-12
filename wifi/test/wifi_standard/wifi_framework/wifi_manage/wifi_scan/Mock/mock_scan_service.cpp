@@ -44,7 +44,7 @@ ErrCode MockScanService::Scan(bool externFlag)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode MockScanService::ScanWithParam(const WifiScanParams &params)
+ErrCode MockScanService::ScanWithParam(const WifiScanParams &params, bool externFlag)
 {
     (void)params;
     WIFI_LOGI("Enter MockScanService::ScanWithParam");

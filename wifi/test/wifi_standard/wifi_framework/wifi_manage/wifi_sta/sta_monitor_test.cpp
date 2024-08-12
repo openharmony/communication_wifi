@@ -14,10 +14,9 @@
  */
 #include "sta_monitor.h"
 #include <gtest/gtest.h>
-#include "mock_sta_state_machine.h"
+#include "sta_state_machine.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_sta_interface.h"
 #include <string>
 
 using ::testing::_;
@@ -39,7 +38,7 @@ public:
     virtual void SetUp()
     {
         pStaMonitor = std::make_unique<StaMonitor>();
-        pStaMonitor->pStaStateMachine = new MockStaStateMachine();
+        pStaMonitor->pStaStateMachine = new StaStateMachine();
         InitStaMonitorSuccess();
     }
     virtual void TearDown()
@@ -92,25 +91,21 @@ public:
 
 void StaMonitorTest::InitStaMonitorSuccess()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::InitStaMonitorFail()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_FAILED);
 }
 
 void StaMonitorTest::UnInitStaMonitorSuccess()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::UnInitStaMonitorFail()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     pStaMonitor->SetStateMachine(pStaMonitor->pStaStateMachine);
     pStaMonitor->SetStateMachine(nullptr);
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);
@@ -294,16 +289,14 @@ void StaMonitorTest::OnWpaConnectionFullCallBackFail()
 void StaMonitorTest::OnWpaConnectionRejectCallBackSuccess()
 {
     int status = 1;
-    std::string bssid = "11:22:33:44:55:66";
-    pStaMonitor->OnWpaConnectionRejectCallBack(status, bssid);
+    pStaMonitor->OnWpaConnectionRejectCallBack(status);
 }
 
 void StaMonitorTest::OnWpaConnectionRejectCallBackFail()
 {
     int status = 1;
-    std::string bssid = "11:22:33:44:55:66";
     pStaMonitor->pStaStateMachine = nullptr;
-    pStaMonitor->OnWpaConnectionRejectCallBack(status, bssid);
+    pStaMonitor->OnWpaConnectionRejectCallBack(status);
 }
 
 void StaMonitorTest::OnWpaHilinkCallBackSuccess()

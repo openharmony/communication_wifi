@@ -149,6 +149,13 @@ WifiErrorNo HdiApStop(int id);
 WifiErrorNo IsHdiApStopped();
 
 /**
+ * @Description Add death recipient callback.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo SetNativeProcessCallback(void (*callback)(int));
+
+/**
  * @Description Create the Ap object.
  *
  * @return WifiErrorNo - operation result

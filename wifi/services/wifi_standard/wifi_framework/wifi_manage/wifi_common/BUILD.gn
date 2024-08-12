@@ -37,6 +37,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$WIFI_ROOT_DIR/base/state_machine/include",
       "$WIFI_ROOT_DIR/base/cRPC/include",
+      "$WIFI_ROOT_DIR/base/utils",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
@@ -68,7 +69,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -108,6 +109,7 @@ if (defined(ohos_lite)) {
     }
     install_enable = true
     include_dirs = [
+      "$WIFI_ROOT_DIR/base/utils",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
@@ -167,7 +169,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
@@ -213,7 +215,7 @@ if (defined(ohos_lite)) {
       "FEATURE_SELF_CURE_SUPPORT",
     ]
 
-    if (is_asan || use_clang_coverage) {
+    if (is_asan) {
       defines += [ "DTFUZZ_TEST" ]
     }
 

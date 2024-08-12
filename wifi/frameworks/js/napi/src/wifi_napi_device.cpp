@@ -91,6 +91,7 @@ static SecTypeJs SecurityTypeNativeToJs(const WifiSecurity& cppSecurityType)
             jsSecurityType = SecTypeJs::SEC_TYPE_PSK;
             break;
         case WifiSecurity::SAE:
+        case WifiSecurity::PSK_SAE:
             jsSecurityType = SecTypeJs::SEC_TYPE_SAE;
             break;
         case WifiSecurity::EAP:
@@ -126,7 +127,7 @@ static ErrCode NativeInfoElemsToJsObj(const napi_env& env,
         SetValueInt32(env, "eid", infoElems[i].id, ieObj);
         const char *uStr = &infoElems[i].content[0];
         size_t len = infoElems[i].content.size();
-        size_t inLen = (infoElems[i].content.size()) * valueStep + 1;
+        size_t inLen = static_cast<size_t>(infoElems[i].content.size() * valueStep + 1);
         char *buf = (char *)calloc(inLen + 1, sizeof(char));
         if (buf == NULL) {
             return WIFI_OPT_FAILED;
@@ -347,6 +348,7 @@ static void ProcessPassphrase(const SecTypeJs& securityType, WifiDeviceConfig& c
         cppConfig.wepKeys[0] = cppConfig.preSharedKey;
         cppConfig.wepTxKeyIndex = 0;
         cppConfig.preSharedKey = "";
+        std::string().swap(cppConfig.preSharedKey);
     }
 }
 
@@ -909,7 +911,6 @@ NO_SANITIZE("cfi") napi_value Disconnect(napi_env env, napi_callback_info info)
 
 NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info info)
 {
-    WIFI_LOGI("GetSignalLevel napi start...");
     size_t argc = 2;
     const int PARAMS_NUM = 2;
     napi_value argv[2];
@@ -931,7 +932,6 @@ NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info in
     int band = 0;
     napi_get_value_int32(env, argv[0], &rssi);
     napi_get_value_int32(env, argv[1], &band);
-    WIFI_LOGI("GetSignalLevel device start...");
     ErrCode ret = wifiDevicePtr->GetSignalLevel(rssi, band, level);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi signal level fail: %{public}d", ret);
@@ -939,7 +939,6 @@ NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info in
     }
     napi_value result;
     napi_create_uint32(env, level, &result);
-    WIFI_LOGI("GetSignalLevel napi end...");
     return result;
 }
 
@@ -977,6 +976,8 @@ static void IpV6InfoToJsObj(const napi_env& env, IpV6Info& ipInfo, napi_value& r
     SetValueUtf8String(env, "linkIpv6Address", ipInfo.linkIpV6Address, result);
     SetValueUtf8String(env, "globalIpv6Address", ipInfo.globalIpV6Address, result);
     SetValueUtf8String(env, "randomGlobalIpv6Address", ipInfo.randGlobalIpV6Address, result);
+    SetValueUtf8String(env, "uniqueIpv6Address", ipInfo.uniqueLocalAddress1, result);
+    SetValueUtf8String(env, "randomUniqueIpv6Address", ipInfo.uniqueLocalAddress2, result);
     SetValueUtf8String(env, "gateway", ipInfo.gateway, result);
     SetValueUtf8String(env, "netmask", ipInfo.netmask, result);
     SetValueUtf8String(env, "primaryDNS", ipInfo.primaryDns, result);

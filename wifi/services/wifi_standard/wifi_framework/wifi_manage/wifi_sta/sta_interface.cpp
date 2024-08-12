@@ -271,7 +271,7 @@ ErrCode StaInterface::StartWps(const WpsConfig &config)
 
 ErrCode StaInterface::CancelWps()
 {
-    LOGI("Enter StaInterface::CancelWps.\n");
+    LOGI("Enter CancelWps.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->CancelWps() != WIFI_OPT_SUCCESS) {

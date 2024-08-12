@@ -52,11 +52,11 @@ public:
     /**
      * @Description generate a MAC address
      *
-     * @param random - long long value mac address[in]
+     * @param random - unsigned long long value mac address[in]
      * @param randomMacAddr - random MAC address[out]
      * @return 0 - success
      */
-    static int GenerateRandomMacAddressByLong(long long random, std::string &randomMacAddr);
+    static int GenerateRandomMacAddressByLong(unsigned long long random, std::string &randomMacAddr);
 
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     /**
@@ -75,32 +75,32 @@ public:
      * @param peerBssid - real MAC address[in]
      * @param randomMacAddr - random MAC address[out]
      */
-    static void LongLongToBytes(long long value, std::vector<uint8_t> &outPlant);
+    static void LongLongToBytes(unsigned long long value, std::vector<uint8_t> &outPlant);
 
     /**
-     * @Description convert uint8_t array to long long value
+     * @Description convert uint8_t array to unsigned long long value
      *
      * @param bytes - uint8_t array bytes[in]
-     * @return long long value
+     * @return unsigned long long value
      */
-    static long long BytesToLonglong(const std::vector<uint8_t> &bytes);
+    static unsigned long long BytesToLonglong(const std::vector<uint8_t> &bytes);
 
     /**
-     * @Description convert uint8_t array to long long mac address
+     * @Description convert uint8_t array to unsigned long long mac address
      *
      * @param bytes - uint8_t array bytes[in]
-     * @return long long value of mac address
+     * @return unsigned long long value of mac address
      */
-    static long long LongAddrFromByteAddr(std::vector<uint8_t> &bytes);
+    static unsigned long long LongAddrFromByteAddr(std::vector<uint8_t> &bytes);
 
     /**
-     * @Description generate a MAC address from long long value
+     * @Description generate a MAC address from unsigned long long value
      *
      * @param addr - addr[in]
      * @param randomMacAddr - random MAC address[out]
      * @return 0 - success
      */
-    static int StringAddrFromLongAddr(long long addr, std::string &randomMacAddr);
+    static int StringAddrFromLongAddr(unsigned long long addr, std::string &randomMacAddr);
     /**
      * @Description a debug tool for BytesArrayToString
      *

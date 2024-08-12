@@ -74,6 +74,7 @@ public:
     explicit WifiAppStateAware();
     ~WifiAppStateAware();
     bool IsForegroundApp(int32_t uid);
+    bool IsForegroundApp(const std::string &bundleName);
 };
 
 class WifiNetAgent {

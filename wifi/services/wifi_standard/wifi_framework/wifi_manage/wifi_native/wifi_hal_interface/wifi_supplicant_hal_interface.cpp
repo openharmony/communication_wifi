@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
+std::mutex WifiSupplicantHalInterface::mSupplicantHalMutex;
 WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
 {
     static WifiSupplicantHalInterface inst;
@@ -101,6 +102,7 @@ WifiErrorNo WifiSupplicantHalInterface::RequestToSupplicant(const std::string &r
 WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
+    std::lock_guard<std::mutex> lock(mSupplicantHalMutex);
     mCallback = callback;
     return WIFI_HAL_OPT_OK;
 #else
@@ -116,6 +118,7 @@ WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(Supplica
 WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
+    std::lock_guard<std::mutex> lock(mSupplicantHalMutex);
     mCallback.onScanNotify = nullptr;
     return WIFI_HAL_OPT_OK;
 #else
@@ -184,6 +187,14 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqWpaSetPowerMode(!mode);   // idl impl need revese power mode
 #endif
+}
+
+void WifiSupplicantHalInterface::NotifyScanResultEvent()
+{
+    std::lock_guard<std::mutex> lock(mSupplicantHalMutex);
+    if (mCallback.onScanNotify) {
+        mCallback.onScanNotify(HAL_SINGLE_SCAN_OVER_OK);
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

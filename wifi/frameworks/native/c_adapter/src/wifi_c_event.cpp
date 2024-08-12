@@ -29,7 +29,6 @@
 #include "wifi_common_util.h"
 #include "wifi_sa_event.h"
 DEFINE_WIFILOG_LABEL("WifiCEvent");
-WifiEvent EventManager::g_wifiEvent = {0};
 std::shared_ptr<OHOS::Wifi::WifiDevice> g_wifiStaPtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<OHOS::Wifi::WifiScan> g_wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 std::shared_ptr<OHOS::Wifi::WifiP2p> g_wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
@@ -394,6 +393,7 @@ void EventManager::Init()
 }
 
 std::mutex EventManager::callbackMutex;
+WifiEvent EventManager::g_wifiEvent = {0};
 bool EventManager::m_isEventRegistered = false;
 
 void EventManager::SaveWifiCallbackInfo(WifiEvent* event)

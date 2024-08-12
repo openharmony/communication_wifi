@@ -26,19 +26,8 @@ namespace Wifi {
 #define FRIEND_GTEST(test_typename) friend class test_typename##Test
 static const int MIN_SYSTEM_SCAN_INTERVAL = 20;
 static const int MAX_SYSTEM_SCAN_INTERVAL = 160;
-static const int DEFAULT_PNO_SCAN_INTERVAL = 300;
 static const int MAX_SCAN_CONFIG_STORE_INDEX = 10000;
 static const int SECOND_TO_MILLI_SECOND = 1000;
-
-enum ScanBandType {
-    SCAN_BAND_UNSPECIFIED = 0,    /* not specified */
-    SCAN_BAND_24_GHZ = 1,         /* 2.4 GHz band */
-    SCAN_BAND_5_GHZ = 2,          /* 5 GHz band without DFS channels */
-    SCAN_BAND_BOTH = 3,           /* both bands without DFS channels */
-    SCAN_BAND_5_GHZ_DFS_ONLY = 4, /* 5 GHz band with DFS channels */
-    SCAN_BAND_5_GHZ_WITH_DFS = 6, /* 5 GHz band with DFS channels */
-    SCAN_BAND_BOTH_WITH_DFS = 7,  /* both bands with DFS channels */
-};
 
 /* Scan Parameter Configuration */
 struct ScanConfig {
@@ -140,6 +129,7 @@ enum ScanCommond {
     CMD_STOP_PNO_SCAN = 4,     /* Stop PNO Scanning */
     CMD_RESTART_PNO_SCAN = 5,  /* Restart PNO Scanning */
     CMD_SCAN_FINISH = 6,       /* Stop PNO scanning and uninstall the driver */
+    CMD_DISABLE_SCAN = 7,
 };
 
 /* Monitored scanning events */

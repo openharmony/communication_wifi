@@ -121,12 +121,17 @@ bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t
 #ifndef WIFI_DHCP_DISABLED
     Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    HotspotConfig hotspotConfig;
+    WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
     std::string ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
     if (!m_DhcpdInterface.StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, true, leaseTime)) {
         WIFI_LOGE("start dhcpd fail.");
         return false;
     }
     WifiNetAgent::GetInstance().AddRoute(ifaceName, ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
+    hotspotConfig.SetIpAddress(ipv4.GetAddressWithString());
+    WifiSettings::GetInstance().SetHotspotConfig(hotspotConfig, m_id);
+    WifiSettings::GetInstance().SyncHotspotConfig();
     WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
 #else

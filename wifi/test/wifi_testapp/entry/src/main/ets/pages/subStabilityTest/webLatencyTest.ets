@@ -26,6 +26,12 @@ import fs from '@ohos.file.fs';
 import http from '@ohos.net.http';
 import { TestData } from '../../entryability/model/testData'
 import prompt from '@system.prompt';
+import common from '@ohos.app.ability.common';
+import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
+import { BusinessError } from '@ohos.base';
+import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
+import notificationManager from '@ohos.notificationManager';
 
 const TAG = '[webLatencyTest]';
 
@@ -72,6 +78,7 @@ struct webLatencyTest {
   @State requestCostTime: number = 0
   private file!: fs.File
   @State fileData: string = "";
+
   listener = mediaquery.matchMediaSync('(orientation:landscape)');
 
   async openLogFile() {
@@ -122,6 +129,72 @@ struct webLatencyTest {
     AppStorage.setOrCreate("openWebNumbers" , this.openWebNumbers)
     console.log(TAG , "数据文件的沙箱路径为: " + this.filePath)
     console.log(TAG , "file fd: " + this.file.fd);
+
+    // 请求发送通知的许可
+    notificationManager.requestEnableNotification().then(() => {
+      console.info(`[EntryAbility] requestEnableNotification success`);
+      // 申请WiFi相关权限
+      let atManager = abilityAccessCtrl.createAtManager();
+      try {
+        atManager.requestPermissionsFromUser(getContext(this) , [
+          'ohos.permission.INTERNET',
+          'ohos.permission.SET_WIFI_INFO',
+          'ohos.permission.GET_WIFI_INFO',
+          'ohos.permission.MANAGE_WIFI_CONNECTION',
+          'ohos.permission.GET_WIFI_PEERS_MAC',
+          'ohos.permission.MANAGE_WIFI_CONNECTION',
+          'ohos.permission.SET_WIFI_CONFIG',
+          "ohos.permission.GET_WIFI_CONFIG",
+          "ohos.permission.GET_WIFI_LOCAL_MAC",
+          "ohos.permission.MANAGE_WIFI_HOTSPOT",
+          "ohos.permission.GET_WIFI_INFO_INTERNAL"
+        ])
+          .then((data) => {
+            console.info(`[EntryAbility], data: ${ JSON.stringify(data) }`);
+          })
+          .catch((err: BusinessError) => {
+            console.info(`[EntryAbility], err: ${ JSON.stringify(err) }`);
+          })
+      } catch( err ) {
+        console.info(`[EntryAbility], catch err->${ JSON.stringify(err) }`);
+      }
+    }).catch((err: BusinessError) => {
+      console.error(`[EntryAbility] requestEnableNotification failed, code is ${ err.code }, message is ${ err.message }`);
+    });
+  }
+
+  // 开始长时任务
+  startContinuousTask() {
+    let context: Context = getContext(this);
+    // 通知参数，指定点击长时任务通知后跳转的应用
+    let wantAgentInfo: wantAgent.WantAgentInfo = {
+      wants : [
+        {
+          bundleName : (context as common.UIAbilityContext).abilityInfo.bundleName ,
+          abilityName : (context as common.UIAbilityContext).abilityInfo.name
+        }
+      ] ,
+      operationType : wantAgent.OperationType.START_ABILITY ,
+      requestCode : 0 ,
+      wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
+    };
+    wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
+      backgroundTaskManager.startBackgroundRunning(context ,
+        backgroundTaskManager.BackgroundMode.WIFI_INTERACTION , wantAgentObj).then(() => {
+        console.info(`Succeeded in operationing startBackgroundRunning.`);
+      }).catch((err: BusinessError) => {
+        console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+      });
+    });
+  }
+
+  // 停止长时任务
+  stopContinuousTask() {
+    backgroundTaskManager.stopBackgroundRunning(getContext()).then(() => {
+      console.info(`Succeeded in operationing stopBackgroundRunning.`);
+    }).catch((err: BusinessError) => {
+      console.error(`Failed to operation stopBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+    });
   }
 
   aboutToDisappear() {
@@ -179,6 +252,7 @@ struct webLatencyTest {
                   this.openSuccessNumbers = 0
                   this.openFailNumbers = 0
                   await this.openLogFile()
+                  this.startContinuousTask();
                   await this.forLoop()
                 } else {
                   prompt.showToast({ message : 'wifi还没连接,请先连接WiFi！' });
@@ -198,6 +272,7 @@ struct webLatencyTest {
                 AppStorage.setOrCreate("openWebNumbers" , this.openWebNumbers)
                 this.webMessageLog = ""
                 fs.closeSync(this.file);
+                this.stopContinuousTask();
               })
           }
         }.width(ConfigData.WH_100_100).backgroundColor('#F5F5F5').padding({ top : " 5vp" })
@@ -348,6 +423,7 @@ struct webLatencyTest {
     }
     console.log(TAG , "测试结束 -------------")
     fs.closeSync(this.file);
+    this.stopContinuousTask();
     AppStorage.setOrCreate("openWebNumbers" , this.openWebNumbers)
     this.webMessageLog = ""
   }

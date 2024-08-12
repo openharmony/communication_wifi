@@ -17,6 +17,7 @@
 #include "ap_monitor.h"
 #include "operator_overload.h"
 #include "mock_wifi_ap_hal_interface.h"
+#include "mock_wifi_config_center.h"
 #include "Mock/mock_wifi_settings.h"
 
 using namespace OHOS;
@@ -30,10 +31,10 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-const std::string Mac = "AA:BB:CC:DD:EE:FF";
+const std::string MAC_ADDRESS = "AA:BB:CC:DD:EE:FF";
 StationInfo staInfo = {
     "test_deviceName",
-    Mac.c_str(),
+    MAC_ADDRESS.c_str(),
     1,
     "127.0.0.1",
 };
@@ -47,7 +48,7 @@ public:
     virtual void SetUp()
     {
         pApMonitor = new ApMonitor();
-        EXPECT_CALL(WifiSettings::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("ap"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApIfaceName()).WillRepeatedly(Return("ap"));
     }
     virtual void TearDown()
     {

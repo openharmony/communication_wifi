@@ -296,6 +296,12 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventWpsTimeoutTest, TestSize.Level1)
     EXPECT_EQ(result, 0);
 }
 
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventAuthTimeoutTest, TestSize.Level1)
+{
+    int32_t result = OnEventAuthTimeout(nullptr, "wlan0");
+    EXPECT_EQ(result, 0);
+}
+
 HWTEST_F(WifiHdiWpaCallbackTest, OnEventScanResultTest, TestSize.Level1)
 {
     struct HdiWpaRecvScanResultParam recvScanResultParam;
@@ -510,6 +516,12 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventInvitationReceivedTest, TestSize.Level1)
 
     result = OnEventInvitationReceived(nullptr, nullptr, "wlan0");
     EXPECT_EQ(result, 1);
+}
+
+HWTEST(WifiHdiWpaCallbackTest, OnNativeProcessDeathTest, TestSize.Level1)
+{
+    int status = 0;
+    OnNativeProcessDeath(status);
 }
 } // namespace Wifi
 } // namespace OHOS

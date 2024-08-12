@@ -18,7 +18,6 @@
 #include "mock_scan_service.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_scan_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -80,7 +79,7 @@ HWTEST_F(ScanInterfaceTest, ScanWithParamSuccess, TestSize.Level1)
     WifiScanParams wifiScanParams;
     wifiScanParams.ssid = "hmwifi";
     wifiScanParams.bssid = "a3:b1:d7:f2:d2:c2";
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams));
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams, false));
 }
 
 HWTEST_F(ScanInterfaceTest, OnScreenStateChangedSuccess1, TestSize.Level1)
@@ -155,7 +154,7 @@ HWTEST_F(ScanInterfaceTest, ScanWithParamTest, TestSize.Level1)
     WifiScanParams wifiScanParams;
     wifiScanParams.ssid = "HMWIFI_G2_03";
     wifiScanParams.bssid = "2a:76:93:47:e2:8a";
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams));
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams, false));
 }
 
 HWTEST_F(ScanInterfaceTest, StartWifiPnoScanTest, TestSize.Level1)
@@ -169,6 +168,7 @@ HWTEST_F(ScanInterfaceTest, StartWifiPnoScanTest, TestSize.Level1)
 HWTEST_F(ScanInterfaceTest, DisableScanTest, TestSize.Level1)
 {
     bool disable = false;
+    pScanInterface->pScanService->pScanStateMachine = new (std::nothrow) ScanStateMachine(0);
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->DisableScan(disable));
 }
 
@@ -194,7 +194,7 @@ HWTEST_F(ScanInterfaceTest, SetEnhanceServiceTest, TestSize.Level1)
     IEnhanceService *enhanceService =nullptr;
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->SetEnhanceService(enhanceService));
 }
- 
+
 HWTEST_F(ScanInterfaceTest, SetNetworkInterfaceUpDownTest, TestSize.Level1)
 {
     pScanInterface->SetNetworkInterfaceUpDown(false);

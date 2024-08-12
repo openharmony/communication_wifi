@@ -41,7 +41,7 @@ public:
 
 private:
     std::unique_ptr<WifiEventHandler> timer_{nullptr};
-    int32_t timerIdInit = 0;
+    uint32_t timerIdInit = 0;
 };
 #else
 class WifiTimer {

@@ -1,7 +1,7 @@
 1.0 {
     global:
         "*WifiManager*";
-        "*WifiStaManager*";
+        "*Wifi*Manager*";
         "*WifiTogglerManager*";
         "*WifiServiceManager*";
         "*SaTimer*";

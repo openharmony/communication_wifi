@@ -38,6 +38,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isEphemeral = false;
     item.preSharedKey.clear();
     item.keyMgmt.clear();
+    std::string().swap(item.preSharedKey);
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         item.wepKeys[i].clear();
     }
@@ -58,6 +59,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.macAddress.clear();
     item.internetSelfCureHistory.clear();
     item.isReassocSelfCureWithFactoryMacAddress = 0;
+    item.isShared = true;
     return;
 }
 
@@ -126,6 +128,19 @@ static void ClearWifiDeviceConfigWapi(WifiDeviceConfig &item)
     return;
 }
 
+static void ClearLastDhcpResultsConfig(WifiDeviceConfig &item)
+{
+    item.lastDhcpResult.ipAddress = 0;
+    item.lastDhcpResult.gateway = 0;
+    item.lastDhcpResult.netmask = 0;
+    item.lastDhcpResult.primaryDns = 0;
+    item.lastDhcpResult.secondDns = 0;
+    item.lastDhcpResult.serverIp = 0;
+    item.lastDhcpResult.leaseDuration = 0;
+    item.lastDhcpResult.dnsAddr.clear();
+    return;
+}
+
 template<>
 void ClearTClass<WifiDeviceConfig>(WifiDeviceConfig &item)
 {
@@ -135,6 +150,7 @@ void ClearTClass<WifiDeviceConfig>(WifiDeviceConfig &item)
     ClearWifiProxyConfig(item.wifiProxyconfig);
     ClearWifiDeviceConfigPrivacy(item);
     ClearWifiDeviceConfigWapi(item);
+    ClearLastDhcpResultsConfig(item);
     return;
 }
 
@@ -172,6 +188,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.internetSelfCureHistory = value;
     } else if (key == "isReassocSelfCureWithFactoryMacAddress") {
         item.isReassocSelfCureWithFactoryMacAddress = std::stoi(value);
+    } else if (key == "isShared") {
+        item.isShared = std::stoi(value);
     } else {
         return -1;
     }
@@ -245,6 +263,7 @@ static int SetWifiDeviceConfigEncrypt(WifiDeviceConfig &item, const std::string 
     int errorKeyValue = 0;
     if (key == "encryptedData") {
         item.preSharedKey = "";
+        std::string().swap(item.preSharedKey);
         item.encryptedData = value;
     } else if (key == "IV") {
         item.IV = value;
@@ -444,6 +463,30 @@ static int SetWifiDeviceconfigWapi(WifiDeviceConfig &item, const std::string &ke
     return errorKeyValue;
 }
 
+static int SetLastDhcpResultsConfig(WifiDeviceConfig &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "LastDhcpResults.ipAddress") {
+        item.lastDhcpResult.ipAddress = static_cast<uint32_t>(std::stoll(value));
+    } else if (key == "LastDhcpResults.gateway") {
+        item.lastDhcpResult.gateway = static_cast<uint32_t>(std::stoll(value));
+    } else if (key == "LastDhcpResults.netmask") {
+        item.lastDhcpResult.netmask = static_cast<uint32_t>(std::stoll(value));
+    } else if (key == "LastDhcpResults.primaryDns") {
+        item.lastDhcpResult.primaryDns = static_cast<uint32_t>(std::stoll(value));
+    } else if (key == "LastDhcpResults.secondDns") {
+        item.lastDhcpResult.secondDns = static_cast<uint32_t>(std::stoll(value));
+    } else if (key == "LastDhcpResults.serverIp") {
+        item.lastDhcpResult.serverIp = static_cast<uint32_t>(std::stoll(value));
+    } else if (key == "LastDhcpResults.leaseDuration") {
+        item.lastDhcpResult.leaseDuration = static_cast<uint32_t>(std::stoll(value));
+    } else {
+        errorKeyValue++;
+        LOGE("Invalid config key value");
+    }
+    return errorKeyValue;
+}
+
 template<>
 int SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::string &key, const std::string &value)
 {
@@ -458,6 +501,8 @@ int SetTClassKeyValue<WifiDeviceConfig>(WifiDeviceConfig &item, const std::strin
         errorKeyValue += SetWifiDeviceconfigPrivacy(item, key, value);
     } else if (key.compare(0, strlen("wifiWapiConfig"), "wifiWapiConfig") == 0) {
         errorKeyValue += SetWifiDeviceconfigWapi(item, key, value);
+    } else if (key.compare(0, strlen("LastDhcpResults"), "LastDhcpResults") == 0) {
+        errorKeyValue += SetLastDhcpResultsConfig(item, key, value);
     } else {
         errorKeyValue += SetWifiDeviceConfig(item, key, value);
     }
@@ -521,6 +566,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;
     ss << "    " <<"isReassocSelfCureWithFactoryMacAddress=" << item.isReassocSelfCureWithFactoryMacAddress
        << std::endl;
+    ss << "    " <<"isShared=" << item.isShared << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else
@@ -654,13 +700,29 @@ static std::string OutPutWifiWapiConfig(WifiDeviceConfig &item)
     return ss.str();
 }
 
+static std::string OutPutLastDhcpResultsConfig(WifiDeviceConfig &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"<LastDhcpResultsConfig>" << std::endl;
+    ss << "    " <<"LastDhcpResults.ipAddress=" << item.lastDhcpResult.ipAddress << std::endl;
+    ss << "    " <<"LastDhcpResults.gateway=" << item.lastDhcpResult.gateway << std::endl;
+    ss << "    " <<"LastDhcpResults.netmask=" << item.lastDhcpResult.netmask << std::endl;
+    ss << "    " <<"LastDhcpResults.primaryDns=" << item.lastDhcpResult.primaryDns << std::endl;
+    ss << "    " <<"LastDhcpResults.secondDns=" << item.lastDhcpResult.secondDns << std::endl;
+    ss << "    " <<"LastDhcpResults.serverIp=" << item.lastDhcpResult.serverIp << std::endl;
+    ss << "    " <<"LastDhcpResults.leaseDuration=" << item.lastDhcpResult.leaseDuration << std::endl;
+    ss << "    " <<"</LastDhcpResultsConfig>" << std::endl;
+    return ss.str();
+}
+
 template<>
 std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << OutPutWifiDeviceConfig(item) << OutPutWifiIpConfig(item.wifiIpConfig)
        << OutPutWifiDeviceConfigEap(item) << OutPutWifiProxyConfig(item.wifiProxyconfig)
-       << OutPutWifiDeviceConfigPrivacy(item) << OutPutWifiWapiConfig(item);
+       << OutPutWifiDeviceConfigPrivacy(item) << OutPutWifiWapiConfig(item)
+       << OutPutLastDhcpResultsConfig(item);
     return ss.str();
 }
 
@@ -921,7 +983,11 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.secondRssiLevel5G = RSSI_LEVEL_2_5G;
     item.thirdRssiLevel5G = RSSI_LEVEL_3_5G;
     item.fourthRssiLevel5G = RSSI_LEVEL_4_5G;
-    item.strDnsBak = "8.8.8.8";
+    char dns[DNS_IP_ADDR_LEN + 1] = { 0 };
+    if (GetParamValue(WIFI_FIRST_DNS_NAME, 0, dns, DNS_IP_ADDR_LEN) <= 0) {
+        LOGE("get WIFI_FIRST_DNS_NAME error");
+    }
+    item.strDnsBak = dns;
     item.isLoadStabak = true;
     item.scanOnlySwitch = true;
     item.realMacAddress = "";
@@ -1322,8 +1388,8 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
     ss << "    " <<"groupStatus=" << static_cast<int>(item.GetP2pGroupStatus()) << std::endl;
     ss << "    " <<"goIpAddress=" << item.GetGoIpAddress() << std::endl;
     ss << OutWifiP2pDeviceClassString(item.GetOwner(), "ownerDev.");
-    int size = item.GetClientDevices().size();
-    for (int i = 0; i < size; i++) {
+    unsigned int size = item.GetClientDevices().size();
+    for (unsigned int i = 0; i < size; i++) {
         std::string prefix = "vecDev_" + std::to_string(i) + ".";
         ss << "    " <<"vecDev_=" << i << std::endl;
         const WifiP2pDevice &tmp = item.GetClientDevices().at(i);
@@ -1417,6 +1483,7 @@ template <> void ClearTClass<WifiStoreRandomMac>(WifiStoreRandomMac &item)
     item.peerBssid.clear();
     item.randomMac.clear();
     item.preSharedKey.clear();
+    std::string().swap(item.preSharedKey);
     item.fuzzyBssids.clear();
     return;
 }
@@ -1642,6 +1709,7 @@ static void ClearWifiBackupConfig(WifiBackupConfig &item)
     item.lastHasInternetTime = -1;
     item.noInternetAccess = false;
     item.preSharedKey.clear();
+    std::string().swap(item.preSharedKey);
     item.wepTxKeyIndex = 0;
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         item.wepKeys[i].clear();

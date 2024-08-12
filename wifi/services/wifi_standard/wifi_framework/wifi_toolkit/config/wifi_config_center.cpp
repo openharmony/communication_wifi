@@ -109,6 +109,16 @@ int WifiConfigCenter::GetLastNetworkId() const
     return mLastNetworkId.load();
 }
 
+void WifiConfigCenter::SetSelectedCandidateNetworkId(const int networkId)
+{
+    mSelectedCandidateNetworkId = networkId;
+}
+
+int WifiConfigCenter::GetSelectedCandidateNetworkId() const
+{
+    return mSelectedCandidateNetworkId.load();
+}
+
 void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)
 {
     mWifiAllowSemiActive = isAllowed;
@@ -404,7 +414,7 @@ std::string WifiConfigCenter::GetConnectTimeoutBssid(int instId)
 int WifiConfigCenter::SetConnectTimeoutBssid(std::string &bssid, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     if (now == static_cast<time_t>(-1)) {
         LOGE("SetConnectTimeoutBssid: call time failed!");
         return -1;

@@ -116,7 +116,7 @@ public:
             WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue, threadName:%{public}s", threadName.c_str());
         } else {
             eventQueue = std::make_shared<ffrt::queue>(threadName.c_str(),
-            ffrt::queue_attr().timeout(WIFI_THREAD_TIMEOUT_LIMIT).callback(timeOutFunc));
+            ffrt::queue_attr().callback(timeOutFunc));
             WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue with callback,"
                 "threadName:%{public}s", threadName.c_str());
         }
@@ -126,14 +126,18 @@ public:
     {
         WIFI_LOGI("WifiEventHandler: ~WifiEventHandler");
         std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
-        if (eventQueue) {
-            eventQueue = nullptr;
-        }
         for (auto iter = taskMap_.begin(); iter != taskMap_.end();) {
-            if (iter->second != nullptr) {
+            if (iter->second != nullptr && eventQueue != nullptr) {
+                int32_t ret = eventQueue->cancel(iter->second);
+                if (ret != 0) {
+                    WIFI_LOGD("~WifiEventHandler cancel failed, error code : %{public}d", ret);
+                }
                 iter->second = nullptr;
             }
             iter = taskMap_.erase(iter);
+        }
+        if (eventQueue != nullptr) {
+            eventQueue.reset();
         }
     }
     bool PostSyncTask(Callback &callback)
@@ -177,32 +181,26 @@ public:
         if (handle == nullptr) {
             return false;
         }
-        taskMap_.push_back(make_pair(name, std::move(handle)));
+        taskMap_[name]  = std::move(handle);
         return true;
     }
     void RemoveAsyncTask(const std::string &name)
     {
         std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         WIFI_LOGD("RemoveAsyncTask Enter %{public}s", name.c_str());
-        for (auto iter = taskMap_.begin(); iter != taskMap_.end();) {
-            if (iter->first != name) {
-                iter++;
-                continue;
+        auto iter = taskMap_.find(name);
+        if (iter != taskMap_.end() && iter->second != nullptr && eventQueue != nullptr) {
+            int32_t ret = eventQueue->cancel(iter->second);
+            if (ret != 0) {
+                WIFI_LOGD("RemoveAsyncTask failed, error code : %{public}d", ret);
             }
-            if (iter->second != nullptr) {
-                int32_t ret = eventQueue->cancel(iter->second);
-                if (ret != 0) {
-                    WIFI_LOGD("RemoveAsyncTask failed, error code : %{public}d", ret);
-                }
-                iter->second = nullptr;
-            }
-            iter = taskMap_.erase(iter);
+            taskMap_.erase(iter);
         }
     }
 private:
     std::shared_ptr<ffrt::queue> eventQueue = nullptr;
     mutable ffrt::mutex eventQurueMutex;
-    std::vector<std::pair<std::string, ffrt::task_handle>> taskMap_;
+    std::map<std::string, ffrt::task_handle> taskMap_;
 };
 #else
 class WifiEventHandler::WifiEventHandlerImpl {

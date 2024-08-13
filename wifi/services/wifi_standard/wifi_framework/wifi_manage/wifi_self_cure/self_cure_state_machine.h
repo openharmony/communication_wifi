@@ -97,6 +97,7 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void HandleDhcpOfferPacketRcv(const IpInfo &info);
+        void HandleP2pEnhanceStateChange(int state);
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
     };
@@ -452,6 +453,7 @@ private:
     std::atomic<bool> isWifiBackground = false;
     sptr<NetStateObserver> mNetWorkDetect;
     bool m_httpDetectResponse = false;
+    bool p2pEnhanceConnected_ = false;
 };
 } // namespace Wifi
 } // namespace OHOS

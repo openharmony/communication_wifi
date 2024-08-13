@@ -254,7 +254,6 @@ public:
         pConcreteManagerMachine->mTargetRole =
             static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE);
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
-        pConcreteManagerMachine->StartSelfCureService(0);
     }
 
     void HandleStaStopTest1()

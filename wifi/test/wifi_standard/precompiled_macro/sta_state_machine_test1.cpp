@@ -28,7 +28,6 @@
 #include "mock_wifi_sta_hal_interface.h"
 #include "wifi_error_no.h"
 
-
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;
@@ -152,6 +151,7 @@ void OnWifiWpa3SelfCureSuccessTest()
     std::vector<WifiScanInfo> scanResults;
     WifiScanInfo scanInfo;
     scanInfo.ssid = "1234";
+    scanInfo.capabilities = "PSK+SAE";
     scanResults.push_back(scanInfo);
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).
         WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
@@ -167,6 +167,7 @@ void InitRandomMacInfoTest()
     std::vector<WifiScanInfo> scanResults;
     WifiScanInfo scanInfo;
     scanInfo.ssid = "1234";
+    scanInfo.securityType = WifiSecurity::OPEN;
     scanResults.push_back(scanInfo);
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).
         WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
@@ -214,9 +215,19 @@ void SetRandomMacFail1()
 void SetRandomMacFail2()
 {
     WifiDeviceConfig deviceConfig;
+    WifiStoreRandomMac randomMacInfo;
+    randomMacInfo.ssid = RANDOMMAC_SSID;
+    randomMacInfo.keyMgmt = KEY_MGMT_WPA_PSK;
+    randomMacInfo.preSharedKey = RANDOMMAC_PASSWORD;
+    randomMacInfo.peerBssid = RANDOMMAC_BSSID;
+    pStaStateMachine->MacAddressGenerate(randomMacInfo);
     deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+    deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
+    std::string MacAddress = "11:22:33:44:55:66";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).
+        WillRepeatedly(DoAll(SetArgReferee<0>(MacAddress), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
     pStaStateMachine->SetRandomMac(0, "");
@@ -346,6 +357,53 @@ void DealDhcpOfferResultTest()
     StaStateMachine staStateMachine;
     pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
     pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
+}
+
+void TransHalDeviceConfigTest()
+{
+    WifiDeviceConfig config;
+    config.keyMgmt = "SAE";
+    std::vector<WifiScanInfo> scanResults;
+    WifiScanInfo scanInfo;
+    scanInfo.ssid = "1234";
+    scanResults.push_back(scanInfo);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).
+        WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiHalDeviceConfig halDeviceConfig;
+    pStaStateMachine->TransHalDeviceConfig(halDeviceConfig, config);
+}
+
+void DealReConnectCmdSuccess()
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
+    MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+    pStaStateMachine->DealReConnectCmd(msg);
+}
+
+void DealReassociateCmdSuccess()
+{
+    EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    std::string bssid = "wifitest";
+    msg->SetMessageObj(bssid);
+    MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+    pStaStateMachine->DealReassociateCmd(msg);
+}
+
+void DealStartWpsCmdFail1()
+{
+    EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
+    MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+    pStaStateMachine->wpsState = SetupMethod::KEYPAD;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    std::string bssid = "wifitest";
+    msg->SetMessageObj(bssid);
+    msg->SetParam1(static_cast<int>(SetupMethod::INVALID));
+    pStaStateMachine->DealStartWpsCmd(msg);
+    pStaStateMachine->DealStartWpsCmd(msg);
+    pStaStateMachine->wpsState = SetupMethod::DISPLAY;
+    pStaStateMachine->DealStartWpsCmd(msg);
 }
 };
 
@@ -483,6 +541,26 @@ HWTEST_F(StaStateMachineTest, SetRandomMacFail1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, SetRandomMacFail2, TestSize.Level1)
 {
     SetRandomMacFail2();
+}
+
+HWTEST_F(StaStateMachineTest, TransHalDeviceConfigTest, TestSize.Level1)
+{
+    TransHalDeviceConfigTest();
+}
+
+HWTEST_F(StaStateMachineTest, DealReConnectCmdSuccess, TestSize.Level1)
+{
+    DealReConnectCmdSuccess();
+}
+
+HWTEST_F(StaStateMachineTest, DealReassociateCmdSuccess, TestSize.Level1)
+{
+    DealReassociateCmdSuccess();
+}
+
+HWTEST_F(StaStateMachineTest, DealStartWpsCmdFail1, TestSize.Level1)
+{
+    DealStartWpsCmdFail1();
 }
 }
 }

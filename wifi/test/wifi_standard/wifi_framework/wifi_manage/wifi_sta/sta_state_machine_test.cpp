@@ -1076,6 +1076,7 @@ public:
         msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
         StaStateMachine staStateMachine;
         pStaStateMachine->pGetIpState->pStaStateMachine = &staStateMachine;
+                pStaStateMachine->pGetIpState->pStaStateMachine->pDhcpResultNotify->pStaStateMachine = &staStateMachine;
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);
     }
 
@@ -1084,6 +1085,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         StaStateMachine staStateMachine;
         pStaStateMachine->pGetIpState->pStaStateMachine = &staStateMachine;
+        pStaStateMachine->pGetIpState->pStaStateMachine->pDhcpResultNotify->pStaStateMachine = &staStateMachine;
         msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
         msg->SetParam1(DHCP_JUMP);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);

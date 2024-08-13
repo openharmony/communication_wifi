@@ -479,6 +479,11 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
     WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
+    if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
+        WIFI_LOGI("current network do not need selfcure");
+        return;
+    }
+
     if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
         WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
         return;

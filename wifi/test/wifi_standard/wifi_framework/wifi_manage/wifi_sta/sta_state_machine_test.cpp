@@ -55,6 +55,7 @@ constexpr int VALID_RSSI3 = -80;
 constexpr int VALID_RSSI4 = 156;
 constexpr int INVALID_RSSI5 = 100;
 static constexpr int MAX_STR_LENT = 127;
+static constexpr int MAX_CONNECTED_COUNT = 4;
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -501,7 +502,7 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
-        pStaStateMachine->linkedInfo.retryedConnCount = 4;
+        pStaStateMachine->linkedInfo.retryedConnCount = MAX_CONNECTED_COUNT;
         pStaStateMachine->DealWpaLinkFailEvent(msg);
     }
 
@@ -513,7 +514,7 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
-        pStaStateMachine->linkedInfo.retryedConnCount = 4;
+        pStaStateMachine->linkedInfo.retryedConnCount = MAX_CONNECTED_COUNT;
         pStaStateMachine->DealWpaLinkFailEvent(msg);
     }
 
@@ -1073,12 +1074,16 @@ public:
         msg->SetParam1(DHCP_RESULT);
         msg->SetParam2(0);
         msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pGetIpState->pStaStateMachine = &staStateMachine;
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);
     }
 
     void GetIpStateStateExeMsgFail()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pGetIpState->pStaStateMachine = &staStateMachine;
         msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
         msg->SetParam1(DHCP_JUMP);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);
@@ -1991,6 +1996,8 @@ public:
         WifiDeviceConfig wifiDeviceConfig;
         wifiDeviceConfig.networkId = 1;
         wifiDeviceConfig.wifiEapConfig.eapSubId = 0;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetDeviceConfig(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig), Return(0)));
         pStaStateMachine->DealWpaEapUmtsAuthEvent(msg2);
     }
 

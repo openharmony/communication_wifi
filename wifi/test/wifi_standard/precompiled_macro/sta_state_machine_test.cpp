@@ -47,6 +47,10 @@ errno_t strcpy_s(char *strDest, size_t destMax, const char *strSrc)
     return 1;
 }
 
+void DealDhcpOfferReport(const OHOS::Wifi::IpInfo &ipInfo, int instId)
+{
+}
+
 namespace OHOS {
 namespace Wifi {
 static const std::string RANDOMMAC_SSID = "testwifi";
@@ -55,6 +59,7 @@ static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 static constexpr int NAPI_MAX_STR_LENT = 127;
 static constexpr int MIN_5G_FREQUENCY = 5160;
 static constexpr int INVALID_RSSI1 = -128;
+static constexpr int GATE_WAY = 124;
 constexpr int TWO = 2;
 
 class StaStateMachineTest : public testing::Test {
@@ -256,7 +261,6 @@ public:
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, &result1);
     }
 
-
     void TryToSaveIpV6ResultTest()
     {
         IpInfo ipInfo;
@@ -264,6 +268,27 @@ public:
         DhcpResult *result = nullptr;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6Result(ipInfo, ipv6Info, result);
         DhcpResult result1;
+        if (snprintf_s(result1.strOptClientId, sizeof(result1.strOptClientId), sizeof(result1.strOptClientId) - 1,
+                "%s", "0.0.0.1") < 0) {
+            return;
+        }
+        if (snprintf_s(result1.strOptRouter1, sizeof(result1.strOptRouter1), sizeof(result1.strOptRouter1) - 1,
+                "%s", "0.0.0.1") < 0) {
+            return;
+        }
+        result1.iptype  = 0;
+        ipv6Info.linkIpV6Address  = "0";
+        ipv6Info.globalIpV6Address  = "0";
+        ipv6Info.randGlobalIpV6Address  = "0";
+        ipv6Info.gateway  = "0";
+        ipv6Info.netmask  = "0";
+        ipv6Info.primaryDns  = "0";
+        ipv6Info.secondDns  = "0";
+        ipv6Info.uniqueLocalAddress1  = "0";
+        ipv6Info.uniqueLocalAddress2  = "0";
+        ipv6Info.dnsAddr.push_back("11");
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6Result(ipInfo, ipv6Info, &result1);
     }
 
@@ -274,9 +299,13 @@ public:
         connectMethod = NETWORK_SELECTED_BY_USER;
         pStaStateMachine->SetConnectMethod(connectMethod);
     }
+
     void InvokeOnDhcpOfferReportTest()
     {
         IpInfo ipInfo;
+        StaServiceCallback callback;
+        callback.OnDhcpOfferReport = DealDhcpOfferReport;
+        pStaStateMachine->RegisterStaServiceCallback(callback);
         pStaStateMachine->InvokeOnDhcpOfferReport(ipInfo);
     }
 
@@ -402,6 +431,78 @@ public:
         pStaStateMachine->DealScreenStateChangedEvent(msg);
         msg->SetParam1(static_cast<int>(MODE_STATE_CLOSE));
         pStaStateMachine->DealScreenStateChangedEvent(msg);
+    }
+
+       void DealCancelWpsCmdSuccess1()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
+        pStaStateMachine->wpsState = SetupMethod::PBC;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->DealCancelWpsCmd(msg);
+    }
+
+    void DealCancelWpsCmdSuccess2()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _));
+        pStaStateMachine->wpsState = SetupMethod::DISPLAY;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->DealCancelWpsCmd(msg);
+    }
+
+    void DealCancelWpsCmdSuccess3()
+    {
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).WillRepeatedly(Return(-1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
+        pStaStateMachine->wpsState = SetupMethod::KEYPAD;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->DealCancelWpsCmd(msg);
+    }
+
+    void DealCancelWpsCmdFail1()
+    {
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
+        pStaStateMachine->wpsState = SetupMethod::PBC;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->DealCancelWpsCmd(msg);
+    }
+
+    void DealCancelWpsCmdFail2()
+    {
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
+        pStaStateMachine->wpsState = SetupMethod::DISPLAY;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->DealCancelWpsCmd(msg);
+    }
+
+    void DealCancelWpsCmdFail3()
+    {
+        EXPECT_CALL(WifiManager::GetInstance(), DealWpsChanged(_, _, _)).Times(AtLeast(0));
+        pStaStateMachine->wpsState = SetupMethod::KEYPAD;
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+        pStaStateMachine->DealCancelWpsCmd(msg);
+        pStaStateMachine->DealCancelWpsCmd(nullptr);
+    }
+    void CanArpReachableTest()
+    {
+        IpInfo ipInfo;
+        ipInfo.gateway =GATE_WAY;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+        pStaStateMachine->CanArpReachable();
+    }
+    void PortalExpiredDetectTest()
+    {
+        pStaStateMachine->portalState = PortalState::AUTHED;
+        pStaStateMachine->portalExpiredDetectCount = PORTAL_EXPERIED_DETECT_MAX_COUNT;
+        pStaStateMachine->PortalExpiredDetect();
     }
 };
 
@@ -538,6 +639,51 @@ HWTEST_F(StaStateMachineTest, DealStartWpsCmdSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest, TestSize.Level1)
 {
     DealScreenStateChangedEventTest();
+}
+
+HWTEST_F(StaStateMachineTest, InvokeOnDhcpOfferReportTest, TestSize.Level1)
+{
+    InvokeOnDhcpOfferReportTest();
+}
+
+HWTEST_F(StaStateMachineTest, DealCancelWpsCmdSuccess1, TestSize.Level1)
+{
+    DealCancelWpsCmdSuccess1();
+}
+
+HWTEST_F(StaStateMachineTest, DealCancelWpsCmdSuccess2, TestSize.Level1)
+{
+    DealCancelWpsCmdSuccess2();
+}
+
+HWTEST_F(StaStateMachineTest, DealCancelWpsCmdSuccess3, TestSize.Level1)
+{
+    DealCancelWpsCmdSuccess3();
+}
+
+HWTEST_F(StaStateMachineTest, DealCancelWpsCmdFail1, TestSize.Level1)
+{
+    DealCancelWpsCmdFail1();
+}
+
+HWTEST_F(StaStateMachineTest, DealCancelWpsCmdFail2, TestSize.Level1)
+{
+    DealCancelWpsCmdFail2();
+}
+
+HWTEST_F(StaStateMachineTest, DealCancelWpsCmdFail3, TestSize.Level1)
+{
+    DealCancelWpsCmdFail3();
+}
+
+HWTEST_F(StaStateMachineTest, CanArpReachableTest, TestSize.Level1)
+{
+    CanArpReachableTest();
+}
+
+HWTEST_F(StaStateMachineTest, PortalExpiredDetectTest, TestSize.Level1)
+{
+    PortalExpiredDetectTest();
 }
 }
 }

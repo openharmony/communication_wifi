@@ -55,6 +55,7 @@ constexpr int VALID_RSSI3 = -80;
 constexpr int VALID_RSSI4 = 156;
 constexpr int INVALID_RSSI5 = 100;
 static constexpr int MAX_STR_LENT = 127;
+static constexpr int MAX_CONNECTED_COUNT = 4;
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -501,6 +502,7 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
+        pStaStateMachine->linkedInfo.retryedConnCount = MAX_CONNECTED_COUNT;
         pStaStateMachine->DealWpaLinkFailEvent(msg);
     }
 
@@ -512,6 +514,7 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
+        pStaStateMachine->linkedInfo.retryedConnCount = MAX_CONNECTED_COUNT;
         pStaStateMachine->DealWpaLinkFailEvent(msg);
     }
 
@@ -775,10 +778,13 @@ public:
     void SetRandomMacSuccess1()
     {
         WifiDeviceConfig deviceConfig;
-        deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+        deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::DEVICEMAC;
         deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
+        std::string macAddress = RANDOMMAC_SSID;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(macAddress), Return(0)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         pStaStateMachine->SetRandomMac(0, "");
@@ -913,6 +919,11 @@ public:
 
     void ApLinkedStateExeMsgFai2()
     {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        std::string bssid = "wifitest";
+        msg->SetMessageObj(bssid);
+        msg->SetMessageName(CMD_SIGNAL_POLL);
+        EXPECT_FALSE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(msg));
         EXPECT_FALSE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(nullptr));
     }
 
@@ -1060,22 +1071,29 @@ public:
     void GetIpStateStateExeMsgSuccess()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetParam1(1);
+        msg->SetParam1(DHCP_RESULT);
         msg->SetParam2(0);
-        msg->SetMessageName(DHCP_RESULT);
+        msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pGetIpState->pStaStateMachine = &staStateMachine;
+                pStaStateMachine->pGetIpState->pStaStateMachine->pDhcpResultNotify->pStaStateMachine = &staStateMachine;
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);
     }
 
     void GetIpStateStateExeMsgFail()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetMessageName(DHCP_JUMP);
+        StaStateMachine staStateMachine;
+        pStaStateMachine->pGetIpState->pStaStateMachine = &staStateMachine;
+        pStaStateMachine->pGetIpState->pStaStateMachine->pDhcpResultNotify->pStaStateMachine = &staStateMachine;
+        msg->SetMessageName(WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT);
+        msg->SetParam1(DHCP_JUMP);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);
-        msg->SetMessageName(DHCP_FAIL);
+        msg->SetParam1(DHCP_FAIL);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);
-        msg->SetMessageName(DHCP_OFFER_REPORT);
+        msg->SetParam1(DHCP_OFFER_REPORT);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);
-        msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+        msg->SetParam1(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(msg);
         pStaStateMachine->pGetIpState->ExecuteStateMsg(nullptr);
     }
@@ -1904,14 +1922,14 @@ public:
     void GetGsmAuthResponseWithLengthTest()
     {
         EapSimGsmAuthParam param;
-        param.rands.push_back("aaaaa");
+        param.rands.push_back("aaaaa12345656789098");
         pStaStateMachine->GetGsmAuthResponseWithLength(param);
     }
 
     void GetGsmAuthResponseWithoutLengthTest()
     {
         EapSimGsmAuthParam param;
-        param.rands.push_back("aaaaa");
+        param.rands.push_back("aaaaa12345656789098");
         pStaStateMachine->GetGsmAuthResponseWithoutLength(param);
     }
 
@@ -1977,6 +1995,11 @@ public:
         param.rand = "111111122222233333333";
         param.autn = "222222333333344444444";
         msg2->SetMessageObj(param);
+        WifiDeviceConfig wifiDeviceConfig;
+        wifiDeviceConfig.networkId = 1;
+        wifiDeviceConfig.wifiEapConfig.eapSubId = 0;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig), Return(0)));
         pStaStateMachine->DealWpaEapUmtsAuthEvent(msg2);
     }
 

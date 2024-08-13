@@ -1455,5 +1455,6 @@ HWTEST_F(WifiHdiWpaClientTest, PushDeviceConfigParseMaskTest, TestSize.Level1)
     result = wifiHdiWpaClient->PushDeviceConfigParseMask(&pConfig, type, mask, parseStr, size);
     EXPECT_EQ(result, 1);
 }
+
 } // namespace Wifi
 } // namespace OHOS

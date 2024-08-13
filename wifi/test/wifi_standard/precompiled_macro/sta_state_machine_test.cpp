@@ -256,6 +256,7 @@ public:
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, &result1);
     }
 
+
     void TryToSaveIpV6ResultTest()
     {
         IpInfo ipInfo;

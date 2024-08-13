@@ -28,6 +28,7 @@
 #include "mock_wifi_sta_hal_interface.h"
 #include "wifi_error_no.h"
 
+
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;

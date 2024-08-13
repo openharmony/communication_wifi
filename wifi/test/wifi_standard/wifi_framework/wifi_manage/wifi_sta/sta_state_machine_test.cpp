@@ -1996,7 +1996,7 @@ public:
         WifiDeviceConfig wifiDeviceConfig;
         wifiDeviceConfig.networkId = 1;
         wifiDeviceConfig.wifiEapConfig.eapSubId = 0;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetDeviceConfig(_, _)).
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig), Return(0)));
         pStaStateMachine->DealWpaEapUmtsAuthEvent(msg2);
     }

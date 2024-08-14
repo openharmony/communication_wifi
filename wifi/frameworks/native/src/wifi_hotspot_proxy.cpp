@@ -647,7 +647,7 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
     WIFI_LOGD("WifiHotspotProxy::RegisterCallBack!");
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     g_wifiHotspotCallbackStub->RegisterCallBack(callback);
     if (!data.WriteInterfaceToken(GetDescriptor())) {

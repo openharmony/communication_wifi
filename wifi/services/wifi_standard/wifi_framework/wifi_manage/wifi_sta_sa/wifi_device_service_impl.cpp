@@ -49,7 +49,7 @@ namespace Wifi {
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
-constexpr int EXTENSION_ERROR_CODE = "13500099";
+constexpr int EXTENSION_ERROR_CODE = 13500099;
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;

@@ -321,8 +321,8 @@ static void ParseScanInfo(std::vector<ScanResultsInfo> &scanResultsInfo, std::ve
         GetScanResultInfoElem(&scanInfo, scanResult.ie.data(), scanResult.ie.size());
         scanInfo.timestamp = scanResult.tsf;
         scanInfo.isHiLinkNetwork = RouterSupportHiLinkByWifiInfo(scanResult.ie.data(), scanResult.ie.size());
-        LOGD("%{public}s: bssid:%{private}s, ssid:%{private}s isHiLinkNetwork = %{public}d", __func__, scanInfo.bssid,
-            scanInfo.ssid, scanInfo.isHiLinkNetwork);
+        LOGD("%{public}s: bssid:%{private}s, ssid:%{private}s isHiLinkNetwork:%{public}d, flags:%{public}s",
+            __func__, scanInfo.bssid, scanInfo.ssid, scanInfo.isHiLinkNetwork, scanInfo.flags);
         InterScanInfo interScanInfo;
         ConvertsScanInfo(interScanInfo, scanInfo);
         scanInfos.emplace_back(interScanInfo);

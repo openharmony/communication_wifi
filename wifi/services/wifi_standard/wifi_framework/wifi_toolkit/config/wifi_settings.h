@@ -157,6 +157,8 @@ public:
 
     void MergeWifiCloneConfig(std::string &cloneData);
 
+    std::string SetBackupReplyCode(int replyCode);
+
     void RemoveBackupFile();
 #endif
 

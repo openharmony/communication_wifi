@@ -1580,7 +1580,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
     }
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;

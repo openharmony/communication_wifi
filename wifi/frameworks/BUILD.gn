@@ -27,6 +27,7 @@ group("wifi_kits") {
       "$WIFI_ROOT_DIR/frameworks/js/napi:wifiext",
       "$WIFI_ROOT_DIR/frameworks/js/napi:wifimanager",
       "$WIFI_ROOT_DIR/frameworks/js/napi:wifimanagerext",
+      "$WIFI_ROOT_DIR/frameworks/cj:cj_wifi_ffi",
     ]
   }
 }

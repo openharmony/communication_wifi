@@ -24,6 +24,7 @@
 #include "wifi_event_subscriber_manager.h"
 #include "wifi_app_state_aware.h"
 #include "wifi_multi_vap_manager.h"
+#include "wifi_p2p_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -70,6 +71,7 @@ public:
     std::unique_ptr<WifiHotspotManager>& GetWifiHotspotManager();
     std::unique_ptr<WifiEventSubscriberManager>& GetWifiEventSubscriberManager();
     std::unique_ptr<WifiMultiVapManager>& GetWifiMultiVapManager();
+    std::unique_ptr<WifiP2pManager>& GetWifiP2pManager();
     int Init();
     void Exit();
 private:
@@ -83,6 +85,7 @@ private:
     std::unique_ptr<WifiHotspotManager> wifiHotspotManager = nullptr;
     std::unique_ptr<WifiEventSubscriberManager> wifiEventSubscriberManager = nullptr;
     std::unique_ptr<WifiMultiVapManager> wifiMultiVapManager = nullptr;
+    std::unique_ptr<WifiP2pManager> wifiP2pManager = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

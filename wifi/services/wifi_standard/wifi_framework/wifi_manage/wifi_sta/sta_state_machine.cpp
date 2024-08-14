@@ -578,6 +578,39 @@ void StaStateMachine::TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig,
     FillWapiCfg(config, halDeviceConfig);
 }
 
+void StaStateMachine::AppendFastTransitionKeyMgmt(
+    const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const
+{
+    if (scanInfo.capabilities.find("FT/EAP") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-EAP ");
+    } else if (scanInfo.capabilities.find("FT/PSK") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-PSK ");
+    } else if (scanInfo.capabilities.find("FT/SAE") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-SAE ");
+    } else {
+        LOGI("No need append ft keyMgmt!");
+    }
+}
+
+void StaStateMachine::ConvertOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const
+{
+    std::vector<WifiScanInfo> scanInfoList;
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    for (auto &scanInfo : scanInfoList) {
+        std::string deviceKeyMgmt;
+        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (config.ssid == scanInfo.ssid
+            && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
+                || (config.keyMgmt == deviceKeyMgmt))) {
+            AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
+            halDeviceConfig.ssid = scanInfo.oriSsid;
+            LOGI("ConvertDeviceCfg back to oriSsid:%{public}s, keyMgmt:%{public}s",
+                SsidAnonymize(halDeviceConfig.ssid).c_str(), halDeviceConfig.keyMgmt.c_str());
+            break;
+        }
+    }
+}
+
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
     LOGI("Enter ConvertDeviceCfg.\n");
@@ -612,19 +645,8 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     }
     LOGI("ConvertDeviceCfg SetDeviceConfig selected network ssid=%{public}s, bssid=%{public}s",
         SsidAnonymize(halDeviceConfig.ssid).c_str(), MacAnonymize(halDeviceConfig.bssid).c_str());
-
-    std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
-    for (auto scanInfo : scanInfoList) {
-        std::string deviceKeyMgmt;
-        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (halDeviceConfig.ssid == scanInfo.ssid && halDeviceConfig.keyMgmt == deviceKeyMgmt) {
-            halDeviceConfig.ssid = scanInfo.oriSsid;
-            LOGI("ConvertDeviceCfg back to oriSsid:%{public}s", SsidAnonymize(halDeviceConfig.ssid).c_str());
-            break;
-        }
-    }
-
+    ConvertOriginalSsid(config, halDeviceConfig);
+    
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, halDeviceConfig) != WIFI_HAL_OPT_OK) {
         LOGE("ConvertDeviceCfg SetDeviceConfig failed!");
         return WIFI_OPT_FAILED;

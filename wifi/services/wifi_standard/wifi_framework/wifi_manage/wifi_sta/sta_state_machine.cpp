@@ -4329,7 +4329,7 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
         if (IsGoodSignalQuality()) {
             NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
             WIFI_LOGI("After updated, current network status history is %{public}s.",
-                  NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+                      NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
         } else {
             WIFI_LOGI("No updated, current network status history is %{public}s.",
                 NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());

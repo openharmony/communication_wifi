@@ -277,15 +277,15 @@ public:
             return;
         }
         result1.iptype  = 0;
-        ipv6Info.linkIpV6Address  = "0";;
-        ipv6Info.globalIpV6Address  = "0";;
-        ipv6Info.randGlobalIpV6Address  = "0";;
-        ipv6Info.gateway  = "0";;
-        ipv6Info.netmask  = "0";;
-        ipv6Info.primaryDns  = "0";;
-        ipv6Info.secondDns  = "0";;
-        ipv6Info.uniqueLocalAddress1  = "0";;
-        ipv6Info.uniqueLocalAddress2  = "0";;
+        ipv6Info.linkIpV6Address  = "0";
+        ipv6Info.globalIpV6Address  = "0";
+        ipv6Info.randGlobalIpV6Address  = "0";
+        ipv6Info.gateway  = "0";
+        ipv6Info.netmask  = "0";
+        ipv6Info.primaryDns  = "0";
+        ipv6Info.secondDns  = "0";
+        ipv6Info.uniqueLocalAddress1  = "0";
+        ipv6Info.uniqueLocalAddress2  = "0";
         ipv6Info.dnsAddr.push_back("11");
         StaStateMachine staStateMachine;
         pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);

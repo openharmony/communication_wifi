@@ -37,6 +37,7 @@ local_base_sources = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/block_connect_service.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_app_state_aware.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_auth_center.cpp",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_channel_helper.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_cmd_client.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code/wifi_country_code_manager.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code/wifi_country_code_policy.cpp",
@@ -74,7 +75,6 @@ local_base_sources = [
   "Mock/mock_state_machine.cpp",
   "Mock/mock_wifi_chip_hal_interface.cpp",
   "Mock/mock_wifi_settings.cpp",
-  
 ]
 
 local_base_include_dirs = [

@@ -41,7 +41,7 @@
 #include "wifi_notification_util.h"
 #include "wifi_net_stats_manager.h"
 #endif // OHOS_ARCH_LITE
-
+#include "wifi_channel_helper.h"
 #ifndef OHOS_WIFI_STA_TEST
 #else
 #include "mock_dhcp_service.h"

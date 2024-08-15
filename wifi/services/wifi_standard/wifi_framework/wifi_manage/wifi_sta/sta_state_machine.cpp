@@ -41,6 +41,7 @@
 #include "wifi_notification_util.h"
 #include "wifi_net_stats_manager.h"
 #endif // OHOS_ARCH_LITE
+
 #include "wifi_channel_helper.h"
 #ifndef OHOS_WIFI_STA_TEST
 #else
@@ -4390,7 +4391,7 @@ bool StaStateMachine::IsGoodSignalQuality()
 {
     const WifiLinkedInfo singalInfo = linkedInfo;
     bool isGoodSignal = true;
-    if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency) != 0) {
+    if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency)) {
         if (singalInfo.rssi <= RSSI_LEVEL_1_5G) {
             isGoodSignal = false;
         }

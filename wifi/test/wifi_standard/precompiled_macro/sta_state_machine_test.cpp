@@ -60,8 +60,9 @@ static constexpr int NAPI_MAX_STR_LENT = 127;
 static constexpr int MIN_5G_FREQUENCY = 5160;
 static constexpr int TEST_2G_FREQUENCY = 2456;
 static constexpr int INVALID_RSSI1 = -128;
-constexpr int TWO = 2;
 static constexpr int GATE_WAY = 124;
+constexpr int TWO = 2;
+
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}

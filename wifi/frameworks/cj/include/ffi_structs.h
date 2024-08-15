@@ -45,14 +45,14 @@ extern "C" {
         int32_t supportedWifiCategory;
         bool isHiLinkNetwork;
     };
-    
+
     struct WifiScanInfoArr
     {
         CWifiScanInfo *head;
         int64_t size;
     };
 
-    // TODO figure out clientCert
+    // TODO figure out clientCertAlias
     struct CWifiEapConfig
     {
         int32_t eapMethod;                        /* EAP authentication mode:PEAP/TLS/TTLS/PWD/SIM/AKA/AKA' */
@@ -112,7 +112,7 @@ extern "C" {
         char *groupName;
         int32_t netId;
         int32_t goBand;
-        int32_t deviceAddressType;        
+        int32_t deviceAddressType;
     };
 
     struct CWifiP2PLinkedInfo

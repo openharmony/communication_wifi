@@ -4332,7 +4332,7 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
                   NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
         } else {
             WIFI_LOGI("No updated, current network status history is %{public}s.",
-                  NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+                NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
         }
     } else {
         NetworkStatusHistoryManager::Insert(wifiDeviceConfig.networkStatusHistory, networkStatus);
@@ -4403,7 +4403,7 @@ bool StaStateMachine::IsGoodSignalQuality()
     if (singalInfo.chload >= MAX_CHLOAD) {
         isGoodSignal = false;
     }
-    retrun isGoodSignal;
+    return isGoodSignal;
 }
 } // namespace Wifi
 } // namespace OHOS

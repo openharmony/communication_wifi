@@ -61,6 +61,7 @@ ohos_unittest("precompiled_macro_unittest") {
     "scan_service_test.cpp",
     "sta_state_machine_test.cpp",
     "sta_state_machine_test1.cpp",
+    
   ]
 
   include_dirs = [

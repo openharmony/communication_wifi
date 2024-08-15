@@ -1254,6 +1254,7 @@ private:
     void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
+    bool IsGoodSignalQuality();
 };
 }  // namespace Wifi
 }  // namespace OHOS

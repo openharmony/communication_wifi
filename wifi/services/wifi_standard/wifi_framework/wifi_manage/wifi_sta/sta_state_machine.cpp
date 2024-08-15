@@ -50,6 +50,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
+constexpr int MAX_CHLOAD = 800;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
@@ -4324,9 +4325,14 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
 {
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     if (networkStatusHistoryInserted) {
-        NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
-        WIFI_LOGI("After updated, current network status history is %{public}s.",
+        if (IsGoodSignalQuality()) {
+            NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
+            WIFI_LOGI("After updated, current network status history is %{public}s.",
                   NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+        } else {
+            WIFI_LOGI("No updated, current network status history is %{public}s.",
+                  NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+        }
     } else {
         NetworkStatusHistoryManager::Insert(wifiDeviceConfig.networkStatusHistory, networkStatus);
         networkStatusHistoryInserted = true;
@@ -4378,6 +4384,25 @@ void StaStateMachine::SetConnectMethod(int connectMethod)
     WIFI_LOGI("SetConnectMethod %{public}s,connectMethod:%{public}d",
         retStr.c_str(), connectMethod);
     return;
+}
+
+bool StaStateMachine::IsGoodSignalQuality()
+{
+    const WifiLinkedInfo singalInfo = linkedInfo;
+    bool isGoodSignal = true;
+    if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency) != 0) {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_5G) {
+            isGoodSignal = false;
+        }
+    } else {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_2G) {
+            isGoodSignal = false;
+        }
+    }
+    if (singalInfo.chload >= MAX_CHLOAD) {
+        isGoodSignal = false;
+    }
+    retrun isGoodSignal;
 }
 } // namespace Wifi
 } // namespace OHOS

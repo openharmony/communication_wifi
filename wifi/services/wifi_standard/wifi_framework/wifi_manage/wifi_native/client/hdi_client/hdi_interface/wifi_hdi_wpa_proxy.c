@@ -168,6 +168,17 @@ static void RemoveIfaceName(const char* ifName)
     return;
 }
 
+static void ClearIfaceName(void)
+{
+    while (g_IfaceNameInfoHead != NULL) {
+        struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
+        g_IfaceNameInfoHead = g_IfaceNameInfoHead->next;
+        LOGI("ClearIfaceName ifName:%{public}s", currernt->ifName);
+        free(currernt);
+        currernt = NULL;
+    }
+}
+
 static int GetIfaceCount()
 {
     int count = 0;
@@ -327,6 +338,7 @@ WifiErrorNo HdiWpaStop()
         g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
         g_devMgr = NULL;
     }
+    ClearIfaceName();
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("HdiWpaStart stop success!");
     return WIFI_HAL_OPT_OK;

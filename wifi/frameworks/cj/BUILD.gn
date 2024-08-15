@@ -39,6 +39,7 @@ ohos_shared_library("cj_wifi_ffi") {
 
   sources = [
     "src/wifi_ffi.cpp",
+    "src/wifi_callback.cpp",
   ]
 
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]

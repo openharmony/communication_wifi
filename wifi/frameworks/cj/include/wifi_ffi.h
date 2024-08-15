@@ -72,7 +72,7 @@ FFI_EXPORT int32_t CJ_CreateGroup(CWifiP2PConfig &cfg);
 FFI_EXPORT int32_t CJ_GetLinkedInfo(CWifiLinkedInfo &info);
 FFI_EXPORT int32_t CJ_AddCandidateConfig(CWifiDeviceConfig cfg, int32_t &ret);
 FFI_EXPORT WifiDeviceConfigArr CJ_GetCandidateConfigs(int32_t &code);
-FFI_EXPORT int32_t CJ_WifiOn(char *type, int64_t id);
+FFI_EXPORT int32_t CJ_WifiOn(char *type, void (*callback)());
 FFI_EXPORT int32_t CJ_WifiOff(char* type);
 }
 

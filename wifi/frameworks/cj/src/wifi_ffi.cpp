@@ -22,6 +22,7 @@
 #include "wifi_p2p.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
+#include "wifi_callback.h"
 
 DEFINE_WIFILOG_LABEL("CJ_WIFI_FFI");
 
@@ -721,14 +722,22 @@ WifiDeviceConfigArr CJ_GetCandidateConfigs(int32_t &code)
     return arr;
 }
 
-int32_t CJ_WifiOn(char *type, int64_t id)
+int32_t CJ_WifiOn(char *type, void (*callback)())
 {
-    return 0;
+    std::string eventType(type);
+    if (eventType.empty()) {
+        return WIFI_OPT_FAILED;
+    }
+    return CjEventRegister::GetInstance().Register(eventType, callback);
 }
 
 int32_t CJ_WifiOff(char* type)
 {
-    return 0;
+    std::string eventType(type);
+    if (eventType.empty()) {
+        return WIFI_OPT_FAILED;
+    }
+    return CjEventRegister::GetInstance().UnRegister(eventType);
 }
 
 }

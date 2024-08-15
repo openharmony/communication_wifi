@@ -23,6 +23,7 @@
 #include "wifi_common_util.h"
 #include "wifi_common_def.h"
 #include "wifi_manager_service_ipc_interface_code.h"
+#include "wifi_watchdog_utils.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 
@@ -165,6 +166,16 @@ void WifiDeviceStub::InitHandleMap()
     return;
 }
 
+static std::map<int, std::string> collieCodeStringStaMap = {
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), "WIFI_SVR_CMD_IS_METERED_HOTSPOT"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT),
+        "WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL), "WIFI_SVR_CMD_GET_SIGNAL_LEVEL"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), "WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE"},
+};
+
 int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     if (data.ReadInterfaceToken() != GetDescriptor()) {
@@ -183,7 +194,14 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         if (exception) {
             return WIFI_OPT_FAILED;
         }
+        std::map<int, std::string>::iterator itCollieId = collieCodeStringStaMap.find(code);
+        int idTimer = -1;
+        if (itCollieId != collieCodeStringStaMap.end()) {
+            idTimer = WifiWatchDogUtils::GetInstance()->StartWatchDogForFunc(itCollieId->second);
+            WIFI_LOGE("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
+        }
         (this->*(iter->second))(code, data, reply);
+        WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
     }
 
     return 0;

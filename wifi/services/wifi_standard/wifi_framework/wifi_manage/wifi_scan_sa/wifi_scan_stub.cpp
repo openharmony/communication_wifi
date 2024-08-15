@@ -24,6 +24,7 @@
 #include "wifi_common_def.h"
 #include "wifi_scan_config.h"
 #include "wifi_common_util.h"
+#include "wifi_watchdog_utils.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 
@@ -68,6 +69,9 @@ void WifiScanStub::InitHandleMap()
     handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN)] =
         &WifiScanStub::OnStartWifiPnoScan;
 }
+static std::map<int, std::string> collieCodeStringScanMap = {
+    { static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), "WIFI_SVR_CMD_START_PNO_SCAN" },
+};
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -87,7 +91,14 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
         if (exception) {
             return WIFI_OPT_FAILED;
         }
+        std::map<int, std::string>::iterator itCollieId = collieCodeStringScanMap.find(code);
+        int idTimer = 0;
+        if (itCollieId != collieCodeStringScanMap.end()) {
+            idTimer = WifiWatchDogUtils::GetInstance()->StartWatchDogForFunc(itCollieId->second);
+            WIFI_LOGI("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
+        }
         (this->*(iter->second))(code, data, reply, option);
+        WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
     }
     return 0;
 }

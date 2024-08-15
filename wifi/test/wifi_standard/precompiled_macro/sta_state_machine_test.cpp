@@ -28,7 +28,6 @@
 #include "mock_wifi_sta_hal_interface.h"
 #include "wifi_error_no.h"
 
-
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;
@@ -59,8 +58,8 @@ static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 static constexpr int NAPI_MAX_STR_LENT = 127;
 static constexpr int MIN_5G_FREQUENCY = 5160;
+static constexpr int TEST_2G_FREQUENCY = 2456;
 static constexpr int INVALID_RSSI1 = -128;
-static constexpr int GATE_WAY = 124;
 constexpr int TWO = 2;
 
 class StaStateMachineTest : public testing::Test {
@@ -278,15 +277,15 @@ public:
             return;
         }
         result1.iptype  = 0;
-        ipv6Info.linkIpV6Address  = "0";
-        ipv6Info.globalIpV6Address  = "0";
-        ipv6Info.randGlobalIpV6Address  = "0";
-        ipv6Info.gateway  = "0";
-        ipv6Info.netmask  = "0";
-        ipv6Info.primaryDns  = "0";
-        ipv6Info.secondDns  = "0";
-        ipv6Info.uniqueLocalAddress1  = "0";
-        ipv6Info.uniqueLocalAddress2  = "0";
+        ipv6Info.linkIpV6Address  = "0";;
+        ipv6Info.globalIpV6Address  = "0";;
+        ipv6Info.randGlobalIpV6Address  = "0";;
+        ipv6Info.gateway  = "0";;
+        ipv6Info.netmask  = "0";;
+        ipv6Info.primaryDns  = "0";;
+        ipv6Info.secondDns  = "0";;
+        ipv6Info.uniqueLocalAddress1  = "0";;
+        ipv6Info.uniqueLocalAddress2  = "0";;
         ipv6Info.dnsAddr.push_back("11");
         StaStateMachine staStateMachine;
         pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
@@ -494,7 +493,7 @@ public:
     void CanArpReachableTest()
     {
         IpInfo ipInfo;
-        ipInfo.gateway =GATE_WAY;
+        ipInfo.gateway =124;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
         pStaStateMachine->CanArpReachable();
@@ -504,6 +503,27 @@ public:
         pStaStateMachine->portalState = PortalState::AUTHED;
         pStaStateMachine->portalExpiredDetectCount = PORTAL_EXPERIED_DETECT_MAX_COUNT;
         pStaStateMachine->PortalExpiredDetect();
+    }
+    void IsGoodSignalQualityTest()
+    {
+        pStaStateMachine->linkedInfo.frequency = MIN_5G_FREQUENCY;
+        pStaStateMachine->linkedInfo.chload = TWO;
+        pStaStateMachine->linkedInfo.rssi = INVALID_RSSI1;
+        EXPECT_FALSE(pStaStateMachine->IsGoodSignalQuality());
+    }
+    void IsGoodSignalQualityTest1()
+    {
+        pStaStateMachine->linkedInfo.frequency = TEST_2G_FREQUENCY;
+        pStaStateMachine->linkedInfo.chload = TWO;
+        pStaStateMachine->linkedInfo.rssi = INVALID_RSSI1;
+        EXPECT_FALSE(pStaStateMachine->IsGoodSignalQuality());
+    }
+    void IsGoodSignalQualityTest2()
+    {
+        pStaStateMachine->linkedInfo.frequency = MIN_5G_FREQUENCY;
+        pStaStateMachine->linkedInfo.chload = MIN_5G_FREQUENCY;
+        pStaStateMachine->linkedInfo.rssi = -1;
+        EXPECT_FALSE(pStaStateMachine->IsGoodSignalQuality());
     }
 };
 
@@ -685,6 +705,21 @@ HWTEST_F(StaStateMachineTest, CanArpReachableTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, PortalExpiredDetectTest, TestSize.Level1)
 {
     PortalExpiredDetectTest();
+}
+
+HWTEST_F(StaStateMachineTest, IsGoodSignalQualityTest, TestSize.Level1)
+{
+    IsGoodSignalQualityTest();
+}
+
+HWTEST_F(StaStateMachineTest, IsGoodSignalQualityTest1, TestSize.Level1)
+{
+    IsGoodSignalQualityTest1();
+}
+
+HWTEST_F(StaStateMachineTest, IsGoodSignalQualityTest2, TestSize.Level1)
+{
+    IsGoodSignalQualityTest2();
 }
 }
 }

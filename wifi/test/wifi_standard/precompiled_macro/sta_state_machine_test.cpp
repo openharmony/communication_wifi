@@ -61,7 +61,7 @@ static constexpr int MIN_5G_FREQUENCY = 5160;
 static constexpr int TEST_2G_FREQUENCY = 2456;
 static constexpr int INVALID_RSSI1 = -128;
 constexpr int TWO = 2;
-
+static constexpr int GATE_WAY = 124;
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -493,7 +493,7 @@ public:
     void CanArpReachableTest()
     {
         IpInfo ipInfo;
-        ipInfo.gateway =124;
+        ipInfo.gateway =GATE_WAY;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
         pStaStateMachine->CanArpReachable();

@@ -2071,6 +2071,7 @@ ErrCode WifiDeviceProxy::GetChangeDeviceConfig(ConfigChange &value, WifiDeviceCo
     config.bssid = reply.ReadString();
     config.callProcessName = reply.ReadString();
     config.ancoCallProcessName = reply.ReadString();
+    config.keyMgmt = reply.ReadString();
     int ret = reply.ReadInt32();
     if (ret != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);

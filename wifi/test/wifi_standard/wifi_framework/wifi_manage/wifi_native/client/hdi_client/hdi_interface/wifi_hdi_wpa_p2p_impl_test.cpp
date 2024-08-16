@@ -19,6 +19,7 @@
 
 using ::testing::ext::TestSize;
 
+
 namespace OHOS {
 namespace Wifi {
 const int SIZE = 128;

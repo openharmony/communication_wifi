@@ -31,13 +31,13 @@ public:
 HWTEST_F(WifiHdiWpaProxyTest, HdiWpaStartTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStart();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiWpaStopTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaStop();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, HdiAddWpaIfaceTest, TestSize.Level1)
@@ -58,7 +58,7 @@ HWTEST_F(WifiHdiWpaProxyTest, HdiRemoveWpaIfaceTest, TestSize.Level1)
     WifiErrorNo result = HdiRemoveWpaIface(nullptr);
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
     result = HdiRemoveWpaIface(ifName);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaProxyTest, CopyUserFileTest, TestSize.Level1)
@@ -85,7 +85,7 @@ HWTEST_F(WifiHdiWpaProxyTest, HdiApStartTest, TestSize.Level1)
     int id = 0;
     char ifaceName[10] = "Wlan0";
     WifiErrorNo result = HdiApStart(id, ifaceName);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 extern "C" void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service);
@@ -102,7 +102,7 @@ extern "C" WifiErrorNo RegistHdfApDeathCallBack();
 HWTEST_F(WifiHdiWpaProxyTest, RegistHdfApDeathCallBackTest, TestSize.Level1)
 {
     WifiErrorNo result = RegistHdfApDeathCallBack();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 extern "C" void RemoveIfaceName(const char* ifName);

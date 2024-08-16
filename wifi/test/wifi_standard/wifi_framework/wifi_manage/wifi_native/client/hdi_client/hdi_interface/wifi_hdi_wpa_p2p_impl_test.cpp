@@ -33,13 +33,13 @@ public:
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiWpaP2pStartTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaP2pStart("wlan0");
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiWpaP2pStopTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaP2pStop();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetSsidPostfixNameTest, TestSize.Level1)

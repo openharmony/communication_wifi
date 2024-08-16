@@ -4326,7 +4326,8 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
 {
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     if (networkStatusHistoryInserted) {
-        if (IsGoodSignalQuality(networkStatus)) {
+        if (IsGoodSignalQuality() || (networkStatus == NetworkStatus::HAS_INTERNET) ||
+            (networkStatus == NetworkStatus::PORTAL)) {
             NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
             WIFI_LOGI("After updated, current network status history is %{public}s.",
                       NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
@@ -4387,20 +4388,20 @@ void StaStateMachine::SetConnectMethod(int connectMethod)
     return;
 }
 
-bool StaStateMachine::IsGoodSignalQuality(const NetworkStatus &networkStatus)
+bool StaStateMachine::IsGoodSignalQuality()
 {
     const WifiLinkedInfo singalInfo = linkedInfo;
     bool isGoodSignal = true;
     if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency)) {
-        if (singalInfo.rssi <= RSSI_LEVEL_1_5G && networkStatus == NetworkStatus::NO_INTERNET) {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_5G) {
             isGoodSignal = false;
         }
     } else {
-        if (singalInfo.rssi <= RSSI_LEVEL_1_2G && networkStatus == NetworkStatus::NO_INTERNET) {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_2G) {
             isGoodSignal = false;
         }
     }
-    if (singalInfo.chload >= MAX_CHLOAD && networkStatus == NetworkStatus::NO_INTERNET) {
+    if (singalInfo.chload >= MAX_CHLOAD) {
         isGoodSignal = false;
     }
     return isGoodSignal;
